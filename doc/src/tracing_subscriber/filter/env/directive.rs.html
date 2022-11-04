@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/directive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>directive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/directive.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>directive.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -862,130 +862,130 @@
 <span id="860">860</span>
 <span id="861">861</span>
 <span id="862">862</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::directive</span>::{<span class="ident">FilterVec</span>, <span class="ident">ParseError</span>, <span class="ident">StaticDirective</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter</span>::{
-    <span class="ident">directive</span>::{<span class="ident">DirectiveSet</span>, <span class="ident">Match</span>},
-    <span class="ident">env</span>::{<span class="ident">field</span>, <span class="ident">FieldMap</span>},
-    <span class="ident">level::LevelFilter</span>,
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::filter::directive::{FilterVec, ParseError, StaticDirective};
+<span class="kw">use </span><span class="kw">crate</span>::filter::{
+    directive::{DirectiveSet, Match},
+    env::{field, FieldMap},
+    level::LevelFilter,
 };
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::Ordering</span>, <span class="ident">fmt</span>, <span class="ident">iter::FromIterator</span>, <span class="ident">str::FromStr</span>};
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{<span class="ident">span</span>, <span class="ident">Level</span>, <span class="ident">Metadata</span>};
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>std::{cmp::Ordering, fmt, iter::FromIterator, str::FromStr};
+<span class="kw">use </span>tracing_core::{span, Level, Metadata};
 
-<span class="doccomment">/// A single filtering directive.</span>
-<span class="comment">// TODO(eliza): add a builder for programmatically constructing directives?</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;env-filter&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Directive</span> {
-    <span class="ident">in_span</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">field::Match</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">target</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">level</span>: <span class="ident">LevelFilter</span>,
+<span class="doccomment">/// A single filtering directive.
+</span><span class="comment">// TODO(eliza): add a builder for programmatically constructing directives?
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;env-filter&quot;</span>)))]
+</span><span class="kw">pub struct </span>Directive {
+    in_span: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    fields: Vec&lt;field::Match&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) target: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) level: LevelFilter,
 }
 
-<span class="doccomment">/// A set of dynamic filtering directives.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">Dynamics</span> <span class="op">=</span> <span class="ident">DirectiveSet</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A set of dynamic filtering directives.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>Dynamics = DirectiveSet&lt;Directive&gt;;
 
-<span class="doccomment">/// A set of static filtering directives.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">Statics</span> <span class="op">=</span> <span class="ident">DirectiveSet</span><span class="op">&lt;</span><span class="ident">StaticDirective</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A set of static filtering directives.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>Statics = DirectiveSet&lt;StaticDirective&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">CallsiteMatcher</span> <span class="op">=</span> <span class="ident">MatchSet</span><span class="op">&lt;</span><span class="ident">field::CallsiteMatch</span><span class="op">&gt;</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">SpanMatcher</span> <span class="op">=</span> <span class="ident">MatchSet</span><span class="op">&lt;</span><span class="ident">field::SpanMatch</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>CallsiteMatcher = MatchSet&lt;field::CallsiteMatch&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>SpanMatcher = MatchSet&lt;field::SpanMatch&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MatchSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">field_matches</span>: <span class="ident">FilterVec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">base_level</span>: <span class="ident">LevelFilter</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MatchSet&lt;T&gt; {
+    field_matches: FilterVec&lt;T&gt;,
+    base_level: LevelFilter,
 }
 
-<span class="kw">impl</span> <span class="ident">Directive</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">in_span</span>.<span class="ident">is_some</span>()
+<span class="kw">impl </span>Directive {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.in_span.is_some()
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.fields.is_empty()
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">to_static</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StaticDirective</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_static</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>to_static(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;StaticDirective&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.is_static() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// TODO(eliza): these strings are all immutable; we should consider</span>
-        <span class="comment">// `Arc`ing them to make this more efficient...</span>
-        <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">field::Match::name</span>).<span class="ident">collect</span>();
+        <span class="comment">// TODO(eliza): these strings are all immutable; we should consider
+        // `Arc`ing them to make this more efficient...
+        </span><span class="kw">let </span>field_names = <span class="self">self</span>.fields.iter().map(field::Match::name).collect();
 
-        <span class="prelude-val">Some</span>(<span class="ident">StaticDirective::new</span>(
-            <span class="self">self</span>.<span class="ident">target</span>.<span class="ident">clone</span>(),
-            <span class="ident">field_names</span>,
-            <span class="self">self</span>.<span class="ident">level</span>,
+        <span class="prelude-val">Some</span>(StaticDirective::new(
+            <span class="self">self</span>.target.clone(),
+            field_names,
+            <span class="self">self</span>.level,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_static</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">has_name</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">field::Match::has_value</span>)
+    <span class="kw">fn </span>is_static(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.has_name() &amp;&amp; !<span class="self">self</span>.fields.iter().any(field::Match::has_value)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_dynamic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_name</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">has_fields</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_dynamic(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_name() || <span class="self">self</span>.has_fields()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_matcher</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">field::CallsiteMatch</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">fieldset</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">fields</span>();
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(
-                <span class="op">|</span><span class="ident">field::Match</span> {
-                     <span class="kw-2">ref</span> <span class="ident">name</span>,
-                     <span class="kw-2">ref</span> <span class="ident">value</span>,
-                 }<span class="op">|</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="ident">name</span>) {
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>()<span class="question-mark">?</span>;
-                        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">field</span>, <span class="ident">value</span>)))
-                    } <span class="kw">else</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>field_matcher(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;field::CallsiteMatch&gt; {
+        <span class="kw">let </span>fieldset = meta.fields();
+        <span class="kw">let </span>fields = <span class="self">self
+            </span>.fields
+            .iter()
+            .filter_map(
+                |field::Match {
+                     <span class="kw-2">ref </span>name,
+                     <span class="kw-2">ref </span>value,
+                 }| {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = fieldset.field(name) {
+                        <span class="kw">let </span>value = value.as_ref().cloned()<span class="question-mark">?</span>;
+                        <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((field, value)))
+                    } <span class="kw">else </span>{
                         <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(()))
                     }
                 },
             )
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FieldMap</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">field::CallsiteMatch</span> {
-            <span class="ident">fields</span>,
-            <span class="ident">level</span>: <span class="self">self</span>.<span class="ident">level</span>,
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;FieldMap&lt;<span class="kw">_</span>&gt;, ()&gt;&gt;()
+            .ok()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(field::CallsiteMatch {
+            fields,
+            level: <span class="self">self</span>.level,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">make_tables</span>(
-        <span class="ident">directives</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Directive</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Dynamics</span>, <span class="ident">Statics</span>) {
-        <span class="comment">// TODO(eliza): this could be made more efficient...</span>
-        <span class="kw">let</span> (<span class="ident">dyns</span>, <span class="ident">stats</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>) <span class="op">=</span>
-            <span class="ident">directives</span>.<span class="ident">into_iter</span>().<span class="ident">partition</span>(<span class="ident">Directive::is_dynamic</span>);
-        <span class="kw">let</span> <span class="ident">statics</span> <span class="op">=</span> <span class="ident">stats</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">to_static</span>())
-            .<span class="ident">chain</span>(<span class="ident">dyns</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="ident">Directive::to_static</span>))
-            .<span class="ident">collect</span>();
-        (<span class="ident">Dynamics::from_iter</span>(<span class="ident">dyns</span>), <span class="ident">statics</span>)
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>make_tables(
+        directives: <span class="kw">impl </span>IntoIterator&lt;Item = Directive&gt;,
+    ) -&gt; (Dynamics, Statics) {
+        <span class="comment">// TODO(eliza): this could be made more efficient...
+        </span><span class="kw">let </span>(dyns, stats): (Vec&lt;Directive&gt;, Vec&lt;Directive&gt;) =
+            directives.into_iter().partition(Directive::is_dynamic);
+        <span class="kw">let </span>statics = stats
+            .into_iter()
+            .filter_map(|d| d.to_static())
+            .chain(dyns.iter().filter_map(Directive::to_static))
+            .collect();
+        (Dynamics::from_iter(dyns), statics)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">deregexify</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">fields</span> {
-            <span class="ident">field</span>.<span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">value</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">field::ValueMatch::Pat</span>(<span class="ident">pat</span>)) =&gt; {
-                    <span class="prelude-val">Some</span>(<span class="ident">field::ValueMatch::Debug</span>(<span class="ident">pat</span>.<span class="ident">into_debug_match</span>()))
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>deregexify(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">for </span>field <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.fields {
+            field.value = <span class="kw">match </span>field.value.take() {
+                <span class="prelude-val">Some</span>(field::ValueMatch::Pat(pat)) =&gt; {
+                    <span class="prelude-val">Some</span>(field::ValueMatch::Debug(pat.into_debug_match()))
                 }
-                <span class="ident">x</span> =&gt; <span class="ident">x</span>,
+                x =&gt; x,
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">regex</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DIRECTIVE_RE</span>: <span class="ident">Regex</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse(from: <span class="kw-2">&amp;</span>str, regex: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ParseError&gt; {
+        <span class="macro">lazy_static! </span>{
+            <span class="kw">static </span><span class="kw-2">ref </span>DIRECTIVE_RE: Regex = Regex::new(
                 <span class="string">r&quot;(?x)
                 ^(?P&lt;global_level&gt;(?i:trace|debug|info|warn|error|off|[0-5]))$ |
                  #                 ^^^.
@@ -1000,15 +1000,15 @@
                      #              `note: we match log level names case-insensitively
                 )?
                 $
-                &quot;</span>
-            )
-            .<span class="ident">unwrap</span>();
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">SPAN_PART_RE</span>: <span class="ident">Regex</span> <span class="op">=</span>
-                <span class="ident">Regex::new</span>(<span class="string">r#&quot;(?P&lt;name&gt;[^\]\{]+)?(?:\{(?P&lt;fields&gt;[^\}]*)\})?&quot;#</span>).<span class="ident">unwrap</span>();
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FIELD_FILTER_RE</span>: <span class="ident">Regex</span> <span class="op">=</span>
-                <span class="comment">// TODO(eliza): this doesn&#39;t _currently_ handle value matchers that include comma</span>
-                <span class="comment">// characters. We should fix that.</span>
-                <span class="ident">Regex::new</span>(<span class="string">r#&quot;(?x)
+                &quot;
+            </span>)
+            .unwrap();
+            <span class="kw">static </span><span class="kw-2">ref </span>SPAN_PART_RE: Regex =
+                Regex::new(<span class="string">r#&quot;(?P&lt;name&gt;[^\]\{]+)?(?:\{(?P&lt;fields&gt;[^\}]*)\})?&quot;#</span>).unwrap();
+            <span class="kw">static </span><span class="kw-2">ref </span>FIELD_FILTER_RE: Regex =
+                <span class="comment">// TODO(eliza): this doesn&#39;t _currently_ handle value matchers that include comma
+                // characters. We should fix that.
+                </span>Regex::new(<span class="string">r#&quot;(?x)
                     (
                         # field name
                         [[:word:]][[[:word:]]\.]*
@@ -1017,712 +1017,712 @@
                     )
                     # trailing comma or EOS
                     (?:,\s?|$)
-                &quot;#</span>).<span class="ident">unwrap</span>();
+                &quot;#</span>).unwrap();
         }
 
-        <span class="kw">let</span> <span class="ident">caps</span> <span class="op">=</span> <span class="ident">DIRECTIVE_RE</span>.<span class="ident">captures</span>(<span class="ident">from</span>).<span class="ident">ok_or_else</span>(<span class="ident">ParseError::new</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>caps = DIRECTIVE_RE.captures(from).ok_or_else(ParseError::new)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">level</span>) <span class="op">=</span> <span class="ident">caps</span>
-            .<span class="ident">name</span>(<span class="string">&quot;global_level&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>().<span class="ident">ok</span>())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(level) = caps
+            .name(<span class="string">&quot;global_level&quot;</span>)
+            .and_then(|s| s.as_str().parse().ok())
         {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Directive</span> {
-                <span class="ident">level</span>,
-                ..<span class="ident">Default::default</span>()
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Directive {
+                level,
+                ..Default::default()
             });
         }
 
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">caps</span>.<span class="ident">name</span>(<span class="string">&quot;target&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">as_str</span>();
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>().<span class="ident">is_ok</span>() {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>())
+        <span class="kw">let </span>target = caps.name(<span class="string">&quot;target&quot;</span>).and_then(|c| {
+            <span class="kw">let </span>s = c.as_str();
+            <span class="kw">if </span>s.parse::&lt;LevelFilter&gt;().is_ok() {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(s.to_owned())
             }
         });
 
-        <span class="kw">let</span> (<span class="ident">in_span</span>, <span class="ident">fields</span>) <span class="op">=</span> <span class="ident">caps</span>
-            .<span class="ident">name</span>(<span class="string">&quot;span&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">as_str</span>().<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;[&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;]&#39;</span>);
-                <span class="kw">let</span> <span class="ident">caps</span> <span class="op">=</span> <span class="ident">SPAN_PART_RE</span>.<span class="ident">captures</span>(<span class="ident">cap</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">caps</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_str</span>().<span class="ident">to_owned</span>());
-                <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">caps</span>
-                    .<span class="ident">name</span>(<span class="string">&quot;fields&quot;</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                        <span class="ident">FIELD_FILTER_RE</span>
-                            .<span class="ident">find_iter</span>(<span class="ident">c</span>.<span class="ident">as_str</span>())
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">field::Match::parse</span>(<span class="ident">c</span>.<span class="ident">as_str</span>(), <span class="ident">regex</span>))
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+        <span class="kw">let </span>(in_span, fields) = caps
+            .name(<span class="string">&quot;span&quot;</span>)
+            .and_then(|cap| {
+                <span class="kw">let </span>cap = cap.as_str().trim_matches(|c| c == <span class="string">&#39;[&#39; </span>|| c == <span class="string">&#39;]&#39;</span>);
+                <span class="kw">let </span>caps = SPAN_PART_RE.captures(cap)<span class="question-mark">?</span>;
+                <span class="kw">let </span>span = caps.name(<span class="string">&quot;name&quot;</span>).map(|c| c.as_str().to_owned());
+                <span class="kw">let </span>fields = caps
+                    .name(<span class="string">&quot;fields&quot;</span>)
+                    .map(|c| {
+                        FIELD_FILTER_RE
+                            .find_iter(c.as_str())
+                            .map(|c| field::Match::parse(c.as_str(), regex))
+                            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()
                     })
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>()));
-                <span class="prelude-val">Some</span>((<span class="ident">span</span>, <span class="ident">fields</span>))
+                    .unwrap_or_else(|| <span class="prelude-val">Ok</span>(Vec::new()));
+                <span class="prelude-val">Some</span>((span, fields))
             })
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Ok</span>(<span class="ident">Vec::new</span>())));
+            .unwrap_or_else(|| (<span class="prelude-val">None</span>, <span class="prelude-val">Ok</span>(Vec::new())));
 
-        <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">caps</span>
-            .<span class="ident">name</span>(<span class="string">&quot;level&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>().<span class="ident">ok</span>())
-            <span class="comment">// Setting the target without the level enables every level for that target</span>
-            .<span class="ident">unwrap_or</span>(<span class="ident">LevelFilter::TRACE</span>);
+        <span class="kw">let </span>level = caps
+            .name(<span class="string">&quot;level&quot;</span>)
+            .and_then(|l| l.as_str().parse().ok())
+            <span class="comment">// Setting the target without the level enables every level for that target
+            </span>.unwrap_or(LevelFilter::TRACE);
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">level</span>,
-            <span class="ident">target</span>,
-            <span class="ident">in_span</span>,
-            <span class="ident">fields</span>: <span class="ident">fields</span><span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            level,
+            target,
+            in_span,
+            fields: fields<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Match</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">cares_about</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Does this directive have a target filter, and does it match the</span>
-        <span class="comment">// metadata&#39;s target?</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">meta</span>.<span class="ident">target</span>().<span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">target</span>[..]) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">impl </span>Match <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>cares_about(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="comment">// Does this directive have a target filter, and does it match the
+        // metadata&#39;s target?
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>target) = <span class="self">self</span>.target {
+            <span class="kw">if </span>!meta.target().starts_with(<span class="kw-2">&amp;</span>target[..]) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
 
-        <span class="comment">// Do we have a name filter, and does it match the metadata&#39;s name?</span>
-        <span class="comment">// TODO(eliza): put name globbing here?</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_span</span> {
-            <span class="kw">if</span> <span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">meta</span>.<span class="ident">name</span>() {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// Do we have a name filter, and does it match the metadata&#39;s name?
+        // TODO(eliza): put name globbing here?
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = <span class="self">self</span>.in_span {
+            <span class="kw">if </span>name != meta.name() {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
 
-        <span class="comment">// Does the metadata define all the fields that this directive cares about?</span>
-        <span class="kw">let</span> <span class="ident">actual_fields</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">fields</span>();
-        <span class="kw">for</span> <span class="ident">expected_field</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span> {
-            <span class="comment">// Does the actual field set (from the metadata) contain this field?</span>
-            <span class="kw">if</span> <span class="ident">actual_fields</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">expected_field</span>.<span class="ident">name</span>).<span class="ident">is_none</span>() {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// Does the metadata define all the fields that this directive cares about?
+        </span><span class="kw">let </span>actual_fields = meta.fields();
+        <span class="kw">for </span>expected_field <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.fields {
+            <span class="comment">// Does the actual field set (from the metadata) contain this field?
+            </span><span class="kw">if </span>actual_fields.field(<span class="kw-2">&amp;</span>expected_field.name).is_none() {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LevelFilter</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">level</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">Directive::parse</span>(<span class="ident">from</span>, <span class="bool-val">true</span>)
+    <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>LevelFilter {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.level
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Directive</span> {
-            <span class="ident">level</span>: <span class="ident">LevelFilter::OFF</span>,
-            <span class="ident">target</span>: <span class="prelude-val">None</span>,
-            <span class="ident">in_span</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Directive {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ParseError;
+    <span class="kw">fn </span>from_str(from: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        Directive::parse(from, <span class="bool-val">true</span>)
+    }
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Directive {
+            level: LevelFilter::OFF,
+            target: <span class="prelude-val">None</span>,
+            in_span: <span class="prelude-val">None</span>,
+            fields: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Directive</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Directive) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Directive</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="comment">// We attempt to order directives by how &quot;specific&quot; they are. This</span>
-        <span class="comment">// ensures that we try the most specific directives first when</span>
-        <span class="comment">// attempting to match a piece of metadata.</span>
+<span class="kw">impl </span>Ord <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Directive) -&gt; Ordering {
+        <span class="comment">// We attempt to order directives by how &quot;specific&quot; they are. This
+        // ensures that we try the most specific directives first when
+        // attempting to match a piece of metadata.
 
-        <span class="comment">// First, we compare based on whether a target is specified, and the</span>
-        <span class="comment">// lengths of those targets if both have targets.</span>
-        <span class="kw">let</span> <span class="ident">ordering</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">target</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="ident">String::len</span>)
-            .<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::len</span>))
-            <span class="comment">// Next compare based on the presence of span names.</span>
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">in_span</span>.<span class="ident">is_some</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">in_span</span>.<span class="ident">is_some</span>()))
-            <span class="comment">// Then we compare how many fields are defined by each</span>
-            <span class="comment">// directive.</span>
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">len</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">fields</span>.<span class="ident">len</span>()))
-            <span class="comment">// Finally, we fall back to lexicographical ordering if the directives are</span>
-            <span class="comment">// equally specific. Although this is no longer semantically important,</span>
-            <span class="comment">// we need to define a total ordering to determine the directive&#39;s place</span>
-            <span class="comment">// in the BTreeMap.</span>
-            .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">target</span>
-                    .<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">target</span>)
-                    .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">in_span</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">in_span</span>))
-                    .<span class="ident">then_with</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">fields</span>[..].<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">fields</span>[..]))
+        // First, we compare based on whether a target is specified, and the
+        // lengths of those targets if both have targets.
+        </span><span class="kw">let </span>ordering = <span class="self">self
+            </span>.target
+            .as_ref()
+            .map(String::len)
+            .cmp(<span class="kw-2">&amp;</span>other.target.as_ref().map(String::len))
+            <span class="comment">// Next compare based on the presence of span names.
+            </span>.then_with(|| <span class="self">self</span>.in_span.is_some().cmp(<span class="kw-2">&amp;</span>other.in_span.is_some()))
+            <span class="comment">// Then we compare how many fields are defined by each
+            // directive.
+            </span>.then_with(|| <span class="self">self</span>.fields.len().cmp(<span class="kw-2">&amp;</span>other.fields.len()))
+            <span class="comment">// Finally, we fall back to lexicographical ordering if the directives are
+            // equally specific. Although this is no longer semantically important,
+            // we need to define a total ordering to determine the directive&#39;s place
+            // in the BTreeMap.
+            </span>.then_with(|| {
+                <span class="self">self</span>.target
+                    .cmp(<span class="kw-2">&amp;</span>other.target)
+                    .then_with(|| <span class="self">self</span>.in_span.cmp(<span class="kw-2">&amp;</span>other.in_span))
+                    .then_with(|| <span class="self">self</span>.fields[..].cmp(<span class="kw-2">&amp;</span>other.fields[..]))
             })
-            .<span class="ident">reverse</span>();
+            .reverse();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">ordering</span> <span class="op">==</span> <span class="ident">Ordering::Equal</span> {
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>{
+            <span class="kw">if </span>ordering == Ordering::Equal {
                 <span class="macro">debug_assert_eq!</span>(
-                    <span class="self">self</span>.<span class="ident">target</span>, <span class="ident">other</span>.<span class="ident">target</span>,
-                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.target == b.target&quot;</span>
-                );
+                    <span class="self">self</span>.target, other.target,
+                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.target == b.target&quot;
+                </span>);
                 <span class="macro">debug_assert_eq!</span>(
-                    <span class="self">self</span>.<span class="ident">in_span</span>, <span class="ident">other</span>.<span class="ident">in_span</span>,
-                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.in_span == b.in_span&quot;</span>
-                );
+                    <span class="self">self</span>.in_span, other.in_span,
+                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.in_span == b.in_span&quot;
+                </span>);
                 <span class="macro">debug_assert_eq!</span>(
-                    <span class="self">self</span>.<span class="ident">fields</span>, <span class="ident">other</span>.<span class="ident">fields</span>,
-                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.fields == b.fields&quot;</span>
-                );
+                    <span class="self">self</span>.fields, other.fields,
+                    <span class="string">&quot;invariant violated: Ordering::Equal must imply a.fields == b.fields&quot;
+                </span>);
             }
         }
 
-        <span class="ident">ordering</span>
+        ordering
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrote_any</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">target</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span> {
-            <span class="ident">fmt::Display::fmt</span>(<span class="ident">target</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-            <span class="ident">wrote_any</span> <span class="op">=</span> <span class="bool-val">true</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>wrote_any = <span class="bool-val">false</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>target) = <span class="self">self</span>.target {
+            fmt::Display::fmt(target, f)<span class="question-mark">?</span>;
+            wrote_any = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_span</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.in_span.is_some() || !<span class="self">self</span>.fields.is_empty() {
+            f.write_str(<span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">span</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_span</span> {
-                <span class="ident">fmt::Display::fmt</span>(<span class="ident">span</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>span) = <span class="self">self</span>.in_span {
+                fmt::Display::fmt(span, f)<span class="question-mark">?</span>;
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">next</span>() {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{{{}&quot;</span>, <span class="ident">field</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;,{}&quot;</span>, <span class="ident">field</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="self">self</span>.fields.iter();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = fields.next() {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{{{}&quot;</span>, field)<span class="question-mark">?</span>;
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;,{}&quot;</span>, field)<span class="question-mark">?</span>;
                 }
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;}&quot;</span>)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;}&quot;</span>)<span class="question-mark">?</span>;
             }
 
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;]&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">wrote_any</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            f.write_str(<span class="string">&quot;]&quot;</span>)<span class="question-mark">?</span>;
+            wrote_any = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">wrote_any</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;=&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>wrote_any {
+            f.write_str(<span class="string">&quot;=&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">level</span>, <span class="ident">f</span>)
+        fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.level, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">level</span>: <span class="ident">LevelFilter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">level</span>,
-            ..<span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>From&lt;LevelFilter&gt; <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>from(level: LevelFilter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            level,
+            ..<span class="self">Self</span>::default()
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Level</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Directive</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">level</span>: <span class="ident">Level</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">LevelFilter::from_level</span>(<span class="ident">level</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;Level&gt; <span class="kw">for </span>Directive {
+    <span class="kw">fn </span>from(level: Level) -&gt; <span class="self">Self </span>{
+        LevelFilter::from_level(level).into()
     }
 }
 
-<span class="comment">// === impl Dynamics ===</span>
+<span class="comment">// === impl Dynamics ===
 
-<span class="kw">impl</span> <span class="ident">Dynamics</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">matcher</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CallsiteMatcher</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base_level</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">field_matches</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">directives_for</span>(<span class="ident">metadata</span>)
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">d</span>.<span class="ident">field_matcher</span>(<span class="ident">metadata</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
+</span><span class="kw">impl </span>Dynamics {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>matcher(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;CallsiteMatcher&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>base_level = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>field_matches = <span class="self">self
+            </span>.directives_for(metadata)
+            .filter_map(|d| {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(f) = d.field_matcher(metadata) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(f);
                 }
-                <span class="kw">match</span> <span class="ident">base_level</span> {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">level</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">b</span> =&gt; <span class="ident">base_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">level</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">base_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">level</span>),
-                    <span class="kw">_</span> =&gt; {}
+                <span class="kw">match </span>base_level {
+                    <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>b) <span class="kw">if </span>d.level &gt; <span class="kw-2">*</span>b =&gt; base_level = <span class="prelude-val">Some</span>(d.level),
+                    <span class="prelude-val">None </span>=&gt; base_level = <span class="prelude-val">Some</span>(d.level),
+                    <span class="kw">_ </span>=&gt; {}
                 }
-                <span class="prelude-val">None</span>
-            })
-            .<span class="ident">collect</span>();
+                <span class="prelude-val">None
+            </span>})
+            .collect();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">base_level</span>) <span class="op">=</span> <span class="ident">base_level</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">CallsiteMatcher</span> {
-                <span class="ident">field_matches</span>,
-                <span class="ident">base_level</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(base_level) = base_level {
+            <span class="prelude-val">Some</span>(CallsiteMatcher {
+                field_matches,
+                base_level,
             })
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">field_matches</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">CallsiteMatcher</span> {
-                <span class="ident">field_matches</span>,
-                <span class="ident">base_level</span>: <span class="ident">base_level</span>.<span class="ident">unwrap_or</span>(<span class="ident">LevelFilter::OFF</span>),
+        } <span class="kw">else if </span>!field_matches.is_empty() {
+            <span class="prelude-val">Some</span>(CallsiteMatcher {
+                field_matches,
+                base_level: base_level.unwrap_or(LevelFilter::OFF),
             })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_value_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">directives</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">value</span>.<span class="ident">is_some</span>()))
-    }
-}
-
-<span class="comment">// ===== impl DynamicMatch =====</span>
-
-<span class="kw">impl</span> <span class="ident">CallsiteMatcher</span> {
-    <span class="doccomment">/// Create a new `SpanMatch` for a given instance of the matched callsite.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_span_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">SpanMatcher</span> {
-        <span class="kw">let</span> <span class="ident">field_matches</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">field_matches</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">to_span_match</span>();
-                <span class="ident">attrs</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">m</span>.<span class="ident">visitor</span>());
-                <span class="ident">m</span>
-            })
-            .<span class="ident">collect</span>();
-        <span class="ident">SpanMatcher</span> {
-            <span class="ident">field_matches</span>,
-            <span class="ident">base_level</span>: <span class="self">self</span>.<span class="ident">base_level</span>,
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_value_filters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.directives()
+            .any(|d| d.fields.iter().any(|f| f.value.is_some()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SpanMatcher</span> {
-    <span class="doccomment">/// Returns the level currently enabled for this callsite.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LevelFilter</span> {
-        <span class="self">self</span>.<span class="ident">field_matches</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="ident">field::SpanMatch::filter</span>)
-            .<span class="ident">max</span>()
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">base_level</span>)
-    }
+<span class="comment">// ===== impl DynamicMatch =====
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">record_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">record</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">m</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_matches</span> {
-            <span class="ident">record</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">m</span>.<span class="ident">visitor</span>())
+</span><span class="kw">impl </span>CallsiteMatcher {
+    <span class="doccomment">/// Create a new `SpanMatch` for a given instance of the matched callsite.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_span_match(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; SpanMatcher {
+        <span class="kw">let </span>field_matches = <span class="self">self
+            </span>.field_matches
+            .iter()
+            .map(|m| {
+                <span class="kw">let </span>m = m.to_span_match();
+                attrs.record(<span class="kw-2">&amp;mut </span>m.visitor());
+                m
+            })
+            .collect();
+        SpanMatcher {
+            field_matches,
+            base_level: <span class="self">self</span>.base_level,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="kw">fn</span> <span class="ident">parse_directives</span>(<span class="ident">dirs</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span> {
-        <span class="ident">dirs</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">parse</span>().<span class="ident">ok</span>())
-            .<span class="ident">collect</span>()
+<span class="kw">impl </span>SpanMatcher {
+    <span class="doccomment">/// Returns the level currently enabled for this callsite.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>level(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LevelFilter {
+        <span class="self">self</span>.field_matches
+            .iter()
+            .filter_map(field::SpanMatch::filter)
+            .max()
+            .unwrap_or(<span class="self">self</span>.base_level)
     }
 
-    <span class="kw">fn</span> <span class="ident">expect_parse</span>(<span class="ident">dirs</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span> {
-        <span class="ident">dirs</span>.<span class="ident">as_ref</span>()
-            .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                <span class="ident">s</span>.<span class="ident">parse</span>()
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;directive &#39;{:?}&#39; should parse: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">err</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>record_update(<span class="kw-2">&amp;</span><span class="self">self</span>, record: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">for </span>m <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.field_matches {
+            record.record(<span class="kw-2">&amp;mut </span>m.visitor())
+        }
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">fn </span>parse_directives(dirs: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; Vec&lt;Directive&gt; {
+        dirs.as_ref()
+            .split(<span class="string">&#39;,&#39;</span>)
+            .filter_map(|s| s.parse().ok())
+            .collect()
+    }
+
+    <span class="kw">fn </span>expect_parse(dirs: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; Vec&lt;Directive&gt; {
+        dirs.as_ref()
+            .split(<span class="string">&#39;,&#39;</span>)
+            .map(|s| {
+                s.parse()
+                    .unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;directive &#39;{:?}&#39; should parse: {}&quot;</span>, s, err))
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">directive_ordering_by_target_len</span>() {
-        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this</span>
-        <span class="comment">// instead.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>directive_ordering_by_target_len() {
+        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this
+        // instead.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dirs = expect_parse(
             <span class="string">&quot;foo::bar=debug,foo::bar::baz=trace,foo=info,a_really_long_name_with_no_colons=warn&quot;</span>,
         );
-        <span class="ident">dirs</span>.<span class="ident">sort_unstable</span>();
+        dirs.sort_unstable();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[
             <span class="string">&quot;a_really_long_name_with_no_colons&quot;</span>,
             <span class="string">&quot;foo::bar::baz&quot;</span>,
             <span class="string">&quot;foo::bar&quot;</span>,
             <span class="string">&quot;foo&quot;</span>,
         ];
-        <span class="kw">let</span> <span class="ident">sorted</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>sorted = dirs
+            .iter()
+            .map(|d| d.target.as_ref().unwrap())
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">sorted</span>);
+        <span class="macro">assert_eq!</span>(expected, sorted);
     }
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">directive_ordering_by_span</span>() {
-        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this</span>
-        <span class="comment">// instead.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="string">&quot;bar[span]=trace,foo=debug,baz::quux=info,a[span]=warn&quot;</span>);
-        <span class="ident">dirs</span>.<span class="ident">sort_unstable</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>directive_ordering_by_span() {
+        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this
+        // instead.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dirs = expect_parse(<span class="string">&quot;bar[span]=trace,foo=debug,baz::quux=info,a[span]=warn&quot;</span>);
+        dirs.sort_unstable();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;baz::quux&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;a&quot;</span>];
-        <span class="kw">let</span> <span class="ident">sorted</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">&quot;baz::quux&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;a&quot;</span>];
+        <span class="kw">let </span>sorted = dirs
+            .iter()
+            .map(|d| d.target.as_ref().unwrap())
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">sorted</span>);
+        <span class="macro">assert_eq!</span>(expected, sorted);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">directive_ordering_uses_lexicographic_when_equal</span>() {
-        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this</span>
-        <span class="comment">// instead.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(<span class="string">&quot;span[b]=debug,b=debug,a=trace,c=info,span[a]=info&quot;</span>);
-        <span class="ident">dirs</span>.<span class="ident">sort_unstable</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>directive_ordering_uses_lexicographic_when_equal() {
+        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this
+        // instead.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dirs = expect_parse(<span class="string">&quot;span[b]=debug,b=debug,a=trace,c=info,span[a]=info&quot;</span>);
+        dirs.sort_unstable();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[
             (<span class="string">&quot;span&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;b&quot;</span>)),
             (<span class="string">&quot;span&quot;</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>)),
             (<span class="string">&quot;c&quot;</span>, <span class="prelude-val">None</span>),
             (<span class="string">&quot;b&quot;</span>, <span class="prelude-val">None</span>),
             (<span class="string">&quot;a&quot;</span>, <span class="prelude-val">None</span>),
         ];
-        <span class="kw">let</span> <span class="ident">sorted</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
+        <span class="kw">let </span>sorted = dirs
+            .iter()
+            .map(|d| {
                 (
-                    <span class="ident">d</span>.<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">as_ref</span>(),
-                    <span class="ident">d</span>.<span class="ident">in_span</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_ref</span>),
+                    d.target.as_ref().unwrap().as_ref(),
+                    d.in_span.as_ref().map(String::as_ref),
                 )
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">sorted</span>);
+        <span class="macro">assert_eq!</span>(expected, sorted);
     }
 
-    <span class="comment">// TODO: this test requires the parser to support directives with multiple</span>
-    <span class="comment">// fields, which it currently can&#39;t handle. We should enable this test when</span>
-    <span class="comment">// that&#39;s implemented.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span>]</span>
-    <span class="kw">fn</span> <span class="ident">directive_ordering_by_field_num</span>() {
-        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this</span>
-        <span class="comment">// instead.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">expect_parse</span>(
-            <span class="string">&quot;b[{foo,bar}]=info,c[{baz,quuux,quuux}]=debug,a[{foo}]=warn,bar[{field}]=trace,foo=debug,baz::quux=info&quot;</span>
-        );
-        <span class="ident">dirs</span>.<span class="ident">sort_unstable</span>();
+    <span class="comment">// TODO: this test requires the parser to support directives with multiple
+    // fields, which it currently can&#39;t handle. We should enable this test when
+    // that&#39;s implemented.
+    </span><span class="attribute">#[test]
+    #[ignore]
+    </span><span class="kw">fn </span>directive_ordering_by_field_num() {
+        <span class="comment">// TODO(eliza): it would be nice to have a property-based test for this
+        // instead.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dirs = expect_parse(
+            <span class="string">&quot;b[{foo,bar}]=info,c[{baz,quuux,quuux}]=debug,a[{foo}]=warn,bar[{field}]=trace,foo=debug,baz::quux=info&quot;
+        </span>);
+        dirs.sort_unstable();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;baz::quux&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>];
-        <span class="kw">let</span> <span class="ident">sorted</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">target</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>expected = <span class="macro">vec!</span>[<span class="string">&quot;baz::quux&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;foo&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>];
+        <span class="kw">let </span>sorted = dirs
+            .iter()
+            .map(|d| d.target.as_ref().unwrap())
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">sorted</span>);
+        <span class="macro">assert_eq!</span>(expected, sorted);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_ralith</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;common=trace,server=trace&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_ralith() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;common=trace,server=trace&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_ralith_uc</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;common=INFO,server=DEBUG&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_ralith_uc() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;common=INFO,server=DEBUG&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_ralith_mixed</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;common=iNfo,server=dEbUg&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_ralith_mixed() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;common=iNfo,server=dEbUg&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;common&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;server&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_valid</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">4</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_valid() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1=error,crate1::mod2,crate2=debug,crate3=off&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">4</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[test]
 
-    <span class="kw">fn</span> <span class="ident">parse_level_directives</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(
+    </span><span class="kw">fn </span>parse_level_directives() {
+        <span class="kw">let </span>dirs = parse_directives(
             <span class="string">&quot;crate1::mod1=error,crate1::mod2=warn,crate1::mod2::mod3=info,\
              crate2=debug,crate3=trace,crate3::mod2::mod1=off&quot;</span>,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_uppercase_level_directives</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_uppercase_level_directives() {
+        <span class="kw">let </span>dirs = parse_directives(
             <span class="string">&quot;crate1::mod1=ERROR,crate1::mod2=WARN,crate1::mod2::mod3=INFO,\
              crate2=DEBUG,crate3=TRACE,crate3::mod2::mod1=OFF&quot;</span>,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_numeric_level_directives</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_numeric_level_directives() {
+        <span class="kw">let </span>dirs = parse_directives(
             <span class="string">&quot;crate1::mod1=1,crate1::mod2=2,crate1::mod2::mod3=3,crate2=4,\
              crate3=5,crate3::mod2::mod1=0&quot;</span>,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">6</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2::mod3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">3</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">3</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">4</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">4</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::OFF</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">5</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate3::mod2::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].level, LevelFilter::OFF);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">5</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_invalid_crate</span>() {
-        <span class="comment">// test parse_directives with multiple = in specification</span>
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1=warn=info,crate2=debug&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_invalid_crate() {
+        <span class="comment">// test parse_directives with multiple = in specification
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1=warn=info,crate2=debug&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_invalid_level</span>() {
-        <span class="comment">// test parse_directives with &#39;noNumber&#39; as log level</span>
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1=noNumber,crate2=debug&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_invalid_level() {
+        <span class="comment">// test parse_directives with &#39;noNumber&#39; as log level
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1=noNumber,crate2=debug&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_string_level</span>() {
-        <span class="comment">// test parse_directives with &#39;warn&#39; as log level</span>
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1=wrong,crate2=warn&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_string_level() {
+        <span class="comment">// test parse_directives with &#39;warn&#39; as log level
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1=wrong,crate2=warn&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_empty_level</span>() {
-        <span class="comment">// test parse_directives with &#39;&#39; as log level</span>
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1=wrong,crate2=&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_empty_level() {
+        <span class="comment">// test parse_directives with &#39;&#39; as log level
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1=wrong,crate2=&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_global</span>() {
-        <span class="comment">// test parse_directives with no crate</span>
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;warn,crate2=debug&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::WARN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_global() {
+        <span class="comment">// test parse_directives with no crate
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;warn,crate2=debug&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">2</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::WARN);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="comment">// helper function for tests below</span>
-    <span class="kw">fn</span> <span class="ident">test_parse_bare_level</span>(<span class="ident">directive_to_test</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">level_expected</span>: <span class="ident">LevelFilter</span>) {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="ident">directive_to_test</span>);
+    <span class="comment">// helper function for tests below
+    </span><span class="kw">fn </span>test_parse_bare_level(directive_to_test: <span class="kw-2">&amp;</span>str, level_expected: LevelFilter) {
+        <span class="kw">let </span>dirs = parse_directives(directive_to_test);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">dirs</span>.<span class="ident">len</span>(),
+            dirs.len(),
             <span class="number">1</span>,
             <span class="string">&quot;\ninput: \&quot;{}\&quot;; parsed: {:#?}&quot;</span>,
-            <span class="ident">directive_to_test</span>,
-            <span class="ident">dirs</span>
+            directive_to_test,
+            dirs
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">level_expected</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, level_expected);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_global_bare_warn_lc</span>() {
-        <span class="comment">// test parse_directives with no crate, in isolation, all lowercase</span>
-        <span class="ident">test_parse_bare_level</span>(<span class="string">&quot;warn&quot;</span>, <span class="ident">LevelFilter::WARN</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_global_bare_warn_lc() {
+        <span class="comment">// test parse_directives with no crate, in isolation, all lowercase
+        </span>test_parse_bare_level(<span class="string">&quot;warn&quot;</span>, LevelFilter::WARN);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_global_bare_warn_uc</span>() {
-        <span class="comment">// test parse_directives with no crate, in isolation, all uppercase</span>
-        <span class="ident">test_parse_bare_level</span>(<span class="string">&quot;WARN&quot;</span>, <span class="ident">LevelFilter::WARN</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_global_bare_warn_uc() {
+        <span class="comment">// test parse_directives with no crate, in isolation, all uppercase
+        </span>test_parse_bare_level(<span class="string">&quot;WARN&quot;</span>, LevelFilter::WARN);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_global_bare_warn_mixed</span>() {
-        <span class="comment">// test parse_directives with no crate, in isolation, mixed case</span>
-        <span class="ident">test_parse_bare_level</span>(<span class="string">&quot;wArN&quot;</span>, <span class="ident">LevelFilter::WARN</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_global_bare_warn_mixed() {
+        <span class="comment">// test parse_directives with no crate, in isolation, mixed case
+        </span>test_parse_bare_level(<span class="string">&quot;wArN&quot;</span>, LevelFilter::WARN);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_valid_with_spans</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;crate1::mod1[foo]=error,crate1::mod2[bar],crate2[baz]=debug&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">3</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::ERROR</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_valid_with_spans() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;crate1::mod1[foo]=error,crate1::mod2[bar],crate2[baz]=debug&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">3</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::ERROR);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">Some</span>(<span class="string">&quot;foo&quot;</span>.to_string()));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::TRACE</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">1</span>].<span class="ident">in_span</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate1::mod2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].level, LevelFilter::TRACE);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">1</span>].in_span, <span class="prelude-val">Some</span>(<span class="string">&quot;bar&quot;</span>.to_string()));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::DEBUG</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">2</span>].<span class="ident">in_span</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;baz&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;crate2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].level, LevelFilter::DEBUG);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">2</span>].in_span, <span class="prelude-val">Some</span>(<span class="string">&quot;baz&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_with_dash_in_target_name</span>() {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;target-name=info&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;target-name&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_with_dash_in_target_name() {
+        <span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;target-name=info&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;target-name&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_with_dash_in_span_name</span>() {
-        <span class="comment">// Reproduces https://github.com/tokio-rs/tracing/issues/1367</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_with_dash_in_span_name() {
+        <span class="comment">// Reproduces https://github.com/tokio-rs/tracing/issues/1367
 
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="string">&quot;target[span-name]=info&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;target&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;span-name&quot;</span>.<span class="ident">to_string</span>()));
+        </span><span class="kw">let </span>dirs = parse_directives(<span class="string">&quot;target[span-name]=info&quot;</span>);
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;target&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">Some</span>(<span class="string">&quot;span-name&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_with_special_characters_in_span_name</span>() {
-        <span class="kw">let</span> <span class="ident">span_name</span> <span class="op">=</span> <span class="string">&quot;!\&quot;#$%&amp;&#39;()*+-./:;&lt;=&gt;?@^_`|~[}&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_with_special_characters_in_span_name() {
+        <span class="kw">let </span>span_name = <span class="string">&quot;!\&quot;#$%&amp;&#39;()*+-./:;&lt;=&gt;?@^_`|~[}&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="macro">format!</span>(<span class="string">&quot;target[{}]=info&quot;</span>, <span class="ident">span_name</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;target&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">level</span>, <span class="ident">LevelFilter::INFO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>[<span class="number">0</span>].<span class="ident">in_span</span>, <span class="prelude-val">Some</span>(<span class="ident">span_name</span>.<span class="ident">to_string</span>()));
+        <span class="kw">let </span>dirs = parse_directives(<span class="macro">format!</span>(<span class="string">&quot;target[{}]=info&quot;</span>, span_name));
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">1</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].target, <span class="prelude-val">Some</span>(<span class="string">&quot;target&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].level, LevelFilter::INFO);
+        <span class="macro">assert_eq!</span>(dirs[<span class="number">0</span>].in_span, <span class="prelude-val">Some</span>(span_name.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_directives_with_invalid_span_chars</span>() {
-        <span class="kw">let</span> <span class="ident">invalid_span_name</span> <span class="op">=</span> <span class="string">&quot;]{&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_directives_with_invalid_span_chars() {
+        <span class="kw">let </span>invalid_span_name = <span class="string">&quot;]{&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">parse_directives</span>(<span class="macro">format!</span>(<span class="string">&quot;target[{}]=info&quot;</span>, <span class="ident">invalid_span_name</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">dirs</span>.<span class="ident">len</span>(), <span class="number">0</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, <span class="ident">dirs</span>);
+        <span class="kw">let </span>dirs = parse_directives(<span class="macro">format!</span>(<span class="string">&quot;target[{}]=info&quot;</span>, invalid_span_name));
+        <span class="macro">assert_eq!</span>(dirs.len(), <span class="number">0</span>, <span class="string">&quot;\nparsed: {:#?}&quot;</span>, dirs);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

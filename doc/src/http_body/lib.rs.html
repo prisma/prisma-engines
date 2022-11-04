@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-body-0.4.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http_body/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-body-0.4.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http_body/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -322,329 +322,329 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/http-body/0.4.5&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">broken_intra_doc_links</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/http-body/0.4.5&quot;</span>)]
+#![deny(
+    missing_debug_implementations,
+    missing_docs,
+    unreachable_pub,
+    broken_intra_doc_links
+)]
+#![cfg_attr(test, deny(warnings))]
 
-<span class="doccomment">//! Asynchronous HTTP request or response body.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`Body`] for more details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Body`]: trait.Body.html</span>
+</span><span class="doccomment">//! Asynchronous HTTP request or response body.
+//!
+//! See [`Body`] for more details.
+//!
+//! [`Body`]: trait.Body.html
 
-<span class="kw">mod</span> <span class="ident">empty</span>;
-<span class="kw">mod</span> <span class="ident">full</span>;
-<span class="kw">mod</span> <span class="ident">limited</span>;
-<span class="kw">mod</span> <span class="ident">next</span>;
-<span class="kw">mod</span> <span class="ident">size_hint</span>;
+</span><span class="kw">mod </span>empty;
+<span class="kw">mod </span>full;
+<span class="kw">mod </span>limited;
+<span class="kw">mod </span>next;
+<span class="kw">mod </span>size_hint;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">combinators</span>;
+<span class="kw">pub mod </span>combinators;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::empty::Empty</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::full::Full</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::limited</span>::{<span class="ident">LengthLimitError</span>, <span class="ident">Limited</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::next</span>::{<span class="ident">Data</span>, <span class="ident">Trailers</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::size_hint::SizeHint</span>;
+<span class="kw">pub use </span><span class="self">self</span>::empty::Empty;
+<span class="kw">pub use </span><span class="self">self</span>::full::Full;
+<span class="kw">pub use </span><span class="self">self</span>::limited::{LengthLimitError, Limited};
+<span class="kw">pub use </span><span class="self">self</span>::next::{Data, Trailers};
+<span class="kw">pub use </span><span class="self">self</span>::size_hint::SizeHint;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::combinators</span>::{<span class="ident">BoxBody</span>, <span class="ident">MapData</span>, <span class="ident">MapErr</span>, <span class="ident">UnsyncBoxBody</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">Bytes</span>};
-<span class="kw">use</span> <span class="ident">http::HeaderMap</span>;
-<span class="kw">use</span> <span class="ident">std::convert::Infallible</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use </span><span class="self">self</span>::combinators::{BoxBody, MapData, MapErr, UnsyncBoxBody};
+<span class="kw">use </span>bytes::{Buf, Bytes};
+<span class="kw">use </span>http::HeaderMap;
+<span class="kw">use </span>std::convert::Infallible;
+<span class="kw">use </span>std::ops;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="doccomment">/// Trait representing a streaming body of a Request or Response.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Data is streamed via the `poll_data` function, which asynchronously yields `T: Buf` values. The</span>
-<span class="doccomment">/// `size_hint` function provides insight into the total number of bytes that will be streamed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `poll_trailers` function returns an optional set of trailers used to finalize the request /</span>
-<span class="doccomment">/// response exchange. This is mostly used when using the HTTP/2.0 protocol.</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Body</span> {
-    <span class="doccomment">/// Values yielded by the `Body`.</span>
-    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">Buf</span>;
+<span class="doccomment">/// Trait representing a streaming body of a Request or Response.
+///
+/// Data is streamed via the `poll_data` function, which asynchronously yields `T: Buf` values. The
+/// `size_hint` function provides insight into the total number of bytes that will be streamed.
+///
+/// The `poll_trailers` function returns an optional set of trailers used to finalize the request /
+/// response exchange. This is mostly used when using the HTTP/2.0 protocol.
+///
+</span><span class="kw">pub trait </span>Body {
+    <span class="doccomment">/// Values yielded by the `Body`.
+    </span><span class="kw">type </span>Data: Buf;
 
-    <span class="doccomment">/// The error type this `Body` might generate.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>;
+    <span class="doccomment">/// The error type this `Body` might generate.
+    </span><span class="kw">type </span>Error;
 
-    <span class="doccomment">/// Attempt to pull out the next data buffer of this stream.</span>
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Attempt to pull out the next data buffer of this stream.
+    </span><span class="kw">fn </span>poll_data(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt;;
 
-    <span class="doccomment">/// Poll for an optional **single** `HeaderMap` of trailers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should only be called once `poll_data` returns `None`.</span>
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Poll for an optional **single** `HeaderMap` of trailers.
+    ///
+    /// This function should only be called once `poll_data` returns `None`.
+    </span><span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt;;
 
-    <span class="doccomment">/// Returns `true` when the end of stream has been reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An end of stream means that both `poll_data` and `poll_trailers` will</span>
-    <span class="doccomment">/// return `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A return value of `false` **does not** guarantee that a value will be</span>
-    <span class="doccomment">/// returned from `poll_stream` or `poll_trailers`.</span>
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+    <span class="doccomment">/// Returns `true` when the end of stream has been reached.
+    ///
+    /// An end of stream means that both `poll_data` and `poll_trailers` will
+    /// return `None`.
+    ///
+    /// A return value of `false` **does not** guarantee that a value will be
+    /// returned from `poll_stream` or `poll_trailers`.
+    </span><span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Returns the bounds on the remaining length of the stream.
+    ///
+    /// When the **exact** remaining length of the stream is known, the upper bound will be set and
+    /// will equal the lower bound.
+    </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        SizeHint::default()
     }
 
-    <span class="doccomment">/// Returns the bounds on the remaining length of the stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When the **exact** remaining length of the stream is known, the upper bound will be set and</span>
-    <span class="doccomment">/// will equal the lower bound.</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="ident">SizeHint::default</span>()
-    }
-
-    <span class="doccomment">/// Returns future that resolves to next data chunk, if any.</span>
-    <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Data</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    <span class="doccomment">/// Returns future that resolves to next data chunk, if any.
+    </span><span class="kw">fn </span>data(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Data&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Unpin + Sized,
     {
-        <span class="ident">Data</span>(<span class="self">self</span>)
+        Data(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns future that resolves to trailers, if any.</span>
-    <span class="kw">fn</span> <span class="ident">trailers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Trailers</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    <span class="doccomment">/// Returns future that resolves to trailers, if any.
+    </span><span class="kw">fn </span>trailers(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Trailers&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Unpin + Sized,
     {
-        <span class="ident">Trailers</span>(<span class="self">self</span>)
+        Trailers(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Maps this body&#39;s data value to a different value.</span>
-    <span class="kw">fn</span> <span class="ident">map_data</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapData</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Data</span>) -&gt; <span class="ident">B</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Maps this body&#39;s data value to a different value.
+    </span><span class="kw">fn </span>map_data&lt;F, B&gt;(<span class="self">self</span>, f: F) -&gt; MapData&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnMut(<span class="self">Self</span>::Data) -&gt; B,
+        B: Buf,
     {
-        <span class="ident">MapData::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapData::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Maps this body&#39;s error value to a different value.</span>
-    <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MapErr</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Error</span>) -&gt; <span class="ident">E</span>,
+    <span class="doccomment">/// Maps this body&#39;s error value to a different value.
+    </span><span class="kw">fn </span>map_err&lt;F, E&gt;(<span class="self">self</span>, f: F) -&gt; MapErr&lt;<span class="self">Self</span>, F&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: FnMut(<span class="self">Self</span>::Error) -&gt; E,
     {
-        <span class="ident">MapErr::new</span>(<span class="self">self</span>, <span class="ident">f</span>)
+        MapErr::new(<span class="self">self</span>, f)
     }
 
-    <span class="doccomment">/// Turn this body into a boxed trait object.</span>
-    <span class="kw">fn</span> <span class="ident">boxed</span>(<span class="self">self</span>) -&gt; <span class="ident">BoxBody</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Turn this body into a boxed trait object.
+    </span><span class="kw">fn </span>boxed(<span class="self">self</span>) -&gt; BoxBody&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">BoxBody::new</span>(<span class="self">self</span>)
+        BoxBody::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Turn this body into a boxed trait object that is !Sync.</span>
-    <span class="kw">fn</span> <span class="ident">boxed_unsync</span>(<span class="self">self</span>) -&gt; <span class="ident">UnsyncBoxBody</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Turn this body into a boxed trait object that is !Sync.
+    </span><span class="kw">fn </span>boxed_unsync(<span class="self">self</span>) -&gt; UnsyncBoxBody&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">UnsyncBoxBody::new</span>(<span class="self">self</span>)
+        UnsyncBoxBody::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">T::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">T::Error</span>;
+<span class="kw">impl</span>&lt;T: Body + Unpin + <span class="question-mark">?</span>Sized&gt; Body <span class="kw">for </span><span class="kw-2">&amp;mut </span>T {
+    <span class="kw">type </span>Data = T::Data;
+    <span class="kw">type </span>Error = T::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">poll_data</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_data(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut **</span><span class="self">self</span>).poll_data(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_trailers(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut **</span><span class="self">self</span>).poll_trailers(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">is_end_stream</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        Pin::new(<span class="kw-2">&amp;**</span><span class="self">self</span>).is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        Pin::new(<span class="kw-2">&amp;**</span><span class="self">self</span>).size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">ops::DerefMut</span>,
-    <span class="ident">P::Target</span>: <span class="ident">Body</span>,
+<span class="kw">impl</span>&lt;P&gt; Body <span class="kw">for </span>Pin&lt;P&gt;
+<span class="kw">where
+    </span>P: Unpin + ops::DerefMut,
+    P::Target: Body,
 {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P</span> <span class="kw">as</span> <span class="ident">ops::Deref</span><span class="op">&gt;</span><span class="ident">::Target</span> <span class="kw">as</span> <span class="ident">Body</span><span class="op">&gt;</span><span class="ident">::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">P</span> <span class="kw">as</span> <span class="ident">ops::Deref</span><span class="op">&gt;</span><span class="ident">::Target</span> <span class="kw">as</span> <span class="ident">Body</span><span class="op">&gt;</span><span class="ident">::Error</span>;
+    <span class="kw">type </span>Data = &lt;&lt;P <span class="kw">as </span>ops::Deref&gt;::Target <span class="kw">as </span>Body&gt;::Data;
+    <span class="kw">type </span>Error = &lt;&lt;P <span class="kw">as </span>ops::Deref&gt;::Target <span class="kw">as </span>Body&gt;::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::get_mut</span>(<span class="self">self</span>).<span class="ident">as_mut</span>().<span class="ident">poll_data</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_data(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        Pin::get_mut(<span class="self">self</span>).as_mut().poll_data(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::get_mut</span>(<span class="self">self</span>).<span class="ident">as_mut</span>().<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        Pin::get_mut(<span class="self">self</span>).as_mut().poll_trailers(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_end_stream</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_ref().is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">size_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">T::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">T::Error</span>;
-
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">poll_data</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">is_end_stream</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.as_ref().size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Body</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">B::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">B::Error</span>;
+<span class="kw">impl</span>&lt;T: Body + Unpin + <span class="question-mark">?</span>Sized&gt; Body <span class="kw">for </span>Box&lt;T&gt; {
+    <span class="kw">type </span>Data = T::Data;
+    <span class="kw">type </span>Error = T::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">map_unchecked_mut</span>(<span class="ident">http::Request::body_mut</span>)
-                .<span class="ident">poll_data</span>(<span class="ident">cx</span>)
-        }
+    <span class="kw">fn </span>poll_data(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut **</span><span class="self">self</span>).poll_data(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">map_unchecked_mut</span>(<span class="ident">http::Request::body_mut</span>)
-                .<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)
-        }
+    <span class="kw">fn </span>poll_trailers(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut **</span><span class="self">self</span>).poll_trailers(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">body</span>().<span class="ident">is_end_stream</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_ref().is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="self">self</span>.<span class="ident">body</span>().<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.as_ref().size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Body</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">B::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">B::Error</span>;
+<span class="kw">impl</span>&lt;B: Body&gt; Body <span class="kw">for </span>http::Request&lt;B&gt; {
+    <span class="kw">type </span>Data = B::Data;
+    <span class="kw">type </span>Error = B::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">map_unchecked_mut</span>(<span class="ident">http::Response::body_mut</span>)
-                .<span class="ident">poll_data</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_data(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.map_unchecked_mut(http::Request::body_mut)
+                .poll_data(cx)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">map_unchecked_mut</span>(<span class="ident">http::Response::body_mut</span>)
-                .<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.map_unchecked_mut(http::Request::body_mut)
+                .poll_trailers(cx)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">body</span>().<span class="ident">is_end_stream</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.body().is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="self">self</span>.<span class="ident">body</span>().<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.body().size_hint()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Bytes</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Infallible</span>;
+<span class="kw">impl</span>&lt;B: Body&gt; Body <span class="kw">for </span>http::Response&lt;B&gt; {
+    <span class="kw">type </span>Data = B::Data;
+    <span class="kw">type </span>Error = B::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>);
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">into_bytes</span>().<span class="ident">into</span>())))
-        } <span class="kw">else</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+    <span class="kw">fn </span>poll_data(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.map_unchecked_mut(http::Response::body_mut)
+                .poll_data(cx)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>))
+    <span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.map_unchecked_mut(http::Response::body_mut)
+                .poll_trailers(cx)
+        }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_empty</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.body().is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="ident">SizeHint::with_exact</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="self">self</span>.body().size_hint()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">fn</span> <span class="ident">_assert_bounds</span>() {
-    <span class="kw">fn</span> <span class="ident">can_be_trait_object</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Body</span><span class="op">&lt;</span><span class="ident">Data</span> <span class="op">=</span> <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">std::io::Error</span><span class="op">&gt;</span>) {}
+<span class="kw">impl </span>Body <span class="kw">for </span>String {
+    <span class="kw">type </span>Data = Bytes;
+    <span class="kw">type </span>Error = Infallible;
+
+    <span class="kw">fn </span>poll_data(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.is_empty() {
+            <span class="kw">let </span>s = std::mem::take(<span class="kw-2">&amp;mut *</span><span class="self">self</span>);
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(s.into_bytes().into())))
+        } <span class="kw">else </span>{
+            Poll::Ready(<span class="prelude-val">None</span>)
+        }
+    }
+
+    <span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        Poll::Ready(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>))
+    }
+
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_empty()
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        SizeHint::with_exact(<span class="self">self</span>.len() <span class="kw">as </span>u64)
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">fn </span>_assert_bounds() {
+    <span class="kw">fn </span>can_be_trait_object(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Body&lt;Data = std::io::Cursor&lt;Vec&lt;u8&gt;&gt;, Error = std::io::Error&gt;) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http_body" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http_body" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

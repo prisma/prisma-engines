@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/page/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sharded_slab/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/page/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sharded_slab/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -447,454 +447,454 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cfg</span>::{<span class="self">self</span>, <span class="ident">CfgPrivate</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::clear::Clear</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Pack</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cfg::{<span class="self">self</span>, CfgPrivate};
+<span class="kw">use </span><span class="kw">crate</span>::clear::Clear;
+<span class="kw">use </span><span class="kw">crate</span>::sync::UnsafeCell;
+<span class="kw">use </span><span class="kw">crate</span>::Pack;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">slot</span>;
-<span class="kw">mod</span> <span class="ident">stack</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::slot::Slot</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>slot;
+<span class="kw">mod </span>stack;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::slot::Slot;
+<span class="kw">use </span>std::{fmt, marker::PhantomData};
 
-<span class="doccomment">/// A page address encodes the location of a slot within a shard (the page</span>
-<span class="doccomment">/// number and offset within that page) as a single linear value.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">addr</span>: <span class="ident">usize</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A page address encodes the location of a slot within a shard (the page
+/// number and offset within that page) as a single linear value.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Addr&lt;C: cfg::Config = cfg::DefaultConfig&gt; {
+    addr: usize,
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">NULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span> <span class="op">+</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Addr&lt;C&gt; {
+    <span class="kw">const </span>NULL: usize = <span class="self">Self</span>::BITS + <span class="number">1</span>;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="comment">// Since every page is twice as large as the previous page, and all page sizes</span>
-        <span class="comment">// are powers of two, we can determine the page index that contains a given</span>
-        <span class="comment">// address by counting leading zeros, which tells us what power of two</span>
-        <span class="comment">// the offset fits into.</span>
-        <span class="comment">//</span>
-        <span class="comment">// First, we must shift down to the smallest page size, so that the last</span>
-        <span class="comment">// offset on the first page becomes 0.</span>
-        <span class="kw">let</span> <span class="ident">shifted</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">addr</span> <span class="op">+</span> <span class="ident">C::INITIAL_SZ</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">C::ADDR_INDEX_SHIFT</span>;
-        <span class="comment">// Now, we can  determine the number of twos places by counting the</span>
-        <span class="comment">// number of leading  zeros (unused twos places) in the number&#39;s binary</span>
-        <span class="comment">// representation, and subtracting that count from the total number of bits in a word.</span>
-        <span class="ident">cfg::WIDTH</span> <span class="op">-</span> <span class="ident">shifted</span>.<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>index(<span class="self">self</span>) -&gt; usize {
+        <span class="comment">// Since every page is twice as large as the previous page, and all page sizes
+        // are powers of two, we can determine the page index that contains a given
+        // address by counting leading zeros, which tells us what power of two
+        // the offset fits into.
+        //
+        // First, we must shift down to the smallest page size, so that the last
+        // offset on the first page becomes 0.
+        </span><span class="kw">let </span>shifted = (<span class="self">self</span>.addr + C::INITIAL_SZ) &gt;&gt; C::ADDR_INDEX_SHIFT;
+        <span class="comment">// Now, we can  determine the number of twos places by counting the
+        // number of leading  zeros (unused twos places) in the number&#39;s binary
+        // representation, and subtracting that count from the total number of bits in a word.
+        </span>cfg::WIDTH - shifted.leading_zeros() <span class="kw">as </span>usize
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">offset</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">addr</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>offset(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.addr
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_head</span>: <span class="ident">usize</span>, <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">cfg::Config</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>FreeList&lt;C&gt; {
+    <span class="kw">fn </span>push&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, new_head: usize, slot: <span class="kw-2">&amp;</span>Slot&lt;T, C&gt;)
+    <span class="kw">where
+        </span>C: cfg::Config;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">C::MAX_PAGES</span> <span class="op">+</span> <span class="ident">C::ADDR_INDEX_SHIFT</span>;
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">const </span>LEN: usize = C::MAX_PAGES + C::ADDR_INDEX_SHIFT;
 
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Prev = ();
 
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">addr</span>
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.addr
     }
 
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">addr</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">addr</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span>);
-        <span class="self">Self</span> {
-            <span class="ident">addr</span>,
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>from_usize(addr: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(addr &lt;= <span class="self">Self</span>::BITS);
+        <span class="self">Self </span>{
+            addr,
+            _cfg: PhantomData,
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::iter::FilterMap</span><span class="op">&lt;</span>
-    <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Slot</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
-<span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Iter&lt;<span class="lifetime">&#39;a</span>, T, C&gt; = std::iter::FilterMap&lt;
+    std::slice::Iter&lt;<span class="lifetime">&#39;a</span>, Slot&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;&gt;,
+    <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Slot&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
+&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Local</span> {
-    <span class="doccomment">/// Index of the first slot on the local free list</span>
-    <span class="ident">head</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Local {
+    <span class="doccomment">/// Index of the first slot on the local free list
+    </span>head: UnsafeCell&lt;usize&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The remote free list</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Slots freed from a remote thread are pushed onto this list.</span>
-    <span class="ident">remote</span>: <span class="ident">stack::TransferStack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="comment">// Total size of the page.</span>
-    <span class="comment">//</span>
-    <span class="comment">// If the head index of the local or remote free list is greater than the size of the</span>
-    <span class="comment">// page, then that free list is emtpy. If the head of both free lists is greater than `size`</span>
-    <span class="comment">// then there are no slots left in that page.</span>
-    <span class="ident">size</span>: <span class="ident">usize</span>,
-    <span class="ident">prev_sz</span>: <span class="ident">usize</span>,
-    <span class="ident">slab</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Slots</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Shared&lt;T, C&gt; {
+    <span class="doccomment">/// The remote free list
+    ///
+    /// Slots freed from a remote thread are pushed onto this list.
+    </span>remote: stack::TransferStack&lt;C&gt;,
+    <span class="comment">// Total size of the page.
+    //
+    // If the head index of the local or remote free list is greater than the size of the
+    // page, then that free list is emtpy. If the head of both free lists is greater than `size`
+    // then there are no slots left in that page.
+    </span>size: usize,
+    prev_sz: usize,
+    slab: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;Slots&lt;T, C&gt;&gt;&gt;,
 }
 
-<span class="kw">type</span> <span class="ident">Slots</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>]<span class="op">&gt;</span>;
+<span class="kw">type </span>Slots&lt;T, C&gt; = Box&lt;[Slot&lt;T, C&gt;]&gt;;
 
-<span class="kw">impl</span> <span class="ident">Local</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">head</span>: <span class="ident">UnsafeCell::new</span>(<span class="number">0</span>),
+<span class="kw">impl </span>Local {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            head: UnsafeCell::new(<span class="number">0</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">head</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">head</span> })
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>head(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.head.with(|head| <span class="kw">unsafe </span>{ <span class="kw-2">*</span>head })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">set_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_head</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">head</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span><span class="ident">head</span> <span class="op">=</span> <span class="ident">new_head</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>set_head(<span class="kw-2">&amp;</span><span class="self">self</span>, new_head: usize) {
+        <span class="self">self</span>.head.with_mut(|head| <span class="kw">unsafe </span>{
+            <span class="kw-2">*</span>head = new_head;
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Local</span> {
-    <span class="kw">fn</span> <span class="ident">push</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_head</span>: <span class="ident">usize</span>, <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) {
-        <span class="ident">slot</span>.<span class="ident">set_next</span>(<span class="self">self</span>.<span class="ident">head</span>());
-        <span class="self">self</span>.<span class="ident">set_head</span>(<span class="ident">new_head</span>);
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; FreeList&lt;C&gt; <span class="kw">for </span>Local {
+    <span class="kw">fn </span>push&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, new_head: usize, slot: <span class="kw-2">&amp;</span>Slot&lt;T, C&gt;) {
+        slot.set_next(<span class="self">self</span>.head());
+        <span class="self">self</span>.set_head(new_head);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Shared&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="kw">const</span> <span class="ident">NULL</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">Addr</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::NULL</span>;
+    <span class="kw">const </span>NULL: usize = Addr::&lt;C&gt;::NULL;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">prev_sz</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">prev_sz</span>,
-            <span class="ident">size</span>,
-            <span class="ident">remote</span>: <span class="ident">stack::TransferStack::new</span>(),
-            <span class="ident">slab</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(size: usize, prev_sz: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            prev_sz,
+            size,
+            remote: stack::TransferStack::new(),
+            slab: UnsafeCell::new(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Return the head of the freelist</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is space on the local list, it returns the head of the local list. Otherwise, it</span>
-    <span class="doccomment">/// pops all the slots from the global list and returns the head of that list</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *Note*: The local list&#39;s head is reset when setting the new state in the slot pointed to be</span>
-    <span class="doccomment">/// `head` returned from this function</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">local</span>: <span class="kw-2">&amp;</span><span class="ident">Local</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">local</span>.<span class="ident">head</span>();
+    <span class="doccomment">/// Return the head of the freelist
+    ///
+    /// If there is space on the local list, it returns the head of the local list. Otherwise, it
+    /// pops all the slots from the global list and returns the head of that list
+    ///
+    /// *Note*: The local list&#39;s head is reset when setting the new state in the slot pointed to be
+    /// `head` returned from this function
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>pop(<span class="kw-2">&amp;</span><span class="self">self</span>, local: <span class="kw-2">&amp;</span>Local) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">let </span>head = local.head();
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; local head {:?}&quot;</span>, <span class="ident">head</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; local head {:?}&quot;</span>, head);
 
-        <span class="comment">// are there any items on the local free list? (fast path)</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">head</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">size</span> {
-            <span class="ident">head</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// slow path: if the local free list is empty, pop all the items on</span>
-            <span class="comment">// the remote free list.</span>
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remote</span>.<span class="ident">pop_all</span>();
+        <span class="comment">// are there any items on the local free list? (fast path)
+        </span><span class="kw">let </span>head = <span class="kw">if </span>head &lt; <span class="self">self</span>.size {
+            head
+        } <span class="kw">else </span>{
+            <span class="comment">// slow path: if the local free list is empty, pop all the items on
+            // the remote free list.
+            </span><span class="kw">let </span>head = <span class="self">self</span>.remote.pop_all();
 
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; remote head {:?}&quot;</span>, <span class="ident">head</span>);
-            <span class="ident">head</span><span class="question-mark">?</span>
-        };
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; remote head {:?}&quot;</span>, head);
+            head<span class="question-mark">?
+        </span>};
 
-        <span class="comment">// if the head is still null, both the local and remote free lists are</span>
-        <span class="comment">// empty --- we can&#39;t fit any more items on this page.</span>
-        <span class="kw">if</span> <span class="ident">head</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::NULL</span> {
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; NULL! {:?}&quot;</span>, <span class="ident">head</span>);
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">head</span>)
+        <span class="comment">// if the head is still null, both the local and remote free lists are
+        // empty --- we can&#39;t fit any more items on this page.
+        </span><span class="kw">if </span>head == <span class="self">Self</span>::NULL {
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; NULL! {:?}&quot;</span>, head);
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(head)
         }
     }
 
-    <span class="doccomment">/// Returns `true` if storage is currently allocated for this page, `false`</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_unallocated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">s</span>).<span class="ident">is_none</span>() })
+    <span class="doccomment">/// Returns `true` if storage is currently allocated for this page, `false`
+    /// otherwise.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_unallocated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.slab.with(|s| <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>s).is_none() })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_slot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">poff</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">offset</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_slot&lt;<span class="lifetime">&#39;a</span>, U&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        addr: Addr&lt;C&gt;,
+        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Slot&lt;T, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt; {
+        <span class="kw">let </span>poff = addr.offset() - <span class="self">self</span>.prev_sz;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, <span class="ident">poff</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, poff);
 
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span> }.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">get</span>(<span class="ident">poff</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>(<span class="ident">slot</span>)
+        <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slot = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>slab }.as_ref()<span class="question-mark">?</span>.get(poff)<span class="question-mark">?</span>;
+            f(slot)
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">free_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remote</span>
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>free_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">impl </span>FreeList&lt;C&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.remote
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shared</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; Shared&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take&lt;F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">gen</span>: <span class="ident">slot::Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">free_list</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
+        addr: Addr&lt;C&gt;,
+        gen: slot::Generation&lt;C&gt;,
+        free_list: <span class="kw-2">&amp;</span>F,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span>F: FreeList&lt;C&gt;,
     {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">offset</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+        <span class="kw">let </span>offset = addr.offset() - <span class="self">self</span>.prev_sz;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; take: offset {:?}&quot;</span>, <span class="ident">offset</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; take: offset {:?}&quot;</span>, offset);
 
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span> }.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">offset</span>)<span class="question-mark">?</span>;
-            <span class="ident">slot</span>.<span class="ident">remove_value</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free_list</span>)
+        <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slab = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>slab }.as_ref()<span class="question-mark">?</span>;
+            <span class="kw">let </span>slot = slab.get(offset)<span class="question-mark">?</span>;
+            slot.remove_value(gen, offset, free_list)
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">gen</span>: <span class="ident">slot::Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">free_list</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">offset</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+        addr: Addr&lt;C&gt;,
+        gen: slot::Generation&lt;C&gt;,
+        free_list: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="kw">let </span>offset = addr.offset() - <span class="self">self</span>.prev_sz;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, <span class="ident">offset</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, offset);
 
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span> }.<span class="ident">as_ref</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slot</span>) <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> <span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">offset</span>)) {
-                <span class="ident">slot</span>.<span class="ident">try_remove_value</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free_list</span>)
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slab = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>slab }.as_ref();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(slot) = slab.and_then(|slab| slab.get(offset)) {
+                slot.try_remove_value(gen, offset, free_list)
+            } <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 
-    <span class="comment">// Need this function separately, as we need to pass a function pointer to `filter_map` and</span>
-    <span class="comment">// `Slot::value` just returns a `&amp;T`, specifically a `&amp;Option&lt;T&gt;` for this impl.</span>
-    <span class="kw">fn</span> <span class="ident">make_ref</span>(<span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">slot</span>.<span class="ident">value</span>().<span class="ident">as_ref</span>()
+    <span class="comment">// Need this function separately, as we need to pass a function pointer to `filter_map` and
+    // `Slot::value` just returns a `&amp;T`, specifically a `&amp;Option&lt;T&gt;` for this impl.
+    </span><span class="kw">fn </span>make_ref(slot: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Slot&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; {
+        slot.value().as_ref()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span>).<span class="ident">as_ref</span>() });
-        <span class="ident">slab</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="ident">slab</span>.<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="ident">Shared::make_ref</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Iter&lt;<span class="lifetime">&#39;a</span>, T, C&gt;&gt; {
+        <span class="kw">let </span>slab = <span class="self">self</span>.slab.with(|slab| <span class="kw">unsafe </span>{ (<span class="kw-2">&amp;*</span>slab).as_ref() });
+        slab.map(|slab| {
+            slab.iter()
+                .filter_map(Shared::make_ref <span class="kw">as fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Slot&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;)
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Shared&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init_with</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init_with&lt;U&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">local</span>: <span class="kw-2">&amp;</span><span class="ident">Local</span>,
-        <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop</span>(<span class="ident">local</span>)<span class="question-mark">?</span>;
+        local: <span class="kw-2">&amp;</span>Local,
+        init: <span class="kw">impl </span>FnOnce(usize, <span class="kw-2">&amp;</span>Slot&lt;T, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt; {
+        <span class="kw">let </span>head = <span class="self">self</span>.pop(local)<span class="question-mark">?</span>;
 
-        <span class="comment">// do we need to allocate storage for this page?</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_unallocated</span>() {
-            <span class="self">self</span>.<span class="ident">allocate</span>();
+        <span class="comment">// do we need to allocate storage for this page?
+        </span><span class="kw">if </span><span class="self">self</span>.is_unallocated() {
+            <span class="self">self</span>.allocate();
         }
 
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+        <span class="kw">let </span>index = head + <span class="self">self</span>.prev_sz;
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">slab</span>) }
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;page must have been allocated to insert!&quot;</span>);
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">slab</span>[<span class="ident">head</span>];
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">init</span>(<span class="ident">index</span>, <span class="ident">slot</span>)<span class="question-mark">?</span>;
-            <span class="ident">local</span>.<span class="ident">set_head</span>(<span class="ident">slot</span>.<span class="ident">next</span>());
-            <span class="prelude-val">Some</span>(<span class="ident">result</span>)
+        <span class="kw">let </span>result = <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slab = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(slab) }
+                .as_ref()
+                .expect(<span class="string">&quot;page must have been allocated to insert!&quot;</span>);
+            <span class="kw">let </span>slot = <span class="kw-2">&amp;</span>slab[head];
+            <span class="kw">let </span>result = init(index, slot)<span class="question-mark">?</span>;
+            local.set_head(slot.next());
+            <span class="prelude-val">Some</span>(result)
         })<span class="question-mark">?</span>;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; init_with: insert at offset: {}&quot;</span>, <span class="ident">index</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">result</span>)
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; init_with: insert at offset: {}&quot;</span>, index);
+        <span class="prelude-val">Some</span>(result)
     }
 
-    <span class="doccomment">/// Allocates storage for the page&#39;s slots.</span>
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; alloc new page ({})&quot;</span>, <span class="self">self</span>.<span class="ident">size</span>);
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_unallocated</span>());
+    <span class="doccomment">/// Allocates storage for the page&#39;s slots.
+    </span><span class="attribute">#[cold]
+    </span><span class="kw">fn </span>allocate(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; alloc new page ({})&quot;</span>, <span class="self">self</span>.size);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_unallocated());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">size</span>);
-        <span class="ident">slab</span>.<span class="ident">extend</span>((<span class="number">1</span>..<span class="self">self</span>.<span class="ident">size</span>).<span class="ident">map</span>(<span class="ident">Slot::new</span>));
-        <span class="ident">slab</span>.<span class="ident">push</span>(<span class="ident">Slot::new</span>(<span class="ident"><span class="self">Self</span>::NULL</span>));
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="comment">// safety: this mut access is safe — it only occurs to initially allocate the page,</span>
-            <span class="comment">// which only happens on this thread; if the page has not yet been allocated, other</span>
-            <span class="comment">// threads will not try to access it yet.</span>
-            <span class="kw">unsafe</span> {
-                <span class="kw-2">*</span><span class="ident">s</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">slab</span>.<span class="ident">into_boxed_slice</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>slab = Vec::with_capacity(<span class="self">self</span>.size);
+        slab.extend((<span class="number">1</span>..<span class="self">self</span>.size).map(Slot::new));
+        slab.push(Slot::new(<span class="self">Self</span>::NULL));
+        <span class="self">self</span>.slab.with_mut(|s| {
+            <span class="comment">// safety: this mut access is safe — it only occurs to initially allocate the page,
+            // which only happens on this thread; if the page has not yet been allocated, other
+            // threads will not try to access it yet.
+            </span><span class="kw">unsafe </span>{
+                <span class="kw-2">*</span>s = <span class="prelude-val">Some</span>(slab.into_boxed_slice());
             }
         });
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mark_clear&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">gen</span>: <span class="ident">slot::Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">free_list</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">offset</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+        addr: Addr&lt;C&gt;,
+        gen: slot::Generation&lt;C&gt;,
+        free_list: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="kw">let </span>offset = addr.offset() - <span class="self">self</span>.prev_sz;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, <span class="ident">offset</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, offset);
 
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span> }.<span class="ident">as_ref</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slot</span>) <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> <span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">offset</span>)) {
-                <span class="ident">slot</span>.<span class="ident">try_clear_storage</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free_list</span>)
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slab = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>slab }.as_ref();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(slot) = slab.and_then(|slab| slab.get(offset)) {
+                slot.try_clear_storage(gen, offset, free_list)
+            } <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">gen</span>: <span class="ident">slot::Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">free_list</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">offset</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">prev_sz</span>;
+        addr: Addr&lt;C&gt;,
+        gen: slot::Generation&lt;C&gt;,
+        free_list: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="kw">let </span>offset = addr.offset() - <span class="self">self</span>.prev_sz;
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, <span class="ident">offset</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; offset {:?}&quot;</span>, offset);
 
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">slab</span> }.<span class="ident">as_ref</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slot</span>) <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">slab</span><span class="op">|</span> <span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">offset</span>)) {
-                <span class="ident">slot</span>.<span class="ident">clear_storage</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free_list</span>)
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        <span class="self">self</span>.slab.with(|slab| {
+            <span class="kw">let </span>slab = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>slab }.as_ref();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(slot) = slab.and_then(|slab| slab.get(offset)) {
+                slot.clear_storage(gen, offset, free_list)
+            } <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Local</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">head</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">head</span> };
-            <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Local&quot;</span>)
-                .<span class="ident">field</span>(<span class="string">&quot;head&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#0x}&quot;</span>, <span class="ident">head</span>))
-                .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Local {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.head.with(|head| {
+            <span class="kw">let </span>head = <span class="kw">unsafe </span>{ <span class="kw-2">*</span>head };
+            f.debug_struct(<span class="string">&quot;Local&quot;</span>)
+                .field(<span class="string">&quot;head&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#0x}&quot;</span>, head))
+                .finish()
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Shared</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Shared&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;remote&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remote</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;prev_sz&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">prev_sz</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">size</span>)
-            <span class="comment">// .field(&quot;slab&quot;, &amp;self.slab)</span>
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;C, T&gt; fmt::Debug <span class="kw">for </span>Shared&lt;C, T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Shared&quot;</span>)
+            .field(<span class="string">&quot;remote&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.remote)
+            .field(<span class="string">&quot;prev_sz&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.prev_sz)
+            .field(<span class="string">&quot;size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.size)
+            <span class="comment">// .field(&quot;slab&quot;, &amp;self.slab)
+            </span>.finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Addr&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;addr&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#0x}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">addr</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;index&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">index</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;offset&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">offset</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; fmt::Debug <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Addr&quot;</span>)
+            .field(<span class="string">&quot;addr&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#0x}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.addr))
+            .field(<span class="string">&quot;index&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.index())
+            .field(<span class="string">&quot;offset&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.offset())
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">addr</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">addr</span>
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialEq <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.addr == other.addr
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Eq <span class="kw">for </span>Addr&lt;C&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">addr</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">addr</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialOrd <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="self">self</span>.addr.partial_cmp(<span class="kw-2">&amp;</span>other.addr)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">addr</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">addr</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Ord <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="self">self</span>.addr.cmp(<span class="kw-2">&amp;</span>other.addr)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_usize</span>(<span class="self">self</span>.<span class="ident">addr</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Clone <span class="kw">for </span>Addr&lt;C&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_usize(<span class="self">self</span>.addr)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Copy <span class="kw">for </span>Addr&lt;C&gt; {}
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">indices</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span>(<span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">C::unpack_addr</span>(<span class="ident">idx</span>);
-    (<span class="ident">addr</span>, <span class="ident">addr</span>.<span class="ident">index</span>())
+<span class="attribute">#[inline(always)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>indices&lt;C: cfg::Config&gt;(idx: usize) -&gt; (Addr&lt;C&gt;, usize) {
+    <span class="kw">let </span>addr = C::unpack_addr(idx);
+    (addr, addr.index())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Pack</span>;
-    <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::Pack;
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">addr_roundtrips</span>(<span class="ident">pidx</span> <span class="kw">in</span> <span class="number">0usize</span>..<span class="ident">Addr</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::BITS</span>) {
-            <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Addr</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::from_usize</span>(<span class="ident">pidx</span>);
-            <span class="kw">let</span> <span class="ident">packed</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">pack</span>(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">addr</span>, <span class="ident">Addr::from_packed</span>(<span class="ident">packed</span>));
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>addr_roundtrips(pidx <span class="kw">in </span><span class="number">0usize</span>..Addr::&lt;cfg::DefaultConfig&gt;::BITS) {
+            <span class="kw">let </span>addr = Addr::&lt;cfg::DefaultConfig&gt;::from_usize(pidx);
+            <span class="kw">let </span>packed = addr.pack(<span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(addr, Addr::from_packed(packed));
         }
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">gen_roundtrips</span>(<span class="ident">gen</span> <span class="kw">in</span> <span class="number">0usize</span>..<span class="ident">slot::Generation</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::BITS</span>) {
-            <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">slot::Generation</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::from_usize</span>(<span class="ident">gen</span>);
-            <span class="kw">let</span> <span class="ident">packed</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">pack</span>(<span class="number">0</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">gen</span>, <span class="ident">slot::Generation::from_packed</span>(<span class="ident">packed</span>));
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>gen_roundtrips(gen <span class="kw">in </span><span class="number">0usize</span>..slot::Generation::&lt;cfg::DefaultConfig&gt;::BITS) {
+            <span class="kw">let </span>gen = slot::Generation::&lt;cfg::DefaultConfig&gt;::from_usize(gen);
+            <span class="kw">let </span>packed = gen.pack(<span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(gen, slot::Generation::from_packed(packed));
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">page_roundtrips</span>(
-            <span class="ident">gen</span> <span class="kw">in</span> <span class="number">0usize</span>..<span class="ident">slot::Generation</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::BITS</span>,
-            <span class="ident">addr</span> <span class="kw">in</span> <span class="number">0usize</span>..<span class="ident">Addr</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::BITS</span>,
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>page_roundtrips(
+            gen <span class="kw">in </span><span class="number">0usize</span>..slot::Generation::&lt;cfg::DefaultConfig&gt;::BITS,
+            addr <span class="kw">in </span><span class="number">0usize</span>..Addr::&lt;cfg::DefaultConfig&gt;::BITS,
         ) {
-            <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">slot::Generation</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::from_usize</span>(<span class="ident">gen</span>);
-            <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Addr</span>::<span class="op">&lt;</span><span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span><span class="ident">::from_usize</span>(<span class="ident">addr</span>);
-            <span class="kw">let</span> <span class="ident">packed</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">pack</span>(<span class="ident">addr</span>.<span class="ident">pack</span>(<span class="number">0</span>));
-            <span class="macro">assert_eq!</span>(<span class="ident">addr</span>, <span class="ident">Addr::from_packed</span>(<span class="ident">packed</span>));
-            <span class="macro">assert_eq!</span>(<span class="ident">gen</span>, <span class="ident">slot::Generation::from_packed</span>(<span class="ident">packed</span>));
+            <span class="kw">let </span>gen = slot::Generation::&lt;cfg::DefaultConfig&gt;::from_usize(gen);
+            <span class="kw">let </span>addr = Addr::&lt;cfg::DefaultConfig&gt;::from_usize(addr);
+            <span class="kw">let </span>packed = gen.pack(addr.pack(<span class="number">0</span>));
+            <span class="macro">assert_eq!</span>(addr, Addr::from_packed(packed));
+            <span class="macro">assert_eq!</span>(gen, slot::Generation::from_packed(packed));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

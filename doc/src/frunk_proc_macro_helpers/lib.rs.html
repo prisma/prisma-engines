@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_proc_macro_helpers-0.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_proc_macro_helpers/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_proc_macro_helpers/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_proc_macro_helpers/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_proc_macro_helpers-0.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_proc_macro_helpers/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_proc_macro_helpers/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_proc_macro_helpers/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -439,446 +439,446 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_playground_url</span> <span class="op">=</span> <span class="string">&quot;https://play.rust-lang.org/&quot;</span>)]</span>
-<span class="doccomment">//! Frunk Proc Macro internals</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library holds common logic for procedural macros used by frunk</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Links:</span>
-<span class="doccomment">//!   1. [Source on Github](https://github.com/lloydmeta/frunk)</span>
-<span class="doccomment">//!   2. [Crates.io page](https://crates.io/crates/frunk)</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc(html_playground_url = <span class="string">&quot;https://play.rust-lang.org/&quot;</span>)]
+</span><span class="doccomment">//! Frunk Proc Macro internals
+//!
+//! This library holds common logic for procedural macros used by frunk
+//!
+//! Links:
+//!   1. [Source on Github](https://github.com/lloydmeta/frunk)
+//!   2. [Crates.io page](https://crates.io/crates/frunk)
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">frunk_core</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro2</span>;
+</span><span class="kw">extern crate </span>frunk_core;
+<span class="kw">extern crate </span>proc_macro;
+<span class="kw">extern crate </span>proc_macro2;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quote</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">syn</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>quote;
+<span class="kw">extern crate </span>syn;
 
-<span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>};
-<span class="kw">use</span> <span class="ident">quote::ToTokens</span>;
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">DeriveInput</span>, <span class="ident">Expr</span>, <span class="ident">Field</span>, <span class="ident">Fields</span>, <span class="ident">GenericParam</span>, <span class="ident">Generics</span>, <span class="ident">Ident</span>, <span class="ident">Lifetime</span>, <span class="ident">LifetimeDef</span>, <span class="ident">Member</span>,
-    <span class="ident">Variant</span>,
+<span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>proc_macro2::{Span, TokenStream <span class="kw">as </span>TokenStream2};
+<span class="kw">use </span>quote::ToTokens;
+<span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>syn::{
+    DeriveInput, Expr, Field, Fields, GenericParam, Generics, Ident, Lifetime, LifetimeDef, Member,
+    Variant,
 };
 
-<span class="doccomment">/// These are assumed to exist as enums in frunk_core::labelled</span>
-<span class="kw">const</span> <span class="ident">ALPHA_CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">char</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="doccomment">/// These are assumed to exist as enums in frunk_core::labelled
+</span><span class="kw">const </span>ALPHA_CHARS: <span class="kw-2">&amp;</span>[char] = <span class="kw-2">&amp;</span>[
     <span class="string">&#39;a&#39;</span>, <span class="string">&#39;b&#39;</span>, <span class="string">&#39;c&#39;</span>, <span class="string">&#39;d&#39;</span>, <span class="string">&#39;e&#39;</span>, <span class="string">&#39;f&#39;</span>, <span class="string">&#39;g&#39;</span>, <span class="string">&#39;h&#39;</span>, <span class="string">&#39;i&#39;</span>, <span class="string">&#39;j&#39;</span>, <span class="string">&#39;k&#39;</span>, <span class="string">&#39;l&#39;</span>, <span class="string">&#39;m&#39;</span>, <span class="string">&#39;n&#39;</span>, <span class="string">&#39;o&#39;</span>, <span class="string">&#39;p&#39;</span>, <span class="string">&#39;q&#39;</span>, <span class="string">&#39;r&#39;</span>, <span class="string">&#39;s&#39;</span>,
     <span class="string">&#39;t&#39;</span>, <span class="string">&#39;u&#39;</span>, <span class="string">&#39;v&#39;</span>, <span class="string">&#39;w&#39;</span>, <span class="string">&#39;x&#39;</span>, <span class="string">&#39;y&#39;</span>, <span class="string">&#39;z&#39;</span>, <span class="string">&#39;A&#39;</span>, <span class="string">&#39;B&#39;</span>, <span class="string">&#39;C&#39;</span>, <span class="string">&#39;D&#39;</span>, <span class="string">&#39;E&#39;</span>, <span class="string">&#39;F&#39;</span>, <span class="string">&#39;G&#39;</span>, <span class="string">&#39;H&#39;</span>, <span class="string">&#39;I&#39;</span>, <span class="string">&#39;J&#39;</span>, <span class="string">&#39;K&#39;</span>, <span class="string">&#39;L&#39;</span>,
     <span class="string">&#39;M&#39;</span>, <span class="string">&#39;N&#39;</span>, <span class="string">&#39;O&#39;</span>, <span class="string">&#39;P&#39;</span>, <span class="string">&#39;Q&#39;</span>, <span class="string">&#39;R&#39;</span>, <span class="string">&#39;S&#39;</span>, <span class="string">&#39;T&#39;</span>, <span class="string">&#39;U&#39;</span>, <span class="string">&#39;V&#39;</span>, <span class="string">&#39;W&#39;</span>, <span class="string">&#39;X&#39;</span>, <span class="string">&#39;Y&#39;</span>, <span class="string">&#39;Z&#39;</span>,
 ];
 
-<span class="doccomment">/// These are assumed to exist as enums in frunk_core::labelled as underscore prepended enums</span>
-<span class="kw">const</span> <span class="ident">UNDERSCORE_CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">char</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&#39;_&#39;</span>, <span class="string">&#39;0&#39;</span>, <span class="string">&#39;1&#39;</span>, <span class="string">&#39;2&#39;</span>, <span class="string">&#39;3&#39;</span>, <span class="string">&#39;4&#39;</span>, <span class="string">&#39;5&#39;</span>, <span class="string">&#39;6&#39;</span>, <span class="string">&#39;7&#39;</span>, <span class="string">&#39;8&#39;</span>, <span class="string">&#39;9&#39;</span>];
+<span class="doccomment">/// These are assumed to exist as enums in frunk_core::labelled as underscore prepended enums
+</span><span class="kw">const </span>UNDERSCORE_CHARS: <span class="kw-2">&amp;</span>[char] = <span class="kw-2">&amp;</span>[<span class="string">&#39;_&#39;</span>, <span class="string">&#39;0&#39;</span>, <span class="string">&#39;1&#39;</span>, <span class="string">&#39;2&#39;</span>, <span class="string">&#39;3&#39;</span>, <span class="string">&#39;4&#39;</span>, <span class="string">&#39;5&#39;</span>, <span class="string">&#39;6&#39;</span>, <span class="string">&#39;7&#39;</span>, <span class="string">&#39;8&#39;</span>, <span class="string">&#39;9&#39;</span>];
 
-<span class="doccomment">/// Parses a TokenStream (usually received as input into a</span>
-<span class="doccomment">/// custom derive function), into a syn MacroInput AST,</span>
-<span class="doccomment">/// which is nice.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ast</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">DeriveInput</span> {
-    <span class="comment">// Parse the string representation</span>
-    <span class="ident">syn::parse</span>(<span class="ident">input</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Parses a TokenStream (usually received as input into a
+/// custom derive function), into a syn MacroInput AST,
+/// which is nice.
+</span><span class="kw">pub fn </span>to_ast(input: TokenStream) -&gt; DeriveInput {
+    <span class="comment">// Parse the string representation
+    </span>syn::parse(input).unwrap()
 }
 
-<span class="doccomment">/// Returns an Ident</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_site_ident</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Ident</span> {
-    <span class="ident">Ident::new</span>(<span class="ident">s</span>, <span class="ident">Span::call_site</span>())
+<span class="doccomment">/// Returns an Ident
+</span><span class="kw">pub fn </span>call_site_ident(s: <span class="kw-2">&amp;</span>str) -&gt; Ident {
+    Ident::new(s, Span::call_site())
 }
 
-<span class="doccomment">/// Given a list of types, creates an AST for the corresponding HList</span>
-<span class="doccomment">/// type.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_type</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">IntoIterator</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">L</span>) -&gt; <span class="ident">TokenStream2</span>
-<span class="kw">where</span>
-    <span class="ident">L::Item</span>: <span class="ident">ToTokens</span>,
-    <span class="ident">L::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>,
+<span class="doccomment">/// Given a list of types, creates an AST for the corresponding HList
+/// type.
+</span><span class="kw">pub fn </span>build_hlist_type&lt;L: IntoIterator&gt;(items: L) -&gt; TokenStream2
+<span class="kw">where
+    </span>L::Item: ToTokens,
+    L::IntoIter: DoubleEndedIterator,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::hlist::HNil</span> };
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>() {
-        <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::hlist::HCons</span><span class="op">&lt;</span>#<span class="ident">item</span>, #<span class="ident">result</span><span class="op">&gt;</span> }
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">quote! </span>{ ::frunk_core::hlist::HNil };
+    <span class="kw">for </span>item <span class="kw">in </span>items.into_iter().rev() {
+        result = <span class="macro">quote! </span>{ ::frunk_core::hlist::HCons&lt;#item, #result&gt; }
     }
-    <span class="ident">result</span>
+    result
 }
 
-<span class="doccomment">/// Given a list of expressions or patterns, creates an AST for the corresponding HList</span>
-<span class="doccomment">/// constructor, which may itself be used as an expression or a pattern.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_constr</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">IntoIterator</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">L</span>) -&gt; <span class="ident">TokenStream2</span>
-<span class="kw">where</span>
-    <span class="ident">L::Item</span>: <span class="ident">ToTokens</span>,
-    <span class="ident">L::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>,
+<span class="doccomment">/// Given a list of expressions or patterns, creates an AST for the corresponding HList
+/// constructor, which may itself be used as an expression or a pattern.
+</span><span class="kw">pub fn </span>build_hlist_constr&lt;L: IntoIterator&gt;(items: L) -&gt; TokenStream2
+<span class="kw">where
+    </span>L::Item: ToTokens,
+    L::IntoIter: DoubleEndedIterator,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::hlist::HNil</span> };
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>() {
-        <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::hlist::HCons</span> { <span class="ident">head</span>: #<span class="ident">item</span>, <span class="ident">tail</span>: #<span class="ident">result</span> }}
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">quote! </span>{ ::frunk_core::hlist::HNil };
+    <span class="kw">for </span>item <span class="kw">in </span>items.into_iter().rev() {
+        result = <span class="macro">quote! </span>{ ::frunk_core::hlist::HCons { head: #item, tail: #result }}
     }
-    <span class="ident">result</span>
+    result
 }
 
-<span class="doccomment">/// Given a list of types, creates an AST for the corresponding Coproduct</span>
-<span class="doccomment">/// type.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_type</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">IntoIterator</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">L</span>) -&gt; <span class="ident">TokenStream2</span>
-<span class="kw">where</span>
-    <span class="ident">L::Item</span>: <span class="ident">ToTokens</span>,
-    <span class="ident">L::IntoIter</span>: <span class="ident">DoubleEndedIterator</span>,
+<span class="doccomment">/// Given a list of types, creates an AST for the corresponding Coproduct
+/// type.
+</span><span class="kw">pub fn </span>build_coprod_type&lt;L: IntoIterator&gt;(items: L) -&gt; TokenStream2
+<span class="kw">where
+    </span>L::Item: ToTokens,
+    L::IntoIter: DoubleEndedIterator,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::coproduct::CNil</span> };
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span>.<span class="ident">into_iter</span>().<span class="ident">rev</span>() {
-        <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::coproduct::Coproduct</span><span class="op">&lt;</span>#<span class="ident">item</span>, #<span class="ident">result</span><span class="op">&gt;</span> }
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">quote! </span>{ ::frunk_core::coproduct::CNil };
+    <span class="kw">for </span>item <span class="kw">in </span>items.into_iter().rev() {
+        result = <span class="macro">quote! </span>{ ::frunk_core::coproduct::Coproduct&lt;#item, #result&gt; }
     }
-    <span class="ident">result</span>
+    result
 }
 
-<span class="doccomment">/// Given an index and an expression or pattern, creates an AST for the corresponding Coproduct</span>
-<span class="doccomment">/// constructor, which may itself be used as an expression or a pattern.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_constr</span>(<span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">item</span>: <span class="kw">impl</span> <span class="ident">ToTokens</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::coproduct::Coproduct::Inl</span>(#<span class="ident">item</span>) };
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">index</span> {
-        <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::coproduct::Coproduct::Inr</span>(#<span class="ident">result</span>) }
+<span class="doccomment">/// Given an index and an expression or pattern, creates an AST for the corresponding Coproduct
+/// constructor, which may itself be used as an expression or a pattern.
+</span><span class="kw">pub fn </span>build_coprod_constr(index: usize, item: <span class="kw">impl </span>ToTokens) -&gt; TokenStream2 {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">quote! </span>{ ::frunk_core::coproduct::Coproduct::Inl(#item) };
+    <span class="kw">for _ in </span><span class="number">0</span>..index {
+        result = <span class="macro">quote! </span>{ ::frunk_core::coproduct::Coproduct::Inr(#result) }
     }
-    <span class="ident">result</span>
+    result
 }
 
-<span class="doccomment">/// Given the length of a Coproduct type, generates an &quot;unreachable&quot; match arm, matching</span>
-<span class="doccomment">/// the CNil case in order to work around limitations in the compiler&#39;s exhaustiveness</span>
-<span class="doccomment">/// checking.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_unreachable_arm</span>(<span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">deref</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">_frunk_unreachable_</span> };
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">length</span> {
-        <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">::frunk_core::coproduct::Coproduct::Inr</span>(#<span class="ident">result</span>)}
+<span class="doccomment">/// Given the length of a Coproduct type, generates an &quot;unreachable&quot; match arm, matching
+/// the CNil case in order to work around limitations in the compiler&#39;s exhaustiveness
+/// checking.
+</span><span class="kw">pub fn </span>build_coprod_unreachable_arm(length: usize, deref: bool) -&gt; TokenStream2 {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">quote! </span>{ _frunk_unreachable_ };
+    <span class="kw">for _ in </span><span class="number">0</span>..length {
+        result = <span class="macro">quote! </span>{ ::frunk_core::coproduct::Coproduct::Inr(#result)}
     }
-    <span class="kw">if</span> <span class="ident">deref</span> {
-        <span class="macro">quote!</span> { #<span class="ident">result</span> =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">_frunk_unreachable_</span> {} }
-    } <span class="kw">else</span> {
-        <span class="macro">quote!</span> { #<span class="ident">result</span> =&gt; <span class="kw">match</span> <span class="ident">_frunk_unreachable_</span> {} }
+    <span class="kw">if </span>deref {
+        <span class="macro">quote! </span>{ #result =&gt; <span class="kw">match </span><span class="kw-2">*</span>_frunk_unreachable_ {} }
+    } <span class="kw">else </span>{
+        <span class="macro">quote! </span>{ #result =&gt; <span class="kw">match </span>_frunk_unreachable_ {} }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_type</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">inner_type</span>: <span class="kw">impl</span> <span class="ident">ToTokens</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="ident">label_type</span> <span class="op">=</span> <span class="ident">build_label_type</span>(<span class="ident">name</span>);
-    <span class="macro">quote!</span> { <span class="ident">::frunk_core::labelled::Field</span><span class="op">&lt;</span>#<span class="ident">label_type</span>, #<span class="ident">inner_type</span><span class="op">&gt;</span> }
+<span class="kw">pub fn </span>build_field_type(name: <span class="kw-2">&amp;</span>Ident, inner_type: <span class="kw">impl </span>ToTokens) -&gt; TokenStream2 {
+    <span class="kw">let </span>label_type = build_label_type(name);
+    <span class="macro">quote! </span>{ ::frunk_core::labelled::Field&lt;#label_type, #inner_type&gt; }
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_expr</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="ident">inner_expr</span>: <span class="kw">impl</span> <span class="ident">ToTokens</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="kw">let</span> <span class="ident">label_type</span> <span class="op">=</span> <span class="ident">build_label_type</span>(<span class="ident">name</span>);
-    <span class="kw">let</span> <span class="ident">literal_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
-    <span class="macro">quote!</span> { <span class="ident">::frunk_core::labelled::field_with_name</span>::<span class="op">&lt;</span>#<span class="ident">label_type</span>, <span class="kw">_</span><span class="op">&gt;</span>(#<span class="ident">literal_name</span>, #<span class="ident">inner_expr</span>) }
+<span class="kw">pub fn </span>build_field_expr(name: <span class="kw-2">&amp;</span>Ident, inner_expr: <span class="kw">impl </span>ToTokens) -&gt; TokenStream2 {
+    <span class="kw">let </span>label_type = build_label_type(name);
+    <span class="kw">let </span>literal_name = name.to_string();
+    <span class="macro">quote! </span>{ ::frunk_core::labelled::field_with_name::&lt;#label_type, <span class="kw">_</span>&gt;(#literal_name, #inner_expr) }
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_pat</span>(<span class="ident">inner_pat</span>: <span class="kw">impl</span> <span class="ident">ToTokens</span>) -&gt; <span class="ident">TokenStream2</span> {
-    <span class="macro">quote!</span> { <span class="ident">::frunk_core::labelled::Field</span> { <span class="ident">value</span>: #<span class="ident">inner_pat</span>, .. } }
+<span class="kw">pub fn </span>build_field_pat(inner_pat: <span class="kw">impl </span>ToTokens) -&gt; TokenStream2 {
+    <span class="macro">quote! </span>{ ::frunk_core::labelled::Field { value: #inner_pat, .. } }
 }
 
-<span class="doccomment">/// Given an Ident returns an AST for its type level representation based on the</span>
-<span class="doccomment">/// enums generated in frunk_core::labelled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, given first_name, returns an AST for (f,i,r,s,t,__,n,a,m,e)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_label_type</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>) -&gt; <span class="kw">impl</span> <span class="ident">ToTokens</span> {
-    <span class="kw">let</span> <span class="ident">as_string</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">as_string</span>.<span class="ident">as_str</span>();
-    <span class="kw">let</span> <span class="ident">name_as_idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">encode_as_ident</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">name_as_tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">name_as_idents</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> {
-            <span class="macro">quote!</span> { <span class="ident">::frunk_core::labelled::chars</span>::#<span class="ident">ident</span> }
+<span class="doccomment">/// Given an Ident returns an AST for its type level representation based on the
+/// enums generated in frunk_core::labelled.
+///
+/// For example, given first_name, returns an AST for (f,i,r,s,t,__,n,a,m,e)
+</span><span class="kw">pub fn </span>build_label_type(ident: <span class="kw-2">&amp;</span>Ident) -&gt; <span class="kw">impl </span>ToTokens {
+    <span class="kw">let </span>as_string = ident.to_string();
+    <span class="kw">let </span>name = as_string.as_str();
+    <span class="kw">let </span>name_as_idents: Vec&lt;Ident&gt; = name.chars().flat_map(|c| encode_as_ident(<span class="kw-2">&amp;</span>c)).collect();
+    <span class="kw">let </span>name_as_tokens: Vec&lt;<span class="kw">_</span>&gt; = name_as_idents
+        .iter()
+        .map(|ident| {
+            <span class="macro">quote! </span>{ ::frunk_core::labelled::chars::#ident }
         })
-        .<span class="ident">collect</span>();
-    <span class="macro">quote!</span> { (#(#<span class="ident">name_as_tokens</span>),<span class="kw-2">*</span>) }
+        .collect();
+    <span class="macro">quote! </span>{ (#(#name_as_tokens),<span class="kw-2">*</span>) }
 }
 
-<span class="doccomment">/// Given a char, encodes it as a vector of Ident</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Takes care of checking to see whether the char can be used as is,</span>
-<span class="doccomment">/// or needs to be encoded as an underscored character (_ and numbers),</span>
-<span class="doccomment">/// or needs to be encoded as a unicode.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method assumes that _uc and uc_ are in frunk_core::labelled as enums</span>
-<span class="kw">fn</span> <span class="ident">encode_as_ident</span>(<span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="ident">char</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">ALPHA_CHARS</span>.<span class="ident">contains</span>(<span class="ident">c</span>) {
-        <span class="macro">vec!</span>[<span class="ident">call_site_ident</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">to_string</span>())]
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">UNDERSCORE_CHARS</span>.<span class="ident">contains</span>(<span class="ident">c</span>) {
-        <span class="macro">vec!</span>[<span class="ident">call_site_ident</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">c</span>))]
-    } <span class="kw">else</span> {
-        <span class="comment">// UTF escape and get the hexcode</span>
-        <span class="kw">let</span> <span class="ident">as_unicode</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">escape_unicode</span>();
-        <span class="comment">// as_unicode can be multiple unicode codepoints encoded as \u{2764}\u{fe0f} (❤️)</span>
-        <span class="comment">// so we filter on alphanumeric to get just u&#39;s as a delimiters along with the</span>
-        <span class="comment">// hex portions</span>
-        <span class="kw">let</span> <span class="ident">delimited_hex</span> <span class="op">=</span> <span class="ident">as_unicode</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_alphanumeric</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hex_idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">delimited_hex</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">encode_as_ident</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>)).<span class="ident">collect</span>();
-        <span class="comment">// sandwich between _uc and uc_</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">book_ended</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">call_site_ident</span>(<span class="string">&quot;_uc&quot;</span>)];
-        <span class="ident">book_ended</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hex_idents</span>);
-        <span class="ident">book_ended</span>.<span class="ident">push</span>(<span class="ident">call_site_ident</span>(<span class="string">&quot;uc_&quot;</span>));
-        <span class="ident">book_ended</span>
+<span class="doccomment">/// Given a char, encodes it as a vector of Ident
+///
+/// Takes care of checking to see whether the char can be used as is,
+/// or needs to be encoded as an underscored character (_ and numbers),
+/// or needs to be encoded as a unicode.
+///
+/// This method assumes that _uc and uc_ are in frunk_core::labelled as enums
+</span><span class="kw">fn </span>encode_as_ident(c: <span class="kw-2">&amp;</span>char) -&gt; Vec&lt;Ident&gt; {
+    <span class="kw">if </span>ALPHA_CHARS.contains(c) {
+        <span class="macro">vec!</span>[call_site_ident(<span class="kw-2">&amp;</span>c.to_string())]
+    } <span class="kw">else if </span>UNDERSCORE_CHARS.contains(c) {
+        <span class="macro">vec!</span>[call_site_ident(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, c))]
+    } <span class="kw">else </span>{
+        <span class="comment">// UTF escape and get the hexcode
+        </span><span class="kw">let </span>as_unicode = c.escape_unicode();
+        <span class="comment">// as_unicode can be multiple unicode codepoints encoded as \u{2764}\u{fe0f} (❤️)
+        // so we filter on alphanumeric to get just u&#39;s as a delimiters along with the
+        // hex portions
+        </span><span class="kw">let </span>delimited_hex = as_unicode.filter(|c| c.is_alphanumeric());
+        <span class="kw">let </span><span class="kw-2">mut </span>hex_idents: Vec&lt;Ident&gt; = delimited_hex.flat_map(|c| encode_as_ident(<span class="kw-2">&amp;</span>c)).collect();
+        <span class="comment">// sandwich between _uc and uc_
+        </span><span class="kw">let </span><span class="kw-2">mut </span>book_ended: Vec&lt;Ident&gt; = <span class="macro">vec!</span>[call_site_ident(<span class="string">&quot;_uc&quot;</span>)];
+        book_ended.append(<span class="kw-2">&amp;mut </span>hex_idents);
+        book_ended.push(call_site_ident(<span class="string">&quot;uc_&quot;</span>));
+        book_ended
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_path_type</span>(<span class="ident">path_expr</span>: <span class="ident">Expr</span>) -&gt; <span class="kw">impl</span> <span class="ident">ToTokens</span> {
-    <span class="kw">let</span> <span class="ident">idents</span> <span class="op">=</span> <span class="ident">find_idents_in_expr</span>(<span class="ident">path_expr</span>);
-    <span class="ident">idents</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">build_label_type</span>(<span class="ident">i</span>))
-        .<span class="ident">fold</span>(<span class="macro">quote!</span>(<span class="ident">::frunk_core::hlist::HNil</span>), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">t</span><span class="op">|</span> {
-            <span class="macro">quote!</span> {
-            <span class="ident">::frunk_core::path::Path</span><span class="op">&lt;</span>
-                <span class="ident">::frunk_core::hlist::HCons</span><span class="op">&lt;</span>
-                   #<span class="ident">t</span>,
-                   #<span class="ident">acc</span>
-                <span class="op">&gt;</span>
-              <span class="op">&gt;</span>
+<span class="kw">pub fn </span>build_path_type(path_expr: Expr) -&gt; <span class="kw">impl </span>ToTokens {
+    <span class="kw">let </span>idents = find_idents_in_expr(path_expr);
+    idents
+        .iter()
+        .map(|i| build_label_type(i))
+        .fold(<span class="macro">quote!</span>(::frunk_core::hlist::HNil), |acc, t| {
+            <span class="macro">quote! </span>{
+            ::frunk_core::path::Path&lt;
+                ::frunk_core::hlist::HCons&lt;
+                   #t,
+                   #acc
+                &gt;
+              &gt;
             }
         })
 }
 
-<span class="doccomment">/// Returns the idents in a path like expression in reverse</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_idents_in_expr</span>(<span class="ident">path_expr</span>: <span class="ident">Expr</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">go</span>(<span class="ident">current</span>: <span class="ident">Expr</span>, <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">current</span> {
-            <span class="ident">Expr::Field</span>(<span class="ident">e</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">member</span>;
-                <span class="kw">match</span> <span class="ident">m</span> {
-                    <span class="ident">Member::Named</span>(<span class="ident">i</span>) =&gt; {
-                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+<span class="doccomment">/// Returns the idents in a path like expression in reverse
+</span><span class="kw">pub fn </span>find_idents_in_expr(path_expr: Expr) -&gt; Vec&lt;Ident&gt; {
+    <span class="kw">fn </span>go(current: Expr, <span class="kw-2">mut </span>v: Vec&lt;Ident&gt;) -&gt; Vec&lt;Ident&gt; {
+        <span class="kw">match </span>current {
+            Expr::Field(e) =&gt; {
+                <span class="kw">let </span>m = e.member;
+                <span class="kw">match </span>m {
+                    Member::Named(i) =&gt; {
+                        v.push(i);
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Only named access is supported&quot;</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Only named access is supported&quot;</span>),
                 }
-                <span class="ident">go</span>(<span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">base</span>, <span class="ident">v</span>)
+                go(<span class="kw-2">*</span>e.base, v)
             }
-            <span class="ident">Expr::Path</span>(<span class="ident">p</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+            Expr::Path(p) =&gt; {
+                <span class="kw">if </span>p.path.segments.len() != <span class="number">1 </span>{
                     <span class="macro">panic!</span>(<span class="string">&quot;Invalid name; this has collons in it&quot;</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">path</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span>.<span class="ident">clone</span>();
-                    <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">i</span>);
-                    <span class="ident">v</span>
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>i = p.path.segments[<span class="number">0</span>].ident.clone();
+                    v.push(i);
+                    v
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid input&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid input&quot;</span>),
         }
     }
-    <span class="ident">go</span>(<span class="ident">path_expr</span>, <span class="ident">Vec::new</span>())
+    go(path_expr, Vec::new())
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StructType</span> {
-    <span class="ident">Named</span>,
-    <span class="ident">Tuple</span>,
-    <span class="ident">Unit</span>,
+<span class="kw">pub enum </span>StructType {
+    Named,
+    Tuple,
+    Unit,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldBinding</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">Field</span>,
-    <span class="kw">pub</span> <span class="ident">binding</span>: <span class="ident">Ident</span>,
+<span class="kw">pub struct </span>FieldBinding {
+    <span class="kw">pub </span>field: Field,
+    <span class="kw">pub </span>binding: Ident,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldBinding</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>.<span class="ident">ty</span>;
-        <span class="macro">quote!</span> { #<span class="ident">ty</span> }
+<span class="kw">impl </span>FieldBinding {
+    <span class="kw">pub fn </span>build_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.field.ty;
+        <span class="macro">quote! </span>{ #ty }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>.<span class="ident">ty</span>;
-        <span class="macro">quote!</span> { <span class="kw-2">&amp;</span><span class="lifetime">&#39;_frunk_ref_</span> #<span class="ident">ty</span> }
+    <span class="kw">pub fn </span>build_type_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.field.ty;
+        <span class="macro">quote! </span>{ <span class="kw-2">&amp;</span><span class="lifetime">&#39;_frunk_ref_ </span>#ty }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field</span>.<span class="ident">ty</span>;
-        <span class="macro">quote!</span> { <span class="kw-2">&amp;</span><span class="lifetime">&#39;_frunk_ref_</span> <span class="kw-2">mut</span> #<span class="ident">ty</span> }
+    <span class="kw">pub fn </span>build_type_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.field.ty;
+        <span class="macro">quote! </span>{ <span class="kw-2">&amp;</span><span class="lifetime">&#39;_frunk_ref_ </span><span class="kw-2">mut </span>#ty }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">binding</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>;
-        <span class="macro">quote!</span> { #<span class="ident">binding</span> }
+    <span class="kw">pub fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>binding = <span class="kw-2">&amp;</span><span class="self">self</span>.binding;
+        <span class="macro">quote! </span>{ #binding }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_pat_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">binding</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>;
-        <span class="macro">quote!</span> { <span class="kw-2">ref</span> #<span class="ident">binding</span> }
+    <span class="kw">pub fn </span>build_pat_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>binding = <span class="kw-2">&amp;</span><span class="self">self</span>.binding;
+        <span class="macro">quote! </span>{ <span class="kw-2">ref </span>#binding }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_pat_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">binding</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>;
-        <span class="macro">quote!</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> #<span class="ident">binding</span> }
+    <span class="kw">pub fn </span>build_pat_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>binding = <span class="kw-2">&amp;</span><span class="self">self</span>.binding;
+        <span class="macro">quote! </span>{ <span class="kw-2">ref mut </span>#binding }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>, <span class="self">self</span>.<span class="ident">build_type</span>())
+    <span class="kw">pub fn </span>build_field_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(<span class="kw-2">&amp;</span><span class="self">self</span>.binding, <span class="self">self</span>.build_type())
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_type_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>, <span class="self">self</span>.<span class="ident">build_type_ref</span>())
+    <span class="kw">pub fn </span>build_field_type_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(<span class="kw-2">&amp;</span><span class="self">self</span>.binding, <span class="self">self</span>.build_type_ref())
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_type_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>, <span class="self">self</span>.<span class="ident">build_type_mut</span>())
+    <span class="kw">pub fn </span>build_field_type_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(<span class="kw-2">&amp;</span><span class="self">self</span>.binding, <span class="self">self</span>.build_type_mut())
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_expr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_expr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>)
+    <span class="kw">pub fn </span>build_field_expr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_expr(<span class="kw-2">&amp;</span><span class="self">self</span>.binding, <span class="kw-2">&amp;</span><span class="self">self</span>.binding)
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_field_pat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_pat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">binding</span>)
+    <span class="kw">pub fn </span>build_field_pat(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_pat(<span class="kw-2">&amp;</span><span class="self">self</span>.binding)
     }
 }
 
-<span class="doccomment">/// Represents the binding of a struct or enum variant&#39;s fields to a corresponding</span>
-<span class="doccomment">/// set of similarly named local variables.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldBindings</span> {
-    <span class="kw">pub</span> <span class="ident">type_</span>: <span class="ident">StructType</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldBinding</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents the binding of a struct or enum variant&#39;s fields to a corresponding
+/// set of similarly named local variables.
+</span><span class="kw">pub struct </span>FieldBindings {
+    <span class="kw">pub </span>type_: StructType,
+    <span class="kw">pub </span>fields: Vec&lt;FieldBinding&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldBindings</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Fields</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">type_</span>: <span class="kw">match</span> <span class="ident">fields</span> {
-                <span class="ident">Fields::Named</span>(<span class="kw">_</span>) =&gt; <span class="ident">StructType::Named</span>,
-                <span class="ident">Fields::Unnamed</span>(<span class="kw">_</span>) =&gt; <span class="ident">StructType::Tuple</span>,
-                <span class="ident">Fields::Unit</span> =&gt; <span class="ident">StructType::Unit</span>,
+<span class="kw">impl </span>FieldBindings {
+    <span class="kw">pub fn </span>new(fields: <span class="kw-2">&amp;</span>Fields) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            type_: <span class="kw">match </span>fields {
+                Fields::Named(<span class="kw">_</span>) =&gt; StructType::Named,
+                Fields::Unnamed(<span class="kw">_</span>) =&gt; StructType::Tuple,
+                Fields::Unit =&gt; StructType::Unit,
             },
-            <span class="ident">fields</span>: <span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">enumerate</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">field</span>)<span class="op">|</span> <span class="ident">FieldBinding</span> {
-                    <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">clone</span>(),
-                    <span class="ident">binding</span>: <span class="ident">field</span>
-                        .<span class="ident">ident</span>
-                        .<span class="ident">clone</span>()
-                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="ident">index</span>), <span class="ident">field</span>.<span class="ident">span</span>())),
+            fields: fields
+                .iter()
+                .enumerate()
+                .map(|(index, field)| FieldBinding {
+                    field: field.clone(),
+                    binding: field
+                        .ident
+                        .clone()
+                        .unwrap_or_else(|| Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, index), field.span())),
                 })
-                .<span class="ident">collect</span>(),
+                .collect(),
         }
     }
 
-    <span class="doccomment">/// Builds a type constructor for use with structs or enum variants. Does not include the name</span>
-    <span class="doccomment">/// of the type or variant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_constr</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">FieldBinding</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">bindings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>).<span class="ident">collect</span>();
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">type_</span> {
-            <span class="ident">StructType::Named</span> =&gt; <span class="macro">quote!</span> { { #(#<span class="ident">bindings</span>,)<span class="op">*</span> } },
-            <span class="ident">StructType::Tuple</span> =&gt; <span class="macro">quote!</span> { ( #(#<span class="ident">bindings</span>,)<span class="op">*</span> ) },
-            <span class="ident">StructType::Unit</span> =&gt; <span class="ident">TokenStream2::new</span>(),
+    <span class="doccomment">/// Builds a type constructor for use with structs or enum variants. Does not include the name
+    /// of the type or variant.
+    </span><span class="kw">pub fn </span>build_type_constr&lt;R: ToTokens&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>FieldBinding) -&gt; R) -&gt; TokenStream2 {
+        <span class="kw">let </span>bindings: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.fields.iter().map(f).collect();
+        <span class="kw">match </span><span class="self">self</span>.type_ {
+            StructType::Named =&gt; <span class="macro">quote! </span>{ { #(#bindings,)* } },
+            StructType::Tuple =&gt; <span class="macro">quote! </span>{ ( #(#bindings,)* ) },
+            StructType::Unit =&gt; TokenStream2::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_type</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">FieldBinding</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_hlist_type</span>(<span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>))
+    <span class="kw">pub fn </span>build_hlist_type&lt;R: ToTokens&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>FieldBinding) -&gt; R) -&gt; TokenStream2 {
+        build_hlist_type(<span class="self">self</span>.fields.iter().map(f))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_constr</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">FieldBinding</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_hlist_constr</span>(<span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>))
+    <span class="kw">pub fn </span>build_hlist_constr&lt;R: ToTokens&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>FieldBinding) -&gt; R) -&gt; TokenStream2 {
+        build_hlist_constr(<span class="self">self</span>.fields.iter().map(f))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ref_generics</span>(<span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">Generics</span>) -&gt; <span class="ident">Generics</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">generics_ref</span> <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">clone</span>();
+<span class="kw">pub fn </span>ref_generics(generics: <span class="kw-2">&amp;</span>Generics) -&gt; Generics {
+    <span class="kw">let </span><span class="kw-2">mut </span>generics_ref = generics.clone();
 
-    <span class="comment">// instantiate a lifetime and lifetime def to add</span>
-    <span class="kw">let</span> <span class="ident">ref_lifetime</span> <span class="op">=</span> <span class="ident">Lifetime::new</span>(<span class="string">&quot;&#39;_frunk_ref_&quot;</span>, <span class="ident">Span::call_site</span>());
-    <span class="kw">let</span> <span class="ident">ref_lifetime_def</span> <span class="op">=</span> <span class="ident">LifetimeDef::new</span>(<span class="ident">ref_lifetime</span>.<span class="ident">clone</span>());
+    <span class="comment">// instantiate a lifetime and lifetime def to add
+    </span><span class="kw">let </span>ref_lifetime = Lifetime::new(<span class="string">&quot;&#39;_frunk_ref_&quot;</span>, Span::call_site());
+    <span class="kw">let </span>ref_lifetime_def = LifetimeDef::new(ref_lifetime.clone());
 
-    <span class="comment">// Constrain the generic lifetimes present in the concrete type to the reference lifetime</span>
-    <span class="comment">// of our implementation of LabelledGeneric for the reference case (&amp; and &amp;mut)</span>
-    {
-        <span class="kw">let</span> <span class="ident">generics_ref_lifetimes_mut</span> <span class="op">=</span> <span class="ident">generics_ref</span>.<span class="ident">lifetimes_mut</span>();
-        <span class="kw">for</span> <span class="ident">existing_lifetime_mut</span> <span class="kw">in</span> <span class="ident">generics_ref_lifetimes_mut</span> {
-            <span class="ident">existing_lifetime_mut</span>.<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="ident">ref_lifetime</span>.<span class="ident">clone</span>());
+    <span class="comment">// Constrain the generic lifetimes present in the concrete type to the reference lifetime
+    // of our implementation of LabelledGeneric for the reference case (&amp; and &amp;mut)
+    </span>{
+        <span class="kw">let </span>generics_ref_lifetimes_mut = generics_ref.lifetimes_mut();
+        <span class="kw">for </span>existing_lifetime_mut <span class="kw">in </span>generics_ref_lifetimes_mut {
+            existing_lifetime_mut.bounds.push(ref_lifetime.clone());
         }
     }
 
-    <span class="comment">// Add our current generic lifetime to the list of generics</span>
-    <span class="kw">let</span> <span class="ident">ref_lifetime_generic</span> <span class="op">=</span> <span class="ident">GenericParam::Lifetime</span>(<span class="ident">ref_lifetime_def</span>);
-    <span class="ident">generics_ref</span>.<span class="ident">params</span>.<span class="ident">push</span>(<span class="ident">ref_lifetime_generic</span>);
+    <span class="comment">// Add our current generic lifetime to the list of generics
+    </span><span class="kw">let </span>ref_lifetime_generic = GenericParam::Lifetime(ref_lifetime_def);
+    generics_ref.params.push(ref_lifetime_generic);
 
-    <span class="ident">generics_ref</span>
+    generics_ref
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VariantBinding</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">FieldBindings</span>,
+<span class="kw">pub struct </span>VariantBinding {
+    <span class="kw">pub </span>name: Ident,
+    <span class="kw">pub </span>fields: FieldBindings,
 }
 
-<span class="kw">impl</span> <span class="ident">VariantBinding</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_constr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">constr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">build_type_constr</span>(<span class="ident">FieldBinding::build</span>);
-        <span class="macro">quote!</span> { #<span class="ident">name</span> #<span class="ident">constr</span> }
+<span class="kw">impl </span>VariantBinding {
+    <span class="kw">pub fn </span>build_type_constr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.name;
+        <span class="kw">let </span>constr = <span class="self">self</span>.fields.build_type_constr(FieldBinding::build);
+        <span class="macro">quote! </span>{ #name #constr }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_pat_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">constr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">build_type_constr</span>(<span class="ident">FieldBinding::build_pat_ref</span>);
-        <span class="macro">quote!</span> { #<span class="ident">name</span> #<span class="ident">constr</span> }
+    <span class="kw">pub fn </span>build_type_pat_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.name;
+        <span class="kw">let </span>constr = <span class="self">self</span>.fields.build_type_constr(FieldBinding::build_pat_ref);
+        <span class="macro">quote! </span>{ #name #constr }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_type_pat_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">constr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">build_type_constr</span>(<span class="ident">FieldBinding::build_pat_mut</span>);
-        <span class="macro">quote!</span> { #<span class="ident">name</span> #<span class="ident">constr</span> }
+    <span class="kw">pub fn </span>build_type_pat_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.name;
+        <span class="kw">let </span>constr = <span class="self">self</span>.fields.build_type_constr(FieldBinding::build_pat_mut);
+        <span class="macro">quote! </span>{ #name #constr }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>,
-            <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">build_hlist_type</span>(<span class="ident">FieldBinding::build_field_type</span>),
+    <span class="kw">pub fn </span>build_hlist_field_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.name,
+            <span class="self">self</span>.fields.build_hlist_type(FieldBinding::build_field_type),
         )
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_field_type_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>,
-            <span class="self">self</span>.<span class="ident">fields</span>
-                .<span class="ident">build_hlist_type</span>(<span class="ident">FieldBinding::build_field_type_ref</span>),
+    <span class="kw">pub fn </span>build_hlist_field_type_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.name,
+            <span class="self">self</span>.fields
+                .build_hlist_type(FieldBinding::build_field_type_ref),
         )
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_field_type_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_type</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>,
-            <span class="self">self</span>.<span class="ident">fields</span>
-                .<span class="ident">build_hlist_type</span>(<span class="ident">FieldBinding::build_field_type_mut</span>),
+    <span class="kw">pub fn </span>build_hlist_field_type_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_type(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.name,
+            <span class="self">self</span>.fields
+                .build_hlist_type(FieldBinding::build_field_type_mut),
         )
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_field_expr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_expr</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>,
-            <span class="self">self</span>.<span class="ident">fields</span>
-                .<span class="ident">build_hlist_constr</span>(<span class="ident">FieldBinding::build_field_expr</span>),
+    <span class="kw">pub fn </span>build_hlist_field_expr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_expr(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.name,
+            <span class="self">self</span>.fields
+                .build_hlist_constr(FieldBinding::build_field_expr),
         )
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_hlist_field_pat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_field_pat</span>(
-            <span class="self">self</span>.<span class="ident">fields</span>
-                .<span class="ident">build_hlist_constr</span>(<span class="ident">FieldBinding::build_field_pat</span>),
+    <span class="kw">pub fn </span>build_hlist_field_pat(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream2 {
+        build_field_pat(
+            <span class="self">self</span>.fields
+                .build_hlist_constr(FieldBinding::build_field_pat),
         )
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VariantBindings</span> {
-    <span class="kw">pub</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">VariantBinding</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>VariantBindings {
+    <span class="kw">pub </span>variants: Vec&lt;VariantBinding&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">VariantBindings</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Variant</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">VariantBindings</span> {
-            <span class="ident">variants</span>: <span class="ident">data</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> <span class="ident">VariantBinding</span> {
-                    <span class="ident">name</span>: <span class="ident">variant</span>.<span class="ident">ident</span>.<span class="ident">clone</span>(),
-                    <span class="ident">fields</span>: <span class="ident">FieldBindings::new</span>(<span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">fields</span>),
+<span class="kw">impl </span>VariantBindings {
+    <span class="kw">pub fn </span>new&lt;<span class="lifetime">&#39;a</span>&gt;(data: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Variant&gt;) -&gt; <span class="self">Self </span>{
+        VariantBindings {
+            variants: data
+                .into_iter()
+                .map(|variant| VariantBinding {
+                    name: variant.ident.clone(),
+                    fields: FieldBindings::new(<span class="kw-2">&amp;</span>variant.fields),
                 })
-                .<span class="ident">collect</span>(),
+                .collect(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_type</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">VariantBinding</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_coprod_type</span>(<span class="self">self</span>.<span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>))
+    <span class="kw">pub fn </span>build_coprod_type&lt;R: ToTokens&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>VariantBinding) -&gt; R) -&gt; TokenStream2 {
+        build_coprod_type(<span class="self">self</span>.variants.iter().map(f))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_constrs</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(
+    <span class="kw">pub fn </span>build_coprod_constrs&lt;R: ToTokens&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">VariantBinding</span>) -&gt; <span class="ident">R</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenStream2</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">variants</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">variant</span>)<span class="op">|</span> <span class="ident">build_coprod_constr</span>(<span class="ident">index</span>, <span class="ident">f</span>(<span class="ident">variant</span>)))
-            .<span class="ident">collect</span>()
+        f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>VariantBinding) -&gt; R,
+    ) -&gt; Vec&lt;TokenStream2&gt; {
+        <span class="self">self</span>.variants
+            .iter()
+            .enumerate()
+            .map(|(index, variant)| build_coprod_constr(index, f(variant)))
+            .collect()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_variant_constrs</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">VariantBinding</span>) -&gt; <span class="ident">R</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">f</span>).<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>build_variant_constrs&lt;R: ToTokens&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span>VariantBinding) -&gt; R) -&gt; Vec&lt;R&gt; {
+        <span class="self">self</span>.variants.iter().map(f).collect()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_coprod_unreachable_arm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">deref</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream2</span> {
-        <span class="ident">build_coprod_unreachable_arm</span>(<span class="self">self</span>.<span class="ident">variants</span>.<span class="ident">len</span>(), <span class="ident">deref</span>)
+    <span class="kw">pub fn </span>build_coprod_unreachable_arm(<span class="kw-2">&amp;</span><span class="self">self</span>, deref: bool) -&gt; TokenStream2 {
+        build_coprod_unreachable_arm(<span class="self">self</span>.variants.len(), deref)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_proc_macro_helpers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_proc_macro_helpers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

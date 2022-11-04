@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/token/token_env_change.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token_env_change.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/token/token_env_change.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token_env_change.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -260,267 +260,267 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">tds::Collation</span>, <span class="ident">Error</span>, <span class="ident">SqlReadBytes</span>};
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">LittleEndian</span>, <span class="ident">ReadBytesExt</span>};
-<span class="kw">use</span> <span class="ident">fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">futures::io::AsyncReadExt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert::TryFrom</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">io</span>::{<span class="ident">Cursor</span>, <span class="ident">Read</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{tds::Collation, Error, SqlReadBytes};
+<span class="kw">use </span>byteorder::{LittleEndian, ReadBytesExt};
+<span class="kw">use </span>fmt::Debug;
+<span class="kw">use </span>futures::io::AsyncReadExt;
+<span class="kw">use </span>std::{
+    convert::TryFrom,
+    fmt,
+    io::{Cursor, Read},
 };
 
-<span class="macro">uint_enum!</span> {
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EnvChangeTy</span> {
-        <span class="ident">Database</span> <span class="op">=</span> <span class="number">1</span>,
-        <span class="ident">Language</span> <span class="op">=</span> <span class="number">2</span>,
-        <span class="ident">CharacterSet</span> <span class="op">=</span> <span class="number">3</span>,
-        <span class="ident">PacketSize</span> <span class="op">=</span> <span class="number">4</span>,
-        <span class="ident">UnicodeDataSortingLID</span> <span class="op">=</span> <span class="number">5</span>,
-        <span class="ident">UnicodeDataSortingCFL</span> <span class="op">=</span> <span class="number">6</span>,
-        <span class="ident">SqlCollation</span> <span class="op">=</span> <span class="number">7</span>,
-        <span class="doccomment">/// below here: &gt;= TDSv7.2</span>
-        <span class="ident">BeginTransaction</span> <span class="op">=</span> <span class="number">8</span>,
-        <span class="ident">CommitTransaction</span> <span class="op">=</span> <span class="number">9</span>,
-        <span class="ident">RollbackTransaction</span> <span class="op">=</span> <span class="number">10</span>,
-        <span class="ident">EnlistDTCTransaction</span> <span class="op">=</span> <span class="number">11</span>,
-        <span class="ident">DefectTransaction</span> <span class="op">=</span> <span class="number">12</span>,
-        <span class="ident">Rtls</span> <span class="op">=</span> <span class="number">13</span>,
-        <span class="ident">PromoteTransaction</span> <span class="op">=</span> <span class="number">15</span>,
-        <span class="ident">TransactionManagerAddress</span> <span class="op">=</span> <span class="number">16</span>,
-        <span class="ident">TransactionEnded</span> <span class="op">=</span> <span class="number">17</span>,
-        <span class="ident">ResetConnection</span> <span class="op">=</span> <span class="number">18</span>,
-        <span class="ident">UserName</span> <span class="op">=</span> <span class="number">19</span>,
-        <span class="doccomment">/// below here: TDS v7.4</span>
-        <span class="ident">Routing</span> <span class="op">=</span> <span class="number">20</span>,
+<span class="macro">uint_enum! </span>{
+    <span class="attribute">#[repr(u8)]
+    </span><span class="kw">pub enum </span>EnvChangeTy {
+        Database = <span class="number">1</span>,
+        Language = <span class="number">2</span>,
+        CharacterSet = <span class="number">3</span>,
+        PacketSize = <span class="number">4</span>,
+        UnicodeDataSortingLID = <span class="number">5</span>,
+        UnicodeDataSortingCFL = <span class="number">6</span>,
+        SqlCollation = <span class="number">7</span>,
+        <span class="doccomment">/// below here: &gt;= TDSv7.2
+        </span>BeginTransaction = <span class="number">8</span>,
+        CommitTransaction = <span class="number">9</span>,
+        RollbackTransaction = <span class="number">10</span>,
+        EnlistDTCTransaction = <span class="number">11</span>,
+        DefectTransaction = <span class="number">12</span>,
+        Rtls = <span class="number">13</span>,
+        PromoteTransaction = <span class="number">15</span>,
+        TransactionManagerAddress = <span class="number">16</span>,
+        TransactionEnded = <span class="number">17</span>,
+        ResetConnection = <span class="number">18</span>,
+        UserName = <span class="number">19</span>,
+        <span class="doccomment">/// below here: TDS v7.4
+        </span>Routing = <span class="number">20</span>,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">EnvChangeTy</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">EnvChangeTy::Database</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Database&quot;</span>),
-            <span class="ident">EnvChangeTy::Language</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Language&quot;</span>),
-            <span class="ident">EnvChangeTy::CharacterSet</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CharacterSet&quot;</span>),
-            <span class="ident">EnvChangeTy::PacketSize</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;PacketSize&quot;</span>),
-            <span class="ident">EnvChangeTy::UnicodeDataSortingLID</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UnicodeDataSortingLID&quot;</span>),
-            <span class="ident">EnvChangeTy::UnicodeDataSortingCFL</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UnicodeDataSortingCFL&quot;</span>),
-            <span class="ident">EnvChangeTy::SqlCollation</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SqlCollation&quot;</span>),
-            <span class="ident">EnvChangeTy::BeginTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;BeginTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::CommitTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CommitTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::RollbackTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RollbackTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::EnlistDTCTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;EnlistDTCTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::DefectTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DefectTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::Rtls</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;RTLS&quot;</span>),
-            <span class="ident">EnvChangeTy::PromoteTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;PromoteTransaction&quot;</span>),
-            <span class="ident">EnvChangeTy::TransactionManagerAddress</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;TransactionManagerAddress&quot;</span>),
-            <span class="ident">EnvChangeTy::TransactionEnded</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;TransactionEnded&quot;</span>),
-            <span class="ident">EnvChangeTy::ResetConnection</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ResetConnection&quot;</span>),
-            <span class="ident">EnvChangeTy::UserName</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UserName&quot;</span>),
-            <span class="ident">EnvChangeTy::Routing</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Routing&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>EnvChangeTy {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            EnvChangeTy::Database =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Database&quot;</span>),
+            EnvChangeTy::Language =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Language&quot;</span>),
+            EnvChangeTy::CharacterSet =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CharacterSet&quot;</span>),
+            EnvChangeTy::PacketSize =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PacketSize&quot;</span>),
+            EnvChangeTy::UnicodeDataSortingLID =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UnicodeDataSortingLID&quot;</span>),
+            EnvChangeTy::UnicodeDataSortingCFL =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UnicodeDataSortingCFL&quot;</span>),
+            EnvChangeTy::SqlCollation =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SqlCollation&quot;</span>),
+            EnvChangeTy::BeginTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;BeginTransaction&quot;</span>),
+            EnvChangeTy::CommitTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;CommitTransaction&quot;</span>),
+            EnvChangeTy::RollbackTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;RollbackTransaction&quot;</span>),
+            EnvChangeTy::EnlistDTCTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;EnlistDTCTransaction&quot;</span>),
+            EnvChangeTy::DefectTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DefectTransaction&quot;</span>),
+            EnvChangeTy::Rtls =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;RTLS&quot;</span>),
+            EnvChangeTy::PromoteTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;PromoteTransaction&quot;</span>),
+            EnvChangeTy::TransactionManagerAddress =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;TransactionManagerAddress&quot;</span>),
+            EnvChangeTy::TransactionEnded =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;TransactionEnded&quot;</span>),
+            EnvChangeTy::ResetConnection =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ResetConnection&quot;</span>),
+            EnvChangeTy::UserName =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UserName&quot;</span>),
+            EnvChangeTy::Routing =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Routing&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TokenEnvChange</span> {
-    <span class="ident">Database</span>(<span class="ident">String</span>, <span class="ident">String</span>),
-    <span class="ident">PacketSize</span>(<span class="ident">u32</span>, <span class="ident">u32</span>),
-    <span class="ident">SqlCollation</span> {
-        <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TokenEnvChange {
+    Database(String, String),
+    PacketSize(u32, u32),
+    SqlCollation {
+        old: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
+        new: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
     },
-    <span class="ident">BeginTransaction</span>([<span class="ident">u8</span>; <span class="number">8</span>]),
-    <span class="ident">CommitTransaction</span>,
-    <span class="ident">RollbackTransaction</span>,
-    <span class="ident">DefectTransaction</span>,
-    <span class="ident">Routing</span> {
-        <span class="ident">host</span>: <span class="ident">String</span>,
-        <span class="ident">port</span>: <span class="ident">u16</span>,
+    BeginTransaction([u8; <span class="number">8</span>]),
+    CommitTransaction,
+    RollbackTransaction,
+    DefectTransaction,
+    Routing {
+        host: String,
+        port: u16,
     },
-    <span class="ident">ChangeMirror</span>(<span class="ident">String</span>),
-    <span class="ident">Ignored</span>(<span class="ident">EnvChangeTy</span>),
+    ChangeMirror(String),
+    Ignored(EnvChangeTy),
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TokenEnvChange</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Database</span>(<span class="kw-2">ref</span> <span class="ident">old</span>, <span class="kw-2">ref</span> <span class="ident">new</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Database change from &#39;{}&#39; to &#39;{}&#39;&quot;</span>, <span class="ident">old</span>, <span class="ident">new</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TokenEnvChange {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Database(<span class="kw-2">ref </span>old, <span class="kw-2">ref </span>new) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Database change from &#39;{}&#39; to &#39;{}&#39;&quot;</span>, old, new)
             }
-            <span class="ident"><span class="self">Self</span>::PacketSize</span>(<span class="ident">old</span>, <span class="ident">new</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Packet size change from &#39;{}&#39; to &#39;{}&#39;&quot;</span>, <span class="ident">old</span>, <span class="ident">new</span>)
+            <span class="self">Self</span>::PacketSize(old, new) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Packet size change from &#39;{}&#39; to &#39;{}&#39;&quot;</span>, old, new)
             }
-            <span class="ident"><span class="self">Self</span>::SqlCollation</span> { <span class="ident">old</span>, <span class="ident">new</span> } =&gt; <span class="kw">match</span> (<span class="ident">old</span>, <span class="ident">new</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">old</span>), <span class="prelude-val">Some</span>(<span class="ident">new</span>)) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SQL collation change from {} to {}&quot;</span>, <span class="ident">old</span>, <span class="ident">new</span>),
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">new</span>)) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SQL collation changed to {}&quot;</span>, <span class="ident">new</span>),
-                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SQL collation change&quot;</span>),
+            <span class="self">Self</span>::SqlCollation { old, new } =&gt; <span class="kw">match </span>(old, new) {
+                (<span class="prelude-val">Some</span>(old), <span class="prelude-val">Some</span>(new)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SQL collation change from {} to {}&quot;</span>, old, new),
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(new)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SQL collation changed to {}&quot;</span>, new),
+                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SQL collation change&quot;</span>),
             },
-            <span class="ident"><span class="self">Self</span>::BeginTransaction</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Begin transaction&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::CommitTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Commit transaction&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::RollbackTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Rollback transaction&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DefectTransaction</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Defect transaction&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> } =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+            <span class="self">Self</span>::BeginTransaction(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Begin transaction&quot;</span>),
+            <span class="self">Self</span>::CommitTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Commit transaction&quot;</span>),
+            <span class="self">Self</span>::RollbackTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Rollback transaction&quot;</span>),
+            <span class="self">Self</span>::DefectTransaction =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Defect transaction&quot;</span>),
+            <span class="self">Self</span>::Routing { host, port } =&gt; <span class="macro">write!</span>(
+                f,
                 <span class="string">&quot;Server requested routing to a new address: {}:{}&quot;</span>,
-                <span class="ident">host</span>, <span class="ident">port</span>
+                host, port
             ),
-            <span class="ident"><span class="self">Self</span>::ChangeMirror</span>(<span class="kw-2">ref</span> <span class="ident">mirror</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Fallback mirror server: `{}`&quot;</span>, <span class="ident">mirror</span>),
-            <span class="ident"><span class="self">Self</span>::Ignored</span>(<span class="ident">ty</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Ignored env change: `{}`&quot;</span>, <span class="ident">ty</span>),
+            <span class="self">Self</span>::ChangeMirror(<span class="kw-2">ref </span>mirror) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Fallback mirror server: `{}`&quot;</span>, mirror),
+            <span class="self">Self</span>::Ignored(ty) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Ignored env change: `{}`&quot;</span>, ty),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TokenEnvChange</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl </span>TokenEnvChange {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode&lt;R&gt;(src: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>R: SqlReadBytes + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u16_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let </span>len = src.read_u16_le().<span class="kw">await</span><span class="question-mark">? </span><span class="kw">as </span>usize;
 
-        <span class="comment">// We read all the bytes now, due to whatever environment change tokens</span>
-        <span class="comment">// we read, they might contain padding zeroes in the end we must</span>
-        <span class="comment">// discard.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
-        <span class="ident">src</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>[<span class="number">0</span>..<span class="ident">len</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// We read all the bytes now, due to whatever environment change tokens
+        // we read, they might contain padding zeroes in the end we must
+        // discard.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
+        src.read_exact(<span class="kw-2">&amp;mut </span>bytes[<span class="number">0</span>..len]).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">ty_byte</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Cursor::new(bytes);
+        <span class="kw">let </span>ty_byte = buf.read_u8()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">EnvChangeTy::try_from</span>(<span class="ident">ty_byte</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::Protocol</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid envchange type {:x}&quot;</span>, <span class="ident">ty_byte</span>).<span class="ident">into</span>()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>ty = EnvChangeTy::try_from(ty_byte)
+            .map_err(|<span class="kw">_</span>| Error::Protocol(<span class="macro">format!</span>(<span class="string">&quot;invalid envchange type {:x}&quot;</span>, ty_byte).into()))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="ident">EnvChangeTy::Database</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+        <span class="kw">let </span>token = <span class="kw">match </span>ty {
+            EnvChangeTy::Database =&gt; {
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">new_value</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>new_value = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">old_value</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>old_value = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="ident">TokenEnvChange::Database</span>(<span class="ident">new_value</span>, <span class="ident">old_value</span>)
+                TokenEnvChange::Database(new_value, old_value)
             }
-            <span class="ident">EnvChangeTy::PacketSize</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+            EnvChangeTy::PacketSize =&gt; {
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">new_value</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>new_value = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">old_value</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>old_value = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="ident">TokenEnvChange::PacketSize</span>(<span class="ident">new_value</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>, <span class="ident">old_value</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+                TokenEnvChange::PacketSize(new_value.parse()<span class="question-mark">?</span>, old_value.parse()<span class="question-mark">?</span>)
             }
-            <span class="ident">EnvChangeTy::SqlCollation</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_value</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
-                <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">new_value</span>[<span class="number">0</span>..<span class="ident">len</span>])<span class="question-mark">?</span>;
+            EnvChangeTy::SqlCollation =&gt; {
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>new_value = <span class="macro">vec!</span>[<span class="number">0</span>; len];
+                buf.read_exact(<span class="kw-2">&amp;mut </span>new_value[<span class="number">0</span>..len])<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">5</span> {
-                    <span class="kw">let</span> <span class="ident">new_sortid</span> <span class="op">=</span> <span class="ident">new_value</span>[<span class="number">4</span>];
-                    <span class="kw">let</span> <span class="ident">new_info</span> <span class="op">=</span> <span class="ident">u32::from_le_bytes</span>([
-                        <span class="ident">new_value</span>[<span class="number">0</span>],
-                        <span class="ident">new_value</span>[<span class="number">1</span>],
-                        <span class="ident">new_value</span>[<span class="number">2</span>],
-                        <span class="ident">new_value</span>[<span class="number">3</span>],
+                <span class="kw">let </span>new = <span class="kw">if </span>len == <span class="number">5 </span>{
+                    <span class="kw">let </span>new_sortid = new_value[<span class="number">4</span>];
+                    <span class="kw">let </span>new_info = u32::from_le_bytes([
+                        new_value[<span class="number">0</span>],
+                        new_value[<span class="number">1</span>],
+                        new_value[<span class="number">2</span>],
+                        new_value[<span class="number">3</span>],
                     ]);
 
-                    <span class="prelude-val">Some</span>(<span class="ident">Collation::new</span>(<span class="ident">new_info</span>, <span class="ident">new_sortid</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                };
+                    <span class="prelude-val">Some</span>(Collation::new(new_info, new_sortid))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>};
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_value</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
-                <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">old_value</span>[<span class="number">0</span>..<span class="ident">len</span>])<span class="question-mark">?</span>;
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>old_value = <span class="macro">vec!</span>[<span class="number">0</span>; len];
+                buf.read_exact(<span class="kw-2">&amp;mut </span>old_value[<span class="number">0</span>..len])<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">5</span> {
-                    <span class="kw">let</span> <span class="ident">old_sortid</span> <span class="op">=</span> <span class="ident">old_value</span>[<span class="number">4</span>];
-                    <span class="kw">let</span> <span class="ident">old_info</span> <span class="op">=</span> <span class="ident">u32::from_le_bytes</span>([
-                        <span class="ident">old_value</span>[<span class="number">0</span>],
-                        <span class="ident">old_value</span>[<span class="number">1</span>],
-                        <span class="ident">old_value</span>[<span class="number">2</span>],
-                        <span class="ident">old_value</span>[<span class="number">3</span>],
+                <span class="kw">let </span>old = <span class="kw">if </span>len == <span class="number">5 </span>{
+                    <span class="kw">let </span>old_sortid = old_value[<span class="number">4</span>];
+                    <span class="kw">let </span>old_info = u32::from_le_bytes([
+                        old_value[<span class="number">0</span>],
+                        old_value[<span class="number">1</span>],
+                        old_value[<span class="number">2</span>],
+                        old_value[<span class="number">3</span>],
                     ]);
 
-                    <span class="prelude-val">Some</span>(<span class="ident">Collation::new</span>(<span class="ident">old_info</span>, <span class="ident">old_sortid</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                };
+                    <span class="prelude-val">Some</span>(Collation::new(old_info, old_sortid))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>};
 
-                <span class="ident">TokenEnvChange::SqlCollation</span> { <span class="ident">new</span>, <span class="ident">old</span> }
+                TokenEnvChange::SqlCollation { new, old }
             }
-            <span class="ident">EnvChangeTy::BeginTransaction</span> <span class="op">|</span> <span class="ident">EnvChangeTy::EnlistDTCTransaction</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                <span class="macro">assert!</span>(<span class="ident">len</span> <span class="op">==</span> <span class="number">8</span>);
+            EnvChangeTy::BeginTransaction | EnvChangeTy::EnlistDTCTransaction =&gt; {
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">?</span>;
+                <span class="macro">assert!</span>(len == <span class="number">8</span>);
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">desc</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-                <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">desc</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>desc = [<span class="number">0</span>; <span class="number">8</span>];
+                buf.read_exact(<span class="kw-2">&amp;mut </span>desc)<span class="question-mark">?</span>;
 
-                <span class="ident">TokenEnvChange::BeginTransaction</span>(<span class="ident">desc</span>)
+                TokenEnvChange::BeginTransaction(desc)
             }
 
-            <span class="ident">EnvChangeTy::CommitTransaction</span> =&gt; <span class="ident">TokenEnvChange::CommitTransaction</span>,
-            <span class="ident">EnvChangeTy::RollbackTransaction</span> =&gt; <span class="ident">TokenEnvChange::RollbackTransaction</span>,
-            <span class="ident">EnvChangeTy::DefectTransaction</span> =&gt; <span class="ident">TokenEnvChange::DefectTransaction</span>,
+            EnvChangeTy::CommitTransaction =&gt; TokenEnvChange::CommitTransaction,
+            EnvChangeTy::RollbackTransaction =&gt; TokenEnvChange::RollbackTransaction,
+            EnvChangeTy::DefectTransaction =&gt; TokenEnvChange::DefectTransaction,
 
-            <span class="ident">EnvChangeTy::Routing</span> =&gt; {
-                <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// routing data value length</span>
-                <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>; <span class="comment">// routing protocol, always 0 (tcp)</span>
+            EnvChangeTy::Routing =&gt; {
+                buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>; <span class="comment">// routing data value length
+                </span>buf.read_u8()<span class="question-mark">?</span>; <span class="comment">// routing protocol, always 0 (tcp)
 
-                <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                </span><span class="kw">let </span>port = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>; <span class="comment">// hostname string length</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+                <span class="kw">let </span>len = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">? </span><span class="kw">as </span>usize; <span class="comment">// hostname string length
+                </span><span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>host = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="ident">TokenEnvChange::Routing</span> { <span class="ident">host</span>, <span class="ident">port</span> }
+                TokenEnvChange::Routing { host, port }
             }
-            <span class="ident">EnvChangeTy::Rtls</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">len</span>];
+            EnvChangeTy::Rtls =&gt; {
+                <span class="kw">let </span>len = buf.read_u8()<span class="question-mark">? </span><span class="kw">as </span>usize;
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="macro">vec!</span>[<span class="number">0</span>; len];
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">take</span>(<span class="ident">len</span>) {
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">for </span>item <span class="kw">in </span>bytes.iter_mut().take(len) {
+                    <span class="kw-2">*</span>item = buf.read_u16::&lt;LittleEndian&gt;()<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">mirror_name</span> <span class="op">=</span> <span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..])<span class="question-mark">?</span>;
+                <span class="kw">let </span>mirror_name = String::from_utf16(<span class="kw-2">&amp;</span>bytes[..])<span class="question-mark">?</span>;
 
-                <span class="ident">TokenEnvChange::ChangeMirror</span>(<span class="ident">mirror_name</span>)
+                TokenEnvChange::ChangeMirror(mirror_name)
             }
-            <span class="ident">ty</span> =&gt; <span class="ident">TokenEnvChange::Ignored</span>(<span class="ident">ty</span>),
+            ty =&gt; TokenEnvChange::Ignored(ty),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">token</span>)
+        <span class="prelude-val">Ok</span>(token)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

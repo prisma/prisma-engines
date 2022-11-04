@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tap-1.0.1/src/tap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tap-1.0.1/src/tap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -617,11 +617,11 @@ make_vec().tap_deref_mut(&lt;[_]&gt;::sort);
 // but has no inherent method `sort`.
 // make_vec().tap_mut(Vec::sort);
 ```
-!*/</span>
+!*/
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">BorrowMut</span>},
-	<span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>},
+</span><span class="kw">use </span>core::{
+	borrow::{Borrow, BorrowMut},
+	ops::{Deref, DerefMut},
 };
 
 <span class="doccomment">/** Point-free value inspection and modification.
@@ -632,288 +632,288 @@ code other than insertion of the `.tap()` call.
 
 The methods in this trait do not perform any view conversions on the value they
 receive; it is borrowed and passed directly to the effect argument.
-**/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Tap</span>
-<span class="kw">where</span>
-	<span class="self">Self</span>: <span class="ident">Sized</span>,
+**/
+</span><span class="kw">pub trait </span>Tap
+<span class="kw">where
+	</span><span class="self">Self</span>: Sized,
 {
-	<span class="doccomment">/// Immutable access to a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function permits a value to be viewed by some inspecting function</span>
-	<span class="doccomment">/// without affecting the overall shape of the expression that contains this</span>
-	<span class="doccomment">/// method call. It is useful for attaching assertions or logging points</span>
-	<span class="doccomment">/// into a multi-part expression.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Here we use `.tap()` to attach logging tracepoints to each stage of a</span>
-	<span class="doccomment">/// value-processing pipeline.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use tap::tap::Tap;</span>
-	<span class="doccomment">/// # struct Tmp;</span>
-	<span class="doccomment">/// # impl Tmp { fn process_value(self) -&gt; Self { self } }</span>
-	<span class="doccomment">/// # fn make_value() -&gt; Tmp { Tmp }</span>
-	<span class="doccomment">/// # macro_rules! log { ($msg:literal, $x:ident) =&gt; {{}}; }</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let end = make_value()</span>
-	<span class="doccomment">///   // this line has no effect on the rest of the code</span>
-	<span class="doccomment">///   .tap(|v| log!(&quot;The produced value was: {}&quot;, v))</span>
-	<span class="doccomment">///   .process_value();</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>)) -&gt; <span class="self">Self</span> {
-		<span class="ident">func</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
-		<span class="self">self</span>
-	}
+	<span class="doccomment">/// Immutable access to a value.
+	///
+	/// This function permits a value to be viewed by some inspecting function
+	/// without affecting the overall shape of the expression that contains this
+	/// method call. It is useful for attaching assertions or logging points
+	/// into a multi-part expression.
+	///
+	/// # Examples
+	///
+	/// Here we use `.tap()` to attach logging tracepoints to each stage of a
+	/// value-processing pipeline.
+	///
+	/// ```rust
+	/// use tap::tap::Tap;
+	/// # struct Tmp;
+	/// # impl Tmp { fn process_value(self) -&gt; Self { self } }
+	/// # fn make_value() -&gt; Tmp { Tmp }
+	/// # macro_rules! log { ($msg:literal, $x:ident) =&gt; {{}}; }
+	///
+	/// let end = make_value()
+	///   // this line has no effect on the rest of the code
+	///   .tap(|v| log!(&quot;The produced value was: {}&quot;, v))
+	///   .process_value();
+	/// ```
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>)) -&gt; <span class="self">Self </span>{
+		func(<span class="kw-2">&amp;</span><span class="self">self</span>);
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Mutable access to a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function permits a value to be modified by some function without</span>
-	<span class="doccomment">/// affecting the overall shape of the expression that contains this method</span>
-	<span class="doccomment">/// call. It is useful for attaching modifier functions that have an</span>
-	<span class="doccomment">/// `&amp;mut Self -&gt; ()` signature to an expression, without requiring an</span>
-	<span class="doccomment">/// explicit `let mut` binding.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Here we use `.tap_mut()` to sort an array without requring multiple</span>
-	<span class="doccomment">/// bindings.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use tap::tap::Tap;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let sorted = [1i32, 5, 2, 4, 3]</span>
-	<span class="doccomment">///   .tap_mut(|arr| arr.sort());</span>
-	<span class="doccomment">/// assert_eq!(sorted, [1, 2, 3, 4, 5]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Without tapping, this would be written as</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// let mut received = [1, 5, 2, 4, 3];</span>
-	<span class="doccomment">/// received.sort();</span>
-	<span class="doccomment">/// let sorted = received;</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The mutable tap is a convenient alternative when the expression to</span>
-	<span class="doccomment">/// produce the collection is more complex, for example, an iterator</span>
-	<span class="doccomment">/// pipeline collected into a vector.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_mut</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>)) -&gt; <span class="self">Self</span> {
-		<span class="ident">func</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
-		<span class="self">self</span>
-	}
+	<span class="doccomment">/// Mutable access to a value.
+	///
+	/// This function permits a value to be modified by some function without
+	/// affecting the overall shape of the expression that contains this method
+	/// call. It is useful for attaching modifier functions that have an
+	/// `&amp;mut Self -&gt; ()` signature to an expression, without requiring an
+	/// explicit `let mut` binding.
+	///
+	/// # Examples
+	///
+	/// Here we use `.tap_mut()` to sort an array without requring multiple
+	/// bindings.
+	///
+	/// ```rust
+	/// use tap::tap::Tap;
+	///
+	/// let sorted = [1i32, 5, 2, 4, 3]
+	///   .tap_mut(|arr| arr.sort());
+	/// assert_eq!(sorted, [1, 2, 3, 4, 5]);
+	/// ```
+	///
+	/// Without tapping, this would be written as
+	///
+	/// ```rust
+	/// let mut received = [1, 5, 2, 4, 3];
+	/// received.sort();
+	/// let sorted = received;
+	/// ```
+	///
+	/// The mutable tap is a convenient alternative when the expression to
+	/// produce the collection is more complex, for example, an iterator
+	/// pipeline collected into a vector.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_mut(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>)) -&gt; <span class="self">Self </span>{
+		func(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Immutable access to the `Borrow&lt;B&gt;` of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identcal to [`Tap::tap`], except that the effect</span>
-	<span class="doccomment">/// function recevies an `&amp;B` produced by `Borrow::&lt;B&gt;::borrow`, rather than</span>
-	<span class="doccomment">/// an `&amp;Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_borrow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">B</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		<span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Immutable access to the `Borrow&lt;B&gt;` of a value.
+	///
+	/// This function is identcal to [`Tap::tap`], except that the effect
+	/// function recevies an `&amp;B` produced by `Borrow::&lt;B&gt;::borrow`, rather than
+	/// an `&amp;Self`.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_borrow&lt;B&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>B)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: Borrow&lt;B&gt;,
+		B: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">Borrow</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(Borrow::&lt;B&gt;::borrow(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Mutable access to the `BorrowMut&lt;B&gt;` of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that the effect</span>
-	<span class="doccomment">/// function receives an `&amp;mut B` produced by `BorrowMut::&lt;B&gt;::borrow_mut`,</span>
-	<span class="doccomment">/// rather than an `&amp;mut Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_borrow_mut</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">B</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		<span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Mutable access to the `BorrowMut&lt;B&gt;` of a value.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that the effect
+	/// function receives an `&amp;mut B` produced by `BorrowMut::&lt;B&gt;::borrow_mut`,
+	/// rather than an `&amp;mut Self`.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_borrow_mut&lt;B&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>B)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: BorrowMut&lt;B&gt;,
+		B: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">BorrowMut</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(BorrowMut::&lt;B&gt;::borrow_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Immutable access to the `AsRef&lt;R&gt;` view of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that the effect</span>
-	<span class="doccomment">/// function receives an `&amp;R` produced by `AsRef::&lt;R&gt;::as_ref`, rather than</span>
-	<span class="doccomment">/// an `&amp;Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ref</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">R</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-		<span class="ident">R</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Immutable access to the `AsRef&lt;R&gt;` view of a value.
+	///
+	/// This function is identical to [`Tap::tap`], except that the effect
+	/// function receives an `&amp;R` produced by `AsRef::&lt;R&gt;::as_ref`, rather than
+	/// an `&amp;Self`.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ref&lt;R&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>R)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: AsRef&lt;R&gt;,
+		R: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(AsRef::&lt;R&gt;::as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Mutable access to the `AsMut&lt;R&gt;` view of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that the effect</span>
-	<span class="doccomment">/// function receives an `&amp;mut R` produced by `AsMut::&lt;R&gt;::as_mut`, rather</span>
-	<span class="doccomment">/// than an `&amp;mut Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ref_mut</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">R</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-		<span class="ident">R</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Mutable access to the `AsMut&lt;R&gt;` view of a value.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that the effect
+	/// function receives an `&amp;mut R` produced by `AsMut::&lt;R&gt;::as_mut`, rather
+	/// than an `&amp;mut Self`.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ref_mut&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>R)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: AsMut&lt;R&gt;,
+		R: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">AsMut</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(AsMut::&lt;R&gt;::as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Immutable access to the `Deref::Target` of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that the effect</span>
-	<span class="doccomment">/// function receives an `&amp;Self::Target` produced by `Deref::deref`, rather</span>
-	<span class="doccomment">/// than an `&amp;Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_deref</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Immutable access to the `Deref::Target` of a value.
+	///
+	/// This function is identical to [`Tap::tap`], except that the effect
+	/// function receives an `&amp;Self::Target` produced by `Deref::deref`, rather
+	/// than an `&amp;Self`.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_deref&lt;T&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>T)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: Deref&lt;Target = T&gt;,
+		T: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">Deref::deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(Deref::deref(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Mutable access to the `Deref::Target` of a value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that the effect</span>
-	<span class="doccomment">/// function receives an `&amp;mut Self::Target` produced by</span>
-	<span class="doccomment">/// `DerefMut::deref_mut`, rather than an `&amp;mut Self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_deref_mut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Mutable access to the `Deref::Target` of a value.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that the effect
+	/// function receives an `&amp;mut Self::Target` produced by
+	/// `DerefMut::deref_mut`, rather than an `&amp;mut Self`.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_deref_mut&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>T)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: DerefMut + Deref&lt;Target = T&gt;,
+		T: <span class="question-mark">?</span>Sized,
 	{
-		<span class="ident">func</span>(<span class="ident">DerefMut::deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
-		<span class="self">self</span>
-	}
+		func(DerefMut::deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
+		<span class="self">self
+	</span>}
 
-	<span class="comment">//  debug-build-only copies of the above methods</span>
+	<span class="comment">//  debug-build-only copies of the above methods
 
-	<span class="doccomment">/// Calls `.tap()` only in debug builds, and is erased in release builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+	</span><span class="doccomment">/// Calls `.tap()` only in debug builds, and is erased in release builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(<span class="kw-2">&amp;</span><span class="self">self</span>);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_mut_dbg</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+	<span class="doccomment">/// Calls `.tap_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_mut_dbg(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_borrow()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_borrow_dbg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">B</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		<span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_borrow()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_borrow_dbg&lt;B&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>B)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: Borrow&lt;B&gt;,
+		B: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">Borrow</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(Borrow::&lt;B&gt;::borrow(<span class="kw-2">&amp;</span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_borrow_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_borrow_mut_dbg</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">B</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-		<span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_borrow_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_borrow_mut_dbg&lt;B&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>B)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: BorrowMut&lt;B&gt;,
+		B: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">BorrowMut</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(BorrowMut::&lt;B&gt;::borrow_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_ref()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ref_dbg</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">R</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-		<span class="ident">R</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_ref()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ref_dbg&lt;R&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>R)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: AsRef&lt;R&gt;,
+		R: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">AsRef</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(AsRef::&lt;R&gt;::as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_ref_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ref_mut_dbg</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">R</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-		<span class="ident">R</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_ref_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ref_mut_dbg&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>R)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: AsMut&lt;R&gt;,
+		R: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">AsMut</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(AsMut::&lt;R&gt;::as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_deref()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_deref_dbg</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_deref()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_deref_dbg&lt;T&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>T)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: Deref&lt;Target = T&gt;,
+		T: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">Deref::deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(Deref::deref(<span class="kw-2">&amp;</span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="doccomment">/// Calls `.tap_deref_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_deref_mut_dbg</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)) -&gt; <span class="self">Self</span>
-	<span class="kw">where</span>
-		<span class="self">Self</span>: <span class="ident">DerefMut</span> <span class="op">+</span> <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+	<span class="doccomment">/// Calls `.tap_deref_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_deref_mut_dbg&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>T)) -&gt; <span class="self">Self
+	</span><span class="kw">where
+		</span><span class="self">Self</span>: DerefMut + Deref&lt;Target = T&gt;,
+		T: <span class="question-mark">?</span>Sized,
 	{
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="ident">func</span>(<span class="ident">DerefMut::deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			func(DerefMut::deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>));
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Tap</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Sized</span> {}
+<span class="kw">impl</span>&lt;T&gt; Tap <span class="kw">for </span>T <span class="kw">where </span>T: Sized {}
 
 <span class="doccomment">/** Optional tapping, conditional on the optional presence of a value.
 
@@ -929,104 +929,104 @@ container to determine if the effect function should execute or not.
 [`Option`]: https://doc.rust-lang.org/std/option/enum.Option.html
 [`TapFallible`]: trait.TapFallible.html
 [`std::ops::Try`]: https://doc.rust-lang.org/std/ops/trait.Try.html
-**/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TapOptional</span>
-<span class="kw">where</span>
-	<span class="self">Self</span>: <span class="ident">Sized</span>,
+**/
+</span><span class="kw">pub trait </span>TapOptional
+<span class="kw">where
+	</span><span class="self">Self</span>: Sized,
 {
-	<span class="doccomment">/// The interior type that the container may or may not carry.</span>
-	<span class="kw">type</span> <span class="ident">Val</span>: <span class="question-mark">?</span><span class="ident">Sized</span>;
+	<span class="doccomment">/// The interior type that the container may or may not carry.
+	</span><span class="kw">type </span>Val: <span class="question-mark">?</span>Sized;
 
-	<span class="doccomment">/// Immutabily accesses an interior value only when it is present.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that it is required</span>
-	<span class="doccomment">/// to check the implementing container for value presence before running.</span>
-	<span class="doccomment">/// Implementors must not run the effect function if the container is marked</span>
-	<span class="doccomment">/// as being empty.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="kw">fn</span> <span class="ident">tap_some</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Val</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Immutabily accesses an interior value only when it is present.
+	///
+	/// This function is identical to [`Tap::tap`], except that it is required
+	/// to check the implementing container for value presence before running.
+	/// Implementors must not run the effect function if the container is marked
+	/// as being empty.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="kw">fn </span>tap_some(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Val)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Mutably accesses an interor value only when it is present.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that it is</span>
-	<span class="doccomment">/// required to check the implementing container for value presence before</span>
-	<span class="doccomment">/// running. Implementors must not run the effect function if the container</span>
-	<span class="doccomment">/// is marked as being empty.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_mut</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Val</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Mutably accesses an interor value only when it is present.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that it is
+	/// required to check the implementing container for value presence before
+	/// running. Implementors must not run the effect function if the container
+	/// is marked as being empty.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="kw">fn </span>tap_some_mut(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Val)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Runs an effect function when the container is empty.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that it is required</span>
-	<span class="doccomment">/// to check the implementing container for value absence before running.</span>
-	<span class="doccomment">/// Implementors must not run the effect function if the container is marked</span>
-	<span class="doccomment">/// as being non-empty.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="kw">fn</span> <span class="ident">tap_none</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>()) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Runs an effect function when the container is empty.
+	///
+	/// This function is identical to [`Tap::tap`], except that it is required
+	/// to check the implementing container for value absence before running.
+	/// Implementors must not run the effect function if the container is marked
+	/// as being non-empty.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="kw">fn </span>tap_none(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce()) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Calls `.tap_some()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Val</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_some</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_some()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_some_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Val)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_some(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 
-	<span class="doccomment">/// Calls `.tap_some_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_mut_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Val</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_some_mut</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_some_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_some_mut_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Val)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_some_mut(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 
-	<span class="doccomment">/// Calls `.tap_none()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_none_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>()) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_none</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_none()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_none_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce()) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_none(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TapOptional</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="ident">Val</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; TapOptional <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+	<span class="kw">type </span>Val = T;
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_some</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_some(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>T)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_mut</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_some_mut(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>T)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_none</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>()) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_none</span>() {
-			<span class="ident">func</span>();
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_none(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce()) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="self">self</span>.is_none() {
+			func();
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 }
 
 <span class="doccomment">/** Fallible tapping, conditional on the optional success of an expression.
@@ -1041,136 +1041,136 @@ container to determine if the effect function should execute or not.
 
 [`Result`]: https://doc.rust-lang.org/std/result/enum.Result.html
 [`std::ops::Try`]: https://doc.rust-lang.org/std/ops/trait.Try.html
-**/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TapFallible</span>
-<span class="kw">where</span>
-	<span class="self">Self</span>: <span class="ident">Sized</span>,
+**/
+</span><span class="kw">pub trait </span>TapFallible
+<span class="kw">where
+	</span><span class="self">Self</span>: Sized,
 {
-	<span class="doccomment">/// The interior type used to indicate a successful construction.</span>
-	<span class="kw">type</span> <span class="prelude-val">Ok</span>: <span class="question-mark">?</span><span class="ident">Sized</span>;
+	<span class="doccomment">/// The interior type used to indicate a successful construction.
+	</span><span class="kw">type </span><span class="prelude-val">Ok</span>: <span class="question-mark">?</span>Sized;
 
-	<span class="doccomment">/// The interior type used to indicate a failed construction.</span>
-	<span class="kw">type</span> <span class="prelude-val">Err</span>: <span class="question-mark">?</span><span class="ident">Sized</span>;
+	<span class="doccomment">/// The interior type used to indicate a failed construction.
+	</span><span class="kw">type </span><span class="prelude-val">Err</span>: <span class="question-mark">?</span>Sized;
 
-	<span class="doccomment">/// Immutably accesses an interior success value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that it is required</span>
-	<span class="doccomment">/// to check the implementing container for value success before running.</span>
-	<span class="doccomment">/// Implementors must not run the effect function if the container is marked</span>
-	<span class="doccomment">/// as being a failure.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Ok</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Immutably accesses an interior success value.
+	///
+	/// This function is identical to [`Tap::tap`], except that it is required
+	/// to check the implementing container for value success before running.
+	/// Implementors must not run the effect function if the container is marked
+	/// as being a failure.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="kw">fn </span>tap_ok(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Ok)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Mutably accesses an interior success value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that it is</span>
-	<span class="doccomment">/// required to check the implementing container for value success before</span>
-	<span class="doccomment">/// running. Implementors must not run the effect function if the container</span>
-	<span class="doccomment">/// is marked as being a failure.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Ok</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Mutably accesses an interior success value.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that it is
+	/// required to check the implementing container for value success before
+	/// running. Implementors must not run the effect function if the container
+	/// is marked as being a failure.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="kw">fn </span>tap_ok_mut(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Ok)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Immutably accesses an interior failure value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap`], except that it is required</span>
-	<span class="doccomment">/// to check the implementing container for value failure before running.</span>
-	<span class="doccomment">/// Implementors must not run the effect function if the container is marked</span>
-	<span class="doccomment">/// as being a success.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap`]: trait.Tap.html#method.tap</span>
-	<span class="kw">fn</span> <span class="ident">tap_err</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Err</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Immutably accesses an interior failure value.
+	///
+	/// This function is identical to [`Tap::tap`], except that it is required
+	/// to check the implementing container for value failure before running.
+	/// Implementors must not run the effect function if the container is marked
+	/// as being a success.
+	///
+	/// [`Tap::tap`]: trait.Tap.html#method.tap
+	</span><span class="kw">fn </span>tap_err(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Err)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Mutably accesses an interior failure value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function is identical to [`Tap::tap_mut`], except that it is</span>
-	<span class="doccomment">/// required to check the implementing container for value failure before</span>
-	<span class="doccomment">/// running. Implementors must not run the effect function if the container</span>
-	<span class="doccomment">/// is marked as being a success.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_mut</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Err</span>)) -&gt; <span class="self">Self</span>;
+	<span class="doccomment">/// Mutably accesses an interior failure value.
+	///
+	/// This function is identical to [`Tap::tap_mut`], except that it is
+	/// required to check the implementing container for value failure before
+	/// running. Implementors must not run the effect function if the container
+	/// is marked as being a success.
+	///
+	/// [`Tap::tap_mut`]: trait.Tap.html#method.tap_mut
+	</span><span class="kw">fn </span>tap_err_mut(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Err)) -&gt; <span class="self">Self</span>;
 
-	<span class="doccomment">/// Calls `.tap_ok()` only in debug builds, and is erased in release builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Ok</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_ok</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_ok()` only in debug builds, and is erased in release builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ok_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Ok)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_ok(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 
-	<span class="doccomment">/// Calls `.tap_ok_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Ok</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_ok_mut</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_ok_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ok_mut_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Ok)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_ok_mut(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 
-	<span class="doccomment">/// Calls `.tap_err()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Err</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_err</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_err()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_err_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="self">Self</span>::Err)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_err(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 
-	<span class="doccomment">/// Calls `.tap_err_mut()` only in debug builds, and is erased in release</span>
-	<span class="doccomment">/// builds.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_mut_dbg</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Err</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">tap_err_mut</span>(<span class="ident">func</span>)
-		} <span class="kw">else</span> {
-			<span class="self">self</span>
-		}
+	<span class="doccomment">/// Calls `.tap_err_mut()` only in debug builds, and is erased in release
+	/// builds.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_err_mut_dbg(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>::Err)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.tap_err_mut(func)
+		} <span class="kw">else </span>{
+			<span class="self">self
+		</span>}
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">TapFallible</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-	<span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">T</span>;
-	<span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">E</span>;
+<span class="kw">impl</span>&lt;T, E&gt; TapFallible <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;T, E&gt; {
+	<span class="kw">type </span><span class="prelude-val">Ok </span>= T;
+	<span class="kw">type </span><span class="prelude-val">Err </span>= E;
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ok(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>T)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_ok_mut(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>T)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">ref mut </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_err</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">E</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_err(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>E)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_mut</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">E</span>)) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span> {
-			<span class="ident">func</span>(<span class="ident">val</span>);
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>tap_err_mut(<span class="kw-2">mut </span><span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>E)) -&gt; <span class="self">Self </span>{
+		<span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref mut </span>val) = <span class="self">self </span>{
+			func(val);
 		}
-		<span class="self">self</span>
-	}
+		<span class="self">self
+	</span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/extjson/de.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/extjson/de.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -223,230 +223,230 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Deserializing [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Extended JSON can be deserialized using [`Bson`](../../enum.Bson.html)&#39;s</span>
-<span class="doccomment">//! `TryFrom&lt;serde_json::Value&gt;` implementation. This implementation accepts both canonical and</span>
-<span class="doccomment">//! relaxed extJSON, and the two modes can even be mixed within a single representation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! e.g.</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use bson::Bson;</span>
-<span class="doccomment">//! # use serde_json::json;</span>
-<span class="doccomment">//! # use std::convert::{TryFrom, TryInto};</span>
-<span class="doccomment">//! let json_doc = json!({ &quot;x&quot;: 5i32, &quot;y&quot;: { &quot;$numberInt&quot;: &quot;5&quot; }, &quot;z&quot;: { &quot;subdoc&quot;: &quot;hello&quot; } });</span>
-<span class="doccomment">//! let bson: Bson = json_doc.try_into().unwrap(); // Bson::Document(...)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let json_date = json!({ &quot;$date&quot;: { &quot;$numberLong&quot;: &quot;1590972160292&quot; } });</span>
-<span class="doccomment">//! let bson_date: Bson = json_date.try_into().unwrap(); // Bson::DateTime(...)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let invalid_ext_json = json!({ &quot;$numberLong&quot;: 5 });</span>
-<span class="doccomment">//! Bson::try_from(invalid_ext_json).expect_err(&quot;5 should be a string&quot;);</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Deserializing [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/)
+//!
+//! ## Usage
+//!
+//! Extended JSON can be deserialized using [`Bson`](../../enum.Bson.html)&#39;s
+//! `TryFrom&lt;serde_json::Value&gt;` implementation. This implementation accepts both canonical and
+//! relaxed extJSON, and the two modes can even be mixed within a single representation.
+//!
+//! e.g.
+//! ```rust
+//! # use bson::Bson;
+//! # use serde_json::json;
+//! # use std::convert::{TryFrom, TryInto};
+//! let json_doc = json!({ &quot;x&quot;: 5i32, &quot;y&quot;: { &quot;$numberInt&quot;: &quot;5&quot; }, &quot;z&quot;: { &quot;subdoc&quot;: &quot;hello&quot; } });
+//! let bson: Bson = json_doc.try_into().unwrap(); // Bson::Document(...)
+//!
+//! let json_date = json!({ &quot;$date&quot;: { &quot;$numberLong&quot;: &quot;1590972160292&quot; } });
+//! let bson_date: Bson = json_date.try_into().unwrap(); // Bson::DateTime(...)
+//!
+//! let invalid_ext_json = json!({ &quot;$numberLong&quot;: 5 });
+//! Bson::try_from(invalid_ext_json).expect_err(&quot;5 should be a string&quot;);
+//! ```
 
-<span class="kw">use</span> <span class="ident">std::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+</span><span class="kw">use </span>std::convert::{TryFrom, TryInto};
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">Unexpected</span>};
+<span class="kw">use </span>serde::de::{Error <span class="kw">as _</span>, Unexpected};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">extjson::models</span>, <span class="ident">oid</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>};
+<span class="kw">use crate</span>::{extjson::models, oid, Bson, Document};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="doccomment">/// Error cases that can occur during deserialization from [extended JSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Errors that can occur during OID construction and generation from the input data.</span>
-    <span class="ident">InvalidObjectId</span>(<span class="ident">oid::Error</span>),
+<span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="doccomment">/// Error cases that can occur during deserialization from [extended JSON](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// Errors that can occur during OID construction and generation from the input data.
+    </span>InvalidObjectId(oid::Error),
 
-    <span class="doccomment">/// A general error encountered during deserialization.</span>
-    <span class="doccomment">/// See: &lt;https://docs.serde.rs/serde/de/trait.Error.html&gt;</span>
-    <span class="ident">DeserializationError</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="doccomment">/// A general error encountered during deserialization.
+    /// See: &lt;https://docs.serde.rs/serde/de/trait.Error.html&gt;
+    </span>DeserializationError { message: String },
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::InvalidObjectId</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
-            <span class="ident"><span class="self">Self</span>::DeserializationError</span> { <span class="kw-2">ref</span> <span class="ident">message</span> } =&gt; <span class="ident">message</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="self">Self</span>::InvalidObjectId(<span class="kw-2">ref </span>err) =&gt; err.fmt(fmt),
+            <span class="self">Self</span>::DeserializationError { <span class="kw-2">ref </span>message } =&gt; message.fmt(fmt),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>Error {}
 
-<span class="kw">impl</span> <span class="ident">serde::de::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">custom</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">std::fmt::Display</span>,
+<span class="kw">impl </span>serde::de::Error <span class="kw">for </span>Error {
+    <span class="kw">fn </span>custom&lt;T&gt;(msg: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: std::fmt::Display,
     {
-        <span class="ident"><span class="self">Self</span>::DeserializationError</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>),
+        <span class="self">Self</span>::DeserializationError {
+            message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, msg),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">serde_json::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::DeserializationError</span> {
-            <span class="ident">message</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>From&lt;serde_json::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: serde_json::Error) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::DeserializationError {
+            message: err.to_string(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">oid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">oid::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::InvalidObjectId</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;oid::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: oid::Error) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::InvalidObjectId(err)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, Error&gt;;
 
-<span class="doccomment">/// This converts from the input JSON object as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="doccomment">/// This converts from the input JSON object as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+</span><span class="kw">impl </span>TryFrom&lt;serde_json::Map&lt;String, serde_json::Value&gt;&gt; <span class="kw">for </span>Bson {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">obj</span>: <span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$oid&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">oid</span>: <span class="ident">models::ObjectId</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+    <span class="kw">fn </span>try_from(obj: serde_json::Map&lt;String, serde_json::Value&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$oid&quot;</span>) {
+            <span class="kw">let </span>oid: models::ObjectId = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::ObjectId(oid.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$symbol&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">symbol</span>: <span class="ident">models::Symbol</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Symbol</span>(<span class="ident">symbol</span>.<span class="ident">value</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$symbol&quot;</span>) {
+            <span class="kw">let </span>symbol: models::Symbol = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Symbol(symbol.value));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$regularExpression&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">regex</span>: <span class="ident">models::Regex</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">regex</span>.<span class="ident">parse</span>().<span class="ident">into</span>());
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$regularExpression&quot;</span>) {
+            <span class="kw">let </span>regex: models::Regex = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(regex.parse().into());
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$numberInt&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">int</span>: <span class="ident">models::Int32</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Int32</span>(<span class="ident">int</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$numberInt&quot;</span>) {
+            <span class="kw">let </span>int: models::Int32 = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Int32(int.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$numberLong&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">int</span>: <span class="ident">models::Int64</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Int64</span>(<span class="ident">int</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$numberLong&quot;</span>) {
+            <span class="kw">let </span>int: models::Int64 = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Int64(int.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$numberDouble&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">double</span>: <span class="ident">models::Double</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Double</span>(<span class="ident">double</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$numberDouble&quot;</span>) {
+            <span class="kw">let </span>double: models::Double = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Double(double.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$binary&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">binary</span>: <span class="ident">models::Binary</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Binary</span>(<span class="ident">binary</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$binary&quot;</span>) {
+            <span class="kw">let </span>binary: models::Binary = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Binary(binary.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$uuid&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">uuid</span>: <span class="ident">models::Uuid</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::Binary</span>(<span class="ident">uuid</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$uuid&quot;</span>) {
+            <span class="kw">let </span>uuid: models::Uuid = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::Binary(uuid.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$code&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">code_w_scope</span>: <span class="ident">models::JavaScriptCodeWithScope</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">code_w_scope</span>.<span class="ident">scope</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">scope</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::JavaScriptCodeWithScope</span> {
-                    <span class="ident">code</span>: <span class="ident">code_w_scope</span>.<span class="ident">code</span>,
-                    <span class="ident">scope</span>: <span class="ident">scope</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$code&quot;</span>) {
+            <span class="kw">let </span>code_w_scope: models::JavaScriptCodeWithScope = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return match </span>code_w_scope.scope {
+                <span class="prelude-val">Some</span>(scope) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">crate</span>::JavaScriptCodeWithScope {
+                    code: code_w_scope.code,
+                    scope: scope.try_into()<span class="question-mark">?</span>,
                 }
-                .<span class="ident">into</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::JavaScriptCode</span>(<span class="ident">code_w_scope</span>.<span class="ident">code</span>)),
+                .into()),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(Bson::JavaScriptCode(code_w_scope.code)),
             };
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$timestamp&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">ts</span>: <span class="ident">models::Timestamp</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ts</span>.<span class="ident">parse</span>().<span class="ident">into</span>());
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$timestamp&quot;</span>) {
+            <span class="kw">let </span>ts: models::Timestamp = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(ts.parse().into());
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$date&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">extjson_datetime</span>: <span class="ident">models::DateTime</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Bson::DateTime</span>(<span class="ident">extjson_datetime</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$date&quot;</span>) {
+            <span class="kw">let </span>extjson_datetime: models::DateTime = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(Bson::DateTime(extjson_datetime.parse()<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$minKey&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">min_key</span>: <span class="ident">models::MinKey</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="ident">min_key</span>.<span class="ident">parse</span>();
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$minKey&quot;</span>) {
+            <span class="kw">let </span>min_key: models::MinKey = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span>min_key.parse();
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$maxKey&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">max_key</span>: <span class="ident">models::MaxKey</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="ident">max_key</span>.<span class="ident">parse</span>();
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$maxKey&quot;</span>) {
+            <span class="kw">let </span>max_key: models::MaxKey = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span>max_key.parse();
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$dbPointer&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">db_ptr</span>: <span class="ident">models::DbPointer</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">db_ptr</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>.<span class="ident">into</span>());
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$dbPointer&quot;</span>) {
+            <span class="kw">let </span>db_ptr: models::DbPointer = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(db_ptr.parse()<span class="question-mark">?</span>.into());
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$numberDecimal&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="string">&quot;decimal128 extjson support not implemented&quot;</span>));
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$numberDecimal&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::custom(<span class="string">&quot;decimal128 extjson support not implemented&quot;</span>));
         }
 
-        <span class="kw">if</span> <span class="ident">obj</span>.<span class="ident">contains_key</span>(<span class="string">&quot;$undefined&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">undefined</span>: <span class="ident">models::Undefined</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">obj</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="ident">undefined</span>.<span class="ident">parse</span>();
+        <span class="kw">if </span>obj.contains_key(<span class="string">&quot;$undefined&quot;</span>) {
+            <span class="kw">let </span>undefined: models::Undefined = serde_json::from_value(obj.into())<span class="question-mark">?</span>;
+            <span class="kw">return </span>undefined.parse();
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Bson::Document</span>(<span class="ident">obj</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(Bson::Document(obj.try_into()<span class="question-mark">?</span>))
     }
 }
 
-<span class="doccomment">/// This converts from the input JSON as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="doccomment">/// This converts from the input JSON as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+</span><span class="kw">impl </span>TryFrom&lt;serde_json::Value&gt; <span class="kw">for </span>Bson {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">serde_json::Value::Number</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>
-                .<span class="ident">as_i64</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">std::i32::MIN</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span> {
-                        <span class="ident">Bson::Int32</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i32</span>)
-                    } <span class="kw">else</span> {
-                        <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)
+    <span class="kw">fn </span>try_from(value: serde_json::Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>value {
+            serde_json::Value::Number(x) =&gt; x
+                .as_i64()
+                .map(|i| {
+                    <span class="kw">if </span>i &gt;= std::i32::MIN <span class="kw">as </span>i64 &amp;&amp; i &lt;= std::i32::MAX <span class="kw">as </span>i64 {
+                        Bson::Int32(i <span class="kw">as </span>i32)
+                    } <span class="kw">else </span>{
+                        Bson::Int64(i)
                     }
                 })
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_f64</span>().<span class="ident">map</span>(<span class="ident">Bson::from</span>))
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">Error::invalid_value</span>(
-                        <span class="ident">Unexpected::Other</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>).<span class="ident">as_str</span>()),
+                .or_else(|| x.as_f64().map(Bson::from))
+                .ok_or_else(|| {
+                    Error::invalid_value(
+                        Unexpected::Other(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, x).as_str()),
                         <span class="kw-2">&amp;</span><span class="string">&quot;a number that could fit in i32, i64, or f64&quot;</span>,
                     )
                 }),
-            <span class="ident">serde_json::Value::String</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">serde_json::Value::Bool</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">serde_json::Value::Array</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Array</span>(
-                <span class="ident">x</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="ident">Bson::try_from</span>)
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            serde_json::Value::String(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            serde_json::Value::Bool(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            serde_json::Value::Array(x) =&gt; <span class="prelude-val">Ok</span>(Bson::Array(
+                x.into_iter()
+                    .map(Bson::try_from)
+                    .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;Bson&gt;&gt;&gt;()<span class="question-mark">?</span>,
             )),
-            <span class="ident">serde_json::Value::Null</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Null</span>),
-            <span class="ident">serde_json::Value::Object</span>(<span class="ident">map</span>) =&gt; <span class="ident">map</span>.<span class="ident">try_into</span>(),
+            serde_json::Value::Null =&gt; <span class="prelude-val">Ok</span>(Bson::Null),
+            serde_json::Value::Object(map) =&gt; map.try_into(),
         }
     }
 }
 
-<span class="doccomment">/// This converts from the input JSON as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).</span>
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Document</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="doccomment">/// This converts from the input JSON as if it were [MongoDB Extended JSON v2](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/).
+</span><span class="kw">impl </span>TryFrom&lt;serde_json::Map&lt;String, serde_json::Value&gt;&gt; <span class="kw">for </span>Document {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">obj</span>: <span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">obj</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Bson</span>)<span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Bson</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident">value</span>))
+    <span class="kw">fn </span>try_from(obj: serde_json::Map&lt;String, serde_json::Value&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(obj
+            .into_iter()
+            .map(|(k, v)| -&gt; <span class="prelude-ty">Result</span>&lt;(String, Bson)&gt; {
+                <span class="kw">let </span>value: Bson = v.try_into()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((k, value))
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Bson</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">collect</span>())
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;(String, Bson)&gt;&gt;&gt;()<span class="question-mark">?
+            </span>.into_iter()
+            .collect())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

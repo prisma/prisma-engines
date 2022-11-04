@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/interpreter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interpreter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/interpreter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interpreter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -304,311 +304,311 @@
 <span id="304">304</span>
 <span id="305">305</span>
 <span id="306">306</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">expression</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_interpreters</span>::{<span class="ident">read</span>, <span class="ident">write</span>},
-    <span class="ident">InterpretationResult</span>, <span class="ident">InterpreterError</span>,
+<span class="kw">use super</span>::{
+    expression::<span class="kw-2">*</span>,
+    query_interpreters::{read, write},
+    InterpretationResult, InterpreterError,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Query</span>, <span class="ident">QueryResult</span>};
-<span class="kw">use</span> <span class="ident">connector::ConnectionLike</span>;
-<span class="kw">use</span> <span class="ident">crossbeam_queue::SegQueue</span>;
-<span class="kw">use</span> <span class="ident">futures::future::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">im::HashMap</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
+<span class="kw">use crate</span>::{Query, QueryResult};
+<span class="kw">use </span>connector::ConnectionLike;
+<span class="kw">use </span>crossbeam_queue::SegQueue;
+<span class="kw">use </span>futures::future::BoxFuture;
+<span class="kw">use </span>im::HashMap;
+<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>tracing::Instrument;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExpressionResult</span> {
-    <span class="doccomment">/// A result from a query execution.</span>
-    <span class="ident">Query</span>(<span class="ident">QueryResult</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>ExpressionResult {
+    <span class="doccomment">/// A result from a query execution.
+    </span>Query(QueryResult),
 
-    <span class="doccomment">/// A fixed result returned in the query graph.</span>
-    <span class="ident">FixedResult</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// A fixed result returned in the query graph.
+    </span>FixedResult(Vec&lt;SelectionResult&gt;),
 
-    <span class="doccomment">/// A result from a computation in the query graph.</span>
-    <span class="ident">Computation</span>(<span class="ident">ComputationResult</span>),
+    <span class="doccomment">/// A result from a computation in the query graph.
+    </span>Computation(ComputationResult),
 
-    <span class="doccomment">/// An empty result</span>
-    <span class="ident">Empty</span>,
+    <span class="doccomment">/// An empty result
+    </span>Empty,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ComputationResult</span> {
-    <span class="ident">Diff</span>(<span class="ident">DiffResult</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>ComputationResult {
+    Diff(DiffResult),
 }
 
-<span class="doccomment">/// Diff of two identifier vectors A and B:</span>
-<span class="doccomment">/// `left` contains all elements that are in A but not in B.</span>
-<span class="doccomment">/// `right` contains all elements that are in B but not in A.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiffResult</span> {
-    <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Diff of two identifier vectors A and B:
+/// `left` contains all elements that are in A but not in B.
+/// `right` contains all elements that are in B but not in A.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DiffResult {
+    <span class="kw">pub </span>left: Vec&lt;SelectionResult&gt;,
+    <span class="kw">pub </span>right: Vec&lt;SelectionResult&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ExpressionResult</span> {
-    <span class="doccomment">/// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.</span>
-    <span class="doccomment">/// A vector is returned as some expression results return more than one result row at once.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_selection_results</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_selection</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Query</span>(<span class="kw-2">ref</span> <span class="ident">result</span>) =&gt; <span class="kw">match</span> <span class="ident">result</span> {
-                <span class="ident">QueryResult::Id</span>(<span class="ident">id</span>) =&gt; <span class="kw">match</span> <span class="ident">id</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="kw">if</span> <span class="ident">field_selection</span>.<span class="ident">matches</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">id</span>.<span class="ident">clone</span>()]),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]),
-                    <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; {
+<span class="kw">impl </span>ExpressionResult {
+    <span class="doccomment">/// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
+    /// A vector is returned as some expression results return more than one result row at once.
+    </span><span class="kw">pub fn </span>as_selection_results(<span class="kw-2">&amp;</span><span class="self">self</span>, field_selection: <span class="kw-2">&amp;</span>FieldSelection) -&gt; InterpretationResult&lt;Vec&lt;SelectionResult&gt;&gt; {
+        <span class="kw">let </span>converted = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Query(<span class="kw-2">ref </span>result) =&gt; <span class="kw">match </span>result {
+                QueryResult::Id(id) =&gt; <span class="kw">match </span>id {
+                    <span class="prelude-val">Some</span>(id) <span class="kw">if </span>field_selection.matches(id) =&gt; <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[id.clone()]),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[]),
+                    <span class="prelude-val">Some</span>(id) =&gt; {
                         <span class="macro">trace!</span>(
                             <span class="string">&quot;Selection result {:?} does not match field selection {:?}&quot;</span>,
-                            <span class="ident">id</span>,
-                            <span class="ident">field_selection</span>
+                            id,
+                            field_selection
                         );
-                        <span class="prelude-val">None</span>
-                    }
+                        <span class="prelude-val">None
+                    </span>}
                 },
 
-                <span class="comment">// We always select IDs, the unwraps are safe.</span>
-                <span class="ident">QueryResult::RecordSelection</span>(<span class="ident">rs</span>) =&gt; <span class="prelude-val">Some</span>(
-                    <span class="ident">rs</span>.<span class="ident">scalars</span>
-                        .<span class="ident">extract_selection_results</span>(<span class="ident">field_selection</span>)
-                        .<span class="ident">expect</span>(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">collect</span>(),
+                <span class="comment">// We always select IDs, the unwraps are safe.
+                </span>QueryResult::RecordSelection(rs) =&gt; <span class="prelude-val">Some</span>(
+                    rs.scalars
+                        .extract_selection_results(field_selection)
+                        .expect(<span class="string">&quot;Expected record selection to contain required model ID fields.&quot;</span>)
+                        .into_iter()
+                        .collect(),
                 ),
 
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             },
 
-            <span class="ident"><span class="self">Self</span>::FixedResult</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sr</span><span class="op">|</span> <span class="ident">field_selection</span>.<span class="ident">assimilate</span>(<span class="ident">sr</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">ok</span>(),
+            <span class="self">Self</span>::FixedResult(p) =&gt; p
+                .clone()
+                .into_iter()
+                .map(|sr| field_selection.assimilate(sr))
+                .collect::&lt;std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()
+                .ok(),
 
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">converted</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">InterpreterError::InterpretationError</span>(
-                <span class="string">&quot;Unable to convert expression result into a set of selection results&quot;</span>.<span class="ident">to_owned</span>(),
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError(
+                <span class="string">&quot;Unable to convert expression result into a set of selection results&quot;</span>.to_owned(),
                 <span class="prelude-val">None</span>,
             )
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_query_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Query</span>(<span class="kw-2">ref</span> <span class="ident">q</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">q</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_query_result(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InterpretationResult&lt;<span class="kw-2">&amp;</span>QueryResult&gt; {
+        <span class="kw">let </span>converted = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Query(<span class="kw-2">ref </span>q) =&gt; <span class="prelude-val">Some</span>(q),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">converted</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">InterpreterError::InterpretationError</span>(<span class="string">&quot;Unable to convert result into a query result&quot;</span>.<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>)
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError(<span class="string">&quot;Unable to convert result into a query result&quot;</span>.to_owned(), <span class="prelude-val">None</span>)
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_diff_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Computation</span>(<span class="ident">ComputationResult::Diff</span>(<span class="kw-2">ref</span> <span class="ident">d</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_diff_result(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InterpretationResult&lt;<span class="kw-2">&amp;</span>DiffResult&gt; {
+        <span class="kw">let </span>converted = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Computation(ComputationResult::Diff(<span class="kw-2">ref </span>d)) =&gt; <span class="prelude-val">Some</span>(d),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">converted</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">InterpreterError::InterpretationError</span>(<span class="string">&quot;Unable to convert result into a computation result&quot;</span>.<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>)
+        converted.ok_or_else(|| {
+            InterpreterError::InterpretationError(<span class="string">&quot;Unable to convert result into a computation result&quot;</span>.to_owned(), <span class="prelude-val">None</span>)
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Env</span> {
-    <span class="ident">env</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ExpressionResult</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default, Debug, Clone)]
+</span><span class="kw">pub struct </span>Env {
+    env: HashMap&lt;String, ExpressionResult&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Env</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ExpressionResult</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">env</span>.<span class="ident">get</span>(<span class="ident">key</span>)
+<span class="kw">impl </span>Env {
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ExpressionResult&gt; {
+        <span class="self">self</span>.env.get(key)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">ExpressionResult</span>) {
-        <span class="self">self</span>.<span class="ident">env</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+    <span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: String, value: ExpressionResult) {
+        <span class="self">self</span>.env.insert(key, value);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">ExpressionResult</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">env</span>.<span class="ident">remove</span>(<span class="ident">key</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">val</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">InterpreterError::EnvVarNotFound</span>(<span class="ident">key</span>.<span class="ident">to_owned</span>())),
+    <span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; InterpretationResult&lt;ExpressionResult&gt; {
+        <span class="kw">match </span><span class="self">self</span>.env.remove(key) {
+            <span class="prelude-val">Some</span>(val) =&gt; <span class="prelude-val">Ok</span>(val),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(InterpreterError::EnvVarNotFound(key.to_owned())),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryInterpreter</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">log</span>: <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike,
+    log: SegQueue&lt;String&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryInterpreter</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryInterpreter&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; fmt::Debug <span class="kw">for </span>QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryInterpreter&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> <span class="ident">QueryInterpreter</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">log_enabled</span>() -&gt; <span class="ident">bool</span> {
-        <span class="ident">tracing::level_filters::STATIC_MAX_LEVEL</span> <span class="op">==</span> <span class="ident">tracing::level_filters::LevelFilter::TRACE</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;conn</span>&gt; QueryInterpreter&lt;<span class="lifetime">&#39;conn</span>&gt; {
+    <span class="kw">fn </span>log_enabled() -&gt; bool {
+        tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>) -&gt; <span class="ident">QueryInterpreter</span> {
-        <span class="kw">let</span> <span class="ident">log</span> <span class="op">=</span> <span class="ident">SegQueue::new</span>();
+    <span class="kw">pub fn </span>new(conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;conn </span><span class="kw-2">mut </span><span class="kw">dyn </span>ConnectionLike) -&gt; QueryInterpreter {
+        <span class="kw">let </span>log = SegQueue::new();
 
-        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::log_enabled</span>() {
-            <span class="ident">log</span>.<span class="ident">push</span>(<span class="string">&quot;\n&quot;</span>.<span class="ident">to_string</span>());
+        <span class="kw">if </span><span class="self">Self</span>::log_enabled() {
+            log.push(<span class="string">&quot;\n&quot;</span>.to_string());
         }
 
-        <span class="self">Self</span> { <span class="ident">conn</span>, <span class="ident">log</span> }
+        <span class="self">Self </span>{ conn, log }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interpret</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">exp</span>: <span class="ident">Expression</span>,
-        <span class="ident">env</span>: <span class="ident">Env</span>,
-        <span class="ident">level</span>: <span class="ident">usize</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">ExpressionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">exp</span> {
-            <span class="ident">Expression::Func</span> { <span class="ident">func</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident">func</span>(<span class="ident">env</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>interpret(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        exp: Expression,
+        env: Env,
+        level: usize,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, InterpretationResult&lt;ExpressionResult&gt;&gt; {
+        <span class="kw">match </span>exp {
+            Expression::Func { func } =&gt; {
+                <span class="kw">let </span>expr = func(env.clone());
 
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">interpret</span>(<span class="ident">expr</span><span class="question-mark">?</span>, <span class="ident">env</span>, <span class="ident">level</span>, <span class="ident">trace_id</span>).<span class="kw">await</span> })
+                Box::pin(<span class="kw">async move </span>{ <span class="self">self</span>.interpret(expr<span class="question-mark">?</span>, env, level, trace_id).<span class="kw">await </span>})
             }
 
-            <span class="ident">Expression::Sequence</span> { <span class="ident">seq</span> } <span class="kw">if</span> <span class="ident">seq</span>.<span class="ident">is_empty</span>() =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> { <span class="prelude-val">Ok</span>(<span class="ident">ExpressionResult::Empty</span>) }),
+            Expression::Sequence { seq } <span class="kw">if </span>seq.is_empty() =&gt; Box::pin(<span class="kw">async </span>{ <span class="prelude-val">Ok</span>(ExpressionResult::Empty) }),
 
-            <span class="ident">Expression::Sequence</span> { <span class="ident">seq</span> } =&gt; {
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="string">&quot;SEQ&quot;</span>);
+            Expression::Sequence { seq } =&gt; {
+                Box::pin(<span class="kw">async move </span>{
+                    <span class="self">self</span>.log_line(level, || <span class="string">&quot;SEQ&quot;</span>);
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">seq</span>.<span class="ident">len</span>());
+                    <span class="kw">let </span><span class="kw-2">mut </span>results = Vec::with_capacity(seq.len());
 
-                    <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">seq</span> {
-                        <span class="ident">results</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">interpret</span>(<span class="ident">expr</span>, <span class="ident">env</span>.<span class="ident">clone</span>(), <span class="ident">level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>);
+                    <span class="kw">for </span>expr <span class="kw">in </span>seq {
+                        results.push(<span class="self">self</span>.interpret(expr, env.clone(), level + <span class="number">1</span>, trace_id.clone()).<span class="kw">await</span><span class="question-mark">?</span>);
                     }
 
-                    <span class="comment">// Last result gets returned</span>
-                    <span class="prelude-val">Ok</span>(<span class="ident">results</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>())
+                    <span class="comment">// Last result gets returned
+                    </span><span class="prelude-val">Ok</span>(results.pop().unwrap())
                 })
             }
 
-            <span class="ident">Expression::Let</span> {
-                <span class="ident">bindings</span>,
-                <span class="kw-2">mut</span> <span class="ident">expressions</span>,
+            Expression::Let {
+                bindings,
+                <span class="kw-2">mut </span>expressions,
             } =&gt; {
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner_env</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">clone</span>();
-                    <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="string">&quot;LET&quot;</span>);
+                Box::pin(<span class="kw">async move </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>inner_env = env.clone();
+                    <span class="self">self</span>.log_line(level, || <span class="string">&quot;LET&quot;</span>);
 
-                    <span class="kw">for</span> <span class="ident">binding</span> <span class="kw">in</span> <span class="ident">bindings</span> {
-                        <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span> <span class="op">+</span> <span class="number">1</span>, <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;bind {} &quot;</span>, <span class="kw-2">&amp;</span><span class="ident">binding</span>.<span class="ident">name</span>));
+                    <span class="kw">for </span>binding <span class="kw">in </span>bindings {
+                        <span class="self">self</span>.log_line(level + <span class="number">1</span>, || <span class="macro">format!</span>(<span class="string">&quot;bind {} &quot;</span>, <span class="kw-2">&amp;</span>binding.name));
 
-                        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>
-                            .<span class="ident">interpret</span>(<span class="ident">binding</span>.<span class="ident">expr</span>, <span class="ident">env</span>.<span class="ident">clone</span>(), <span class="ident">level</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>())
+                        <span class="kw">let </span>result = <span class="self">self
+                            </span>.interpret(binding.expr, env.clone(), level + <span class="number">2</span>, trace_id.clone())
                             .<span class="kw">await</span><span class="question-mark">?</span>;
-                        <span class="ident">inner_env</span>.<span class="ident">insert</span>(<span class="ident">binding</span>.<span class="ident">name</span>, <span class="ident">result</span>);
+                        inner_env.insert(binding.name, result);
                     }
 
-                    <span class="comment">// the unwrapping improves the readability of the log significantly</span>
-                    <span class="kw">let</span> <span class="ident">next_expression</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">expressions</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                        <span class="ident">expressions</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">expressions</span> }
+                    <span class="comment">// the unwrapping improves the readability of the log significantly
+                    </span><span class="kw">let </span>next_expression = <span class="kw">if </span>expressions.len() == <span class="number">1 </span>{
+                        expressions.pop().unwrap()
+                    } <span class="kw">else </span>{
+                        Expression::Sequence { seq: expressions }
                     };
 
-                    <span class="self">self</span>.<span class="ident">interpret</span>(<span class="ident">next_expression</span>, <span class="ident">inner_env</span>, <span class="ident">level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-                })
+                    <span class="self">self</span>.interpret(next_expression, inner_env, level + <span class="number">1</span>, trace_id).<span class="kw">await
+                </span>})
             }
 
-            <span class="ident">Expression::Query</span> { <span class="ident">query</span> } =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">query</span> {
-                    <span class="ident">Query::Read</span>(<span class="ident">read</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;READ {}&quot;</span>, <span class="ident">read</span>));
-                        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:read-execute&quot;</span>);
-                        <span class="prelude-val">Ok</span>(<span class="ident">read::execute</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="ident">read</span>, <span class="prelude-val">None</span>, <span class="ident">trace_id</span>)
-                            .<span class="ident">instrument</span>(<span class="ident">span</span>)
-                            .<span class="kw">await</span>
-                            .<span class="ident">map</span>(<span class="ident">ExpressionResult::Query</span>)<span class="question-mark">?</span>)
+            Expression::Query { query } =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="kw">match </span><span class="kw-2">*</span>query {
+                    Query::Read(read) =&gt; {
+                        <span class="self">self</span>.log_line(level, || <span class="macro">format!</span>(<span class="string">&quot;READ {}&quot;</span>, read));
+                        <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:read-execute&quot;</span>);
+                        <span class="prelude-val">Ok</span>(read::execute(<span class="self">self</span>.conn, read, <span class="prelude-val">None</span>, trace_id)
+                            .instrument(span)
+                            .<span class="kw">await
+                            </span>.map(ExpressionResult::Query)<span class="question-mark">?</span>)
                     }
 
-                    <span class="ident">Query::Write</span>(<span class="ident">write</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;WRITE {}&quot;</span>, <span class="ident">write</span>));
-                        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:write-execute&quot;</span>);
-                        <span class="prelude-val">Ok</span>(<span class="ident">write::execute</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="ident">write</span>, <span class="ident">trace_id</span>)
-                            .<span class="ident">instrument</span>(<span class="ident">span</span>)
-                            .<span class="kw">await</span>
-                            .<span class="ident">map</span>(<span class="ident">ExpressionResult::Query</span>)<span class="question-mark">?</span>)
+                    Query::Write(write) =&gt; {
+                        <span class="self">self</span>.log_line(level, || <span class="macro">format!</span>(<span class="string">&quot;WRITE {}&quot;</span>, write));
+                        <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:write-execute&quot;</span>);
+                        <span class="prelude-val">Ok</span>(write::execute(<span class="self">self</span>.conn, write, trace_id)
+                            .instrument(span)
+                            .<span class="kw">await
+                            </span>.map(ExpressionResult::Query)<span class="question-mark">?</span>)
                     }
                 }
             }),
 
-            <span class="ident">Expression::Get</span> { <span class="ident">binding_name</span> } =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;GET {}&quot;</span>, <span class="ident">binding_name</span>));
-                <span class="ident">env</span>.<span class="ident">clone</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">binding_name</span>)
+            Expression::Get { binding_name } =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="self">self</span>.log_line(level, || <span class="macro">format!</span>(<span class="string">&quot;GET {}&quot;</span>, binding_name));
+                env.clone().remove(<span class="kw-2">&amp;</span>binding_name)
             }),
 
-            <span class="ident">Expression::GetFirstNonEmpty</span> { <span class="ident">binding_names</span> } =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;GET FIRST NON EMPTY {:?}&quot;</span>, <span class="ident">binding_names</span>));
+            Expression::GetFirstNonEmpty { binding_names } =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="self">self</span>.log_line(level, || <span class="macro">format!</span>(<span class="string">&quot;GET FIRST NON EMPTY {:?}&quot;</span>, binding_names));
 
-                <span class="prelude-val">Ok</span>(<span class="ident">binding_names</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">binding_name</span><span class="op">|</span> {
-                        <span class="ident">env</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">binding_name</span>)
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">env</span>.<span class="ident">clone</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">binding_name</span>).<span class="ident">unwrap</span>())
+                <span class="prelude-val">Ok</span>(binding_names
+                    .into_iter()
+                    .find_map(|binding_name| {
+                        env.get(<span class="kw-2">&amp;</span>binding_name)
+                            .map(|<span class="kw">_</span>| env.clone().remove(<span class="kw-2">&amp;</span>binding_name).unwrap())
                     })
-                    .<span class="ident">unwrap</span>())
+                    .unwrap())
             }),
 
-            <span class="ident">Expression::If</span> {
-                <span class="ident">func</span>,
-                <span class="ident">then</span>,
-                <span class="ident">else_</span>: <span class="ident">elze</span>,
-            } =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="string">&quot;IF&quot;</span>);
+            Expression::If {
+                func,
+                then,
+                else_: elze,
+            } =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="self">self</span>.log_line(level, || <span class="string">&quot;IF&quot;</span>);
 
-                <span class="kw">if</span> <span class="ident">func</span>() {
-                    <span class="self">self</span>.<span class="ident">interpret</span>(<span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">then</span> }, <span class="ident">env</span>, <span class="ident">level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">trace_id</span>)
-                        .<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">interpret</span>(<span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">elze</span> }, <span class="ident">env</span>, <span class="ident">level</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">trace_id</span>)
-                        .<span class="kw">await</span>
-                }
+                <span class="kw">if </span>func() {
+                    <span class="self">self</span>.interpret(Expression::Sequence { seq: then }, env, level + <span class="number">1</span>, trace_id)
+                        .<span class="kw">await
+                </span>} <span class="kw">else </span>{
+                    <span class="self">self</span>.interpret(Expression::Sequence { seq: elze }, env, level + <span class="number">1</span>, trace_id)
+                        .<span class="kw">await
+                </span>}
             }),
 
-            <span class="ident">Expression::Return</span> { <span class="ident">result</span> } =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="self">self</span>.<span class="ident">log_line</span>(<span class="ident">level</span>, <span class="op">|</span><span class="op">|</span> <span class="string">&quot;RETURN&quot;</span>);
-                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">result</span>)
+            Expression::Return { result } =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="self">self</span>.log_line(level, || <span class="string">&quot;RETURN&quot;</span>);
+                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span>result)
             }),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_output</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">log</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">30</span>);
+    <span class="kw">pub fn </span>log_output(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = String::with_capacity(<span class="self">self</span>.log.len() * <span class="number">30</span>);
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">log</span>.<span class="ident">pop</span>() {
-            <span class="ident">output</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(s) = <span class="self">self</span>.log.pop() {
+            output.push_str(<span class="kw-2">&amp;</span>s);
         }
 
-        <span class="ident">output</span>
+        output
     }
 
-    <span class="kw">fn</span> <span class="ident">log_line</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">level</span>: <span class="ident">usize</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">S</span>,
+    <span class="kw">fn </span>log_line&lt;F, S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, level: usize, f: F)
+    <span class="kw">where
+        </span>S: AsRef&lt;str&gt;,
+        F: FnOnce() -&gt; S,
     {
-        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::log_enabled</span>() {
-            <span class="self">self</span>.<span class="ident">log</span>
-                .<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{:indent$}{}\n&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="ident">f</span>().<span class="ident">as_ref</span>(), <span class="ident">indent</span> <span class="op">=</span> <span class="ident">level</span> <span class="op">*</span> <span class="number">2</span>));
+        <span class="kw">if </span><span class="self">Self</span>::log_enabled() {
+            <span class="self">self</span>.log
+                .push(<span class="macro">format!</span>(<span class="string">&quot;{:indent$}{}\n&quot;</span>, <span class="string">&quot;&quot;</span>, f().as_ref(), indent = level * <span class="number">2</span>));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

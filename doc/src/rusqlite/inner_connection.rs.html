@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/inner_connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inner_connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/inner_connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inner_connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -438,362 +438,362 @@
 <span id="438">438</span>
 <span id="439">439</span>
 <span id="440">440</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::ffi::CStr;
+<span class="kw">use </span>std::os::raw::{c_char, c_int};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
+</span><span class="kw">use </span>std::path::Path;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::str;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
+<span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::str_for_sqlite</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Connection</span>, <span class="ident">InterruptHandle</span>, <span class="ident">OpenFlags</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">error_from_handle</span>, <span class="ident">error_from_sqlite_code</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::raw_statement::RawStatement</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::statement::Statement</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::unlock_notify</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::version::version_number</span>;
+<span class="kw">use </span><span class="kw">super</span>::ffi;
+<span class="kw">use </span><span class="kw">super</span>::str_for_sqlite;
+<span class="kw">use super</span>::{Connection, InterruptHandle, OpenFlags, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::{error_from_handle, error_from_sqlite_code, Error};
+<span class="kw">use </span><span class="kw">crate</span>::raw_statement::RawStatement;
+<span class="kw">use </span><span class="kw">crate</span>::statement::Statement;
+<span class="kw">use </span><span class="kw">crate</span>::unlock_notify;
+<span class="kw">use </span><span class="kw">crate</span>::version::version_number;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InnerConnection</span> {
-    <span class="kw">pub</span> <span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>,
-    <span class="comment">// It&#39;s unsafe to call `sqlite3_close` while another thread is performing</span>
-    <span class="comment">// a `sqlite3_interrupt`, and vice versa, so we take this mutex during</span>
-    <span class="comment">// those functions. This protects a copy of the `db` pointer (which is</span>
-    <span class="comment">// cleared on closing), however the main copy, `db`, is unprotected.</span>
-    <span class="comment">// Otherwise, a long running query would prevent calling interrupt, as</span>
-    <span class="comment">// interrupt would only acquire the lock after the query&#39;s completion.</span>
-    <span class="ident">interrupt_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_commit_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_rollback_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_update_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">progress_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>() -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">owned</span>: <span class="ident">bool</span>,
+<span class="kw">pub struct </span>InnerConnection {
+    <span class="kw">pub </span>db: <span class="kw-2">*mut </span>ffi::sqlite3,
+    <span class="comment">// It&#39;s unsafe to call `sqlite3_close` while another thread is performing
+    // a `sqlite3_interrupt`, and vice versa, so we take this mutex during
+    // those functions. This protects a copy of the `db` pointer (which is
+    // cleared on closing), however the main copy, `db`, is unprotected.
+    // Otherwise, a long running query would prevent calling interrupt, as
+    // interrupt would only acquire the lock after the query&#39;s completion.
+    </span>interrupt_lock: Arc&lt;Mutex&lt;<span class="kw-2">*mut </span>ffi::sqlite3&gt;&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+    </span><span class="kw">pub </span>free_commit_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+    </span><span class="kw">pub </span>free_rollback_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+    </span><span class="kw">pub </span>free_update_hook: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe fn</span>(<span class="kw-2">*mut </span>::std::os::raw::c_void)&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+    </span><span class="kw">pub </span>progress_handler: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>FnMut() -&gt; bool + Send&gt;&gt;,
+    owned: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">InnerConnection</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">owned</span>: <span class="ident">bool</span>) -&gt; <span class="ident">InnerConnection</span> {
-        <span class="ident">InnerConnection</span> {
-            <span class="ident">db</span>,
-            <span class="ident">interrupt_lock</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">db</span>)),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-            <span class="ident">free_commit_hook</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-            <span class="ident">free_rollback_hook</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-            <span class="ident">free_update_hook</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-            <span class="ident">progress_handler</span>: <span class="prelude-val">None</span>,
-            <span class="ident">owned</span>,
+<span class="kw">impl </span>InnerConnection {
+    <span class="attribute">#[allow(clippy::mutex_atomic)]
+    #[inline]
+    </span><span class="kw">pub unsafe fn </span>new(db: <span class="kw-2">*mut </span>ffi::sqlite3, owned: bool) -&gt; InnerConnection {
+        InnerConnection {
+            db,
+            interrupt_lock: Arc::new(Mutex::new(db)),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+            </span>free_commit_hook: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+            </span>free_rollback_hook: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+            </span>free_update_hook: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;hooks&quot;</span>)]
+            </span>progress_handler: <span class="prelude-val">None</span>,
+            owned,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_with_flags</span>(
-        <span class="ident">c_path</span>: <span class="kw-2">&amp;</span><span class="ident">CStr</span>,
-        <span class="ident">flags</span>: <span class="ident">OpenFlags</span>,
-        <span class="ident">vfs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CStr</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InnerConnection</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bundled&quot;</span>))]</span>
-        <span class="ident">ensure_valid_sqlite_version</span>();
-        <span class="ident">ensure_safe_sqlite_threading_mode</span>()<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>open_with_flags(
+        c_path: <span class="kw-2">&amp;</span>CStr,
+        flags: OpenFlags,
+        vfs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CStr&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;InnerConnection&gt; {
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
+        </span>ensure_valid_sqlite_version();
+        ensure_safe_sqlite_threading_mode()<span class="question-mark">?</span>;
 
-        <span class="comment">// Replicate the check for sane open flags from SQLite, because the check in</span>
-        <span class="comment">// SQLite itself wasn&#39;t added until version 3.7.3.</span>
-        <span class="macro">debug_assert_eq!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">OpenFlags::SQLITE_OPEN_READ_ONLY</span>.<span class="ident">bits</span>, <span class="number">0x02</span>);
-        <span class="macro">debug_assert_eq!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">OpenFlags::SQLITE_OPEN_READ_WRITE</span>.<span class="ident">bits</span>, <span class="number">0x04</span>);
+        <span class="comment">// Replicate the check for sane open flags from SQLite, because the check in
+        // SQLite itself wasn&#39;t added until version 3.7.3.
+        </span><span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_ONLY.bits, <span class="number">0x02</span>);
+        <span class="macro">debug_assert_eq!</span>(<span class="number">1 </span>&lt;&lt; OpenFlags::SQLITE_OPEN_READ_WRITE.bits, <span class="number">0x04</span>);
         <span class="macro">debug_assert_eq!</span>(
-            <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">OpenFlags::SQLITE_OPEN_READ_WRITE</span> <span class="op">|</span> <span class="ident">OpenFlags::SQLITE_OPEN_CREATE</span>).<span class="ident">bits</span>,
-            <span class="number">0x40</span>
-        );
-        <span class="kw">if</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">flags</span>.<span class="ident">bits</span> <span class="op">&amp;</span> <span class="number">0x7</span>)) <span class="op">&amp;</span> <span class="number">0x46</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteFailure</span>(
-                <span class="ident">ffi::Error::new</span>(<span class="ident">ffi::SQLITE_MISUSE</span>),
+            <span class="number">1 </span>&lt;&lt; (OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_CREATE).bits,
+            <span class="number">0x40
+        </span>);
+        <span class="kw">if </span>(<span class="number">1 </span>&lt;&lt; (flags.bits &amp; <span class="number">0x7</span>)) &amp; <span class="number">0x46 </span>== <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteFailure(
+                ffi::Error::new(ffi::SQLITE_MISUSE),
                 <span class="prelude-val">None</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">z_vfs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">vfs</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">c_vfs</span>) =&gt; <span class="ident">c_vfs</span>.<span class="ident">as_ptr</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">ptr::null</span>(),
+        <span class="kw">let </span>z_vfs = <span class="kw">match </span>vfs {
+            <span class="prelude-val">Some</span>(c_vfs) =&gt; c_vfs.as_ptr(),
+            <span class="prelude-val">None </span>=&gt; ptr::null(),
         };
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_open_v2</span>(<span class="ident">c_path</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">db</span>, <span class="ident">flags</span>.<span class="ident">bits</span>(), <span class="ident">z_vfs</span>);
-            <span class="kw">if</span> <span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> {
-                <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">db</span>.<span class="ident">is_null</span>() {
-                    <span class="ident">error_from_sqlite_code</span>(<span class="ident">r</span>, <span class="prelude-val">Some</span>(<span class="ident">c_path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">to_string</span>()))
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">error_from_handle</span>(<span class="ident">db</span>, <span class="ident">r</span>);
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Error::SqliteFailure</span>(
-                        <span class="ident">ffi::Error</span> {
-                            <span class="ident">code</span>: <span class="ident">ffi::ErrorCode::CannotOpen</span>,
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>db: <span class="kw-2">*mut </span>ffi::sqlite3 = ptr::null_mut();
+            <span class="kw">let </span>r = ffi::sqlite3_open_v2(c_path.as_ptr(), <span class="kw-2">&amp;mut </span>db, flags.bits(), z_vfs);
+            <span class="kw">if </span>r != ffi::SQLITE_OK {
+                <span class="kw">let </span>e = <span class="kw">if </span>db.is_null() {
+                    error_from_sqlite_code(r, <span class="prelude-val">Some</span>(c_path.to_string_lossy().to_string()))
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>e = error_from_handle(db, r);
+                    <span class="kw">if let </span>Error::SqliteFailure(
+                        ffi::Error {
+                            code: ffi::ErrorCode::CannotOpen,
                             ..
                         },
-                        <span class="prelude-val">Some</span>(<span class="ident">msg</span>),
-                    ) <span class="op">=</span> <span class="ident">e</span>
+                        <span class="prelude-val">Some</span>(msg),
+                    ) = e
                     {
-                        <span class="ident">e</span> <span class="op">=</span> <span class="ident">Error::SqliteFailure</span>(
-                            <span class="ident">ffi::Error::new</span>(<span class="ident">r</span>),
-                            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">c_path</span>.<span class="ident">to_string_lossy</span>())),
+                        e = Error::SqliteFailure(
+                            ffi::Error::new(r),
+                            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, msg, c_path.to_string_lossy())),
                         );
                     }
-                    <span class="ident">ffi::sqlite3_close</span>(<span class="ident">db</span>);
-                    <span class="ident">e</span>
+                    ffi::sqlite3_close(db);
+                    e
                 };
 
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(e);
             }
 
-            <span class="comment">// attempt to turn on extended results code; don&#39;t fail if we can&#39;t.</span>
-            <span class="ident">ffi::sqlite3_extended_result_codes</span>(<span class="ident">db</span>, <span class="number">1</span>);
+            <span class="comment">// attempt to turn on extended results code; don&#39;t fail if we can&#39;t.
+            </span>ffi::sqlite3_extended_result_codes(db, <span class="number">1</span>);
 
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_busy_timeout</span>(<span class="ident">db</span>, <span class="number">5000</span>);
-            <span class="kw">if</span> <span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> {
-                <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">error_from_handle</span>(<span class="ident">db</span>, <span class="ident">r</span>);
-                <span class="ident">ffi::sqlite3_close</span>(<span class="ident">db</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+            <span class="kw">let </span>r = ffi::sqlite3_busy_timeout(db, <span class="number">5000</span>);
+            <span class="kw">if </span>r != ffi::SQLITE_OK {
+                <span class="kw">let </span>e = error_from_handle(db, r);
+                ffi::sqlite3_close(db);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(e);
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">InnerConnection::new</span>(<span class="ident">db</span>, <span class="bool-val">true</span>))
+            <span class="prelude-val">Ok</span>(InnerConnection::new(db, <span class="bool-val">true</span>))
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span> {
-        <span class="self">self</span>.<span class="ident">db</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>db(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>ffi::sqlite3 {
+        <span class="self">self</span>.db
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_result</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="ident">InnerConnection::decode_result_raw</span>(<span class="self">self</span>.<span class="ident">db</span>(), <span class="ident">code</span>) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>decode_result(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">unsafe </span>{ InnerConnection::decode_result_raw(<span class="self">self</span>.db(), code) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">decode_result_raw</span>(<span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="ident">ffi::SQLITE_OK</span> {
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>decode_result_raw(db: <span class="kw-2">*mut </span>ffi::sqlite3, code: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span>code == ffi::SQLITE_OK {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">error_from_handle</span>(<span class="ident">db</span>, <span class="ident">code</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(error_from_handle(db, code))
         }
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="attribute">#[allow(clippy::mutex_atomic)]
+    </span><span class="kw">pub fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.db.is_null() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="self">self</span>.<span class="ident">remove_hooks</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shared_handle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupt_lock</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="self">self</span>.remove_hooks();
+        <span class="kw">let </span><span class="kw-2">mut </span>shared_handle = <span class="self">self</span>.interrupt_lock.lock().unwrap();
         <span class="macro">assert!</span>(
-            <span class="op">!</span><span class="ident">shared_handle</span>.<span class="ident">is_null</span>(),
-            <span class="string">&quot;Bug: Somehow interrupt_lock was cleared before the DB was closed&quot;</span>
-        );
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">owned</span> {
-            <span class="self">self</span>.<span class="ident">db</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            !shared_handle.is_null(),
+            <span class="string">&quot;Bug: Somehow interrupt_lock was cleared before the DB was closed&quot;
+        </span>);
+        <span class="kw">if </span>!<span class="self">self</span>.owned {
+            <span class="self">self</span>.db = ptr::null_mut();
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_close</span>(<span class="self">self</span>.<span class="ident">db</span>);
-            <span class="comment">// Need to use _raw because _guard has a reference out, and</span>
-            <span class="comment">// decode_result takes &amp;mut self.</span>
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">InnerConnection::decode_result_raw</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">r</span>);
-            <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_ok</span>() {
-                <span class="kw-2">*</span><span class="ident">shared_handle</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-                <span class="self">self</span>.<span class="ident">db</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>r = ffi::sqlite3_close(<span class="self">self</span>.db);
+            <span class="comment">// Need to use _raw because _guard has a reference out, and
+            // decode_result takes &amp;mut self.
+            </span><span class="kw">let </span>r = InnerConnection::decode_result_raw(<span class="self">self</span>.db, r);
+            <span class="kw">if </span>r.is_ok() {
+                <span class="kw-2">*</span>shared_handle = ptr::null_mut();
+                <span class="self">self</span>.db = ptr::null_mut();
             }
-            <span class="ident">r</span>
+            r
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_interrupt_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InterruptHandle</span> {
-        <span class="ident">InterruptHandle</span> {
-            <span class="ident">db_lock</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interrupt_lock</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>get_interrupt_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InterruptHandle {
+        InterruptHandle {
+            db_lock: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.interrupt_lock),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_load_extension</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">onoff</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_enable_load_extension</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">onoff</span>) };
-        <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
+    <span class="attribute">#[inline]
+    #[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
+    </span><span class="kw">pub fn </span>enable_load_extension(<span class="kw-2">&amp;mut </span><span class="self">self</span>, onoff: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ ffi::sqlite3_enable_load_extension(<span class="self">self</span>.db, onoff) };
+        <span class="self">self</span>.decode_result(r)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dylib_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">entry_point</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">dylib_str</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::path_to_cstring</span>(<span class="ident">dylib_path</span>)<span class="question-mark">?</span>;
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errmsg</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry_point</span>) <span class="op">=</span> <span class="ident">entry_point</span> {
-                <span class="kw">let</span> <span class="ident">c_entry</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::str_to_cstring</span>(<span class="ident">entry_point</span>)<span class="question-mark">?</span>;
-                <span class="ident">ffi::sqlite3_load_extension</span>(
-                    <span class="self">self</span>.<span class="ident">db</span>,
-                    <span class="ident">dylib_str</span>.<span class="ident">as_ptr</span>(),
-                    <span class="ident">c_entry</span>.<span class="ident">as_ptr</span>(),
-                    <span class="kw-2">&amp;mut</span> <span class="ident">errmsg</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;load_extension&quot;</span>)]
+    </span><span class="kw">pub fn </span>load_extension(<span class="kw-2">&amp;</span><span class="self">self</span>, dylib_path: <span class="kw-2">&amp;</span>Path, entry_point: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>dylib_str = <span class="kw">super</span>::path_to_cstring(dylib_path)<span class="question-mark">?</span>;
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>errmsg: <span class="kw-2">*mut </span>c_char = ptr::null_mut();
+            <span class="kw">let </span>r = <span class="kw">if let </span><span class="prelude-val">Some</span>(entry_point) = entry_point {
+                <span class="kw">let </span>c_entry = <span class="kw">crate</span>::str_to_cstring(entry_point)<span class="question-mark">?</span>;
+                ffi::sqlite3_load_extension(
+                    <span class="self">self</span>.db,
+                    dylib_str.as_ptr(),
+                    c_entry.as_ptr(),
+                    <span class="kw-2">&amp;mut </span>errmsg,
                 )
-            } <span class="kw">else</span> {
-                <span class="ident">ffi::sqlite3_load_extension</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">dylib_str</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">errmsg</span>)
+            } <span class="kw">else </span>{
+                ffi::sqlite3_load_extension(<span class="self">self</span>.db, dylib_str.as_ptr(), ptr::null(), <span class="kw-2">&amp;mut </span>errmsg)
             };
-            <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">ffi::SQLITE_OK</span> {
+            <span class="kw">if </span>r == ffi::SQLITE_OK {
                 <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::errmsg_to_string</span>(<span class="ident">errmsg</span>);
-                <span class="ident">ffi::sqlite3_free</span>(<span class="ident">errmsg</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>);
-                <span class="prelude-val">Err</span>(<span class="ident">error_from_sqlite_code</span>(<span class="ident">r</span>, <span class="prelude-val">Some</span>(<span class="ident">message</span>)))
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>message = <span class="kw">super</span>::errmsg_to_string(errmsg);
+                ffi::sqlite3_free(errmsg <span class="kw">as </span><span class="kw-2">*mut </span>::std::os::raw::c_void);
+                <span class="prelude-val">Err</span>(error_from_sqlite_code(r, <span class="prelude-val">Some</span>(message)))
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_rowid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_last_insert_rowid</span>(<span class="self">self</span>.<span class="ident">db</span>()) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>last_insert_rowid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="kw">unsafe </span>{ ffi::sqlite3_last_insert_rowid(<span class="self">self</span>.db()) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Connection</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_stmt</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-        <span class="kw">let</span> (<span class="ident">c_sql</span>, <span class="ident">len</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">str_for_sqlite</span>(<span class="ident">sql</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_tail</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unlock_notify&quot;</span>) {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rc</span>;
-                <span class="kw">loop</span> {
-                    <span class="ident">rc</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_prepare_v2</span>(
-                        <span class="self">self</span>.<span class="ident">db</span>(),
-                        <span class="ident">c_sql</span>,
-                        <span class="ident">len</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+    <span class="kw">pub fn </span>prepare&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, conn: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Connection, sql: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Statement&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>c_stmt = ptr::null_mut();
+        <span class="kw">let </span>(c_sql, len, <span class="kw">_</span>) = str_for_sqlite(sql.as_bytes())<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>c_tail = ptr::null();
+        <span class="kw">let </span>r = <span class="kw">unsafe </span>{
+            <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;unlock_notify&quot;</span>) {
+                <span class="kw">let </span><span class="kw-2">mut </span>rc;
+                <span class="kw">loop </span>{
+                    rc = ffi::sqlite3_prepare_v2(
+                        <span class="self">self</span>.db(),
+                        c_sql,
+                        len,
+                        <span class="kw-2">&amp;mut </span>c_stmt <span class="kw">as </span><span class="kw-2">*mut *mut </span>ffi::sqlite3_stmt,
+                        <span class="kw-2">&amp;mut </span>c_tail <span class="kw">as </span><span class="kw-2">*mut *const </span>c_char,
                     );
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">unlock_notify::is_locked</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">rc</span>) {
+                    <span class="kw">if </span>!unlock_notify::is_locked(<span class="self">self</span>.db, rc) {
                         <span class="kw">break</span>;
                     }
-                    <span class="ident">rc</span> <span class="op">=</span> <span class="ident">unlock_notify::wait_for_unlock_notify</span>(<span class="self">self</span>.<span class="ident">db</span>);
-                    <span class="kw">if</span> <span class="ident">rc</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> {
+                    rc = unlock_notify::wait_for_unlock_notify(<span class="self">self</span>.db);
+                    <span class="kw">if </span>rc != ffi::SQLITE_OK {
                         <span class="kw">break</span>;
                     }
                 }
-                <span class="ident">rc</span>
-            } <span class="kw">else</span> {
-                <span class="ident">ffi::sqlite3_prepare_v2</span>(
-                    <span class="self">self</span>.<span class="ident">db</span>(),
-                    <span class="ident">c_sql</span>,
-                    <span class="ident">len</span>,
-                    <span class="kw-2">&amp;mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
-                    <span class="kw-2">&amp;mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+                rc
+            } <span class="kw">else </span>{
+                ffi::sqlite3_prepare_v2(
+                    <span class="self">self</span>.db(),
+                    c_sql,
+                    len,
+                    <span class="kw-2">&amp;mut </span>c_stmt <span class="kw">as </span><span class="kw-2">*mut *mut </span>ffi::sqlite3_stmt,
+                    <span class="kw-2">&amp;mut </span>c_tail <span class="kw">as </span><span class="kw-2">*mut *const </span>c_char,
                 )
             }
         };
-        <span class="comment">// If there is an error, *ppStmt is set to NULL.</span>
-        <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="comment">// If the input text contains no SQL (if the input is an empty string or a</span>
-        <span class="comment">// comment) then *ppStmt is set to NULL.</span>
-        <span class="kw">let</span> <span class="ident">c_stmt</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span> <span class="op">=</span> <span class="ident">c_stmt</span>;
-        <span class="kw">let</span> <span class="ident">c_tail</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">c_tail</span>;
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">c_tail</span>.<span class="ident">is_null</span>() {
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> (<span class="ident">c_tail</span> <span class="kw">as</span> <span class="ident">isize</span>) <span class="op">-</span> (<span class="ident">c_sql</span> <span class="kw">as</span> <span class="ident">isize</span>);
-            <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">isize</span> {
-                <span class="number">0</span>
-            } <span class="kw">else</span> {
-                <span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>
+        <span class="comment">// If there is an error, *ppStmt is set to NULL.
+        </span><span class="self">self</span>.decode_result(r)<span class="question-mark">?</span>;
+        <span class="comment">// If the input text contains no SQL (if the input is an empty string or a
+        // comment) then *ppStmt is set to NULL.
+        </span><span class="kw">let </span>c_stmt: <span class="kw-2">*mut </span>ffi::sqlite3_stmt = c_stmt;
+        <span class="kw">let </span>c_tail: <span class="kw-2">*const </span>c_char = c_tail;
+        <span class="kw">let </span>tail = <span class="kw">if </span>c_tail.is_null() {
+            <span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span>n = (c_tail <span class="kw">as </span>isize) - (c_sql <span class="kw">as </span>isize);
+            <span class="kw">if </span>n &lt;= <span class="number">0 </span>|| n &gt;= len <span class="kw">as </span>isize {
+                <span class="number">0
+            </span>} <span class="kw">else </span>{
+                n <span class="kw">as </span>usize
             }
         };
-        <span class="prelude-val">Ok</span>(<span class="ident">Statement::new</span>(<span class="ident">conn</span>, <span class="kw">unsafe</span> {
-            <span class="ident">RawStatement::new</span>(<span class="ident">c_stmt</span>, <span class="ident">tail</span>)
+        <span class="prelude-val">Ok</span>(Statement::new(conn, <span class="kw">unsafe </span>{
+            RawStatement::new(c_stmt, tail)
         }))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">changes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_changes</span>(<span class="self">self</span>.<span class="ident">db</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>changes(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ ffi::sqlite3_changes(<span class="self">self</span>.db()) <span class="kw">as </span>usize }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autocommit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_get_autocommit</span>(<span class="self">self</span>.<span class="ident">db</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_autocommit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{ ffi::sqlite3_get_autocommit(<span class="self">self</span>.db()) != <span class="number">0 </span>}
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span> <span class="comment">// 3.8.6</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_busy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_next_stmt</span>(<span class="ident">db</span>, <span class="ident">ptr::null_mut</span>());
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">stmt</span>.<span class="ident">is_null</span>() {
-                <span class="kw">if</span> <span class="ident">ffi::sqlite3_stmt_busy</span>(<span class="ident">stmt</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)] </span><span class="comment">// 3.8.6
+    </span><span class="kw">pub fn </span>is_busy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>db = <span class="self">self</span>.db();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>stmt = ffi::sqlite3_next_stmt(db, ptr::null_mut());
+            <span class="kw">while </span>!stmt.is_null() {
+                <span class="kw">if </span>ffi::sqlite3_stmt_busy(stmt) != <span class="number">0 </span>{
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
-                <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_next_stmt</span>(<span class="ident">db</span>, <span class="ident">stmt</span>);
+                stmt = ffi::sqlite3_next_stmt(db, stmt);
             }
         }
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remove_hooks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;hooks&quot;</span>))]
+    #[inline]
+    </span><span class="kw">fn </span>remove_hooks(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">InnerConnection</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_must_use</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident">std::thread::panicking</span>;
+<span class="kw">impl </span>Drop <span class="kw">for </span>InnerConnection {
+    <span class="attribute">#[allow(unused_must_use)]
+    #[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span>std::thread::panicking;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">close</span>() {
-            <span class="kw">if</span> <span class="ident">panicking</span>() {
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, <span class="ident">e</span>);
-            } <span class="kw">else</span> {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, <span class="ident">e</span>);
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="self">self</span>.close() {
+            <span class="kw">if </span>panicking() {
+                <span class="macro">eprintln!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, e);
+            } <span class="kw">else </span>{
+                <span class="macro">panic!</span>(<span class="string">&quot;Error while closing SQLite connection: {:?}&quot;</span>, e);
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bundled&quot;</span>))]</span>
-<span class="kw">static</span> <span class="ident">SQLITE_VERSION_CHECK</span>: <span class="ident">std::sync::Once</span> <span class="op">=</span> <span class="ident">std::sync::Once::new</span>();
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bundled&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">BYPASS_VERSION_CHECK</span>: <span class="ident">AtomicBool</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
+</span><span class="kw">static </span>SQLITE_VERSION_CHECK: std::sync::Once = std::sync::Once::new();
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
+</span><span class="kw">pub static </span>BYPASS_VERSION_CHECK: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bundled&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">ensure_valid_sqlite_version</span>() {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::version::version</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;bundled&quot;</span>))]
+</span><span class="kw">fn </span>ensure_valid_sqlite_version() {
+    <span class="kw">use </span><span class="kw">crate</span>::version::version;
 
-    <span class="ident">SQLITE_VERSION_CHECK</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">version_number</span> <span class="op">=</span> <span class="ident">version_number</span>();
+    SQLITE_VERSION_CHECK.call_once(|| {
+        <span class="kw">let </span>version_number = version_number();
 
-        <span class="comment">// Check our hard floor.</span>
-        <span class="kw">if</span> <span class="ident">version_number</span> <span class="op">&lt;</span> <span class="number">3_006_008</span> {
+        <span class="comment">// Check our hard floor.
+        </span><span class="kw">if </span>version_number &lt; <span class="number">3_006_008 </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;rusqlite requires SQLite 3.6.8 or newer&quot;</span>);
         }
 
-        <span class="comment">// Check that the major version number for runtime and buildtime match.</span>
-        <span class="kw">let</span> <span class="ident">buildtime_major</span> <span class="op">=</span> <span class="ident">ffi::SQLITE_VERSION_NUMBER</span> <span class="op">/</span> <span class="number">1_000_000</span>;
-        <span class="kw">let</span> <span class="ident">runtime_major</span> <span class="op">=</span> <span class="ident">version_number</span> <span class="op">/</span> <span class="number">1_000_000</span>;
-        <span class="kw">if</span> <span class="ident">buildtime_major</span> <span class="op">!</span><span class="op">=</span> <span class="ident">runtime_major</span> {
+        <span class="comment">// Check that the major version number for runtime and buildtime match.
+        </span><span class="kw">let </span>buildtime_major = ffi::SQLITE_VERSION_NUMBER / <span class="number">1_000_000</span>;
+        <span class="kw">let </span>runtime_major = version_number / <span class="number">1_000_000</span>;
+        <span class="kw">if </span>buildtime_major != runtime_major {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;rusqlite was built against SQLite {} but is running with SQLite {}&quot;</span>,
-                <span class="ident">str::from_utf8</span>(<span class="ident">ffi::SQLITE_VERSION</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">version</span>()
+                str::from_utf8(ffi::SQLITE_VERSION).unwrap(),
+                version()
             );
         }
 
-        <span class="kw">if</span> <span class="ident">BYPASS_VERSION_CHECK</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
+        <span class="kw">if </span>BYPASS_VERSION_CHECK.load(Ordering::Relaxed) {
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// Check that the runtime version number is compatible with the version number</span>
-        <span class="comment">// we found at build-time.</span>
-        <span class="kw">if</span> <span class="ident">version_number</span> <span class="op">&lt;</span> <span class="ident">ffi::SQLITE_VERSION_NUMBER</span> {
+        <span class="comment">// Check that the runtime version number is compatible with the version number
+        // we found at build-time.
+        </span><span class="kw">if </span>version_number &lt; ffi::SQLITE_VERSION_NUMBER {
             <span class="macro">panic!</span>(
                 <span class="string">&quot;\
 rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fix this, either:
@@ -801,77 +801,77 @@ rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fi
 * Call rusqlite::bypass_sqlite_version_check() prior to your first connection attempt. Doing this
   means you&#39;re sure everything will work correctly even though the runtime version is older than
   the version we found at build time.&quot;</span>,
-                <span class="ident">str::from_utf8</span>(<span class="ident">ffi::SQLITE_VERSION</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">version</span>()
+                str::from_utf8(ffi::SQLITE_VERSION).unwrap(),
+                version()
             );
         }
     });
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">static</span> <span class="ident">SQLITE_INIT</span>: <span class="ident">std::sync::Once</span> <span class="op">=</span> <span class="ident">std::sync::Once::new</span>();
+<span class="attribute">#[cfg(not(any(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+</span><span class="kw">static </span>SQLITE_INIT: std::sync::Once = std::sync::Once::new();
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">BYPASS_SQLITE_INIT</span>: <span class="ident">AtomicBool</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
+<span class="kw">pub static </span>BYPASS_SQLITE_INIT: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
 
-<span class="comment">// threading mode checks are not necessary (and do not work) on target</span>
-<span class="comment">// platforms that do not have threading (such as webassembly)</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">ensure_safe_sqlite_threading_mode</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="comment">// threading mode checks are not necessary (and do not work) on target
+// platforms that do not have threading (such as webassembly)
+</span><span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">fn </span>ensure_safe_sqlite_threading_mode() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">fn</span> <span class="ident">ensure_safe_sqlite_threading_mode</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// Ensure SQLite was compiled in thredsafe mode.</span>
-    <span class="kw">if</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_threadsafe</span>() <span class="op">==</span> <span class="number">0</span> } {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteSingleThreadedMode</span>);
+<span class="attribute">#[cfg(not(any(target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+</span><span class="kw">fn </span>ensure_safe_sqlite_threading_mode() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="comment">// Ensure SQLite was compiled in thredsafe mode.
+    </span><span class="kw">if unsafe </span>{ ffi::sqlite3_threadsafe() == <span class="number">0 </span>} {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::SqliteSingleThreadedMode);
     }
 
-    <span class="comment">// Now we know SQLite is _capable_ of being in Multi-thread of Serialized mode,</span>
-    <span class="comment">// but it&#39;s possible someone configured it to be in Single-thread mode</span>
-    <span class="comment">// before calling into us. That would mean we&#39;re exposing an unsafe API via</span>
-    <span class="comment">// a safe one (in Rust terminology), which is no good. We have two options</span>
-    <span class="comment">// to protect against this, depending on the version of SQLite we&#39;re linked</span>
-    <span class="comment">// with:</span>
-    <span class="comment">//</span>
-    <span class="comment">// 1. If we&#39;re on 3.7.0 or later, we can ask SQLite for a mutex and check for</span>
-    <span class="comment">//    the magic value 8. This isn&#39;t documented, but it&#39;s what SQLite</span>
-    <span class="comment">//    returns for its mutex allocation function in Single-thread mode.</span>
-    <span class="comment">// 2. If we&#39;re prior to SQLite 3.7.0, AFAIK there&#39;s no way to check the</span>
-    <span class="comment">//    threading mode. The check we perform for &gt;= 3.7.0 will segfault.</span>
-    <span class="comment">//    Instead, we insist on being able to call sqlite3_config and</span>
-    <span class="comment">//    sqlite3_initialize ourself, ensuring we know the threading</span>
-    <span class="comment">//    mode. This will fail if someone else has already initialized SQLite</span>
-    <span class="comment">//    even if they initialized it safely. That&#39;s not ideal either, which is</span>
-    <span class="comment">//    why we expose bypass_sqlite_initialization    above.</span>
-    <span class="kw">if</span> <span class="ident">version_number</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">3_007_000</span> {
-        <span class="kw">const</span> <span class="ident">SQLITE_SINGLETHREADED_MUTEX_MAGIC</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="ident">is_singlethreaded</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">mutex_ptr</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_mutex_alloc</span>(<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">is_singlethreaded</span> <span class="op">=</span> <span class="ident">mutex_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">SQLITE_SINGLETHREADED_MUTEX_MAGIC</span>;
-            <span class="ident">ffi::sqlite3_mutex_free</span>(<span class="ident">mutex_ptr</span>);
-            <span class="ident">is_singlethreaded</span>
+    <span class="comment">// Now we know SQLite is _capable_ of being in Multi-thread of Serialized mode,
+    // but it&#39;s possible someone configured it to be in Single-thread mode
+    // before calling into us. That would mean we&#39;re exposing an unsafe API via
+    // a safe one (in Rust terminology), which is no good. We have two options
+    // to protect against this, depending on the version of SQLite we&#39;re linked
+    // with:
+    //
+    // 1. If we&#39;re on 3.7.0 or later, we can ask SQLite for a mutex and check for
+    //    the magic value 8. This isn&#39;t documented, but it&#39;s what SQLite
+    //    returns for its mutex allocation function in Single-thread mode.
+    // 2. If we&#39;re prior to SQLite 3.7.0, AFAIK there&#39;s no way to check the
+    //    threading mode. The check we perform for &gt;= 3.7.0 will segfault.
+    //    Instead, we insist on being able to call sqlite3_config and
+    //    sqlite3_initialize ourself, ensuring we know the threading
+    //    mode. This will fail if someone else has already initialized SQLite
+    //    even if they initialized it safely. That&#39;s not ideal either, which is
+    //    why we expose bypass_sqlite_initialization    above.
+    </span><span class="kw">if </span>version_number() &gt;= <span class="number">3_007_000 </span>{
+        <span class="kw">const </span>SQLITE_SINGLETHREADED_MUTEX_MAGIC: usize = <span class="number">8</span>;
+        <span class="kw">let </span>is_singlethreaded = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>mutex_ptr = ffi::sqlite3_mutex_alloc(<span class="number">0</span>);
+            <span class="kw">let </span>is_singlethreaded = mutex_ptr <span class="kw">as </span>usize == SQLITE_SINGLETHREADED_MUTEX_MAGIC;
+            ffi::sqlite3_mutex_free(mutex_ptr);
+            is_singlethreaded
         };
-        <span class="kw">if</span> <span class="ident">is_singlethreaded</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::SqliteSingleThreadedMode</span>)
-        } <span class="kw">else</span> {
+        <span class="kw">if </span>is_singlethreaded {
+            <span class="prelude-val">Err</span>(Error::SqliteSingleThreadedMode)
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(())
         }
-    } <span class="kw">else</span> {
-        <span class="ident">SQLITE_INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">BYPASS_SQLITE_INIT</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) {
+    } <span class="kw">else </span>{
+        SQLITE_INIT.call_once(|| {
+            <span class="kw">if </span>BYPASS_SQLITE_INIT.load(Ordering::Relaxed) {
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">unsafe</span> {
-                <span class="kw">if</span> <span class="ident">ffi::sqlite3_config</span>(<span class="ident">ffi::SQLITE_CONFIG_MULTITHREAD</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ffi::sqlite3_initialize</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> {
+            <span class="kw">unsafe </span>{
+                <span class="kw">if </span>ffi::sqlite3_config(ffi::SQLITE_CONFIG_MULTITHREAD) != ffi::SQLITE_OK || ffi::sqlite3_initialize() != ffi::SQLITE_OK {
                     <span class="macro">panic!</span>(
                         <span class="string">&quot;Could not ensure safe initialization of SQLite.\n\
                          To fix this, either:\n\
                          * Upgrade SQLite to at least version 3.7.0\n\
                          * Ensure that SQLite has been initialized in Multi-thread or Serialized mode and call\n\
-                           rusqlite::bypass_sqlite_initialization() prior to your first connection attempt.&quot;</span>
-                    );
+                           rusqlite::bypass_sqlite_initialization() prior to your first connection attempt.&quot;
+                    </span>);
                 }
             }
         });
@@ -879,4 +879,4 @@ rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fi
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

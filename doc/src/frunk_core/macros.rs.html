@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -393,400 +393,400 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Macros all collected into a single module so that the order of `mod`</span>
-<span class="doccomment">//! statements in `lib.rs` does not matter.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Macros all collected into a single module so that the order of `mod`
+//! statements in `lib.rs` does not matter.
 
-<span class="doccomment">/// Returns an `HList` based on the values passed in.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Helps to avoid having to write nested `HCons`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk; fn main() {</span>
-<span class="doccomment">/// let h = hlist![13.5f32, &quot;hello&quot;, Some(41)];</span>
-<span class="doccomment">/// let (h1, (h2, h3)) = h.into_tuple2();</span>
-<span class="doccomment">/// assert_eq!(h1, 13.5f32);</span>
-<span class="doccomment">/// assert_eq!(h2, &quot;hello&quot;);</span>
-<span class="doccomment">/// assert_eq!(h3, Some(41));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Also works when you have trailing commas</span>
-<span class="doccomment">/// let h4 = hlist![&quot;yo&quot;,];</span>
-<span class="doccomment">/// let h5 = hlist![13.5f32, &quot;hello&quot;, Some(41),];</span>
-<span class="doccomment">/// assert_eq!(h4, hlist![&quot;yo&quot;]);</span>
-<span class="doccomment">/// assert_eq!(h5, hlist![13.5f32, &quot;hello&quot;, Some(41)]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Use &quot;...tail&quot; to append an existing list at the end</span>
-<span class="doccomment">/// let h6 = hlist![12, ...h5];</span>
-<span class="doccomment">/// assert_eq!(h6, hlist![12, 13.5f32, &quot;hello&quot;, Some(41)]);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">hlist</span> {
-    () =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HNil</span> };
-    (...<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">expr</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::hlist!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>,] };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HCons</span> {
-            <span class="ident">head</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>,
-            <span class="ident">tail</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::hlist!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>)<span class="kw-2">*</span>],
+/// Returns an `HList` based on the values passed in.
+///
+/// Helps to avoid having to write nested `HCons`.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk; fn main() {
+/// let h = hlist![13.5f32, &quot;hello&quot;, Some(41)];
+/// let (h1, (h2, h3)) = h.into_tuple2();
+/// assert_eq!(h1, 13.5f32);
+/// assert_eq!(h2, &quot;hello&quot;);
+/// assert_eq!(h3, Some(41));
+///
+/// // Also works when you have trailing commas
+/// let h4 = hlist![&quot;yo&quot;,];
+/// let h5 = hlist![13.5f32, &quot;hello&quot;, Some(41),];
+/// assert_eq!(h4, hlist![&quot;yo&quot;]);
+/// assert_eq!(h5, hlist![13.5f32, &quot;hello&quot;, Some(41)]);
+///
+/// // Use &quot;...tail&quot; to append an existing list at the end
+/// let h6 = hlist![12, ...h5];
+/// assert_eq!(h6, hlist![12, 13.5f32, &quot;hello&quot;, Some(41)]);
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>hlist {
+    () =&gt; { <span class="macro-nonterminal">$crate::hlist::HNil </span>};
+    (...<span class="macro-nonterminal">$rest</span>:expr) =&gt; { <span class="macro-nonterminal">$rest </span>};
+    (<span class="macro-nonterminal">$a</span>:expr) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::hlist!</span>[<span class="macro-nonterminal">$a</span>,] };
+    (<span class="macro-nonterminal">$a</span>:expr, $(<span class="macro-nonterminal">$tok</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$crate::hlist::HCons </span>{
+            head: <span class="macro-nonterminal">$a</span>,
+            tail: <span class="macro-nonterminal">$</span><span class="macro">crate::hlist!</span>[$(<span class="macro-nonterminal">$tok</span>)<span class="kw-2">*</span>],
         }
     };
 }
 
-<span class="doccomment">/// Macro for pattern-matching on HLists.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Taken from https://github.com/tbu-/rust-rfcs/blob/master/text/0873-type-macros.md</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk; fn main() {</span>
-<span class="doccomment">/// let h = hlist![13.5f32, &quot;hello&quot;, Some(41)];</span>
-<span class="doccomment">/// let hlist_pat![a1, a2, a3] = h;</span>
-<span class="doccomment">/// assert_eq!(a1, 13.5f32);</span>
-<span class="doccomment">/// assert_eq!(a2, &quot;hello&quot;);</span>
-<span class="doccomment">/// assert_eq!(a3, Some(41));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Use &quot;...tail&quot; to match the rest of the list</span>
-<span class="doccomment">/// let hlist_pat![b_head, ...b_tail] = h;</span>
-<span class="doccomment">/// assert_eq!(b_head, 13.5f32);</span>
-<span class="doccomment">/// assert_eq!(b_tail, hlist![&quot;hello&quot;, Some(41)]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // You can also use &quot;...&quot; to just ignore the rest.</span>
-<span class="doccomment">/// let hlist_pat![c, ...] = h;</span>
-<span class="doccomment">/// assert_eq!(c, 13.5f32);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">hlist_pat</span> {
-    () =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HNil</span> };
-    (...) =&gt; { <span class="kw">_</span> };
-    (...<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">pat</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">pat</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::hlist_pat!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>,] };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">pat</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HCons</span> {
-            <span class="ident">head</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>,
-            <span class="ident">tail</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::hlist_pat!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>)<span class="kw-2">*</span>],
+<span class="doccomment">/// Macro for pattern-matching on HLists.
+///
+/// Taken from https://github.com/tbu-/rust-rfcs/blob/master/text/0873-type-macros.md
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk; fn main() {
+/// let h = hlist![13.5f32, &quot;hello&quot;, Some(41)];
+/// let hlist_pat![a1, a2, a3] = h;
+/// assert_eq!(a1, 13.5f32);
+/// assert_eq!(a2, &quot;hello&quot;);
+/// assert_eq!(a3, Some(41));
+///
+/// // Use &quot;...tail&quot; to match the rest of the list
+/// let hlist_pat![b_head, ...b_tail] = h;
+/// assert_eq!(b_head, 13.5f32);
+/// assert_eq!(b_tail, hlist![&quot;hello&quot;, Some(41)]);
+///
+/// // You can also use &quot;...&quot; to just ignore the rest.
+/// let hlist_pat![c, ...] = h;
+/// assert_eq!(c, 13.5f32);
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>hlist_pat {
+    () =&gt; { <span class="macro-nonterminal">$crate::hlist::HNil </span>};
+    (...) =&gt; { <span class="kw">_ </span>};
+    (...<span class="macro-nonterminal">$rest</span>:pat) =&gt; { <span class="macro-nonterminal">$rest </span>};
+    (<span class="macro-nonterminal">$a</span>:pat) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::hlist_pat!</span>[<span class="macro-nonterminal">$a</span>,] };
+    (<span class="macro-nonterminal">$a</span>:pat, $(<span class="macro-nonterminal">$tok</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$crate::hlist::HCons </span>{
+            head: <span class="macro-nonterminal">$a</span>,
+            tail: <span class="macro-nonterminal">$</span><span class="macro">crate::hlist_pat!</span>[$(<span class="macro-nonterminal">$tok</span>)<span class="kw-2">*</span>],
         }
     };
 }
 
-<span class="doccomment">/// Returns a type signature for an HList of the provided types</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a type macro (introduced in Rust 1.13) that makes it easier</span>
-<span class="doccomment">/// to write nested type signatures.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk; fn main() {</span>
-<span class="doccomment">/// let h: HList!(f32, &amp;str, Option&lt;i32&gt;) = hlist![13.5f32, &quot;hello&quot;, Some(41)];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Use &quot;...Tail&quot; to append another HList type at the end.</span>
-<span class="doccomment">/// let h: HList!(f32, ...HList!(&amp;str, Option&lt;i32&gt;)) = hlist![13.5f32, &quot;hello&quot;, Some(41)];</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">HList</span> {
-    () =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HNil</span> };
-    (...<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Rest</span>:<span class="ident">ty</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Rest</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>:<span class="ident">ty</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::HList!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>,] };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>:<span class="ident">ty</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hlist::HCons</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::HList!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>)<span class="kw-2">*</span>]<span class="op">&gt;</span>
+<span class="doccomment">/// Returns a type signature for an HList of the provided types
+///
+/// This is a type macro (introduced in Rust 1.13) that makes it easier
+/// to write nested type signatures.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk; fn main() {
+/// let h: HList!(f32, &amp;str, Option&lt;i32&gt;) = hlist![13.5f32, &quot;hello&quot;, Some(41)];
+///
+/// // Use &quot;...Tail&quot; to append another HList type at the end.
+/// let h: HList!(f32, ...HList!(&amp;str, Option&lt;i32&gt;)) = hlist![13.5f32, &quot;hello&quot;, Some(41)];
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>HList {
+    () =&gt; { <span class="macro-nonterminal">$crate::hlist::HNil </span>};
+    (...<span class="macro-nonterminal">$Rest</span>:ty) =&gt; { <span class="macro-nonterminal">$Rest </span>};
+    (<span class="macro-nonterminal">$A</span>:ty) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::HList!</span>[<span class="macro-nonterminal">$A</span>,] };
+    (<span class="macro-nonterminal">$A</span>:ty, $(<span class="macro-nonterminal">$tok</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$crate::hlist::HCons</span>&lt;<span class="macro-nonterminal">$A</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::HList!</span>[$(<span class="macro-nonterminal">$tok</span>)<span class="kw-2">*</span>]&gt;
     };
 }
 
-<span class="doccomment">/// Returns a type signature for a Coproduct of the provided types</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a type macro (introduced in Rust 1.13) that makes it easier</span>
-<span class="doccomment">/// to write nested type signatures.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// type I32Bool = Coprod!(i32, bool);</span>
-<span class="doccomment">/// let co1 = I32Bool::inject(3);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Use ...Tail to append another coproduct at the end.</span>
-<span class="doccomment">/// let co2 = &lt;Coprod!(&amp;str, String, ...I32Bool)&gt;::inject(3);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">Coprod</span> {
-    () =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::coproduct::CNil</span> };
-    (...<span class="macro-nonterminal">$</span><span class="macro-nonterminal">Rest</span>:<span class="ident">ty</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Rest</span> };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>:<span class="ident">ty</span>) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::Coprod!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>,] };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>:<span class="ident">ty</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::coproduct::Coproduct</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">A</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::Coprod!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tok</span>)<span class="kw-2">*</span>]<span class="op">&gt;</span>
+<span class="doccomment">/// Returns a type signature for a Coproduct of the provided types
+///
+/// This is a type macro (introduced in Rust 1.13) that makes it easier
+/// to write nested type signatures.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// type I32Bool = Coprod!(i32, bool);
+/// let co1 = I32Bool::inject(3);
+///
+/// // Use ...Tail to append another coproduct at the end.
+/// let co2 = &lt;Coprod!(&amp;str, String, ...I32Bool)&gt;::inject(3);
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>Coprod {
+    () =&gt; { <span class="macro-nonterminal">$crate::coproduct::CNil </span>};
+    (...<span class="macro-nonterminal">$Rest</span>:ty) =&gt; { <span class="macro-nonterminal">$Rest </span>};
+    (<span class="macro-nonterminal">$A</span>:ty) =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::Coprod!</span>[<span class="macro-nonterminal">$A</span>,] };
+    (<span class="macro-nonterminal">$A</span>:ty, $(<span class="macro-nonterminal">$tok</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$crate::coproduct::Coproduct</span>&lt;<span class="macro-nonterminal">$A</span>, <span class="macro-nonterminal">$</span><span class="macro">crate::Coprod!</span>[$(<span class="macro-nonterminal">$tok</span>)<span class="kw-2">*</span>]&gt;
     };
 }
 
-<span class="doccomment">/// Used for creating a Field</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There are 3 forms of this macro:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Create an instance of the `Field` struct with a tuple name type</span>
-<span class="doccomment">///   and any given value. The runtime-retrievable static name</span>
-<span class="doccomment">///   field will be set to the the concatenation of the types passed in the</span>
-<span class="doccomment">///   tuple type used as the first argument.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// use frunk::labelled::chars::*;</span>
+<span class="doccomment">/// Used for creating a Field
+///
+/// There are 3 forms of this macro:
+///
+/// * Create an instance of the `Field` struct with a tuple name type
+///   and any given value. The runtime-retrievable static name
+///   field will be set to the the concatenation of the types passed in the
+///   tuple type used as the first argument.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// use frunk::labelled::chars::*;
 
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let labelled = field![(n,a,m,e), &quot;joe&quot;];</span>
-<span class="doccomment">/// assert_eq!(labelled.name, &quot;name&quot;);</span>
-<span class="doccomment">/// assert_eq!(labelled.value, &quot;joe&quot;)</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Create an instance of the `Field` struct with a custom, non-tuple</span>
-<span class="doccomment">///   name type and a value. The runtime-retrievable static name field</span>
-<span class="doccomment">///   will be set to the stringified version of the type provided.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// enum first_name {}</span>
-<span class="doccomment">/// let labelled = field![first_name, &quot;Joe&quot;];</span>
-<span class="doccomment">/// assert_eq!(labelled.name, &quot;first_name&quot;);</span>
-<span class="doccomment">/// assert_eq!(labelled.value, &quot;Joe&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Create an instance of the `Field` struct with any name type and value,</span>
-<span class="doccomment">///   _and_ a custom name, passed as the last argument in the macro</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// use frunk::labelled::chars::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // useful aliasing of our type-level string</span>
-<span class="doccomment">/// type age = (a, g, e);</span>
-<span class="doccomment">/// let labelled = field![age, 30, &quot;Age&quot;];</span>
-<span class="doccomment">/// assert_eq!(labelled.name, &quot;Age&quot;);</span>
-<span class="doccomment">/// assert_eq!(labelled.value, 30);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">field</span> {
-    <span class="comment">// No name provided and type is a tuple</span>
-    (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">repeated</span>: <span class="ident">ty</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">repeated</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>, <span class="macro">concat!</span>( $(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">repeated</span>)),<span class="op">*</span> ) )
+/// # fn main() {
+/// let labelled = field![(n,a,m,e), &quot;joe&quot;];
+/// assert_eq!(labelled.name, &quot;name&quot;);
+/// assert_eq!(labelled.value, &quot;joe&quot;)
+/// # }
+/// ```
+///
+/// * Create an instance of the `Field` struct with a custom, non-tuple
+///   name type and a value. The runtime-retrievable static name field
+///   will be set to the stringified version of the type provided.
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// enum first_name {}
+/// let labelled = field![first_name, &quot;Joe&quot;];
+/// assert_eq!(labelled.name, &quot;first_name&quot;);
+/// assert_eq!(labelled.value, &quot;Joe&quot;);
+/// # }
+/// ```
+///
+/// * Create an instance of the `Field` struct with any name type and value,
+///   _and_ a custom name, passed as the last argument in the macro
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// use frunk::labelled::chars::*;
+///
+/// # fn main() {
+/// // useful aliasing of our type-level string
+/// type age = (a, g, e);
+/// let labelled = field![age, 30, &quot;Age&quot;];
+/// assert_eq!(labelled.name, &quot;Age&quot;);
+/// assert_eq!(labelled.value, 30);
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>field {
+    <span class="comment">// No name provided and type is a tuple
+    </span>(($(<span class="macro-nonterminal">$repeated</span>: ty),<span class="kw-2">*</span>), <span class="macro-nonterminal">$value</span>: expr) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( ($(<span class="macro-nonterminal">$repeated</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$value</span>, <span class="macro">concat!</span>( $(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$repeated</span>)),* ) )
     };
-    <span class="comment">// No name provided and type is a tuple, but with trailing commas</span>
-    (($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">repeated</span>: <span class="ident">ty</span>,)<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">repeated</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> )
+    <span class="comment">// No name provided and type is a tuple, but with trailing commas
+    </span>(($(<span class="macro-nonterminal">$repeated</span>: ty,)<span class="kw-2">*</span>), <span class="macro-nonterminal">$value</span>: expr) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( ($(<span class="macro-nonterminal">$repeated</span>),<span class="kw-2">*</span>), <span class="macro-nonterminal">$value </span>)
     };
-    <span class="comment">// We are provided any type, with no stable name</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_type</span>: <span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_type</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_type</span>) )
+    <span class="comment">// We are provided any type, with no stable name
+    </span>(<span class="macro-nonterminal">$name_type</span>: ty, <span class="macro-nonterminal">$value</span>: expr) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::field!</span>( <span class="macro-nonterminal">$name_type</span>, <span class="macro-nonterminal">$value</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name_type</span>) )
     };
-    <span class="comment">// We are provided any type, with a stable name</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_type</span>: <span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::labelled::field_with_name</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name_type</span>,<span class="kw">_</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>)
+    <span class="comment">// We are provided any type, with a stable name
+    </span>(<span class="macro-nonterminal">$name_type</span>: ty, <span class="macro-nonterminal">$value</span>: expr, <span class="macro-nonterminal">$name</span>: expr) =&gt; {
+        <span class="macro-nonterminal">$crate::labelled::field_with_name</span>::&lt;<span class="macro-nonterminal">$name_type</span>,<span class="kw">_</span>&gt;(<span class="macro-nonterminal">$name</span>, <span class="macro-nonterminal">$value</span>)
     }
 }
 
-<span class="doccomment">/// Returns a polymorphic function for use with mapping/folding heterogeneous</span>
-<span class="doccomment">/// types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro is intended for use with simple scenarios, and doesn&#39;t handle</span>
-<span class="doccomment">/// trait implementation bounds or where clauses (it might in the future when</span>
-<span class="doccomment">/// procedural macros land). If it doesn&#39;t work for you, simply implement</span>
-<span class="doccomment">/// Func on your own.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// type I32F32StrBool&lt;&#39;a&gt; = Coprod!(i32, f32, &amp;&#39;a str);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let co1 = I32F32StrBool::inject(&quot;lollerskates&quot;);</span>
-<span class="doccomment">/// let folded = co1.fold(poly_fn!(</span>
-<span class="doccomment">///   [&#39;a] |x: &amp;&#39;a str| -&gt; i8 { 1 },</span>
-<span class="doccomment">///   |x: i32| -&gt; i8 { 2 },</span>
-<span class="doccomment">///   |f: f32| -&gt; i8 { 3 },</span>
-<span class="doccomment">/// ));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(folded, 1);</span>
-<span class="doccomment">/// # }</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">poly_fn</span> {
-    <span class="comment">// encountered first func w/ type params</span>
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>),<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
+<span class="doccomment">/// Returns a polymorphic function for use with mapping/folding heterogeneous
+/// types.
+///
+/// This macro is intended for use with simple scenarios, and doesn&#39;t handle
+/// trait implementation bounds or where clauses (it might in the future when
+/// procedural macros land). If it doesn&#39;t work for you, simply implement
+/// Func on your own.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// type I32F32StrBool&lt;&#39;a&gt; = Coprod!(i32, f32, &amp;&#39;a str);
+///
+/// let co1 = I32F32StrBool::inject(&quot;lollerskates&quot;);
+/// let folded = co1.fold(poly_fn!(
+///   [&#39;a] |x: &amp;&#39;a str| -&gt; i8 { 1 },
+///   |x: i32| -&gt; i8 { 2 },
+///   |f: f32| -&gt; i8 { 3 },
+/// ));
+///
+/// assert_eq!(folded, 1);
+/// # }
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>poly_fn {
+    <span class="comment">// encountered first func w/ type params
+    </span>([$(<span class="macro-nonterminal">$tparams</span>: tt),<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, ~<span class="ident">p</span>  <span class="ident">f</span>~ ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, ~p  f~ ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
-    <span class="comment">// encountered first func w/ type params, trailing comma on tparams</span>
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// encountered first func w/ type params, trailing comma on tparams
+    </span>([$(<span class="macro-nonterminal">$tparams</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, ~<span class="ident">p</span>  <span class="ident">f</span>~ ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, ~p  f~ ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
-    <span class="comment">// encountered first func w/o type params</span>
-    (<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// encountered first func w/o type params
+    </span>(|<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ ~<span class="ident">p</span>  <span class="ident">f</span>~ <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
-    )};
-
-    <span class="comment">// encountered non-first func w/ type params</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>),<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
-    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
-    )};
-    <span class="comment">// encountered non-first func w/ type params, trailing comma in tparams</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
-    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
-    )};
-    <span class="comment">// encountered non-first func w/o type params</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>)
-    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+       <span class="macro-nonterminal">p</span>~ ~p  f~ |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
 
-    <span class="comment">// last w/ type params, for when there is no trailing comma on the funcs...</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>),<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> })
+    <span class="comment">// encountered non-first func w/ type params
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f [$(<span class="macro-nonterminal">$tparams</span>: tt),<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span>
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
-    <span class="comment">// last w/ type params, for when there is a trailing comma in tparams, but no trailing comma on the funcs..</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> })
+    <span class="comment">// encountered non-first func w/ type params, trailing comma in tparams
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f [$(<span class="macro-nonterminal">$tparams</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tparams</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span>
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
-    <span class="comment">// last w/o type params, for when there is no trailing comma on the funcs...</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>)<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span> <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> })
+    <span class="comment">// encountered non-first func w/o type params
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, $(<span class="macro-nonterminal">$rest</span>: tt)<span class="kw-2">*</span>)
     =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
-       <span class="macro-nonterminal">p</span>~ $( [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>}, )<span class="op">*</span> ~<span class="ident">p</span>  <span class="ident">f</span>~ <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>}, $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_arg_typ</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_ret_typ</span> {<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f_body</span>}, )<span class="op">*</span> ~<span class="ident">f</span>
+       <span class="macro-nonterminal">p</span>~ $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f $(<span class="macro-nonterminal">$rest</span>)*
     )};
 
-    <span class="comment">// unroll</span>
-    (<span class="ident">p</span>~ $([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>: <span class="ident">tt</span>, )<span class="kw-2">*</span>] <span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">p</span> <span class="ident">f</span>~ $(<span class="op">|</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>: <span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>: <span class="ident">ty</span><span class="op">|</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>: <span class="ident">ty</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>: <span class="ident">expr</span> }, )<span class="op">*</span> ~<span class="ident">f</span>) =&gt; {{
-        <span class="kw">struct</span> <span class="ident">F</span>;
+    <span class="comment">// last w/ type params, for when there is no trailing comma on the funcs...
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f [$(<span class="macro-nonterminal">$tparams</span>: tt),<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr })
+    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f
+    )};
+    <span class="comment">// last w/ type params, for when there is a trailing comma in tparams, but no trailing comma on the funcs..
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f [$(<span class="macro-nonterminal">$tparams</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr })
+    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
+       <span class="macro-nonterminal">p</span>~ [$(<span class="macro-nonterminal">$tparams</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f
+    )};
+    <span class="comment">// last w/o type params, for when there is no trailing comma on the funcs...
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt)<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$f_args</span>: ident : <span class="macro-nonterminal">$f_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$f_ret_typ</span>: ty { <span class="macro-nonterminal">$f_body</span>: expr }, )* ~f |<span class="macro-nonterminal">$arg</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr })
+    =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::poly_fn!</span>(
+       <span class="macro-nonterminal">p</span>~ $( [$(<span class="macro-nonterminal">$pars</span>, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>| -&gt; <span class="macro-nonterminal">$p_ret_typ </span>{<span class="macro-nonterminal">$p_body</span>}, )* ~p  f~ |<span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$arg_typ</span>| -&gt; <span class="macro-nonterminal">$ret_typ </span>{<span class="macro-nonterminal">$body</span>}, $(|<span class="macro-nonterminal">$f_args</span>: <span class="macro-nonterminal">$f_arg_typ</span>| -&gt; <span class="macro-nonterminal">$f_ret_typ </span>{<span class="macro-nonterminal">$f_body</span>}, )* ~f
+    )};
+
+    <span class="comment">// unroll
+    </span>(p~ $([$(<span class="macro-nonterminal">$pars</span>: tt, )<span class="kw-2">*</span>] |<span class="macro-nonterminal">$p_args</span>: ident : <span class="macro-nonterminal">$p_arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$p_ret_typ</span>: ty { <span class="macro-nonterminal">$p_body</span>: expr }, )* ~p f~ $(|<span class="macro-nonterminal">$args</span>: ident : <span class="macro-nonterminal">$arg_typ</span>: ty| -&gt; <span class="macro-nonterminal">$ret_typ</span>: ty { <span class="macro-nonterminal">$body</span>: expr }, )* ~f) =&gt; {{
+        <span class="kw">struct </span>F;
         $(
-            <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">pars</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::traits::Func</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_ret_typ</span>;
+            <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$pars</span>,)<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">$crate::traits::Func</span>&lt;<span class="macro-nonterminal">$p_arg_typ</span>&gt; <span class="kw">for </span>F {
+                <span class="kw">type </span>Output = <span class="macro-nonterminal">$p_ret_typ</span>;
 
-                <span class="kw">fn</span> <span class="ident">call</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_arg_typ</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p_body</span> }
+                <span class="kw">fn </span>call(<span class="macro-nonterminal">$p_args</span>: <span class="macro-nonterminal">$p_arg_typ</span>) -&gt; <span class="self">Self</span>::Output { <span class="macro-nonterminal">$p_body </span>}
             }
-        )<span class="op">*</span>
+        )*
         $(
-            <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::traits::Func</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span> {
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret_typ</span>;
+            <span class="kw">impl </span><span class="macro-nonterminal">$crate::traits::Func</span>&lt;<span class="macro-nonterminal">$arg_typ</span>&gt; <span class="kw">for </span>F {
+                <span class="kw">type </span>Output = <span class="macro-nonterminal">$ret_typ</span>;
 
-                <span class="kw">fn</span> <span class="ident">call</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg_typ</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> }
+                <span class="kw">fn </span>call(<span class="macro-nonterminal">$args</span>: <span class="macro-nonterminal">$arg_typ</span>) -&gt; <span class="self">Self</span>::Output { <span class="macro-nonterminal">$body </span>}
             }
-        )<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::traits::Poly</span>(<span class="ident">F</span>)
+        )*
+        <span class="macro-nonterminal">$crate::traits::Poly</span>(F)
     }}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trailing_commas</span>() {
-        <span class="kw">use</span> <span class="ident">test_structs::unit_copy</span>::{<span class="ident">A</span>, <span class="ident">B</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>trailing_commas() {
+        <span class="kw">use </span>test_structs::unit_copy::{A, B};
 
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[]: <span class="macro">HList!</span>[] <span class="op">=</span> <span class="macro">hlist!</span>[];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>]: <span class="macro">HList!</span>[<span class="ident">A</span>] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>,]: <span class="macro">HList!</span>[<span class="ident">A</span>,] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>,];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, <span class="ident">B</span>]: <span class="macro">HList!</span>[<span class="ident">A</span>, <span class="ident">B</span>] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, <span class="ident">B</span>,]: <span class="macro">HList!</span>[<span class="ident">A</span>, <span class="ident">B</span>,] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>,];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[]: <span class="macro">HList!</span>[] = <span class="macro">hlist!</span>[];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A]: <span class="macro">HList!</span>[A] = <span class="macro">hlist!</span>[A];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A,]: <span class="macro">HList!</span>[A,] = <span class="macro">hlist!</span>[A,];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, B]: <span class="macro">HList!</span>[A, B] = <span class="macro">hlist!</span>[A, B];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, B,]: <span class="macro">HList!</span>[A, B,] = <span class="macro">hlist!</span>[A, B,];
 
-        <span class="kw">let</span> <span class="ident">falsum</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="ident">falsum</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[] <span class="op">=</span> <span class="macro">panic!</span>();
+        <span class="kw">let </span>falsum = || <span class="bool-val">false</span>;
+        <span class="kw">if </span>falsum() {
+            <span class="kw">let _</span>: <span class="macro">Coprod!</span>[] = <span class="macro">panic!</span>();
         }
-        <span class="kw">if</span> <span class="ident">falsum</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>] <span class="op">=</span> <span class="macro">panic!</span>();
+        <span class="kw">if </span>falsum() {
+            <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A] = <span class="macro">panic!</span>();
         }
-        <span class="kw">if</span> <span class="ident">falsum</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>,] <span class="op">=</span> <span class="macro">panic!</span>();
+        <span class="kw">if </span>falsum() {
+            <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A,] = <span class="macro">panic!</span>();
         }
-        <span class="kw">if</span> <span class="ident">falsum</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>, <span class="ident">B</span>] <span class="op">=</span> <span class="macro">panic!</span>();
+        <span class="kw">if </span>falsum() {
+            <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A, B] = <span class="macro">panic!</span>();
         }
-        <span class="kw">if</span> <span class="ident">falsum</span>() {
-            <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>, <span class="ident">B</span>,] <span class="op">=</span> <span class="macro">panic!</span>();
+        <span class="kw">if </span>falsum() {
+            <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A, B,] = <span class="macro">panic!</span>();
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ellipsis_tail</span>() {
-        <span class="kw">use</span> <span class="ident">coproduct::Coproduct</span>;
-        <span class="kw">use</span> <span class="ident">test_structs::unit_copy</span>::{<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ellipsis_tail() {
+        <span class="kw">use </span>coproduct::Coproduct;
+        <span class="kw">use </span>test_structs::unit_copy::{A, B, C};
 
-        <span class="comment">// hlist: accepted locations, and consistency between macros</span>
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[...<span class="macro">hlist_pat!</span>[<span class="ident">C</span>]]: <span class="macro">HList!</span>[...<span class="macro">HList!</span>[<span class="ident">C</span>]] <span class="op">=</span> { <span class="macro">hlist!</span>[...<span class="macro">hlist!</span>[<span class="ident">C</span>]] };
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, ...<span class="macro">hlist_pat!</span>[<span class="ident">C</span>]]: <span class="macro">HList!</span>[<span class="ident">A</span>, ...<span class="macro">HList!</span>[<span class="ident">C</span>]] <span class="op">=</span> { <span class="macro">hlist!</span>[<span class="ident">A</span>, ...<span class="macro">hlist!</span>[<span class="ident">C</span>]] };
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, <span class="ident">B</span>, ...<span class="macro">hlist_pat!</span>[<span class="ident">C</span>]]: <span class="macro">HList!</span>[<span class="ident">A</span>, <span class="ident">B</span>, ...<span class="macro">HList!</span>[<span class="ident">C</span>]] <span class="op">=</span>
-            { <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>, ...<span class="macro">hlist!</span>[<span class="ident">C</span>]] };
+        <span class="comment">// hlist: accepted locations, and consistency between macros
+        </span><span class="kw">let </span><span class="macro">hlist_pat!</span>[...<span class="macro">hlist_pat!</span>[C]]: <span class="macro">HList!</span>[...<span class="macro">HList!</span>[C]] = { <span class="macro">hlist!</span>[...<span class="macro">hlist!</span>[C]] };
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, ...<span class="macro">hlist_pat!</span>[C]]: <span class="macro">HList!</span>[A, ...<span class="macro">HList!</span>[C]] = { <span class="macro">hlist!</span>[A, ...<span class="macro">hlist!</span>[C]] };
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, B, ...<span class="macro">hlist_pat!</span>[C]]: <span class="macro">HList!</span>[A, B, ...<span class="macro">HList!</span>[C]] =
+            { <span class="macro">hlist!</span>[A, B, ...<span class="macro">hlist!</span>[C]] };
 
-        <span class="comment">// hlist: ellipsis semantics</span>
-        <span class="comment">//   (by pairing an ellipsis call with a non-ellipsis call)</span>
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, ...<span class="macro">hlist!</span>[<span class="ident">B</span>, <span class="ident">C</span>]];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, ...<span class="macro">hlist_pat!</span>[<span class="ident">B</span>, <span class="ident">C</span>]] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>];
+        <span class="comment">// hlist: ellipsis semantics
+        //   (by pairing an ellipsis call with a non-ellipsis call)
+        </span><span class="kw">let </span><span class="macro">hlist_pat!</span>[A, B, C] = <span class="macro">hlist!</span>[A, ...<span class="macro">hlist!</span>[B, C]];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, ...<span class="macro">hlist_pat!</span>[B, C]] = <span class="macro">hlist!</span>[A, B, C];
 
-        <span class="comment">// coprod: accepted locations and semantics</span>
-        <span class="kw">let</span> <span class="ident">choice</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>] <span class="op">=</span> <span class="ident">Coproduct::inject</span>(<span class="ident">A</span>);
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[...<span class="macro">Coprod!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>]] <span class="op">=</span> <span class="ident">choice</span>;
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>, ...<span class="macro">Coprod!</span>[<span class="ident">B</span>, <span class="ident">C</span>]] <span class="op">=</span> <span class="ident">choice</span>;
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>[<span class="ident">A</span>, <span class="ident">B</span>, ...<span class="macro">Coprod!</span>[<span class="ident">C</span>]] <span class="op">=</span> <span class="ident">choice</span>;
+        <span class="comment">// coprod: accepted locations and semantics
+        </span><span class="kw">let </span>choice: <span class="macro">Coprod!</span>[A, B, C] = Coproduct::inject(A);
+        <span class="kw">let _</span>: <span class="macro">Coprod!</span>[...<span class="macro">Coprod!</span>[A, B, C]] = choice;
+        <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A, ...<span class="macro">Coprod!</span>[B, C]] = choice;
+        <span class="kw">let _</span>: <span class="macro">Coprod!</span>[A, B, ...<span class="macro">Coprod!</span>[C]] = choice;
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ellipsis_ignore</span>() {
-        <span class="kw">use</span> <span class="ident">test_structs::unit_copy</span>::{<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ellipsis_ignore() {
+        <span class="kw">use </span>test_structs::unit_copy::{A, B, C, D, E};
 
-        <span class="comment">// &#39;...&#39; accepted locations</span>
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[...] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, ...] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>];
-        <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="ident">A</span>, <span class="ident">B</span>, ...] <span class="op">=</span> <span class="macro">hlist!</span>[<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>];
+        <span class="comment">// &#39;...&#39; accepted locations
+        </span><span class="kw">let </span><span class="macro">hlist_pat!</span>[...] = <span class="macro">hlist!</span>[A, B, C, D, E];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, ...] = <span class="macro">hlist!</span>[A, B, C, D, E];
+        <span class="kw">let </span><span class="macro">hlist_pat!</span>[A, B, ...] = <span class="macro">hlist!</span>[A, B, C, D, E];
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poly_fn_macro_test</span>() {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="macro">hlist!</span>[<span class="number">9000</span>, <span class="string">&quot;joe&quot;</span>, <span class="number">41f32</span>, <span class="string">&quot;schmoe&quot;</span>, <span class="number">50</span>];
-        <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">map</span>(<span class="macro">poly_fn!</span>(
-            <span class="op">|</span><span class="ident">x</span>: <span class="ident">i32</span><span class="op">|</span> -&gt; <span class="ident">bool</span> { <span class="ident">x</span> <span class="op">&gt;</span> <span class="number">100</span> },
-            <span class="op">|</span><span class="ident">_x</span>: <span class="ident">f32</span><span class="op">|</span> -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;dummy&quot;</span> },
-            [<span class="lifetime">&#39;a</span>] <span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">|</span> -&gt; <span class="ident">usize</span> { <span class="ident">x</span>.<span class="ident">len</span>() }
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>poly_fn_macro_test() {
+        <span class="kw">let </span>h = <span class="macro">hlist!</span>[<span class="number">9000</span>, <span class="string">&quot;joe&quot;</span>, <span class="number">41f32</span>, <span class="string">&quot;schmoe&quot;</span>, <span class="number">50</span>];
+        <span class="kw">let </span>h2 = h.map(<span class="macro">poly_fn!</span>(
+            |x: i32| -&gt; bool { x &gt; <span class="number">100 </span>},
+            |_x: f32| -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str { <span class="string">&quot;dummy&quot; </span>},
+            [<span class="lifetime">&#39;a</span>] |x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str| -&gt; usize { x.len() }
         ));
-        <span class="macro">assert_eq!</span>(<span class="ident">h2</span>, <span class="macro">hlist!</span>[<span class="bool-val">true</span>, <span class="number">3</span>, <span class="string">&quot;dummy&quot;</span>, <span class="number">6</span>, <span class="bool-val">false</span>]);
+        <span class="macro">assert_eq!</span>(h2, <span class="macro">hlist!</span>[<span class="bool-val">true</span>, <span class="number">3</span>, <span class="string">&quot;dummy&quot;</span>, <span class="number">6</span>, <span class="bool-val">false</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poly_fn_macro_coproduct_test</span>() {
-        <span class="kw">type</span> <span class="ident">I32F32StrBool</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="ident">f32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>poly_fn_macro_coproduct_test() {
+        <span class="kw">type </span>I32F32StrBool&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="macro">Coprod!</span>(i32, f32, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str);
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32F32StrBool::inject</span>(<span class="string">&quot;lollerskates&quot;</span>);
-        <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">fold</span>(<span class="macro">poly_fn!</span>(
-            [<span class="lifetime">&#39;a</span>] <span class="op">|</span><span class="ident">_x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">|</span> -&gt; <span class="ident">i8</span> { <span class="number">1</span> },
-            <span class="op">|</span><span class="ident">_x</span>: <span class="ident">i32</span><span class="op">|</span> -&gt; <span class="ident">i8</span> { <span class="number">2</span> },
-            <span class="op">|</span><span class="ident">_f</span>: <span class="ident">f32</span><span class="op">|</span> -&gt; <span class="ident">i8</span> { <span class="number">3</span> },
+        <span class="kw">let </span>co1 = I32F32StrBool::inject(<span class="string">&quot;lollerskates&quot;</span>);
+        <span class="kw">let </span>folded = co1.fold(<span class="macro">poly_fn!</span>(
+            [<span class="lifetime">&#39;a</span>] |_x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str| -&gt; i8 { <span class="number">1 </span>},
+            |_x: i32| -&gt; i8 { <span class="number">2 </span>},
+            |_f: f32| -&gt; i8 { <span class="number">3 </span>},
         ));
-        <span class="macro">assert_eq!</span>(<span class="ident">folded</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(folded, <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poly_fn_macro_trailing_commas_test</span>() {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="macro">hlist!</span>[<span class="number">9000</span>, <span class="string">&quot;joe&quot;</span>, <span class="number">41f32</span>, <span class="string">&quot;schmoe&quot;</span>, <span class="number">50</span>];
-        <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">map</span>(<span class="macro">poly_fn!</span>(
-            <span class="op">|</span><span class="ident">x</span>: <span class="ident">i32</span><span class="op">|</span> -&gt; <span class="ident">bool</span> { <span class="ident">x</span> <span class="op">&gt;</span> <span class="number">100</span> },
-            <span class="op">|</span><span class="ident">_x</span>: <span class="ident">f32</span><span class="op">|</span> -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;dummy&quot;</span> },
-            [<span class="lifetime">&#39;a</span>,] <span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">|</span> -&gt; <span class="ident">usize</span> { <span class="ident">x</span>.<span class="ident">len</span>() },
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>poly_fn_macro_trailing_commas_test() {
+        <span class="kw">let </span>h = <span class="macro">hlist!</span>[<span class="number">9000</span>, <span class="string">&quot;joe&quot;</span>, <span class="number">41f32</span>, <span class="string">&quot;schmoe&quot;</span>, <span class="number">50</span>];
+        <span class="kw">let </span>h2 = h.map(<span class="macro">poly_fn!</span>(
+            |x: i32| -&gt; bool { x &gt; <span class="number">100 </span>},
+            |_x: f32| -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str { <span class="string">&quot;dummy&quot; </span>},
+            [<span class="lifetime">&#39;a</span>,] |x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str| -&gt; usize { x.len() },
         ));
-        <span class="macro">assert_eq!</span>(<span class="ident">h2</span>, <span class="macro">hlist!</span>[<span class="bool-val">true</span>, <span class="number">3</span>, <span class="string">&quot;dummy&quot;</span>, <span class="number">6</span>, <span class="bool-val">false</span>]);
+        <span class="macro">assert_eq!</span>(h2, <span class="macro">hlist!</span>[<span class="bool-val">true</span>, <span class="number">3</span>, <span class="string">&quot;dummy&quot;</span>, <span class="number">6</span>, <span class="bool-val">false</span>]);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

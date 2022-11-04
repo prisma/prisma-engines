@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.17.4/src/span_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.17.4/src/span_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -170,156 +170,156 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer::WithContext</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">trace::SpanContext</span>, <span class="ident">Context</span>, <span class="ident">KeyValue</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::layer::WithContext;
+<span class="kw">use </span>opentelemetry::{trace::SpanContext, Context, KeyValue};
 
-<span class="doccomment">/// Utility functions to allow tracing [`Span`]s to accept and return</span>
-<span class="doccomment">/// [OpenTelemetry] [`Context`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Span`]: tracing::Span</span>
-<span class="doccomment">/// [OpenTelemetry]: https://opentelemetry.io</span>
-<span class="doccomment">/// [`Context`]: opentelemetry::Context</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">OpenTelemetrySpanExt</span> {
-    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided</span>
-    <span class="doccomment">/// parent [`Context`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context`]: opentelemetry::Context</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use opentelemetry::{propagation::TextMapPropagator, trace::TraceContextExt};</span>
-    <span class="doccomment">/// use opentelemetry::sdk::propagation::TraceContextPropagator;</span>
-    <span class="doccomment">/// use tracing_opentelemetry::OpenTelemetrySpanExt;</span>
-    <span class="doccomment">/// use std::collections::HashMap;</span>
-    <span class="doccomment">/// use tracing::Span;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.</span>
-    <span class="doccomment">/// let mut carrier = HashMap::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Propagator can be swapped with b3 propagator, jaeger propagator, etc.</span>
-    <span class="doccomment">/// let propagator = TraceContextPropagator::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Extract otel parent context via the chosen propagator</span>
-    <span class="doccomment">/// let parent_context = propagator.extract(&amp;carrier);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Generate a tracing span as usual</span>
-    <span class="doccomment">/// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Assign parent trace from external context</span>
-    <span class="doccomment">/// app_root.set_parent(parent_context.clone());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Or if the current span has been created elsewhere:</span>
-    <span class="doccomment">/// Span::current().set_parent(parent_context);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">set_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">Context</span>);
+<span class="doccomment">/// Utility functions to allow tracing [`Span`]s to accept and return
+/// [OpenTelemetry] [`Context`]s.
+///
+/// [`Span`]: tracing::Span
+/// [OpenTelemetry]: https://opentelemetry.io
+/// [`Context`]: opentelemetry::Context
+</span><span class="kw">pub trait </span>OpenTelemetrySpanExt {
+    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided
+    /// parent [`Context`].
+    ///
+    /// [`Context`]: opentelemetry::Context
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use opentelemetry::{propagation::TextMapPropagator, trace::TraceContextExt};
+    /// use opentelemetry::sdk::propagation::TraceContextPropagator;
+    /// use tracing_opentelemetry::OpenTelemetrySpanExt;
+    /// use std::collections::HashMap;
+    /// use tracing::Span;
+    ///
+    /// // Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.
+    /// let mut carrier = HashMap::new();
+    ///
+    /// // Propagator can be swapped with b3 propagator, jaeger propagator, etc.
+    /// let propagator = TraceContextPropagator::new();
+    ///
+    /// // Extract otel parent context via the chosen propagator
+    /// let parent_context = propagator.extract(&amp;carrier);
+    ///
+    /// // Generate a tracing span as usual
+    /// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);
+    ///
+    /// // Assign parent trace from external context
+    /// app_root.set_parent(parent_context.clone());
+    ///
+    /// // Or if the current span has been created elsewhere:
+    /// Span::current().set_parent(parent_context);
+    /// ```
+    </span><span class="kw">fn </span>set_parent(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: Context);
 
-    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided</span>
-    <span class="doccomment">/// followed span [`SpanContext`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SpanContext`]: opentelemetry::trace::SpanContext</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use opentelemetry::{propagation::TextMapPropagator, trace::TraceContextExt};</span>
-    <span class="doccomment">/// use opentelemetry::sdk::propagation::TraceContextPropagator;</span>
-    <span class="doccomment">/// use tracing_opentelemetry::OpenTelemetrySpanExt;</span>
-    <span class="doccomment">/// use std::collections::HashMap;</span>
-    <span class="doccomment">/// use tracing::Span;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.</span>
-    <span class="doccomment">/// let mut carrier = HashMap::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Propagator can be swapped with b3 propagator, jaeger propagator, etc.</span>
-    <span class="doccomment">/// let propagator = TraceContextPropagator::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Extract otel context of linked span via the chosen propagator</span>
-    <span class="doccomment">/// let linked_span_otel_context = propagator.extract(&amp;carrier);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Extract the linked span context from the otel context</span>
-    <span class="doccomment">/// let linked_span_context = linked_span_otel_context.span().span_context().clone();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Generate a tracing span as usual</span>
-    <span class="doccomment">/// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Assign linked trace from external context</span>
-    <span class="doccomment">/// app_root.add_link(linked_span_context);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Or if the current span has been created elsewhere:</span>
-    <span class="doccomment">/// let linked_span_context = linked_span_otel_context.span().span_context().clone();</span>
-    <span class="doccomment">/// Span::current().add_link(linked_span_context);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">add_link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">SpanContext</span>);
+    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided
+    /// followed span [`SpanContext`].
+    ///
+    /// [`SpanContext`]: opentelemetry::trace::SpanContext
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use opentelemetry::{propagation::TextMapPropagator, trace::TraceContextExt};
+    /// use opentelemetry::sdk::propagation::TraceContextPropagator;
+    /// use tracing_opentelemetry::OpenTelemetrySpanExt;
+    /// use std::collections::HashMap;
+    /// use tracing::Span;
+    ///
+    /// // Example carrier, could be a framework header map that impls otel&#39;s `Extractor`.
+    /// let mut carrier = HashMap::new();
+    ///
+    /// // Propagator can be swapped with b3 propagator, jaeger propagator, etc.
+    /// let propagator = TraceContextPropagator::new();
+    ///
+    /// // Extract otel context of linked span via the chosen propagator
+    /// let linked_span_otel_context = propagator.extract(&amp;carrier);
+    ///
+    /// // Extract the linked span context from the otel context
+    /// let linked_span_context = linked_span_otel_context.span().span_context().clone();
+    ///
+    /// // Generate a tracing span as usual
+    /// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);
+    ///
+    /// // Assign linked trace from external context
+    /// app_root.add_link(linked_span_context);
+    ///
+    /// // Or if the current span has been created elsewhere:
+    /// let linked_span_context = linked_span_otel_context.span().span_context().clone();
+    /// Span::current().add_link(linked_span_context);
+    /// ```
+    </span><span class="kw">fn </span>add_link(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: SpanContext);
 
-    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided</span>
-    <span class="doccomment">/// followed span [`SpanContext`] and attributes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SpanContext`]: opentelemetry::trace::SpanContext</span>
-    <span class="kw">fn</span> <span class="ident">add_link_with_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">SpanContext</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Associates `self` with a given OpenTelemetry trace, using the provided
+    /// followed span [`SpanContext`] and attributes.
+    ///
+    /// [`SpanContext`]: opentelemetry::trace::SpanContext
+    </span><span class="kw">fn </span>add_link_with_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: SpanContext, attributes: Vec&lt;KeyValue&gt;);
 
-    <span class="doccomment">/// Extracts an OpenTelemetry [`Context`] from `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context`]: opentelemetry::Context</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">/// use tracing_opentelemetry::OpenTelemetrySpanExt;</span>
-    <span class="doccomment">/// use tracing::Span;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn make_request(cx: Context) {</span>
-    <span class="doccomment">///     // perform external request after injecting context</span>
-    <span class="doccomment">///     // e.g. if the request&#39;s headers impl `opentelemetry::propagation::Injector`</span>
-    <span class="doccomment">///     // then `propagator.inject_context(cx, request.headers_mut())`</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Generate a tracing span as usual</span>
-    <span class="doccomment">/// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // To include tracing context in client requests from _this_ app,</span>
-    <span class="doccomment">/// // extract the current OpenTelemetry context.</span>
-    <span class="doccomment">/// make_request(app_root.context());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Or if the current span has been created elsewhere:</span>
-    <span class="doccomment">/// make_request(Span::current().context())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Context</span>;
+    <span class="doccomment">/// Extracts an OpenTelemetry [`Context`] from `self`.
+    ///
+    /// [`Context`]: opentelemetry::Context
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use opentelemetry::Context;
+    /// use tracing_opentelemetry::OpenTelemetrySpanExt;
+    /// use tracing::Span;
+    ///
+    /// fn make_request(cx: Context) {
+    ///     // perform external request after injecting context
+    ///     // e.g. if the request&#39;s headers impl `opentelemetry::propagation::Injector`
+    ///     // then `propagator.inject_context(cx, request.headers_mut())`
+    /// }
+    ///
+    /// // Generate a tracing span as usual
+    /// let app_root = tracing::span!(tracing::Level::INFO, &quot;app_start&quot;);
+    ///
+    /// // To include tracing context in client requests from _this_ app,
+    /// // extract the current OpenTelemetry context.
+    /// make_request(app_root.context());
+    ///
+    /// // Or if the current span has been created elsewhere:
+    /// make_request(Span::current().context())
+    /// ```
+    </span><span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Context;
 }
 
-<span class="kw">impl</span> <span class="ident">OpenTelemetrySpanExt</span> <span class="kw">for</span> <span class="ident">tracing::Span</span> {
-    <span class="kw">fn</span> <span class="ident">set_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">Context</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">with_subscriber</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">id</span>, <span class="ident">subscriber</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">get_context</span>) <span class="op">=</span> <span class="ident">subscriber</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() {
-                <span class="ident">get_context</span>.<span class="ident">with_context</span>(<span class="ident">subscriber</span>, <span class="ident">id</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">data</span>, <span class="ident">_tracer</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">take</span>() {
-                        <span class="ident">data</span>.<span class="ident">parent_cx</span> <span class="op">=</span> <span class="ident">cx</span>;
+<span class="kw">impl </span>OpenTelemetrySpanExt <span class="kw">for </span>tracing::Span {
+    <span class="kw">fn </span>set_parent(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: Context) {
+        <span class="kw">let </span><span class="kw-2">mut </span>cx = <span class="prelude-val">Some</span>(cx);
+        <span class="self">self</span>.with_subscriber(<span class="kw">move </span>|(id, subscriber)| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(get_context) = subscriber.downcast_ref::&lt;WithContext&gt;() {
+                get_context.with_context(subscriber, id, <span class="kw">move </span>|data, _tracer| {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.take() {
+                        data.parent_cx = cx;
                     }
                 });
             }
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">add_link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">SpanContext</span>) {
-        <span class="self">self</span>.<span class="ident">add_link_with_attributes</span>(<span class="ident">cx</span>, <span class="ident">Vec::new</span>())
+    <span class="kw">fn </span>add_link(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: SpanContext) {
+        <span class="self">self</span>.add_link_with_attributes(cx, Vec::new())
     }
 
-    <span class="kw">fn</span> <span class="ident">add_link_with_attributes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="ident">SpanContext</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">is_valid</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">att</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">attributes</span>);
-            <span class="self">self</span>.<span class="ident">with_subscriber</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">id</span>, <span class="ident">subscriber</span>)<span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">get_context</span>) <span class="op">=</span> <span class="ident">subscriber</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() {
-                    <span class="ident">get_context</span>.<span class="ident">with_context</span>(<span class="ident">subscriber</span>, <span class="ident">id</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">data</span>, <span class="ident">_tracer</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">take</span>() {
-                            <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">att</span>.<span class="ident">take</span>().<span class="ident">unwrap_or_default</span>();
-                            <span class="kw">let</span> <span class="ident">follows_link</span> <span class="op">=</span> <span class="ident">opentelemetry::trace::Link::new</span>(<span class="ident">cx</span>, <span class="ident">attr</span>);
-                            <span class="ident">data</span>.<span class="ident">builder</span>
-                                .<span class="ident">links</span>
-                                .<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>))
-                                .<span class="ident">push</span>(<span class="ident">follows_link</span>);
+    <span class="kw">fn </span>add_link_with_attributes(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: SpanContext, attributes: Vec&lt;KeyValue&gt;) {
+        <span class="kw">if </span>cx.is_valid() {
+            <span class="kw">let </span><span class="kw-2">mut </span>cx = <span class="prelude-val">Some</span>(cx);
+            <span class="kw">let </span><span class="kw-2">mut </span>att = <span class="prelude-val">Some</span>(attributes);
+            <span class="self">self</span>.with_subscriber(<span class="kw">move </span>|(id, subscriber)| {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(get_context) = subscriber.downcast_ref::&lt;WithContext&gt;() {
+                    get_context.with_context(subscriber, id, <span class="kw">move </span>|data, _tracer| {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(cx) = cx.take() {
+                            <span class="kw">let </span>attr = att.take().unwrap_or_default();
+                            <span class="kw">let </span>follows_link = opentelemetry::trace::Link::new(cx, attr);
+                            data.builder
+                                .links
+                                .get_or_insert_with(|| Vec::with_capacity(<span class="number">1</span>))
+                                .push(follows_link);
                         }
                     });
                 }
@@ -327,18 +327,18 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Context</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cx</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">with_subscriber</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">subscriber</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">get_context</span>) <span class="op">=</span> <span class="ident">subscriber</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() {
-                <span class="ident">get_context</span>.<span class="ident">with_context</span>(<span class="ident">subscriber</span>, <span class="ident">id</span>, <span class="op">|</span><span class="ident">builder</span>, <span class="ident">tracer</span><span class="op">|</span> {
-                    <span class="ident">cx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tracer</span>.<span class="ident">sampled_context</span>(<span class="ident">builder</span>));
+    <span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Context {
+        <span class="kw">let </span><span class="kw-2">mut </span>cx = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.with_subscriber(|(id, subscriber)| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(get_context) = subscriber.downcast_ref::&lt;WithContext&gt;() {
+                get_context.with_context(subscriber, id, |builder, tracer| {
+                    cx = <span class="prelude-val">Some</span>(tracer.sampled_context(builder));
                 })
             }
         });
 
-        <span class="ident">cx</span>.<span class="ident">unwrap_or_default</span>()
+        cx.unwrap_or_default()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

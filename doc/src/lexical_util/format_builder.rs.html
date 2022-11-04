@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/format_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/format_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1025,1032 +1025,1032 @@
 <span id="1025">1025</span>
 <span id="1026">1026</span>
 <span id="1027">1027</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Builder for the number format.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Builder for the number format.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_flags</span> <span class="kw">as</span> <span class="ident">flags</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">mem</span>, <span class="ident">num</span>};
-<span class="kw">use</span> <span class="ident">static_assertions::const_assert</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::format_flags <span class="kw">as </span>flags;
+<span class="kw">use </span>core::{mem, num};
+<span class="kw">use </span>static_assertions::const_assert;
 
-<span class="doccomment">/// Type with the exact same size as a `u8`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">OptionU8</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">num::NonZeroU8</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Type with the exact same size as a `u8`.
+</span><span class="kw">pub type </span>OptionU8 = <span class="prelude-ty">Option</span>&lt;num::NonZeroU8&gt;;
 
-<span class="comment">// Ensure the sizes are identical.</span>
-<span class="macro">const_assert!</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">OptionU8</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>());
+<span class="comment">// Ensure the sizes are identical.
+</span><span class="macro">const_assert!</span>(mem::size_of::&lt;OptionU8&gt;() == mem::size_of::&lt;u8&gt;());
 
-<span class="doccomment">/// Add single flag to SyntaxFormat.</span>
-<span class="macro">macro_rules!</span> <span class="ident">add_flag</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bool</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bool</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> <span class="op">|</span><span class="op">=</span> <span class="ident">flags</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>;
+<span class="doccomment">/// Add single flag to SyntaxFormat.
+</span><span class="macro">macro_rules! </span>add_flag {
+    (<span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$bool</span>:expr, <span class="macro-nonterminal">$flag</span>:ident) =&gt; {
+        <span class="kw">if </span><span class="macro-nonterminal">$bool </span>{
+            <span class="macro-nonterminal">$format </span>|= flags::<span class="macro-nonterminal">$flag</span>;
         }
     };
 }
 
-<span class="doccomment">/// Add multiple flags to SyntaxFormat.</span>
-<span class="macro">macro_rules!</span> <span class="ident">add_flags</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bool</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span> ;)<span class="kw-2">*</span>) =&gt; {{
-        $(<span class="macro">add_flag!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bool</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>);)<span class="op">*</span>
+<span class="doccomment">/// Add multiple flags to SyntaxFormat.
+</span><span class="macro">macro_rules! </span>add_flags {
+    (<span class="macro-nonterminal">$format</span>:ident ; $(<span class="macro-nonterminal">$bool</span>:expr, <span class="macro-nonterminal">$flag</span>:ident ;)<span class="kw-2">*</span>) =&gt; {{
+        $(<span class="macro">add_flag!</span>(<span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$bool</span>, <span class="macro-nonterminal">$flag</span>);)*
     }};
 }
 
-<span class="doccomment">/// Determine if a flag is set in the format.</span>
-<span class="macro">macro_rules!</span> <span class="ident">has_flag</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> <span class="op">&amp;</span> <span class="ident">flags</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">flag</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    };
+<span class="doccomment">/// Determine if a flag is set in the format.
+</span><span class="macro">macro_rules! </span>has_flag {
+    (<span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$flag</span>:ident) =&gt; {
+        <span class="macro-nonterminal">$format </span>&amp; flags::<span class="macro-nonterminal">$flag </span>!= <span class="number">0
+    </span>};
 }
 
-<span class="doccomment">/// Unwrap `Option` as a const fn.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">unwrap_or_zero</span>(<span class="ident">option</span>: <span class="ident">OptionU8</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">match</span> <span class="ident">option</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">get</span>(),
-        <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
+<span class="doccomment">/// Unwrap `Option` as a const fn.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">const fn </span>unwrap_or_zero(option: OptionU8) -&gt; u8 {
+    <span class="kw">match </span>option {
+        <span class="prelude-val">Some</span>(x) =&gt; x.get(),
+        <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
     }
 }
 
-<span class="doccomment">/// Build number format from specifications.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the format on calling build if it was able to compile the format,</span>
-<span class="doccomment">/// otherwise, returns None.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `digit_separator`                         - Character to separate digits.</span>
-<span class="doccomment">/// * `mantissa_radix`                          - Radix for mantissa digits.</span>
-<span class="doccomment">/// * `exponent_base`                           - Base for the exponent.</span>
-<span class="doccomment">/// * `exponent_radix`                          - Radix for the exponent digits.</span>
-<span class="doccomment">/// * `base_prefix`                             - Optional character for the base prefix.</span>
-<span class="doccomment">/// * `base_suffix`                             - Optional character for the base suffix.</span>
-<span class="doccomment">/// * `required_integer_digits`                 - If digits are required before the decimal point.</span>
-<span class="doccomment">/// * `required_fraction_digits`                - If digits are required after the decimal point.</span>
-<span class="doccomment">/// * `required_exponent_digits`                - If digits are required after the exponent character.</span>
-<span class="doccomment">/// * `required_mantissa_digits`                - If at least 1 significant digit is required.</span>
-<span class="doccomment">/// * `no_positive_mantissa_sign`               - If positive sign before the mantissa is not allowed.</span>
-<span class="doccomment">/// * `required_mantissa_sign`                  - If positive sign before the mantissa is required.</span>
-<span class="doccomment">/// * `no_exponent_notation`                    - If exponent notation is not allowed.</span>
-<span class="doccomment">/// * `no_positive_exponent_sign`               - If positive sign before the exponent is not allowed.</span>
-<span class="doccomment">/// * `required_exponent_sign`                  - If sign before the exponent is required.</span>
-<span class="doccomment">/// * `no_exponent_without_fraction`            - If exponent without fraction is not allowed.</span>
-<span class="doccomment">/// * `no_special`                              - If special (non-finite) values are not allowed.</span>
-<span class="doccomment">/// * `case_sensitive_special`                  - If special (non-finite) values are case-sensitive.</span>
-<span class="doccomment">/// * `no_integer_leading_zeros`                - If leading zeros before an integer are not allowed.</span>
-<span class="doccomment">/// * `no_float_leading_zeros`                  - If leading zeros before a float are not allowed.</span>
-<span class="doccomment">/// * `required_exponent_notation`              - If exponent notation is required.</span>
-<span class="doccomment">/// * `case_sensitive_exponent`                 - If exponent characters are case-sensitive.</span>
-<span class="doccomment">/// * `case_sensitive_base_prefix`              - If base prefixes are case-sensitive.</span>
-<span class="doccomment">/// * `case_sensitive_base_suffix`              - If base suffixes are case-sensitive.</span>
-<span class="doccomment">/// * `integer_internal_digit_separator`        - If digit separators are allowed between integer digits.</span>
-<span class="doccomment">/// * `fraction_internal_digit_separator`       - If digit separators are allowed between fraction digits.</span>
-<span class="doccomment">/// * `exponent_internal_digit_separator`       - If digit separators are allowed between exponent digits.</span>
-<span class="doccomment">/// * `integer_leading_digit_separator`         - If a digit separator is allowed before any integer digits.</span>
-<span class="doccomment">/// * `fraction_leading_digit_separator`        - If a digit separator is allowed before any fraction digits.</span>
-<span class="doccomment">/// * `exponent_leading_digit_separator`        - If a digit separator is allowed before any exponent digits.</span>
-<span class="doccomment">/// * `integer_trailing_digit_separator`        - If a digit separator is allowed after any integer digits.</span>
-<span class="doccomment">/// * `fraction_trailing_digit_separator`       - If a digit separator is allowed after any fraction digits.</span>
-<span class="doccomment">/// * `exponent_trailing_digit_separator`       - If a digit separator is allowed after any exponent digits.</span>
-<span class="doccomment">/// * `integer_consecutive_digit_separator`     - If multiple consecutive integer digit separators are allowed.</span>
-<span class="doccomment">/// * `fraction_consecutive_digit_separator`    - If multiple consecutive fraction digit separators are allowed.</span>
-<span class="doccomment">/// * `special_digit_separator`                 - If any digit separators are allowed in special (non-finite) values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Write Integer Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// No fields are used for writing integers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Parse Integer Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These fields are used for parsing integers:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `digit_separator`</span>
-<span class="doccomment">/// * `mantissa_radix`</span>
-<span class="doccomment">/// * `base_prefix`</span>
-<span class="doccomment">/// * `base_suffix`</span>
-<span class="doccomment">/// * `no_positive_mantissa_sign`</span>
-<span class="doccomment">/// * `required_mantissa_sign`</span>
-<span class="doccomment">/// * `no_integer_leading_zeros`</span>
-<span class="doccomment">/// * `integer_internal_digit_separator`</span>
-<span class="doccomment">/// * `integer_leading_digit_separator`</span>
-<span class="doccomment">/// * `integer_trailing_digit_separator`</span>
-<span class="doccomment">/// * `integer_consecutive_digit_separator`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Write Float Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These fields are used for writing floats:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `mantissa_radix`</span>
-<span class="doccomment">/// * `exponent_base`</span>
-<span class="doccomment">/// * `exponent_radix`</span>
-<span class="doccomment">/// * `no_positive_mantissa_sign`</span>
-<span class="doccomment">/// * `required_mantissa_sign`</span>
-<span class="doccomment">/// * `no_exponent_notation`</span>
-<span class="doccomment">/// * `no_positive_exponent_sign`</span>
-<span class="doccomment">/// * `required_exponent_sign`</span>
-<span class="doccomment">/// * `required_exponent_notation`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Parse Float Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These fields are used for parsing floats:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `digit_separator`</span>
-<span class="doccomment">/// * `mantissa_radix`</span>
-<span class="doccomment">/// * `exponent_base`</span>
-<span class="doccomment">/// * `exponent_radix`</span>
-<span class="doccomment">/// * `base_prefix`</span>
-<span class="doccomment">/// * `base_suffix`</span>
-<span class="doccomment">/// * `required_integer_digits`</span>
-<span class="doccomment">/// * `required_fraction_digits`</span>
-<span class="doccomment">/// * `required_exponent_digits`</span>
-<span class="doccomment">/// * `no_positive_mantissa_sign`</span>
-<span class="doccomment">/// * `required_mantissa_sign`</span>
-<span class="doccomment">/// * `no_exponent_notation`</span>
-<span class="doccomment">/// * `no_positive_exponent_sign`</span>
-<span class="doccomment">/// * `required_exponent_sign`</span>
-<span class="doccomment">/// * `no_exponent_without_fraction`</span>
-<span class="doccomment">/// * `no_special`</span>
-<span class="doccomment">/// * `case_sensitive_special`</span>
-<span class="doccomment">/// * `no_integer_leading_zeros`</span>
-<span class="doccomment">/// * `no_float_leading_zeros`</span>
-<span class="doccomment">/// * `required_exponent_notation`</span>
-<span class="doccomment">/// * `case_sensitive_exponent`</span>
-<span class="doccomment">/// * `case_sensitive_base_prefix`</span>
-<span class="doccomment">/// * `case_sensitive_base_suffix`</span>
-<span class="doccomment">/// * `integer_internal_digit_separator`</span>
-<span class="doccomment">/// * `fraction_internal_digit_separator`</span>
-<span class="doccomment">/// * `exponent_internal_digit_separator`</span>
-<span class="doccomment">/// * `integer_leading_digit_separator`</span>
-<span class="doccomment">/// * `fraction_leading_digit_separator`</span>
-<span class="doccomment">/// * `exponent_leading_digit_separator`</span>
-<span class="doccomment">/// * `integer_trailing_digit_separator`</span>
-<span class="doccomment">/// * `fraction_trailing_digit_separator`</span>
-<span class="doccomment">/// * `exponent_trailing_digit_separator`</span>
-<span class="doccomment">/// * `integer_consecutive_digit_separator`</span>
-<span class="doccomment">/// * `fraction_consecutive_digit_separator`</span>
-<span class="doccomment">/// * `special_digit_separator`</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NumberFormatBuilder</span> {
-    <span class="ident">digit_separator</span>: <span class="ident">OptionU8</span>,
-    <span class="ident">base_prefix</span>: <span class="ident">OptionU8</span>,
-    <span class="ident">base_suffix</span>: <span class="ident">OptionU8</span>,
-    <span class="ident">mantissa_radix</span>: <span class="ident">u8</span>,
-    <span class="ident">exponent_base</span>: <span class="ident">OptionU8</span>,
-    <span class="ident">exponent_radix</span>: <span class="ident">OptionU8</span>,
-    <span class="ident">required_integer_digits</span>: <span class="ident">bool</span>,
-    <span class="ident">required_fraction_digits</span>: <span class="ident">bool</span>,
-    <span class="ident">required_exponent_digits</span>: <span class="ident">bool</span>,
-    <span class="ident">required_mantissa_digits</span>: <span class="ident">bool</span>,
-    <span class="ident">no_positive_mantissa_sign</span>: <span class="ident">bool</span>,
-    <span class="ident">required_mantissa_sign</span>: <span class="ident">bool</span>,
-    <span class="ident">no_exponent_notation</span>: <span class="ident">bool</span>,
-    <span class="ident">no_positive_exponent_sign</span>: <span class="ident">bool</span>,
-    <span class="ident">required_exponent_sign</span>: <span class="ident">bool</span>,
-    <span class="ident">no_exponent_without_fraction</span>: <span class="ident">bool</span>,
-    <span class="ident">no_special</span>: <span class="ident">bool</span>,
-    <span class="ident">case_sensitive_special</span>: <span class="ident">bool</span>,
-    <span class="ident">no_integer_leading_zeros</span>: <span class="ident">bool</span>,
-    <span class="ident">no_float_leading_zeros</span>: <span class="ident">bool</span>,
-    <span class="ident">required_exponent_notation</span>: <span class="ident">bool</span>,
-    <span class="ident">case_sensitive_exponent</span>: <span class="ident">bool</span>,
-    <span class="ident">case_sensitive_base_prefix</span>: <span class="ident">bool</span>,
-    <span class="ident">case_sensitive_base_suffix</span>: <span class="ident">bool</span>,
-    <span class="ident">integer_internal_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">fraction_internal_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">exponent_internal_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">integer_leading_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">fraction_leading_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">exponent_leading_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">integer_trailing_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">fraction_trailing_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">exponent_trailing_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">integer_consecutive_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">fraction_consecutive_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">exponent_consecutive_digit_separator</span>: <span class="ident">bool</span>,
-    <span class="ident">special_digit_separator</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Build number format from specifications.
+///
+/// Returns the format on calling build if it was able to compile the format,
+/// otherwise, returns None.
+///
+/// # Fields
+///
+/// * `digit_separator`                         - Character to separate digits.
+/// * `mantissa_radix`                          - Radix for mantissa digits.
+/// * `exponent_base`                           - Base for the exponent.
+/// * `exponent_radix`                          - Radix for the exponent digits.
+/// * `base_prefix`                             - Optional character for the base prefix.
+/// * `base_suffix`                             - Optional character for the base suffix.
+/// * `required_integer_digits`                 - If digits are required before the decimal point.
+/// * `required_fraction_digits`                - If digits are required after the decimal point.
+/// * `required_exponent_digits`                - If digits are required after the exponent character.
+/// * `required_mantissa_digits`                - If at least 1 significant digit is required.
+/// * `no_positive_mantissa_sign`               - If positive sign before the mantissa is not allowed.
+/// * `required_mantissa_sign`                  - If positive sign before the mantissa is required.
+/// * `no_exponent_notation`                    - If exponent notation is not allowed.
+/// * `no_positive_exponent_sign`               - If positive sign before the exponent is not allowed.
+/// * `required_exponent_sign`                  - If sign before the exponent is required.
+/// * `no_exponent_without_fraction`            - If exponent without fraction is not allowed.
+/// * `no_special`                              - If special (non-finite) values are not allowed.
+/// * `case_sensitive_special`                  - If special (non-finite) values are case-sensitive.
+/// * `no_integer_leading_zeros`                - If leading zeros before an integer are not allowed.
+/// * `no_float_leading_zeros`                  - If leading zeros before a float are not allowed.
+/// * `required_exponent_notation`              - If exponent notation is required.
+/// * `case_sensitive_exponent`                 - If exponent characters are case-sensitive.
+/// * `case_sensitive_base_prefix`              - If base prefixes are case-sensitive.
+/// * `case_sensitive_base_suffix`              - If base suffixes are case-sensitive.
+/// * `integer_internal_digit_separator`        - If digit separators are allowed between integer digits.
+/// * `fraction_internal_digit_separator`       - If digit separators are allowed between fraction digits.
+/// * `exponent_internal_digit_separator`       - If digit separators are allowed between exponent digits.
+/// * `integer_leading_digit_separator`         - If a digit separator is allowed before any integer digits.
+/// * `fraction_leading_digit_separator`        - If a digit separator is allowed before any fraction digits.
+/// * `exponent_leading_digit_separator`        - If a digit separator is allowed before any exponent digits.
+/// * `integer_trailing_digit_separator`        - If a digit separator is allowed after any integer digits.
+/// * `fraction_trailing_digit_separator`       - If a digit separator is allowed after any fraction digits.
+/// * `exponent_trailing_digit_separator`       - If a digit separator is allowed after any exponent digits.
+/// * `integer_consecutive_digit_separator`     - If multiple consecutive integer digit separators are allowed.
+/// * `fraction_consecutive_digit_separator`    - If multiple consecutive fraction digit separators are allowed.
+/// * `special_digit_separator`                 - If any digit separators are allowed in special (non-finite) values.
+///
+/// # Write Integer Fields
+///
+/// No fields are used for writing integers.
+///
+/// # Parse Integer Fields
+///
+/// These fields are used for parsing integers:
+///
+/// * `digit_separator`
+/// * `mantissa_radix`
+/// * `base_prefix`
+/// * `base_suffix`
+/// * `no_positive_mantissa_sign`
+/// * `required_mantissa_sign`
+/// * `no_integer_leading_zeros`
+/// * `integer_internal_digit_separator`
+/// * `integer_leading_digit_separator`
+/// * `integer_trailing_digit_separator`
+/// * `integer_consecutive_digit_separator`
+///
+/// # Write Float Fields
+///
+/// These fields are used for writing floats:
+///
+/// * `mantissa_radix`
+/// * `exponent_base`
+/// * `exponent_radix`
+/// * `no_positive_mantissa_sign`
+/// * `required_mantissa_sign`
+/// * `no_exponent_notation`
+/// * `no_positive_exponent_sign`
+/// * `required_exponent_sign`
+/// * `required_exponent_notation`
+///
+/// # Parse Float Fields
+///
+/// These fields are used for parsing floats:
+///
+/// * `digit_separator`
+/// * `mantissa_radix`
+/// * `exponent_base`
+/// * `exponent_radix`
+/// * `base_prefix`
+/// * `base_suffix`
+/// * `required_integer_digits`
+/// * `required_fraction_digits`
+/// * `required_exponent_digits`
+/// * `no_positive_mantissa_sign`
+/// * `required_mantissa_sign`
+/// * `no_exponent_notation`
+/// * `no_positive_exponent_sign`
+/// * `required_exponent_sign`
+/// * `no_exponent_without_fraction`
+/// * `no_special`
+/// * `case_sensitive_special`
+/// * `no_integer_leading_zeros`
+/// * `no_float_leading_zeros`
+/// * `required_exponent_notation`
+/// * `case_sensitive_exponent`
+/// * `case_sensitive_base_prefix`
+/// * `case_sensitive_base_suffix`
+/// * `integer_internal_digit_separator`
+/// * `fraction_internal_digit_separator`
+/// * `exponent_internal_digit_separator`
+/// * `integer_leading_digit_separator`
+/// * `fraction_leading_digit_separator`
+/// * `exponent_leading_digit_separator`
+/// * `integer_trailing_digit_separator`
+/// * `fraction_trailing_digit_separator`
+/// * `exponent_trailing_digit_separator`
+/// * `integer_consecutive_digit_separator`
+/// * `fraction_consecutive_digit_separator`
+/// * `special_digit_separator`
+</span><span class="kw">pub struct </span>NumberFormatBuilder {
+    digit_separator: OptionU8,
+    base_prefix: OptionU8,
+    base_suffix: OptionU8,
+    mantissa_radix: u8,
+    exponent_base: OptionU8,
+    exponent_radix: OptionU8,
+    required_integer_digits: bool,
+    required_fraction_digits: bool,
+    required_exponent_digits: bool,
+    required_mantissa_digits: bool,
+    no_positive_mantissa_sign: bool,
+    required_mantissa_sign: bool,
+    no_exponent_notation: bool,
+    no_positive_exponent_sign: bool,
+    required_exponent_sign: bool,
+    no_exponent_without_fraction: bool,
+    no_special: bool,
+    case_sensitive_special: bool,
+    no_integer_leading_zeros: bool,
+    no_float_leading_zeros: bool,
+    required_exponent_notation: bool,
+    case_sensitive_exponent: bool,
+    case_sensitive_base_prefix: bool,
+    case_sensitive_base_suffix: bool,
+    integer_internal_digit_separator: bool,
+    fraction_internal_digit_separator: bool,
+    exponent_internal_digit_separator: bool,
+    integer_leading_digit_separator: bool,
+    fraction_leading_digit_separator: bool,
+    exponent_leading_digit_separator: bool,
+    integer_trailing_digit_separator: bool,
+    fraction_trailing_digit_separator: bool,
+    exponent_trailing_digit_separator: bool,
+    integer_consecutive_digit_separator: bool,
+    fraction_consecutive_digit_separator: bool,
+    exponent_consecutive_digit_separator: bool,
+    special_digit_separator: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">NumberFormatBuilder</span> {
-    <span class="comment">// CONSTRUCTORS</span>
+<span class="kw">impl </span>NumberFormatBuilder {
+    <span class="comment">// CONSTRUCTORS
 
-    <span class="doccomment">/// Create new NumberFormatBuilder with default arguments.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">digit_separator</span>: <span class="prelude-val">None</span>,
-            <span class="ident">base_prefix</span>: <span class="prelude-val">None</span>,
-            <span class="ident">base_suffix</span>: <span class="prelude-val">None</span>,
-            <span class="ident">mantissa_radix</span>: <span class="number">10</span>,
-            <span class="ident">exponent_base</span>: <span class="prelude-val">None</span>,
-            <span class="ident">exponent_radix</span>: <span class="prelude-val">None</span>,
-            <span class="ident">required_integer_digits</span>: <span class="bool-val">false</span>,
-            <span class="ident">required_fraction_digits</span>: <span class="bool-val">false</span>,
-            <span class="ident">required_exponent_digits</span>: <span class="bool-val">true</span>,
-            <span class="ident">required_mantissa_digits</span>: <span class="bool-val">true</span>,
-            <span class="ident">no_positive_mantissa_sign</span>: <span class="bool-val">false</span>,
-            <span class="ident">required_mantissa_sign</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_exponent_notation</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_positive_exponent_sign</span>: <span class="bool-val">false</span>,
-            <span class="ident">required_exponent_sign</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_exponent_without_fraction</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_special</span>: <span class="bool-val">false</span>,
-            <span class="ident">case_sensitive_special</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_integer_leading_zeros</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_float_leading_zeros</span>: <span class="bool-val">false</span>,
-            <span class="ident">required_exponent_notation</span>: <span class="bool-val">false</span>,
-            <span class="ident">case_sensitive_exponent</span>: <span class="bool-val">false</span>,
-            <span class="ident">case_sensitive_base_prefix</span>: <span class="bool-val">false</span>,
-            <span class="ident">case_sensitive_base_suffix</span>: <span class="bool-val">false</span>,
-            <span class="ident">integer_internal_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">fraction_internal_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">exponent_internal_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">integer_leading_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">fraction_leading_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">exponent_leading_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">integer_trailing_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">fraction_trailing_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">exponent_trailing_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">integer_consecutive_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">fraction_consecutive_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">exponent_consecutive_digit_separator</span>: <span class="bool-val">false</span>,
-            <span class="ident">special_digit_separator</span>: <span class="bool-val">false</span>,
+    </span><span class="doccomment">/// Create new NumberFormatBuilder with default arguments.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            digit_separator: <span class="prelude-val">None</span>,
+            base_prefix: <span class="prelude-val">None</span>,
+            base_suffix: <span class="prelude-val">None</span>,
+            mantissa_radix: <span class="number">10</span>,
+            exponent_base: <span class="prelude-val">None</span>,
+            exponent_radix: <span class="prelude-val">None</span>,
+            required_integer_digits: <span class="bool-val">false</span>,
+            required_fraction_digits: <span class="bool-val">false</span>,
+            required_exponent_digits: <span class="bool-val">true</span>,
+            required_mantissa_digits: <span class="bool-val">true</span>,
+            no_positive_mantissa_sign: <span class="bool-val">false</span>,
+            required_mantissa_sign: <span class="bool-val">false</span>,
+            no_exponent_notation: <span class="bool-val">false</span>,
+            no_positive_exponent_sign: <span class="bool-val">false</span>,
+            required_exponent_sign: <span class="bool-val">false</span>,
+            no_exponent_without_fraction: <span class="bool-val">false</span>,
+            no_special: <span class="bool-val">false</span>,
+            case_sensitive_special: <span class="bool-val">false</span>,
+            no_integer_leading_zeros: <span class="bool-val">false</span>,
+            no_float_leading_zeros: <span class="bool-val">false</span>,
+            required_exponent_notation: <span class="bool-val">false</span>,
+            case_sensitive_exponent: <span class="bool-val">false</span>,
+            case_sensitive_base_prefix: <span class="bool-val">false</span>,
+            case_sensitive_base_suffix: <span class="bool-val">false</span>,
+            integer_internal_digit_separator: <span class="bool-val">false</span>,
+            fraction_internal_digit_separator: <span class="bool-val">false</span>,
+            exponent_internal_digit_separator: <span class="bool-val">false</span>,
+            integer_leading_digit_separator: <span class="bool-val">false</span>,
+            fraction_leading_digit_separator: <span class="bool-val">false</span>,
+            exponent_leading_digit_separator: <span class="bool-val">false</span>,
+            integer_trailing_digit_separator: <span class="bool-val">false</span>,
+            fraction_trailing_digit_separator: <span class="bool-val">false</span>,
+            exponent_trailing_digit_separator: <span class="bool-val">false</span>,
+            integer_consecutive_digit_separator: <span class="bool-val">false</span>,
+            fraction_consecutive_digit_separator: <span class="bool-val">false</span>,
+            exponent_consecutive_digit_separator: <span class="bool-val">false</span>,
+            special_digit_separator: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Create number format for standard, binary number.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">binary</span>() -&gt; <span class="ident">u128</span> {
-        <span class="ident"><span class="self">Self</span>::from_radix</span>(<span class="number">2</span>)
+    <span class="doccomment">/// Create number format for standard, binary number.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>binary() -&gt; u128 {
+        <span class="self">Self</span>::from_radix(<span class="number">2</span>)
     }
 
-    <span class="doccomment">/// Create number format for standard, octal number.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">octal</span>() -&gt; <span class="ident">u128</span> {
-        <span class="ident"><span class="self">Self</span>::from_radix</span>(<span class="number">8</span>)
+    <span class="doccomment">/// Create number format for standard, octal number.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>octal() -&gt; u128 {
+        <span class="self">Self</span>::from_radix(<span class="number">8</span>)
     }
 
-    <span class="doccomment">/// Create number format for standard, decimal number.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">decimal</span>() -&gt; <span class="ident">u128</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="ident">builder</span>.<span class="ident">mantissa_radix</span> <span class="op">=</span> <span class="number">10</span>;
-        <span class="ident">builder</span>.<span class="ident">exponent_base</span> <span class="op">=</span> <span class="ident">num::NonZeroU8::new</span>(<span class="number">10</span>);
-        <span class="ident">builder</span>.<span class="ident">exponent_radix</span> <span class="op">=</span> <span class="ident">num::NonZeroU8::new</span>(<span class="number">10</span>);
-        <span class="ident">builder</span>.<span class="ident">build</span>()
+    <span class="doccomment">/// Create number format for standard, decimal number.
+    </span><span class="kw">pub const fn </span>decimal() -&gt; u128 {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = <span class="self">Self</span>::new();
+        builder.mantissa_radix = <span class="number">10</span>;
+        builder.exponent_base = num::NonZeroU8::new(<span class="number">10</span>);
+        builder.exponent_radix = num::NonZeroU8::new(<span class="number">10</span>);
+        builder.build()
     }
 
-    <span class="doccomment">/// Create number format for standard, hexadecimal number.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hexadecimal</span>() -&gt; <span class="ident">u128</span> {
-        <span class="ident"><span class="self">Self</span>::from_radix</span>(<span class="number">16</span>)
+    <span class="doccomment">/// Create number format for standard, hexadecimal number.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>hexadecimal() -&gt; u128 {
+        <span class="self">Self</span>::from_radix(<span class="number">16</span>)
     }
 
-    <span class="doccomment">/// Create number format from radix.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_radix</span>(<span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u128</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
-            .<span class="ident">radix</span>(<span class="ident">radix</span>)
-            .<span class="ident">exponent_base</span>(<span class="ident">num::NonZeroU8::new</span>(<span class="ident">radix</span>))
-            .<span class="ident">exponent_radix</span>(<span class="ident">num::NonZeroU8::new</span>(<span class="ident">radix</span>))
-            .<span class="ident">build</span>()
+    <span class="doccomment">/// Create number format from radix.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>from_radix(radix: u8) -&gt; u128 {
+        <span class="self">Self</span>::new()
+            .radix(radix)
+            .exponent_base(num::NonZeroU8::new(radix))
+            .exponent_radix(num::NonZeroU8::new(radix))
+            .build()
     }
 
-    <span class="comment">// GETTERS</span>
+    <span class="comment">// GETTERS
 
-    <span class="doccomment">/// Get the digit separator for the number format.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionU8</span> {
-        <span class="self">self</span>.<span class="ident">digit_separator</span>
+    </span><span class="doccomment">/// Get the digit separator for the number format.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionU8 {
+        <span class="self">self</span>.digit_separator
     }
 
-    <span class="doccomment">/// Get the radix for mantissa digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_mantissa_radix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">mantissa_radix</span>
+    <span class="doccomment">/// Get the radix for mantissa digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_mantissa_radix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.mantissa_radix
     }
 
-    <span class="doccomment">/// Get the radix for the exponent.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionU8</span> {
-        <span class="self">self</span>.<span class="ident">exponent_base</span>
+    <span class="doccomment">/// Get the radix for the exponent.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionU8 {
+        <span class="self">self</span>.exponent_base
     }
 
-    <span class="doccomment">/// Get the radix for exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_radix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionU8</span> {
-        <span class="self">self</span>.<span class="ident">exponent_radix</span>
+    <span class="doccomment">/// Get the radix for exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_radix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionU8 {
+        <span class="self">self</span>.exponent_radix
     }
 
-    <span class="doccomment">/// Get the optional character for the base prefix.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_base_prefix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionU8</span> {
-        <span class="self">self</span>.<span class="ident">base_prefix</span>
+    <span class="doccomment">/// Get the optional character for the base prefix.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_base_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionU8 {
+        <span class="self">self</span>.base_prefix
     }
 
-    <span class="doccomment">/// Get the optional character for the base suffix.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_base_suffix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OptionU8</span> {
-        <span class="self">self</span>.<span class="ident">base_suffix</span>
+    <span class="doccomment">/// Get the optional character for the base suffix.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_base_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OptionU8 {
+        <span class="self">self</span>.base_suffix
     }
 
-    <span class="doccomment">/// Get if digits are required before the decimal point.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_integer_digits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_integer_digits</span>
+    <span class="doccomment">/// Get if digits are required before the decimal point.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_integer_digits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_integer_digits
     }
 
-    <span class="doccomment">/// Get if digits are required after the decimal point.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_fraction_digits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_fraction_digits</span>
+    <span class="doccomment">/// Get if digits are required after the decimal point.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_fraction_digits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_fraction_digits
     }
 
-    <span class="doccomment">/// Get if digits are required after the exponent character.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_exponent_digits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_digits</span>
+    <span class="doccomment">/// Get if digits are required after the exponent character.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_exponent_digits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_exponent_digits
     }
 
-    <span class="doccomment">/// Get if at least 1 significant digit is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_mantissa_digits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_mantissa_digits</span>
+    <span class="doccomment">/// Get if at least 1 significant digit is required.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_mantissa_digits(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_mantissa_digits
     }
 
-    <span class="doccomment">/// Get if a positive sign before the mantissa is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_positive_mantissa_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_positive_mantissa_sign</span>
+    <span class="doccomment">/// Get if a positive sign before the mantissa is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_positive_mantissa_sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_positive_mantissa_sign
     }
 
-    <span class="doccomment">/// Get if a sign symbol before the mantissa is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_mantissa_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_mantissa_sign</span>
+    <span class="doccomment">/// Get if a sign symbol before the mantissa is required.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_mantissa_sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_mantissa_sign
     }
 
-    <span class="doccomment">/// Get if exponent notation is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_exponent_notation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_exponent_notation</span>
+    <span class="doccomment">/// Get if exponent notation is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_exponent_notation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_exponent_notation
     }
 
-    <span class="doccomment">/// Get if a positive sign before the exponent is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_positive_exponent_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_positive_exponent_sign</span>
+    <span class="doccomment">/// Get if a positive sign before the exponent is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_positive_exponent_sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_positive_exponent_sign
     }
 
-    <span class="doccomment">/// Get if a sign symbol before the exponent is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_exponent_sign</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_sign</span>
+    <span class="doccomment">/// Get if a sign symbol before the exponent is required.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_exponent_sign(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_exponent_sign
     }
 
-    <span class="doccomment">/// Get if an exponent without fraction is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_exponent_without_fraction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_exponent_without_fraction</span>
+    <span class="doccomment">/// Get if an exponent without fraction is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_exponent_without_fraction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_exponent_without_fraction
     }
 
-    <span class="doccomment">/// Get if special (non-finite) values are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_special</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_special</span>
+    <span class="doccomment">/// Get if special (non-finite) values are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_special(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_special
     }
 
-    <span class="doccomment">/// Get if special (non-finite) values are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_case_sensitive_special</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_special</span>
+    <span class="doccomment">/// Get if special (non-finite) values are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_case_sensitive_special(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.case_sensitive_special
     }
 
-    <span class="doccomment">/// Get if leading zeros before an integer are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_integer_leading_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_integer_leading_zeros</span>
+    <span class="doccomment">/// Get if leading zeros before an integer are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_integer_leading_zeros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_integer_leading_zeros
     }
 
-    <span class="doccomment">/// Get if leading zeros before a float are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_no_float_leading_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">no_float_leading_zeros</span>
+    <span class="doccomment">/// Get if leading zeros before a float are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_no_float_leading_zeros(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.no_float_leading_zeros
     }
 
-    <span class="doccomment">/// Get if exponent notation is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_required_exponent_notation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_notation</span>
+    <span class="doccomment">/// Get if exponent notation is required.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_required_exponent_notation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.required_exponent_notation
     }
 
-    <span class="doccomment">/// Get if exponent characters are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_case_sensitive_exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_exponent</span>
+    <span class="doccomment">/// Get if exponent characters are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_case_sensitive_exponent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.case_sensitive_exponent
     }
 
-    <span class="doccomment">/// Get if base prefixes are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_case_sensitive_base_prefix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_base_prefix</span>
+    <span class="doccomment">/// Get if base prefixes are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_case_sensitive_base_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.case_sensitive_base_prefix
     }
 
-    <span class="doccomment">/// Get if base suffixes are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_case_sensitive_base_suffix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_base_suffix</span>
+    <span class="doccomment">/// Get if base suffixes are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_case_sensitive_base_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.case_sensitive_base_suffix
     }
 
-    <span class="doccomment">/// Get if digit separators are allowed between integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_integer_internal_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">integer_internal_digit_separator</span>
+    <span class="doccomment">/// Get if digit separators are allowed between integer digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_integer_internal_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.integer_internal_digit_separator
     }
 
-    <span class="doccomment">/// Get if digit separators are allowed between fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_fraction_internal_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fraction_internal_digit_separator</span>
+    <span class="doccomment">/// Get if digit separators are allowed between fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_fraction_internal_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fraction_internal_digit_separator
     }
 
-    <span class="doccomment">/// Get if digit separators are allowed between exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_internal_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">exponent_internal_digit_separator</span>
+    <span class="doccomment">/// Get if digit separators are allowed between exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_internal_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.exponent_internal_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed before any integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_integer_leading_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">integer_leading_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed before any integer digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_integer_leading_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.integer_leading_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed before any fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_fraction_leading_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fraction_leading_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed before any fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_fraction_leading_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fraction_leading_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed before any exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_leading_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">exponent_leading_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed before any exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_leading_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.exponent_leading_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed after any integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_integer_trailing_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">integer_trailing_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed after any integer digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_integer_trailing_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.integer_trailing_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed after any fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_fraction_trailing_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fraction_trailing_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed after any fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_fraction_trailing_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fraction_trailing_digit_separator
     }
 
-    <span class="doccomment">/// Get if a digit separator is allowed after any exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_trailing_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">exponent_trailing_digit_separator</span>
+    <span class="doccomment">/// Get if a digit separator is allowed after any exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_trailing_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.exponent_trailing_digit_separator
     }
 
-    <span class="doccomment">/// Get if multiple consecutive integer digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_integer_consecutive_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">integer_consecutive_digit_separator</span>
+    <span class="doccomment">/// Get if multiple consecutive integer digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_integer_consecutive_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.integer_consecutive_digit_separator
     }
 
-    <span class="doccomment">/// Get if multiple consecutive fraction digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_fraction_consecutive_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">fraction_consecutive_digit_separator</span>
+    <span class="doccomment">/// Get if multiple consecutive fraction digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_fraction_consecutive_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.fraction_consecutive_digit_separator
     }
 
-    <span class="doccomment">/// Get if multiple consecutive exponent digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_exponent_consecutive_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">exponent_consecutive_digit_separator</span>
+    <span class="doccomment">/// Get if multiple consecutive exponent digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_exponent_consecutive_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.exponent_consecutive_digit_separator
     }
 
-    <span class="doccomment">/// Get if any digit separators are allowed in special (non-finite) values.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_special_digit_separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">special_digit_separator</span>
+    <span class="doccomment">/// Get if any digit separators are allowed in special (non-finite) values.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>get_special_digit_separator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.special_digit_separator
     }
 
-    <span class="comment">// SETTERS</span>
+    <span class="comment">// SETTERS
 
-    <span class="doccomment">/// Set the digit separator for the number format.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">character</span>: <span class="ident">OptionU8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">digit_separator</span> <span class="op">=</span> <span class="ident">character</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Alias for mantissa radix.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">radix</span>(<span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">mantissa_radix</span>(<span class="ident">radix</span>)
-    }
-
-    <span class="doccomment">/// Set the radix for mantissa digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mantissa_radix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">mantissa_radix</span> <span class="op">=</span> <span class="ident">radix</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the radix for the exponent.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_base</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">base</span>: <span class="ident">OptionU8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_base</span> <span class="op">=</span> <span class="ident">base</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the radix for exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_radix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">OptionU8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_radix</span> <span class="op">=</span> <span class="ident">radix</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the optional character for the base prefix.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">base_prefix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">base_prefix</span>: <span class="ident">OptionU8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">base_prefix</span> <span class="op">=</span> <span class="ident">base_prefix</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set the optional character for the base suffix.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">base_suffix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">base_suffix</span>: <span class="ident">OptionU8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">base_suffix</span> <span class="op">=</span> <span class="ident">base_suffix</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digits are required before the decimal point.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_integer_digits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_integer_digits</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digits are required after the decimal point.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_fraction_digits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_fraction_digits</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digits are required after the exponent character.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_exponent_digits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_digits</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if at least 1 significant digit is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_mantissa_digits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_mantissa_digits</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digits are required for all float components.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_digits</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">required_integer_digits</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">required_fraction_digits</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">required_exponent_digits</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">required_mantissa_digits</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a positive sign before the mantissa is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_positive_mantissa_sign</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_positive_mantissa_sign</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a sign symbol before the mantissa is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_mantissa_sign</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_mantissa_sign</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if exponent notation is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_exponent_notation</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_exponent_notation</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a positive sign before the exponent is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_positive_exponent_sign</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_positive_exponent_sign</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a sign symbol before the exponent is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_exponent_sign</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_sign</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if an exponent without fraction is not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_exponent_without_fraction</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_exponent_without_fraction</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if special (non-finite) values are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_special</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_special</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if special (non-finite) values are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">case_sensitive_special</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_special</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if leading zeros before an integer are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_integer_leading_zeros</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_integer_leading_zeros</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if leading zeros before a float are not allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_float_leading_zeros</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">no_float_leading_zeros</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if exponent notation is required.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">required_exponent_notation</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required_exponent_notation</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if exponent characters are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">case_sensitive_exponent</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_exponent</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if base prefixes are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">case_sensitive_base_prefix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_base_prefix</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if base suffixes are case-sensitive.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">case_sensitive_base_suffix</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">case_sensitive_base_suffix</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digit separators are allowed between integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integer_internal_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">integer_internal_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digit separators are allowed between fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">fraction_internal_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fraction_internal_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if digit separators are allowed between exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_internal_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_internal_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all internal digit separator flags.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">internal_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a digit separator is allowed before any integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integer_leading_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">integer_leading_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a digit separator is allowed before any fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">fraction_leading_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fraction_leading_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a digit separator is allowed before any exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_leading_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_leading_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all leading digit separator flags.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">leading_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if a digit separator is allowed after any integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integer_trailing_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">integer_trailing_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
+    </span><span class="doccomment">/// Set the digit separator for the number format.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, character: OptionU8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.digit_separator = character;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set if a digit separator is allowed after any fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">fraction_trailing_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fraction_trailing_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Alias for mantissa radix.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>radix(<span class="self">self</span>, radix: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.mantissa_radix(radix)
     }
-
-    <span class="doccomment">/// Set if a digit separator is allowed after any exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_trailing_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_trailing_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all trailing digit separator flags.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">trailing_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if multiple consecutive integer digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integer_consecutive_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">integer_consecutive_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if multiple consecutive fraction digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">fraction_consecutive_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">fraction_consecutive_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if multiple consecutive exponent digit separators are allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_consecutive_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exponent_consecutive_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all consecutive digit separator flags.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">consecutive_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set if any digit separators are allowed in special (non-finite) values.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">special_digit_separator</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">special_digit_separator</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all digit separator flag masks.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">digit_separator_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_digit_separator_flags</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_digit_separator_flags</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_digit_separator_flags</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">special_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all integer digit separator flag masks.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integer_digit_separator_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">integer_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all fraction digit separator flag masks.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">fraction_digit_separator_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fraction_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Set all exponent digit separator flag masks.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">exponent_digit_separator_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_internal_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_leading_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_trailing_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exponent_consecutive_digit_separator</span>(<span class="ident">flag</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="comment">// BUILDER</span>
 
-    <span class="doccomment">/// Create 128-bit, packed number format struct from builder options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// NOTE: This function will never fail, due to issues with panicking</span>
-    <span class="doccomment">/// (and therefore unwrapping Errors/Options) in const fns. It is</span>
-    <span class="doccomment">/// therefore up to you to ensure the format is valid, called via the</span>
-    <span class="doccomment">/// `is_valid` function on `NumberFormat`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Set the radix for mantissa digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>mantissa_radix(<span class="kw-2">mut </span><span class="self">self</span>, radix: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.mantissa_radix = radix;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the radix for the exponent.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_base(<span class="kw-2">mut </span><span class="self">self</span>, base: OptionU8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_base = base;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the radix for exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_radix(<span class="kw-2">mut </span><span class="self">self</span>, radix: OptionU8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_radix = radix;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the optional character for the base prefix.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, feature = <span class="string">&quot;format&quot;</span>))]
+    </span><span class="kw">pub const fn </span>base_prefix(<span class="kw-2">mut </span><span class="self">self</span>, base_prefix: OptionU8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.base_prefix = base_prefix;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set the optional character for the base suffix.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, feature = <span class="string">&quot;format&quot;</span>))]
+    </span><span class="kw">pub const fn </span>base_suffix(<span class="kw-2">mut </span><span class="self">self</span>, base_suffix: OptionU8) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.base_suffix = base_suffix;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digits are required before the decimal point.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_integer_digits(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_integer_digits = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digits are required after the decimal point.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_fraction_digits(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_fraction_digits = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digits are required after the exponent character.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_exponent_digits(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_exponent_digits = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if at least 1 significant digit is required.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_mantissa_digits(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_mantissa_digits = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digits are required for all float components.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_digits(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.required_integer_digits(flag);
+        <span class="self">self </span>= <span class="self">self</span>.required_fraction_digits(flag);
+        <span class="self">self </span>= <span class="self">self</span>.required_exponent_digits(flag);
+        <span class="self">self </span>= <span class="self">self</span>.required_mantissa_digits(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a positive sign before the mantissa is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_positive_mantissa_sign(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_positive_mantissa_sign = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a sign symbol before the mantissa is required.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_mantissa_sign(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_mantissa_sign = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if exponent notation is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_exponent_notation(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_exponent_notation = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a positive sign before the exponent is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_positive_exponent_sign(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_positive_exponent_sign = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a sign symbol before the exponent is required.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_exponent_sign(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_exponent_sign = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if an exponent without fraction is not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_exponent_without_fraction(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_exponent_without_fraction = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if special (non-finite) values are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_special(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_special = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if special (non-finite) values are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>case_sensitive_special(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.case_sensitive_special = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if leading zeros before an integer are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_integer_leading_zeros(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_integer_leading_zeros = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if leading zeros before a float are not allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>no_float_leading_zeros(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.no_float_leading_zeros = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if exponent notation is required.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>required_exponent_notation(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required_exponent_notation = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if exponent characters are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>case_sensitive_exponent(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.case_sensitive_exponent = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if base prefixes are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, feature = <span class="string">&quot;format&quot;</span>))]
+    </span><span class="kw">pub const fn </span>case_sensitive_base_prefix(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.case_sensitive_base_prefix = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if base suffixes are case-sensitive.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, feature = <span class="string">&quot;format&quot;</span>))]
+    </span><span class="kw">pub const fn </span>case_sensitive_base_suffix(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.case_sensitive_base_suffix = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digit separators are allowed between integer digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>integer_internal_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.integer_internal_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digit separators are allowed between fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>fraction_internal_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fraction_internal_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if digit separators are allowed between exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_internal_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_internal_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all internal digit separator flags.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>internal_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_internal_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_internal_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_internal_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed before any integer digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>integer_leading_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.integer_leading_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed before any fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>fraction_leading_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fraction_leading_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed before any exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_leading_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_leading_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all leading digit separator flags.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>leading_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_leading_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_leading_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_leading_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed after any integer digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>integer_trailing_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.integer_trailing_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed after any fraction digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>fraction_trailing_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fraction_trailing_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if a digit separator is allowed after any exponent digits.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_trailing_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_trailing_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all trailing digit separator flags.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>trailing_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_trailing_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_trailing_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_trailing_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if multiple consecutive integer digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>integer_consecutive_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.integer_consecutive_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if multiple consecutive fraction digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>fraction_consecutive_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.fraction_consecutive_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if multiple consecutive exponent digit separators are allowed.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_consecutive_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exponent_consecutive_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all consecutive digit separator flags.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>consecutive_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_consecutive_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_consecutive_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_consecutive_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set if any digit separators are allowed in special (non-finite) values.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>special_digit_separator(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.special_digit_separator = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all digit separator flag masks.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>digit_separator_flags(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_digit_separator_flags(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_digit_separator_flags(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_digit_separator_flags(flag);
+        <span class="self">self </span>= <span class="self">self</span>.special_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all integer digit separator flag masks.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>integer_digit_separator_flags(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.integer_internal_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.integer_leading_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.integer_trailing_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.integer_consecutive_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all fraction digit separator flag masks.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>fraction_digit_separator_flags(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.fraction_internal_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_leading_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_trailing_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.fraction_consecutive_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set all exponent digit separator flag masks.
+    </span><span class="attribute">#[inline(always)]
+    #[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+    </span><span class="kw">pub const fn </span>exponent_digit_separator_flags(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self </span>= <span class="self">self</span>.exponent_internal_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_leading_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_trailing_digit_separator(flag);
+        <span class="self">self </span>= <span class="self">self</span>.exponent_consecutive_digit_separator(flag);
+        <span class="self">self
+    </span>}
+
+    <span class="comment">// BUILDER
+
+    </span><span class="doccomment">/// Create 128-bit, packed number format struct from builder options.
+    ///
+    /// NOTE: This function will never fail, due to issues with panicking
+    /// (and therefore unwrapping Errors/Options) in const fns. It is
+    /// therefore up to you to ensure the format is valid, called via the
+    /// `is_valid` function on `NumberFormat`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
+        <span class="kw">let </span><span class="kw-2">mut </span>format: u128 = <span class="number">0</span>;
         <span class="macro">add_flags!</span>(
-            <span class="ident">format</span> ;
-            <span class="self">self</span>.<span class="ident">required_integer_digits</span>, <span class="ident">REQUIRED_INTEGER_DIGITS</span> ;
-            <span class="self">self</span>.<span class="ident">required_fraction_digits</span>, <span class="ident">REQUIRED_FRACTION_DIGITS</span> ;
-            <span class="self">self</span>.<span class="ident">required_exponent_digits</span>, <span class="ident">REQUIRED_EXPONENT_DIGITS</span> ;
-            <span class="self">self</span>.<span class="ident">required_mantissa_digits</span>, <span class="ident">REQUIRED_MANTISSA_DIGITS</span> ;
-            <span class="self">self</span>.<span class="ident">no_positive_mantissa_sign</span>, <span class="ident">NO_POSITIVE_MANTISSA_SIGN</span> ;
-            <span class="self">self</span>.<span class="ident">required_mantissa_sign</span>, <span class="ident">REQUIRED_MANTISSA_SIGN</span> ;
-            <span class="self">self</span>.<span class="ident">no_exponent_notation</span>, <span class="ident">NO_EXPONENT_NOTATION</span> ;
-            <span class="self">self</span>.<span class="ident">no_positive_exponent_sign</span>, <span class="ident">NO_POSITIVE_EXPONENT_SIGN</span> ;
-            <span class="self">self</span>.<span class="ident">required_exponent_sign</span>, <span class="ident">REQUIRED_EXPONENT_SIGN</span> ;
-            <span class="self">self</span>.<span class="ident">no_exponent_without_fraction</span>, <span class="ident">NO_EXPONENT_WITHOUT_FRACTION</span> ;
-            <span class="self">self</span>.<span class="ident">no_special</span>, <span class="ident">NO_SPECIAL</span> ;
-            <span class="self">self</span>.<span class="ident">case_sensitive_special</span>, <span class="ident">CASE_SENSITIVE_SPECIAL</span> ;
-            <span class="self">self</span>.<span class="ident">no_integer_leading_zeros</span>, <span class="ident">NO_INTEGER_LEADING_ZEROS</span> ;
-            <span class="self">self</span>.<span class="ident">no_float_leading_zeros</span>, <span class="ident">NO_FLOAT_LEADING_ZEROS</span> ;
-            <span class="self">self</span>.<span class="ident">required_exponent_notation</span>, <span class="ident">REQUIRED_EXPONENT_NOTATION</span> ;
-            <span class="self">self</span>.<span class="ident">case_sensitive_exponent</span>, <span class="ident">CASE_SENSITIVE_EXPONENT</span> ;
-            <span class="self">self</span>.<span class="ident">case_sensitive_base_prefix</span>, <span class="ident">CASE_SENSITIVE_BASE_PREFIX</span> ;
-            <span class="self">self</span>.<span class="ident">case_sensitive_base_suffix</span>, <span class="ident">CASE_SENSITIVE_BASE_SUFFIX</span> ;
-            <span class="self">self</span>.<span class="ident">integer_internal_digit_separator</span>, <span class="ident">INTEGER_INTERNAL_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">fraction_internal_digit_separator</span>, <span class="ident">FRACTION_INTERNAL_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">exponent_internal_digit_separator</span>, <span class="ident">EXPONENT_INTERNAL_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">integer_leading_digit_separator</span>, <span class="ident">INTEGER_LEADING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">fraction_leading_digit_separator</span>, <span class="ident">FRACTION_LEADING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">exponent_leading_digit_separator</span>, <span class="ident">EXPONENT_LEADING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">integer_trailing_digit_separator</span>, <span class="ident">INTEGER_TRAILING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">fraction_trailing_digit_separator</span>, <span class="ident">FRACTION_TRAILING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">exponent_trailing_digit_separator</span>, <span class="ident">EXPONENT_TRAILING_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">integer_consecutive_digit_separator</span>, <span class="ident">INTEGER_CONSECUTIVE_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">fraction_consecutive_digit_separator</span>, <span class="ident">FRACTION_CONSECUTIVE_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">exponent_consecutive_digit_separator</span>, <span class="ident">EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR</span> ;
-            <span class="self">self</span>.<span class="ident">special_digit_separator</span>, <span class="ident">SPECIAL_DIGIT_SEPARATOR</span> ;
+            format ;
+            <span class="self">self</span>.required_integer_digits, REQUIRED_INTEGER_DIGITS ;
+            <span class="self">self</span>.required_fraction_digits, REQUIRED_FRACTION_DIGITS ;
+            <span class="self">self</span>.required_exponent_digits, REQUIRED_EXPONENT_DIGITS ;
+            <span class="self">self</span>.required_mantissa_digits, REQUIRED_MANTISSA_DIGITS ;
+            <span class="self">self</span>.no_positive_mantissa_sign, NO_POSITIVE_MANTISSA_SIGN ;
+            <span class="self">self</span>.required_mantissa_sign, REQUIRED_MANTISSA_SIGN ;
+            <span class="self">self</span>.no_exponent_notation, NO_EXPONENT_NOTATION ;
+            <span class="self">self</span>.no_positive_exponent_sign, NO_POSITIVE_EXPONENT_SIGN ;
+            <span class="self">self</span>.required_exponent_sign, REQUIRED_EXPONENT_SIGN ;
+            <span class="self">self</span>.no_exponent_without_fraction, NO_EXPONENT_WITHOUT_FRACTION ;
+            <span class="self">self</span>.no_special, NO_SPECIAL ;
+            <span class="self">self</span>.case_sensitive_special, CASE_SENSITIVE_SPECIAL ;
+            <span class="self">self</span>.no_integer_leading_zeros, NO_INTEGER_LEADING_ZEROS ;
+            <span class="self">self</span>.no_float_leading_zeros, NO_FLOAT_LEADING_ZEROS ;
+            <span class="self">self</span>.required_exponent_notation, REQUIRED_EXPONENT_NOTATION ;
+            <span class="self">self</span>.case_sensitive_exponent, CASE_SENSITIVE_EXPONENT ;
+            <span class="self">self</span>.case_sensitive_base_prefix, CASE_SENSITIVE_BASE_PREFIX ;
+            <span class="self">self</span>.case_sensitive_base_suffix, CASE_SENSITIVE_BASE_SUFFIX ;
+            <span class="self">self</span>.integer_internal_digit_separator, INTEGER_INTERNAL_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.fraction_internal_digit_separator, FRACTION_INTERNAL_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.exponent_internal_digit_separator, EXPONENT_INTERNAL_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.integer_leading_digit_separator, INTEGER_LEADING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.fraction_leading_digit_separator, FRACTION_LEADING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.exponent_leading_digit_separator, EXPONENT_LEADING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.integer_trailing_digit_separator, INTEGER_TRAILING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.fraction_trailing_digit_separator, FRACTION_TRAILING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.exponent_trailing_digit_separator, EXPONENT_TRAILING_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.integer_consecutive_digit_separator, INTEGER_CONSECUTIVE_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.fraction_consecutive_digit_separator, FRACTION_CONSECUTIVE_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.exponent_consecutive_digit_separator, EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR ;
+            <span class="self">self</span>.special_digit_separator, SPECIAL_DIGIT_SEPARATOR ;
         );
-        <span class="kw">if</span> <span class="ident">format</span> <span class="op">&amp;</span> <span class="ident">flags::DIGIT_SEPARATOR_FLAG_MASK</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">format</span> <span class="op">|</span><span class="op">=</span>
-                (<span class="ident">unwrap_or_zero</span>(<span class="self">self</span>.<span class="ident">digit_separator</span>) <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::DIGIT_SEPARATOR_SHIFT</span>;
+        <span class="kw">if </span>format &amp; flags::DIGIT_SEPARATOR_FLAG_MASK != <span class="number">0 </span>{
+            format |=
+                (unwrap_or_zero(<span class="self">self</span>.digit_separator) <span class="kw">as </span>u128) &lt;&lt; flags::DIGIT_SEPARATOR_SHIFT;
         }
-        <span class="ident">format</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">unwrap_or_zero</span>(<span class="self">self</span>.<span class="ident">base_prefix</span>) <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::BASE_PREFIX_SHIFT</span>;
-        <span class="ident">format</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">unwrap_or_zero</span>(<span class="self">self</span>.<span class="ident">base_suffix</span>) <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::BASE_SUFFIX_SHIFT</span>;
-        <span class="ident">format</span> <span class="op">|</span><span class="op">=</span> (<span class="self">self</span>.<span class="ident">mantissa_radix</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::MANTISSA_RADIX_SHIFT</span>;
-        <span class="ident">format</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">unwrap_or_zero</span>(<span class="self">self</span>.<span class="ident">exponent_base</span>) <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::EXPONENT_BASE_SHIFT</span>;
-        <span class="ident">format</span> <span class="op">|</span><span class="op">=</span> (<span class="ident">unwrap_or_zero</span>(<span class="self">self</span>.<span class="ident">exponent_radix</span>) <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">flags::EXPONENT_RADIX_SHIFT</span>;
+        format |= (unwrap_or_zero(<span class="self">self</span>.base_prefix) <span class="kw">as </span>u128) &lt;&lt; flags::BASE_PREFIX_SHIFT;
+        format |= (unwrap_or_zero(<span class="self">self</span>.base_suffix) <span class="kw">as </span>u128) &lt;&lt; flags::BASE_SUFFIX_SHIFT;
+        format |= (<span class="self">self</span>.mantissa_radix <span class="kw">as </span>u128) &lt;&lt; flags::MANTISSA_RADIX_SHIFT;
+        format |= (unwrap_or_zero(<span class="self">self</span>.exponent_base) <span class="kw">as </span>u128) &lt;&lt; flags::EXPONENT_BASE_SHIFT;
+        format |= (unwrap_or_zero(<span class="self">self</span>.exponent_radix) <span class="kw">as </span>u128) &lt;&lt; flags::EXPONENT_RADIX_SHIFT;
 
-        <span class="ident">format</span>
+        format
     }
 
-    <span class="doccomment">/// Re-create builder from format.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">rebuild</span>(<span class="ident">format</span>: <span class="ident">u128</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">NumberFormatBuilder</span> {
-            <span class="ident">digit_separator</span>: <span class="ident">num::NonZeroU8::new</span>(<span class="ident">flags::digit_separator</span>(<span class="ident">format</span>)),
-            <span class="ident">base_prefix</span>: <span class="ident">num::NonZeroU8::new</span>(<span class="ident">flags::base_prefix</span>(<span class="ident">format</span>)),
-            <span class="ident">base_suffix</span>: <span class="ident">num::NonZeroU8::new</span>(<span class="ident">flags::base_suffix</span>(<span class="ident">format</span>)),
-            <span class="ident">mantissa_radix</span>: <span class="ident">flags::mantissa_radix</span>(<span class="ident">format</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">exponent_base</span>: <span class="ident">num::NonZeroU8::new</span>(<span class="ident">flags::exponent_base</span>(<span class="ident">format</span>) <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">exponent_radix</span>: <span class="ident">num::NonZeroU8::new</span>(<span class="ident">flags::exponent_radix</span>(<span class="ident">format</span>) <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">required_integer_digits</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_INTEGER_DIGITS</span>),
-            <span class="ident">required_fraction_digits</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_FRACTION_DIGITS</span>),
-            <span class="ident">required_exponent_digits</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_EXPONENT_DIGITS</span>),
-            <span class="ident">required_mantissa_digits</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_MANTISSA_DIGITS</span>),
-            <span class="ident">no_positive_mantissa_sign</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_POSITIVE_MANTISSA_SIGN</span>),
-            <span class="ident">required_mantissa_sign</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_MANTISSA_SIGN</span>),
-            <span class="ident">no_exponent_notation</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_EXPONENT_NOTATION</span>),
-            <span class="ident">no_positive_exponent_sign</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_POSITIVE_EXPONENT_SIGN</span>),
-            <span class="ident">required_exponent_sign</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_EXPONENT_SIGN</span>),
-            <span class="ident">no_exponent_without_fraction</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_EXPONENT_WITHOUT_FRACTION</span>),
-            <span class="ident">no_special</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_SPECIAL</span>),
-            <span class="ident">case_sensitive_special</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">CASE_SENSITIVE_SPECIAL</span>),
-            <span class="ident">no_integer_leading_zeros</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_INTEGER_LEADING_ZEROS</span>),
-            <span class="ident">no_float_leading_zeros</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">NO_FLOAT_LEADING_ZEROS</span>),
-            <span class="ident">required_exponent_notation</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">REQUIRED_EXPONENT_NOTATION</span>),
-            <span class="ident">case_sensitive_exponent</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">CASE_SENSITIVE_EXPONENT</span>),
-            <span class="ident">case_sensitive_base_prefix</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">CASE_SENSITIVE_BASE_PREFIX</span>),
-            <span class="ident">case_sensitive_base_suffix</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">CASE_SENSITIVE_BASE_SUFFIX</span>),
-            <span class="ident">integer_internal_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">INTEGER_INTERNAL_DIGIT_SEPARATOR</span>),
-            <span class="ident">fraction_internal_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">FRACTION_INTERNAL_DIGIT_SEPARATOR</span>),
-            <span class="ident">exponent_internal_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">EXPONENT_INTERNAL_DIGIT_SEPARATOR</span>),
-            <span class="ident">integer_leading_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">INTEGER_LEADING_DIGIT_SEPARATOR</span>),
-            <span class="ident">fraction_leading_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">FRACTION_LEADING_DIGIT_SEPARATOR</span>),
-            <span class="ident">exponent_leading_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">EXPONENT_LEADING_DIGIT_SEPARATOR</span>),
-            <span class="ident">integer_trailing_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">INTEGER_TRAILING_DIGIT_SEPARATOR</span>),
-            <span class="ident">fraction_trailing_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">FRACTION_TRAILING_DIGIT_SEPARATOR</span>),
-            <span class="ident">exponent_trailing_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">EXPONENT_TRAILING_DIGIT_SEPARATOR</span>),
-            <span class="ident">integer_consecutive_digit_separator</span>: <span class="macro">has_flag!</span>(
-                <span class="ident">format</span>,
-                <span class="ident">INTEGER_CONSECUTIVE_DIGIT_SEPARATOR</span>
+    <span class="doccomment">/// Re-create builder from format.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>rebuild(format: u128) -&gt; <span class="self">Self </span>{
+        NumberFormatBuilder {
+            digit_separator: num::NonZeroU8::new(flags::digit_separator(format)),
+            base_prefix: num::NonZeroU8::new(flags::base_prefix(format)),
+            base_suffix: num::NonZeroU8::new(flags::base_suffix(format)),
+            mantissa_radix: flags::mantissa_radix(format) <span class="kw">as </span>u8,
+            exponent_base: num::NonZeroU8::new(flags::exponent_base(format) <span class="kw">as </span>u8),
+            exponent_radix: num::NonZeroU8::new(flags::exponent_radix(format) <span class="kw">as </span>u8),
+            required_integer_digits: <span class="macro">has_flag!</span>(format, REQUIRED_INTEGER_DIGITS),
+            required_fraction_digits: <span class="macro">has_flag!</span>(format, REQUIRED_FRACTION_DIGITS),
+            required_exponent_digits: <span class="macro">has_flag!</span>(format, REQUIRED_EXPONENT_DIGITS),
+            required_mantissa_digits: <span class="macro">has_flag!</span>(format, REQUIRED_MANTISSA_DIGITS),
+            no_positive_mantissa_sign: <span class="macro">has_flag!</span>(format, NO_POSITIVE_MANTISSA_SIGN),
+            required_mantissa_sign: <span class="macro">has_flag!</span>(format, REQUIRED_MANTISSA_SIGN),
+            no_exponent_notation: <span class="macro">has_flag!</span>(format, NO_EXPONENT_NOTATION),
+            no_positive_exponent_sign: <span class="macro">has_flag!</span>(format, NO_POSITIVE_EXPONENT_SIGN),
+            required_exponent_sign: <span class="macro">has_flag!</span>(format, REQUIRED_EXPONENT_SIGN),
+            no_exponent_without_fraction: <span class="macro">has_flag!</span>(format, NO_EXPONENT_WITHOUT_FRACTION),
+            no_special: <span class="macro">has_flag!</span>(format, NO_SPECIAL),
+            case_sensitive_special: <span class="macro">has_flag!</span>(format, CASE_SENSITIVE_SPECIAL),
+            no_integer_leading_zeros: <span class="macro">has_flag!</span>(format, NO_INTEGER_LEADING_ZEROS),
+            no_float_leading_zeros: <span class="macro">has_flag!</span>(format, NO_FLOAT_LEADING_ZEROS),
+            required_exponent_notation: <span class="macro">has_flag!</span>(format, REQUIRED_EXPONENT_NOTATION),
+            case_sensitive_exponent: <span class="macro">has_flag!</span>(format, CASE_SENSITIVE_EXPONENT),
+            case_sensitive_base_prefix: <span class="macro">has_flag!</span>(format, CASE_SENSITIVE_BASE_PREFIX),
+            case_sensitive_base_suffix: <span class="macro">has_flag!</span>(format, CASE_SENSITIVE_BASE_SUFFIX),
+            integer_internal_digit_separator: <span class="macro">has_flag!</span>(format, INTEGER_INTERNAL_DIGIT_SEPARATOR),
+            fraction_internal_digit_separator: <span class="macro">has_flag!</span>(format, FRACTION_INTERNAL_DIGIT_SEPARATOR),
+            exponent_internal_digit_separator: <span class="macro">has_flag!</span>(format, EXPONENT_INTERNAL_DIGIT_SEPARATOR),
+            integer_leading_digit_separator: <span class="macro">has_flag!</span>(format, INTEGER_LEADING_DIGIT_SEPARATOR),
+            fraction_leading_digit_separator: <span class="macro">has_flag!</span>(format, FRACTION_LEADING_DIGIT_SEPARATOR),
+            exponent_leading_digit_separator: <span class="macro">has_flag!</span>(format, EXPONENT_LEADING_DIGIT_SEPARATOR),
+            integer_trailing_digit_separator: <span class="macro">has_flag!</span>(format, INTEGER_TRAILING_DIGIT_SEPARATOR),
+            fraction_trailing_digit_separator: <span class="macro">has_flag!</span>(format, FRACTION_TRAILING_DIGIT_SEPARATOR),
+            exponent_trailing_digit_separator: <span class="macro">has_flag!</span>(format, EXPONENT_TRAILING_DIGIT_SEPARATOR),
+            integer_consecutive_digit_separator: <span class="macro">has_flag!</span>(
+                format,
+                INTEGER_CONSECUTIVE_DIGIT_SEPARATOR
             ),
-            <span class="ident">fraction_consecutive_digit_separator</span>: <span class="macro">has_flag!</span>(
-                <span class="ident">format</span>,
-                <span class="ident">FRACTION_CONSECUTIVE_DIGIT_SEPARATOR</span>
+            fraction_consecutive_digit_separator: <span class="macro">has_flag!</span>(
+                format,
+                FRACTION_CONSECUTIVE_DIGIT_SEPARATOR
             ),
-            <span class="ident">exponent_consecutive_digit_separator</span>: <span class="macro">has_flag!</span>(
-                <span class="ident">format</span>,
-                <span class="ident">EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR</span>
+            exponent_consecutive_digit_separator: <span class="macro">has_flag!</span>(
+                format,
+                EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR
             ),
-            <span class="ident">special_digit_separator</span>: <span class="macro">has_flag!</span>(<span class="ident">format</span>, <span class="ident">SPECIAL_DIGIT_SEPARATOR</span>),
+            special_digit_separator: <span class="macro">has_flag!</span>(format, SPECIAL_DIGIT_SEPARATOR),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">NumberFormatBuilder</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>NumberFormatBuilder {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

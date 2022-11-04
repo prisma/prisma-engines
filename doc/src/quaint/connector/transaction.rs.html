@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/transaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/transaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    ast::<span class="kw-2">*</span>,
+    error::{Error, ErrorKind},
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">decrement_gauge</span>, <span class="ident">increment_gauge</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>metrics::{decrement_gauge, increment_gauge};
+<span class="kw">use </span>std::{fmt, str::FromStr};
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">metrics</span> <span class="kw">as</span> <span class="ident">metrics</span>;
+<span class="kw">extern crate </span>metrics <span class="kw">as </span>metrics;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TransactionOptions</span> {
-    <span class="doccomment">/// The isolation level to use.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TransactionOptions {
+    <span class="doccomment">/// The isolation level to use.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
 
-    <span class="doccomment">/// Whether or not to put the isolation level `SET` before or after the `BEGIN`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">isolation_first</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not to put the isolation level `SET` before or after the `BEGIN`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) isolation_first: bool,
 }
 
-<span class="doccomment">/// A representation of an SQL database transaction. If not commited, a</span>
-<span class="doccomment">/// transaction will be rolled back by default when dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Currently does not support nesting, so starting a new transaction using the</span>
-<span class="doccomment">/// transaction object will panic.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Queryable</span>,
+<span class="doccomment">/// A representation of an SQL database transaction. If not commited, a
+/// transaction will be rolled back by default when dropped.
+///
+/// Currently does not support nesting, so starting a new transaction using the
+/// transaction object will panic.
+</span><span class="kw">pub struct </span>Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Queryable</span>,
-        <span class="ident">begin_stmt</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">tx_opts</span>: <span class="ident">TransactionOptions</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">inner</span> };
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>new(
+        inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Queryable,
+        begin_stmt: <span class="kw-2">&amp;</span>str,
+        tx_opts: TransactionOptions,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Transaction&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">Self </span>{ inner };
 
-        <span class="kw">if</span> <span class="ident">tx_opts</span>.<span class="ident">isolation_first</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">isolation</span>) <span class="op">=</span> <span class="ident">tx_opts</span>.<span class="ident">isolation_level</span> {
-                <span class="ident">inner</span>.<span class="ident">set_tx_isolation_level</span>(<span class="ident">isolation</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if </span>tx_opts.isolation_first {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(isolation) = tx_opts.isolation_level {
+                inner.set_tx_isolation_level(isolation).<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
 
-        <span class="ident">inner</span>.<span class="ident">raw_cmd</span>(<span class="ident">begin_stmt</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        inner.raw_cmd(begin_stmt).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">tx_opts</span>.<span class="ident">isolation_first</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">isolation</span>) <span class="op">=</span> <span class="ident">tx_opts</span>.<span class="ident">isolation_level</span> {
-                <span class="ident">inner</span>.<span class="ident">set_tx_isolation_level</span>(<span class="ident">isolation</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if </span>!tx_opts.isolation_first {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(isolation) = tx_opts.isolation_level {
+                inner.set_tx_isolation_level(isolation).<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
 
-        <span class="ident">inner</span>.<span class="ident">server_reset_query</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        inner.server_reset_query(<span class="kw-2">&amp;</span>this).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">increment_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">this</span>)
+        <span class="prelude-val">Ok</span>(this)
     }
 
-    <span class="doccomment">/// Commit the changes to the database and consume the transaction.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Commit the changes to the database and consume the transaction.
+    </span><span class="kw">pub async fn </span>commit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;COMMIT&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.inner.raw_cmd(<span class="string">&quot;COMMIT&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Rolls back the changes to the database.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="doccomment">/// Rolls back the changes to the database.
+    </span><span class="kw">pub async fn </span>rollback(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
         <span class="macro">decrement_gauge!</span>(<span class="string">&quot;prisma_client_queries_active&quot;</span>, <span class="number">1.0</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;ROLLBACK&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.inner.raw_cmd(<span class="string">&quot;ROLLBACK&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="kw">await</span>
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Queryable <span class="kw">for </span>Transaction&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="self">self</span>.inner.query(q).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute(q).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="self">self</span>.inner.query_raw(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="self">self</span>.inner.query_raw_typed(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute_raw(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute_raw_typed(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.raw_cmd(cmd).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+        <span class="self">self</span>.inner.version().<span class="kw">await
+    </span>}
+
+    <span class="kw">fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_healthy()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute</span>(<span class="ident">q</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.set_tx_isolation_level(isolation_level).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query_raw_typed</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute_raw_typed</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">raw_cmd</span>(<span class="ident">cmd</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">version</span>().<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_healthy</span>()
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tx_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_tx_isolation_level</span>(<span class="ident">isolation_level</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">requires_isolation_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">requires_isolation_first</span>()
+    <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.requires_isolation_first()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="doccomment">/// Controls the locking and row versioning behavior of connections or transactions.</span>
-<span class="doccomment">/// The levels correspond to the ANSI standard isolation levels, plus `Snapshot` for SQL Server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Details on exact behavior and validity can be found in the documentation of the database vendors:</span>
-<span class="doccomment">/// - [SQL Server documentation].</span>
-<span class="doccomment">/// - [Postgres documentation].</span>
-<span class="doccomment">/// - [MySQL documentation].</span>
-<span class="doccomment">/// - [SQLite documentation].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15</span>
-<span class="doccomment">/// [Postgres documentation]: https://www.postgresql.org/docs/current/sql-set-transaction.html</span>
-<span class="doccomment">/// [MySQL documentation]: https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html</span>
-<span class="doccomment">/// [SQLite documentation]: https://www.sqlite.org/isolation.html</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IsolationLevel</span> {
-    <span class="ident">ReadUncommitted</span>,
-    <span class="ident">ReadCommitted</span>,
-    <span class="ident">RepeatableRead</span>,
-    <span class="ident">Snapshot</span>,
-    <span class="ident">Serializable</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="doccomment">/// Controls the locking and row versioning behavior of connections or transactions.
+/// The levels correspond to the ANSI standard isolation levels, plus `Snapshot` for SQL Server.
+///
+/// Details on exact behavior and validity can be found in the documentation of the database vendors:
+/// - [SQL Server documentation].
+/// - [Postgres documentation].
+/// - [MySQL documentation].
+/// - [SQLite documentation].
+///
+/// [SQL Server documentation]: https://docs.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql?view=sql-server-ver15
+/// [Postgres documentation]: https://www.postgresql.org/docs/current/sql-set-transaction.html
+/// [MySQL documentation]: https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html
+/// [SQLite documentation]: https://www.sqlite.org/isolation.html
+///
+</span><span class="kw">pub enum </span>IsolationLevel {
+    ReadUncommitted,
+    ReadCommitted,
+    RepeatableRead,
+    Snapshot,
+    Serializable,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ReadUncommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ UNCOMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ReadCommitted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;READ COMMITTED&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::RepeatableRead</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;REPEATABLE READ&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Snapshot</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SNAPSHOT&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Serializable</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SERIALIZABLE&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>IsolationLevel {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::ReadUncommitted =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;READ UNCOMMITTED&quot;</span>),
+            <span class="self">Self</span>::ReadCommitted =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;READ COMMITTED&quot;</span>),
+            <span class="self">Self</span>::RepeatableRead =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;REPEATABLE READ&quot;</span>),
+            <span class="self">Self</span>::Snapshot =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SNAPSHOT&quot;</span>),
+            <span class="self">Self</span>::Serializable =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SERIALIZABLE&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">IsolationLevel</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>IsolationLevel {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;read uncommitted&quot;</span> <span class="op">|</span> <span class="string">&quot;readuncommitted&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadUncommitted</span>),
-            <span class="string">&quot;read committed&quot;</span> <span class="op">|</span> <span class="string">&quot;readcommitted&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ReadCommitted</span>),
-            <span class="string">&quot;repeatable read&quot;</span> <span class="op">|</span> <span class="string">&quot;repeatableread&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RepeatableRead</span>),
-            <span class="string">&quot;snapshot&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Snapshot</span>),
-            <span class="string">&quot;serializable&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Serializable</span>),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="macro">format!</span>(<span class="string">&quot;Invalid isolation level `{}`&quot;</span>, <span class="ident">s</span>));
-                <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>())
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>s.to_lowercase().as_str() {
+            <span class="string">&quot;read uncommitted&quot; </span>| <span class="string">&quot;readuncommitted&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ReadUncommitted),
+            <span class="string">&quot;read committed&quot; </span>| <span class="string">&quot;readcommitted&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ReadCommitted),
+            <span class="string">&quot;repeatable read&quot; </span>| <span class="string">&quot;repeatableread&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::RepeatableRead),
+            <span class="string">&quot;snapshot&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Snapshot),
+            <span class="string">&quot;serializable&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Serializable),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>kind = ErrorKind::conversion(<span class="macro">format!</span>(<span class="string">&quot;Invalid isolation level `{}`&quot;</span>, s));
+                <span class="prelude-val">Err</span>(Error::builder(kind).build())
             }
         }
     }
 }
-<span class="kw">impl</span> <span class="ident">TransactionOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span>, <span class="ident">isolation_first</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">isolation_level</span>,
-            <span class="ident">isolation_first</span>,
+<span class="kw">impl </span>TransactionOptions {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;, isolation_first: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            isolation_level,
+            isolation_first,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

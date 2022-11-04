@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/prisma_1_defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prisma_1_defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/prisma_1_defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prisma_1_defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -73,80 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">calculate_datamodel::CalculateDatamodelContext</span>,
-    <span class="ident">warnings</span>::{<span class="ident">warning_default_cuid_warning</span>, <span class="ident">warning_default_uuid_warning</span>, <span class="ident">ModelAndField</span>},
-    <span class="ident">SqlFamilyTrait</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    calculate_datamodel::CalculateDatamodelContext,
+    warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField},
+    SqlFamilyTrait,
 };
-<span class="kw">use</span> <span class="ident">introspection_connector::Version</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors</span>::{<span class="ident">MySqlType</span>, <span class="ident">PostgresType</span>},
-    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">ValueGenerator</span>},
+<span class="kw">use </span>introspection_connector::Version;
+<span class="kw">use </span>psl::{
+    builtin_connectors::{MySqlType, PostgresType},
+    dml::{<span class="self">self</span>, Datamodel, ValueGenerator},
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
+<span class="kw">use </span>sql_schema_describer::SqlSchema;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add_prisma_1_id_defaults</span>(
-    <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">Version</span>,
-    <span class="ident">data_model</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>,
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CalculateDatamodelContext</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_prisma_1_id_defaults(
+    version: <span class="kw-2">&amp;</span>Version,
+    data_model: <span class="kw-2">&amp;mut </span>Datamodel,
+    schema: <span class="kw-2">&amp;</span>SqlSchema,
+    ctx: <span class="kw-2">&amp;mut </span>CalculateDatamodelContext,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">needs_to_be_changed</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>needs_to_be_changed = <span class="macro">vec!</span>[];
 
-    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">version</span>, <span class="ident">Version::Prisma1</span> <span class="op">|</span> <span class="ident">Version::Prisma11</span>) {
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">data_model</span>.<span class="ident">models</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">has_single_id_field</span>()) {
-            <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">field_is_primary</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">name</span>)).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">database_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>);
-            <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">table_walker</span>(<span class="ident">table_name</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">id_field</span>.<span class="ident">database_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>.<span class="ident">name</span>);
-            <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="ident">column_name</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">model_and_field</span> <span class="op">=</span> <span class="ident">ModelAndField::new</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">id_field</span>.<span class="ident">name</span>);
+    <span class="kw">if </span><span class="macro">matches!</span>(version, Version::Prisma1 | Version::Prisma11) {
+        <span class="kw">for </span>model <span class="kw">in </span>data_model.models().filter(|m| m.has_single_id_field()) {
+            <span class="kw">let </span>id_field = model.scalar_fields().find(|f| model.field_is_primary(<span class="kw-2">&amp;</span>f.name)).unwrap();
+            <span class="kw">let </span>table_name = model.database_name.as_ref().unwrap_or(<span class="kw-2">&amp;</span>model.name);
+            <span class="kw">let </span>table = schema.table_walker(table_name).unwrap();
+            <span class="kw">let </span>column_name = id_field.database_name.as_ref().unwrap_or(<span class="kw-2">&amp;</span>id_field.name);
+            <span class="kw">let </span>column = table.column(column_name).unwrap();
+            <span class="kw">let </span>model_and_field = ModelAndField::new(<span class="kw-2">&amp;</span>model.name, <span class="kw-2">&amp;</span>id_field.name);
 
-            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_postgres</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span> {
-                    <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+            <span class="kw">if </span>ctx.sql_family().is_postgres() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) = <span class="kw-2">&amp;</span>column.column_type().native_type {
+                    <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = native_type.downcast_ref();
 
-                    <span class="kw">if</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::VarChar</span>(<span class="prelude-val">Some</span>(<span class="number">25</span>)) {
-                        <span class="ident">needs_to_be_changed</span>.<span class="ident">push</span>((<span class="ident">model_and_field</span>, <span class="bool-val">true</span>))
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::VarChar</span>(<span class="prelude-val">Some</span>(<span class="number">36</span>)) {
-                        <span class="ident">needs_to_be_changed</span>.<span class="ident">push</span>((<span class="ident">model_and_field</span>, <span class="bool-val">false</span>))
+                    <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">25</span>)) {
+                        needs_to_be_changed.push((model_and_field, <span class="bool-val">true</span>))
+                    } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>PostgresType::VarChar(<span class="prelude-val">Some</span>(<span class="number">36</span>)) {
+                        needs_to_be_changed.push((model_and_field, <span class="bool-val">false</span>))
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mysql</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span> {
-                    <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">MySqlType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+            } <span class="kw">else if </span>ctx.sql_family().is_mysql() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) = <span class="kw-2">&amp;</span>column.column_type().native_type {
+                    <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>MySqlType = native_type.downcast_ref();
 
-                    <span class="kw">if</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">MySqlType::Char</span>(<span class="number">25</span>) {
-                        <span class="ident">needs_to_be_changed</span>.<span class="ident">push</span>((<span class="ident">model_and_field</span>, <span class="bool-val">true</span>))
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">MySqlType::Char</span>(<span class="number">36</span>) {
-                        <span class="ident">needs_to_be_changed</span>.<span class="ident">push</span>((<span class="ident">model_and_field</span>, <span class="bool-val">false</span>))
+                    <span class="kw">if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">25</span>) {
+                        needs_to_be_changed.push((model_and_field, <span class="bool-val">true</span>))
+                    } <span class="kw">else if </span>native_type == <span class="kw-2">&amp;</span>MySqlType::Char(<span class="number">36</span>) {
+                        needs_to_be_changed.push((model_and_field, <span class="bool-val">false</span>))
                     }
                 }
             };
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inferred_cuids</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inferred_uuids</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>inferred_cuids = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>inferred_uuids = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> (<span class="ident">mf</span>, <span class="ident">cuid</span>) <span class="kw">in</span> <span class="ident">needs_to_be_changed</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">data_model</span>.<span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;</span><span class="ident">mf</span>.<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">mf</span>.<span class="ident">field</span>);
-        <span class="kw">if</span> <span class="ident">cuid</span> {
-            <span class="ident">field</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_cuid</span>()));
-            <span class="ident">inferred_cuids</span>.<span class="ident">push</span>(<span class="ident">mf</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">field</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_uuid</span>()));
-            <span class="ident">inferred_uuids</span>.<span class="ident">push</span>(<span class="ident">mf</span>);
+    <span class="kw">for </span>(mf, cuid) <span class="kw">in </span>needs_to_be_changed {
+        <span class="kw">let </span>field = <span class="kw-2">&amp;mut </span>data_model.find_scalar_field_mut(<span class="kw-2">&amp;</span>mf.model, <span class="kw-2">&amp;</span>mf.field);
+        <span class="kw">if </span>cuid {
+            field.default_value = <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(ValueGenerator::new_cuid()));
+            inferred_cuids.push(mf);
+        } <span class="kw">else </span>{
+            field.default_value = <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(ValueGenerator::new_uuid()));
+            inferred_uuids.push(mf);
         }
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">inferred_cuids</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">ctx</span>.<span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_default_cuid_warning</span>(<span class="kw-2">&amp;</span><span class="ident">inferred_cuids</span>))
+    <span class="kw">if </span>!inferred_cuids.is_empty() {
+        ctx.warnings.push(warning_default_cuid_warning(<span class="kw-2">&amp;</span>inferred_cuids))
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">inferred_uuids</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">ctx</span>.<span class="ident">warnings</span>.<span class="ident">push</span>(<span class="ident">warning_default_uuid_warning</span>(<span class="kw-2">&amp;</span><span class="ident">inferred_uuids</span>))
+    <span class="kw">if </span>!inferred_uuids.is_empty() {
+        ctx.warnings.push(warning_default_uuid_warning(<span class="kw-2">&amp;</span>inferred_uuids))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

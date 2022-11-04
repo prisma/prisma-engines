@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/to_sql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/to_sql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_sql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -406,413 +406,413 @@
 <span id="406">406</span>
 <span id="407">407</span>
 <span id="408">408</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Null</span>, <span class="ident">Value</span>, <span class="ident">ValueRef</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vtab::array::Array</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{Null, Value, ValueRef};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::vtab::array::Array;
+<span class="kw">use crate</span>::{Error, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::convert::TryFrom;
 
-<span class="doccomment">/// `ToSqlOutput` represents the possible output types for implementers of the</span>
-<span class="doccomment">/// [`ToSql`] trait.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A borrowed SQLite-representable value.</span>
-    <span class="ident">Borrowed</span>(<span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="doccomment">/// `ToSqlOutput` represents the possible output types for implementers of the
+/// [`ToSql`] trait.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ToSqlOutput&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// A borrowed SQLite-representable value.
+    </span>Borrowed(ValueRef&lt;<span class="lifetime">&#39;a</span>&gt;),
 
-    <span class="doccomment">/// An owned SQLite-representable value.</span>
-    <span class="ident">Owned</span>(<span class="ident">Value</span>),
+    <span class="doccomment">/// An owned SQLite-representable value.
+    </span>Owned(Value),
 
-    <span class="doccomment">/// `feature = &quot;blob&quot;` A BLOB of the given length that is filled with</span>
-    <span class="doccomment">/// zeroes.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-    <span class="ident">ZeroBlob</span>(<span class="ident">i32</span>),
+    <span class="doccomment">/// `feature = &quot;blob&quot;` A BLOB of the given length that is filled with
+    /// zeroes.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+    </span>ZeroBlob(i32),
 
-    <span class="doccomment">/// `feature = &quot;array&quot;`</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array&quot;</span>)]</span>
-    <span class="ident">Array</span>(<span class="ident">Array</span>),
+    <span class="doccomment">/// `feature = &quot;array&quot;`
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
+    </span>Array(Array),
 }
 
-<span class="comment">// Generically allow any type that can be converted into a ValueRef</span>
-<span class="comment">// to be converted into a ToSqlOutput as well.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="comment">// Generically allow any type that can be converted into a ValueRef
+// to be converted into a ToSqlOutput as well.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>ToSqlOutput&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: Into&lt;ValueRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ToSqlOutput::Borrowed</span>(<span class="ident">t</span>.<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        ToSqlOutput::Borrowed(t.into())
     }
 }
 
-<span class="comment">// We cannot also generically allow any type that can be converted</span>
-<span class="comment">// into a Value to be converted into a ToSqlOutput because of</span>
-<span class="comment">// coherence rules (https://github.com/rust-lang/rust/pull/46192),</span>
-<span class="comment">// so we&#39;ll manually implement it for all the types we know can</span>
-<span class="comment">// be converted into Values.</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_value</span>(
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; (
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="self">Self</span> { <span class="ident">ToSqlOutput::Owned</span>(<span class="ident">t</span>.<span class="ident">into</span>())}
+<span class="comment">// We cannot also generically allow any type that can be converted
+// into a Value to be converted into a ToSqlOutput because of
+// coherence rules (https://github.com/rust-lang/rust/pull/46192),
+// so we&#39;ll manually implement it for all the types we know can
+// be converted into Values.
+</span><span class="macro">macro_rules! </span>from_value(
+    (<span class="macro-nonterminal">$t</span>:ty) =&gt; (
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>from(t: <span class="macro-nonterminal">$t</span>) -&gt; <span class="self">Self </span>{ ToSqlOutput::Owned(t.into())}
         }
     )
 );
-<span class="macro">from_value!</span>(<span class="ident">String</span>);
-<span class="macro">from_value!</span>(<span class="ident">Null</span>);
-<span class="macro">from_value!</span>(<span class="ident">bool</span>);
-<span class="macro">from_value!</span>(<span class="ident">i8</span>);
-<span class="macro">from_value!</span>(<span class="ident">i16</span>);
-<span class="macro">from_value!</span>(<span class="ident">i32</span>);
-<span class="macro">from_value!</span>(<span class="ident">i64</span>);
-<span class="macro">from_value!</span>(<span class="ident">isize</span>);
-<span class="macro">from_value!</span>(<span class="ident">u8</span>);
-<span class="macro">from_value!</span>(<span class="ident">u16</span>);
-<span class="macro">from_value!</span>(<span class="ident">u32</span>);
-<span class="macro">from_value!</span>(<span class="ident">f32</span>);
-<span class="macro">from_value!</span>(<span class="ident">f64</span>);
-<span class="macro">from_value!</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
+<span class="macro">from_value!</span>(String);
+<span class="macro">from_value!</span>(Null);
+<span class="macro">from_value!</span>(bool);
+<span class="macro">from_value!</span>(i8);
+<span class="macro">from_value!</span>(i16);
+<span class="macro">from_value!</span>(i32);
+<span class="macro">from_value!</span>(i64);
+<span class="macro">from_value!</span>(isize);
+<span class="macro">from_value!</span>(u8);
+<span class="macro">from_value!</span>(u16);
+<span class="macro">from_value!</span>(u32);
+<span class="macro">from_value!</span>(f32);
+<span class="macro">from_value!</span>(f64);
+<span class="macro">from_value!</span>(Vec&lt;u8&gt;);
 
-<span class="comment">// It would be nice if we could avoid the heap allocation (of the `Vec`) that</span>
-<span class="comment">// `i128` needs in `Into&lt;Value&gt;`, but it&#39;s probably fine for the moment, and not</span>
-<span class="comment">// worth adding another case to Value.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-<span class="macro">from_value!</span>(<span class="ident">i128</span>);
+<span class="comment">// It would be nice if we could avoid the heap allocation (of the `Vec`) that
+// `i128` needs in `Into&lt;Value&gt;`, but it&#39;s probably fine for the moment, and not
+// worth adding another case to Value.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+</span><span class="macro">from_value!</span>(i128);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-<span class="macro">from_value!</span>(<span class="ident">uuid::Uuid</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+</span><span class="macro">from_value!</span>(uuid::Uuid);
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ToSqlOutput::Borrowed</span>(<span class="ident">v</span>) =&gt; <span class="ident">ToSqlOutput::Borrowed</span>(<span class="ident">v</span>),
-            <span class="ident">ToSqlOutput::Owned</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="ident">ToSqlOutput::Borrowed</span>(<span class="ident">ValueRef::from</span>(<span class="ident">v</span>)),
+<span class="kw">impl </span>ToSql <span class="kw">for </span>ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ToSqlOutput::Borrowed(v) =&gt; ToSqlOutput::Borrowed(v),
+            ToSqlOutput::Owned(<span class="kw-2">ref </span>v) =&gt; ToSqlOutput::Borrowed(ValueRef::from(v)),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">ToSqlOutput::ZeroBlob</span>(<span class="ident">i</span>) =&gt; <span class="ident">ToSqlOutput::ZeroBlob</span>(<span class="ident">i</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;array&quot;</span>)]</span>
-            <span class="ident">ToSqlOutput::Array</span>(<span class="kw-2">ref</span> <span class="ident">a</span>) =&gt; <span class="ident">ToSqlOutput::Array</span>(<span class="ident">a</span>.<span class="ident">clone</span>()),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+            </span>ToSqlOutput::ZeroBlob(i) =&gt; ToSqlOutput::ZeroBlob(i),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;array&quot;</span>)]
+            </span>ToSqlOutput::Array(<span class="kw-2">ref </span>a) =&gt; ToSqlOutput::Array(a.clone()),
         })
     }
 }
 
-<span class="doccomment">/// A trait for types that can be converted into SQLite values. Returns</span>
-<span class="doccomment">/// [`Error::ToSqlConversionFailure`] if the conversion fails.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToSql</span> {
-    <span class="doccomment">/// Converts Rust value to SQLite value</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A trait for types that can be converted into SQLite values. Returns
+/// [`Error::ToSqlConversionFailure`] if the conversion fails.
+</span><span class="kw">pub trait </span>ToSql {
+    <span class="doccomment">/// Converts Rust value to SQLite value
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">ToOwned</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>()
+<span class="kw">impl</span>&lt;T: ToSql + ToOwned + <span class="question-mark">?</span>Sized&gt; ToSql <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.as_ref().to_sql()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>()
+<span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; ToSql <span class="kw">for </span>Box&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.as_ref().to_sql()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">std::rc::Rc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>()
+<span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; ToSql <span class="kw">for </span>std::rc::Rc&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.as_ref().to_sql()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">to_sql</span>()
+<span class="kw">impl</span>&lt;T: ToSql + <span class="question-mark">?</span>Sized&gt; ToSql <span class="kw">for </span>std::sync::Arc&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.as_ref().to_sql()
     }
 }
 
-<span class="comment">// We should be able to use a generic impl like this:</span>
-<span class="comment">//</span>
-<span class="comment">// impl&lt;T: Copy&gt; ToSql for T where T: Into&lt;Value&gt; {</span>
-<span class="comment">//     fn to_sql(&amp;self) -&gt; Result&lt;ToSqlOutput&gt; {</span>
-<span class="comment">//         Ok(ToSqlOutput::from((*self).into()))</span>
-<span class="comment">//     }</span>
-<span class="comment">// }</span>
-<span class="comment">//</span>
-<span class="comment">// instead of the following macro, but this runs afoul of</span>
-<span class="comment">// https://github.com/rust-lang/rust/issues/30191 and reports conflicting</span>
-<span class="comment">// implementations even when there aren&#39;t any.</span>
+<span class="comment">// We should be able to use a generic impl like this:
+//
+// impl&lt;T: Copy&gt; ToSql for T where T: Into&lt;Value&gt; {
+//     fn to_sql(&amp;self) -&gt; Result&lt;ToSqlOutput&gt; {
+//         Ok(ToSqlOutput::from((*self).into()))
+//     }
+// }
+//
+// instead of the following macro, but this runs afoul of
+// https://github.com/rust-lang/rust/issues/30191 and reports conflicting
+// implementations even when there aren&#39;t any.
 
-<span class="macro">macro_rules!</span> <span class="ident">to_sql_self</span>(
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; (
-        <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="kw-2">*</span><span class="self">self</span>))
+</span><span class="macro">macro_rules! </span>to_sql_self(
+    (<span class="macro-nonterminal">$t</span>:ty) =&gt; (
+        <span class="kw">impl </span>ToSql <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+                <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="kw-2">*</span><span class="self">self</span>))
             }
         }
     )
 );
 
-<span class="macro">to_sql_self!</span>(<span class="ident">Null</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">bool</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">i8</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">i16</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">i32</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">i64</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">isize</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">u8</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">u16</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">u32</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">f32</span>);
-<span class="macro">to_sql_self!</span>(<span class="ident">f64</span>);
+<span class="macro">to_sql_self!</span>(Null);
+<span class="macro">to_sql_self!</span>(bool);
+<span class="macro">to_sql_self!</span>(i8);
+<span class="macro">to_sql_self!</span>(i16);
+<span class="macro">to_sql_self!</span>(i32);
+<span class="macro">to_sql_self!</span>(i64);
+<span class="macro">to_sql_self!</span>(isize);
+<span class="macro">to_sql_self!</span>(u8);
+<span class="macro">to_sql_self!</span>(u16);
+<span class="macro">to_sql_self!</span>(u32);
+<span class="macro">to_sql_self!</span>(f32);
+<span class="macro">to_sql_self!</span>(f64);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-<span class="macro">to_sql_self!</span>(<span class="ident">i128</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+</span><span class="macro">to_sql_self!</span>(i128);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-<span class="macro">to_sql_self!</span>(<span class="ident">uuid::Uuid</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+</span><span class="macro">to_sql_self!</span>(uuid::Uuid);
 
-<span class="macro">macro_rules!</span> <span class="ident">to_sql_self_fallible</span>(
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; (
-        <span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::Owned</span>(<span class="ident">Value::Integer</span>(
-                    <span class="ident">i64::try_from</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">map_err</span>(
-                        <span class="comment">// TODO: Include the values in the error message.</span>
-                        <span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Error::ToSqlConversionFailure</span>(<span class="ident">err</span>.<span class="ident">into</span>())
-                    )<span class="question-mark">?</span>
-                )))
+<span class="macro">macro_rules! </span>to_sql_self_fallible(
+    (<span class="macro-nonterminal">$t</span>:ty) =&gt; (
+        <span class="kw">impl </span>ToSql <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+                <span class="prelude-val">Ok</span>(ToSqlOutput::Owned(Value::Integer(
+                    i64::try_from(<span class="kw-2">*</span><span class="self">self</span>).map_err(
+                        <span class="comment">// TODO: Include the values in the error message.
+                        </span>|err| Error::ToSqlConversionFailure(err.into())
+                    )<span class="question-mark">?
+                </span>)))
             }
         }
     )
 );
 
-<span class="comment">// Special implementations for usize and u64 because these conversions can fail.</span>
-<span class="macro">to_sql_self_fallible!</span>(<span class="ident">u64</span>);
-<span class="macro">to_sql_self_fallible!</span>(<span class="ident">usize</span>);
+<span class="comment">// Special implementations for usize and u64 because these conversions can fail.
+</span><span class="macro">to_sql_self_fallible!</span>(u64);
+<span class="macro">to_sql_self_fallible!</span>(usize);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ToSql</span>,
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; ToSql <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>T
+<span class="kw">where
+    </span>T: ToSql,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">to_sql</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        (<span class="kw-2">*</span><span class="self">self</span>).to_sql()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="self">self</span>.<span class="ident">as_str</span>()))
+<span class="kw">impl </span>ToSql <span class="kw">for </span>String {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="self">self</span>.as_str()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="self">self</span>))
+<span class="kw">impl </span>ToSql <span class="kw">for </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="self">self</span>.<span class="ident">as_slice</span>()))
+<span class="kw">impl </span>ToSql <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="self">self</span>.as_slice()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="self">self</span>))
+<span class="kw">impl </span>ToSql <span class="kw">for </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="self">self</span>))
+<span class="kw">impl </span>ToSql <span class="kw">for </span>Value {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">Null</span>)),
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">to_sql</span>(),
+<span class="kw">impl</span>&lt;T: ToSql&gt; ToSql <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(ToSqlOutput::from(Null)),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>t) =&gt; t.to_sql(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ToSql</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::ToSql;
 
-    <span class="kw">fn</span> <span class="ident">is_to_sql</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span>() {}
+    <span class="kw">fn </span>is_to_sql&lt;T: ToSql&gt;() {}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_integral_types</span>() {
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>();
-        <span class="ident">is_to_sql</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_integral_types() {
+        is_to_sql::&lt;i8&gt;();
+        is_to_sql::&lt;i16&gt;();
+        is_to_sql::&lt;i32&gt;();
+        is_to_sql::&lt;i64&gt;();
+        is_to_sql::&lt;u8&gt;();
+        is_to_sql::&lt;u16&gt;();
+        is_to_sql::&lt;u32&gt;();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cow_str</span>() {
-        <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">&quot;str&quot;</span>;
-        <span class="kw">let</span> <span class="ident">cow</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>);
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">cow</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">cow</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>(<span class="ident">String::from</span>(<span class="ident">s</span>));
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">cow</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
-        <span class="comment">// Ensure this compiles.</span>
-        <span class="kw">let</span> <span class="ident">_p</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">cow</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_cow_str() {
+        <span class="kw">use </span>std::borrow::Cow;
+        <span class="kw">let </span>s = <span class="string">&quot;str&quot;</span>;
+        <span class="kw">let </span>cow: Cow&lt;str&gt; = Cow::Borrowed(s);
+        <span class="kw">let </span>r = cow.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
+        <span class="kw">let </span>cow: Cow&lt;str&gt; = Cow::Owned::&lt;str&gt;(String::from(s));
+        <span class="kw">let </span>r = cow.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
+        <span class="comment">// Ensure this compiles.
+        </span><span class="kw">let </span>_p: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[cow];
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_box_dyn</span>() {
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="string">&quot;Hello world!&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ToSql::to_sql</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_box_dyn() {
+        <span class="kw">let </span>s: Box&lt;<span class="kw">dyn </span>ToSql&gt; = Box::new(<span class="string">&quot;Hello world!&quot;</span>);
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = ToSql::to_sql(<span class="kw-2">&amp;</span>s);
 
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(r.is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_box_deref</span>() {
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;Hello world!&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_box_deref() {
+        <span class="kw">let </span>s: Box&lt;str&gt; = <span class="string">&quot;Hello world!&quot;</span>.into();
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
 
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(r.is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_box_direct</span>() {
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;Hello world!&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ToSql::to_sql</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_box_direct() {
+        <span class="kw">let </span>s: Box&lt;str&gt; = <span class="string">&quot;Hello world!&quot;</span>.into();
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = ToSql::to_sql(<span class="kw-2">&amp;</span>s);
 
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(r.is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cells</span>() {
-        <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">rc::Rc</span>, <span class="ident">sync::Arc</span>};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_cells() {
+        <span class="kw">use </span>std::{rc::Rc, sync::Arc};
 
-        <span class="kw">let</span> <span class="ident">source_str</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="string">&quot;Hello world!&quot;</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>source_str: Box&lt;str&gt; = <span class="string">&quot;Hello world!&quot;</span>.into();
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Rc::new</span>(<span class="ident">source_str</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Rc&lt;Box&lt;str&gt;&gt; = Rc::new(source_str.clone());
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">source_str</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Arc&lt;Box&lt;str&gt;&gt; = Arc::new(source_str.clone());
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">source_str</span>);
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Arc&lt;str&gt; = Arc::from(<span class="kw-2">&amp;*</span>source_str);
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">source_str</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Arc&lt;<span class="kw">dyn </span>ToSql&gt; = Arc::new(source_str.clone());
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Rc::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">source_str</span>);
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Rc&lt;str&gt; = Rc::from(<span class="kw-2">&amp;*</span>source_str);
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Rc::new</span>(<span class="ident">source_str</span>);
-        <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>] <span class="op">=</span> <span class="macro">crate::params!</span>[<span class="ident">s</span>];
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">to_sql</span>();
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>s: Rc&lt;<span class="kw">dyn </span>ToSql&gt; = Rc::new(source_str);
+        <span class="kw">let </span>_s: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql] = <span class="macro">crate::params!</span>[s];
+        <span class="kw">let </span>r = s.to_sql();
+        <span class="macro">assert!</span>(r.is_ok());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_i128</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Connection</span>;
-        <span class="kw">use</span> <span class="ident">std::i128</span>;
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo (i128 BLOB, desc TEXT)&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute</span>(
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_i128() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::Connection;
+        <span class="kw">use </span>std::i128;
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.execute_batch(<span class="string">&quot;CREATE TABLE foo (i128 BLOB, desc TEXT)&quot;</span>)<span class="question-mark">?</span>;
+        db.execute(
             <span class="string">&quot;
             INSERT INTO foo(i128, desc) VALUES
                 (?, &#39;zero&#39;),
                 (?, &#39;neg one&#39;), (?, &#39;neg two&#39;),
                 (?, &#39;pos one&#39;), (?, &#39;pos two&#39;),
                 (?, &#39;min&#39;), (?, &#39;max&#39;)&quot;</span>,
-            [<span class="number">0i128</span>, <span class="op">-</span><span class="number">1i128</span>, <span class="op">-</span><span class="number">2i128</span>, <span class="number">1i128</span>, <span class="number">2i128</span>, <span class="ident">i128::MIN</span>, <span class="ident">i128::MAX</span>],
+            [<span class="number">0i128</span>, -<span class="number">1i128</span>, -<span class="number">2i128</span>, <span class="number">1i128</span>, <span class="number">2i128</span>, i128::MIN, i128::MAX],
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT i128, desc FROM foo ORDER BY i128 ASC&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT i128, desc FROM foo ORDER BY i128 ASC&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">stmt</span>
-            .<span class="ident">query_map</span>([], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-                <span class="prelude-val">Ok</span>((<span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">i128</span><span class="op">&gt;</span>(<span class="number">0</span>)<span class="question-mark">?</span>, <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">String</span><span class="op">&gt;</span>(<span class="number">1</span>)<span class="question-mark">?</span>))
-            })<span class="question-mark">?</span>
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>res = stmt
+            .query_map([], |row| {
+                <span class="prelude-val">Ok</span>((row.get::&lt;<span class="kw">_</span>, i128&gt;(<span class="number">0</span>)<span class="question-mark">?</span>, row.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">1</span>)<span class="question-mark">?</span>))
+            })<span class="question-mark">?
+            </span>.collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">res</span>,
+            res,
             <span class="kw-2">&amp;</span>[
-                (<span class="ident">i128::MIN</span>, <span class="string">&quot;min&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="op">-</span><span class="number">2</span>, <span class="string">&quot;neg two&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="op">-</span><span class="number">1</span>, <span class="string">&quot;neg one&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="number">0</span>, <span class="string">&quot;zero&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="number">1</span>, <span class="string">&quot;pos one&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="number">2</span>, <span class="string">&quot;pos two&quot;</span>.<span class="ident">to_owned</span>()),
-                (<span class="ident">i128::MAX</span>, <span class="string">&quot;max&quot;</span>.<span class="ident">to_owned</span>()),
+                (i128::MIN, <span class="string">&quot;min&quot;</span>.to_owned()),
+                (-<span class="number">2</span>, <span class="string">&quot;neg two&quot;</span>.to_owned()),
+                (-<span class="number">1</span>, <span class="string">&quot;neg one&quot;</span>.to_owned()),
+                (<span class="number">0</span>, <span class="string">&quot;zero&quot;</span>.to_owned()),
+                (<span class="number">1</span>, <span class="string">&quot;pos one&quot;</span>.to_owned()),
+                (<span class="number">2</span>, <span class="string">&quot;pos two&quot;</span>.to_owned()),
+                (i128::MAX, <span class="string">&quot;max&quot;</span>.to_owned()),
             ]
         );
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_uuid</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">params</span>, <span class="ident">Connection</span>};
-        <span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_uuid() -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">use crate</span>::{params, Connection};
+        <span class="kw">use </span>uuid::Uuid;
 
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo (id BLOB CHECK(length(id) = 16), label TEXT);&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.execute_batch(<span class="string">&quot;CREATE TABLE foo (id BLOB CHECK(length(id) = 16), label TEXT);&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>();
+        <span class="kw">let </span>id = Uuid::new_v4();
 
-        <span class="ident">db</span>.<span class="ident">execute</span>(
+        db.execute(
             <span class="string">&quot;INSERT INTO foo (id, label) VALUES (?, ?)&quot;</span>,
-            <span class="macro">params!</span>[<span class="ident">id</span>, <span class="string">&quot;target&quot;</span>],
+            <span class="macro">params!</span>[id, <span class="string">&quot;target&quot;</span>],
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT id, label FROM foo WHERE id = ?&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT id, label FROM foo WHERE id = ?&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>(<span class="macro">params!</span>[<span class="ident">id</span>])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query(<span class="macro">params!</span>[id])<span class="question-mark">?</span>;
+        <span class="kw">let </span>row = rows.next()<span class="question-mark">?</span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">found_id</span>: <span class="ident">Uuid</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_unwrap</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">found_label</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get_unwrap</span>(<span class="number">1</span>);
+        <span class="kw">let </span>found_id: Uuid = row.get_unwrap(<span class="number">0</span>);
+        <span class="kw">let </span>found_label: String = row.get_unwrap(<span class="number">1</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">found_id</span>, <span class="ident">id</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">found_label</span>, <span class="string">&quot;target&quot;</span>);
+        <span class="macro">assert_eq!</span>(found_id, id);
+        <span class="macro">assert_eq!</span>(found_label, <span class="string">&quot;target&quot;</span>);
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

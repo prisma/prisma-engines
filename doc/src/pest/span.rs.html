@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest-2.3.0/src/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -448,455 +448,455 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
-</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser</span>
-<span class="comment">// Copyright (c) 2018 Dragoș Tiselice</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
+// Copyright (c) 2018 Dragoș Tiselice
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Bound</span>, <span class="ident">RangeBounds</span>};
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
-<span class="kw">use</span> <span class="ident">core::str</span>;
+</span><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::hash::{Hash, Hasher};
+<span class="kw">use </span>core::ops::{Bound, RangeBounds};
+<span class="kw">use </span>core::ptr;
+<span class="kw">use </span>core::str;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position</span>;
+<span class="kw">use </span><span class="kw">crate</span>::position;
 
-<span class="doccomment">/// A span over a `&amp;str`. It is created from either [two `Position`s] or from a [`Pair`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [two `Position`s]: struct.Position.html#method.span</span>
-<span class="doccomment">/// [`Pair`]: ../iterators/struct.Pair.html#method.span</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span>,
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be a valid character boundary index into `input`.</span>
-    <span class="ident">start</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Must be a valid character boundary index into `input`.</span>
-    <span class="ident">end</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A span over a `&amp;str`. It is created from either [two `Position`s] or from a [`Pair`].
+///
+/// [two `Position`s]: struct.Position.html#method.span
+/// [`Pair`]: ../iterators/struct.Pair.html#method.span
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Span&lt;<span class="lifetime">&#39;i</span>&gt; {
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str,
+    <span class="doccomment">/// # Safety
+    ///
+    /// Must be a valid character boundary index into `input`.
+    </span>start: usize,
+    <span class="doccomment">/// # Safety
+    ///
+    /// Must be a valid character boundary index into `input`.
+    </span>end: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new `Span` without checking invariants. (Checked with `debug_assertions`.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `input[start..end]` must be a valid subslice; that is, said indexing should not panic.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new_unchecked</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Span</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">input</span>.<span class="ident">get</span>(<span class="ident">start</span>..<span class="ident">end</span>).<span class="ident">is_some</span>());
-        <span class="ident">Span</span> { <span class="ident">input</span>, <span class="ident">start</span>, <span class="ident">end</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Span&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="doccomment">/// Create a new `Span` without checking invariants. (Checked with `debug_assertions`.)
+    ///
+    /// # Safety
+    ///
+    /// `input[start..end]` must be a valid subslice; that is, said indexing should not panic.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>new_unchecked(input: <span class="kw-2">&amp;</span>str, start: usize, end: usize) -&gt; Span {
+        <span class="macro">debug_assert!</span>(input.get(start..end).is_some());
+        Span { input, start, end }
     }
 
-    <span class="doccomment">/// Attempts to create a new span. Will return `None` if `input[start..end]` is an invalid index</span>
-    <span class="doccomment">/// into `input`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Span;</span>
-    <span class="doccomment">/// let input = &quot;Hello!&quot;;</span>
-    <span class="doccomment">/// assert_eq!(None, Span::new(input, 100, 0));</span>
-    <span class="doccomment">/// assert!(Span::new(input, 0, input.len()).is_some());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">get</span>(<span class="ident">start</span>..<span class="ident">end</span>).<span class="ident">is_some</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Span</span> { <span class="ident">input</span>, <span class="ident">start</span>, <span class="ident">end</span> })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="doccomment">/// Attempts to create a new span. Will return `None` if `input[start..end]` is an invalid index
+    /// into `input`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Span;
+    /// let input = &quot;Hello!&quot;;
+    /// assert_eq!(None, Span::new(input, 100, 0));
+    /// assert!(Span::new(input, 0, input.len()).is_some());
+    /// ```
+    </span><span class="kw">pub fn </span>new(input: <span class="kw-2">&amp;</span>str, start: usize, end: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Span&gt; {
+        <span class="kw">if </span>input.get(start..end).is_some() {
+            <span class="prelude-val">Some</span>(Span { input, start, end })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Attempts to create a new span based on a sub-range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use pest::Span;</span>
-    <span class="doccomment">/// let input = &quot;Hello World!&quot;;</span>
-    <span class="doccomment">/// let world = Span::new(input, 6, input.len()).unwrap();</span>
-    <span class="doccomment">/// let orl = world.get(1..=3);</span>
-    <span class="doccomment">/// assert!(orl.is_some());</span>
-    <span class="doccomment">/// assert_eq!(orl.unwrap().as_str(), &quot;orl&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">offset</span>) =&gt; <span class="kw-2">*</span><span class="ident">offset</span>,
-            <span class="ident">Bound::Excluded</span>(<span class="ident">offset</span>) =&gt; <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
+    <span class="doccomment">/// Attempts to create a new span based on a sub-range.
+    ///
+    /// ```
+    /// use pest::Span;
+    /// let input = &quot;Hello World!&quot;;
+    /// let world = Span::new(input, 6, input.len()).unwrap();
+    /// let orl = world.get(1..=3);
+    /// assert!(orl.is_some());
+    /// assert_eq!(orl.unwrap().as_str(), &quot;orl&quot;);
+    /// ```
+    ///
+    /// # Examples
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw">impl </span>RangeBounds&lt;usize&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Span&lt;<span class="lifetime">&#39;i</span>&gt;&gt; {
+        <span class="kw">let </span>start = <span class="kw">match </span>range.start_bound() {
+            Bound::Included(offset) =&gt; <span class="kw-2">*</span>offset,
+            Bound::Excluded(offset) =&gt; <span class="kw-2">*</span>offset + <span class="number">1</span>,
+            Bound::Unbounded =&gt; <span class="number">0</span>,
         };
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-            <span class="ident">Bound::Included</span>(<span class="ident">offset</span>) =&gt; <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>,
-            <span class="ident">Bound::Excluded</span>(<span class="ident">offset</span>) =&gt; <span class="kw-2">*</span><span class="ident">offset</span>,
-            <span class="ident">Bound::Unbounded</span> =&gt; <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">len</span>(),
+        <span class="kw">let </span>end = <span class="kw">match </span>range.end_bound() {
+            Bound::Included(offset) =&gt; <span class="kw-2">*</span>offset + <span class="number">1</span>,
+            Bound::Excluded(offset) =&gt; <span class="kw-2">*</span>offset,
+            Bound::Unbounded =&gt; <span class="self">self</span>.as_str().len(),
         };
 
-        <span class="self">self</span>.<span class="ident">as_str</span>().<span class="ident">get</span>(<span class="ident">start</span>..<span class="ident">end</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Span</span> {
-            <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">input</span>,
-            <span class="ident">start</span>: <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">start</span>,
-            <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">end</span>,
+        <span class="self">self</span>.as_str().get(start..end).map(|<span class="kw">_</span>| Span {
+            input: <span class="self">self</span>.input,
+            start: <span class="self">self</span>.start + start,
+            end: <span class="self">self</span>.start + end,
         })
     }
 
-    <span class="doccomment">/// Returns the `Span`&#39;s start byte position as a `usize`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Position;</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let start = Position::from_start(input);</span>
-    <span class="doccomment">/// let end = start.clone();</span>
-    <span class="doccomment">/// let span = start.span(&amp;end);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(span.start(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">start</span>
+    <span class="doccomment">/// Returns the `Span`&#39;s start byte position as a `usize`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Position;
+    /// let input = &quot;ab&quot;;
+    /// let start = Position::from_start(input);
+    /// let end = start.clone();
+    /// let span = start.span(&amp;end);
+    ///
+    /// assert_eq!(span.start(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.start
     }
 
-    <span class="doccomment">/// Returns the `Span`&#39;s end byte position as a `usize`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Position;</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let start = Position::from_start(input);</span>
-    <span class="doccomment">/// let end = start.clone();</span>
-    <span class="doccomment">/// let span = start.span(&amp;end);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(span.end(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">end</span>
+    <span class="doccomment">/// Returns the `Span`&#39;s end byte position as a `usize`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Position;
+    /// let input = &quot;ab&quot;;
+    /// let start = Position::from_start(input);
+    /// let end = start.clone();
+    /// let span = start.span(&amp;end);
+    ///
+    /// assert_eq!(span.end(), 0);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>end(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.end
     }
 
-    <span class="doccomment">/// Returns the `Span`&#39;s start `Position`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Position;</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let start = Position::from_start(input);</span>
-    <span class="doccomment">/// let end = start.clone();</span>
-    <span class="doccomment">/// let span = start.clone().span(&amp;end);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(span.start_pos(), start);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">position::Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-        <span class="comment">// Span&#39;s start position is always a UTF-8 border.</span>
-        <span class="kw">unsafe</span> { <span class="ident">position::Position::new_unchecked</span>(<span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">start</span>) }
+    <span class="doccomment">/// Returns the `Span`&#39;s start `Position`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Position;
+    /// let input = &quot;ab&quot;;
+    /// let start = Position::from_start(input);
+    /// let end = start.clone();
+    /// let span = start.clone().span(&amp;end);
+    ///
+    /// assert_eq!(span.start_pos(), start);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>start_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; position::Position&lt;<span class="lifetime">&#39;i</span>&gt; {
+        <span class="comment">// Span&#39;s start position is always a UTF-8 border.
+        </span><span class="kw">unsafe </span>{ position::Position::new_unchecked(<span class="self">self</span>.input, <span class="self">self</span>.start) }
     }
 
-    <span class="doccomment">/// Returns the `Span`&#39;s end `Position`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Position;</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let start = Position::from_start(input);</span>
-    <span class="doccomment">/// let end = start.clone();</span>
-    <span class="doccomment">/// let span = start.span(&amp;end);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(span.end_pos(), end);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">end_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">position::Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-        <span class="comment">// Span&#39;s end position is always a UTF-8 border.</span>
-        <span class="kw">unsafe</span> { <span class="ident">position::Position::new_unchecked</span>(<span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">end</span>) }
+    <span class="doccomment">/// Returns the `Span`&#39;s end `Position`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Position;
+    /// let input = &quot;ab&quot;;
+    /// let start = Position::from_start(input);
+    /// let end = start.clone();
+    /// let span = start.span(&amp;end);
+    ///
+    /// assert_eq!(span.end_pos(), end);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>end_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; position::Position&lt;<span class="lifetime">&#39;i</span>&gt; {
+        <span class="comment">// Span&#39;s end position is always a UTF-8 border.
+        </span><span class="kw">unsafe </span>{ position::Position::new_unchecked(<span class="self">self</span>.input, <span class="self">self</span>.end) }
     }
 
-    <span class="doccomment">/// Splits the `Span` into a pair of `Position`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest::Position;</span>
-    <span class="doccomment">/// let input = &quot;ab&quot;;</span>
-    <span class="doccomment">/// let start = Position::from_start(input);</span>
-    <span class="doccomment">/// let end = start.clone();</span>
-    <span class="doccomment">/// let span = start.clone().span(&amp;end);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(span.split(), (start, end));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) -&gt; (<span class="ident">position::Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>, <span class="ident">position::Position</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>) {
-        <span class="comment">// Span&#39;s start and end positions are always a UTF-8 borders.</span>
-        <span class="kw">let</span> <span class="ident">pos1</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">position::Position::new_unchecked</span>(<span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">start</span>) };
-        <span class="kw">let</span> <span class="ident">pos2</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">position::Position::new_unchecked</span>(<span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">end</span>) };
+    <span class="doccomment">/// Splits the `Span` into a pair of `Position`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest::Position;
+    /// let input = &quot;ab&quot;;
+    /// let start = Position::from_start(input);
+    /// let end = start.clone();
+    /// let span = start.clone().span(&amp;end);
+    ///
+    /// assert_eq!(span.split(), (start, end));
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>split(<span class="self">self</span>) -&gt; (position::Position&lt;<span class="lifetime">&#39;i</span>&gt;, position::Position&lt;<span class="lifetime">&#39;i</span>&gt;) {
+        <span class="comment">// Span&#39;s start and end positions are always a UTF-8 borders.
+        </span><span class="kw">let </span>pos1 = <span class="kw">unsafe </span>{ position::Position::new_unchecked(<span class="self">self</span>.input, <span class="self">self</span>.start) };
+        <span class="kw">let </span>pos2 = <span class="kw">unsafe </span>{ position::Position::new_unchecked(<span class="self">self</span>.input, <span class="self">self</span>.end) };
 
-        (<span class="ident">pos1</span>, <span class="ident">pos2</span>)
+        (pos1, pos2)
     }
 
-    <span class="doccomment">/// Captures a slice from the `&amp;str` defined by the `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;abc&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(1).unwrap();</span>
-    <span class="doccomment">/// let start_pos = state.position().clone();</span>
-    <span class="doccomment">/// state = state.match_string(&quot;b&quot;).unwrap();</span>
-    <span class="doccomment">/// let span = start_pos.span(&amp;state.position().clone());</span>
-    <span class="doccomment">/// assert_eq!(span.as_str(), &quot;b&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span> {
-        <span class="comment">// Span&#39;s start and end positions are always a UTF-8 borders.</span>
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">input</span>[<span class="self">self</span>.<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">end</span>]
+    <span class="doccomment">/// Captures a slice from the `&amp;str` defined by the `Span`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;abc&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(1).unwrap();
+    /// let start_pos = state.position().clone();
+    /// state = state.match_string(&quot;b&quot;).unwrap();
+    /// let span = start_pos.span(&amp;state.position().clone());
+    /// assert_eq!(span.as_str(), &quot;b&quot;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str {
+        <span class="comment">// Span&#39;s start and end positions are always a UTF-8 borders.
+        </span><span class="kw-2">&amp;</span><span class="self">self</span>.input[<span class="self">self</span>.start..<span class="self">self</span>.end]
     }
 
-    <span class="doccomment">/// Iterates over all lines (partially) covered by this span. Yielding a `&amp;str` for each line.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a\nb\nc&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(2).unwrap();</span>
-    <span class="doccomment">/// let start_pos = state.position().clone();</span>
-    <span class="doccomment">/// state = state.match_string(&quot;b\nc&quot;).unwrap();</span>
-    <span class="doccomment">/// let span = start_pos.span(&amp;state.position().clone());</span>
-    <span class="doccomment">/// assert_eq!(span.lines().collect::&lt;Vec&lt;_&gt;&gt;(), vec![&quot;b\n&quot;, &quot;c&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lines</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Lines</span> {
-        <span class="ident">Lines</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">lines_span</span>(),
+    <span class="doccomment">/// Iterates over all lines (partially) covered by this span. Yielding a `&amp;str` for each line.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;a\nb\nc&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(2).unwrap();
+    /// let start_pos = state.position().clone();
+    /// state = state.match_string(&quot;b\nc&quot;).unwrap();
+    /// let span = start_pos.span(&amp;state.position().clone());
+    /// assert_eq!(span.lines().collect::&lt;Vec&lt;_&gt;&gt;(), vec![&quot;b\n&quot;, &quot;c&quot;]);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>lines(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Lines {
+        Lines {
+            inner: <span class="self">self</span>.lines_span(),
         }
     }
 
-    <span class="doccomment">/// Iterates over all lines (partially) covered by this span. Yielding a `Span` for each line.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use pest;</span>
-    <span class="doccomment">/// # use pest::Span;</span>
-    <span class="doccomment">/// # #[allow(non_camel_case_types)]</span>
-    <span class="doccomment">/// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]</span>
-    <span class="doccomment">/// enum Rule {}</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let input = &quot;a\nb\nc&quot;;</span>
-    <span class="doccomment">/// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(2).unwrap();</span>
-    <span class="doccomment">/// let start_pos = state.position().clone();</span>
-    <span class="doccomment">/// state = state.match_string(&quot;b\nc&quot;).unwrap();</span>
-    <span class="doccomment">/// let span = start_pos.span(&amp;state.position().clone());</span>
-    <span class="doccomment">/// assert_eq!(span.lines_span().collect::&lt;Vec&lt;_&gt;&gt;(), vec![Span::new(input, 2, 4).unwrap(), Span::new(input, 4, 5).unwrap()]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lines_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LinesSpan</span> {
-        <span class="ident">LinesSpan</span> {
-            <span class="ident">span</span>: <span class="self">self</span>,
-            <span class="ident">pos</span>: <span class="self">self</span>.<span class="ident">start</span>,
+    <span class="doccomment">/// Iterates over all lines (partially) covered by this span. Yielding a `Span` for each line.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use pest;
+    /// # use pest::Span;
+    /// # #[allow(non_camel_case_types)]
+    /// # #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+    /// enum Rule {}
+    ///
+    /// let input = &quot;a\nb\nc&quot;;
+    /// let mut state: Box&lt;pest::ParserState&lt;Rule&gt;&gt; = pest::ParserState::new(input).skip(2).unwrap();
+    /// let start_pos = state.position().clone();
+    /// state = state.match_string(&quot;b\nc&quot;).unwrap();
+    /// let span = start_pos.span(&amp;state.position().clone());
+    /// assert_eq!(span.lines_span().collect::&lt;Vec&lt;_&gt;&gt;(), vec![Span::new(input, 2, 4).unwrap(), Span::new(input, 4, 5).unwrap()]);
+    /// ```
+    </span><span class="kw">pub fn </span>lines_span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LinesSpan {
+        LinesSpan {
+            span: <span class="self">self</span>,
+            pos: <span class="self">self</span>.start,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Span&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;str&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_str</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;start&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">start</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;end&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; fmt::Debug <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Span&quot;</span>)
+            .field(<span class="string">&quot;str&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_str())
+            .field(<span class="string">&quot;start&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.start)
+            .field(<span class="string">&quot;end&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.end)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">ptr::eq</span>(<span class="self">self</span>.<span class="ident">input</span>, <span class="ident">other</span>.<span class="ident">input</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">start</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">end</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; PartialEq <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Span&lt;<span class="lifetime">&#39;i</span>&gt;) -&gt; bool {
+        ptr::eq(<span class="self">self</span>.input, other.input) &amp;&amp; <span class="self">self</span>.start == other.start &amp;&amp; <span class="self">self</span>.end == other.end
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Eq <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;i</span>&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        (<span class="self">self</span>.<span class="ident">input</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">str</span>).<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">start</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">end</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Hash <span class="kw">for </span>Span&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        (<span class="self">self</span>.input <span class="kw">as </span><span class="kw-2">*const </span>str).hash(state);
+        <span class="self">self</span>.start.hash(state);
+        <span class="self">self</span>.end.hash(state);
     }
 }
 
-<span class="doccomment">/// Line iterator for Spans, created by [`Span::lines_span()`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Iterates all lines that are at least _partially_ covered by the span. Yielding a `Span` for each.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Span::lines_span()`]: struct.Span.html#method.lines_span</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LinesSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
-    <span class="ident">pos</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Line iterator for Spans, created by [`Span::lines_span()`].
+///
+/// Iterates all lines that are at least _partially_ covered by the span. Yielding a `Span` for each.
+///
+/// [`Span::lines_span()`]: struct.Span.html#method.lines_span
+</span><span class="kw">pub struct </span>LinesSpan&lt;<span class="lifetime">&#39;i</span>&gt; {
+    span: <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>Span&lt;<span class="lifetime">&#39;i</span>&gt;,
+    pos: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LinesSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">span</span>.<span class="ident">end</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Iterator <span class="kw">for </span>LinesSpan&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">type </span>Item = Span&lt;<span class="lifetime">&#39;i</span>&gt;;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pos &gt; <span class="self">self</span>.span.end {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="ident">position::Position::new</span>(<span class="self">self</span>.<span class="ident">span</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">pos</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">pos</span>.<span class="ident">at_end</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>pos = position::Position::new(<span class="self">self</span>.span.input, <span class="self">self</span>.pos)<span class="question-mark">?</span>;
+        <span class="kw">if </span>pos.at_end() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">line_start</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">find_line_start</span>();
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">find_line_end</span>();
+        <span class="kw">let </span>line_start = pos.find_line_start();
+        <span class="self">self</span>.pos = pos.find_line_end();
 
-        <span class="ident">Span::new</span>(<span class="self">self</span>.<span class="ident">span</span>.<span class="ident">input</span>, <span class="ident">line_start</span>, <span class="self">self</span>.<span class="ident">pos</span>)
+        Span::new(<span class="self">self</span>.span.input, line_start, <span class="self">self</span>.pos)
     }
 }
 
-<span class="doccomment">/// Line iterator for Spans, created by [`Span::lines()`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Iterates all lines that are at least _partially_ covered by the span. Yielding a `&amp;str` for each.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Span::lines()`]: struct.Span.html#method.lines</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">LinesSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Line iterator for Spans, created by [`Span::lines()`].
+///
+/// Iterates all lines that are at least _partially_ covered by the span. Yielding a `&amp;str` for each.
+///
+/// [`Span::lines()`]: struct.Span.html#method.lines
+</span><span class="kw">pub struct </span>Lines&lt;<span class="lifetime">&#39;i</span>&gt; {
+    inner: LinesSpan&lt;<span class="lifetime">&#39;i</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Lines</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">str</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Iterator <span class="kw">for </span>Lines&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>str;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.next().map(|span| span.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">alloc::borrow::ToOwned</span>;
-    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>alloc::borrow::ToOwned;
+    <span class="kw">use </span>alloc::vec::Vec;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc123abc&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">3</span>, <span class="ident">input</span>.<span class="ident">len</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">span</span>.<span class="ident">as_str</span>(), <span class="string">&quot;123abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">span</span>.<span class="ident">input</span>, <span class="ident">input</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>get() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc123abc&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">3</span>, input.len()).unwrap();
+        <span class="macro">assert_eq!</span>(span.as_str(), <span class="string">&quot;123abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(span.input, input);
 
-        <span class="kw">let</span> <span class="ident">span1</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(..<span class="op">=</span><span class="number">2</span>);
-        <span class="macro">assert!</span>(<span class="ident">span1</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">span1</span>.<span class="ident">unwrap</span>().<span class="ident">input</span>, <span class="ident">input</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">span1</span>.<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="string">&quot;123&quot;</span>);
+        <span class="kw">let </span>span1 = span.get(..=<span class="number">2</span>);
+        <span class="macro">assert!</span>(span1.is_some());
+        <span class="macro">assert_eq!</span>(span1.unwrap().input, input);
+        <span class="macro">assert_eq!</span>(span1.unwrap().as_str(), <span class="string">&quot;123&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">span2</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(..);
-        <span class="macro">assert!</span>(<span class="ident">span2</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">span2</span>.<span class="ident">unwrap</span>().<span class="ident">input</span>, <span class="ident">input</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">span2</span>.<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="string">&quot;123abc&quot;</span>);
+        <span class="kw">let </span>span2 = span.get(..);
+        <span class="macro">assert!</span>(span2.is_some());
+        <span class="macro">assert_eq!</span>(span2.unwrap().input, input);
+        <span class="macro">assert_eq!</span>(span2.unwrap().as_str(), <span class="string">&quot;123abc&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">span3</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(<span class="number">3</span>..);
-        <span class="macro">assert!</span>(<span class="ident">span3</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">span3</span>.<span class="ident">unwrap</span>().<span class="ident">input</span>, <span class="ident">input</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">span3</span>.<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="string">&quot;abc&quot;</span>);
+        <span class="kw">let </span>span3 = span.get(<span class="number">3</span>..);
+        <span class="macro">assert!</span>(span3.is_some());
+        <span class="macro">assert_eq!</span>(span3.unwrap().input, input);
+        <span class="macro">assert_eq!</span>(span3.unwrap().as_str(), <span class="string">&quot;abc&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">span4</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(<span class="number">0</span>..<span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="ident">span4</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">span4</span>.<span class="ident">unwrap</span>().<span class="ident">input</span>, <span class="ident">input</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">span4</span>.<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>span4 = span.get(<span class="number">0</span>..<span class="number">0</span>);
+        <span class="macro">assert!</span>(span4.is_some());
+        <span class="macro">assert_eq!</span>(span4.unwrap().input, input);
+        <span class="macro">assert_eq!</span>(span4.unwrap().as_str(), <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_fails</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">0</span>, <span class="ident">input</span>.<span class="ident">len</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>get_fails() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">0</span>, input.len()).unwrap();
 
-        <span class="kw">let</span> <span class="ident">span1</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(<span class="number">0</span>..<span class="number">100</span>);
-        <span class="macro">assert!</span>(<span class="ident">span1</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>span1 = span.get(<span class="number">0</span>..<span class="number">100</span>);
+        <span class="macro">assert!</span>(span1.is_none());
 
-        <span class="kw">let</span> <span class="ident">span2</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">get</span>(<span class="number">100</span>..<span class="number">200</span>);
-        <span class="macro">assert!</span>(<span class="ident">span2</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>span2 = span.get(<span class="number">100</span>..<span class="number">200</span>);
+        <span class="macro">assert!</span>(span2.is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">span_comp</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc\ndef\nghi&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">1</span>, <span class="number">7</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">span2</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">50</span>, <span class="number">51</span>);
-        <span class="macro">assert!</span>(<span class="ident">span2</span>.<span class="ident">is_none</span>());
-        <span class="kw">let</span> <span class="ident">span3</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">0</span>, <span class="number">8</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">span</span> <span class="op">!</span><span class="op">=</span> <span class="ident">span3</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>span_comp() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc\ndef\nghi&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">1</span>, <span class="number">7</span>).unwrap();
+        <span class="kw">let </span>span2 = Span::new(input, <span class="number">50</span>, <span class="number">51</span>);
+        <span class="macro">assert!</span>(span2.is_none());
+        <span class="kw">let </span>span3 = Span::new(input, <span class="number">0</span>, <span class="number">8</span>).unwrap();
+        <span class="macro">assert!</span>(span != span3);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">split</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a&quot;</span>;
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">position::Position::from_start</span>(<span class="ident">input</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>split() {
+        <span class="kw">let </span>input = <span class="string">&quot;a&quot;</span>;
+        <span class="kw">let </span>start = position::Position::from_start(input);
+        <span class="kw">let </span><span class="kw-2">mut </span>end = start;
 
-        <span class="macro">assert!</span>(<span class="ident">end</span>.<span class="ident">skip</span>(<span class="number">1</span>));
+        <span class="macro">assert!</span>(end.skip(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">clone</span>().<span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="ident">end</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>span = start.clone().span(<span class="kw-2">&amp;</span>end.clone());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">span</span>.<span class="ident">split</span>(), (<span class="ident">start</span>, <span class="ident">end</span>));
+        <span class="macro">assert_eq!</span>(span.split(), (start, end));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">lines_mid</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc\ndef\nghi&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">1</span>, <span class="number">7</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">lines</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">lines_span</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines_span</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>lines_mid() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc\ndef\nghi&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">1</span>, <span class="number">7</span>).unwrap();
+        <span class="kw">let </span>lines: Vec&lt;<span class="kw">_</span>&gt; = span.lines().collect();
+        <span class="kw">let </span>lines_span: Vec&lt;<span class="kw">_</span>&gt; = span.lines_span().map(|span| span.as_str()).collect();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>[<span class="number">0</span>], <span class="string">&quot;abc\n&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>[<span class="number">1</span>], <span class="string">&quot;def\n&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>, <span class="ident">lines_span</span>) <span class="comment">// Verify parity with lines_span()</span>
-    }
+        <span class="macro">assert_eq!</span>(lines.len(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(lines[<span class="number">0</span>], <span class="string">&quot;abc\n&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(lines[<span class="number">1</span>], <span class="string">&quot;def\n&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(lines, lines_span) <span class="comment">// Verify parity with lines_span()
+    </span>}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">lines_eof</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc\ndef\nghi&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">5</span>, <span class="number">11</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">span</span>.<span class="ident">end_pos</span>().<span class="ident">at_end</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">span</span>.<span class="ident">end</span>(), <span class="number">11</span>);
-        <span class="kw">let</span> <span class="ident">lines</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">lines_span</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines_span</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>lines_eof() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc\ndef\nghi&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">5</span>, <span class="number">11</span>).unwrap();
+        <span class="macro">assert!</span>(span.end_pos().at_end());
+        <span class="macro">assert_eq!</span>(span.end(), <span class="number">11</span>);
+        <span class="kw">let </span>lines: Vec&lt;<span class="kw">_</span>&gt; = span.lines().collect();
+        <span class="kw">let </span>lines_span: Vec&lt;<span class="kw">_</span>&gt; = span.lines_span().map(|span| span.as_str()).collect();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>[<span class="number">0</span>], <span class="string">&quot;def\n&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>[<span class="number">1</span>], <span class="string">&quot;ghi&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lines</span>, <span class="ident">lines_span</span>) <span class="comment">// Verify parity with lines_span()</span>
-    }
+        <span class="macro">assert_eq!</span>(lines.len(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(lines[<span class="number">0</span>], <span class="string">&quot;def\n&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(lines[<span class="number">1</span>], <span class="string">&quot;ghi&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(lines, lines_span) <span class="comment">// Verify parity with lines_span()
+    </span>}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">lines_span</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;abc\ndef\nghi&quot;</span>;
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">1</span>, <span class="number">7</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">lines_span</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines_span</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">lines</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">lines</span>().<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>lines_span() {
+        <span class="kw">let </span>input = <span class="string">&quot;abc\ndef\nghi&quot;</span>;
+        <span class="kw">let </span>span = Span::new(input, <span class="number">1</span>, <span class="number">7</span>).unwrap();
+        <span class="kw">let </span>lines_span: Vec&lt;<span class="kw">_</span>&gt; = span.lines_span().collect();
+        <span class="kw">let </span>lines: Vec&lt;<span class="kw">_</span>&gt; = span.lines().collect();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">lines_span</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">lines_span</span>[<span class="number">0</span>], <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">0</span>, <span class="number">4</span>).<span class="ident">unwrap</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">lines_span</span>[<span class="number">1</span>], <span class="ident">Span::new</span>(<span class="ident">input</span>, <span class="number">4</span>, <span class="number">8</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(lines_span.len(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(lines_span[<span class="number">0</span>], Span::new(input, <span class="number">0</span>, <span class="number">4</span>).unwrap());
+        <span class="macro">assert_eq!</span>(lines_span[<span class="number">1</span>], Span::new(input, <span class="number">4</span>, <span class="number">8</span>).unwrap());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">lines_span</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>())
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="ident">lines</span>
+            lines_span
+                .iter()
+                .map(|span| span.as_str())
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+            lines
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

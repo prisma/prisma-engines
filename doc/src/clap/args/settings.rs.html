@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -235,242 +235,242 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="comment">// Std</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>, <span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ascii::AsciiExt</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</pre><pre class="rust"><code><span class="comment">// Std
+</span><span class="attribute">#[allow(deprecated, unused_imports)]
+</span><span class="kw">use </span>std::ascii::AsciiExt;
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="macro">bitflags!</span> {
-    <span class="kw">struct</span> <span class="ident">Flags</span>: <span class="ident">u32</span> {
-        <span class="kw">const</span> <span class="ident">REQUIRED</span>         <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">const</span> <span class="ident">MULTIPLE</span>         <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="kw">const</span> <span class="ident">EMPTY_VALS</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="kw">const</span> <span class="ident">GLOBAL</span>           <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="kw">const</span> <span class="ident">HIDDEN</span>           <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="kw">const</span> <span class="ident">TAKES_VAL</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="kw">const</span> <span class="ident">USE_DELIM</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="kw">const</span> <span class="ident">NEXT_LINE_HELP</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="kw">const</span> <span class="ident">R_UNLESS_ALL</span>     <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="kw">const</span> <span class="ident">REQ_DELIM</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-        <span class="kw">const</span> <span class="ident">DELIM_NOT_SET</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-        <span class="kw">const</span> <span class="ident">HIDE_POS_VALS</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-        <span class="kw">const</span> <span class="ident">ALLOW_TAC_VALS</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-        <span class="kw">const</span> <span class="ident">REQUIRE_EQUALS</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
-        <span class="kw">const</span> <span class="ident">LAST</span>             <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
-        <span class="kw">const</span> <span class="ident">HIDE_DEFAULT_VAL</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
-        <span class="kw">const</span> <span class="ident">CASE_INSENSITIVE</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-        <span class="kw">const</span> <span class="ident">HIDE_ENV_VALS</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
-        <span class="kw">const</span> <span class="ident">HIDDEN_SHORT_H</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
-        <span class="kw">const</span> <span class="ident">HIDDEN_LONG_H</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
+<span class="macro">bitflags! </span>{
+    <span class="kw">struct </span>Flags: u32 {
+        <span class="kw">const </span>REQUIRED         = <span class="number">1</span>;
+        <span class="kw">const </span>MULTIPLE         = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="kw">const </span>EMPTY_VALS       = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="kw">const </span>GLOBAL           = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="kw">const </span>HIDDEN           = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="kw">const </span>TAKES_VAL        = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="kw">const </span>USE_DELIM        = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="kw">const </span>NEXT_LINE_HELP   = <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="kw">const </span>R_UNLESS_ALL     = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
+        <span class="kw">const </span>REQ_DELIM        = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
+        <span class="kw">const </span>DELIM_NOT_SET    = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
+        <span class="kw">const </span>HIDE_POS_VALS    = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
+        <span class="kw">const </span>ALLOW_TAC_VALS   = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
+        <span class="kw">const </span>REQUIRE_EQUALS   = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
+        <span class="kw">const </span>LAST             = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
+        <span class="kw">const </span>HIDE_DEFAULT_VAL = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
+        <span class="kw">const </span>CASE_INSENSITIVE = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
+        <span class="kw">const </span>HIDE_ENV_VALS    = <span class="number">1 </span>&lt;&lt; <span class="number">17</span>;
+        <span class="kw">const </span>HIDDEN_SHORT_H   = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
+        <span class="kw">const </span>HIDDEN_LONG_H    = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgFlags</span>(<span class="ident">Flags</span>);
+<span class="attribute">#[doc(hidden)]
+#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>ArgFlags(Flags);
 
-<span class="kw">impl</span> <span class="ident">ArgFlags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgFlags::default</span>()
+<span class="kw">impl </span>ArgFlags {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        ArgFlags::default()
     }
 
-    <span class="macro">impl_settings!</span> {<span class="ident">ArgSettings</span>,
-        <span class="ident">Required</span> =&gt; <span class="ident">Flags::REQUIRED</span>,
-        <span class="ident">Multiple</span> =&gt; <span class="ident">Flags::MULTIPLE</span>,
-        <span class="ident">EmptyValues</span> =&gt; <span class="ident">Flags::EMPTY_VALS</span>,
-        <span class="ident">Global</span> =&gt; <span class="ident">Flags::GLOBAL</span>,
-        <span class="ident">Hidden</span> =&gt; <span class="ident">Flags::HIDDEN</span>,
-        <span class="ident">TakesValue</span> =&gt; <span class="ident">Flags::TAKES_VAL</span>,
-        <span class="ident">UseValueDelimiter</span> =&gt; <span class="ident">Flags::USE_DELIM</span>,
-        <span class="ident">NextLineHelp</span> =&gt; <span class="ident">Flags::NEXT_LINE_HELP</span>,
-        <span class="ident">RequiredUnlessAll</span> =&gt; <span class="ident">Flags::R_UNLESS_ALL</span>,
-        <span class="ident">RequireDelimiter</span> =&gt; <span class="ident">Flags::REQ_DELIM</span>,
-        <span class="ident">ValueDelimiterNotSet</span> =&gt; <span class="ident">Flags::DELIM_NOT_SET</span>,
-        <span class="ident">HidePossibleValues</span> =&gt; <span class="ident">Flags::HIDE_POS_VALS</span>,
-        <span class="ident">AllowLeadingHyphen</span> =&gt; <span class="ident">Flags::ALLOW_TAC_VALS</span>,
-        <span class="ident">RequireEquals</span> =&gt; <span class="ident">Flags::REQUIRE_EQUALS</span>,
-        <span class="ident">Last</span> =&gt; <span class="ident">Flags::LAST</span>,
-        <span class="ident">CaseInsensitive</span> =&gt; <span class="ident">Flags::CASE_INSENSITIVE</span>,
-        <span class="ident">HideEnvValues</span> =&gt; <span class="ident">Flags::HIDE_ENV_VALS</span>,
-        <span class="ident">HideDefaultValue</span> =&gt; <span class="ident">Flags::HIDE_DEFAULT_VAL</span>,
-        <span class="ident">HiddenShortHelp</span> =&gt; <span class="ident">Flags::HIDDEN_SHORT_H</span>,
-        <span class="ident">HiddenLongHelp</span> =&gt; <span class="ident">Flags::HIDDEN_LONG_H</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ArgFlags</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgFlags</span>(<span class="ident">Flags::EMPTY_VALS</span> <span class="op">|</span> <span class="ident">Flags::DELIM_NOT_SET</span>)
+    <span class="macro">impl_settings! </span>{ArgSettings,
+        Required =&gt; Flags::REQUIRED,
+        Multiple =&gt; Flags::MULTIPLE,
+        EmptyValues =&gt; Flags::EMPTY_VALS,
+        Global =&gt; Flags::GLOBAL,
+        Hidden =&gt; Flags::HIDDEN,
+        TakesValue =&gt; Flags::TAKES_VAL,
+        UseValueDelimiter =&gt; Flags::USE_DELIM,
+        NextLineHelp =&gt; Flags::NEXT_LINE_HELP,
+        RequiredUnlessAll =&gt; Flags::R_UNLESS_ALL,
+        RequireDelimiter =&gt; Flags::REQ_DELIM,
+        ValueDelimiterNotSet =&gt; Flags::DELIM_NOT_SET,
+        HidePossibleValues =&gt; Flags::HIDE_POS_VALS,
+        AllowLeadingHyphen =&gt; Flags::ALLOW_TAC_VALS,
+        RequireEquals =&gt; Flags::REQUIRE_EQUALS,
+        Last =&gt; Flags::LAST,
+        CaseInsensitive =&gt; Flags::CASE_INSENSITIVE,
+        HideEnvValues =&gt; Flags::HIDE_ENV_VALS,
+        HideDefaultValue =&gt; Flags::HIDE_DEFAULT_VAL,
+        HiddenShortHelp =&gt; Flags::HIDDEN_SHORT_H,
+        HiddenLongHelp =&gt; Flags::HIDDEN_LONG_H
     }
 }
 
-<span class="doccomment">/// Various settings that apply to arguments and may be set, unset, and checked via getter/setter</span>
-<span class="doccomment">/// methods [`Arg::set`], [`Arg::unset`], and [`Arg::is_set`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Arg::set`]: ./struct.Arg.html#method.set</span>
-<span class="doccomment">/// [`Arg::unset`]: ./struct.Arg.html#method.unset</span>
-<span class="doccomment">/// [`Arg::is_set`]: ./struct.Arg.html#method.is_set</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ArgSettings</span> {
-    <span class="doccomment">/// The argument must be used</span>
-    <span class="ident">Required</span>,
-    <span class="doccomment">/// The argument may be used multiple times such as `--flag --flag`</span>
-    <span class="ident">Multiple</span>,
-    <span class="doccomment">/// The argument allows empty values such as `--option &quot;&quot;`</span>
-    <span class="ident">EmptyValues</span>,
-    <span class="doccomment">/// The argument should be propagated down through all child [`SubCommand`]s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">Global</span>,
-    <span class="doccomment">/// The argument should **not** be shown in help text</span>
-    <span class="ident">Hidden</span>,
-    <span class="doccomment">/// The argument accepts a value, such as `--option &lt;value&gt;`</span>
-    <span class="ident">TakesValue</span>,
-    <span class="doccomment">/// Determines if the argument allows values to be grouped via a delimiter</span>
-    <span class="ident">UseValueDelimiter</span>,
-    <span class="doccomment">/// Prints the help text on the line after the argument</span>
-    <span class="ident">NextLineHelp</span>,
-    <span class="doccomment">/// Requires the use of a value delimiter for all multiple values</span>
-    <span class="ident">RequireDelimiter</span>,
-    <span class="doccomment">/// Hides the possible values from the help string</span>
-    <span class="ident">HidePossibleValues</span>,
-    <span class="doccomment">/// Allows vals that start with a &#39;-&#39;</span>
-    <span class="ident">AllowLeadingHyphen</span>,
-    <span class="doccomment">/// Require options use `--option=val` syntax</span>
-    <span class="ident">RequireEquals</span>,
-    <span class="doccomment">/// Specifies that the arg is the last positional argument and may be accessed early via `--`</span>
-    <span class="doccomment">/// syntax</span>
-    <span class="ident">Last</span>,
-    <span class="doccomment">/// Hides the default value from the help string</span>
-    <span class="ident">HideDefaultValue</span>,
-    <span class="doccomment">/// Makes `Arg::possible_values` case insensitive</span>
-    <span class="ident">CaseInsensitive</span>,
-    <span class="doccomment">/// Hides ENV values in the help message</span>
-    <span class="ident">HideEnvValues</span>,
-    <span class="doccomment">/// The argument should **not** be shown in short help text</span>
-    <span class="ident">HiddenShortHelp</span>,
-    <span class="doccomment">/// The argument should **not** be shown in long help text</span>
-    <span class="ident">HiddenLongHelp</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">RequiredUnlessAll</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">ValueDelimiterNotSet</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>ArgFlags {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ArgFlags(Flags::EMPTY_VALS | Flags::DELIM_NOT_SET)
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ArgSettings</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">to_ascii_lowercase</span>() {
-            <span class="string">&quot;required&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::Required</span>),
-            <span class="string">&quot;multiple&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::Multiple</span>),
-            <span class="string">&quot;global&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::Global</span>),
-            <span class="string">&quot;emptyvalues&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::EmptyValues</span>),
-            <span class="string">&quot;hidden&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::Hidden</span>),
-            <span class="string">&quot;takesvalue&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::TakesValue</span>),
-            <span class="string">&quot;usevaluedelimiter&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::UseValueDelimiter</span>),
-            <span class="string">&quot;nextlinehelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::NextLineHelp</span>),
-            <span class="string">&quot;requiredunlessall&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::RequiredUnlessAll</span>),
-            <span class="string">&quot;requiredelimiter&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::RequireDelimiter</span>),
-            <span class="string">&quot;valuedelimiternotset&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::ValueDelimiterNotSet</span>),
-            <span class="string">&quot;hidepossiblevalues&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::HidePossibleValues</span>),
-            <span class="string">&quot;allowleadinghyphen&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::AllowLeadingHyphen</span>),
-            <span class="string">&quot;requireequals&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::RequireEquals</span>),
-            <span class="string">&quot;last&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::Last</span>),
-            <span class="string">&quot;hidedefaultvalue&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::HideDefaultValue</span>),
-            <span class="string">&quot;caseinsensitive&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::CaseInsensitive</span>),
-            <span class="string">&quot;hideenvvalues&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::HideEnvValues</span>),
-            <span class="string">&quot;hiddenshorthelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::HiddenShortHelp</span>),
-            <span class="string">&quot;hiddenlonghelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ArgSettings::HiddenLongHelp</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown ArgSetting, cannot convert from str&quot;</span>.<span class="ident">to_owned</span>()),
+<span class="doccomment">/// Various settings that apply to arguments and may be set, unset, and checked via getter/setter
+/// methods [`Arg::set`], [`Arg::unset`], and [`Arg::is_set`]
+///
+/// [`Arg::set`]: ./struct.Arg.html#method.set
+/// [`Arg::unset`]: ./struct.Arg.html#method.unset
+/// [`Arg::is_set`]: ./struct.Arg.html#method.is_set
+</span><span class="attribute">#[derive(Debug, PartialEq, Copy, Clone)]
+</span><span class="kw">pub enum </span>ArgSettings {
+    <span class="doccomment">/// The argument must be used
+    </span>Required,
+    <span class="doccomment">/// The argument may be used multiple times such as `--flag --flag`
+    </span>Multiple,
+    <span class="doccomment">/// The argument allows empty values such as `--option &quot;&quot;`
+    </span>EmptyValues,
+    <span class="doccomment">/// The argument should be propagated down through all child [`SubCommand`]s
+    ///
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>Global,
+    <span class="doccomment">/// The argument should **not** be shown in help text
+    </span>Hidden,
+    <span class="doccomment">/// The argument accepts a value, such as `--option &lt;value&gt;`
+    </span>TakesValue,
+    <span class="doccomment">/// Determines if the argument allows values to be grouped via a delimiter
+    </span>UseValueDelimiter,
+    <span class="doccomment">/// Prints the help text on the line after the argument
+    </span>NextLineHelp,
+    <span class="doccomment">/// Requires the use of a value delimiter for all multiple values
+    </span>RequireDelimiter,
+    <span class="doccomment">/// Hides the possible values from the help string
+    </span>HidePossibleValues,
+    <span class="doccomment">/// Allows vals that start with a &#39;-&#39;
+    </span>AllowLeadingHyphen,
+    <span class="doccomment">/// Require options use `--option=val` syntax
+    </span>RequireEquals,
+    <span class="doccomment">/// Specifies that the arg is the last positional argument and may be accessed early via `--`
+    /// syntax
+    </span>Last,
+    <span class="doccomment">/// Hides the default value from the help string
+    </span>HideDefaultValue,
+    <span class="doccomment">/// Makes `Arg::possible_values` case insensitive
+    </span>CaseInsensitive,
+    <span class="doccomment">/// Hides ENV values in the help message
+    </span>HideEnvValues,
+    <span class="doccomment">/// The argument should **not** be shown in short help text
+    </span>HiddenShortHelp,
+    <span class="doccomment">/// The argument should **not** be shown in long help text
+    </span>HiddenLongHelp,
+    <span class="attribute">#[doc(hidden)]
+    </span>RequiredUnlessAll,
+    <span class="attribute">#[doc(hidden)]
+    </span>ValueDelimiterNotSet,
+}
+
+<span class="kw">impl </span>FromStr <span class="kw">for </span>ArgSettings {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, &lt;<span class="self">Self </span><span class="kw">as </span>FromStr&gt;::Err&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>s.to_ascii_lowercase() {
+            <span class="string">&quot;required&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::Required),
+            <span class="string">&quot;multiple&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::Multiple),
+            <span class="string">&quot;global&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::Global),
+            <span class="string">&quot;emptyvalues&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::EmptyValues),
+            <span class="string">&quot;hidden&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::Hidden),
+            <span class="string">&quot;takesvalue&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::TakesValue),
+            <span class="string">&quot;usevaluedelimiter&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::UseValueDelimiter),
+            <span class="string">&quot;nextlinehelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::NextLineHelp),
+            <span class="string">&quot;requiredunlessall&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::RequiredUnlessAll),
+            <span class="string">&quot;requiredelimiter&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::RequireDelimiter),
+            <span class="string">&quot;valuedelimiternotset&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::ValueDelimiterNotSet),
+            <span class="string">&quot;hidepossiblevalues&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::HidePossibleValues),
+            <span class="string">&quot;allowleadinghyphen&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::AllowLeadingHyphen),
+            <span class="string">&quot;requireequals&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::RequireEquals),
+            <span class="string">&quot;last&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::Last),
+            <span class="string">&quot;hidedefaultvalue&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::HideDefaultValue),
+            <span class="string">&quot;caseinsensitive&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::CaseInsensitive),
+            <span class="string">&quot;hideenvvalues&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::HideEnvValues),
+            <span class="string">&quot;hiddenshorthelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::HiddenShortHelp),
+            <span class="string">&quot;hiddenlonghelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ArgSettings::HiddenLongHelp),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown ArgSetting, cannot convert from str&quot;</span>.to_owned()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgSettings</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::ArgSettings;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">arg_settings_fromstr</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>arg_settings_fromstr() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;allowleadinghyphen&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::AllowLeadingHyphen</span>
+            <span class="string">&quot;allowleadinghyphen&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::AllowLeadingHyphen
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;emptyvalues&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::EmptyValues</span>
+            <span class="string">&quot;emptyvalues&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::EmptyValues
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;global&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::Global</span>
+            <span class="string">&quot;global&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::Global
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hidepossiblevalues&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::HidePossibleValues</span>
+            <span class="string">&quot;hidepossiblevalues&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::HidePossibleValues
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hidden&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::Hidden</span>
+            <span class="string">&quot;hidden&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::Hidden
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;multiple&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::Multiple</span>
+            <span class="string">&quot;multiple&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::Multiple
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;nextlinehelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::NextLineHelp</span>
+            <span class="string">&quot;nextlinehelp&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::NextLineHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;requiredunlessall&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::RequiredUnlessAll</span>
+            <span class="string">&quot;requiredunlessall&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::RequiredUnlessAll
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;requiredelimiter&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::RequireDelimiter</span>
+            <span class="string">&quot;requiredelimiter&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::RequireDelimiter
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;required&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::Required</span>
+            <span class="string">&quot;required&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::Required
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;takesvalue&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::TakesValue</span>
+            <span class="string">&quot;takesvalue&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::TakesValue
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;usevaluedelimiter&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::UseValueDelimiter</span>
+            <span class="string">&quot;usevaluedelimiter&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::UseValueDelimiter
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;valuedelimiternotset&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::ValueDelimiterNotSet</span>
+            <span class="string">&quot;valuedelimiternotset&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::ValueDelimiterNotSet
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;requireequals&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::RequireEquals</span>
+            <span class="string">&quot;requireequals&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::RequireEquals
         );
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;last&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">ArgSettings::Last</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;last&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(), ArgSettings::Last);
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hidedefaultvalue&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::HideDefaultValue</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;caseinsensitive&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::CaseInsensitive</span>
+            <span class="string">&quot;hidedefaultvalue&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::HideDefaultValue
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hideenvvalues&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::HideEnvValues</span>
+            <span class="string">&quot;caseinsensitive&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::CaseInsensitive
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hiddenshorthelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::HiddenShortHelp</span>
+            <span class="string">&quot;hideenvvalues&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::HideEnvValues
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hiddenlonghelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">ArgSettings::HiddenLongHelp</span>
+            <span class="string">&quot;hiddenshorthelp&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::HiddenShortHelp
         );
-        <span class="macro">assert!</span>(<span class="string">&quot;hahahaha&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ArgSettings</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="string">&quot;hiddenlonghelp&quot;</span>.parse::&lt;ArgSettings&gt;().unwrap(),
+            ArgSettings::HiddenLongHelp
+        );
+        <span class="macro">assert!</span>(<span class="string">&quot;hahahaha&quot;</span>.parse::&lt;ArgSettings&gt;().is_err());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

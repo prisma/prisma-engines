@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -857,802 +857,802 @@
 <span id="857">857</span>
 <span id="858">858</span>
 <span id="859">859</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::DeserializeOwned</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Request</span> {
-    <span class="kw">type</span> <span class="ident">Params</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Serialize</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Serialize</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+<span class="kw">pub trait </span>Request {
+    <span class="kw">type </span>Params: DeserializeOwned + Serialize;
+    <span class="kw">type </span><span class="prelude-ty">Result</span>: DeserializeOwned + Serialize;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">lsp_request</span> {
+<span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>lsp_request {
     (<span class="string">&quot;initialize&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::Initialize</span>
-    };
+        <span class="macro-nonterminal">$crate::request::Initialize
+    </span>};
     (<span class="string">&quot;shutdown&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::Shutdown</span>
-    };
+        <span class="macro-nonterminal">$crate::request::Shutdown
+    </span>};
 
     (<span class="string">&quot;window/showMessageRequest&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ShowMessageRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ShowMessageRequest
+    </span>};
 
     (<span class="string">&quot;client/registerCapability&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::RegisterCapability</span>
-    };
+        <span class="macro-nonterminal">$crate::request::RegisterCapability
+    </span>};
     (<span class="string">&quot;client/unregisterCapability&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::UnregisterCapability</span>
-    };
+        <span class="macro-nonterminal">$crate::request::UnregisterCapability
+    </span>};
 
     (<span class="string">&quot;workspace/symbol&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WorkspaceSymbol</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WorkspaceSymbol
+    </span>};
     (<span class="string">&quot;workspace/executeCommand&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ExecuteCommand</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ExecuteCommand
+    </span>};
 
     (<span class="string">&quot;textDocument/willSaveWaitUntil&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WillSaveWaitUntil</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WillSaveWaitUntil
+    </span>};
 
     (<span class="string">&quot;textDocument/completion&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::Completion</span>
-    };
+        <span class="macro-nonterminal">$crate::request::Completion
+    </span>};
     (<span class="string">&quot;completionItem/resolve&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ResolveCompletionItem</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ResolveCompletionItem
+    </span>};
     (<span class="string">&quot;textDocument/hover&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::HoverRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::HoverRequest
+    </span>};
     (<span class="string">&quot;textDocument/signatureHelp&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SignatureHelpRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SignatureHelpRequest
+    </span>};
     (<span class="string">&quot;textDocument/declaration&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::GotoDeclaration</span>
-    };
+        <span class="macro-nonterminal">$crate::request::GotoDeclaration
+    </span>};
     (<span class="string">&quot;textDocument/definition&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::GotoDefinition</span>
-    };
+        <span class="macro-nonterminal">$crate::request::GotoDefinition
+    </span>};
     (<span class="string">&quot;textDocument/references&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::References</span>
-    };
+        <span class="macro-nonterminal">$crate::request::References
+    </span>};
     (<span class="string">&quot;textDocument/documentHighlight&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::DocumentHighlightRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::DocumentHighlightRequest
+    </span>};
     (<span class="string">&quot;textDocument/documentSymbol&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::DocumentSymbolRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::DocumentSymbolRequest
+    </span>};
     (<span class="string">&quot;textDocument/codeAction&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CodeActionRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CodeActionRequest
+    </span>};
     (<span class="string">&quot;textDocument/codeLens&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CodeLensRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CodeLensRequest
+    </span>};
     (<span class="string">&quot;codeLens/resolve&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CodeLensResolve</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CodeLensResolve
+    </span>};
     (<span class="string">&quot;textDocument/documentLink&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::DocumentLinkRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::DocumentLinkRequest
+    </span>};
     (<span class="string">&quot;documentLink/resolve&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::DocumentLinkResolve</span>
-    };
+        <span class="macro-nonterminal">$crate::request::DocumentLinkResolve
+    </span>};
     (<span class="string">&quot;workspace/applyEdit&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ApplyWorkspaceEdit</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ApplyWorkspaceEdit
+    </span>};
     (<span class="string">&quot;textDocument/rangeFormatting&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::RangeFormatting</span>
-    };
+        <span class="macro-nonterminal">$crate::request::RangeFormatting
+    </span>};
     (<span class="string">&quot;textDocument/onTypeFormatting&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::OnTypeFormatting</span>
-    };
+        <span class="macro-nonterminal">$crate::request::OnTypeFormatting
+    </span>};
     (<span class="string">&quot;textDocument/formatting&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::Formatting</span>
-    };
+        <span class="macro-nonterminal">$crate::request::Formatting
+    </span>};
     (<span class="string">&quot;textDocument/rename&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::Rename</span>
-    };
+        <span class="macro-nonterminal">$crate::request::Rename
+    </span>};
     (<span class="string">&quot;textDocument/documentColor&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::DocumentColor</span>
-    };
+        <span class="macro-nonterminal">$crate::request::DocumentColor
+    </span>};
     (<span class="string">&quot;textDocument/colorPresentation&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ColorPresentationRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ColorPresentationRequest
+    </span>};
     (<span class="string">&quot;textDocument/foldingRange&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::FoldingRangeRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::FoldingRangeRequest
+    </span>};
     (<span class="string">&quot;textDocument/prepareRename&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::PrepareRenameRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::PrepareRenameRequest
+    </span>};
     (<span class="string">&quot;textDocument/implementation&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::GotoImplementation</span>
-    };
+        <span class="macro-nonterminal">$crate::request::GotoImplementation
+    </span>};
     (<span class="string">&quot;textDocument/typeDefinition&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::GotoTypeDefinition</span>
-    };
+        <span class="macro-nonterminal">$crate::request::GotoTypeDefinition
+    </span>};
     (<span class="string">&quot;textDocument/selectionRange&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SelectionRangeRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SelectionRangeRequest
+    </span>};
     (<span class="string">&quot;workspace/workspaceFolders&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WorkspaceFoldersRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WorkspaceFoldersRequest
+    </span>};
     (<span class="string">&quot;workspace/configuration&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WorkspaceConfiguration</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WorkspaceConfiguration
+    </span>};
     (<span class="string">&quot;window/workDoneProgress/create&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WorkDoneProgressCreate</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WorkDoneProgressCreate
+    </span>};
     (<span class="string">&quot;callHierarchy/incomingCalls&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CallHierarchyIncomingCalls</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CallHierarchyIncomingCalls
+    </span>};
     (<span class="string">&quot;callHierarchy/outgoingCalls&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CallHierarchyOutgoingCalls</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CallHierarchyOutgoingCalls
+    </span>};
     (<span class="string">&quot;textDocument/moniker&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::MonikerRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::MonikerRequest
+    </span>};
     (<span class="string">&quot;textDocument/linkedEditingRange&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::LinkedEditingRange</span>
-    };
+        <span class="macro-nonterminal">$crate::request::LinkedEditingRange
+    </span>};
     (<span class="string">&quot;textDocument/prepareCallHierarchy&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CallHierarchyPrepare</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CallHierarchyPrepare
+    </span>};
     (<span class="string">&quot;textDocument/semanticTokens/full&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SemanticTokensFullRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SemanticTokensFullRequest
+    </span>};
     (<span class="string">&quot;textDocument/semanticTokens/full/delta&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SemanticTokensFullDeltaRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SemanticTokensFullDeltaRequest
+    </span>};
     (<span class="string">&quot;textDocument/semanticTokens/range&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SemanticTokensRangeRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SemanticTokensRangeRequest
+    </span>};
     (<span class="string">&quot;workspace/willCreateFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WillCreateFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WillCreateFiles
+    </span>};
     (<span class="string">&quot;workspace/willRenameFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WillRenameFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WillRenameFiles
+    </span>};
     (<span class="string">&quot;workspace/willDeleteFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::WillDeleteFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::request::WillDeleteFiles
+    </span>};
     (<span class="string">&quot;workspace/semanticTokens/refresh&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::SemanticTokensRefesh</span>
-    };
+        <span class="macro-nonterminal">$crate::request::SemanticTokensRefesh
+    </span>};
     (<span class="string">&quot;workspace/codeLens/refresh&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CodeLensRefresh</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CodeLensRefresh
+    </span>};
     (<span class="string">&quot;codeAction/resolve&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::CodeActionResolveRequest</span>
-    };
+        <span class="macro-nonterminal">$crate::request::CodeActionResolveRequest
+    </span>};
     (<span class="string">&quot;window/showDocument&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::request::ShowDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::request::ShowDocument
+    </span>};
 }
 
-<span class="doccomment">/// The initialize request is sent as the first request from the client to the server.</span>
-<span class="doccomment">/// If the server receives request or notification before the `initialize` request it should act as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * for a request the respond should be errored with `code: -32001`. The message can be picked by the server.</span>
-<span class="doccomment">/// * notifications should be dropped.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Initialize</span> {}
+<span class="doccomment">/// The initialize request is sent as the first request from the client to the server.
+/// If the server receives request or notification before the `initialize` request it should act as follows:
+///
+/// * for a request the respond should be errored with `code: -32001`. The message can be picked by the server.
+/// * notifications should be dropped.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Initialize {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">Initialize</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">InitializeParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">InitializeResult</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;initialize&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>Initialize {
+    <span class="kw">type </span>Params = InitializeParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= InitializeResult;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;initialize&quot;</span>;
 }
 
-<span class="doccomment">/// The shutdown request is sent from the client to the server. It asks the server to shut down,</span>
-<span class="doccomment">/// but to not exit (otherwise the response might not be delivered correctly to the client).</span>
-<span class="doccomment">/// There is a separate exit notification that asks the server to exit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Shutdown</span> {}
+<span class="doccomment">/// The shutdown request is sent from the client to the server. It asks the server to shut down,
+/// but to not exit (otherwise the response might not be delivered correctly to the client).
+/// There is a separate exit notification that asks the server to exit.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Shutdown {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">Shutdown</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;shutdown&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>Shutdown {
+    <span class="kw">type </span>Params = ();
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;shutdown&quot;</span>;
 }
 
-<span class="doccomment">/// The show message request is sent from a server to a client to ask the client to display a particular message</span>
-<span class="doccomment">/// in the user interface. In addition to the show message notification the request allows to pass actions and to</span>
-<span class="doccomment">/// wait for an answer from the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShowMessageRequest</span> {}
+<span class="doccomment">/// The show message request is sent from a server to a client to ask the client to display a particular message
+/// in the user interface. In addition to the show message notification the request allows to pass actions and to
+/// wait for an answer from the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ShowMessageRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ShowMessageRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ShowMessageRequestParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageActionItem</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/showMessageRequest&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ShowMessageRequest {
+    <span class="kw">type </span>Params = ShowMessageRequestParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;MessageActionItem&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/showMessageRequest&quot;</span>;
 }
 
-<span class="doccomment">/// The client/registerCapability request is sent from the server to the client to register for a new capability</span>
-<span class="doccomment">/// on the client side. Not all clients need to support dynamic capability registration. A client opts in via the</span>
-<span class="doccomment">/// ClientCapabilities.GenericCapability property.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RegisterCapability</span> {}
+<span class="doccomment">/// The client/registerCapability request is sent from the server to the client to register for a new capability
+/// on the client side. Not all clients need to support dynamic capability registration. A client opts in via the
+/// ClientCapabilities.GenericCapability property.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>RegisterCapability {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">RegisterCapability</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">RegistrationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;client/registerCapability&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>RegisterCapability {
+    <span class="kw">type </span>Params = RegistrationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;client/registerCapability&quot;</span>;
 }
 
-<span class="doccomment">/// The client/unregisterCapability request is sent from the server to the client to unregister a</span>
-<span class="doccomment">/// previously register capability.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UnregisterCapability</span> {}
+<span class="doccomment">/// The client/unregisterCapability request is sent from the server to the client to unregister a
+/// previously register capability.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>UnregisterCapability {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">UnregisterCapability</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">UnregistrationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;client/unregisterCapability&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>UnregisterCapability {
+    <span class="kw">type </span>Params = UnregistrationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;client/unregisterCapability&quot;</span>;
 }
 
-<span class="doccomment">/// The Completion request is sent from the client to the server to compute completion items at a given cursor position.</span>
-<span class="doccomment">/// Completion items are presented in the IntelliSense user interface. If computing full completion items is expensive,</span>
-<span class="doccomment">/// servers can additionally provide a handler for the completion item resolve request (&#39;completionItem/resolve&#39;).</span>
-<span class="doccomment">/// This request is sent when a completion item is selected in the user interface. A typical use case is for example:</span>
-<span class="doccomment">/// the &#39;textDocument/completion&#39; request doesn’t fill in the documentation property for returned completion items</span>
-<span class="doccomment">/// since it is expensive to compute. When the item is selected in the user interface then a ‘completionItem/resolve’</span>
-<span class="doccomment">/// request is sent with the selected completion item as a param. The returned completion item should have the</span>
-<span class="doccomment">/// documentation property filled in. The request can delay the computation of the detail and documentation properties.</span>
-<span class="doccomment">/// However, properties that are needed for the initial sorting and filtering, like sortText, filterText, insertText,</span>
-<span class="doccomment">/// and textEdit must be provided in the textDocument/completion request and must not be changed during resolve.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Completion</span> {}
+<span class="doccomment">/// The Completion request is sent from the client to the server to compute completion items at a given cursor position.
+/// Completion items are presented in the IntelliSense user interface. If computing full completion items is expensive,
+/// servers can additionally provide a handler for the completion item resolve request (&#39;completionItem/resolve&#39;).
+/// This request is sent when a completion item is selected in the user interface. A typical use case is for example:
+/// the &#39;textDocument/completion&#39; request doesn’t fill in the documentation property for returned completion items
+/// since it is expensive to compute. When the item is selected in the user interface then a ‘completionItem/resolve’
+/// request is sent with the selected completion item as a param. The returned completion item should have the
+/// documentation property filled in. The request can delay the computation of the detail and documentation properties.
+/// However, properties that are needed for the initial sorting and filtering, like sortText, filterText, insertText,
+/// and textEdit must be provided in the textDocument/completion request and must not be changed during resolve.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Completion {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">Completion</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CompletionParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompletionResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/completion&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>Completion {
+    <span class="kw">type </span>Params = CompletionParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;CompletionResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/completion&quot;</span>;
 }
 
-<span class="doccomment">/// The request is sent from the client to the server to resolve additional information for a given completion item.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolveCompletionItem</span> {}
+<span class="doccomment">/// The request is sent from the client to the server to resolve additional information for a given completion item.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ResolveCompletionItem {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ResolveCompletionItem</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CompletionItem</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">CompletionItem</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;completionItem/resolve&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ResolveCompletionItem {
+    <span class="kw">type </span>Params = CompletionItem;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= CompletionItem;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;completionItem/resolve&quot;</span>;
 }
 
-<span class="doccomment">/// The hover request is sent from the client to the server to request hover information at a given text</span>
-<span class="doccomment">/// document position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HoverRequest</span> {}
+<span class="doccomment">/// The hover request is sent from the client to the server to request hover information at a given text
+/// document position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>HoverRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">HoverRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">HoverParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Hover</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/hover&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>HoverRequest {
+    <span class="kw">type </span>Params = HoverParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Hover&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/hover&quot;</span>;
 }
 
-<span class="doccomment">/// The signature help request is sent from the client to the server to request signature information at</span>
-<span class="doccomment">/// a given cursor position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SignatureHelpRequest</span> {}
+<span class="doccomment">/// The signature help request is sent from the client to the server to request signature information at
+/// a given cursor position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>SignatureHelpRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SignatureHelpRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">SignatureHelpParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SignatureHelp</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/signatureHelp&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SignatureHelpRequest {
+    <span class="kw">type </span>Params = SignatureHelpParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;SignatureHelp&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/signatureHelp&quot;</span>;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GotoDeclaration</span> {}
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoDeclarationParams</span> <span class="op">=</span> <span class="ident">GotoDefinitionParams</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoDeclarationResponse</span> <span class="op">=</span> <span class="ident">GotoDefinitionResponse</span>;
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>GotoDeclaration {}
+<span class="kw">pub type </span>GotoDeclarationParams = GotoDefinitionParams;
+<span class="kw">pub type </span>GotoDeclarationResponse = GotoDefinitionResponse;
 
-<span class="doccomment">/// The goto declaration request is sent from the client to the server to resolve the declaration location of</span>
-<span class="doccomment">/// a symbol at a given text document position.</span>
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">GotoDeclaration</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">GotoDeclarationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GotoDeclarationResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/declaration&quot;</span>;
+<span class="doccomment">/// The goto declaration request is sent from the client to the server to resolve the declaration location of
+/// a symbol at a given text document position.
+</span><span class="kw">impl </span>Request <span class="kw">for </span>GotoDeclaration {
+    <span class="kw">type </span>Params = GotoDeclarationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;GotoDeclarationResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/declaration&quot;</span>;
 }
 
-<span class="doccomment">/// The goto definition request is sent from the client to the server to resolve the definition location of</span>
-<span class="doccomment">/// a symbol at a given text document position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GotoDefinition</span> {}
+<span class="doccomment">/// The goto definition request is sent from the client to the server to resolve the definition location of
+/// a symbol at a given text document position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>GotoDefinition {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">GotoDefinition</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">GotoDefinitionParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GotoDefinitionResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/definition&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>GotoDefinition {
+    <span class="kw">type </span>Params = GotoDefinitionParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;GotoDefinitionResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/definition&quot;</span>;
 }
 
-<span class="doccomment">/// The references request is sent from the client to the server to resolve project-wide references for the</span>
-<span class="doccomment">/// symbol denoted by the given text document position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">References</span> {}
+<span class="doccomment">/// The references request is sent from the client to the server to resolve project-wide references for the
+/// symbol denoted by the given text document position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>References {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">References</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ReferenceParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Location</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/references&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>References {
+    <span class="kw">type </span>Params = ReferenceParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;Location&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/references&quot;</span>;
 }
 
-<span class="doccomment">/// The goto type definition request is sent from the client to the</span>
-<span class="doccomment">/// server to resolve the type definition location of a symbol at a</span>
-<span class="doccomment">/// given text document position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GotoTypeDefinition</span> {}
+<span class="doccomment">/// The goto type definition request is sent from the client to the
+/// server to resolve the type definition location of a symbol at a
+/// given text document position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>GotoTypeDefinition {}
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoTypeDefinitionParams</span> <span class="op">=</span> <span class="ident">GotoDefinitionParams</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoTypeDefinitionResponse</span> <span class="op">=</span> <span class="ident">GotoDefinitionResponse</span>;
+<span class="kw">pub type </span>GotoTypeDefinitionParams = GotoDefinitionParams;
+<span class="kw">pub type </span>GotoTypeDefinitionResponse = GotoDefinitionResponse;
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">GotoTypeDefinition</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">GotoTypeDefinitionParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GotoTypeDefinitionResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/typeDefinition&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>GotoTypeDefinition {
+    <span class="kw">type </span>Params = GotoTypeDefinitionParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;GotoTypeDefinitionResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/typeDefinition&quot;</span>;
 }
 
-<span class="doccomment">/// The goto implementation request is sent from the client to the</span>
-<span class="doccomment">/// server to resolve the implementation location of a symbol at a</span>
-<span class="doccomment">/// given text document position.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GotoImplementation</span> {}
+<span class="doccomment">/// The goto implementation request is sent from the client to the
+/// server to resolve the implementation location of a symbol at a
+/// given text document position.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>GotoImplementation {}
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoImplementationParams</span> <span class="op">=</span> <span class="ident">GotoTypeDefinitionParams</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">GotoImplementationResponse</span> <span class="op">=</span> <span class="ident">GotoDefinitionResponse</span>;
+<span class="kw">pub type </span>GotoImplementationParams = GotoTypeDefinitionParams;
+<span class="kw">pub type </span>GotoImplementationResponse = GotoDefinitionResponse;
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">GotoImplementation</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">GotoImplementationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GotoImplementationResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/implementation&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>GotoImplementation {
+    <span class="kw">type </span>Params = GotoImplementationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;GotoImplementationResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/implementation&quot;</span>;
 }
 
-<span class="doccomment">/// The document highlight request is sent from the client to the server to resolve a document highlights</span>
-<span class="doccomment">/// for a given text document position.</span>
-<span class="doccomment">/// For programming languages this usually highlights all references to the symbol scoped to this file.</span>
-<span class="doccomment">/// However we kept &#39;textDocument/documentHighlight&#39; and &#39;textDocument/references&#39; separate requests since</span>
-<span class="doccomment">/// the first one is allowed to be more fuzzy.</span>
-<span class="doccomment">/// Symbol matches usually have a DocumentHighlightKind of Read or Write whereas fuzzy or textual matches</span>
-<span class="doccomment">/// use Text as the kind.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentHighlightRequest</span> {}
+<span class="doccomment">/// The document highlight request is sent from the client to the server to resolve a document highlights
+/// for a given text document position.
+/// For programming languages this usually highlights all references to the symbol scoped to this file.
+/// However we kept &#39;textDocument/documentHighlight&#39; and &#39;textDocument/references&#39; separate requests since
+/// the first one is allowed to be more fuzzy.
+/// Symbol matches usually have a DocumentHighlightKind of Read or Write whereas fuzzy or textual matches
+/// use Text as the kind.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DocumentHighlightRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">DocumentHighlightRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentHighlightParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentHighlight</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentHighlight&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>DocumentHighlightRequest {
+    <span class="kw">type </span>Params = DocumentHighlightParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;DocumentHighlight&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/documentHighlight&quot;</span>;
 }
 
-<span class="doccomment">/// The document symbol request is sent from the client to the server to list all symbols found in a given</span>
-<span class="doccomment">/// text document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentSymbolRequest</span> {}
+<span class="doccomment">/// The document symbol request is sent from the client to the server to list all symbols found in a given
+/// text document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DocumentSymbolRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">DocumentSymbolRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentSymbolParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DocumentSymbolResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentSymbol&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>DocumentSymbolRequest {
+    <span class="kw">type </span>Params = DocumentSymbolParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;DocumentSymbolResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/documentSymbol&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace symbol request is sent from the client to the server to list project-wide symbols</span>
-<span class="doccomment">/// matching the query string.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WorkspaceSymbol</span> {}
+<span class="doccomment">/// The workspace symbol request is sent from the client to the server to list project-wide symbols
+/// matching the query string.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WorkspaceSymbol {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WorkspaceSymbol</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">WorkspaceSymbolParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SymbolInformation</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/symbol&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WorkspaceSymbol {
+    <span class="kw">type </span>Params = WorkspaceSymbolParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;SymbolInformation&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/symbol&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/executeCommand request is sent from the client to the server to trigger command execution on the server.</span>
-<span class="doccomment">/// In most cases the server creates a WorkspaceEdit structure and applies the changes to the workspace using the request</span>
-<span class="doccomment">/// workspace/applyEdit which is sent from the server to the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExecuteCommand</span> {}
+<span class="doccomment">/// The workspace/executeCommand request is sent from the client to the server to trigger command execution on the server.
+/// In most cases the server creates a WorkspaceEdit structure and applies the changes to the workspace using the request
+/// workspace/applyEdit which is sent from the server to the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ExecuteCommand {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ExecuteCommand</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ExecuteCommandParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/executeCommand&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ExecuteCommand {
+    <span class="kw">type </span>Params = ExecuteCommandParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Value&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/executeCommand&quot;</span>;
 }
 
-<span class="doccomment">/// The document will save request is sent from the client to the server before the document is</span>
-<span class="doccomment">/// actually saved. The request can return an array of TextEdits which will be applied to the text</span>
-<span class="doccomment">/// document before it is saved. Please note that clients might drop results if computing the text</span>
-<span class="doccomment">/// edits took too long or if a server constantly fails on this request. This is done to keep the</span>
-<span class="doccomment">/// save fast and reliable.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WillSaveWaitUntil</span> {}
+<span class="doccomment">/// The document will save request is sent from the client to the server before the document is
+/// actually saved. The request can return an array of TextEdits which will be applied to the text
+/// document before it is saved. Please note that clients might drop results if computing the text
+/// edits took too long or if a server constantly fails on this request. This is done to keep the
+/// save fast and reliable.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WillSaveWaitUntil {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WillSaveWaitUntil</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">WillSaveTextDocumentParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/willSaveWaitUntil&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WillSaveWaitUntil {
+    <span class="kw">type </span>Params = WillSaveTextDocumentParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;TextEdit&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/willSaveWaitUntil&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/applyEdit request is sent from the server to the client to modify resource on the</span>
-<span class="doccomment">/// client side.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ApplyWorkspaceEdit</span> {}
+<span class="doccomment">/// The workspace/applyEdit request is sent from the server to the client to modify resource on the
+/// client side.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ApplyWorkspaceEdit {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ApplyWorkspaceEdit</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ApplyWorkspaceEditParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">ApplyWorkspaceEditResponse</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/applyEdit&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ApplyWorkspaceEdit {
+    <span class="kw">type </span>Params = ApplyWorkspaceEditParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ApplyWorkspaceEditResponse;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/applyEdit&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/configuration request is sent from the server to the client to fetch configuration settings</span>
-<span class="doccomment">/// from the client. The request can fetch several configuration settings in one roundtrip.</span>
-<span class="doccomment">/// The order of the returned configuration settings correspond to the order of the passed ConfigurationItems</span>
-<span class="doccomment">/// (e.g. the first item in the response is the result for the first configuration item in the params).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A ConfigurationItem consists of the configuration section to ask for and an additional scope URI.</span>
-<span class="doccomment">/// The configuration section ask for is defined by the server and doesn’t necessarily need to correspond to</span>
-<span class="doccomment">/// the configuration store used be the client. So a server might ask for a configuration cpp.formatterOptions</span>
-<span class="doccomment">/// but the client stores the configuration in a XML store layout differently.</span>
-<span class="doccomment">/// It is up to the client to do the necessary conversion. If a scope URI is provided the client should return</span>
-<span class="doccomment">/// the setting scoped to the provided resource. If the client for example uses EditorConfig to manage its</span>
-<span class="doccomment">/// settings the configuration should be returned for the passed resource URI. If the client can’t provide a</span>
-<span class="doccomment">/// configuration setting for a given scope then null need to be present in the returned array.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WorkspaceConfiguration</span> {}
+<span class="doccomment">/// The workspace/configuration request is sent from the server to the client to fetch configuration settings
+/// from the client. The request can fetch several configuration settings in one roundtrip.
+/// The order of the returned configuration settings correspond to the order of the passed ConfigurationItems
+/// (e.g. the first item in the response is the result for the first configuration item in the params).
+///
+/// A ConfigurationItem consists of the configuration section to ask for and an additional scope URI.
+/// The configuration section ask for is defined by the server and doesn’t necessarily need to correspond to
+/// the configuration store used be the client. So a server might ask for a configuration cpp.formatterOptions
+/// but the client stores the configuration in a XML store layout differently.
+/// It is up to the client to do the necessary conversion. If a scope URI is provided the client should return
+/// the setting scoped to the provided resource. If the client for example uses EditorConfig to manage its
+/// settings the configuration should be returned for the passed resource URI. If the client can’t provide a
+/// configuration setting for a given scope then null need to be present in the returned array.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WorkspaceConfiguration {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WorkspaceConfiguration</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ConfigurationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/configuration&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WorkspaceConfiguration {
+    <span class="kw">type </span>Params = ConfigurationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= Vec&lt;Value&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/configuration&quot;</span>;
 }
 
-<span class="doccomment">/// The code action request is sent from the client to the server to compute commands for a given text document</span>
-<span class="doccomment">/// and range. The request is triggered when the user moves the cursor into a problem marker in the editor or</span>
-<span class="doccomment">/// presses the lightbulb associated with a marker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeActionRequest</span> {}
+<span class="doccomment">/// The code action request is sent from the client to the server to compute commands for a given text document
+/// and range. The request is triggered when the user moves the cursor into a problem marker in the editor or
+/// presses the lightbulb associated with a marker.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>CodeActionRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CodeActionRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CodeActionParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodeActionResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/codeAction&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CodeActionRequest {
+    <span class="kw">type </span>Params = CodeActionParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;CodeActionResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/codeAction&quot;</span>;
 }
 
-<span class="doccomment">/// The request is sent from the client to the server to resolve additional information for a given code action.</span>
-<span class="doccomment">/// This is usually used to compute the `edit` property of a code action to avoid its unnecessary computation</span>
-<span class="doccomment">/// during the `textDocument/codeAction` request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeActionResolveRequest</span> {}
+<span class="doccomment">/// The request is sent from the client to the server to resolve additional information for a given code action.
+/// This is usually used to compute the `edit` property of a code action to avoid its unnecessary computation
+/// during the `textDocument/codeAction` request.
+///
+/// since 3.16.0
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>CodeActionResolveRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CodeActionResolveRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CodeAction</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">CodeAction</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;codeAction/resolve&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CodeActionResolveRequest {
+    <span class="kw">type </span>Params = CodeAction;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= CodeAction;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;codeAction/resolve&quot;</span>;
 }
 
-<span class="doccomment">/// The code lens request is sent from the client to the server to compute code lenses for a given text document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeLensRequest</span> {}
+<span class="doccomment">/// The code lens request is sent from the client to the server to compute code lenses for a given text document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>CodeLensRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CodeLensRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CodeLensParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeLens</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/codeLens&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CodeLensRequest {
+    <span class="kw">type </span>Params = CodeLensParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;CodeLens&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/codeLens&quot;</span>;
 }
 
-<span class="doccomment">/// The code lens resolve request is sent from the client to the server to resolve the command for a</span>
-<span class="doccomment">/// given code lens item.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeLensResolve</span> {}
+<span class="doccomment">/// The code lens resolve request is sent from the client to the server to resolve the command for a
+/// given code lens item.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>CodeLensResolve {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CodeLensResolve</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CodeLens</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">CodeLens</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;codeLens/resolve&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CodeLensResolve {
+    <span class="kw">type </span>Params = CodeLens;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= CodeLens;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;codeLens/resolve&quot;</span>;
 }
 
-<span class="doccomment">/// The document links request is sent from the client to the server to request the location of links in a document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentLinkRequest</span> {}
+<span class="doccomment">/// The document links request is sent from the client to the server to request the location of links in a document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DocumentLinkRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">DocumentLinkRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentLinkParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DocumentLink</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentLink&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>DocumentLinkRequest {
+    <span class="kw">type </span>Params = DocumentLinkParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;DocumentLink&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/documentLink&quot;</span>;
 }
 
-<span class="doccomment">/// The document link resolve request is sent from the client to the server to resolve the target of</span>
-<span class="doccomment">/// a given document link.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentLinkResolve</span> {}
+<span class="doccomment">/// The document link resolve request is sent from the client to the server to resolve the target of
+/// a given document link.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DocumentLinkResolve {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">DocumentLinkResolve</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentLink</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">DocumentLink</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;documentLink/resolve&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>DocumentLinkResolve {
+    <span class="kw">type </span>Params = DocumentLink;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= DocumentLink;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;documentLink/resolve&quot;</span>;
 }
 
-<span class="doccomment">/// The document formatting request is sent from the server to the client to format a whole document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Formatting</span> {}
+<span class="doccomment">/// The document formatting request is sent from the server to the client to format a whole document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Formatting {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">Formatting</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentFormattingParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/formatting&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>Formatting {
+    <span class="kw">type </span>Params = DocumentFormattingParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;TextEdit&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/formatting&quot;</span>;
 }
 
-<span class="doccomment">/// The document range formatting request is sent from the client to the server to format a given range in a document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RangeFormatting</span> {}
+<span class="doccomment">/// The document range formatting request is sent from the client to the server to format a given range in a document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>RangeFormatting {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">RangeFormatting</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentRangeFormattingParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/rangeFormatting&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>RangeFormatting {
+    <span class="kw">type </span>Params = DocumentRangeFormattingParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;TextEdit&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/rangeFormatting&quot;</span>;
 }
 
-<span class="doccomment">/// The document on type formatting request is sent from the client to the server to format parts of</span>
-<span class="doccomment">/// the document during typing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnTypeFormatting</span> {}
+<span class="doccomment">/// The document on type formatting request is sent from the client to the server to format parts of
+/// the document during typing.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>OnTypeFormatting {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">OnTypeFormatting</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentOnTypeFormattingParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextEdit</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/onTypeFormatting&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>OnTypeFormatting {
+    <span class="kw">type </span>Params = DocumentOnTypeFormattingParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;TextEdit&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/onTypeFormatting&quot;</span>;
 }
 
-<span class="doccomment">/// The linked editing request is sent from the client to the server to return for a given position in a document</span>
-<span class="doccomment">/// the range of the symbol at the position and all ranges that have the same content.</span>
-<span class="doccomment">/// Optionally a word pattern can be returned to describe valid contents. A rename to one of the ranges can be applied</span>
-<span class="doccomment">/// to all other ranges if the new content is valid. If no result-specific word pattern is provided, the word pattern from</span>
-<span class="doccomment">/// the client’s language configuration is used.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LinkedEditingRange</span> {}
+<span class="doccomment">/// The linked editing request is sent from the client to the server to return for a given position in a document
+/// the range of the symbol at the position and all ranges that have the same content.
+/// Optionally a word pattern can be returned to describe valid contents. A rename to one of the ranges can be applied
+/// to all other ranges if the new content is valid. If no result-specific word pattern is provided, the word pattern from
+/// the client’s language configuration is used.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>LinkedEditingRange {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">LinkedEditingRange</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">LinkedEditingRangeParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LinkedEditingRanges</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/linkedEditingRange&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>LinkedEditingRange {
+    <span class="kw">type </span>Params = LinkedEditingRangeParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;LinkedEditingRanges&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/linkedEditingRange&quot;</span>;
 }
 
-<span class="doccomment">/// The rename request is sent from the client to the server to perform a workspace-wide rename of a symbol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Rename</span> {}
+<span class="doccomment">/// The rename request is sent from the client to the server to perform a workspace-wide rename of a symbol.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Rename {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">Rename</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">RenameParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WorkspaceEdit</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/rename&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>Rename {
+    <span class="kw">type </span>Params = RenameParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;WorkspaceEdit&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/rename&quot;</span>;
 }
 
-<span class="doccomment">/// The document color request is sent from the client to the server to list all color references found in a given text document.</span>
-<span class="doccomment">/// Along with the range, a color value in RGB is returned.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentColor</span> {}
+<span class="doccomment">/// The document color request is sent from the client to the server to list all color references found in a given text document.
+/// Along with the range, a color value in RGB is returned.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DocumentColor {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">DocumentColor</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DocumentColorParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColorInformation</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentColor&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>DocumentColor {
+    <span class="kw">type </span>Params = DocumentColorParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= Vec&lt;ColorInformation&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/documentColor&quot;</span>;
 }
 
-<span class="doccomment">/// The color presentation request is sent from the client to the server to obtain a list of presentations for a color value</span>
-<span class="doccomment">/// at a given location.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ColorPresentationRequest</span> {}
+<span class="doccomment">/// The color presentation request is sent from the client to the server to obtain a list of presentations for a color value
+/// at a given location.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ColorPresentationRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ColorPresentationRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ColorPresentationParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColorPresentation</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/colorPresentation&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ColorPresentationRequest {
+    <span class="kw">type </span>Params = ColorPresentationParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= Vec&lt;ColorPresentation&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/colorPresentation&quot;</span>;
 }
 
-<span class="doccomment">/// The folding range request is sent from the client to the server to return all folding ranges found in a given text document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FoldingRangeRequest</span> {}
+<span class="doccomment">/// The folding range request is sent from the client to the server to return all folding ranges found in a given text document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>FoldingRangeRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">FoldingRangeRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">FoldingRangeParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FoldingRange</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/foldingRange&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>FoldingRangeRequest {
+    <span class="kw">type </span>Params = FoldingRangeParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;FoldingRange&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/foldingRange&quot;</span>;
 }
 
-<span class="doccomment">/// The prepare rename request is sent from the client to the server to setup and test the validity of a rename operation</span>
-<span class="doccomment">/// at a given location.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PrepareRenameRequest</span> {}
+<span class="doccomment">/// The prepare rename request is sent from the client to the server to setup and test the validity of a rename operation
+/// at a given location.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>PrepareRenameRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">PrepareRenameRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">TextDocumentPositionParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrepareRenameResponse</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/prepareRename&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>PrepareRenameRequest {
+    <span class="kw">type </span>Params = TextDocumentPositionParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;PrepareRenameResponse&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/prepareRename&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/workspaceFolders request is sent from the server to the client to fetch the current open list of</span>
-<span class="doccomment">/// workspace folders. Returns null in the response if only a single file is open in the tool.</span>
-<span class="doccomment">/// Returns an empty array if a workspace is open but no folders are configured.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WorkspaceFoldersRequest</span> {}
+<span class="doccomment">/// The workspace/workspaceFolders request is sent from the server to the client to fetch the current open list of
+/// workspace folders. Returns null in the response if only a single file is open in the tool.
+/// Returns an empty array if a workspace is open but no folders are configured.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WorkspaceFoldersRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WorkspaceFoldersRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WorkspaceFolder</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/workspaceFolders&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WorkspaceFoldersRequest {
+    <span class="kw">type </span>Params = ();
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;WorkspaceFolder&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/workspaceFolders&quot;</span>;
 }
 
-<span class="doccomment">/// The `window/workDoneProgress/create` request is sent from the server</span>
-<span class="doccomment">/// to the clientto ask the client to create a work done progress.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WorkDoneProgressCreate</span> {}
+<span class="doccomment">/// The `window/workDoneProgress/create` request is sent from the server
+/// to the clientto ask the client to create a work done progress.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WorkDoneProgressCreate {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WorkDoneProgressCreate</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">WorkDoneProgressCreateParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/workDoneProgress/create&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WorkDoneProgressCreate {
+    <span class="kw">type </span>Params = WorkDoneProgressCreateParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/workDoneProgress/create&quot;</span>;
 }
 
-<span class="doccomment">/// The selection range request is sent from the client to the server to return</span>
-<span class="doccomment">/// suggested selection ranges at given positions. A selection range is a range</span>
-<span class="doccomment">/// around the cursor position which the user might be interested in selecting.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A selection range in the return array is for the position in the provided parameters at the same index.</span>
-<span class="doccomment">/// Therefore `positions[i]` must be contained in `result[i].range`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Typically, but not necessary, selection ranges correspond to the nodes of the</span>
-<span class="doccomment">/// syntax tree.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SelectionRangeRequest</span> {}
+<span class="doccomment">/// The selection range request is sent from the client to the server to return
+/// suggested selection ranges at given positions. A selection range is a range
+/// around the cursor position which the user might be interested in selecting.
+///
+/// A selection range in the return array is for the position in the provided parameters at the same index.
+/// Therefore `positions[i]` must be contained in `result[i].range`.
+///
+/// Typically, but not necessary, selection ranges correspond to the nodes of the
+/// syntax tree.
+</span><span class="kw">pub enum </span>SelectionRangeRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SelectionRangeRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">SelectionRangeParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionRange</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/selectionRange&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SelectionRangeRequest {
+    <span class="kw">type </span>Params = SelectionRangeParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionRange&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/selectionRange&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CallHierarchyPrepare</span> {}
+<span class="kw">pub enum </span>CallHierarchyPrepare {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CallHierarchyPrepare</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CallHierarchyPrepareParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CallHierarchyItem</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/prepareCallHierarchy&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CallHierarchyPrepare {
+    <span class="kw">type </span>Params = CallHierarchyPrepareParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;CallHierarchyItem&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/prepareCallHierarchy&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CallHierarchyIncomingCalls</span> {}
+<span class="kw">pub enum </span>CallHierarchyIncomingCalls {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CallHierarchyIncomingCalls</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CallHierarchyIncomingCallsParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CallHierarchyIncomingCall</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;callHierarchy/incomingCalls&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CallHierarchyIncomingCalls {
+    <span class="kw">type </span>Params = CallHierarchyIncomingCallsParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;CallHierarchyIncomingCall&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;callHierarchy/incomingCalls&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CallHierarchyOutgoingCalls</span> {}
+<span class="kw">pub enum </span>CallHierarchyOutgoingCalls {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CallHierarchyOutgoingCalls</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CallHierarchyOutgoingCallsParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CallHierarchyOutgoingCall</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;callHierarchy/outgoingCalls&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CallHierarchyOutgoingCalls {
+    <span class="kw">type </span>Params = CallHierarchyOutgoingCallsParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;CallHierarchyOutgoingCall&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;callHierarchy/outgoingCalls&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensFullRequest</span> {}
+<span class="kw">pub enum </span>SemanticTokensFullRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SemanticTokensFullRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">SemanticTokensParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SemanticTokensResult</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/semanticTokens/full&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SemanticTokensFullRequest {
+    <span class="kw">type </span>Params = SemanticTokensParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;SemanticTokensResult&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/semanticTokens/full&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensFullDeltaRequest</span> {}
+<span class="kw">pub enum </span>SemanticTokensFullDeltaRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SemanticTokensFullDeltaRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">SemanticTokensDeltaParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SemanticTokensFullDeltaResult</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/semanticTokens/full/delta&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SemanticTokensFullDeltaRequest {
+    <span class="kw">type </span>Params = SemanticTokensDeltaParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;SemanticTokensFullDeltaResult&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/semanticTokens/full/delta&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensRangeRequest</span> {}
+<span class="kw">pub enum </span>SemanticTokensRangeRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SemanticTokensRangeRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">SemanticTokensRangeParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SemanticTokensRangeResult</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/semanticTokens/range&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SemanticTokensRangeRequest {
+    <span class="kw">type </span>Params = SemanticTokensRangeParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;SemanticTokensRangeResult&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/semanticTokens/range&quot;</span>;
 }
 
-<span class="doccomment">/// The `workspace/semanticTokens/refresh` request is sent from the server to the client.</span>
-<span class="doccomment">/// Servers can use it to ask clients to refresh the editors for which this server provides semantic tokens.</span>
-<span class="doccomment">/// As a result the client should ask the server to recompute the semantic tokens for these editors.</span>
-<span class="doccomment">/// This is useful if a server detects a project wide configuration change which requires a re-calculation of all semantic tokens.</span>
-<span class="doccomment">/// Note that the client still has the freedom to delay the re-calculation of the semantic tokens if for example an editor is currently not visible.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensRefesh</span> {}
+<span class="doccomment">/// The `workspace/semanticTokens/refresh` request is sent from the server to the client.
+/// Servers can use it to ask clients to refresh the editors for which this server provides semantic tokens.
+/// As a result the client should ask the server to recompute the semantic tokens for these editors.
+/// This is useful if a server detects a project wide configuration change which requires a re-calculation of all semantic tokens.
+/// Note that the client still has the freedom to delay the re-calculation of the semantic tokens if for example an editor is currently not visible.
+</span><span class="kw">pub enum </span>SemanticTokensRefesh {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">SemanticTokensRefesh</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/semanticTokens/refresh&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>SemanticTokensRefesh {
+    <span class="kw">type </span>Params = ();
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/semanticTokens/refresh&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/codeLens/refresh request is sent from the server to the client.</span>
-<span class="doccomment">/// Servers can use it to ask clients to refresh the code lenses currently shown in editors.</span>
-<span class="doccomment">/// As a result the client should ask the server to recompute the code lenses for these editors.</span>
-<span class="doccomment">/// This is useful if a server detects a configuration change which requires a re-calculation of all code lenses.</span>
-<span class="doccomment">/// Note that the client still has the freedom to delay the re-calculation of the code lenses if for example an editor is currently not visible.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeLensRefresh</span> {}
+<span class="doccomment">/// The workspace/codeLens/refresh request is sent from the server to the client.
+/// Servers can use it to ask clients to refresh the code lenses currently shown in editors.
+/// As a result the client should ask the server to recompute the code lenses for these editors.
+/// This is useful if a server detects a configuration change which requires a re-calculation of all code lenses.
+/// Note that the client still has the freedom to delay the re-calculation of the code lenses if for example an editor is currently not visible.
+</span><span class="kw">pub enum </span>CodeLensRefresh {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">CodeLensRefresh</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> ();
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/codeLens/refresh&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>CodeLensRefresh {
+    <span class="kw">type </span>Params = ();
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/codeLens/refresh&quot;</span>;
 }
 
-<span class="doccomment">/// The will create files request is sent from the client to the server before files are actually created as long as the creation is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are created. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep creates fast and reliable.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WillCreateFiles</span> {}
+<span class="doccomment">/// The will create files request is sent from the client to the server before files are actually created as long as the creation is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are created. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep creates fast and reliable.
+</span><span class="kw">pub enum </span>WillCreateFiles {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WillCreateFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CreateFilesParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WorkspaceEdit</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/willCreateFiles&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WillCreateFiles {
+    <span class="kw">type </span>Params = CreateFilesParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;WorkspaceEdit&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/willCreateFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The will rename files request is sent from the client to the server before files are actually renamed as long as the rename is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are renamed. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep renames fast and reliable.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WillRenameFiles</span> {}
+<span class="doccomment">/// The will rename files request is sent from the client to the server before files are actually renamed as long as the rename is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are renamed. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep renames fast and reliable.
+</span><span class="kw">pub enum </span>WillRenameFiles {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WillRenameFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">RenameFilesParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WorkspaceEdit</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/willRenameFiles&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WillRenameFiles {
+    <span class="kw">type </span>Params = RenameFilesParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;WorkspaceEdit&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/willRenameFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The will delete files request is sent from the client to the server before files are actually deleted as long as the deletion is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are deleted. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep deletes fast and reliable.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WillDeleteFiles</span> {}
+<span class="doccomment">/// The will delete files request is sent from the client to the server before files are actually deleted as long as the deletion is triggered from within the client. The request can return a WorkspaceEdit which will be applied to workspace before the files are deleted. Please note that clients might drop results if computing the edit took too long or if a server constantly fails on this request. This is done to keep deletes fast and reliable.
+</span><span class="kw">pub enum </span>WillDeleteFiles {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">WillDeleteFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DeleteFilesParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WorkspaceEdit</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/willDeleteFiles&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>WillDeleteFiles {
+    <span class="kw">type </span>Params = DeleteFilesParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;WorkspaceEdit&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/willDeleteFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The show document request is sent from a server to a client to ask the client to display a particular document in the user interface.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShowDocument</span> {}
+<span class="doccomment">/// The show document request is sent from a server to a client to ask the client to display a particular document in the user interface.
+</span><span class="kw">pub enum </span>ShowDocument {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">ShowDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ShowDocumentParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="ident">ShowDocumentResult</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/showDocument&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>ShowDocument {
+    <span class="kw">type </span>Params = ShowDocumentParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= ShowDocumentResult;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/showDocument&quot;</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MonikerRequest</span> {}
+<span class="kw">pub enum </span>MonikerRequest {}
 
-<span class="kw">impl</span> <span class="ident">Request</span> <span class="kw">for</span> <span class="ident">MonikerRequest</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">MonikerParams</span>;
-    <span class="kw">type</span> <span class="prelude-ty">Result</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Moniker</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/moniker&quot;</span>;
+<span class="kw">impl </span>Request <span class="kw">for </span>MonikerRequest {
+    <span class="kw">type </span>Params = MonikerParams;
+    <span class="kw">type </span><span class="prelude-ty">Result </span>= <span class="prelude-ty">Option</span>&lt;Vec&lt;Moniker&gt;&gt;;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/moniker&quot;</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">fake_call</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>()
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">Request</span>,
-        <span class="ident">R::Params</span>: <span class="ident">serde::Serialize</span>,
-        <span class="ident">R::Result</span>: <span class="ident">serde::de::DeserializeOwned</span>,
+    <span class="kw">fn </span>fake_call&lt;R&gt;()
+    <span class="kw">where
+        </span>R: Request,
+        R::Params: serde::Serialize,
+        R::Result: serde::de::DeserializeOwned,
     {
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">check_macro</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>) =&gt; {
-            <span class="comment">// check whethe the macro name matches the method</span>
-            <span class="macro">assert_eq!</span>(<span class="op">&lt;</span><span class="macro">lsp_request!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="kw">as</span> <span class="ident">Request</span><span class="op">&gt;</span><span class="ident">::METHOD</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
-            <span class="comment">// test whether type checking passes for each component</span>
-            <span class="ident">fake_call</span>::<span class="op">&lt;</span><span class="macro">lsp_request!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)<span class="op">&gt;</span>();
+    <span class="macro">macro_rules! </span>check_macro {
+        (<span class="macro-nonterminal">$name</span>:tt) =&gt; {
+            <span class="comment">// check whethe the macro name matches the method
+            </span><span class="macro">assert_eq!</span>(&lt;<span class="macro">lsp_request!</span>(<span class="macro-nonterminal">$name</span>) <span class="kw">as </span>Request&gt;::METHOD, <span class="macro-nonterminal">$name</span>);
+            <span class="comment">// test whether type checking passes for each component
+            </span>fake_call::&lt;<span class="macro">lsp_request!</span>(<span class="macro-nonterminal">$name</span>)&gt;();
         };
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">check_macro_definitions</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>check_macro_definitions() {
         <span class="macro">check_macro!</span>(<span class="string">&quot;initialize&quot;</span>);
         <span class="macro">check_macro!</span>(<span class="string">&quot;shutdown&quot;</span>);
 
@@ -1712,9 +1712,9 @@
         <span class="macro">check_macro!</span>(<span class="string">&quot;callHierarchy/outgoingCalls&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;proposed&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">check_proposed_macro_definitions</span>() {}
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;proposed&quot;</span>)]
+    </span><span class="kw">fn </span>check_proposed_macro_definitions() {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

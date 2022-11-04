@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/csync.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>csync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/csync.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>csync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -198,205 +198,205 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! CSYNC record for synchronizing data from a child zone to the parent</span>
+</span><span class="doccomment">//! CSYNC record for synchronizing data from a child zone to the parent
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::type_bit_map</span>::{<span class="ident">decode_type_bit_maps</span>, <span class="ident">encode_type_bit_maps</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::RecordType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::type_bit_map::{decode_type_bit_maps, encode_type_bit_maps};
+<span class="kw">use </span><span class="kw">crate</span>::rr::RecordType;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 7477, Child-to-Parent Synchronization in DNS, March 2015][rfc7477]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.1.1.  The CSYNC Resource Record Wire Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The CSYNC RDATA consists of the following fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                       1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-<span class="doccomment">///   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-<span class="doccomment">///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">///  |                          SOA Serial                           |</span>
-<span class="doccomment">///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">///  |       Flags                   |            Type Bit Map       /</span>
-<span class="doccomment">///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">///  /                     Type Bit Map (continued)                  /</span>
-<span class="doccomment">///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [rfc7477]: https://tools.ietf.org/html/rfc7477</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CSYNC</span> {
-    <span class="ident">soa_serial</span>: <span class="ident">u32</span>,
-    <span class="ident">immediate</span>: <span class="ident">bool</span>,
-    <span class="ident">soa_minimum</span>: <span class="ident">bool</span>,
-    <span class="ident">type_bit_maps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [RFC 7477, Child-to-Parent Synchronization in DNS, March 2015][rfc7477]
+///
+/// ```text
+/// 2.1.1.  The CSYNC Resource Record Wire Format
+///
+/// The CSYNC RDATA consists of the following fields:
+///
+///                       1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+///   0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///  |                          SOA Serial                           |
+///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///  |       Flags                   |            Type Bit Map       /
+///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///  /                     Type Bit Map (continued)                  /
+///  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/// ```
+///
+/// [rfc7477]: https://tools.ietf.org/html/rfc7477
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>CSYNC {
+    soa_serial: u32,
+    immediate: bool,
+    soa_minimum: bool,
+    type_bit_maps: Vec&lt;RecordType&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CSYNC</span> {
-    <span class="doccomment">/// Creates a new CSYNC record data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `soa_serial` - A serial number for the zone</span>
-    <span class="doccomment">/// * `immediate` - A flag signalling if the change should happen immediately</span>
-    <span class="doccomment">/// * `soa_minimum` - A flag to used to signal if the soa_serial should be validated</span>
-    <span class="doccomment">/// * `type_bit_maps` - a bit map of the types to synchronize</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The new CSYNC record data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">soa_serial</span>: <span class="ident">u32</span>,
-        <span class="ident">immediate</span>: <span class="ident">bool</span>,
-        <span class="ident">soa_minimum</span>: <span class="ident">bool</span>,
-        <span class="ident">type_bit_maps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">soa_serial</span>,
-            <span class="ident">immediate</span>,
-            <span class="ident">soa_minimum</span>,
-            <span class="ident">type_bit_maps</span>,
+<span class="kw">impl </span>CSYNC {
+    <span class="doccomment">/// Creates a new CSYNC record data.
+    ///
+    /// # Arguments
+    ///
+    /// * `soa_serial` - A serial number for the zone
+    /// * `immediate` - A flag signalling if the change should happen immediately
+    /// * `soa_minimum` - A flag to used to signal if the soa_serial should be validated
+    /// * `type_bit_maps` - a bit map of the types to synchronize
+    ///
+    /// # Return value
+    ///
+    /// The new CSYNC record data.
+    </span><span class="kw">pub fn </span>new(
+        soa_serial: u32,
+        immediate: bool,
+        soa_minimum: bool,
+        type_bit_maps: Vec&lt;RecordType&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            soa_serial,
+            immediate,
+            soa_minimum,
+            type_bit_maps,
         }
     }
 
-    <span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc7477#section-2.1.1.2.1), Child-to-Parent Synchronization in DNS, March 2015</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 2.1.1.2.1.  The Type Bit Map Field</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The Type Bit Map field indicates the record types to be processed by</span>
-    <span class="doccomment">///    the parental agent, according to the procedures in Section 3.  The</span>
-    <span class="doccomment">///    Type Bit Map field is encoded in the same way as the Type Bit Map</span>
-    <span class="doccomment">///    field of the NSEC record, described in [RFC4034], Section 4.1.2.  If</span>
-    <span class="doccomment">///    a bit has been set that a parental agent implementation does not</span>
-    <span class="doccomment">///    understand, the parental agent MUST NOT act upon the record.</span>
-    <span class="doccomment">///    Specifically, a parental agent must not simply copy the data, and it</span>
-    <span class="doccomment">///    must understand the semantics associated with a bit in the Type Bit</span>
-    <span class="doccomment">///    Map field that has been set to 1.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_bit_maps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">RecordType</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_bit_maps</span>
+    <span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc7477#section-2.1.1.2.1), Child-to-Parent Synchronization in DNS, March 2015
+    ///
+    /// ```text
+    /// 2.1.1.2.1.  The Type Bit Map Field
+    ///
+    ///    The Type Bit Map field indicates the record types to be processed by
+    ///    the parental agent, according to the procedures in Section 3.  The
+    ///    Type Bit Map field is encoded in the same way as the Type Bit Map
+    ///    field of the NSEC record, described in [RFC4034], Section 4.1.2.  If
+    ///    a bit has been set that a parental agent implementation does not
+    ///    understand, the parental agent MUST NOT act upon the record.
+    ///    Specifically, a parental agent must not simply copy the data, and it
+    ///    must understand the semantics associated with a bit in the Type Bit
+    ///    Map field that has been set to 1.
+    /// ```
+    </span><span class="kw">pub fn </span>type_bit_maps(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[RecordType] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.type_bit_maps
     }
 
-    <span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc7477#section-2.1.1.2), Child-to-Parent Synchronization in DNS, March 2015</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 2.1.1.2.  The Flags Field</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The Flags field contains 16 bits of boolean flags that define</span>
-    <span class="doccomment">///    operations that affect the processing of the CSYNC record.  The flags</span>
-    <span class="doccomment">///    defined in this document are as follows:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///       0x00 0x01: &quot;immediate&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///       0x00 0x02: &quot;soaminimum&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The definitions for how the flags are to be used can be found in</span>
-    <span class="doccomment">///    Section 3.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The remaining flags are reserved for use by future specifications.</span>
-    <span class="doccomment">///    Undefined flags MUST be set to 0 by CSYNC publishers.  Parental</span>
-    <span class="doccomment">///    agents MUST NOT process a CSYNC record if it contains a 1 value for a</span>
-    <span class="doccomment">///    flag that is unknown to or unsupported by the parental agent.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">immediate</span> {
-            <span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="number">0b0000_0001</span>
-        };
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">soa_minimum</span> {
-            <span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="number">0b0000_0010</span>
-        };
-        <span class="ident">flags</span>
+    <span class="doccomment">/// [RFC 7477](https://tools.ietf.org/html/rfc7477#section-2.1.1.2), Child-to-Parent Synchronization in DNS, March 2015
+    ///
+    /// ```text
+    /// 2.1.1.2.  The Flags Field
+    ///
+    ///    The Flags field contains 16 bits of boolean flags that define
+    ///    operations that affect the processing of the CSYNC record.  The flags
+    ///    defined in this document are as follows:
+    ///
+    ///       0x00 0x01: &quot;immediate&quot;
+    ///
+    ///       0x00 0x02: &quot;soaminimum&quot;
+    ///
+    ///    The definitions for how the flags are to be used can be found in
+    ///    Section 3.
+    ///
+    ///    The remaining flags are reserved for use by future specifications.
+    ///    Undefined flags MUST be set to 0 by CSYNC publishers.  Parental
+    ///    agents MUST NOT process a CSYNC record if it contains a 1 value for a
+    ///    flag that is unknown to or unsupported by the parental agent.
+    /// ```
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="kw">let </span><span class="kw-2">mut </span>flags: u16 = <span class="number">0</span>;
+        <span class="kw">if </span><span class="self">self</span>.immediate {
+            flags |= <span class="number">0b0000_0001
+        </span>};
+        <span class="kw">if </span><span class="self">self</span>.soa_minimum {
+            flags |= <span class="number">0b0000_0010
+        </span>};
+        flags
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">CSYNC</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">start_idx</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>();
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;, rdata_length: Restrict&lt;u16&gt;) -&gt; ProtoResult&lt;CSYNC&gt; {
+    <span class="kw">let </span>start_idx = decoder.index();
 
-    <span class="kw">let</span> <span class="ident">soa_serial</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u32</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>();
+    <span class="kw">let </span>soa_serial = decoder.read_u32()<span class="question-mark">?</span>.unverified();
 
-    <span class="kw">let</span> <span class="ident">flags</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">decoder</span>
-        .<span class="ident">read_u16</span>()<span class="question-mark">?</span>
-        .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">flags</span><span class="op">|</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="number">0b1111_1100</span> <span class="op">==</span> <span class="number">0</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">flags</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::UnrecognizedCsyncFlags</span>(<span class="ident">flags</span>)))<span class="question-mark">?</span>;
+    <span class="kw">let </span>flags: u16 = decoder
+        .read_u16()<span class="question-mark">?
+        </span>.verify_unwrap(|flags| flags &amp; <span class="number">0b1111_1100 </span>== <span class="number">0</span>)
+        .map_err(|flags| ProtoError::from(ProtoErrorKind::UnrecognizedCsyncFlags(flags)))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">immediate</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="number">0b0000_0001</span> <span class="op">==</span> <span class="number">0b0000_0001</span>;
-    <span class="kw">let</span> <span class="ident">soa_minimum</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">flags</span> <span class="op">&amp;</span> <span class="number">0b0000_0010</span> <span class="op">==</span> <span class="number">0b0000_0010</span>;
+    <span class="kw">let </span>immediate: bool = flags &amp; <span class="number">0b0000_0001 </span>== <span class="number">0b0000_0001</span>;
+    <span class="kw">let </span>soa_minimum: bool = flags &amp; <span class="number">0b0000_0010 </span>== <span class="number">0b0000_0010</span>;
 
-    <span class="kw">let</span> <span class="ident">bit_map_len</span> <span class="op">=</span> <span class="ident">rdata_length</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>)
-        .<span class="ident">checked_sub</span>(<span class="ident">decoder</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="ident">start_idx</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;invalid rdata length in CSYNC&quot;</span>))<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">record_types</span> <span class="op">=</span> <span class="ident">decode_type_bit_maps</span>(<span class="ident">decoder</span>, <span class="ident">bit_map_len</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>bit_map_len = rdata_length
+        .map(|u| u <span class="kw">as </span>usize)
+        .checked_sub(decoder.index() - start_idx)
+        .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;invalid rdata length in CSYNC&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>record_types = decode_type_bit_maps(decoder, bit_map_len)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">CSYNC::new</span>(<span class="ident">soa_serial</span>, <span class="ident">immediate</span>, <span class="ident">soa_minimum</span>, <span class="ident">record_types</span>))
+    <span class="prelude-val">Ok</span>(CSYNC::new(soa_serial, immediate, soa_minimum, record_types))
 }
 
-<span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">csync</span>: <span class="kw-2">&amp;</span><span class="ident">CSYNC</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">encoder</span>.<span class="ident">emit_u32</span>(<span class="ident">csync</span>.<span class="ident">soa_serial</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">csync</span>.<span class="ident">flags</span>())<span class="question-mark">?</span>;
-    <span class="ident">encode_type_bit_maps</span>(<span class="ident">encoder</span>, <span class="ident">csync</span>.<span class="ident">type_bit_maps</span>())<span class="question-mark">?</span>;
+<span class="doccomment">/// Write the RData from the given Decoder
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, csync: <span class="kw-2">&amp;</span>CSYNC) -&gt; ProtoResult&lt;()&gt; {
+    encoder.emit_u32(csync.soa_serial)<span class="question-mark">?</span>;
+    encoder.emit_u16(csync.flags())<span class="question-mark">?</span>;
+    encode_type_bit_maps(encoder, csync.type_bit_maps())<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CSYNC</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>CSYNC {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{soa_serial} {flags}&quot;</span>,
-            <span class="ident">soa_serial</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">soa_serial</span>,
-            <span class="ident">flags</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>(),
+            soa_serial = <span class="kw-2">&amp;</span><span class="self">self</span>.soa_serial,
+            flags = <span class="kw-2">&amp;</span><span class="self">self</span>.flags(),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> <span class="ident">ty</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">type_bit_maps</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">ty</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>ty <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.type_bit_maps {
+            <span class="macro">write!</span>(f, <span class="string">&quot; {}&quot;</span>, ty)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RecordType::A</span>, <span class="ident">RecordType::NS</span>, <span class="ident">RecordType::AAAA</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">let </span>types = <span class="macro">vec!</span>[RecordType::A, RecordType::NS, RecordType::AAAA];
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">CSYNC::new</span>(<span class="number">123</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="ident">types</span>);
+        <span class="kw">let </span>rdata = CSYNC::new(<span class="number">123</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, types);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">restrict</span> <span class="op">=</span> <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">restrict</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>restrict = Restrict::new(bytes.len() <span class="kw">as </span>u16);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder, restrict).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

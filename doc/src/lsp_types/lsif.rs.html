@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/lsif.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsif.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/lsif.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsif.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -336,343 +336,343 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types of Language Server Index Format (LSIF). LSIF is a standard format</span>
-<span class="doccomment">//! for language servers or other programming tools to dump their knowledge</span>
-<span class="doccomment">//! about a workspace.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Based on &lt;https://microsoft.github.io/language-server-protocol/specifications/lsif/0.6.0/specification/&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types of Language Server Index Format (LSIF). LSIF is a standard format
+//! for language servers or other programming tools to dump their knowledge
+//! about a workspace.
+//!
+//! Based on &lt;https://microsoft.github.io/language-server-protocol/specifications/lsif/0.6.0/specification/&gt;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Url</span>, <span class="ident">Range</span>};
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use crate</span>::{Url, Range};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Id</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::NumberOrString</span>;
+<span class="kw">pub type </span>Id = <span class="kw">crate</span>::NumberOrString;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LocationOrRangeId</span> {
-    <span class="ident">Location</span>(<span class="ident"><span class="kw">crate</span>::Location</span>),
-    <span class="ident">RangeId</span>(<span class="ident">Id</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>LocationOrRangeId {
+    Location(<span class="kw">crate</span>::Location),
+    RangeId(Id),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Entry</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Id</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Element</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Entry {
+    <span class="kw">pub </span>id: Id,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>data: Element,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Element</span> {
-    <span class="ident">Vertex</span>(<span class="ident">Vertex</span>),
-    <span class="ident">Edge</span>(<span class="ident">Edge</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(tag = <span class="string">&quot;type&quot;</span>)]
+</span><span class="kw">pub enum </span>Element {
+    Vertex(Vertex),
+    Edge(Edge),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToolInfo</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Default::default&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Vec::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>ToolInfo {
+    <span class="kw">pub </span>name: String,
+    <span class="attribute">#[serde(default = <span class="string">&quot;Default::default&quot;</span>)]
+    #[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>args: Vec&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>version: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Encoding</span> {
-    <span class="doccomment">/// Currently only &#39;utf-16&#39; is supported due to the limitations in LSP.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;utf-16&quot;</span>)]</span>
-    <span class="ident">Utf16</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub enum </span>Encoding {
+    <span class="doccomment">/// Currently only &#39;utf-16&#39; is supported due to the limitations in LSP.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;utf-16&quot;</span>)]
+    </span>Utf16,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RangeBasedDocumentSymbol</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Id</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Default::default&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Vec::is_empty&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">children</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RangeBasedDocumentSymbol</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>RangeBasedDocumentSymbol {
+    <span class="kw">pub </span>id: Id,
+    <span class="attribute">#[serde(default = <span class="string">&quot;Default::default&quot;</span>)]
+    #[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
+    </span><span class="kw">pub </span>children: Vec&lt;RangeBasedDocumentSymbol&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DocumentSymbolOrRangeBasedVec</span> {
-    <span class="ident">DocumentSymbol</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DocumentSymbol</span><span class="op">&gt;</span>),
-    <span class="ident">RangeBased</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RangeBasedDocumentSymbol</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>DocumentSymbolOrRangeBasedVec {
+    DocumentSymbol(Vec&lt;<span class="kw">crate</span>::DocumentSymbol&gt;),
+    RangeBased(Vec&lt;RangeBasedDocumentSymbol&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefinitionTag</span> {
-    <span class="doccomment">/// The text covered by the range     </span>
-    <span class="ident">text</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The symbol kind.</span>
-    <span class="ident">kind</span>: <span class="ident"><span class="kw">crate</span>::SymbolKind</span>,
-    <span class="doccomment">/// Indicates if this symbol is deprecated.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;std::ops::Not::not&quot;</span>)]</span>
-    <span class="ident">deprecated</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The full range of the definition not including leading/trailing whitespace but everything else, e.g comments and code.</span>
-    <span class="doccomment">/// The range must be included in fullRange.</span>
-    <span class="ident">full_range</span>: <span class="ident">Range</span>,
-    <span class="doccomment">/// Optional detail information for the definition.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">detail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DefinitionTag {
+    <span class="doccomment">/// The text covered by the range     
+    </span>text: String,
+    <span class="doccomment">/// The symbol kind.
+    </span>kind: <span class="kw">crate</span>::SymbolKind,
+    <span class="doccomment">/// Indicates if this symbol is deprecated.
+    </span><span class="attribute">#[serde(default)]
+    #[serde(skip_serializing_if = <span class="string">&quot;std::ops::Not::not&quot;</span>)]
+    </span>deprecated: bool,
+    <span class="doccomment">/// The full range of the definition not including leading/trailing whitespace but everything else, e.g comments and code.
+    /// The range must be included in fullRange.
+    </span>full_range: Range,
+    <span class="doccomment">/// Optional detail information for the definition.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeclarationTag</span> {
-    <span class="doccomment">/// The text covered by the range     </span>
-    <span class="ident">text</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The symbol kind.</span>
-    <span class="ident">kind</span>: <span class="ident"><span class="kw">crate</span>::SymbolKind</span>,
-    <span class="doccomment">/// Indicates if this symbol is deprecated.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="ident">deprecated</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The full range of the definition not including leading/trailing whitespace but everything else, e.g comments and code.</span>
-    <span class="doccomment">/// The range must be included in fullRange.</span>
-    <span class="ident">full_range</span>: <span class="ident">Range</span>,
-    <span class="doccomment">/// Optional detail information for the definition.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="ident">detail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DeclarationTag {
+    <span class="doccomment">/// The text covered by the range     
+    </span>text: String,
+    <span class="doccomment">/// The symbol kind.
+    </span>kind: <span class="kw">crate</span>::SymbolKind,
+    <span class="doccomment">/// Indicates if this symbol is deprecated.
+    </span><span class="attribute">#[serde(default)]
+    </span>deprecated: bool,
+    <span class="doccomment">/// The full range of the definition not including leading/trailing whitespace but everything else, e.g comments and code.
+    /// The range must be included in fullRange.
+    </span>full_range: Range,
+    <span class="doccomment">/// Optional detail information for the definition.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span>detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReferenceTag</span> {
-    <span class="ident">text</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ReferenceTag {
+    text: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownTag</span> {
-    <span class="ident">text</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>UnknownTag {
+    text: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RangeTag</span> {
-    <span class="ident">Definition</span>(<span class="ident">DefinitionTag</span>),
-    <span class="ident">Declaration</span>(<span class="ident">DeclarationTag</span>),
-    <span class="ident">Reference</span>(<span class="ident">ReferenceTag</span>),
-    <span class="ident">Unknown</span>(<span class="ident">UnknownTag</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(tag = <span class="string">&quot;type&quot;</span>)]
+</span><span class="kw">pub enum </span>RangeTag {
+    Definition(DefinitionTag),
+    Declaration(DeclarationTag),
+    Reference(ReferenceTag),
+    Unknown(UnknownTag),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;label&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Vertex</span> {
-    <span class="ident">MetaData</span>(<span class="ident">MetaData</span>),
-    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#the-project-vertex&gt;</span>
-    <span class="ident">Project</span>(<span class="ident">Project</span>),
-    <span class="ident">Document</span>(<span class="ident">Document</span>),
-    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#ranges&gt;</span>
-    <span class="ident">Range</span> {
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-        <span class="ident">range</span>: <span class="ident">Range</span>,
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-        <span class="ident">tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RangeTag</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(tag = <span class="string">&quot;label&quot;</span>)]
+</span><span class="kw">pub enum </span>Vertex {
+    MetaData(MetaData),
+    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#the-project-vertex&gt;
+    </span>Project(Project),
+    Document(Document),
+    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#ranges&gt;
+    </span>Range {
+        <span class="attribute">#[serde(flatten)]
+        </span>range: Range,
+        <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span>tag: <span class="prelude-ty">Option</span>&lt;RangeTag&gt;,
     },
-    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#result-set&gt;</span>
-    <span class="ident">ResultSet</span>(<span class="ident">ResultSet</span>),
-    <span class="ident">Moniker</span>(<span class="ident"><span class="kw">crate</span>::Moniker</span>),
-    <span class="ident">PackageInformation</span>(<span class="ident">PackageInformation</span>),
+    <span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#result-set&gt;
+    </span>ResultSet(ResultSet),
+    Moniker(<span class="kw">crate</span>::Moniker),
+    PackageInformation(PackageInformation),
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$event&quot;</span>)]</span>
-    <span class="ident">Event</span>(<span class="ident">Event</span>),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$event&quot;</span>)]
+    </span>Event(Event),
 
-    <span class="ident">DefinitionResult</span>,
-    <span class="ident">DeclarationResult</span>,
-    <span class="ident">TypeDefinitionResult</span>,
-    <span class="ident">ReferenceResult</span>,
-    <span class="ident">ImplementationResult</span>,
-    <span class="ident">FoldingRangeResult</span> {
-        <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::FoldingRange</span><span class="op">&gt;</span>,
+    DefinitionResult,
+    DeclarationResult,
+    TypeDefinitionResult,
+    ReferenceResult,
+    ImplementationResult,
+    FoldingRangeResult {
+        result: Vec&lt;<span class="kw">crate</span>::FoldingRange&gt;,
     },
-    <span class="ident">HoverResult</span> {
-        <span class="ident">result</span>: <span class="ident"><span class="kw">crate</span>::Hover</span>,
+    HoverResult {
+        result: <span class="kw">crate</span>::Hover,
     },
-    <span class="ident">DocumentSymbolResult</span> {
-        <span class="ident">result</span>: <span class="ident">DocumentSymbolOrRangeBasedVec</span>,
+    DocumentSymbolResult {
+        result: DocumentSymbolOrRangeBasedVec,
     },
-    <span class="ident">DocumentLinkResult</span> {
-        <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DocumentLink</span><span class="op">&gt;</span>,
+    DocumentLinkResult {
+        result: Vec&lt;<span class="kw">crate</span>::DocumentLink&gt;,
     },
-    <span class="ident">DiagnosticResult</span> {
-        <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Diagnostic</span><span class="op">&gt;</span>,
+    DiagnosticResult {
+        result: Vec&lt;<span class="kw">crate</span>::Diagnostic&gt;,
     },
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventKind</span> {
-    <span class="ident">Begin</span>,
-    <span class="ident">End</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub enum </span>EventKind {
+    Begin,
+    End,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventScope</span> {
-    <span class="ident">Document</span>,
-    <span class="ident">Project</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub enum </span>EventScope {
+    Document,
+    Project,
 }
 
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Event</span> {
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">EventKind</span>,
-    <span class="kw">pub</span> <span class="ident">scope</span>: <span class="ident">EventScope</span>,
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Id</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+</span><span class="kw">pub struct </span>Event {
+    <span class="kw">pub </span>kind: EventKind,
+    <span class="kw">pub </span>scope: EventScope,
+    <span class="kw">pub </span>data: Id,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">tag</span> <span class="op">=</span> <span class="string">&quot;label&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Edge</span> {
-    <span class="ident">Contains</span>(<span class="ident">EdgeDataMultiIn</span>),
-    <span class="ident">Moniker</span>(<span class="ident">EdgeData</span>),
-    <span class="ident">NextMoniker</span>(<span class="ident">EdgeData</span>),
-    <span class="ident">Next</span>(<span class="ident">EdgeData</span>),
-    <span class="ident">PackageInformation</span>(<span class="ident">EdgeData</span>),
-    <span class="ident">Item</span>(<span class="ident">Item</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(tag = <span class="string">&quot;label&quot;</span>)]
+</span><span class="kw">pub enum </span>Edge {
+    Contains(EdgeDataMultiIn),
+    Moniker(EdgeData),
+    NextMoniker(EdgeData),
+    Next(EdgeData),
+    PackageInformation(EdgeData),
+    Item(Item),
 
-    <span class="comment">// Methods</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/definition&quot;</span>)]</span>
-    <span class="ident">Definition</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/declaration&quot;</span>)]</span>
-    <span class="ident">Declaration</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/hover&quot;</span>)]</span>
-    <span class="ident">Hover</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/references&quot;</span>)]</span>
-    <span class="ident">References</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/implementation&quot;</span>)]</span>
-    <span class="ident">Implementation</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/typeDefinition&quot;</span>)]</span>
-    <span class="ident">TypeDefinition</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/foldingRange&quot;</span>)]</span>
-    <span class="ident">FoldingRange</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentLink&quot;</span>)]</span>
-    <span class="ident">DocumentLink</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/documentSymbol&quot;</span>)]</span>
-    <span class="ident">DocumentSymbol</span>(<span class="ident">EdgeData</span>),
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;textDocument/diagnostic&quot;</span>)]</span>
-    <span class="ident">Diagnostic</span>(<span class="ident">EdgeData</span>),
+    <span class="comment">// Methods
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/definition&quot;</span>)]
+    </span>Definition(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/declaration&quot;</span>)]
+    </span>Declaration(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/hover&quot;</span>)]
+    </span>Hover(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/references&quot;</span>)]
+    </span>References(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/implementation&quot;</span>)]
+    </span>Implementation(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/typeDefinition&quot;</span>)]
+    </span>TypeDefinition(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/foldingRange&quot;</span>)]
+    </span>FoldingRange(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/documentLink&quot;</span>)]
+    </span>DocumentLink(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/documentSymbol&quot;</span>)]
+    </span>DocumentSymbol(EdgeData),
+    <span class="attribute">#[serde(rename = <span class="string">&quot;textDocument/diagnostic&quot;</span>)]
+    </span>Diagnostic(EdgeData),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgeData</span> {
-    <span class="kw">pub</span> <span class="ident">in_v</span>: <span class="ident">Id</span>,
-    <span class="kw">pub</span> <span class="ident">out_v</span>: <span class="ident">Id</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>EdgeData {
+    <span class="kw">pub </span>in_v: Id,
+    <span class="kw">pub </span>out_v: Id,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EdgeDataMultiIn</span> {
-    <span class="kw">pub</span> <span class="ident">in_vs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Id</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">out_v</span>: <span class="ident">Id</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>EdgeDataMultiIn {
+    <span class="kw">pub </span>in_vs: Vec&lt;Id&gt;,
+    <span class="kw">pub </span>out_v: Id,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefinitionResultType</span> {
-    <span class="ident">Scalar</span>(<span class="ident">LocationOrRangeId</span>),
-    <span class="ident">Array</span>(<span class="ident">LocationOrRangeId</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>DefinitionResultType {
+    Scalar(LocationOrRangeId),
+    Array(LocationOrRangeId),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ItemKind</span> {
-    <span class="ident">Declarations</span>,
-    <span class="ident">Definitions</span>,
-    <span class="ident">References</span>,
-    <span class="ident">ReferenceResults</span>,
-    <span class="ident">ImplementationResults</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub enum </span>ItemKind {
+    Declarations,
+    Definitions,
+    References,
+    ReferenceResults,
+    ImplementationResults,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Item</span> {
-    <span class="kw">pub</span> <span class="ident">document</span>: <span class="ident">Id</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">property</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ItemKind</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">edge_data</span>: <span class="ident">EdgeDataMultiIn</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Item {
+    <span class="kw">pub </span>document: Id,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>property: <span class="prelude-ty">Option</span>&lt;ItemKind&gt;,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>edge_data: EdgeDataMultiIn,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Document</span> {
-    <span class="kw">pub</span> <span class="ident">uri</span>: <span class="ident">Url</span>,
-    <span class="kw">pub</span> <span class="ident">language_id</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Document {
+    <span class="kw">pub </span>uri: Url,
+    <span class="kw">pub </span>language_id: String,
 }
 
-<span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#result-set&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResultSet</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#result-set&gt;
+</span><span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ResultSet {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>key: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#the-project-vertex&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Project</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">String</span>,
+<span class="doccomment">/// &lt;https://github.com/Microsoft/language-server-protocol/blob/master/indexFormat/specification.md#the-project-vertex&gt;
+</span><span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Project {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>resource: <span class="prelude-ty">Option</span>&lt;Url&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>kind: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaData</span> {
-    <span class="doccomment">/// The version of the LSIF format using semver notation. See &lt;https://semver.org/&gt;. Please note</span>
-    <span class="doccomment">/// the version numbers starting with 0 don&#39;t adhere to semver and adopters have to assume</span>
-    <span class="doccomment">/// that each new version is breaking.</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>MetaData {
+    <span class="doccomment">/// The version of the LSIF format using semver notation. See &lt;https://semver.org/&gt;. Please note
+    /// the version numbers starting with 0 don&#39;t adhere to semver and adopters have to assume
+    /// that each new version is breaking.
+    </span><span class="kw">pub </span>version: String,
 
-    <span class="doccomment">/// The project root (in form of an URI) used to compute this dump.</span>
-    <span class="kw">pub</span> <span class="ident">project_root</span>: <span class="ident">Url</span>,
+    <span class="doccomment">/// The project root (in form of an URI) used to compute this dump.
+    </span><span class="kw">pub </span>project_root: Url,
 
-    <span class="doccomment">/// The string encoding used to compute line and character values in</span>
-    <span class="doccomment">/// positions and ranges.</span>
-    <span class="kw">pub</span> <span class="ident">position_encoding</span>: <span class="ident">Encoding</span>,
+    <span class="doccomment">/// The string encoding used to compute line and character values in
+    /// positions and ranges.
+    </span><span class="kw">pub </span>position_encoding: Encoding,
 
-    <span class="doccomment">/// Information about the tool that created the dump</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">tool_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ToolInfo</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Information about the tool that created the dump
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>tool_info: <span class="prelude-ty">Option</span>&lt;ToolInfo&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Repository</span> {
-    <span class="kw">pub</span> <span class="ident">r#type</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">commit_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>Repository {
+    <span class="kw">pub </span>r#type: String,
+    <span class="kw">pub </span>url: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>commit_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PackageInformation</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">manager</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">uri</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">content</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">repository</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Repository</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>PackageInformation {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>manager: String,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>uri: <span class="prelude-ty">Option</span>&lt;Url&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>content: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>repository: <span class="prelude-ty">Option</span>&lt;Repository&gt;,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>version: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

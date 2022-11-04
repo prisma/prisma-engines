@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -219,226 +219,226 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">cockroachdb</span>;
-<span class="kw">mod</span> <span class="ident">mongodb</span>;
-<span class="kw">mod</span> <span class="ident">mysql</span>;
-<span class="kw">mod</span> <span class="ident">postgres</span>;
-<span class="kw">mod</span> <span class="ident">sql_server</span>;
-<span class="kw">mod</span> <span class="ident">sqlite</span>;
-<span class="kw">mod</span> <span class="ident">vitess</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>cockroachdb;
+<span class="kw">mod </span>mongodb;
+<span class="kw">mod </span>mysql;
+<span class="kw">mod </span>postgres;
+<span class="kw">mod </span>sql_server;
+<span class="kw">mod </span>sqlite;
+<span class="kw">mod </span>vitess;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mysql</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">postgres</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sql_server</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sqlite</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">vitess</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>mongodb::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>mysql::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>postgres::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>sql_server::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>sqlite::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>vitess::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::DatamodelRenderer</span>, <span class="ident">TestConfig</span>, <span class="ident">TestError</span>};
-<span class="kw">use</span> <span class="ident">cockroachdb</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">enum_dispatch::enum_dispatch</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt</span>};
+<span class="kw">use crate</span>::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
+<span class="kw">use </span>cockroachdb::<span class="kw-2">*</span>;
+<span class="kw">use </span>enum_dispatch::enum_dispatch;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>std::{convert::TryFrom, fmt};
 
-<span class="attribute">#[<span class="ident">enum_dispatch</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConnectorTagInterface</span> {
-    <span class="doccomment">/// The name of the datamodel provider for this connector.</span>
-    <span class="doccomment">/// Must match valid datamodel provider strings.</span>
-    <span class="kw">fn</span> <span class="ident">datamodel_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+<span class="attribute">#[enum_dispatch]
+</span><span class="kw">pub trait </span>ConnectorTagInterface {
+    <span class="doccomment">/// The name of the datamodel provider for this connector.
+    /// Must match valid datamodel provider strings.
+    </span><span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
-    <span class="doccomment">/// Returns the renderer to be used for templating the datamodel (the models portion).</span>
-    <span class="kw">fn</span> <span class="ident">datamodel_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DatamodelRenderer</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns the renderer to be used for templating the datamodel (the models portion).
+    </span><span class="kw">fn </span>datamodel_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DatamodelRenderer&gt;;
 
-    <span class="doccomment">/// The connection string to use to connect to the test database and version.</span>
-    <span class="doccomment">/// - `test_database` is the database to connect to, which is an implementation detail of the</span>
-    <span class="doccomment">///   implementing connector, like a file or a schema.</span>
-    <span class="doccomment">/// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local</span>
-    <span class="doccomment">///   test run connection strings and CI connection strings differ because of networking.</span>
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(
+    <span class="doccomment">/// The connection string to use to connect to the test database and version.
+    /// - `test_database` is the database to connect to, which is an implementation detail of the
+    ///   implementing connector, like a file or a schema.
+    /// - `is_ci` signals whether or not the test run is done on CI or not. May be important if local
+    ///   test run connection strings and CI connection strings differ because of networking.
+    </span><span class="kw">fn </span>connection_string(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">is_ci</span>: <span class="ident">bool</span>,
-        <span class="ident">is_multi_schema</span>: <span class="ident">bool</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span>;
+        test_database: <span class="kw-2">&amp;</span>str,
+        is_ci: bool,
+        is_multi_schema: bool,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; String;
 
-    <span class="doccomment">/// Capabilities of the implementing connector.</span>
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>];
+    <span class="doccomment">/// Capabilities of the implementing connector.
+    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability];
 
-    <span class="doccomment">/// Serialization of the connector. Expected to return `(tag_name, version)`.</span>
-    <span class="doccomment">/// Todo: Think of something better.</span>
-    <span class="kw">fn</span> <span class="ident">as_parse_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Serialization of the connector. Expected to return `(tag_name, version)`.
+    /// Todo: Think of something better.
+    </span><span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;);
 
-    <span class="doccomment">/// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.</span>
-    <span class="kw">fn</span> <span class="ident">is_versioned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.
+    </span><span class="kw">fn </span>is_versioned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).</span>
-    <span class="kw">fn</span> <span class="ident">requires_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="doccomment">/// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).
+    </span><span class="kw">fn </span>requires_teardown(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Defines where relational constraints are handled:</span>
-    <span class="doccomment">///   - &quot;prisma&quot; is handled in the Query Engine core</span>
-    <span class="doccomment">///   - &quot;foreignKeys&quot; lets the database handle them</span>
-    <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;foreignKeys&quot;</span>
-    }
+    <span class="doccomment">/// Defines where relational constraints are handled:
+    ///   - &quot;prisma&quot; is handled in the Query Engine core
+    ///   - &quot;foreignKeys&quot; lets the database handle them
+    </span><span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;foreignKeys&quot;
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">enum_dispatch</span>(<span class="ident">ConnectorTagInterface</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectorTag</span> {
-    <span class="ident">SqlServer</span>(<span class="ident">SqlServerConnectorTag</span>),
-    <span class="ident">Postgres</span>(<span class="ident">PostgresConnectorTag</span>),
-    <span class="ident">MySql</span>(<span class="ident">MySqlConnectorTag</span>),
-    <span class="ident">MongoDb</span>(<span class="ident">MongoDbConnectorTag</span>),
-    <span class="ident">Sqlite</span>(<span class="ident">SqliteConnectorTag</span>),
-    <span class="ident">Vitess</span>(<span class="ident">VitessConnectorTag</span>),
-    <span class="ident">Cockroach</span>(<span class="ident">CockroachDbConnectorTag</span>),
+<span class="attribute">#[enum_dispatch(ConnectorTagInterface)]
+#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>ConnectorTag {
+    SqlServer(SqlServerConnectorTag),
+    Postgres(PostgresConnectorTag),
+    MySql(MySqlConnectorTag),
+    MongoDb(MongoDbConnectorTag),
+    Sqlite(SqliteConnectorTag),
+    Vitess(VitessConnectorTag),
+    Cockroach(CockroachDbConnectorTag),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectorVersion</span> {
-    <span class="ident">SqlServer</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SqlServerVersion</span><span class="op">&gt;</span>),
-    <span class="ident">Postgres</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresVersion</span><span class="op">&gt;</span>),
-    <span class="ident">MySql</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MySqlVersion</span><span class="op">&gt;</span>),
-    <span class="ident">MongoDb</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MongoDbVersion</span><span class="op">&gt;</span>),
-    <span class="ident">Sqlite</span>,
-    <span class="ident">CockroachDb</span>,
-    <span class="ident">Vitess</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VitessVersion</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>ConnectorVersion {
+    SqlServer(<span class="prelude-ty">Option</span>&lt;SqlServerVersion&gt;),
+    Postgres(<span class="prelude-ty">Option</span>&lt;PostgresVersion&gt;),
+    MySql(<span class="prelude-ty">Option</span>&lt;MySqlVersion&gt;),
+    MongoDb(<span class="prelude-ty">Option</span>&lt;MongoDbVersion&gt;),
+    Sqlite,
+    CockroachDb,
+    Vitess(<span class="prelude-ty">Option</span>&lt;VitessVersion&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ConnectorTag</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorVersion</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorTag</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">connector</span> {
-            <span class="ident">ConnectorTag::SqlServer</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::SqlServer</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
-            <span class="ident">ConnectorTag::Postgres</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::Postgres</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
-            <span class="ident">ConnectorTag::MySql</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::MySql</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
-            <span class="ident">ConnectorTag::MongoDb</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::MongoDb</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
-            <span class="ident">ConnectorTag::Sqlite</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorVersion::Sqlite</span>,
-            <span class="ident">ConnectorTag::Cockroach</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorVersion::CockroachDb</span>,
-            <span class="ident">ConnectorTag::Vitess</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::Vitess</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ConnectorTag&gt; <span class="kw">for </span>ConnectorVersion {
+    <span class="kw">fn </span>from(connector: <span class="kw-2">&amp;</span>ConnectorTag) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>connector {
+            ConnectorTag::SqlServer(c) =&gt; ConnectorVersion::SqlServer(c.version()),
+            ConnectorTag::Postgres(c) =&gt; ConnectorVersion::Postgres(c.version()),
+            ConnectorTag::MySql(c) =&gt; ConnectorVersion::MySql(c.version()),
+            ConnectorTag::MongoDb(c) =&gt; ConnectorVersion::MongoDb(c.version()),
+            ConnectorTag::Sqlite(<span class="kw">_</span>) =&gt; ConnectorVersion::Sqlite,
+            ConnectorTag::Cockroach(<span class="kw">_</span>) =&gt; ConnectorVersion::CockroachDb,
+            ConnectorTag::Vitess(c) =&gt; ConnectorVersion::Vitess(c.version()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectorTag</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">printable</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::SqlServer</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;SQL Server&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Postgres</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;PostgreSQL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MySql</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;MySQL&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::MongoDb</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;MongoDB&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Sqlite</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;SQLite&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Vitess</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Vitess&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Cockroach</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;CockroachDB&quot;</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ConnectorTag {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>printable = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::SqlServer(<span class="kw">_</span>) =&gt; <span class="string">&quot;SQL Server&quot;</span>,
+            <span class="self">Self</span>::Postgres(<span class="kw">_</span>) =&gt; <span class="string">&quot;PostgreSQL&quot;</span>,
+            <span class="self">Self</span>::MySql(<span class="kw">_</span>) =&gt; <span class="string">&quot;MySQL&quot;</span>,
+            <span class="self">Self</span>::MongoDb(<span class="kw">_</span>) =&gt; <span class="string">&quot;MongoDB&quot;</span>,
+            <span class="self">Self</span>::Sqlite(<span class="kw">_</span>) =&gt; <span class="string">&quot;SQLite&quot;</span>,
+            <span class="self">Self</span>::Vitess(<span class="kw">_</span>) =&gt; <span class="string">&quot;Vitess&quot;</span>,
+            <span class="self">Self</span>::Cockroach(<span class="kw">_</span>) =&gt; <span class="string">&quot;CockroachDB&quot;</span>,
         };
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">printable</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, printable)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectorVersion</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">printable</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::SqlServer</span>(<span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;SQL Server ({})&quot;</span>, <span class="ident">v</span>.<span class="ident">to_string</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;SQL Server (unknown)&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ConnectorVersion {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>printable = <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::SqlServer(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;SQL Server ({})&quot;</span>, v.to_string()),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;SQL Server (unknown)&quot;</span>.to_string(),
             },
-            <span class="ident"><span class="self">Self</span>::Postgres</span>(<span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;PostgreSQL ({})&quot;</span>, <span class="ident">v</span>.<span class="ident">to_string</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;PostgreSQL (unknown)&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::Postgres(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;PostgreSQL ({})&quot;</span>, v.to_string()),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;PostgreSQL (unknown)&quot;</span>.to_string(),
             },
-            <span class="ident"><span class="self">Self</span>::MySql</span>(<span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;MySQL ({})&quot;</span>, <span class="ident">v</span>.<span class="ident">to_string</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;MySQL (unknown)&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::MySql(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;MySQL ({})&quot;</span>, v.to_string()),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;MySQL (unknown)&quot;</span>.to_string(),
             },
-            <span class="ident"><span class="self">Self</span>::MongoDb</span>(<span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;MongoDB ({})&quot;</span>, <span class="ident">v</span>.<span class="ident">to_string</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;MongoDB (unknown)&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::MongoDb(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;MongoDB ({})&quot;</span>, v.to_string()),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;MongoDB (unknown)&quot;</span>.to_string(),
             },
-            <span class="ident"><span class="self">Self</span>::Sqlite</span> =&gt; <span class="string">&quot;SQLite&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident"><span class="self">Self</span>::Vitess</span>(<span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Vitess ({})&quot;</span>, <span class="ident">v</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="string">&quot;Vitess (unknown)&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::Sqlite =&gt; <span class="string">&quot;SQLite&quot;</span>.to_string(),
+            <span class="self">Self</span>::Vitess(v) =&gt; <span class="kw">match </span>v {
+                <span class="prelude-val">Some</span>(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Vitess ({})&quot;</span>, v),
+                <span class="prelude-val">None </span>=&gt; <span class="string">&quot;Vitess (unknown)&quot;</span>.to_string(),
             },
-            <span class="ident"><span class="self">Self</span>::CockroachDb</span> =&gt; <span class="string">&quot;CockroachDB&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="self">Self</span>::CockroachDb =&gt; <span class="string">&quot;CockroachDB&quot;</span>.to_string(),
         };
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">printable</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, printable)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorTag</span> {
-    <span class="doccomment">/// Returns all possible connector tags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">SqlServerConnectorTag::all</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SqlServer</span>)
-            .<span class="ident">chain</span>(<span class="ident">PostgresConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Postgres</span>))
-            .<span class="ident">chain</span>(<span class="ident">MySqlConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MySql</span>))
-            .<span class="ident">chain</span>(<span class="ident">MongoDbConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MongoDb</span>))
-            .<span class="ident">chain</span>(<span class="ident">SqliteConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Sqlite</span>))
-            .<span class="ident">chain</span>(<span class="ident">CockroachDbConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Cockroach</span>))
-            .<span class="ident">collect</span>()
+<span class="kw">impl </span>ConnectorTag {
+    <span class="doccomment">/// Returns all possible connector tags.
+    </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        SqlServerConnectorTag::all()
+            .into_iter()
+            .map(<span class="self">Self</span>::SqlServer)
+            .chain(PostgresConnectorTag::all().into_iter().map(<span class="self">Self</span>::Postgres))
+            .chain(MySqlConnectorTag::all().into_iter().map(<span class="self">Self</span>::MySql))
+            .chain(MongoDbConnectorTag::all().into_iter().map(<span class="self">Self</span>::MongoDb))
+            .chain(SqliteConnectorTag::all().into_iter().map(<span class="self">Self</span>::Sqlite))
+            .chain(CockroachDbConnectorTag::all().into_iter().map(<span class="self">Self</span>::Cockroach))
+            .collect()
     }
 
-    <span class="doccomment">/// Determines whether or not a test should run for the given enabled connectors and capabilities</span>
-    <span class="doccomment">/// a connector is required to have.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_run</span>(
-        <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">TestConfig</span>,
-        <span class="ident">enabled</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>],
-        <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>],
-        <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">current_connector</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">enabled</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">current_connector</span>) {
-            <span class="macro">println!</span>(<span class="string">&quot;Skipping test &#39;{}&#39;, current test connector is not enabled.&quot;</span>, <span class="ident">test_name</span>);
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Determines whether or not a test should run for the given enabled connectors and capabilities
+    /// a connector is required to have.
+    </span><span class="kw">pub fn </span>should_run(
+        config: <span class="kw-2">&amp;</span>TestConfig,
+        enabled: <span class="kw-2">&amp;</span>[ConnectorTag],
+        capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+        test_name: <span class="kw-2">&amp;</span>str,
+    ) -&gt; bool {
+        <span class="kw">let </span>current_connector = config.test_connector_tag().unwrap();
+        <span class="kw">if </span>!enabled.contains(<span class="kw-2">&amp;</span>current_connector) {
+            <span class="macro">println!</span>(<span class="string">&quot;Skipping test &#39;{}&#39;, current test connector is not enabled.&quot;</span>, test_name);
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">capabilities</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> <span class="op">!</span><span class="ident">current_connector</span>.<span class="ident">capabilities</span>().<span class="ident">contains</span>(<span class="ident">cap</span>))
+        <span class="kw">if </span>capabilities
+            .iter()
+            .any(|cap| !current_connector.capabilities().contains(cap))
         {
             <span class="macro">println!</span>(
                 <span class="string">&quot;Skipping test &#39;{}&#39;, current test connector doesn&#39;t offer one or more capabilities that are required.&quot;</span>,
-                <span class="ident">test_name</span>
+                test_name
             );
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="bool-val">true</span>
+        <span class="bool-val">true
+    </span>}
+}
+
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>ConnectorTag {
+    <span class="kw">type </span>Error = TestError;
+
+    <span class="kw">fn </span>try_from(tag: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="self">Self</span>::try_from((tag, <span class="prelude-val">None</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorTag</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TestError</span>;
+<span class="kw">impl </span>TryFrom&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)&gt; <span class="kw">for </span>ConnectorTag {
+    <span class="kw">type </span>Error = TestError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_from</span>((<span class="ident">tag</span>, <span class="prelude-val">None</span>))
-    }
-}
+    <span class="kw">fn </span>try_from(value: (<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>(connector, version) = value;
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorTag</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TestError</span>;
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">connector</span>, <span class="ident">version</span>) <span class="op">=</span> <span class="ident">value</span>;
-
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connector</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Sqlite</span>(<span class="ident">SqliteConnectorTag::new</span>()),
-            <span class="string">&quot;sqlserver&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::SqlServer</span>(<span class="ident">SqlServerConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;cockroachdb&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Cockroach</span>(<span class="ident">CockroachDbConnectorTag::new</span>()),
-            <span class="string">&quot;postgres&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Postgres</span>(<span class="ident">PostgresConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;mysql&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::MySql</span>(<span class="ident">MySqlConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;mongodb&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::MongoDb</span>(<span class="ident">MongoDbConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;vitess&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Vitess</span>(<span class="ident">VitessConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown connector tag `{}`&quot;</span>, <span class="ident">connector</span>))),
+        <span class="kw">let </span>tag = <span class="kw">match </span>connector.to_lowercase().as_str() {
+            <span class="string">&quot;sqlite&quot; </span>=&gt; <span class="self">Self</span>::Sqlite(SqliteConnectorTag::new()),
+            <span class="string">&quot;sqlserver&quot; </span>=&gt; <span class="self">Self</span>::SqlServer(SqlServerConnectorTag::new(version)<span class="question-mark">?</span>),
+            <span class="string">&quot;cockroachdb&quot; </span>=&gt; <span class="self">Self</span>::Cockroach(CockroachDbConnectorTag::new()),
+            <span class="string">&quot;postgres&quot; </span>=&gt; <span class="self">Self</span>::Postgres(PostgresConnectorTag::new(version)<span class="question-mark">?</span>),
+            <span class="string">&quot;mysql&quot; </span>=&gt; <span class="self">Self</span>::MySql(MySqlConnectorTag::new(version)<span class="question-mark">?</span>),
+            <span class="string">&quot;mongodb&quot; </span>=&gt; <span class="self">Self</span>::MongoDb(MongoDbConnectorTag::new(version)<span class="question-mark">?</span>),
+            <span class="string">&quot;vitess&quot; </span>=&gt; <span class="self">Self</span>::Vitess(VitessConnectorTag::new(version)<span class="question-mark">?</span>),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown connector tag `{}`&quot;</span>, connector))),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">tag</span>)
+        <span class="prelude-val">Ok</span>(tag)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/resolv-conf-0.7.0/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../resolv_conf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/resolv-conf-0.7.0/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../resolv_conf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../resolv_conf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -439,446 +439,446 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">IntoIterator</span>, <span class="ident">Iterator</span>};
-<span class="kw">use</span> <span class="ident">std::slice::Iter</span>;
-<span class="kw">use</span> {<span class="ident">grammar</span>, <span class="ident">Network</span>, <span class="ident">ParseError</span>, <span class="ident">ScopedIp</span>};
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::iter::{IntoIterator, Iterator};
+<span class="kw">use </span>std::slice::Iter;
+<span class="kw">use </span>{grammar, Network, ParseError, ScopedIp};
+<span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
-<span class="kw">const</span> <span class="ident">NAMESERVER_LIMIT</span>:<span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
-<span class="kw">const</span> <span class="ident">SEARCH_LIMIT</span>:<span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
+<span class="kw">const </span>NAMESERVER_LIMIT:usize = <span class="number">3</span>;
+<span class="kw">const </span>SEARCH_LIMIT:usize = <span class="number">6</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">LastSearch</span> {
+<span class="attribute">#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">enum </span>LastSearch {
     <span class="prelude-val">None</span>,
-    <span class="ident">Domain</span>,
-    <span class="ident">Search</span>,
+    Domain,
+    Search,
 }
 
 
-<span class="doccomment">/// Represent a resolver configuration, as described in `man 5 resolv.conf`.</span>
-<span class="doccomment">/// The options and defaults match those in the linux `man` page.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: while most fields in the structure are public the `search` and</span>
-<span class="doccomment">/// `domain` fields must be accessed via methods. This is because there are</span>
-<span class="doccomment">/// few different ways to treat `domain` field. In GNU libc `search` and</span>
-<span class="doccomment">/// `domain` replace each other ([`get_last_search_or_domain`]).</span>
-<span class="doccomment">/// In MacOS `/etc/resolve/*` files `domain` is treated in entirely different</span>
-<span class="doccomment">/// way.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Also consider using [`glibc_normalize`] and [`get_system_domain`] to match</span>
-<span class="doccomment">/// behavior of GNU libc. (latter requires ``system`` feature enabled)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// extern crate resolv_conf;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// use std::net::Ipv4Addr;</span>
-<span class="doccomment">/// use resolv_conf::{Config, ScopedIp};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     // Create a new config</span>
-<span class="doccomment">///     let mut config = Config::new();</span>
-<span class="doccomment">///     config.nameservers.push(ScopedIp::V4(Ipv4Addr::new(8, 8, 8, 8)));</span>
-<span class="doccomment">///     config.set_search(vec![&quot;example.com&quot;.into()]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Parse a config</span>
-<span class="doccomment">///     let parsed = Config::parse(&quot;nameserver 8.8.8.8\nsearch example.com&quot;).unwrap();</span>
-<span class="doccomment">///     assert_eq!(parsed, config);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`glibc_normalize`]: #method.glibc_normalize</span>
-<span class="doccomment">/// [`get_last_search_or_domain`]: #method.get_last_search_or_domain</span>
-<span class="doccomment">/// [`get_system_domain`]: #method.get_system_domain</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// List of nameservers</span>
-    <span class="kw">pub</span> <span class="ident">nameservers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScopedIp</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicated whether the last line that has been parsed is a &quot;domain&quot; directive or a &quot;search&quot;</span>
-    <span class="doccomment">/// directive. This is important for compatibility with glibc, since in glibc&#39;s implementation,</span>
-    <span class="doccomment">/// &quot;search&quot; and &quot;domain&quot; are mutually exclusive, and only the last directive is taken into</span>
-    <span class="doccomment">/// consideration.</span>
-    <span class="ident">last_search</span>: <span class="ident">LastSearch</span>,
-    <span class="doccomment">/// Domain to append to name when it doesn&#39;t contain ndots</span>
-    <span class="ident">domain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// List of suffixes to append to name when it doesn&#39;t contain ndots</span>
-    <span class="ident">search</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// List of preferred addresses</span>
-    <span class="kw">pub</span> <span class="ident">sortlist</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Network</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Enable DNS resolve debugging</span>
-    <span class="kw">pub</span> <span class="ident">debug</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Number of dots in name to try absolute resolving first (default 1)</span>
-    <span class="kw">pub</span> <span class="ident">ndots</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Dns query timeout (default 5 [sec])</span>
-    <span class="kw">pub</span> <span class="ident">timeout</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Number of attempts to resolve name if server is inaccesible (default 2)</span>
-    <span class="kw">pub</span> <span class="ident">attempts</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Round-robin selection of servers (default false)</span>
-    <span class="kw">pub</span> <span class="ident">rotate</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Don&#39;t check names for validity (default false)</span>
-    <span class="kw">pub</span> <span class="ident">no_check_names</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Try AAAA query before A</span>
-    <span class="kw">pub</span> <span class="ident">inet6</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Use reverse lookup of ipv6 using bit-label format described instead</span>
-    <span class="doccomment">/// of nibble format</span>
-    <span class="kw">pub</span> <span class="ident">ip6_bytestring</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Do ipv6 reverse lookups in ip6.int zone instead of ip6.arpa</span>
-    <span class="doccomment">/// (default false)</span>
-    <span class="kw">pub</span> <span class="ident">ip6_dotint</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Enable dns extensions described in RFC 2671</span>
-    <span class="kw">pub</span> <span class="ident">edns0</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Don&#39;t make ipv4 and ipv6 requests simultaneously</span>
-    <span class="kw">pub</span> <span class="ident">single_request</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Use same socket for the A and AAAA requests</span>
-    <span class="kw">pub</span> <span class="ident">single_request_reopen</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Don&#39;t resolve unqualified name as top level domain</span>
-    <span class="kw">pub</span> <span class="ident">no_tld_query</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Force using TCP for DNS resolution</span>
-    <span class="kw">pub</span> <span class="ident">use_vc</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Disable the automatic reloading of a changed configuration file</span>
-    <span class="kw">pub</span> <span class="ident">no_reload</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Optionally send the AD (authenticated data) bit in queries</span>
-    <span class="kw">pub</span> <span class="ident">trust_ad</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The order in which databases should be searched during a lookup</span>
-    <span class="doccomment">/// **(openbsd-only)**</span>
-    <span class="kw">pub</span> <span class="ident">lookup</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The order in which internet protocol families should be prefered</span>
-    <span class="doccomment">/// **(openbsd-only)**</span>
-    <span class="kw">pub</span> <span class="ident">family</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Family</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represent a resolver configuration, as described in `man 5 resolv.conf`.
+/// The options and defaults match those in the linux `man` page.
+///
+/// Note: while most fields in the structure are public the `search` and
+/// `domain` fields must be accessed via methods. This is because there are
+/// few different ways to treat `domain` field. In GNU libc `search` and
+/// `domain` replace each other ([`get_last_search_or_domain`]).
+/// In MacOS `/etc/resolve/*` files `domain` is treated in entirely different
+/// way.
+///
+/// Also consider using [`glibc_normalize`] and [`get_system_domain`] to match
+/// behavior of GNU libc. (latter requires ``system`` feature enabled)
+///
+/// ```rust
+/// extern crate resolv_conf;
+///
+/// use std::net::Ipv4Addr;
+/// use resolv_conf::{Config, ScopedIp};
+///
+/// fn main() {
+///     // Create a new config
+///     let mut config = Config::new();
+///     config.nameservers.push(ScopedIp::V4(Ipv4Addr::new(8, 8, 8, 8)));
+///     config.set_search(vec![&quot;example.com&quot;.into()]);
+///
+///     // Parse a config
+///     let parsed = Config::parse(&quot;nameserver 8.8.8.8\nsearch example.com&quot;).unwrap();
+///     assert_eq!(parsed, config);
+/// }
+/// ```
+///
+/// [`glibc_normalize`]: #method.glibc_normalize
+/// [`get_last_search_or_domain`]: #method.get_last_search_or_domain
+/// [`get_system_domain`]: #method.get_system_domain
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Config {
+    <span class="doccomment">/// List of nameservers
+    </span><span class="kw">pub </span>nameservers: Vec&lt;ScopedIp&gt;,
+    <span class="doccomment">/// Indicated whether the last line that has been parsed is a &quot;domain&quot; directive or a &quot;search&quot;
+    /// directive. This is important for compatibility with glibc, since in glibc&#39;s implementation,
+    /// &quot;search&quot; and &quot;domain&quot; are mutually exclusive, and only the last directive is taken into
+    /// consideration.
+    </span>last_search: LastSearch,
+    <span class="doccomment">/// Domain to append to name when it doesn&#39;t contain ndots
+    </span>domain: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// List of suffixes to append to name when it doesn&#39;t contain ndots
+    </span>search: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+    <span class="doccomment">/// List of preferred addresses
+    </span><span class="kw">pub </span>sortlist: Vec&lt;Network&gt;,
+    <span class="doccomment">/// Enable DNS resolve debugging
+    </span><span class="kw">pub </span>debug: bool,
+    <span class="doccomment">/// Number of dots in name to try absolute resolving first (default 1)
+    </span><span class="kw">pub </span>ndots: u32,
+    <span class="doccomment">/// Dns query timeout (default 5 [sec])
+    </span><span class="kw">pub </span>timeout: u32,
+    <span class="doccomment">/// Number of attempts to resolve name if server is inaccesible (default 2)
+    </span><span class="kw">pub </span>attempts: u32,
+    <span class="doccomment">/// Round-robin selection of servers (default false)
+    </span><span class="kw">pub </span>rotate: bool,
+    <span class="doccomment">/// Don&#39;t check names for validity (default false)
+    </span><span class="kw">pub </span>no_check_names: bool,
+    <span class="doccomment">/// Try AAAA query before A
+    </span><span class="kw">pub </span>inet6: bool,
+    <span class="doccomment">/// Use reverse lookup of ipv6 using bit-label format described instead
+    /// of nibble format
+    </span><span class="kw">pub </span>ip6_bytestring: bool,
+    <span class="doccomment">/// Do ipv6 reverse lookups in ip6.int zone instead of ip6.arpa
+    /// (default false)
+    </span><span class="kw">pub </span>ip6_dotint: bool,
+    <span class="doccomment">/// Enable dns extensions described in RFC 2671
+    </span><span class="kw">pub </span>edns0: bool,
+    <span class="doccomment">/// Don&#39;t make ipv4 and ipv6 requests simultaneously
+    </span><span class="kw">pub </span>single_request: bool,
+    <span class="doccomment">/// Use same socket for the A and AAAA requests
+    </span><span class="kw">pub </span>single_request_reopen: bool,
+    <span class="doccomment">/// Don&#39;t resolve unqualified name as top level domain
+    </span><span class="kw">pub </span>no_tld_query: bool,
+    <span class="doccomment">/// Force using TCP for DNS resolution
+    </span><span class="kw">pub </span>use_vc: bool,
+    <span class="doccomment">/// Disable the automatic reloading of a changed configuration file
+    </span><span class="kw">pub </span>no_reload: bool,
+    <span class="doccomment">/// Optionally send the AD (authenticated data) bit in queries
+    </span><span class="kw">pub </span>trust_ad: bool,
+    <span class="doccomment">/// The order in which databases should be searched during a lookup
+    /// **(openbsd-only)**
+    </span><span class="kw">pub </span>lookup: Vec&lt;Lookup&gt;,
+    <span class="doccomment">/// The order in which internet protocol families should be prefered
+    /// **(openbsd-only)**
+    </span><span class="kw">pub </span>family: Vec&lt;Family&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Create a new `Config` object with default values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate resolv_conf;</span>
-    <span class="doccomment">/// use resolv_conf::Config;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let config = Config::new();</span>
-    <span class="doccomment">/// assert_eq!(config.nameservers, vec![]);</span>
-    <span class="doccomment">/// assert!(config.get_domain().is_none());</span>
-    <span class="doccomment">/// assert!(config.get_search().is_none());</span>
-    <span class="doccomment">/// assert_eq!(config.sortlist, vec![]);</span>
-    <span class="doccomment">/// assert_eq!(config.debug, false);</span>
-    <span class="doccomment">/// assert_eq!(config.ndots, 1);</span>
-    <span class="doccomment">/// assert_eq!(config.timeout, 5);</span>
-    <span class="doccomment">/// assert_eq!(config.attempts, 2);</span>
-    <span class="doccomment">/// assert_eq!(config.rotate, false);</span>
-    <span class="doccomment">/// assert_eq!(config.no_check_names, false);</span>
-    <span class="doccomment">/// assert_eq!(config.inet6, false);</span>
-    <span class="doccomment">/// assert_eq!(config.ip6_bytestring, false);</span>
-    <span class="doccomment">/// assert_eq!(config.ip6_dotint, false);</span>
-    <span class="doccomment">/// assert_eq!(config.edns0, false);</span>
-    <span class="doccomment">/// assert_eq!(config.single_request, false);</span>
-    <span class="doccomment">/// assert_eq!(config.single_request_reopen, false);</span>
-    <span class="doccomment">/// assert_eq!(config.no_tld_query, false);</span>
-    <span class="doccomment">/// assert_eq!(config.use_vc, false);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Config</span> {
-        <span class="ident">Config</span> {
-            <span class="ident">nameservers</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">domain</span>: <span class="prelude-val">None</span>,
-            <span class="ident">search</span>: <span class="prelude-val">None</span>,
-            <span class="ident">last_search</span>: <span class="ident">LastSearch::None</span>,
-            <span class="ident">sortlist</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">debug</span>: <span class="bool-val">false</span>,
-            <span class="ident">ndots</span>: <span class="number">1</span>,
-            <span class="ident">timeout</span>: <span class="number">5</span>,
-            <span class="ident">attempts</span>: <span class="number">2</span>,
-            <span class="ident">rotate</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_check_names</span>: <span class="bool-val">false</span>,
-            <span class="ident">inet6</span>: <span class="bool-val">false</span>,
-            <span class="ident">ip6_bytestring</span>: <span class="bool-val">false</span>,
-            <span class="ident">ip6_dotint</span>: <span class="bool-val">false</span>,
-            <span class="ident">edns0</span>: <span class="bool-val">false</span>,
-            <span class="ident">single_request</span>: <span class="bool-val">false</span>,
-            <span class="ident">single_request_reopen</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_tld_query</span>: <span class="bool-val">false</span>,
-            <span class="ident">use_vc</span>: <span class="bool-val">false</span>,
-            <span class="ident">no_reload</span>: <span class="bool-val">false</span>,
-            <span class="ident">trust_ad</span>: <span class="bool-val">false</span>,
-            <span class="ident">lookup</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">family</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl </span>Config {
+    <span class="doccomment">/// Create a new `Config` object with default values.
+    ///
+    /// ```rust
+    /// # extern crate resolv_conf;
+    /// use resolv_conf::Config;
+    /// # fn main() {
+    /// let config = Config::new();
+    /// assert_eq!(config.nameservers, vec![]);
+    /// assert!(config.get_domain().is_none());
+    /// assert!(config.get_search().is_none());
+    /// assert_eq!(config.sortlist, vec![]);
+    /// assert_eq!(config.debug, false);
+    /// assert_eq!(config.ndots, 1);
+    /// assert_eq!(config.timeout, 5);
+    /// assert_eq!(config.attempts, 2);
+    /// assert_eq!(config.rotate, false);
+    /// assert_eq!(config.no_check_names, false);
+    /// assert_eq!(config.inet6, false);
+    /// assert_eq!(config.ip6_bytestring, false);
+    /// assert_eq!(config.ip6_dotint, false);
+    /// assert_eq!(config.edns0, false);
+    /// assert_eq!(config.single_request, false);
+    /// assert_eq!(config.single_request_reopen, false);
+    /// assert_eq!(config.no_tld_query, false);
+    /// assert_eq!(config.use_vc, false);
+    /// # }
+    </span><span class="kw">pub fn </span>new() -&gt; Config {
+        Config {
+            nameservers: Vec::new(),
+            domain: <span class="prelude-val">None</span>,
+            search: <span class="prelude-val">None</span>,
+            last_search: LastSearch::None,
+            sortlist: Vec::new(),
+            debug: <span class="bool-val">false</span>,
+            ndots: <span class="number">1</span>,
+            timeout: <span class="number">5</span>,
+            attempts: <span class="number">2</span>,
+            rotate: <span class="bool-val">false</span>,
+            no_check_names: <span class="bool-val">false</span>,
+            inet6: <span class="bool-val">false</span>,
+            ip6_bytestring: <span class="bool-val">false</span>,
+            ip6_dotint: <span class="bool-val">false</span>,
+            edns0: <span class="bool-val">false</span>,
+            single_request: <span class="bool-val">false</span>,
+            single_request_reopen: <span class="bool-val">false</span>,
+            no_tld_query: <span class="bool-val">false</span>,
+            use_vc: <span class="bool-val">false</span>,
+            no_reload: <span class="bool-val">false</span>,
+            trust_ad: <span class="bool-val">false</span>,
+            lookup: Vec::new(),
+            family: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Parse a buffer and return the corresponding `Config` object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate resolv_conf;</span>
-    <span class="doccomment">/// use resolv_conf::{ScopedIp, Config};</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let config_str = &quot;# /etc/resolv.conf</span>
-    <span class="doccomment">/// nameserver  8.8.8.8</span>
-    <span class="doccomment">/// nameserver  8.8.4.4</span>
-    <span class="doccomment">/// search      example.com sub.example.com</span>
-    <span class="doccomment">/// options     ndots:8 attempts:8&quot;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Parse the config</span>
-    <span class="doccomment">/// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Print the config</span>
-    <span class="doccomment">/// println!(&quot;{:?}&quot;, parsed_config);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">ParseError</span><span class="op">&gt;</span> {
-        <span class="ident">grammar::parse</span>(<span class="ident">buf</span>.<span class="ident">as_ref</span>())
+    <span class="doccomment">/// Parse a buffer and return the corresponding `Config` object.
+    ///
+    /// ```rust
+    /// # extern crate resolv_conf;
+    /// use resolv_conf::{ScopedIp, Config};
+    /// # fn main() {
+    /// let config_str = &quot;# /etc/resolv.conf
+    /// nameserver  8.8.8.8
+    /// nameserver  8.8.4.4
+    /// search      example.com sub.example.com
+    /// options     ndots:8 attempts:8&quot;;
+    ///
+    /// // Parse the config
+    /// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);
+    ///
+    /// // Print the config
+    /// println!(&quot;{:?}&quot;, parsed_config);
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>parse&lt;T: AsRef&lt;[u8]&gt;&gt;(buf: T) -&gt; <span class="prelude-ty">Result</span>&lt;Config, ParseError&gt; {
+        grammar::parse(buf.as_ref())
     }
 
-    <span class="doccomment">/// Return the suffixes declared in the last &quot;domain&quot; or &quot;search&quot; directive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # extern crate resolv_conf;</span>
-    <span class="doccomment">/// use resolv_conf::{ScopedIp, Config};</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let config_str = &quot;search example.com sub.example.com\ndomain localdomain&quot;;</span>
-    <span class="doccomment">/// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);</span>
-    <span class="doccomment">/// let domains = parsed_config.get_last_search_or_domain()</span>
-    <span class="doccomment">///                            .map(|domain| domain.clone())</span>
-    <span class="doccomment">///                            .collect::&lt;Vec&lt;String&gt;&gt;();</span>
-    <span class="doccomment">/// assert_eq!(domains, vec![String::from(&quot;localdomain&quot;)]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let config_str = &quot;domain localdomain\nsearch example.com sub.example.com&quot;;</span>
-    <span class="doccomment">/// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);</span>
-    <span class="doccomment">/// let domains = parsed_config.get_last_search_or_domain()</span>
-    <span class="doccomment">///                            .map(|domain| domain.clone())</span>
-    <span class="doccomment">///                            .collect::&lt;Vec&lt;String&gt;&gt;();</span>
-    <span class="doccomment">/// assert_eq!(domains, vec![String::from(&quot;example.com&quot;), String::from(&quot;sub.example.com&quot;)]);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_last_search_or_domain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">DomainIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">domain_iter</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">last_search</span> {
-            <span class="ident">LastSearch::Search</span> =&gt; <span class="ident">DomainIterInternal::Search</span>(
-                <span class="self">self</span>.<span class="ident">get_search</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">domains</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">domains</span>.<span class="ident">into_iter</span>())),
+    <span class="doccomment">/// Return the suffixes declared in the last &quot;domain&quot; or &quot;search&quot; directive.
+    ///
+    /// ```rust
+    /// # extern crate resolv_conf;
+    /// use resolv_conf::{ScopedIp, Config};
+    /// # fn main() {
+    /// let config_str = &quot;search example.com sub.example.com\ndomain localdomain&quot;;
+    /// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);
+    /// let domains = parsed_config.get_last_search_or_domain()
+    ///                            .map(|domain| domain.clone())
+    ///                            .collect::&lt;Vec&lt;String&gt;&gt;();
+    /// assert_eq!(domains, vec![String::from(&quot;localdomain&quot;)]);
+    ///
+    /// let config_str = &quot;domain localdomain\nsearch example.com sub.example.com&quot;;
+    /// let parsed_config = Config::parse(&amp;config_str).expect(&quot;Failed to parse config&quot;);
+    /// let domains = parsed_config.get_last_search_or_domain()
+    ///                            .map(|domain| domain.clone())
+    ///                            .collect::&lt;Vec&lt;String&gt;&gt;();
+    /// assert_eq!(domains, vec![String::from(&quot;example.com&quot;), String::from(&quot;sub.example.com&quot;)]);
+    /// # }
+    </span><span class="kw">pub fn </span>get_last_search_or_domain&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; DomainIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>domain_iter = <span class="kw">match </span><span class="self">self</span>.last_search {
+            LastSearch::Search =&gt; DomainIterInternal::Search(
+                <span class="self">self</span>.get_search()
+                    .and_then(|domains| <span class="prelude-val">Some</span>(domains.into_iter())),
             ),
-            <span class="ident">LastSearch::Domain</span> =&gt; <span class="ident">DomainIterInternal::Domain</span>(<span class="self">self</span>.<span class="ident">get_domain</span>()),
-            <span class="ident">LastSearch::None</span> =&gt; <span class="ident">DomainIterInternal::None</span>,
+            LastSearch::Domain =&gt; DomainIterInternal::Domain(<span class="self">self</span>.get_domain()),
+            LastSearch::None =&gt; DomainIterInternal::None,
         };
-        <span class="ident">DomainIter</span>(<span class="ident">domain_iter</span>)
+        DomainIter(domain_iter)
     }
 
-    <span class="doccomment">/// Return the domain declared in the last &quot;domain&quot; directive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Return the domain declared in the last &quot;domain&quot; directive.
+    </span><span class="kw">pub fn </span>get_domain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.domain.as_ref()
     }
 
-    <span class="doccomment">/// Return the domains declared in the last &quot;search&quot; directive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">search</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Return the domains declared in the last &quot;search&quot; directive.
+    </span><span class="kw">pub fn </span>get_search(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Vec&lt;String&gt;&gt; {
+        <span class="self">self</span>.search.as_ref()
     }
 
-    <span class="doccomment">/// Set the domain corresponding to the &quot;domain&quot; directive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_domain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">domain</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">domain</span>);
-        <span class="self">self</span>.<span class="ident">last_search</span> <span class="op">=</span> <span class="ident">LastSearch::Domain</span>;
+    <span class="doccomment">/// Set the domain corresponding to the &quot;domain&quot; directive.
+    </span><span class="kw">pub fn </span>set_domain(<span class="kw-2">&amp;mut </span><span class="self">self</span>, domain: String) {
+        <span class="self">self</span>.domain = <span class="prelude-val">Some</span>(domain);
+        <span class="self">self</span>.last_search = LastSearch::Domain;
     }
 
-    <span class="doccomment">/// Set the domains corresponding the &quot;search&quot; directive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_search</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">search</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">search</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">search</span>);
-        <span class="self">self</span>.<span class="ident">last_search</span> <span class="op">=</span> <span class="ident">LastSearch::Search</span>;
+    <span class="doccomment">/// Set the domains corresponding the &quot;search&quot; directive.
+    </span><span class="kw">pub fn </span>set_search(<span class="kw-2">&amp;mut </span><span class="self">self</span>, search: Vec&lt;String&gt;) {
+        <span class="self">self</span>.search = <span class="prelude-val">Some</span>(search);
+        <span class="self">self</span>.last_search = LastSearch::Search;
     }
 
-    <span class="doccomment">/// Normalize config according to glibc rulees</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Currently this method does the following things:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. Truncates list of nameservers to 3 at max</span>
-    <span class="doccomment">/// 2. Truncates search list to 6 at max</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Other normalizations may be added in future as long as they hold true</span>
-    <span class="doccomment">/// for a particular GNU libc implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: this method is not called after parsing, because we think it&#39;s</span>
-    <span class="doccomment">/// not forward-compatible to rely on such small and ugly limits. Still,</span>
-    <span class="doccomment">/// it&#39;s useful to keep implementation as close to glibc as possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">glibc_normalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">nameservers</span>.<span class="ident">truncate</span>(<span class="ident">NAMESERVER_LIMIT</span>);
-        <span class="self">self</span>.<span class="ident">search</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">search</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">s</span><span class="op">|</span> {
-            <span class="ident">s</span>.<span class="ident">truncate</span>(<span class="ident">SEARCH_LIMIT</span>);
-            <span class="ident">s</span>
+    <span class="doccomment">/// Normalize config according to glibc rulees
+    ///
+    /// Currently this method does the following things:
+    ///
+    /// 1. Truncates list of nameservers to 3 at max
+    /// 2. Truncates search list to 6 at max
+    ///
+    /// Other normalizations may be added in future as long as they hold true
+    /// for a particular GNU libc implementation.
+    ///
+    /// Note: this method is not called after parsing, because we think it&#39;s
+    /// not forward-compatible to rely on such small and ugly limits. Still,
+    /// it&#39;s useful to keep implementation as close to glibc as possible.
+    </span><span class="kw">pub fn </span>glibc_normalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.nameservers.truncate(NAMESERVER_LIMIT);
+        <span class="self">self</span>.search = <span class="self">self</span>.search.take().map(|<span class="kw-2">mut </span>s| {
+            s.truncate(SEARCH_LIMIT);
+            s
         });
     }
 
-    <span class="doccomment">/// Get nameserver or on the local machine</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_nameservers_or_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScopedIp</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nameservers</span>.<span class="ident">is_empty</span>() {
+    <span class="doccomment">/// Get nameserver or on the local machine
+    </span><span class="kw">pub fn </span>get_nameservers_or_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScopedIp&gt; {
+        <span class="kw">if </span><span class="self">self</span>.nameservers.is_empty() {
             <span class="macro">vec!</span>[
-                <span class="ident">ScopedIp::from</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
-                <span class="ident">ScopedIp::from</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+                ScopedIp::from(IpAddr::V4(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+                ScopedIp::from(IpAddr::V6(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             ]
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">nameservers</span>.<span class="ident">to_vec</span>()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.nameservers.to_vec()
         }
     }
 
-    <span class="doccomment">/// Get domain from config or fallback to the suffix of a hostname</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is how glibc finds out a hostname. This method requires</span>
-    <span class="doccomment">/// ``system`` feature enabled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_system_domain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// Get domain from config or fallback to the suffix of a hostname
+    ///
+    /// This is how glibc finds out a hostname. This method requires
+    /// ``system`` feature enabled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;system&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_system_domain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">if </span><span class="self">self</span>.domain.is_some() {
+            <span class="kw">return </span><span class="self">self</span>.domain.clone();
         }
 
-        <span class="kw">let</span> <span class="ident">hostname</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">::hostname::get</span>().<span class="ident">ok</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>.<span class="ident">into_string</span>().<span class="ident">ok</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        <span class="kw">let </span>hostname = <span class="kw">match </span>::hostname::get().ok() {
+            <span class="prelude-val">Some</span>(name) =&gt; name.into_string().ok(),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
 
-        <span class="ident">hostname</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&#39;.&#39;</span>) {
-                <span class="kw">let</span> <span class="ident">hn</span> <span class="op">=</span> <span class="ident">s</span>[<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>..].<span class="ident">to_string</span>();
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">hn</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">hn</span>)
+        hostname.and_then(|s| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(pos) = s.find(<span class="string">&#39;.&#39;</span>) {
+                <span class="kw">let </span>hn = s[pos + <span class="number">1</span>..].to_string();
+                <span class="kw">if </span>!hn.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(hn)
                 }
             };
-            <span class="prelude-val">None</span>
-        })
+            <span class="prelude-val">None
+        </span>})
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">for</span> <span class="ident">nameserver</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">nameservers</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;nameserver {}&quot;</span>, <span class="ident">nameserver</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Config {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">for </span>nameserver <span class="kw">in </span><span class="self">self</span>.nameservers.iter() {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;nameserver {}&quot;</span>, nameserver)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_search</span> <span class="op">!</span><span class="op">=</span> <span class="ident">LastSearch::Domain</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">domain</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">domain</span> {
-                <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;domain {}&quot;</span>, <span class="ident">domain</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.last_search != LastSearch::Domain {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>domain) = <span class="self">self</span>.domain {
+                <span class="macro">writeln!</span>(fmt, <span class="string">&quot;domain {}&quot;</span>, domain)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">search</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">search</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">search</span>.<span class="ident">is_empty</span>() {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;search&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> <span class="ident">suffix</span> <span class="kw">in</span> <span class="ident">search</span>.<span class="ident">iter</span>() {
-                    <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">suffix</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>search) = <span class="self">self</span>.search {
+            <span class="kw">if </span>!search.is_empty() {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;search&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>suffix <span class="kw">in </span>search.iter() {
+                    <span class="macro">write!</span>(fmt, <span class="string">&quot; {}&quot;</span>, suffix)<span class="question-mark">?</span>;
                 }
-                <span class="macro">writeln!</span>(<span class="ident">fmt</span>)<span class="question-mark">?</span>;
+                <span class="macro">writeln!</span>(fmt)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_search</span> <span class="op">==</span> <span class="ident">LastSearch::Domain</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">domain</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">domain</span> {
-                <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;domain {}&quot;</span>, <span class="ident">domain</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.last_search == LastSearch::Domain {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>domain) = <span class="self">self</span>.domain {
+                <span class="macro">writeln!</span>(fmt, <span class="string">&quot;domain {}&quot;</span>, domain)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">sortlist</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;sortlist&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">network</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">sortlist</span>.<span class="ident">iter</span>() {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">network</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.sortlist.is_empty() {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;sortlist&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">for </span>network <span class="kw">in </span><span class="self">self</span>.sortlist.iter() {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot; {}&quot;</span>, network)<span class="question-mark">?</span>;
             }
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>)<span class="question-mark">?</span>;
+            <span class="macro">writeln!</span>(fmt)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">debug</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options debug&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.debug {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options debug&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ndots</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options ndots:{}&quot;</span>, <span class="self">self</span>.<span class="ident">ndots</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.ndots != <span class="number">1 </span>{
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options ndots:{}&quot;</span>, <span class="self">self</span>.ndots)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">!</span><span class="op">=</span> <span class="number">5</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options timeout:{}&quot;</span>, <span class="self">self</span>.<span class="ident">timeout</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.timeout != <span class="number">5 </span>{
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options timeout:{}&quot;</span>, <span class="self">self</span>.timeout)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attempts</span> <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options attempts:{}&quot;</span>, <span class="self">self</span>.<span class="ident">attempts</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.attempts != <span class="number">2 </span>{
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options attempts:{}&quot;</span>, <span class="self">self</span>.attempts)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rotate</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options rotate&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.rotate {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options rotate&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_check_names</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options no-check-names&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.no_check_names {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options no-check-names&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inet6</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options inet6&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.inet6 {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options inet6&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ip6_bytestring</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options ip6-bytestring&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.ip6_bytestring {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options ip6-bytestring&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ip6_dotint</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options ip6-dotint&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.ip6_dotint {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options ip6-dotint&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">edns0</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options edns0&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.edns0 {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options edns0&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">single_request</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options single-request&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.single_request {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options single-request&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">single_request_reopen</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options single-request-reopen&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.single_request_reopen {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options single-request-reopen&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_tld_query</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options no-tld-query&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.no_tld_query {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options no-tld-query&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">use_vc</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options use-vc&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.use_vc {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options use-vc&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">no_reload</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options no-reload&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.no_reload {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options no-reload&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">trust_ad</span> {
-            <span class="macro">writeln!</span>(<span class="ident">fmt</span>, <span class="string">&quot;options trust-ad&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.trust_ad {
+            <span class="macro">writeln!</span>(fmt, <span class="string">&quot;options trust-ad&quot;</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// An iterator returned by [`Config.get_last_search_or_domain`](struct.Config.html#method.get_last_search_or_domain)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DomainIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">DomainIterInternal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
+<span class="doccomment">/// An iterator returned by [`Config.get_last_search_or_domain`](struct.Config.html#method.get_last_search_or_domain)
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DomainIter&lt;<span class="lifetime">&#39;a</span>&gt;(DomainIterInternal&lt;<span class="lifetime">&#39;a</span>&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DomainIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>DomainIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">DomainIterInternal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Search</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Domain</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">enum </span>DomainIterInternal&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Search(<span class="prelude-ty">Option</span>&lt;Iter&lt;<span class="lifetime">&#39;a</span>, String&gt;&gt;),
+    Domain(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;),
     <span class="prelude-val">None</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">DomainIterInternal</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>DomainIterInternal&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">DomainIterInternal::Search</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">domains</span>)) =&gt; <span class="ident">domains</span>.<span class="ident">next</span>(),
-            <span class="ident">DomainIterInternal::Domain</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">domain</span>) =&gt; <span class="ident">domain</span>.<span class="ident">take</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            DomainIterInternal::Search(<span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>domains)) =&gt; domains.next(),
+            DomainIterInternal::Domain(<span class="kw-2">ref mut </span>domain) =&gt; domain.take(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// The databases that should be searched during a lookup.</span>
-<span class="doccomment">/// This option is commonly found on openbsd.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Lookup</span> {
-    <span class="doccomment">/// Search for entries in /etc/hosts</span>
-    <span class="ident">File</span>,
-    <span class="doccomment">/// Query a domain name server</span>
-    <span class="ident">Bind</span>,
-    <span class="doccomment">/// A database we don&#39;t know yet</span>
-    <span class="ident">Extra</span>(<span class="ident">String</span>),
+<span class="doccomment">/// The databases that should be searched during a lookup.
+/// This option is commonly found on openbsd.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Lookup {
+    <span class="doccomment">/// Search for entries in /etc/hosts
+    </span>File,
+    <span class="doccomment">/// Query a domain name server
+    </span>Bind,
+    <span class="doccomment">/// A database we don&#39;t know yet
+    </span>Extra(String),
 }
 
-<span class="doccomment">/// The internet protocol family that is prefered.</span>
-<span class="doccomment">/// This option is commonly found on openbsd.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Family</span> {
-    <span class="doccomment">/// A A lookup for an ipv4 address</span>
-    <span class="ident">Inet4</span>,
-    <span class="doccomment">/// A AAAA lookup for an ipv6 address</span>
-    <span class="ident">Inet6</span>,
+<span class="doccomment">/// The internet protocol family that is prefered.
+/// This option is commonly found on openbsd.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Family {
+    <span class="doccomment">/// A A lookup for an ipv4 address
+    </span>Inet4,
+    <span class="doccomment">/// A AAAA lookup for an ipv6 address
+    </span>Inet6,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="resolv_conf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="resolv_conf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

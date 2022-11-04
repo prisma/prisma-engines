@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/attributes/id.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/attributes/id.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>id.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -240,68 +240,68 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldResolutionError</span>, <span class="ident">FieldResolvingSetup</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">attributes::resolve_field_array_with_args</span>,
-    <span class="ident">coerce</span>,
-    <span class="ident">context::Context</span>,
-    <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IdAttribute</span>, <span class="ident">IndexFieldPath</span>, <span class="ident">ModelAttributes</span>, <span class="ident">SortOrder</span>},
-    <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{FieldResolutionError, FieldResolvingSetup};
+<span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, WithName, WithSpan},
+    attributes::resolve_field_array_with_args,
+    coerce,
+    context::Context,
+    types::{FieldWithArgs, IdAttribute, IndexFieldPath, ModelAttributes, SortOrder},
+    DatamodelError, StringId,
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// @@id on models</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">model</span>(<span class="ident">model_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute</span>();
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_default_arg</span>(<span class="string">&quot;fields&quot;</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
+<span class="doccomment">/// @@id on models
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>model(model_data: <span class="kw-2">&amp;mut </span>ModelAttributes, model_id: ast::ModelId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>attr = ctx.current_attribute();
+    <span class="kw">let </span>fields = <span class="kw">match </span>ctx.visit_default_arg(<span class="string">&quot;fields&quot;</span>) {
+        <span class="prelude-val">Ok</span>(value) =&gt; value,
+        <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>ctx.push_error(err),
     };
 
-    <span class="kw">let</span> <span class="ident">resolving</span> <span class="op">=</span> <span class="ident">FieldResolvingSetup::OnlyTopLevel</span>;
+    <span class="kw">let </span>resolving = FieldResolvingSetup::OnlyTopLevel;
 
-    <span class="kw">let</span> <span class="ident">resolved_fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_field_array_with_args</span>(<span class="ident">fields</span>, <span class="ident">attr</span>.<span class="ident">span</span>, <span class="ident">model_id</span>, <span class="ident">resolving</span>, <span class="ident">ctx</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>) =&gt; <span class="kw">return</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-            <span class="ident">unknown_fields</span>: <span class="ident">unresolvable_fields</span>,
-            <span class="ident">relation_fields</span>,
+    <span class="kw">let </span>resolved_fields = <span class="kw">match </span>resolve_field_array_with_args(fields, attr.span, model_id, resolving, ctx) {
+        <span class="prelude-val">Ok</span>(fields) =&gt; fields,
+        <span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith) =&gt; <span class="kw">return</span>,
+        <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+            unknown_fields: unresolvable_fields,
+            relation_fields,
         }) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">unresolvable_fields</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="ident">fields_str</span> <span class="op">=</span> <span class="ident">unresolvable_fields</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="ident">field_name</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">top_id</span> {
-                        <span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">ct_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>();
+            <span class="kw">if </span>!unresolvable_fields.is_empty() {
+                <span class="kw">let </span>fields_str = unresolvable_fields
+                    .into_iter()
+                    .map(|(top_id, field_name)| <span class="kw">match </span>top_id {
+                        ast::TopId::CompositeType(ctid) =&gt; {
+                            <span class="kw">let </span>ct_name = <span class="kw-2">&amp;</span>ctx.ast[ctid].name();
 
-                            <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {ct_name}&quot;</span>))
+                            Cow::from(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {ct_name}&quot;</span>))
                         }
-                        <span class="ident">ast::TopId::Model</span>(<span class="kw">_</span>) =&gt; <span class="ident">Cow::from</span>(<span class="ident">field_name</span>),
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                        ast::TopId::Model(<span class="kw">_</span>) =&gt; Cow::from(field_name),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     })
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot;, &quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The multi field id declaration refers to the unknown fields {fields_str}.&quot;</span>);
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">name</span>(), <span class="ident">fields</span>.<span class="ident">span</span>());
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The multi field id declaration refers to the unknown fields {fields_str}.&quot;</span>);
+                <span class="kw">let </span>error = DatamodelError::new_model_validation_error(<span class="kw-2">&amp;</span>msg, ctx.ast[model_id].name(), fields.span());
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                ctx.push_error(error);
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">relation_fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">f</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+            <span class="kw">if </span>!relation_fields.is_empty() {
+                <span class="kw">let </span>field_names = relation_fields
+                    .iter()
+                    .map(|(f, <span class="kw">_</span>)| f.name())
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot;, &quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The id definition refers to the relation fields {field_names}. ID definitions must reference only scalar fields.&quot;</span>);
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The id definition refers to the relation fields {field_names}. ID definitions must reference only scalar fields.&quot;</span>);
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                    <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">name</span>(),
-                    <span class="ident">attr</span>.<span class="ident">span</span>,
+                ctx.push_error(DatamodelError::new_model_validation_error(
+                    <span class="kw-2">&amp;</span>msg,
+                    ctx.ast[model_id].name(),
+                    attr.span,
                 ));
             }
 
@@ -309,178 +309,178 @@
         }
     };
 
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
 
-    <span class="comment">// ID attribute fields must reference only required fields.</span>
-    <span class="kw">let</span> <span class="ident">fields_that_are_not_required</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">resolved_fields</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>();
+    <span class="comment">// ID attribute fields must reference only required fields.
+    </span><span class="kw">let </span>fields_that_are_not_required: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = resolved_fields
+        .iter()
+        .filter_map(|field| {
+            <span class="kw">let </span>field_id = field.path.field_in_index();
 
-            <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>];
+            <span class="kw">match </span>field.path.type_holding_the_indexed_field() {
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[model_id][field_id];
 
-                    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">name</span>())
+                    <span class="kw">if </span>field.arity.is_required() {
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="prelude-val">Some</span>(field.name())
                     }
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>][<span class="ident">field_id</span>];
+                <span class="prelude-val">Some</span>(ctid) =&gt; {
+                    <span class="kw">let </span>field = <span class="kw-2">&amp;</span>ctx.ast[ctid][field_id];
 
-                    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() {
-                        <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">name</span>())
+                    <span class="kw">if </span>field.arity.is_required() {
+                        <span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="prelude-val">Some</span>(field.name())
                     }
                 }
             }
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">fields_that_are_not_required</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">if </span>!fields_that_are_not_required.is_empty() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;The id definition refers to the optional fields {}. ID definitions must reference only required fields.&quot;</span>,
-                <span class="ident">fields_that_are_not_required</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+                fields_that_are_not_required.join(<span class="string">&quot;, &quot;</span>)
             ),
-            <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-            <span class="ident">attr</span>.<span class="ident">span</span>,
+            ast_model.name(),
+            attr.span,
         ))
     }
 
-    <span class="kw">if</span> <span class="ident">model_data</span>.<span class="ident">primary_key</span>.<span class="ident">is_some</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">if </span>model_data.primary_key.is_some() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="string">&quot;Each model must have at most one id criteria. You can&#39;t have `@id` and `@@id` at the same time.&quot;</span>,
-            <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-            <span class="ident">ast_model</span>.<span class="ident">span</span>(),
+            ast_model.name(),
+            ast_model.span(),
         ))
     }
 
-    <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">mapped_name</span>) <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">primary_key_mapped_name</span>(<span class="ident">ctx</span>);
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::get_name_argument</span>(<span class="ident">ctx</span>);
+    <span class="kw">let </span>(name, mapped_name) = {
+        <span class="kw">let </span>mapped_name = primary_key_mapped_name(ctx);
+        <span class="kw">let </span>name = <span class="kw">super</span>::get_name_argument(ctx);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="ident"><span class="kw">super</span>::validate_client_name</span>(<span class="ident">attr</span>.<span class="ident">span</span>(), <span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">name</span>, <span class="string">&quot;@@id&quot;</span>, <span class="ident">ctx</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = name {
+            <span class="kw">super</span>::validate_client_name(attr.span(), ast_model.name(), name, <span class="string">&quot;@@id&quot;</span>, ctx);
         }
 
-        (<span class="ident">name</span>, <span class="ident">mapped_name</span>)
+        (name, mapped_name)
     };
 
-    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::validate_clustering_setting</span>(<span class="ident">ctx</span>);
+    <span class="kw">let </span>clustered = <span class="kw">super</span>::validate_clustering_setting(ctx);
 
-    <span class="ident">model_data</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
-        <span class="ident">name</span>,
-        <span class="ident">source_attribute</span>: <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(),
-        <span class="ident">mapped_name</span>,
-        <span class="ident">fields</span>: <span class="ident">resolved_fields</span>,
-        <span class="ident">source_field</span>: <span class="prelude-val">None</span>,
-        <span class="ident">clustered</span>,
+    model_data.primary_key = <span class="prelude-val">Some</span>(IdAttribute {
+        name,
+        source_attribute: ctx.current_attribute_id(),
+        mapped_name,
+        fields: resolved_fields,
+        source_field: <span class="prelude-val">None</span>,
+        clustered,
     });
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">field</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
-    <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="ident">model_attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>field&lt;<span class="lifetime">&#39;db</span>&gt;(
+    ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
+    field_id: ast::FieldId,
+    model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
-    <span class="kw">match</span> <span class="ident">model_attributes</span>.<span class="ident">primary_key</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">match </span>model_attributes.primary_key {
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="string">&quot;At most one field must be marked as the id field with the `@id` attribute.&quot;</span>,
-            <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-            <span class="ident">ast_model</span>.<span class="ident">span</span>(),
+            ast_model.name(),
+            ast_model.span(),
         )),
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">primary_key_mapped_name</span>(<span class="ident">ctx</span>);
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span>mapped_name = primary_key_mapped_name(ctx);
 
-            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">ctx</span>
-                .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;length&quot;</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">length</span><span class="op">|</span> <span class="ident">coerce::integer</span>(<span class="ident">length</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>);
+            <span class="kw">let </span>length = ctx
+                .visit_optional_arg(<span class="string">&quot;length&quot;</span>)
+                .and_then(|length| coerce::integer(length, ctx.diagnostics))
+                .map(|len| len <span class="kw">as </span>u32);
 
-            <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-                .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;sort&quot;</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">coerce::constant</span>(<span class="ident">sort</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+            <span class="kw">let </span>sort_order = <span class="kw">match </span>ctx
+                .visit_optional_arg(<span class="string">&quot;sort&quot;</span>)
+                .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
             {
-                <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; {
-                    <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Asc),
+                <span class="prelude-val">Some</span>(other) =&gt; {
+                    ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The `sort` argument can only be `Asc` or `Desc` you provided: {}.&quot;</span>,
-                        <span class="ident">other</span>
+                        other
                     ));
-                    <span class="prelude-val">None</span>
-                }
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">None
+                </span>}
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::validate_clustering_setting</span>(<span class="ident">ctx</span>);
+            <span class="kw">let </span>clustered = <span class="kw">super</span>::validate_clustering_setting(ctx);
 
-            <span class="ident">model_attributes</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IdAttribute</span> {
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">mapped_name</span>,
-                <span class="ident">source_attribute</span>: <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(),
-                <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">FieldWithArgs</span> {
-                    <span class="ident">path</span>: <span class="ident">IndexFieldPath::new</span>(<span class="ident">field_id</span>),
-                    <span class="ident">sort_order</span>,
-                    <span class="ident">length</span>,
-                    <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+            model_attributes.primary_key = <span class="prelude-val">Some</span>(IdAttribute {
+                name: <span class="prelude-val">None</span>,
+                mapped_name,
+                source_attribute: ctx.current_attribute_id(),
+                fields: <span class="macro">vec!</span>[FieldWithArgs {
+                    path: IndexFieldPath::new(field_id),
+                    sort_order,
+                    length,
+                    operator_class: <span class="prelude-val">None</span>,
                 }],
-                <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
-                <span class="ident">clustered</span>,
+                source_field: <span class="prelude-val">Some</span>(field_id),
+                clustered,
             })
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_id_field_arities</span>(
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">model_attributes</span>: <span class="kw-2">&amp;</span><span class="ident">ModelAttributes</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate_id_field_arities(
+    model_id: ast::ModelId,
+    model_attributes: <span class="kw-2">&amp;</span>ModelAttributes,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="ident">model_attributes</span>.<span class="ident">is_ignored</span> {
+    <span class="kw">if </span>model_attributes.is_ignored {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">model_attributes</span>.<span class="ident">primary_key</span> {
-        <span class="ident">pk</span>
-    } <span class="kw">else</span> {
+    <span class="kw">let </span>pk = <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = <span class="kw-2">&amp;</span>model_attributes.primary_key {
+        pk
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_id</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">source_field</span> {
-        <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>]
-    } <span class="kw">else</span> {
+    <span class="kw">let </span>ast_field = <span class="kw">if let </span><span class="prelude-val">Some</span>(field_id) = pk.source_field {
+        <span class="kw-2">&amp;</span>ctx.ast[model_id][field_id]
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::FieldArity::List</span> <span class="op">|</span> <span class="ident">ast::FieldArity::Optional</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    <span class="kw">if let </span>ast::FieldArity::List | ast::FieldArity::Optional = ast_field.arity {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
             <span class="string">&quot;Fields that are marked as id must be required.&quot;</span>,
             <span class="string">&quot;@id&quot;</span>,
-            <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">pk</span>.<span class="ident">source_attribute</span>].<span class="ident">span</span>,
+            ctx.ast[pk.source_attribute].span,
         ))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">primary_key_mapped_name</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+<span class="kw">fn </span>primary_key_mapped_name(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;StringId&gt; {
+    <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
     {
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">mapped_name</span>
+    mapped_name
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

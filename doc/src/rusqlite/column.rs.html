@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/column.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>column.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/column.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>column.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -295,302 +295,302 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::str;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>, <span class="ident">Row</span>, <span class="ident">Rows</span>, <span class="ident">Statement</span>};
+<span class="kw">use crate</span>::{Error, <span class="prelude-ty">Result</span>, Row, Rows, Statement};
 
-<span class="doccomment">/// Information about a column of a SQLite query.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">str</span>,
-    <span class="ident">decl_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Information about a column of a SQLite query.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Column&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt </span>str,
+    decl_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt </span>str&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the name of the column.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl </span>Column&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="doccomment">/// Returns the name of the column.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// Returns the type of the column (`None` for expression).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decl_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">decl_type</span>
+    <span class="doccomment">/// Returns the type of the column (`None` for expression).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>decl_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.decl_type
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get all the column names in the result set of the prepared statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If associated DB schema can be altered concurrently, you should make</span>
-    <span class="doccomment">/// sure that current statement has already been stepped once before</span>
-    <span class="doccomment">/// calling this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_count</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">i</span>);
-            <span class="ident">cols</span>.<span class="ident">push</span>(<span class="ident">s</span>);
+<span class="kw">impl </span>Statement&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="doccomment">/// Get all the column names in the result set of the prepared statement.
+    ///
+    /// If associated DB schema can be altered concurrently, you should make
+    /// sure that current statement has already been stepped once before
+    /// calling this method.
+    </span><span class="kw">pub fn </span>column_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">let </span>n = <span class="self">self</span>.column_count();
+        <span class="kw">let </span><span class="kw-2">mut </span>cols = Vec::with_capacity(n <span class="kw">as </span>usize);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="kw">let </span>s = <span class="self">self</span>.column_name_unwrap(i);
+            cols.push(s);
         }
-        <span class="ident">cols</span>
+        cols
     }
 
-    <span class="doccomment">/// Return the number of columns in the result set returned by the prepared</span>
-    <span class="doccomment">/// statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If associated DB schema can be altered concurrently, you should make</span>
-    <span class="doccomment">/// sure that current statement has already been stepped once before</span>
-    <span class="doccomment">/// calling this method.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_count</span>()
+    <span class="doccomment">/// Return the number of columns in the result set returned by the prepared
+    /// statement.
+    ///
+    /// If associated DB schema can be altered concurrently, you should make
+    /// sure that current statement has already been stepped once before
+    /// calling this method.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.stmt.column_count()
     }
 
-    <span class="doccomment">/// Check that column name reference lifetime is limited:</span>
-    <span class="doccomment">/// https://www.sqlite.org/c3ref/column_name.html</span>
-    <span class="doccomment">/// &gt; The returned string pointer is valid...</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `column_name` reference can become invalid if `stmt` is reprepared</span>
-    <span class="doccomment">/// (because of schema change) when `query_row` is called. So we assert</span>
-    <span class="doccomment">/// that a compilation error happens if this reference is kept alive:</span>
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// use rusqlite::{Connection, Result};</span>
-    <span class="doccomment">/// fn main() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">///     let db = Connection::open_in_memory()?;</span>
-    <span class="doccomment">///     let mut stmt = db.prepare(&quot;SELECT 1 as x&quot;)?;</span>
-    <span class="doccomment">///     let column_name = stmt.column_name(0)?;</span>
-    <span class="doccomment">///     let x = stmt.query_row([], |r| r.get::&lt;_, i64&gt;(0))?; // E0502</span>
-    <span class="doccomment">///     assert_eq!(1, x);</span>
-    <span class="doccomment">///     assert_eq!(&quot;x&quot;, column_name);</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">column_name_unwrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="comment">// Just panic if the bounds are wrong for now, we never call this</span>
-        <span class="comment">// without checking first.</span>
-        <span class="self">self</span>.<span class="ident">column_name</span>(<span class="ident">col</span>).<span class="ident">expect</span>(<span class="string">&quot;Column out of bounds&quot;</span>)
+    <span class="doccomment">/// Check that column name reference lifetime is limited:
+    /// https://www.sqlite.org/c3ref/column_name.html
+    /// &gt; The returned string pointer is valid...
+    ///
+    /// `column_name` reference can become invalid if `stmt` is reprepared
+    /// (because of schema change) when `query_row` is called. So we assert
+    /// that a compilation error happens if this reference is kept alive:
+    /// ```compile_fail
+    /// use rusqlite::{Connection, Result};
+    /// fn main() -&gt; Result&lt;()&gt; {
+    ///     let db = Connection::open_in_memory()?;
+    ///     let mut stmt = db.prepare(&quot;SELECT 1 as x&quot;)?;
+    ///     let column_name = stmt.column_name(0)?;
+    ///     let x = stmt.query_row([], |r| r.get::&lt;_, i64&gt;(0))?; // E0502
+    ///     assert_eq!(1, x);
+    ///     assert_eq!(&quot;x&quot;, column_name);
+    ///     Ok(())
+    /// }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>column_name_unwrap(<span class="kw-2">&amp;</span><span class="self">self</span>, col: usize) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="comment">// Just panic if the bounds are wrong for now, we never call this
+        // without checking first.
+        </span><span class="self">self</span>.column_name(col).expect(<span class="string">&quot;Column out of bounds&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns the name assigned to a particular column in the result set</span>
-    <span class="doccomment">/// returned by the prepared statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If associated DB schema can be altered concurrently, you should make</span>
-    <span class="doccomment">/// sure that current statement has already been stepped once before</span>
-    <span class="doccomment">/// calling this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid</span>
-    <span class="doccomment">/// column range for this row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics when column name is not valid UTF-8.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>
-            .<span class="ident">column_name</span>(<span class="ident">col</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">col</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">slice</span><span class="op">|</span> {
-                <span class="ident">str::from_utf8</span>(<span class="ident">slice</span>.<span class="ident">to_bytes</span>()).<span class="ident">expect</span>(<span class="string">&quot;Invalid UTF-8 sequence in column name&quot;</span>)
+    <span class="doccomment">/// Returns the name assigned to a particular column in the result set
+    /// returned by the prepared statement.
+    ///
+    /// If associated DB schema can be altered concurrently, you should make
+    /// sure that current statement has already been stepped once before
+    /// calling this method.
+    ///
+    /// ## Failure
+    ///
+    /// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid
+    /// column range for this row.
+    ///
+    /// Panics when column name is not valid UTF-8.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_name(<span class="kw-2">&amp;</span><span class="self">self</span>, col: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.stmt
+            .column_name(col)
+            .ok_or(Error::InvalidColumnIndex(col))
+            .map(|slice| {
+                str::from_utf8(slice.to_bytes()).expect(<span class="string">&quot;Invalid UTF-8 sequence in column name&quot;</span>)
             })
     }
 
-    <span class="doccomment">/// Returns the column index in the result set for a given column name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is no AS clause then the name of the column is unspecified and</span>
-    <span class="doccomment">/// may change from one release of SQLite to the next.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If associated DB schema can be altered concurrently, you should make</span>
-    <span class="doccomment">/// sure that current statement has already been stepped once before</span>
-    <span class="doccomment">/// calling this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will return an `Error::InvalidColumnName` when there is no column with</span>
-    <span class="doccomment">/// the specified `name`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_count</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
-            <span class="comment">// Note: `column_name` is only fallible if `i` is out of bounds,</span>
-            <span class="comment">// which we&#39;ve already checked.</span>
-            <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>().<span class="ident">to_bytes</span>()) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">i</span>);
+    <span class="doccomment">/// Returns the column index in the result set for a given column name.
+    ///
+    /// If there is no AS clause then the name of the column is unspecified and
+    /// may change from one release of SQLite to the next.
+    ///
+    /// If associated DB schema can be altered concurrently, you should make
+    /// sure that current statement has already been stepped once before
+    /// calling this method.
+    ///
+    /// # Failure
+    ///
+    /// Will return an `Error::InvalidColumnName` when there is no column with
+    /// the specified `name`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_index(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+        <span class="kw">let </span>bytes = name.as_bytes();
+        <span class="kw">let </span>n = <span class="self">self</span>.column_count();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="comment">// Note: `column_name` is only fallible if `i` is out of bounds,
+            // which we&#39;ve already checked.
+            </span><span class="kw">if </span>bytes.eq_ignore_ascii_case(<span class="self">self</span>.stmt.column_name(i).unwrap().to_bytes()) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(i);
             }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidColumnName</span>(<span class="ident">String::from</span>(<span class="ident">name</span>)))
+        <span class="prelude-val">Err</span>(Error::InvalidColumnName(String::from(name)))
     }
 
-    <span class="doccomment">/// Returns a slice describing the columns of the result of the query.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If associated DB schema can be altered concurrently, you should make</span>
-    <span class="doccomment">/// sure that current statement has already been stepped once before</span>
-    <span class="doccomment">/// calling this method.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;column_decltype&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_count</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">i</span>);
-            <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_decltype</span>(<span class="ident">i</span>);
-            <span class="kw">let</span> <span class="ident">decl_type</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                <span class="ident">str::from_utf8</span>(<span class="ident">s</span>.<span class="ident">to_bytes</span>()).<span class="ident">expect</span>(<span class="string">&quot;Invalid UTF-8 sequence in column declaration&quot;</span>)
+    <span class="doccomment">/// Returns a slice describing the columns of the result of the query.
+    ///
+    /// If associated DB schema can be altered concurrently, you should make
+    /// sure that current statement has already been stepped once before
+    /// calling this method.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;column_decltype&quot;</span>)]
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Column&gt; {
+        <span class="kw">let </span>n = <span class="self">self</span>.column_count();
+        <span class="kw">let </span><span class="kw-2">mut </span>cols = Vec::with_capacity(n <span class="kw">as </span>usize);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
+            <span class="kw">let </span>name = <span class="self">self</span>.column_name_unwrap(i);
+            <span class="kw">let </span>slice = <span class="self">self</span>.stmt.column_decltype(i);
+            <span class="kw">let </span>decl_type = slice.map(|s| {
+                str::from_utf8(s.to_bytes()).expect(<span class="string">&quot;Invalid UTF-8 sequence in column declaration&quot;</span>)
             });
-            <span class="ident">cols</span>.<span class="ident">push</span>(<span class="ident">Column</span> { <span class="ident">name</span>, <span class="ident">decl_type</span> });
+            cols.push(Column { name, decl_type });
         }
-        <span class="ident">cols</span>
+        cols
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get all the column names.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">map</span>(<span class="ident">Statement::column_names</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="doccomment">/// Get all the column names.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt; {
+        <span class="self">self</span>.stmt.map(Statement::column_names)
     }
 
-    <span class="doccomment">/// Return the number of columns.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">map</span>(<span class="ident">Statement::column_count</span>)
+    <span class="doccomment">/// Return the number of columns.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.stmt.map(Statement::column_count)
     }
 
-    <span class="doccomment">/// Return the name of the column.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> <span class="ident">stmt</span>.<span class="ident">column_name</span>(<span class="ident">col</span>))
+    <span class="doccomment">/// Return the name of the column.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_name(<span class="kw-2">&amp;</span><span class="self">self</span>, col: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt;&gt; {
+        <span class="self">self</span>.stmt.map(|stmt| stmt.column_name(col))
     }
 
-    <span class="doccomment">/// Return the index of the column.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> <span class="ident">stmt</span>.<span class="ident">column_index</span>(<span class="ident">name</span>))
+    <span class="doccomment">/// Return the index of the column.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_index(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;usize&gt;&gt; {
+        <span class="self">self</span>.stmt.map(|stmt| stmt.column_index(name))
     }
 
-    <span class="doccomment">/// Returns a slice describing the columns of the Rows.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;column_decltype&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">map</span>(<span class="ident">Statement::columns</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get all the column names of the Row.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_names</span>()
-    }
-
-    <span class="doccomment">/// Return the number of columns in the current row.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_count</span>()
-    }
-
-    <span class="doccomment">/// Return the name of the column.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name</span>(<span class="ident">col</span>)
-    }
-
-    <span class="doccomment">/// Return the index of the column.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_index</span>(<span class="ident">name</span>)
-    }
-
-    <span class="doccomment">/// Returns a slice describing the columns of the Row.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;column_decltype&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">columns</span>()
+    <span class="doccomment">/// Returns a slice describing the columns of the Rows.
+    </span><span class="attribute">#[inline]
+    #[cfg(feature = <span class="string">&quot;column_decltype&quot;</span>)]
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&gt;&gt; {
+        <span class="self">self</span>.stmt.map(Statement::columns)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Row&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="doccomment">/// Get all the column names of the Row.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.stmt.column_names()
+    }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;column_decltype&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_columns</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Column</span>;
+    <span class="doccomment">/// Return the number of columns in the current row.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.stmt.column_count()
+    }
 
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT * FROM sqlite_master&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">columns</span>();
-        <span class="kw">let</span> <span class="ident">column_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Column::name</span>).<span class="ident">collect</span>();
+    <span class="doccomment">/// Return the name of the column.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_name(<span class="kw-2">&amp;</span><span class="self">self</span>, col: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.stmt.column_name(col)
+    }
+
+    <span class="doccomment">/// Return the index of the column.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_index(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+        <span class="self">self</span>.stmt.column_index(name)
+    }
+
+    <span class="doccomment">/// Returns a slice describing the columns of the Row.
+    </span><span class="attribute">#[inline]
+    #[cfg(feature = <span class="string">&quot;column_decltype&quot;</span>)]
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;Column&gt; {
+        <span class="self">self</span>.stmt.columns()
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use crate</span>::{Connection, <span class="prelude-ty">Result</span>};
+
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;column_decltype&quot;</span>)]
+    </span><span class="kw">fn </span>test_columns() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::Column;
+
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        <span class="kw">let </span>query = db.prepare(<span class="string">&quot;SELECT * FROM sqlite_master&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>columns = query.columns();
+        <span class="kw">let </span>column_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = columns.iter().map(Column::name).collect();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">column_names</span>.<span class="ident">as_slice</span>(),
+            column_names.as_slice(),
             <span class="kw-2">&amp;</span>[<span class="string">&quot;type&quot;</span>, <span class="string">&quot;name&quot;</span>, <span class="string">&quot;tbl_name&quot;</span>, <span class="string">&quot;rootpage&quot;</span>, <span class="string">&quot;sql&quot;</span>]
         );
-        <span class="kw">let</span> <span class="ident">column_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Column::decl_type</span>).<span class="ident">collect</span>();
+        <span class="kw">let </span>column_types: Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;&gt; = columns.iter().map(Column::decl_type).collect();
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">column_types</span>[..<span class="number">3</span>],
+            <span class="kw-2">&amp;</span>column_types[..<span class="number">3</span>],
             <span class="kw-2">&amp;</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">&quot;text&quot;</span>),]
         );
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_column_name_in_error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">types::Type</span>, <span class="ident">Error</span>};
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_column_name_in_error() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use crate</span>::{types::Type, Error};
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.execute_batch(
             <span class="string">&quot;BEGIN;
              CREATE TABLE foo(x INTEGER, y TEXT);
              INSERT INTO foo VALUES(4, NULL);
              END;&quot;</span>,
         )<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT x as renamed, y FROM foo&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>([])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
-        <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">String</span><span class="op">&gt;</span>(<span class="number">0</span>).<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::InvalidColumnType</span>(<span class="ident">idx</span>, <span class="ident">name</span>, <span class="ident">ty</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">idx</span>, <span class="number">0</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">name</span>, <span class="string">&quot;renamed&quot;</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">ty</span>, <span class="ident">Type::Integer</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>stmt = db.prepare(<span class="string">&quot;SELECT x as renamed, y FROM foo&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query([])<span class="question-mark">?</span>;
+        <span class="kw">let </span>row = rows.next()<span class="question-mark">?</span>.unwrap();
+        <span class="kw">match </span>row.get::&lt;<span class="kw">_</span>, String&gt;(<span class="number">0</span>).unwrap_err() {
+            Error::InvalidColumnType(idx, name, ty) =&gt; {
+                <span class="macro">assert_eq!</span>(idx, <span class="number">0</span>);
+                <span class="macro">assert_eq!</span>(name, <span class="string">&quot;renamed&quot;</span>);
+                <span class="macro">assert_eq!</span>(ty, Type::Integer);
             }
-            <span class="ident">e</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error type: {:?}&quot;</span>, <span class="ident">e</span>);
+            e =&gt; {
+                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error type: {:?}&quot;</span>, e);
             }
         }
-        <span class="kw">match</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">String</span><span class="op">&gt;</span>(<span class="string">&quot;y&quot;</span>).<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::InvalidColumnType</span>(<span class="ident">idx</span>, <span class="ident">name</span>, <span class="ident">ty</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">idx</span>, <span class="number">1</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">name</span>, <span class="string">&quot;y&quot;</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">ty</span>, <span class="ident">Type::Null</span>);
+        <span class="kw">match </span>row.get::&lt;<span class="kw">_</span>, String&gt;(<span class="string">&quot;y&quot;</span>).unwrap_err() {
+            Error::InvalidColumnType(idx, name, ty) =&gt; {
+                <span class="macro">assert_eq!</span>(idx, <span class="number">1</span>);
+                <span class="macro">assert_eq!</span>(name, <span class="string">&quot;y&quot;</span>);
+                <span class="macro">assert_eq!</span>(ty, Type::Null);
             }
-            <span class="ident">e</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error type: {:?}&quot;</span>, <span class="ident">e</span>);
+            e =&gt; {
+                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error type: {:?}&quot;</span>, e);
             }
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// `column_name` reference should stay valid until `stmt` is reprepared (or</span>
-    <span class="doccomment">/// reset) even if DB schema is altered (SQLite documentation is</span>
-    <span class="doccomment">/// ambiguous here because it says reference &quot;is valid until (...) the next</span>
-    <span class="doccomment">/// call to sqlite3_column_name() or sqlite3_column_name16() on the same</span>
-    <span class="doccomment">/// column.&quot;. We assume that reference is valid if only</span>
-    <span class="doccomment">/// `sqlite3_column_name()` is used):</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_column_name_reference</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE y (x);&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">prepare</span>(<span class="string">&quot;SELECT x FROM y;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">column_name</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;x&quot;</span>, <span class="ident">column_name</span>);
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;ALTER TABLE y RENAME COLUMN x TO z;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="comment">// column name is not refreshed until statement is re-prepared</span>
-        <span class="kw">let</span> <span class="ident">same_column_name</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">column_name</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">same_column_name</span>, <span class="ident">column_name</span>);
+    <span class="doccomment">/// `column_name` reference should stay valid until `stmt` is reprepared (or
+    /// reset) even if DB schema is altered (SQLite documentation is
+    /// ambiguous here because it says reference &quot;is valid until (...) the next
+    /// call to sqlite3_column_name() or sqlite3_column_name16() on the same
+    /// column.&quot;. We assume that reference is valid if only
+    /// `sqlite3_column_name()` is used):
+    </span><span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span><span class="kw">fn </span>test_column_name_reference() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.execute_batch(<span class="string">&quot;CREATE TABLE y (x);&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt = db.prepare(<span class="string">&quot;SELECT x FROM y;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>column_name = stmt.column_name(<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;x&quot;</span>, column_name);
+        db.execute_batch(<span class="string">&quot;ALTER TABLE y RENAME COLUMN x TO z;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="comment">// column name is not refreshed until statement is re-prepared
+        </span><span class="kw">let </span>same_column_name = stmt.column_name(<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(same_column_name, column_name);
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

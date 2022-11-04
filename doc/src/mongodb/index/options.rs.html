@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/index/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/index/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -262,269 +262,269 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">serde_helpers</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util</span>,
-    <span class="ident">collation::Collation</span>,
+<span class="kw">use crate</span>::{
+    bson::{serde_helpers, Document},
+    bson_util,
+    collation::Collation,
 };
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+<span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="doccomment">/// These are the valid options for specifying an [`IndexModel`](../struct.IndexModel.html).</span>
-<span class="doccomment">/// For more information on these properties, see the [documentation](https://www.mongodb.com/docs/manual/reference/command/createIndexes/#definition).</span>
-<span class="attribute">#[<span class="ident">serde_with::skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">builder</span>(<span class="ident">field_defaults</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">into</span>)))]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexOptions</span> {
-    <span class="doccomment">/// Tells the server to build the index in the background and not block other tasks. Starting</span>
-    <span class="doccomment">/// in MongoDB 4.2, this option is deprecated and ignored by the server.</span>
-    <span class="kw">pub</span> <span class="ident">background</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// These are the valid options for specifying an [`IndexModel`](../struct.IndexModel.html).
+/// For more information on these properties, see the [documentation](https://www.mongodb.com/docs/manual/reference/command/createIndexes/#definition).
+</span><span class="attribute">#[serde_with::skip_serializing_none]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, TypedBuilder)]
+#[builder(field_defaults(default, setter(into)))]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>IndexOptions {
+    <span class="doccomment">/// Tells the server to build the index in the background and not block other tasks. Starting
+    /// in MongoDB 4.2, this option is deprecated and ignored by the server.
+    </span><span class="kw">pub </span>background: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Specifies a TTL to control how long MongoDB retains</span>
-    <span class="doccomment">/// documents in this collection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [documentation](https://www.mongodb.com/docs/manual/core/index-ttl/)</span>
-    <span class="doccomment">/// for more information on how to use this option.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;expireAfterSeconds&quot;</span>,
-        <span class="ident">default</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">expire_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies a TTL to control how long MongoDB retains
+    /// documents in this collection.
+    ///
+    /// See the [documentation](https://www.mongodb.com/docs/manual/core/index-ttl/)
+    /// for more information on how to use this option.
+    </span><span class="attribute">#[serde(
+        rename = <span class="string">&quot;expireAfterSeconds&quot;</span>,
+        default,
+        deserialize_with = <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_seconds&quot;</span>,
+        serialize_with = <span class="string">&quot;bson_util::serialize_duration_option_as_int_secs&quot;
+    </span>)]
+    </span><span class="kw">pub </span>expire_after: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// Specifies a name outside the default generated name.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies a name outside the default generated name.
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// If true, the index only references documents with the specified field. The</span>
-    <span class="doccomment">/// default value is false.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [documentation](https://www.mongodb.com/docs/manual/core/index-sparse/)</span>
-    <span class="doccomment">/// for more information on how to use this option.</span>
-    <span class="kw">pub</span> <span class="ident">sparse</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If true, the index only references documents with the specified field. The
+    /// default value is false.
+    ///
+    /// See the [documentation](https://www.mongodb.com/docs/manual/core/index-sparse/)
+    /// for more information on how to use this option.
+    </span><span class="kw">pub </span>sparse: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Allows users to configure the storage engine on a per-index basis when creating</span>
-    <span class="doccomment">/// an index.</span>
-    <span class="kw">pub</span> <span class="ident">storage_engine</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Allows users to configure the storage engine on a per-index basis when creating
+    /// an index.
+    </span><span class="kw">pub </span>storage_engine: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// Forces the index to be unique so the collection will not accept documents where the index</span>
-    <span class="doccomment">/// key value matches an existing value in the index. The default value is false.</span>
-    <span class="kw">pub</span> <span class="ident">unique</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Forces the index to be unique so the collection will not accept documents where the index
+    /// key value matches an existing value in the index. The default value is false.
+    </span><span class="kw">pub </span>unique: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Specify the version number of the index.</span>
-    <span class="doccomment">/// Starting in MongoDB 3.2, Version 0 indexes are not allowed.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;v&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexVersion</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specify the version number of the index.
+    /// Starting in MongoDB 3.2, Version 0 indexes are not allowed.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;v&quot;</span>)]
+    </span><span class="kw">pub </span>version: <span class="prelude-ty">Option</span>&lt;IndexVersion&gt;,
 
-    <span class="doccomment">/// For text indexes, the language that determines the list of stop words and the</span>
-    <span class="doccomment">/// rules for the stemmer and tokenizer.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;default_language&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">default_language</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For text indexes, the language that determines the list of stop words and the
+    /// rules for the stemmer and tokenizer.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;default_language&quot;</span>)]
+    </span><span class="kw">pub </span>default_language: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// For `text` indexes, the name of the field, in the collection’s documents, that</span>
-    <span class="doccomment">/// contains the override language for the document.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;language_override&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">language_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `text` indexes, the name of the field, in the collection’s documents, that
+    /// contains the override language for the document.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;language_override&quot;</span>)]
+    </span><span class="kw">pub </span>language_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The `text` index version number. Users can use this option to override the default</span>
-    <span class="doccomment">/// version number.</span>
-    <span class="kw">pub</span> <span class="ident">text_index_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TextIndexVersion</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `text` index version number. Users can use this option to override the default
+    /// version number.
+    </span><span class="kw">pub </span>text_index_version: <span class="prelude-ty">Option</span>&lt;TextIndexVersion&gt;,
 
-    <span class="doccomment">/// For `text` indexes, a document that contains field and weight pairs.</span>
-    <span class="kw">pub</span> <span class="ident">weights</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `text` indexes, a document that contains field and weight pairs.
+    </span><span class="kw">pub </span>weights: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// The `2dsphere` index version number.</span>
-    <span class="doccomment">/// As of MongoDB 3.2, version 3 is the default. Version 2 is the default in MongoDB 2.6 and</span>
-    <span class="doccomment">/// 3.0 series.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;2dsphereIndexVersion&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">sphere_2d_index_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sphere2DIndexVersion</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `2dsphere` index version number.
+    /// As of MongoDB 3.2, version 3 is the default. Version 2 is the default in MongoDB 2.6 and
+    /// 3.0 series.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;2dsphereIndexVersion&quot;</span>)]
+    </span><span class="kw">pub </span>sphere_2d_index_version: <span class="prelude-ty">Option</span>&lt;Sphere2DIndexVersion&gt;,
 
-    <span class="doccomment">/// For `2dsphere` indexes, the number of precision of the stored geohash value of the</span>
-    <span class="doccomment">/// location data. The bits value ranges from 1 to 32 inclusive.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_u32_option_as_i32&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `2dsphere` indexes, the number of precision of the stored geohash value of the
+    /// location data. The bits value ranges from 1 to 32 inclusive.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u32_option_as_i32&quot;</span>)]
+    </span><span class="kw">pub </span>bits: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// For `2dsphere` indexes, the upper inclusive boundary for the longitude and latitude</span>
-    <span class="doccomment">/// values.</span>
-    <span class="kw">pub</span> <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `2dsphere` indexes, the upper inclusive boundary for the longitude and latitude
+    /// values.
+    </span><span class="kw">pub </span>max: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-    <span class="doccomment">/// For `2dsphere` indexes, the lower inclusive boundary for the longitude and latitude</span>
-    <span class="doccomment">/// values.</span>
-    <span class="kw">pub</span> <span class="ident">min</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `2dsphere` indexes, the lower inclusive boundary for the longitude and latitude
+    /// values.
+    </span><span class="kw">pub </span>min: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
-    <span class="doccomment">/// For `geoHaystack` indexes, specify the number of units within which to group the location</span>
-    <span class="doccomment">/// values.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::serialize_u32_option_as_i32&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">bucket_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For `geoHaystack` indexes, specify the number of units within which to group the location
+    /// values.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;bson_util::serialize_u32_option_as_i32&quot;</span>)]
+    </span><span class="kw">pub </span>bucket_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// If specified, the index only references documents that match the filter</span>
-    <span class="doccomment">/// expression. See Partial Indexes for more information.</span>
-    <span class="kw">pub</span> <span class="ident">partial_filter_expression</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If specified, the index only references documents that match the filter
+    /// expression. See Partial Indexes for more information.
+    </span><span class="kw">pub </span>partial_filter_expression: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// Specifies the collation for the index.</span>
-    <span class="kw">pub</span> <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies the collation for the index.
+    </span><span class="kw">pub </span>collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
 
-    <span class="doccomment">/// Allows users to include or exclude specific field paths from a wildcard index.</span>
-    <span class="kw">pub</span> <span class="ident">wildcard_projection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Allows users to include or exclude specific field paths from a wildcard index.
+    </span><span class="kw">pub </span>wildcard_projection: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 
-    <span class="doccomment">/// A flag that determines whether the index is hidden from the query planner. A</span>
-    <span class="doccomment">/// hidden index is not evaluated as part of the query plan selection.</span>
-    <span class="kw">pub</span> <span class="ident">hidden</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A flag that determines whether the index is hidden from the query planner. A
+    /// hidden index is not evaluated as part of the query plan selection.
+    </span><span class="kw">pub </span>hidden: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">skip</span>))]</span>
-    <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="attribute">#[builder(default, setter(skip))]
+    </span>clustered: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">IndexOptions</span> {
-    <span class="doccomment">/// Optionally specifies that this index is clustered.  This is not a valid option to provide to</span>
-    <span class="doccomment">/// &#39;create_indexes&#39;, but can appear in the options returned for an index via &#39;list_indexes&#39;.</span>
-    <span class="doccomment">/// To create a clustered index, create a new collection using the &#39;clustered_index&#39; option.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This options is only supported by servers &gt;= 6.0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">clustered</span>
+<span class="kw">impl </span>IndexOptions {
+    <span class="doccomment">/// Optionally specifies that this index is clustered.  This is not a valid option to provide to
+    /// &#39;create_indexes&#39;, but can appear in the options returned for an index via &#39;list_indexes&#39;.
+    /// To create a clustered index, create a new collection using the &#39;clustered_index&#39; option.
+    ///
+    /// This options is only supported by servers &gt;= 6.0.
+    </span><span class="kw">pub fn </span>clustered(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.clustered
     }
 }
 
-<span class="doccomment">/// The version of the index. Version 0 Indexes are disallowed as of MongoDB 3.2.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [Version 0 Indexes](https://www.mongodb.com/docs/manual/release-notes/3.2-compatibility/#std-label-3.2-version-0-indexes) for more information.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexVersion</span> {
-    <span class="attribute">#[<span class="ident">deprecated</span>]</span>
-    <span class="doccomment">/// Version 0.</span>
-    <span class="ident">V0</span>,
+<span class="doccomment">/// The version of the index. Version 0 Indexes are disallowed as of MongoDB 3.2.
+///
+/// See [Version 0 Indexes](https://www.mongodb.com/docs/manual/release-notes/3.2-compatibility/#std-label-3.2-version-0-indexes) for more information.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>IndexVersion {
+    <span class="attribute">#[deprecated]
+    </span><span class="doccomment">/// Version 0.
+    </span>V0,
 
-    <span class="doccomment">/// Version 1.</span>
-    <span class="ident">V1</span>,
+    <span class="doccomment">/// Version 1.
+    </span>V1,
 
-    <span class="doccomment">/// Version 2.</span>
-    <span class="ident">V2</span>,
+    <span class="doccomment">/// Version 2.
+    </span>V2,
 
-    <span class="comment">//// Specify a custom index version. This is present to provide forwards compatibility with</span>
-    <span class="doccomment">/// any future index versions which may be added to new versions of MongoDB.</span>
-    <span class="ident">Custom</span>(<span class="ident">u32</span>),
+    <span class="comment">//// Specify a custom index version. This is present to provide forwards compatibility with
+    </span><span class="doccomment">/// any future index versions which may be added to new versions of MongoDB.
+    </span>Custom(u32),
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">IndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="attribute">#[allow(deprecated)]
+</span><span class="kw">impl </span>Serialize <span class="kw">for </span>IndexVersion {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">IndexVersion::V0</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">0</span>),
-            <span class="ident">IndexVersion::V1</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
-            <span class="ident">IndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            IndexVersion::V0 =&gt; serializer.serialize_i32(<span class="number">0</span>),
+            IndexVersion::V1 =&gt; serializer.serialize_i32(<span class="number">1</span>),
+            IndexVersion::V2 =&gt; serializer.serialize_i32(<span class="number">2</span>),
+            IndexVersion::Custom(i) =&gt; serde_helpers::serialize_u32_as_i32(i, serializer),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(deprecated)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>IndexVersion {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V0</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V1</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::V2</span>),
-            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">IndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+        <span class="kw">match </span>i32::deserialize(deserializer)<span class="question-mark">? </span>{
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(IndexVersion::V0),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(IndexVersion::V1),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(IndexVersion::V2),
+            i =&gt; <span class="prelude-val">Ok</span>(IndexVersion::Custom(i <span class="kw">as </span>u32)),
         }
     }
 }
 
-<span class="doccomment">/// Specify the version for a `text` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/index-text/#versions).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TextIndexVersion</span> {
-    <span class="doccomment">/// Version 1.</span>
-    <span class="ident">V1</span>,
+<span class="doccomment">/// Specify the version for a `text` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/index-text/#versions).
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>TextIndexVersion {
+    <span class="doccomment">/// Version 1.
+    </span>V1,
 
-    <span class="doccomment">/// Version 2.</span>
-    <span class="ident">V2</span>,
+    <span class="doccomment">/// Version 2.
+    </span>V2,
 
-    <span class="doccomment">/// Version 3.</span>
-    <span class="ident">V3</span>,
+    <span class="doccomment">/// Version 3.
+    </span>V3,
 
-    <span class="doccomment">/// Specify a custom text index version. This is present to provide forwards compatibility with</span>
-    <span class="doccomment">/// any future text index versions which may be added to new versions of MongoDB.</span>
-    <span class="ident">Custom</span>(<span class="ident">u32</span>),
+    <span class="doccomment">/// Specify a custom text index version. This is present to provide forwards compatibility with
+    /// any future text index versions which may be added to new versions of MongoDB.
+    </span>Custom(u32),
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">TextIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>TextIndexVersion {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TextIndexVersion::V1</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">1</span>),
-            <span class="ident">TextIndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">TextIndexVersion::V3</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
-            <span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            TextIndexVersion::V1 =&gt; serializer.serialize_i32(<span class="number">1</span>),
+            TextIndexVersion::V2 =&gt; serializer.serialize_i32(<span class="number">2</span>),
+            TextIndexVersion::V3 =&gt; serializer.serialize_i32(<span class="number">3</span>),
+            TextIndexVersion::Custom(i) =&gt; serde_helpers::serialize_u32_as_i32(i, serializer),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TextIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>TextIndexVersion {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V1</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V2</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::V3</span>),
-            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">TextIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+        <span class="kw">match </span>i32::deserialize(deserializer)<span class="question-mark">? </span>{
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(TextIndexVersion::V1),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(TextIndexVersion::V2),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(TextIndexVersion::V3),
+            i =&gt; <span class="prelude-val">Ok</span>(TextIndexVersion::Custom(i <span class="kw">as </span>u32)),
         }
     }
 }
 
-<span class="doccomment">/// Specify the version for a `2dsphere` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/2dsphere/#versions).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Sphere2DIndexVersion</span> {
-    <span class="doccomment">/// Version 2.</span>
-    <span class="ident">V2</span>,
+<span class="doccomment">/// Specify the version for a `2dsphere` index. For more information, see [Versions](https://www.mongodb.com/docs/manual/core/2dsphere/#versions).
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub enum </span>Sphere2DIndexVersion {
+    <span class="doccomment">/// Version 2.
+    </span>V2,
 
-    <span class="doccomment">/// Version 3.</span>
-    <span class="ident">V3</span>,
+    <span class="doccomment">/// Version 3.
+    </span>V3,
 
-    <span class="doccomment">/// Specify a custom sphere 2D index version. This is present to provide forwards compatibility</span>
-    <span class="doccomment">/// with any future sphere 2D index verions which may be added to new versions of MongoDB.</span>
-    <span class="ident">Custom</span>(<span class="ident">u32</span>),
+    <span class="doccomment">/// Specify a custom sphere 2D index version. This is present to provide forwards compatibility
+    /// with any future sphere 2D index verions which may be added to new versions of MongoDB.
+    </span>Custom(u32),
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">Sphere2DIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>Sphere2DIndexVersion {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Sphere2DIndexVersion::V2</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">2</span>),
-            <span class="ident">Sphere2DIndexVersion::V3</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="number">3</span>),
-            <span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span>) =&gt; <span class="ident">serde_helpers::serialize_u32_as_i32</span>(<span class="ident">i</span>, <span class="ident">serializer</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            Sphere2DIndexVersion::V2 =&gt; serializer.serialize_i32(<span class="number">2</span>),
+            Sphere2DIndexVersion::V3 =&gt; serializer.serialize_i32(<span class="number">3</span>),
+            Sphere2DIndexVersion::Custom(i) =&gt; serde_helpers::serialize_u32_as_i32(i, serializer),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Sphere2DIndexVersion</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Sphere2DIndexVersion {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">i32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V2</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::V3</span>),
-            <span class="ident">i</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Sphere2DIndexVersion::Custom</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+        <span class="kw">match </span>i32::deserialize(deserializer)<span class="question-mark">? </span>{
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(Sphere2DIndexVersion::V2),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(Sphere2DIndexVersion::V3),
+            i =&gt; <span class="prelude-val">Ok</span>(Sphere2DIndexVersion::Custom(i <span class="kw">as </span>u32)),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

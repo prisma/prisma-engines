@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/shard.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/shard.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -430,437 +430,437 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cfg</span>::{<span class="self">self</span>, <span class="ident">CfgPrivate</span>},
-    <span class="ident">clear::Clear</span>,
-    <span class="ident">page</span>,
-    <span class="ident">sync</span>::{
-        <span class="ident">alloc</span>,
-        <span class="ident">atomic</span>::{
-            <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>,
-            <span class="ident">Ordering</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    cfg::{<span class="self">self</span>, CfgPrivate},
+    clear::Clear,
+    page,
+    sync::{
+        alloc,
+        atomic::{
+            AtomicPtr, AtomicUsize,
+            Ordering::{<span class="self">self</span>, <span class="kw-2">*</span>},
         },
     },
-    <span class="ident">tid::Tid</span>,
-    <span class="ident">Pack</span>,
+    tid::Tid,
+    Pack,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">ptr</span>, <span class="ident">slice</span>};
+<span class="kw">use </span>std::{fmt, ptr, slice};
 
-<span class="comment">// ┌─────────────┐      ┌────────┐</span>
-<span class="comment">// │ page 1      │      │        │</span>
-<span class="comment">// ├─────────────┤ ┌───▶│  next──┼─┐</span>
-<span class="comment">// │ page 2      │ │    ├────────┤ │</span>
-<span class="comment">// │             │ │    │XXXXXXXX│ │</span>
-<span class="comment">// │ local_free──┼─┘    ├────────┤ │</span>
-<span class="comment">// │ global_free─┼─┐    │        │◀┘</span>
-<span class="comment">// ├─────────────┤ └───▶│  next──┼─┐</span>
-<span class="comment">// │   page 3    │      ├────────┤ │</span>
-<span class="comment">// └─────────────┘      │XXXXXXXX│ │</span>
-<span class="comment">//       ...            ├────────┤ │</span>
-<span class="comment">// ┌─────────────┐      │XXXXXXXX│ │</span>
-<span class="comment">// │ page n      │      ├────────┤ │</span>
-<span class="comment">// └─────────────┘      │        │◀┘</span>
-<span class="comment">//                      │  next──┼───▶</span>
-<span class="comment">//                      ├────────┤</span>
-<span class="comment">//                      │XXXXXXXX│</span>
-<span class="comment">//                      └────────┘</span>
-<span class="comment">//                         ...</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The shard&#39;s parent thread ID.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tid</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The local free list for each page.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These are only ever accessed from this shard&#39;s thread, so they are</span>
-    <span class="doccomment">/// stored separately from the shared state for the page that can be</span>
-    <span class="doccomment">/// accessed concurrently, to minimize false sharing.</span>
-    <span class="ident">local</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">page::Local</span>]<span class="op">&gt;</span>,
-    <span class="doccomment">/// The shared state for each page in this shard.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This consists of the page&#39;s metadata (size, previous size), remote free</span>
-    <span class="doccomment">/// list, and a pointer to the actual array backing that page.</span>
-    <span class="ident">shared</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">page::Shared</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>]<span class="op">&gt;</span>,
+<span class="comment">// ┌─────────────┐      ┌────────┐
+// │ page 1      │      │        │
+// ├─────────────┤ ┌───▶│  next──┼─┐
+// │ page 2      │ │    ├────────┤ │
+// │             │ │    │XXXXXXXX│ │
+// │ local_free──┼─┘    ├────────┤ │
+// │ global_free─┼─┐    │        │◀┘
+// ├─────────────┤ └───▶│  next──┼─┐
+// │   page 3    │      ├────────┤ │
+// └─────────────┘      │XXXXXXXX│ │
+//       ...            ├────────┤ │
+// ┌─────────────┐      │XXXXXXXX│ │
+// │ page n      │      ├────────┤ │
+// └─────────────┘      │        │◀┘
+//                      │  next──┼───▶
+//                      ├────────┤
+//                      │XXXXXXXX│
+//                      └────────┘
+//                         ...
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Shard&lt;T, C: cfg::Config&gt; {
+    <span class="doccomment">/// The shard&#39;s parent thread ID.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) tid: usize,
+    <span class="doccomment">/// The local free list for each page.
+    ///
+    /// These are only ever accessed from this shard&#39;s thread, so they are
+    /// stored separately from the shared state for the page that can be
+    /// accessed concurrently, to minimize false sharing.
+    </span>local: Box&lt;[page::Local]&gt;,
+    <span class="doccomment">/// The shared state for each page in this shard.
+    ///
+    /// This consists of the page&#39;s metadata (size, previous size), remote free
+    /// list, and a pointer to the actual array backing that page.
+    </span>shared: Box&lt;[page::Shared&lt;T, C&gt;]&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> {
-    <span class="ident">shards</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Ptr</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>]<span class="op">&gt;</span>,
-    <span class="ident">max</span>: <span class="ident">AtomicUsize</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Array&lt;T, C: cfg::Config&gt; {
+    shards: Box&lt;[Ptr&lt;T, C&gt;]&gt;,
+    max: AtomicUsize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span>(<span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">alloc::Track</span><span class="op">&lt;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Ptr&lt;T, C: cfg::Config&gt;(AtomicPtr&lt;alloc::Track&lt;Shard&lt;T, C&gt;&gt;&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">slice::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ptr</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T: <span class="lifetime">&#39;a</span>, C: cfg::Config + <span class="lifetime">&#39;a</span>&gt;(slice::IterMut&lt;<span class="lifetime">&#39;a</span>, Ptr&lt;T, C&gt;&gt;);
 
-<span class="comment">// === impl Shard ===</span>
+<span class="comment">// === impl Shard ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;T, C&gt; Shard&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_slot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">idx</span>: <span class="ident">usize</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_slot&lt;<span class="lifetime">&#39;a</span>, U&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        idx: usize,
+        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>page::Slot&lt;T, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt; {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; {:?}&quot;</span>, <span class="ident">addr</span>);
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; {:?}&quot;</span>, addr);
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">with_slot</span>(<span class="ident">addr</span>, <span class="ident">f</span>)
+        <span class="self">self</span>.shared[page_index].with_slot(addr, f)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tid</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total_sz</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">C::MAX_PAGES</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">page_num</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">C::page_size</span>(<span class="ident">page_num</span>);
-                <span class="kw">let</span> <span class="ident">prev_sz</span> <span class="op">=</span> <span class="ident">total_sz</span>;
-                <span class="ident">total_sz</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sz</span>;
-                <span class="ident">page::Shared::new</span>(<span class="ident">sz</span>, <span class="ident">prev_sz</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(tid: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>total_sz = <span class="number">0</span>;
+        <span class="kw">let </span>shared = (<span class="number">0</span>..C::MAX_PAGES)
+            .map(|page_num| {
+                <span class="kw">let </span>sz = C::page_size(page_num);
+                <span class="kw">let </span>prev_sz = total_sz;
+                total_sz += sz;
+                page::Shared::new(sz, prev_sz)
             })
-            .<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">C::MAX_PAGES</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">page::Local::new</span>()).<span class="ident">collect</span>();
-        <span class="self">Self</span> { <span class="ident">tid</span>, <span class="ident">local</span>, <span class="ident">shared</span> }
+            .collect();
+        <span class="kw">let </span>local = (<span class="number">0</span>..C::MAX_PAGES).map(|<span class="kw">_</span>| page::Local::new()).collect();
+        <span class="self">Self </span>{ tid, local, shared }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Shard&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="doccomment">/// Remove an item on the shard&#39;s local thread.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="doccomment">/// Remove an item on the shard&#39;s local thread.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_local(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; remove_local {:?}&quot;</span>, <span class="ident">addr</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; remove_local {:?}&quot;</span>, addr);
 
-        <span class="self">self</span>.<span class="ident">shared</span>
-            .<span class="ident">get</span>(<span class="ident">page_index</span>)<span class="question-mark">?</span>
-            .<span class="ident">take</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
+        <span class="self">self</span>.shared
+            .get(page_index)<span class="question-mark">?
+            </span>.take(addr, C::unpack_gen(idx), <span class="self">self</span>.local(page_index))
     }
 
-    <span class="doccomment">/// Remove an item, while on a different thread from the shard&#39;s local thread.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>().<span class="ident">as_usize</span>() <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">tid</span>);
+    <span class="doccomment">/// Remove an item, while on a different thread from the shard&#39;s local thread.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_remote(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="macro">debug_assert!</span>(Tid::&lt;C&gt;::current().as_usize() != <span class="self">self</span>.tid);
 
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; take_remote {:?}; page {:?}&quot;</span>, <span class="ident">addr</span>, <span class="ident">page_index</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; take_remote {:?}; page {:?}&quot;</span>, addr, page_index);
 
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">get</span>(<span class="ident">page_index</span>)<span class="question-mark">?</span>;
-        <span class="ident">shared</span>.<span class="ident">take</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
+        <span class="kw">let </span>shared = <span class="self">self</span>.shared.get(page_index)<span class="question-mark">?</span>;
+        shared.take(addr, C::unpack_gen(idx), shared.free_list())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_local(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
+        <span class="self">self</span>.shared[page_index].remove(addr, C::unpack_gen(idx), <span class="self">self</span>.local(page_index))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove_remote(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>];
-        <span class="ident">shared</span>.<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
+        <span class="kw">let </span>shared = <span class="kw-2">&amp;</span><span class="self">self</span>.shared[page_index];
+        shared.remove(addr, C::unpack_gen(idx), shared.free_list())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">page::Shared</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">iter</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;<span class="lifetime">&#39;_</span>, page::Shared&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;&gt; {
+        <span class="self">self</span>.shared.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Shard&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init_with</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init_with&lt;U&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">page::Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="comment">// Can we fit the value into an exist`ing page?</span>
-        <span class="kw">for</span> (<span class="ident">page_idx</span>, <span class="ident">page</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_idx</span>);
+        <span class="kw-2">mut </span>init: <span class="kw">impl </span>FnMut(usize, <span class="kw-2">&amp;</span>page::Slot&lt;T, C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;U&gt; {
+        <span class="comment">// Can we fit the value into an exist`ing page?
+        </span><span class="kw">for </span>(page_idx, page) <span class="kw">in </span><span class="self">self</span>.shared.iter().enumerate() {
+            <span class="kw">let </span>local = <span class="self">self</span>.local(page_idx);
 
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; page {}; {:?}; {:?}&quot;</span>, <span class="ident">page_idx</span>, <span class="ident">local</span>, <span class="ident">page</span>);
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; page {}; {:?}; {:?}&quot;</span>, page_idx, local, page);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">page</span>.<span class="ident">init_with</span>(<span class="ident">local</span>, <span class="kw-2">&amp;mut</span> <span class="ident">init</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(res) = page.init_with(local, <span class="kw-2">&amp;mut </span>init) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(res);
             }
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mark_clear_local(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">mark_clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
+        <span class="self">self</span>.shared[page_index].mark_clear(addr, C::unpack_gen(idx), <span class="self">self</span>.local(page_index))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mark_clear_remote(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>];
-        <span class="ident">shared</span>.<span class="ident">mark_clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
+        <span class="kw">let </span>shared = <span class="kw-2">&amp;</span><span class="self">self</span>.shared[page_index];
+        shared.mark_clear(addr, C::unpack_gen(idx), shared.free_list())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear_after_release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) {
-        <span class="ident"><span class="kw">crate</span>::sync::atomic::fence</span>(<span class="ident"><span class="kw">crate</span>::sync::atomic::Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>().<span class="ident">as_usize</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear_after_release(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) {
+        <span class="kw">crate</span>::sync::atomic::fence(<span class="kw">crate</span>::sync::atomic::Ordering::Acquire);
+        <span class="kw">let </span>tid = Tid::&lt;C&gt;::current().as_usize();
         <span class="macro">test_println!</span>(
             <span class="string">&quot;-&gt; clear_after_release; self.tid={:?}; current.tid={:?};&quot;</span>,
-            <span class="ident">tid</span>,
-            <span class="self">self</span>.<span class="ident">tid</span>
+            tid,
+            <span class="self">self</span>.tid
         );
-        <span class="kw">if</span> <span class="ident">tid</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">tid</span> {
-            <span class="self">self</span>.<span class="ident">clear_local</span>(<span class="ident">idx</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">clear_remote</span>(<span class="ident">idx</span>);
+        <span class="kw">if </span>tid == <span class="self">self</span>.tid {
+            <span class="self">self</span>.clear_local(idx);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.clear_remote(idx);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">fn </span>clear_local(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
+        <span class="self">self</span>.shared[page_index].clear(addr, C::unpack_gen(idx), <span class="self">self</span>.local(page_index))
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert_eq_in_drop!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page::indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+    <span class="kw">fn </span>clear_remote(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="macro">debug_assert_eq_in_drop!</span>(Tid::&lt;C&gt;::from_packed(idx).as_usize(), <span class="self">self</span>.tid);
+        <span class="kw">let </span>(addr, page_index) = page::indices::&lt;C&gt;(idx);
 
-        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>page_index &gt; <span class="self">self</span>.shared.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>];
-        <span class="ident">shared</span>.<span class="ident">clear</span>(<span class="ident">addr</span>, <span class="ident">C::unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
+        <span class="kw">let </span>shared = <span class="kw-2">&amp;</span><span class="self">self</span>.shared[page_index];
+        shared.clear(addr, C::unpack_gen(idx), shared.free_list())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">page::Local</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        <span class="macro">debug_assert_eq_in_drop!</span>(
-            <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>().<span class="ident">as_usize</span>(),
-            <span class="self">self</span>.<span class="ident">tid</span>,
-            <span class="string">&quot;tried to access local data from another thread!&quot;</span>
-        );
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>local(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="kw-2">&amp;</span>page::Local {
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span><span class="macro">debug_assert_eq_in_drop!</span>(
+            Tid::&lt;C&gt;::current().as_usize(),
+            <span class="self">self</span>.tid,
+            <span class="string">&quot;tried to access local data from another thread!&quot;
+        </span>);
 
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span>[<span class="ident">i</span>]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.local[i]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Shard&quot;</span>);
+<span class="kw">impl</span>&lt;T: fmt::Debug, C: cfg::Config&gt; fmt::Debug <span class="kw">for </span>Shard&lt;T, C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = f.debug_struct(<span class="string">&quot;Shard&quot;</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        <span class="ident">d</span>.<span class="ident">field</span>(<span class="string">&quot;tid&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="ident">d</span>.<span class="ident">field</span>(<span class="string">&quot;shared&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>).<span class="ident">finish</span>()
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span>d.field(<span class="string">&quot;tid&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tid);
+        d.field(<span class="string">&quot;shared&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.shared).finish()
     }
 }
 
-<span class="comment">// === impl Array ===</span>
+<span class="comment">// === impl Array ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;T, C&gt; Array&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shards</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">C::MAX_SHARDS</span>);
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">C::MAX_SHARDS</span> {
-            <span class="comment">// XXX(eliza): T_T this could be avoided with maybeuninit or something...</span>
-            <span class="ident">shards</span>.<span class="ident">push</span>(<span class="ident">Ptr::null</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>shards = Vec::with_capacity(C::MAX_SHARDS);
+        <span class="kw">for _ in </span><span class="number">0</span>..C::MAX_SHARDS {
+            <span class="comment">// XXX(eliza): T_T this could be avoided with maybeuninit or something...
+            </span>shards.push(Ptr::null());
         }
-        <span class="self">Self</span> {
-            <span class="ident">shards</span>: <span class="ident">shards</span>.<span class="ident">into</span>(),
-            <span class="ident">max</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+        <span class="self">Self </span>{
+            shards: shards.into(),
+            max: AtomicUsize::new(<span class="number">0</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get shard={}&quot;</span>, <span class="ident">idx</span>);
-        <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">idx</span>)<span class="question-mark">?</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Shard&lt;T, C&gt;&gt; {
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get shard={}&quot;</span>, idx);
+        <span class="self">self</span>.shards.get(idx)<span class="question-mark">?</span>.load(Acquire)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">Tid</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>();
-        <span class="macro">test_println!</span>(<span class="string">&quot;current: {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">tid</span>.<span class="ident">as_usize</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Tid&lt;C&gt;, <span class="kw-2">&amp;</span>Shard&lt;T, C&gt;) {
+        <span class="kw">let </span>tid = Tid::&lt;C&gt;::current();
+        <span class="macro">test_println!</span>(<span class="string">&quot;current: {:?}&quot;</span>, tid);
+        <span class="kw">let </span>idx = tid.as_usize();
         <span class="macro">assert!</span>(
-            <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">len</span>(),
+            idx &lt; <span class="self">self</span>.shards.len(),
             <span class="string">&quot;Thread count overflowed the configured max count. \
             Thread index = {}, max threads = {}.&quot;</span>,
-            <span class="ident">idx</span>,
-            <span class="ident">C::MAX_SHARDS</span>,
+            idx,
+            C::MAX_SHARDS,
         );
-        <span class="comment">// It&#39;s okay for this to be relaxed. The value is only ever stored by</span>
-        <span class="comment">// the thread that corresponds to the index, and we are that thread.</span>
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>[<span class="ident">idx</span>].<span class="ident">load</span>(<span class="ident">Relaxed</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">Box::new</span>(<span class="ident">alloc::Track::new</span>(<span class="ident">Shard::new</span>(<span class="ident">idx</span>))));
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; allocated new shard for index {} at {:p}&quot;</span>, <span class="ident">idx</span>, <span class="ident">ptr</span>);
-            <span class="self">self</span>.<span class="ident">shards</span>[<span class="ident">idx</span>].<span class="ident">set</span>(<span class="ident">ptr</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-            <span class="kw">while</span> <span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">idx</span> {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">compare_exchange</span>(<span class="ident">max</span>, <span class="ident">idx</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>) {
+        <span class="comment">// It&#39;s okay for this to be relaxed. The value is only ever stored by
+        // the thread that corresponds to the index, and we are that thread.
+        </span><span class="kw">let </span>shard = <span class="self">self</span>.shards[idx].load(Relaxed).unwrap_or_else(|| {
+            <span class="kw">let </span>ptr = Box::into_raw(Box::new(alloc::Track::new(Shard::new(idx))));
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; allocated new shard for index {} at {:p}&quot;</span>, idx, ptr);
+            <span class="self">self</span>.shards[idx].set(ptr);
+            <span class="kw">let </span><span class="kw-2">mut </span>max = <span class="self">self</span>.max.load(Acquire);
+            <span class="kw">while </span>max &lt; idx {
+                <span class="kw">match </span><span class="self">self</span>.max.compare_exchange(max, idx, AcqRel, Acquire) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="ident">max</span> <span class="op">=</span> <span class="ident">actual</span>,
+                    <span class="prelude-val">Err</span>(actual) =&gt; max = actual,
                 }
             }
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}, prev={}&quot;</span>, <span class="ident">std::cmp::max</span>(<span class="ident">max</span>, <span class="ident">idx</span>), <span class="ident">max</span>);
-            <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: we just put it there!</span>
-                <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span>
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}, prev={}&quot;</span>, std::cmp::max(max, idx), max);
+            <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: we just put it there!
+                </span><span class="kw-2">&amp;*</span>ptr
             }
-            .<span class="ident">get_ref</span>()
+            .get_ref()
         });
-        (<span class="ident">tid</span>, <span class="ident">shard</span>)
+        (tid, shard)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; IterMut&lt;<span class="lifetime">&#39;_</span>, T, C&gt; {
         <span class="macro">test_println!</span>(<span class="string">&quot;Array::iter_mut&quot;</span>);
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}&quot;</span>, <span class="ident">max</span>);
-        <span class="ident">IterMut</span>(<span class="self">self</span>.<span class="ident">shards</span>[<span class="number">0</span>..<span class="op">=</span><span class="ident">max</span>].<span class="ident">iter_mut</span>())
+        <span class="kw">let </span>max = <span class="self">self</span>.max.load(Acquire);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; highest index={}&quot;</span>, max);
+        IterMut(<span class="self">self</span>.shards[<span class="number">0</span>..=max].iter_mut())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// XXX(eliza): this could be `with_mut` if we wanted to impl a wrapper for std atomics to change `get_mut` to `with_mut`...</span>
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-        <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>[<span class="number">0</span>..<span class="op">=</span><span class="ident">max</span>] {
-            <span class="comment">// XXX(eliza): this could be `with_mut` if we wanted to impl a wrapper for std atomics to change `get_mut` to `with_mut`...</span>
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-            <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
+<span class="kw">impl</span>&lt;T, C: cfg::Config&gt; Drop <span class="kw">for </span>Array&lt;T, C&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// XXX(eliza): this could be `with_mut` if we wanted to impl a wrapper for std atomics to change `get_mut` to `with_mut`...
+        </span><span class="kw">let </span>max = <span class="self">self</span>.max.load(Acquire);
+        <span class="kw">for </span>shard <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.shards[<span class="number">0</span>..=max] {
+            <span class="comment">// XXX(eliza): this could be `with_mut` if we wanted to impl a wrapper for std atomics to change `get_mut` to `with_mut`...
+            </span><span class="kw">let </span>ptr = shard.<span class="number">0</span>.load(Acquire);
+            <span class="kw">if </span>ptr.is_null() {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: this is the only place where these boxes are</span>
-                <span class="comment">// deallocated, and we have exclusive access to the shard array,</span>
-                <span class="comment">// because...we are dropping it...</span>
-                <span class="ident">Box::from_raw</span>(<span class="ident">ptr</span>)
+            <span class="kw">let </span>shard = <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: this is the only place where these boxes are
+                // deallocated, and we have exclusive access to the shard array,
+                // because...we are dropping it...
+                </span>Box::from_raw(ptr)
             };
-            <span class="ident">drop</span>(<span class="ident">shard</span>)
+            drop(shard)
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_map</span>();
-        <span class="kw">for</span> <span class="ident">shard</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>[<span class="number">0</span>..<span class="op">=</span><span class="ident">max</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="ident">ptr::NonNull::new</span>(<span class="ident">ptr</span>) {
-                <span class="ident">set</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:p}&quot;</span>, <span class="ident">ptr</span>), <span class="kw">unsafe</span> { <span class="ident">shard</span>.<span class="ident">as_ref</span>() });
-            } <span class="kw">else</span> {
-                <span class="ident">set</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:p}&quot;</span>, <span class="ident">ptr</span>), <span class="kw-2">&amp;</span>());
+<span class="kw">impl</span>&lt;T: fmt::Debug, C: cfg::Config&gt; fmt::Debug <span class="kw">for </span>Array&lt;T, C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>max = <span class="self">self</span>.max.load(Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>set = f.debug_map();
+        <span class="kw">for </span>shard <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.shards[<span class="number">0</span>..=max] {
+            <span class="kw">let </span>ptr = shard.<span class="number">0</span>.load(Acquire);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = ptr::NonNull::new(ptr) {
+                set.entry(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:p}&quot;</span>, ptr), <span class="kw">unsafe </span>{ shard.as_ref() });
+            } <span class="kw">else </span>{
+                set.entry(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:p}&quot;</span>, ptr), <span class="kw-2">&amp;</span>());
             }
         }
-        <span class="ident">set</span>.<span class="ident">finish</span>()
+        set.finish()
     }
 }
 
-<span class="comment">// === impl Ptr ===</span>
+<span class="comment">// === impl Ptr ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">null</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()))
+</span><span class="kw">impl</span>&lt;T, C: cfg::Config&gt; Ptr&lt;T, C&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>null() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(AtomicPtr::new(ptr::null_mut()))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">order</span>);
-        <span class="macro">test_println!</span>(<span class="string">&quot;---&gt; loaded={:p} (order={:?})&quot;</span>, <span class="ident">ptr</span>, <span class="ident">order</span>);
-        <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Shard&lt;T, C&gt;&gt; {
+        <span class="kw">let </span>ptr = <span class="self">self</span>.<span class="number">0</span>.load(order);
+        <span class="macro">test_println!</span>(<span class="string">&quot;---&gt; loaded={:p} (order={:?})&quot;</span>, ptr, order);
+        <span class="kw">if </span>ptr.is_null() {
             <span class="macro">test_println!</span>(<span class="string">&quot;---&gt; null&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">track</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: The returned reference will have the same lifetime as the</span>
-            <span class="comment">// reference to the shard pointer, which (morally, if not actually)</span>
-            <span class="comment">// owns the shard. The shard is only deallocated when the shard</span>
-            <span class="comment">// array is dropped, and it won&#39;t be dropped while this pointer is</span>
-            <span class="comment">// borrowed --- and the returned reference has the same lifetime.</span>
-            <span class="comment">//</span>
-            <span class="comment">// We know that the pointer is not null, because we just</span>
-            <span class="comment">// null-checked it immediately prior.</span>
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ptr</span>
+        <span class="kw">let </span>track = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: The returned reference will have the same lifetime as the
+            // reference to the shard pointer, which (morally, if not actually)
+            // owns the shard. The shard is only deallocated when the shard
+            // array is dropped, and it won&#39;t be dropped while this pointer is
+            // borrowed --- and the returned reference has the same lifetime.
+            //
+            // We know that the pointer is not null, because we just
+            // null-checked it immediately prior.
+            </span><span class="kw-2">&amp;*</span>ptr
         };
 
-        <span class="prelude-val">Some</span>(<span class="ident">track</span>.<span class="ident">get_ref</span>())
+        <span class="prelude-val">Some</span>(track.get_ref())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new</span>: <span class="kw-2">*mut</span> <span class="ident">alloc::Track</span><span class="op">&lt;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">compare_exchange</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">new</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;a shard can only be inserted by the thread that owns it, this is a bug!&quot;</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, new: <span class="kw-2">*mut </span>alloc::Track&lt;Shard&lt;T, C&gt;&gt;) {
+        <span class="self">self</span>.<span class="number">0
+            </span>.compare_exchange(ptr::null_mut(), new, AcqRel, Acquire)
+            .expect(<span class="string">&quot;a shard can only be inserted by the thread that owns it, this is a bug!&quot;</span>);
     }
 }
 
-<span class="comment">// === Iterators ===</span>
+<span class="comment">// === Iterators ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; Iterator <span class="kw">for </span>IterMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: <span class="lifetime">&#39;a</span>,
+    C: cfg::Config + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shard&lt;T, C&gt;;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="macro">test_println!</span>(<span class="string">&quot;IterMut::next&quot;</span>);
-        <span class="kw">loop</span> {
-            <span class="comment">// Skip over empty indices if they are less than the highest</span>
-            <span class="comment">// allocated shard. Some threads may have accessed the slab</span>
-            <span class="comment">// (generating a thread ID) but never actually inserted data, so</span>
-            <span class="comment">// they may have never allocated a shard.</span>
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>();
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; next.is_some={}&quot;</span>, <span class="ident">next</span>.<span class="ident">is_some</span>());
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="ident">next</span><span class="question-mark">?</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) {
+        <span class="kw">loop </span>{
+            <span class="comment">// Skip over empty indices if they are less than the highest
+            // allocated shard. Some threads may have accessed the slab
+            // (generating a thread ID) but never actually inserted data, so
+            // they may have never allocated a shard.
+            </span><span class="kw">let </span>next = <span class="self">self</span>.<span class="number">0</span>.next();
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; next.is_some={}&quot;</span>, next.is_some());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = next<span class="question-mark">?</span>.load(Acquire) {
                 <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; done&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>);
+                <span class="kw">return </span><span class="prelude-val">Some</span>(shard);
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

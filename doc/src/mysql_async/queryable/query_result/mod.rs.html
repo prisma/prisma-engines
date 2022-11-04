@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/query_result/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/query_result/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -401,408 +401,408 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">mysql_common::row::convert::FromRowError</span>;
+</span><span class="kw">use </span>mysql_common::row::convert::FromRowError;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{borrow::Cow, fmt, marker::PhantomData, result::Result <span class="kw">as </span>StdResult, sync::Arc};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn</span>::{<span class="ident">routines::NextSetRoutine</span>, <span class="ident">PendingResult</span>},
-    <span class="ident">connection_like::Connection</span>,
-    <span class="ident">error</span>::<span class="kw-2">*</span>,
-    <span class="ident">prelude</span>::{<span class="ident">FromRow</span>, <span class="ident">Protocol</span>},
-    <span class="ident">Column</span>, <span class="ident">Row</span>,
+<span class="kw">use crate</span>::{
+    conn::{routines::NextSetRoutine, PendingResult},
+    connection_like::Connection,
+    error::<span class="kw-2">*</span>,
+    prelude::{FromRow, Protocol},
+    Column, Row,
 };
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">result_set_stream</span>;
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="kw">pub mod </span>result_set_stream;
+<span class="kw">mod </span>tests;
 
-<span class="doccomment">/// Result set metadata.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResultSetMeta</span> {
-    <span class="doccomment">/// Text result set, that may contain rows.</span>
-    <span class="ident">Text</span>(<span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Binary result set, that may contain rows.</span>
-    <span class="ident">Binary</span>(<span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>),
+<span class="doccomment">/// Result set metadata.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ResultSetMeta {
+    <span class="doccomment">/// Text result set, that may contain rows.
+    </span>Text(Arc&lt;[Column]&gt;),
+    <span class="doccomment">/// Binary result set, that may contain rows.
+    </span>Binary(Arc&lt;[Column]&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">ResultSetMeta</span> {
-    <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ResultSetMeta::Text</span>(<span class="ident">cols</span>) <span class="op">|</span> <span class="ident">ResultSetMeta::Binary</span>(<span class="ident">cols</span>) =&gt; <span class="ident">cols</span>,
+<span class="kw">impl </span>ResultSetMeta {
+    <span class="kw">fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;[Column]&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ResultSetMeta::Text(cols) | ResultSetMeta::Binary(cols) =&gt; cols,
         }
     }
 }
 
-<span class="doccomment">/// Result of a query or statement execution.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Represents an asynchronous query result, that may not be fully consumed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Note</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unconsumed query results are dropped implicitly when corresponding connection</span>
-<span class="doccomment">/// is dropped or queried. Also note, that in this case all remaining errors will be</span>
-<span class="doccomment">/// emitted to the caller:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {</span>
-<span class="doccomment">/// use mysql_async::*;</span>
-<span class="doccomment">/// use mysql_async::prelude::*;</span>
-<span class="doccomment">/// let mut conn = Conn::new(get_opts()).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // second result set will contain an error,</span>
-<span class="doccomment">/// // but the first result set is ok, so this line will pass</span>
-<span class="doccomment">/// conn.query_iter(&quot;DO 1; BLABLA;&quot;).await?;</span>
-<span class="doccomment">/// // `QueryResult` was dropped withot being consumed</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // driver must cleanup any unconsumed result to perform another query on `conn`,</span>
-<span class="doccomment">/// // so this operation will be performed implicitly, but the unconsumed result</span>
-<span class="doccomment">/// // contains an error claiming about &#39;BLABLA&#39;, so this error will be emitted here:</span>
-<span class="doccomment">/// assert!(conn.query_iter(&quot;DO 1&quot;).await.unwrap_err().to_string().contains(&quot;BLABLA&quot;));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # conn.disconnect().await }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">conn</span>: <span class="ident">Connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span>,
-    <span class="ident">__phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Result of a query or statement execution.
+///
+/// Represents an asynchronous query result, that may not be fully consumed.
+///
+/// # Note
+///
+/// Unconsumed query results are dropped implicitly when corresponding connection
+/// is dropped or queried. Also note, that in this case all remaining errors will be
+/// emitted to the caller:
+///
+/// ```rust
+/// # use mysql_async::test_misc::get_opts;
+/// # #[tokio::main]
+/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {
+/// use mysql_async::*;
+/// use mysql_async::prelude::*;
+/// let mut conn = Conn::new(get_opts()).await?;
+///
+/// // second result set will contain an error,
+/// // but the first result set is ok, so this line will pass
+/// conn.query_iter(&quot;DO 1; BLABLA;&quot;).await?;
+/// // `QueryResult` was dropped withot being consumed
+///
+/// // driver must cleanup any unconsumed result to perform another query on `conn`,
+/// // so this operation will be performed implicitly, but the unconsumed result
+/// // contains an error claiming about &#39;BLABLA&#39;, so this error will be emitted here:
+/// assert!(conn.query_iter(&quot;DO 1&quot;).await.unwrap_err().to_string().contains(&quot;BLABLA&quot;));
+///
+/// # conn.disconnect().await }
+/// ```
+</span><span class="kw">pub struct </span>QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; {
+    conn: Connection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt;,
+    __phantom: PhantomData&lt;P&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryResult&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;conn&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conn</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;__phantom&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;PhantomData&lt;P&gt;&quot;</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; fmt::Debug <span class="kw">for </span>QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryResult&quot;</span>)
+            .field(<span class="string">&quot;conn&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.conn)
+            .field(<span class="string">&quot;__phantom&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;PhantomData&lt;P&gt;&quot;</span>)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Protocol</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;
+<span class="kw">where
+    </span>P: Protocol,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">conn</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QueryResult</span> {
-            <span class="ident">conn</span>: <span class="ident">conn</span>.<span class="ident">into</span>(),
-            <span class="ident">__phantom</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">pub fn </span>new&lt;T: Into&lt;Connection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt;&gt;&gt;(conn: T) -&gt; <span class="self">Self </span>{
+        QueryResult {
+            conn: conn.into(),
+            __phantom: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if this query result may contain rows.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `false` then no rows possible for this query tesult (e.g. result of an UPDATE query).</span>
-    <span class="kw">fn</span> <span class="ident">has_rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>
-            .<span class="ident">get_pending_result</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pending_result</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">pending_result</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">PendingResult::Pending</span>(<span class="ident">meta</span>)) =&gt; <span class="ident">meta</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">PendingResult::Taken</span>(<span class="ident">meta</span>)) =&gt; <span class="ident">meta</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Returns `true` if this query result may contain rows.
+    ///
+    /// If `false` then no rows possible for this query tesult (e.g. result of an UPDATE query).
+    </span><span class="kw">fn </span>has_rows(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.conn
+            .get_pending_result()
+            .map(|pending_result| <span class="kw">match </span>pending_result {
+                <span class="prelude-val">Some</span>(PendingResult::Pending(meta)) =&gt; meta.columns().len() &gt; <span class="number">0</span>,
+                <span class="prelude-val">Some</span>(PendingResult::Taken(meta)) =&gt; meta.columns().len() &gt; <span class="number">0</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// `true` if there are no more rows nor result sets in this query.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will return `false` if the last result set was taken</span>
-    <span class="doccomment">/// by the [`QueryResult::stream`] that was dropped before being fully consumed</span>
-    <span class="doccomment">/// (i.e. caller will get `false` even if QueryResult data is reachable only for library internals).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">has_rows</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">more_results_exists</span>()
+    <span class="doccomment">/// `true` if there are no more rows nor result sets in this query.
+    ///
+    /// This function will return `false` if the last result set was taken
+    /// by the [`QueryResult::stream`] that was dropped before being fully consumed
+    /// (i.e. caller will get `false` even if QueryResult data is reachable only for library internals).
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.has_rows() &amp;&amp; !<span class="self">self</span>.conn.more_results_exists()
     }
 
-    <span class="doccomment">/// Low-level function that reads a result set row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if there are no more rows in the current set.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Low-level function that reads a result set row.
+    ///
+    /// Returns `None` if there are no more rows in the current set.
+    </span><span class="kw">async fn </span>next_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>, columns: Arc&lt;[Column]&gt;) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="prelude-val">None</span>;
 
-        <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// Empty, but not yet consumed result set.</span>
-            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="comment">// Not yet consumed non-empty result set.</span>
-            <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">read_packet</span>().<span class="kw">await</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) =&gt; <span class="ident">packet</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="comment">// Next row contained an error. No more data will follow.</span>
-                    <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+        <span class="kw">if </span>columns.is_empty() {
+            <span class="comment">// Empty, but not yet consumed result set.
+            </span><span class="self">self</span>.conn.set_pending_result(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="comment">// Not yet consumed non-empty result set.
+            </span><span class="kw">let </span>packet = <span class="kw">match </span><span class="self">self</span>.conn.read_packet().<span class="kw">await </span>{
+                <span class="prelude-val">Ok</span>(packet) =&gt; packet,
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="comment">// Next row contained an error. No more data will follow.
+                    </span><span class="self">self</span>.conn.set_pending_result(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err);
                 }
             };
 
-            <span class="kw">if</span> <span class="ident">P::is_last_result_set_packet</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">capabilities</span>(), <span class="kw-2">&amp;</span><span class="ident">packet</span>) {
-                <span class="comment">// `packet` is a result set terminator.</span>
-                <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">set_pending_result</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="comment">// `packet` is a result set row.</span>
-                <span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">P::read_result_set_row</span>(<span class="kw-2">&amp;</span><span class="ident">packet</span>, <span class="ident">columns</span>)<span class="question-mark">?</span>);
+            <span class="kw">if </span>P::is_last_result_set_packet(<span class="self">self</span>.conn.capabilities(), <span class="kw-2">&amp;</span>packet) {
+                <span class="comment">// `packet` is a result set terminator.
+                </span><span class="self">self</span>.conn.set_pending_result(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="comment">// `packet` is a result set row.
+                </span>row = <span class="prelude-val">Some</span>(P::read_result_set_row(<span class="kw-2">&amp;</span>packet, columns)<span class="question-mark">?</span>);
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">row</span>)
+        <span class="prelude-val">Ok</span>(row)
     }
 
-    <span class="doccomment">/// Low-level function that jumps to the next result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `false` if there are no more result sets.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">more_results_exists</span>() {
-            <span class="comment">// More data will follow.</span>
-            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">routine</span>(<span class="ident">NextSetRoutine</span>::<span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span><span class="ident">::new</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Low-level function that jumps to the next result set.
+    ///
+    /// Returns `false` if there are no more result sets.
+    </span><span class="kw">async fn </span>next_set(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;bool&gt; {
+        <span class="kw">if </span><span class="self">self</span>.conn.more_results_exists() {
+            <span class="comment">// More data will follow.
+            </span><span class="self">self</span>.conn.routine(NextSetRoutine::&lt;P&gt;::new()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">has_pending_result</span>())
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.conn.has_pending_result())
     }
 
-    <span class="doccomment">/// Low-level function that reads a next row and tries to jump</span>
-    <span class="doccomment">/// to the next result set if the current one is exhausted.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_row_or_next_set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">meta</span>: <span class="ident">ResultSetMeta</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">columns</span>().<span class="ident">clone</span>();
+    <span class="doccomment">/// Low-level function that reads a next row and tries to jump
+    /// to the next result set if the current one is exhausted.
+    </span><span class="kw">async fn </span>next_row_or_next_set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, meta: ResultSetMeta) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt; {
+        <span class="kw">let </span>columns = meta.columns().clone();
 
-        <span class="self">self</span>.<span class="ident">next_row_or_next_set2</span>(<span class="ident">columns</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.next_row_or_next_set2(columns).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Low-level function that reads a next row and tries to jump</span>
-    <span class="doccomment">/// to the next result set if the current one is exhausted.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_row_or_next_set2</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_row</span>(<span class="ident">columns</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>));
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">next_set</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+    <span class="doccomment">/// Low-level function that reads a next row and tries to jump
+    /// to the next result set if the current one is exhausted.
+    </span><span class="kw">async fn </span>next_row_or_next_set2(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        columns: Arc&lt;[Column]&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(row) = <span class="self">self</span>.next_row(columns).<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row));
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.next_set().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
     }
 
-    <span class="doccomment">/// Skips the taken result set.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">skip_taken</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">meta</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ResultSetMeta</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_row_or_next_set</span>((<span class="kw-2">*</span><span class="ident">meta</span>).<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span> {}
+    <span class="doccomment">/// Skips the taken result set.
+    </span><span class="kw">async fn </span>skip_taken(<span class="kw-2">&amp;mut </span><span class="self">self</span>, meta: Arc&lt;ResultSetMeta&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw">_</span>) = <span class="self">self</span>.next_row_or_next_set((<span class="kw-2">*</span>meta).clone()).<span class="kw">await</span><span class="question-mark">? </span>{}
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">use_pending_result</span>()<span class="question-mark">?</span>.<span class="ident">cloned</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">PendingResult::Pending</span>(<span class="ident">meta</span>)) =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="ident">next_row_or_next_set</span>(<span class="ident">meta</span>).<span class="kw">await</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">PendingResult::Taken</span>(<span class="ident">meta</span>)) =&gt; <span class="self">self</span>.<span class="ident">skip_taken</span>(<span class="ident">meta</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub async fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.conn.use_pending_result()<span class="question-mark">?</span>.cloned() {
+                <span class="prelude-val">Some</span>(PendingResult::Pending(meta)) =&gt; <span class="kw">return </span><span class="self">self</span>.next_row_or_next_set(meta).<span class="kw">await</span>,
+                <span class="prelude-val">Some</span>(PendingResult::Taken(meta)) =&gt; <span class="self">self</span>.skip_taken(meta).<span class="kw">await</span><span class="question-mark">?</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
             }
         }
     }
 
-    <span class="doccomment">/// Last insert id, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">last_insert_id</span>()
+    <span class="doccomment">/// Last insert id, if any.
+    </span><span class="kw">pub fn </span>last_insert_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="self">self</span>.conn.last_insert_id()
     }
 
-    <span class="doccomment">/// Number of affected rows as reported by the server, or `0`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affected_rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">affected_rows</span>()
+    <span class="doccomment">/// Number of affected rows as reported by the server, or `0`.
+    </span><span class="kw">pub fn </span>affected_rows(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.conn.affected_rows()
     }
 
-    <span class="doccomment">/// Text information as reported by the server, or an empty string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">info</span>()
+    <span class="doccomment">/// Text information as reported by the server, or an empty string.
+    </span><span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="self">self</span>.conn.info()
     }
 
-    <span class="doccomment">/// Number of warnings as reported by the server, or `0`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">get_warnings</span>()
+    <span class="doccomment">/// Number of warnings as reported by the server, or `0`.
+    </span><span class="kw">pub fn </span>warnings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.conn.get_warnings()
     }
 
-    <span class="doccomment">/// Collects the current result set of this query result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is parametrized by `R` and internally calls `R::from_row(Row)` on each row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It will collect rows up to a neares result set boundary. This means that you should call</span>
-    <span class="doccomment">/// `collect` as many times as result sets in your query result. For example query</span>
-    <span class="doccomment">/// `SELECT &#39;foo&#39;; SELECT &#39;foo&#39;, &#39;bar&#39;;` will produce `QueryResult` with two result sets in it.</span>
-    <span class="doccomment">/// One can use `QueryResult::is_empty` to make sure that there is no more result sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panic</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll panic if any row isn&#39;t convertible to `R` (i.e. programmer error or unknown schema).</span>
-    <span class="doccomment">/// * In case of programmer error see [`FromRow`] docs;</span>
-    <span class="doccomment">/// * In case of unknown schema use [`QueryResult::try_collect`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Collects the current result set of this query result.
+    ///
+    /// It is parametrized by `R` and internally calls `R::from_row(Row)` on each row.
+    ///
+    /// It will collect rows up to a neares result set boundary. This means that you should call
+    /// `collect` as many times as result sets in your query result. For example query
+    /// `SELECT &#39;foo&#39;; SELECT &#39;foo&#39;, &#39;bar&#39;;` will produce `QueryResult` with two result sets in it.
+    /// One can use `QueryResult::is_empty` to make sure that there is no more result sets.
+    ///
+    /// # Panic
+    ///
+    /// It&#39;ll panic if any row isn&#39;t convertible to `R` (i.e. programmer error or unknown schema).
+    /// * In case of programmer error see [`FromRow`] docs;
+    /// * In case of unknown schema use [`QueryResult::try_collect`].
+    </span><span class="kw">pub async fn </span>collect&lt;R&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;R&gt;&gt;
+    <span class="kw">where
+        </span>R: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">reduce</span>(<span class="ident">Vec::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> {
-            <span class="ident">acc</span>.<span class="ident">push</span>(<span class="ident">FromRow::from_row</span>(<span class="ident">row</span>));
-            <span class="ident">acc</span>
+        <span class="self">self</span>.reduce(Vec::new(), |<span class="kw-2">mut </span>acc, row| {
+            acc.push(FromRow::from_row(row));
+            acc
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Collects the current result set of this query result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It works the same way as [`QueryResult::collect`] but won&#39;t panic if row isn&#39;t convertible</span>
-    <span class="doccomment">/// to `R`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_collect</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Collects the current result set of this query result.
+    ///
+    /// It works the same way as [`QueryResult::collect`] but won&#39;t panic if row isn&#39;t convertible
+    /// to `R`.
+    </span><span class="kw">pub async fn </span>try_collect&lt;R&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;StdResult&lt;R, FromRowError&gt;&gt;&gt;
+    <span class="kw">where
+        </span>R: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">reduce</span>(<span class="ident">Vec::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> {
-            <span class="ident">acc</span>.<span class="ident">push</span>(<span class="ident">FromRow::from_row_opt</span>(<span class="ident">row</span>));
-            <span class="ident">acc</span>
+        <span class="self">self</span>.reduce(Vec::new(), |<span class="kw-2">mut </span>acc, row| {
+            acc.push(FromRow::from_row_opt(row));
+            acc
         })
-        .<span class="kw">await</span>
+        .<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Collects the current result set of this query result and drops everything else.
+    ///
+    /// # Panic
+    ///
+    /// It&#39;ll panic if any row isn&#39;t convertible to `R` (i.e. programmer error or unknown schema).
+    /// * In case of programmer error see `FromRow` docs;
+    /// * In case of unknown schema use [`QueryResult::try_collect`].
+    </span><span class="kw">pub async fn </span>collect_and_drop&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;R&gt;&gt;
+    <span class="kw">where
+        </span>R: FromRow + Send + <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">let </span>output = <span class="self">self</span>.collect::&lt;R&gt;().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(output)
     }
 
-    <span class="doccomment">/// Collects the current result set of this query result and drops everything else.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panic</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll panic if any row isn&#39;t convertible to `R` (i.e. programmer error or unknown schema).</span>
-    <span class="doccomment">/// * In case of programmer error see `FromRow` docs;</span>
-    <span class="doccomment">/// * In case of unknown schema use [`QueryResult::try_collect`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect_and_drop</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Collects the current result set of this query result and drops everything else.
+    ///
+    /// It works the same way as [`QueryResult::collect_and_drop`] but won&#39;t panic if row isn&#39;t
+    /// convertible to `R`.
+    </span><span class="kw">pub async fn </span>try_collect_and_drop&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;StdResult&lt;R, FromRowError&gt;&gt;&gt;
+    <span class="kw">where
+        </span>R: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
+        <span class="kw">let </span>output = <span class="self">self</span>.try_collect().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(output)
     }
 
-    <span class="doccomment">/// Collects the current result set of this query result and drops everything else.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It works the same way as [`QueryResult::collect_and_drop`] but won&#39;t panic if row isn&#39;t</span>
-    <span class="doccomment">/// convertible to `R`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">try_collect_and_drop</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Executes `fun` on every row of the current result set.
+    ///
+    /// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).
+    </span><span class="kw">pub async fn </span>for_each&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>F: FnMut(Row),
     {
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_collect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
-    }
-
-    <span class="doccomment">/// Executes `fun` on every row of the current result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Row</span>),
-    {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">if </span><span class="self">self</span>.is_empty() {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-                <span class="ident">fun</span>(<span class="ident">row</span>);
+        } <span class="kw">else </span>{
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = <span class="self">self</span>.next().<span class="kw">await</span><span class="question-mark">? </span>{
+                fun(row);
             }
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="doccomment">/// Executes `fun` on every row of the current result set and drops everything else.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">for_each_and_drop</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Row</span>),
+    <span class="doccomment">/// Executes `fun` on every row of the current result set and drops everything else.
+    </span><span class="kw">pub async fn </span>for_each_and_drop&lt;F&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>F: FnMut(Row),
     {
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="ident">fun</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.for_each(fun).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Maps every row of the current result set to `U` using `fun`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Row</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Maps every row of the current result set to `U` using `fun`.
+    ///
+    /// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).
+    </span><span class="kw">pub async fn </span>map&lt;F, U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;U&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(Row) -&gt; U,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">acc</span>.<span class="ident">push</span>(<span class="ident">fun</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>)));
+        <span class="kw">let </span><span class="kw-2">mut </span>acc = Vec::new();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = <span class="self">self</span>.next().<span class="kw">await</span><span class="question-mark">? </span>{
+            acc.push(fun(<span class="kw">crate</span>::from_row(row)));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">acc</span>)
+        <span class="prelude-val">Ok</span>(acc)
     }
 
-    <span class="doccomment">/// Map every row of the current result set to `U` using `fun` and drops everything else.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">map_and_drop</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Row</span>) -&gt; <span class="ident">U</span>,
+    <span class="doccomment">/// Map every row of the current result set to `U` using `fun` and drops everything else.
+    </span><span class="kw">pub async fn </span>map_and_drop&lt;F, U&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;U&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(Row) -&gt; U,
     {
-        <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>(<span class="ident">fun</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">rows</span>)
+        <span class="kw">let </span>rows = <span class="self">self</span>.map(fun).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(rows)
     }
 
-    <span class="doccomment">/// Reduces rows of the current result set to `U` using `fun`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reduce</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">init</span>: <span class="ident">U</span>, <span class="kw-2">mut</span> <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">U</span>, <span class="ident">T</span>) -&gt; <span class="ident">U</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Reduces rows of the current result set to `U` using `fun`.
+    ///
+    /// It will stop on the nearest result set boundary (see `QueryResult::collect` docs).
+    </span><span class="kw">pub async fn </span>reduce&lt;T, F, U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>init: U, <span class="kw-2">mut </span>fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnMut(U, T) -&gt; U,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">init</span> <span class="op">=</span> <span class="ident">fun</span>(<span class="ident">init</span>, <span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>));
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = <span class="self">self</span>.next().<span class="kw">await</span><span class="question-mark">? </span>{
+            init = fun(init, <span class="kw">crate</span>::from_row(row));
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">init</span>)
+        <span class="prelude-val">Ok</span>(init)
     }
 
-    <span class="doccomment">/// Reduces rows of the current result set to `U` using `fun` and drops everything else.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reduce_and_drop</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">U</span>, <span class="ident">fun</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">U</span>, <span class="ident">T</span>) -&gt; <span class="ident">U</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Reduces rows of the current result set to `U` using `fun` and drops everything else.
+    </span><span class="kw">pub async fn </span>reduce_and_drop&lt;T, F, U&gt;(<span class="kw-2">mut </span><span class="self">self</span>, init: U, fun: F) -&gt; <span class="prelude-ty">Result</span>&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnMut(U, T) -&gt; U,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">reduce</span>(<span class="ident">init</span>, <span class="ident">fun</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">acc</span>)
+        <span class="kw">let </span>acc = <span class="self">self</span>.reduce(init, fun).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(acc)
     }
 
-    <span class="doccomment">/// Drops this query result.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_result</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">while</span> <span class="self">self</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">is_some</span>() {}
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">has_pending_result</span>() {
-                <span class="kw">break</span> <span class="prelude-val">Ok</span>(());
+    <span class="doccomment">/// Drops this query result.
+    </span><span class="kw">pub async fn </span>drop_result(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">while </span><span class="self">self</span>.next().<span class="kw">await</span><span class="question-mark">?</span>.is_some() {}
+            <span class="kw">if </span>!<span class="self">self</span>.conn.has_pending_result() {
+                <span class="kw">break </span><span class="prelude-val">Ok</span>(());
             }
         }
     }
 
-    <span class="doccomment">/// Returns a reference to a columns list of this query result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Empty list means that this result set was never meant to contain rows.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="self">self</span>.<span class="ident">conn</span>
-            .<span class="ident">get_pending_result</span>()
-            .<span class="ident">ok</span>()
-            .<span class="ident">flatten</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">meta</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">meta</span> {
-                <span class="ident">PendingResult::Pending</span>(<span class="ident">meta</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">columns</span>()[..],
-                <span class="ident">PendingResult::Taken</span>(<span class="ident">meta</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">columns</span>()[..],
+    <span class="doccomment">/// Returns a reference to a columns list of this query result.
+    ///
+    /// Empty list means that this result set was never meant to contain rows.
+    </span><span class="kw">pub fn </span>columns_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="self">self</span>.conn
+            .get_pending_result()
+            .ok()
+            .flatten()
+            .map(|meta| <span class="kw">match </span>meta {
+                PendingResult::Pending(meta) =&gt; <span class="kw-2">&amp;</span>meta.columns()[..],
+                PendingResult::Taken(meta) =&gt; <span class="kw-2">&amp;</span>meta.columns()[..],
             })
-            .<span class="ident">unwrap_or_default</span>()
+            .unwrap_or_default()
     }
 
-    <span class="doccomment">/// Returns a copy of a columns list of this query result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">conn</span>
-            .<span class="ident">get_pending_result</span>()
-            .<span class="ident">ok</span>()
-            .<span class="ident">flatten</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">meta</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">meta</span> {
-                <span class="ident">PendingResult::Pending</span>(<span class="ident">meta</span>) =&gt; <span class="ident">meta</span>.<span class="ident">columns</span>(),
-                <span class="ident">PendingResult::Taken</span>(<span class="ident">meta</span>) =&gt; <span class="ident">meta</span>.<span class="ident">columns</span>(),
+    <span class="doccomment">/// Returns a copy of a columns list of this query result.
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;[Column]&gt;&gt; {
+        <span class="self">self</span>.conn
+            .get_pending_result()
+            .ok()
+            .flatten()
+            .map(|meta| <span class="kw">match </span>meta {
+                PendingResult::Pending(meta) =&gt; meta.columns(),
+                PendingResult::Taken(meta) =&gt; meta.columns(),
             })
-            .<span class="ident">cloned</span>()
+            .cloned()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/capabilities.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>capabilities.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/capabilities.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>capabilities.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -167,174 +167,174 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{fmt, str::FromStr};
 
-<span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
-<span class="doccomment">/// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.</span>
-<span class="macro">macro_rules!</span> <span class="ident">capabilities</span> {
-    ($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span> ),<span class="kw-2">*</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectorCapability</span> {
+<span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
+/// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
+</span><span class="macro">macro_rules! </span>capabilities {
+    ($( <span class="macro-nonterminal">$variant</span>:ident $(,)<span class="question-mark">? </span>),<span class="kw-2">*</span>) =&gt; {
+        <span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+        </span><span class="kw">pub enum </span>ConnectorCapability {
             $(
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>,
-            )<span class="op">*</span>
+                <span class="macro-nonterminal">$variant</span>,
+            )*
         }
 
-        <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectorCapability</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
+        <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ConnectorCapability {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                <span class="kw">let </span>name = <span class="kw">match </span><span class="self">self </span>{
                     $(
-                        <span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span> =&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>),
-                    )<span class="op">*</span>
+                        <span class="self">Self</span>::<span class="macro-nonterminal">$variant </span>=&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$variant</span>),
+                    )*
                 };
 
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>)
+                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, name)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ConnectorCapability</span> {
-            <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
+        <span class="kw">impl </span>FromStr <span class="kw">for </span>ConnectorCapability {
+            <span class="kw">type </span><span class="prelude-val">Err </span>= String;
 
-            <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="ident">s</span> {
+            <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+                <span class="kw">match </span>s {
                     $(
-                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>),
-                    )<span class="op">*</span>
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;{} is not a known connector capability.&quot;</span>, <span class="ident">s</span>)),
+                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$variant</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::<span class="macro-nonterminal">$variant</span>),
+                    )*
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;{} is not a known connector capability.&quot;</span>, s)),
                 }
             }
         }
     };
 }
 
-<span class="comment">// Capabilities describe what functionality connectors are able to provide.</span>
-<span class="comment">// Some are used only by the query engine, some are used only by the datamodel parser.</span>
-<span class="macro">capabilities!</span>(
-    <span class="comment">// General capabilities, not specific to any part of Prisma.</span>
-    <span class="ident">ScalarLists</span>,
-    <span class="ident">Enums</span>,
-    <span class="ident">Json</span>,
-    <span class="ident">JsonLists</span>,
-    <span class="ident">AutoIncrement</span>,
-    <span class="ident">RelationFieldsInArbitraryOrder</span>,
-    <span class="ident">CompositeTypes</span>,
-    <span class="ident">DefaultValueAuto</span>,
-    <span class="ident">TwoWayEmbeddedManyToManyRelation</span>,
-    <span class="ident">ImplicitManyToManyRelation</span>,
-    <span class="ident">MultiSchema</span>,
-    <span class="comment">//Start of ME/IE only capabilities</span>
-    <span class="ident">AutoIncrementAllowedOnNonId</span>,
-    <span class="ident">AutoIncrementMultipleAllowed</span>,
-    <span class="ident">AutoIncrementNonIndexedAllowed</span>,
-    <span class="ident">NamedPrimaryKeys</span>,
-    <span class="ident">NamedForeignKeys</span>,
-    <span class="ident">ReferenceCycleDetection</span>,
-    <span class="ident">NamedDefaultValues</span>,
-    <span class="ident">IndexColumnLengthPrefixing</span>,
-    <span class="ident">PrimaryKeySortOrderDefinition</span>,
-    <span class="ident">FullTextIndex</span>,
-    <span class="ident">SortOrderInFullTextIndex</span>,
-    <span class="ident">MultipleFullTextAttributesPerModel</span>,
-    <span class="ident">ClusteringSetting</span>,
-    <span class="comment">// Start of query-engine-only Capabilities</span>
-    <span class="ident">EnumArrayPush</span>,
-    <span class="ident">InsensitiveFilters</span>,
-    <span class="ident">CreateMany</span>,
-    <span class="ident">CreateManyWriteableAutoIncId</span>,
-    <span class="ident">WritableAutoincField</span>,
-    <span class="ident">CreateSkipDuplicates</span>,
-    <span class="ident">UpdateableId</span>,
-    <span class="ident">JsonFiltering</span>, <span class="comment">// Used as an umbrella in tests to filter for connectors that supports json filtering.</span>
-    <span class="ident">JsonFilteringJsonPath</span>, <span class="comment">// Connector supports filtering json fields using json path (eg: mysql).</span>
-    <span class="ident">JsonFilteringArrayPath</span>, <span class="comment">// Connector supports filtering json fields using array path (eg: postgres).</span>
-    <span class="ident">JsonFilteringAlphanumeric</span>, <span class="comment">// Connector supports alphanumeric json filters (gt, gte, lt, lte...).</span>
-    <span class="ident">JsonFilteringAlphanumericFieldRef</span>, <span class="comment">// Connector supports alphanumeric json filters against a json field reference.</span>
-    <span class="ident">CompoundIds</span>,
-    <span class="ident">AnyId</span>, <span class="comment">// Any (or combination of) uniques and not only id fields can constitute an id for a model.</span>
-    <span class="ident">SqlQueryRaw</span>,
-    <span class="ident">MongoDbQueryRaw</span>,
-    <span class="ident">FullTextSearchWithoutIndex</span>,
-    <span class="ident">FullTextSearchWithIndex</span>,
-    <span class="ident">AdvancedJsonNullability</span>,    <span class="comment">// Connector distinguishes between their null type and JSON null.</span>
-    <span class="ident">UndefinedType</span>,              <span class="comment">// Connector distinguishes `null` and `undefined`</span>
-    <span class="ident">DecimalType</span>,                <span class="comment">// Connector supports Prisma Decimal type.</span>
-    <span class="ident">BackwardCompatibleQueryRaw</span>, <span class="comment">// Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,</span>
-    <span class="ident">OrderByNullsFirstLast</span>,      <span class="comment">// Connector supports ORDER BY NULLS LAST/FIRST</span>
-    <span class="comment">// Block of isolation levels.</span>
-    <span class="ident">SupportsTxIsolationReadUncommitted</span>,
-    <span class="ident">SupportsTxIsolationReadCommitted</span>,
-    <span class="ident">SupportsTxIsolationRepeatableRead</span>,
-    <span class="ident">SupportsTxIsolationSerializable</span>,
-    <span class="ident">SupportsTxIsolationSnapshot</span>,
-    <span class="ident">NativeUpsert</span>
+<span class="comment">// Capabilities describe what functionality connectors are able to provide.
+// Some are used only by the query engine, some are used only by the datamodel parser.
+</span><span class="macro">capabilities!</span>(
+    <span class="comment">// General capabilities, not specific to any part of Prisma.
+    </span>ScalarLists,
+    Enums,
+    Json,
+    JsonLists,
+    AutoIncrement,
+    RelationFieldsInArbitraryOrder,
+    CompositeTypes,
+    DefaultValueAuto,
+    TwoWayEmbeddedManyToManyRelation,
+    ImplicitManyToManyRelation,
+    MultiSchema,
+    <span class="comment">//Start of ME/IE only capabilities
+    </span>AutoIncrementAllowedOnNonId,
+    AutoIncrementMultipleAllowed,
+    AutoIncrementNonIndexedAllowed,
+    NamedPrimaryKeys,
+    NamedForeignKeys,
+    ReferenceCycleDetection,
+    NamedDefaultValues,
+    IndexColumnLengthPrefixing,
+    PrimaryKeySortOrderDefinition,
+    FullTextIndex,
+    SortOrderInFullTextIndex,
+    MultipleFullTextAttributesPerModel,
+    ClusteringSetting,
+    <span class="comment">// Start of query-engine-only Capabilities
+    </span>EnumArrayPush,
+    InsensitiveFilters,
+    CreateMany,
+    CreateManyWriteableAutoIncId,
+    WritableAutoincField,
+    CreateSkipDuplicates,
+    UpdateableId,
+    JsonFiltering, <span class="comment">// Used as an umbrella in tests to filter for connectors that supports json filtering.
+    </span>JsonFilteringJsonPath, <span class="comment">// Connector supports filtering json fields using json path (eg: mysql).
+    </span>JsonFilteringArrayPath, <span class="comment">// Connector supports filtering json fields using array path (eg: postgres).
+    </span>JsonFilteringAlphanumeric, <span class="comment">// Connector supports alphanumeric json filters (gt, gte, lt, lte...).
+    </span>JsonFilteringAlphanumericFieldRef, <span class="comment">// Connector supports alphanumeric json filters against a json field reference.
+    </span>CompoundIds,
+    AnyId, <span class="comment">// Any (or combination of) uniques and not only id fields can constitute an id for a model.
+    </span>SqlQueryRaw,
+    MongoDbQueryRaw,
+    FullTextSearchWithoutIndex,
+    FullTextSearchWithIndex,
+    AdvancedJsonNullability,    <span class="comment">// Connector distinguishes between their null type and JSON null.
+    </span>UndefinedType,              <span class="comment">// Connector distinguishes `null` and `undefined`
+    </span>DecimalType,                <span class="comment">// Connector supports Prisma Decimal type.
+    </span>BackwardCompatibleQueryRaw, <span class="comment">// Temporary SQLite specific capability. Should be removed once https://github.com/prisma/prisma/issues/12784 is fixed,
+    </span>OrderByNullsFirstLast,      <span class="comment">// Connector supports ORDER BY NULLS LAST/FIRST
+    // Block of isolation levels.
+    </span>SupportsTxIsolationReadUncommitted,
+    SupportsTxIsolationReadCommitted,
+    SupportsTxIsolationRepeatableRead,
+    SupportsTxIsolationSerializable,
+    SupportsTxIsolationSnapshot,
+    NativeUpsert
 );
 
-<span class="doccomment">/// Contains all capabilities that the connector is able to serve.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorCapabilities</span> {
-    <span class="kw">pub</span> <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Contains all capabilities that the connector is able to serve.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ConnectorCapabilities {
+    <span class="kw">pub </span>capabilities: Vec&lt;ConnectorCapability&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorCapabilities</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">capabilities</span>: <span class="macro">vec!</span>[] }
+<span class="kw">impl </span>ConnectorCapabilities {
+    <span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ capabilities: <span class="macro">vec!</span>[] }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">capabilities</span> }
+    <span class="kw">pub fn </span>new(capabilities: Vec&lt;ConnectorCapability&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ capabilities }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capability</span>: <span class="ident">ConnectorCapability</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">capability</span>)
+    <span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
+        <span class="self">self</span>.capabilities.contains(<span class="kw-2">&amp;</span>capability)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">capabilities</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">connector_capability</span><span class="op">|</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">connector_capability</span>))
+    <span class="kw">pub fn </span>supports_any(<span class="kw-2">&amp;</span><span class="self">self</span>, capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability]) -&gt; bool {
+        <span class="self">self</span>.capabilities
+            .iter()
+            .any(|connector_capability| capabilities.contains(connector_capability))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_cap_does_not_contain</span>() {
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::empty</span>();
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_empty_cap_does_not_contain() {
+        <span class="kw">let </span>cap = ConnectorCapabilities::empty();
+        <span class="macro">assert!</span>(!cap.supports_any(<span class="kw-2">&amp;</span>[ConnectorCapability::JsonFilteringJsonPath]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cap_with_others_does_not_contain</span>() {
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
-            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_cap_with_others_does_not_contain() {
+        <span class="kw">let </span>cap = ConnectorCapabilities::new(<span class="macro">vec!</span>[
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
+        <span class="macro">assert!</span>(!cap.supports_any(<span class="kw-2">&amp;</span>[ConnectorCapability::JsonFilteringJsonPath]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_cap_with_others_does_contain</span>() {
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
-            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_cap_with_others_does_contain() {
+        <span class="kw">let </span>cap = ConnectorCapabilities::new(<span class="macro">vec!</span>[
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        <span class="macro">assert!</span>(<span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[
-            <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+        <span class="macro">assert!</span>(cap.supports_any(<span class="kw-2">&amp;</span>[
+            ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::JsonFilteringArrayPath,
         ]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_does_contain</span>() {
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
-            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
-            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_does_contain() {
+        <span class="kw">let </span>cap = ConnectorCapabilities::new(<span class="macro">vec!</span>[
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
+        <span class="macro">assert!</span>(!cap.supports_any(<span class="kw-2">&amp;</span>[ConnectorCapability::JsonFilteringJsonPath]));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

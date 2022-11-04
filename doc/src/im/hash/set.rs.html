@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/hash/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../im/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/hash/set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../im/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1132,1139 +1132,1139 @@
 <span id="1132">1132</span>
 <span id="1133">1133</span>
 <span id="1134">1134</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="doccomment">//! An unordered set.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An immutable hash set using [hash array mapped tries] [1].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Most operations on this set are O(log&lt;sub&gt;x&lt;/sub&gt; n) for a</span>
-<span class="doccomment">//! suitably high *x* that it should be nearly O(1) for most sets.</span>
-<span class="doccomment">//! Because of this, it&#39;s a great choice for a generic set as long as</span>
-<span class="doccomment">//! you don&#39;t mind that values will need to implement</span>
-<span class="doccomment">//! [`Hash`][std::hash::Hash] and [`Eq`][std::cmp::Eq].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Values will have a predictable order based on the hasher</span>
-<span class="doccomment">//! being used. Unless otherwise specified, this will be the standard</span>
-<span class="doccomment">//! [`RandomState`][std::collections::hash_map::RandomState] hasher.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [1]: https://en.wikipedia.org/wiki/Hash_array_mapped_trie</span>
-<span class="doccomment">//! [std::cmp::Eq]: https://doc.rust-lang.org/std/cmp/trait.Eq.html</span>
-<span class="doccomment">//! [std::hash::Hash]: https://doc.rust-lang.org/std/hash/trait.Hash.html</span>
-<span class="doccomment">//! [std::collections::hash_map::RandomState]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html</span>
+</span><span class="doccomment">//! An unordered set.
+//!
+//! An immutable hash set using [hash array mapped tries] [1].
+//!
+//! Most operations on this set are O(log&lt;sub&gt;x&lt;/sub&gt; n) for a
+//! suitably high *x* that it should be nearly O(1) for most sets.
+//! Because of this, it&#39;s a great choice for a generic set as long as
+//! you don&#39;t mind that values will need to implement
+//! [`Hash`][std::hash::Hash] and [`Eq`][std::cmp::Eq].
+//!
+//! Values will have a predictable order based on the hasher
+//! being used. Unless otherwise specified, this will be the standard
+//! [`RandomState`][std::collections::hash_map::RandomState] hasher.
+//!
+//! [1]: https://en.wikipedia.org/wiki/Hash_array_mapped_trie
+//! [std::cmp::Eq]: https://doc.rust-lang.org/std/cmp/trait.Eq.html
+//! [std::hash::Hash]: https://doc.rust-lang.org/std/hash/trait.Hash.html
+//! [std::collections::hash_map::RandomState]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
 
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::collections::hash_map::RandomState</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="self">self</span>, <span class="ident">BTreeSet</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">FromIterator</span>, <span class="ident">IntoIterator</span>, <span class="ident">Sum</span>};
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Add</span>, <span class="ident">Deref</span>, <span class="ident">Mul</span>};
+</span><span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::collections::hash_map::RandomState;
+<span class="kw">use </span>std::collections::{<span class="self">self</span>, BTreeSet};
+<span class="kw">use </span>std::fmt::{Debug, Error, Formatter};
+<span class="kw">use </span>std::hash::{BuildHasher, Hash, Hasher};
+<span class="kw">use </span>std::iter::FusedIterator;
+<span class="kw">use </span>std::iter::{FromIterator, IntoIterator, Sum};
+<span class="kw">use </span>std::ops::{Add, Deref, Mul};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nodes::hamt</span>::{<span class="ident">hash_key</span>, <span class="ident">Drain</span> <span class="kw">as</span> <span class="ident">NodeDrain</span>, <span class="ident">HashValue</span>, <span class="ident">Iter</span> <span class="kw">as</span> <span class="ident">NodeIter</span>, <span class="ident">Node</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ordset::OrdSet</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">Pool</span>, <span class="ident">PoolRef</span>, <span class="ident">Ref</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Vector</span>;
+<span class="kw">use </span><span class="kw">crate</span>::nodes::hamt::{hash_key, Drain <span class="kw">as </span>NodeDrain, HashValue, Iter <span class="kw">as </span>NodeIter, Node};
+<span class="kw">use </span><span class="kw">crate</span>::ordset::OrdSet;
+<span class="kw">use </span><span class="kw">crate</span>::util::{Pool, PoolRef, Ref};
+<span class="kw">use </span><span class="kw">crate</span>::Vector;
 
-<span class="doccomment">/// Construct a set from a sequence of values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate im;</span>
-<span class="doccomment">/// # use im::hashset::HashSet;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   hashset![1, 2, 3],</span>
-<span class="doccomment">///   HashSet::from(vec![1, 2, 3])</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">hashset</span> {
-    () =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hashset::HashSet::new</span>() };
+<span class="doccomment">/// Construct a set from a sequence of values.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate im;
+/// # use im::hashset::HashSet;
+/// # fn main() {
+/// assert_eq!(
+///   hashset![1, 2, 3],
+///   HashSet::from(vec![1, 2, 3])
+/// );
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>hashset {
+    () =&gt; { <span class="macro-nonterminal">$crate::hashset::HashSet::new</span>() };
 
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>),<span class="op">*</span> ) =&gt; {{
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hashset::HashSet::new</span>();
+    ( $(<span class="macro-nonterminal">$x</span>:expr),* ) =&gt; {{
+        <span class="kw">let </span><span class="kw-2">mut </span>l = <span class="macro-nonterminal">$crate::hashset::HashSet::new</span>();
         $(
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>);
-        )<span class="op">*</span>
-            <span class="ident">l</span>
+            l.insert(<span class="macro-nonterminal">$x</span>);
+        )*
+            l
     }};
 
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span> ,)<span class="op">*</span> ) =&gt; {{
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">l</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hashset::HashSet::new</span>();
+    ( $(<span class="macro-nonterminal">$x</span>:expr ,)* ) =&gt; {{
+        <span class="kw">let </span><span class="kw-2">mut </span>l = <span class="macro-nonterminal">$crate::hashset::HashSet::new</span>();
         $(
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>);
-        )<span class="op">*</span>
-            <span class="ident">l</span>
+            l.insert(<span class="macro-nonterminal">$x</span>);
+        )*
+            l
     }};
 }
 
-<span class="macro">def_pool!</span>(<span class="ident">HashSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">Node</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="macro">def_pool!</span>(HashSetPool&lt;A&gt;, Node&lt;Value&lt;A&gt;&gt;);
 
-<span class="doccomment">/// An unordered set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An immutable hash set using [hash array mapped tries] [1].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Most operations on this set are O(log&lt;sub&gt;x&lt;/sub&gt; n) for a</span>
-<span class="doccomment">/// suitably high *x* that it should be nearly O(1) for most sets.</span>
-<span class="doccomment">/// Because of this, it&#39;s a great choice for a generic set as long as</span>
-<span class="doccomment">/// you don&#39;t mind that values will need to implement</span>
-<span class="doccomment">/// [`Hash`][std::hash::Hash] and [`Eq`][std::cmp::Eq].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Values will have a predictable order based on the hasher</span>
-<span class="doccomment">/// being used. Unless otherwise specified, this will be the standard</span>
-<span class="doccomment">/// [`RandomState`][std::collections::hash_map::RandomState] hasher.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [1]: https://en.wikipedia.org/wiki/Hash_array_mapped_trie</span>
-<span class="doccomment">/// [std::cmp::Eq]: https://doc.rust-lang.org/std/cmp/trait.Eq.html</span>
-<span class="doccomment">/// [std::hash::Hash]: https://doc.rust-lang.org/std/hash/trait.Hash.html</span>
-<span class="doccomment">/// [std::collections::hash_map::RandomState]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span> <span class="op">=</span> <span class="ident">RandomState</span><span class="op">&gt;</span> {
-    <span class="ident">hasher</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">pool</span>: <span class="ident">HashSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-    <span class="ident">root</span>: <span class="ident">PoolRef</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">size</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An unordered set.
+///
+/// An immutable hash set using [hash array mapped tries] [1].
+///
+/// Most operations on this set are O(log&lt;sub&gt;x&lt;/sub&gt; n) for a
+/// suitably high *x* that it should be nearly O(1) for most sets.
+/// Because of this, it&#39;s a great choice for a generic set as long as
+/// you don&#39;t mind that values will need to implement
+/// [`Hash`][std::hash::Hash] and [`Eq`][std::cmp::Eq].
+///
+/// Values will have a predictable order based on the hasher
+/// being used. Unless otherwise specified, this will be the standard
+/// [`RandomState`][std::collections::hash_map::RandomState] hasher.
+///
+/// [1]: https://en.wikipedia.org/wiki/Hash_array_mapped_trie
+/// [std::cmp::Eq]: https://doc.rust-lang.org/std/cmp/trait.Eq.html
+/// [std::hash::Hash]: https://doc.rust-lang.org/std/hash/trait.Hash.html
+/// [std::collections::hash_map::RandomState]: https://doc.rust-lang.org/std/collections/hash_map/struct.RandomState.html
+</span><span class="kw">pub struct </span>HashSet&lt;A, S = RandomState&gt; {
+    hasher: Ref&lt;S&gt;,
+    pool: HashSetPool&lt;A&gt;,
+    root: PoolRef&lt;Node&lt;Value&lt;A&gt;&gt;&gt;,
+    size: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="ident">A</span>);
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+</span><span class="kw">struct </span>Value&lt;A&gt;(A);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">A</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;A&gt; Deref <span class="kw">for </span>Value&lt;A&gt; {
+    <span class="kw">type </span>Target = A;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="comment">// FIXME lacking specialisation, we can&#39;t simply implement `HashValue`</span>
-<span class="comment">// for `A`, we have to use the `Value&lt;A&gt;` indirection.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">HashValue</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
+<span class="comment">// FIXME lacking specialisation, we can&#39;t simply implement `HashValue`
+// for `A`, we have to use the `Value&lt;A&gt;` indirection.
+</span><span class="kw">impl</span>&lt;A&gt; HashValue <span class="kw">for </span>Value&lt;A&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
 {
-    <span class="kw">type</span> <span class="ident">Key</span> <span class="op">=</span> <span class="ident">A</span>;
+    <span class="kw">type </span>Key = A;
 
-    <span class="kw">fn</span> <span class="ident">extract_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Key</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="kw">fn </span>extract_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Key {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, _other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">RandomState</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct an empty set.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;A&gt; HashSet&lt;A, RandomState&gt; {
+    <span class="doccomment">/// Construct an empty set.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Construct an empty set using a specific memory pool.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pool</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">HashSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">pool</span>: <span class="ident">pool</span>.<span class="ident">clone</span>(),
-            <span class="ident">hasher</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">root</span>: <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>),
+    <span class="doccomment">/// Construct an empty set using a specific memory pool.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;pool&quot;</span>)]
+    #[must_use]
+    </span><span class="kw">pub fn </span>with_pool(pool: <span class="kw-2">&amp;</span>HashSetPool&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            pool: pool.clone(),
+            hasher: Default::default(),
+            size: <span class="number">0</span>,
+            root: PoolRef::default(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">RandomState</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;A&gt; HashSet&lt;A, RandomState&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
 {
-    <span class="doccomment">/// Construct a set with a single value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// let set = HashSet::unit(123);</span>
-    <span class="doccomment">/// assert!(set.contains(&amp;123));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unit</span>(<span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">HashSet::new</span>().<span class="ident">update</span>(<span class="ident">a</span>)
+    <span class="doccomment">/// Construct a set with a single value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// # use std::sync::Arc;
+    /// let set = HashSet::unit(123);
+    /// assert!(set.contains(&amp;123));
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>unit(a: A) -&gt; <span class="self">Self </span>{
+        HashSet::new().update(a)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Test whether a set is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// assert!(</span>
-    <span class="doccomment">///   !hashset![1, 2, 3].is_empty()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(</span>
-    <span class="doccomment">///   HashSet::&lt;i32&gt;::new().is_empty()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+<span class="kw">impl</span>&lt;A, S&gt; HashSet&lt;A, S&gt; {
+    <span class="doccomment">/// Test whether a set is empty.
+    ///
+    /// Time: O(1)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// assert!(
+    ///   !hashset![1, 2, 3].is_empty()
+    /// );
+    /// assert!(
+    ///   HashSet::&lt;i32&gt;::new().is_empty()
+    /// );
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Get the size of a set.
+    ///
+    /// Time: O(1)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// assert_eq!(3, hashset![1, 2, 3].len());
+    /// ```
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.size
     }
 
-    <span class="doccomment">/// Get the size of a set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// assert_eq!(3, hashset![1, 2, 3].len());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">size</span>
+    <span class="doccomment">/// Test whether two sets refer to the same content in memory.
+    ///
+    /// This is true if the two sides are references to the same set,
+    /// or if the two sets refer to the same root node.
+    ///
+    /// This would return true if you&#39;re comparing a set to itself, or
+    /// if you&#39;re comparing a set to a fresh clone of itself.
+    ///
+    /// Time: O(1)
+    </span><span class="kw">pub fn </span>ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        std::ptr::eq(<span class="self">self</span>, other) || PoolRef::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.root, <span class="kw-2">&amp;</span>other.root)
     }
 
-    <span class="doccomment">/// Test whether two sets refer to the same content in memory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is true if the two sides are references to the same set,</span>
-    <span class="doccomment">/// or if the two sets refer to the same root node.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This would return true if you&#39;re comparing a set to itself, or</span>
-    <span class="doccomment">/// if you&#39;re comparing a set to a fresh clone of itself.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">std::ptr::eq</span>(<span class="self">self</span>, <span class="ident">other</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">PoolRef::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">root</span>)
+    <span class="doccomment">/// Get a reference to the memory pool used by this set.
+    ///
+    /// Note that if you didn&#39;t specifically construct it with a pool, you&#39;ll
+    /// get back a reference to a pool of size 0.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;pool&quot;</span>)]
+    </span><span class="kw">pub fn </span>pool(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashSetPool&lt;A&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.pool
     }
 
-    <span class="doccomment">/// Get a reference to the memory pool used by this set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that if you didn&#39;t specifically construct it with a pool, you&#39;ll</span>
-    <span class="doccomment">/// get back a reference to a pool of size 0.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>
-    }
-
-    <span class="doccomment">/// Construct an empty hash set using the provided hasher.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_hasher</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>(<span class="ident">hasher</span>: <span class="ident">RS</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Construct an empty hash set using the provided hasher.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>with_hasher&lt;RS&gt;(hasher: RS) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>Ref&lt;S&gt;: From&lt;RS&gt;,
     {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashSetPool::default</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
-        <span class="ident">HashSet</span> {
-            <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">pool</span>,
-            <span class="ident">root</span>,
-            <span class="ident">hasher</span>: <span class="ident">From::from</span>(<span class="ident">hasher</span>),
+        <span class="kw">let </span>pool = HashSetPool::default();
+        <span class="kw">let </span>root = PoolRef::default(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>);
+        HashSet {
+            size: <span class="number">0</span>,
+            pool,
+            root,
+            hasher: From::from(hasher),
         }
     }
 
-    <span class="doccomment">/// Construct an empty hash set using the provided memory pool and hasher.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pool_hasher</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">HashSetPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">hasher</span>: <span class="ident">RS</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Construct an empty hash set using the provided memory pool and hasher.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;pool&quot;</span>)]
+    #[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>with_pool_hasher&lt;RS&gt;(pool: <span class="kw-2">&amp;</span>HashSetPool&lt;A&gt;, hasher: RS) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>Ref&lt;S&gt;: From&lt;RS&gt;,
     {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
-        <span class="ident">HashSet</span> {
-            <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">pool</span>: <span class="ident">pool</span>.<span class="ident">clone</span>(),
-            <span class="ident">root</span>,
-            <span class="ident">hasher</span>: <span class="ident">From::from</span>(<span class="ident">hasher</span>),
+        <span class="kw">let </span>root = PoolRef::default(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>);
+        HashSet {
+            size: <span class="number">0</span>,
+            pool: pool.clone(),
+            root,
+            hasher: From::from(hasher),
         }
     }
 
-    <span class="doccomment">/// Get a reference to the set&#39;s [`BuildHasher`][BuildHasher].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [BuildHasher]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hasher</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>
+    <span class="doccomment">/// Get a reference to the set&#39;s [`BuildHasher`][BuildHasher].
+    ///
+    /// [BuildHasher]: https://doc.rust-lang.org/std/hash/trait.BuildHasher.html
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>hasher(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Ref&lt;S&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.hasher
     }
 
-    <span class="doccomment">/// Construct an empty hash set using the same hasher as the current hash set.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from</span><span class="op">&lt;</span><span class="ident">A1</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A1</span>, <span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A1</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Construct an empty hash set using the same hasher as the current hash set.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>new_from&lt;A1&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashSet&lt;A1, S&gt;
+    <span class="kw">where
+        </span>A1: Hash + Eq + Clone,
     {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashSetPool::default</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
-        <span class="ident">HashSet</span> {
-            <span class="ident">size</span>: <span class="number">0</span>,
-            <span class="ident">pool</span>,
-            <span class="ident">root</span>,
-            <span class="ident">hasher</span>: <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>pool = HashSetPool::default();
+        <span class="kw">let </span>root = PoolRef::default(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>);
+        HashSet {
+            size: <span class="number">0</span>,
+            pool,
+            root,
+            hasher: <span class="self">self</span>.hasher.clone(),
         }
     }
 
-    <span class="doccomment">/// Discard all elements from the set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This leaves you with an empty set, and all elements that</span>
-    <span class="doccomment">/// were previously inside it are dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::HashSet;</span>
-    <span class="doccomment">/// let mut set = hashset![1, 2, 3];</span>
-    <span class="doccomment">/// set.clear();</span>
-    <span class="doccomment">/// assert!(set.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>);
-            <span class="self">self</span>.<span class="ident">size</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Discard all elements from the set.
+    ///
+    /// This leaves you with an empty set, and all elements that
+    /// were previously inside it are dropped.
+    ///
+    /// Time: O(n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::HashSet;
+    /// let mut set = hashset![1, 2, 3];
+    /// set.clear();
+    /// assert!(set.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="self">self</span>.is_empty() {
+            <span class="self">self</span>.root = PoolRef::default(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>);
+            <span class="self">self</span>.size = <span class="number">0</span>;
         }
     }
 
-    <span class="doccomment">/// Get an iterator over the values in a hash set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please note that the order is consistent between sets using</span>
-    <span class="doccomment">/// the same hasher, but no other ordering guarantee is offered.</span>
-    <span class="doccomment">/// Items will not come out in insertion order or sort order.</span>
-    <span class="doccomment">/// They will, however, come out in the same order every time for</span>
-    <span class="doccomment">/// the same set.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="ident">Iter</span> {
-            <span class="ident">it</span>: <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
+    <span class="doccomment">/// Get an iterator over the values in a hash set.
+    ///
+    /// Please note that the order is consistent between sets using
+    /// the same hasher, but no other ordering guarantee is offered.
+    /// Items will not come out in insertion order or sort order.
+    /// They will, however, come out in the same order every time for
+    /// the same set.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>, A&gt; {
+        Iter {
+            it: NodeIter::new(<span class="kw-2">&amp;</span><span class="self">self</span>.root, <span class="self">self</span>.size),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;A, S&gt; HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">test_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>test_eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.len() != other.len() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen</span> <span class="op">=</span> <span class="ident">collections::HashSet::new</span>();
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">other</span>.<span class="ident">contains</span>(<span class="ident">value</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>seen = collections::HashSet::new();
+        <span class="kw">for </span>value <span class="kw">in </span><span class="self">self</span>.iter() {
+            <span class="kw">if </span>!other.contains(value) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
-            <span class="ident">seen</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+            seen.insert(value);
         }
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">seen</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
-            }
-        }
-        <span class="bool-val">true</span>
-    }
-
-    <span class="doccomment">/// Test if a value is part of a set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(log n)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BA</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">BA</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
-    {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">get</span>(<span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">a</span>), <span class="number">0</span>, <span class="ident">a</span>).<span class="ident">is_some</span>()
-    }
-
-    <span class="doccomment">/// Test whether a set is a subset of another set, meaning that</span>
-    <span class="doccomment">/// all values in our set must also be in the other set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_subset</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">RS</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">RS</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">borrow</span>();
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">contains</span>(<span class="ident">a</span>))
-    }
-
-    <span class="doccomment">/// Test whether a set is a proper subset of another set, meaning</span>
-    <span class="doccomment">/// that all values in our set must also be in the other set. A</span>
-    <span class="doccomment">/// proper subset must also be smaller than the other set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_proper_subset</span><span class="op">&lt;</span><span class="ident">RS</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">RS</span>) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">RS</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-    {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">borrow</span>().<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_subset</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
-{
-    <span class="doccomment">/// Insert a value into a set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(log n)</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>);
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">match</span> <span class="ident">root</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash</span>, <span class="number">0</span>, <span class="ident">Value</span>(<span class="ident">a</span>)) {
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">Value</span>(<span class="ident">old_value</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">old_value</span>),
-        }
-    }
-
-    <span class="doccomment">/// Remove a value from a set if it exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(log n)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BA</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">BA</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="ident">a</span>), <span class="number">0</span>, <span class="ident">a</span>);
-        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_some</span>() {
-            <span class="self">self</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="ident">result</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="number">0</span>)
-    }
-
-    <span class="doccomment">/// Construct a new set from the current set with the given value</span>
-    <span class="doccomment">/// added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// let set = hashset![123];</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///   set.update(456),</span>
-    <span class="doccomment">///   hashset![123, 456]</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="ident">out</span>.<span class="ident">insert</span>(<span class="ident">a</span>);
-        <span class="ident">out</span>
-    }
-
-    <span class="doccomment">/// Construct a new set with the given value removed if it&#39;s in</span>
-    <span class="doccomment">/// the set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(log n)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">without</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BA</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">BA</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">A</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BA</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="ident">out</span>.<span class="ident">remove</span>(<span class="ident">a</span>);
-        <span class="ident">out</span>
-    }
-
-    <span class="doccomment">/// Filter out values from a set which don&#39;t satisfy a predicate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is slightly more efficient than filtering using an</span>
-    <span class="doccomment">/// iterator, in that it doesn&#39;t need to rehash the retained</span>
-    <span class="doccomment">/// values, but it still needs to reconstruct the entire tree</span>
-    <span class="doccomment">/// structure of the set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::HashSet;</span>
-    <span class="doccomment">/// let mut set = hashset![1, 2, 3];</span>
-    <span class="doccomment">/// set.retain(|v| *v &gt; 1);</span>
-    <span class="doccomment">/// let expected = hashset![2, 3];</span>
-    <span class="doccomment">/// assert_eq!(expected, set);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">bool</span>,
-    {
-        <span class="kw">let</span> <span class="ident">old_root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">root</span>);
-        <span class="kw">for</span> (<span class="ident">value</span>, <span class="ident">hash</span>) <span class="kw">in</span> <span class="ident">NodeIter::new</span>(<span class="kw-2">&amp;</span><span class="ident">old_root</span>, <span class="self">self</span>.<span class="ident">size</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="ident">value</span>) <span class="op">&amp;&amp;</span> <span class="ident">root</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="ident">hash</span>, <span class="number">0</span>, <span class="ident">value</span>).<span class="ident">is_some</span>() {
-                <span class="self">self</span>.<span class="ident">size</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">for </span>value <span class="kw">in </span>other.iter() {
+            <span class="kw">if </span>!seen.contains(<span class="kw-2">&amp;</span>value) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Test if a value is part of a set.
+    ///
+    /// Time: O(log n)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>contains&lt;BA&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>BA) -&gt; bool
+    <span class="kw">where
+        </span>BA: Hash + Eq + <span class="question-mark">?</span>Sized,
+        A: Borrow&lt;BA&gt;,
+    {
+        <span class="self">self</span>.root.get(hash_key(<span class="kw-2">&amp;*</span><span class="self">self</span>.hasher, a), <span class="number">0</span>, a).is_some()
     }
 
-    <span class="doccomment">/// Construct the union of two sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// let set1 = hashset!{1, 2};</span>
-    <span class="doccomment">/// let set2 = hashset!{2, 3};</span>
-    <span class="doccomment">/// let expected = hashset!{1, 2, 3};</span>
-    <span class="doccomment">/// assert_eq!(expected, set1.union(set2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">to_mutate</span>, <span class="ident">to_consume</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-            (<span class="self">self</span>, <span class="ident">other</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">other</span>, <span class="self">self</span>)
+    <span class="doccomment">/// Test whether a set is a subset of another set, meaning that
+    /// all values in our set must also be in the other set.
+    ///
+    /// Time: O(n log n)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>is_subset&lt;RS&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: RS) -&gt; bool
+    <span class="kw">where
+        </span>RS: Borrow&lt;<span class="self">Self</span>&gt;,
+    {
+        <span class="kw">let </span>o = other.borrow();
+        <span class="self">self</span>.iter().all(|a| o.contains(a))
+    }
+
+    <span class="doccomment">/// Test whether a set is a proper subset of another set, meaning
+    /// that all values in our set must also be in the other set. A
+    /// proper subset must also be smaller than the other set.
+    ///
+    /// Time: O(n log n)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>is_proper_subset&lt;RS&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: RS) -&gt; bool
+    <span class="kw">where
+        </span>RS: Borrow&lt;<span class="self">Self</span>&gt;,
+    {
+        <span class="self">self</span>.len() != other.borrow().len() &amp;&amp; <span class="self">self</span>.is_subset(other)
+    }
+}
+
+<span class="kw">impl</span>&lt;A, S&gt; HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
+{
+    <span class="doccomment">/// Insert a value into a set.
+    ///
+    /// Time: O(log n)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: A) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="kw">let </span>hash = hash_key(<span class="kw-2">&amp;*</span><span class="self">self</span>.hasher, <span class="kw-2">&amp;</span>a);
+        <span class="kw">let </span>root = PoolRef::make_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, <span class="kw-2">&amp;mut </span><span class="self">self</span>.root);
+        <span class="kw">match </span>root.insert(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, hash, <span class="number">0</span>, Value(a)) {
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="self">self</span>.size += <span class="number">1</span>;
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(Value(old_value)) =&gt; <span class="prelude-val">Some</span>(old_value),
+        }
+    }
+
+    <span class="doccomment">/// Remove a value from a set if it exists.
+    ///
+    /// Time: O(log n)
+    </span><span class="kw">pub fn </span>remove&lt;BA&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>BA) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt;
+    <span class="kw">where
+        </span>BA: Hash + Eq + <span class="question-mark">?</span>Sized,
+        A: Borrow&lt;BA&gt;,
+    {
+        <span class="kw">let </span>root = PoolRef::make_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, <span class="kw-2">&amp;mut </span><span class="self">self</span>.root);
+        <span class="kw">let </span>result = root.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, hash_key(<span class="kw-2">&amp;*</span><span class="self">self</span>.hasher, a), <span class="number">0</span>, a);
+        <span class="kw">if </span>result.is_some() {
+            <span class="self">self</span>.size -= <span class="number">1</span>;
+        }
+        result.map(|v| v.<span class="number">0</span>)
+    }
+
+    <span class="doccomment">/// Construct a new set from the current set with the given value
+    /// added.
+    ///
+    /// Time: O(log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// # use std::sync::Arc;
+    /// let set = hashset![123];
+    /// assert_eq!(
+    ///   set.update(456),
+    ///   hashset![123, 456]
+    /// );
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, a: A) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">self</span>.clone();
+        out.insert(a);
+        out
+    }
+
+    <span class="doccomment">/// Construct a new set with the given value removed if it&#39;s in
+    /// the set.
+    ///
+    /// Time: O(log n)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>without&lt;BA&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>BA) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>BA: Hash + Eq + <span class="question-mark">?</span>Sized,
+        A: Borrow&lt;BA&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">self</span>.clone();
+        out.remove(a);
+        out
+    }
+
+    <span class="doccomment">/// Filter out values from a set which don&#39;t satisfy a predicate.
+    ///
+    /// This is slightly more efficient than filtering using an
+    /// iterator, in that it doesn&#39;t need to rehash the retained
+    /// values, but it still needs to reconstruct the entire tree
+    /// structure of the set.
+    ///
+    /// Time: O(n log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::HashSet;
+    /// let mut set = hashset![1, 2, 3];
+    /// set.retain(|v| *v &gt; 1);
+    /// let expected = hashset![2, 3];
+    /// assert_eq!(expected, set);
+    /// ```
+    </span><span class="kw">pub fn </span>retain&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>f: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>A) -&gt; bool,
+    {
+        <span class="kw">let </span>old_root = <span class="self">self</span>.root.clone();
+        <span class="kw">let </span>root = PoolRef::make_mut(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, <span class="kw-2">&amp;mut </span><span class="self">self</span>.root);
+        <span class="kw">for </span>(value, hash) <span class="kw">in </span>NodeIter::new(<span class="kw-2">&amp;</span>old_root, <span class="self">self</span>.size) {
+            <span class="kw">if </span>!f(value) &amp;&amp; root.remove(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, hash, <span class="number">0</span>, value).is_some() {
+                <span class="self">self</span>.size -= <span class="number">1</span>;
+            }
+        }
+    }
+
+    <span class="doccomment">/// Construct the union of two sets.
+    ///
+    /// Time: O(n log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// let set1 = hashset!{1, 2};
+    /// let set2 = hashset!{2, 3};
+    /// let expected = hashset!{1, 2, 3};
+    /// assert_eq!(expected, set1.union(set2));
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>union(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(<span class="kw-2">mut </span>to_mutate, to_consume) = <span class="kw">if </span><span class="self">self</span>.len() &gt;= other.len() {
+            (<span class="self">self</span>, other)
+        } <span class="kw">else </span>{
+            (other, <span class="self">self</span>)
         };
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">to_consume</span> {
-            <span class="ident">to_mutate</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+        <span class="kw">for </span>value <span class="kw">in </span>to_consume {
+            to_mutate.insert(value);
         }
-        <span class="ident">to_mutate</span>
+        to_mutate
     }
 
-    <span class="doccomment">/// Construct the union of multiple sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">Default</span>,
+    <span class="doccomment">/// Construct the union of multiple sets.
+    ///
+    /// Time: O(n log n)
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>unions&lt;I&gt;(i: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="self">Self</span>&gt;,
+        S: Default,
     {
-        <span class="ident">i</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident"><span class="self">Self</span>::default</span>(), <span class="ident"><span class="self">Self</span>::union</span>)
+        i.into_iter().fold(<span class="self">Self</span>::default(), <span class="self">Self</span>::union)
     }
 
-    <span class="doccomment">/// Construct the symmetric difference between two sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is an alias for the</span>
-    <span class="doccomment">/// [`symmetric_difference`][symmetric_difference] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// let set1 = hashset!{1, 2};</span>
-    <span class="doccomment">/// let set2 = hashset!{2, 3};</span>
-    <span class="doccomment">/// let expected = hashset!{1, 3};</span>
-    <span class="doccomment">/// assert_eq!(expected, set1.difference(set2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [symmetric_difference]: #method.symmetric_difference</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">symmetric_difference</span>(<span class="ident">other</span>)
+    <span class="doccomment">/// Construct the symmetric difference between two sets.
+    ///
+    /// This is an alias for the
+    /// [`symmetric_difference`][symmetric_difference] method.
+    ///
+    /// Time: O(n log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// let set1 = hashset!{1, 2};
+    /// let set2 = hashset!{2, 3};
+    /// let expected = hashset!{1, 3};
+    /// assert_eq!(expected, set1.difference(set2));
+    /// ```
+    ///
+    /// [symmetric_difference]: #method.symmetric_difference
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>difference(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.symmetric_difference(other)
     }
 
-    <span class="doccomment">/// Construct the symmetric difference between two sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// let set1 = hashset!{1, 2};</span>
-    <span class="doccomment">/// let set2 = hashset!{2, 3};</span>
-    <span class="doccomment">/// let expected = hashset!{1, 3};</span>
-    <span class="doccomment">/// assert_eq!(expected, set1.symmetric_difference(set2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symmetric_difference</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">is_none</span>() {
-                <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Construct the symmetric difference between two sets.
+    ///
+    /// Time: O(n log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// let set1 = hashset!{1, 2};
+    /// let set2 = hashset!{2, 3};
+    /// let expected = hashset!{1, 3};
+    /// assert_eq!(expected, set1.symmetric_difference(set2));
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>symmetric_difference(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>value <span class="kw">in </span>other {
+            <span class="kw">if </span><span class="self">self</span>.remove(<span class="kw-2">&amp;</span>value).is_none() {
+                <span class="self">self</span>.insert(value);
             }
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Construct the relative complement between two sets, that is the set</span>
-    <span class="doccomment">/// of values in `self` that do not occur in `other`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(m log n) where m is the size of the other set</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::ordset::OrdSet;</span>
-    <span class="doccomment">/// let set1 = ordset!{1, 2};</span>
-    <span class="doccomment">/// let set2 = ordset!{2, 3};</span>
-    <span class="doccomment">/// let expected = ordset!{1};</span>
-    <span class="doccomment">/// assert_eq!(expected, set1.relative_complement(set2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relative_complement</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>);
+    <span class="doccomment">/// Construct the relative complement between two sets, that is the set
+    /// of values in `self` that do not occur in `other`.
+    ///
+    /// Time: O(m log n) where m is the size of the other set
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::ordset::OrdSet;
+    /// let set1 = ordset!{1, 2};
+    /// let set2 = ordset!{2, 3};
+    /// let expected = ordset!{1};
+    /// assert_eq!(expected, set1.relative_complement(set2));
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>relative_complement(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>value <span class="kw">in </span>other {
+            <span class="kw">let _ </span>= <span class="self">self</span>.remove(<span class="kw-2">&amp;</span>value);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Construct the intersection of two sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n log n)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::hashset::HashSet;</span>
-    <span class="doccomment">/// let set1 = hashset!{1, 2};</span>
-    <span class="doccomment">/// let set2 = hashset!{2, 3};</span>
-    <span class="doccomment">/// let expected = hashset!{2};</span>
-    <span class="doccomment">/// assert_eq!(expected, set1.intersection(set2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersection</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">new_from</span>();
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>) {
-                <span class="ident">out</span>.<span class="ident">insert</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Construct the intersection of two sets.
+    ///
+    /// Time: O(n log n)
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[macro_use] extern crate im;
+    /// # use im::hashset::HashSet;
+    /// let set1 = hashset!{1, 2};
+    /// let set2 = hashset!{2, 3};
+    /// let expected = hashset!{2};
+    /// assert_eq!(expected, set1.intersection(set2));
+    /// ```
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>intersection(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">self</span>.new_from();
+        <span class="kw">for </span>value <span class="kw">in </span>other {
+            <span class="kw">if </span><span class="self">self</span>.contains(<span class="kw-2">&amp;</span>value) {
+                out.insert(value);
             }
         }
-        <span class="ident">out</span>
+        out
     }
 }
 
-<span class="comment">// Core traits</span>
+<span class="comment">// Core traits
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
+</span><span class="kw">impl</span>&lt;A, S&gt; Clone <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Clone,
 {
-    <span class="doccomment">/// Clone a set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">HashSet</span> {
-            <span class="ident">hasher</span>: <span class="self">self</span>.<span class="ident">hasher</span>.<span class="ident">clone</span>(),
-            <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>(),
-            <span class="ident">root</span>: <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>(),
-            <span class="ident">size</span>: <span class="self">self</span>.<span class="ident">size</span>,
+    <span class="doccomment">/// Clone a set.
+    ///
+    /// Time: O(1)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        HashSet {
+            hasher: <span class="self">self</span>.hasher.clone(),
+            pool: <span class="self">self</span>.pool.clone(),
+            root: <span class="self">self</span>.root.clone(),
+            size: <span class="self">self</span>.size,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; PartialEq <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">test_eq</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.test_eq(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Eq <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
+    S: BuildHasher + Default,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">PartialOrd</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; PartialOrd <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone + PartialOrd,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">hasher</span>) {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>());
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="kw">if </span>Ref::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.hasher, <span class="kw-2">&amp;</span>other.hasher) {
+            <span class="kw">return </span><span class="self">self</span>.iter().partial_cmp(other.iter());
         }
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+        <span class="self">self</span>.iter().partial_cmp(other.iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Ord <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone + Ord,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">if</span> <span class="ident">Ref::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hasher</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">hasher</span>) {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>());
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">if </span>Ref::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.hasher, <span class="kw-2">&amp;</span>other.hasher) {
+            <span class="kw">return </span><span class="self">self</span>.iter().cmp(other.iter());
         }
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+        <span class="self">self</span>.iter().cmp(other.iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Hash <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-    <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">Hasher</span>,
+    <span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
+    <span class="kw">where
+        </span>H: Hasher,
     {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>() {
-            <span class="ident">i</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="self">self</span>.iter() {
+            i.hash(state);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Default <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">HashSetPool::default</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">PoolRef::default</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="number">0</span>);
-        <span class="ident">HashSet</span> {
-            <span class="ident">hasher</span>: <span class="ident">Ref</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="ident">::default</span>(),
-            <span class="ident">pool</span>,
-            <span class="ident">root</span>,
-            <span class="ident">size</span>: <span class="number">0</span>,
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>pool = HashSetPool::default();
+        <span class="kw">let </span>root = PoolRef::default(<span class="kw-2">&amp;</span>pool.<span class="number">0</span>);
+        HashSet {
+            hasher: Ref::&lt;S&gt;::default(),
+            pool,
+            root,
+            size: <span class="number">0</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Add</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Add <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = HashSet&lt;A, S&gt;;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">union</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.union(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Mul</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Mul <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = HashSet&lt;A, S&gt;;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">intersection</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.intersection(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Add</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; Add <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = HashSet&lt;A, S&gt;;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">union</span>(<span class="ident">other</span>.<span class="ident">clone</span>())
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.clone().union(other.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Mul</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; Mul <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = HashSet&lt;A, S&gt;;
 
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">intersection</span>(<span class="ident">other</span>.<span class="ident">clone</span>())
+    <span class="kw">fn </span>mul(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.clone().intersection(other.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Sum</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Sum <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">sum</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">it</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>sum&lt;I&gt;(it: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: Iterator&lt;Item = <span class="self">Self</span>&gt;,
     {
-        <span class="ident">it</span>.<span class="ident">fold</span>(<span class="ident"><span class="self">Self</span>::default</span>(), <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span> <span class="ident">b</span>)
+        it.fold(<span class="self">Self</span>::default(), |a, b| a + b)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;A, S, R&gt; Extend&lt;R&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone + From&lt;R&gt;,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iter</span>: <span class="ident">I</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>extend&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iter: I)
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = R&gt;,
     {
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">From::from</span>(<span class="ident">value</span>));
+        <span class="kw">for </span>value <span class="kw">in </span>iter {
+            <span class="self">self</span>.insert(From::from(value));
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">has_specialisation</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Debug</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="attribute">#[cfg(not(has_specialisation))]
+</span><span class="kw">impl</span>&lt;A, S&gt; Debug <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Debug,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_set</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        f.debug_set().entries(<span class="self">self</span>.iter()).finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">has_specialisation</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Debug</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="attribute">#[cfg(has_specialisation)]
+</span><span class="kw">impl</span>&lt;A, S&gt; Debug <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Debug,
+    S: BuildHasher,
 {
-    <span class="ident">default</span> <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_set</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>()
+    default <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        f.debug_set().entries(<span class="self">self</span>.iter()).finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">has_specialisation</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Ord</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="attribute">#[cfg(has_specialisation)]
+</span><span class="kw">impl</span>&lt;A, S&gt; Debug <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Debug + Ord,
+    S: BuildHasher,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_set</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        f.debug_set().entries(<span class="self">self</span>.iter()).finish()
     }
 }
 
-<span class="comment">// Iterators</span>
+<span class="comment">// Iterators
 
-<span class="doccomment">/// An iterator over the elements of a set.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="ident">it</span>: <span class="ident">NodeIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+</span><span class="doccomment">/// An iterator over the elements of a set.
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>, A&gt; {
+    it: NodeIter&lt;<span class="lifetime">&#39;a</span>, Value&lt;A&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>;
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">v</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.it.next().map(|(v, <span class="kw">_</span>)| <span class="kw-2">&amp;</span>v.<span class="number">0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">size_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {}
-
-<span class="doccomment">/// A consuming iterator over the elements of a set.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-{
-    <span class="ident">it</span>: <span class="ident">NodeDrain</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">v</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="number">0</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.it.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; ExactSizeIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, A&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; FusedIterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, A&gt; {}
 
-<span class="comment">// Iterator conversions</span>
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">RA</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">RA</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RA</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="doccomment">/// A consuming iterator over the elements of a set.
+</span><span class="kw">pub struct </span>ConsumingIter&lt;A&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RA</span><span class="op">&gt;</span>,
+    it: NodeDrain&lt;Value&lt;A&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;A&gt; Iterator <span class="kw">for </span>ConsumingIter&lt;A&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+{
+    <span class="kw">type </span>Item = A;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.it.next().map(|(v, <span class="kw">_</span>)| v.<span class="number">0</span>)
+    }
+
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.it.size_hint()
+    }
+}
+
+<span class="kw">impl</span>&lt;A&gt; ExactSizeIterator <span class="kw">for </span>ConsumingIter&lt;A&gt; <span class="kw">where </span>A: Hash + Eq + Clone {}
+
+<span class="kw">impl</span>&lt;A&gt; FusedIterator <span class="kw">for </span>ConsumingIter&lt;A&gt; <span class="kw">where </span>A: Hash + Eq + Clone {}
+
+<span class="comment">// Iterator conversions
+
+</span><span class="kw">impl</span>&lt;A, RA, S&gt; FromIterator&lt;RA&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone + From&lt;RA&gt;,
+    S: BuildHasher + Default,
+{
+    <span class="kw">fn </span>from_iter&lt;T&gt;(i: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: IntoIterator&lt;Item = RA&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">i</span> {
-            <span class="ident">set</span>.<span class="ident">insert</span>(<span class="ident">From::from</span>(<span class="ident">value</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>set = <span class="self">Self</span>::default();
+        <span class="kw">for </span>value <span class="kw">in </span>i {
+            set.insert(From::from(value));
         }
-        <span class="ident">set</span>
+        set
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, A&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;A, S&gt; IntoIterator <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">ConsumingIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = A;
+    <span class="kw">type </span>IntoIter = ConsumingIter&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">ConsumingIter</span> {
-            <span class="ident">it</span>: <span class="ident">NodeDrain::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pool</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">size</span>),
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        ConsumingIter {
+            it: NodeDrain::new(<span class="kw-2">&amp;</span><span class="self">self</span>.pool.<span class="number">0</span>, <span class="self">self</span>.root, <span class="self">self</span>.size),
         }
     }
 }
 
-<span class="comment">// Conversions</span>
+<span class="comment">// Conversions
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">OA</span>, <span class="ident">SA</span>, <span class="ident">SB</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>, <span class="ident">SA</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">OA</span>, <span class="ident">SB</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">ToOwned</span><span class="op">&lt;</span><span class="ident">Owned</span> <span class="op">=</span> <span class="ident">OA</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">OA</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">SA</span>: <span class="ident">BuildHasher</span>,
-    <span class="ident">SB</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;a</span>, A, OA, SA, SB&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span>HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A, SA&gt;&gt; <span class="kw">for </span>HashSet&lt;OA, SB&gt;
+<span class="kw">where
+    </span>A: ToOwned&lt;Owned = OA&gt; + Hash + Eq + <span class="question-mark">?</span>Sized,
+    OA: Borrow&lt;A&gt; + Hash + Eq + Clone,
+    SA: BuildHasher,
+    SB: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">set</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="ident">SA</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">set</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">a</span>).<span class="ident">to_owned</span>()).<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(set: <span class="kw-2">&amp;</span>HashSet&lt;<span class="kw-2">&amp;</span>A, SA&gt;) -&gt; <span class="self">Self </span>{
+        set.iter().map(|a| (<span class="kw-2">*</span>a).to_owned()).collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">A</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[A]&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">A</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">slice</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(slice: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[A]) -&gt; <span class="self">Self </span>{
+        slice.iter().cloned().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; From&lt;Vec&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">vec</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(vec: Vec&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        vec.into_iter().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vec</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">vec</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(vec: <span class="kw-2">&amp;</span>Vec&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        vec.iter().cloned().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; From&lt;Vector&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vector</span>: <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">vector</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(vector: Vector&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        vector.into_iter().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vector&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">vector</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(vector: <span class="kw-2">&amp;</span>Vector&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        vector.iter().cloned().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">collections::HashSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; From&lt;collections::HashSet&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">hash_set</span>: <span class="ident">collections::HashSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">hash_set</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(hash_set: collections::HashSet&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        hash_set.into_iter().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">collections::HashSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>collections::HashSet&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Eq + Hash + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">hash_set</span>: <span class="kw-2">&amp;</span><span class="ident">collections::HashSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">hash_set</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(hash_set: <span class="kw-2">&amp;</span>collections::HashSet&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        hash_set.iter().cloned().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BTreeSet&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">btree_set</span>: <span class="kw-2">&amp;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">btree_set</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(btree_set: <span class="kw-2">&amp;</span>BTreeSet&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        btree_set.iter().cloned().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;A, S&gt; From&lt;OrdSet&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Ord + Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ordset</span>: <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ordset</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(ordset: OrdSet&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        ordset.into_iter().collect()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, S&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OrdSet&lt;A&gt;&gt; <span class="kw">for </span>HashSet&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Ord + Hash + Eq + Clone,
+    S: BuildHasher + Default,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">ordset</span>: <span class="kw-2">&amp;</span><span class="ident">OrdSet</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ordset</span>.<span class="ident">into_iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="kw">fn </span>from(ordset: <span class="kw-2">&amp;</span>OrdSet&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        ordset.into_iter().cloned().collect()
     }
 }
 
-<span class="comment">// Proptest</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;proptest&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">proptest</span> {
-    <span class="attribute">#[<span class="ident">deprecated</span>(
-        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;14.3.0&quot;</span>,
-        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;proptest strategies have moved to im::proptest&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proptest::hash_set</span>;
+<span class="comment">// Proptest
+</span><span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;proptest&quot;</span>))]
+#[doc(hidden)]
+</span><span class="kw">pub mod </span>proptest {
+    <span class="attribute">#[deprecated(
+        since = <span class="string">&quot;14.3.0&quot;</span>,
+        note = <span class="string">&quot;proptest strategies have moved to im::proptest&quot;
+    </span>)]
+    </span><span class="kw">pub use </span><span class="kw">crate</span>::proptest::hash_set;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::proptest</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test::LolHasher</span>;
-    <span class="kw">use</span> <span class="ident">::proptest::num::i16</span>;
-    <span class="kw">use</span> <span class="ident">::proptest::proptest</span>;
-    <span class="kw">use</span> <span class="ident">std::hash::BuildHasherDefault</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::proptest::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::test::LolHasher;
+    <span class="kw">use </span>::proptest::num::i16;
+    <span class="kw">use </span>::proptest::proptest;
+    <span class="kw">use </span>std::hash::BuildHasherDefault;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_failing</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">LolHasher</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="ident">set</span>.<span class="ident">insert</span>(<span class="number">14658</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">set</span>.<span class="ident">len</span>());
-        <span class="ident">set</span>.<span class="ident">insert</span>(<span class="op">-</span><span class="number">19198</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">2</span>, <span class="ident">set</span>.<span class="ident">len</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_failing() {
+        <span class="kw">let </span><span class="kw-2">mut </span>set: HashSet&lt;i16, BuildHasherDefault&lt;LolHasher&gt;&gt; = Default::default();
+        set.insert(<span class="number">14658</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, set.len());
+        set.insert(-<span class="number">19198</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">2</span>, set.len());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">match_strings_with_string_slices</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="kw-2">&amp;</span><span class="macro">hashset!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
-        <span class="ident">set</span> <span class="op">=</span> <span class="ident">set</span>.<span class="ident">without</span>(<span class="string">&quot;bar&quot;</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">set</span>.<span class="ident">contains</span>(<span class="string">&quot;bar&quot;</span>));
-        <span class="ident">set</span>.<span class="ident">remove</span>(<span class="string">&quot;foo&quot;</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">set</span>.<span class="ident">contains</span>(<span class="string">&quot;foo&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>match_strings_with_string_slices() {
+        <span class="kw">let </span><span class="kw-2">mut </span>set: HashSet&lt;String&gt; = From::from(<span class="kw-2">&amp;</span><span class="macro">hashset!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
+        set = set.without(<span class="string">&quot;bar&quot;</span>);
+        <span class="macro">assert!</span>(!set.contains(<span class="string">&quot;bar&quot;</span>));
+        set.remove(<span class="string">&quot;foo&quot;</span>);
+        <span class="macro">assert!</span>(!set.contains(<span class="string">&quot;foo&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">macro_allows_trailing_comma</span>() {
-        <span class="kw">let</span> <span class="ident">set1</span> <span class="op">=</span> <span class="macro">hashset!</span> {<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>};
-        <span class="kw">let</span> <span class="ident">set2</span> <span class="op">=</span> <span class="macro">hashset!</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>macro_allows_trailing_comma() {
+        <span class="kw">let </span>set1 = <span class="macro">hashset! </span>{<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>};
+        <span class="kw">let </span>set2 = <span class="macro">hashset! </span>{
             <span class="string">&quot;foo&quot;</span>,
             <span class="string">&quot;bar&quot;</span>,
         };
-        <span class="macro">assert_eq!</span>(<span class="ident">set1</span>, <span class="ident">set2</span>);
+        <span class="macro">assert_eq!</span>(set1, set2);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">issue_60_drain_iterator_memory_corruption</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test::MetroHashBuilder</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1000</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];
-            <span class="ident">lhs</span>.<span class="ident">sort_unstable</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>issue_60_drain_iterator_memory_corruption() {
+        <span class="kw">use </span><span class="kw">crate</span>::test::MetroHashBuilder;
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1000 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>lhs = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>];
+            lhs.sort_unstable();
 
-            <span class="kw">let</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Ref::from</span>(<span class="ident">MetroHashBuilder::new</span>(<span class="ident">i</span>));
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iset</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">MetroHashBuilder</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::with_hasher</span>(<span class="ident">hasher</span>.<span class="ident">clone</span>());
-            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">lhs</span> {
-                <span class="ident">iset</span>.<span class="ident">insert</span>(<span class="ident">i</span>);
+            <span class="kw">let </span>hasher = Ref::from(MetroHashBuilder::new(i));
+            <span class="kw">let </span><span class="kw-2">mut </span>iset: HashSet&lt;<span class="kw">_</span>, MetroHashBuilder&gt; = HashSet::with_hasher(hasher.clone());
+            <span class="kw">for </span><span class="kw-2">&amp;</span>i <span class="kw">in </span><span class="kw-2">&amp;</span>lhs {
+                iset.insert(i);
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">iset</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-            <span class="ident">rhs</span>.<span class="ident">sort_unstable</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>rhs: Vec&lt;<span class="kw">_</span>&gt; = iset.clone().into_iter().collect();
+            rhs.sort_unstable();
 
-            <span class="kw">if</span> <span class="ident">lhs</span> <span class="op">!</span><span class="op">=</span> <span class="ident">rhs</span> {
-                <span class="macro">println!</span>(<span class="string">&quot;iteration: {}&quot;</span>, <span class="ident">i</span>);
-                <span class="macro">println!</span>(<span class="string">&quot;seed: {}&quot;</span>, <span class="ident">hasher</span>.<span class="ident">seed</span>());
-                <span class="macro">println!</span>(<span class="string">&quot;lhs: {}: {:?}&quot;</span>, <span class="ident">lhs</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">lhs</span>);
-                <span class="macro">println!</span>(<span class="string">&quot;rhs: {}: {:?}&quot;</span>, <span class="ident">rhs</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">rhs</span>);
+            <span class="kw">if </span>lhs != rhs {
+                <span class="macro">println!</span>(<span class="string">&quot;iteration: {}&quot;</span>, i);
+                <span class="macro">println!</span>(<span class="string">&quot;seed: {}&quot;</span>, hasher.seed());
+                <span class="macro">println!</span>(<span class="string">&quot;lhs: {}: {:?}&quot;</span>, lhs.len(), <span class="kw-2">&amp;</span>lhs);
+                <span class="macro">println!</span>(<span class="string">&quot;rhs: {}: {:?}&quot;</span>, rhs.len(), <span class="kw-2">&amp;</span>rhs);
                 <span class="macro">panic!</span>();
             }
         }
     }
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">proptest_a_set</span>(<span class="kw-2">ref</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">hash_set</span>(<span class="string">&quot;.*&quot;</span>, <span class="number">10</span>..<span class="number">100</span>)) {
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">100</span>);
-            <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span>);
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>proptest_a_set(<span class="kw-2">ref </span>s <span class="kw">in </span>hash_set(<span class="string">&quot;.*&quot;</span>, <span class="number">10</span>..<span class="number">100</span>)) {
+            <span class="macro">assert!</span>(s.len() &lt; <span class="number">100</span>);
+            <span class="macro">assert!</span>(s.len() &gt;= <span class="number">10</span>);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

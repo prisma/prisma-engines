@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/indexmap-1.9.1/src/serde_seq.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_seq.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../indexmap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../indexmap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../indexmap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/indexmap-1.9.1/src/serde_seq.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_seq.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../indexmap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../indexmap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../indexmap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -110,117 +110,117 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Functions to serialize and deserialize an `IndexMap` as an ordered sequence.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The default `serde` implementation serializes `IndexMap` as a normal map,</span>
-<span class="doccomment">//! but there is no guarantee that serialization formats will preserve the order</span>
-<span class="doccomment">//! of the key-value pairs. This module serializes `IndexMap` as a sequence of</span>
-<span class="doccomment">//! `(key, value)` elements instead, in order.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module may be used in a field attribute for derived implementations:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use indexmap::IndexMap;</span>
-<span class="doccomment">//! # use serde_derive::{Deserialize, Serialize};</span>
-<span class="doccomment">//! #[derive(Deserialize, Serialize)]</span>
-<span class="doccomment">//! struct Data {</span>
-<span class="doccomment">//!     #[serde(with = &quot;indexmap::serde_seq&quot;)]</span>
-<span class="doccomment">//!     map: IndexMap&lt;i32, u64&gt;,</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions to serialize and deserialize an `IndexMap` as an ordered sequence.
+//!
+//! The default `serde` implementation serializes `IndexMap` as a normal map,
+//! but there is no guarantee that serialization formats will preserve the order
+//! of the key-value pairs. This module serializes `IndexMap` as a sequence of
+//! `(key, value)` elements instead, in order.
+//!
+//! This module may be used in a field attribute for derived implementations:
+//!
+//! ```
+//! # use indexmap::IndexMap;
+//! # use serde_derive::{Deserialize, Serialize};
+//! #[derive(Deserialize, Serialize)]
+//! struct Data {
+//!     #[serde(with = &quot;indexmap::serde_seq&quot;)]
+//!     map: IndexMap&lt;i32, u64&gt;,
+//!     // ...
+//! }
+//! ```
+//!
+//! Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`
 
-<span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">SeqAccess</span>, <span class="ident">Visitor</span>};
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+</span><span class="kw">use </span>serde::de::{Deserialize, Deserializer, SeqAccess, Visitor};
+<span class="kw">use </span>serde::ser::{Serialize, Serializer};
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>};
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use </span>core::fmt::{<span class="self">self</span>, Formatter};
+<span class="kw">use </span>core::hash::{BuildHasher, Hash};
+<span class="kw">use </span>core::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::IndexMap</span>;
+<span class="kw">use </span><span class="kw">crate</span>::IndexMap;
 
-<span class="doccomment">/// Serializes an `IndexMap` as an ordered sequence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function may be used in a field attribute for deriving `Serialize`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indexmap::IndexMap;</span>
-<span class="doccomment">/// # use serde_derive::Serialize;</span>
-<span class="doccomment">/// #[derive(Serialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     #[serde(serialize_with = &quot;indexmap::serde_seq::serialize&quot;)]</span>
-<span class="doccomment">///     map: IndexMap&lt;i32, u64&gt;,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Ok</span>, <span class="ident">T::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>,
-    <span class="ident">V</span>: <span class="ident">Serialize</span>,
-    <span class="ident">S</span>: <span class="ident">BuildHasher</span>,
-    <span class="ident">T</span>: <span class="ident">Serializer</span>,
+<span class="doccomment">/// Serializes an `IndexMap` as an ordered sequence.
+///
+/// This function may be used in a field attribute for deriving `Serialize`:
+///
+/// ```
+/// # use indexmap::IndexMap;
+/// # use serde_derive::Serialize;
+/// #[derive(Serialize)]
+/// struct Data {
+///     #[serde(serialize_with = &quot;indexmap::serde_seq::serialize&quot;)]
+///     map: IndexMap&lt;i32, u64&gt;,
+///     // ...
+/// }
+/// ```
+///
+/// Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`
+</span><span class="kw">pub fn </span>serialize&lt;K, V, S, T&gt;(map: <span class="kw-2">&amp;</span>IndexMap&lt;K, V, S&gt;, serializer: T) -&gt; <span class="prelude-ty">Result</span>&lt;T::Ok, T::Error&gt;
+<span class="kw">where
+    </span>K: Serialize + Hash + Eq,
+    V: Serialize,
+    S: BuildHasher,
+    T: Serializer,
 {
-    <span class="ident">serializer</span>.<span class="ident">collect_seq</span>(<span class="ident">map</span>)
+    serializer.collect_seq(map)
 }
 
-<span class="doccomment">/// Visitor to deserialize a *sequenced* `IndexMap`</span>
-<span class="kw">struct</span> <span class="ident">SeqVisitor</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span>)<span class="op">&gt;</span>);
+<span class="doccomment">/// Visitor to deserialize a *sequenced* `IndexMap`
+</span><span class="kw">struct </span>SeqVisitor&lt;K, V, S&gt;(PhantomData&lt;(K, V, S)&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SeqVisitor</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">V</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">BuildHasher</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, K, V, S&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SeqVisitor&lt;K, V, S&gt;
+<span class="kw">where
+    </span>K: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; + Eq + Hash,
+    V: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+    S: Default + BuildHasher,
 {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Value = IndexMap&lt;K, V, S&gt;;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a sequenced map&quot;</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;a sequenced map&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_seq&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>seq: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+    <span class="kw">where
+        </span>A: SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">capacity</span> <span class="op">=</span> <span class="ident">seq</span>.<span class="ident">size_hint</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">IndexMap::with_capacity_and_hasher</span>(<span class="ident">capacity</span>, <span class="ident">S::default</span>());
+        <span class="kw">let </span>capacity = seq.size_hint().unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>map = IndexMap::with_capacity_and_hasher(capacity, S::default());
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>)) <span class="op">=</span> <span class="ident">seq</span>.<span class="ident">next_element</span>()<span class="question-mark">?</span> {
-            <span class="ident">map</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>((key, value)) = seq.next_element()<span class="question-mark">? </span>{
+            map.insert(key, value);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">map</span>)
+        <span class="prelude-val">Ok</span>(map)
     }
 }
 
-<span class="doccomment">/// Deserializes an `IndexMap` from an ordered sequence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function may be used in a field attribute for deriving `Deserialize`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indexmap::IndexMap;</span>
-<span class="doccomment">/// # use serde_derive::Deserialize;</span>
-<span class="doccomment">/// #[derive(Deserialize)]</span>
-<span class="doccomment">/// struct Data {</span>
-<span class="doccomment">///     #[serde(deserialize_with = &quot;indexmap::serde_seq::deserialize&quot;)]</span>
-<span class="doccomment">///     map: IndexMap&lt;i32, u64&gt;,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span>, <span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-    <span class="ident">K</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span>,
-    <span class="ident">V</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">BuildHasher</span>,
+<span class="doccomment">/// Deserializes an `IndexMap` from an ordered sequence.
+///
+/// This function may be used in a field attribute for deriving `Deserialize`:
+///
+/// ```
+/// # use indexmap::IndexMap;
+/// # use serde_derive::Deserialize;
+/// #[derive(Deserialize)]
+/// struct Data {
+///     #[serde(deserialize_with = &quot;indexmap::serde_seq::deserialize&quot;)]
+///     map: IndexMap&lt;i32, u64&gt;,
+///     // ...
+/// }
+/// ```
+///
+/// Requires crate feature `&quot;serde&quot;` or `&quot;serde-1&quot;`
+</span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D, K, V, S&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;IndexMap&lt;K, V, S&gt;, D::Error&gt;
+<span class="kw">where
+    </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
+    K: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; + Eq + Hash,
+    V: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
+    S: Default + BuildHasher,
 {
-    <span class="ident">deserializer</span>.<span class="ident">deserialize_seq</span>(<span class="ident">SeqVisitor</span>(<span class="ident">PhantomData</span>))
+    deserializer.deserialize_seq(SeqVisitor(PhantomData))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="indexmap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="indexmap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

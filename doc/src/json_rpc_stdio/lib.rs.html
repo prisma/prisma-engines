@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/json-rpc-stdio/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../json_rpc_stdio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../json_rpc_stdio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../json_rpc_stdio/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/json-rpc-stdio/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../json_rpc_stdio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../json_rpc_stdio/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../json_rpc_stdio/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -215,211 +215,211 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 
-<span class="doccomment">//! This crate implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core</span>
-<span class="doccomment">//! for the JSON-RPC part.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Notifications in the Client are not supported yet.</span>
+</span><span class="doccomment">//! This crate implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
+//! for the JSON-RPC part.
+//!
+//! Notifications in the Client are not supported yet.
 
-<span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">IoHandler</span>, <span class="ident">MethodCall</span>, <span class="ident">Notification</span>, <span class="ident">Request</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">io</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
+</span><span class="kw">use </span>jsonrpc_core::{IoHandler, MethodCall, Notification, Request};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::{
+    collections::HashMap,
+    io,
+    sync::atomic::{AtomicU64, Ordering},
 };
-<span class="kw">use</span> <span class="ident">tokio</span>::{
-    <span class="ident">io</span>::{<span class="ident">AsyncBufReadExt</span>, <span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">AsyncWriteExt</span>},
-    <span class="ident">sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>},
+<span class="kw">use </span>tokio::{
+    io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt},
+    sync::{mpsc, oneshot},
 };
 
-<span class="kw">static</span> <span class="ident">REQUEST_ID_COUNTER</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
+<span class="kw">static </span>REQUEST_ID_COUNTER: AtomicU64 = AtomicU64::new(<span class="number">0</span>);
 
-<span class="doccomment">/// A handle to a connected client you can use to send requests.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
-    <span class="ident">notification_sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span>,
-    <span class="ident">request_sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span>(<span class="ident">MethodCall</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Output</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to a connected client you can use to send requests.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Client {
+    notification_sender: mpsc::Sender&lt;Notification&gt;,
+    request_sender: mpsc::Sender&lt;(MethodCall, oneshot::Sender&lt;jsonrpc_core::Output&gt;)&gt;,
 }
 
-<span class="doccomment">/// Constructor a JSON-RPC client. Returns a tuple: the client you can use to send requests, and</span>
-<span class="doccomment">/// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_client</span>() -&gt; (<span class="ident">Client</span>, <span class="ident">ClientAdapter</span>) {
-    <span class="kw">let</span> (<span class="ident">request_sender</span>, <span class="ident">request_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">30</span>);
-    <span class="kw">let</span> (<span class="ident">notification_sender</span>, <span class="ident">notification_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">30</span>);
-    <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span> {
-        <span class="ident">request_sender</span>,
-        <span class="ident">notification_sender</span>,
+<span class="doccomment">/// Constructor a JSON-RPC client. Returns a tuple: the client you can use to send requests, and
+/// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.
+</span><span class="kw">pub fn </span>new_client() -&gt; (Client, ClientAdapter) {
+    <span class="kw">let </span>(request_sender, request_receiver) = mpsc::channel(<span class="number">30</span>);
+    <span class="kw">let </span>(notification_sender, notification_receiver) = mpsc::channel(<span class="number">30</span>);
+    <span class="kw">let </span>client = Client {
+        request_sender,
+        notification_sender,
     };
 
-    <span class="kw">let</span> <span class="ident">adapter</span> <span class="op">=</span> <span class="ident">ClientAdapter</span> {
-        <span class="ident">request_receiver</span>,
-        <span class="ident">notification_receiver</span>,
+    <span class="kw">let </span>adapter = ClientAdapter {
+        request_receiver,
+        notification_receiver,
     };
 
-    (<span class="ident">client</span>, <span class="ident">adapter</span>)
+    (client, adapter)
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="doccomment">/// Asynchronously send a JSON-RPC notification.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">notify</span><span class="op">&lt;</span><span class="ident">Req</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">method</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="ident">Req</span>) -&gt; <span class="ident">jsonrpc_core::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Req</span>: <span class="ident">serde::Serialize</span>,
+<span class="kw">impl </span>Client {
+    <span class="doccomment">/// Asynchronously send a JSON-RPC notification.
+    </span><span class="kw">pub async fn </span>notify&lt;Req&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, method: String, params: Req) -&gt; jsonrpc_core::Result&lt;()&gt;
+    <span class="kw">where
+        </span>Req: serde::Serialize,
     {
-        <span class="kw">let</span> <span class="ident">json_params</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="ident">params</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> <span class="ident">jsonrpc_core::Error::invalid_request</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">json_params</span> {
-            <span class="ident">jsonrpc_core::Value::Array</span>(<span class="ident">arr</span>) =&gt; <span class="ident">jsonrpc_core::Params::Array</span>(<span class="ident">arr</span>),
-            <span class="ident">jsonrpc_core::Value::Object</span>(<span class="ident">obj</span>) =&gt; <span class="ident">jsonrpc_core::Params::Map</span>(<span class="ident">obj</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">jsonrpc_core::Error::invalid_request</span>()),
+        <span class="kw">let </span>json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())<span class="question-mark">?</span>;
+        <span class="kw">let </span>params = <span class="kw">match </span>json_params {
+            jsonrpc_core::Value::Array(arr) =&gt; jsonrpc_core::Params::Array(arr),
+            jsonrpc_core::Value::Object(obj) =&gt; jsonrpc_core::Params::Map(obj),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(jsonrpc_core::Error::invalid_request()),
         };
-        <span class="kw">let</span> <span class="ident">notification</span> <span class="op">=</span> <span class="ident">jsonrpc_core::Notification</span> {
-            <span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">jsonrpc_core::Version::V2</span>),
-            <span class="ident">method</span>,
-            <span class="ident">params</span>,
+        <span class="kw">let </span>notification = jsonrpc_core::Notification {
+            jsonrpc: <span class="prelude-val">Some</span>(jsonrpc_core::Version::V2),
+            method,
+            params,
         };
-        <span class="self">self</span>.<span class="ident">notification_sender</span>.<span class="ident">send</span>(<span class="ident">notification</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="self">self</span>.notification_sender.send(notification).<span class="kw">await</span>.unwrap();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Asynchronously send a JSON-RPC request.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call</span><span class="op">&lt;</span><span class="ident">Req</span>, <span class="ident">Res</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">method</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="ident">Req</span>) -&gt; <span class="ident">jsonrpc_core::Result</span><span class="op">&lt;</span><span class="ident">Res</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Req</span>: <span class="ident">serde::Serialize</span>,
-        <span class="ident">Res</span>: <span class="ident">serde::de::DeserializeOwned</span>,
+    <span class="doccomment">/// Asynchronously send a JSON-RPC request.
+    </span><span class="kw">pub async fn </span>call&lt;Req, Res&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, method: String, params: Req) -&gt; jsonrpc_core::Result&lt;Res&gt;
+    <span class="kw">where
+        </span>Req: serde::Serialize,
+        Res: serde::de::DeserializeOwned,
     {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">REQUEST_ID_COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">let</span> <span class="ident">json_params</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="ident">params</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> <span class="ident">jsonrpc_core::Error::invalid_request</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">json_params</span> {
-            <span class="ident">jsonrpc_core::Value::Array</span>(<span class="ident">arr</span>) =&gt; <span class="ident">jsonrpc_core::Params::Array</span>(<span class="ident">arr</span>),
-            <span class="ident">jsonrpc_core::Value::Object</span>(<span class="ident">obj</span>) =&gt; <span class="ident">jsonrpc_core::Params::Map</span>(<span class="ident">obj</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">jsonrpc_core::Error::invalid_request</span>()),
+        <span class="kw">let </span>id = REQUEST_ID_COUNTER.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
+        <span class="kw">let </span>json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())<span class="question-mark">?</span>;
+        <span class="kw">let </span>params = <span class="kw">match </span>json_params {
+            jsonrpc_core::Value::Array(arr) =&gt; jsonrpc_core::Params::Array(arr),
+            jsonrpc_core::Value::Object(obj) =&gt; jsonrpc_core::Params::Map(obj),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(jsonrpc_core::Error::invalid_request()),
         };
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">jsonrpc_core::MethodCall</span> {
-            <span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">jsonrpc_core::Version::V2</span>),
-            <span class="ident">method</span>,
-            <span class="ident">params</span>,
-            <span class="ident">id</span>: <span class="ident">jsonrpc_core::Id::Num</span>(<span class="ident">id</span>),
+        <span class="kw">let </span>request = jsonrpc_core::MethodCall {
+            jsonrpc: <span class="prelude-val">Some</span>(jsonrpc_core::Version::V2),
+            method,
+            params,
+            id: jsonrpc_core::Id::Num(id),
         };
-        <span class="kw">let</span> (<span class="ident">response_sender</span>, <span class="ident">response_receiver</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
-        <span class="self">self</span>.<span class="ident">request_sender</span>.<span class="ident">send</span>((<span class="ident">request</span>, <span class="ident">response_sender</span>)).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(response_sender, response_receiver) = oneshot::channel();
+        <span class="self">self</span>.request_sender.send((request, response_sender)).<span class="kw">await</span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response_receiver</span>.<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>response = response_receiver.<span class="kw">await</span>.unwrap();
 
-        <span class="kw">match</span> <span class="ident">response</span> {
-            <span class="ident">jsonrpc_core::Output::Success</span>(<span class="ident">res</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">serde_json::from_value</span>(<span class="ident">res</span>.<span class="ident">result</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">jsonrpc_core::Output::Failure</span>(<span class="ident">res</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">res</span>.<span class="ident">error</span>),
+        <span class="kw">match </span>response {
+            jsonrpc_core::Output::Success(res) =&gt; <span class="prelude-val">Ok</span>(serde_json::from_value(res.result).unwrap()),
+            jsonrpc_core::Output::Failure(res) =&gt; <span class="prelude-val">Err</span>(res.error),
         }
     }
 }
 
-<span class="doccomment">/// The other side of the channels. Only used as a handle to be passed into run_with_client().</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientAdapter</span> {
-    <span class="ident">request_receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span>(<span class="ident">MethodCall</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Output</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">notification_receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The other side of the channels. Only used as a handle to be passed into run_with_client().
+</span><span class="kw">pub struct </span>ClientAdapter {
+    request_receiver: mpsc::Receiver&lt;(MethodCall, oneshot::Sender&lt;jsonrpc_core::Output&gt;)&gt;,
+    notification_receiver: mpsc::Receiver&lt;Notification&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Message</span> {
-    <span class="ident">Response</span>(<span class="ident">jsonrpc_core::Output</span>),
-    <span class="ident">Request</span>(<span class="ident">Request</span>),
+<span class="attribute">#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+</span><span class="kw">enum </span>Message {
+    Response(jsonrpc_core::Output),
+    Request(Request),
 }
 
-<span class="doccomment">/// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another</span>
-<span class="doccomment">/// IO error happens.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_with_client</span>(<span class="ident">request_handler</span>: <span class="kw-2">&amp;</span><span class="ident">IoHandler</span>, <span class="ident">adapter</span>: <span class="ident">ClientAdapter</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">run_with_io</span>(<span class="ident">request_handler</span>, <span class="ident">tokio::io::stdin</span>(), <span class="ident">tokio::io::stdout</span>(), <span class="ident">adapter</span>).<span class="kw">await</span>
-}
+<span class="doccomment">/// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another
+/// IO error happens.
+</span><span class="kw">pub async fn </span>run_with_client(request_handler: <span class="kw-2">&amp;</span>IoHandler, adapter: ClientAdapter) -&gt; std::io::Result&lt;()&gt; {
+    run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), adapter).<span class="kw">await
+</span>}
 
-<span class="doccomment">/// Start doing JSON-RPC over stdio, server-only. The future will only return once stdin is closed</span>
-<span class="doccomment">/// or another IO error happens.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="ident">request_handler</span>: <span class="kw-2">&amp;</span><span class="ident">IoHandler</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">_client</span>, <span class="ident">client_adapter</span>) <span class="op">=</span> <span class="ident">new_client</span>();
-    <span class="ident">run_with_io</span>(<span class="ident">request_handler</span>, <span class="ident">tokio::io::stdin</span>(), <span class="ident">tokio::io::stdout</span>(), <span class="ident">client_adapter</span>).<span class="kw">await</span>
-}
+<span class="doccomment">/// Start doing JSON-RPC over stdio, server-only. The future will only return once stdin is closed
+/// or another IO error happens.
+</span><span class="kw">pub async fn </span>run(request_handler: <span class="kw-2">&amp;</span>IoHandler) -&gt; std::io::Result&lt;()&gt; {
+    <span class="kw">let </span>(_client, client_adapter) = new_client();
+    run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), client_adapter).<span class="kw">await
+</span>}
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_with_io</span>(
-    <span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="ident">IoHandler</span>,
-    <span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">output</span>: <span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="kw-2">mut</span> <span class="ident">client_adapter</span>: <span class="ident">ClientAdapter</span>,
-) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">tokio::io::BufReader::new</span>(<span class="ident">input</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_lines</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">lines</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">tokio::io::BufWriter::new</span>(<span class="ident">output</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">in_flight</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Id</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">stdout_sender</span>, <span class="kw-2">mut</span> <span class="ident">stdout_receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="number">30</span>);
+<span class="kw">async fn </span>run_with_io(
+    handler: <span class="kw-2">&amp;</span>IoHandler,
+    input: <span class="kw">impl </span>AsyncRead + Unpin,
+    output: <span class="kw">impl </span>AsyncWrite + Send + Unpin + <span class="lifetime">&#39;static</span>,
+    <span class="kw-2">mut </span>client_adapter: ClientAdapter,
+) -&gt; std::io::Result&lt;()&gt; {
+    <span class="kw">let </span>input = tokio::io::BufReader::new(input);
+    <span class="kw">let </span><span class="kw-2">mut </span>input_lines = input.lines();
+    <span class="kw">let </span><span class="kw-2">mut </span>output = tokio::io::BufWriter::new(output);
+    <span class="kw">let </span><span class="kw-2">mut </span>in_flight: HashMap&lt;jsonrpc_core::Id, oneshot::Sender&lt;<span class="kw">_</span>&gt;&gt; = HashMap::new();
+    <span class="kw">let </span>(<span class="kw-2">mut </span>stdout_sender, <span class="kw-2">mut </span>stdout_receiver) = mpsc::channel::&lt;Vec&lt;u8&gt;&gt;(<span class="number">30</span>);
 
-    <span class="comment">// Spawn stdout in its own task to queue writes.</span>
-    <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>) <span class="op">=</span> <span class="ident">stdout_receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span> {
-            <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">line</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-            <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="string">b&quot;\n&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-            <span class="ident">output</span>.<span class="ident">flush</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="comment">// Spawn stdout in its own task to queue writes.
+    </span>tokio::spawn(<span class="kw">async move </span>{
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(line) = stdout_receiver.recv().<span class="kw">await </span>{
+            output.write_all(<span class="kw-2">&amp;</span>line).<span class="kw">await</span>.unwrap();
+            output.write_all(<span class="string">b&quot;\n&quot;</span>).<span class="kw">await</span>.unwrap();
+            output.flush().<span class="kw">await</span>.unwrap();
         }
     });
 
-    <span class="kw">loop</span> {
-        <span class="macro">tokio::select!</span> {
-            <span class="ident">next_line</span> <span class="op">=</span> <span class="ident">input_lines</span>.<span class="ident">next_line</span>() =&gt; {
-                <span class="ident">handle_stdin_next_line</span>(<span class="ident">next_line</span>, <span class="ident">stdout_sender</span>.<span class="ident">clone</span>(), <span class="ident">handler</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_flight</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">loop </span>{
+        <span class="macro">tokio::select! </span>{
+            next_line = input_lines.next_line() =&gt; {
+                handle_stdin_next_line(next_line, stdout_sender.clone(), handler, <span class="kw-2">&amp;mut </span>in_flight).<span class="kw">await</span><span class="question-mark">?</span>;
             }
-            <span class="ident">next_request</span> <span class="op">=</span> <span class="ident">client_adapter</span>.<span class="ident">request_receiver</span>.<span class="ident">recv</span>() =&gt; {
-                <span class="ident">handle_next_client_request</span>(<span class="ident">next_request</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stdout_sender</span>, <span class="kw-2">&amp;mut</span> <span class="ident">in_flight</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            next_request = client_adapter.request_receiver.recv() =&gt; {
+                handle_next_client_request(next_request, <span class="kw-2">&amp;mut </span>stdout_sender, <span class="kw-2">&amp;mut </span>in_flight).<span class="kw">await</span><span class="question-mark">?</span>;
             }
-            <span class="ident">next_notification</span> <span class="op">=</span> <span class="ident">client_adapter</span>.<span class="ident">notification_receiver</span>.<span class="ident">recv</span>() =&gt; {
-                <span class="ident">handle_next_client_notification</span>(<span class="ident">next_notification</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stdout_sender</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            next_notification = client_adapter.notification_receiver.recv() =&gt; {
+                handle_next_client_notification(next_notification, <span class="kw-2">&amp;mut </span>stdout_sender).<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_next_client_request</span>(
-    <span class="ident">next_request</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">jsonrpc_core::MethodCall</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Output</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">stdout_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">in_flight</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Id</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">next_request</span>, <span class="ident">channel</span>) <span class="op">=</span> <span class="ident">next_request</span>.<span class="ident">unwrap</span>();
-    <span class="ident">in_flight</span>.<span class="ident">insert</span>(<span class="ident">next_request</span>.<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">channel</span>);
-    <span class="kw">let</span> <span class="ident">request_json</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">next_request</span>)<span class="question-mark">?</span>;
-    <span class="ident">stdout_sender</span>.<span class="ident">send</span>(<span class="ident">request_json</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+<span class="kw">async fn </span>handle_next_client_request(
+    next_request: <span class="prelude-ty">Option</span>&lt;(jsonrpc_core::MethodCall, oneshot::Sender&lt;jsonrpc_core::Output&gt;)&gt;,
+    stdout_sender: <span class="kw-2">&amp;mut </span>mpsc::Sender&lt;Vec&lt;u8&gt;&gt;,
+    in_flight: <span class="kw-2">&amp;mut </span>HashMap&lt;jsonrpc_core::Id, oneshot::Sender&lt;jsonrpc_core::Output&gt;&gt;,
+) -&gt; io::Result&lt;()&gt; {
+    <span class="kw">let </span>(next_request, channel) = next_request.unwrap();
+    in_flight.insert(next_request.id.clone(), channel);
+    <span class="kw">let </span>request_json = serde_json::to_vec(<span class="kw-2">&amp;</span>next_request)<span class="question-mark">?</span>;
+    stdout_sender.send(request_json).<span class="kw">await</span>.unwrap();
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_next_client_notification</span>(
-    <span class="ident">next_notification</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span>,
-    <span class="ident">stdout_sender</span>: <span class="kw-2">&amp;mut</span> <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">next_notification</span> <span class="op">=</span> <span class="ident">next_notification</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">request_json</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">next_notification</span>)<span class="question-mark">?</span>;
-    <span class="ident">stdout_sender</span>.<span class="ident">send</span>(<span class="ident">request_json</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+<span class="kw">async fn </span>handle_next_client_notification(
+    next_notification: <span class="prelude-ty">Option</span>&lt;Notification&gt;,
+    stdout_sender: <span class="kw-2">&amp;mut </span>mpsc::Sender&lt;Vec&lt;u8&gt;&gt;,
+) -&gt; io::Result&lt;()&gt; {
+    <span class="kw">let </span>next_notification = next_notification.unwrap();
+    <span class="kw">let </span>request_json = serde_json::to_vec(<span class="kw-2">&amp;</span>next_notification)<span class="question-mark">?</span>;
+    stdout_sender.send(request_json).<span class="kw">await</span>.unwrap();
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_stdin_next_line</span>(
-    <span class="ident">next_line</span>: <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">stdout_sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="ident">IoHandler</span>,
-    <span class="ident">in_flight</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Id</span>, <span class="ident">oneshot::Sender</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">next_line</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next_line</span>) <span class="op">=</span> <span class="ident">next_line</span><span class="question-mark">?</span> {
-        <span class="ident">next_line</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="kw">async fn </span>handle_stdin_next_line(
+    next_line: io::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;,
+    stdout_sender: mpsc::Sender&lt;Vec&lt;u8&gt;&gt;,
+    handler: <span class="kw-2">&amp;</span>IoHandler,
+    in_flight: <span class="kw-2">&amp;mut </span>HashMap&lt;jsonrpc_core::Id, oneshot::Sender&lt;jsonrpc_core::Output&gt;&gt;,
+) -&gt; io::Result&lt;()&gt; {
+    <span class="kw">let </span>next_line = <span class="kw">if let </span><span class="prelude-val">Some</span>(next_line) = next_line<span class="question-mark">? </span>{
+        next_line
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     };
 
-    <span class="kw">match</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">next_line</span>)<span class="question-mark">?</span> {
-        <span class="ident">Message::Request</span>(<span class="ident">request</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">clone</span>();
-            <span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">handle_request</span>(<span class="kw-2">&amp;</span><span class="ident">handler</span>, <span class="ident">request</span>).<span class="kw">await</span>;
-                <span class="ident">stdout_sender</span>.<span class="ident">send</span>(<span class="ident">response</span>.<span class="ident">into_bytes</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="kw">match </span>serde_json::from_str::&lt;Message&gt;(<span class="kw-2">&amp;</span>next_line)<span class="question-mark">? </span>{
+        Message::Request(request) =&gt; {
+            <span class="kw">let </span>handler = handler.clone();
+            tokio::spawn(<span class="kw">async move </span>{
+                <span class="kw">let </span>response = handle_request(<span class="kw-2">&amp;</span>handler, request).<span class="kw">await</span>;
+                stdout_sender.send(response.into_bytes()).<span class="kw">await</span>.unwrap();
             });
         }
-        <span class="ident">Message::Response</span>(<span class="ident">response</span>) =&gt; {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chan</span>) <span class="op">=</span> <span class="ident">in_flight</span>.<span class="ident">remove</span>(<span class="ident">response</span>.<span class="ident">id</span>()) {
-                <span class="ident">chan</span>.<span class="ident">send</span>(<span class="ident">response</span>).<span class="ident">expect</span>(<span class="string">&quot;Response channel broken&quot;</span>);
+        Message::Response(response) =&gt; {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(chan) = in_flight.remove(response.id()) {
+                chan.send(response).expect(<span class="string">&quot;Response channel broken&quot;</span>);
             }
         }
     }
@@ -427,10 +427,10 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Process a request asynchronously</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_request</span>(<span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="ident">IoHandler</span>, <span class="ident">input</span>: <span class="ident">Request</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">io</span>.<span class="ident">handle_rpc_request</span>(<span class="ident">input</span>).<span class="kw">await</span>;
-    <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Process a request asynchronously
+</span><span class="kw">async fn </span>handle_request(io: <span class="kw-2">&amp;</span>IoHandler, input: Request) -&gt; String {
+    <span class="kw">let </span>response = io.handle_rpc_request(input).<span class="kw">await</span>;
+    serde_json::to_string(<span class="kw-2">&amp;</span>response).unwrap()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="json_rpc_stdio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="json_rpc_stdio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

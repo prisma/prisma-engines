@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -643,650 +643,650 @@
 <span id="643">643</span>
 <span id="644">644</span>
 <span id="645">645</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">datasource</span>;
-<span class="kw">mod</span> <span class="ident">native_types</span>;
-<span class="kw">mod</span> <span class="ident">validations</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>datasource;
+<span class="kw">mod </span>native_types;
+<span class="kw">mod </span>validations;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
+<span class="kw">pub use </span>native_types::PostgresType;
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CompletionItem</span>, <span class="ident">CompletionItemKind</span>, <span class="ident">CompletionList</span>, <span class="ident">InsertTextFormat</span>};
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{
-        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">StringFilter</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>lsp_types::{CompletionItem, CompletionItemKind, CompletionList, InsertTextFormat};
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
-    <span class="ident">diagnostics::Diagnostics</span>,
-    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
-    <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>, <span class="ident">PreviewFeature</span>,
+    diagnostics::Diagnostics,
+    parser_database::{ast, walkers, IndexAlgorithm, OperatorClass, ParserDatabase, ReferentialAction, ScalarType},
+    Datasource, DatasourceConnectorData, PreviewFeature,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>};
-<span class="kw">use</span> <span class="ident">PostgresType</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
+<span class="kw">use </span>PostgresType::<span class="kw-2">*</span>;
 
-<span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span>,
-    <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span>,
+<span class="kw">const </span>CONSTRAINT_SCOPES: <span class="kw-2">&amp;</span>[ConstraintScope] = <span class="kw-2">&amp;</span>[
+    ConstraintScope::GlobalPrimaryKeyKeyIndex,
+    ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
 ];
 
-<span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ConnectorCapability::AdvancedJsonNullability</span>,
-    <span class="ident">ConnectorCapability::AnyId</span>,
-    <span class="ident">ConnectorCapability::AutoIncrement</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementAllowedOnNonId</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementMultipleAllowed</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementNonIndexedAllowed</span>,
-    <span class="ident">ConnectorCapability::CompoundIds</span>,
-    <span class="ident">ConnectorCapability::CreateMany</span>,
-    <span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>,
-    <span class="ident">ConnectorCapability::CreateSkipDuplicates</span>,
-    <span class="ident">ConnectorCapability::Enums</span>,
-    <span class="ident">ConnectorCapability::EnumArrayPush</span>,
-    <span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>,
-    <span class="ident">ConnectorCapability::InsensitiveFilters</span>,
-    <span class="ident">ConnectorCapability::Json</span>,
-    <span class="ident">ConnectorCapability::JsonFiltering</span>,
-    <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
-    <span class="ident">ConnectorCapability::JsonFilteringAlphanumeric</span>,
-    <span class="ident">ConnectorCapability::JsonFilteringAlphanumericFieldRef</span>,
-    <span class="ident">ConnectorCapability::MultiSchema</span>,
-    <span class="ident">ConnectorCapability::NamedForeignKeys</span>,
-    <span class="ident">ConnectorCapability::NamedPrimaryKeys</span>,
-    <span class="ident">ConnectorCapability::SqlQueryRaw</span>,
-    <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
-    <span class="ident">ConnectorCapability::ScalarLists</span>,
-    <span class="ident">ConnectorCapability::JsonLists</span>,
-    <span class="ident">ConnectorCapability::UpdateableId</span>,
-    <span class="ident">ConnectorCapability::WritableAutoincField</span>,
-    <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
-    <span class="ident">ConnectorCapability::DecimalType</span>,
-    <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationReadUncommitted</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationReadCommitted</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationRepeatableRead</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
-    <span class="ident">ConnectorCapability::NativeUpsert</span>,
+<span class="kw">const </span>CAPABILITIES: <span class="kw-2">&amp;</span>[ConnectorCapability] = <span class="kw-2">&amp;</span>[
+    ConnectorCapability::AdvancedJsonNullability,
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::CreateManyWriteableAutoIncId,
+    ConnectorCapability::CreateSkipDuplicates,
+    ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
+    ConnectorCapability::FullTextSearchWithoutIndex,
+    ConnectorCapability::InsensitiveFilters,
+    ConnectorCapability::Json,
+    ConnectorCapability::JsonFiltering,
+    ConnectorCapability::JsonFilteringArrayPath,
+    ConnectorCapability::JsonFilteringAlphanumeric,
+    ConnectorCapability::JsonFilteringAlphanumericFieldRef,
+    ConnectorCapability::MultiSchema,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::SqlQueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::ScalarLists,
+    ConnectorCapability::JsonLists,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::WritableAutoincField,
+    ConnectorCapability::ImplicitManyToManyRelation,
+    ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationReadUncommitted,
+    ConnectorCapability::SupportsTxIsolationReadCommitted,
+    ConnectorCapability::SupportsTxIsolationRepeatableRead,
+    ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatamodelConnector</span>;
+<span class="kw">pub struct </span>PostgresDatamodelConnector;
 
-<span class="kw">const</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>: <span class="kw-2">&amp;</span>[(<span class="ident">ScalarType</span>, <span class="ident">PostgresType</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    (<span class="ident">ScalarType::Int</span>, <span class="ident">PostgresType::Integer</span>),
-    (<span class="ident">ScalarType::BigInt</span>, <span class="ident">PostgresType::BigInt</span>),
-    (<span class="ident">ScalarType::Float</span>, <span class="ident">PostgresType::DoublePrecision</span>),
-    (<span class="ident">ScalarType::Decimal</span>, <span class="ident">PostgresType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>)))),
-    (<span class="ident">ScalarType::Boolean</span>, <span class="ident">PostgresType::Boolean</span>),
-    (<span class="ident">ScalarType::String</span>, <span class="ident">PostgresType::Text</span>),
-    (<span class="ident">ScalarType::DateTime</span>, <span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">3</span>))),
-    (<span class="ident">ScalarType::Bytes</span>, <span class="ident">PostgresType::ByteA</span>),
-    (<span class="ident">ScalarType::Json</span>, <span class="ident">PostgresType::JsonB</span>),
+<span class="kw">const </span>SCALAR_TYPE_DEFAULTS: <span class="kw-2">&amp;</span>[(ScalarType, PostgresType)] = <span class="kw-2">&amp;</span>[
+    (ScalarType::Int, PostgresType::Integer),
+    (ScalarType::BigInt, PostgresType::BigInt),
+    (ScalarType::Float, PostgresType::DoublePrecision),
+    (ScalarType::Decimal, PostgresType::Decimal(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>)))),
+    (ScalarType::Boolean, PostgresType::Boolean),
+    (ScalarType::String, PostgresType::Text),
+    (ScalarType::DateTime, PostgresType::Timestamp(<span class="prelude-val">Some</span>(<span class="number">3</span>))),
+    (ScalarType::Bytes, PostgresType::ByteA),
+    (ScalarType::Json, PostgresType::JsonB),
 ];
 
-<span class="doccomment">/// Postgres-specific properties in the datasource block.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresDatasourceProperties</span> {
-    <span class="ident">extensions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Postgres-specific properties in the datasource block.
+</span><span class="attribute">#[derive(Default, Debug)]
+</span><span class="kw">pub struct </span>PostgresDatasourceProperties {
+    extensions: <span class="prelude-ty">Option</span>&lt;PostgresExtensions&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresDatasourceProperties</span> {
-    <span class="doccomment">/// Database extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresExtensions</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>PostgresDatasourceProperties {
+    <span class="doccomment">/// Database extensions.
+    </span><span class="kw">pub fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresExtensions&gt; {
+        <span class="self">self</span>.extensions.as_ref()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_extensions</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">extensions</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">PostgresExtensions</span> {
-            <span class="ident">extensions</span>,
-            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
+    <span class="kw">pub fn </span>set_extensions(<span class="kw-2">&amp;mut </span><span class="self">self</span>, extensions: Vec&lt;PostgresExtension&gt;) {
+        <span class="self">self</span>.extensions = <span class="prelude-val">Some</span>(PostgresExtensions {
+            extensions,
+            span: ast::Span::empty(),
         });
     }
 }
 
-<span class="doccomment">/// An extension defined in the extensions array of the datasource.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// datasource db {</span>
-<span class="doccomment">///   extensions = [postgis, foobar]</span>
-<span class="doccomment">///   //            ^^^^^^^</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtension</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">span</span>: <span class="ident">ast::Span</span>,
-    <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An extension defined in the extensions array of the datasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //            ^^^^^^^
+/// }
+/// ```
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>PostgresExtension {
+    name: String,
+    span: ast::Span,
+    schema: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    version: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresExtension</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
-            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
-            <span class="ident">version</span>: <span class="prelude-val">None</span>,
-            <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>PostgresExtension {
+    <span class="kw">pub fn </span>new(name: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            span: ast::Span::empty(),
+            schema: <span class="prelude-val">None</span>,
+            version: <span class="prelude-val">None</span>,
+            db_name: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_span</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">ast::Span</span>) {
-        <span class="self">self</span>.<span class="ident">span</span> <span class="op">=</span> <span class="ident">span</span>;
+    <span class="kw">pub fn </span>set_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: ast::Span) {
+        <span class="self">self</span>.span = span;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">schema</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">schema</span>);
+    <span class="kw">pub fn </span>set_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, schema: String) {
+        <span class="self">self</span>.schema = <span class="prelude-val">Some</span>(schema);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>);
+    <span class="kw">pub fn </span>set_version(<span class="kw-2">&amp;mut </span><span class="self">self</span>, version: String) {
+        <span class="self">self</span>.version = <span class="prelude-val">Some</span>(version);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_db_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">db_name</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>);
+    <span class="kw">pub fn </span>set_db_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, db_name: String) {
+        <span class="self">self</span>.db_name = <span class="prelude-val">Some</span>(db_name);
     }
 
-    <span class="doccomment">/// The name of the extension in the datasource.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// extensions = [bar]</span>
-    <span class="doccomment">/// //            ^^^ this</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="doccomment">/// The name of the extension in the datasource.
+    ///
+    /// ```ignore
+    /// extensions = [bar]
+    /// //            ^^^ this
+    /// ```
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// The name of the extension in the database, defined in the</span>
-    <span class="doccomment">/// `map` argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// extensions = [bar(map: &quot;foo&quot;)]</span>
-    <span class="doccomment">/// //                     ^^^^^ this</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db_name</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The name of the extension in the database, defined in the
+    /// `map` argument.
+    ///
+    /// ```ignore
+    /// extensions = [bar(map: &quot;foo&quot;)]
+    /// //                     ^^^^^ this
+    /// ```
+    </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.db_name.as_deref()
     }
 
-    <span class="doccomment">/// The span of the extension definition in the datamodel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::Span</span> {
-        <span class="self">self</span>.<span class="ident">span</span>
+    <span class="doccomment">/// The span of the extension definition in the datamodel.
+    </span><span class="kw">pub fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ast::Span {
+        <span class="self">self</span>.span
     }
 
-    <span class="doccomment">/// The schema where the extension tables are stored.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// extensions = [postgis(schema: &quot;public&quot;)]</span>
-    <span class="doccomment">/// //                            ^^^^^^^^ this</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The schema where the extension tables are stored.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(schema: &quot;public&quot;)]
+    /// //                            ^^^^^^^^ this
+    /// ```
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.schema.as_deref()
     }
 
-    <span class="doccomment">/// The version of the extension to be used in the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// extensions = [postgis(version: &quot;2.1&quot;)]</span>
-    <span class="doccomment">/// //                             ^^^^^ this</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The version of the extension to be used in the database.
+    ///
+    /// ```ignore
+    /// extensions = [postgis(version: &quot;2.1&quot;)]
+    /// //                             ^^^^^ this
+    /// ```
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.version.as_deref()
     }
 }
 
-<span class="doccomment">/// The extensions defined in the extensions array of the datrasource.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// datasource db {</span>
-<span class="doccomment">///   extensions = [postgis, foobar]</span>
-<span class="doccomment">///   //           ^^^^^^^^^^^^^^^^^</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresExtensions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">extensions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span</span>: <span class="ident">ast::Span</span>,
+<span class="doccomment">/// The extensions defined in the extensions array of the datrasource.
+///
+/// ```ignore
+/// datasource db {
+///   extensions = [postgis, foobar]
+///   //           ^^^^^^^^^^^^^^^^^
+/// }
+/// ```
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>PostgresExtensions {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) extensions: Vec&lt;PostgresExtension&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) span: ast::Span,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PostgresExtensions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">extensions</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>PostgresExtensions {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            extensions: Vec::new(),
+            span: ast::Span::empty(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresExtensions</span> {
-    <span class="doccomment">/// The span of the extensions in the datamodel.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ast::Span</span> {
-        <span class="self">self</span>.<span class="ident">span</span>
+<span class="kw">impl </span>PostgresExtensions {
+    <span class="doccomment">/// The span of the extensions in the datamodel.
+    </span><span class="kw">pub fn </span>span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ast::Span {
+        <span class="self">self</span>.span
     }
 
-    <span class="doccomment">/// The extension definitions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">PostgresExtension</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>
+    <span class="doccomment">/// The extension definitions.
+    </span><span class="kw">pub fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[PostgresExtension] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.extensions
     }
 
-    <span class="doccomment">/// Finds the extension with the given database name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_by_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresExtension</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">extensions</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">ext</span><span class="op">|</span> {
-            <span class="ident">ext</span>.<span class="ident">db_name</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_name</span><span class="op">|</span> <span class="ident">db_name</span> <span class="op">==</span> <span class="ident">name</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
+    <span class="doccomment">/// Finds the extension with the given database name.
+    </span><span class="kw">pub fn </span>find_by_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresExtension&gt; {
+        <span class="self">self</span>.extensions().iter().find(|ext| {
+            ext.db_name()
+                .map(|db_name| db_name == name)
+                .unwrap_or_else(|| ext.name() == name)
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">PostgresDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">is_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        [<span class="string">&quot;postgresql&quot;</span>, <span class="string">&quot;postgres&quot;</span>].<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)
+<span class="kw">impl </span>Connector <span class="kw">for </span>PostgresDatamodelConnector {
+    <span class="kw">fn </span>is_provider(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        [<span class="string">&quot;postgresql&quot;</span>, <span class="string">&quot;postgres&quot;</span>].contains(<span class="kw-2">&amp;</span>name)
     }
 
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;postgresql&quot;</span>
+    <span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;postgresql&quot;
+    </span>}
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;Postgres&quot;
+    </span>}
+
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
+        CAPABILITIES
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;Postgres&quot;</span>
+    <span class="doccomment">/// The maximum length of postgres identifiers, in bytes.
+    ///
+    /// Reference: &lt;https://www.postgresql.org/docs/12/limits.html&gt;
+    </span><span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">63
+    </span>}
+
+    <span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
+
+        NoAction | Restrict | Cascade | SetNull | SetDefault
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
-        <span class="ident">CAPABILITIES</span>
+    <span class="kw">fn </span>emulated_referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
+
+        Restrict | SetNull | Cascade
     }
 
-    <span class="doccomment">/// The maximum length of postgres identifiers, in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Reference: &lt;https://www.postgresql.org/docs/12/limits.html&gt;</span>
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">63</span>
-    }
+    <span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = native_type.downcast_ref();
 
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
-
-        <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">SetDefault</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">emulated_referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
-
-        <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">Cascade</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
-
-        <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="comment">// String</span>
-            <span class="ident">Text</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Uuid</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Xml</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Inet</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">Citext</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="comment">// Boolean</span>
-            <span class="ident">Boolean</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
-            <span class="comment">// Int</span>
-            <span class="ident">SmallInt</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Integer</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">Oid</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="comment">// BigInt</span>
-            <span class="ident">BigInt</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
-            <span class="comment">// Float</span>
-            <span class="ident">Real</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="ident">DoublePrecision</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="comment">// Decimal</span>
-            <span class="ident">Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::Decimal</span>,
-            <span class="ident">Money</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="comment">// DateTime</span>
-            <span class="ident">Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Date</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="comment">// Json</span>
-            <span class="ident">Json</span> =&gt; <span class="ident">ScalarType::Json</span>,
-            <span class="ident">JsonB</span> =&gt; <span class="ident">ScalarType::Json</span>,
-            <span class="comment">// Bytes</span>
-            <span class="ident">ByteA</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
+        <span class="kw">match </span>native_type {
+            <span class="comment">// String
+            </span>Text =&gt; ScalarType::String,
+            Char(<span class="kw">_</span>) =&gt; ScalarType::String,
+            VarChar(<span class="kw">_</span>) =&gt; ScalarType::String,
+            Bit(<span class="kw">_</span>) =&gt; ScalarType::String,
+            VarBit(<span class="kw">_</span>) =&gt; ScalarType::String,
+            Uuid =&gt; ScalarType::String,
+            Xml =&gt; ScalarType::String,
+            Inet =&gt; ScalarType::String,
+            Citext =&gt; ScalarType::String,
+            <span class="comment">// Boolean
+            </span>Boolean =&gt; ScalarType::Boolean,
+            <span class="comment">// Int
+            </span>SmallInt =&gt; ScalarType::Int,
+            Integer =&gt; ScalarType::Int,
+            Oid =&gt; ScalarType::Int,
+            <span class="comment">// BigInt
+            </span>BigInt =&gt; ScalarType::BigInt,
+            <span class="comment">// Float
+            </span>Real =&gt; ScalarType::Float,
+            DoublePrecision =&gt; ScalarType::Float,
+            <span class="comment">// Decimal
+            </span>Decimal(<span class="kw">_</span>) =&gt; ScalarType::Decimal,
+            Money =&gt; ScalarType::Float,
+            <span class="comment">// DateTime
+            </span>Timestamp(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            Timestamptz(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            Date =&gt; ScalarType::DateTime,
+            Time(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            Timetz(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            <span class="comment">// Json
+            </span>Json =&gt; ScalarType::Json,
+            JsonB =&gt; ScalarType::Json,
+            <span class="comment">// Bytes
+            </span>ByteA =&gt; ScalarType::Bytes,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">st</span> <span class="op">==</span> <span class="ident">scalar_type</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">native_type</span>)<span class="op">|</span> <span class="ident">native_type</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS&quot;</span>, <span class="ident">scalar_type</span>))
-            .<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+        <span class="kw">let </span>native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, <span class="kw">_</span>)| st == scalar_type)
+            .map(|(<span class="kw">_</span>, native_type)| native_type)
+            .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS&quot;</span>, scalar_type))
+            .unwrap();
 
-        <span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span>(<span class="kw-2">*</span><span class="ident">native_type</span>)
+        NativeTypeInstance::new::&lt;PostgresType&gt;(<span class="kw-2">*</span>native_type)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+        native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = native_type.downcast_ref();
 
-        <span class="ident">SCALAR_TYPE_DEFAULTS</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="ident">nt</span>)<span class="op">|</span> <span class="ident">scalar_type</span> <span class="op">==</span> <span class="ident">st</span> <span class="op">&amp;&amp;</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="ident">nt</span>)
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st &amp;&amp; native_type == nt)
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(
+    <span class="kw">fn </span>validate_native_type_arguments(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type_instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="ident">span</span>: <span class="ident">ast::Span</span>,
-        <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        native_type_instance: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        _scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+        span: ast::Span,
+        errors: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type_instance</span>.<span class="ident">downcast_ref</span>();
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="ident">native_type_instance</span>);
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>PostgresType = native_type_instance.downcast_ref();
+        <span class="kw">let </span>error = <span class="self">self</span>.native_instance_error(native_type_instance);
 
-        <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>(<span class="ident">span</span>))
+        <span class="kw">match </span>native_type {
+            Decimal(<span class="prelude-val">Some</span>((precision, scale))) <span class="kw">if </span>scale &gt; precision =&gt; {
+                errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">prec</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(
+            Decimal(<span class="prelude-val">Some</span>((prec, <span class="kw">_</span>))) <span class="kw">if </span><span class="kw-2">*</span>prec &gt; <span class="number">1000 </span>|| <span class="kw-2">*</span>prec == <span class="number">0 </span>=&gt; {
+                errors.push_error(error.new_argument_m_out_of_range_error(
                     <span class="string">&quot;Precision must be positive with a maximum value of 1000.&quot;</span>,
-                    <span class="ident">span</span>,
+                    span,
                 ))
             }
-            <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M must be a positive integer.&quot;</span>, <span class="ident">span</span>))
+            Bit(<span class="prelude-val">Some</span>(<span class="number">0</span>)) | VarBit(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
+                errors.push_error(error.new_argument_m_out_of_range_error(<span class="string">&quot;M must be a positive integer.&quot;</span>, span))
             }
-            <span class="ident">Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 6.&quot;</span>, <span class="ident">span</span>))
+            Timestamp(<span class="prelude-val">Some</span>(p)) | Timestamptz(<span class="prelude-val">Some</span>(p)) | Time(<span class="prelude-val">Some</span>(p)) | Timetz(<span class="prelude-val">Some</span>(p)) <span class="kw">if </span><span class="kw-2">*</span>p &gt; <span class="number">6 </span>=&gt; {
+                errors.push_error(error.new_argument_m_out_of_range_error(<span class="string">&quot;M can range from 0 to 6.&quot;</span>, span))
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="ident">validations::compatible_native_types</span>(<span class="ident">index</span>, <span class="self">self</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::generalized_index_validations</span>(<span class="ident">index</span>, <span class="self">self</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::spgist_indexed_column_count</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+        <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+            validations::compatible_native_types(index, <span class="self">self</span>, errors);
+            validations::generalized_index_validations(index, <span class="self">self</span>, errors);
+            validations::spgist_indexed_column_count(index, errors);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_datasource</span>(
+    <span class="kw">fn </span>validate_datasource(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-        <span class="ident">ds</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>,
-        <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        preview_features: BitFlags&lt;PreviewFeature&gt;,
+        ds: <span class="kw-2">&amp;</span>Datasource,
+        errors: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">props</span>) <span class="op">=</span> <span class="ident">ds</span>.<span class="ident">downcast_connector_data</span>::<span class="op">&lt;</span><span class="ident">PostgresDatasourceProperties</span><span class="op">&gt;</span>() {
-            <span class="ident">validations::extensions_preview_flag_must_be_set</span>(<span class="ident">preview_features</span>, <span class="ident">props</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::extension_names_follow_prisma_syntax_rules</span>(<span class="ident">preview_features</span>, <span class="ident">props</span>, <span class="ident">errors</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(props) = ds.downcast_connector_data::&lt;PostgresDatasourceProperties&gt;() {
+            validations::extensions_preview_flag_must_be_set(preview_features, props, errors);
+            validations::extension_names_follow_prisma_syntax_rules(preview_features, props, errors);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
-        <span class="ident">CONSTRAINT_SCOPES</span>
+    <span class="kw">fn </span>constraint_violation_scopes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
-        <span class="ident">native_types::CONSTRUCTORS</span>
+    <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
+        native_types::CONSTRUCTORS
     }
 
-    <span class="kw">fn</span> <span class="ident">supported_index_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
-        <span class="ident">BitFlags::empty</span>()
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::BTree</span>
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::Gist</span>
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::Hash</span>
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::Gin</span>
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::SpGist</span>
-            <span class="op">|</span> <span class="ident">IndexAlgorithm::Brin</span>
+    <span class="kw">fn </span>supported_index_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;IndexAlgorithm&gt; {
+        BitFlags::empty()
+            | IndexAlgorithm::BTree
+            | IndexAlgorithm::Gist
+            | IndexAlgorithm::Hash
+            | IndexAlgorithm::Gin
+            | IndexAlgorithm::SpGist
+            | IndexAlgorithm::Brin
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">ast::Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">PostgresType::from_parts</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span>(<span class="ident">native_type</span>))
+        name: <span class="kw-2">&amp;</span>str,
+        args: <span class="kw-2">&amp;</span>[String],
+        span: ast::Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="kw">let </span>native_type = PostgresType::from_parts(name, args, span, diagnostics)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(NativeTypeInstance::new::&lt;PostgresType&gt;(native_type))
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">PostgresType</span><span class="op">&gt;</span>().<span class="ident">to_parts</span>()
+    <span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;) {
+        native_type.downcast_ref::&lt;PostgresType&gt;().to_parts()
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type_name</span>: <span class="ident">String</span>, <span class="ident">native_type_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">native_type_name</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;uuid&quot;</span>) =&gt; <span class="string">&quot;Uuid&quot;</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">scalar_type_name</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>scalar_filter_name(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type_name: String, native_type_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="kw">match </span>native_type_name {
+            <span class="prelude-val">Some</span>(name) <span class="kw">if </span>name.eq_ignore_ascii_case(<span class="string">&quot;uuid&quot;</span>) =&gt; <span class="string">&quot;Uuid&quot;</span>.into(),
+            <span class="kw">_ </span>=&gt; scalar_type_name.into(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">string_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input_object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">StringFilter</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">input_object_name</span> {
-            <span class="string">&quot;Uuid&quot;</span> =&gt; <span class="ident">BitFlags::empty</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">BitFlags::all</span>(),
+    <span class="kw">fn </span>string_filters(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object_name: <span class="kw-2">&amp;</span>str) -&gt; BitFlags&lt;StringFilter&gt; {
+        <span class="kw">match </span>input_object_name {
+            <span class="string">&quot;Uuid&quot; </span>=&gt; BitFlags::empty(),
+            <span class="kw">_ </span>=&gt; BitFlags::all(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgres://&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgresql://&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `postgresql://` or `postgres://`.&quot;</span>.<span class="ident">to_owned</span>());
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span>!url.starts_with(<span class="string">&quot;postgres://&quot;</span>) &amp;&amp; !url.starts_with(<span class="string">&quot;postgresql://&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `postgresql://` or `postgres://`.&quot;</span>.to_owned());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">push_completions</span>(
+    <span class="kw">fn </span>push_completions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>,
-        <span class="ident">position</span>: <span class="ident">ast::SchemaPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">completions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompletionList</span>,
+        db: <span class="kw-2">&amp;</span>ParserDatabase,
+        position: ast::SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt;,
+        completions: <span class="kw-2">&amp;mut </span>CompletionList,
     ) {
-        <span class="kw">match</span> <span class="ident">position</span> {
-            <span class="ident">ast::SchemaPosition::Model</span>(
+        <span class="kw">match </span>position {
+            ast::SchemaPosition::Model(
                 <span class="kw">_</span>,
-                <span class="ident">ast::ModelPosition::ModelAttribute</span>(<span class="string">&quot;index&quot;</span>, <span class="kw">_</span>, <span class="ident">ast::AttributePosition::Argument</span>(<span class="string">&quot;type&quot;</span>)),
+                ast::ModelPosition::ModelAttribute(<span class="string">&quot;index&quot;</span>, <span class="kw">_</span>, ast::AttributePosition::Argument(<span class="string">&quot;type&quot;</span>)),
             ) =&gt; {
-                <span class="kw">for</span> <span class="ident">index_type</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">supported_index_types</span>() {
-                    <span class="ident">completions</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">CompletionItem</span> {
-                        <span class="ident">label</span>: <span class="ident">index_type</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CompletionItemKind::ENUM</span>),
-                        <span class="ident">detail</span>: <span class="prelude-val">Some</span>(<span class="ident">index_type</span>.<span class="ident">documentation</span>().<span class="ident">to_owned</span>()),
-                        ..<span class="ident">Default::default</span>()
+                <span class="kw">for </span>index_type <span class="kw">in </span><span class="self">self</span>.supported_index_types() {
+                    completions.items.push(CompletionItem {
+                        label: index_type.to_string(),
+                        kind: <span class="prelude-val">Some</span>(CompletionItemKind::ENUM),
+                        detail: <span class="prelude-val">Some</span>(index_type.documentation().to_owned()),
+                        ..Default::default()
                     });
                 }
             }
-            <span class="ident">ast::SchemaPosition::Model</span>(
-                <span class="ident">model_id</span>,
-                <span class="ident">ast::ModelPosition::ModelAttribute</span>(
+            ast::SchemaPosition::Model(
+                model_id,
+                ast::ModelPosition::ModelAttribute(
                     <span class="string">&quot;index&quot;</span>,
-                    <span class="ident">attr_id</span>,
-                    <span class="ident">ast::AttributePosition::FunctionArgument</span>(<span class="ident">field_name</span>, <span class="string">&quot;ops&quot;</span>),
+                    attr_id,
+                    ast::AttributePosition::FunctionArgument(field_name, <span class="string">&quot;ops&quot;</span>),
                 ),
             ) =&gt; {
-                <span class="comment">// let&#39;s not care about composite field indices yet</span>
-                <span class="kw">if</span> <span class="ident">field_name</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>) {
+                <span class="comment">// let&#39;s not care about composite field indices yet
+                </span><span class="kw">if </span>field_name.contains(<span class="string">&#39;.&#39;</span>) {
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">index_field</span> <span class="op">=</span> <span class="ident">db</span>
-                    .<span class="ident">walk_models</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">model_id</span>() <span class="op">==</span> <span class="ident">model_id</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> {
-                        <span class="ident">model</span>.<span class="ident">indexes</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
-                            <span class="ident">index</span>.<span class="ident">attribute_id</span>()
-                                <span class="op">==</span> <span class="ident">ast::AttributeId::new_in_container</span>(<span class="ident">ast::AttributeContainer::Model</span>(<span class="ident">model_id</span>), <span class="ident">attr_id</span>)
+                <span class="kw">let </span>index_field = db
+                    .walk_models()
+                    .find(|model| model.model_id() == model_id)
+                    .and_then(|model| {
+                        model.indexes().find(|index| {
+                            index.attribute_id()
+                                == ast::AttributeId::new_in_container(ast::AttributeContainer::Model(model_id), attr_id)
                         })
                     })
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
-                        <span class="ident">index</span>
-                            .<span class="ident">fields</span>()
-                            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">field_name</span>)
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_scalar_field</span>())
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">index</span>, <span class="ident">field</span>))
+                    .and_then(|index| {
+                        index
+                            .fields()
+                            .find(|f| f.name() == field_name)
+                            .and_then(|f| f.as_scalar_field())
+                            .map(|field| (index, field))
                     });
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">index</span>, <span class="ident">field</span>)) <span class="op">=</span> <span class="ident">index_field</span> {
-                    <span class="kw">let</span> <span class="ident">algo</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">unwrap_or_default</span>();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((index, field)) = index_field {
+                    <span class="kw">let </span>algo = index.algorithm().unwrap_or_default();
 
-                    <span class="kw">for</span> <span class="ident">operator</span> <span class="kw">in</span> <span class="ident">allowed_index_operator_classes</span>(<span class="ident">algo</span>, <span class="ident">field</span>) {
-                        <span class="ident">completions</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">CompletionItem</span> {
-                            <span class="ident">label</span>: <span class="ident">operator</span>.<span class="ident">to_string</span>(),
-                            <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CompletionItemKind::ENUM</span>),
-                            ..<span class="ident">Default::default</span>()
+                    <span class="kw">for </span>operator <span class="kw">in </span>allowed_index_operator_classes(algo, field) {
+                        completions.items.push(CompletionItem {
+                            label: operator.to_string(),
+                            kind: <span class="prelude-val">Some</span>(CompletionItemKind::ENUM),
+                            ..Default::default()
                         });
                     }
 
-                    <span class="ident">completions</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">CompletionItem</span> {
-                        <span class="ident">label</span>: <span class="string">&quot;raw&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">insert_text</span>: <span class="prelude-val">Some</span>(<span class="string">r#&quot;raw(&quot;$0&quot;)&quot;#</span>.<span class="ident">to_string</span>()),
-                        <span class="ident">insert_text_format</span>: <span class="prelude-val">Some</span>(<span class="ident">InsertTextFormat::SNIPPET</span>),
-                        <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CompletionItemKind::FUNCTION</span>),
-                        ..<span class="ident">Default::default</span>()
+                    completions.items.push(CompletionItem {
+                        label: <span class="string">&quot;raw&quot;</span>.to_string(),
+                        insert_text: <span class="prelude-val">Some</span>(<span class="string">r#&quot;raw(&quot;$0&quot;)&quot;#</span>.to_string()),
+                        insert_text_format: <span class="prelude-val">Some</span>(InsertTextFormat::SNIPPET),
+                        kind: <span class="prelude-val">Some</span>(CompletionItemKind::FUNCTION),
+                        ..Default::default()
                     });
                 }
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_datasource_properties</span>(
+    <span class="kw">fn </span>parse_datasource_properties(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">ast::Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="ident">DatasourceConnectorData</span> {
-        <span class="kw">let</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">datasource::parse_extensions</span>(<span class="ident">args</span>, <span class="ident">diagnostics</span>);
-        <span class="kw">let</span> <span class="ident">properties</span> <span class="op">=</span> <span class="ident">PostgresDatasourceProperties</span> { <span class="ident">extensions</span> };
+        args: <span class="kw-2">&amp;mut </span>HashMap&lt;<span class="kw-2">&amp;</span>str, (ast::Span, <span class="kw-2">&amp;</span>ast::Expression)&gt;,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; DatasourceConnectorData {
+        <span class="kw">let </span>extensions = datasource::parse_extensions(args, diagnostics);
+        <span class="kw">let </span>properties = PostgresDatasourceProperties { extensions };
 
-        <span class="ident">DatasourceConnectorData::new</span>(<span class="ident">Box::new</span>(<span class="ident">properties</span>))
+        DatasourceConnectorData::new(Box::new(properties))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">allowed_index_operator_classes</span>(<span class="ident">algo</span>: <span class="ident">IndexAlgorithm</span>, <span class="ident">field</span>: <span class="ident">walkers::ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">scalar_type</span>();
-    <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="number">1</span>);
+<span class="kw">fn </span>allowed_index_operator_classes(algo: IndexAlgorithm, field: walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;OperatorClass&gt; {
+    <span class="kw">let </span>scalar_type = field.scalar_type();
+    <span class="kw">let </span>native_type = field.raw_native_type().map(|t| t.<span class="number">1</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">classes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>classes = Vec::new();
 
-    <span class="kw">match</span> (<span class="ident">algo</span>, <span class="ident">scalar_type</span>, <span class="ident">native_type</span>) {
-        (<span class="ident">IndexAlgorithm::Gist</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetOps</span>);
-        }
-
-        (<span class="ident">IndexAlgorithm::Gin</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::ArrayOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Gin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Json</span>), <span class="kw">_</span>) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::JsonbOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::JsonbPathOps</span>);
+    <span class="kw">match </span>(algo, scalar_type, native_type) {
+        (IndexAlgorithm::Gist, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::InetOps);
         }
 
-        (<span class="ident">IndexAlgorithm::SpGist</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetOps</span>);
+        (IndexAlgorithm::Gin, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>field.ast_field().arity.is_list() =&gt; {
+            classes.push(OperatorClass::ArrayOps);
         }
-        (<span class="ident">IndexAlgorithm::SpGist</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>), <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Text&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;VarChar&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TextOps</span>);
-        }
-
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Bit&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::BitMinMaxOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;VarBit&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::VarBitMinMaxOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Char&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::BpcharBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::BpcharMinMaxOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Date&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::DateBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::DateMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::DateMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Real&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float4BloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float4MinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float4MinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Float</span>), <span class="kw">_</span>) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float8BloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float8MinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Float8MinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetInclusionOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::InetMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;SmallInt&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int2BloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int2MinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int2MinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Int</span>), <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Integer&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int4BloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int4MinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int4MinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::BigInt</span>), <span class="kw">_</span>) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int8BloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int8MinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::Int8MinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>), <span class="kw">_</span>) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::NumericBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::NumericMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::NumericMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Oid&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::OidBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::OidMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::OidMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>), <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;ByteA&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::ByteaBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::ByteaMinMaxOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>), <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Text&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;VarChar&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TextBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TextMinMaxOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="prelude-val">Some</span>(<span class="ident">ScalarType::DateTime</span>), <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Timestamp&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Timestamptz&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampTzBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampTzMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Time&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Timetz&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeTzBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeTzMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span>);
-        }
-        (<span class="ident">IndexAlgorithm::Brin</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Uuid&quot;</span>)) =&gt; {
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::UuidBloomOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::UuidMinMaxOps</span>);
-            <span class="ident">classes</span>.<span class="ident">push</span>(<span class="ident">OperatorClass::UuidMinMaxMultiOps</span>);
+        (IndexAlgorithm::Gin, <span class="prelude-val">Some</span>(ScalarType::Json), <span class="kw">_</span>) =&gt; {
+            classes.push(OperatorClass::JsonbOps);
+            classes.push(OperatorClass::JsonbPathOps);
         }
 
-        <span class="kw">_</span> =&gt; (),
+        (IndexAlgorithm::SpGist, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::InetOps);
+        }
+        (IndexAlgorithm::SpGist, <span class="prelude-val">Some</span>(ScalarType::String), <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="string">&quot;Text&quot;</span>) | <span class="prelude-val">Some</span>(<span class="string">&quot;VarChar&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TextOps);
+        }
+
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Bit&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::BitMinMaxOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;VarBit&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::VarBitMinMaxOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Char&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::BpcharBloomOps);
+            classes.push(OperatorClass::BpcharMinMaxOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Date&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::DateBloomOps);
+            classes.push(OperatorClass::DateMinMaxOps);
+            classes.push(OperatorClass::DateMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Real&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::Float4BloomOps);
+            classes.push(OperatorClass::Float4MinMaxOps);
+            classes.push(OperatorClass::Float4MinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::Float), <span class="kw">_</span>) =&gt; {
+            classes.push(OperatorClass::Float8BloomOps);
+            classes.push(OperatorClass::Float8MinMaxOps);
+            classes.push(OperatorClass::Float8MinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Inet&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::InetBloomOps);
+            classes.push(OperatorClass::InetInclusionOps);
+            classes.push(OperatorClass::InetMinMaxOps);
+            classes.push(OperatorClass::InetMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;SmallInt&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::Int2BloomOps);
+            classes.push(OperatorClass::Int2MinMaxOps);
+            classes.push(OperatorClass::Int2MinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::Int), <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="string">&quot;Integer&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::Int4BloomOps);
+            classes.push(OperatorClass::Int4MinMaxOps);
+            classes.push(OperatorClass::Int4MinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::BigInt), <span class="kw">_</span>) =&gt; {
+            classes.push(OperatorClass::Int8BloomOps);
+            classes.push(OperatorClass::Int8MinMaxOps);
+            classes.push(OperatorClass::Int8MinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::Decimal), <span class="kw">_</span>) =&gt; {
+            classes.push(OperatorClass::NumericBloomOps);
+            classes.push(OperatorClass::NumericMinMaxOps);
+            classes.push(OperatorClass::NumericMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Oid&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::OidBloomOps);
+            classes.push(OperatorClass::OidMinMaxOps);
+            classes.push(OperatorClass::OidMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::Bytes), <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="string">&quot;ByteA&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::ByteaBloomOps);
+            classes.push(OperatorClass::ByteaMinMaxOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::String), <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="string">&quot;Text&quot;</span>) | <span class="prelude-val">Some</span>(<span class="string">&quot;VarChar&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TextBloomOps);
+            classes.push(OperatorClass::TextMinMaxOps);
+        }
+        (IndexAlgorithm::Brin, <span class="prelude-val">Some</span>(ScalarType::DateTime), <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(<span class="string">&quot;Timestamp&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TimestampBloomOps);
+            classes.push(OperatorClass::TimestampMinMaxOps);
+            classes.push(OperatorClass::TimestampMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Timestamptz&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TimestampTzBloomOps);
+            classes.push(OperatorClass::TimestampTzMinMaxOps);
+            classes.push(OperatorClass::TimestampTzMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Time&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TimeBloomOps);
+            classes.push(OperatorClass::TimeMinMaxOps);
+            classes.push(OperatorClass::TimeMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Timetz&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::TimeTzBloomOps);
+            classes.push(OperatorClass::TimeTzMinMaxOps);
+            classes.push(OperatorClass::TimeTzMinMaxMultiOps);
+        }
+        (IndexAlgorithm::Brin, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Uuid&quot;</span>)) =&gt; {
+            classes.push(OperatorClass::UuidBloomOps);
+            classes.push(OperatorClass::UuidMinMaxOps);
+            classes.push(OperatorClass::UuidMinMaxMultiOps);
+        }
+
+        <span class="kw">_ </span>=&gt; (),
     }
 
-    <span class="ident">classes</span>
+    classes
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

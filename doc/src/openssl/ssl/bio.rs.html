@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/ssl/bio.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bio.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/ssl/bio.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bio.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -288,295 +288,295 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
-<span class="kw">use</span> <span class="ident">ffi</span>::{
-    <span class="self">self</span>, <span class="ident">BIO_clear_retry_flags</span>, <span class="ident">BIO_new</span>, <span class="ident">BIO_set_retry_read</span>, <span class="ident">BIO_set_retry_write</span>, <span class="ident">BIO</span>,
-    <span class="ident">BIO_CTRL_DGRAM_QUERY_MTU</span>, <span class="ident">BIO_CTRL_FLUSH</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>cfg_if::cfg_if;
+<span class="kw">use </span>ffi::{
+    <span class="self">self</span>, BIO_clear_retry_flags, BIO_new, BIO_set_retry_read, BIO_set_retry_write, BIO,
+    BIO_CTRL_DGRAM_QUERY_MTU, BIO_CTRL_FLUSH,
 };
-<span class="kw">use</span> <span class="ident">libc</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">c_long</span>, <span class="ident">c_void</span>, <span class="ident">strlen</span>};
-<span class="kw">use</span> <span class="ident">std::any::Any</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::io::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::panic</span>::{<span class="ident">catch_unwind</span>, <span class="ident">AssertUnwindSafe</span>};
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::slice</span>;
+<span class="kw">use </span>libc::{c_char, c_int, c_long, c_void, strlen};
+<span class="kw">use </span>std::any::Any;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::io::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::panic::{catch_unwind, AssertUnwindSafe};
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::slice;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cvt_p</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ErrorStack</span>;
+<span class="kw">use </span><span class="kw">crate</span>::cvt_p;
+<span class="kw">use </span><span class="kw">crate</span>::error::ErrorStack;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">stream</span>: <span class="ident">S</span>,
-    <span class="kw">pub</span> <span class="ident">error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">panic</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">dtls_mtu_size</span>: <span class="ident">c_long</span>,
+<span class="kw">pub struct </span>StreamState&lt;S&gt; {
+    <span class="kw">pub </span>stream: S,
+    <span class="kw">pub </span>error: <span class="prelude-ty">Option</span>&lt;io::Error&gt;,
+    <span class="kw">pub </span>panic: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Any + Send&gt;&gt;,
+    <span class="kw">pub </span>dtls_mtu_size: c_long,
 }
 
-<span class="doccomment">/// Safe wrapper for `BIO_METHOD`</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BioMethod</span>(<span class="ident">BIO_METHOD</span>);
+<span class="doccomment">/// Safe wrapper for `BIO_METHOD`
+</span><span class="kw">pub struct </span>BioMethod(BIO_METHOD);
 
-<span class="kw">impl</span> <span class="ident">BioMethod</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BioMethod</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-        <span class="ident">BIO_METHOD::new</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="ident">BioMethod</span>)
+<span class="kw">impl </span>BioMethod {
+    <span class="kw">fn </span>new&lt;S: Read + Write&gt;() -&gt; <span class="prelude-ty">Result</span>&lt;BioMethod, ErrorStack&gt; {
+        BIO_METHOD::new::&lt;S&gt;().map(BioMethod)
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">BioMethod</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">BioMethod</span> {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>BioMethod {}
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>BioMethod {}
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">*mut</span> <span class="ident">BIO</span>, <span class="ident">BioMethod</span>), <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">BioMethod::new</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>new&lt;S: Read + Write&gt;(stream: S) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">*mut </span>BIO, BioMethod), ErrorStack&gt; {
+    <span class="kw">let </span>method = BioMethod::new::&lt;S&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">StreamState</span> {
-        <span class="ident">stream</span>,
-        <span class="ident">error</span>: <span class="prelude-val">None</span>,
-        <span class="ident">panic</span>: <span class="prelude-val">None</span>,
-        <span class="ident">dtls_mtu_size</span>: <span class="number">0</span>,
+    <span class="kw">let </span>state = Box::new(StreamState {
+        stream,
+        error: <span class="prelude-val">None</span>,
+        panic: <span class="prelude-val">None</span>,
+        dtls_mtu_size: <span class="number">0</span>,
     });
 
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">bio</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">BIO_new</span>(<span class="ident">method</span>.<span class="number">0</span>.<span class="ident">get</span>()))<span class="question-mark">?</span>;
-        <span class="ident">BIO_set_data</span>(<span class="ident">bio</span>, <span class="ident">Box::into_raw</span>(<span class="ident">state</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
-        <span class="ident">BIO_set_init</span>(<span class="ident">bio</span>, <span class="number">1</span>);
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>bio = cvt_p(BIO_new(method.<span class="number">0</span>.get()))<span class="question-mark">?</span>;
+        BIO_set_data(bio, Box::into_raw(state) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
+        BIO_set_init(bio, <span class="number">1</span>);
 
-        <span class="prelude-val">Ok</span>((<span class="ident">bio</span>, <span class="ident">method</span>))
+        <span class="prelude-val">Ok</span>((bio, method))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_error</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
-    <span class="ident">state</span>.<span class="ident">error</span>.<span class="ident">take</span>()
+<span class="kw">pub unsafe fn </span>take_error&lt;S&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; <span class="prelude-ty">Option</span>&lt;io::Error&gt; {
+    <span class="kw">let </span>state = state::&lt;S&gt;(bio);
+    state.error.take()
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">take_panic</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
-    <span class="ident">state</span>.<span class="ident">panic</span>.<span class="ident">take</span>()
+<span class="kw">pub unsafe fn </span>take_panic&lt;S&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>Any + Send&gt;&gt; {
+    <span class="kw">let </span>state = state::&lt;S&gt;(bio);
+    state.panic.take()
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">S</span> {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">BIO_get_data</span>(<span class="ident">bio</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>);
-    <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">stream</span>
+<span class="kw">pub unsafe fn </span>get_ref&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a</span>&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>S {
+    <span class="kw">let </span>state = <span class="kw-2">&amp;*</span>(BIO_get_data(bio) <span class="kw">as </span><span class="kw-2">*const </span>StreamState&lt;S&gt;);
+    <span class="kw-2">&amp;</span>state.stream
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">S</span> {
-    <span class="kw-2">&amp;mut</span> <span class="ident">state</span>(<span class="ident">bio</span>).<span class="ident">stream</span>
+<span class="kw">pub unsafe fn </span>get_mut&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a</span>&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>S {
+    <span class="kw-2">&amp;mut </span>state(bio).stream
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_dtls_mtu_size</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>, <span class="ident">mtu_size</span>: <span class="ident">usize</span>) {
-    <span class="kw">if</span> <span class="ident">mtu_size</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">c_long::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span> {
+<span class="kw">pub unsafe fn </span>set_dtls_mtu_size&lt;S&gt;(bio: <span class="kw-2">*mut </span>BIO, mtu_size: usize) {
+    <span class="kw">if </span>mtu_size <span class="kw">as </span>u64 &gt; c_long::max_value() <span class="kw">as </span>u64 {
         <span class="macro">panic!</span>(
             <span class="string">&quot;Given MTU size {} can&#39;t be represented in a positive `c_long` range&quot;</span>,
-            <span class="ident">mtu_size</span>
+            mtu_size
         )
     }
-    <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>).<span class="ident">dtls_mtu_size</span> <span class="op">=</span> <span class="ident">mtu_size</span> <span class="kw">as</span> <span class="ident">c_long</span>;
+    state::&lt;S&gt;(bio).dtls_mtu_size = mtu_size <span class="kw">as </span>c_long;
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">state</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">BIO_get_data</span>(<span class="ident">bio</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>)
+<span class="kw">unsafe fn </span>state&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a</span>&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>StreamState&lt;S&gt; {
+    <span class="kw-2">&amp;mut *</span>(BIO_get_data(bio) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>)
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bwrite</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
-    <span class="ident">BIO_clear_retry_flags</span>(<span class="ident">bio</span>);
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>bwrite&lt;S: Write&gt;(bio: <span class="kw-2">*mut </span>BIO, buf: <span class="kw-2">*const </span>c_char, len: c_int) -&gt; c_int {
+    BIO_clear_retry_flags(bio);
 
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
+    <span class="kw">let </span>state = state::&lt;S&gt;(bio);
+    <span class="kw">let </span>buf = slice::from_raw_parts(buf <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>, len <span class="kw">as </span>usize);
 
-    <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">write</span>(<span class="ident">buf</span>))) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) =&gt; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-            <span class="kw">if</span> <span class="ident">retriable_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
-                <span class="ident">BIO_set_retry_write</span>(<span class="ident">bio</span>);
+    <span class="kw">match </span>catch_unwind(AssertUnwindSafe(|| state.stream.write(buf))) {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(len)) =&gt; len <span class="kw">as </span>c_int,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; {
+            <span class="kw">if </span>retriable_error(<span class="kw-2">&amp;</span>err) {
+                BIO_set_retry_write(bio);
             }
-            <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-            <span class="op">-</span><span class="number">1</span>
-        }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-            <span class="op">-</span><span class="number">1</span>
-        }
+            state.error = <span class="prelude-val">Some</span>(err);
+            -<span class="number">1
+        </span>}
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            state.panic = <span class="prelude-val">Some</span>(err);
+            -<span class="number">1
+        </span>}
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bread</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>, <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>, <span class="ident">len</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
-    <span class="ident">BIO_clear_retry_flags</span>(<span class="ident">bio</span>);
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>bread&lt;S: Read&gt;(bio: <span class="kw-2">*mut </span>BIO, buf: <span class="kw-2">*mut </span>c_char, len: c_int) -&gt; c_int {
+    BIO_clear_retry_flags(bio);
 
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">buf</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
+    <span class="kw">let </span>state = state::&lt;S&gt;(bio);
+    <span class="kw">let </span>buf = slice::from_raw_parts_mut(buf <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>, len <span class="kw">as </span>usize);
 
-    <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">read</span>(<span class="ident">buf</span>))) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>)) =&gt; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-            <span class="kw">if</span> <span class="ident">retriable_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
-                <span class="ident">BIO_set_retry_read</span>(<span class="ident">bio</span>);
+    <span class="kw">match </span>catch_unwind(AssertUnwindSafe(|| state.stream.read(buf))) {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(len)) =&gt; len <span class="kw">as </span>c_int,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; {
+            <span class="kw">if </span>retriable_error(<span class="kw-2">&amp;</span>err) {
+                BIO_set_retry_read(bio);
             }
-            <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-            <span class="op">-</span><span class="number">1</span>
-        }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-            <span class="op">-</span><span class="number">1</span>
-        }
+            state.error = <span class="prelude-val">Some</span>(err);
+            -<span class="number">1
+        </span>}
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            state.panic = <span class="prelude-val">Some</span>(err);
+            -<span class="number">1
+        </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span> <span class="comment">// matches macro requires rust 1.42.0</span>
-<span class="kw">fn</span> <span class="ident">retriable_error</span>(<span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="ident">io::Error</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-        <span class="ident">io::ErrorKind::WouldBlock</span> <span class="op">|</span> <span class="ident">io::ErrorKind::NotConnected</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="attribute">#[allow(clippy::match_like_matches_macro)] </span><span class="comment">// matches macro requires rust 1.42.0
+</span><span class="kw">fn </span>retriable_error(err: <span class="kw-2">&amp;</span>io::Error) -&gt; bool {
+    <span class="kw">match </span>err.kind() {
+        io::ErrorKind::WouldBlock | io::ErrorKind::NotConnected =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">bputs</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>, <span class="ident">s</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">c_int</span> {
-    <span class="ident">bwrite</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>, <span class="ident">s</span>, <span class="ident">strlen</span>(<span class="ident">s</span>) <span class="kw">as</span> <span class="ident">c_int</span>)
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>bputs&lt;S: Write&gt;(bio: <span class="kw-2">*mut </span>BIO, s: <span class="kw-2">*const </span>c_char) -&gt; c_int {
+    bwrite::&lt;S&gt;(bio, s, strlen(s) <span class="kw">as </span>c_int)
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">ctrl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
-    <span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>,
-    <span class="ident">cmd</span>: <span class="ident">c_int</span>,
-    <span class="ident">_num</span>: <span class="ident">c_long</span>,
-    <span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-) -&gt; <span class="ident">c_long</span> {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>);
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>ctrl&lt;S: Write&gt;(
+    bio: <span class="kw-2">*mut </span>BIO,
+    cmd: c_int,
+    _num: c_long,
+    _ptr: <span class="kw-2">*mut </span>c_void,
+) -&gt; c_long {
+    <span class="kw">let </span>state = state::&lt;S&gt;(bio);
 
-    <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">==</span> <span class="ident">BIO_CTRL_FLUSH</span> {
-        <span class="kw">match</span> <span class="ident">catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">stream</span>.<span class="ident">flush</span>())) {
+    <span class="kw">if </span>cmd == BIO_CTRL_FLUSH {
+        <span class="kw">match </span>catch_unwind(AssertUnwindSafe(|| state.stream.flush())) {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="number">1</span>,
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-                <span class="number">0</span>
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="ident">state</span>.<span class="ident">panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-                <span class="number">0</span>
-            }
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)) =&gt; {
+                state.error = <span class="prelude-val">Some</span>(err);
+                <span class="number">0
+            </span>}
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                state.panic = <span class="prelude-val">Some</span>(err);
+                <span class="number">0
+            </span>}
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cmd</span> <span class="op">==</span> <span class="ident">BIO_CTRL_DGRAM_QUERY_MTU</span> {
-        <span class="ident">state</span>.<span class="ident">dtls_mtu_size</span>
-    } <span class="kw">else</span> {
-        <span class="number">0</span>
+    } <span class="kw">else if </span>cmd == BIO_CTRL_DGRAM_QUERY_MTU {
+        state.dtls_mtu_size
+    } <span class="kw">else </span>{
+        <span class="number">0
+    </span>}
+}
+
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>create(bio: <span class="kw-2">*mut </span>BIO) -&gt; c_int {
+    BIO_set_init(bio, <span class="number">0</span>);
+    BIO_set_num(bio, <span class="number">0</span>);
+    BIO_set_data(bio, ptr::null_mut());
+    BIO_set_flags(bio, <span class="number">0</span>);
+    <span class="number">1
+</span>}
+
+<span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>destroy&lt;S&gt;(bio: <span class="kw-2">*mut </span>BIO) -&gt; c_int {
+    <span class="kw">if </span>bio.is_null() {
+        <span class="kw">return </span><span class="number">0</span>;
     }
-}
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="ident">c_int</span> {
-    <span class="ident">BIO_set_init</span>(<span class="ident">bio</span>, <span class="number">0</span>);
-    <span class="ident">BIO_set_num</span>(<span class="ident">bio</span>, <span class="number">0</span>);
-    <span class="ident">BIO_set_data</span>(<span class="ident">bio</span>, <span class="ident">ptr::null_mut</span>());
-    <span class="ident">BIO_set_flags</span>(<span class="ident">bio</span>, <span class="number">0</span>);
-    <span class="number">1</span>
-}
+    <span class="kw">let </span>data = BIO_get_data(bio);
+    <span class="macro">assert!</span>(!data.is_null());
+    Box::&lt;StreamState&lt;S&gt;&gt;::from_raw(data <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>);
+    BIO_set_data(bio, ptr::null_mut());
+    BIO_set_init(bio, <span class="number">0</span>);
+    <span class="number">1
+</span>}
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">BIO</span>) -&gt; <span class="ident">c_int</span> {
-    <span class="kw">if</span> <span class="ident">bio</span>.<span class="ident">is_null</span>() {
-        <span class="kw">return</span> <span class="number">0</span>;
-    }
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(any(ossl110, libressl273))] </span>{
+        <span class="kw">use </span>ffi::{BIO_get_data, BIO_set_data, BIO_set_flags, BIO_set_init};
+        <span class="kw">use </span><span class="kw">crate</span>::cvt;
 
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">BIO_get_data</span>(<span class="ident">bio</span>);
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">data</span>.<span class="ident">is_null</span>());
-    <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">StreamState</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
-    <span class="ident">BIO_set_data</span>(<span class="ident">bio</span>, <span class="ident">ptr::null_mut</span>());
-    <span class="ident">BIO_set_init</span>(<span class="ident">bio</span>, <span class="number">0</span>);
-    <span class="number">1</span>
-}
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_set_num(_bio: <span class="kw-2">*mut </span>ffi::BIO, _num: c_int) {}
 
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl273</span>))]</span> {
-        <span class="kw">use</span> <span class="ident">ffi</span>::{<span class="ident">BIO_get_data</span>, <span class="ident">BIO_set_data</span>, <span class="ident">BIO_set_flags</span>, <span class="ident">BIO_set_init</span>};
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cvt</span>;
+        <span class="attribute">#[allow(bad_style, clippy::upper_case_acronyms)]
+        </span><span class="kw">struct </span>BIO_METHOD(<span class="kw-2">*mut </span>ffi::BIO_METHOD);
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_set_num</span>(<span class="ident">_bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>, <span class="ident">_num</span>: <span class="ident">c_int</span>) {}
-
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>, <span class="ident">clippy::upper_case_acronyms</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">BIO_METHOD</span>(<span class="kw-2">*mut</span> <span class="ident">ffi::BIO_METHOD</span>);
-
-        <span class="kw">impl</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">cvt_p</span>(<span class="ident">ffi::BIO_meth_new</span>(<span class="ident">ffi::BIO_TYPE_NONE</span>, <span class="string">b&quot;rust\0&quot;</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">BIO_METHOD</span>(<span class="ident">ptr</span>);
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_write__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">bwrite</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_read__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">bread</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_puts__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">bputs</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_ctrl__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">ctrl</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_create__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">create</span>)))<span class="question-mark">?</span>;
-                    <span class="ident">cvt</span>(<span class="ident">ffi::BIO_meth_set_destroy__fixed_rust</span>(<span class="ident">method</span>.<span class="number">0</span>, <span class="prelude-val">Some</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>)))<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">method</span>)
+        <span class="kw">impl </span>BIO_METHOD {
+            <span class="kw">fn </span>new&lt;S: Read + Write&gt;() -&gt; <span class="prelude-ty">Result</span>&lt;BIO_METHOD, ErrorStack&gt; {
+                <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>ptr = cvt_p(ffi::BIO_meth_new(ffi::BIO_TYPE_NONE, <span class="string">b&quot;rust\0&quot;</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>))<span class="question-mark">?</span>;
+                    <span class="kw">let </span>method = BIO_METHOD(ptr);
+                    cvt(ffi::BIO_meth_set_write__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(bwrite::&lt;S&gt;)))<span class="question-mark">?</span>;
+                    cvt(ffi::BIO_meth_set_read__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(bread::&lt;S&gt;)))<span class="question-mark">?</span>;
+                    cvt(ffi::BIO_meth_set_puts__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(bputs::&lt;S&gt;)))<span class="question-mark">?</span>;
+                    cvt(ffi::BIO_meth_set_ctrl__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(ctrl::&lt;S&gt;)))<span class="question-mark">?</span>;
+                    cvt(ffi::BIO_meth_set_create__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(create)))<span class="question-mark">?</span>;
+                    cvt(ffi::BIO_meth_set_destroy__fixed_rust(method.<span class="number">0</span>, <span class="prelude-val">Some</span>(destroy::&lt;S&gt;)))<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(method)
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::BIO_METHOD</span> {
-                <span class="self">self</span>.<span class="number">0</span>
-            }
+            <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>ffi::BIO_METHOD {
+                <span class="self">self</span>.<span class="number">0
+            </span>}
         }
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="kw">unsafe</span> {
-                    <span class="ident">ffi::BIO_meth_free</span>(<span class="self">self</span>.<span class="number">0</span>);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>BIO_METHOD {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="kw">unsafe </span>{
+                    ffi::BIO_meth_free(<span class="self">self</span>.<span class="number">0</span>);
                 }
             }
         }
-    } <span class="kw">else</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>, <span class="ident">clippy::upper_case_acronyms</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">BIO_METHOD</span>(<span class="kw-2">*mut</span> <span class="ident">ffi::BIO_METHOD</span>);
+    } <span class="kw">else </span>{
+        <span class="attribute">#[allow(bad_style, clippy::upper_case_acronyms)]
+        </span><span class="kw">struct </span>BIO_METHOD(<span class="kw-2">*mut </span>ffi::BIO_METHOD);
 
-        <span class="kw">impl</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BIO_METHOD</span>, <span class="ident">ErrorStack</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ffi::BIO_METHOD</span> {
-                    <span class="ident">type_</span>: <span class="ident">ffi::BIO_TYPE_NONE</span>,
-                    <span class="ident">name</span>: <span class="string">b&quot;rust\0&quot;</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>,
-                    <span class="ident">bwrite</span>: <span class="prelude-val">Some</span>(<span class="ident">bwrite</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>),
-                    <span class="ident">bread</span>: <span class="prelude-val">Some</span>(<span class="ident">bread</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>),
-                    <span class="ident">bputs</span>: <span class="prelude-val">Some</span>(<span class="ident">bputs</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>),
-                    <span class="ident">bgets</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">ctrl</span>: <span class="prelude-val">Some</span>(<span class="ident">ctrl</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>),
-                    <span class="ident">create</span>: <span class="prelude-val">Some</span>(<span class="ident">create</span>),
-                    <span class="ident">destroy</span>: <span class="prelude-val">Some</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>),
-                    <span class="ident">callback_ctrl</span>: <span class="prelude-val">None</span>,
+        <span class="kw">impl </span>BIO_METHOD {
+            <span class="kw">fn </span>new&lt;S: Read + Write&gt;() -&gt; <span class="prelude-ty">Result</span>&lt;BIO_METHOD, ErrorStack&gt; {
+                <span class="kw">let </span>ptr = Box::new(ffi::BIO_METHOD {
+                    type_: ffi::BIO_TYPE_NONE,
+                    name: <span class="string">b&quot;rust\0&quot;</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>,
+                    bwrite: <span class="prelude-val">Some</span>(bwrite::&lt;S&gt;),
+                    bread: <span class="prelude-val">Some</span>(bread::&lt;S&gt;),
+                    bputs: <span class="prelude-val">Some</span>(bputs::&lt;S&gt;),
+                    bgets: <span class="prelude-val">None</span>,
+                    ctrl: <span class="prelude-val">Some</span>(ctrl::&lt;S&gt;),
+                    create: <span class="prelude-val">Some</span>(create),
+                    destroy: <span class="prelude-val">Some</span>(destroy::&lt;S&gt;),
+                    callback_ctrl: <span class="prelude-val">None</span>,
                 });
 
-                <span class="prelude-val">Ok</span>(<span class="ident">BIO_METHOD</span>(<span class="ident">Box::into_raw</span>(<span class="ident">ptr</span>)))
+                <span class="prelude-val">Ok</span>(BIO_METHOD(Box::into_raw(ptr)))
             }
 
-            <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::BIO_METHOD</span> {
-                <span class="self">self</span>.<span class="number">0</span>
-            }
+            <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>ffi::BIO_METHOD {
+                <span class="self">self</span>.<span class="number">0
+            </span>}
         }
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">BIO_METHOD</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="kw">unsafe</span> {
-                    <span class="ident">Box</span>::<span class="op">&lt;</span><span class="ident">ffi::BIO_METHOD</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="self">self</span>.<span class="number">0</span>);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>BIO_METHOD {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="kw">unsafe </span>{
+                    Box::&lt;ffi::BIO_METHOD&gt;::from_raw(<span class="self">self</span>.<span class="number">0</span>);
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_set_init</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>, <span class="ident">init</span>: <span class="ident">c_int</span>) {
-            (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">init</span> <span class="op">=</span> <span class="ident">init</span>;
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_set_init(bio: <span class="kw-2">*mut </span>ffi::BIO, init: c_int) {
+            (<span class="kw-2">*</span>bio).init = init;
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_set_flags</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>, <span class="ident">flags</span>: <span class="ident">c_int</span>) {
-            (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">flags</span> <span class="op">=</span> <span class="ident">flags</span>;
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_set_flags(bio: <span class="kw-2">*mut </span>ffi::BIO, flags: c_int) {
+            (<span class="kw-2">*</span>bio).flags = flags;
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_get_data</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span> {
-            (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">ptr</span>
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_get_data(bio: <span class="kw-2">*mut </span>ffi::BIO) -&gt; <span class="kw-2">*mut </span>c_void {
+            (<span class="kw-2">*</span>bio).ptr
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_set_data</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>, <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) {
-            (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">ptr</span> <span class="op">=</span> <span class="ident">data</span>;
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_set_data(bio: <span class="kw-2">*mut </span>ffi::BIO, data: <span class="kw-2">*mut </span>c_void) {
+            (<span class="kw-2">*</span>bio).ptr = data;
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bad_style</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">BIO_set_num</span>(<span class="ident">bio</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::BIO</span>, <span class="ident">num</span>: <span class="ident">c_int</span>) {
-            (<span class="kw-2">*</span><span class="ident">bio</span>).<span class="ident">num</span> <span class="op">=</span> <span class="ident">num</span>;
+        <span class="attribute">#[allow(bad_style)]
+        </span><span class="kw">unsafe fn </span>BIO_set_num(bio: <span class="kw-2">*mut </span>ffi::BIO, num: c_int) {
+            (<span class="kw-2">*</span>bio).num = num;
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

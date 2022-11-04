@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../quaint/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -231,233 +231,233 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Convert given set of tuples into `Values`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use quaint::{col, values, ast::*, visitor::{Visitor, Sqlite}};</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let condition = Row::from((col!(&quot;id&quot;), col!(&quot;name&quot;)))</span>
-<span class="doccomment">///     .in_selection(values!((1, &quot;Musti&quot;), (2, &quot;Naukio&quot;)));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let query = Select::from_table(&quot;cats&quot;).so_that(condition);</span>
-<span class="doccomment">/// let (sql, _) = Sqlite::build(query)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;SELECT `cats`.* FROM `cats` WHERE (`id`,`name`) IN (VALUES (?,?),(?,?))&quot;,</span>
-<span class="doccomment">///     sql</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">values</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; (
-        <span class="ident">Values::from</span>(<span class="ident">std::iter::empty</span>() $(.<span class="ident">chain</span>(<span class="ident">std::iter::once</span>(<span class="ident">Row::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>))))<span class="kw-2">*</span>)
+</pre><pre class="rust"><code><span class="doccomment">/// Convert given set of tuples into `Values`.
+///
+/// ```rust
+/// # use quaint::{col, values, ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+///
+/// let condition = Row::from((col!(&quot;id&quot;), col!(&quot;name&quot;)))
+///     .in_selection(values!((1, &quot;Musti&quot;), (2, &quot;Naukio&quot;)));
+///
+/// let query = Select::from_table(&quot;cats&quot;).so_that(condition);
+/// let (sql, _) = Sqlite::build(query)?;
+///
+/// assert_eq!(
+///     &quot;SELECT `cats`.* FROM `cats` WHERE (`id`,`name`) IN (VALUES (?,?),(?,?))&quot;,
+///     sql
+/// );
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>values {
+    ($(<span class="macro-nonterminal">$x</span>:expr),<span class="kw-2">*</span>) =&gt; (
+        Values::from(std::iter::empty() $(.chain(std::iter::once(Row::from(<span class="macro-nonterminal">$x</span>))))<span class="kw-2">*</span>)
     );
 }
 
-<span class="doccomment">/// Marks a given string or a tuple as a column. Useful when using a column in</span>
-<span class="doccomment">/// calculations, e.g.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ``` rust</span>
-<span class="doccomment">/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">/// let join = &quot;dogs&quot;.on((&quot;dogs&quot;, &quot;slave_id&quot;).equals(Column::from((&quot;cats&quot;, &quot;master_id&quot;))));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let query = Select::from_table(&quot;cats&quot;)</span>
-<span class="doccomment">///     .value(Table::from(&quot;cats&quot;).asterisk())</span>
-<span class="doccomment">///     .value(col!(&quot;dogs&quot;, &quot;age&quot;) - val!(4))</span>
-<span class="doccomment">///     .inner_join(join);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`&quot;,</span>
-<span class="doccomment">///     sql</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">col</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">Expression::from</span>(<span class="ident">Column::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>))
+<span class="doccomment">/// Marks a given string or a tuple as a column. Useful when using a column in
+/// calculations, e.g.
+///
+/// ``` rust
+/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+/// let join = &quot;dogs&quot;.on((&quot;dogs&quot;, &quot;slave_id&quot;).equals(Column::from((&quot;cats&quot;, &quot;master_id&quot;))));
+///
+/// let query = Select::from_table(&quot;cats&quot;)
+///     .value(Table::from(&quot;cats&quot;).asterisk())
+///     .value(col!(&quot;dogs&quot;, &quot;age&quot;) - val!(4))
+///     .inner_join(join);
+///
+/// let (sql, params) = Sqlite::build(query)?;
+///
+/// assert_eq!(
+///     &quot;SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`&quot;,
+///     sql
+/// );
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>col {
+    (<span class="macro-nonterminal">$e1</span>:expr) =&gt; {
+        Expression::from(Column::from(<span class="macro-nonterminal">$e1</span>))
     };
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e2</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">Expression::from</span>(<span class="ident">Column::from</span>((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e1</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e2</span>)))
-    };
-}
-
-<span class="doccomment">/// Marks a given string as a value. Useful when using a value in calculations,</span>
-<span class="doccomment">/// e.g.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ``` rust</span>
-<span class="doccomment">/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-<span class="doccomment">/// let join = &quot;dogs&quot;.on((&quot;dogs&quot;, &quot;slave_id&quot;).equals(Column::from((&quot;cats&quot;, &quot;master_id&quot;))));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let query = Select::from_table(&quot;cats&quot;)</span>
-<span class="doccomment">///     .value(Table::from(&quot;cats&quot;).asterisk())</span>
-<span class="doccomment">///     .value(col!(&quot;dogs&quot;, &quot;age&quot;) - val!(4))</span>
-<span class="doccomment">///     .inner_join(join);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`&quot;,</span>
-<span class="doccomment">///     sql</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">val</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">Expression::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>)
+    (<span class="macro-nonterminal">$e1</span>:expr, <span class="macro-nonterminal">$e2</span>:expr) =&gt; {
+        Expression::from(Column::from((<span class="macro-nonterminal">$e1</span>, <span class="macro-nonterminal">$e2</span>)))
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">value</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">that</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> <span class="op">=</span> <span class="ident">that</span>;
-                <span class="ident"><span class="kw">crate</span>::ast::Value</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">that</span>))
+<span class="doccomment">/// Marks a given string as a value. Useful when using a value in calculations,
+/// e.g.
+///
+/// ``` rust
+/// # use quaint::{col, val, ast::*, visitor::{Visitor, Sqlite}};
+/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+/// let join = &quot;dogs&quot;.on((&quot;dogs&quot;, &quot;slave_id&quot;).equals(Column::from((&quot;cats&quot;, &quot;master_id&quot;))));
+///
+/// let query = Select::from_table(&quot;cats&quot;)
+///     .value(Table::from(&quot;cats&quot;).asterisk())
+///     .value(col!(&quot;dogs&quot;, &quot;age&quot;) - val!(4))
+///     .inner_join(join);
+///
+/// let (sql, params) = Sqlite::build(query)?;
+///
+/// assert_eq!(
+///     &quot;SELECT `cats`.*, (`dogs`.`age` - ?) FROM `cats` INNER JOIN `dogs` ON `dogs`.`slave_id` = `cats`.`master_id`&quot;,
+///     sql
+/// );
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>val {
+    (<span class="macro-nonterminal">$val</span>:expr) =&gt; {
+        Expression::from(<span class="macro-nonterminal">$val</span>)
+    };
+}
+
+<span class="macro">macro_rules! </span>value {
+    (<span class="macro-nonterminal">$target</span>:ident: <span class="macro-nonterminal">$kind</span>:ty,<span class="macro-nonterminal">$paramkind</span>:ident,<span class="macro-nonterminal">$that</span>:expr) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="macro-nonterminal">$kind</span>&gt; <span class="kw">for </span><span class="kw">crate</span>::ast::Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>from(that: <span class="macro-nonterminal">$kind</span>) -&gt; <span class="self">Self </span>{
+                <span class="kw">let </span><span class="macro-nonterminal">$target </span>= that;
+                <span class="kw">crate</span>::ast::Value::<span class="macro-nonterminal">$paramkind</span>(<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$that</span>))
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">match</span> <span class="ident">that</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident"><span class="kw">crate</span>::ast::Value::from</span>(<span class="ident">val</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="ident"><span class="kw">crate</span>::ast::Value</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="prelude-val">None</span>),
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$kind</span>&gt;&gt; <span class="kw">for </span><span class="kw">crate</span>::ast::Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>from(that: <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$kind</span>&gt;) -&gt; <span class="self">Self </span>{
+                <span class="kw">match </span>that {
+                    <span class="prelude-val">Some</span>(val) =&gt; <span class="kw">crate</span>::ast::Value::from(val),
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">crate</span>::ast::Value::<span class="macro-nonterminal">$paramkind</span>(<span class="prelude-val">None</span>),
                 }
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">aliasable</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) =&gt; (
+<span class="macro">macro_rules! </span>aliasable {
+    ($(<span class="macro-nonterminal">$kind</span>:ty),<span class="kw-2">*</span>) =&gt; (
         $(
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Aliasable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span> {
-                <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Aliasable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$kind </span>{
+                <span class="kw">type </span>Target = Table&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-                <span class="kw">fn</span> <span class="ident">alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Target</span>
-                <span class="kw">where</span>
-                    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+                <span class="kw">fn </span>alias&lt;T&gt;(<span class="self">self</span>, alias: T) -&gt; <span class="self">Self</span>::Target
+                <span class="kw">where
+                    </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
                 {
-                    <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
-                    <span class="ident">table</span>.<span class="ident">alias</span>(<span class="ident">alias</span>)
+                    <span class="kw">let </span>table: Table = <span class="self">self</span>.into();
+                    table.alias(alias)
                 }
             }
-        )<span class="op">*</span>
+        )*
     );
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">function</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) =&gt; (
+<span class="macro">macro_rules! </span>function {
+    ($(<span class="macro-nonterminal">$kind</span>:ident),<span class="kw-2">*</span>) =&gt; (
         $(
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Function</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="ident">Function</span> {
-                        <span class="ident">typ_</span>: <span class="ident">FunctionType</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>(<span class="ident">f</span>),
-                        <span class="ident">alias</span>: <span class="prelude-val">None</span>,
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Function&lt;<span class="lifetime">&#39;a</span>&gt; {
+                <span class="kw">fn </span>from(f: <span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+                    Function {
+                        typ_: FunctionType::<span class="macro-nonterminal">$kind</span>(f),
+                        alias: <span class="prelude-val">None</span>,
                     }
                 }
             }
 
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                    <span class="ident">Function::from</span>(<span class="ident">f</span>).<span class="ident">into</span>()
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
+                <span class="kw">fn </span>from(f: <span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+                    Function::from(f).into()
                 }
             }
-        )<span class="op">*</span>
+        )*
     );
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">expression</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span>:<span class="ident">ident</span>,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">that</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">kind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">Expression</span> {
-                    <span class="ident">kind</span>: <span class="ident">ExpressionKind</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">paramkind</span>(<span class="ident">that</span>),
-                    <span class="ident">alias</span>: <span class="prelude-val">None</span>,
+<span class="macro">macro_rules! </span>expression {
+    (<span class="macro-nonterminal">$kind</span>:ident,<span class="macro-nonterminal">$paramkind</span>:ident) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>from(that: <span class="macro-nonterminal">$kind</span>&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+                Expression {
+                    kind: ExpressionKind::<span class="macro-nonterminal">$paramkind</span>(that),
+                    alias: <span class="prelude-val">None</span>,
                 }
             }
         }
     };
 }
 
-<span class="doccomment">/// A test-generator to test types in the defined database.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">test_type</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>:<span class="ident">expr</span>)),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) =&gt; {
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Queryable</span>;
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_api::TestApi</span>;
-                <span class="kw">use</span> <span class="ident">tokio::runtime::Builder</span>;
+<span class="doccomment">/// A test-generator to test types in the defined database.
+</span><span class="attribute">#[cfg(test)]
+</span><span class="macro">macro_rules! </span>test_type {
+    (<span class="macro-nonterminal">$name</span>:ident(<span class="macro-nonterminal">$db</span>:ident, <span class="macro-nonterminal">$sql_type</span>:literal, $((<span class="macro-nonterminal">$input</span>:expr, <span class="macro-nonterminal">$output</span>:expr)),+ $(,)<span class="question-mark">?</span>)) =&gt; {
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            </span><span class="kw">fn </span>[&lt; test_type_ <span class="macro-nonterminal">$name </span>&gt;] () -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
+                <span class="kw">use </span><span class="kw">crate</span>::connector::Queryable;
+                <span class="kw">use </span><span class="kw">crate</span>::tests::test_api::TestApi;
+                <span class="kw">use </span>tokio::runtime::Builder;
 
-                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">Builder::new_multi_thread</span>().<span class="ident">enable_all</span>().<span class="ident">build</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let </span>rt = Builder::new_multi_thread().enable_all().build().unwrap();
 
-                <span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">setup</span> <span class="op">=</span> [<span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span> <span class="ident">_test_api</span> <span class="op">&gt;</span>]().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">setup</span>.<span class="ident">create_type_table</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                rt.block_on(<span class="kw">async </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>setup = [&lt; <span class="macro-nonterminal">$db </span>_test_api &gt;]().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>table = setup.create_type_table(<span class="macro-nonterminal">$sql_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                     $(
-                        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>;
-                        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">output</span>;
+                        <span class="kw">let </span>input = <span class="macro-nonterminal">$input</span>;
+                        <span class="kw">let </span>output = <span class="macro-nonterminal">$output</span>;
 
-                        <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>).<span class="ident">value</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">input</span>);
-                        <span class="ident">setup</span>.<span class="ident">conn</span>().<span class="ident">insert</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>insert = Insert::single_into(<span class="kw-2">&amp;</span>table).value(<span class="string">&quot;value&quot;</span>, input);
+                        setup.conn().insert(insert.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>).<span class="ident">column</span>(<span class="string">&quot;value&quot;</span>).<span class="ident">order_by</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">descend</span>());
-                        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">setup</span>.<span class="ident">conn</span>().<span class="ident">select</span>(<span class="ident">select</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_single</span>()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>select = Select::from_table(<span class="kw-2">&amp;</span>table).column(<span class="string">&quot;value&quot;</span>).order_by(<span class="string">&quot;id&quot;</span>.descend());
+                        <span class="kw">let </span>res = setup.conn().select(select).<span class="kw">await</span><span class="question-mark">?</span>.into_single()<span class="question-mark">?</span>;
 
-                        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>), <span class="ident">res</span>.<span class="ident">at</span>(<span class="number">0</span>));
-                    )<span class="op">+</span>
+                        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>output), res.at(<span class="number">0</span>));
+                    )+
 
-                    <span class="prelude-ty">Result</span>::<span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::error::Error</span><span class="op">&gt;</span><span class="ident">::Ok</span>(())
-                }).<span class="ident">unwrap</span>();
+                    <span class="prelude-ty">Result</span>::&lt;(), <span class="kw">crate</span>::error::Error&gt;::Ok(())
+                }).unwrap();
 
                 <span class="prelude-val">Ok</span>(())
             }
         }
     };
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>:<span class="ident">literal</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>)) =&gt; {
-        <span class="macro">paste::item!</span> {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> [<span class="op">&lt;</span> <span class="ident">test_type_</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&gt;</span>] () -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Queryable</span>;
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_api::TestApi</span>;
-                <span class="kw">use</span> <span class="ident">tokio::runtime::Builder</span>;
+    (<span class="macro-nonterminal">$name</span>:ident(<span class="macro-nonterminal">$db</span>:ident, <span class="macro-nonterminal">$sql_type</span>:literal, $(<span class="macro-nonterminal">$value</span>:expr),+ $(,)<span class="question-mark">?</span>)) =&gt; {
+        <span class="macro">paste::item! </span>{
+            <span class="attribute">#[test]
+            </span><span class="kw">fn </span>[&lt; test_type_ <span class="macro-nonterminal">$name </span>&gt;] () -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
+                <span class="kw">use </span><span class="kw">crate</span>::connector::Queryable;
+                <span class="kw">use </span><span class="kw">crate</span>::tests::test_api::TestApi;
+                <span class="kw">use </span>tokio::runtime::Builder;
 
-                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">Builder::new_multi_thread</span>().<span class="ident">enable_all</span>().<span class="ident">build</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let </span>rt = Builder::new_multi_thread().enable_all().build().unwrap();
 
-                <span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="kw">async</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">setup</span> <span class="op">=</span> [<span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">db</span> <span class="ident">_test_api</span> <span class="op">&gt;</span>]().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">setup</span>.<span class="ident">create_type_table</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sql_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                rt.block_on(<span class="kw">async </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>setup = [&lt; <span class="macro-nonterminal">$db </span>_test_api &gt;]().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>table = setup.create_type_table(<span class="macro-nonterminal">$sql_type</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                     $(
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>;
-                        <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>).<span class="ident">value</span>(<span class="string">&quot;value&quot;</span>, <span class="ident">value</span>.<span class="ident">clone</span>());
-                        <span class="ident">setup</span>.<span class="ident">conn</span>().<span class="ident">insert</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>value = <span class="macro-nonterminal">$value</span>;
+                        <span class="kw">let </span>insert = Insert::single_into(<span class="kw-2">&amp;</span>table).value(<span class="string">&quot;value&quot;</span>, value.clone());
+                        setup.conn().insert(insert.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>).<span class="ident">column</span>(<span class="string">&quot;value&quot;</span>).<span class="ident">order_by</span>(<span class="string">&quot;id&quot;</span>.<span class="ident">descend</span>());
-                        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">setup</span>.<span class="ident">conn</span>().<span class="ident">select</span>(<span class="ident">select</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_single</span>()<span class="question-mark">?</span>;
+                        <span class="kw">let </span>select = Select::from_table(<span class="kw-2">&amp;</span>table).column(<span class="string">&quot;value&quot;</span>).order_by(<span class="string">&quot;id&quot;</span>.descend());
+                        <span class="kw">let </span>res = setup.conn().select(select).<span class="kw">await</span><span class="question-mark">?</span>.into_single()<span class="question-mark">?</span>;
 
-                        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>), <span class="ident">res</span>.<span class="ident">at</span>(<span class="number">0</span>));
-                    )<span class="op">+</span>
+                        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>value), res.at(<span class="number">0</span>));
+                    )+
 
-                    <span class="prelude-ty">Result</span>::<span class="op">&lt;</span>(), <span class="ident"><span class="kw">crate</span>::error::Error</span><span class="op">&gt;</span><span class="ident">::Ok</span>(())
-                }).<span class="ident">unwrap</span>();
+                    <span class="prelude-ty">Result</span>::&lt;(), <span class="kw">crate</span>::error::Error&gt;::Ok(())
+                }).unwrap();
 
                 <span class="prelude-val">Ok</span>(())
             }
@@ -465,4 +465,4 @@
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

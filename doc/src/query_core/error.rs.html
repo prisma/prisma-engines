@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -273,280 +273,280 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">InterpreterError</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphError</span>, <span class="ident">QueryParserError</span>, <span class="ident">QueryParserErrorKind</span>,
-    <span class="ident">RelationViolation</span>, <span class="ident">TransactionError</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
+    RelationViolation, TransactionError,
 };
-<span class="kw">use</span> <span class="ident">bigdecimal::BigDecimal</span>;
-<span class="kw">use</span> <span class="ident">connector::error::ConnectorError</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::DomainError</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use </span>bigdecimal::BigDecimal;
+<span class="kw">use </span>connector::error::ConnectorError;
+<span class="kw">use </span>prisma_models::DomainError;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(
-    <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;</span>
-)]</span>
+<span class="attribute">#[derive(Debug, Error)]
+#[error(
+    <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;
+</span>)]
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldConversionError</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">expected_type</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">found</span>: <span class="ident">String</span>,
+</span><span class="kw">pub struct </span>FieldConversionError {
+    <span class="kw">pub </span>field: String,
+    <span class="kw">pub </span>expected_type: String,
+    <span class="kw">pub </span>found: String,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldConversionError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">field</span>: <span class="ident">String</span>, <span class="ident">expected_type</span>: <span class="ident">String</span>, <span class="ident">found</span>: <span class="ident">String</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::FieldConversionError</span>(<span class="self">Self</span> {
-            <span class="ident">field</span>,
-            <span class="ident">expected_type</span>,
-            <span class="ident">found</span>,
+<span class="kw">impl </span>FieldConversionError {
+    <span class="kw">pub fn </span>create(field: String, expected_type: String, found: String) -&gt; CoreError {
+        CoreError::FieldConversionError(<span class="self">Self </span>{
+            field,
+            expected_type,
+            found,
         })
     }
 }
 
-<span class="comment">// TODO: Cleanup unused errors after refactorings.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CoreError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error in query graph construction: {:?}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">QueryGraphError</span>(<span class="ident">QueryGraphError</span>),
+<span class="comment">// TODO: Cleanup unused errors after refactorings.
+</span><span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>CoreError {
+    <span class="attribute">#[error(<span class="string">&quot;Error in query graph construction: {:?}&quot;</span>, _0)]
+    </span>QueryGraphError(QueryGraphError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error in query graph construction: {:?}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error in query graph construction: {:?}&quot;</span>, _0)]
+    </span>QueryGraphBuilderError(QueryGraphBuilderError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error in connector: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">ConnectorError</span>(<span class="ident">ConnectorError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error in connector: {}&quot;</span>, _0)]
+    </span>ConnectorError(ConnectorError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error in domain logic: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">DomainError</span>(<span class="ident">DomainError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error in domain logic: {}&quot;</span>, _0)]
+    </span>DomainError(DomainError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">QueryParserError</span>(<span class="ident">QueryParserError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>QueryParserError(QueryParserError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unsupported feature: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnsupportedFeatureError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Unsupported feature: {}&quot;</span>, _0)]
+    </span>UnsupportedFeatureError(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unable to convert {from_type} value \&quot;{value}\&quot; to type {to_type}&quot;</span>)]</span>
-    <span class="ident">ConversionError</span> {
-        <span class="ident">value</span>: <span class="ident">String</span>,
-        <span class="ident">from_type</span>: <span class="ident">String</span>,
-        <span class="ident">to_type</span>: <span class="ident">String</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Unable to convert {from_type} value \&quot;{value}\&quot; to type {to_type}&quot;</span>)]
+    </span>ConversionError {
+        value: String,
+        from_type: String,
+        to_type: String,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">SerializationError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>SerializationError(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">InterpreterError</span>(<span class="ident">InterpreterError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>InterpreterError(InterpreterError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">ConfigurationError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>ConfigurationError(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">TransactionError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">TransactionError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>TransactionError(<span class="attribute">#[from] </span>TransactionError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">FieldConversionError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">FieldConversionError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>FieldConversionError(<span class="attribute">#[from] </span>FieldConversionError),
 }
 
-<span class="kw">impl</span> <span class="ident">CoreError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">null_serialization_error</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
+<span class="kw">impl </span>CoreError {
+    <span class="kw">pub fn </span>null_serialization_error(field_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        CoreError::SerializationError(<span class="macro">format!</span>(
             <span class="string">&quot;Inconsistent query result: Field {} is required to return data, got `null` instead.&quot;</span>,
-            <span class="ident">field_name</span>
+            field_name
         ))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimal_conversion_error</span>(<span class="ident">decimal</span>: <span class="kw-2">&amp;</span><span class="ident">BigDecimal</span>, <span class="ident">to_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CoreError::ConversionError</span> {
-            <span class="ident">value</span>: <span class="ident">decimal</span>.<span class="ident">to_string</span>(),
-            <span class="ident">from_type</span>: <span class="string">&quot;BigDecimal&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">to_type</span>: <span class="ident">to_type</span>.<span class="ident">into</span>(),
+    <span class="kw">pub fn </span>decimal_conversion_error(decimal: <span class="kw-2">&amp;</span>BigDecimal, to_type: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        CoreError::ConversionError {
+            value: decimal.to_string(),
+            from_type: <span class="string">&quot;BigDecimal&quot;</span>.into(),
+            to_type: to_type.into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueryGraphBuilderError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">QueryGraphBuilderError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;QueryGraphBuilderError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: QueryGraphBuilderError) -&gt; CoreError {
+        CoreError::QueryGraphBuilderError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueryGraphError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">QueryGraphError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::QueryGraphError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;QueryGraphError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: QueryGraphError) -&gt; CoreError {
+        CoreError::QueryGraphError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ConnectorError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::ConnectorError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;ConnectorError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: ConnectorError) -&gt; CoreError {
+        CoreError::ConnectorError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DomainError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">DomainError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::DomainError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;DomainError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: DomainError) -&gt; CoreError {
+        CoreError::DomainError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueryParserError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">QueryParserError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::QueryParserError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;QueryParserError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: QueryParserError) -&gt; CoreError {
+        CoreError::QueryParserError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InterpreterError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">InterpreterError</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="ident">CoreError::InterpreterError</span>(<span class="ident">e</span>)
+<span class="kw">impl </span>From&lt;InterpreterError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: InterpreterError) -&gt; CoreError {
+        CoreError::InterpreterError(e)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">url::ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">url::ParseError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ConfigurationError</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, <span class="ident">e</span>))
+<span class="kw">impl </span>From&lt;url::ParseError&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: url::ParseError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, e))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">connection_string::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CoreError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">connection_string::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::ConfigurationError</span>(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, <span class="ident">e</span>))
+<span class="kw">impl </span>From&lt;connection_string::Error&gt; <span class="kw">for </span>CoreError {
+    <span class="kw">fn </span>from(e: connection_string::Error) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::ConfigurationError(<span class="macro">format!</span>(<span class="string">&quot;Error parsing connection string: {}&quot;</span>, e))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">user_facing_errors::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">user_facing_errors::Error</span> {
-        <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">CoreError::TransactionError</span>(<span class="ident">err</span>) =&gt; {
-                <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::InteractiveTransactionError</span> {
-                    <span class="ident">error</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>From&lt;CoreError&gt; <span class="kw">for </span>user_facing_errors::Error {
+    <span class="kw">fn </span>from(err: CoreError) -&gt; user_facing_errors::Error {
+        <span class="kw">match </span>err {
+            CoreError::TransactionError(err) =&gt; {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InteractiveTransactionError {
+                    error: err.to_string(),
                 })
-                .<span class="ident">into</span>()
+                .into()
             }
 
-            <span class="ident">CoreError::ConnectorError</span>(<span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_error</span>),
+            CoreError::ConnectorError(ConnectorError {
+                user_facing_error: <span class="prelude-val">Some</span>(user_facing_error),
                 ..
             })
-            <span class="op">|</span> <span class="ident">CoreError::InterpreterError</span>(<span class="ident">InterpreterError::ConnectorError</span>(<span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_error</span>),
+            | CoreError::InterpreterError(InterpreterError::ConnectorError(ConnectorError {
+                user_facing_error: <span class="prelude-val">Some</span>(user_facing_error),
                 ..
-            })) =&gt; <span class="ident">user_facing_error</span>.<span class="ident">into</span>(),
+            })) =&gt; user_facing_error.into(),
 
-            <span class="ident">CoreError::QueryParserError</span>(<span class="ident">query_parser_error</span>)
-            <span class="op">|</span> <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::QueryParserError</span>(<span class="ident">query_parser_error</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">known_error</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query_parser_error</span>.<span class="ident">error_kind</span> {
-                    <span class="ident">QueryParserErrorKind::RequiredValueNotSetError</span> =&gt; {
-                        <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::MissingRequiredValue</span> {
-                            <span class="ident">path</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">query_parser_error</span>.<span class="ident">path</span>),
+            CoreError::QueryParserError(query_parser_error)
+            | CoreError::QueryGraphBuilderError(QueryGraphBuilderError::QueryParserError(query_parser_error)) =&gt; {
+                <span class="kw">let </span>known_error = <span class="kw">match </span>query_parser_error.error_kind {
+                    QueryParserErrorKind::RequiredValueNotSetError =&gt; {
+                        user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredValue {
+                            path: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.path),
                         })
                     }
-                    <span class="kw">_</span> =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::QueryValidationFailed</span> {
-                        <span class="ident">query_validation_error</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">query_parser_error</span>.<span class="ident">error_kind</span>),
-                        <span class="ident">query_position</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">query_parser_error</span>.<span class="ident">path</span>),
+                    <span class="kw">_ </span>=&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::QueryValidationFailed {
+                        query_validation_error: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.error_kind),
+                        query_position: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, query_parser_error.path),
                     }),
                 };
 
-                <span class="ident">known_error</span>.<span class="ident">into</span>()
+                known_error.into()
             }
 
-            <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::MissingRequiredArgument</span> {
-                <span class="ident">argument_name</span>,
-                <span class="ident">object_name</span>,
-                <span class="ident">field_name</span>,
-            }) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::MissingRequiredArgument</span> {
-                <span class="ident">argument_name</span>,
-                <span class="ident">field_name</span>,
-                <span class="ident">object_name</span>,
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::MissingRequiredArgument {
+                argument_name,
+                object_name,
+                field_name,
+            }) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingRequiredArgument {
+                argument_name,
+                field_name,
+                object_name,
             })
-            .<span class="ident">into</span>(),
+            .into(),
 
-            <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>(<span class="ident">RelationViolation</span> {
-                <span class="ident">relation_name</span>,
-                <span class="ident">model_a_name</span>,
-                <span class="ident">model_b_name</span>,
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(RelationViolation {
+                relation_name,
+                model_a_name,
+                model_b_name,
             }))
-            <span class="op">|</span> <span class="ident">CoreError::InterpreterError</span>(<span class="ident">InterpreterError::QueryGraphBuilderError</span>(
-                <span class="ident">QueryGraphBuilderError::RelationViolation</span>(<span class="ident">RelationViolation</span> {
-                    <span class="ident">relation_name</span>,
-                    <span class="ident">model_a_name</span>,
-                    <span class="ident">model_b_name</span>,
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RelationViolation(RelationViolation {
+                    relation_name,
+                    model_a_name,
+                    model_b_name,
                 }),
-            )) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::RelationViolation</span> {
-                <span class="ident">relation_name</span>,
-                <span class="ident">model_a_name</span>,
-                <span class="ident">model_b_name</span>,
+            )) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                relation_name,
+                model_a_name,
+                model_b_name,
             })
-            .<span class="ident">into</span>(),
+            .into(),
 
-            <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="ident">details</span>))
-            <span class="op">|</span> <span class="ident">CoreError::InterpreterError</span>(<span class="ident">InterpreterError::QueryGraphBuilderError</span>(
-                <span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="ident">details</span>),
-            )) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::ConnectedRecordsNotFound</span> {
-                <span class="ident">details</span>,
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(details))
+            | CoreError::InterpreterError(InterpreterError::QueryGraphBuilderError(
+                QueryGraphBuilderError::RecordNotFound(details),
+            )) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::ConnectedRecordsNotFound {
+                details,
             })
-            .<span class="ident">into</span>(),
+            .into(),
 
-            <span class="ident">CoreError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="ident">details</span>)) =&gt; {
-                <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::InputError</span> { <span class="ident">details</span> }).<span class="ident">into</span>()
+            CoreError::QueryGraphBuilderError(QueryGraphBuilderError::InputError(details)) =&gt; {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InputError { details }).into()
             }
 
-            <span class="ident">CoreError::InterpreterError</span>(<span class="ident">InterpreterError::InterpretationError</span>(<span class="ident">msg</span>, <span class="prelude-val">Some</span>(<span class="ident">cause</span>))) =&gt; {
-                <span class="kw">match</span> <span class="ident">cause</span>.<span class="ident">as_ref</span>() {
-                    <span class="ident">InterpreterError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="ident">cause</span>)) =&gt; {
-                        <span class="ident">user_facing_errors::KnownError::new</span>(
-                            <span class="ident">user_facing_errors::query_engine::RecordRequiredButNotFound</span> { <span class="ident">cause</span>: <span class="ident">cause</span>.<span class="ident">clone</span>() },
+            CoreError::InterpreterError(InterpreterError::InterpretationError(msg, <span class="prelude-val">Some</span>(cause))) =&gt; {
+                <span class="kw">match </span>cause.as_ref() {
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordNotFound(cause)) =&gt; {
+                        user_facing_errors::KnownError::new(
+                            user_facing_errors::query_engine::RecordRequiredButNotFound { cause: cause.clone() },
                         )
-                        .<span class="ident">into</span>()
+                        .into()
                     }
-                    <span class="ident">InterpreterError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>(
-                        <span class="ident">RelationViolation</span> {
-                            <span class="ident">relation_name</span>,
-                            <span class="ident">model_a_name</span>,
-                            <span class="ident">model_b_name</span>,
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RelationViolation(
+                        RelationViolation {
+                            relation_name,
+                            model_a_name,
+                            model_b_name,
                         },
-                    )) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::RelationViolation</span> {
-                        <span class="ident">model_a_name</span>: <span class="ident">model_a_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">model_b_name</span>: <span class="ident">model_b_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">relation_name</span>: <span class="ident">relation_name</span>.<span class="ident">clone</span>(),
+                    )) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::RelationViolation {
+                        model_a_name: model_a_name.clone(),
+                        model_b_name: model_b_name.clone(),
+                        relation_name: relation_name.clone(),
                     })
-                    .<span class="ident">into</span>(),
-                    <span class="ident">InterpreterError::QueryGraphBuilderError</span>(<span class="ident">QueryGraphBuilderError::RecordsNotConnected</span> {
-                        <span class="ident">relation_name</span>,
-                        <span class="ident">parent_name</span>,
-                        <span class="ident">child_name</span>,
-                    }) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::RecordsNotConnected</span> {
-                        <span class="ident">parent_name</span>: <span class="ident">parent_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">child_name</span>: <span class="ident">child_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">relation_name</span>: <span class="ident">relation_name</span>.<span class="ident">clone</span>(),
+                    .into(),
+                    InterpreterError::QueryGraphBuilderError(QueryGraphBuilderError::RecordsNotConnected {
+                        relation_name,
+                        parent_name,
+                        child_name,
+                    }) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::RecordsNotConnected {
+                        parent_name: parent_name.clone(),
+                        child_name: child_name.clone(),
+                        relation_name: relation_name.clone(),
                     })
-                    .<span class="ident">into</span>(),
-                    <span class="kw">_</span> =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::InterpretationError</span> {
-                        <span class="ident">details</span>: <span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">cause</span>),
+                    .into(),
+                    <span class="kw">_ </span>=&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::InterpretationError {
+                        details: <span class="macro">format!</span>(<span class="string">&quot;{}: {}&quot;</span>, msg, cause),
                     })
-                    .<span class="ident">into</span>(),
+                    .into(),
                 }
             }
 
-            <span class="ident">CoreError::FieldConversionError</span>(<span class="ident">FieldConversionError</span> {
-                <span class="ident">field</span>,
-                <span class="ident">expected_type</span>,
-                <span class="ident">found</span>,
-            }) =&gt; <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::MissingFieldsInModel</span> {
-                <span class="ident">field</span>,
-                <span class="ident">expected_type</span>,
-                <span class="ident">found</span>,
+            CoreError::FieldConversionError(FieldConversionError {
+                field,
+                expected_type,
+                found,
+            }) =&gt; user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingFieldsInModel {
+                field,
+                expected_type,
+                found,
             })
-            .<span class="ident">into</span>(),
+            .into(),
 
-            <span class="ident">CoreError::ConversionError</span> { .. } =&gt; {
-                <span class="ident">user_facing_errors::KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::ValueOutOfRange</span> {
-                    <span class="ident">details</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+            CoreError::ConversionError { .. } =&gt; {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::ValueOutOfRange {
+                    details: err.to_string(),
                 })
-                .<span class="ident">into</span>()
+                .into()
             }
 
-            <span class="kw">_</span> =&gt; <span class="ident">user_facing_errors::Error::from_dyn_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>),
+            <span class="kw">_ </span>=&gt; user_facing_errors::Error::from_dyn_error(<span class="kw-2">&amp;</span>err),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

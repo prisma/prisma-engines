@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/format_description_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format_description_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/format_description_event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format_description_event.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -339,346 +339,346 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">cmp::min</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>std::{borrow::Cow, cmp::min, io};
 
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">binlog</span>::{
-        <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>},
-        <span class="ident">BinlogCtx</span>, <span class="ident">BinlogEvent</span>, <span class="ident">BinlogStruct</span>,
+<span class="kw">use crate</span>::{
+    binlog::{
+        consts::{BinlogVersion, EventType},
+        BinlogCtx, BinlogEvent, BinlogStruct,
     },
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw</span>::{
-        <span class="ident">bytes</span>::{<span class="ident">EofBytes</span>, <span class="ident">FixedLengthText</span>},
-        <span class="ident">int</span>::{<span class="ident">ConstU8</span>, <span class="ident">LeU16</span>, <span class="ident">LeU32</span>},
-        <span class="ident">Const</span>, <span class="ident">RawBytes</span>, <span class="ident">RawInt</span>,
+    io::ParseBuf,
+    misc::raw::{
+        bytes::{EofBytes, FixedLengthText},
+        int::{ConstU8, LeU16, LeU32},
+        Const, RawBytes, RawInt,
     },
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BinlogEventFooter</span>, <span class="ident">BinlogEventHeader</span>};
+<span class="kw">use super</span>::{BinlogEventFooter, BinlogEventHeader};
 
-<span class="doccomment">/// Length of a server version string.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SERVER_VER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">50</span>;
+<span class="doccomment">/// Length of a server version string.
+</span><span class="kw">pub const </span>SERVER_VER_LEN: usize = <span class="number">50</span>;
 
 <span class="macro">define_const!</span>(
-    <span class="ident">ConstU8</span>,
-    <span class="ident">EventHeaderLength</span>,
-    <span class="ident">InvalidEventHeaderLength</span>(<span class="string">&quot;Invalid event_header_length value for format description event&quot;</span>),
-    <span class="number">19</span>
-);
+    ConstU8,
+    EventHeaderLength,
+    InvalidEventHeaderLength(<span class="string">&quot;Invalid event_header_length value for format description event&quot;</span>),
+    <span class="number">19
+</span>);
 
-<span class="doccomment">/// A format description event is the first event of a binlog for binlog-version 4.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It describes how the other events are layed out.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Version of this binlog format.</span>
-    <span class="ident">binlog_version</span>: <span class="ident">Const</span><span class="op">&lt;</span><span class="ident">BinlogVersion</span>, <span class="ident">LeU16</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Version of the MySQL Server that created the binlog (len=50).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The string is evaluted to apply work-arounds in the slave.</span>
-    <span class="ident">server_version</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">FixedLengthText</span><span class="op">&lt;</span>{ <span class="ident">SERVER_VER_LEN</span> }<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Seconds since Unix epoch when the binlog was created.</span>
-    <span class="ident">create_timestamp</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Event header length. Aloway `19`.</span>
-    <span class="ident">event_header_length</span>: <span class="ident">EventHeaderLength</span>,
-    <span class="doccomment">/// An array indexed by Binlog Event Type - 1 to extract the length of the event specific</span>
-    <span class="doccomment">/// header.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use [`Self::get_event_type_header_length`] to get header length for particular event type.</span>
-    <span class="ident">event_type_header_lengths</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">EofBytes</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// This event structure also stores a footer containig checksum algorithm description.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Footer must be assigned manualy after `Self::read`</span>
-    <span class="ident">footer</span>: <span class="ident">BinlogEventFooter</span>,
+<span class="doccomment">/// A format description event is the first event of a binlog for binlog-version 4.
+///
+/// It describes how the other events are layed out.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Version of this binlog format.
+    </span>binlog_version: Const&lt;BinlogVersion, LeU16&gt;,
+    <span class="doccomment">/// Version of the MySQL Server that created the binlog (len=50).
+    ///
+    /// The string is evaluted to apply work-arounds in the slave.
+    </span>server_version: RawBytes&lt;<span class="lifetime">&#39;a</span>, FixedLengthText&lt;{ SERVER_VER_LEN }&gt;&gt;,
+    <span class="doccomment">/// Seconds since Unix epoch when the binlog was created.
+    </span>create_timestamp: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Event header length. Aloway `19`.
+    </span>event_header_length: EventHeaderLength,
+    <span class="doccomment">/// An array indexed by Binlog Event Type - 1 to extract the length of the event specific
+    /// header.
+    ///
+    /// Use [`Self::get_event_type_header_length`] to get header length for particular event type.
+    </span>event_type_header_lengths: RawBytes&lt;<span class="lifetime">&#39;a</span>, EofBytes&gt;,
+    <span class="doccomment">/// This event structure also stores a footer containig checksum algorithm description.
+    ///
+    /// # Note
+    ///
+    /// Footer must be assigned manualy after `Self::read`
+    </span>footer: BinlogEventFooter,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Length of a server version string.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SERVER_VER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SERVER_VER_LEN</span>;
-    <span class="doccomment">/// Offset of a server version string.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SERVER_VER_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Length of a server version string.
+    </span><span class="kw">pub const </span>SERVER_VER_LEN: usize = SERVER_VER_LEN;
+    <span class="doccomment">/// Offset of a server version string.
+    </span><span class="kw">pub const </span>SERVER_VER_OFFSET: usize = <span class="number">2</span>;
 
-    <span class="comment">// Other format-related constants</span>
-    <span class="doccomment">/// Length of a query event post-header, where 3.23, 4.x and 5.0 agree.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">QUERY_HEADER_MINIMAL_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span>);
-    <span class="doccomment">/// Length of a query event post-header, where 5.0 differs: 2 for length of N-bytes vars.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">QUERY_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::QUERY_HEADER_MINIMAL_LEN</span> <span class="op">+</span> <span class="number">2</span>;
-    <span class="doccomment">/// Length of a stop event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STOP_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of a start event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">START_V3_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::SERVER_VER_LEN</span> <span class="op">+</span> <span class="number">4</span>;
-    <span class="doccomment">/// Length of a rotate event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROTATE_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-    <span class="doccomment">/// Length of an intvar event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INTVAR_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of an append block event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">APPEND_BLOCK_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="doccomment">/// Length of a delete file event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE_FILE_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="doccomment">/// Length of a rand event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RAND_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of a user var event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USER_VAR_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of a fde event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FORMAT_DESCRIPTION_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span>
-        (<span class="ident"><span class="self">Self</span>::START_V3_HEADER_LEN</span> <span class="op">+</span> <span class="ident">EventType::ENUM_END_EVENT</span> <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="doccomment">/// Length of a xid event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">XID_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of a begin load query event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BEGIN_LOAD_QUERY_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::APPEND_BLOCK_HEADER_LEN</span>;
-    <span class="doccomment">/// Length of a v1 rows query event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROWS_HEADER_LEN_V1</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-    <span class="doccomment">/// Length of a table map event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TABLE_MAP_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-    <span class="doccomment">/// Length of an execute load query event extra header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EXECUTE_LOAD_QUERY_EXTRA_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>);
-    <span class="doccomment">/// Length of an execute load query event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EXECUTE_LOAD_QUERY_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span>
-        (<span class="ident"><span class="self">Self</span>::QUERY_HEADER_LEN</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::EXECUTE_LOAD_QUERY_EXTRA_HEADER_LEN</span>);
-    <span class="doccomment">/// Length of an incident event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INCIDENT_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-    <span class="doccomment">/// Length of a heartbeat event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HEARTBEAT_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of an ignorable event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IGNORABLE_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="doccomment">/// Length of a rows events post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROWS_HEADER_LEN_V2</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
-    <span class="doccomment">/// Length of a gtid events post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GTID_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">42</span>;
-    <span class="doccomment">/// Length of an incident event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TRANSACTION_CONTEXT_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">18</span>;
-    <span class="doccomment">/// Length of a view change event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VIEW_CHANGE_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">52</span>;
-    <span class="doccomment">/// Length of a xa prepare event post-header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">XA_PREPARE_HEADER_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// Other format-related constants
+    </span><span class="doccomment">/// Length of a query event post-header, where 3.23, 4.x and 5.0 agree.
+    </span><span class="kw">pub const </span>QUERY_HEADER_MINIMAL_LEN: usize = (<span class="number">4 </span>+ <span class="number">4 </span>+ <span class="number">1 </span>+ <span class="number">2</span>);
+    <span class="doccomment">/// Length of a query event post-header, where 5.0 differs: 2 for length of N-bytes vars.
+    </span><span class="kw">pub const </span>QUERY_HEADER_LEN: usize = <span class="self">Self</span>::QUERY_HEADER_MINIMAL_LEN + <span class="number">2</span>;
+    <span class="doccomment">/// Length of a stop event post-header.
+    </span><span class="kw">pub const </span>STOP_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of a start event post-header.
+    </span><span class="kw">pub const </span>START_V3_HEADER_LEN: usize = <span class="number">2 </span>+ <span class="self">Self</span>::SERVER_VER_LEN + <span class="number">4</span>;
+    <span class="doccomment">/// Length of a rotate event post-header.
+    </span><span class="kw">pub const </span>ROTATE_HEADER_LEN: usize = <span class="number">8</span>;
+    <span class="doccomment">/// Length of an intvar event post-header.
+    </span><span class="kw">pub const </span>INTVAR_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of an append block event post-header.
+    </span><span class="kw">pub const </span>APPEND_BLOCK_HEADER_LEN: usize = <span class="number">4</span>;
+    <span class="doccomment">/// Length of a delete file event post-header.
+    </span><span class="kw">pub const </span>DELETE_FILE_HEADER_LEN: usize = <span class="number">4</span>;
+    <span class="doccomment">/// Length of a rand event post-header.
+    </span><span class="kw">pub const </span>RAND_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of a user var event post-header.
+    </span><span class="kw">pub const </span>USER_VAR_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of a fde event post-header.
+    </span><span class="kw">pub const </span>FORMAT_DESCRIPTION_HEADER_LEN: usize =
+        (<span class="self">Self</span>::START_V3_HEADER_LEN + EventType::ENUM_END_EVENT <span class="kw">as </span>usize);
+    <span class="doccomment">/// Length of a xid event post-header.
+    </span><span class="kw">pub const </span>XID_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of a begin load query event post-header.
+    </span><span class="kw">pub const </span>BEGIN_LOAD_QUERY_HEADER_LEN: usize = <span class="self">Self</span>::APPEND_BLOCK_HEADER_LEN;
+    <span class="doccomment">/// Length of a v1 rows query event post-header.
+    </span><span class="kw">pub const </span>ROWS_HEADER_LEN_V1: usize = <span class="number">8</span>;
+    <span class="doccomment">/// Length of a table map event post-header.
+    </span><span class="kw">pub const </span>TABLE_MAP_HEADER_LEN: usize = <span class="number">8</span>;
+    <span class="doccomment">/// Length of an execute load query event extra header.
+    </span><span class="kw">pub const </span>EXECUTE_LOAD_QUERY_EXTRA_HEADER_LEN: usize = (<span class="number">4 </span>+ <span class="number">4 </span>+ <span class="number">4 </span>+ <span class="number">1</span>);
+    <span class="doccomment">/// Length of an execute load query event post-header.
+    </span><span class="kw">pub const </span>EXECUTE_LOAD_QUERY_HEADER_LEN: usize =
+        (<span class="self">Self</span>::QUERY_HEADER_LEN + <span class="self">Self</span>::EXECUTE_LOAD_QUERY_EXTRA_HEADER_LEN);
+    <span class="doccomment">/// Length of an incident event post-header.
+    </span><span class="kw">pub const </span>INCIDENT_HEADER_LEN: usize = <span class="number">2</span>;
+    <span class="doccomment">/// Length of a heartbeat event post-header.
+    </span><span class="kw">pub const </span>HEARTBEAT_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of an ignorable event post-header.
+    </span><span class="kw">pub const </span>IGNORABLE_HEADER_LEN: usize = <span class="number">0</span>;
+    <span class="doccomment">/// Length of a rows events post-header.
+    </span><span class="kw">pub const </span>ROWS_HEADER_LEN_V2: usize = <span class="number">10</span>;
+    <span class="doccomment">/// Length of a gtid events post-header.
+    </span><span class="kw">pub const </span>GTID_HEADER_LEN: usize = <span class="number">42</span>;
+    <span class="doccomment">/// Length of an incident event post-header.
+    </span><span class="kw">pub const </span>TRANSACTION_CONTEXT_HEADER_LEN: usize = <span class="number">18</span>;
+    <span class="doccomment">/// Length of a view change event post-header.
+    </span><span class="kw">pub const </span>VIEW_CHANGE_HEADER_LEN: usize = <span class="number">52</span>;
+    <span class="doccomment">/// Length of a xa prepare event post-header.
+    </span><span class="kw">pub const </span>XA_PREPARE_HEADER_LEN: usize = <span class="number">0</span>;
 
-    <span class="doccomment">/// Creates new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">binlog_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">binlog_version</span>: <span class="ident">Const::new</span>(<span class="ident">binlog_version</span>),
-            <span class="ident">server_version</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">create_timestamp</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">event_header_length</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">event_type_header_lengths</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">footer</span>: <span class="ident">Default::default</span>(),
+    <span class="doccomment">/// Creates new instance.
+    </span><span class="kw">pub fn </span>new(binlog_version: BinlogVersion) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            binlog_version: Const::new(binlog_version),
+            server_version: Default::default(),
+            create_timestamp: Default::default(),
+            event_header_length: Default::default(),
+            event_type_header_lengths: Default::default(),
+            footer: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Defines the `server_version` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_binlog_version</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">binlog_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">binlog_version</span> <span class="op">=</span> <span class="ident">Const::new</span>(<span class="ident">binlog_version</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Defines the `server_version` field.
+    </span><span class="kw">pub fn </span>with_binlog_version(<span class="kw-2">mut </span><span class="self">self</span>, binlog_version: BinlogVersion) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.binlog_version = Const::new(binlog_version);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Defines the `server_version` field.
+    </span><span class="kw">pub fn </span>with_server_version(<span class="kw-2">mut </span><span class="self">self</span>, server_version: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.server_version = RawBytes::new(server_version);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Defines the `server_version` field.
+    </span><span class="kw">pub fn </span>with_create_timestamp(<span class="kw-2">mut </span><span class="self">self</span>, create_timestamp: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.create_timestamp = RawInt::new(create_timestamp);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Defines the `server_version` field.
+    </span><span class="kw">pub fn </span>with_event_type_header_lengths(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        event_type_header_lengths: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.event_type_header_lengths = RawBytes::new(event_type_header_lengths);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Defines the `server_version` field.
+    </span><span class="kw">pub fn </span>with_footer(<span class="kw-2">mut </span><span class="self">self</span>, footer: BinlogEventFooter) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.footer = footer;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Returns the `binlog_version` field value.
+    </span><span class="kw">pub fn </span>binlog_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BinlogVersion {
+        <span class="self">self</span>.binlog_version.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `server_version` field value.
+    ///
+    /// `server_version` is the version of the MySQL Server that created the binlog.
+    </span><span class="kw">pub fn </span>server_version_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.server_version.as_bytes()
     }
 
-    <span class="doccomment">/// Defines the `server_version` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_server_version</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_version</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">server_version</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">server_version</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `server_version` field value as string (lossy converted).
+    </span><span class="kw">pub fn </span>server_version(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.server_version.as_str()
     }
 
-    <span class="doccomment">/// Defines the `server_version` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_create_timestamp</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">create_timestamp</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">create_timestamp</span> <span class="op">=</span> <span class="ident">RawInt::new</span>(<span class="ident">create_timestamp</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `create_timestamp` field value.
+    ///
+    /// `created_timestamp` is the creation timestamp, if non-zero, is the time in seconds
+    /// when this event was created.
+    </span><span class="kw">pub fn </span>create_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.create_timestamp.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the `event_header_length` field value.
+    ///
+    /// `event_header_length` is the length of the event header. This value includes the
+    /// `extra_headers` field, so this header length is `19`.
+    </span><span class="kw">pub fn </span>event_header_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.event_header_length.value()
     }
 
-    <span class="doccomment">/// Defines the `server_version` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_event_type_header_lengths</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">event_type_header_lengths</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">event_type_header_lengths</span> <span class="op">=</span> <span class="ident">RawBytes::new</span>(<span class="ident">event_type_header_lengths</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `event_type_header_lengths` field value.
+    ///
+    /// `event_type_header_lengths` is the lengths for the fixed data part of each event. An array
+    /// indexed by Binlog Event Type - 1.
+    </span><span class="kw">pub fn </span>event_type_header_lengths(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.event_type_header_lengths.as_bytes()
     }
 
-    <span class="doccomment">/// Defines the `server_version` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_footer</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">footer</span>: <span class="ident">BinlogEventFooter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">footer</span> <span class="op">=</span> <span class="ident">footer</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns the `footer` field value.
+    </span><span class="kw">pub fn </span>footer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BinlogEventFooter {
+        <span class="self">self</span>.footer
     }
 
-    <span class="doccomment">/// Returns the `binlog_version` field value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binlog_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BinlogVersion</span> {
-        <span class="self">self</span>.<span class="ident">binlog_version</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns a parsed MySql version.
+    </span><span class="kw">pub fn </span>split_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u8, u8, u8) {
+        <span class="kw">crate</span>::misc::split_version(<span class="kw-2">&amp;</span><span class="self">self</span>.server_version.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Returns the `server_version` field value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `server_version` is the version of the MySQL Server that created the binlog.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `server_version` field value as string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_version</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="doccomment">/// Returns the `create_timestamp` field value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `created_timestamp` is the creation timestamp, if non-zero, is the time in seconds</span>
-    <span class="doccomment">/// when this event was created.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">create_timestamp</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the `event_header_length` field value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `event_header_length` is the length of the event header. This value includes the</span>
-    <span class="doccomment">/// `extra_headers` field, so this header length is `19`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_header_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">event_header_length</span>.<span class="ident">value</span>()
-    }
-
-    <span class="doccomment">/// Returns the `event_type_header_lengths` field value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `event_type_header_lengths` is the lengths for the fixed data part of each event. An array</span>
-    <span class="doccomment">/// indexed by Binlog Event Type - 1.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type_header_lengths</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">event_type_header_lengths</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the `footer` field value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BinlogEventFooter</span> {
-        <span class="self">self</span>.<span class="ident">footer</span>
-    }
-
-    <span class="doccomment">/// Returns a parsed MySql version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>) {
-        <span class="ident"><span class="kw">crate</span>::misc::split_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_version</span>.<span class="number">0</span>)
-    }
-
-    <span class="doccomment">/// Returns header length for the given event type, if defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_event_type_header_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_type</span>: <span class="ident">EventType</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">if</span> <span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::UNKNOWN_EVENT</span> {
-            <span class="kw">return</span> <span class="number">0</span>;
+    <span class="doccomment">/// Returns header length for the given event type, if defined.
+    </span><span class="kw">pub fn </span>get_event_type_header_length(<span class="kw-2">&amp;</span><span class="self">self</span>, event_type: EventType) -&gt; u8 {
+        <span class="kw">if </span>event_type == EventType::UNKNOWN_EVENT {
+            <span class="kw">return </span><span class="number">0</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">event_type_header_lengths</span>
-            .<span class="ident">as_bytes</span>()
-            .<span class="ident">get</span>(<span class="ident">usize::from</span>(<span class="ident">event_type</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">saturating_sub</span>(<span class="number">1</span>))
-            .<span class="ident">copied</span>()
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">event_type</span> {
-                <span class="ident">EventType::UNKNOWN_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::START_EVENT_V3</span> =&gt; <span class="ident"><span class="self">Self</span>::START_V3_HEADER_LEN</span>,
-                <span class="ident">EventType::QUERY_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::QUERY_HEADER_LEN</span>,
-                <span class="ident">EventType::STOP_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::STOP_HEADER_LEN</span>,
-                <span class="ident">EventType::ROTATE_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::ROTATE_HEADER_LEN</span>,
-                <span class="ident">EventType::INTVAR_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::INTVAR_HEADER_LEN</span>,
-                <span class="ident">EventType::LOAD_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::SLAVE_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::CREATE_FILE_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::APPEND_BLOCK_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::APPEND_BLOCK_HEADER_LEN</span>,
-                <span class="ident">EventType::EXEC_LOAD_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::DELETE_FILE_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::DELETE_FILE_HEADER_LEN</span>,
-                <span class="ident">EventType::NEW_LOAD_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::RAND_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::RAND_HEADER_LEN</span>,
-                <span class="ident">EventType::USER_VAR_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::USER_VAR_HEADER_LEN</span>,
-                <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::FORMAT_DESCRIPTION_HEADER_LEN</span>,
-                <span class="ident">EventType::XID_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::XID_HEADER_LEN</span>,
-                <span class="ident">EventType::BEGIN_LOAD_QUERY_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::BEGIN_LOAD_QUERY_HEADER_LEN</span>,
-                <span class="ident">EventType::EXECUTE_LOAD_QUERY_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::EXECUTE_LOAD_QUERY_HEADER_LEN</span>,
-                <span class="ident">EventType::TABLE_MAP_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::TABLE_MAP_HEADER_LEN</span>,
-                <span class="ident">EventType::PRE_GA_WRITE_ROWS_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::PRE_GA_UPDATE_ROWS_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::PRE_GA_DELETE_ROWS_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::WRITE_ROWS_EVENT_V1</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V1</span>,
-                <span class="ident">EventType::UPDATE_ROWS_EVENT_V1</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V1</span>,
-                <span class="ident">EventType::DELETE_ROWS_EVENT_V1</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V1</span>,
-                <span class="ident">EventType::INCIDENT_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::INCIDENT_HEADER_LEN</span>,
-                <span class="ident">EventType::HEARTBEAT_EVENT</span> =&gt; <span class="number">0</span>,
-                <span class="ident">EventType::IGNORABLE_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::IGNORABLE_HEADER_LEN</span>,
-                <span class="ident">EventType::ROWS_QUERY_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::IGNORABLE_HEADER_LEN</span>,
-                <span class="ident">EventType::WRITE_ROWS_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V2</span>,
-                <span class="ident">EventType::UPDATE_ROWS_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V2</span>,
-                <span class="ident">EventType::DELETE_ROWS_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V2</span>,
-                <span class="ident">EventType::GTID_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::GTID_HEADER_LEN</span>,
-                <span class="ident">EventType::ANONYMOUS_GTID_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::GTID_HEADER_LEN</span>,
-                <span class="ident">EventType::PREVIOUS_GTIDS_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::IGNORABLE_HEADER_LEN</span>,
-                <span class="ident">EventType::TRANSACTION_CONTEXT_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::TRANSACTION_CONTEXT_HEADER_LEN</span>,
-                <span class="ident">EventType::VIEW_CHANGE_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::VIEW_CHANGE_HEADER_LEN</span>,
-                <span class="ident">EventType::XA_PREPARE_LOG_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::XA_PREPARE_HEADER_LEN</span>,
-                <span class="ident">EventType::PARTIAL_UPDATE_ROWS_EVENT</span> =&gt; <span class="ident"><span class="self">Self</span>::ROWS_HEADER_LEN_V2</span>,
-                <span class="ident">EventType::ENUM_END_EVENT</span> =&gt; <span class="number">0</span>,
-            } <span class="kw">as</span> <span class="ident">u8</span>)
+        <span class="self">self</span>.event_type_header_lengths
+            .as_bytes()
+            .get(usize::from(event_type <span class="kw">as </span>u8).saturating_sub(<span class="number">1</span>))
+            .copied()
+            .unwrap_or_else(|| <span class="kw">match </span>event_type {
+                EventType::UNKNOWN_EVENT =&gt; <span class="number">0</span>,
+                EventType::START_EVENT_V3 =&gt; <span class="self">Self</span>::START_V3_HEADER_LEN,
+                EventType::QUERY_EVENT =&gt; <span class="self">Self</span>::QUERY_HEADER_LEN,
+                EventType::STOP_EVENT =&gt; <span class="self">Self</span>::STOP_HEADER_LEN,
+                EventType::ROTATE_EVENT =&gt; <span class="self">Self</span>::ROTATE_HEADER_LEN,
+                EventType::INTVAR_EVENT =&gt; <span class="self">Self</span>::INTVAR_HEADER_LEN,
+                EventType::LOAD_EVENT =&gt; <span class="number">0</span>,
+                EventType::SLAVE_EVENT =&gt; <span class="number">0</span>,
+                EventType::CREATE_FILE_EVENT =&gt; <span class="number">0</span>,
+                EventType::APPEND_BLOCK_EVENT =&gt; <span class="self">Self</span>::APPEND_BLOCK_HEADER_LEN,
+                EventType::EXEC_LOAD_EVENT =&gt; <span class="number">0</span>,
+                EventType::DELETE_FILE_EVENT =&gt; <span class="self">Self</span>::DELETE_FILE_HEADER_LEN,
+                EventType::NEW_LOAD_EVENT =&gt; <span class="number">0</span>,
+                EventType::RAND_EVENT =&gt; <span class="self">Self</span>::RAND_HEADER_LEN,
+                EventType::USER_VAR_EVENT =&gt; <span class="self">Self</span>::USER_VAR_HEADER_LEN,
+                EventType::FORMAT_DESCRIPTION_EVENT =&gt; <span class="self">Self</span>::FORMAT_DESCRIPTION_HEADER_LEN,
+                EventType::XID_EVENT =&gt; <span class="self">Self</span>::XID_HEADER_LEN,
+                EventType::BEGIN_LOAD_QUERY_EVENT =&gt; <span class="self">Self</span>::BEGIN_LOAD_QUERY_HEADER_LEN,
+                EventType::EXECUTE_LOAD_QUERY_EVENT =&gt; <span class="self">Self</span>::EXECUTE_LOAD_QUERY_HEADER_LEN,
+                EventType::TABLE_MAP_EVENT =&gt; <span class="self">Self</span>::TABLE_MAP_HEADER_LEN,
+                EventType::PRE_GA_WRITE_ROWS_EVENT =&gt; <span class="number">0</span>,
+                EventType::PRE_GA_UPDATE_ROWS_EVENT =&gt; <span class="number">0</span>,
+                EventType::PRE_GA_DELETE_ROWS_EVENT =&gt; <span class="number">0</span>,
+                EventType::WRITE_ROWS_EVENT_V1 =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V1,
+                EventType::UPDATE_ROWS_EVENT_V1 =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V1,
+                EventType::DELETE_ROWS_EVENT_V1 =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V1,
+                EventType::INCIDENT_EVENT =&gt; <span class="self">Self</span>::INCIDENT_HEADER_LEN,
+                EventType::HEARTBEAT_EVENT =&gt; <span class="number">0</span>,
+                EventType::IGNORABLE_EVENT =&gt; <span class="self">Self</span>::IGNORABLE_HEADER_LEN,
+                EventType::ROWS_QUERY_EVENT =&gt; <span class="self">Self</span>::IGNORABLE_HEADER_LEN,
+                EventType::WRITE_ROWS_EVENT =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V2,
+                EventType::UPDATE_ROWS_EVENT =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V2,
+                EventType::DELETE_ROWS_EVENT =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V2,
+                EventType::GTID_EVENT =&gt; <span class="self">Self</span>::GTID_HEADER_LEN,
+                EventType::ANONYMOUS_GTID_EVENT =&gt; <span class="self">Self</span>::GTID_HEADER_LEN,
+                EventType::PREVIOUS_GTIDS_EVENT =&gt; <span class="self">Self</span>::IGNORABLE_HEADER_LEN,
+                EventType::TRANSACTION_CONTEXT_EVENT =&gt; <span class="self">Self</span>::TRANSACTION_CONTEXT_HEADER_LEN,
+                EventType::VIEW_CHANGE_EVENT =&gt; <span class="self">Self</span>::VIEW_CHANGE_HEADER_LEN,
+                EventType::XA_PREPARE_LOG_EVENT =&gt; <span class="self">Self</span>::XA_PREPARE_HEADER_LEN,
+                EventType::PARTIAL_UPDATE_ROWS_EVENT =&gt; <span class="self">Self</span>::ROWS_HEADER_LEN_V2,
+                EventType::ENUM_END_EVENT =&gt; <span class="number">0</span>,
+            } <span class="kw">as </span>u8)
     }
 
-    <span class="doccomment">/// Returns a `&#39;static` version of `self`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">FormatDescriptionEvent</span> {
-            <span class="ident">binlog_version</span>: <span class="self">self</span>.<span class="ident">binlog_version</span>,
-            <span class="ident">server_version</span>: <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">create_timestamp</span>: <span class="self">self</span>.<span class="ident">create_timestamp</span>,
-            <span class="ident">event_header_length</span>: <span class="self">self</span>.<span class="ident">event_header_length</span>,
-            <span class="ident">event_type_header_lengths</span>: <span class="self">self</span>.<span class="ident">event_type_header_lengths</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">footer</span>: <span class="self">self</span>.<span class="ident">footer</span>,
+    <span class="doccomment">/// Returns a `&#39;static` version of `self`.
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; FormatDescriptionEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        FormatDescriptionEvent {
+            binlog_version: <span class="self">self</span>.binlog_version,
+            server_version: <span class="self">self</span>.server_version.into_owned(),
+            create_timestamp: <span class="self">self</span>.create_timestamp,
+            event_header_length: <span class="self">self</span>.event_header_length,
+            event_type_header_lengths: <span class="self">self</span>.event_type_header_lengths.into_owned(),
+            footer: <span class="self">self</span>.footer,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = BinlogCtx&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">_ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="number">57</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">binlog_version</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">server_version</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">create_timestamp</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">event_header_length</span> <span class="op">=</span> <span class="ident">sbuf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize(_ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sbuf: ParseBuf = buf.parse(<span class="number">57</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>binlog_version = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>server_version = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>create_timestamp = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>event_header_length = sbuf.parse_unchecked(())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">event_type_header_lengths</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>event_type_header_lengths = buf.parse(())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">binlog_version</span>,
-            <span class="ident">server_version</span>,
-            <span class="ident">create_timestamp</span>,
-            <span class="ident">event_header_length</span>,
-            <span class="ident">event_type_header_lengths</span>,
-            <span class="ident">footer</span>: <span class="ident">Default::default</span>(),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            binlog_version,
+            server_version,
+            create_timestamp,
+            event_header_length,
+            event_type_header_lengths,
+            footer: Default::default(),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">binlog_version</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">server_version</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">create_timestamp</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">event_header_length</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">event_type_header_lengths</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.binlog_version.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.server_version.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.create_timestamp.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.event_header_length.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.event_type_header_lengths.serialize(<span class="kw-2">&amp;mut *</span>buf);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">2</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident"><span class="self">Self</span>::SERVER_VER_LEN</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">4</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="number">1</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="self">self</span>.<span class="ident">event_type_header_lengths</span>.<span class="ident">len</span>());
+        len += S(<span class="number">2</span>);
+        len += S(<span class="self">Self</span>::SERVER_VER_LEN);
+        len += S(<span class="number">4</span>);
+        len += S(<span class="number">1</span>);
+        len += S(<span class="self">self</span>.event_type_header_lengths.len());
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">EVENT_TYPE</span>: <span class="ident">EventType</span> <span class="op">=</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">const </span>EVENT_TYPE: EventType = EventType::FORMAT_DESCRIPTION_EVENT;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

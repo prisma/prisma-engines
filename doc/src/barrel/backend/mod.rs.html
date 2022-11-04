@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/backend/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/backend/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -125,132 +125,132 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A backend module which provides a few generic traits</span>
-<span class="doccomment">//! to implement SQL generation for different databases.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It also re-exports the generators for existing databases</span>
-<span class="doccomment">//! so they can be used more conveniently.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A backend module which provides a few generic traits
+//! to implement SQL generation for different databases.
+//!
+//! It also re-exports the generators for existing databases
+//! so they can be used more conveniently.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">mysql</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::mysql::MySql</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+</span><span class="kw">mod </span>mysql;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::mysql::MySql;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pg&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">pg</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pg&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::pg::Pg</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;pg&quot;</span>)]
+</span><span class="kw">mod </span>pg;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;pg&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::pg::Pg;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite3&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">sqlite3</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite3&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sqlite3::Sqlite</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite3&quot;</span>)]
+</span><span class="kw">mod </span>sqlite3;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite3&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::sqlite3::Sqlite;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">mssql</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::mssql::MsSql</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+</span><span class="kw">mod </span>mssql;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::mssql::MsSql;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">types::Type</span>, <span class="ident">Migration</span>};
+<span class="attribute">#[allow(unused_imports)]
+</span><span class="kw">use crate</span>::{types::Type, Migration};
 
-<span class="doccomment">/// An enum describing all supported Sql flavours</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SqlVariant</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite3&quot;</span>)]</span>
-    <span class="ident">Sqlite</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pg&quot;</span>)]</span>
-    <span class="ident">Pg</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-    <span class="ident">Mysql</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="ident">Mssql</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">__Empty</span>,
+<span class="doccomment">/// An enum describing all supported Sql flavours
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub enum </span>SqlVariant {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite3&quot;</span>)]
+    </span>Sqlite,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;pg&quot;</span>)]
+    </span>Pg,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    </span>Mysql,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span>Mssql,
+    <span class="attribute">#[doc(hidden)]
+    </span>__Empty,
 }
 
-<span class="kw">impl</span> <span class="ident">SqlVariant</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">run_for</span>(<span class="self">self</span>, <span class="ident">_migr</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite3&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Sqlite</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span>(),
+<span class="kw">impl </span>SqlVariant {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>run_for(<span class="self">self</span>, _migr: <span class="kw-2">&amp;</span>Migration) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite3&quot;</span>)]
+            </span>SqlVariant::Sqlite =&gt; _migr.make::&lt;Sqlite&gt;(),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pg&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Pg</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">Pg</span><span class="op">&gt;</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;pg&quot;</span>)]
+            </span>SqlVariant::Pg =&gt; _migr.make::&lt;Pg&gt;(),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Mysql</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MySql</span><span class="op">&gt;</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>SqlVariant::Mysql =&gt; _migr.make::&lt;MySql&gt;(),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-            <span class="ident">SqlVariant::Mssql</span> =&gt; <span class="ident">_migr</span>.<span class="ident">make</span>::<span class="op">&lt;</span><span class="ident">MsSql</span><span class="op">&gt;</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+            </span>SqlVariant::Mssql =&gt; _migr.make::&lt;MsSql&gt;(),
 
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;You need to select an Sql variant!&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;You need to select an Sql variant!&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// A generic SQL generator trait</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SqlGenerator</span> {
-    <span class="doccomment">/// Create a new table with a name</span>
-    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+<span class="doccomment">/// A generic SQL generator trait
+</span><span class="kw">pub trait </span>SqlGenerator {
+    <span class="doccomment">/// Create a new table with a name
+    </span><span class="kw">fn </span>create_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Create a new table with a name, only if it doesn&#39;t exist</span>
-    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Create a new table with a name, only if it doesn&#39;t exist
+    </span><span class="kw">fn </span>create_table_if_not_exists(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Drop a table with a name</span>
-    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Drop a table with a name
+    </span><span class="kw">fn </span>drop_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Drop a table with a name, only if it exists</span>
-    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Drop a table with a name, only if it exists
+    </span><span class="kw">fn </span>drop_table_if_exists(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Rename a table from &lt;old&gt; to &lt;new&gt;</span>
-    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Rename a table from &lt;old&gt; to &lt;new&gt;
+    </span><span class="kw">fn </span>rename_table(old: <span class="kw-2">&amp;</span>str, new: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Modify a table in some other way</span>
-    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Modify a table in some other way
+    </span><span class="kw">fn </span>alter_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Create a new column with a type</span>
-    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Create a new column with a type
+    </span><span class="kw">fn </span>add_column(ex: bool, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, _type: <span class="kw-2">&amp;</span>Type) -&gt; String;
 
-    <span class="doccomment">/// Drop an existing column from the table</span>
-    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Drop an existing column from the table
+    </span><span class="kw">fn </span>drop_column(name: <span class="kw-2">&amp;</span>str) -&gt; String;
 
-    <span class="doccomment">/// Rename an existing column</span>
-    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Rename an existing column
+    </span><span class="kw">fn </span>rename_column(old: <span class="kw-2">&amp;</span>str, new: <span class="kw-2">&amp;</span>str) -&gt; String;
 
-    <span class="doccomment">/// Create a multi-column index</span>
-    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Create a multi-column index
+    </span><span class="kw">fn </span>create_index(table: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, _type: <span class="kw-2">&amp;</span>Type) -&gt; String;
 
-    <span class="doccomment">/// Create a constraint</span>
-    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Create a constraint
+    </span><span class="kw">fn </span>create_constraint(name: <span class="kw-2">&amp;</span>str, _type: <span class="kw-2">&amp;</span>Type, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String;
 
-    <span class="doccomment">/// Create a multi-column index</span>
-    <span class="kw">fn</span> <span class="ident">create_partial_index</span>(
-        <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">conditions</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    ) -&gt; <span class="ident">String</span> {
+    <span class="doccomment">/// Create a multi-column index
+    </span><span class="kw">fn </span>create_partial_index(
+        table: <span class="kw-2">&amp;</span>str,
+        schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        name: <span class="kw-2">&amp;</span>str,
+        _type: <span class="kw-2">&amp;</span>Type,
+        conditions: <span class="kw-2">&amp;</span>str,
+    ) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">&quot;{} WHERE {}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::create_index</span>(<span class="ident">table</span>, <span class="ident">schema</span>, <span class="ident">name</span>, <span class="ident">_type</span>),
-            <span class="ident">conditions</span>
+            <span class="self">Self</span>::create_index(table, schema, name, _type),
+            conditions
         )
     }
 
-    <span class="doccomment">/// Drop a multi-column index</span>
-    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Drop a multi-column index
+    </span><span class="kw">fn </span>drop_index(name: <span class="kw-2">&amp;</span>str) -&gt; String;
 
-    <span class="doccomment">/// Add a foreign key</span>
-    <span class="kw">fn</span> <span class="ident">add_foreign_key</span>(
-        <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">relation_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Add a foreign key
+    </span><span class="kw">fn </span>add_foreign_key(
+        columns: <span class="kw-2">&amp;</span>[String],
+        table: <span class="kw-2">&amp;</span>str,
+        relation_columns: <span class="kw-2">&amp;</span>[String],
+        schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; String;
 
-    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">String</span>;
+    <span class="kw">fn </span>add_primary_key(columns: <span class="kw-2">&amp;</span>[String]) -&gt; String;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

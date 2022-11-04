@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/traversal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traversal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/traversal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traversal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -439,444 +439,444 @@
 <span id="439">439</span>
 <span id="440">440</span>
 </pre><pre class="rust"><code>
-<span class="kw">use</span> {<span class="ident">Incoming</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">IntoNeighbors</span>, <span class="ident">IntoNeighborsDirected</span>, <span class="ident">Visitable</span>, <span class="ident">VisitMap</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">GraphRef</span>, <span class="ident">Reversed</span>, <span class="ident">IntoNodeIdentifiers</span>};
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
+<span class="kw">use </span>{Incoming};
+<span class="kw">use super</span>::{IntoNeighbors, IntoNeighborsDirected, Visitable, VisitMap};
+<span class="kw">use super</span>::{GraphRef, Reversed, IntoNodeIdentifiers};
+<span class="kw">use </span>std::collections::VecDeque;
 
-<span class="doccomment">/// Visit nodes of a graph in a depth-first-search (DFS) emitting nodes in</span>
-<span class="doccomment">/// preorder (when they are first discovered).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The traversal starts at a given node and only traverses nodes reachable</span>
-<span class="doccomment">/// from it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Dfs` is not recursive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Dfs` does not itself borrow the graph, and because of this you can run</span>
-<span class="doccomment">/// a traversal over a graph while still retaining mutable access to it, if you</span>
-<span class="doccomment">/// use it like the following example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use petgraph::Graph;</span>
-<span class="doccomment">/// use petgraph::visit::Dfs;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut graph = Graph::&lt;_,()&gt;::new();</span>
-<span class="doccomment">/// let a = graph.add_node(0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut dfs = Dfs::new(&amp;graph, a);</span>
-<span class="doccomment">/// while let Some(nx) = dfs.next(&amp;graph) {</span>
-<span class="doccomment">///     // we can access `graph` mutably here still</span>
-<span class="doccomment">///     graph[nx] += 1;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(graph[a], 1);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** The algorithm may not behave correctly if nodes are removed</span>
-<span class="doccomment">/// during iteration. It may not necessarily visit added nodes or edges.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dfs</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The stack of nodes to visit</span>
-    <span class="kw">pub</span> <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The map of discovered nodes</span>
-    <span class="kw">pub</span> <span class="ident">discovered</span>: <span class="ident">VM</span>,
+<span class="doccomment">/// Visit nodes of a graph in a depth-first-search (DFS) emitting nodes in
+/// preorder (when they are first discovered).
+///
+/// The traversal starts at a given node and only traverses nodes reachable
+/// from it.
+///
+/// `Dfs` is not recursive.
+///
+/// `Dfs` does not itself borrow the graph, and because of this you can run
+/// a traversal over a graph while still retaining mutable access to it, if you
+/// use it like the following example:
+///
+/// ```
+/// use petgraph::Graph;
+/// use petgraph::visit::Dfs;
+///
+/// let mut graph = Graph::&lt;_,()&gt;::new();
+/// let a = graph.add_node(0);
+///
+/// let mut dfs = Dfs::new(&amp;graph, a);
+/// while let Some(nx) = dfs.next(&amp;graph) {
+///     // we can access `graph` mutably here still
+///     graph[nx] += 1;
+/// }
+///
+/// assert_eq!(graph[a], 1);
+/// ```
+///
+/// **Note:** The algorithm may not behave correctly if nodes are removed
+/// during iteration. It may not necessarily visit added nodes or edges.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Dfs&lt;N, VM&gt; {
+    <span class="doccomment">/// The stack of nodes to visit
+    </span><span class="kw">pub </span>stack: Vec&lt;N&gt;,
+    <span class="doccomment">/// The map of discovered nodes
+    </span><span class="kw">pub </span>discovered: VM,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> <span class="ident">Dfs</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-          <span class="ident">VM</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N, VM&gt; Dfs&lt;N, VM&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+          VM: VisitMap&lt;N&gt;,
 {
-    <span class="doccomment">/// Create a new **Dfs**, using the graph&#39;s visitor map, and put **start**</span>
-    <span class="doccomment">/// in the stack of nodes to visit.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">start</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new **Dfs**, using the graph&#39;s visitor map, and put **start**
+    /// in the stack of nodes to visit.
+    </span><span class="kw">pub fn </span>new&lt;G&gt;(graph: G, start: N) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfs</span> <span class="op">=</span> <span class="ident">Dfs::empty</span>(<span class="ident">graph</span>);
-        <span class="ident">dfs</span>.<span class="ident">move_to</span>(<span class="ident">start</span>);
-        <span class="ident">dfs</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>dfs = Dfs::empty(graph);
+        dfs.move_to(start);
+        dfs
     }
 
-    <span class="doccomment">/// Create a `Dfs` from a vector and a visit map</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>, <span class="ident">discovered</span>: <span class="ident">VM</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Dfs</span> {
-            <span class="ident">stack</span>: <span class="ident">stack</span>,
-            <span class="ident">discovered</span>: <span class="ident">discovered</span>,
+    <span class="doccomment">/// Create a `Dfs` from a vector and a visit map
+    </span><span class="kw">pub fn </span>from_parts(stack: Vec&lt;N&gt;, discovered: VM) -&gt; <span class="self">Self </span>{
+        Dfs {
+            stack: stack,
+            discovered: discovered,
         }
     }
 
-    <span class="doccomment">/// Clear the visit state</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>)
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Clear the visit state
+    </span><span class="kw">pub fn </span>reset&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G)
+        <span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="ident">graph</span>.<span class="ident">reset_map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">discovered</span>);
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
+        graph.reset_map(<span class="kw-2">&amp;mut </span><span class="self">self</span>.discovered);
+        <span class="self">self</span>.stack.clear();
     }
 
-    <span class="doccomment">/// Create a new **Dfs** using the graph&#39;s visitor map, and no stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new **Dfs** using the graph&#39;s visitor map, and no stack.
+    </span><span class="kw">pub fn </span>empty&lt;G&gt;(graph: G) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="ident">Dfs</span> {
-            <span class="ident">stack</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">discovered</span>: <span class="ident">graph</span>.<span class="ident">visit_map</span>(),
+        Dfs {
+            stack: Vec::new(),
+            discovered: graph.visit_map(),
         }
     }
 
-    <span class="doccomment">/// Keep the discovered map, but clear the visit stack and restart</span>
-    <span class="doccomment">/// the dfs from a particular node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">N</span>)
+    <span class="doccomment">/// Keep the discovered map, but clear the visit stack and restart
+    /// the dfs from a particular node.
+    </span><span class="kw">pub fn </span>move_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: N)
     {
-        <span class="self">self</span>.<span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">start</span>);
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">start</span>);
+        <span class="self">self</span>.discovered.visit(start);
+        <span class="self">self</span>.stack.clear();
+        <span class="self">self</span>.stack.push(start);
     }
 
-    <span class="doccomment">/// Return the next node in the dfs, or **None** if the traversal is done.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Return the next node in the dfs, or **None** if the traversal is done.
+    </span><span class="kw">pub fn </span>next&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt;
+        <span class="kw">where </span>G: IntoNeighbors&lt;NodeId=N&gt;,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>() {
-            <span class="kw">for</span> <span class="ident">succ</span> <span class="kw">in</span> <span class="ident">graph</span>.<span class="ident">neighbors</span>(<span class="ident">node</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">succ</span>) {
-                    <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">succ</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.stack.pop() {
+            <span class="kw">for </span>succ <span class="kw">in </span>graph.neighbors(node) {
+                <span class="kw">if </span><span class="self">self</span>.discovered.visit(succ) {
+                    <span class="self">self</span>.stack.push(succ);
                 }
             }
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(node);
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Visit nodes in a depth-first-search (DFS) emitting nodes in postorder</span>
-<span class="doccomment">/// (each node after all its descendants have been emitted).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `DfsPostOrder` is not recursive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The traversal starts at a given node and only traverses nodes reachable</span>
-<span class="doccomment">/// from it.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DfsPostOrder</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The stack of nodes to visit</span>
-    <span class="kw">pub</span> <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The map of discovered nodes</span>
-    <span class="kw">pub</span> <span class="ident">discovered</span>: <span class="ident">VM</span>,
-    <span class="doccomment">/// The map of finished nodes</span>
-    <span class="kw">pub</span> <span class="ident">finished</span>: <span class="ident">VM</span>,
+<span class="doccomment">/// Visit nodes in a depth-first-search (DFS) emitting nodes in postorder
+/// (each node after all its descendants have been emitted).
+///
+/// `DfsPostOrder` is not recursive.
+///
+/// The traversal starts at a given node and only traverses nodes reachable
+/// from it.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>DfsPostOrder&lt;N, VM&gt; {
+    <span class="doccomment">/// The stack of nodes to visit
+    </span><span class="kw">pub </span>stack: Vec&lt;N&gt;,
+    <span class="doccomment">/// The map of discovered nodes
+    </span><span class="kw">pub </span>discovered: VM,
+    <span class="doccomment">/// The map of finished nodes
+    </span><span class="kw">pub </span>finished: VM,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> <span class="ident">DfsPostOrder</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-          <span class="ident">VM</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N, VM&gt; DfsPostOrder&lt;N, VM&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+          VM: VisitMap&lt;N&gt;,
 {
-    <span class="doccomment">/// Create a new `DfsPostOrder` using the graph&#39;s visitor map, and put</span>
-    <span class="doccomment">/// `start` in the stack of nodes to visit.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">start</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new `DfsPostOrder` using the graph&#39;s visitor map, and put
+    /// `start` in the stack of nodes to visit.
+    </span><span class="kw">pub fn </span>new&lt;G&gt;(graph: G, start: N) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dfs</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::empty</span>(<span class="ident">graph</span>);
-        <span class="ident">dfs</span>.<span class="ident">move_to</span>(<span class="ident">start</span>);
-        <span class="ident">dfs</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>dfs = <span class="self">Self</span>::empty(graph);
+        dfs.move_to(start);
+        dfs
     }
 
-    <span class="doccomment">/// Create a new `DfsPostOrder` using the graph&#39;s visitor map, and no stack.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new `DfsPostOrder` using the graph&#39;s visitor map, and no stack.
+    </span><span class="kw">pub fn </span>empty&lt;G&gt;(graph: G) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="ident">DfsPostOrder</span> {
-            <span class="ident">stack</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">discovered</span>: <span class="ident">graph</span>.<span class="ident">visit_map</span>(),
-            <span class="ident">finished</span>: <span class="ident">graph</span>.<span class="ident">visit_map</span>(),
+        DfsPostOrder {
+            stack: Vec::new(),
+            discovered: graph.visit_map(),
+            finished: graph.visit_map(),
         }
     }
 
-    <span class="doccomment">/// Clear the visit state</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>)
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Clear the visit state
+    </span><span class="kw">pub fn </span>reset&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G)
+        <span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="ident">graph</span>.<span class="ident">reset_map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">discovered</span>);
-        <span class="ident">graph</span>.<span class="ident">reset_map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">finished</span>);
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
+        graph.reset_map(<span class="kw-2">&amp;mut </span><span class="self">self</span>.discovered);
+        graph.reset_map(<span class="kw-2">&amp;mut </span><span class="self">self</span>.finished);
+        <span class="self">self</span>.stack.clear();
     }
 
-    <span class="doccomment">/// Keep the discovered and finished map, but clear the visit stack and restart</span>
-    <span class="doccomment">/// the dfs from a particular node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">move_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">N</span>)
+    <span class="doccomment">/// Keep the discovered and finished map, but clear the visit stack and restart
+    /// the dfs from a particular node.
+    </span><span class="kw">pub fn </span>move_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start: N)
     {
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">start</span>);
+        <span class="self">self</span>.stack.clear();
+        <span class="self">self</span>.stack.push(start);
     }
 
-    <span class="doccomment">/// Return the next node in the traversal, or `None` if the traversal is done.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Return the next node in the traversal, or `None` if the traversal is done.
+    </span><span class="kw">pub fn </span>next&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt;
+        <span class="kw">where </span>G: IntoNeighbors&lt;NodeId=N&gt;,
     {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">nx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">nx</span>) {
-                <span class="comment">// First time visiting `nx`: Push neighbors, don&#39;t pop `nx`</span>
-                <span class="kw">for</span> <span class="ident">succ</span> <span class="kw">in</span> <span class="ident">graph</span>.<span class="ident">neighbors</span>(<span class="ident">nx</span>) {
-                    <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">discovered</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">succ</span>) {
-                        <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">succ</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>nx) = <span class="self">self</span>.stack.last() {
+            <span class="kw">if </span><span class="self">self</span>.discovered.visit(nx) {
+                <span class="comment">// First time visiting `nx`: Push neighbors, don&#39;t pop `nx`
+                </span><span class="kw">for </span>succ <span class="kw">in </span>graph.neighbors(nx) {
+                    <span class="kw">if </span>!<span class="self">self</span>.discovered.is_visited(<span class="kw-2">&amp;</span>succ) {
+                        <span class="self">self</span>.stack.push(succ);
                     }
                 }
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>();
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span>.<span class="ident">visit</span>(<span class="ident">nx</span>) {
-                    <span class="comment">// Second time: All reachable nodes must have been finished</span>
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">nx</span>);
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.stack.pop();
+                <span class="kw">if </span><span class="self">self</span>.finished.visit(nx) {
+                    <span class="comment">// Second time: All reachable nodes must have been finished
+                    </span><span class="kw">return </span><span class="prelude-val">Some</span>(nx);
                 }
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// A breadth first search (BFS) of a graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The traversal starts at a given node and only traverses nodes reachable</span>
-<span class="doccomment">/// from it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bfs` is not recursive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Bfs` does not itself borrow the graph, and because of this you can run</span>
-<span class="doccomment">/// a traversal over a graph while still retaining mutable access to it, if you</span>
-<span class="doccomment">/// use it like the following example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use petgraph::Graph;</span>
-<span class="doccomment">/// use petgraph::visit::Bfs;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut graph = Graph::&lt;_,()&gt;::new();</span>
-<span class="doccomment">/// let a = graph.add_node(0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut bfs = Bfs::new(&amp;graph, a);</span>
-<span class="doccomment">/// while let Some(nx) = bfs.next(&amp;graph) {</span>
-<span class="doccomment">///     // we can access `graph` mutably here still</span>
-<span class="doccomment">///     graph[nx] += 1;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(graph[a], 1);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note:** The algorithm may not behave correctly if nodes are removed</span>
-<span class="doccomment">/// during iteration. It may not necessarily visit added nodes or edges.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bfs</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The queue of nodes to visit</span>
-    <span class="kw">pub</span> <span class="ident">stack</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The map of discovered nodes</span>
-    <span class="kw">pub</span> <span class="ident">discovered</span>: <span class="ident">VM</span>,
+<span class="doccomment">/// A breadth first search (BFS) of a graph.
+///
+/// The traversal starts at a given node and only traverses nodes reachable
+/// from it.
+///
+/// `Bfs` is not recursive.
+///
+/// `Bfs` does not itself borrow the graph, and because of this you can run
+/// a traversal over a graph while still retaining mutable access to it, if you
+/// use it like the following example:
+///
+/// ```
+/// use petgraph::Graph;
+/// use petgraph::visit::Bfs;
+///
+/// let mut graph = Graph::&lt;_,()&gt;::new();
+/// let a = graph.add_node(0);
+///
+/// let mut bfs = Bfs::new(&amp;graph, a);
+/// while let Some(nx) = bfs.next(&amp;graph) {
+///     // we can access `graph` mutably here still
+///     graph[nx] += 1;
+/// }
+///
+/// assert_eq!(graph[a], 1);
+/// ```
+///
+/// **Note:** The algorithm may not behave correctly if nodes are removed
+/// during iteration. It may not necessarily visit added nodes or edges.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Bfs&lt;N, VM&gt; {
+    <span class="doccomment">/// The queue of nodes to visit
+    </span><span class="kw">pub </span>stack: VecDeque&lt;N&gt;,
+    <span class="doccomment">/// The map of discovered nodes
+    </span><span class="kw">pub </span>discovered: VM,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> <span class="ident">Bfs</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-          <span class="ident">VM</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N, VM&gt; Bfs&lt;N, VM&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+          VM: VisitMap&lt;N&gt;,
 {
-    <span class="doccomment">/// Create a new **Bfs**, using the graph&#39;s visitor map, and put **start**</span>
-    <span class="doccomment">/// in the stack of nodes to visit.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">start</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new **Bfs**, using the graph&#39;s visitor map, and put **start**
+    /// in the stack of nodes to visit.
+    </span><span class="kw">pub fn </span>new&lt;G&gt;(graph: G, start: N) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">discovered</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">visit_map</span>();
-        <span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">start</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
-        <span class="ident">stack</span>.<span class="ident">push_front</span>(<span class="ident">start</span>);
-        <span class="ident">Bfs</span> {
-            <span class="ident">stack</span>: <span class="ident">stack</span>,
-            <span class="ident">discovered</span>: <span class="ident">discovered</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>discovered = graph.visit_map();
+        discovered.visit(start);
+        <span class="kw">let </span><span class="kw-2">mut </span>stack = VecDeque::new();
+        stack.push_front(start);
+        Bfs {
+            stack: stack,
+            discovered: discovered,
         }
     }
 
-    <span class="doccomment">/// Return the next node in the bfs, or **None** if the traversal is done.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Return the next node in the bfs, or **None** if the traversal is done.
+    </span><span class="kw">pub fn </span>next&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt;
+        <span class="kw">where </span>G: IntoNeighbors&lt;NodeId=N&gt;
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop_front</span>() {
-            <span class="kw">for</span> <span class="ident">succ</span> <span class="kw">in</span> <span class="ident">graph</span>.<span class="ident">neighbors</span>(<span class="ident">node</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">discovered</span>.<span class="ident">visit</span>(<span class="ident">succ</span>) {
-                    <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push_back</span>(<span class="ident">succ</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = <span class="self">self</span>.stack.pop_front() {
+            <span class="kw">for </span>succ <span class="kw">in </span>graph.neighbors(node) {
+                <span class="kw">if </span><span class="self">self</span>.discovered.visit(succ) {
+                    <span class="self">self</span>.stack.push_back(succ);
                 }
             }
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(node);
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
 }
 
-<span class="doccomment">/// A topological order traversal for a graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note** that `Topo` only visits nodes that are not part of cycles,</span>
-<span class="doccomment">/// i.e. nodes in a true DAG. Use other visitors like `DfsPostOrder` or</span>
-<span class="doccomment">/// algorithms like kosaraju_scc to handle graphs with possible cycles.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Topo</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> {
-    <span class="ident">tovisit</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
-    <span class="ident">ordered</span>: <span class="ident">VM</span>,
+<span class="doccomment">/// A topological order traversal for a graph.
+///
+/// **Note** that `Topo` only visits nodes that are not part of cycles,
+/// i.e. nodes in a true DAG. Use other visitors like `DfsPostOrder` or
+/// algorithms like kosaraju_scc to handle graphs with possible cycles.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Topo&lt;N, VM&gt; {
+    tovisit: Vec&lt;N&gt;,
+    ordered: VM,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span> <span class="ident">Topo</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">VM</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
-          <span class="ident">VM</span>: <span class="ident">VisitMap</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N, VM&gt; Topo&lt;N, VM&gt;
+    <span class="kw">where </span>N: Copy + PartialEq,
+          VM: VisitMap&lt;N&gt;,
 {
-    <span class="doccomment">/// Create a new `Topo`, using the graph&#39;s visitor map, and put all</span>
-    <span class="doccomment">/// initial nodes in the to visit list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNodeIdentifiers</span> <span class="op">+</span> <span class="ident">IntoNeighborsDirected</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Create a new `Topo`, using the graph&#39;s visitor map, and put all
+    /// initial nodes in the to visit list.
+    </span><span class="kw">pub fn </span>new&lt;G&gt;(graph: G) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: IntoNodeIdentifiers + IntoNeighborsDirected + Visitable&lt;NodeId=N, Map=VM&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">topo</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::empty</span>(<span class="ident">graph</span>);
-        <span class="ident">topo</span>.<span class="ident">extend_with_initials</span>(<span class="ident">graph</span>);
-        <span class="ident">topo</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>topo = <span class="self">Self</span>::empty(graph);
+        topo.extend_with_initials(graph);
+        topo
     }
 
-    <span class="kw">fn</span> <span class="ident">extend_with_initials</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="ident">G</span>)
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNodeIdentifiers</span> <span class="op">+</span> <span class="ident">IntoNeighborsDirected</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>extend_with_initials&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, g: G)
+        <span class="kw">where </span>G: IntoNodeIdentifiers + IntoNeighborsDirected&lt;NodeId=N&gt;,
     {
-        <span class="comment">// find all initial nodes (nodes without incoming edges)</span>
-        <span class="self">self</span>.<span class="ident">tovisit</span>.<span class="ident">extend</span>(<span class="ident">g</span>.<span class="ident">node_identifiers</span>()
-                             .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">a</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">neighbors_directed</span>(<span class="ident">a</span>, <span class="ident">Incoming</span>).<span class="ident">next</span>().<span class="ident">is_none</span>()));
+        <span class="comment">// find all initial nodes (nodes without incoming edges)
+        </span><span class="self">self</span>.tovisit.extend(g.node_identifiers()
+                             .filter(<span class="kw">move </span>|<span class="kw-2">&amp;</span>a| g.neighbors_directed(a, Incoming).next().is_none()));
     }
 
-    <span class="comment">/* Private until it has a use */</span>
-    <span class="doccomment">/// Create a new `Topo`, using the graph&#39;s visitor map with *no* starting</span>
-    <span class="doccomment">/// index specified.</span>
-    <span class="kw">fn</span> <span class="ident">empty</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>
+    <span class="comment">/* Private until it has a use */
+    </span><span class="doccomment">/// Create a new `Topo`, using the graph&#39;s visitor map with *no* starting
+    /// index specified.
+    </span><span class="kw">fn </span>empty&lt;G&gt;(graph: G) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>G: GraphRef + Visitable&lt;NodeId=N, Map=VM&gt;
     {
-        <span class="ident">Topo</span> {
-            <span class="ident">ordered</span>: <span class="ident">graph</span>.<span class="ident">visit_map</span>(),
-            <span class="ident">tovisit</span>: <span class="ident">Vec::new</span>(),
+        Topo {
+            ordered: graph.visit_map(),
+            tovisit: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Clear visited state, and put all initial nodes in the to visit list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">graph</span>: <span class="ident">G</span>)
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNodeIdentifiers</span> <span class="op">+</span> <span class="ident">IntoNeighborsDirected</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Clear visited state, and put all initial nodes in the to visit list.
+    </span><span class="kw">pub fn </span>reset&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, graph: G)
+        <span class="kw">where </span>G: IntoNodeIdentifiers + IntoNeighborsDirected + Visitable&lt;NodeId=N, Map=VM&gt;,
     {
-        <span class="ident">graph</span>.<span class="ident">reset_map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">ordered</span>);
-        <span class="self">self</span>.<span class="ident">tovisit</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">extend_with_initials</span>(<span class="ident">graph</span>);
+        graph.reset_map(<span class="kw-2">&amp;mut </span><span class="self">self</span>.ordered);
+        <span class="self">self</span>.tovisit.clear();
+        <span class="self">self</span>.extend_with_initials(graph);
     }
 
-    <span class="doccomment">/// Return the next node in the current topological order traversal, or</span>
-    <span class="doccomment">/// `None` if the traversal is at the end.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *Note:* The graph may not have a complete topological order, and the only</span>
-    <span class="doccomment">/// way to know is to run the whole traversal and make sure it visits every node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighborsDirected</span> <span class="op">+</span> <span class="ident">Visitable</span><span class="op">&lt;</span><span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span>, <span class="ident">Map</span><span class="op">=</span><span class="ident">VM</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Return the next node in the current topological order traversal, or
+    /// `None` if the traversal is at the end.
+    ///
+    /// *Note:* The graph may not have a complete topological order, and the only
+    /// way to know is to run the whole traversal and make sure it visits every node.
+    </span><span class="kw">pub fn </span>next&lt;G&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, g: G) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt;
+        <span class="kw">where </span>G: IntoNeighborsDirected + Visitable&lt;NodeId=N, Map=VM&gt;,
     {
-        <span class="comment">// Take an unvisited element and find which of its neighbors are next</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tovisit</span>.<span class="ident">pop</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ordered</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">nix</span>) {
+        <span class="comment">// Take an unvisited element and find which of its neighbors are next
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(nix) = <span class="self">self</span>.tovisit.pop() {
+            <span class="kw">if </span><span class="self">self</span>.ordered.is_visited(<span class="kw-2">&amp;</span>nix) {
                 <span class="kw">continue</span>;
             }
-            <span class="self">self</span>.<span class="ident">ordered</span>.<span class="ident">visit</span>(<span class="ident">nix</span>);
-            <span class="kw">for</span> <span class="ident">neigh</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">neighbors</span>(<span class="ident">nix</span>) {
-                <span class="comment">// Look at each neighbor, and those that only have incoming edges</span>
-                <span class="comment">// from the already ordered list, they are the next to visit.</span>
-                <span class="kw">if</span> <span class="ident">Reversed</span>(<span class="ident">g</span>).<span class="ident">neighbors</span>(<span class="ident">neigh</span>).<span class="ident">all</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">ordered</span>.<span class="ident">is_visited</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>)) {
-                    <span class="self">self</span>.<span class="ident">tovisit</span>.<span class="ident">push</span>(<span class="ident">neigh</span>);
+            <span class="self">self</span>.ordered.visit(nix);
+            <span class="kw">for </span>neigh <span class="kw">in </span>g.neighbors(nix) {
+                <span class="comment">// Look at each neighbor, and those that only have incoming edges
+                // from the already ordered list, they are the next to visit.
+                </span><span class="kw">if </span>Reversed(g).neighbors(neigh).all(|b| <span class="self">self</span>.ordered.is_visited(<span class="kw-2">&amp;</span>b)) {
+                    <span class="self">self</span>.tovisit.push(neigh);
                 }
             }
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">nix</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(nix);
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
 
-<span class="doccomment">/// A walker is a traversal state, but where part of the traversal</span>
-<span class="doccomment">/// information is supplied manually to each next call.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This for example allows graph traversals that don&#39;t hold a borrow of the</span>
-<span class="doccomment">/// graph they are traversing.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span>;
-    <span class="doccomment">/// Advance to the next item</span>
-    <span class="kw">fn</span> <span class="ident">walk_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A walker is a traversal state, but where part of the traversal
+/// information is supplied manually to each next call.
+///
+/// This for example allows graph traversals that don&#39;t hold a borrow of the
+/// graph they are traversing.
+</span><span class="kw">pub trait </span>Walker&lt;Context&gt; {
+    <span class="kw">type </span>Item;
+    <span class="doccomment">/// Advance to the next item
+    </span><span class="kw">fn </span>walk_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, context: Context) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="doccomment">/// Create an iterator out of the walker and given `context`.</span>
-    <span class="kw">fn</span> <span class="ident">iter</span>(<span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>) -&gt; <span class="ident">WalkerIter</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Context</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">Sized</span>,
-              <span class="ident">Context</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Create an iterator out of the walker and given `context`.
+    </span><span class="kw">fn </span>iter(<span class="self">self</span>, context: Context) -&gt; WalkerIter&lt;<span class="self">Self</span>, Context&gt;
+        <span class="kw">where </span><span class="self">Self</span>: Sized,
+              Context: Clone,
     {
-        <span class="ident">WalkerIter</span> {
-            <span class="ident">walker</span>: <span class="self">self</span>,
-            <span class="ident">context</span>: <span class="ident">context</span>,
+        WalkerIter {
+            walker: <span class="self">self</span>,
+            context: context,
         }
     }
 }
 
-<span class="doccomment">/// A walker and its context wrapped into an iterator.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WalkerIter</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">walker</span>: <span class="ident">W</span>,
-    <span class="ident">context</span>: <span class="ident">C</span>,
+<span class="doccomment">/// A walker and its context wrapped into an iterator.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WalkerIter&lt;W, C&gt; {
+    walker: W,
+    context: C,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">WalkerIter</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">C</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">W</span>: <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-          <span class="ident">C</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;W, C&gt; WalkerIter&lt;W, C&gt;
+    <span class="kw">where </span>W: Walker&lt;C&gt;,
+          C: Clone,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">C</span> {
-        <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; C {
+        <span class="self">self</span>.context.clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">W</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">walker</span>
+    <span class="kw">pub fn </span>inner_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>W {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.walker
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">W</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">walker</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">WalkerIter</span><span class="op">&lt;</span><span class="ident">W</span>, <span class="ident">C</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">W</span>: <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-          <span class="ident">C</span>: <span class="ident">Clone</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">W::Item</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walker</span>.<span class="ident">walk_next</span>(<span class="self">self</span>.<span class="ident">context</span>.<span class="ident">clone</span>())
+    <span class="kw">pub fn </span>inner_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>W {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.walker
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Dfs</span><span class="op">&lt;</span><span class="ident">G::NodeId</span>, <span class="ident">G::Map</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>
+<span class="kw">impl</span>&lt;W, C&gt; Iterator <span class="kw">for </span>WalkerIter&lt;W, C&gt;
+    <span class="kw">where </span>W: Walker&lt;C&gt;,
+          C: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">walk_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">context</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">context</span>)
+    <span class="kw">type </span>Item = W::Item;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.walker.walk_next(<span class="self">self</span>.context.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DfsPostOrder</span><span class="op">&lt;</span><span class="ident">G::NodeId</span>, <span class="ident">G::Map</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>
+<span class="kw">impl</span>&lt;G&gt; Walker&lt;G&gt; <span class="kw">for </span>Dfs&lt;G::NodeId, G::Map&gt;
+    <span class="kw">where </span>G: IntoNeighbors + Visitable
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">walk_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">context</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">context</span>)
+    <span class="kw">type </span>Item = G::NodeId;
+    <span class="kw">fn </span>walk_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, context: G) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.next(context)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bfs</span><span class="op">&lt;</span><span class="ident">G::NodeId</span>, <span class="ident">G::Map</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighbors</span> <span class="op">+</span> <span class="ident">Visitable</span>
+<span class="kw">impl</span>&lt;G&gt; Walker&lt;G&gt; <span class="kw">for </span>DfsPostOrder&lt;G::NodeId, G::Map&gt;
+    <span class="kw">where </span>G: IntoNeighbors + Visitable
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">walk_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">context</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">context</span>)
+    <span class="kw">type </span>Item = G::NodeId;
+    <span class="kw">fn </span>walk_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, context: G) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.next(context)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="ident">G</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Topo</span><span class="op">&lt;</span><span class="ident">G::NodeId</span>, <span class="ident">G::Map</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoNeighborsDirected</span> <span class="op">+</span> <span class="ident">Visitable</span>,
+<span class="kw">impl</span>&lt;G&gt; Walker&lt;G&gt; <span class="kw">for </span>Bfs&lt;G::NodeId, G::Map&gt;
+    <span class="kw">where </span>G: IntoNeighbors + Visitable
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">G::NodeId</span>;
-    <span class="kw">fn</span> <span class="ident">walk_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">context</span>: <span class="ident">G</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">context</span>)
+    <span class="kw">type </span>Item = G::NodeId;
+    <span class="kw">fn </span>walk_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, context: G) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.next(context)
+    }
+}
+
+<span class="kw">impl</span>&lt;G&gt; Walker&lt;G&gt; <span class="kw">for </span>Topo&lt;G::NodeId, G::Map&gt;
+    <span class="kw">where </span>G: IntoNeighborsDirected + Visitable,
+{
+    <span class="kw">type </span>Item = G::NodeId;
+    <span class="kw">fn </span>walk_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, context: G) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.next(context)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

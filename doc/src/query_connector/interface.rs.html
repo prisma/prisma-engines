@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/interface.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interface.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/interface.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>interface.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -367,374 +367,374 @@
 <span id="367">367</span>
 <span id="368">368</span>
 <span id="369">369</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">coerce_null_to_zero_value</span>, <span class="ident">Filter</span>, <span class="ident">NativeUpsert</span>, <span class="ident">QueryArguments</span>, <span class="ident">WriteArgs</span>};
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">dml::FieldArity</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{coerce_null_to_zero_value, Filter, NativeUpsert, QueryArguments, WriteArgs};
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>dml::FieldArity;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connector</span> {
-    <span class="doccomment">/// Returns a connection to a data source.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>Connector {
+    <span class="doccomment">/// Returns a connection to a data source.
+    </span><span class="kw">async fn </span>get_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Box&lt;<span class="kw">dyn </span>Connection + Send + Sync&gt;&gt;;
 
-    <span class="doccomment">/// Returns name of the connector.</span>
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">/// Returns name of the connector.
+    </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String;
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connection</span>: <span class="ident">ConnectionLike</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>Connection: ConnectionLike {
+    <span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;a</span>&gt;&gt;;
 
-    <span class="doccomment">/// Explicit upcast.</span>
-    <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>;
+    <span class="doccomment">/// Explicit upcast.
+    </span><span class="kw">fn </span>as_connection_like(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike;
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Transaction</span>: <span class="ident">ConnectionLike</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>Transaction: ConnectionLike {
+    <span class="kw">async fn </span>commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
+    <span class="kw">async fn </span>rollback(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
 
-    <span class="doccomment">/// Explicit upcast of self reference. Rusts current vtable layout doesn&#39;t allow for an upcast if</span>
-    <span class="doccomment">/// `trait A`, `trait B: A`, so that `Box&lt;dyn B&gt; as Box&lt;dyn A&gt;` works. This is a simple, explicit workaround.</span>
-    <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>;
+    <span class="doccomment">/// Explicit upcast of self reference. Rusts current vtable layout doesn&#39;t allow for an upcast if
+    /// `trait A`, `trait B: A`, so that `Box&lt;dyn B&gt; as Box&lt;dyn A&gt;` works. This is a simple, explicit workaround.
+    </span><span class="kw">fn </span>as_connection_like(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike;
 }
 
-<span class="doccomment">/// Marker trait required by the query core executor to abstract connections and</span>
-<span class="doccomment">/// transactions into something that can is capable of writing to or reading from the database.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConnectionLike</span>: <span class="ident">ReadOperations</span> <span class="op">+</span> <span class="ident">WriteOperations</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {}
+<span class="doccomment">/// Marker trait required by the query core executor to abstract connections and
+/// transactions into something that can is capable of writing to or reading from the database.
+</span><span class="kw">pub trait </span>ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
 
-<span class="doccomment">/// A wrapper struct allowing to either filter for records or for the core to</span>
-<span class="doccomment">/// communicate already known record selectors to connectors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Connector implementations should use known selectors to skip unnecessary fetch operations</span>
-<span class="doccomment">/// if the query core already determined the selectors in a previous step. Simply put,</span>
-<span class="doccomment">/// `selectors` should always have precendence over `filter`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">pub</span> <span class="ident">filter</span>: <span class="ident">Filter</span>,
-    <span class="kw">pub</span> <span class="ident">selectors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A wrapper struct allowing to either filter for records or for the core to
+/// communicate already known record selectors to connectors.
+///
+/// Connector implementations should use known selectors to skip unnecessary fetch operations
+/// if the query core already determined the selectors in a previous step. Simply put,
+/// `selectors` should always have precendence over `filter`.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>RecordFilter {
+    <span class="kw">pub </span>filter: Filter,
+    <span class="kw">pub </span>selectors: <span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionResult&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
-            <span class="ident">selectors</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>RecordFilter {
+    <span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            filter: Filter::empty(),
+            selectors: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_selectors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">selectors</span>.<span class="ident">is_some</span>()
+    <span class="kw">pub fn </span>has_selectors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.selectors.is_some()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter</span>,
-            <span class="ident">selectors</span>: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
-            <span class="ident">selectors</span>: <span class="prelude-val">Some</span>(<span class="ident">selectors</span>),
+<span class="kw">impl </span>From&lt;Filter&gt; <span class="kw">for </span>RecordFilter {
+    <span class="kw">fn </span>from(filter: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            filter,
+            selectors: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">SelectionResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
-            <span class="ident">selectors</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">selector</span>]),
+<span class="kw">impl </span>From&lt;Vec&lt;SelectionResult&gt;&gt; <span class="kw">for </span>RecordFilter {
+    <span class="kw">fn </span>from(selectors: Vec&lt;SelectionResult&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            filter: Filter::empty(),
+            selectors: <span class="prelude-val">Some</span>(selectors),
         }
     }
 }
 
-<span class="doccomment">/// Selections for aggregation queries.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationSelection</span> {
-    <span class="doccomment">/// Single field selector. Only valid in the context of group by statements.</span>
-    <span class="ident">Field</span>(<span class="ident">ScalarFieldRef</span>),
-
-    <span class="doccomment">/// Counts records of the model that match the query.</span>
-    <span class="doccomment">/// `all` indicates that an all-records selection has been made (e.g. SQL *).</span>
-    <span class="doccomment">/// `fields` are specific fields to count on. By convention, if `all` is true,</span>
-    <span class="doccomment">/// it will always be the last of the count results.</span>
-    <span class="ident">Count</span> { <span class="ident">all</span>: <span class="ident">bool</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> },
-
-    <span class="doccomment">/// Compute average for each field contained.</span>
-    <span class="ident">Average</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>),
-
-    <span class="doccomment">/// Compute sum for each field contained.</span>
-    <span class="ident">Sum</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>),
-
-    <span class="doccomment">/// Compute mininum for each field contained.</span>
-    <span class="ident">Min</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>),
-
-    <span class="doccomment">/// Compute maximum for each field contained.</span>
-    <span class="ident">Max</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>),
+<span class="kw">impl </span>From&lt;SelectionResult&gt; <span class="kw">for </span>RecordFilter {
+    <span class="kw">fn </span>from(selector: SelectionResult) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            filter: Filter::empty(),
+            selectors: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[selector]),
+        }
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">AggregationSelection</span> {
-    <span class="doccomment">/// Returns (&lt;field db name&gt;, TypeIdentifier, FieldArity)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifiers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; {
-                <span class="macro">vec!</span>[(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(), <span class="ident">field</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">arity</span>)]
+<span class="doccomment">/// Selections for aggregation queries.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>AggregationSelection {
+    <span class="doccomment">/// Single field selector. Only valid in the context of group by statements.
+    </span>Field(ScalarFieldRef),
+
+    <span class="doccomment">/// Counts records of the model that match the query.
+    /// `all` indicates that an all-records selection has been made (e.g. SQL *).
+    /// `fields` are specific fields to count on. By convention, if `all` is true,
+    /// it will always be the last of the count results.
+    </span>Count { all: bool, fields: Vec&lt;ScalarFieldRef&gt; },
+
+    <span class="doccomment">/// Compute average for each field contained.
+    </span>Average(Vec&lt;ScalarFieldRef&gt;),
+
+    <span class="doccomment">/// Compute sum for each field contained.
+    </span>Sum(Vec&lt;ScalarFieldRef&gt;),
+
+    <span class="doccomment">/// Compute mininum for each field contained.
+    </span>Min(Vec&lt;ScalarFieldRef&gt;),
+
+    <span class="doccomment">/// Compute maximum for each field contained.
+    </span>Max(Vec&lt;ScalarFieldRef&gt;),
+}
+
+<span class="kw">impl </span>AggregationSelection {
+    <span class="doccomment">/// Returns (&lt;field db name&gt;, TypeIdentifier, FieldArity)
+    </span><span class="kw">pub fn </span>identifiers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(String, TypeIdentifier, FieldArity)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            AggregationSelection::Field(field) =&gt; {
+                <span class="macro">vec!</span>[(field.db_name().to_owned(), field.type_identifier.clone(), field.arity)]
             }
 
-            <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">Some</span>(<span class="ident">TypeIdentifier::Int</span>));
+            AggregationSelection::Count { all, fields } =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>mapped = <span class="self">Self</span>::map_field_types(fields, <span class="prelude-val">Some</span>(TypeIdentifier::Int));
 
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                    <span class="ident">mapped</span>.<span class="ident">push</span>((<span class="string">&quot;all&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">TypeIdentifier::Int</span>, <span class="ident">FieldArity::Required</span>));
+                <span class="kw">if </span><span class="kw-2">*</span>all {
+                    mapped.push((<span class="string">&quot;all&quot;</span>.to_owned(), TypeIdentifier::Int, FieldArity::Required));
                 }
 
-                <span class="ident">mapped</span>
+                mapped
             }
 
-            <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">Some</span>(<span class="ident">TypeIdentifier::Float</span>)),
-            <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">None</span>),
-            <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">None</span>),
-            <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; <span class="ident"><span class="self">Self</span>::map_field_types</span>(<span class="ident">fields</span>, <span class="prelude-val">None</span>),
+            AggregationSelection::Average(fields) =&gt; <span class="self">Self</span>::map_field_types(fields, <span class="prelude-val">Some</span>(TypeIdentifier::Float)),
+            AggregationSelection::Sum(fields) =&gt; <span class="self">Self</span>::map_field_types(fields, <span class="prelude-val">None</span>),
+            AggregationSelection::Min(fields) =&gt; <span class="self">Self</span>::map_field_types(fields, <span class="prelude-val">None</span>),
+            AggregationSelection::Max(fields) =&gt; <span class="self">Self</span>::map_field_types(fields, <span class="prelude-val">None</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">map_field_types</span>(
-        <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>],
-        <span class="ident">fixed_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TypeIdentifier</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>)<span class="op">&gt;</span> {
-        <span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+    <span class="kw">fn </span>map_field_types(
+        fields: <span class="kw-2">&amp;</span>[ScalarFieldRef],
+        fixed_type: <span class="prelude-ty">Option</span>&lt;TypeIdentifier&gt;,
+    ) -&gt; Vec&lt;(String, TypeIdentifier, FieldArity)&gt; {
+        fields
+            .iter()
+            .map(|f| {
                 (
-                    <span class="ident">f</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">fixed_type</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">type_identifier</span>.<span class="ident">clone</span>()),
-                    <span class="ident">FieldArity::Required</span>,
+                    f.db_name().to_owned(),
+                    fixed_type.clone().unwrap_or_else(|| f.type_identifier.clone()),
+                    FieldArity::Required,
                 )
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">AggregationRow</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationResult</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>AggregationRow = Vec&lt;AggregationResult&gt;;
 
-<span class="doccomment">/// Result of an aggregation operation on a model or field.</span>
-<span class="doccomment">/// A `Field` return type is only interesting for aggregations involving</span>
-<span class="doccomment">/// group bys, as they return field values alongside group aggregates.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationResult</span> {
-    <span class="ident">Field</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>),
-    <span class="ident">Count</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>),
-    <span class="ident">Average</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>),
-    <span class="ident">Sum</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>),
-    <span class="ident">Min</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>),
-    <span class="ident">Max</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>),
+<span class="doccomment">/// Result of an aggregation operation on a model or field.
+/// A `Field` return type is only interesting for aggregations involving
+/// group bys, as they return field values alongside group aggregates.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>AggregationResult {
+    Field(ScalarFieldRef, PrismaValue),
+    Count(<span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt;, PrismaValue),
+    Average(ScalarFieldRef, PrismaValue),
+    Sum(ScalarFieldRef, PrismaValue),
+    Min(ScalarFieldRef, PrismaValue),
+    Max(ScalarFieldRef, PrismaValue),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelAggregationSelection</span> {
-    <span class="comment">// Always a count(*) for now</span>
-    <span class="ident">Count</span>(<span class="ident">RelationFieldRef</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>RelAggregationSelection {
+    <span class="comment">// Always a count(*) for now
+    </span>Count(RelationFieldRef, <span class="prelude-ty">Option</span>&lt;Filter&gt;),
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelAggregationRow</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationResult</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>RelAggregationRow = Vec&lt;RelAggregationResult&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelAggregationResult</span> {
-    <span class="ident">Count</span>(<span class="ident">RelationFieldRef</span>, <span class="ident">PrismaValue</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>RelAggregationResult {
+    Count(RelationFieldRef, PrismaValue),
 }
 
-<span class="kw">impl</span> <span class="ident">RelAggregationSelection</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_alias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;_aggr_count_{}&quot;</span>, <span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>())
+<span class="kw">impl </span>RelAggregationSelection {
+    <span class="kw">pub fn </span>db_alias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelAggregationSelection::Count(rf, <span class="kw">_</span>) =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;_aggr_count_{}&quot;</span>, rf.name.to_owned())
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="kw">_</span>) =&gt; <span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(),
+    <span class="kw">pub fn </span>field_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelAggregationSelection::Count(rf, <span class="kw">_</span>) =&gt; rf.name.as_str(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_identifier_with_arity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">TypeIdentifier</span>, <span class="ident">FieldArity</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">FieldArity::Required</span>),
+    <span class="kw">pub fn </span>type_identifier_with_arity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (TypeIdentifier, FieldArity) {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelAggregationSelection::Count(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; (TypeIdentifier::Int, FieldArity::Required),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>, <span class="ident">val</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">RelAggregationResult</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="kw">_</span>) =&gt; <span class="ident">RelAggregationResult::Count</span>(<span class="ident">rf</span>, <span class="ident">coerce_null_to_zero_value</span>(<span class="ident">val</span>)),
+    <span class="kw">pub fn </span>into_result(<span class="self">self</span>, val: PrismaValue) -&gt; RelAggregationResult {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelAggregationSelection::Count(rf, <span class="kw">_</span>) =&gt; RelAggregationResult::Count(rf, coerce_null_to_zero_value(val)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReadOperations</span> {
-    <span class="doccomment">/// Gets a single record or `None` back from the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - The `ModelRef` represents the datamodel and its relations.</span>
-    <span class="doccomment">/// - The `Filter` defines what item we want back and is guaranteed to be</span>
-    <span class="doccomment">///   defined to filter at most one item by the core.</span>
-    <span class="doccomment">/// - The `FieldSelection` defines the values to be returned.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_single_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-        <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>ReadOperations {
+    <span class="doccomment">/// Gets a single record or `None` back from the database.
+    ///
+    /// - The `ModelRef` represents the datamodel and its relations.
+    /// - The `Filter` defines what item we want back and is guaranteed to be
+    ///   defined to filter at most one item by the core.
+    /// - The `FieldSelection` defines the values to be returned.
+    </span><span class="kw">async fn </span>get_single_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        filter: <span class="kw-2">&amp;</span>Filter,
+        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+        aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt;;
 
-    <span class="doccomment">/// Gets multiple records from the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - The `ModelRef` represents the datamodel and its relations.</span>
-    <span class="doccomment">/// - The `QueryArguments` defines various constraints (see docs for detailed explanation).</span>
-    <span class="doccomment">/// - The `FieldSelection` defines the fields (e.g. columns or document fields)</span>
-    <span class="doccomment">///   to be returned as a projection of fields of the model it queries.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_many_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-        <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Gets multiple records from the database.
+    ///
+    /// - The `ModelRef` represents the datamodel and its relations.
+    /// - The `QueryArguments` defines various constraints (see docs for detailed explanation).
+    /// - The `FieldSelection` defines the fields (e.g. columns or document fields)
+    ///   to be returned as a projection of fields of the model it queries.
+    </span><span class="kw">async fn </span>get_many_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        query_arguments: QueryArguments,
+        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+        aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt;;
 
-    <span class="doccomment">/// Retrieves pairs of IDs that belong together from a intermediate join</span>
-    <span class="doccomment">/// table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Given the field from parent, and the projections, return the given</span>
-    <span class="doccomment">/// projections with the corresponding child projections fetched from the</span>
-    <span class="doccomment">/// database. The IDs returned will be used to perform a in-memory join</span>
-    <span class="doccomment">/// between two datasets.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Retrieves pairs of IDs that belong together from a intermediate join
+    /// table.
+    ///
+    /// Given the field from parent, and the projections, return the given
+    /// projections with the corresponding child projections fetched from the
+    /// database. The IDs returned will be used to perform a in-memory join
+    /// between two datasets.
+    </span><span class="kw">async fn </span>get_related_m2m_record_ids(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        from_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt;;
 
-    <span class="doccomment">/// Aggregates records for a specific model based on the given selections.</span>
-    <span class="doccomment">/// Whether or not the aggregations can be executed in a single query or</span>
-    <span class="doccomment">/// requires multiple roundtrips to the underlying data source is at the</span>
-    <span class="doccomment">/// discretion of the implementing connector.</span>
-    <span class="doccomment">/// `having` can only be a scalar filter. Relation elements can be safely ignored.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-        <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-        <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-        <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Aggregates records for a specific model based on the given selections.
+    /// Whether or not the aggregations can be executed in a single query or
+    /// requires multiple roundtrips to the underlying data source is at the
+    /// discretion of the implementing connector.
+    /// `having` can only be a scalar filter. Relation elements can be safely ignored.
+    </span><span class="kw">async fn </span>aggregate_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        query_arguments: QueryArguments,
+        selections: Vec&lt;AggregationSelection&gt;,
+        group_by: Vec&lt;ScalarFieldRef&gt;,
+        having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationRow&gt;&gt;;
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WriteOperations</span> {
-    <span class="doccomment">/// Insert a single record to the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>WriteOperations {
+    <span class="doccomment">/// Insert a single record to the database.
+    </span><span class="kw">async fn </span>create_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        args: WriteArgs,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt;;
 
-    <span class="doccomment">/// Inserts many records at once into the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
-        <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Inserts many records at once into the database.
+    </span><span class="kw">async fn </span>create_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        args: Vec&lt;WriteArgs&gt;,
+        skip_duplicates: bool,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt;;
 
-    <span class="doccomment">/// Update records in the `Model` with the given `WriteArgs` filtered by the</span>
-    <span class="doccomment">/// `Filter`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Update records in the `Model` with the given `WriteArgs` filtered by the
+    /// `Filter`.
+    </span><span class="kw">async fn </span>update_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt;;
 
-    <span class="doccomment">/// Update record in the `Model` with the given `WriteArgs` filtered by the</span>
-    <span class="doccomment">/// `Filter`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Update record in the `Model` with the given `WriteArgs` filtered by the
+    /// `Filter`.
+    </span><span class="kw">async fn </span>update_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: RecordFilter,
+        args: WriteArgs,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt;;
 
-    <span class="doccomment">/// Native upsert</span>
-    <span class="doccomment">/// Use the connectors native upsert to upsert the `Model`</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">native_upsert_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">upsert</span>: <span class="ident">NativeUpsert</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Native upsert
+    /// Use the connectors native upsert to upsert the `Model`
+    </span><span class="kw">async fn </span>native_upsert_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        upsert: NativeUpsert,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;SingleRecord&gt;;
 
-    <span class="doccomment">/// Delete records in the `Model` with the given `Filter`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Delete records in the `Model` with the given `Filter`.
+    </span><span class="kw">async fn </span>delete_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: RecordFilter,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt;;
 
-    <span class="comment">// We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.</span>
+    <span class="comment">// We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 
-    <span class="doccomment">/// Connect the children to the parent (m2m relation only).</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    </span><span class="doccomment">/// Connect the children to the parent (m2m relation only).
+    </span><span class="kw">async fn </span>m2m_connect(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+        child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
 
-    <span class="doccomment">/// Disconnect the children from the parent (m2m relation only).</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="doccomment">/// Disconnect the children from the parent (m2m relation only).
+    </span><span class="kw">async fn </span>m2m_disconnect(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+        child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;;
 
-    <span class="doccomment">/// Execute the raw query in the database as-is.</span>
-    <span class="doccomment">/// The parsing of the query arguments is deferred to the connectors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the number of rows affected.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Execute the raw query in the database as-is.
+    /// The parsing of the query arguments is deferred to the connectors.
+    ///
+    /// Returns the number of rows affected.
+    </span><span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt;;
 
-    <span class="doccomment">/// Execute the raw query in the database as-is.</span>
-    <span class="doccomment">/// The parsing of the query arguments is deferred to the connectors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns resulting rows as JSON.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-        <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-        <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Execute the raw query in the database as-is.
+    /// The parsing of the query arguments is deferred to the connectors.
+    ///
+    /// Returns resulting rows as JSON.
+    </span><span class="kw">async fn </span>query_raw(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        inputs: HashMap&lt;String, PrismaValue&gt;,
+        query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

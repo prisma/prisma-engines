@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/multi_thread/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tokio/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/multi_thread/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tokio/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -144,151 +144,151 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Multi-threaded runtime</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Multi-threaded runtime
 
-<span class="kw">mod</span> <span class="ident">idle</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::idle::Idle</span>;
+</span><span class="kw">mod </span>idle;
+<span class="kw">use </span><span class="self">self</span>::idle::Idle;
 
-<span class="kw">mod</span> <span class="ident">park</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">park</span>::{<span class="ident">Parker</span>, <span class="ident">Unparker</span>};
+<span class="kw">mod </span>park;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>park::{Parker, Unparker};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">queue</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>queue;
 
-<span class="kw">mod</span> <span class="ident">worker</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">worker::Launch</span>;
+<span class="kw">mod </span>worker;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>worker::Launch;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">worker::block_in_place</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>worker::block_in_place;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task</span>::{<span class="self">self</span>, <span class="ident">JoinHandle</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">Config</span>, <span class="ident">Driver</span>, <span class="ident">HandleInner</span>};
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::Arc;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::{<span class="self">self</span>, JoinHandle};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{Config, Driver, HandleInner};
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
 
-<span class="doccomment">/// Work-stealing based thread pool for executing futures.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MultiThread</span> {
-    <span class="ident">spawner</span>: <span class="ident">Spawner</span>,
+<span class="doccomment">/// Work-stealing based thread pool for executing futures.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MultiThread {
+    spawner: Spawner,
 }
 
-<span class="doccomment">/// Submits futures to the associated thread pool for execution.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Spawner` instance is a handle to a single thread pool that allows the owner</span>
-<span class="doccomment">/// of the handle to spawn futures onto the thread pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Spawner` handle is *only* used for spawning new futures. It does not</span>
-<span class="doccomment">/// impact the lifecycle of the thread pool in any way. The thread pool may</span>
-<span class="doccomment">/// shut down while there are outstanding `Spawner` instances.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Spawner` instances are obtained by calling [`MultiThread::spawner`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`MultiThread::spawner`]: method@MultiThread::spawner</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Spawner</span> {
-    <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">worker::Shared</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Submits futures to the associated thread pool for execution.
+///
+/// A `Spawner` instance is a handle to a single thread pool that allows the owner
+/// of the handle to spawn futures onto the thread pool.
+///
+/// The `Spawner` handle is *only* used for spawning new futures. It does not
+/// impact the lifecycle of the thread pool in any way. The thread pool may
+/// shut down while there are outstanding `Spawner` instances.
+///
+/// `Spawner` instances are obtained by calling [`MultiThread::spawner`].
+///
+/// [`MultiThread::spawner`]: method@MultiThread::spawner
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Spawner {
+    shared: Arc&lt;worker::Shared&gt;,
 }
 
-<span class="comment">// ===== impl MultiThread =====</span>
+<span class="comment">// ===== impl MultiThread =====
 
-<span class="kw">impl</span> <span class="ident">MultiThread</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">size</span>: <span class="ident">usize</span>,
-        <span class="ident">driver</span>: <span class="ident">Driver</span>,
-        <span class="ident">handle_inner</span>: <span class="ident">HandleInner</span>,
-        <span class="ident">config</span>: <span class="ident">Config</span>,
-    ) -&gt; (<span class="ident">MultiThread</span>, <span class="ident">Launch</span>) {
-        <span class="kw">let</span> <span class="ident">parker</span> <span class="op">=</span> <span class="ident">Parker::new</span>(<span class="ident">driver</span>);
-        <span class="kw">let</span> (<span class="ident">shared</span>, <span class="ident">launch</span>) <span class="op">=</span> <span class="ident">worker::create</span>(<span class="ident">size</span>, <span class="ident">parker</span>, <span class="ident">handle_inner</span>, <span class="ident">config</span>);
-        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner</span> { <span class="ident">shared</span> };
-        <span class="kw">let</span> <span class="ident">multi_thread</span> <span class="op">=</span> <span class="ident">MultiThread</span> { <span class="ident">spawner</span> };
+</span><span class="kw">impl </span>MultiThread {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        size: usize,
+        driver: Driver,
+        handle_inner: HandleInner,
+        config: Config,
+    ) -&gt; (MultiThread, Launch) {
+        <span class="kw">let </span>parker = Parker::new(driver);
+        <span class="kw">let </span>(shared, launch) = worker::create(size, parker, handle_inner, config);
+        <span class="kw">let </span>spawner = Spawner { shared };
+        <span class="kw">let </span>multi_thread = MultiThread { spawner };
 
-        (<span class="ident">multi_thread</span>, <span class="ident">launch</span>)
+        (multi_thread, launch)
     }
 
-    <span class="doccomment">/// Returns reference to `Spawner`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `Spawner` handle can be cloned and enables spawning tasks from other</span>
-    <span class="doccomment">/// threads.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Spawner</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spawner</span>
+    <span class="doccomment">/// Returns reference to `Spawner`.
+    ///
+    /// The `Spawner` handle can be cloned and enables spawning tasks from other
+    /// threads.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Spawner {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.spawner
     }
 
-    <span class="doccomment">/// Blocks the current thread waiting for the future to complete.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The future will execute on the current thread, but all spawned tasks</span>
-    <span class="doccomment">/// will be executed on the thread pool.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span>,
+    <span class="doccomment">/// Blocks the current thread waiting for the future to complete.
+    ///
+    /// The future will execute on the current thread, but all spawned tasks
+    /// will be executed on the thread pool.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>block_on&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, future: F) -&gt; F::Output
+    <span class="kw">where
+        </span>F: Future,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::enter</span>(<span class="bool-val">true</span>);
-        <span class="ident">enter</span>.<span class="ident">block_on</span>(<span class="ident">future</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to park thread&quot;</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>enter = <span class="kw">crate</span>::runtime::enter(<span class="bool-val">true</span>);
+        enter.block_on(future).expect(<span class="string">&quot;failed to park thread&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MultiThread</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;MultiThread&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>MultiThread {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;MultiThread&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">MultiThread</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">spawner</span>.<span class="ident">shutdown</span>();
+<span class="kw">impl </span>Drop <span class="kw">for </span>MultiThread {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.spawner.shutdown();
     }
 }
 
-<span class="comment">// ==== impl Spawner =====</span>
+<span class="comment">// ==== impl Spawner =====
 
-<span class="kw">impl</span> <span class="ident">Spawner</span> {
-    <span class="doccomment">/// Spawns a future onto the thread pool</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">id</span>: <span class="ident">task::Id</span>) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident"><span class="kw">crate</span>::future::Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F::Output</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+</span><span class="kw">impl </span>Spawner {
+    <span class="doccomment">/// Spawns a future onto the thread pool
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawn&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, future: F, id: task::Id) -&gt; JoinHandle&lt;F::Output&gt;
+    <span class="kw">where
+        </span>F: <span class="kw">crate</span>::future::Future + Send + <span class="lifetime">&#39;static</span>,
+        F::Output: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">worker::Shared::bind_new_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>, <span class="ident">future</span>, <span class="ident">id</span>)
+        worker::Shared::bind_new_task(<span class="kw-2">&amp;</span><span class="self">self</span>.shared, future, id)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">close</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.shared.close();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_handle_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HandleInner</span> {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">as_handle_inner</span>()
-    }
-}
-
-<span class="macro">cfg_metrics!</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">SchedulerMetrics</span>, <span class="ident">WorkerMetrics</span>};
-
-    <span class="kw">impl</span> <span class="ident">Spawner</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_workers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>.<span class="ident">len</span>()
-        }
-
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">scheduler_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SchedulerMetrics</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">scheduler_metrics</span>
-        }
-
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">worker_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">WorkerMetrics</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">worker_metrics</span>[<span class="ident">worker</span>]
-        }
-
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">injection_queue_depth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">injection_queue_depth</span>()
-        }
-
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">worker_local_queue_depth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">worker</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-            <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">worker_local_queue_depth</span>(<span class="ident">worker</span>)
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_handle_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HandleInner {
+        <span class="self">self</span>.shared.as_handle_inner()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Spawner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Spawner&quot;</span>).<span class="ident">finish</span>()
+<span class="macro">cfg_metrics! </span>{
+    <span class="kw">use </span><span class="kw">crate</span>::runtime::{SchedulerMetrics, WorkerMetrics};
+
+    <span class="kw">impl </span>Spawner {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>num_workers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+            <span class="self">self</span>.shared.worker_metrics.len()
+        }
+
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>scheduler_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SchedulerMetrics {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.shared.scheduler_metrics
+        }
+
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>worker_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>, worker: usize) -&gt; <span class="kw-2">&amp;</span>WorkerMetrics {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.shared.worker_metrics[worker]
+        }
+
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>injection_queue_depth(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+            <span class="self">self</span>.shared.injection_queue_depth()
+        }
+
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>worker_local_queue_depth(<span class="kw-2">&amp;</span><span class="self">self</span>, worker: usize) -&gt; usize {
+            <span class="self">self</span>.shared.worker_local_queue_depth(worker)
+        }
+    }
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Spawner {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Spawner&quot;</span>).finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

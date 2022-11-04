@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/lookup_ip.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lookup_ip.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/lookup_ip.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lookup_ip.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -734,741 +734,741 @@
 <span id="734">734</span>
 <span id="735">735</span>
 <span id="736">736</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! LookupIp result from a resolution of ipv4 and ipv6 records with a Resolver.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! At it&#39;s heart LookupIp uses Lookup for performing all lookups. It is unlike other standard lookups in that there are customizations around A and AAAA resolutions.</span>
+</span><span class="doccomment">//! LookupIp result from a resolution of ipv4 and ipv6 records with a Resolver.
+//!
+//! At it&#39;s heart LookupIp uses Lookup for performing all lookups. It is unlike other standard lookups in that there are customizations around A and AAAA resolutions.
 
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::net::IpAddr</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</span><span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::net::IpAddr;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">future::Either</span>, <span class="ident">future::Future</span>, <span class="ident">FutureExt</span>};
+<span class="kw">use </span>futures_util::{future, future::Either, future::Future, FutureExt};
 
-<span class="kw">use</span> <span class="ident">proto::error::ProtoError</span>;
-<span class="kw">use</span> <span class="ident">proto::op::Query</span>;
-<span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>};
-<span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsHandle</span>, <span class="ident">DnsRequestOptions</span>};
+<span class="kw">use </span>proto::error::ProtoError;
+<span class="kw">use </span>proto::op::Query;
+<span class="kw">use </span>proto::rr::{Name, RData, Record, RecordType};
+<span class="kw">use </span>proto::xfer::{DnsHandle, DnsRequestOptions};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::caching_client::CachingClient</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::LookupIpStrategy</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dns_lru::MAX_TTL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hosts::Hosts</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup</span>::{<span class="ident">Lookup</span>, <span class="ident">LookupIntoIter</span>, <span class="ident">LookupIter</span>};
+<span class="kw">use </span><span class="kw">crate</span>::caching_client::CachingClient;
+<span class="kw">use </span><span class="kw">crate</span>::config::LookupIpStrategy;
+<span class="kw">use </span><span class="kw">crate</span>::dns_lru::MAX_TTL;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::hosts::Hosts;
+<span class="kw">use </span><span class="kw">crate</span>::lookup::{Lookup, LookupIntoIter, LookupIter};
 
-<span class="doccomment">/// Result of a DNS query when querying for A or AAAA records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When resolving IP records, there can be many IPs that match a given name. A consumer of this should expect that there are more than a single address potentially returned. Generally there are multiple IPs stored for a given service in DNS so that there is a form of high availability offered for a given name. The service implementation is responsible for the semantics around which IP should be used and when, but in general if a connection fails to one, the next in the list should be attempted.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIp</span>(<span class="ident">Lookup</span>);
+<span class="doccomment">/// Result of a DNS query when querying for A or AAAA records.
+///
+/// When resolving IP records, there can be many IPs that match a given name. A consumer of this should expect that there are more than a single address potentially returned. Generally there are multiple IPs stored for a given service in DNS so that there is a form of high availability offered for a given name. The service implementation is responsible for the semantics around which IP should be used and when, but in general if a connection fails to one, the next in the list should be attempted.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>LookupIp(Lookup);
 
-<span class="kw">impl</span> <span class="ident">LookupIp</span> {
-    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">LookupIpIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
+<span class="kw">impl </span>LookupIp {
+    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LookupIpIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        LookupIpIter(<span class="self">self</span>.<span class="number">0</span>.iter())
     }
 
-    <span class="doccomment">/// Returns a reference to the `Query` that was used to produce this result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Query</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query</span>()
+    <span class="doccomment">/// Returns a reference to the `Query` that was used to produce this result.
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Query {
+        <span class="self">self</span>.<span class="number">0</span>.query()
     }
 
-    <span class="doccomment">/// Returns the `Instant` at which this lookup is no longer valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">valid_until</span>()
+    <span class="doccomment">/// Returns the `Instant` at which this lookup is no longer valid.
+    </span><span class="kw">pub fn </span>valid_until(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Instant {
+        <span class="self">self</span>.<span class="number">0</span>.valid_until()
     }
 
-    <span class="doccomment">/// Return a reference to the inner lookup</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful for getting all records from the request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Lookup</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Return a reference to the inner lookup
+    ///
+    /// This can be useful for getting all records from the request
+    </span><span class="kw">pub fn </span>as_lookup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Lookup {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;Lookup&gt; <span class="kw">for </span>LookupIp {
+    <span class="kw">fn </span>from(lookup: Lookup) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(lookup)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LookupIp</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">Lookup</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">lookup</span>)
-    }
+<span class="kw">impl </span>From&lt;LookupIp&gt; <span class="kw">for </span>Lookup {
+    <span class="kw">fn </span>from(lookup: LookupIp) -&gt; <span class="self">Self </span>{
+        lookup.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LookupIp</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Lookup</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">LookupIp</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">lookup</span>.<span class="number">0</span>
-    }
-}
+<span class="doccomment">/// Borrowed view of set of IPs returned from a LookupIp
+</span><span class="kw">pub struct </span>LookupIpIter&lt;<span class="lifetime">&#39;i</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) LookupIter&lt;<span class="lifetime">&#39;i</span>&gt;);
 
-<span class="doccomment">/// Borrowed view of set of IPs returned from a LookupIp</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Iterator <span class="kw">for </span>LookupIpIter&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">type </span>Item = IpAddr;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddr</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+        iter.filter_map(|rdata| <span class="kw">match </span><span class="kw-2">*</span>rdata {
+            RData::A(ip) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(ip)),
+            RData::AAAA(ip) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(ip)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">next</span>()
+        .next()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">LookupIp</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddr</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">LookupIpIntoIter</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>LookupIp {
+    <span class="kw">type </span>Item = IpAddr;
+    <span class="kw">type </span>IntoIter = LookupIpIntoIter;
 
-    <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is</span>
-    <span class="doccomment">///  held behind an Arc with more than one reference (which is most likely the case coming from cache)</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">LookupIpIntoIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>())
+    <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is
+    ///  held behind an Arc with more than one reference (which is most likely the case coming from cache)
+    </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        LookupIpIntoIter(<span class="self">self</span>.<span class="number">0</span>.into_iter())
     }
 }
 
-<span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIpIntoIter</span>(<span class="ident">LookupIntoIter</span>);
+<span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup
+</span><span class="kw">pub struct </span>LookupIpIntoIter(LookupIntoIter);
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIpIntoIter</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">IpAddr</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>LookupIpIntoIter {
+    <span class="kw">type </span>Item = IpAddr;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">ip</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">ip</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+        iter.filter_map(|rdata| <span class="kw">match </span>rdata {
+            RData::A(ip) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(ip)),
+            RData::AAAA(ip) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(ip)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">next</span>()
+        .next()
     }
 }
 
-<span class="doccomment">/// The Future returned from [crate::AsyncResolver] when performing an A or AAAA lookup.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type isn&#39;t necessarily something that should be used by users, see the default TypeParameters are generally correct</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIpFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// The Future returned from [crate::AsyncResolver] when performing an A or AAAA lookup.
+///
+/// This type isn&#39;t necessarily something that should be used by users, see the default TypeParameters are generally correct
+</span><span class="kw">pub struct </span>LookupIpFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">client_cache</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-    <span class="ident">strategy</span>: <span class="ident">LookupIpStrategy</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">query</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">finally_ip_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span>,
+    client_cache: CachingClient&lt;C, E&gt;,
+    names: Vec&lt;Name&gt;,
+    strategy: LookupIpStrategy,
+    options: DnsRequestOptions,
+    query: Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;&gt; + Send&gt;&gt;,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+    finally_ip_addr: <span class="prelude-ty">Option</span>&lt;RData&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">LookupIpFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;C, E&gt; Future <span class="kw">for </span>LookupIpFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">LookupIp</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;LookupIp, ResolveError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Try polling the underlying DNS query.</span>
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>);
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">loop </span>{
+            <span class="comment">// Try polling the underlying DNS query.
+            </span><span class="kw">let </span>query = <span class="self">self</span>.query.as_mut().poll(cx);
 
-            <span class="comment">// Determine whether or not we will attempt to retry the query.</span>
-            <span class="kw">let</span> <span class="ident">should_retry</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span> {
-                <span class="comment">// If the query is NotReady, yield immediately.</span>
-                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                <span class="comment">// If the query returned a successful lookup, we will attempt</span>
-                <span class="comment">// to retry if the lookup is empty. Otherwise, we will return</span>
-                <span class="comment">// that lookup.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">lookup</span>)) =&gt; <span class="ident">lookup</span>.<span class="ident">is_empty</span>(),
-                <span class="comment">// If the query failed, we will attempt to retry.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Determine whether or not we will attempt to retry the query.
+            </span><span class="kw">let </span>should_retry = <span class="kw">match </span>query {
+                <span class="comment">// If the query is NotReady, yield immediately.
+                </span>Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+                <span class="comment">// If the query returned a successful lookup, we will attempt
+                // to retry if the lookup is empty. Otherwise, we will return
+                // that lookup.
+                </span>Poll::Ready(<span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>lookup)) =&gt; lookup.is_empty(),
+                <span class="comment">// If the query failed, we will attempt to retry.
+                </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
             };
 
-            <span class="kw">if</span> <span class="ident">should_retry</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">pop</span>() {
-                    <span class="comment">// If there&#39;s another name left to try, build a new query</span>
-                    <span class="comment">// for that next name and continue looping.</span>
-                    <span class="self">self</span>.<span class="ident">query</span> <span class="op">=</span> <span class="ident">strategic_lookup</span>(
-                        <span class="ident">name</span>,
-                        <span class="self">self</span>.<span class="ident">strategy</span>,
-                        <span class="self">self</span>.<span class="ident">client_cache</span>.<span class="ident">clone</span>(),
-                        <span class="self">self</span>.<span class="ident">options</span>,
-                        <span class="self">self</span>.<span class="ident">hosts</span>.<span class="ident">clone</span>(),
+            <span class="kw">if </span>should_retry {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = <span class="self">self</span>.names.pop() {
+                    <span class="comment">// If there&#39;s another name left to try, build a new query
+                    // for that next name and continue looping.
+                    </span><span class="self">self</span>.query = strategic_lookup(
+                        name,
+                        <span class="self">self</span>.strategy,
+                        <span class="self">self</span>.client_cache.clone(),
+                        <span class="self">self</span>.options,
+                        <span class="self">self</span>.hosts.clone(),
                     )
-                    .<span class="ident">boxed</span>();
-                    <span class="comment">// Continue looping with the new query. It will be polled</span>
-                    <span class="comment">// on the next iteration of the loop.</span>
-                    <span class="kw">continue</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ip_addr</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">finally_ip_addr</span>.<span class="ident">take</span>() {
-                    <span class="comment">// Otherwise, if there&#39;s an IP address to fall back to,</span>
-                    <span class="comment">// we&#39;ll return it.</span>
-                    <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record::from_rdata</span>(<span class="ident">Name::new</span>(), <span class="ident">MAX_TTL</span>, <span class="ident">ip_addr</span>);
-                    <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">Lookup::new_with_max_ttl</span>(<span class="ident">Query::new</span>(), <span class="ident">Arc::from</span>([<span class="ident">record</span>]));
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">lookup</span>.<span class="ident">into</span>()));
+                    .boxed();
+                    <span class="comment">// Continue looping with the new query. It will be polled
+                    // on the next iteration of the loop.
+                    </span><span class="kw">continue</span>;
+                } <span class="kw">else if let </span><span class="prelude-val">Some</span>(ip_addr) = <span class="self">self</span>.finally_ip_addr.take() {
+                    <span class="comment">// Otherwise, if there&#39;s an IP address to fall back to,
+                    // we&#39;ll return it.
+                    </span><span class="kw">let </span>record = Record::from_rdata(Name::new(), MAX_TTL, ip_addr);
+                    <span class="kw">let </span>lookup = Lookup::new_with_max_ttl(Query::new(), Arc::from([record]));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(lookup.into()));
                 }
             };
 
-            <span class="comment">// If we didn&#39;t have to retry the query, or we weren&#39;t able to</span>
-            <span class="comment">// retry because we&#39;ve exhausted the names to search and have no</span>
-            <span class="comment">// fallback IP address, return the current query.</span>
-            <span class="kw">return</span> <span class="ident">query</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">map</span>(<span class="ident">LookupIp::from</span>));
-            <span class="comment">// If we skipped retrying the  query, this will return the</span>
-            <span class="comment">// successful lookup, otherwise, if the retry failed, this will</span>
-            <span class="comment">// return the last  query result --- either an empty lookup or the</span>
-            <span class="comment">// last error we saw.</span>
+            <span class="comment">// If we didn&#39;t have to retry the query, or we weren&#39;t able to
+            // retry because we&#39;ve exhausted the names to search and have no
+            // fallback IP address, return the current query.
+            </span><span class="kw">return </span>query.map(|f| f.map(LookupIp::from));
+            <span class="comment">// If we skipped retrying the  query, this will return the
+            // successful lookup, otherwise, if the retry failed, this will
+            // return the last  query result --- either an empty lookup or the
+            // last error we saw.
+        </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;C, E&gt; LookupIpFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
+{
+    <span class="doccomment">/// Perform a lookup from a hostname to a set of IPs
+    ///
+    /// # Arguments
+    ///
+    /// * `names` - a set of DNS names to attempt to resolve, they will be attempted in queue order, i.e. the first is `names.pop()`. Upon each failure, the next will be attempted.
+    /// * `strategy` - the lookup IP strategy to use
+    /// * `client_cache` - cache with a connection to use for performing all lookups
+    </span><span class="kw">pub fn </span>lookup(
+        names: Vec&lt;Name&gt;,
+        strategy: LookupIpStrategy,
+        client_cache: CachingClient&lt;C, E&gt;,
+        options: DnsRequestOptions,
+        hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+        finally_ip_addr: <span class="prelude-ty">Option</span>&lt;RData&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>empty =
+            ResolveError::from(ResolveErrorKind::Message(<span class="string">&quot;can not lookup IPs for no names&quot;</span>));
+        <span class="self">Self </span>{
+            names,
+            strategy,
+            client_cache,
+            <span class="comment">// If there are no names remaining, this will be returned immediately,
+            // otherwise, it will be retried.
+            </span>query: future::err(empty).boxed(),
+            options,
+            hosts,
+            finally_ip_addr,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">LookupIpFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// returns a new future for lookup
+</span><span class="kw">async fn </span>strategic_lookup&lt;C, E&gt;(
+    name: Name,
+    strategy: LookupIpStrategy,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="doccomment">/// Perform a lookup from a hostname to a set of IPs</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `names` - a set of DNS names to attempt to resolve, they will be attempted in queue order, i.e. the first is `names.pop()`. Upon each failure, the next will be attempted.</span>
-    <span class="doccomment">/// * `strategy` - the lookup IP strategy to use</span>
-    <span class="doccomment">/// * `client_cache` - cache with a connection to use for performing all lookups</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span>(
-        <span class="ident">names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-        <span class="ident">strategy</span>: <span class="ident">LookupIpStrategy</span>,
-        <span class="ident">client_cache</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-        <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">finally_ip_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span>
-            <span class="ident">ResolveError::from</span>(<span class="ident">ResolveErrorKind::Message</span>(<span class="string">&quot;can not lookup IPs for no names&quot;</span>));
-        <span class="self">Self</span> {
-            <span class="ident">names</span>,
-            <span class="ident">strategy</span>,
-            <span class="ident">client_cache</span>,
-            <span class="comment">// If there are no names remaining, this will be returned immediately,</span>
-            <span class="comment">// otherwise, it will be retried.</span>
-            <span class="ident">query</span>: <span class="ident">future::err</span>(<span class="ident">empty</span>).<span class="ident">boxed</span>(),
-            <span class="ident">options</span>,
-            <span class="ident">hosts</span>,
-            <span class="ident">finally_ip_addr</span>,
-        }
+    <span class="kw">match </span>strategy {
+        LookupIpStrategy::Ipv4Only =&gt; ipv4_only(name, client, options, hosts).<span class="kw">await</span>,
+        LookupIpStrategy::Ipv6Only =&gt; ipv6_only(name, client, options, hosts).<span class="kw">await</span>,
+        LookupIpStrategy::Ipv4AndIpv6 =&gt; ipv4_and_ipv6(name, client, options, hosts).<span class="kw">await</span>,
+        LookupIpStrategy::Ipv6thenIpv4 =&gt; ipv6_then_ipv4(name, client, options, hosts).<span class="kw">await</span>,
+        LookupIpStrategy::Ipv4thenIpv6 =&gt; ipv4_then_ipv6(name, client, options, hosts).<span class="kw">await</span>,
     }
 }
 
-<span class="doccomment">/// returns a new future for lookup</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">strategic_lookup</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">strategy</span>: <span class="ident">LookupIpStrategy</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// first lookups in hosts, then performs the query
+</span><span class="kw">async fn </span>hosts_lookup&lt;C, E&gt;(
+    query: Query,
+    <span class="kw-2">mut </span>client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">match</span> <span class="ident">strategy</span> {
-        <span class="ident">LookupIpStrategy::Ipv4Only</span> =&gt; <span class="ident">ipv4_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv6Only</span> =&gt; <span class="ident">ipv6_only</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv4AndIpv6</span> =&gt; <span class="ident">ipv4_and_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv6thenIpv4</span> =&gt; <span class="ident">ipv6_then_ipv4</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-        <span class="ident">LookupIpStrategy::Ipv4thenIpv6</span> =&gt; <span class="ident">ipv4_then_ipv6</span>(<span class="ident">name</span>, <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>,
-    }
-}
-
-<span class="doccomment">/// first lookups in hosts, then performs the query</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">hosts_lookup</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">query</span>: <span class="ident">Query</span>,
-    <span class="kw-2">mut</span> <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-{
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hosts</span>) <span class="op">=</span> <span class="ident">hosts</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lookup</span>) <span class="op">=</span> <span class="ident">hosts</span>.<span class="ident">lookup_static_host</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(hosts) = hosts {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(lookup) = hosts.lookup_static_host(<span class="kw-2">&amp;</span>query) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(lookup);
         };
     }
 
-    <span class="ident">client</span>.<span class="ident">lookup</span>(<span class="ident">query</span>, <span class="ident">options</span>).<span class="kw">await</span>
-}
+    client.lookup(query, options).<span class="kw">await
+</span>}
 
-<span class="doccomment">/// queries only for A records</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ipv4_only</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// queries only for A records
+</span><span class="kw">async fn </span>ipv4_only&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">hosts_lookup</span>(<span class="ident">Query::query</span>(<span class="ident">name</span>, <span class="ident">RecordType::A</span>), <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>
-}
+    hosts_lookup(Query::query(name, RecordType::A), client, options, hosts).<span class="kw">await
+</span>}
 
-<span class="doccomment">/// queries only for AAAA records</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ipv6_only</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// queries only for AAAA records
+</span><span class="kw">async fn </span>ipv6_only&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">hosts_lookup</span>(<span class="ident">Query::query</span>(<span class="ident">name</span>, <span class="ident">RecordType::AAAA</span>), <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="kw">await</span>
-}
+    hosts_lookup(Query::query(name, RecordType::AAAA), client, options, hosts).<span class="kw">await
+</span>}
 
-<span class="comment">// TODO: this really needs to have a stream interface</span>
-<span class="doccomment">/// queries only for A and AAAA in parallel</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ipv4_and_ipv6</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="comment">// TODO: this really needs to have a stream interface
+</span><span class="doccomment">/// queries only for A and AAAA in parallel
+</span><span class="kw">async fn </span>ipv4_and_ipv6&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">let</span> <span class="ident">sel_res</span> <span class="op">=</span> <span class="ident">future::select</span>(
-        <span class="ident">hosts_lookup</span>(
-            <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>),
-            <span class="ident">client</span>.<span class="ident">clone</span>(),
-            <span class="ident">options</span>,
-            <span class="ident">hosts</span>.<span class="ident">clone</span>(),
+    <span class="kw">let </span>sel_res = future::select(
+        hosts_lookup(
+            Query::query(name.clone(), RecordType::A),
+            client.clone(),
+            options,
+            hosts.clone(),
         )
-        .<span class="ident">boxed</span>(),
-        <span class="ident">hosts_lookup</span>(<span class="ident">Query::query</span>(<span class="ident">name</span>, <span class="ident">RecordType::AAAA</span>), <span class="ident">client</span>, <span class="ident">options</span>, <span class="ident">hosts</span>).<span class="ident">boxed</span>(),
+        .boxed(),
+        hosts_lookup(Query::query(name, RecordType::AAAA), client, options, hosts).boxed(),
     )
     .<span class="kw">await</span>;
 
-    <span class="kw">let</span> (<span class="ident">ips</span>, <span class="ident">remaining_query</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">sel_res</span> {
-        <span class="ident">Either::Left</span>(<span class="ident">ips_and_remaining</span>) =&gt; <span class="ident">ips_and_remaining</span>,
-        <span class="ident">Either::Right</span>(<span class="ident">ips_and_remaining</span>) =&gt; <span class="ident">ips_and_remaining</span>,
+    <span class="kw">let </span>(ips, remaining_query) = <span class="kw">match </span>sel_res {
+        Either::Left(ips_and_remaining) =&gt; ips_and_remaining,
+        Either::Right(ips_and_remaining) =&gt; ips_and_remaining,
     };
 
-    <span class="kw">let</span> <span class="ident">next_ips</span> <span class="op">=</span> <span class="ident">remaining_query</span>.<span class="kw">await</span>;
+    <span class="kw">let </span>next_ips = remaining_query.<span class="kw">await</span>;
 
-    <span class="kw">match</span> (<span class="ident">ips</span>, <span class="ident">next_ips</span>) {
-        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Ok</span>(<span class="ident">next_ips</span>)) =&gt; {
-            <span class="comment">// TODO: create a LookupIp enum with the ability to chain these together</span>
-            <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="ident">ips</span>.<span class="ident">append</span>(<span class="ident">next_ips</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
+    <span class="kw">match </span>(ips, next_ips) {
+        (<span class="prelude-val">Ok</span>(ips), <span class="prelude-val">Ok</span>(next_ips)) =&gt; {
+            <span class="comment">// TODO: create a LookupIp enum with the ability to chain these together
+            </span><span class="kw">let </span>ips = ips.append(next_ips);
+            <span class="prelude-val">Ok</span>(ips)
         }
-        (<span class="prelude-val">Ok</span>(<span class="ident">ips</span>), <span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="op">|</span> (<span class="prelude-val">Err</span>(<span class="ident">e</span>), <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)) =&gt; {
+        (<span class="prelude-val">Ok</span>(ips), <span class="prelude-val">Err</span>(e)) | (<span class="prelude-val">Err</span>(e), <span class="prelude-val">Ok</span>(ips)) =&gt; {
             <span class="macro">debug!</span>(
                 <span class="string">&quot;one of ipv4 or ipv6 lookup failed in ipv4_and_ipv6 strategy: {}&quot;</span>,
-                <span class="ident">e</span>
+                e
             );
-            <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
+            <span class="prelude-val">Ok</span>(ips)
         }
-        (<span class="prelude-val">Err</span>(<span class="ident">e1</span>), <span class="prelude-val">Err</span>(<span class="ident">e2</span>)) =&gt; {
+        (<span class="prelude-val">Err</span>(e1), <span class="prelude-val">Err</span>(e2)) =&gt; {
             <span class="macro">debug!</span>(
                 <span class="string">&quot;both of ipv4 or ipv6 lookup failed in ipv4_and_ipv6 strategy e1: {}, e2: {}&quot;</span>,
-                <span class="ident">e1</span>, <span class="ident">e2</span>
+                e1, e2
             );
-            <span class="prelude-val">Err</span>(<span class="ident">e1</span>)
+            <span class="prelude-val">Err</span>(e1)
         }
     }
 }
 
-<span class="doccomment">/// queries only for AAAA and on no results queries for A</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ipv6_then_ipv4</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// queries only for AAAA and on no results queries for A
+</span><span class="kw">async fn </span>ipv6_then_ipv4&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">rt_then_swap</span>(
-        <span class="ident">name</span>,
-        <span class="ident">client</span>,
-        <span class="ident">RecordType::AAAA</span>,
-        <span class="ident">RecordType::A</span>,
-        <span class="ident">options</span>,
-        <span class="ident">hosts</span>,
+    rt_then_swap(
+        name,
+        client,
+        RecordType::AAAA,
+        RecordType::A,
+        options,
+        hosts,
     )
-    .<span class="kw">await</span>
-}
+    .<span class="kw">await
+</span>}
 
-<span class="doccomment">/// queries only for A and on no results queries for AAAA</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ipv4_then_ipv6</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// queries only for A and on no results queries for AAAA
+</span><span class="kw">async fn </span>ipv4_then_ipv6&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">rt_then_swap</span>(
-        <span class="ident">name</span>,
-        <span class="ident">client</span>,
-        <span class="ident">RecordType::A</span>,
-        <span class="ident">RecordType::AAAA</span>,
-        <span class="ident">options</span>,
-        <span class="ident">hosts</span>,
+    rt_then_swap(
+        name,
+        client,
+        RecordType::A,
+        RecordType::AAAA,
+        options,
+        hosts,
     )
-    .<span class="kw">await</span>
-}
+    .<span class="kw">await
+</span>}
 
-<span class="doccomment">/// queries only for first_type and on no results queries for second_type</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rt_then_swap</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">client</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">first_type</span>: <span class="ident">RecordType</span>,
-    <span class="ident">second_type</span>: <span class="ident">RecordType</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">hosts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Hosts</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// queries only for first_type and on no results queries for second_type
+</span><span class="kw">async fn </span>rt_then_swap&lt;C, E&gt;(
+    name: Name,
+    client: CachingClient&lt;C, E&gt;,
+    first_type: RecordType,
+    second_type: RecordType,
+    options: DnsRequestOptions,
+    hosts: <span class="prelude-ty">Option</span>&lt;Arc&lt;Hosts&gt;&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">let</span> <span class="ident">or_client</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">hosts_lookup</span>(
-        <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">first_type</span>),
-        <span class="ident">client</span>,
-        <span class="ident">options</span>,
-        <span class="ident">hosts</span>.<span class="ident">clone</span>(),
+    <span class="kw">let </span>or_client = client.clone();
+    <span class="kw">let </span>res = hosts_lookup(
+        Query::query(name.clone(), first_type),
+        client,
+        options,
+        hosts.clone(),
     )
     .<span class="kw">await</span>;
 
-    <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ips</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">ips</span>.<span class="ident">is_empty</span>() {
-                <span class="comment">// no ips returns, NXDomain or Otherwise, doesn&#39;t matter</span>
-                <span class="ident">hosts_lookup</span>(
-                    <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">second_type</span>),
-                    <span class="ident">or_client</span>,
-                    <span class="ident">options</span>,
-                    <span class="ident">hosts</span>,
+    <span class="kw">match </span>res {
+        <span class="prelude-val">Ok</span>(ips) =&gt; {
+            <span class="kw">if </span>ips.is_empty() {
+                <span class="comment">// no ips returns, NXDomain or Otherwise, doesn&#39;t matter
+                </span>hosts_lookup(
+                    Query::query(name.clone(), second_type),
+                    or_client,
+                    options,
+                    hosts,
                 )
-                .<span class="kw">await</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">ips</span>)
+                .<span class="kw">await
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(ips)
             }
         }
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-            <span class="ident">hosts_lookup</span>(
-                <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">second_type</span>),
-                <span class="ident">or_client</span>,
-                <span class="ident">options</span>,
-                <span class="ident">hosts</span>,
+            hosts_lookup(
+                Query::query(name.clone(), second_type),
+                or_client,
+                options,
+                hosts,
             )
-            .<span class="kw">await</span>
-        }
+            .<span class="kw">await
+        </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub mod </span>tests {
+    <span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+    <span class="kw">use </span>std::sync::{Arc, Mutex};
 
-    <span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::future</span>;
+    <span class="kw">use </span>futures_executor::block_on;
+    <span class="kw">use </span>futures_util::future;
 
-    <span class="kw">use</span> <span class="ident">proto::op::Message</span>;
-    <span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">Record</span>};
-    <span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsHandle</span>, <span class="ident">DnsRequest</span>, <span class="ident">DnsResponse</span>};
+    <span class="kw">use </span>proto::op::Message;
+    <span class="kw">use </span>proto::rr::{Name, RData, Record};
+    <span class="kw">use </span>proto::xfer::{DnsHandle, DnsRequest, DnsResponse};
 
-    <span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">once</span>, <span class="ident">Stream</span>};
+    <span class="kw">use </span>futures_util::stream::{once, Stream};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ResolveError</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::error::ResolveError;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MockDnsHandle</span> {
-        <span class="ident">messages</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(Clone)]
+    </span><span class="kw">pub struct </span>MockDnsHandle {
+        messages: Arc&lt;Mutex&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt;&gt;&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">MockDnsHandle</span> {
-        <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span>
-            <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span>;
+    <span class="kw">impl </span>DnsHandle <span class="kw">for </span>MockDnsHandle {
+        <span class="kw">type </span>Response =
+            Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt; + Send + Unpin&gt;&gt;;
+        <span class="kw">type </span>Error = ResolveError;
 
-        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">once</span>(<span class="ident">future::ready</span>(
-                <span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">pop</span>().<span class="ident">unwrap_or_else</span>(<span class="ident">empty</span>),
+        <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: R) -&gt; <span class="self">Self</span>::Response {
+            Box::pin(once(future::ready(
+                <span class="self">self</span>.messages.lock().unwrap().pop().unwrap_or_else(empty),
             )))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v4_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-        <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::A</span>));
-        <span class="ident">message</span>.<span class="ident">insert_answers</span>(<span class="macro">vec!</span>[<span class="ident">Record::from_rdata</span>(
-            <span class="ident">Name::root</span>(),
+    <span class="kw">pub fn </span>v4_message() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>message = Message::new();
+        message.add_query(Query::query(Name::root(), RecordType::A));
+        message.insert_answers(<span class="macro">vec!</span>[Record::from_rdata(
+            Name::root(),
             <span class="number">86400</span>,
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
         )]);
 
-        <span class="kw">let</span> <span class="ident">resp</span>: <span class="ident">DnsResponse</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">into</span>();
-        <span class="macro">assert!</span>(<span class="ident">resp</span>.<span class="ident">contains_answer</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
+        <span class="kw">let </span>resp: DnsResponse = message.into();
+        <span class="macro">assert!</span>(resp.contains_answer());
+        <span class="prelude-val">Ok</span>(resp)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v6_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-        <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::AAAA</span>));
-        <span class="ident">message</span>.<span class="ident">insert_answers</span>(<span class="macro">vec!</span>[<span class="ident">Record::from_rdata</span>(
-            <span class="ident">Name::root</span>(),
+    <span class="kw">pub fn </span>v6_message() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>message = Message::new();
+        message.add_query(Query::query(Name::root(), RecordType::AAAA));
+        message.insert_answers(<span class="macro">vec!</span>[Record::from_rdata(
+            Name::root(),
             <span class="number">86400</span>,
-            <span class="ident">RData::AAAA</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::AAAA(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
         )]);
 
-        <span class="kw">let</span> <span class="ident">resp</span>: <span class="ident">DnsResponse</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">into</span>();
-        <span class="macro">assert!</span>(<span class="ident">resp</span>.<span class="ident">contains_answer</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
+        <span class="kw">let </span>resp: DnsResponse = message.into();
+        <span class="macro">assert!</span>(resp.contains_answer());
+        <span class="prelude-val">Ok</span>(resp)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Message::new</span>().<span class="ident">into</span>())
+    <span class="kw">pub fn </span>empty() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="prelude-val">Ok</span>(Message::new().into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="string">&quot;forced test failure&quot;</span>))
+    <span class="kw">pub fn </span>error() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="prelude-val">Err</span>(ResolveError::from(<span class="string">&quot;forced test failure&quot;</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mock</span>(<span class="ident">messages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">MockDnsHandle</span> {
-        <span class="ident">MockDnsHandle</span> {
-            <span class="ident">messages</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">messages</span>)),
+    <span class="kw">pub fn </span>mock(messages: Vec&lt;<span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt;) -&gt; MockDnsHandle {
+        MockDnsHandle {
+            messages: Arc::new(Mutex::new(messages)),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ipv4_only_strategy</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ipv4_only_strategy() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_only</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+            block_on(ipv4_only(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ipv6_only_strategy</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ipv6_only_strategy() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv6_only</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+            block_on(ipv6_only(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ipv4_and_ipv6_strategy</span>() {
-        <span class="comment">// ipv6 is consistently queried first (even though the select has it second)</span>
-        <span class="comment">// both succeed</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_and_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>(), <span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ipv4_and_ipv6_strategy() {
+        <span class="comment">// ipv6 is consistently queried first (even though the select has it second)
+        // both succeed
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_and_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message(), v4_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
             <span class="macro">vec!</span>[
-                <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-                <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+                IpAddr::V4(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+                IpAddr::V6(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
             ]
         );
 
-        <span class="comment">// only ipv4 available</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_and_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">empty</span>(), <span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// only ipv4 available
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_and_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[empty(), v4_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[IpAddr::V4(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
         );
 
-        <span class="comment">// error then ipv4</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_and_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">error</span>(), <span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// error then ipv4
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_and_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[error(), v4_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[IpAddr::V4(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
         );
 
-        <span class="comment">// only ipv6 available</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_and_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>(), <span class="ident">empty</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// only ipv6 available
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_and_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message(), empty()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[IpAddr::V6(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
         );
 
-        <span class="comment">// error, then only ipv6 available</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_and_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>(), <span class="ident">error</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// error, then only ipv6 available
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_and_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message(), error()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ipv6_then_ipv4_strategy</span>() {
-        <span class="comment">// ipv6 first</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv6_then_ipv4</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
-                <span class="prelude-val">None</span>,
-            ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
-        );
-
-        <span class="comment">// nothing then ipv4</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv6_then_ipv4</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>(), <span class="ident">empty</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
-                <span class="prelude-val">None</span>,
-            ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
-        );
-
-        <span class="comment">// ipv4 and error</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv6_then_ipv4</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>(), <span class="ident">error</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
-                <span class="prelude-val">None</span>,
-            ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[IpAddr::V6(Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ipv4_then_ipv6_strategy</span>() {
-        <span class="comment">// ipv6 first</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_then_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ipv6_then_ipv4_strategy() {
+        <span class="comment">// ipv6 first
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv6_then_ipv4(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
 
-        <span class="comment">// nothing then ipv6</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_then_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>(), <span class="ident">empty</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// nothing then ipv4
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv6_then_ipv4(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message(), empty()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
 
-        <span class="comment">// error then ipv6</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">ipv4_then_ipv6</span>(
-                <span class="ident">Name::root</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v6_message</span>(), <span class="ident">error</span>()]), <span class="bool-val">false</span>),
-                <span class="ident">DnsRequestOptions::default</span>(),
+        <span class="comment">// ipv4 and error
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv6_then_ipv4(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message(), error()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
                 <span class="prelude-val">None</span>,
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv6Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+        );
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ipv4_then_ipv6_strategy() {
+        <span class="comment">// ipv6 first
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_then_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
+                <span class="prelude-val">None</span>,
+            ))
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+        );
+
+        <span class="comment">// nothing then ipv6
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_then_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message(), empty()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
+                <span class="prelude-val">None</span>,
+            ))
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+        );
+
+        <span class="comment">// error then ipv6
+        </span><span class="macro">assert_eq!</span>(
+            block_on(ipv4_then_ipv6(
+                Name::root(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v6_message(), error()]), <span class="bool-val">false</span>),
+                DnsRequestOptions::default(),
+                <span class="prelude-val">None</span>,
+            ))
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv6Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

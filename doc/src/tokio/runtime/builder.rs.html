@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1019,1026 +1019,1026 @@
 <span id="1019">1019</span>
 <span id="1020">1020</span>
 <span id="1021">1021</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::handle::Handle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">blocking</span>, <span class="ident">driver</span>, <span class="ident">Callback</span>, <span class="ident">Runtime</span>, <span class="ident">Spawner</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::runtime::handle::Handle;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{blocking, driver, Callback, Runtime, Spawner};
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Builds Tokio Runtime with custom configuration values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Methods can be chained in order to set the configuration values. The</span>
-<span class="doccomment">/// Runtime is constructed by calling [`build`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// New instances of `Builder` are obtained via [`Builder::new_multi_thread`]</span>
-<span class="doccomment">/// or [`Builder::new_current_thread`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See function level documentation for details on the various configuration</span>
-<span class="doccomment">/// settings.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`build`]: method@Self::build</span>
-<span class="doccomment">/// [`Builder::new_multi_thread`]: method@Self::new_multi_thread</span>
-<span class="doccomment">/// [`Builder::new_current_thread`]: method@Self::new_current_thread</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::runtime::Builder;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     // build runtime</span>
-<span class="doccomment">///     let runtime = Builder::new_multi_thread()</span>
-<span class="doccomment">///         .worker_threads(4)</span>
-<span class="doccomment">///         .thread_name(&quot;my-custom-name&quot;)</span>
-<span class="doccomment">///         .thread_stack_size(3 * 1024 * 1024)</span>
-<span class="doccomment">///         .build()</span>
-<span class="doccomment">///         .unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // use runtime ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// Runtime type</span>
-    <span class="ident">kind</span>: <span class="ident">Kind</span>,
+<span class="doccomment">/// Builds Tokio Runtime with custom configuration values.
+///
+/// Methods can be chained in order to set the configuration values. The
+/// Runtime is constructed by calling [`build`].
+///
+/// New instances of `Builder` are obtained via [`Builder::new_multi_thread`]
+/// or [`Builder::new_current_thread`].
+///
+/// See function level documentation for details on the various configuration
+/// settings.
+///
+/// [`build`]: method@Self::build
+/// [`Builder::new_multi_thread`]: method@Self::new_multi_thread
+/// [`Builder::new_current_thread`]: method@Self::new_current_thread
+///
+/// # Examples
+///
+/// ```
+/// use tokio::runtime::Builder;
+///
+/// fn main() {
+///     // build runtime
+///     let runtime = Builder::new_multi_thread()
+///         .worker_threads(4)
+///         .thread_name(&quot;my-custom-name&quot;)
+///         .thread_stack_size(3 * 1024 * 1024)
+///         .build()
+///         .unwrap();
+///
+///     // use runtime ...
+/// }
+/// ```
+</span><span class="kw">pub struct </span>Builder {
+    <span class="doccomment">/// Runtime type
+    </span>kind: Kind,
 
-    <span class="doccomment">/// Whether or not to enable the I/O driver</span>
-    <span class="ident">enable_io</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not to enable the I/O driver
+    </span>enable_io: bool,
 
-    <span class="doccomment">/// Whether or not to enable the time driver</span>
-    <span class="ident">enable_time</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not to enable the time driver
+    </span>enable_time: bool,
 
-    <span class="doccomment">/// Whether or not the clock should start paused.</span>
-    <span class="ident">start_paused</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not the clock should start paused.
+    </span>start_paused: bool,
 
-    <span class="doccomment">/// The number of worker threads, used by Runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only used when not using the current-thread executor.</span>
-    <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The number of worker threads, used by Runtime.
+    ///
+    /// Only used when not using the current-thread executor.
+    </span>worker_threads: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
-    <span class="doccomment">/// Cap on thread usage.</span>
-    <span class="ident">max_blocking_threads</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Cap on thread usage.
+    </span>max_blocking_threads: usize,
 
-    <span class="doccomment">/// Name fn used for threads spawned by the runtime.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">thread_name</span>: <span class="ident">ThreadNameFn</span>,
+    <span class="doccomment">/// Name fn used for threads spawned by the runtime.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) thread_name: ThreadNameFn,
 
-    <span class="doccomment">/// Stack size used for threads spawned by the runtime.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">thread_stack_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Stack size used for threads spawned by the runtime.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) thread_stack_size: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 
-    <span class="doccomment">/// Callback to run after each thread starts.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">after_start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Callback</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Callback to run after each thread starts.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) after_start: <span class="prelude-ty">Option</span>&lt;Callback&gt;,
 
-    <span class="doccomment">/// To run before each worker thread stops</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">before_stop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Callback</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// To run before each worker thread stops
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) before_stop: <span class="prelude-ty">Option</span>&lt;Callback&gt;,
 
-    <span class="doccomment">/// To run before each worker thread is parked.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">before_park</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Callback</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// To run before each worker thread is parked.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) before_park: <span class="prelude-ty">Option</span>&lt;Callback&gt;,
 
-    <span class="doccomment">/// To run after each thread is unparked.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">after_unpark</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Callback</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// To run after each thread is unparked.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) after_unpark: <span class="prelude-ty">Option</span>&lt;Callback&gt;,
 
-    <span class="doccomment">/// Customizable keep alive timeout for BlockingPool</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">keep_alive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Customizable keep alive timeout for BlockingPool
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) keep_alive: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// How many ticks before pulling a task from the global/remote queue?</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">global_queue_interval</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// How many ticks before pulling a task from the global/remote queue?
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) global_queue_interval: u32,
 
-    <span class="doccomment">/// How many ticks before yielding to the driver for timer and I/O events?</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">event_interval</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// How many ticks before yielding to the driver for timer and I/O events?
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) event_interval: u32,
 
-    <span class="doccomment">/// When true, the multi-threade scheduler LIFO slot should not be used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This option should only be exposed as unstable.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">disable_lifo_slot</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// When true, the multi-threade scheduler LIFO slot should not be used.
+    ///
+    /// This option should only be exposed as unstable.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) disable_lifo_slot: bool,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">unhandled_panic</span>: <span class="ident">UnhandledPanic</span>,
+    <span class="attribute">#[cfg(tokio_unstable)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) unhandled_panic: UnhandledPanic,
 }
 
-<span class="macro">cfg_unstable!</span> {
-    <span class="doccomment">/// How the runtime should respond to unhandled panics.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Instances of `UnhandledPanic` are passed to `Builder::unhandled_panic`</span>
-    <span class="doccomment">/// to configure the runtime behavior when a spawned task panics.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`Builder::unhandled_panic`] for more details.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UnhandledPanic</span> {
-        <span class="doccomment">/// The runtime should ignore panics on spawned tasks.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The panic is forwarded to the task&#39;s [`JoinHandle`] and all spawned</span>
-        <span class="doccomment">/// tasks continue running normally.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This is the default behavior.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime::{self, UnhandledPanic};</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # pub fn main() {</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
-        <span class="doccomment">///     .unhandled_panic(UnhandledPanic::Ignore)</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let task1 = rt.spawn(async { panic!(&quot;boom&quot;); });</span>
-        <span class="doccomment">/// let task2 = rt.spawn(async {</span>
-        <span class="doccomment">///     // This task completes normally</span>
-        <span class="doccomment">///     &quot;done&quot;</span>
-        <span class="doccomment">/// });</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// rt.block_on(async {</span>
-        <span class="doccomment">///     // The panic on the first task is forwarded to the `JoinHandle`</span>
-        <span class="doccomment">///     assert!(task1.await.is_err());</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">///     // The second task completes normally</span>
-        <span class="doccomment">///     assert!(task2.await.is_ok());</span>
-        <span class="doccomment">/// })</span>
-        <span class="doccomment">/// # }</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`JoinHandle`]: struct@crate::task::JoinHandle</span>
-        <span class="ident">Ignore</span>,
+<span class="macro">cfg_unstable! </span>{
+    <span class="doccomment">/// How the runtime should respond to unhandled panics.
+    ///
+    /// Instances of `UnhandledPanic` are passed to `Builder::unhandled_panic`
+    /// to configure the runtime behavior when a spawned task panics.
+    ///
+    /// See [`Builder::unhandled_panic`] for more details.
+    </span><span class="attribute">#[derive(Debug, Clone)]
+    #[non_exhaustive]
+    </span><span class="kw">pub enum </span>UnhandledPanic {
+        <span class="doccomment">/// The runtime should ignore panics on spawned tasks.
+        ///
+        /// The panic is forwarded to the task&#39;s [`JoinHandle`] and all spawned
+        /// tasks continue running normally.
+        ///
+        /// This is the default behavior.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use tokio::runtime::{self, UnhandledPanic};
+        ///
+        /// # pub fn main() {
+        /// let rt = runtime::Builder::new_current_thread()
+        ///     .unhandled_panic(UnhandledPanic::Ignore)
+        ///     .build()
+        ///     .unwrap();
+        ///
+        /// let task1 = rt.spawn(async { panic!(&quot;boom&quot;); });
+        /// let task2 = rt.spawn(async {
+        ///     // This task completes normally
+        ///     &quot;done&quot;
+        /// });
+        ///
+        /// rt.block_on(async {
+        ///     // The panic on the first task is forwarded to the `JoinHandle`
+        ///     assert!(task1.await.is_err());
+        ///
+        ///     // The second task completes normally
+        ///     assert!(task2.await.is_ok());
+        /// })
+        /// # }
+        /// ```
+        ///
+        /// [`JoinHandle`]: struct@crate::task::JoinHandle
+        </span>Ignore,
 
-        <span class="doccomment">/// The runtime should immediately shutdown if a spawned task panics.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The runtime will immediately shutdown even if the panicked task&#39;s</span>
-        <span class="doccomment">/// [`JoinHandle`] is still available. All further spawned tasks will be</span>
-        <span class="doccomment">/// immediately dropped and call to [`Runtime::block_on`] will panic.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```should_panic</span>
-        <span class="doccomment">/// use tokio::runtime::{self, UnhandledPanic};</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # pub fn main() {</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
-        <span class="doccomment">///     .unhandled_panic(UnhandledPanic::ShutdownRuntime)</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// rt.spawn(async { panic!(&quot;boom&quot;); });</span>
-        <span class="doccomment">/// rt.spawn(async {</span>
-        <span class="doccomment">///     // This task never completes.</span>
-        <span class="doccomment">/// });</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// rt.block_on(async {</span>
-        <span class="doccomment">///     // Do some work</span>
-        <span class="doccomment">/// # loop { tokio::task::yield_now().await; }</span>
-        <span class="doccomment">/// })</span>
-        <span class="doccomment">/// # }</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`JoinHandle`]: struct@crate::task::JoinHandle</span>
-        <span class="ident">ShutdownRuntime</span>,
+        <span class="doccomment">/// The runtime should immediately shutdown if a spawned task panics.
+        ///
+        /// The runtime will immediately shutdown even if the panicked task&#39;s
+        /// [`JoinHandle`] is still available. All further spawned tasks will be
+        /// immediately dropped and call to [`Runtime::block_on`] will panic.
+        ///
+        /// # Examples
+        ///
+        /// ```should_panic
+        /// use tokio::runtime::{self, UnhandledPanic};
+        ///
+        /// # pub fn main() {
+        /// let rt = runtime::Builder::new_current_thread()
+        ///     .unhandled_panic(UnhandledPanic::ShutdownRuntime)
+        ///     .build()
+        ///     .unwrap();
+        ///
+        /// rt.spawn(async { panic!(&quot;boom&quot;); });
+        /// rt.spawn(async {
+        ///     // This task never completes.
+        /// });
+        ///
+        /// rt.block_on(async {
+        ///     // Do some work
+        /// # loop { tokio::task::yield_now().await; }
+        /// })
+        /// # }
+        /// ```
+        ///
+        /// [`JoinHandle`]: struct@crate::task::JoinHandle
+        </span>ShutdownRuntime,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ThreadNameFn</span> <span class="op">=</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ThreadNameFn = std::sync::Arc&lt;<span class="kw">dyn </span>Fn() -&gt; String + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="ident">CurrentThread</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
-    <span class="ident">MultiThread</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Kind {
+    CurrentThread,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;rt-multi-thread&quot;</span>, not(tokio_wasi)))]
+    </span>MultiThread,
 }
 
-<span class="kw">impl</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// Returns a new builder with the current thread scheduler selected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To spawn non-`Send` tasks on the resulting runtime, combine it with a</span>
-    <span class="doccomment">/// [`LocalSet`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_current_thread</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">loom</span>)]</span>
-        <span class="kw">const</span> <span class="ident">EVENT_INTERVAL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
-        <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-        <span class="kw">const</span> <span class="ident">EVENT_INTERVAL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">61</span>;
+<span class="kw">impl </span>Builder {
+    <span class="doccomment">/// Returns a new builder with the current thread scheduler selected.
+    ///
+    /// Configuration methods can be chained on the return value.
+    ///
+    /// To spawn non-`Send` tasks on the resulting runtime, combine it with a
+    /// [`LocalSet`].
+    ///
+    /// [`LocalSet`]: crate::task::LocalSet
+    </span><span class="kw">pub fn </span>new_current_thread() -&gt; Builder {
+        <span class="attribute">#[cfg(loom)]
+        </span><span class="kw">const </span>EVENT_INTERVAL: u32 = <span class="number">4</span>;
+        <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.
+        </span><span class="attribute">#[cfg(not(loom))]
+        </span><span class="kw">const </span>EVENT_INTERVAL: u32 = <span class="number">61</span>;
 
-        <span class="ident">Builder::new</span>(<span class="ident">Kind::CurrentThread</span>, <span class="number">31</span>, <span class="ident">EVENT_INTERVAL</span>)
+        Builder::new(Kind::CurrentThread, <span class="number">31</span>, EVENT_INTERVAL)
     }
 
-    <span class="macro">cfg_not_wasi!</span> {
-        <span class="doccomment">/// Returns a new builder with the multi thread scheduler selected.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_multi_thread</span>() -&gt; <span class="ident">Builder</span> {
-            <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.</span>
-            <span class="ident">Builder::new</span>(<span class="ident">Kind::MultiThread</span>, <span class="number">61</span>, <span class="number">61</span>)
+    <span class="macro">cfg_not_wasi! </span>{
+        <span class="doccomment">/// Returns a new builder with the multi thread scheduler selected.
+        ///
+        /// Configuration methods can be chained on the return value.
+        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;rt-multi-thread&quot;</span>)]
+        #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt-multi-thread&quot;</span>)))]
+        </span><span class="kw">pub fn </span>new_multi_thread() -&gt; Builder {
+            <span class="comment">// The number `61` is fairly arbitrary. I believe this value was copied from golang.
+            </span>Builder::new(Kind::MultiThread, <span class="number">61</span>, <span class="number">61</span>)
         }
     }
 
-    <span class="doccomment">/// Returns a new runtime builder initialized with default configuration</span>
-    <span class="doccomment">/// values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Configuration methods can be chained on the return value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">global_queue_interval</span>: <span class="ident">u32</span>, <span class="ident">event_interval</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder</span> {
-            <span class="ident">kind</span>,
+    <span class="doccomment">/// Returns a new runtime builder initialized with default configuration
+    /// values.
+    ///
+    /// Configuration methods can be chained on the return value.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(kind: Kind, global_queue_interval: u32, event_interval: u32) -&gt; Builder {
+        Builder {
+            kind,
 
-            <span class="comment">// I/O defaults to &quot;off&quot;</span>
-            <span class="ident">enable_io</span>: <span class="bool-val">false</span>,
+            <span class="comment">// I/O defaults to &quot;off&quot;
+            </span>enable_io: <span class="bool-val">false</span>,
 
-            <span class="comment">// Time defaults to &quot;off&quot;</span>
-            <span class="ident">enable_time</span>: <span class="bool-val">false</span>,
+            <span class="comment">// Time defaults to &quot;off&quot;
+            </span>enable_time: <span class="bool-val">false</span>,
 
-            <span class="comment">// The clock starts not-paused</span>
-            <span class="ident">start_paused</span>: <span class="bool-val">false</span>,
+            <span class="comment">// The clock starts not-paused
+            </span>start_paused: <span class="bool-val">false</span>,
 
-            <span class="comment">// Default to lazy auto-detection (one thread per CPU core)</span>
-            <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
+            <span class="comment">// Default to lazy auto-detection (one thread per CPU core)
+            </span>worker_threads: <span class="prelude-val">None</span>,
 
-            <span class="ident">max_blocking_threads</span>: <span class="number">512</span>,
+            max_blocking_threads: <span class="number">512</span>,
 
-            <span class="comment">// Default thread name</span>
-            <span class="ident">thread_name</span>: <span class="ident">std::sync::Arc::new</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;tokio-runtime-worker&quot;</span>.<span class="ident">into</span>()),
+            <span class="comment">// Default thread name
+            </span>thread_name: std::sync::Arc::new(|| <span class="string">&quot;tokio-runtime-worker&quot;</span>.into()),
 
-            <span class="comment">// Do not set a stack size by default</span>
-            <span class="ident">thread_stack_size</span>: <span class="prelude-val">None</span>,
+            <span class="comment">// Do not set a stack size by default
+            </span>thread_stack_size: <span class="prelude-val">None</span>,
 
-            <span class="comment">// No worker thread callbacks</span>
-            <span class="ident">after_start</span>: <span class="prelude-val">None</span>,
-            <span class="ident">before_stop</span>: <span class="prelude-val">None</span>,
-            <span class="ident">before_park</span>: <span class="prelude-val">None</span>,
-            <span class="ident">after_unpark</span>: <span class="prelude-val">None</span>,
+            <span class="comment">// No worker thread callbacks
+            </span>after_start: <span class="prelude-val">None</span>,
+            before_stop: <span class="prelude-val">None</span>,
+            before_park: <span class="prelude-val">None</span>,
+            after_unpark: <span class="prelude-val">None</span>,
 
-            <span class="ident">keep_alive</span>: <span class="prelude-val">None</span>,
+            keep_alive: <span class="prelude-val">None</span>,
 
-            <span class="comment">// Defaults for these values depend on the scheduler kind, so we get them</span>
-            <span class="comment">// as parameters.</span>
-            <span class="ident">global_queue_interval</span>,
-            <span class="ident">event_interval</span>,
+            <span class="comment">// Defaults for these values depend on the scheduler kind, so we get them
+            // as parameters.
+            </span>global_queue_interval,
+            event_interval,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-            <span class="ident">unhandled_panic</span>: <span class="ident">UnhandledPanic::Ignore</span>,
+            <span class="attribute">#[cfg(tokio_unstable)]
+            </span>unhandled_panic: UnhandledPanic::Ignore,
 
-            <span class="ident">disable_lifo_slot</span>: <span class="bool-val">false</span>,
+            disable_lifo_slot: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Enables both I/O and time drivers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Doing this is a shorthand for calling `enable_io` and `enable_time`</span>
-    <span class="doccomment">/// individually. If additional components are added to Tokio in the future,</span>
-    <span class="doccomment">/// `enable_all` will include these future components.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tokio::runtime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .enable_all()</span>
-    <span class="doccomment">///     .build()</span>
-    <span class="doccomment">///     .unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-            <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;net&quot;</span>,
-            <span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>),
-            <span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>)
-        ))]</span>
-        <span class="self">self</span>.<span class="ident">enable_io</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
-        <span class="self">self</span>.<span class="ident">enable_time</span>();
+    <span class="doccomment">/// Enables both I/O and time drivers.
+    ///
+    /// Doing this is a shorthand for calling `enable_io` and `enable_time`
+    /// individually. If additional components are added to Tokio in the future,
+    /// `enable_all` will include these future components.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::runtime;
+    ///
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .enable_all()
+    ///     .build()
+    ///     .unwrap();
+    /// ```
+    </span><span class="kw">pub fn </span>enable_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="attribute">#[cfg(any(
+            feature = <span class="string">&quot;net&quot;</span>,
+            all(unix, feature = <span class="string">&quot;process&quot;</span>),
+            all(unix, feature = <span class="string">&quot;signal&quot;</span>)
+        ))]
+        </span><span class="self">self</span>.enable_io();
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
+        </span><span class="self">self</span>.enable_time();
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the number of worker threads the `Runtime` will use.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be any number above 0 though it is advised to keep this value</span>
-    <span class="doccomment">/// on the smaller side.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Default</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is the number of cores available to the system.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When using the `current_thread` runtime this method has no effect.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Multi threaded runtime with 4 threads</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tokio::runtime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This will spawn a work-stealing runtime with 4 worker threads.</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .worker_threads(4)</span>
-    <span class="doccomment">///     .build()</span>
-    <span class="doccomment">///     .unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// rt.spawn(async move {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Current thread runtime (will only run on the current thread via `Runtime::block_on`)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tokio::runtime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a runtime that _must_ be driven from a call</span>
-    <span class="doccomment">/// // to `Runtime::block_on`.</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
-    <span class="doccomment">///     .build()</span>
-    <span class="doccomment">///     .unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This will run the runtime and future on the current thread</span>
-    <span class="doccomment">/// rt.block_on(async move {});</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if `val` is not larger than `0`.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">worker_threads</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">val</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Worker threads cannot be set to 0&quot;</span>);
-        <span class="self">self</span>.<span class="ident">worker_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the number of worker threads the `Runtime` will use.
+    ///
+    /// This can be any number above 0 though it is advised to keep this value
+    /// on the smaller side.
+    ///
+    /// # Default
+    ///
+    /// The default value is the number of cores available to the system.
+    ///
+    /// When using the `current_thread` runtime this method has no effect.
+    ///
+    /// # Examples
+    ///
+    /// ## Multi threaded runtime with 4 threads
+    ///
+    /// ```
+    /// use tokio::runtime;
+    ///
+    /// // This will spawn a work-stealing runtime with 4 worker threads.
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .worker_threads(4)
+    ///     .build()
+    ///     .unwrap();
+    ///
+    /// rt.spawn(async move {});
+    /// ```
+    ///
+    /// ## Current thread runtime (will only run on the current thread via `Runtime::block_on`)
+    ///
+    /// ```
+    /// use tokio::runtime;
+    ///
+    /// // Create a runtime that _must_ be driven from a call
+    /// // to `Runtime::block_on`.
+    /// let rt = runtime::Builder::new_current_thread()
+    ///     .build()
+    ///     .unwrap();
+    ///
+    /// // This will run the runtime and future on the current thread
+    /// rt.block_on(async move {});
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This will panic if `val` is not larger than `0`.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>worker_threads(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="macro">assert!</span>(val &gt; <span class="number">0</span>, <span class="string">&quot;Worker threads cannot be set to 0&quot;</span>);
+        <span class="self">self</span>.worker_threads = <span class="prelude-val">Some</span>(val);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies the limit for additional threads spawned by the Runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These threads are used for blocking operations like tasks spawned</span>
-    <span class="doccomment">/// through [`spawn_blocking`]. Unlike the [`worker_threads`], they are not</span>
-    <span class="doccomment">/// always active and will exit if left idle for too long. You can change</span>
-    <span class="doccomment">/// this timeout duration with [`thread_keep_alive`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default value is 512.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will panic if `val` is not larger than `0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Upgrading from 0.x</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In old versions `max_threads` limited both blocking and worker threads, but the</span>
-    <span class="doccomment">/// current `max_blocking_threads` does not include async worker threads in the count.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`spawn_blocking`]: fn@crate::task::spawn_blocking</span>
-    <span class="doccomment">/// [`worker_threads`]: Self::worker_threads</span>
-    <span class="doccomment">/// [`thread_keep_alive`]: Self::thread_keep_alive</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;max_threads&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_blocking_threads</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">val</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;Max blocking threads cannot be set to 0&quot;</span>);
-        <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies the limit for additional threads spawned by the Runtime.
+    ///
+    /// These threads are used for blocking operations like tasks spawned
+    /// through [`spawn_blocking`]. Unlike the [`worker_threads`], they are not
+    /// always active and will exit if left idle for too long. You can change
+    /// this timeout duration with [`thread_keep_alive`].
+    ///
+    /// The default value is 512.
+    ///
+    /// # Panics
+    ///
+    /// This will panic if `val` is not larger than `0`.
+    ///
+    /// # Upgrading from 0.x
+    ///
+    /// In old versions `max_threads` limited both blocking and worker threads, but the
+    /// current `max_blocking_threads` does not include async worker threads in the count.
+    ///
+    /// [`spawn_blocking`]: fn@crate::task::spawn_blocking
+    /// [`worker_threads`]: Self::worker_threads
+    /// [`thread_keep_alive`]: Self::thread_keep_alive
+    </span><span class="attribute">#[track_caller]
+    #[cfg_attr(docsrs, doc(alias = <span class="string">&quot;max_threads&quot;</span>))]
+    </span><span class="kw">pub fn </span>max_blocking_threads(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="macro">assert!</span>(val &gt; <span class="number">0</span>, <span class="string">&quot;Max blocking threads cannot be set to 0&quot;</span>);
+        <span class="self">self</span>.max_blocking_threads = val;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets name of threads spawned by the `Runtime`&#39;s thread pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default name is &quot;tokio-runtime-worker&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .thread_name(&quot;my-pool&quot;)</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">thread_name</span> <span class="op">=</span> <span class="ident">std::sync::Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets name of threads spawned by the `Runtime`&#39;s thread pool.
+    ///
+    /// The default name is &quot;tokio-runtime-worker&quot;.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    ///
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .thread_name(&quot;my-pool&quot;)
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>thread_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="kw">let </span>val = val.into();
+        <span class="self">self</span>.thread_name = std::sync::Arc::new(<span class="kw">move </span>|| val.clone());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets a function used to generate the name of threads spawned by the `Runtime`&#39;s thread pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default name fn is `|| &quot;tokio-runtime-worker&quot;.into()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # use std::sync::atomic::{AtomicUsize, Ordering};</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .thread_name_fn(|| {</span>
-    <span class="doccomment">///        static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);</span>
-    <span class="doccomment">///        let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);</span>
-    <span class="doccomment">///        format!(&quot;my-pool-{}&quot;, id)</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_name_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">String</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Sets a function used to generate the name of threads spawned by the `Runtime`&#39;s thread pool.
+    ///
+    /// The default name fn is `|| &quot;tokio-runtime-worker&quot;.into()`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # use std::sync::atomic::{AtomicUsize, Ordering};
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .thread_name_fn(|| {
+    ///        static ATOMIC_ID: AtomicUsize = AtomicUsize::new(0);
+    ///        let id = ATOMIC_ID.fetch_add(1, Ordering::SeqCst);
+    ///        format!(&quot;my-pool-{}&quot;, id)
+    ///     })
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>thread_name_fn&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn() -&gt; String + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">thread_name</span> <span class="op">=</span> <span class="ident">std::sync::Arc::new</span>(<span class="ident">f</span>);
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.thread_name = std::sync::Arc::new(f);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the stack size (in bytes) for worker threads.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The actual stack size may be greater than this value if the platform</span>
-    <span class="doccomment">/// specifies minimal stack size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default stack size for spawned threads is 2 MiB, though this</span>
-    <span class="doccomment">/// particular stack size is subject to change in the future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .thread_stack_size(32 * 1024)</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_stack_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">thread_stack_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the stack size (in bytes) for worker threads.
+    ///
+    /// The actual stack size may be greater than this value if the platform
+    /// specifies minimal stack size.
+    ///
+    /// The default stack size for spawned threads is 2 MiB, though this
+    /// particular stack size is subject to change in the future.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    ///
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .thread_stack_size(32 * 1024)
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>thread_stack_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.thread_stack_size = <span class="prelude-val">Some</span>(val);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Executes function `f` after each thread is started but before it starts</span>
-    <span class="doccomment">/// doing work.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for bookkeeping and monitoring use cases.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .on_thread_start(|| {</span>
-    <span class="doccomment">///         println!(&quot;thread started&quot;);</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_thread_start</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Executes function `f` after each thread is started but before it starts
+    /// doing work.
+    ///
+    /// This is intended for bookkeeping and monitoring use cases.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # pub fn main() {
+    /// let runtime = runtime::Builder::new_multi_thread()
+    ///     .on_thread_start(|| {
+    ///         println!(&quot;thread started&quot;);
+    ///     })
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(not(loom))]
+    </span><span class="kw">pub fn </span>on_thread_start&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn() + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">after_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::sync::Arc::new</span>(<span class="ident">f</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.after_start = <span class="prelude-val">Some</span>(std::sync::Arc::new(f));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Executes function `f` before each thread stops.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for bookkeeping and monitoring use cases.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .on_thread_stop(|| {</span>
-    <span class="doccomment">///         println!(&quot;thread stopping&quot;);</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_thread_stop</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Executes function `f` before each thread stops.
+    ///
+    /// This is intended for bookkeeping and monitoring use cases.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # pub fn main() {
+    /// let runtime = runtime::Builder::new_multi_thread()
+    ///     .on_thread_stop(|| {
+    ///         println!(&quot;thread stopping&quot;);
+    ///     })
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(not(loom))]
+    </span><span class="kw">pub fn </span>on_thread_stop&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn() + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">before_stop</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::sync::Arc::new</span>(<span class="ident">f</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.before_stop = <span class="prelude-val">Some</span>(std::sync::Arc::new(f));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Executes function `f` just before a thread is parked (goes idle).</span>
-    <span class="doccomment">/// `f` is called within the Tokio context, so functions like [`tokio::spawn`](crate::spawn)</span>
-    <span class="doccomment">/// can be called, and may result in this thread being unparked immediately.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be used to start work only when the executor is idle, or for bookkeeping</span>
-    <span class="doccomment">/// and monitoring purposes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: There can only be one park callback for a runtime; calling this function</span>
-    <span class="doccomment">/// more than once replaces the last callback defined, rather than adding to it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Multithreaded executor</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// # use std::sync::atomic::{AtomicBool, Ordering};</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # use tokio::sync::Barrier;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let once = AtomicBool::new(true);</span>
-    <span class="doccomment">/// let barrier = Arc::new(Barrier::new(2));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .worker_threads(1)</span>
-    <span class="doccomment">///     .on_thread_park({</span>
-    <span class="doccomment">///         let barrier = barrier.clone();</span>
-    <span class="doccomment">///         move || {</span>
-    <span class="doccomment">///             let barrier = barrier.clone();</span>
-    <span class="doccomment">///             if once.swap(false, Ordering::Relaxed) {</span>
-    <span class="doccomment">///                 tokio::spawn(async move { barrier.wait().await; });</span>
-    <span class="doccomment">///            }</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build()</span>
-    <span class="doccomment">///     .unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// runtime.block_on(async {</span>
-    <span class="doccomment">///    barrier.wait().await;</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// ## Current thread executor</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::sync::Arc;</span>
-    <span class="doccomment">/// # use std::sync::atomic::{AtomicBool, Ordering};</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # use tokio::sync::Barrier;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let once = AtomicBool::new(true);</span>
-    <span class="doccomment">/// let barrier = Arc::new(Barrier::new(2));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new_current_thread()</span>
-    <span class="doccomment">///     .on_thread_park({</span>
-    <span class="doccomment">///         let barrier = barrier.clone();</span>
-    <span class="doccomment">///         move || {</span>
-    <span class="doccomment">///             let barrier = barrier.clone();</span>
-    <span class="doccomment">///             if once.swap(false, Ordering::Relaxed) {</span>
-    <span class="doccomment">///                 tokio::spawn(async move { barrier.wait().await; });</span>
-    <span class="doccomment">///            }</span>
-    <span class="doccomment">///         }</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build()</span>
-    <span class="doccomment">///     .unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// runtime.block_on(async {</span>
-    <span class="doccomment">///    barrier.wait().await;</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_thread_park</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Executes function `f` just before a thread is parked (goes idle).
+    /// `f` is called within the Tokio context, so functions like [`tokio::spawn`](crate::spawn)
+    /// can be called, and may result in this thread being unparked immediately.
+    ///
+    /// This can be used to start work only when the executor is idle, or for bookkeeping
+    /// and monitoring purposes.
+    ///
+    /// Note: There can only be one park callback for a runtime; calling this function
+    /// more than once replaces the last callback defined, rather than adding to it.
+    ///
+    /// # Examples
+    ///
+    /// ## Multithreaded executor
+    /// ```
+    /// # use std::sync::Arc;
+    /// # use std::sync::atomic::{AtomicBool, Ordering};
+    /// # use tokio::runtime;
+    /// # use tokio::sync::Barrier;
+    /// # pub fn main() {
+    /// let once = AtomicBool::new(true);
+    /// let barrier = Arc::new(Barrier::new(2));
+    ///
+    /// let runtime = runtime::Builder::new_multi_thread()
+    ///     .worker_threads(1)
+    ///     .on_thread_park({
+    ///         let barrier = barrier.clone();
+    ///         move || {
+    ///             let barrier = barrier.clone();
+    ///             if once.swap(false, Ordering::Relaxed) {
+    ///                 tokio::spawn(async move { barrier.wait().await; });
+    ///            }
+    ///         }
+    ///     })
+    ///     .build()
+    ///     .unwrap();
+    ///
+    /// runtime.block_on(async {
+    ///    barrier.wait().await;
+    /// })
+    /// # }
+    /// ```
+    /// ## Current thread executor
+    /// ```
+    /// # use std::sync::Arc;
+    /// # use std::sync::atomic::{AtomicBool, Ordering};
+    /// # use tokio::runtime;
+    /// # use tokio::sync::Barrier;
+    /// # pub fn main() {
+    /// let once = AtomicBool::new(true);
+    /// let barrier = Arc::new(Barrier::new(2));
+    ///
+    /// let runtime = runtime::Builder::new_current_thread()
+    ///     .on_thread_park({
+    ///         let barrier = barrier.clone();
+    ///         move || {
+    ///             let barrier = barrier.clone();
+    ///             if once.swap(false, Ordering::Relaxed) {
+    ///                 tokio::spawn(async move { barrier.wait().await; });
+    ///            }
+    ///         }
+    ///     })
+    ///     .build()
+    ///     .unwrap();
+    ///
+    /// runtime.block_on(async {
+    ///    barrier.wait().await;
+    /// })
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(not(loom))]
+    </span><span class="kw">pub fn </span>on_thread_park&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn() + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">before_park</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::sync::Arc::new</span>(<span class="ident">f</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.before_park = <span class="prelude-val">Some</span>(std::sync::Arc::new(f));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Executes function `f` just after a thread unparks (starts executing tasks).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for bookkeeping and monitoring use cases; note that work</span>
-    <span class="doccomment">/// in this callback will increase latencies when the application has allowed one or</span>
-    <span class="doccomment">/// more runtime threads to go idle.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: There can only be one unpark callback for a runtime; calling this function</span>
-    <span class="doccomment">/// more than once replaces the last callback defined, rather than adding to it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let runtime = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .on_thread_unpark(|| {</span>
-    <span class="doccomment">///         println!(&quot;thread unparking&quot;);</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// runtime.unwrap().block_on(async {</span>
-    <span class="doccomment">///    tokio::task::yield_now().await;</span>
-    <span class="doccomment">///    println!(&quot;Hello from Tokio!&quot;);</span>
-    <span class="doccomment">/// })</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">loom</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_thread_unpark</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Executes function `f` just after a thread unparks (starts executing tasks).
+    ///
+    /// This is intended for bookkeeping and monitoring use cases; note that work
+    /// in this callback will increase latencies when the application has allowed one or
+    /// more runtime threads to go idle.
+    ///
+    /// Note: There can only be one unpark callback for a runtime; calling this function
+    /// more than once replaces the last callback defined, rather than adding to it.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # pub fn main() {
+    /// let runtime = runtime::Builder::new_multi_thread()
+    ///     .on_thread_unpark(|| {
+    ///         println!(&quot;thread unparking&quot;);
+    ///     })
+    ///     .build();
+    ///
+    /// runtime.unwrap().block_on(async {
+    ///    tokio::task::yield_now().await;
+    ///    println!(&quot;Hello from Tokio!&quot;);
+    /// })
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(not(loom))]
+    </span><span class="kw">pub fn </span>on_thread_unpark&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>F: Fn() + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">after_unpark</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std::sync::Arc::new</span>(<span class="ident">f</span>));
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.after_unpark = <span class="prelude-val">Some</span>(std::sync::Arc::new(f));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Creates the configured `Runtime`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `Runtime` instance is ready to spawn tasks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tokio::runtime::Builder;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let rt  = Builder::new_multi_thread().build().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// rt.block_on(async {</span>
-    <span class="doccomment">///     println!(&quot;Hello from the Tokio runtime&quot;);</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::CurrentThread</span> =&gt; <span class="self">self</span>.<span class="ident">build_current_thread_runtime</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
-            <span class="ident">Kind::MultiThread</span> =&gt; <span class="self">self</span>.<span class="ident">build_threaded_runtime</span>(),
+    <span class="doccomment">/// Creates the configured `Runtime`.
+    ///
+    /// The returned `Runtime` instance is ready to spawn tasks.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::runtime::Builder;
+    ///
+    /// let rt  = Builder::new_multi_thread().build().unwrap();
+    ///
+    /// rt.block_on(async {
+    ///     println!(&quot;Hello from the Tokio runtime&quot;);
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Runtime&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
+            Kind::CurrentThread =&gt; <span class="self">self</span>.build_current_thread_runtime(),
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;rt-multi-thread&quot;</span>, not(tokio_wasi)))]
+            </span>Kind::MultiThread =&gt; <span class="self">self</span>.build_threaded_runtime(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_cfg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">driver::Cfg</span> {
-        <span class="ident">driver::Cfg</span> {
-            <span class="ident">enable_pause_time</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-                <span class="ident">Kind::CurrentThread</span> =&gt; <span class="bool-val">true</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>, <span class="ident">not</span>(<span class="ident">tokio_wasi</span>)))]</span>
-                <span class="ident">Kind::MultiThread</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>get_cfg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; driver::Cfg {
+        driver::Cfg {
+            enable_pause_time: <span class="kw">match </span><span class="self">self</span>.kind {
+                Kind::CurrentThread =&gt; <span class="bool-val">true</span>,
+                <span class="attribute">#[cfg(all(feature = <span class="string">&quot;rt-multi-thread&quot;</span>, not(tokio_wasi)))]
+                </span>Kind::MultiThread =&gt; <span class="bool-val">false</span>,
             },
-            <span class="ident">enable_io</span>: <span class="self">self</span>.<span class="ident">enable_io</span>,
-            <span class="ident">enable_time</span>: <span class="self">self</span>.<span class="ident">enable_time</span>,
-            <span class="ident">start_paused</span>: <span class="self">self</span>.<span class="ident">start_paused</span>,
+            enable_io: <span class="self">self</span>.enable_io,
+            enable_time: <span class="self">self</span>.enable_time,
+            start_paused: <span class="self">self</span>.start_paused,
         }
     }
 
-    <span class="doccomment">/// Sets a custom timeout for a thread in the blocking pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, the timeout for a thread is set to 10 seconds. This can</span>
-    <span class="doccomment">/// be overridden using .thread_keep_alive().</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .thread_keep_alive(Duration::from_millis(100))</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">keep_alive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets a custom timeout for a thread in the blocking pool.
+    ///
+    /// By default, the timeout for a thread is set to 10 seconds. This can
+    /// be overridden using .thread_keep_alive().
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # use std::time::Duration;
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .thread_keep_alive(Duration::from_millis(100))
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>thread_keep_alive(<span class="kw-2">&amp;mut </span><span class="self">self</span>, duration: Duration) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.keep_alive = <span class="prelude-val">Some</span>(duration);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll the global
+    /// task queue.
+    ///
+    /// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.
+    ///
+    /// By default the global queue interval is:
+    ///
+    /// * `31` for the current-thread scheduler.
+    /// * `61` for the multithreaded scheduler.
+    ///
+    /// Schedulers have a local queue of already-claimed tasks, and a global queue of incoming
+    /// tasks. Setting the interval to a smaller value increases the fairness of the scheduler,
+    /// at the cost of more synchronization overhead. That can be beneficial for prioritizing
+    /// getting started on new work, especially if tasks frequently yield rather than complete
+    /// or await on further I/O. Conversely, a higher value prioritizes existing work, and
+    /// is a good choice when most tasks quickly complete polling.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .global_queue_interval(31)
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>global_queue_interval(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.global_queue_interval = val;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll for
+    /// external events (timers, I/O, and so on).
+    ///
+    /// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.
+    ///
+    /// By default, the event interval is `61` for all scheduler types.
+    ///
+    /// Setting the event interval determines the effective &quot;priority&quot; of delivering
+    /// these external events (which may wake up additional tasks), compared to
+    /// executing tasks that are currently ready to run. A smaller value is useful
+    /// when tasks frequently spend a long time in polling, or frequently yield,
+    /// which can result in overly long delays picking up I/O events. Conversely,
+    /// picking up new events requires extra synchronization and syscall overhead,
+    /// so if tasks generally complete their polling quickly, a higher event interval
+    /// will minimize that overhead while still keeping the scheduler responsive to
+    /// events.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use tokio::runtime;
+    /// # pub fn main() {
+    /// let rt = runtime::Builder::new_multi_thread()
+    ///     .event_interval(31)
+    ///     .build();
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>event_interval(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u32) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.event_interval = val;
+        <span class="self">self
+    </span>}
+
+    <span class="macro">cfg_unstable! </span>{
+        <span class="doccomment">/// Configure how the runtime responds to an unhandled panic on a
+        /// spawned task.
+        ///
+        /// By default, an unhandled panic (i.e. a panic not caught by
+        /// [`std::panic::catch_unwind`]) has no impact on the runtime&#39;s
+        /// execution. The panic is error value is forwarded to the task&#39;s
+        /// [`JoinHandle`] and all other spawned tasks continue running.
+        ///
+        /// The `unhandled_panic` option enables configuring this behavior.
+        ///
+        /// * `UnhandledPanic::Ignore` is the default behavior. Panics on
+        ///   spawned tasks have no impact on the runtime&#39;s execution.
+        /// * `UnhandledPanic::ShutdownRuntime` will force the runtime to
+        ///   shutdown immediately when a spawned task panics even if that
+        ///   task&#39;s `JoinHandle` has not been dropped. All other spawned tasks
+        ///   will immediately terminate and further calls to
+        ///   [`Runtime::block_on`] will panic.
+        ///
+        /// # Unstable
+        ///
+        /// This option is currently unstable and its implementation is
+        /// incomplete. The API may change or be removed in the future. See
+        /// tokio-rs/tokio#4516 for more details.
+        ///
+        /// # Examples
+        ///
+        /// The following demonstrates a runtime configured to shutdown on
+        /// panic. The first spawned task panics and results in the runtime
+        /// shutting down. The second spawned task never has a chance to
+        /// execute. The call to `block_on` will panic due to the runtime being
+        /// forcibly shutdown.
+        ///
+        /// ```should_panic
+        /// use tokio::runtime::{self, UnhandledPanic};
+        ///
+        /// # pub fn main() {
+        /// let rt = runtime::Builder::new_current_thread()
+        ///     .unhandled_panic(UnhandledPanic::ShutdownRuntime)
+        ///     .build()
+        ///     .unwrap();
+        ///
+        /// rt.spawn(async { panic!(&quot;boom&quot;); });
+        /// rt.spawn(async {
+        ///     // This task never completes.
+        /// });
+        ///
+        /// rt.block_on(async {
+        ///     // Do some work
+        /// # loop { tokio::task::yield_now().await; }
+        /// })
+        /// # }
+        /// ```
+        ///
+        /// [`JoinHandle`]: struct@crate::task::JoinHandle
+        </span><span class="kw">pub fn </span>unhandled_panic(<span class="kw-2">&amp;mut </span><span class="self">self</span>, behavior: UnhandledPanic) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+            <span class="self">self</span>.unhandled_panic = behavior;
+            <span class="self">self
+        </span>}
+
+        <span class="doccomment">/// Disables the LIFO task scheduler heuristic.
+        ///
+        /// The multi-threaded scheduler includes a heuristic for optimizing
+        /// message-passing patterns. This heuristic results in the **last**
+        /// scheduled task being polled first.
+        ///
+        /// To implement this heuristic, each worker thread has a slot which
+        /// holds the task that should be polled next. However, this slot cannot
+        /// be stolen by other worker threads, which can result in lower total
+        /// throughput when tasks tend to have longer poll times.
+        ///
+        /// This configuration option will disable this heuristic resulting in
+        /// all scheduled tasks being pushed into the worker-local queue, which
+        /// is stealable.
+        ///
+        /// Consider trying this option when the task &quot;scheduled&quot; time is high
+        /// but the runtime is underutilized. Use tokio-rs/tokio-metrics to
+        /// collect this data.
+        ///
+        /// # Unstable
+        ///
+        /// This configuration option is considered a workaround for the LIFO
+        /// slot not being stealable. When the slot becomes stealable, we will
+        /// revisit whther or not this option is necessary. See
+        /// tokio-rs/tokio#4941.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use tokio::runtime;
+        ///
+        /// let rt = runtime::Builder::new_multi_thread()
+        ///     .disable_lifo_slot()
+        ///     .build()
+        ///     .unwrap();
+        /// ```
+        </span><span class="kw">pub fn </span>disable_lifo_slot(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+            <span class="self">self</span>.disable_lifo_slot = <span class="bool-val">true</span>;
+            <span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll the global</span>
-    <span class="doccomment">/// task queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default the global queue interval is:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `31` for the current-thread scheduler.</span>
-    <span class="doccomment">/// * `61` for the multithreaded scheduler.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Schedulers have a local queue of already-claimed tasks, and a global queue of incoming</span>
-    <span class="doccomment">/// tasks. Setting the interval to a smaller value increases the fairness of the scheduler,</span>
-    <span class="doccomment">/// at the cost of more synchronization overhead. That can be beneficial for prioritizing</span>
-    <span class="doccomment">/// getting started on new work, especially if tasks frequently yield rather than complete</span>
-    <span class="doccomment">/// or await on further I/O. Conversely, a higher value prioritizes existing work, and</span>
-    <span class="doccomment">/// is a good choice when most tasks quickly complete polling.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .global_queue_interval(31)</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_queue_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">global_queue_interval</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>build_current_thread_runtime(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Runtime&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::runtime::{Config, CurrentThread, HandleInner, Kind};
 
-    <span class="doccomment">/// Sets the number of scheduler ticks after which the scheduler will poll for</span>
-    <span class="doccomment">/// external events (timers, I/O, and so on).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A scheduler &quot;tick&quot; roughly corresponds to one `poll` invocation on a task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, the event interval is `61` for all scheduler types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting the event interval determines the effective &quot;priority&quot; of delivering</span>
-    <span class="doccomment">/// these external events (which may wake up additional tasks), compared to</span>
-    <span class="doccomment">/// executing tasks that are currently ready to run. A smaller value is useful</span>
-    <span class="doccomment">/// when tasks frequently spend a long time in polling, or frequently yield,</span>
-    <span class="doccomment">/// which can result in overly long delays picking up I/O events. Conversely,</span>
-    <span class="doccomment">/// picking up new events requires extra synchronization and syscall overhead,</span>
-    <span class="doccomment">/// so if tasks generally complete their polling quickly, a higher event interval</span>
-    <span class="doccomment">/// will minimize that overhead while still keeping the scheduler responsive to</span>
-    <span class="doccomment">/// events.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tokio::runtime;</span>
-    <span class="doccomment">/// # pub fn main() {</span>
-    <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-    <span class="doccomment">///     .event_interval(31)</span>
-    <span class="doccomment">///     .build();</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">event_interval</span> <span class="op">=</span> <span class="ident">val</span>;
-        <span class="self">self</span>
-    }
+        <span class="kw">let </span>(driver, resources) = driver::Driver::new(<span class="self">self</span>.get_cfg())<span class="question-mark">?</span>;
 
-    <span class="macro">cfg_unstable!</span> {
-        <span class="doccomment">/// Configure how the runtime responds to an unhandled panic on a</span>
-        <span class="doccomment">/// spawned task.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// By default, an unhandled panic (i.e. a panic not caught by</span>
-        <span class="doccomment">/// [`std::panic::catch_unwind`]) has no impact on the runtime&#39;s</span>
-        <span class="doccomment">/// execution. The panic is error value is forwarded to the task&#39;s</span>
-        <span class="doccomment">/// [`JoinHandle`] and all other spawned tasks continue running.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The `unhandled_panic` option enables configuring this behavior.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// * `UnhandledPanic::Ignore` is the default behavior. Panics on</span>
-        <span class="doccomment">///   spawned tasks have no impact on the runtime&#39;s execution.</span>
-        <span class="doccomment">/// * `UnhandledPanic::ShutdownRuntime` will force the runtime to</span>
-        <span class="doccomment">///   shutdown immediately when a spawned task panics even if that</span>
-        <span class="doccomment">///   task&#39;s `JoinHandle` has not been dropped. All other spawned tasks</span>
-        <span class="doccomment">///   will immediately terminate and further calls to</span>
-        <span class="doccomment">///   [`Runtime::block_on`] will panic.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Unstable</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This option is currently unstable and its implementation is</span>
-        <span class="doccomment">/// incomplete. The API may change or be removed in the future. See</span>
-        <span class="doccomment">/// tokio-rs/tokio#4516 for more details.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The following demonstrates a runtime configured to shutdown on</span>
-        <span class="doccomment">/// panic. The first spawned task panics and results in the runtime</span>
-        <span class="doccomment">/// shutting down. The second spawned task never has a chance to</span>
-        <span class="doccomment">/// execute. The call to `block_on` will panic due to the runtime being</span>
-        <span class="doccomment">/// forcibly shutdown.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```should_panic</span>
-        <span class="doccomment">/// use tokio::runtime::{self, UnhandledPanic};</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # pub fn main() {</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
-        <span class="doccomment">///     .unhandled_panic(UnhandledPanic::ShutdownRuntime)</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// rt.spawn(async { panic!(&quot;boom&quot;); });</span>
-        <span class="doccomment">/// rt.spawn(async {</span>
-        <span class="doccomment">///     // This task never completes.</span>
-        <span class="doccomment">/// });</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// rt.block_on(async {</span>
-        <span class="doccomment">///     // Do some work</span>
-        <span class="doccomment">/// # loop { tokio::task::yield_now().await; }</span>
-        <span class="doccomment">/// })</span>
-        <span class="doccomment">/// # }</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`JoinHandle`]: struct@crate::task::JoinHandle</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unhandled_panic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">behavior</span>: <span class="ident">UnhandledPanic</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">unhandled_panic</span> <span class="op">=</span> <span class="ident">behavior</span>;
-            <span class="self">self</span>
-        }
+        <span class="comment">// Blocking pool
+        </span><span class="kw">let </span>blocking_pool = blocking::create_blocking_pool(<span class="self">self</span>, <span class="self">self</span>.max_blocking_threads);
+        <span class="kw">let </span>blocking_spawner = blocking_pool.spawner().clone();
 
-        <span class="doccomment">/// Disables the LIFO task scheduler heuristic.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The multi-threaded scheduler includes a heuristic for optimizing</span>
-        <span class="doccomment">/// message-passing patterns. This heuristic results in the **last**</span>
-        <span class="doccomment">/// scheduled task being polled first.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// To implement this heuristic, each worker thread has a slot which</span>
-        <span class="doccomment">/// holds the task that should be polled next. However, this slot cannot</span>
-        <span class="doccomment">/// be stolen by other worker threads, which can result in lower total</span>
-        <span class="doccomment">/// throughput when tasks tend to have longer poll times.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This configuration option will disable this heuristic resulting in</span>
-        <span class="doccomment">/// all scheduled tasks being pushed into the worker-local queue, which</span>
-        <span class="doccomment">/// is stealable.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Consider trying this option when the task &quot;scheduled&quot; time is high</span>
-        <span class="doccomment">/// but the runtime is underutilized. Use tokio-rs/tokio-metrics to</span>
-        <span class="doccomment">/// collect this data.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Unstable</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This configuration option is considered a workaround for the LIFO</span>
-        <span class="doccomment">/// slot not being stealable. When the slot becomes stealable, we will</span>
-        <span class="doccomment">/// revisit whther or not this option is necessary. See</span>
-        <span class="doccomment">/// tokio-rs/tokio#4941.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-        <span class="doccomment">///     .disable_lifo_slot()</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_lifo_slot</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">disable_lifo_slot</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">build_current_thread_runtime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">Config</span>, <span class="ident">CurrentThread</span>, <span class="ident">HandleInner</span>, <span class="ident">Kind</span>};
-
-        <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver::Driver::new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
-
-        <span class="comment">// Blocking pool</span>
-        <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span> <span class="ident">blocking::create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span>);
-        <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
-
-        <span class="kw">let</span> <span class="ident">handle_inner</span> <span class="op">=</span> <span class="ident">HandleInner</span> {
-            <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
-            <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
-            <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
-            <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
-            <span class="ident">blocking_spawner</span>,
+        <span class="kw">let </span>handle_inner = HandleInner {
+            io_handle: resources.io_handle,
+            time_handle: resources.time_handle,
+            signal_handle: resources.signal_handle,
+            clock: resources.clock,
+            blocking_spawner,
         };
 
-        <span class="comment">// And now put a single-threaded scheduler on top of the timer. When</span>
-        <span class="comment">// there are no futures ready to do something, it&#39;ll let the timer or</span>
-        <span class="comment">// the reactor to generate some new stimuli for the futures to continue</span>
-        <span class="comment">// in their life.</span>
-        <span class="kw">let</span> <span class="ident">scheduler</span> <span class="op">=</span> <span class="ident">CurrentThread::new</span>(
-            <span class="ident">driver</span>,
-            <span class="ident">handle_inner</span>,
-            <span class="ident">Config</span> {
-                <span class="ident">before_park</span>: <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(),
-                <span class="ident">after_unpark</span>: <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>(),
-                <span class="ident">global_queue_interval</span>: <span class="self">self</span>.<span class="ident">global_queue_interval</span>,
-                <span class="ident">event_interval</span>: <span class="self">self</span>.<span class="ident">event_interval</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-                <span class="ident">unhandled_panic</span>: <span class="self">self</span>.<span class="ident">unhandled_panic</span>.<span class="ident">clone</span>(),
-                <span class="ident">disable_lifo_slot</span>: <span class="self">self</span>.<span class="ident">disable_lifo_slot</span>,
+        <span class="comment">// And now put a single-threaded scheduler on top of the timer. When
+        // there are no futures ready to do something, it&#39;ll let the timer or
+        // the reactor to generate some new stimuli for the futures to continue
+        // in their life.
+        </span><span class="kw">let </span>scheduler = CurrentThread::new(
+            driver,
+            handle_inner,
+            Config {
+                before_park: <span class="self">self</span>.before_park.clone(),
+                after_unpark: <span class="self">self</span>.after_unpark.clone(),
+                global_queue_interval: <span class="self">self</span>.global_queue_interval,
+                event_interval: <span class="self">self</span>.event_interval,
+                <span class="attribute">#[cfg(tokio_unstable)]
+                </span>unhandled_panic: <span class="self">self</span>.unhandled_panic.clone(),
+                disable_lifo_slot: <span class="self">self</span>.disable_lifo_slot,
             },
         );
-        <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::CurrentThread</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
+        <span class="kw">let </span>spawner = Spawner::CurrentThread(scheduler.spawner().clone());
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
-            <span class="ident">kind</span>: <span class="ident">Kind::CurrentThread</span>(<span class="ident">scheduler</span>),
-            <span class="ident">handle</span>: <span class="ident">Handle</span> { <span class="ident">spawner</span> },
-            <span class="ident">blocking_pool</span>,
+        <span class="prelude-val">Ok</span>(Runtime {
+            kind: Kind::CurrentThread(scheduler),
+            handle: Handle { spawner },
+            blocking_pool,
         })
     }
 }
 
-<span class="macro">cfg_io_driver!</span> {
-    <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="doccomment">/// Enables the I/O driver.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Doing this enables using net, process, signal, and some I/O types on</span>
-        <span class="doccomment">/// the runtime.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-        <span class="doccomment">///     .enable_io()</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_io</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">enable_io</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>
-        }
+<span class="macro">cfg_io_driver! </span>{
+    <span class="kw">impl </span>Builder {
+        <span class="doccomment">/// Enables the I/O driver.
+        ///
+        /// Doing this enables using net, process, signal, and some I/O types on
+        /// the runtime.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use tokio::runtime;
+        ///
+        /// let rt = runtime::Builder::new_multi_thread()
+        ///     .enable_io()
+        ///     .build()
+        ///     .unwrap();
+        /// ```
+        </span><span class="kw">pub fn </span>enable_io(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+            <span class="self">self</span>.enable_io = <span class="bool-val">true</span>;
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="macro">cfg_time!</span> {
-    <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="doccomment">/// Enables the time driver.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Doing this enables using `tokio::time` on the runtime.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_multi_thread()</span>
-        <span class="doccomment">///     .enable_time()</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">enable_time</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>
-        }
+<span class="macro">cfg_time! </span>{
+    <span class="kw">impl </span>Builder {
+        <span class="doccomment">/// Enables the time driver.
+        ///
+        /// Doing this enables using `tokio::time` on the runtime.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use tokio::runtime;
+        ///
+        /// let rt = runtime::Builder::new_multi_thread()
+        ///     .enable_time()
+        ///     .build()
+        ///     .unwrap();
+        /// ```
+        </span><span class="kw">pub fn </span>enable_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+            <span class="self">self</span>.enable_time = <span class="bool-val">true</span>;
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="macro">cfg_test_util!</span> {
-    <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="doccomment">/// Controls if the runtime&#39;s clock starts paused or advancing.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Pausing time requires the current-thread runtime; construction of</span>
-        <span class="doccomment">/// the runtime will panic otherwise.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Examples</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use tokio::runtime;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let rt = runtime::Builder::new_current_thread()</span>
-        <span class="doccomment">///     .enable_time()</span>
-        <span class="doccomment">///     .start_paused(true)</span>
-        <span class="doccomment">///     .build()</span>
-        <span class="doccomment">///     .unwrap();</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_paused</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start_paused</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-            <span class="self">self</span>.<span class="ident">start_paused</span> <span class="op">=</span> <span class="ident">start_paused</span>;
-            <span class="self">self</span>
-        }
+<span class="macro">cfg_test_util! </span>{
+    <span class="kw">impl </span>Builder {
+        <span class="doccomment">/// Controls if the runtime&#39;s clock starts paused or advancing.
+        ///
+        /// Pausing time requires the current-thread runtime; construction of
+        /// the runtime will panic otherwise.
+        ///
+        /// # Examples
+        ///
+        /// ```
+        /// use tokio::runtime;
+        ///
+        /// let rt = runtime::Builder::new_current_thread()
+        ///     .enable_time()
+        ///     .start_paused(true)
+        ///     .build()
+        ///     .unwrap();
+        /// ```
+        </span><span class="kw">pub fn </span>start_paused(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start_paused: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+            <span class="self">self</span>.start_paused = start_paused;
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="macro">cfg_rt_multi_thread!</span> {
-    <span class="kw">impl</span> <span class="ident">Builder</span> {
-        <span class="kw">fn</span> <span class="ident">build_threaded_runtime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span> {
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sys::num_cpus</span>;
-            <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">Config</span>, <span class="ident">HandleInner</span>, <span class="ident">Kind</span>, <span class="ident">MultiThread</span>};
+<span class="macro">cfg_rt_multi_thread! </span>{
+    <span class="kw">impl </span>Builder {
+        <span class="kw">fn </span>build_threaded_runtime(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Runtime&gt; {
+            <span class="kw">use </span><span class="kw">crate</span>::loom::sys::num_cpus;
+            <span class="kw">use </span><span class="kw">crate</span>::runtime::{Config, HandleInner, Kind, MultiThread};
 
-            <span class="kw">let</span> <span class="ident">core_threads</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">worker_threads</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">num_cpus</span>);
+            <span class="kw">let </span>core_threads = <span class="self">self</span>.worker_threads.unwrap_or_else(num_cpus);
 
-            <span class="kw">let</span> (<span class="ident">driver</span>, <span class="ident">resources</span>) <span class="op">=</span> <span class="ident">driver::Driver::new</span>(<span class="self">self</span>.<span class="ident">get_cfg</span>())<span class="question-mark">?</span>;
+            <span class="kw">let </span>(driver, resources) = driver::Driver::new(<span class="self">self</span>.get_cfg())<span class="question-mark">?</span>;
 
-            <span class="comment">// Create the blocking pool</span>
-            <span class="kw">let</span> <span class="ident">blocking_pool</span> <span class="op">=</span>
-                <span class="ident">blocking::create_blocking_pool</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">max_blocking_threads</span> <span class="op">+</span> <span class="ident">core_threads</span>);
-            <span class="kw">let</span> <span class="ident">blocking_spawner</span> <span class="op">=</span> <span class="ident">blocking_pool</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>();
+            <span class="comment">// Create the blocking pool
+            </span><span class="kw">let </span>blocking_pool =
+                blocking::create_blocking_pool(<span class="self">self</span>, <span class="self">self</span>.max_blocking_threads + core_threads);
+            <span class="kw">let </span>blocking_spawner = blocking_pool.spawner().clone();
 
-            <span class="kw">let</span> <span class="ident">handle_inner</span> <span class="op">=</span> <span class="ident">HandleInner</span> {
-                <span class="ident">io_handle</span>: <span class="ident">resources</span>.<span class="ident">io_handle</span>,
-                <span class="ident">time_handle</span>: <span class="ident">resources</span>.<span class="ident">time_handle</span>,
-                <span class="ident">signal_handle</span>: <span class="ident">resources</span>.<span class="ident">signal_handle</span>,
-                <span class="ident">clock</span>: <span class="ident">resources</span>.<span class="ident">clock</span>,
-                <span class="ident">blocking_spawner</span>,
+            <span class="kw">let </span>handle_inner = HandleInner {
+                io_handle: resources.io_handle,
+                time_handle: resources.time_handle,
+                signal_handle: resources.signal_handle,
+                clock: resources.clock,
+                blocking_spawner,
             };
 
-            <span class="kw">let</span> (<span class="ident">scheduler</span>, <span class="ident">launch</span>) <span class="op">=</span> <span class="ident">MultiThread::new</span>(
-                <span class="ident">core_threads</span>,
-                <span class="ident">driver</span>,
-                <span class="ident">handle_inner</span>,
-                <span class="ident">Config</span> {
-                    <span class="ident">before_park</span>: <span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">clone</span>(),
-                    <span class="ident">after_unpark</span>: <span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">clone</span>(),
-                    <span class="ident">global_queue_interval</span>: <span class="self">self</span>.<span class="ident">global_queue_interval</span>,
-                    <span class="ident">event_interval</span>: <span class="self">self</span>.<span class="ident">event_interval</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-                    <span class="ident">unhandled_panic</span>: <span class="self">self</span>.<span class="ident">unhandled_panic</span>.<span class="ident">clone</span>(),
-                    <span class="ident">disable_lifo_slot</span>: <span class="self">self</span>.<span class="ident">disable_lifo_slot</span>,
+            <span class="kw">let </span>(scheduler, launch) = MultiThread::new(
+                core_threads,
+                driver,
+                handle_inner,
+                Config {
+                    before_park: <span class="self">self</span>.before_park.clone(),
+                    after_unpark: <span class="self">self</span>.after_unpark.clone(),
+                    global_queue_interval: <span class="self">self</span>.global_queue_interval,
+                    event_interval: <span class="self">self</span>.event_interval,
+                    <span class="attribute">#[cfg(tokio_unstable)]
+                    </span>unhandled_panic: <span class="self">self</span>.unhandled_panic.clone(),
+                    disable_lifo_slot: <span class="self">self</span>.disable_lifo_slot,
                 },
             );
-            <span class="kw">let</span> <span class="ident">spawner</span> <span class="op">=</span> <span class="ident">Spawner::MultiThread</span>(<span class="ident">scheduler</span>.<span class="ident">spawner</span>().<span class="ident">clone</span>());
+            <span class="kw">let </span>spawner = Spawner::MultiThread(scheduler.spawner().clone());
 
-            <span class="comment">// Create the runtime handle</span>
-            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> { <span class="ident">spawner</span> };
+            <span class="comment">// Create the runtime handle
+            </span><span class="kw">let </span>handle = Handle { spawner };
 
-            <span class="comment">// Spawn the thread pool workers</span>
-            <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::runtime::context::enter</span>(<span class="ident">handle</span>.<span class="ident">clone</span>());
-            <span class="ident">launch</span>.<span class="ident">launch</span>();
+            <span class="comment">// Spawn the thread pool workers
+            </span><span class="kw">let </span>_enter = <span class="kw">crate</span>::runtime::context::enter(handle.clone());
+            launch.launch();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Runtime</span> {
-                <span class="ident">kind</span>: <span class="ident">Kind::MultiThread</span>(<span class="ident">scheduler</span>),
-                <span class="ident">handle</span>,
-                <span class="ident">blocking_pool</span>,
+            <span class="prelude-val">Ok</span>(Runtime {
+                kind: Kind::MultiThread(scheduler),
+                handle,
+                blocking_pool,
             })
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Builder&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;worker_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">worker_threads</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_blocking_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_blocking_threads</span>)
-            .<span class="ident">field</span>(
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Builder {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Builder&quot;</span>)
+            .field(<span class="string">&quot;worker_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.worker_threads)
+            .field(<span class="string">&quot;max_blocking_threads&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_blocking_threads)
+            .field(
                 <span class="string">&quot;thread_name&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="string">&quot;&lt;dyn Fn() -&gt; String + Send + Sync + &#39;static&gt;&quot;</span>,
             )
-            .<span class="ident">field</span>(<span class="string">&quot;thread_stack_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">thread_stack_size</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;after_start&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after_start</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;before_stop&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before_stop</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;before_park&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before_park</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;after_unpark&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after_unpark</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;...&quot;</span>))
-            .<span class="ident">finish</span>()
+            .field(<span class="string">&quot;thread_stack_size&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.thread_stack_size)
+            .field(<span class="string">&quot;after_start&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.after_start.as_ref().map(|<span class="kw">_</span>| <span class="string">&quot;...&quot;</span>))
+            .field(<span class="string">&quot;before_stop&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.before_stop.as_ref().map(|<span class="kw">_</span>| <span class="string">&quot;...&quot;</span>))
+            .field(<span class="string">&quot;before_park&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.before_park.as_ref().map(|<span class="kw">_</span>| <span class="string">&quot;...&quot;</span>))
+            .field(<span class="string">&quot;after_unpark&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.after_unpark.as_ref().map(|<span class="kw">_</span>| <span class="string">&quot;...&quot;</span>))
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

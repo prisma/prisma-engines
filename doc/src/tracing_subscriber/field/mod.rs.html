@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/field/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/field/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -366,371 +366,371 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with [fields] and [field visitors].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [fields]: tracing_core::field</span>
-<span class="doccomment">//! [field visitors]: tracing_core::field::Visit</span>
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tracing_core::field::Visit</span>;
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">span</span>::{<span class="ident">Attributes</span>, <span class="ident">Record</span>},
-    <span class="ident">Event</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with [fields] and [field visitors].
+//!
+//! [fields]: tracing_core::field
+//! [field visitors]: tracing_core::field::Visit
+</span><span class="kw">use </span>core::{fmt, marker::PhantomData};
+<span class="kw">pub use </span>tracing_core::field::Visit;
+<span class="kw">use </span>tracing_core::{
+    span::{Attributes, Record},
+    Event,
 };
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">debug</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">delimited</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">display</span>;
+<span class="kw">pub mod </span>debug;
+<span class="kw">pub mod </span>delimited;
+<span class="kw">pub mod </span>display;
 
-<span class="doccomment">/// Creates new [visitors].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A type implementing `MakeVisitor` represents a composable factory for types</span>
-<span class="doccomment">/// implementing the [`Visit` trait][visitors]. The `MakeVisitor` trait defines</span>
-<span class="doccomment">/// a single function, `make_visitor`, which takes in a `T`-typed `target` and</span>
-<span class="doccomment">/// returns a type implementing `Visit` configured for that target. A target may</span>
-<span class="doccomment">/// be a string, output stream, or data structure that the visitor will record</span>
-<span class="doccomment">/// data to, configuration variables that determine the visitor&#39;s behavior, or</span>
-<span class="doccomment">/// `()` when no input is required to produce a visitor.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [visitors]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The visitor type produced by this `MakeVisitor`.</span>
-    <span class="kw">type</span> <span class="ident">Visitor</span>: <span class="ident">Visit</span>;
+<span class="doccomment">/// Creates new [visitors].
+///
+/// A type implementing `MakeVisitor` represents a composable factory for types
+/// implementing the [`Visit` trait][visitors]. The `MakeVisitor` trait defines
+/// a single function, `make_visitor`, which takes in a `T`-typed `target` and
+/// returns a type implementing `Visit` configured for that target. A target may
+/// be a string, output stream, or data structure that the visitor will record
+/// data to, configuration variables that determine the visitor&#39;s behavior, or
+/// `()` when no input is required to produce a visitor.
+///
+/// [visitors]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html
+</span><span class="kw">pub trait </span>MakeVisitor&lt;T&gt; {
+    <span class="doccomment">/// The visitor type produced by this `MakeVisitor`.
+    </span><span class="kw">type </span>Visitor: Visit;
 
-    <span class="doccomment">/// Make a new visitor for the provided `target`.</span>
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span>;
+    <span class="doccomment">/// Make a new visitor for the provided `target`.
+    </span><span class="kw">fn </span>make_visitor(<span class="kw-2">&amp;</span><span class="self">self</span>, target: T) -&gt; <span class="self">Self</span>::Visitor;
 }
 
-<span class="doccomment">/// A [visitor] that produces output once it has visited a set of fields.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [visitor]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>: <span class="ident">Visit</span> {
-    <span class="doccomment">/// Completes the visitor, returning any output.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is called once a full set of fields has been visited.</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">Out</span>;
+<span class="doccomment">/// A [visitor] that produces output once it has visited a set of fields.
+///
+/// [visitor]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html
+</span><span class="kw">pub trait </span>VisitOutput&lt;Out&gt;: Visit {
+    <span class="doccomment">/// Completes the visitor, returning any output.
+    ///
+    /// This is called once a full set of fields has been visited.
+    </span><span class="kw">fn </span>finish(<span class="self">self</span>) -&gt; Out;
 
-    <span class="doccomment">/// Visit a set of fields, and return the output of finishing the visitor</span>
-    <span class="doccomment">/// once the fields have been visited.</span>
-    <span class="kw">fn</span> <span class="ident">visit</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">R</span>) -&gt; <span class="ident">Out</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">RecordFields</span>,
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Visit a set of fields, and return the output of finishing the visitor
+    /// once the fields have been visited.
+    </span><span class="kw">fn </span>visit&lt;R&gt;(<span class="kw-2">mut </span><span class="self">self</span>, fields: <span class="kw-2">&amp;</span>R) -&gt; Out
+    <span class="kw">where
+        </span>R: RecordFields,
+        <span class="self">Self</span>: Sized,
     {
-        <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
-        <span class="self">self</span>.<span class="ident">finish</span>()
+        fields.record(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
+        <span class="self">self</span>.finish()
     }
 }
 
-<span class="doccomment">/// Extension trait implemented by types which can be recorded by a [visitor].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows writing code that is generic over `tracing_core`&#39;s</span>
-<span class="doccomment">/// [`span::Attributes`][attr], [`span::Record`][rec], and [`Event`][event]</span>
-<span class="doccomment">/// types. These types all provide inherent `record` methods that allow a</span>
-<span class="doccomment">/// visitor to record their fields, but there is no common trait representing this.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// With `RecordFields`, we can write code like this:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tracing_core::field::Visit;</span>
-<span class="doccomment">/// # use tracing_core::field::Field;</span>
-<span class="doccomment">/// use tracing_subscriber::field::RecordFields;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct MyVisitor {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # impl MyVisitor { fn new() -&gt; Self { Self{} } }</span>
-<span class="doccomment">/// impl Visit for MyVisitor {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// # fn record_debug(&amp;mut self, _: &amp;Field, _: &amp;dyn std::fmt::Debug) {}</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn record_with_my_visitor&lt;R&gt;(r: R)</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     R: RecordFields,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let mut visitor = MyVisitor::new();</span>
-<span class="doccomment">///     r.record(&amp;mut visitor);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [visitor]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html</span>
-<span class="doccomment">/// [attr]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Attributes.html</span>
-<span class="doccomment">/// [rec]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Record.html</span>
-<span class="doccomment">/// [event]: https://docs.rs/tracing-core/latest/tracing_core/event/struct.Event.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RecordFields</span>: <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">RecordFieldsMarker</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Record all the fields in `self` with the provided `visitor`.</span>
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Visit</span>);
+<span class="doccomment">/// Extension trait implemented by types which can be recorded by a [visitor].
+///
+/// This allows writing code that is generic over `tracing_core`&#39;s
+/// [`span::Attributes`][attr], [`span::Record`][rec], and [`Event`][event]
+/// types. These types all provide inherent `record` methods that allow a
+/// visitor to record their fields, but there is no common trait representing this.
+///
+/// With `RecordFields`, we can write code like this:
+/// ```
+/// use tracing_core::field::Visit;
+/// # use tracing_core::field::Field;
+/// use tracing_subscriber::field::RecordFields;
+///
+/// struct MyVisitor {
+///     // ...
+/// }
+/// # impl MyVisitor { fn new() -&gt; Self { Self{} } }
+/// impl Visit for MyVisitor {
+///     // ...
+/// # fn record_debug(&amp;mut self, _: &amp;Field, _: &amp;dyn std::fmt::Debug) {}
+/// }
+///
+/// fn record_with_my_visitor&lt;R&gt;(r: R)
+/// where
+///     R: RecordFields,
+/// {
+///     let mut visitor = MyVisitor::new();
+///     r.record(&amp;mut visitor);
+/// }
+/// ```
+/// [visitor]: https://docs.rs/tracing-core/latest/tracing_core/field/trait.Visit.html
+/// [attr]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Attributes.html
+/// [rec]: https://docs.rs/tracing-core/latest/tracing_core/span/struct.Record.html
+/// [event]: https://docs.rs/tracing-core/latest/tracing_core/event/struct.Event.html
+</span><span class="kw">pub trait </span>RecordFields: <span class="kw">crate</span>::sealed::Sealed&lt;RecordFieldsMarker&gt; {
+    <span class="doccomment">/// Record all the fields in `self` with the provided `visitor`.
+    </span><span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Visit);
 }
 
-<span class="doccomment">/// Extension trait implemented for all `MakeVisitor` implementations that</span>
-<span class="doccomment">/// produce a visitor implementing `VisitOutput`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeOutput</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Out</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">Out</span>)<span class="op">&gt;</span>,
-    <span class="ident"><span class="self">Self</span>::Visitor</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extension trait implemented for all `MakeVisitor` implementations that
+/// produce a visitor implementing `VisitOutput`.
+</span><span class="kw">pub trait </span>MakeOutput&lt;T, Out&gt;
+<span class="kw">where
+    </span><span class="self">Self</span>: MakeVisitor&lt;T&gt; + <span class="kw">crate</span>::sealed::Sealed&lt;(T, Out)&gt;,
+    <span class="self">Self</span>::Visitor: VisitOutput&lt;Out&gt;,
 {
-    <span class="doccomment">/// Visits all fields in `fields` with a new visitor constructed from</span>
-    <span class="doccomment">/// `target`.</span>
-    <span class="kw">fn</span> <span class="ident">visit_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>) -&gt; <span class="ident">Out</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">RecordFields</span>,
+    <span class="doccomment">/// Visits all fields in `fields` with a new visitor constructed from
+    /// `target`.
+    </span><span class="kw">fn </span>visit_with&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, target: T, fields: <span class="kw-2">&amp;</span>F) -&gt; Out
+    <span class="kw">where
+        </span>F: RecordFields,
     {
-        <span class="self">self</span>.<span class="ident">make_visitor</span>(<span class="ident">target</span>).<span class="ident">visit</span>(<span class="ident">fields</span>)
+        <span class="self">self</span>.make_visitor(target).visit(fields)
     }
 }
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>]</span>
-    <span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![feature = <span class="string">&quot;std&quot;</span>]
+    </span><span class="kw">use </span>std::io;
 
-    <span class="doccomment">/// Extension trait implemented by visitors to indicate that they write to an</span>
-    <span class="doccomment">/// `io::Write` instance, and allow access to that writer.</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VisitWrite</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// Returns the writer that this visitor writes to.</span>
-        <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">io::Write</span>;
+    <span class="doccomment">/// Extension trait implemented by visitors to indicate that they write to an
+    /// `io::Write` instance, and allow access to that writer.
+    </span><span class="kw">pub trait </span>VisitWrite: VisitOutput&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+        <span class="doccomment">/// Returns the writer that this visitor writes to.
+        </span><span class="kw">fn </span>writer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>io::Write;
     }
 }
 
-<span class="doccomment">/// Extension trait implemented by visitors to indicate that they write to a</span>
-<span class="doccomment">/// `fmt::Write` instance, and allow access to that writer.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VisitFmt</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the formatter that this visitor writes to.</span>
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>;
+<span class="doccomment">/// Extension trait implemented by visitors to indicate that they write to a
+/// `fmt::Write` instance, and allow access to that writer.
+</span><span class="kw">pub trait </span>VisitFmt: VisitOutput&lt;fmt::Result&gt; {
+    <span class="doccomment">/// Returns the formatter that this visitor writes to.
+    </span><span class="kw">fn </span>writer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write;
 }
 
-<span class="doccomment">/// Extension trait providing `MakeVisitor` combinators.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeExt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span>,
-    <span class="self">Self</span>: <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">MakeExtMarker</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extension trait providing `MakeVisitor` combinators.
+</span><span class="kw">pub trait </span>MakeExt&lt;T&gt;
+<span class="kw">where
+    </span><span class="self">Self</span>: MakeVisitor&lt;T&gt; + Sized,
+    <span class="self">Self</span>: <span class="kw">crate</span>::sealed::Sealed&lt;MakeExtMarker&lt;T&gt;&gt;,
 {
-    <span class="doccomment">/// Wraps `self` so that any `fmt::Debug` fields are recorded using the</span>
-    <span class="doccomment">/// alternate formatter (`{:#?}`).</span>
-    <span class="kw">fn</span> <span class="ident">debug_alt</span>(<span class="self">self</span>) -&gt; <span class="ident">debug::Alt</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">debug::Alt::new</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Wraps `self` so that any `fmt::Debug` fields are recorded using the
+    /// alternate formatter (`{:#?}`).
+    </span><span class="kw">fn </span>debug_alt(<span class="self">self</span>) -&gt; debug::Alt&lt;<span class="self">Self</span>&gt; {
+        debug::Alt::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Wraps `self` so that any string fields named &quot;message&quot; are recorded</span>
-    <span class="doccomment">/// using `fmt::Display`.</span>
-    <span class="kw">fn</span> <span class="ident">display_messages</span>(<span class="self">self</span>) -&gt; <span class="ident">display::Messages</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">display::Messages::new</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Wraps `self` so that any string fields named &quot;message&quot; are recorded
+    /// using `fmt::Display`.
+    </span><span class="kw">fn </span>display_messages(<span class="self">self</span>) -&gt; display::Messages&lt;<span class="self">Self</span>&gt; {
+        display::Messages::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Wraps `self` so that when fields are formatted to a writer, they are</span>
-    <span class="doccomment">/// separated by the provided `delimiter`.</span>
-    <span class="kw">fn</span> <span class="ident">delimited</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">delimiter</span>: <span class="ident">D</span>) -&gt; <span class="ident">delimited::Delimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-        <span class="ident"><span class="self">Self</span>::Visitor</span>: <span class="ident">VisitFmt</span>,
+    <span class="doccomment">/// Wraps `self` so that when fields are formatted to a writer, they are
+    /// separated by the provided `delimiter`.
+    </span><span class="kw">fn </span>delimited&lt;D&gt;(<span class="self">self</span>, delimiter: D) -&gt; delimited::Delimited&lt;D, <span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>D: AsRef&lt;str&gt; + Clone,
+        <span class="self">Self</span>::Visitor: VisitFmt,
     {
-        <span class="ident">delimited::Delimited::new</span>(<span class="ident">delimiter</span>, <span class="self">self</span>)
+        delimited::Delimited::new(delimiter, <span class="self">self</span>)
     }
 }
 
-<span class="comment">// === impl RecordFields ===</span>
+<span class="comment">// === impl RecordFields ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">RecordFieldsMarker</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RecordFields</span> <span class="kw">for</span> <span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Visit</span>) {
-        <span class="ident">Event::record</span>(<span class="self">self</span>, <span class="ident">visitor</span>)
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">crate</span>::sealed::Sealed&lt;RecordFieldsMarker&gt; <span class="kw">for </span>Event&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RecordFields <span class="kw">for </span>Event&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Visit) {
+        Event::record(<span class="self">self</span>, visitor)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">RecordFieldsMarker</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RecordFields</span> <span class="kw">for</span> <span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Visit</span>) {
-        <span class="ident">Attributes::record</span>(<span class="self">self</span>, <span class="ident">visitor</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">crate</span>::sealed::Sealed&lt;RecordFieldsMarker&gt; <span class="kw">for </span>Attributes&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RecordFields <span class="kw">for </span>Attributes&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Visit) {
+        Attributes::record(<span class="self">self</span>, visitor)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">RecordFieldsMarker</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RecordFields</span> <span class="kw">for</span> <span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Visit</span>) {
-        <span class="ident">Record::record</span>(<span class="self">self</span>, <span class="ident">visitor</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">crate</span>::sealed::Sealed&lt;RecordFieldsMarker&gt; <span class="kw">for </span>Record&lt;<span class="lifetime">&#39;a</span>&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RecordFields <span class="kw">for </span>Record&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Visit) {
+        Record::record(<span class="self">self</span>, visitor)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">RecordFieldsMarker</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">F</span> <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">RecordFields</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">RecordFields</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">RecordFields</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; <span class="kw">crate</span>::sealed::Sealed&lt;RecordFieldsMarker&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>F <span class="kw">where </span>F: RecordFields {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, F&gt; RecordFields <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>F
+<span class="kw">where
+    </span>F: RecordFields,
 {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Visit</span>) {
-        <span class="ident">F::record</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">visitor</span>)
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Visit) {
+        F::record(<span class="kw-2">*</span><span class="self">self</span>, visitor)
     }
 }
 
-<span class="comment">// === blanket impls ===</span>
+<span class="comment">// === blanket impls ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">T</span>) -&gt; <span class="ident">V</span>,
-    <span class="ident">V</span>: <span class="ident">Visit</span>,
+</span><span class="kw">impl</span>&lt;T, V, F&gt; MakeVisitor&lt;T&gt; <span class="kw">for </span>F
+<span class="kw">where
+    </span>F: Fn(T) -&gt; V,
+    V: Visit,
 {
-    <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">V</span>;
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
-        (<span class="self">self</span>)(<span class="ident">target</span>)
+    <span class="kw">type </span>Visitor = V;
+    <span class="kw">fn </span>make_visitor(<span class="kw-2">&amp;</span><span class="self">self</span>, target: T) -&gt; <span class="self">Self</span>::Visitor {
+        (<span class="self">self</span>)(target)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Out</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">Out</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">M::Visitor</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>,
-{
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Out</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">MakeOutput</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Out</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">M::Visitor</span>: <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">Out</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Out, M&gt; <span class="kw">crate</span>::sealed::Sealed&lt;(T, Out)&gt; <span class="kw">for </span>M
+<span class="kw">where
+    </span>M: MakeVisitor&lt;T&gt;,
+    M::Visitor: VisitOutput&lt;Out&gt;,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">MakeExtMarker</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span> <span class="kw">where</span> <span class="ident">M</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">MakeExt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">M</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sized</span>,
-    <span class="ident">M</span>: <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span><span class="op">&lt;</span><span class="ident">MakeExtMarker</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Out, M&gt; MakeOutput&lt;T, Out&gt; <span class="kw">for </span>M
+<span class="kw">where
+    </span>M: MakeVisitor&lt;T&gt;,
+    M::Visitor: VisitOutput&lt;Out&gt;,
 {
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MakeExtMarker</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">_p</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, M&gt; <span class="kw">crate</span>::sealed::Sealed&lt;MakeExtMarker&lt;T&gt;&gt; <span class="kw">for </span>M <span class="kw">where </span>M: MakeVisitor&lt;T&gt; + Sized {}
+
+<span class="kw">impl</span>&lt;T, M&gt; MakeExt&lt;T&gt; <span class="kw">for </span>M
+<span class="kw">where
+    </span>M: MakeVisitor&lt;T&gt; + Sized,
+    M: <span class="kw">crate</span>::sealed::Sealed&lt;MakeExtMarker&lt;T&gt;&gt;,
+{
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordFieldsMarker</span> {
-    <span class="ident">_p</span>: (),
+<span class="attribute">#[derive(Debug)]
+#[doc(hidden)]
+</span><span class="kw">pub struct </span>MakeExtMarker&lt;T&gt; {
+    _p: PhantomData&lt;T&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::field</span>) <span class="kw">mod</span> <span class="ident">test_util</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::field</span>) <span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-    <span class="kw">use</span> <span class="ident">tracing_core</span>::{
-        <span class="ident">callsite::Callsite</span>,
-        <span class="ident">field</span>::{<span class="ident">Field</span>, <span class="ident">Value</span>},
-        <span class="ident">metadata</span>::{<span class="ident">Kind</span>, <span class="ident">Level</span>, <span class="ident">Metadata</span>},
+<span class="attribute">#[derive(Debug)]
+#[doc(hidden)]
+</span><span class="kw">pub struct </span>RecordFieldsMarker {
+    _p: (),
+}
+
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;alloc&quot;</span>))]
+#[macro_use]
+</span><span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::field) <span class="kw">mod </span>test_util {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::field) <span class="kw">use </span>alloc::string::String;
+    <span class="kw">use </span>tracing_core::{
+        callsite::Callsite,
+        field::{Field, Value},
+        metadata::{Kind, Level, Metadata},
     };
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TestAttrs1</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TestAttrs2</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TestAttrs1;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TestAttrs2;
 
-    <span class="kw">impl</span> <span class="ident">TestAttrs1</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-            <span class="kw">let</span> <span class="ident">fieldset</span> <span class="op">=</span> <span class="ident">TEST_META_1</span>.<span class="ident">fields</span>();
-            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">impl </span>TestAttrs1 {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with&lt;T&gt;(f: <span class="kw">impl </span>FnOnce(Attributes&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; T) -&gt; T {
+            <span class="kw">let </span>fieldset = TEST_META_1.fields();
+            <span class="kw">let </span>values = <span class="kw-2">&amp;</span>[
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;question&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;life, the universe, and everything&quot;</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;question&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">&quot;life, the universe, and everything&quot; </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
-                (<span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;question.answer&quot;</span>).<span class="ident">unwrap</span>(), <span class="prelude-val">None</span>),
+                (<span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;question.answer&quot;</span>).unwrap(), <span class="prelude-val">None</span>),
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;tricky&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;tricky&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;can_you_do_it&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;can_you_do_it&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
             ];
-            <span class="kw">let</span> <span class="ident">valueset</span> <span class="op">=</span> <span class="ident">fieldset</span>.<span class="ident">value_set</span>(<span class="ident">values</span>);
-            <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">tracing_core::span::Attributes::new</span>(<span class="kw-2">&amp;</span><span class="ident">TEST_META_1</span>, <span class="kw-2">&amp;</span><span class="ident">valueset</span>);
-            <span class="ident">f</span>(<span class="ident">attrs</span>)
+            <span class="kw">let </span>valueset = fieldset.value_set(values);
+            <span class="kw">let </span>attrs = tracing_core::span::Attributes::new(<span class="kw-2">&amp;</span>TEST_META_1, <span class="kw-2">&amp;</span>valueset);
+            f(attrs)
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">TestAttrs2</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-            <span class="kw">let</span> <span class="ident">fieldset</span> <span class="op">=</span> <span class="ident">TEST_META_1</span>.<span class="ident">fields</span>();
-            <span class="kw">let</span> <span class="ident">none</span> <span class="op">=</span> <span class="ident">tracing_core::field::debug</span>(<span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::None</span>);
-            <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">impl </span>TestAttrs2 {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with&lt;T&gt;(f: <span class="kw">impl </span>FnOnce(Attributes&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; T) -&gt; T {
+            <span class="kw">let </span>fieldset = TEST_META_1.fields();
+            <span class="kw">let </span>none = tracing_core::field::debug(<span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>::&lt;<span class="kw-2">&amp;</span>str&gt;::None);
+            <span class="kw">let </span>values = <span class="kw-2">&amp;</span>[
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;question&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">none</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;question&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>none <span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;question.answer&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">42</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;question.answer&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">42 </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;tricky&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;tricky&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">true </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
                 (
-                    <span class="kw-2">&amp;</span><span class="ident">fieldset</span>.<span class="ident">field</span>(<span class="string">&quot;can_you_do_it&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">false</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Value</span>),
+                    <span class="kw-2">&amp;</span>fieldset.field(<span class="string">&quot;can_you_do_it&quot;</span>).unwrap(),
+                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">false </span><span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Value),
                 ),
             ];
-            <span class="kw">let</span> <span class="ident">valueset</span> <span class="op">=</span> <span class="ident">fieldset</span>.<span class="ident">value_set</span>(<span class="ident">values</span>);
-            <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">tracing_core::span::Attributes::new</span>(<span class="kw-2">&amp;</span><span class="ident">TEST_META_1</span>, <span class="kw-2">&amp;</span><span class="ident">valueset</span>);
-            <span class="ident">f</span>(<span class="ident">attrs</span>)
+            <span class="kw">let </span>valueset = fieldset.value_set(values);
+            <span class="kw">let </span>attrs = tracing_core::span::Attributes::new(<span class="kw-2">&amp;</span>TEST_META_1, <span class="kw-2">&amp;</span>valueset);
+            f(attrs)
         }
     }
 
-    <span class="kw">struct</span> <span class="ident">TestCallsite1</span>;
-    <span class="kw">static</span> <span class="ident">TEST_CALLSITE_1</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Callsite</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">TestCallsite1</span>;
-    <span class="kw">static</span> <span class="ident">TEST_META_1</span>: <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">tracing_core::metadata!</span> {
-        <span class="ident">name</span>: <span class="string">&quot;field_test1&quot;</span>,
-        <span class="ident">target</span>: <span class="macro">module_path!</span>(),
-        <span class="ident">level</span>: <span class="ident">Level::INFO</span>,
-        <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="string">&quot;question&quot;</span>, <span class="string">&quot;question.answer&quot;</span>, <span class="string">&quot;tricky&quot;</span>, <span class="string">&quot;can_you_do_it&quot;</span>],
-        <span class="ident">callsite</span>: <span class="ident">TEST_CALLSITE_1</span>,
-        <span class="ident">kind</span>: <span class="ident">Kind::SPAN</span>,
+    <span class="kw">struct </span>TestCallsite1;
+    <span class="kw">static </span>TEST_CALLSITE_1: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Callsite = <span class="kw-2">&amp;</span>TestCallsite1;
+    <span class="kw">static </span>TEST_META_1: Metadata&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="macro">tracing_core::metadata! </span>{
+        name: <span class="string">&quot;field_test1&quot;</span>,
+        target: <span class="macro">module_path!</span>(),
+        level: Level::INFO,
+        fields: <span class="kw-2">&amp;</span>[<span class="string">&quot;question&quot;</span>, <span class="string">&quot;question.answer&quot;</span>, <span class="string">&quot;tricky&quot;</span>, <span class="string">&quot;can_you_do_it&quot;</span>],
+        callsite: TEST_CALLSITE_1,
+        kind: Kind::SPAN,
     };
 
-    <span class="kw">impl</span> <span class="ident">Callsite</span> <span class="kw">for</span> <span class="ident">TestCallsite1</span> {
-        <span class="kw">fn</span> <span class="ident">set_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">tracing_core::subscriber::Interest</span>) {
+    <span class="kw">impl </span>Callsite <span class="kw">for </span>TestCallsite1 {
+        <span class="kw">fn </span>set_interest(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: tracing_core::subscriber::Interest) {
             <span class="macro">unimplemented!</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-            <span class="kw-2">&amp;</span><span class="ident">TEST_META_1</span>
+        <span class="kw">fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt; {
+            <span class="kw-2">&amp;</span>TEST_META_1
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MakeDebug</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>,
-        <span class="ident">err</span>: <span class="ident">fmt::Result</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MakeDebug;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+        writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write,
+        err: fmt::Result,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>) -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">writer</span>,
-                <span class="ident">err</span>: <span class="prelude-val">Ok</span>(()),
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write) -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                writer,
+                err: <span class="prelude-val">Ok</span>(()),
             }
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
-            <span class="macro">write!</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="string">&quot;{}={:?}&quot;</span>, <span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">unwrap</span>();
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Visit <span class="kw">for </span>DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">fn </span>record_debug(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>fmt::Debug) {
+            <span class="macro">write!</span>(<span class="self">self</span>.writer, <span class="string">&quot;{}={:?}&quot;</span>, field, value).unwrap();
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="self">self</span>.<span class="ident">err</span>
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; VisitOutput&lt;fmt::Result&gt; <span class="kw">for </span>DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">fn </span>finish(<span class="self">self</span>) -&gt; fmt::Result {
+            <span class="self">self</span>.err
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">VisitFmt</span> <span class="kw">for</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
-            <span class="self">self</span>.<span class="ident">writer</span>
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; VisitFmt <span class="kw">for </span>DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">fn </span>writer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write {
+            <span class="self">self</span>.writer
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MakeDebug</span> {
-        <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-        <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span>) -&gt; <span class="ident">DebugVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="ident">DebugVisitor::new</span>(<span class="ident">w</span>)
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MakeVisitor&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write&gt; <span class="kw">for </span>MakeDebug {
+        <span class="kw">type </span>Visitor = DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt;;
+        <span class="kw">fn </span>make_visitor(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>fmt::Write) -&gt; DebugVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+            DebugVisitor::new(w)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

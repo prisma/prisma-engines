@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -703,710 +703,710 @@
 <span id="703">703</span>
 <span id="704">704</span>
 <span id="705">705</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">database_schema::SqlDatabaseSchema</span>,
-    <span class="ident">flavour::PostgresFlavour</span>,
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_migration</span>::{
-        <span class="ident">AlterEnum</span>, <span class="ident">AlterExtension</span>, <span class="ident">CreateExtension</span>, <span class="ident">DropExtension</span>, <span class="ident">ExtensionChange</span>, <span class="ident">SequenceChange</span>, <span class="ident">SequenceChanges</span>,
-        <span class="ident">SqlMigrationStep</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
+<span class="kw">use crate</span>::{
+    database_schema::SqlDatabaseSchema,
+    flavour::PostgresFlavour,
+    pair::Pair,
+    sql_migration::{
+        AlterEnum, AlterExtension, CreateExtension, DropExtension, ExtensionChange, SequenceChange, SequenceChanges,
+        SqlMigrationStep,
     },
-    <span class="ident">sql_schema_differ</span>::{<span class="ident">column::ColumnTypeChange</span>, <span class="ident">differ_database::DifferDatabase</span>},
+    sql_schema_differ::{column::ColumnTypeChange, differ_database::DifferDatabase},
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">psl::builtin_connectors</span>::{<span class="ident">CockroachType</span>, <span class="ident">PostgresType</span>};
-<span class="kw">use</span> <span class="ident">regex::RegexSet</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">postgres::PostgresSchemaExt</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>psl::builtin_connectors::{CockroachType, PostgresType};
+<span class="kw">use </span>regex::RegexSet;
+<span class="kw">use </span>sql_schema_describer::{
+    postgres::PostgresSchemaExt,
+    walkers::{ColumnWalker, IndexWalker},
 };
 
-<span class="doccomment">/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.</span>
-<span class="kw">static</span> <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">RegexSet</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-    <span class="ident">RegexSet::new</span>(<span class="kw-2">&amp;</span>[
-        <span class="comment">// PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599</span>
-        <span class="string">&quot;(?i)^spatial_ref_sys$&quot;</span>,
+<span class="doccomment">/// These can be tables or views, depending on the PostGIS version. In both cases, they should be ignored.
+</span><span class="kw">static </span>POSTGIS_TABLES_OR_VIEWS: Lazy&lt;RegexSet&gt; = Lazy::new(|| {
+    RegexSet::new([
+        <span class="comment">// PostGIS. Reference: https://postgis.net/docs/manual-1.4/ch04.html#id418599
+        </span><span class="string">&quot;(?i)^spatial_ref_sys$&quot;</span>,
         <span class="string">&quot;(?i)^geometry_columns$&quot;</span>,
         <span class="string">&quot;(?i)^geography_columns$&quot;</span>,
-        <span class="comment">// See §11.2 in: https://postgis.net/docs/using_raster_dataman.html</span>
-        <span class="string">&quot;(?i)^raster_columns$&quot;</span>,
+        <span class="comment">// See §11.2 in: https://postgis.net/docs/using_raster_dataman.html
+        </span><span class="string">&quot;(?i)^raster_columns$&quot;</span>,
         <span class="string">&quot;(?i)^raster_overviews$&quot;</span>,
     ])
-    .<span class="ident">unwrap</span>()
+    .unwrap()
 });
 
-<span class="comment">// https://www.postgresql.org/docs/12/pgbuffercache.html</span>
-<span class="kw">static</span> <span class="ident">EXTENSION_VIEWS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">RegexSet</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RegexSet::new</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;(?i)^pg_buffercache$&quot;</span>]).<span class="ident">unwrap</span>());
+<span class="comment">// https://www.postgresql.org/docs/12/pgbuffercache.html
+</span><span class="kw">static </span>EXTENSION_VIEWS: Lazy&lt;RegexSet&gt; = Lazy::new(|| RegexSet::new([<span class="string">&quot;(?i)^pg_buffercache$&quot;</span>]).unwrap());
 
-<span class="kw">impl</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">can_alter_primary_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_cockroachdb</span>()
+<span class="kw">impl </span>SqlSchemaDifferFlavour <span class="kw">for </span>PostgresFlavour {
+    <span class="kw">fn </span>can_alter_primary_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_cockroachdb()
     }
 
-    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>can_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">column_autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_autoincrement</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">is_autoincrement</span>()
+        columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="comment">// Handle the enum cases first.</span>
-        <span class="kw">match</span> <span class="ident">columns</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>()).<span class="ident">into_tuple</span>() {
-            (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) <span class="kw">if</span> <span class="ident">previous_enum</span> <span class="op">==</span> <span class="ident">next_enum</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+        <span class="comment">// Handle the enum cases first.
+        </span><span class="kw">match </span>columns.map(|col| col.column_type_family().as_enum()).into_tuple() {
+            (<span class="prelude-val">Some</span>(previous_enum), <span class="prelude-val">Some</span>(next_enum)) <span class="kw">if </span>previous_enum == next_enum =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) | (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable),
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
         };
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>)
+        <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
+            cockroach_column_type_change(columns)
+        } <span class="kw">else </span>{
+            postgres_column_type_change(columns)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_enum_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">enum_differ</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">enum_pairs</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">alter_enum</span> <span class="op">=</span> <span class="ident">AlterEnum</span> {
-                <span class="ident">id</span>: <span class="ident">enum_differ</span>.<span class="ident">enums</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">id</span>),
-                <span class="ident">created_variants</span>: <span class="ident">enum_differ</span>.<span class="ident">created_values</span>().<span class="ident">map</span>(<span class="ident">String::from</span>).<span class="ident">collect</span>(),
-                <span class="ident">dropped_variants</span>: <span class="ident">enum_differ</span>.<span class="ident">dropped_values</span>().<span class="ident">map</span>(<span class="ident">String::from</span>).<span class="ident">collect</span>(),
-                <span class="ident">previous_usages_as_default</span>: <span class="ident">Vec::new</span>(), <span class="comment">// this gets filled in later</span>
-            };
+    <span class="kw">fn </span>push_enum_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">for </span>enum_differ <span class="kw">in </span>db.enum_pairs() {
+            <span class="kw">let </span><span class="kw-2">mut </span>alter_enum = AlterEnum {
+                id: enum_differ.enums.map(|e| e.id),
+                created_variants: enum_differ.created_values().map(String::from).collect(),
+                dropped_variants: enum_differ.dropped_values().map(String::from).collect(),
+                previous_usages_as_default: Vec::new(), <span class="comment">// this gets filled in later
+            </span>};
 
-            <span class="kw">if</span> <span class="ident">alter_enum</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">if </span>alter_enum.is_empty() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">push_alter_enum_previous_usages_as_default</span>(<span class="ident">db</span>, <span class="kw-2">&amp;mut</span> <span class="ident">alter_enum</span>);
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="ident">alter_enum</span>));
+            push_alter_enum_previous_usages_as_default(db, <span class="kw-2">&amp;mut </span>alter_enum);
+            steps.push(SqlMigrationStep::AlterEnum(alter_enum));
         }
 
-        <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">created_enums</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="ident">enm</span>.<span class="ident">id</span>))
+        <span class="kw">for </span>enm <span class="kw">in </span>db.created_enums() {
+            steps.push(SqlMigrationStep::CreateEnum(enm.id))
         }
 
-        <span class="kw">for</span> <span class="ident">enm</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_enums</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::DropEnum</span>(<span class="ident">enm</span>.<span class="ident">id</span>))
+        <span class="kw">for </span>enm <span class="kw">in </span>db.dropped_enums() {
+            steps.push(SqlMigrationStep::DropEnum(enm.id))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_alter_sequence_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+    <span class="kw">fn </span>push_alter_sequence_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">if </span>!<span class="self">self</span>.is_cockroachdb() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span>, <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">schemas</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> (<span class="ident">schema</span>, <span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>()));
+        <span class="kw">let </span>schemas: Pair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
+            .schemas
+            .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
-        <span class="kw">let</span> <span class="ident">sequence_pairs</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">all_column_pairs</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
-                <span class="ident">schemas</span>
-                    .<span class="ident">zip</span>(<span class="ident">cols</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">schema</span>, <span class="ident">ext</span>), <span class="ident">column_id</span>)<span class="op">|</span> (<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>), <span class="ident">ext</span>))
+        <span class="kw">let </span>sequence_pairs = db
+            .all_column_pairs()
+            .map(|cols| {
+                schemas
+                    .zip(cols)
+                    .map(|((schema, ext), column_id)| (schema.walk(column_id), ext))
             })
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> {
-                <span class="ident">cols</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">col</span>, <span class="ident">ext</span>)<span class="op">|</span> {
-                    <span class="ident">col</span>.<span class="ident">default</span>()
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_sequence</span>())
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sequence_name</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">get_sequence</span>(<span class="ident">sequence_name</span>))
+            .filter_map(|cols| {
+                cols.map(|(col, ext)| {
+                    col.default()
+                        .and_then(|d| d.as_sequence())
+                        .and_then(|sequence_name| ext.get_sequence(sequence_name))
                 })
-                .<span class="ident">transpose</span>()
+                .transpose()
             });
 
-        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">sequence_pairs</span> {
-            <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">previous</span>.<span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">next</span>.<span class="number">1</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">SequenceChange</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BitFlags::default</span>();
+        <span class="kw">for </span>pair <span class="kw">in </span>sequence_pairs {
+            <span class="kw">let </span>prev = pair.previous.<span class="number">1</span>;
+            <span class="kw">let </span>next = pair.next.<span class="number">1</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>changes: BitFlags&lt;SequenceChange&gt; = BitFlags::default();
 
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">min_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">min_value</span> {
-                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::MinValue</span>;
+            <span class="kw">if </span>prev.min_value != next.min_value {
+                changes |= SequenceChange::MinValue;
             }
 
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">max_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">max_value</span> {
-                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::MaxValue</span>;
+            <span class="kw">if </span>prev.max_value != next.max_value {
+                changes |= SequenceChange::MaxValue;
             }
 
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">start_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">start_value</span> {
-                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Start</span>;
+            <span class="kw">if </span>prev.start_value != next.start_value {
+                changes |= SequenceChange::Start;
             }
 
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">cache_size</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">cache_size</span> {
-                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Cache</span>;
+            <span class="kw">if </span>prev.cache_size != next.cache_size {
+                changes |= SequenceChange::Cache;
             }
 
-            <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">increment_by</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">increment_by</span> {
-                <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">SequenceChange::Increment</span>;
+            <span class="kw">if </span>prev.increment_by != next.increment_by {
+                changes |= SequenceChange::Increment;
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">changes</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::AlterSequence</span>(
-                    <span class="ident">pair</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u32</span>),
-                    <span class="ident">SequenceChanges</span>(<span class="ident">changes</span>),
+            <span class="kw">if </span>!changes.is_empty() {
+                steps.push(SqlMigrationStep::AlterSequence(
+                    pair.map(|p| p.<span class="number">0 </span><span class="kw">as </span>u32),
+                    SequenceChanges(changes),
                 ));
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">columns_previous</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">columns</span>();
-        <span class="kw">let</span> <span class="ident">columns_next</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">columns</span>();
+    <span class="kw">fn </span>indexes_match(<span class="kw-2">&amp;</span><span class="self">self</span>, a: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, b: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">let </span>columns_previous = a.columns();
+        <span class="kw">let </span>columns_next = b.columns();
 
-        <span class="kw">let</span> <span class="ident">pg_ext_previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="kw">let</span> <span class="ident">pg_ext_next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+        <span class="kw">let </span>pg_ext_previous: <span class="kw-2">&amp;</span>PostgresSchemaExt = a.schema.downcast_connector_data();
+        <span class="kw">let </span>pg_ext_next: <span class="kw-2">&amp;</span>PostgresSchemaExt = b.schema.downcast_connector_data();
 
-        <span class="kw">let</span> <span class="ident">previous_algo</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">index_algorithm</span>(<span class="ident">a</span>.<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">next_algo</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">index_algorithm</span>(<span class="ident">b</span>.<span class="ident">id</span>);
+        <span class="kw">let </span>previous_algo = pg_ext_previous.index_algorithm(a.id);
+        <span class="kw">let </span>next_algo = pg_ext_next.index_algorithm(b.id);
 
-        <span class="ident">columns_previous</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">columns_next</span>.<span class="ident">len</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">previous_algo</span> <span class="op">==</span> <span class="ident">next_algo</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">columns_previous</span>.<span class="ident">zip</span>(<span class="ident">columns_next</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">col_a</span>, <span class="ident">col_b</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">a_class</span> <span class="op">=</span> <span class="ident">pg_ext_previous</span>.<span class="ident">get_opclass</span>(<span class="ident">col_a</span>.<span class="ident">id</span>);
-                <span class="kw">let</span> <span class="ident">b_class</span> <span class="op">=</span> <span class="ident">pg_ext_next</span>.<span class="ident">get_opclass</span>(<span class="ident">col_b</span>.<span class="ident">id</span>);
-                <span class="kw">let</span> <span class="ident">a_kind</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
-                <span class="kw">let</span> <span class="ident">b_kind</span> <span class="op">=</span> <span class="ident">b_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">kind</span>);
-                <span class="kw">let</span> <span class="ident">a_is_default</span> <span class="op">=</span> <span class="ident">a_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_default</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-                <span class="kw">let</span> <span class="ident">b_is_default</span> <span class="op">=</span> <span class="ident">b_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_default</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+        columns_previous.len() == columns_next.len()
+            &amp;&amp; previous_algo == next_algo
+            &amp;&amp; columns_previous.zip(columns_next).all(|(col_a, col_b)| {
+                <span class="kw">let </span>a_class = pg_ext_previous.get_opclass(col_a.id);
+                <span class="kw">let </span>b_class = pg_ext_next.get_opclass(col_b.id);
+                <span class="kw">let </span>a_kind = a_class.map(|c| <span class="kw-2">&amp;</span>c.kind);
+                <span class="kw">let </span>b_kind = b_class.map(|c| <span class="kw-2">&amp;</span>c.kind);
+                <span class="kw">let </span>a_is_default = a_class.map(|c| c.is_default).unwrap_or(<span class="bool-val">false</span>);
+                <span class="kw">let </span>b_is_default = b_class.map(|c| c.is_default).unwrap_or(<span class="bool-val">false</span>);
 
-                <span class="comment">// the dml doesn&#39;t always have opclass defined if it&#39;s the</span>
-                <span class="comment">// default.</span>
-                <span class="ident">a_kind</span> <span class="op">==</span> <span class="ident">b_kind</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">a_class</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">b_is_default</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">b_class</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">a_is_default</span>)
+                <span class="comment">// the dml doesn&#39;t always have opclass defined if it&#39;s the
+                // default.
+                </span>a_kind == b_kind || (a_class.is_none() &amp;&amp; b_is_default) || (b_class.is_none() &amp;&amp; a_is_default)
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">indexes_should_be_recreated_after_column_drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
+    <span class="kw">fn </span>indexes_should_be_recreated_after_column_drop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, pair: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        <span class="comment">// Implements correct comparison for truncated index names.
+        </span><span class="kw">let </span>(previous_name, next_name) = pair.map(|idx| idx.name()).into_tuple();
+
+        previous_name != next_name
     }
 
-    <span class="kw">fn</span> <span class="ident">index_should_be_renamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pair</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Implements correct comparison for truncated index names.</span>
-        <span class="kw">let</span> (<span class="ident">previous_name</span>, <span class="ident">next_name</span>) <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>()).<span class="ident">into_tuple</span>();
-
-        <span class="ident">previous_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_name</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
+    <span class="kw">fn </span>set_tables_to_redefine(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">if </span>!<span class="self">self</span>.is_cockroachdb() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">id_gets_dropped</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">table_pairs</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">tables</span><span class="op">|</span> {
-                <span class="ident">tables</span>.<span class="ident">column_pairs</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">columns</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">type_change</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">column_type_change</span>(<span class="ident">columns</span>);
-                    <span class="kw">let</span> <span class="ident">is_id</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_single_primary_key</span>();
+        <span class="kw">let </span>id_gets_dropped = db
+            .table_pairs()
+            .filter(|tables| {
+                tables.column_pairs().any(|columns| {
+                    <span class="kw">let </span>type_change = <span class="self">self</span>.column_type_change(columns);
+                    <span class="kw">let </span>is_id = columns.previous.is_single_primary_key();
 
-                    <span class="ident">is_id</span> <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">type_change</span>, <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>))
-                }) <span class="op">|</span><span class="op">|</span> <span class="ident">tables</span>.<span class="ident">dropped_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_single_primary_key</span>())
+                    is_id &amp;&amp; <span class="macro">matches!</span>(type_change, <span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable))
+                }) || tables.dropped_columns().any(|col| col.is_single_primary_key())
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">table_ids</span>());
+            .map(|t| t.table_ids());
 
-        <span class="ident">db</span>.<span class="ident">tables_to_redefine</span> <span class="op">=</span> <span class="ident">id_gets_dropped</span>.<span class="ident">collect</span>();
+        db.tables_to_redefine = id_gets_dropped.collect();
     }
 
-    <span class="kw">fn</span> <span class="ident">string_matches_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">string</span>.<span class="ident">starts_with</span>(<span class="string">&quot;\\x&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">string</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">string</span>.<span class="ident">is_ascii</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>string_matches_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, string: <span class="kw-2">&amp;</span>str, bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="kw">if </span>!string.starts_with(<span class="string">&quot;\\x&quot;</span>) || string.len() - <span class="number">2 </span>!= bytes.len() * <span class="number">2 </span>|| !string.is_ascii() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">string</span>[<span class="number">2</span>..];
+        <span class="kw">let </span>string = <span class="kw-2">&amp;</span>string[<span class="number">2</span>..];
 
-        <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">byte</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">chars</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">string</span>[<span class="ident">idx</span> <span class="op">*</span> <span class="number">2</span>..<span class="ident">idx</span> <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>];
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">byte_from_string</span>) <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">chars</span>, <span class="number">16</span>) {
-                <span class="ident">byte_from_string</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">byte</span>
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        bytes.iter().enumerate().all(|(idx, byte)| {
+            <span class="kw">let </span>chars = <span class="kw-2">&amp;</span>string[idx * <span class="number">2</span>..idx * <span class="number">2 </span>+ <span class="number">2</span>];
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(byte_from_string) = u8::from_str_radix(chars, <span class="number">16</span>) {
+                byte_from_string == <span class="kw-2">*</span>byte
+            } <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">table_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">table_name</span>)
+    <span class="kw">fn </span>table_should_be_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
     }
 
-    <span class="kw">fn</span> <span class="ident">view_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">POSTGIS_TABLES_OR_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">EXTENSION_VIEWS</span>.<span class="ident">is_match</span>(<span class="ident">view_name</span>)
+    <span class="kw">fn </span>view_should_be_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>, view_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
     }
 
-    <span class="kw">fn</span> <span class="ident">push_extension_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">ext</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">non_relocatable_extension_pairs</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::DropExtension</span>(<span class="ident">DropExtension</span> { <span class="ident">id</span>: <span class="ident">ext</span>.<span class="ident">previous</span>.<span class="ident">id</span> }));
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="ident">CreateExtension</span> { <span class="ident">id</span>: <span class="ident">ext</span>.<span class="ident">next</span>.<span class="ident">id</span> }));
+    <span class="kw">fn </span>push_extension_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">for </span>ext <span class="kw">in </span>db.non_relocatable_extension_pairs() {
+            steps.push(SqlMigrationStep::DropExtension(DropExtension { id: ext.previous.id }));
+            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id: ext.next.id }));
         }
 
-        <span class="kw">for</span> <span class="ident">ext</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">relocatable_extension_pairs</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">for </span>ext <span class="kw">in </span>db.relocatable_extension_pairs() {
+            <span class="kw">let </span><span class="kw-2">mut </span>changes = Vec::new();
 
-            <span class="kw">match</span> (<span class="ident">ext</span>.<span class="ident">previous</span>.<span class="ident">version</span>(), <span class="ident">ext</span>.<span class="ident">next</span>.<span class="ident">version</span>()) {
-                (<span class="ident">prev</span>, <span class="ident">next</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">prev</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">prev</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span> =&gt; {
-                    <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">ExtensionChange::AlterVersion</span>);
+            <span class="kw">match </span>(ext.previous.version(), ext.next.version()) {
+                (prev, next) <span class="kw">if </span>!prev.is_empty() &amp;&amp; !next.is_empty() &amp;&amp; prev != next =&gt; {
+                    changes.push(ExtensionChange::AlterVersion);
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
 
-            <span class="kw">match</span> (<span class="ident">ext</span>.<span class="ident">previous</span>.<span class="ident">schema</span>(), <span class="ident">ext</span>.<span class="ident">next</span>.<span class="ident">schema</span>()) {
-                (<span class="ident">prev</span>, <span class="ident">next</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">prev</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">prev</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span> =&gt; {
-                    <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">ExtensionChange::AlterSchema</span>);
+            <span class="kw">match </span>(ext.previous.schema(), ext.next.schema()) {
+                (prev, next) <span class="kw">if </span>!prev.is_empty() &amp;&amp; !next.is_empty() &amp;&amp; prev != next =&gt; {
+                    changes.push(ExtensionChange::AlterSchema);
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
 
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::AlterExtension</span>(<span class="ident">AlterExtension</span> {
-                <span class="ident">ids</span>: <span class="ident">Pair::new</span>(<span class="ident">ext</span>.<span class="ident">previous</span>.<span class="ident">id</span>, <span class="ident">ext</span>.<span class="ident">next</span>.<span class="ident">id</span>),
-                <span class="ident">changes</span>,
+            steps.push(SqlMigrationStep::AlterExtension(AlterExtension {
+                ids: Pair::new(ext.previous.id, ext.next.id),
+                changes,
             }));
         }
 
-        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">created_extensions</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="ident">CreateExtension</span> { <span class="ident">id</span> }));
+        <span class="kw">for </span>id <span class="kw">in </span>db.created_extensions() {
+            steps.push(SqlMigrationStep::CreateExtension(CreateExtension { id }));
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">define_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span>, <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">schemas</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">schema</span><span class="op">|</span> (<span class="ident">schema</span>, <span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>()));
+    <span class="kw">fn </span>define_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>, db: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">let </span>schemas: Pair&lt;(<span class="kw-2">&amp;</span>SqlDatabaseSchema, <span class="kw-2">&amp;</span>PostgresSchemaExt)&gt; = db
+            .schemas
+            .map(|schema| (schema, schema.describer_schema.downcast_connector_data()));
 
-        <span class="kw">for</span> <span class="ident">extension</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="number">1</span>.<span class="ident">extension_walkers</span>() {
-            <span class="ident">db</span>.<span class="ident">extensions</span>
-                .<span class="ident">insert</span>(<span class="ident">extension</span>.<span class="ident">name</span>(), <span class="ident">Pair::new</span>(<span class="prelude-val">Some</span>(<span class="ident">extension</span>.<span class="ident">id</span>), <span class="prelude-val">None</span>));
+        <span class="kw">for </span>extension <span class="kw">in </span>schemas.previous.<span class="number">1</span>.extension_walkers() {
+            db.extensions
+                .insert(extension.name(), Pair::new(<span class="prelude-val">Some</span>(extension.id), <span class="prelude-val">None</span>));
         }
 
-        <span class="kw">for</span> <span class="ident">extension</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="number">1</span>.<span class="ident">extension_walkers</span>() {
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">extensions</span>.<span class="ident">entry</span>(<span class="ident">extension</span>.<span class="ident">name</span>()).<span class="ident">or_default</span>();
-            <span class="ident">entry</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">extension</span>.<span class="ident">id</span>);
+        <span class="kw">for </span>extension <span class="kw">in </span>schemas.next.<span class="number">1</span>.extension_walkers() {
+            <span class="kw">let </span>entry = db.extensions.entry(extension.name()).or_default();
+            entry.next = <span class="prelude-val">Some</span>(extension.id);
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cockroach_column_type_change</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
+<span class="kw">fn </span>cockroach_column_type_change(columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">use </span>ColumnTypeChange::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CockroachType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
-    <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CockroachType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
-    <span class="kw">let</span> <span class="ident">from_list_to_scalar</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
-    <span class="kw">let</span> <span class="ident">from_scalar_to_list</span> <span class="op">=</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+    <span class="kw">let </span>previous_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CockroachType&gt; = columns.previous.column_native_type();
+    <span class="kw">let </span>next_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CockroachType&gt; = columns.next.column_native_type();
+    <span class="kw">let </span>from_list_to_scalar = columns.previous.arity().is_list() &amp;&amp; !columns.next.arity().is_list();
+    <span class="kw">let </span>from_scalar_to_list = !columns.previous.arity().is_list() &amp;&amp; columns.next.arity().is_list();
 
-    <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::String</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">CockroachType::Char</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">from_scalar_to_list</span> <span class="op">|</span><span class="op">|</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NotCastable</span>),
-        (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) =&gt; <span class="ident">cockroach_native_type_change_riskyness</span>(<span class="kw-2">*</span><span class="ident">previous</span>, <span class="kw-2">*</span><span class="ident">next</span>, <span class="ident">columns</span>),
-        <span class="comment">// Unsupported types will have None as Native type</span>
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+    <span class="kw">match </span>(previous_type, next_type) {
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(CockroachType::String(<span class="prelude-val">None</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(SafeCast),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(CockroachType::String(<span class="kw">_</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(CockroachType::Char(<span class="kw">_</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>from_scalar_to_list || from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(NotCastable),
+        (<span class="prelude-val">Some</span>(previous), <span class="prelude-val">Some</span>(next)) =&gt; cockroach_native_type_change_riskyness(<span class="kw-2">*</span>previous, <span class="kw-2">*</span>next, columns),
+        <span class="comment">// Unsupported types will have None as Native type
+        </span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-            <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> =&gt;
+            <span class="kw">if </span>columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =&gt;
         {
-            <span class="prelude-val">None</span>
-        }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+            <span class="prelude-val">None
+        </span>}
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
     }
 }
 
-<span class="comment">// https://go.crdb.dev/issue-v/49329/v22.1</span>
-<span class="kw">fn</span> <span class="ident">cockroach_native_type_change_riskyness</span>(
-    <span class="ident">previous</span>: <span class="ident">CockroachType</span>,
-    <span class="ident">next</span>: <span class="ident">CockroachType</span>,
-    <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">covered_by_index</span> <span class="op">=</span> <span class="ident">columns</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_part_of_secondary_index</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">is_part_of_primary_key</span>())
-        .<span class="ident">into_tuple</span>()
-        <span class="op">==</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>);
+<span class="comment">// https://go.crdb.dev/issue-v/49329/v22.1
+</span><span class="kw">fn </span>cockroach_native_type_change_riskyness(
+    previous: CockroachType,
+    next: CockroachType,
+    columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">let </span>covered_by_index = columns
+        .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
+        .into_tuple()
+        == (<span class="bool-val">true</span>, <span class="bool-val">true</span>);
 
-    <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
-        (<span class="ident">CockroachType::Int4</span>, <span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>)) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
-        (<span class="ident">CockroachType::Int8</span>, <span class="ident">CockroachType::Int4</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">covered_by_index</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
-        (<span class="ident">previous</span>, <span class="ident">next</span>) <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span> =&gt; <span class="prelude-val">None</span>,
-        <span class="comment">// Timestamp default precisions</span>
-        (<span class="ident">CockroachType::Time</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Time</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">None</span>))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">None</span>), <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
-        <span class="op">|</span> (<span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)), <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">None</span>,
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>),
+    <span class="kw">match </span>(previous, next) {
+        (CockroachType::Int4, CockroachType::String(<span class="prelude-val">None</span>)) <span class="kw">if </span>!covered_by_index =&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast),
+        (CockroachType::Int8, CockroachType::Int4) <span class="kw">if </span>!covered_by_index =&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast),
+        (previous, next) <span class="kw">if </span>previous == next =&gt; <span class="prelude-val">None</span>,
+        <span class="comment">// Timestamp default precisions
+        </span>(CockroachType::Time(<span class="prelude-val">None</span>), CockroachType::Time(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        | (CockroachType::Time(<span class="prelude-val">Some</span>(<span class="number">6</span>)), CockroachType::Time(<span class="prelude-val">None</span>))
+        | (CockroachType::Timetz(<span class="prelude-val">None</span>), CockroachType::Timetz(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        | (CockroachType::Timetz(<span class="prelude-val">Some</span>(<span class="number">6</span>)), CockroachType::Timetz(<span class="prelude-val">None</span>))
+        | (CockroachType::Timestamptz(<span class="prelude-val">None</span>), CockroachType::Timestamptz(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        | (CockroachType::Timestamptz(<span class="prelude-val">Some</span>(<span class="number">6</span>)), CockroachType::Timestamptz(<span class="prelude-val">None</span>))
+        | (CockroachType::Timestamp(<span class="prelude-val">None</span>), CockroachType::Timestamp(<span class="prelude-val">Some</span>(<span class="number">6</span>)))
+        | (CockroachType::Timestamp(<span class="prelude-val">Some</span>(<span class="number">6</span>)), CockroachType::Timestamp(<span class="prelude-val">None</span>)) =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">postgres_column_type_change</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
-    <span class="kw">let</span> <span class="ident">previous_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>();
-    <span class="kw">let</span> <span class="ident">next_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>();
-    <span class="kw">let</span> <span class="ident">from_list_to_scalar</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
-    <span class="kw">let</span> <span class="ident">from_scalar_to_list</span> <span class="op">=</span> <span class="op">!</span><span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_list</span>();
+<span class="kw">fn </span>postgres_column_type_change(columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">use </span>ColumnTypeChange::<span class="kw-2">*</span>;
+    <span class="kw">let </span>previous_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = columns.previous.column_native_type();
+    <span class="kw">let </span>next_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = columns.next.column_native_type();
+    <span class="kw">let </span>from_list_to_scalar = columns.previous.arity().is_list() &amp;&amp; !columns.next.arity().is_list();
+    <span class="kw">let </span>from_scalar_to_list = !columns.previous.arity().is_list() &amp;&amp; columns.next.arity().is_list();
 
-    <span class="kw">match</span> (<span class="ident">previous_type</span>, <span class="ident">next_type</span>) {
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>)) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="prelude-val">None</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SafeCast</span>),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">from_scalar_to_list</span> <span class="op">|</span><span class="op">|</span> <span class="ident">from_list_to_scalar</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">NotCastable</span>),
-        (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) =&gt; <span class="ident">postgres_native_type_change_riskyness</span>(<span class="ident">previous</span>, <span class="ident">next</span>),
-        <span class="comment">// Unsupported types will have None as Native type</span>
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
-        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+    <span class="kw">match </span>(previous_type, next_type) {
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(PostgresType::Text)) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(SafeCast),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="prelude-val">None</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(SafeCast),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="kw">_</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(PostgresType::Char(<span class="kw">_</span>))) <span class="kw">if </span>from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>from_scalar_to_list || from_list_to_scalar =&gt; <span class="prelude-val">Some</span>(NotCastable),
+        (<span class="prelude-val">Some</span>(previous), <span class="prelude-val">Some</span>(next)) =&gt; postgres_native_type_change_riskyness(previous, next),
+        <span class="comment">// Unsupported types will have None as Native type
+        </span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-            <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span> =&gt;
+            <span class="kw">if </span>columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =&gt;
         {
-            <span class="prelude-val">None</span>
-        }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">RiskyCast</span>),
+            <span class="prelude-val">None
+        </span>}
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(RiskyCast),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">postgres_native_type_change_riskyness</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">psl::builtin_connectors::PostgresType</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">ColumnTypeChange</span>::<span class="kw-2">*</span>;
+<span class="kw">fn </span>postgres_native_type_change_riskyness(previous: <span class="kw-2">&amp;</span>PostgresType, next: <span class="kw-2">&amp;</span>PostgresType) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">use </span>psl::builtin_connectors::PostgresType::<span class="kw-2">*</span>;
+    <span class="kw">use </span>ColumnTypeChange::<span class="kw-2">*</span>;
 
-    <span class="comment">// varchar / varbit without param=&gt; unlimited length</span>
-    <span class="comment">// char / bit without param =&gt; length is 1</span>
-    <span class="kw">let</span> <span class="ident">next_is_char</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">next</span>, <span class="ident">Char</span>(<span class="kw">_</span>));
+    <span class="comment">// varchar / varbit without param=&gt; unlimited length
+    // char / bit without param =&gt; length is 1
+    </span><span class="kw">let </span>next_is_char = || <span class="macro">matches!</span>(next, Char(<span class="kw">_</span>));
 
-    <span class="kw">let</span> <span class="ident">cast</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">previous</span> {
-            <span class="ident">PostgresType::Inet</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">PostgresType::Citext</span> <span class="op">|</span> <span class="ident">PostgresType::Text</span> <span class="op">|</span> <span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">ColumnTypeChange::SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+    <span class="kw">let </span>cast = || {
+        <span class="prelude-val">Some</span>(<span class="kw">match </span>previous {
+            PostgresType::Inet =&gt; <span class="kw">match </span>next {
+                PostgresType::Citext | PostgresType::Text | PostgresType::VarChar(<span class="kw">_</span>) =&gt; ColumnTypeChange::SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">PostgresType::Money</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">PostgresType::Citext</span> <span class="op">|</span> <span class="ident">PostgresType::Text</span> <span class="op">|</span> <span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">ColumnTypeChange::SafeCast</span>,
-                <span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ColumnTypeChange::RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
+            PostgresType::Money =&gt; <span class="kw">match </span>next {
+                PostgresType::Citext | PostgresType::Text | PostgresType::VarChar(<span class="kw">_</span>) =&gt; ColumnTypeChange::SafeCast,
+                PostgresType::Decimal(<span class="kw">_</span>) =&gt; ColumnTypeChange::RiskyCast,
+                <span class="kw">_ </span>=&gt; RiskyCast,
             },
-            <span class="ident">PostgresType::Citext</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">PostgresType::Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">RiskyCast</span>,
+            PostgresType::Citext =&gt; <span class="kw">match </span>next {
+                PostgresType::Text =&gt; SafeCast,
+                PostgresType::VarChar(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; RiskyCast,
             },
-            <span class="ident">PostgresType::Oid</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">PostgresType::Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::BigInt</span> <span class="op">|</span> <span class="ident">PostgresType::Integer</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            PostgresType::Oid =&gt; <span class="kw">match </span>next {
+                PostgresType::Text =&gt; SafeCast,
+                PostgresType::VarChar(<span class="kw">_</span>) =&gt; SafeCast,
+                PostgresType::BigInt | PostgresType::Integer =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">SmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Integer</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">BigInt</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Decimal</span>(<span class="ident">params</span>) =&gt; <span class="kw">match</span> <span class="ident">params</span> {
-                    <span class="comment">// SmallInt can be at most three digits, so this might fail.</span>
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            SmallInt =&gt; <span class="kw">match </span>next {
+                Integer =&gt; SafeCast,
+                BigInt =&gt; SafeCast,
+                Decimal(params) =&gt; <span class="kw">match </span>params {
+                    <span class="comment">// SmallInt can be at most three digits, so this might fail.
+                    </span><span class="prelude-val">Some</span>((p, s)) <span class="kw">if </span>p - s &lt; <span class="number">3 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Real</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                    <span class="comment">// Smallint can have three digits and an optional sign.</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                Real =&gt; SafeCast,
+                DoublePrecision =&gt; SafeCast,
+                VarChar(param) | Char(param) =&gt; <span class="kw">match </span>param {
+                    <span class="comment">// Smallint can have three digits and an optional sign.
+                    </span><span class="prelude-val">Some</span>(len) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">4 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">None </span><span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Integer</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">SmallInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">BigInt</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Decimal</span>(<span class="ident">params</span>) =&gt; <span class="kw">match</span> <span class="ident">params</span> {
-                    <span class="comment">// Integer can be at most 10 digits, so this might fail.</span>
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="number">10</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            Integer =&gt; <span class="kw">match </span>next {
+                SmallInt =&gt; RiskyCast,
+                BigInt =&gt; SafeCast,
+                Decimal(params) =&gt; <span class="kw">match </span>params {
+                    <span class="comment">// Integer can be at most 10 digits, so this might fail.
+                    </span><span class="prelude-val">Some</span>((p, s)) <span class="kw">if </span>p - s &lt; <span class="number">10 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Real</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                    <span class="comment">// Integer can have five digits and an optional sign.</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">11</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                Real =&gt; SafeCast,
+                DoublePrecision =&gt; SafeCast,
+                VarChar(param) | Char(param) =&gt; <span class="kw">match </span>param {
+                    <span class="comment">// Integer can have five digits and an optional sign.
+                    </span><span class="prelude-val">Some</span>(len) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">11 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">None </span><span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">BigInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">SmallInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Integer</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Decimal</span>(<span class="ident">params</span>) =&gt; <span class="kw">match</span> <span class="ident">params</span> {
-                    <span class="comment">// Bigint can be at most nineteen digits, so this might fail.</span>
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="ident">p</span> <span class="op">-</span> <span class="ident">s</span> <span class="op">&lt;</span> <span class="number">19</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            BigInt =&gt; <span class="kw">match </span>next {
+                SmallInt =&gt; RiskyCast,
+                Integer =&gt; RiskyCast,
+                Decimal(params) =&gt; <span class="kw">match </span>params {
+                    <span class="comment">// Bigint can be at most nineteen digits, so this might fail.
+                    </span><span class="prelude-val">Some</span>((p, s)) <span class="kw">if </span>p - s &lt; <span class="number">19 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Real</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">param</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">param</span>) =&gt; <span class="kw">match</span> <span class="ident">param</span> {
-                    <span class="comment">// Bigint can have twenty digits and an optional sign.</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">20</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                Real =&gt; SafeCast,
+                DoublePrecision =&gt; SafeCast,
+                VarChar(param) | Char(param) =&gt; <span class="kw">match </span>param {
+                    <span class="comment">// Bigint can have twenty digits and an optional sign.
+                    </span><span class="prelude-val">Some</span>(len) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">20 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">None </span><span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Decimal</span>(<span class="ident">old_params</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">SmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_params</span> {
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            Decimal(old_params) =&gt; <span class="kw">match </span>next {
+                SmallInt =&gt; <span class="kw">match </span>old_params {
+                    <span class="prelude-val">None </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, s)) <span class="kw">if </span><span class="kw-2">*</span>s &gt; <span class="number">0 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((p, <span class="number">0</span>)) <span class="kw">if </span><span class="kw-2">*</span>p &gt; <span class="number">2 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Integer</span> =&gt; <span class="kw">match</span> <span class="ident">old_params</span> {
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&gt;</span> <span class="number">9</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                Integer =&gt; <span class="kw">match </span>old_params {
+                    <span class="prelude-val">None </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, s)) <span class="kw">if </span><span class="kw-2">*</span>s &gt; <span class="number">0 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((p, <span class="number">0</span>)) <span class="kw">if </span><span class="kw-2">*</span>p &gt; <span class="number">9 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">BigInt</span> =&gt; <span class="kw">match</span> <span class="ident">old_params</span> {
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">s</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&gt;</span> <span class="number">18</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                BigInt =&gt; <span class="kw">match </span>old_params {
+                    <span class="prelude-val">None </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((<span class="kw">_</span>, s)) <span class="kw">if </span><span class="kw-2">*</span>s &gt; <span class="number">0 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">Some</span>((p, <span class="number">0</span>)) <span class="kw">if </span><span class="kw-2">*</span>p &gt; <span class="number">18 </span>=&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Decimal</span>(<span class="ident">new_params</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_params</span>, <span class="ident">new_params</span>) {
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((<span class="ident">p_new</span>, <span class="ident">s_new</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p_new</span> <span class="op">&lt;</span> <span class="number">131072</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s_new</span> <span class="op">&lt;</span> <span class="number">16383</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="comment">// Sigh... So, numeric(4,0) to numeric(4,2) would be risky,</span>
-                    <span class="comment">// so would numeric(4,2) to numeric(4,0).</span>
-                    (<span class="prelude-val">Some</span>((<span class="ident">p_old</span>, <span class="ident">s_old</span>)), <span class="prelude-val">Some</span>((<span class="ident">p_new</span>, <span class="ident">s_new</span>))) <span class="kw">if</span> <span class="ident">p_old</span> <span class="op">-</span> <span class="ident">s_old</span> <span class="op">&gt;</span> <span class="ident">p_new</span> <span class="op">-</span> <span class="ident">s_new</span> <span class="op">|</span><span class="op">|</span> <span class="ident">s_old</span> <span class="op">&gt;</span> <span class="ident">s_new</span> =&gt; {
-                        <span class="ident">RiskyCast</span>
+                Decimal(new_params) =&gt; <span class="kw">match </span>(old_params, new_params) {
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((p_new, s_new))) <span class="kw">if </span><span class="kw-2">*</span>p_new &lt; <span class="number">131072 </span>|| <span class="kw-2">*</span>s_new &lt; <span class="number">16383 </span>=&gt; RiskyCast,
+                    <span class="comment">// Sigh... So, numeric(4,0) to numeric(4,2) would be risky,
+                    // so would numeric(4,2) to numeric(4,0).
+                    </span>(<span class="prelude-val">Some</span>((p_old, s_old)), <span class="prelude-val">Some</span>((p_new, s_new))) <span class="kw">if </span>p_old - s_old &gt; p_new - s_new || s_old &gt; s_new =&gt; {
+                        RiskyCast
                     }
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="comment">//todo this is the same as in mssql, but could be more finegrained</span>
-                <span class="ident">Real</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">length</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">length</span>) =&gt; <span class="kw">match</span> (<span class="ident">length</span>, <span class="ident">old_params</span>) {
-                    <span class="comment">// We must fit p digits and a possible sign to our</span>
-                    <span class="comment">// string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="number">0</span>))) <span class="kw">if</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="comment">// We must fit p digits, a possible sign and a comma to</span>
-                    <span class="comment">// our string, otherwise might truncate.</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="ident">n</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">p</span> <span class="op">+</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">len</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="comment">//up to 131072 digits before the decimal point; up to 16383 digits after the decimal point</span>
-                    (<span class="prelude-val">Some</span>(<span class="ident">len</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">131073</span> =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+                <span class="comment">//todo this is the same as in mssql, but could be more finegrained
+                </span>Real =&gt; RiskyCast,
+                DoublePrecision =&gt; RiskyCast,
+                VarChar(length) | Char(length) =&gt; <span class="kw">match </span>(length, old_params) {
+                    <span class="comment">// We must fit p digits and a possible sign to our
+                    // string, otherwise might truncate.
+                    </span>(<span class="prelude-val">Some</span>(len), <span class="prelude-val">Some</span>((p, <span class="number">0</span>))) <span class="kw">if </span>p + <span class="number">1 </span>&gt; <span class="kw-2">*</span>len =&gt; RiskyCast,
+                    <span class="comment">// We must fit p digits, a possible sign and a comma to
+                    // our string, otherwise might truncate.
+                    </span>(<span class="prelude-val">Some</span>(len), <span class="prelude-val">Some</span>((p, n))) <span class="kw">if </span><span class="kw-2">*</span>n &gt; <span class="number">0 </span>&amp;&amp; p + <span class="number">2 </span>&gt; <span class="kw-2">*</span>len =&gt; RiskyCast,
+                    <span class="comment">//up to 131072 digits before the decimal point; up to 16383 digits after the decimal point
+                    </span>(<span class="prelude-val">Some</span>(len), <span class="prelude-val">None</span>) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">131073 </span>=&gt; RiskyCast,
+                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; SafeCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Real</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">SmallInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Integer</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">BigInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Real</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">len</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">len</span>) =&gt; <span class="kw">match</span> <span class="ident">len</span> {
-                    <span class="comment">// If float, we can have 47 characters including the sign and comma.</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">47</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            Real =&gt; <span class="kw">match </span>next {
+                SmallInt =&gt; RiskyCast,
+                Integer =&gt; RiskyCast,
+                BigInt =&gt; RiskyCast,
+                Decimal(<span class="kw">_</span>) =&gt; RiskyCast,
+                Real =&gt; SafeCast,
+                DoublePrecision =&gt; SafeCast,
+                VarChar(len) | Char(len) =&gt; <span class="kw">match </span>len {
+                    <span class="comment">// If float, we can have 47 characters including the sign and comma.
+                    </span><span class="prelude-val">Some</span>(len) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">47 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">None </span><span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">DoublePrecision</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">SmallInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Integer</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">BigInt</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Real</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">DoublePrecision</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">len</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">len</span>) =&gt; <span class="kw">match</span> <span class="ident">len</span> {
-                    <span class="comment">// If double, we can have 317 characters including the sign and comma.</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span> <span class="number">317</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            DoublePrecision =&gt; <span class="kw">match </span>next {
+                SmallInt =&gt; RiskyCast,
+                Integer =&gt; RiskyCast,
+                BigInt =&gt; RiskyCast,
+                Decimal(<span class="kw">_</span>) =&gt; RiskyCast,
+                Real =&gt; RiskyCast,
+                DoublePrecision =&gt; SafeCast,
+                VarChar(len) | Char(len) =&gt; <span class="kw">match </span>len {
+                    <span class="comment">// If double, we can have 317 characters including the sign and comma.
+                    </span><span class="prelude-val">Some</span>(len) <span class="kw">if </span><span class="kw-2">*</span>len &lt; <span class="number">317 </span>=&gt; RiskyCast,
+                    <span class="prelude-val">None </span><span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                Text =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">VarChar</span>(<span class="ident">old_param</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                    (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="ident">old_length</span>), <span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">old_length</span> <span class="op">&gt;</span> <span class="ident">new_length</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            VarChar(old_param) =&gt; <span class="kw">match </span>next {
+                Text =&gt; SafeCast,
+                VarChar(new_param) | Char(new_param) =&gt; <span class="kw">match </span>(old_param, new_param) {
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; RiskyCast,
+                    (<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">Some</span>(old_length), <span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>old_length &gt; new_length =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Char</span>(<span class="ident">old_param</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="ident">new_param</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="ident">new_param</span>) =&gt; <span class="kw">match</span> (<span class="ident">old_param</span>, <span class="ident">new_param</span>) {
-                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">next_is_char</span>() =&gt; <span class="ident">RiskyCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                    (<span class="prelude-val">Some</span>(<span class="ident">old_length</span>), <span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">old_length</span> <span class="op">&gt;</span> <span class="ident">new_length</span> =&gt; <span class="ident">RiskyCast</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">SafeCast</span>,
+            Char(old_param) =&gt; <span class="kw">match </span>next {
+                Text =&gt; SafeCast,
+                VarChar(new_param) | Char(new_param) =&gt; <span class="kw">match </span>(old_param, new_param) {
+                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="kw">if </span>next_is_char() =&gt; RiskyCast,
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; SafeCast,
+                    (<span class="prelude-val">Some</span>(old_length), <span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>old_length &gt; new_length =&gt; RiskyCast,
+                    <span class="kw">_ </span>=&gt; SafeCast,
                 },
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Text</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">Citext</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Text =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) | Citext =&gt; SafeCast,
+                VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">ByteA</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="op">|</span> <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span> <span class="number">2</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            ByteA =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="prelude-val">Some</span>(length)) | Char(<span class="prelude-val">Some</span>(length)) <span class="kw">if </span><span class="kw-2">*</span>length &gt; <span class="number">2 </span>=&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Timestamp</span>(<span class="ident">a</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">22</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">PostgresType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">a</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">b</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Date</span> <span class="op">|</span> <span class="ident">Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Timestamp(a) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(len)) | VarChar(<span class="prelude-val">Some</span>(len)) <span class="kw">if </span><span class="kw-2">*</span>len &gt; <span class="number">22 </span>=&gt; SafeCast,
+                PostgresType::Timestamp(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                PostgresType::Timestamp(<span class="prelude-val">Some</span>(b)) <span class="kw">if </span>a.is_none() || <span class="kw-2">*</span>a == <span class="prelude-val">Some</span>(<span class="kw-2">*</span>b) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                Timestamp(<span class="kw">_</span>) | Timestamptz(<span class="kw">_</span>) | Date | Time(<span class="kw">_</span>) | Timetz(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Timestamptz</span>(<span class="ident">a</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">PostgresType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">a</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">b</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Date</span> <span class="op">|</span> <span class="ident">Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Timestamptz(a) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(len)) | VarChar(<span class="prelude-val">Some</span>(len)) <span class="kw">if </span><span class="kw-2">*</span>len &gt; <span class="number">27 </span>=&gt; SafeCast,
+                PostgresType::Timestamptz(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                PostgresType::Timestamptz(<span class="prelude-val">Some</span>(b)) <span class="kw">if </span>a.is_none() || <span class="kw-2">*</span>a == <span class="prelude-val">Some</span>(<span class="kw-2">*</span>b) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                Timestamp(<span class="kw">_</span>) | Timestamptz(<span class="kw">_</span>) | Date | Time(<span class="kw">_</span>) | Timetz(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Date</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">27</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Date =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(len)) | VarChar(<span class="prelude-val">Some</span>(len)) <span class="kw">if </span><span class="kw-2">*</span>len &gt; <span class="number">27 </span>=&gt; SafeCast,
+                Timestamp(<span class="kw">_</span>) | Timestamptz(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Time</span>(<span class="ident">a</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">13</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::Time</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">PostgresType::Time</span>(<span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">a</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">b</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Time(a) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(len)) | VarChar(<span class="prelude-val">Some</span>(len)) <span class="kw">if </span><span class="kw-2">*</span>len &gt; <span class="number">13 </span>=&gt; SafeCast,
+                PostgresType::Time(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                PostgresType::Time(<span class="prelude-val">Some</span>(b)) <span class="kw">if </span>a.is_none() || <span class="kw-2">*</span>a == <span class="prelude-val">Some</span>(<span class="kw-2">*</span>b) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                Timetz(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Timetz</span>(<span class="ident">a</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">len</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">18</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">PostgresType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">a</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">b</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">Timetz</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Timetz(a) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(len)) | VarChar(<span class="prelude-val">Some</span>(len)) <span class="kw">if </span><span class="kw-2">*</span>len &gt; <span class="number">18 </span>=&gt; SafeCast,
+                PostgresType::Timetz(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                PostgresType::Timetz(<span class="prelude-val">Some</span>(b)) <span class="kw">if </span>a.is_none() || <span class="kw-2">*</span>a == <span class="prelude-val">Some</span>(<span class="kw-2">*</span>b) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                Timetz(<span class="kw">_</span>) | Time(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Boolean</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span> <span class="number">4</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span> <span class="number">3</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Boolean =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="kw">_</span>) =&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(length)) <span class="kw">if </span><span class="kw-2">*</span>length &gt; <span class="number">4 </span>=&gt; SafeCast,
+                Char(<span class="prelude-val">Some</span>(length)) <span class="kw">if </span><span class="kw-2">*</span>length &gt; <span class="number">3 </span>=&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Bit</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Bit(<span class="prelude-val">None</span>) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) | VarBit(<span class="kw">_</span>) =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">new_length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">length</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="op">|</span> <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">new_length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">length</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Bit(<span class="prelude-val">Some</span>(length)) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) | VarBit(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>new_length &gt;= length =&gt; SafeCast,
+                VarBit(<span class="prelude-val">Some</span>(new_length)) | Char(<span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>new_length &gt;= length =&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
 
-            <span class="ident">VarBit</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            VarBit(<span class="prelude-val">None</span>) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) | Bit(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">VarBit</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarBit</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">new_length</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">length</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="op">|</span> <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">new_length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">length</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">Bit</span>(<span class="prelude-val">Some</span>(<span class="ident">new_length</span>)) <span class="kw">if</span> <span class="ident">new_length</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">length</span> =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Bit</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="ident">Char</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            VarBit(<span class="prelude-val">Some</span>(length)) =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) | VarBit(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarBit(<span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span><span class="kw-2">*</span>new_length &gt; <span class="kw-2">*</span>length =&gt; SafeCast,
+                VarChar(<span class="prelude-val">Some</span>(new_length)) | Char(<span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>new_length &gt;= length =&gt; SafeCast,
+                Bit(<span class="prelude-val">Some</span>(new_length)) <span class="kw">if </span>new_length &lt;= length =&gt; RiskyCast,
+                Bit(<span class="prelude-val">None</span>) =&gt; RiskyCast,
+                Char(<span class="kw">_</span>) | VarChar(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Uuid</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="op">|</span> <span class="ident">Char</span>(<span class="prelude-val">Some</span>(<span class="ident">length</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">length</span> <span class="op">&gt;</span> <span class="number">31</span> =&gt; <span class="ident">SafeCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Uuid =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="prelude-val">Some</span>(length)) | Char(<span class="prelude-val">Some</span>(length)) <span class="kw">if </span><span class="kw-2">*</span>length &gt; <span class="number">31 </span>=&gt; SafeCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Xml</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Xml =&gt; <span class="kw">match </span>next {
+                Text | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">Json</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">JsonB</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            Json =&gt; <span class="kw">match </span>next {
+                Text | JsonB | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
-            <span class="ident">JsonB</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">Text</span> <span class="op">|</span> <span class="ident">Json</span> <span class="op">|</span> <span class="ident">VarChar</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">SafeCast</span>,
-                <span class="ident">VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">RiskyCast</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">NotCastable</span>,
+            JsonB =&gt; <span class="kw">match </span>next {
+                Text | Json | VarChar(<span class="prelude-val">None</span>) =&gt; SafeCast,
+                VarChar(<span class="kw">_</span>) | Char(<span class="kw">_</span>) =&gt; RiskyCast,
+                <span class="kw">_ </span>=&gt; NotCastable,
             },
         })
     };
 
-    <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="ident">cast</span>()
+    <span class="kw">if </span>previous == next {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        cast()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_alter_enum_previous_usages_as_default</span>(<span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">alter_enum</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AlterEnum</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_usages_as_default</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw">_</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">fn </span>push_alter_enum_previous_usages_as_default(db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;, alter_enum: <span class="kw-2">&amp;mut </span>AlterEnum) {
+    <span class="kw">let </span><span class="kw-2">mut </span>previous_usages_as_default: Vec&lt;(<span class="kw">_</span>, <span class="prelude-ty">Option</span>&lt;<span class="kw">_</span>&gt;)&gt; = Vec::new();
 
-    <span class="kw">let</span> <span class="ident">enum_names</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>());
+    <span class="kw">let </span>enum_names = db.schemas.walk(alter_enum.id).map(|enm| enm.name());
 
-    <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_tables</span>() {
-        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">table</span>
-            .<span class="ident">columns</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_is_enum</span>(<span class="ident">enum_names</span>.<span class="ident">previous</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">default</span>().<span class="ident">is_some</span>())
+    <span class="kw">for </span>table <span class="kw">in </span>db.dropped_tables() {
+        <span class="kw">for </span>column <span class="kw">in </span>table
+            .columns()
+            .filter(|col| col.column_type_is_enum(enum_names.previous) &amp;&amp; col.default().is_some())
         {
-            <span class="ident">previous_usages_as_default</span>.<span class="ident">push</span>((<span class="ident">column</span>.<span class="ident">id</span>, <span class="prelude-val">None</span>));
+            previous_usages_as_default.push((column.id, <span class="prelude-val">None</span>));
         }
     }
 
-    <span class="kw">for</span> <span class="ident">tables</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">table_pairs</span>() {
-        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">tables</span>
-            .<span class="ident">dropped_columns</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_is_enum</span>(<span class="ident">enum_names</span>.<span class="ident">previous</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">default</span>().<span class="ident">is_some</span>())
+    <span class="kw">for </span>tables <span class="kw">in </span>db.table_pairs() {
+        <span class="kw">for </span>column <span class="kw">in </span>tables
+            .dropped_columns()
+            .filter(|col| col.column_type_is_enum(enum_names.previous) &amp;&amp; col.default().is_some())
         {
-            <span class="ident">previous_usages_as_default</span>.<span class="ident">push</span>((<span class="ident">column</span>.<span class="ident">id</span>, <span class="prelude-val">None</span>));
+            previous_usages_as_default.push((column.id, <span class="prelude-val">None</span>));
         }
 
-        <span class="kw">for</span> <span class="ident">columns</span> <span class="kw">in</span> <span class="ident">tables</span>
-            .<span class="ident">column_pairs</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">previous</span>.<span class="ident">column_type_is_enum</span>(<span class="ident">enum_names</span>.<span class="ident">previous</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">previous</span>.<span class="ident">default</span>().<span class="ident">is_some</span>())
+        <span class="kw">for </span>columns <span class="kw">in </span>tables
+            .column_pairs()
+            .filter(|col| col.previous.column_type_is_enum(enum_names.previous) &amp;&amp; col.previous.default().is_some())
         {
-            <span class="kw">let</span> <span class="ident">next_usage_as_default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>.<span class="ident">next</span>)
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_type_is_enum</span>(<span class="ident">enum_names</span>.<span class="ident">next</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">default</span>().<span class="ident">is_some</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">id</span>);
+            <span class="kw">let </span>next_usage_as_default = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>columns.next)
+                .filter(|col| col.column_type_is_enum(enum_names.next) &amp;&amp; col.default().is_some())
+                .map(|col| col.id);
 
-            <span class="ident">previous_usages_as_default</span>.<span class="ident">push</span>((<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">id</span>, <span class="ident">next_usage_as_default</span>));
+            previous_usages_as_default.push((columns.previous.id, next_usage_as_default));
         }
     }
 
-    <span class="ident">alter_enum</span>.<span class="ident">previous_usages_as_default</span> <span class="op">=</span> <span class="ident">previous_usages_as_default</span>;
+    alter_enum.previous_usages_as_default = previous_usages_as_default;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

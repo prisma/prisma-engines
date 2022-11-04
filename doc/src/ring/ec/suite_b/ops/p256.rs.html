@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ops/p256.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>p256.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ops/p256.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>p256.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -380,387 +380,387 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">elem</span>::{<span class="ident">binary_op</span>, <span class="ident">binary_op_assign</span>},
-    <span class="ident">elem_sqr_mul</span>, <span class="ident">elem_sqr_mul_acc</span>, <span class="ident">Modulus</span>, <span class="kw-2">*</span>,
+</span><span class="kw">use super</span>::{
+    elem::{binary_op, binary_op_assign},
+    elem_sqr_mul, elem_sqr_mul_acc, Modulus, <span class="kw-2">*</span>,
 };
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use </span>core::marker::PhantomData;
 
-<span class="macro">macro_rules!</span> <span class="ident">p256_limbs</span> {
-    [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb</span>:<span class="ident">expr</span>),<span class="op">+</span> ] =&gt; {
-        <span class="macro">limbs!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">limb</span>),<span class="op">+</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
+<span class="macro">macro_rules! </span>p256_limbs {
+    [ $(<span class="macro-nonterminal">$limb</span>:expr),+ ] =&gt; {
+        <span class="macro">limbs!</span>[$(<span class="macro-nonterminal">$limb</span>),+, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]
     };
 }
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">COMMON_OPS</span>: <span class="ident">CommonOps</span> <span class="op">=</span> <span class="ident">CommonOps</span> {
-    <span class="ident">num_limbs</span>: <span class="number">256</span> <span class="op">/</span> <span class="ident">LIMB_BITS</span>,
+<span class="kw">pub static </span>COMMON_OPS: CommonOps = CommonOps {
+    num_limbs: <span class="number">256 </span>/ LIMB_BITS,
 
-    <span class="ident">q</span>: <span class="ident">Modulus</span> {
-        <span class="ident">p</span>: <span class="macro">p256_limbs!</span>[
+    q: Modulus {
+        p: <span class="macro">p256_limbs!</span>[
             <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000001</span>,
-            <span class="number">0xffffffff</span>
-        ],
-        <span class="ident">rr</span>: <span class="macro">p256_limbs!</span>[
+            <span class="number">0xffffffff
+        </span>],
+        rr: <span class="macro">p256_limbs!</span>[
             <span class="number">0x00000003</span>, <span class="number">0x00000000</span>, <span class="number">0xffffffff</span>, <span class="number">0xfffffffb</span>, <span class="number">0xfffffffe</span>, <span class="number">0xffffffff</span>, <span class="number">0xfffffffd</span>,
-            <span class="number">0x00000004</span>
-        ],
+            <span class="number">0x00000004
+        </span>],
     },
 
-    <span class="ident">n</span>: <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+    n: Elem {
+        limbs: <span class="macro">p256_limbs!</span>[
             <span class="number">0xfc632551</span>, <span class="number">0xf3b9cac2</span>, <span class="number">0xa7179e84</span>, <span class="number">0xbce6faad</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000000</span>,
-            <span class="number">0xffffffff</span>
-        ],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>, <span class="comment">// Unencoded</span>
-    },
+            <span class="number">0xffffffff
+        </span>],
+        m: PhantomData,
+        encoding: PhantomData, <span class="comment">// Unencoded
+    </span>},
 
-    <span class="ident">a</span>: <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+    a: Elem {
+        limbs: <span class="macro">p256_limbs!</span>[
             <span class="number">0xfffffffc</span>, <span class="number">0xffffffff</span>, <span class="number">0xffffffff</span>, <span class="number">0x00000003</span>, <span class="number">0x00000000</span>, <span class="number">0x00000000</span>, <span class="number">0x00000004</span>,
-            <span class="number">0xfffffffc</span>
-        ],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>, <span class="comment">// R</span>
-    },
-    <span class="ident">b</span>: <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+            <span class="number">0xfffffffc
+        </span>],
+        m: PhantomData,
+        encoding: PhantomData, <span class="comment">// R
+    </span>},
+    b: Elem {
+        limbs: <span class="macro">p256_limbs!</span>[
             <span class="number">0x29c4bddf</span>, <span class="number">0xd89cdf62</span>, <span class="number">0x78843090</span>, <span class="number">0xacf005cd</span>, <span class="number">0xf7212ed6</span>, <span class="number">0xe5a220ab</span>, <span class="number">0x04874834</span>,
-            <span class="number">0xdc30061d</span>
-        ],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>, <span class="comment">// R</span>
-    },
+            <span class="number">0xdc30061d
+        </span>],
+        m: PhantomData,
+        encoding: PhantomData, <span class="comment">// R
+    </span>},
 
-    <span class="ident">elem_add_impl</span>: <span class="ident">GFp_nistz256_add</span>,
-    <span class="ident">elem_mul_mont</span>: <span class="ident">GFp_nistz256_mul_mont</span>,
-    <span class="ident">elem_sqr_mont</span>: <span class="ident">GFp_nistz256_sqr_mont</span>,
+    elem_add_impl: GFp_nistz256_add,
+    elem_mul_mont: GFp_nistz256_mul_mont,
+    elem_sqr_mont: GFp_nistz256_sqr_mont,
 
-    <span class="ident">point_add_jacobian_impl</span>: <span class="ident">GFp_nistz256_point_add</span>,
+    point_add_jacobian_impl: GFp_nistz256_point_add,
 };
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PRIVATE_KEY_OPS</span>: <span class="ident">PrivateKeyOps</span> <span class="op">=</span> <span class="ident">PrivateKeyOps</span> {
-    <span class="ident">common</span>: <span class="kw-2">&amp;</span><span class="ident">COMMON_OPS</span>,
-    <span class="ident">elem_inv_squared</span>: <span class="ident">p256_elem_inv_squared</span>,
-    <span class="ident">point_mul_base_impl</span>: <span class="ident">p256_point_mul_base_impl</span>,
-    <span class="ident">point_mul_impl</span>: <span class="ident">GFp_nistz256_point_mul</span>,
+<span class="kw">pub static </span>PRIVATE_KEY_OPS: PrivateKeyOps = PrivateKeyOps {
+    common: <span class="kw-2">&amp;</span>COMMON_OPS,
+    elem_inv_squared: p256_elem_inv_squared,
+    point_mul_base_impl: p256_point_mul_base_impl,
+    point_mul_impl: GFp_nistz256_point_mul,
 };
 
-<span class="kw">fn</span> <span class="ident">p256_elem_inv_squared</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="comment">// Calculate a**-2 (mod q) == a**(q - 3) (mod q)</span>
-    <span class="comment">//</span>
-    <span class="comment">// The exponent (q - 3) is:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc</span>
+<span class="kw">fn </span>p256_elem_inv_squared(a: <span class="kw-2">&amp;</span>Elem&lt;R&gt;) -&gt; Elem&lt;R&gt; {
+    <span class="comment">// Calculate a**-2 (mod q) == a**(q - 3) (mod q)
+    //
+    // The exponent (q - 3) is:
+    //
+    //    0xffffffff00000001000000000000000000000000fffffffffffffffffffffffc
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqr_mul</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">squarings</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">elem_sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">COMMON_OPS</span>, <span class="ident">a</span>, <span class="ident">squarings</span>, <span class="ident">b</span>)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sqr_mul(a: <span class="kw-2">&amp;</span>Elem&lt;R&gt;, squarings: usize, b: <span class="kw-2">&amp;</span>Elem&lt;R&gt;) -&gt; Elem&lt;R&gt; {
+        elem_sqr_mul(<span class="kw-2">&amp;</span>COMMON_OPS, a, squarings, b)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqr_mul_acc</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">squarings</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="ident">elem_sqr_mul_acc</span>(<span class="kw-2">&amp;</span><span class="ident">COMMON_OPS</span>, <span class="ident">a</span>, <span class="ident">squarings</span>, <span class="ident">b</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sqr_mul_acc(a: <span class="kw-2">&amp;mut </span>Elem&lt;R&gt;, squarings: usize, b: <span class="kw-2">&amp;</span>Elem&lt;R&gt;) {
+        elem_sqr_mul_acc(<span class="kw-2">&amp;</span>COMMON_OPS, a, squarings, b)
     }
 
-    <span class="kw">let</span> <span class="ident">b_1</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span>;
-    <span class="kw">let</span> <span class="ident">b_11</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="ident">b_1</span>, <span class="number">1</span>, <span class="ident">b_1</span>);
-    <span class="kw">let</span> <span class="ident">b_111</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_11</span>, <span class="number">1</span>, <span class="ident">b_1</span>);
-    <span class="kw">let</span> <span class="ident">f_11</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_111</span>, <span class="number">3</span>, <span class="kw-2">&amp;</span><span class="ident">b_111</span>);
-    <span class="kw">let</span> <span class="ident">fff</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">f_11</span>, <span class="number">6</span>, <span class="kw-2">&amp;</span><span class="ident">f_11</span>);
-    <span class="kw">let</span> <span class="ident">fff_111</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">fff</span>, <span class="number">3</span>, <span class="kw-2">&amp;</span><span class="ident">b_111</span>);
-    <span class="kw">let</span> <span class="ident">fffffff_11</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">fff_111</span>, <span class="number">15</span>, <span class="kw-2">&amp;</span><span class="ident">fff_111</span>);
-    <span class="kw">let</span> <span class="ident">ffffffff</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">fffffff_11</span>, <span class="number">2</span>, <span class="kw-2">&amp;</span><span class="ident">b_11</span>);
+    <span class="kw">let </span>b_1 = <span class="kw-2">&amp;</span>a;
+    <span class="kw">let </span>b_11 = sqr_mul(b_1, <span class="number">1</span>, b_1);
+    <span class="kw">let </span>b_111 = sqr_mul(<span class="kw-2">&amp;</span>b_11, <span class="number">1</span>, b_1);
+    <span class="kw">let </span>f_11 = sqr_mul(<span class="kw-2">&amp;</span>b_111, <span class="number">3</span>, <span class="kw-2">&amp;</span>b_111);
+    <span class="kw">let </span>fff = sqr_mul(<span class="kw-2">&amp;</span>f_11, <span class="number">6</span>, <span class="kw-2">&amp;</span>f_11);
+    <span class="kw">let </span>fff_111 = sqr_mul(<span class="kw-2">&amp;</span>fff, <span class="number">3</span>, <span class="kw-2">&amp;</span>b_111);
+    <span class="kw">let </span>fffffff_11 = sqr_mul(<span class="kw-2">&amp;</span>fff_111, <span class="number">15</span>, <span class="kw-2">&amp;</span>fff_111);
+    <span class="kw">let </span>ffffffff = sqr_mul(<span class="kw-2">&amp;</span>fffffff_11, <span class="number">2</span>, <span class="kw-2">&amp;</span>b_11);
 
-    <span class="comment">// ffffffff00000001</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">ffffffff</span>, <span class="number">31</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">b_1</span>);
+    <span class="comment">// ffffffff00000001
+    </span><span class="kw">let </span><span class="kw-2">mut </span>acc = sqr_mul(<span class="kw-2">&amp;</span>ffffffff, <span class="number">31 </span>+ <span class="number">1</span>, b_1);
 
-    <span class="comment">// ffffffff00000001000000000000000000000000ffffffff</span>
-    <span class="ident">sqr_mul_acc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>, <span class="number">96</span> <span class="op">+</span> <span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">ffffffff</span>);
+    <span class="comment">// ffffffff00000001000000000000000000000000ffffffff
+    </span>sqr_mul_acc(<span class="kw-2">&amp;mut </span>acc, <span class="number">96 </span>+ <span class="number">32</span>, <span class="kw-2">&amp;</span>ffffffff);
 
-    <span class="comment">// ffffffff00000001000000000000000000000000ffffffffffffffff</span>
-    <span class="ident">sqr_mul_acc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>, <span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">ffffffff</span>);
+    <span class="comment">// ffffffff00000001000000000000000000000000ffffffffffffffff
+    </span>sqr_mul_acc(<span class="kw-2">&amp;mut </span>acc, <span class="number">32</span>, <span class="kw-2">&amp;</span>ffffffff);
 
-    <span class="comment">// ffffffff00000001000000000000000000000000fffffffffffffffffffffff_11</span>
-    <span class="ident">sqr_mul_acc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>, <span class="number">30</span>, <span class="kw-2">&amp;</span><span class="ident">fffffff_11</span>);
+    <span class="comment">// ffffffff00000001000000000000000000000000fffffffffffffffffffffff_11
+    </span>sqr_mul_acc(<span class="kw-2">&amp;mut </span>acc, <span class="number">30</span>, <span class="kw-2">&amp;</span>fffffff_11);
 
-    <span class="comment">// ffffffff00000001000000000000000000000000fffffffffffffffffffffffc</span>
-    <span class="ident">COMMON_OPS</span>.<span class="ident">elem_square</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>);
-    <span class="ident">COMMON_OPS</span>.<span class="ident">elem_square</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>);
+    <span class="comment">// ffffffff00000001000000000000000000000000fffffffffffffffffffffffc
+    </span>COMMON_OPS.elem_square(<span class="kw-2">&amp;mut </span>acc);
+    COMMON_OPS.elem_square(<span class="kw-2">&amp;mut </span>acc);
 
-    <span class="ident">acc</span>
+    acc
 }
 
-<span class="kw">fn</span> <span class="ident">p256_point_mul_base_impl</span>(<span class="ident">g_scalar</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>) -&gt; <span class="ident">Point</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Point::new_at_infinity</span>();
+<span class="kw">fn </span>p256_point_mul_base_impl(g_scalar: <span class="kw-2">&amp;</span>Scalar) -&gt; Point {
+    <span class="kw">let </span><span class="kw-2">mut </span>r = Point::new_at_infinity();
 
-    <span class="comment">// Keep this in sync with the logic for defining `GFp_USE_LARGE_TABLE` and</span>
-    <span class="comment">// with the logic for deciding whether to test `GFp_nistz256_point_add_affine`</span>
-    <span class="comment">// in suite_b/ops.rs.</span>
+    <span class="comment">// Keep this in sync with the logic for defining `GFp_USE_LARGE_TABLE` and
+    // with the logic for deciding whether to test `GFp_nistz256_point_add_affine`
+    // in suite_b/ops.rs.
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-    {
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="ident">GFp_nistz256_point_mul_base</span>(
-                <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,          <span class="comment">// [3][COMMON_OPS.num_limbs]</span>
-                <span class="ident">g_scalar</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-            );
+    </span><span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+    </span>{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">fn </span>GFp_nistz256_point_mul_base(
+                r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
+                </span>g_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+            </span>);
         }
-        <span class="kw">unsafe</span> {
-            <span class="ident">GFp_nistz256_point_mul_base</span>(<span class="ident">r</span>.<span class="ident">xyz</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">g_scalar</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>());
+        <span class="kw">unsafe </span>{
+            GFp_nistz256_point_mul_base(r.xyz.as_mut_ptr(), g_scalar.limbs.as_ptr());
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)))]</span>
-    {
-        <span class="kw">static</span> <span class="ident">GENERATOR</span>: (<span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) <span class="op">=</span> (
-            <span class="ident">Elem</span> {
-                <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+    <span class="attribute">#[cfg(not(any(target_arch = <span class="string">&quot;aarch64&quot;</span>, target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>)))]
+    </span>{
+        <span class="kw">static </span>GENERATOR: (Elem&lt;R&gt;, Elem&lt;R&gt;) = (
+            Elem {
+                limbs: <span class="macro">p256_limbs!</span>[
                     <span class="number">0x18a9143c</span>, <span class="number">0x79e730d4</span>, <span class="number">0x5fedb601</span>, <span class="number">0x75ba95fc</span>, <span class="number">0x77622510</span>, <span class="number">0x79fb732b</span>,
-                    <span class="number">0xa53755c6</span>, <span class="number">0x18905f76</span>
-                ],
-                <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-                <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+                    <span class="number">0xa53755c6</span>, <span class="number">0x18905f76
+                </span>],
+                m: PhantomData,
+                encoding: PhantomData,
             },
-            <span class="ident">Elem</span> {
-                <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+            Elem {
+                limbs: <span class="macro">p256_limbs!</span>[
                     <span class="number">0xce95560a</span>, <span class="number">0xddf25357</span>, <span class="number">0xba19e45c</span>, <span class="number">0x8b4ab8e4</span>, <span class="number">0xdd21f325</span>, <span class="number">0xd2e88688</span>,
-                    <span class="number">0x25885d85</span>, <span class="number">0x8571ff18</span>
-                ],
-                <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-                <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+                    <span class="number">0x25885d85</span>, <span class="number">0x8571ff18
+                </span>],
+                m: PhantomData,
+                encoding: PhantomData,
             },
         );
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">GFp_nistz256_point_mul</span>(
-                <span class="ident">r</span>.<span class="ident">xyz</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">g_scalar</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(),
-                <span class="ident">GENERATOR</span>.<span class="number">0</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(),
-                <span class="ident">GENERATOR</span>.<span class="number">1</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(),
+        <span class="kw">unsafe </span>{
+            GFp_nistz256_point_mul(
+                r.xyz.as_mut_ptr(),
+                g_scalar.limbs.as_ptr(),
+                GENERATOR.<span class="number">0</span>.limbs.as_ptr(),
+                GENERATOR.<span class="number">1</span>.limbs.as_ptr(),
             );
         }
     }
 
-    <span class="ident">r</span>
+    r
 }
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PUBLIC_KEY_OPS</span>: <span class="ident">PublicKeyOps</span> <span class="op">=</span> <span class="ident">PublicKeyOps</span> {
-    <span class="ident">common</span>: <span class="kw-2">&amp;</span><span class="ident">COMMON_OPS</span>,
+<span class="kw">pub static </span>PUBLIC_KEY_OPS: PublicKeyOps = PublicKeyOps {
+    common: <span class="kw-2">&amp;</span>COMMON_OPS,
 };
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SCALAR_OPS</span>: <span class="ident">ScalarOps</span> <span class="op">=</span> <span class="ident">ScalarOps</span> {
-    <span class="ident">common</span>: <span class="kw-2">&amp;</span><span class="ident">COMMON_OPS</span>,
-    <span class="ident">scalar_inv_to_mont_impl</span>: <span class="ident">p256_scalar_inv_to_mont</span>,
-    <span class="ident">scalar_mul_mont</span>: <span class="ident">GFp_p256_scalar_mul_mont</span>,
+<span class="kw">pub static </span>SCALAR_OPS: ScalarOps = ScalarOps {
+    common: <span class="kw-2">&amp;</span>COMMON_OPS,
+    scalar_inv_to_mont_impl: p256_scalar_inv_to_mont,
+    scalar_mul_mont: GFp_p256_scalar_mul_mont,
 };
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PUBLIC_SCALAR_OPS</span>: <span class="ident">PublicScalarOps</span> <span class="op">=</span> <span class="ident">PublicScalarOps</span> {
-    <span class="ident">scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">SCALAR_OPS</span>,
-    <span class="ident">public_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">PUBLIC_KEY_OPS</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">PRIVATE_KEY_OPS</span>,
+<span class="kw">pub static </span>PUBLIC_SCALAR_OPS: PublicScalarOps = PublicScalarOps {
+    scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
+    public_key_ops: <span class="kw-2">&amp;</span>PUBLIC_KEY_OPS,
+    private_key_ops: <span class="kw-2">&amp;</span>PRIVATE_KEY_OPS,
 
-    <span class="ident">q_minus_n</span>: <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[<span class="number">0x039cdaae</span>, <span class="number">0x0c46353d</span>, <span class="number">0x58e8617b</span>, <span class="number">0x43190553</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>, <span class="comment">// Unencoded</span>
-    },
+    q_minus_n: Elem {
+        limbs: <span class="macro">p256_limbs!</span>[<span class="number">0x039cdaae</span>, <span class="number">0x0c46353d</span>, <span class="number">0x58e8617b</span>, <span class="number">0x43190553</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+        m: PhantomData,
+        encoding: PhantomData, <span class="comment">// Unencoded
+    </span>},
 };
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PRIVATE_SCALAR_OPS</span>: <span class="ident">PrivateScalarOps</span> <span class="op">=</span> <span class="ident">PrivateScalarOps</span> {
-    <span class="ident">scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">SCALAR_OPS</span>,
+<span class="kw">pub static </span>PRIVATE_SCALAR_OPS: PrivateScalarOps = PrivateScalarOps {
+    scalar_ops: <span class="kw-2">&amp;</span>SCALAR_OPS,
 
-    <span class="ident">oneRR_mod_n</span>: <span class="ident">Scalar</span> {
-        <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+    oneRR_mod_n: Scalar {
+        limbs: <span class="macro">p256_limbs!</span>[
             <span class="number">0xbe79eea2</span>, <span class="number">0x83244c95</span>, <span class="number">0x49bd6fa6</span>, <span class="number">0x4699799c</span>, <span class="number">0x2b6bec59</span>, <span class="number">0x2845b239</span>, <span class="number">0xf3d95620</span>,
-            <span class="number">0x66e12d94</span>
-        ],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>, <span class="comment">// R</span>
-    },
+            <span class="number">0x66e12d94
+        </span>],
+        m: PhantomData,
+        encoding: PhantomData, <span class="comment">// R
+    </span>},
 };
 
-<span class="kw">fn</span> <span class="ident">p256_scalar_inv_to_mont</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">Unencoded</span><span class="op">&gt;</span>) -&gt; <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="comment">// Calculate the modular inverse of scalar |a| using Fermat&#39;s Little</span>
-    <span class="comment">// Theorem:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    a**-1 (mod n) == a**(n - 2) (mod n)</span>
-    <span class="comment">//</span>
-    <span class="comment">// The exponent (n - 2) is:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f</span>
+<span class="kw">fn </span>p256_scalar_inv_to_mont(a: <span class="kw-2">&amp;</span>Scalar&lt;Unencoded&gt;) -&gt; Scalar&lt;R&gt; {
+    <span class="comment">// Calculate the modular inverse of scalar |a| using Fermat&#39;s Little
+    // Theorem:
+    //
+    //    a**-1 (mod n) == a**(n - 2) (mod n)
+    //
+    // The exponent (n - 2) is:
+    //
+    //    0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc63254f
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">binary_op</span>(<span class="ident">GFp_p256_scalar_mul_mont</span>, <span class="ident">a</span>, <span class="ident">b</span>)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
+        binary_op(GFp_p256_scalar_mul_mont, a, b)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqr</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">unary_op</span>(<span class="ident">GFp_p256_scalar_sqr_mont</span>, <span class="ident">a</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sqr(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
+        unary_op(GFp_p256_scalar_sqr_mont, a)
     }
 
-    <span class="comment">// Returns (`a` squared `squarings` times) * `b`.</span>
-    <span class="kw">fn</span> <span class="ident">sqr_mul</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">squarings</span>: <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">squarings</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">Scalar::zero</span>();
-        <span class="kw">unsafe</span> { <span class="ident">GFp_p256_scalar_sqr_rep_mont</span>(<span class="ident">tmp</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(), <span class="ident">squarings</span>) }
-        <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>, <span class="ident">b</span>)
+    <span class="comment">// Returns (`a` squared `squarings` times) * `b`.
+    </span><span class="kw">fn </span>sqr_mul(a: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;, squarings: Limb, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) -&gt; Scalar&lt;R&gt; {
+        <span class="macro">debug_assert!</span>(squarings &gt;= <span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = Scalar::zero();
+        <span class="kw">unsafe </span>{ GFp_p256_scalar_sqr_rep_mont(tmp.limbs.as_mut_ptr(), a.limbs.as_ptr(), squarings) }
+        mul(<span class="kw-2">&amp;</span>tmp, b)
     }
 
-    <span class="comment">// Sets `acc` = (`acc` squared `squarings` times) * `b`.</span>
-    <span class="kw">fn</span> <span class="ident">sqr_mul_acc</span>(<span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">squarings</span>: <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">squarings</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="kw">unsafe</span> {
-            <span class="ident">GFp_p256_scalar_sqr_rep_mont</span>(<span class="ident">acc</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">acc</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(), <span class="ident">squarings</span>)
+    <span class="comment">// Sets `acc` = (`acc` squared `squarings` times) * `b`.
+    </span><span class="kw">fn </span>sqr_mul_acc(acc: <span class="kw-2">&amp;mut </span>Scalar&lt;R&gt;, squarings: Limb, b: <span class="kw-2">&amp;</span>Scalar&lt;R&gt;) {
+        <span class="macro">debug_assert!</span>(squarings &gt;= <span class="number">1</span>);
+        <span class="kw">unsafe </span>{
+            GFp_p256_scalar_sqr_rep_mont(acc.limbs.as_mut_ptr(), acc.limbs.as_ptr(), squarings)
         }
-        <span class="ident">binary_op_assign</span>(<span class="ident">GFp_p256_scalar_mul_mont</span>, <span class="ident">acc</span>, <span class="ident">b</span>);
+        binary_op_assign(GFp_p256_scalar_mul_mont, acc, b);
     }
 
-    <span class="kw">fn</span> <span class="ident">to_mont</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>) -&gt; <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="kw">static</span> <span class="ident">N_RR</span>: <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">Unencoded</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Scalar</span> {
-            <span class="ident">limbs</span>: <span class="macro">p256_limbs!</span>[
+    <span class="kw">fn </span>to_mont(a: <span class="kw-2">&amp;</span>Scalar) -&gt; Scalar&lt;R&gt; {
+        <span class="kw">static </span>N_RR: Scalar&lt;Unencoded&gt; = Scalar {
+            limbs: <span class="macro">p256_limbs!</span>[
                 <span class="number">0xbe79eea2</span>, <span class="number">0x83244c95</span>, <span class="number">0x49bd6fa6</span>, <span class="number">0x4699799c</span>, <span class="number">0x2b6bec59</span>, <span class="number">0x2845b239</span>, <span class="number">0xf3d95620</span>,
-                <span class="number">0x66e12d94</span>
-            ],
-            <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-            <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+                <span class="number">0x66e12d94
+            </span>],
+            m: PhantomData,
+            encoding: PhantomData,
         };
-        <span class="ident">binary_op</span>(<span class="ident">GFp_p256_scalar_mul_mont</span>, <span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">N_RR</span>)
+        binary_op(GFp_p256_scalar_mul_mont, a, <span class="kw-2">&amp;</span>N_RR)
     }
 
-    <span class="comment">// Indexes into `d`.</span>
-    <span class="kw">const</span> <span class="ident">B_1</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">B_10</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">B_11</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-    <span class="kw">const</span> <span class="ident">B_101</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
-    <span class="kw">const</span> <span class="ident">B_111</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="kw">const</span> <span class="ident">B_1111</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
-    <span class="kw">const</span> <span class="ident">B_10101</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
-    <span class="kw">const</span> <span class="ident">B_101111</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
-    <span class="kw">const</span> <span class="ident">DIGIT_COUNT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+    <span class="comment">// Indexes into `d`.
+    </span><span class="kw">const </span>B_1: usize = <span class="number">0</span>;
+    <span class="kw">const </span>B_10: usize = <span class="number">1</span>;
+    <span class="kw">const </span>B_11: usize = <span class="number">2</span>;
+    <span class="kw">const </span>B_101: usize = <span class="number">3</span>;
+    <span class="kw">const </span>B_111: usize = <span class="number">4</span>;
+    <span class="kw">const </span>B_1111: usize = <span class="number">5</span>;
+    <span class="kw">const </span>B_10101: usize = <span class="number">6</span>;
+    <span class="kw">const </span>B_101111: usize = <span class="number">7</span>;
+    <span class="kw">const </span>DIGIT_COUNT: usize = <span class="number">8</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> [<span class="ident">Scalar::zero</span>(); <span class="ident">DIGIT_COUNT</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>d = [Scalar::zero(); DIGIT_COUNT];
 
-    <span class="ident">d</span>[<span class="ident">B_1</span>] <span class="op">=</span> <span class="ident">to_mont</span>(<span class="ident">a</span>);
-    <span class="ident">d</span>[<span class="ident">B_10</span>] <span class="op">=</span> <span class="ident">sqr</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_1</span>]);
-    <span class="ident">d</span>[<span class="ident">B_11</span>] <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_10</span>], <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_1</span>]);
-    <span class="ident">d</span>[<span class="ident">B_101</span>] <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_10</span>], <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_11</span>]);
-    <span class="ident">d</span>[<span class="ident">B_111</span>] <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_101</span>], <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_10</span>]);
-    <span class="kw">let</span> <span class="ident">b_1010</span> <span class="op">=</span> <span class="ident">sqr</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_101</span>]);
-    <span class="ident">d</span>[<span class="ident">B_1111</span>] <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_1010</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_101</span>]);
-    <span class="ident">d</span>[<span class="ident">B_10101</span>] <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_1010</span>, <span class="number">0</span> <span class="op">+</span> <span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_1</span>]);
-    <span class="kw">let</span> <span class="ident">b_101010</span> <span class="op">=</span> <span class="ident">sqr</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_10101</span>]);
-    <span class="ident">d</span>[<span class="ident">B_101111</span>] <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_101010</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_101</span>]);
-    <span class="kw">let</span> <span class="ident">b_111111</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_101010</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_10101</span>]);
+    d[B_1] = to_mont(a);
+    d[B_10] = sqr(<span class="kw-2">&amp;</span>d[B_1]);
+    d[B_11] = mul(<span class="kw-2">&amp;</span>d[B_10], <span class="kw-2">&amp;</span>d[B_1]);
+    d[B_101] = mul(<span class="kw-2">&amp;</span>d[B_10], <span class="kw-2">&amp;</span>d[B_11]);
+    d[B_111] = mul(<span class="kw-2">&amp;</span>d[B_101], <span class="kw-2">&amp;</span>d[B_10]);
+    <span class="kw">let </span>b_1010 = sqr(<span class="kw-2">&amp;</span>d[B_101]);
+    d[B_1111] = mul(<span class="kw-2">&amp;</span>b_1010, <span class="kw-2">&amp;</span>d[B_101]);
+    d[B_10101] = sqr_mul(<span class="kw-2">&amp;</span>b_1010, <span class="number">0 </span>+ <span class="number">1</span>, <span class="kw-2">&amp;</span>d[B_1]);
+    <span class="kw">let </span>b_101010 = sqr(<span class="kw-2">&amp;</span>d[B_10101]);
+    d[B_101111] = mul(<span class="kw-2">&amp;</span>b_101010, <span class="kw-2">&amp;</span>d[B_101]);
+    <span class="kw">let </span>b_111111 = mul(<span class="kw-2">&amp;</span>b_101010, <span class="kw-2">&amp;</span>d[B_10101]);
 
-    <span class="kw">let</span> <span class="ident">ff</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">b_111111</span>, <span class="number">0</span> <span class="op">+</span> <span class="number">2</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">B_11</span>]);
-    <span class="kw">let</span> <span class="ident">ffff</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">ff</span>, <span class="number">0</span> <span class="op">+</span> <span class="number">8</span>, <span class="kw-2">&amp;</span><span class="ident">ff</span>);
-    <span class="kw">let</span> <span class="ident">ffffffff</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">ffff</span>, <span class="number">0</span> <span class="op">+</span> <span class="number">16</span>, <span class="kw-2">&amp;</span><span class="ident">ffff</span>);
+    <span class="kw">let </span>ff = sqr_mul(<span class="kw-2">&amp;</span>b_111111, <span class="number">0 </span>+ <span class="number">2</span>, <span class="kw-2">&amp;</span>d[B_11]);
+    <span class="kw">let </span>ffff = sqr_mul(<span class="kw-2">&amp;</span>ff, <span class="number">0 </span>+ <span class="number">8</span>, <span class="kw-2">&amp;</span>ff);
+    <span class="kw">let </span>ffffffff = sqr_mul(<span class="kw-2">&amp;</span>ffff, <span class="number">0 </span>+ <span class="number">16</span>, <span class="kw-2">&amp;</span>ffff);
 
-    <span class="comment">// ffffffff00000000ffffffff</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">sqr_mul</span>(<span class="kw-2">&amp;</span><span class="ident">ffffffff</span>, <span class="number">32</span> <span class="op">+</span> <span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">ffffffff</span>);
+    <span class="comment">// ffffffff00000000ffffffff
+    </span><span class="kw">let </span><span class="kw-2">mut </span>acc = sqr_mul(<span class="kw-2">&amp;</span>ffffffff, <span class="number">32 </span>+ <span class="number">32</span>, <span class="kw-2">&amp;</span>ffffffff);
 
-    <span class="comment">// ffffffff00000000ffffffffffffffff</span>
-    <span class="ident">sqr_mul_acc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>, <span class="number">0</span> <span class="op">+</span> <span class="number">32</span>, <span class="kw-2">&amp;</span><span class="ident">ffffffff</span>);
+    <span class="comment">// ffffffff00000000ffffffffffffffff
+    </span>sqr_mul_acc(<span class="kw-2">&amp;mut </span>acc, <span class="number">0 </span>+ <span class="number">32</span>, <span class="kw-2">&amp;</span>ffffffff);
 
-    <span class="comment">// The rest of the exponent, in binary, is:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    1011110011100110111110101010110110100111000101111001111010000100</span>
-    <span class="comment">//    1111001110111001110010101100001011111100011000110010010101001111</span>
+    <span class="comment">// The rest of the exponent, in binary, is:
+    //
+    //    1011110011100110111110101010110110100111000101111001111010000100
+    //    1111001110111001110010101100001011111100011000110010010101001111
 
-    <span class="kw">static</span> <span class="ident">REMAINING_WINDOWS</span>: [(<span class="ident">u8</span>, <span class="ident">u8</span>); <span class="number">26</span>] <span class="op">=</span> [
-        (<span class="number">6</span>, <span class="ident">B_101111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">B_11</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">1</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">B_1111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">5</span>, <span class="ident">B_10101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">1</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">3</span>, <span class="ident">B_101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">3</span>, <span class="ident">B_101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">3</span> <span class="op">+</span> <span class="number">6</span>, <span class="ident">B_101111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">B_1111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">1</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">B_1</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">4</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">B_1</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">B_1111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">1</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">3</span>, <span class="ident">B_101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">1</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">B_11</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">4</span> <span class="op">+</span> <span class="number">6</span>, <span class="ident">B_101111</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span>, <span class="ident">B_11</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">3</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">B_11</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">3</span> <span class="op">+</span> <span class="number">2</span>, <span class="ident">B_11</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">B_1</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">5</span>, <span class="ident">B_10101</span> <span class="kw">as</span> <span class="ident">u8</span>),
-        (<span class="number">2</span> <span class="op">+</span> <span class="number">4</span>, <span class="ident">B_1111</span> <span class="kw">as</span> <span class="ident">u8</span>),
+    </span><span class="kw">static </span>REMAINING_WINDOWS: [(u8, u8); <span class="number">26</span>] = [
+        (<span class="number">6</span>, B_101111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">2</span>, B_11 <span class="kw">as </span>u8),
+        (<span class="number">1 </span>+ <span class="number">4</span>, B_1111 <span class="kw">as </span>u8),
+        (<span class="number">5</span>, B_10101 <span class="kw">as </span>u8),
+        (<span class="number">1 </span>+ <span class="number">3</span>, B_101 <span class="kw">as </span>u8),
+        (<span class="number">3</span>, B_101 <span class="kw">as </span>u8),
+        (<span class="number">3</span>, B_101 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
+        (<span class="number">3 </span>+ <span class="number">6</span>, B_101111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">4</span>, B_1111 <span class="kw">as </span>u8),
+        (<span class="number">1 </span>+ <span class="number">1</span>, B_1 <span class="kw">as </span>u8),
+        (<span class="number">4 </span>+ <span class="number">1</span>, B_1 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">4</span>, B_1111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
+        (<span class="number">1 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">3</span>, B_111 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">3</span>, B_101 <span class="kw">as </span>u8),
+        (<span class="number">1 </span>+ <span class="number">2</span>, B_11 <span class="kw">as </span>u8),
+        (<span class="number">4 </span>+ <span class="number">6</span>, B_101111 <span class="kw">as </span>u8),
+        (<span class="number">2</span>, B_11 <span class="kw">as </span>u8),
+        (<span class="number">3 </span>+ <span class="number">2</span>, B_11 <span class="kw">as </span>u8),
+        (<span class="number">3 </span>+ <span class="number">2</span>, B_11 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">1</span>, B_1 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">5</span>, B_10101 <span class="kw">as </span>u8),
+        (<span class="number">2 </span>+ <span class="number">4</span>, B_1111 <span class="kw">as </span>u8),
     ];
 
-    <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">squarings</span>, <span class="ident">digit</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">REMAINING_WINDOWS</span> {
-        <span class="ident">sqr_mul_acc</span>(<span class="kw-2">&amp;mut</span> <span class="ident">acc</span>, <span class="ident">Limb::from</span>(<span class="ident">squarings</span>), <span class="kw-2">&amp;</span><span class="ident">d</span>[<span class="ident">usize::from</span>(<span class="ident">digit</span>)]);
+    <span class="kw">for </span><span class="kw-2">&amp;</span>(squarings, digit) <span class="kw">in </span><span class="kw-2">&amp;</span>REMAINING_WINDOWS {
+        sqr_mul_acc(<span class="kw-2">&amp;mut </span>acc, Limb::from(squarings), <span class="kw-2">&amp;</span>d[usize::from(digit)]);
     }
 
-    <span class="ident">acc</span>
+    acc
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">GFp_nistz256_add</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
-    <span class="kw">fn</span> <span class="ident">GFp_nistz256_mul_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
-    <span class="kw">fn</span> <span class="ident">GFp_nistz256_sqr_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">fn </span>GFp_nistz256_add(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
+    <span class="kw">fn </span>GFp_nistz256_mul_mont(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
+    <span class="kw">fn </span>GFp_nistz256_sqr_mont(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
 
-    <span class="kw">fn</span> <span class="ident">GFp_nistz256_point_add</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [3][COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [3][COMMON_OPS.num_limbs]</span>
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [3][COMMON_OPS.num_limbs]</span>
-    );
-    <span class="kw">fn</span> <span class="ident">GFp_nistz256_point_mul</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,          <span class="comment">// [3][COMMON_OPS.num_limbs]</span>
-        <span class="ident">p_scalar</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">p_x</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,      <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">p_y</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,      <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
+    <span class="kw">fn </span>GFp_nistz256_point_add(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [3][COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
+        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [3][COMMON_OPS.num_limbs]
+    </span>);
+    <span class="kw">fn </span>GFp_nistz256_point_mul(
+        r: <span class="kw-2">*mut </span>Limb,          <span class="comment">// [3][COMMON_OPS.num_limbs]
+        </span>p_scalar: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>p_x: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>p_y: <span class="kw-2">*const </span>Limb,      <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
 
-    <span class="kw">fn</span> <span class="ident">GFp_p256_scalar_mul_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
-    <span class="kw">fn</span> <span class="ident">GFp_p256_scalar_sqr_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-    );
-    <span class="kw">fn</span> <span class="ident">GFp_p256_scalar_sqr_rep_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,   <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="comment">// [COMMON_OPS.num_limbs]</span>
-        <span class="ident">rep</span>: <span class="ident">Limb</span>,
+    <span class="kw">fn </span>GFp_p256_scalar_mul_mont(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>b: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
+    <span class="kw">fn </span>GFp_p256_scalar_sqr_mont(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+    </span>);
+    <span class="kw">fn </span>GFp_p256_scalar_sqr_rep_mont(
+        r: <span class="kw-2">*mut </span>Limb,   <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>a: <span class="kw-2">*const </span>Limb, <span class="comment">// [COMMON_OPS.num_limbs]
+        </span>rep: Limb,
     );
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

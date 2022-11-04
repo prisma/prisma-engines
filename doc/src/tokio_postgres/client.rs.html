@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -632,639 +632,639 @@
 <span id="632">632</span>
 <span id="633">633</span>
 <span id="634">634</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec</span>::{<span class="ident">BackendMessages</span>, <span class="ident">FrontendMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::Host</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::SslMode</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connection</span>::{<span class="ident">Request</span>, <span class="ident">RequestMessages</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::copy_out::CopyOutStream</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::keepalive::KeepaliveConfig</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query::RowStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::simple_query::SimpleQueryStream</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::MakeTlsConnect</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::TlsConnect</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">Oid</span>, <span class="ident">ToSql</span>, <span class="ident">Type</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Socket</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">copy_in</span>, <span class="ident">copy_out</span>, <span class="ident">prepare</span>, <span class="ident">query</span>, <span class="ident">simple_query</span>, <span class="ident">slice_iter</span>, <span class="ident">CancelToken</span>, <span class="ident">CopyInSink</span>, <span class="ident">Error</span>,
-    <span class="ident">Row</span>, <span class="ident">SimpleQueryMessage</span>, <span class="ident">Statement</span>, <span class="ident">ToStatement</span>, <span class="ident">Transaction</span>, <span class="ident">TransactionBuilder</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::{BackendMessages, FrontendMessage};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::config::Host;
+<span class="kw">use </span><span class="kw">crate</span>::config::SslMode;
+<span class="kw">use </span><span class="kw">crate</span>::connection::{Request, RequestMessages};
+<span class="kw">use </span><span class="kw">crate</span>::copy_out::CopyOutStream;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::keepalive::KeepaliveConfig;
+<span class="kw">use </span><span class="kw">crate</span>::query::RowStream;
+<span class="kw">use </span><span class="kw">crate</span>::simple_query::SimpleQueryStream;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls::MakeTlsConnect;
+<span class="kw">use </span><span class="kw">crate</span>::tls::TlsConnect;
+<span class="kw">use </span><span class="kw">crate</span>::types::{Oid, ToSql, Type};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::Socket;
+<span class="kw">use crate</span>::{
+    copy_in, copy_out, prepare, query, simple_query, slice_iter, CancelToken, CopyInSink, Error,
+    Row, SimpleQueryMessage, Statement, ToStatement, Transaction, TransactionBuilder,
 };
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">pin_mut</span>, <span class="ident">ready</span>, <span class="ident">StreamExt</span>, <span class="ident">TryStreamExt</span>};
-<span class="kw">use</span> <span class="ident">parking_lot::Mutex</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message</span>::{<span class="ident">backend::Message</span>, <span class="ident">frontend</span>};
-<span class="kw">use</span> <span class="ident">postgres_types::BorrowToSql</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+<span class="kw">use </span>bytes::{Buf, BytesMut};
+<span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>futures_channel::mpsc;
+<span class="kw">use </span>futures_util::{future, pin_mut, ready, StreamExt, TryStreamExt};
+<span class="kw">use </span>parking_lot::Mutex;
+<span class="kw">use </span>postgres_protocol::message::{backend::Message, frontend};
+<span class="kw">use </span>postgres_types::BorrowToSql;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Responses</span> {
-    <span class="ident">receiver</span>: <span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">BackendMessages</span><span class="op">&gt;</span>,
-    <span class="ident">cur</span>: <span class="ident">BackendMessages</span>,
+<span class="kw">pub struct </span>Responses {
+    receiver: mpsc::Receiver&lt;BackendMessages&gt;,
+    cur: BackendMessages,
 }
 
-<span class="kw">impl</span> <span class="ident">Responses</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cur</span>.<span class="ident">next</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">body</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">body</span>))),
-                <span class="prelude-val">Some</span>(<span class="ident">message</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">message</span>)),
-                <span class="prelude-val">None</span> =&gt; {}
+<span class="kw">impl </span>Responses {
+    <span class="kw">pub fn </span>poll_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;Message, Error&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.cur.next().map_err(Error::parse)<span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(Message::ErrorResponse(body)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::db(body))),
+                <span class="prelude-val">Some</span>(message) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(message)),
+                <span class="prelude-val">None </span>=&gt; {}
             }
 
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="ident">messages</span>) =&gt; <span class="self">self</span>.<span class="ident">cur</span> <span class="op">=</span> <span class="ident">messages</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>())),
+            <span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.receiver.poll_next_unpin(cx)) {
+                <span class="prelude-val">Some</span>(messages) =&gt; <span class="self">self</span>.cur = messages,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(Error::closed())),
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>)).<span class="kw">await</span>
-    }
+    <span class="kw">pub async fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Message, Error&gt; {
+        future::poll_fn(|cx| <span class="self">self</span>.poll_next(cx)).<span class="kw">await
+    </span>}
 }
 
-<span class="doccomment">/// A cache of type info and prepared statements for fetching type info</span>
-<span class="doccomment">/// (corresponding to the queries in the [prepare](prepare) module).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CachedTypeInfo</span> {
-    <span class="doccomment">/// A statement for basic information for a type from its</span>
-    <span class="doccomment">/// OID. Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_QUERY) (or its</span>
-    <span class="doccomment">/// fallback).</span>
-    <span class="ident">typeinfo</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A statement for getting information for a composite type from its OID.</span>
-    <span class="doccomment">/// Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_COMPOSITE_QUERY).</span>
-    <span class="ident">typeinfo_composite</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A statement for getting information for a composite type from its OID.</span>
-    <span class="doccomment">/// Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_COMPOSITE_QUERY) (or</span>
-    <span class="doccomment">/// its fallback).</span>
-    <span class="ident">typeinfo_enum</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A cache of type info and prepared statements for fetching type info
+/// (corresponding to the queries in the [prepare](prepare) module).
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>CachedTypeInfo {
+    <span class="doccomment">/// A statement for basic information for a type from its
+    /// OID. Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_QUERY) (or its
+    /// fallback).
+    </span>typeinfo: <span class="prelude-ty">Option</span>&lt;Statement&gt;,
+    <span class="doccomment">/// A statement for getting information for a composite type from its OID.
+    /// Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_COMPOSITE_QUERY).
+    </span>typeinfo_composite: <span class="prelude-ty">Option</span>&lt;Statement&gt;,
+    <span class="doccomment">/// A statement for getting information for a composite type from its OID.
+    /// Corresponds to [TYPEINFO_QUERY](prepare::TYPEINFO_COMPOSITE_QUERY) (or
+    /// its fallback).
+    </span>typeinfo_enum: <span class="prelude-ty">Option</span>&lt;Statement&gt;,
 
-    <span class="doccomment">/// Cache of types already looked up.</span>
-    <span class="ident">types</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Oid</span>, <span class="ident">Type</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Cache of types already looked up.
+    </span>types: HashMap&lt;Oid, Type&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InnerClient</span> {
-    <span class="ident">sender</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">pgbouncer_mode</span>: <span class="ident">bool</span>,
-    <span class="ident">cached_typeinfo</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">CachedTypeInfo</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>InnerClient {
+    sender: mpsc::UnboundedSender&lt;Request&gt;,
+    pgbouncer_mode: bool,
+    cached_typeinfo: Mutex&lt;CachedTypeInfo&gt;,
 
-    <span class="doccomment">/// A buffer to use when writing out postgres commands.</span>
-    <span class="ident">buffer</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A buffer to use when writing out postgres commands.
+    </span>buffer: Mutex&lt;BytesMut&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">InnerClient</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">messages</span>: <span class="ident">RequestMessages</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Responses</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">Request</span> { <span class="ident">messages</span>, <span class="ident">sender</span> };
-        <span class="self">self</span>.<span class="ident">sender</span>
-            .<span class="ident">unbounded_send</span>(<span class="ident">request</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::closed</span>())<span class="question-mark">?</span>;
+<span class="kw">impl </span>InnerClient {
+    <span class="kw">pub fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, messages: RequestMessages) -&gt; <span class="prelude-ty">Result</span>&lt;Responses, Error&gt; {
+        <span class="kw">let </span>(sender, receiver) = mpsc::channel(<span class="number">1</span>);
+        <span class="kw">let </span>request = Request { messages, sender };
+        <span class="self">self</span>.sender
+            .unbounded_send(request)
+            .map_err(|<span class="kw">_</span>| Error::closed())<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Responses</span> {
-            <span class="ident">receiver</span>,
-            <span class="ident">cur</span>: <span class="ident">BackendMessages::empty</span>(),
+        <span class="prelude-val">Ok</span>(Responses {
+            receiver,
+            cur: BackendMessages::empty(),
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">typeinfo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>typeinfo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Statement&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pgbouncer_mode {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo.clone()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_typeinfo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">statement</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>set_typeinfo(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>Statement) {
+        <span class="kw">if </span>!<span class="self">self</span>.pgbouncer_mode {
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo = <span class="prelude-val">Some</span>(statement.clone());
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">typeinfo_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo_composite</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>typeinfo_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Statement&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pgbouncer_mode {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo_composite.clone()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_typeinfo_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo_composite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">statement</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>set_typeinfo_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>Statement) {
+        <span class="kw">if </span>!<span class="self">self</span>.pgbouncer_mode {
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo_composite = <span class="prelude-val">Some</span>(statement.clone());
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">typeinfo_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo_enum</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>typeinfo_enum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Statement&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pgbouncer_mode {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo_enum.clone()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_typeinfo_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">typeinfo_enum</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">statement</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>set_typeinfo_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>Statement) {
+        <span class="kw">if </span>!<span class="self">self</span>.pgbouncer_mode {
+            <span class="self">self</span>.cached_typeinfo.lock().typeinfo_enum = <span class="prelude-val">Some</span>(statement.clone());
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">types</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">oid</span>).<span class="ident">cloned</span>()
+    <span class="kw">pub fn </span>type_(<span class="kw-2">&amp;</span><span class="self">self</span>, oid: Oid) -&gt; <span class="prelude-ty">Option</span>&lt;Type&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pgbouncer_mode {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cached_typeinfo.lock().types.get(<span class="kw-2">&amp;</span>oid).cloned()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oid</span>: <span class="ident">Oid</span>, <span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pgbouncer_mode</span> {
-            <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">types</span>.<span class="ident">insert</span>(<span class="ident">oid</span>, <span class="ident">type_</span>.<span class="ident">clone</span>());
+    <span class="kw">pub fn </span>set_type(<span class="kw-2">&amp;</span><span class="self">self</span>, oid: Oid, type_: <span class="kw-2">&amp;</span>Type) {
+        <span class="kw">if </span>!<span class="self">self</span>.pgbouncer_mode {
+            <span class="self">self</span>.cached_typeinfo.lock().types.insert(oid, type_.clone());
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_type_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">cached_typeinfo</span>.<span class="ident">lock</span>().<span class="ident">types</span>.<span class="ident">clear</span>();
+    <span class="kw">pub fn </span>clear_type_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.cached_typeinfo.lock().types.clear();
     }
 
-    <span class="doccomment">/// Call the given function with a buffer to be used when writing out</span>
-    <span class="doccomment">/// postgres commands.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_buf</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">R</span>,
+    <span class="doccomment">/// Call the given function with a buffer to be used when writing out
+    /// postgres commands.
+    </span><span class="kw">pub fn </span>with_buf&lt;F, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F) -&gt; R
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>BytesMut) -&gt; R,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>);
-        <span class="ident">buffer</span>.<span class="ident">clear</span>();
-        <span class="ident">r</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="self">self</span>.buffer.lock();
+        <span class="kw">let </span>r = f(<span class="kw-2">&amp;mut </span>buffer);
+        buffer.clear();
+        r
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SocketConfig</span> {
-    <span class="kw">pub</span> <span class="ident">host</span>: <span class="ident">Host</span>,
-    <span class="kw">pub</span> <span class="ident">port</span>: <span class="ident">u16</span>,
-    <span class="kw">pub</span> <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KeepaliveConfig</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SocketConfig {
+    <span class="kw">pub </span>host: Host,
+    <span class="kw">pub </span>port: u16,
+    <span class="kw">pub </span>connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>keepalive: <span class="prelude-ty">Option</span>&lt;KeepaliveConfig&gt;,
 }
 
-<span class="doccomment">/// An asynchronous PostgreSQL client.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The client is one half of what is returned when a connection is established. Users interact with the database</span>
-<span class="doccomment">/// through this client object.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="ident">socket_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketConfig</span><span class="op">&gt;</span>,
-    <span class="ident">ssl_mode</span>: <span class="ident">SslMode</span>,
-    <span class="ident">process_id</span>: <span class="ident">i32</span>,
-    <span class="ident">secret_key</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// An asynchronous PostgreSQL client.
+///
+/// The client is one half of what is returned when a connection is established. Users interact with the database
+/// through this client object.
+</span><span class="kw">pub struct </span>Client {
+    inner: Arc&lt;InnerClient&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span>socket_config: <span class="prelude-ty">Option</span>&lt;SocketConfig&gt;,
+    ssl_mode: SslMode,
+    process_id: i32,
+    secret_key: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">sender</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-        <span class="ident">ssl_mode</span>: <span class="ident">SslMode</span>,
-        <span class="ident">process_id</span>: <span class="ident">i32</span>,
-        <span class="ident">secret_key</span>: <span class="ident">i32</span>,
-        <span class="ident">pgbouncer_mode</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">Client</span> {
-        <span class="ident">Client</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">InnerClient</span> {
-                <span class="ident">sender</span>,
-                <span class="ident">pgbouncer_mode</span>,
-                <span class="ident">cached_typeinfo</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">buffer</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>Client {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        sender: mpsc::UnboundedSender&lt;Request&gt;,
+        ssl_mode: SslMode,
+        process_id: i32,
+        secret_key: i32,
+        pgbouncer_mode: bool,
+    ) -&gt; Client {
+        Client {
+            inner: Arc::new(InnerClient {
+                sender,
+                pgbouncer_mode,
+                cached_typeinfo: Default::default(),
+                buffer: Default::default(),
             }),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">socket_config</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ssl_mode</span>,
-            <span class="ident">process_id</span>,
-            <span class="ident">secret_key</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>socket_config: <span class="prelude-val">None</span>,
+            ssl_mode,
+            process_id,
+            secret_key,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InnerClient</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Arc&lt;InnerClient&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_socket_config</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">socket_config</span>: <span class="ident">SocketConfig</span>) {
-        <span class="self">self</span>.<span class="ident">socket_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">socket_config</span>);
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_socket_config(<span class="kw-2">&amp;mut </span><span class="self">self</span>, socket_config: SocketConfig) {
+        <span class="self">self</span>.socket_config = <span class="prelude-val">Some</span>(socket_config);
     }
 
-    <span class="doccomment">/// Creates a new prepared statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prepared statements can be executed repeatedly, and may contain query parameters (indicated by `$1`, `$2`, etc),</span>
-    <span class="doccomment">/// which are set when executed. Prepared statements can only be used with the connection that created them.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">prepare_typed</span>(<span class="ident">query</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Creates a new prepared statement.
+    ///
+    /// Prepared statements can be executed repeatedly, and may contain query parameters (indicated by `$1`, `$2`, etc),
+    /// which are set when executed. Prepared statements can only be used with the connection that created them.
+    </span><span class="kw">pub async fn </span>prepare(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Statement, Error&gt; {
+        <span class="self">self</span>.prepare_typed(query, <span class="kw-2">&amp;</span>[]).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Like `prepare`, but allows the types of query parameters to be explicitly specified.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The list of types may be smaller than the number of parameters - the types of the remaining parameters will be</span>
-    <span class="doccomment">/// inferred. For example, `client.prepare_typed(query, &amp;[])` is equivalent to `client.prepare(query)`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prepare_typed</span>(
+    <span class="doccomment">/// Like `prepare`, but allows the types of query parameters to be explicitly specified.
+    ///
+    /// The list of types may be smaller than the number of parameters - the types of the remaining parameters will be
+    /// inferred. For example, `client.prepare_typed(query, &amp;[])` is equivalent to `client.prepare(query)`.
+    </span><span class="kw">pub async fn </span>prepare_typed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">parameter_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">Type</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">prepare::prepare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">query</span>, <span class="ident">parameter_types</span>).<span class="kw">await</span>
-    }
+        query: <span class="kw-2">&amp;</span>str,
+        parameter_types: <span class="kw-2">&amp;</span>[Type],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Statement, Error&gt; {
+        prepare::prepare(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, query, parameter_types).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a statement, returning a vector of the resulting rows.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Executes a statement, returning a vector of the resulting rows.
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>query&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
+        statement: <span class="kw-2">&amp;</span>T,
+        params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Row&gt;, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
     {
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">statement</span>, <span class="ident">slice_iter</span>(<span class="ident">params</span>))
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">try_collect</span>()
-            .<span class="kw">await</span>
-    }
+        <span class="self">self</span>.query_raw(statement, slice_iter(params))
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.try_collect()
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a statement which returns a single row, returning it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an error if the query does not return exactly one row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_one</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Executes a statement which returns a single row, returning it.
+    ///
+    /// Returns an error if the query does not return exactly one row.
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>query_one&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Row</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
+        statement: <span class="kw-2">&amp;</span>T,
+        params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Row, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
     {
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">statement</span>, <span class="ident">slice_iter</span>(<span class="ident">params</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">pin_mut!</span>(<span class="ident">stream</span>);
+        <span class="kw">let </span>stream = <span class="self">self</span>.query_raw(statement, slice_iter(params)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">pin_mut!</span>(stream);
 
-        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">row</span>) =&gt; <span class="ident">row</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::row_count</span>()),
+        <span class="kw">let </span>row = <span class="kw">match </span>stream.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(row) =&gt; row,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::row_count()),
         };
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::row_count</span>());
+        <span class="kw">if </span>stream.try_next().<span class="kw">await</span><span class="question-mark">?</span>.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::row_count());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">row</span>)
+        <span class="prelude-val">Ok</span>(row)
     }
 
-    <span class="doccomment">/// Executes a statements which returns zero or one rows, returning it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an error if the query returns more than one row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_opt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Executes a statements which returns zero or one rows, returning it.
+    ///
+    /// Returns an error if the query returns more than one row.
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>query_opt&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
+        statement: <span class="kw-2">&amp;</span>T,
+        params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
     {
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">statement</span>, <span class="ident">slice_iter</span>(<span class="ident">params</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">pin_mut!</span>(<span class="ident">stream</span>);
+        <span class="kw">let </span>stream = <span class="self">self</span>.query_raw(statement, slice_iter(params)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">pin_mut!</span>(stream);
 
-        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">row</span>) =&gt; <span class="ident">row</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">let </span>row = <span class="kw">match </span>stream.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(row) =&gt; row,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::row_count</span>());
+        <span class="kw">if </span>stream.try_next().<span class="kw">await</span><span class="question-mark">?</span>.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::row_count());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row))
     }
 
-    <span class="doccomment">/// The maximally flexible version of [`query`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`query`]: #method.query</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # async fn async_main(client: &amp;tokio_postgres::Client) -&gt; Result&lt;(), tokio_postgres::Error&gt; {</span>
-    <span class="doccomment">/// use tokio_postgres::types::ToSql;</span>
-    <span class="doccomment">/// use futures_util::{pin_mut, TryStreamExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let params: Vec&lt;String&gt; = vec![</span>
-    <span class="doccomment">///     &quot;first param&quot;.into(),</span>
-    <span class="doccomment">///     &quot;second param&quot;.into(),</span>
-    <span class="doccomment">/// ];</span>
-    <span class="doccomment">/// let mut it = client.query_raw(</span>
-    <span class="doccomment">///     &quot;SELECT foo FROM bar WHERE biz = $1 AND baz = $2&quot;,</span>
-    <span class="doccomment">///     params,</span>
-    <span class="doccomment">/// ).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pin_mut!(it);</span>
-    <span class="doccomment">/// while let Some(row) = it.try_next().await? {</span>
-    <span class="doccomment">///     let foo: i32 = row.get(&quot;foo&quot;);</span>
-    <span class="doccomment">///     println!(&quot;foo: {}&quot;, foo);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">params</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RowStream</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
-        <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="doccomment">/// The maximally flexible version of [`query`].
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    ///
+    /// [`query`]: #method.query
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # async fn async_main(client: &amp;tokio_postgres::Client) -&gt; Result&lt;(), tokio_postgres::Error&gt; {
+    /// use tokio_postgres::types::ToSql;
+    /// use futures_util::{pin_mut, TryStreamExt};
+    ///
+    /// let params: Vec&lt;String&gt; = vec![
+    ///     &quot;first param&quot;.into(),
+    ///     &quot;second param&quot;.into(),
+    /// ];
+    /// let mut it = client.query_raw(
+    ///     &quot;SELECT foo FROM bar WHERE biz = $1 AND baz = $2&quot;,
+    ///     params,
+    /// ).await?;
+    ///
+    /// pin_mut!(it);
+    /// while let Some(row) = it.try_next().await? {
+    ///     let foo: i32 = row.get(&quot;foo&quot;);
+    ///     println!(&quot;foo: {}&quot;, foo);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>query_raw&lt;T, P, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>T, params: I) -&gt; <span class="prelude-ty">Result</span>&lt;RowStream, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
+        P: BorrowToSql,
+        I: IntoIterator&lt;Item = P&gt;,
+        I::IntoIter: ExactSizeIterator,
     {
-        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">statement</span>.<span class="ident">__convert</span>().<span class="ident">into_statement</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">query::query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">statement</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+        <span class="kw">let </span>statement = statement.__convert().into_statement(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        query::query(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, statement, params).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a statement, returning the number of rows modified.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the statement does not modify any rows (e.g. `SELECT`), 0 is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Executes a statement, returning the number of rows modified.
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// If the statement does not modify any rows (e.g. `SELECT`), 0 is returned.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    </span><span class="kw">pub async fn </span>execute&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
+        statement: <span class="kw-2">&amp;</span>T,
+        params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>ToSql + Sync)],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
     {
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="ident">statement</span>, <span class="ident">slice_iter</span>(<span class="ident">params</span>)).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.execute_raw(statement, slice_iter(params)).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// The maximally flexible version of [`execute`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list</span>
-    <span class="doccomment">/// provided, 1-indexed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be</span>
-    <span class="doccomment">/// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front</span>
-    <span class="doccomment">/// with the `prepare` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number of parameters provided does not match the number expected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`execute`]: #method.execute</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">params</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
-        <span class="ident">P</span>: <span class="ident">BorrowToSql</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="doccomment">/// The maximally flexible version of [`execute`].
+    ///
+    /// A statement may contain parameters, specified by `$n`, where `n` is the index of the parameter of the list
+    /// provided, 1-indexed.
+    ///
+    /// The `statement` argument can either be a `Statement`, or a raw query string. If the same statement will be
+    /// repeatedly executed (perhaps with different query parameters), consider preparing the statement up front
+    /// with the `prepare` method.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number of parameters provided does not match the number expected.
+    ///
+    /// [`execute`]: #method.execute
+    </span><span class="kw">pub async fn </span>execute_raw&lt;T, P, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>T, params: I) -&gt; <span class="prelude-ty">Result</span>&lt;u64, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
+        P: BorrowToSql,
+        I: IntoIterator&lt;Item = P&gt;,
+        I::IntoIter: ExactSizeIterator,
     {
-        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">statement</span>.<span class="ident">__convert</span>().<span class="ident">into_statement</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">query::execute</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">statement</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+        <span class="kw">let </span>statement = statement.__convert().into_statement(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        query::execute(<span class="self">self</span>.inner(), statement, params).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a `COPY FROM STDIN` statement, returning a sink used to write the copy data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PostgreSQL does not support parameters in `COPY` statements, so this method does not take any. The copy *must*</span>
-    <span class="doccomment">/// be explicitly completed via the `Sink::close` or `finish` methods. If it is not, the copy will be aborted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the statement contains parameters.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">copy_in</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CopyInSink</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
-        <span class="ident">U</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="doccomment">/// Executes a `COPY FROM STDIN` statement, returning a sink used to write the copy data.
+    ///
+    /// PostgreSQL does not support parameters in `COPY` statements, so this method does not take any. The copy *must*
+    /// be explicitly completed via the `Sink::close` or `finish` methods. If it is not, the copy will be aborted.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the statement contains parameters.
+    </span><span class="kw">pub async fn </span>copy_in&lt;T, U&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;CopyInSink&lt;U&gt;, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
+        U: Buf + <span class="lifetime">&#39;static </span>+ Send,
     {
-        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">statement</span>.<span class="ident">__convert</span>().<span class="ident">into_statement</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">copy_in::copy_in</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">statement</span>).<span class="kw">await</span>
-    }
+        <span class="kw">let </span>statement = statement.__convert().into_statement(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        copy_in::copy_in(<span class="self">self</span>.inner(), statement).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a `COPY TO STDOUT` statement, returning a stream of the resulting data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PostgreSQL does not support parameters in `COPY` statements, so this method does not take any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the statement contains parameters.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">copy_out</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CopyOutStream</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToStatement</span>,
+    <span class="doccomment">/// Executes a `COPY TO STDOUT` statement, returning a stream of the resulting data.
+    ///
+    /// PostgreSQL does not support parameters in `COPY` statements, so this method does not take any.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the statement contains parameters.
+    </span><span class="kw">pub async fn </span>copy_out&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, statement: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;CopyOutStream, Error&gt;
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized + ToStatement,
     {
-        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">statement</span>.<span class="ident">__convert</span>().<span class="ident">into_statement</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">copy_out::copy_out</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">statement</span>).<span class="kw">await</span>
-    }
+        <span class="kw">let </span>statement = statement.__convert().into_statement(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        copy_out::copy_out(<span class="self">self</span>.inner(), statement).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a sequence of SQL statements using the simple query protocol, returning the resulting rows.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Statements should be separated by semicolons. If an error occurs, execution of the sequence will stop at that</span>
-    <span class="doccomment">/// point. The simple query protocol returns the values in rows as strings rather than in their binary encodings,</span>
-    <span class="doccomment">/// so the associated row type doesn&#39;t work with the `FromSql` trait. Rather than simply returning a list of the</span>
-    <span class="doccomment">/// rows, this method returns a list of an enum which indicates either the completion of one of the commands,</span>
-    <span class="doccomment">/// or a row of data. This preserves the framing between the separate statements in the request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Warning</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prepared statements should be use for any query which contains user-specified data, as they provided the</span>
-    <span class="doccomment">/// functionality to safely embed that data in the request. Do not form statements via string concatenation and pass</span>
-    <span class="doccomment">/// them to this method!</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">simple_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SimpleQueryMessage</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">simple_query_raw</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">try_collect</span>().<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Executes a sequence of SQL statements using the simple query protocol, returning the resulting rows.
+    ///
+    /// Statements should be separated by semicolons. If an error occurs, execution of the sequence will stop at that
+    /// point. The simple query protocol returns the values in rows as strings rather than in their binary encodings,
+    /// so the associated row type doesn&#39;t work with the `FromSql` trait. Rather than simply returning a list of the
+    /// rows, this method returns a list of an enum which indicates either the completion of one of the commands,
+    /// or a row of data. This preserves the framing between the separate statements in the request.
+    ///
+    /// # Warning
+    ///
+    /// Prepared statements should be use for any query which contains user-specified data, as they provided the
+    /// functionality to safely embed that data in the request. Do not form statements via string concatenation and pass
+    /// them to this method!
+    </span><span class="kw">pub async fn </span>simple_query(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;SimpleQueryMessage&gt;, Error&gt; {
+        <span class="self">self</span>.simple_query_raw(query).<span class="kw">await</span><span class="question-mark">?</span>.try_collect().<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">simple_query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SimpleQueryStream</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">simple_query::simple_query</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">query</span>).<span class="kw">await</span>
-    }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>simple_query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;SimpleQueryStream, Error&gt; {
+        simple_query::simple_query(<span class="self">self</span>.inner(), query).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a sequence of SQL statements using the simple query protocol.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Statements should be separated by semicolons. If an error occurs, execution of the sequence will stop at that</span>
-    <span class="doccomment">/// point. This is intended for use when, for example, initializing a database schema.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Warning</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prepared statements should be use for any query which contains user-specified data, as they provided the</span>
-    <span class="doccomment">/// functionality to safely embed that data in the request. Do not form statements via string concatenation and pass</span>
-    <span class="doccomment">/// them to this method!</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">simple_query::batch_execute</span>(<span class="self">self</span>.<span class="ident">inner</span>(), <span class="ident">query</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Executes a sequence of SQL statements using the simple query protocol.
+    ///
+    /// Statements should be separated by semicolons. If an error occurs, execution of the sequence will stop at that
+    /// point. This is intended for use when, for example, initializing a database schema.
+    ///
+    /// # Warning
+    ///
+    /// Prepared statements should be use for any query which contains user-specified data, as they provided the
+    /// functionality to safely embed that data in the request. Do not form statements via string concatenation and pass
+    /// them to this method!
+    </span><span class="kw">pub async fn </span>batch_execute(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        simple_query::batch_execute(<span class="self">self</span>.inner(), query).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Begins a new database transaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The transaction will roll back by default - use the `commit` method to commit it.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">struct</span> <span class="ident">RollbackIfNotDone</span><span class="op">&lt;</span><span class="lifetime">&#39;me</span><span class="op">&gt;</span> {
-            <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;me</span> <span class="ident">Client</span>,
-            <span class="ident">done</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Begins a new database transaction.
+    ///
+    /// The transaction will roll back by default - use the `commit` method to commit it.
+    </span><span class="kw">pub async fn </span>transaction(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction&lt;<span class="lifetime">&#39;_</span>&gt;, Error&gt; {
+        <span class="kw">struct </span>RollbackIfNotDone&lt;<span class="lifetime">&#39;me</span>&gt; {
+            client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;me </span>Client,
+            done: bool,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RollbackIfNotDone</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done</span> {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>RollbackIfNotDone&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="kw">if </span><span class="self">self</span>.done {
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">inner</span>().<span class="ident">with_buf</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
-                    <span class="ident">frontend::query</span>(<span class="string">&quot;ROLLBACK&quot;</span>, <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-                    <span class="ident">buf</span>.<span class="ident">split</span>().<span class="ident">freeze</span>()
+                <span class="kw">let </span>buf = <span class="self">self</span>.client.inner().with_buf(|buf| {
+                    frontend::query(<span class="string">&quot;ROLLBACK&quot;</span>, buf).unwrap();
+                    buf.split().freeze()
                 });
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">client</span>
-                    .<span class="ident">inner</span>()
-                    .<span class="ident">send</span>(<span class="ident">RequestMessages::Single</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">buf</span>)));
+                <span class="kw">let _ </span>= <span class="self">self
+                    </span>.client
+                    .inner()
+                    .send(RequestMessages::Single(FrontendMessage::Raw(buf)));
             }
         }
 
-        <span class="comment">// This is done, as `Future` created by this method can be dropped after</span>
-        <span class="comment">// `RequestMessages` is synchronously send to the `Connection` by</span>
-        <span class="comment">// `batch_execute()`, but before `Responses` is asynchronously polled to</span>
-        <span class="comment">// completion. In that case `Transaction` won&#39;t be created and thus</span>
-        <span class="comment">// won&#39;t be rolled back.</span>
-        {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cleaner</span> <span class="op">=</span> <span class="ident">RollbackIfNotDone</span> {
-                <span class="ident">client</span>: <span class="self">self</span>,
-                <span class="ident">done</span>: <span class="bool-val">false</span>,
+        <span class="comment">// This is done, as `Future` created by this method can be dropped after
+        // `RequestMessages` is synchronously send to the `Connection` by
+        // `batch_execute()`, but before `Responses` is asynchronously polled to
+        // completion. In that case `Transaction` won&#39;t be created and thus
+        // won&#39;t be rolled back.
+        </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>cleaner = RollbackIfNotDone {
+                client: <span class="self">self</span>,
+                done: <span class="bool-val">false</span>,
             };
-            <span class="self">self</span>.<span class="ident">batch_execute</span>(<span class="string">&quot;BEGIN&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident">cleaner</span>.<span class="ident">done</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="self">self</span>.batch_execute(<span class="string">&quot;BEGIN&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            cleaner.done = <span class="bool-val">true</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Transaction::new</span>(<span class="self">self</span>))
+        <span class="prelude-val">Ok</span>(Transaction::new(<span class="self">self</span>))
     }
 
-    <span class="doccomment">/// Returns a builder for a transaction with custom settings.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike the `transaction` method, the builder can be used to control the transaction&#39;s isolation level and other</span>
-    <span class="doccomment">/// attributes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">TransactionBuilder::new</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a builder for a transaction with custom settings.
+    ///
+    /// Unlike the `transaction` method, the builder can be used to control the transaction&#39;s isolation level and other
+    /// attributes.
+    </span><span class="kw">pub fn </span>build_transaction(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; TransactionBuilder&lt;<span class="lifetime">&#39;_</span>&gt; {
+        TransactionBuilder::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Constructs a cancellation token that can later be used to request cancellation of a query running on the</span>
-    <span class="doccomment">/// connection associated with this client.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CancelToken</span> {
-        <span class="ident">CancelToken</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">socket_config</span>: <span class="self">self</span>.<span class="ident">socket_config</span>.<span class="ident">clone</span>(),
-            <span class="ident">ssl_mode</span>: <span class="self">self</span>.<span class="ident">ssl_mode</span>,
-            <span class="ident">process_id</span>: <span class="self">self</span>.<span class="ident">process_id</span>,
-            <span class="ident">secret_key</span>: <span class="self">self</span>.<span class="ident">secret_key</span>,
+    <span class="doccomment">/// Constructs a cancellation token that can later be used to request cancellation of a query running on the
+    /// connection associated with this client.
+    </span><span class="kw">pub fn </span>cancel_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CancelToken {
+        CancelToken {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>socket_config: <span class="self">self</span>.socket_config.clone(),
+            ssl_mode: <span class="self">self</span>.ssl_mode,
+            process_id: <span class="self">self</span>.process_id,
+            secret_key: <span class="self">self</span>.secret_key,
         }
     }
 
-    <span class="doccomment">/// Attempts to cancel an in-progress query.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The server provides no information about whether a cancellation attempt was successful or not. An error will</span>
-    <span class="doccomment">/// only be returned if the client was unable to connect to the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `runtime` Cargo feature (enabled by default).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.6.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use Client::cancel_token() instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cancel_query</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tls</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">MakeTlsConnect</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Attempts to cancel an in-progress query.
+    ///
+    /// The server provides no information about whether a cancellation attempt was successful or not. An error will
+    /// only be returned if the client was unable to connect to the database.
+    ///
+    /// Requires the `runtime` Cargo feature (enabled by default).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    #[deprecated(since = <span class="string">&quot;0.6.0&quot;</span>, note = <span class="string">&quot;use Client::cancel_token() instead&quot;</span>)]
+    </span><span class="kw">pub async fn </span>cancel_query&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, tls: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>T: MakeTlsConnect&lt;Socket&gt;,
     {
-        <span class="self">self</span>.<span class="ident">cancel_token</span>().<span class="ident">cancel_query</span>(<span class="ident">tls</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.cancel_token().cancel_query(tls).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Like `cancel_query`, but uses a stream which is already connected to the server rather than opening a new</span>
-    <span class="doccomment">/// connection itself.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.6.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;use Client::cancel_token() instead&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cancel_query_raw</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">tls</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">T</span>: <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Like `cancel_query`, but uses a stream which is already connected to the server rather than opening a new
+    /// connection itself.
+    </span><span class="attribute">#[deprecated(since = <span class="string">&quot;0.6.0&quot;</span>, note = <span class="string">&quot;use Client::cancel_token() instead&quot;</span>)]
+    </span><span class="kw">pub async fn </span>cancel_query_raw&lt;S, T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: S, tls: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>S: AsyncRead + AsyncWrite + Unpin,
+        T: TlsConnect&lt;S&gt;,
     {
-        <span class="self">self</span>.<span class="ident">cancel_token</span>().<span class="ident">cancel_query_raw</span>(<span class="ident">stream</span>, <span class="ident">tls</span>).<span class="kw">await</span>
+        <span class="self">self</span>.cancel_token().cancel_query_raw(stream, tls).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Clears the client&#39;s type information cache.
+    ///
+    /// When user-defined types are used in a query, the client loads their definitions from the database and caches
+    /// them for the lifetime of the client. If those definitions are changed in the database, this method can be used
+    /// to flush the local cache and allow the new, updated definitions to be loaded.
+    </span><span class="kw">pub fn </span>clear_type_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner().clear_type_cache();
     }
 
-    <span class="doccomment">/// Clears the client&#39;s type information cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When user-defined types are used in a query, the client loads their definitions from the database and caches</span>
-    <span class="doccomment">/// them for the lifetime of the client. If those definitions are changed in the database, this method can be used</span>
-    <span class="doccomment">/// to flush the local cache and allow the new, updated definitions to be loaded.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_type_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">clear_type_cache</span>();
+    <span class="doccomment">/// Determines if the connection to the server has already closed.
+    ///
+    /// In that case, all future queries will fail.
+    </span><span class="kw">pub fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.sender.is_closed()
     }
 
-    <span class="doccomment">/// Determines if the connection to the server has already closed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In that case, all future queries will fail.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sender</span>.<span class="ident">is_closed</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_api_close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sender</span>.<span class="ident">close_channel</span>()
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>__private_api_close(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.sender.close_channel()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Client</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Client&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Client {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Client&quot;</span>).finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

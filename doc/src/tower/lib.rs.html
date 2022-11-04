@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tower/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tower/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -240,247 +240,247 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>
-)]</span>
-<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">elided_lifetimes_in_paths</span>, <span class="ident">clippy::type_complexity</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
-<span class="comment">// `rustdoc::broken_intra_doc_links` is checked on CI</span>
+</pre><pre class="rust"><code><span class="attribute">#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub
+)]
+#![forbid(unsafe_code)]
+#![allow(elided_lifetimes_in_paths, clippy::type_complexity)]
+#![cfg_attr(test, allow(clippy::float_cmp))]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+</span><span class="comment">// `rustdoc::broken_intra_doc_links` is checked on CI
 
-<span class="doccomment">//! `async fn(Request) -&gt; Result&lt;Response, Error&gt;`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Overview</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tower is a library of modular and reusable components for building</span>
-<span class="doccomment">//! robust networking clients and servers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tower provides a simple core abstraction, the [`Service`] trait, which</span>
-<span class="doccomment">//! represents an asynchronous function taking a request and returning either a</span>
-<span class="doccomment">//! response or an error. This abstraction can be used to model both clients and</span>
-<span class="doccomment">//! servers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Generic components, like [timeouts], [rate limiting], and [load balancing],</span>
-<span class="doccomment">//! can be modeled as [`Service`]s that wrap some inner service and apply</span>
-<span class="doccomment">//! additional behavior before or after the inner service is called. This allows</span>
-<span class="doccomment">//! implementing these components in a protocol-agnostic, composable way. Typically,</span>
-<span class="doccomment">//! such services are referred to as _middleware_.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An additional abstraction, the [`Layer`] trait, is used to compose</span>
-<span class="doccomment">//! middleware with [`Service`]s. If a [`Service`] can be thought of as an</span>
-<span class="doccomment">//! asynchronous function from a request type to a response type, a [`Layer`] is</span>
-<span class="doccomment">//! a function taking a [`Service`] of one type and returning a [`Service`] of a</span>
-<span class="doccomment">//! different type. The [`ServiceBuilder`] type is used to add middleware to a</span>
-<span class="doccomment">//! service by composing it with multiple [`Layer`]s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The Tower Ecosystem</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tower is made up of the following crates:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`tower`] (this crate)</span>
-<span class="doccomment">//! * [`tower-service`]</span>
-<span class="doccomment">//! * [`tower-layer`]</span>
-<span class="doccomment">//! * [`tower-test`]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Since the [`Service`] and [`Layer`] traits are important integration points</span>
-<span class="doccomment">//! for all libraries using Tower, they are kept as stable as possible, and</span>
-<span class="doccomment">//! breaking changes are made rarely. Therefore, they are defined in separate</span>
-<span class="doccomment">//! crates, [`tower-service`] and [`tower-layer`]. This crate contains</span>
-<span class="doccomment">//! re-exports of those core traits, implementations of commonly-used</span>
-<span class="doccomment">//! middleware, and [utilities] for working with [`Service`]s and [`Layer`]s.</span>
-<span class="doccomment">//! Finally, the [`tower-test`] crate provides tools for testing programs using</span>
-<span class="doccomment">//! Tower.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tower provides an abstraction layer, and generic implementations of various</span>
-<span class="doccomment">//! middleware. This means that the `tower` crate on its own does *not* provide</span>
-<span class="doccomment">//! a working implementation of a network client or server. Instead, Tower&#39;s</span>
-<span class="doccomment">//! [`Service` trait][`Service`] provides an integration point between</span>
-<span class="doccomment">//! application code, libraries providing middleware implementations, and</span>
-<span class="doccomment">//! libraries that implement servers and/or clients for various network</span>
-<span class="doccomment">//! protocols.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Depending on your particular use case, you might use Tower in several ways:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * **Implementing application logic** for a networked program. You might</span>
-<span class="doccomment">//!   use the [`Service`] trait to model your application&#39;s behavior, and use</span>
-<span class="doccomment">//!   the middleware [provided by this crate](#modules) and by other libraries</span>
-<span class="doccomment">//!   to add functionality to clients and servers provided by one or more</span>
-<span class="doccomment">//!   protocol implementations.</span>
-<span class="doccomment">//! * **Implementing middleware** to add custom behavior to network clients and</span>
-<span class="doccomment">//!   servers in a reusable manner. This might be general-purpose middleware</span>
-<span class="doccomment">//!   (and if it is, please consider releasing your middleware as a library for</span>
-<span class="doccomment">//!   other Tower users!) or application-specific behavior that needs to be</span>
-<span class="doccomment">//!   shared between multiple clients or servers.</span>
-<span class="doccomment">//! * **Implementing a network protocol**. Libraries that implement network</span>
-<span class="doccomment">//!   protocols (such as HTTP) can depend on `tower-service` to use the</span>
-<span class="doccomment">//!   [`Service`] trait as an integration point between the protocol and user</span>
-<span class="doccomment">//!   code. For example, a client for some protocol might implement [`Service`],</span>
-<span class="doccomment">//!   allowing users to add arbitrary Tower middleware to those clients.</span>
-<span class="doccomment">//!   Similarly, a server might be created from a user-provided [`Service`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Additionally, when a network protocol requires functionality already</span>
-<span class="doccomment">//!   provided by existing Tower middleware, a protocol implementation might use</span>
-<span class="doccomment">//!   Tower middleware internally, as well as as an integration point.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Library Support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A number of third-party libraries support Tower and the [`Service`] trait.</span>
-<span class="doccomment">//! The following is an incomplete list of such libraries:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`hyper`]: A fast and correct low-level HTTP implementation.</span>
-<span class="doccomment">//! * [`tonic`]: A [gRPC-over-HTTP/2][grpc] implementation built on top of</span>
-<span class="doccomment">//!   [`hyper`]. See [here][tonic-examples] for examples of using [`tonic`] with</span>
-<span class="doccomment">//!   Tower.</span>
-<span class="doccomment">//! * [`warp`]: A lightweight, composable web framework. See</span>
-<span class="doccomment">//!   [here][warp-service] for details on using [`warp`] with Tower.</span>
-<span class="doccomment">//! * [`tower-lsp`] and its fork, [`lspower`]: implementations of the [Language</span>
-<span class="doccomment">//!   Server Protocol][lsp] based on Tower.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`hyper`]: https://crates.io/crates/hyper</span>
-<span class="doccomment">//! [`tonic`]: https://crates.io/crates/tonic</span>
-<span class="doccomment">//! [tonic-examples]: https://github.com/hyperium/tonic/tree/master/examples/src/tower</span>
-<span class="doccomment">//! [grpc]: https://grpc.io</span>
-<span class="doccomment">//! [`warp`]: https://crates.io/crates/warp</span>
-<span class="doccomment">//! [warp-service]: https://docs.rs/warp/0.2.5/warp/fn.service.html</span>
-<span class="doccomment">//! [`tower-lsp`]: https://crates.io/crates/tower-lsp</span>
-<span class="doccomment">//! [`lspower`]: https://crates.io/crates/lspower</span>
-<span class="doccomment">//! [lsp]: https://microsoft.github.io/language-server-protocol/</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you&#39;re the maintainer of a crate that supports Tower, we&#39;d love to add</span>
-<span class="doccomment">//! your crate to this list! Please [open a PR] adding a brief description of</span>
-<span class="doccomment">//! your library!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you&#39;re brand new to Tower and want to start with the basics, we recommend you</span>
-<span class="doccomment">//! check out some of our [guides].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The various middleware implementations provided by this crate are feature</span>
-<span class="doccomment">//! flagged, so that users can only compile the parts of Tower they need. By</span>
-<span class="doccomment">//! default, all the optional middleware are disabled.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To get started using all of Tower&#39;s optional middleware, add this to your</span>
-<span class="doccomment">//! `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! tower = { version = &quot;0.4&quot;, features = [&quot;full&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Alternatively, you can only enable some features. For example, to enable</span>
-<span class="doccomment">//! only the [`retry`] and [`timeout`][timeouts] middleware, write:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! tower = { version = &quot;0.4&quot;, features = [&quot;retry&quot;, &quot;timeout&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [here](#modules) for a complete list of all middleware provided by</span>
-<span class="doccomment">//! Tower.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Supported Rust Versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tower will keep a rolling MSRV (minimum supported Rust version) policy of **at</span>
-<span class="doccomment">//! least** 6 months. When increasing the MSRV, the new Rust version must have been</span>
-<span class="doccomment">//! released at least six months ago. The current MSRV is 1.49.0.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Service`]: crate::Service</span>
-<span class="doccomment">//! [`Layer`]: crate::Layer</span>
-<span class="doccomment">//! [timeouts]: crate::timeout</span>
-<span class="doccomment">//! [rate limiting]: crate::limit::rate</span>
-<span class="doccomment">//! [load balancing]: crate::balance</span>
-<span class="doccomment">//! [`ServiceBuilder`]: crate::ServiceBuilder</span>
-<span class="doccomment">//! [utilities]: crate::ServiceExt</span>
-<span class="doccomment">//! [`tower`]: https://crates.io/crates/tower</span>
-<span class="doccomment">//! [`tower-service`]: https://crates.io/crates/tower-service</span>
-<span class="doccomment">//! [`tower-layer`]: https://crates.io/crates/tower-layer</span>
-<span class="doccomment">//! [`tower-test`]: https://crates.io/crates/tower-test</span>
-<span class="doccomment">//! [`retry`]: crate::retry</span>
-<span class="doccomment">//! [open a PR]: https://github.com/tower-rs/tower/compare</span>
-<span class="doccomment">//! [guides]: https://github.com/tower-rs/tower/tree/master/guides</span>
+</span><span class="doccomment">//! `async fn(Request) -&gt; Result&lt;Response, Error&gt;`
+//!
+//! # Overview
+//!
+//! Tower is a library of modular and reusable components for building
+//! robust networking clients and servers.
+//!
+//! Tower provides a simple core abstraction, the [`Service`] trait, which
+//! represents an asynchronous function taking a request and returning either a
+//! response or an error. This abstraction can be used to model both clients and
+//! servers.
+//!
+//! Generic components, like [timeouts], [rate limiting], and [load balancing],
+//! can be modeled as [`Service`]s that wrap some inner service and apply
+//! additional behavior before or after the inner service is called. This allows
+//! implementing these components in a protocol-agnostic, composable way. Typically,
+//! such services are referred to as _middleware_.
+//!
+//! An additional abstraction, the [`Layer`] trait, is used to compose
+//! middleware with [`Service`]s. If a [`Service`] can be thought of as an
+//! asynchronous function from a request type to a response type, a [`Layer`] is
+//! a function taking a [`Service`] of one type and returning a [`Service`] of a
+//! different type. The [`ServiceBuilder`] type is used to add middleware to a
+//! service by composing it with multiple [`Layer`]s.
+//!
+//! ## The Tower Ecosystem
+//!
+//! Tower is made up of the following crates:
+//!
+//! * [`tower`] (this crate)
+//! * [`tower-service`]
+//! * [`tower-layer`]
+//! * [`tower-test`]
+//!
+//! Since the [`Service`] and [`Layer`] traits are important integration points
+//! for all libraries using Tower, they are kept as stable as possible, and
+//! breaking changes are made rarely. Therefore, they are defined in separate
+//! crates, [`tower-service`] and [`tower-layer`]. This crate contains
+//! re-exports of those core traits, implementations of commonly-used
+//! middleware, and [utilities] for working with [`Service`]s and [`Layer`]s.
+//! Finally, the [`tower-test`] crate provides tools for testing programs using
+//! Tower.
+//!
+//! # Usage
+//!
+//! Tower provides an abstraction layer, and generic implementations of various
+//! middleware. This means that the `tower` crate on its own does *not* provide
+//! a working implementation of a network client or server. Instead, Tower&#39;s
+//! [`Service` trait][`Service`] provides an integration point between
+//! application code, libraries providing middleware implementations, and
+//! libraries that implement servers and/or clients for various network
+//! protocols.
+//!
+//! Depending on your particular use case, you might use Tower in several ways:
+//!
+//! * **Implementing application logic** for a networked program. You might
+//!   use the [`Service`] trait to model your application&#39;s behavior, and use
+//!   the middleware [provided by this crate](#modules) and by other libraries
+//!   to add functionality to clients and servers provided by one or more
+//!   protocol implementations.
+//! * **Implementing middleware** to add custom behavior to network clients and
+//!   servers in a reusable manner. This might be general-purpose middleware
+//!   (and if it is, please consider releasing your middleware as a library for
+//!   other Tower users!) or application-specific behavior that needs to be
+//!   shared between multiple clients or servers.
+//! * **Implementing a network protocol**. Libraries that implement network
+//!   protocols (such as HTTP) can depend on `tower-service` to use the
+//!   [`Service`] trait as an integration point between the protocol and user
+//!   code. For example, a client for some protocol might implement [`Service`],
+//!   allowing users to add arbitrary Tower middleware to those clients.
+//!   Similarly, a server might be created from a user-provided [`Service`].
+//!
+//!   Additionally, when a network protocol requires functionality already
+//!   provided by existing Tower middleware, a protocol implementation might use
+//!   Tower middleware internally, as well as as an integration point.
+//!
+//! ## Library Support
+//!
+//! A number of third-party libraries support Tower and the [`Service`] trait.
+//! The following is an incomplete list of such libraries:
+//!
+//! * [`hyper`]: A fast and correct low-level HTTP implementation.
+//! * [`tonic`]: A [gRPC-over-HTTP/2][grpc] implementation built on top of
+//!   [`hyper`]. See [here][tonic-examples] for examples of using [`tonic`] with
+//!   Tower.
+//! * [`warp`]: A lightweight, composable web framework. See
+//!   [here][warp-service] for details on using [`warp`] with Tower.
+//! * [`tower-lsp`] and its fork, [`lspower`]: implementations of the [Language
+//!   Server Protocol][lsp] based on Tower.
+//!
+//! [`hyper`]: https://crates.io/crates/hyper
+//! [`tonic`]: https://crates.io/crates/tonic
+//! [tonic-examples]: https://github.com/hyperium/tonic/tree/master/examples/src/tower
+//! [grpc]: https://grpc.io
+//! [`warp`]: https://crates.io/crates/warp
+//! [warp-service]: https://docs.rs/warp/0.2.5/warp/fn.service.html
+//! [`tower-lsp`]: https://crates.io/crates/tower-lsp
+//! [`lspower`]: https://crates.io/crates/lspower
+//! [lsp]: https://microsoft.github.io/language-server-protocol/
+//!
+//! If you&#39;re the maintainer of a crate that supports Tower, we&#39;d love to add
+//! your crate to this list! Please [open a PR] adding a brief description of
+//! your library!
+//!
+//! ## Getting Started
+//!
+//! If you&#39;re brand new to Tower and want to start with the basics, we recommend you
+//! check out some of our [guides].
+//!
+//! The various middleware implementations provided by this crate are feature
+//! flagged, so that users can only compile the parts of Tower they need. By
+//! default, all the optional middleware are disabled.
+//!
+//! To get started using all of Tower&#39;s optional middleware, add this to your
+//! `Cargo.toml`:
+//!
+//! ```toml
+//! tower = { version = &quot;0.4&quot;, features = [&quot;full&quot;] }
+//! ```
+//!
+//! Alternatively, you can only enable some features. For example, to enable
+//! only the [`retry`] and [`timeout`][timeouts] middleware, write:
+//!
+//! ```toml
+//! tower = { version = &quot;0.4&quot;, features = [&quot;retry&quot;, &quot;timeout&quot;] }
+//! ```
+//!
+//! See [here](#modules) for a complete list of all middleware provided by
+//! Tower.
+//!
+//!
+//! ## Supported Rust Versions
+//!
+//! Tower will keep a rolling MSRV (minimum supported Rust version) policy of **at
+//! least** 6 months. When increasing the MSRV, the new Rust version must have been
+//! released at least six months ago. The current MSRV is 1.49.0.
+//!
+//! [`Service`]: crate::Service
+//! [`Layer`]: crate::Layer
+//! [timeouts]: crate::timeout
+//! [rate limiting]: crate::limit::rate
+//! [load balancing]: crate::balance
+//! [`ServiceBuilder`]: crate::ServiceBuilder
+//! [utilities]: crate::ServiceExt
+//! [`tower`]: https://crates.io/crates/tower
+//! [`tower-service`]: https://crates.io/crates/tower-service
+//! [`tower-layer`]: https://crates.io/crates/tower-layer
+//! [`tower-test`]: https://crates.io/crates/tower-test
+//! [`retry`]: crate::retry
+//! [open a PR]: https://github.com/tower-rs/tower/compare
+//! [guides]: https://github.com/tower-rs/tower/tree/master/guides
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;balance&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;balance&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">balance</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;buffer&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;buffer&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">buffer</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">discover</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">filter</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hedge&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hedge&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hedge</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">limit</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">load</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">load_shed</span>;
+</span><span class="attribute">#[macro_use]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>macros;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;balance&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;balance&quot;</span>)))]
+</span><span class="kw">pub mod </span>balance;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;buffer&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;buffer&quot;</span>)))]
+</span><span class="kw">pub mod </span>buffer;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;discover&quot;</span>)))]
+</span><span class="kw">pub mod </span>discover;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;filter&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;filter&quot;</span>)))]
+</span><span class="kw">pub mod </span>filter;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;hedge&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;hedge&quot;</span>)))]
+</span><span class="kw">pub mod </span>hedge;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;limit&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;limit&quot;</span>)))]
+</span><span class="kw">pub mod </span>limit;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;load&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;load&quot;</span>)))]
+</span><span class="kw">pub mod </span>load;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;load-shed&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;load-shed&quot;</span>)))]
+</span><span class="kw">pub mod </span>load_shed;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;make&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;make&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">make</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ready-cache&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ready-cache&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ready_cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reconnect&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reconnect&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reconnect</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">retry</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;spawn-ready&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;spawn-ready&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">spawn_ready</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;steer&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;steer&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">steer</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">timeout</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;make&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;make&quot;</span>)))]
+</span><span class="kw">pub mod </span>make;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;ready-cache&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;ready-cache&quot;</span>)))]
+</span><span class="kw">pub mod </span>ready_cache;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reconnect&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;reconnect&quot;</span>)))]
+</span><span class="kw">pub mod </span>reconnect;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;retry&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;retry&quot;</span>)))]
+</span><span class="kw">pub mod </span>retry;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;spawn-ready&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;spawn-ready&quot;</span>)))]
+</span><span class="kw">pub mod </span>spawn_ready;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;steer&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;steer&quot;</span>)))]
+</span><span class="kw">pub mod </span>steer;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;timeout&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;timeout&quot;</span>)))]
+</span><span class="kw">pub mod </span>timeout;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+</span><span class="kw">pub mod </span>util;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">layer</span>;
+<span class="kw">pub mod </span>builder;
+<span class="kw">pub mod </span>layer;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::util</span>::{<span class="ident">service_fn</span>, <span class="ident">ServiceExt</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::util::{service_fn, ServiceExt};
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builder::ServiceBuilder</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;make&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;make&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::make::MakeService</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tower_layer::Layer</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::builder::ServiceBuilder;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;make&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;make&quot;</span>)))]
+#[doc(inline)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::make::MakeService;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>tower_layer::Layer;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>tower_service::Service;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_pub</span>)]</span>
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="attribute">#[allow(unreachable_pub)]
+</span><span class="kw">mod </span>sealed {
+    <span class="kw">pub trait </span>Sealed&lt;T&gt; {}
 }
 
-<span class="doccomment">/// Alias for a type-erased error type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BoxError</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias for a type-erased error type.
+</span><span class="kw">pub type </span>BoxError = Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

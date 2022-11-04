@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/session/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/session/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -664,671 +664,671 @@
 <span id="664">664</span>
 <span id="665">665</span>
 <span id="666">666</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">cluster_time</span>;
-<span class="kw">mod</span> <span class="ident">pool</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>cluster_time;
+<span class="kw">mod </span>pool;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashSet</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+<span class="kw">use </span>std::{
+    collections::HashSet,
+    sync::Arc,
+    time::{Duration, Instant},
 };
 
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>uuid::Uuid;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">spec::BinarySubtype</span>, <span class="ident">Binary</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>, <span class="ident">Timestamp</span>},
-    <span class="ident">cmap::conn::PinnedConnectionHandle</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation</span>::{<span class="ident">AbortTransaction</span>, <span class="ident">CommitTransaction</span>, <span class="ident">Operation</span>},
-    <span class="ident">options</span>::{<span class="ident">SessionOptions</span>, <span class="ident">TransactionOptions</span>},
-    <span class="ident">runtime</span>,
-    <span class="ident">sdam</span>::{<span class="ident">ServerInfo</span>, <span class="ident">TransactionSupportStatus</span>},
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
-    <span class="ident">Client</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, spec::BinarySubtype, Binary, Bson, Document, Timestamp},
+    cmap::conn::PinnedConnectionHandle,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    operation::{AbortTransaction, CommitTransaction, Operation},
+    options::{SessionOptions, TransactionOptions},
+    runtime,
+    sdam::{ServerInfo, TransactionSupportStatus},
+    selection_criteria::SelectionCriteria,
+    Client,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cluster_time::ClusterTime</span>;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use</span> <span class="ident">pool::ServerSessionPool</span>;
+<span class="kw">pub use </span>cluster_time::ClusterTime;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">use </span>pool::ServerSessionPool;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::options::ServerAddress</span>;
+<span class="kw">use </span><span class="kw">super</span>::options::ServerAddress;
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">SESSIONS_UNSUPPORTED_COMMANDS</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_set</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;killcursors&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;parallelcollectionscan&quot;</span>);
-        <span class="ident">hash_set</span>
+<span class="macro">lazy_static! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span><span class="kw-2">ref </span>SESSIONS_UNSUPPORTED_COMMANDS: HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; = {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash_set = HashSet::new();
+        hash_set.insert(<span class="string">&quot;killcursors&quot;</span>);
+        hash_set.insert(<span class="string">&quot;parallelcollectionscan&quot;</span>);
+        hash_set
     };
 }
 
-<span class="doccomment">/// A MongoDB client session. This struct represents a logical session used for ordering sequential</span>
-<span class="doccomment">/// operations. To create a `ClientSession`, call `start_session` on a `Client`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `ClientSession` instances are not thread safe or fork safe. They can only be used by one thread</span>
-<span class="doccomment">/// or process at a time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Transactions</span>
-<span class="doccomment">/// Transactions are used to execute a series of operations across multiple documents and</span>
-<span class="doccomment">/// collections atomically. For more information about when and how to use transactions in MongoDB,</span>
-<span class="doccomment">/// see the [manual](https://www.mongodb.com/docs/manual/core/transactions/).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Replica set transactions are supported on MongoDB 4.0+. Sharded transactions are supported on</span>
-<span class="doccomment">/// MongoDDB 4.2+. Transactions are associated with a `ClientSession`. To begin a transaction, call</span>
-<span class="doccomment">/// [`ClientSession::start_transaction`] on a `ClientSession`. The `ClientSession` must be passed to</span>
-<span class="doccomment">/// operations to be executed within the transaction.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use mongodb::{</span>
-<span class="doccomment">///     bson::{doc, Document},</span>
-<span class="doccomment">///     error::{Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},</span>
-<span class="doccomment">///     options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern},</span>
-<span class="doccomment">/// #   Client,</span>
-<span class="doccomment">///     ClientSession,</span>
-<span class="doccomment">///     Collection,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">/// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);</span>
-<span class="doccomment">/// let mut session = client.start_session(None).await?;</span>
-<span class="doccomment">/// let options = TransactionOptions::builder()</span>
-<span class="doccomment">///     .read_concern(ReadConcern::majority())</span>
-<span class="doccomment">///     .write_concern(WriteConcern::builder().w(Acknowledgment::Majority).build())</span>
-<span class="doccomment">///     .build();</span>
-<span class="doccomment">/// session.start_transaction(options).await?;</span>
-<span class="doccomment">/// // A &quot;TransientTransactionError&quot; label indicates that the entire transaction can be retried</span>
-<span class="doccomment">/// // with a reasonable expectation that it will succeed.</span>
-<span class="doccomment">/// while let Err(error) = execute_transaction(&amp;coll, &amp;mut session).await {</span>
-<span class="doccomment">///     if !error.contains_label(TRANSIENT_TRANSACTION_ERROR) {</span>
-<span class="doccomment">///         break;</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// async fn execute_transaction(coll: &amp;Collection&lt;Document&gt;, session: &amp;mut ClientSession) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, session).await?;</span>
-<span class="doccomment">///     coll.delete_one_with_session(doc! { &quot;y&quot;: 2 }, None, session).await?;</span>
-<span class="doccomment">///     // An &quot;UnknownTransactionCommitResult&quot; label indicates that it is unknown whether the</span>
-<span class="doccomment">///     // commit has satisfied the write concern associated with the transaction. If an error</span>
-<span class="doccomment">///     // with this label is returned, it is safe to retry the commit until the write concern is</span>
-<span class="doccomment">///     // satisfied or an error without the label is returned.</span>
-<span class="doccomment">///     loop {</span>
-<span class="doccomment">///         let result = session.commit_transaction().await;</span>
-<span class="doccomment">///         if let Err(ref error) = result {</span>
-<span class="doccomment">///             if error.contains_label(UNKNOWN_TRANSACTION_COMMIT_RESULT) {</span>
-<span class="doccomment">///                 continue;</span>
-<span class="doccomment">///             }</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///         result?</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientSession</span> {
-    <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
-    <span class="ident">server_session</span>: <span class="ident">ServerSession</span>,
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="ident">is_implicit</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">transaction</span>: <span class="ident">Transaction</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">snapshot_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">operation_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A MongoDB client session. This struct represents a logical session used for ordering sequential
+/// operations. To create a `ClientSession`, call `start_session` on a `Client`.
+///
+/// `ClientSession` instances are not thread safe or fork safe. They can only be used by one thread
+/// or process at a time.
+///
+/// ## Transactions
+/// Transactions are used to execute a series of operations across multiple documents and
+/// collections atomically. For more information about when and how to use transactions in MongoDB,
+/// see the [manual](https://www.mongodb.com/docs/manual/core/transactions/).
+///
+/// Replica set transactions are supported on MongoDB 4.0+. Sharded transactions are supported on
+/// MongoDDB 4.2+. Transactions are associated with a `ClientSession`. To begin a transaction, call
+/// [`ClientSession::start_transaction`] on a `ClientSession`. The `ClientSession` must be passed to
+/// operations to be executed within the transaction.
+///
+/// ```rust
+/// use mongodb::{
+///     bson::{doc, Document},
+///     error::{Result, TRANSIENT_TRANSACTION_ERROR, UNKNOWN_TRANSACTION_COMMIT_RESULT},
+///     options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern},
+/// #   Client,
+///     ClientSession,
+///     Collection,
+/// };
+///
+/// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+/// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);
+/// let mut session = client.start_session(None).await?;
+/// let options = TransactionOptions::builder()
+///     .read_concern(ReadConcern::majority())
+///     .write_concern(WriteConcern::builder().w(Acknowledgment::Majority).build())
+///     .build();
+/// session.start_transaction(options).await?;
+/// // A &quot;TransientTransactionError&quot; label indicates that the entire transaction can be retried
+/// // with a reasonable expectation that it will succeed.
+/// while let Err(error) = execute_transaction(&amp;coll, &amp;mut session).await {
+///     if !error.contains_label(TRANSIENT_TRANSACTION_ERROR) {
+///         break;
+///     }
+/// }
+/// # Ok(())
+/// # }
+///
+/// async fn execute_transaction(coll: &amp;Collection&lt;Document&gt;, session: &amp;mut ClientSession) -&gt; Result&lt;()&gt; {
+///     coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, session).await?;
+///     coll.delete_one_with_session(doc! { &quot;y&quot;: 2 }, None, session).await?;
+///     // An &quot;UnknownTransactionCommitResult&quot; label indicates that it is unknown whether the
+///     // commit has satisfied the write concern associated with the transaction. If an error
+///     // with this label is returned, it is safe to retry the commit until the write concern is
+///     // satisfied or an error without the label is returned.
+///     loop {
+///         let result = session.commit_transaction().await;
+///         if let Err(ref error) = result {
+///             if error.contains_label(UNKNOWN_TRANSACTION_COMMIT_RESULT) {
+///                 continue;
+///             }
+///         }
+///         result?
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ClientSession {
+    cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
+    server_session: ServerSession,
+    client: Client,
+    is_implicit: bool,
+    options: <span class="prelude-ty">Option</span>&lt;SessionOptions&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) transaction: Transaction,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) snapshot_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) operation_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Transaction</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">state</span>: <span class="ident">TransactionState</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransactionOptions</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pinned</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransactionPin</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">recovery_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Transaction {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) state: TransactionState,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) options: <span class="prelude-ty">Option</span>&lt;TransactionOptions&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pinned: <span class="prelude-ty">Option</span>&lt;TransactionPin&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) recovery_token: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Transaction</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransactionOptions</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::Starting</span>;
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>;
-        <span class="self">self</span>.<span class="ident">recovery_token</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>Transaction {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>start(<span class="kw-2">&amp;mut </span><span class="self">self</span>, options: <span class="prelude-ty">Option</span>&lt;TransactionOptions&gt;) {
+        <span class="self">self</span>.state = TransactionState::Starting;
+        <span class="self">self</span>.options = options;
+        <span class="self">self</span>.recovery_token = <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">commit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data_committed</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::Committed</span> { <span class="ident">data_committed</span> };
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>commit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data_committed: bool) {
+        <span class="self">self</span>.state = TransactionState::Committed { data_committed };
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::Aborted</span>;
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>abort(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.state = TransactionState::Aborted;
+        <span class="self">self</span>.options = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.pinned = <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::None</span>;
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">self</span>.<span class="ident">recovery_token</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.state = TransactionState::None;
+        <span class="self">self</span>.options = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.pinned = <span class="prelude-val">None</span>;
+        <span class="self">self</span>.recovery_token = <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pinned_mongos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pinned</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">TransactionPin::Mongos</span>(<span class="ident">s</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pinned_mongos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.pinned {
+            <span class="prelude-val">Some</span>(TransactionPin::Mongos(s)) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pinned_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pinned</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">TransactionPin::Connection</span>(<span class="ident">c</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">c</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pinned_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.pinned {
+            <span class="prelude-val">Some</span>(TransactionPin::Connection(c)) =&gt; <span class="prelude-val">Some</span>(c),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Transaction</span> {
-            <span class="ident">state</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(),
-            <span class="ident">options</span>: <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">take</span>(),
-            <span class="ident">pinned</span>: <span class="self">self</span>.<span class="ident">pinned</span>.<span class="ident">take</span>(),
-            <span class="ident">recovery_token</span>: <span class="self">self</span>.<span class="ident">recovery_token</span>.<span class="ident">take</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Transaction</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">state</span>: <span class="ident">TransactionState::None</span>,
-            <span class="ident">options</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pinned</span>: <span class="prelude-val">None</span>,
-            <span class="ident">recovery_token</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Transaction {
+            state: <span class="self">self</span>.state.clone(),
+            options: <span class="self">self</span>.options.take(),
+            pinned: <span class="self">self</span>.pinned.take(),
+            recovery_token: <span class="self">self</span>.recovery_token.take(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TransactionState</span> {
+<span class="kw">impl </span>Default <span class="kw">for </span>Transaction {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            state: TransactionState::None,
+            options: <span class="prelude-val">None</span>,
+            pinned: <span class="prelude-val">None</span>,
+            recovery_token: <span class="prelude-val">None</span>,
+        }
+    }
+}
+
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TransactionState {
     <span class="prelude-val">None</span>,
-    <span class="ident">Starting</span>,
-    <span class="ident">InProgress</span>,
-    <span class="ident">Committed</span> {
-        <span class="doccomment">/// Whether any data was committed when commit_transaction was initially called. This is</span>
-        <span class="doccomment">/// required to determine whether a commitTransaction command should be run if the user</span>
-        <span class="doccomment">/// calls commit_transaction again.</span>
-        <span class="ident">data_committed</span>: <span class="ident">bool</span>,
+    Starting,
+    InProgress,
+    Committed {
+        <span class="doccomment">/// Whether any data was committed when commit_transaction was initially called. This is
+        /// required to determine whether a commitTransaction command should be run if the user
+        /// calls commit_transaction again.
+        </span>data_committed: bool,
     },
-    <span class="ident">Aborted</span>,
+    Aborted,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TransactionPin</span> {
-    <span class="ident">Mongos</span>(<span class="ident">SelectionCriteria</span>),
-    <span class="ident">Connection</span>(<span class="ident">PinnedConnectionHandle</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TransactionPin {
+    Mongos(SelectionCriteria),
+    Connection(PinnedConnectionHandle),
 }
 
-<span class="kw">impl</span> <span class="ident">ClientSession</span> {
-    <span class="doccomment">/// Creates a new `ClientSession` wrapping the provided server session.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">server_session</span>: <span class="ident">ServerSession</span>,
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>,
-        <span class="ident">is_implicit</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">client</span>,
-            <span class="ident">server_session</span>,
-            <span class="ident">cluster_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_implicit</span>,
-            <span class="ident">options</span>,
-            <span class="ident">transaction</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">snapshot_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">operation_time</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ClientSession {
+    <span class="doccomment">/// Creates a new `ClientSession` wrapping the provided server session.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        server_session: ServerSession,
+        client: Client,
+        options: <span class="prelude-ty">Option</span>&lt;SessionOptions&gt;,
+        is_implicit: bool,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            client,
+            server_session,
+            cluster_time: <span class="prelude-val">None</span>,
+            is_implicit,
+            options,
+            transaction: Default::default(),
+            snapshot_time: <span class="prelude-val">None</span>,
+            operation_time: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The client used to create this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Client</span> {
-        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// The client used to create this session.
+    </span><span class="kw">pub fn </span>client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Client {
+        <span class="self">self</span>.client.clone()
     }
 
-    <span class="doccomment">/// The id of this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Document</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">id</span>
+    <span class="doccomment">/// The id of this session.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Document {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.server_session.id
     }
 
-    <span class="doccomment">/// Whether this session was created implicitly by the driver or explcitly by the user.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_implicit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_implicit</span>
+    <span class="doccomment">/// Whether this session was created implicitly by the driver or explcitly by the user.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_implicit(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_implicit
     }
 
-    <span class="doccomment">/// Whether this session is currently in a transaction.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">in_transaction</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">TransactionState::Starting</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">TransactionState::InProgress</span>
+    <span class="doccomment">/// Whether this session is currently in a transaction.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>in_transaction(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.transaction.state == TransactionState::Starting
+            || <span class="self">self</span>.transaction.state == TransactionState::InProgress
     }
 
-    <span class="doccomment">/// The highest seen cluster time this session has seen so far.</span>
-    <span class="doccomment">/// This will be `None` if this session has not been used in an operation yet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// The highest seen cluster time this session has seen so far.
+    /// This will be `None` if this session has not been used in an operation yet.
+    </span><span class="kw">pub fn </span>cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ClusterTime&gt; {
+        <span class="self">self</span>.cluster_time.as_ref()
     }
 
-    <span class="doccomment">/// The options used to create this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// The options used to create this session.
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SessionOptions&gt; {
+        <span class="self">self</span>.options.as_ref()
     }
 
-    <span class="doccomment">/// Set the cluster time to the provided one if it is greater than this session&#39;s highest seen</span>
-    <span class="doccomment">/// cluster time or if this session&#39;s cluster time is `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">ClusterTime</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cluster_time</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ct</span><span class="op">|</span> <span class="ident">ct</span> <span class="op">&lt;</span> <span class="ident">to</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
-            <span class="self">self</span>.<span class="ident">cluster_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">to</span>.<span class="ident">clone</span>());
+    <span class="doccomment">/// Set the cluster time to the provided one if it is greater than this session&#39;s highest seen
+    /// cluster time or if this session&#39;s cluster time is `None`.
+    </span><span class="kw">pub fn </span>advance_cluster_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, to: <span class="kw-2">&amp;</span>ClusterTime) {
+        <span class="kw">if </span><span class="self">self</span>.cluster_time().map(|ct| ct &lt; to).unwrap_or(<span class="bool-val">true</span>) {
+            <span class="self">self</span>.cluster_time = <span class="prelude-val">Some</span>(to.clone());
         }
     }
 
-    <span class="doccomment">/// Advance operation time for this session. If the provided timestamp is earlier than this</span>
-    <span class="doccomment">/// session&#39;s current operation time, then the operation time is unchanged.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_operation_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ts</span>: <span class="ident">Timestamp</span>) {
-        <span class="self">self</span>.<span class="ident">operation_time</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">operation_time</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">current_op_time</span>) <span class="kw">if</span> <span class="ident">current_op_time</span> <span class="op">&lt;</span> <span class="ident">ts</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ts</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ts</span>),
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">operation_time</span>,
+    <span class="doccomment">/// Advance operation time for this session. If the provided timestamp is earlier than this
+    /// session&#39;s current operation time, then the operation time is unchanged.
+    </span><span class="kw">pub fn </span>advance_operation_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ts: Timestamp) {
+        <span class="self">self</span>.operation_time = <span class="kw">match </span><span class="self">self</span>.operation_time {
+            <span class="prelude-val">Some</span>(current_op_time) <span class="kw">if </span>current_op_time &lt; ts =&gt; <span class="prelude-val">Some</span>(ts),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(ts),
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.operation_time,
         }
     }
 
-    <span class="doccomment">/// The operation time returned by the last operation executed in this session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operation_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">operation_time</span>
+    <span class="doccomment">/// The operation time returned by the last operation executed in this session.
+    </span><span class="kw">pub fn </span>operation_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Timestamp&gt; {
+        <span class="self">self</span>.operation_time
     }
 
-    <span class="doccomment">/// Mark this session (and the underlying server session) as dirty.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">mark_dirty</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">dirty</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Mark this session (and the underlying server session) as dirty.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>mark_dirty(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.server_session.dirty = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// Updates the date that the underlying server session was last used as part of an operation</span>
-    <span class="doccomment">/// sent to the server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_last_use</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">last_use</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="doccomment">/// Updates the date that the underlying server session was last used as part of an operation
+    /// sent to the server.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_last_use(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.server_session.last_use = Instant::now();
     }
 
-    <span class="doccomment">/// Gets the current txn_number.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">txn_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">txn_number</span>
+    <span class="doccomment">/// Gets the current txn_number.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>txn_number(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.server_session.txn_number
     }
 
-    <span class="doccomment">/// Increments the txn_number.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">increment_txn_number</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">txn_number</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Increments the txn_number.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>increment_txn_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.server_session.txn_number += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Increments the txn_number and returns the new value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_and_increment_txn_number</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">increment_txn_number</span>();
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">txn_number</span>
+    <span class="doccomment">/// Increments the txn_number and returns the new value.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_and_increment_txn_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.increment_txn_number();
+        <span class="self">self</span>.server_session.txn_number
     }
 
-    <span class="doccomment">/// Pin mongos to session.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pin_mongos</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">address</span>: <span class="ident">ServerAddress</span>) {
-        <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">TransactionPin::Mongos</span>(<span class="ident">SelectionCriteria::Predicate</span>(
-            <span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server_info</span>: <span class="kw-2">&amp;</span><span class="ident">ServerInfo</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">server_info</span>.<span class="ident">address</span>() <span class="op">==</span> <span class="ident">address</span>),
+    <span class="doccomment">/// Pin mongos to session.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pin_mongos(<span class="kw-2">&amp;mut </span><span class="self">self</span>, address: ServerAddress) {
+        <span class="self">self</span>.transaction.pinned = <span class="prelude-val">Some</span>(TransactionPin::Mongos(SelectionCriteria::Predicate(
+            Arc::new(<span class="kw">move </span>|server_info: <span class="kw-2">&amp;</span>ServerInfo| <span class="kw-2">*</span>server_info.address() == address),
         )));
     }
 
-    <span class="doccomment">/// Pin the connection to the session.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pin_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">handle</span>: <span class="ident">PinnedConnectionHandle</span>) {
-        <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">TransactionPin::Connection</span>(<span class="ident">handle</span>));
+    <span class="doccomment">/// Pin the connection to the session.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pin_connection(<span class="kw-2">&amp;mut </span><span class="self">self</span>, handle: PinnedConnectionHandle) {
+        <span class="self">self</span>.transaction.pinned = <span class="prelude-val">Some</span>(TransactionPin::Connection(handle));
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unpin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">pinned</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unpin(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.transaction.pinned = <span class="prelude-val">None</span>;
     }
 
-    <span class="doccomment">/// Whether this session is dirty.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_dirty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">dirty</span>
+    <span class="doccomment">/// Whether this session is dirty.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_dirty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.server_session.dirty
     }
 
-    <span class="doccomment">/// Starts a new transaction on this session with the given `TransactionOptions`. If no options</span>
-    <span class="doccomment">/// are provided, the session&#39;s `defaultTransactionOptions` will be used. This session must</span>
-    <span class="doccomment">/// be passed into each operation within the transaction; otherwise, the operation will be</span>
-    <span class="doccomment">/// executed outside of the transaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Errors returned from operations executed within a transaction may include a</span>
-    <span class="doccomment">/// [`crate::error::TRANSIENT_TRANSACTION_ERROR`] label. This label indicates that the entire</span>
-    <span class="doccomment">/// transaction can be retried with a reasonable expectation that it will succeed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Transactions are supported on MongoDB 4.0+. The Rust driver currently only supports</span>
-    <span class="doccomment">/// transactions on replica sets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-    <span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-    <span class="doccomment">/// session.start_transaction(None).await?;</span>
-    <span class="doccomment">/// let result = coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, &amp;mut session).await?;</span>
-    <span class="doccomment">/// session.commit_transaction().await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransactionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">snapshot</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Starts a new transaction on this session with the given `TransactionOptions`. If no options
+    /// are provided, the session&#39;s `defaultTransactionOptions` will be used. This session must
+    /// be passed into each operation within the transaction; otherwise, the operation will be
+    /// executed outside of the transaction.
+    ///
+    /// Errors returned from operations executed within a transaction may include a
+    /// [`crate::error::TRANSIENT_TRANSACTION_ERROR`] label. This label indicates that the entire
+    /// transaction can be retried with a reasonable expectation that it will succeed.
+    ///
+    /// Transactions are supported on MongoDB 4.0+. The Rust driver currently only supports
+    /// transactions on replica sets.
+    ///
+    /// ```rust
+    /// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession};
+    /// #
+    /// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+    /// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+    /// # let mut session = client.start_session(None).await?;
+    /// session.start_transaction(None).await?;
+    /// let result = coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, &amp;mut session).await?;
+    /// session.commit_transaction().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>start_transaction(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;TransactionOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self
+            </span>.options
+            .as_ref()
+            .and_then(|o| o.snapshot)
+            .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Transactions are not supported in snapshot sessions&quot;</span>.<span class="ident">into</span>(),
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;Transactions are not supported in snapshot sessions&quot;</span>.into(),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-            <span class="ident">TransactionState::Starting</span> <span class="op">|</span> <span class="ident">TransactionState::InProgress</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;transaction already in progress&quot;</span>.<span class="ident">into</span>(),
+        <span class="kw">match </span><span class="self">self</span>.transaction.state {
+            TransactionState::Starting | TransactionState::InProgress =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                    message: <span class="string">&quot;transaction already in progress&quot;</span>.into(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="ident">TransactionState::Committed</span> { .. } =&gt; {
-                <span class="self">self</span>.<span class="ident">unpin</span>(); <span class="comment">// Unpin session if previous transaction is committed.</span>
-            }
-            <span class="kw">_</span> =&gt; {}
+            TransactionState::Committed { .. } =&gt; {
+                <span class="self">self</span>.unpin(); <span class="comment">// Unpin session if previous transaction is committed.
+            </span>}
+            <span class="kw">_ </span>=&gt; {}
         }
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">transaction_support_status</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">TransactionSupportStatus::Supported</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">into</span>() {
-                    <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">options</span>) =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">defaults</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">default_transaction_options</span>() {
+        <span class="kw">match </span><span class="self">self</span>.client.transaction_support_status().<span class="kw">await</span><span class="question-mark">? </span>{
+            TransactionSupportStatus::Supported =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>options = <span class="kw">match </span>options.into() {
+                    <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>options) =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(defaults) = <span class="self">self</span>.default_transaction_options() {
                             <span class="macro">merge_options!</span>(
-                                <span class="ident">defaults</span>,
-                                <span class="ident">options</span>,
+                                defaults,
+                                options,
                                 [
-                                    <span class="ident">read_concern</span>,
-                                    <span class="ident">write_concern</span>,
-                                    <span class="ident">selection_criteria</span>,
-                                    <span class="ident">max_commit_time</span>
+                                    read_concern,
+                                    write_concern,
+                                    selection_criteria,
+                                    max_commit_time
                                 ]
                             );
                         }
-                        <span class="prelude-val">Some</span>(<span class="ident">options</span>)
+                        <span class="prelude-val">Some</span>(options)
                     }
-                    <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">default_transaction_options</span>().<span class="ident">cloned</span>(),
+                    <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.default_transaction_options().cloned(),
                 };
                 <span class="macro">resolve_options!</span>(
-                    <span class="self">self</span>.<span class="ident">client</span>,
-                    <span class="ident">options</span>,
-                    [<span class="ident">read_concern</span>, <span class="ident">write_concern</span>, <span class="ident">selection_criteria</span>]
+                    <span class="self">self</span>.client,
+                    options,
+                    [read_concern, write_concern, selection_criteria]
                 );
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">options</span>) <span class="op">=</span> <span class="ident">options</span> {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">options</span>
-                        .<span class="ident">write_concern</span>
-                        .<span class="ident">as_ref</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">wc</span><span class="op">|</span> <span class="ident">wc</span>.<span class="ident">is_acknowledged</span>())
-                        .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>options) = options {
+                    <span class="kw">if </span>!options
+                        .write_concern
+                        .as_ref()
+                        .map(|wc| wc.is_acknowledged())
+                        .unwrap_or(<span class="bool-val">true</span>)
                     {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                            <span class="ident">message</span>: <span class="string">&quot;transactions do not support unacknowledged write concerns&quot;</span>
-                                .<span class="ident">into</span>(),
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                            message: <span class="string">&quot;transactions do not support unacknowledged write concerns&quot;
+                                </span>.into(),
                         }
-                        .<span class="ident">into</span>());
+                        .into());
                     }
                 }
 
-                <span class="self">self</span>.<span class="ident">increment_txn_number</span>();
-                <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">start</span>(<span class="ident">options</span>);
+                <span class="self">self</span>.increment_txn_number();
+                <span class="self">self</span>.transaction.start(options);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Transactions are not supported by this deployment&quot;</span>.<span class="ident">into</span>(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;Transactions are not supported by this deployment&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
+            .into()),
         }
     }
 
-    <span class="doccomment">/// Commits the transaction that is currently active on this session.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method may return an error with a [`crate::error::UNKNOWN_TRANSACTION_COMMIT_RESULT`]</span>
-    <span class="doccomment">/// label. This label indicates that it is unknown whether the commit has satisfied the write</span>
-    <span class="doccomment">/// concern associated with the transaction. If an error with this label is returned, it is</span>
-    <span class="doccomment">/// safe to retry the commit until the write concern is satisfied or an error without the label</span>
-    <span class="doccomment">/// is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-    <span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-    <span class="doccomment">/// session.start_transaction(None).await?;</span>
-    <span class="doccomment">/// let result = coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, &amp;mut session).await?;</span>
-    <span class="doccomment">/// session.commit_transaction().await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation will retry once upon failure if the connection and encountered error support</span>
-    <span class="doccomment">/// retryability. See the documentation</span>
-    <span class="doccomment">/// [here](https://www.mongodb.com/docs/manual/core/retryable-writes/) for more information on</span>
-    <span class="doccomment">/// retryable writes.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-            <span class="ident">TransactionState::None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;no transaction started&quot;</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Commits the transaction that is currently active on this session.
+    ///
+    ///
+    /// This method may return an error with a [`crate::error::UNKNOWN_TRANSACTION_COMMIT_RESULT`]
+    /// label. This label indicates that it is unknown whether the commit has satisfied the write
+    /// concern associated with the transaction. If an error with this label is returned, it is
+    /// safe to retry the commit until the write concern is satisfied or an error without the label
+    /// is returned.
+    ///
+    /// ```rust
+    /// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession};
+    /// #
+    /// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+    /// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+    /// # let mut session = client.start_session(None).await?;
+    /// session.start_transaction(None).await?;
+    /// let result = coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, &amp;mut session).await?;
+    /// session.commit_transaction().await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// This operation will retry once upon failure if the connection and encountered error support
+    /// retryability. See the documentation
+    /// [here](https://www.mongodb.com/docs/manual/core/retryable-writes/) for more information on
+    /// retryable writes.
+    </span><span class="kw">pub async fn </span>commit_transaction(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.transaction.state {
+            TransactionState::None =&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;no transaction started&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
-            <span class="ident">TransactionState::Aborted</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Cannot call commitTransaction after calling abortTransaction&quot;</span>.<span class="ident">into</span>(),
+            .into()),
+            TransactionState::Aborted =&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;Cannot call commitTransaction after calling abortTransaction&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
-            <span class="ident">TransactionState::Starting</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">commit</span>(<span class="bool-val">false</span>);
+            .into()),
+            TransactionState::Starting =&gt; {
+                <span class="self">self</span>.transaction.commit(<span class="bool-val">false</span>);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">TransactionState::InProgress</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">commit_transaction</span> <span class="op">=</span> <span class="ident">CommitTransaction::new</span>(<span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">options</span>.<span class="ident">clone</span>());
-                <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">commit</span>(<span class="bool-val">true</span>);
-                <span class="self">self</span>.<span class="ident">client</span>
-                    .<span class="ident">clone</span>()
-                    .<span class="ident">execute_operation</span>(<span class="ident">commit_transaction</span>, <span class="self">self</span>)
-                    .<span class="kw">await</span>
-            }
-            <span class="ident">TransactionState::Committed</span> {
-                <span class="ident">data_committed</span>: <span class="bool-val">true</span>,
+            TransactionState::InProgress =&gt; {
+                <span class="kw">let </span>commit_transaction = CommitTransaction::new(<span class="self">self</span>.transaction.options.clone());
+                <span class="self">self</span>.transaction.commit(<span class="bool-val">true</span>);
+                <span class="self">self</span>.client
+                    .clone()
+                    .execute_operation(commit_transaction, <span class="self">self</span>)
+                    .<span class="kw">await
+            </span>}
+            TransactionState::Committed {
+                data_committed: <span class="bool-val">true</span>,
             } =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">commit_transaction</span> <span class="op">=</span>
-                    <span class="ident">CommitTransaction::new</span>(<span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">options</span>.<span class="ident">clone</span>());
-                <span class="ident">commit_transaction</span>.<span class="ident">update_for_retry</span>();
-                <span class="self">self</span>.<span class="ident">client</span>
-                    .<span class="ident">clone</span>()
-                    .<span class="ident">execute_operation</span>(<span class="ident">commit_transaction</span>, <span class="self">self</span>)
-                    .<span class="kw">await</span>
-            }
-            <span class="ident">TransactionState::Committed</span> {
-                <span class="ident">data_committed</span>: <span class="bool-val">false</span>,
+                <span class="kw">let </span><span class="kw-2">mut </span>commit_transaction =
+                    CommitTransaction::new(<span class="self">self</span>.transaction.options.clone());
+                commit_transaction.update_for_retry();
+                <span class="self">self</span>.client
+                    .clone()
+                    .execute_operation(commit_transaction, <span class="self">self</span>)
+                    .<span class="kw">await
+            </span>}
+            TransactionState::Committed {
+                data_committed: <span class="bool-val">false</span>,
             } =&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="doccomment">/// Aborts the transaction that is currently active on this session. Any open transaction will</span>
-    <span class="doccomment">/// be aborted automatically in the `Drop` implementation of `ClientSession`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession, Collection};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-    <span class="doccomment">/// # let mut session = client.start_session(None).await?;</span>
-    <span class="doccomment">/// session.start_transaction(None).await?;</span>
-    <span class="doccomment">/// match execute_transaction(&amp;coll, &amp;mut session).await {</span>
-    <span class="doccomment">///     Ok(_) =&gt; session.commit_transaction().await?,</span>
-    <span class="doccomment">///     Err(_) =&gt; session.abort_transaction().await?,</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// async fn execute_transaction(coll: &amp;Collection&lt;Document&gt;, session: &amp;mut ClientSession) -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">///     coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, session).await?;</span>
-    <span class="doccomment">///     coll.delete_one_with_session(doc! { &quot;y&quot;: 2 }, None, session).await?;</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This operation will retry once upon failure if the connection and encountered error support</span>
-    <span class="doccomment">/// retryability. See the documentation</span>
-    <span class="doccomment">/// [here](https://www.mongodb.com/docs/manual/core/retryable-writes/) for more information on</span>
-    <span class="doccomment">/// retryable writes.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">abort_transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-            <span class="ident">TransactionState::None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;no transaction started&quot;</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Aborts the transaction that is currently active on this session. Any open transaction will
+    /// be aborted automatically in the `Drop` implementation of `ClientSession`.
+    ///
+    /// ```rust
+    /// # use mongodb::{bson::{doc, Document}, error::Result, Client, ClientSession, Collection};
+    /// #
+    /// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+    /// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+    /// # let mut session = client.start_session(None).await?;
+    /// session.start_transaction(None).await?;
+    /// match execute_transaction(&amp;coll, &amp;mut session).await {
+    ///     Ok(_) =&gt; session.commit_transaction().await?,
+    ///     Err(_) =&gt; session.abort_transaction().await?,
+    /// }
+    /// # Ok(())
+    /// # }
+    ///
+    /// async fn execute_transaction(coll: &amp;Collection&lt;Document&gt;, session: &amp;mut ClientSession) -&gt; Result&lt;()&gt; {
+    ///     coll.insert_one_with_session(doc! { &quot;x&quot;: 1 }, None, session).await?;
+    ///     coll.delete_one_with_session(doc! { &quot;y&quot;: 2 }, None, session).await?;
+    ///     Ok(())
+    /// }
+    /// ```
+    ///
+    /// This operation will retry once upon failure if the connection and encountered error support
+    /// retryability. See the documentation
+    /// [here](https://www.mongodb.com/docs/manual/core/retryable-writes/) for more information on
+    /// retryable writes.
+    </span><span class="kw">pub async fn </span>abort_transaction(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self</span>.transaction.state {
+            TransactionState::None =&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;no transaction started&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
-            <span class="ident">TransactionState::Committed</span> { .. } =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Cannot call abortTransaction after calling commitTransaction&quot;</span>.<span class="ident">into</span>(),
+            .into()),
+            TransactionState::Committed { .. } =&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;Cannot call abortTransaction after calling commitTransaction&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
-            <span class="ident">TransactionState::Aborted</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                <span class="ident">message</span>: <span class="string">&quot;cannot call abortTransaction twice&quot;</span>.<span class="ident">into</span>(),
+            .into()),
+            TransactionState::Aborted =&gt; <span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                message: <span class="string">&quot;cannot call abortTransaction twice&quot;</span>.into(),
             }
-            .<span class="ident">into</span>()),
-            <span class="ident">TransactionState::Starting</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">abort</span>();
+            .into()),
+            TransactionState::Starting =&gt; {
+                <span class="self">self</span>.transaction.abort();
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">TransactionState::InProgress</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">write_concern</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">transaction</span>
-                    .<span class="ident">options</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">options</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>())
-                    .<span class="ident">cloned</span>();
-                <span class="kw">let</span> <span class="ident">abort_transaction</span> <span class="op">=</span>
-                    <span class="ident">AbortTransaction::new</span>(<span class="ident">write_concern</span>, <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">pinned</span>.<span class="ident">take</span>());
-                <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">abort</span>();
-                <span class="comment">// Errors returned from running an abortTransaction command should be ignored.</span>
-                <span class="kw">let</span> <span class="ident">_result</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">client</span>
-                    .<span class="ident">clone</span>()
-                    .<span class="ident">execute_operation</span>(<span class="ident">abort_transaction</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)
+            TransactionState::InProgress =&gt; {
+                <span class="kw">let </span>write_concern = <span class="self">self
+                    </span>.transaction
+                    .options
+                    .as_ref()
+                    .and_then(|options| options.write_concern.as_ref())
+                    .cloned();
+                <span class="kw">let </span>abort_transaction =
+                    AbortTransaction::new(write_concern, <span class="self">self</span>.transaction.pinned.take());
+                <span class="self">self</span>.transaction.abort();
+                <span class="comment">// Errors returned from running an abortTransaction command should be ignored.
+                </span><span class="kw">let </span>_result = <span class="self">self
+                    </span>.client
+                    .clone()
+                    .execute_operation(abort_transaction, <span class="kw-2">&amp;mut *</span><span class="self">self</span>)
                     .<span class="kw">await</span>;
                 <span class="prelude-val">Ok</span>(())
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">default_transaction_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TransactionOptions</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">options</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">default_transaction_options</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>default_transaction_options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TransactionOptions&gt; {
+        <span class="self">self</span>.options
+            .as_ref()
+            .and_then(|options| options.default_transaction_options.as_ref())
     }
 }
 
-<span class="kw">struct</span> <span class="ident">DroppedClientSession</span> {
-    <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
-    <span class="ident">server_session</span>: <span class="ident">ServerSession</span>,
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="ident">is_implicit</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>,
-    <span class="ident">transaction</span>: <span class="ident">Transaction</span>,
-    <span class="ident">snapshot_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-    <span class="ident">operation_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>DroppedClientSession {
+    cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
+    server_session: ServerSession,
+    client: Client,
+    is_implicit: bool,
+    options: <span class="prelude-ty">Option</span>&lt;SessionOptions&gt;,
+    transaction: Transaction,
+    snapshot_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+    operation_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DroppedClientSession</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientSession</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dropped_session</span>: <span class="ident">DroppedClientSession</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cluster_time</span>: <span class="ident">dropped_session</span>.<span class="ident">cluster_time</span>,
-            <span class="ident">server_session</span>: <span class="ident">dropped_session</span>.<span class="ident">server_session</span>,
-            <span class="ident">client</span>: <span class="ident">dropped_session</span>.<span class="ident">client</span>,
-            <span class="ident">is_implicit</span>: <span class="ident">dropped_session</span>.<span class="ident">is_implicit</span>,
-            <span class="ident">options</span>: <span class="ident">dropped_session</span>.<span class="ident">options</span>,
-            <span class="ident">transaction</span>: <span class="ident">dropped_session</span>.<span class="ident">transaction</span>,
-            <span class="ident">snapshot_time</span>: <span class="ident">dropped_session</span>.<span class="ident">snapshot_time</span>,
-            <span class="ident">operation_time</span>: <span class="ident">dropped_session</span>.<span class="ident">operation_time</span>,
+<span class="kw">impl </span>From&lt;DroppedClientSession&gt; <span class="kw">for </span>ClientSession {
+    <span class="kw">fn </span>from(dropped_session: DroppedClientSession) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cluster_time: dropped_session.cluster_time,
+            server_session: dropped_session.server_session,
+            client: dropped_session.client,
+            is_implicit: dropped_session.is_implicit,
+            options: dropped_session.options,
+            transaction: dropped_session.transaction,
+            snapshot_time: dropped_session.snapshot_time,
+            operation_time: dropped_session.operation_time,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ClientSession</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">TransactionState::InProgress</span> {
-            <span class="kw">let</span> <span class="ident">dropped_session</span> <span class="op">=</span> <span class="ident">DroppedClientSession</span> {
-                <span class="ident">cluster_time</span>: <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">clone</span>(),
-                <span class="ident">server_session</span>: <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">clone</span>(),
-                <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(),
-                <span class="ident">is_implicit</span>: <span class="self">self</span>.<span class="ident">is_implicit</span>,
-                <span class="ident">options</span>: <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">clone</span>(),
-                <span class="ident">transaction</span>: <span class="self">self</span>.<span class="ident">transaction</span>.<span class="ident">take</span>(),
-                <span class="ident">snapshot_time</span>: <span class="self">self</span>.<span class="ident">snapshot_time</span>,
-                <span class="ident">operation_time</span>: <span class="self">self</span>.<span class="ident">operation_time</span>,
+<span class="kw">impl </span>Drop <span class="kw">for </span>ClientSession {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.transaction.state == TransactionState::InProgress {
+            <span class="kw">let </span>dropped_session = DroppedClientSession {
+                cluster_time: <span class="self">self</span>.cluster_time.clone(),
+                server_session: <span class="self">self</span>.server_session.clone(),
+                client: <span class="self">self</span>.client.clone(),
+                is_implicit: <span class="self">self</span>.is_implicit,
+                options: <span class="self">self</span>.options.clone(),
+                transaction: <span class="self">self</span>.transaction.take(),
+                snapshot_time: <span class="self">self</span>.snapshot_time,
+                operation_time: <span class="self">self</span>.operation_time,
             };
-            <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span>: <span class="ident">ClientSession</span> <span class="op">=</span> <span class="ident">dropped_session</span>.<span class="ident">into</span>();
-                <span class="kw">let</span> <span class="ident">_result</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">abort_transaction</span>().<span class="kw">await</span>;
+            runtime::execute(<span class="kw">async move </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>session: ClientSession = dropped_session.into();
+                <span class="kw">let </span>_result = session.abort_transaction().<span class="kw">await</span>;
             });
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">server_session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server_session</span>.<span class="ident">clone</span>();
-            <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="ident">client</span>.<span class="ident">check_in_server_session</span>(<span class="ident">server_session</span>).<span class="kw">await</span>;
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>client = <span class="self">self</span>.client.clone();
+            <span class="kw">let </span>server_session = <span class="self">self</span>.server_session.clone();
+            runtime::execute(<span class="kw">async move </span>{
+                client.check_in_server_session(server_session).<span class="kw">await</span>;
             });
         }
     }
 }
 
-<span class="doccomment">/// Client side abstraction of a server session. These are pooled and may be associated with</span>
-<span class="doccomment">/// multiple `ClientSession`s over the course of their lifetime.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ServerSession</span> {
-    <span class="doccomment">/// The id of the server session to which this corresponds.</span>
-    <span class="ident">id</span>: <span class="ident">Document</span>,
+<span class="doccomment">/// Client side abstraction of a server session. These are pooled and may be associated with
+/// multiple `ClientSession`s over the course of their lifetime.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ServerSession {
+    <span class="doccomment">/// The id of the server session to which this corresponds.
+    </span>id: Document,
 
-    <span class="doccomment">/// The last time an operation was executed with this session.</span>
-    <span class="ident">last_use</span>: <span class="ident">std::time::Instant</span>,
+    <span class="doccomment">/// The last time an operation was executed with this session.
+    </span>last_use: std::time::Instant,
 
-    <span class="doccomment">/// Whether a network error was encountered while using this session.</span>
-    <span class="ident">dirty</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether a network error was encountered while using this session.
+    </span>dirty: bool,
 
-    <span class="doccomment">/// A monotonically increasing transaction number for this session.</span>
-    <span class="ident">txn_number</span>: <span class="ident">i64</span>,
+    <span class="doccomment">/// A monotonically increasing transaction number for this session.
+    </span>txn_number: i64,
 }
 
-<span class="kw">impl</span> <span class="ident">ServerSession</span> {
-    <span class="doccomment">/// Creates a new session, generating the id client side.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
-            <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Uuid</span>,
-            <span class="ident">bytes</span>: <span class="ident">Uuid::new_v4</span>().<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>(),
+<span class="kw">impl </span>ServerSession {
+    <span class="doccomment">/// Creates a new session, generating the id client side.
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>binary = Bson::Binary(Binary {
+            subtype: BinarySubtype::Uuid,
+            bytes: Uuid::new_v4().as_bytes().to_vec(),
         });
 
-        <span class="self">Self</span> {
-            <span class="ident">id</span>: <span class="macro">doc!</span> { <span class="string">&quot;id&quot;</span>: <span class="ident">binary</span> },
-            <span class="ident">last_use</span>: <span class="ident">Instant::now</span>(),
-            <span class="ident">dirty</span>: <span class="bool-val">false</span>,
-            <span class="ident">txn_number</span>: <span class="number">0</span>,
+        <span class="self">Self </span>{
+            id: <span class="macro">doc! </span>{ <span class="string">&quot;id&quot;</span>: binary },
+            last_use: Instant::now(),
+            dirty: <span class="bool-val">false</span>,
+            txn_number: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Determines if this server session is about to expire in a short amount of time (1 minute).</span>
-    <span class="kw">fn</span> <span class="ident">is_about_to_expire</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">logical_session_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">logical_session_timeout</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+    <span class="doccomment">/// Determines if this server session is about to expire in a short amount of time (1 minute).
+    </span><span class="kw">fn </span>is_about_to_expire(<span class="kw-2">&amp;</span><span class="self">self</span>, logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; bool {
+        <span class="kw">let </span>timeout = <span class="kw">match </span>logical_session_timeout {
+            <span class="prelude-val">Some</span>(t) =&gt; t,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">expiration_date</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_use</span> <span class="op">+</span> <span class="ident">timeout</span>;
-        <span class="ident">expiration_date</span> <span class="op">&lt;</span> <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span>)
+        <span class="kw">let </span>expiration_date = <span class="self">self</span>.last_use + timeout;
+        expiration_date &lt; Instant::now() + Duration::from_secs(<span class="number">60</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

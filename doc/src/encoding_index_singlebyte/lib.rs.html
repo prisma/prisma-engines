@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-index-singlebyte-1.20141219.5/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding_index_singlebyte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding_index_singlebyte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding_index_singlebyte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-index-singlebyte-1.20141219.5/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding_index_singlebyte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding_index_singlebyte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding_index_singlebyte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -93,100 +93,100 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">//</span>
-<span class="comment">// Any copyright is dedicated to the Public Domain.</span>
-<span class="comment">// https://creativecommons.org/publicdomain/zero/1.0/</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+//
+// Any copyright is dedicated to the Public Domain.
+// https://creativecommons.org/publicdomain/zero/1.0/
 
-<span class="doccomment">//! Single-byte index tables for</span>
-<span class="doccomment">//! [rust-encoding](https://github.com/lifthrasiir/rust-encoding).</span>
+</span><span class="doccomment">//! Single-byte index tables for
+//! [rust-encoding](https://github.com/lifthrasiir/rust-encoding).
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
+</span><span class="attribute">#![cfg_attr(test, feature(test))]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">encoding_index_tests</span>;
+#[cfg(test)]
+#[macro_use]
+</span><span class="kw">extern crate </span>encoding_index_tests;
 
-<span class="doccomment">/// IBM code page 866.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ibm866</span>;
+<span class="doccomment">/// IBM code page 866.
+</span><span class="kw">pub mod </span>ibm866;
 
-<span class="doccomment">/// ISO 8859-2.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_2</span>;
+<span class="doccomment">/// ISO 8859-2.
+</span><span class="kw">pub mod </span>iso_8859_2;
 
-<span class="doccomment">/// ISO 8859-3.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_3</span>;
+<span class="doccomment">/// ISO 8859-3.
+</span><span class="kw">pub mod </span>iso_8859_3;
 
-<span class="doccomment">/// ISO 8859-4.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_4</span>;
+<span class="doccomment">/// ISO 8859-4.
+</span><span class="kw">pub mod </span>iso_8859_4;
 
-<span class="doccomment">/// ISO 8859-5.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_5</span>;
+<span class="doccomment">/// ISO 8859-5.
+</span><span class="kw">pub mod </span>iso_8859_5;
 
-<span class="doccomment">/// ISO 8859-6.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_6</span>;
+<span class="doccomment">/// ISO 8859-6.
+</span><span class="kw">pub mod </span>iso_8859_6;
 
-<span class="doccomment">/// ISO 8859-7.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_7</span>;
+<span class="doccomment">/// ISO 8859-7.
+</span><span class="kw">pub mod </span>iso_8859_7;
 
-<span class="doccomment">/// ISO 8859-8 (either visual or logical).</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_8</span>;
+<span class="doccomment">/// ISO 8859-8 (either visual or logical).
+</span><span class="kw">pub mod </span>iso_8859_8;
 
-<span class="doccomment">/// ISO 8859-10.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_10</span>;
+<span class="doccomment">/// ISO 8859-10.
+</span><span class="kw">pub mod </span>iso_8859_10;
 
-<span class="doccomment">/// ISO 8859-13.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_13</span>;
+<span class="doccomment">/// ISO 8859-13.
+</span><span class="kw">pub mod </span>iso_8859_13;
 
-<span class="doccomment">/// ISO 8859-14.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_14</span>;
+<span class="doccomment">/// ISO 8859-14.
+</span><span class="kw">pub mod </span>iso_8859_14;
 
-<span class="doccomment">/// ISO 8859-15.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_15</span>;
+<span class="doccomment">/// ISO 8859-15.
+</span><span class="kw">pub mod </span>iso_8859_15;
 
-<span class="doccomment">/// ISO 8859-16.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iso_8859_16</span>;
+<span class="doccomment">/// ISO 8859-16.
+</span><span class="kw">pub mod </span>iso_8859_16;
 
-<span class="doccomment">/// KOI8-R.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">koi8_r</span>;
+<span class="doccomment">/// KOI8-R.
+</span><span class="kw">pub mod </span>koi8_r;
 
-<span class="doccomment">/// KOI8-U.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">koi8_u</span>;
+<span class="doccomment">/// KOI8-U.
+</span><span class="kw">pub mod </span>koi8_u;
 
-<span class="doccomment">/// MacRoman.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macintosh</span>;
+<span class="doccomment">/// MacRoman.
+</span><span class="kw">pub mod </span>macintosh;
 
-<span class="doccomment">/// Windows code page 874.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_874</span>;
+<span class="doccomment">/// Windows code page 874.
+</span><span class="kw">pub mod </span>windows_874;
 
-<span class="doccomment">/// Windows code page 1250.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1250</span>;
+<span class="doccomment">/// Windows code page 1250.
+</span><span class="kw">pub mod </span>windows_1250;
 
-<span class="doccomment">/// Windows code page 1251.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1251</span>;
+<span class="doccomment">/// Windows code page 1251.
+</span><span class="kw">pub mod </span>windows_1251;
 
-<span class="doccomment">/// Windows code page 1252.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1252</span>;
+<span class="doccomment">/// Windows code page 1252.
+</span><span class="kw">pub mod </span>windows_1252;
 
-<span class="doccomment">/// Windows code page 1253.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1253</span>;
+<span class="doccomment">/// Windows code page 1253.
+</span><span class="kw">pub mod </span>windows_1253;
 
-<span class="doccomment">/// Windows code page 1254.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1254</span>;
+<span class="doccomment">/// Windows code page 1254.
+</span><span class="kw">pub mod </span>windows_1254;
 
-<span class="doccomment">/// Windows code page 1254.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1255</span>;
+<span class="doccomment">/// Windows code page 1254.
+</span><span class="kw">pub mod </span>windows_1255;
 
-<span class="doccomment">/// Windows code page 1256.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1256</span>;
+<span class="doccomment">/// Windows code page 1256.
+</span><span class="kw">pub mod </span>windows_1256;
 
-<span class="doccomment">/// Windows code page 1257.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1257</span>;
+<span class="doccomment">/// Windows code page 1257.
+</span><span class="kw">pub mod </span>windows_1257;
 
-<span class="doccomment">/// Windows code page 1258.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">windows_1258</span>;
+<span class="doccomment">/// Windows code page 1258.
+</span><span class="kw">pub mod </span>windows_1258;
 
-<span class="doccomment">/// MacCyrillic.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">x_mac_cyrillic</span>;
+<span class="doccomment">/// MacCyrillic.
+</span><span class="kw">pub mod </span>x_mac_cyrillic;
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding_index_singlebyte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding_index_singlebyte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

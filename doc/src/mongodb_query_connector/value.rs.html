@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -483,490 +483,490 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">filter::FilterPrefix</span>,
-    <span class="ident">output_meta</span>::{<span class="ident">CompositeOutputMeta</span>, <span class="ident">OutputMeta</span>, <span class="ident">ScalarOutputMeta</span>},
-    <span class="ident">IntoBson</span>, <span class="ident">MongoError</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    filter::FilterPrefix,
+    output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
+    IntoBson, MongoError,
 };
-<span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">FromPrimitive</span>, <span class="ident">ToPrimitive</span>};
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">spec::BinarySubtype</span>, <span class="ident">Binary</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>, <span class="ident">Timestamp</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>, <span class="ident">TypeIdentifier</span>,
+<span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
+<span class="kw">use </span>chrono::{TimeZone, Utc};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
+<span class="kw">use </span>prisma_models::{
+    CompositeFieldRef, Field, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, TypeIdentifier,
 };
-<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MongoDbType</span>;
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">fmt::Display</span>};
+<span class="kw">use </span>psl::builtin_connectors::MongoDbType;
+<span class="kw">use </span>serde_json::Value;
+<span class="kw">use </span>std::{convert::TryFrom, fmt::Display};
 
-<span class="doccomment">/// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by</span>
-<span class="doccomment">/// the native types or as defined by the default `TypeIdentifier` to BSON mapping.</span>
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">selection</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>;
+<span class="doccomment">/// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by
+/// the native types or as defined by the default `TypeIdentifier` to BSON mapping.
+</span><span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>SelectedField, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(selection, value) = <span class="self">self</span>;
 
-        <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; (<span class="ident">sf</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
-            <span class="ident">SelectedField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(), <span class="comment">// [Composites] todo</span>
+        <span class="kw">match </span>selection {
+            SelectedField::Scalar(sf) =&gt; (sf, value).into_bson(),
+            SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(), <span class="comment">// [Composites] todo
+        </span>}
+    }
+}
+
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>Field, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(selection, value) = <span class="self">self</span>;
+
+        <span class="kw">match </span>selection {
+            Field::Scalar(sf) =&gt; (sf, value).into_bson(),
+            Field::Composite(cf) =&gt; (cf, value).into_bson(),
+            Field::Relation(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Relation fields should never hit the BSON conversion logic.&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">selection</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>;
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>CompositeFieldRef, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(cf, value) = <span class="self">self</span>;
 
-        <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; (<span class="ident">sf</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
-            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; (<span class="ident">cf</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
-            <span class="ident">Field::Relation</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Relation fields should never hit the BSON conversion logic.&quot;</span>),
-        }
-    }
-}
+        <span class="kw">match </span>value {
+            PrismaValue::Null =&gt; <span class="prelude-val">Ok</span>(Bson::Null),
+            PrismaValue::Object(pairs) <span class="kw">if </span>cf.is_list() =&gt; <span class="prelude-val">Ok</span>(Bson::Array(<span class="macro">vec!</span>[convert_composite_object(cf, pairs)<span class="question-mark">?</span>])),
+            PrismaValue::Object(pairs) =&gt; convert_composite_object(cf, pairs),
 
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">cf</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>;
-
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">PrismaValue::Null</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Null</span>),
-            <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Array</span>(<span class="macro">vec!</span>[<span class="ident">convert_composite_object</span>(<span class="ident">cf</span>, <span class="ident">pairs</span>)<span class="question-mark">?</span>])),
-            <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>) =&gt; <span class="ident">convert_composite_object</span>(<span class="ident">cf</span>, <span class="ident">pairs</span>),
-
-            <span class="ident">PrismaValue::List</span>(<span class="ident">values</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Array</span>(
-                <span class="ident">values</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>) <span class="op">=</span> <span class="ident">val</span> {
-                            <span class="ident">convert_composite_object</span>(<span class="ident">cf</span>, <span class="ident">pairs</span>)
-                        } <span class="kw">else</span> {
+            PrismaValue::List(values) =&gt; <span class="prelude-val">Ok</span>(Bson::Array(
+                values
+                    .into_iter()
+                    .map(|val| {
+                        <span class="kw">if let </span>PrismaValue::Object(pairs) = val {
+                            convert_composite_object(cf, pairs)
+                        } <span class="kw">else </span>{
                             <span class="macro">unreachable!</span>(<span class="string">&quot;Composite lists must be objects&quot;</span>)
                         }
                     })
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             )),
 
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">value</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{}&quot;</span>, value),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_composite_object</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>, <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+<span class="kw">fn </span>convert_composite_object(cf: <span class="kw-2">&amp;</span>CompositeFieldRef, pairs: Vec&lt;(String, PrismaValue)&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>doc = Document::new();
 
-    <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">pairs</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">cf</span>
-            .<span class="ident">typ</span>
-            .<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>) <span class="comment">// Todo: This is assuming a lot by only checking the prisma names, not DB names.</span>
-            .<span class="ident">expect</span>(<span class="string">&quot;Writing unavailable composite field.&quot;</span>);
+    <span class="kw">for </span>(field, value) <span class="kw">in </span>pairs {
+        <span class="kw">let </span>field = cf
+            .typ
+            .find_field(<span class="kw-2">&amp;</span>field) <span class="comment">// Todo: This is assuming a lot by only checking the prisma names, not DB names.
+            </span>.expect(<span class="string">&quot;Writing unavailable composite field.&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> (<span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>converted = (field, value).into_bson()<span class="question-mark">?</span>;
 
-        <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">db_name</span>(), <span class="ident">converted</span>);
+        doc.insert(field.db_name(), converted);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Bson::Document</span>(<span class="ident">doc</span>))
+    <span class="prelude-val">Ok</span>(Bson::Document(doc))
 }
 
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">FilterPrefix</span>, <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">prefix</span>, <span class="ident">sf</span>) <span class="op">=</span> <span class="self">self</span>;
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>FilterPrefix, <span class="kw-2">&amp;</span>ScalarFieldRef) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(prefix, sf) = <span class="self">self</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Bson::String</span>(<span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">sf</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>())))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">FilterPrefix</span>, <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">prefix</span>, <span class="ident">cf</span>) <span class="op">=</span> <span class="self">self</span>;
-
-        <span class="prelude-val">Ok</span>(<span class="ident">Bson::String</span>(<span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">cf</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>())))
+        <span class="prelude-val">Ok</span>(Bson::String(prefix.render_with(sf.db_name().to_string())))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">FilterPrefix</span>, <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">prefix</span>, <span class="ident">rf</span>) <span class="op">=</span> <span class="self">self</span>;
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>FilterPrefix, <span class="kw-2">&amp;</span>CompositeFieldRef) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(prefix, cf) = <span class="self">self</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Bson::String</span>(<span class="ident">prefix</span>.<span class="ident">render_with</span>(<span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">to_owned</span>())))
+        <span class="prelude-val">Ok</span>(Bson::String(prefix.render_with(cf.db_name().to_string())))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sf</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>;
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>FilterPrefix, <span class="kw-2">&amp;</span>RelationFieldRef) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(prefix, rf) = <span class="self">self</span>;
 
-        <span class="kw">let</span> <span class="ident">mongo_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sf</span>.<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">nt</span>.<span class="ident">deserialize_native_type</span>());
+        <span class="prelude-val">Ok</span>(Bson::String(prefix.render_with(rf.relation().name.to_owned())))
+    }
+}
 
-        <span class="comment">// If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.</span>
-        <span class="kw">match</span> (<span class="ident">mongo_type</span>, <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>, <span class="ident">value</span>) {
-            <span class="comment">// We assume this is always valid if it arrives here.</span>
-            (<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">PrismaValue::Null</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Bson::Null</span>),
-            (<span class="prelude-val">Some</span>(<span class="ident">mt</span>), <span class="kw">_</span>, <span class="ident">value</span>) =&gt; (<span class="ident">mt</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
-            (<span class="kw">_</span>, <span class="ident">field_type</span>, <span class="ident">value</span>) =&gt; (<span class="ident">field_type</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>(),
+<span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>ScalarFieldRef, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="kw">let </span>(sf, value) = <span class="self">self</span>;
+
+        <span class="kw">let </span>mongo_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>MongoDbType&gt; = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+
+        <span class="comment">// If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
+        </span><span class="kw">match </span>(mongo_type, <span class="kw-2">&amp;</span>sf.type_identifier, value) {
+            <span class="comment">// We assume this is always valid if it arrives here.
+            </span>(<span class="kw">_</span>, <span class="kw">_</span>, PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(Bson::Null),
+            (<span class="prelude-val">Some</span>(mt), <span class="kw">_</span>, value) =&gt; (mt, value).into_bson(),
+            (<span class="kw">_</span>, field_type, value) =&gt; (field_type, value).into_bson(),
         }
     }
 }
 
-<span class="doccomment">/// Conversion using an explicit native type.</span>
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">MongoDbType</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="comment">// ObjectId</span>
-            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::ObjectId</span>(<span class="ident">ObjectId::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
-            (<span class="ident">MongoDbType::ObjectId</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; {
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">12</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::MalformedObjectId</span>(<span class="macro">format!</span>(
+<span class="doccomment">/// Conversion using an explicit native type.
+</span><span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>MongoDbType, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
+            <span class="comment">// ObjectId
+            </span>(MongoDbType::ObjectId, PrismaValue::String(s)) =&gt; Bson::ObjectId(ObjectId::parse_str(<span class="kw-2">&amp;</span>s)<span class="question-mark">?</span>),
+            (MongoDbType::ObjectId, PrismaValue::Bytes(b)) =&gt; {
+                <span class="kw">if </span>b.len() != <span class="number">12 </span>{
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::MalformedObjectId(<span class="macro">format!</span>(
                         <span class="string">&quot;ObjectIDs require exactly 12 bytes, got: {}&quot;</span>,
-                        <span class="ident">b</span>.<span class="ident">len</span>()
+                        b.len()
                     )));
                 }
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>] <span class="op">=</span> [<span class="number">0x0</span>; <span class="number">12</span>];
-                <span class="ident">bytes</span>.<span class="ident">iter_mut</span>().<span class="ident">set_from</span>(<span class="ident">b</span>.<span class="ident">into_iter</span>());
+                <span class="kw">let </span><span class="kw-2">mut </span>bytes: [u8; <span class="number">12</span>] = [<span class="number">0x0</span>; <span class="number">12</span>];
+                bytes.iter_mut().set_from(b.into_iter());
 
-                <span class="ident">Bson::ObjectId</span>(<span class="ident">ObjectId::from_bytes</span>(<span class="ident">bytes</span>))
+                Bson::ObjectId(ObjectId::from_bytes(bytes))
             }
 
-            <span class="comment">// String</span>
-            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">MongoDbType::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">u</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">u</span>.<span class="ident">to_string</span>()),
+            <span class="comment">// String
+            </span>(MongoDbType::String, PrismaValue::String(s)) =&gt; Bson::String(s),
+            (MongoDbType::String, PrismaValue::Uuid(u)) =&gt; Bson::String(u.to_string()),
 
-            <span class="comment">// Double</span>
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">f64</span>),
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">f</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">f</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">MongoDbType::Double</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">b</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            <span class="comment">// Double
+            </span>(MongoDbType::Double, PrismaValue::Int(i)) =&gt; Bson::Double(i <span class="kw">as </span>f64),
+            (MongoDbType::Double, PrismaValue::Float(f)) =&gt; Bson::Double(f.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
+            (MongoDbType::Double, PrismaValue::BigInt(b)) =&gt; Bson::Double(b.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
 
-            <span class="comment">// Int</span>
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">i32</span>),
-            (<span class="ident">MongoDbType::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int32</span>(<span class="ident">b</span>.<span class="ident">to_i32</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I32</span>)<span class="question-mark">?</span>),
+            <span class="comment">// Int
+            </span>(MongoDbType::Int, PrismaValue::Int(b)) =&gt; Bson::Int32(b <span class="kw">as </span>i32),
+            (MongoDbType::Int, PrismaValue::BigInt(b)) =&gt; Bson::Int32(b <span class="kw">as </span>i32),
+            (MongoDbType::Int, PrismaValue::Float(b)) =&gt; Bson::Int32(b.to_i32().convert(expl::MONGO_I32)<span class="question-mark">?</span>),
 
-            <span class="comment">// Long</span>
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">b</span>),
-            (<span class="ident">MongoDbType::Long</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">d</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            <span class="comment">// Long
+            </span>(MongoDbType::Long, PrismaValue::Int(b)) =&gt; Bson::Int64(b),
+            (MongoDbType::Long, PrismaValue::BigInt(b)) =&gt; Bson::Int64(b),
+            (MongoDbType::Long, PrismaValue::Float(d)) =&gt; Bson::Int64(d.to_i64().convert(expl::MONGO_I64)<span class="question-mark">?</span>),
 
-            <span class="comment">// Array</span>
-            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) =&gt; <span class="ident">Bson::Array</span>(
-                <span class="ident">vals</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">typ</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            <span class="comment">// Array
+            </span>(typ, PrismaValue::List(vals)) =&gt; Bson::Array(
+                vals.into_iter()
+                    .map(|val| (typ, val).into_bson())
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             ),
 
-            <span class="comment">// BinData</span>
-            (<span class="ident">MongoDbType::BinData</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
-                <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
-                <span class="ident">bytes</span>,
+            <span class="comment">// BinData
+            </span>(MongoDbType::BinData, PrismaValue::Bytes(bytes)) =&gt; Bson::Binary(Binary {
+                subtype: BinarySubtype::Generic,
+                bytes,
             }),
 
-            <span class="comment">// Bool</span>
-            (<span class="ident">MongoDbType::Bool</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
+            <span class="comment">// Bool
+            </span>(MongoDbType::Bool, PrismaValue::Boolean(b)) =&gt; Bson::Boolean(b),
 
-            <span class="comment">// Date / Timestamp</span>
-            (<span class="ident">MongoDbType::Date</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
-            (<span class="ident">MongoDbType::Timestamp</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
-                <span class="comment">// We might not want to offer timestamp as a type, it&#39;s internal and mapping is weird.</span>
-                <span class="ident">time</span>: <span class="ident">dt</span>.<span class="ident">timestamp</span>() <span class="kw">as</span> <span class="ident">u32</span>,
-                <span class="ident">increment</span>: <span class="number">0</span>,
+            <span class="comment">// Date / Timestamp
+            </span>(MongoDbType::Date, PrismaValue::DateTime(dt)) =&gt; Bson::DateTime(dt.into()),
+            (MongoDbType::Timestamp, PrismaValue::DateTime(dt)) =&gt; Bson::Timestamp(Timestamp {
+                <span class="comment">// We might not want to offer timestamp as a type, it&#39;s internal and mapping is weird.
+                </span>time: dt.timestamp() <span class="kw">as </span>u32,
+                increment: <span class="number">0</span>,
             }),
 
-            <span class="comment">// Unhandled conversions</span>
-            (<span class="ident">mdb_type</span>, <span class="ident">p_val</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">p_val</span>),
-                    <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">mdb_type</span>),
+            <span class="comment">// Unhandled conversions
+            </span>(mdb_type, p_val) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::ConversionError {
+                    from: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, p_val),
+                    to: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, mdb_type),
                 })
             }
         })
     }
 }
 
-<span class="doccomment">/// Convert the `PrismaValue` into Bson using the type hint given by `TypeIdentifier`.</span>
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">TypeIdentifier</span>, <span class="ident">PrismaValue</span>) {
-    <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="comment">// String &amp; UUID</span>
-            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">TypeIdentifier::String</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::Uuid</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-            (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+<span class="doccomment">/// Convert the `PrismaValue` into Bson using the type hint given by `TypeIdentifier`.
+</span><span class="kw">impl </span>IntoBson <span class="kw">for </span>(<span class="kw-2">&amp;</span>TypeIdentifier, PrismaValue) {
+    <span class="kw">fn </span>into_bson(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;Bson&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span><span class="self">self </span>{
+            <span class="comment">// String &amp; UUID
+            </span>(TypeIdentifier::String, PrismaValue::String(s)) =&gt; Bson::String(s),
+            (TypeIdentifier::String, PrismaValue::Uuid(s)) =&gt; Bson::String(s.to_string()),
+            (TypeIdentifier::UUID, PrismaValue::Uuid(s)) =&gt; Bson::String(s.to_string()),
+            (TypeIdentifier::UUID, PrismaValue::String(s)) =&gt; Bson::String(s),
 
-            <span class="comment">// Enums</span>
-            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
-            (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>)) =&gt; <span class="ident">Bson::String</span>(<span class="ident">s</span>),
+            <span class="comment">// Enums
+            </span>(TypeIdentifier::Enum(<span class="kw">_</span>), PrismaValue::String(s)) =&gt; Bson::String(s),
+            (TypeIdentifier::Enum(<span class="kw">_</span>), PrismaValue::Enum(s)) =&gt; Bson::String(s),
 
-            <span class="comment">// Bool</span>
-            (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>),
+            <span class="comment">// Bool
+            </span>(TypeIdentifier::Boolean, PrismaValue::Boolean(b)) =&gt; Bson::Boolean(b),
 
-            <span class="comment">// DateTime</span>
-            (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()),
+            <span class="comment">// DateTime
+            </span>(TypeIdentifier::DateTime, PrismaValue::DateTime(dt)) =&gt; Bson::DateTime(dt.into()),
 
-            <span class="comment">// Int</span>
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            <span class="comment">// Int
+            </span>(TypeIdentifier::Int, PrismaValue::Int(i)) =&gt; Bson::Int64(i),
+            (TypeIdentifier::Int, PrismaValue::BigInt(i)) =&gt; Bson::Int64(i),
+            (TypeIdentifier::Int, PrismaValue::Float(dec)) =&gt; Bson::Int64(dec.to_i64().convert(expl::MONGO_I64)<span class="question-mark">?</span>),
 
-            <span class="comment">// BigInt</span>
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">i</span>),
-            (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; <span class="ident">Bson::Int64</span>(<span class="ident">dec</span>.<span class="ident">to_i64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_I64</span>)<span class="question-mark">?</span>),
+            <span class="comment">// BigInt
+            </span>(TypeIdentifier::BigInt, PrismaValue::BigInt(i)) =&gt; Bson::Int64(i),
+            (TypeIdentifier::BigInt, PrismaValue::Int(i)) =&gt; Bson::Int64(i),
+            (TypeIdentifier::BigInt, PrismaValue::Float(dec)) =&gt; Bson::Int64(dec.to_i64().convert(expl::MONGO_I64)<span class="question-mark">?</span>),
 
-            <span class="comment">// Float</span>
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; {
-                <span class="comment">// We don&#39;t have native support for float numbers (yet)</span>
-                <span class="comment">// so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html</span>
-                <span class="kw">let</span> <span class="ident">dec_str</span> <span class="op">=</span> <span class="ident">dec</span>.<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">f64_val</span> <span class="op">=</span> <span class="ident">dec_str</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>().<span class="ident">ok</span>();
-                <span class="kw">let</span> <span class="ident">converted</span> <span class="op">=</span> <span class="ident">f64_val</span>.<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>;
+            <span class="comment">// Float
+            </span>(TypeIdentifier::Float, PrismaValue::Float(dec)) =&gt; {
+                <span class="comment">// We don&#39;t have native support for float numbers (yet)
+                // so we need to do this, see https://docs.rs/bigdecimal/latest/bigdecimal/index.html
+                </span><span class="kw">let </span>dec_str = dec.to_string();
+                <span class="kw">let </span>f64_val = dec_str.parse::&lt;f64&gt;().ok();
+                <span class="kw">let </span>converted = f64_val.convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>;
 
-                <span class="ident">Bson::Double</span>(<span class="ident">converted</span>)
+                Bson::Double(converted)
             }
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (TypeIdentifier::Float, PrismaValue::Int(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
+            (TypeIdentifier::Float, PrismaValue::BigInt(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
 
-            <span class="comment">// Decimal (todo properly when the driver supports dec128)</span>
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Float</span>(<span class="ident">dec</span>)) =&gt; {
-                <span class="ident">Bson::Double</span>(<span class="ident">dec</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>)
+            <span class="comment">// Decimal (todo properly when the driver supports dec128)
+            </span>(TypeIdentifier::Decimal, PrismaValue::Float(dec)) =&gt; {
+                Bson::Double(dec.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>)
             }
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
-            (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>)) =&gt; <span class="ident">Bson::Double</span>(<span class="ident">i</span>.<span class="ident">to_f64</span>().<span class="ident">convert</span>(<span class="ident">expl::MONGO_DOUBLE</span>)<span class="question-mark">?</span>),
+            (TypeIdentifier::Decimal, PrismaValue::Int(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
+            (TypeIdentifier::Decimal, PrismaValue::BigInt(i)) =&gt; Bson::Double(i.to_f64().convert(expl::MONGO_DOUBLE)<span class="question-mark">?</span>),
 
-            <span class="comment">// Bytes</span>
-            (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes</span>)) =&gt; <span class="ident">Bson::Binary</span>(<span class="ident">Binary</span> {
-                <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
-                <span class="ident">bytes</span>,
+            <span class="comment">// Bytes
+            </span>(TypeIdentifier::Bytes, PrismaValue::Bytes(bytes)) =&gt; Bson::Binary(Binary {
+                subtype: BinarySubtype::Generic,
+                bytes,
             }),
 
-            <span class="comment">// Json</span>
-            (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">PrismaValue::Json</span>(<span class="ident">json</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">Value</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">json</span>)<span class="question-mark">?</span>;
-                <span class="ident">Bson::try_from</span>(<span class="ident">val</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">MongoError::ConversionError</span> {
-                    <span class="ident">from</span>: <span class="string">&quot;Stringified JSON&quot;</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">to</span>: <span class="string">&quot;Mongo BSON (extJSON)&quot;</span>.<span class="ident">to_owned</span>(),
-                })<span class="question-mark">?</span>
-            }
+            <span class="comment">// Json
+            </span>(TypeIdentifier::Json, PrismaValue::Json(json)) =&gt; {
+                <span class="kw">let </span>val: Value = serde_json::from_str(<span class="kw-2">&amp;</span>json)<span class="question-mark">?</span>;
+                Bson::try_from(val).map_err(|<span class="kw">_</span>| MongoError::ConversionError {
+                    from: <span class="string">&quot;Stringified JSON&quot;</span>.to_owned(),
+                    to: <span class="string">&quot;Mongo BSON (extJSON)&quot;</span>.to_owned(),
+                })<span class="question-mark">?
+            </span>}
 
-            <span class="comment">// List values</span>
-            (<span class="ident">typ</span>, <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>)) =&gt; <span class="ident">Bson::Array</span>(
-                <span class="ident">vals</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">typ</span>, <span class="ident">val</span>).<span class="ident">into_bson</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            <span class="comment">// List values
+            </span>(typ, PrismaValue::List(vals)) =&gt; Bson::Array(
+                vals.into_iter()
+                    .map(|val| (typ, val).into_bson())
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             ),
 
-            <span class="comment">// Unhandled mappings</span>
-            (<span class="ident">TypeIdentifier::Xml</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="string">&quot;Mongo doesn&#39;t support XML.&quot;</span>.<span class="ident">to_owned</span>())),
-            (<span class="ident">TypeIdentifier::Unsupported</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
+            <span class="comment">// Unhandled mappings
+            </span>(TypeIdentifier::Xml, <span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::Unsupported(<span class="string">&quot;Mongo doesn&#39;t support XML.&quot;</span>.to_owned())),
+            (TypeIdentifier::Unsupported, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unsupported types should never hit the connector.&quot;</span>),
 
-            (<span class="ident">ident</span>, <span class="ident">val</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(<span class="macro">format!</span>(
+            (ident, val) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::Unsupported(<span class="macro">format!</span>(
                     <span class="string">&quot;Unhandled and unsupported value mapping for MongoDB: {} as {:?}.&quot;</span>,
-                    <span class="ident">val</span>, <span class="ident">ident</span>,
+                    val, ident,
                 )))
             }
         })
     }
 }
 
-<span class="comment">// Parsing of values coming from MongoDB back to the connector / core.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">OutputMeta</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">meta</span> {
-        <span class="ident">OutputMeta::Scalar</span>(<span class="ident">scalar_meta</span>) =&gt; <span class="ident">read_scalar_value</span>(<span class="ident">bson</span>, <span class="ident">scalar_meta</span>),
-        <span class="ident">OutputMeta::Composite</span>(<span class="ident">composite_meta</span>) =&gt; <span class="ident">read_composite_value</span>(<span class="ident">bson</span>, <span class="ident">composite_meta</span>),
+<span class="comment">// Parsing of values coming from MongoDB back to the connector / core.
+</span><span class="kw">pub fn </span>value_from_bson(bson: Bson, meta: <span class="kw-2">&amp;</span>OutputMeta) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    <span class="kw">match </span>meta {
+        OutputMeta::Scalar(scalar_meta) =&gt; read_scalar_value(bson, scalar_meta),
+        OutputMeta::Composite(composite_meta) =&gt; read_composite_value(bson, composite_meta),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">read_scalar_value</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarOutputMeta</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">ident</span>, <span class="ident">bson</span>) {
-        <span class="comment">// We expect a list to be returned.</span>
-        (<span class="ident">type_identifier</span>, <span class="ident">bson</span>) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> =&gt; <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Null</span> =&gt; <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>()),
+<span class="kw">fn </span>read_scalar_value(bson: Bson, meta: <span class="kw-2">&amp;</span>ScalarOutputMeta) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    <span class="kw">let </span>val = <span class="kw">match </span>(<span class="kw-2">&amp;</span>meta.ident, bson) {
+        <span class="comment">// We expect a list to be returned.
+        </span>(type_identifier, bson) <span class="kw">if </span>meta.list =&gt; <span class="kw">match </span>bson {
+            Bson::Null =&gt; PrismaValue::List(Vec::new()),
 
-            <span class="ident">Bson::Array</span>(<span class="ident">list</span>) =&gt; <span class="ident">PrismaValue::List</span>(
-                <span class="ident">list</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">list_val</span><span class="op">|</span> <span class="ident">value_from_bson</span>(<span class="ident">list_val</span>, <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">strip_list</span>().<span class="ident">into</span>()))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            Bson::Array(list) =&gt; PrismaValue::List(
+                list.into_iter()
+                    .map(|list_val| value_from_bson(list_val, <span class="kw-2">&amp;</span>meta.strip_list().into()))
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             ),
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">bson</span>),
-                    <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;List of {:?}&quot;</span>, <span class="ident">type_identifier</span>),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::ConversionError {
+                    from: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, bson),
+                    to: <span class="macro">format!</span>(<span class="string">&quot;List of {:?}&quot;</span>, type_identifier),
                 });
             }
         },
 
-        <span class="comment">// Null catch-all.</span>
-        (<span class="kw">_</span>, <span class="ident">Bson::Null</span>) =&gt; {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">dv</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">default</span> {
-                <span class="ident">dv</span>.<span class="ident">clone</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">PrismaValue::Null</span>
+        <span class="comment">// Null catch-all.
+        </span>(<span class="kw">_</span>, Bson::Null) =&gt; {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>dv) = meta.default {
+                dv.clone()
+            } <span class="kw">else </span>{
+                PrismaValue::Null
             }
         }
 
-        <span class="comment">// String + UUID + Enum</span>
-        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
-        (<span class="ident">TypeIdentifier::String</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">oid</span>.<span class="ident">to_string</span>()),
-        (<span class="ident">TypeIdentifier::UUID</span>, <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Uuid</span>(<span class="ident">uuid::Uuid::parse_str</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)<span class="question-mark">?</span>),
-        (<span class="ident">TypeIdentifier::Enum</span>(<span class="kw">_</span>), <span class="ident">Bson::String</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>),
+        <span class="comment">// String + UUID + Enum
+        </span>(TypeIdentifier::String, Bson::String(s)) =&gt; PrismaValue::String(s),
+        (TypeIdentifier::String, Bson::ObjectId(oid)) =&gt; PrismaValue::String(oid.to_string()),
+        (TypeIdentifier::UUID, Bson::String(s)) =&gt; PrismaValue::Uuid(uuid::Uuid::parse_str(<span class="kw-2">&amp;</span>s)<span class="question-mark">?</span>),
+        (TypeIdentifier::Enum(<span class="kw">_</span>), Bson::String(s)) =&gt; PrismaValue::Enum(s),
 
-        <span class="comment">// Bool</span>
-        (<span class="ident">TypeIdentifier::Boolean</span>, <span class="ident">Bson::Boolean</span>(<span class="ident">b</span>)) =&gt; <span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>),
+        <span class="comment">// Bool
+        </span>(TypeIdentifier::Boolean, Bson::Boolean(b)) =&gt; PrismaValue::Boolean(b),
 
-        <span class="comment">// Int</span>
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>),
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
-        (<span class="ident">TypeIdentifier::Int</span>, <span class="ident">Bson::Double</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        <span class="comment">// Int
+        </span>(TypeIdentifier::Int, Bson::Int64(i)) =&gt; PrismaValue::Int(i),
+        (TypeIdentifier::Int, Bson::Int32(i)) =&gt; PrismaValue::Int(i <span class="kw">as </span>i64),
+        (TypeIdentifier::Int, Bson::Double(i)) =&gt; PrismaValue::Int(i <span class="kw">as </span>i64),
 
-        <span class="comment">// BigInt</span>
-        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>),
-        (<span class="ident">TypeIdentifier::BigInt</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; <span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>),
+        <span class="comment">// BigInt
+        </span>(TypeIdentifier::BigInt, Bson::Int64(i)) =&gt; PrismaValue::BigInt(i),
+        (TypeIdentifier::BigInt, Bson::Int32(i)) =&gt; PrismaValue::BigInt(i <span class="kw">as </span>i64),
 
-        <span class="comment">// Floats</span>
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
+        <span class="comment">// Floats
+        </span>(TypeIdentifier::Float, Bson::Double(f)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
         }
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
+        (TypeIdentifier::Float, Bson::Int32(i)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_i64(i <span class="kw">as </span>i64).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
         }
-        (<span class="ident">TypeIdentifier::Float</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
-        }
-
-        <span class="comment">// Decimals</span>
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Double</span>(<span class="ident">f</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
-        }
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int32</span>(<span class="ident">i</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
-        }
-        (<span class="ident">TypeIdentifier::Decimal</span>, <span class="ident">Bson::Int64</span>(<span class="ident">i</span>)) =&gt; {
-            <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_i64</span>(<span class="ident">i</span>).<span class="ident">convert</span>(<span class="ident">expl::PRISMA_FLOAT</span>)<span class="question-mark">?</span>.<span class="ident">normalized</span>())
+        (TypeIdentifier::Float, Bson::Int64(i)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
         }
 
-        <span class="comment">// DateTime</span>
-        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::DateTime</span>(<span class="ident">dt</span>)) =&gt; <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">to_chrono</span>().<span class="ident">into</span>()),
-        (<span class="ident">TypeIdentifier::DateTime</span>, <span class="ident">Bson::Timestamp</span>(<span class="ident">ts</span>)) =&gt; {
-            <span class="ident">PrismaValue::DateTime</span>(<span class="ident">Utc</span>.<span class="ident">timestamp</span>(<span class="ident">ts</span>.<span class="ident">time</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>).<span class="ident">into</span>())
+        <span class="comment">// Decimals
+        </span>(TypeIdentifier::Decimal, Bson::Double(f)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_f64(f).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
+        }
+        (TypeIdentifier::Decimal, Bson::Int32(i)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_i64(i <span class="kw">as </span>i64).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
+        }
+        (TypeIdentifier::Decimal, Bson::Int64(i)) =&gt; {
+            PrismaValue::Float(BigDecimal::from_i64(i).convert(expl::PRISMA_FLOAT)<span class="question-mark">?</span>.normalized())
         }
 
-        <span class="comment">// Bytes</span>
-        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::Binary</span>(<span class="ident">bin</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bin</span>.<span class="ident">bytes</span>),
-        (<span class="ident">TypeIdentifier::Bytes</span>, <span class="ident">Bson::ObjectId</span>(<span class="ident">oid</span>)) =&gt; <span class="ident">PrismaValue::Bytes</span>(<span class="ident">oid</span>.<span class="ident">bytes</span>().<span class="ident">to_vec</span>()),
+        <span class="comment">// DateTime
+        </span>(TypeIdentifier::DateTime, Bson::DateTime(dt)) =&gt; PrismaValue::DateTime(dt.to_chrono().into()),
+        (TypeIdentifier::DateTime, Bson::Timestamp(ts)) =&gt; {
+            PrismaValue::DateTime(Utc.timestamp(ts.time <span class="kw">as </span>i64, <span class="number">0</span>).into())
+        }
 
-        <span class="comment">// Json</span>
-        (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">bson</span>) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">bson</span>.<span class="ident">into_relaxed_extjson</span>())<span class="question-mark">?</span>),
+        <span class="comment">// Bytes
+        </span>(TypeIdentifier::Bytes, Bson::Binary(bin)) =&gt; PrismaValue::Bytes(bin.bytes),
+        (TypeIdentifier::Bytes, Bson::ObjectId(oid)) =&gt; PrismaValue::Bytes(oid.bytes().to_vec()),
 
-        (<span class="ident">ident</span>, <span class="ident">bson</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                <span class="ident">from</span>: <span class="ident">bson</span>.<span class="ident">to_string</span>(),
-                <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">ident</span>),
+        <span class="comment">// Json
+        </span>(TypeIdentifier::Json, bson) =&gt; PrismaValue::Json(serde_json::to_string(<span class="kw-2">&amp;</span>bson.into_relaxed_extjson())<span class="question-mark">?</span>),
+
+        (ident, bson) =&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::ConversionError {
+                from: bson.to_string(),
+                to: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, ident),
             })
         }
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+    <span class="prelude-val">Ok</span>(val)
 }
 
-<span class="kw">fn</span> <span class="ident">read_composite_value</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeOutputMeta</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> {
-        <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="comment">// Coerce null to empty list (Prisma doesn&#39;t have nullable lists)</span>
-            <span class="ident">Bson::Null</span> =&gt; <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>()),
+<span class="kw">fn </span>read_composite_value(bson: Bson, meta: <span class="kw-2">&amp;</span>CompositeOutputMeta) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    <span class="kw">let </span>val = <span class="kw">if </span>meta.list {
+        <span class="kw">match </span>bson {
+            <span class="comment">// Coerce null to empty list (Prisma doesn&#39;t have nullable lists)
+            </span>Bson::Null =&gt; PrismaValue::List(Vec::new()),
 
-            <span class="ident">Bson::Array</span>(<span class="ident">list</span>) =&gt; <span class="ident">PrismaValue::List</span>(
-                <span class="ident">list</span>.<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">list_val</span><span class="op">|</span> <span class="ident">value_from_bson</span>(<span class="ident">list_val</span>, <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">strip_list</span>().<span class="ident">into</span>()))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            Bson::Array(list) =&gt; PrismaValue::List(
+                list.into_iter()
+                    .map(|list_val| value_from_bson(list_val, <span class="kw-2">&amp;</span>meta.strip_list().into()))
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>,
             ),
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">bson</span>),
-                    <span class="ident">to</span>: <span class="string">&quot;List&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::ConversionError {
+                    from: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, bson),
+                    to: <span class="string">&quot;List&quot;</span>.to_owned(),
                 });
             }
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// Null catch-all.</span>
-        <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Null</span> =&gt; <span class="ident">PrismaValue::Null</span>,
-            <span class="ident">Bson::Document</span>(<span class="kw-2">mut</span> <span class="ident">doc</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">doc</span>.<span class="ident">len</span>());
+    } <span class="kw">else </span>{
+        <span class="comment">// Null catch-all.
+        </span><span class="kw">match </span>bson {
+            Bson::Null =&gt; PrismaValue::Null,
+            Bson::Document(<span class="kw-2">mut </span>doc) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>pairs = Vec::with_capacity(doc.len());
 
-                <span class="comment">// This approach ensures that missing fields are filled,</span>
-                <span class="comment">// so that the serialization can decide if this is invalid or not.</span>
-                <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">meta</span>) <span class="kw">in</span> <span class="ident">meta</span>.<span class="ident">inner</span>.<span class="ident">iter</span>() {
-                    <span class="kw">match</span> (<span class="ident">doc</span>.<span class="ident">remove</span>(<span class="ident">field</span>), <span class="ident">meta</span>) {
-                        (<span class="prelude-val">Some</span>(<span class="ident">value</span>), <span class="kw">_</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">value</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>;
-                            <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">value</span>))
+                <span class="comment">// This approach ensures that missing fields are filled,
+                // so that the serialization can decide if this is invalid or not.
+                </span><span class="kw">for </span>(field, meta) <span class="kw">in </span>meta.inner.iter() {
+                    <span class="kw">match </span>(doc.remove(field), meta) {
+                        (<span class="prelude-val">Some</span>(value), <span class="kw">_</span>) =&gt; {
+                            <span class="kw">let </span>value = value_from_bson(value, meta)<span class="question-mark">?</span>;
+                            pairs.push((field.clone(), value))
                         }
-                        <span class="comment">// Coerce missing scalar lists as empty lists</span>
-                        (<span class="prelude-val">None</span>, <span class="ident">OutputMeta::Composite</span>(<span class="ident">meta</span>)) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">list</span> =&gt; {
-                            <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::List</span>(<span class="ident">Vec::new</span>())))
+                        <span class="comment">// Coerce missing scalar lists as empty lists
+                        </span>(<span class="prelude-val">None</span>, OutputMeta::Composite(meta)) <span class="kw">if </span>meta.list =&gt; {
+                            pairs.push((field.clone(), PrismaValue::List(Vec::new())))
                         }
-                        <span class="comment">// Coerce missing scalars with their default values</span>
-                        (<span class="prelude-val">None</span>, <span class="ident">OutputMeta::Scalar</span>(<span class="ident">meta</span>)) <span class="kw">if</span> <span class="ident">meta</span>.<span class="ident">default</span>.<span class="ident">is_some</span>() =&gt; {
-                            <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">meta</span>.<span class="ident">default</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>()))
+                        <span class="comment">// Coerce missing scalars with their default values
+                        </span>(<span class="prelude-val">None</span>, OutputMeta::Scalar(meta)) <span class="kw">if </span>meta.default.is_some() =&gt; {
+                            pairs.push((field.clone(), meta.default.clone().unwrap()))
                         }
-                        <span class="comment">// Fill missing fields without default values with nulls.</span>
-                        (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>)),
+                        <span class="comment">// Fill missing fields without default values with nulls.
+                        </span>(<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; pairs.push((field.clone(), PrismaValue::Null)),
                     }
                 }
 
-                <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>)
+                PrismaValue::Object(pairs)
             }
-            <span class="ident">bson</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                    <span class="ident">from</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">bson</span>),
-                    <span class="ident">to</span>: <span class="string">&quot;Document&quot;</span>.<span class="ident">to_owned</span>(),
+            bson =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::ConversionError {
+                    from: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, bson),
+                    to: <span class="string">&quot;Document&quot;</span>.to_owned(),
                 })
             }
         }
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+    <span class="prelude-val">Ok</span>(val)
 }
 
-<span class="kw">trait</span> <span class="ident">UnwrapConversion</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">trait </span>UnwrapConversion&lt;T: Display&gt; {
+    <span class="kw">fn </span>convert(<span class="self">self</span>, to_type_explanation: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;T&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UnwrapConversion</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Display</span>,
+<span class="kw">impl</span>&lt;T&gt; UnwrapConversion&lt;T&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: Display,
 {
-    <span class="kw">fn</span> <span class="ident">convert</span>(<span class="self">self</span>, <span class="ident">to_type_explanation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
-                <span class="ident">from</span>: <span class="ident">format_opt</span>(<span class="self">self</span>),
-                <span class="ident">to</span>: <span class="ident">to_type_explanation</span>.<span class="ident">to_owned</span>(),
+    <span class="kw">fn </span>convert(<span class="self">self</span>, to_type_explanation: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;T&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="prelude-val">Some</span>(i) =&gt; <span class="prelude-val">Ok</span>(i),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(MongoError::ConversionError {
+                from: format_opt(<span class="self">self</span>),
+                to: to_type_explanation.to_owned(),
             }),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_opt</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">match</span> <span class="ident">opt</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="string">&quot;None&quot;</span>.<span class="ident">to_owned</span>(),
+<span class="kw">fn </span>format_opt&lt;T: Display&gt;(opt: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; String {
+    <span class="kw">match </span>opt {
+        <span class="prelude-val">Some</span>(t) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, t),
+        <span class="prelude-val">None </span>=&gt; <span class="string">&quot;None&quot;</span>.to_owned(),
     }
 }
 
-<span class="doccomment">/// Explanation constants for conversion errors.</span>
-<span class="kw">mod</span> <span class="ident">expl</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="doccomment">/// Explanation constants for conversion errors.
+</span><span class="kw">mod </span>expl {
+    <span class="attribute">#![allow(dead_code)]
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MONGO_DOUBLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;MongoDB Double (64bit)&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MONGO_I32</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;MongoDB Int (32 bit)&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MONGO_I64</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;MongoDB Int (64 bit)&quot;</span>;
+    </span><span class="kw">pub const </span>MONGO_DOUBLE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;MongoDB Double (64bit)&quot;</span>;
+    <span class="kw">pub const </span>MONGO_I32: <span class="kw-2">&amp;</span>str = <span class="string">&quot;MongoDB Int (32 bit)&quot;</span>;
+    <span class="kw">pub const </span>MONGO_I64: <span class="kw-2">&amp;</span>str = <span class="string">&quot;MongoDB Int (64 bit)&quot;</span>;
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_FLOAT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Prisma Float (BigDecimal)&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_BIGINT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Prisma BigInt (64 bit)&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PRISMA_INT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Prisma Int (64 bit)&quot;</span>;
+    <span class="kw">pub const </span>PRISMA_FLOAT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Prisma Float (BigDecimal)&quot;</span>;
+    <span class="kw">pub const </span>PRISMA_BIGINT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Prisma BigInt (64 bit)&quot;</span>;
+    <span class="kw">pub const </span>PRISMA_INT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Prisma Int (64 bit)&quot;</span>;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

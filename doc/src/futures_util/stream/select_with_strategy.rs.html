@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/select_with_strategy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select_with_strategy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/stream/select_with_strategy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select_with_strategy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -302,309 +302,309 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::assert_stream</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">pin::Pin</span>};
-<span class="kw">use</span> <span class="ident">futures_core::stream</span>::{<span class="ident">FusedStream</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">futures_core::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::assert_stream;
+<span class="kw">use </span>core::{fmt, pin::Pin};
+<span class="kw">use </span>futures_core::stream::{FusedStream, Stream};
+<span class="kw">use </span>futures_core::task::{Context, Poll};
+<span class="kw">use </span>pin_project_lite::pin_project;
 
-<span class="doccomment">/// Type to tell [`SelectWithStrategy`] which stream to poll next.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PollNext</span> {
-    <span class="doccomment">/// Poll the first stream.</span>
-    <span class="ident">Left</span>,
-    <span class="doccomment">/// Poll the second stream.</span>
-    <span class="ident">Right</span>,
+<span class="doccomment">/// Type to tell [`SelectWithStrategy`] which stream to poll next.
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
+</span><span class="kw">pub enum </span>PollNext {
+    <span class="doccomment">/// Poll the first stream.
+    </span>Left,
+    <span class="doccomment">/// Poll the second stream.
+    </span>Right,
 }
 
-<span class="kw">impl</span> <span class="ident">PollNext</span> {
-    <span class="doccomment">/// Toggle the value and return the old one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">toggle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">other</span>();
-        <span class="ident">old</span>
+<span class="kw">impl </span>PollNext {
+    <span class="doccomment">/// Toggle the value and return the old one.
+    </span><span class="kw">pub fn </span>toggle(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>old = <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.other();
+        old
     }
 
-    <span class="kw">fn</span> <span class="ident">other</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PollNext</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PollNext::Left</span> =&gt; <span class="ident">PollNext::Right</span>,
-            <span class="ident">PollNext::Right</span> =&gt; <span class="ident">PollNext::Left</span>,
+    <span class="kw">fn </span>other(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PollNext {
+        <span class="kw">match </span><span class="self">self </span>{
+            PollNext::Left =&gt; PollNext::Right,
+            PollNext::Right =&gt; PollNext::Left,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PollNext</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PollNext::Left</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>PollNext {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        PollNext::Left
     }
 }
 
-<span class="kw">enum</span> <span class="ident">InternalState</span> {
-    <span class="ident">Start</span>,
-    <span class="ident">LeftFinished</span>,
-    <span class="ident">RightFinished</span>,
-    <span class="ident">BothFinished</span>,
+<span class="kw">enum </span>InternalState {
+    Start,
+    LeftFinished,
+    RightFinished,
+    BothFinished,
 }
 
-<span class="kw">impl</span> <span class="ident">InternalState</span> {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ps</span>: <span class="ident">PollNext</span>) {
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ps</span>) {
-            (<span class="ident">InternalState::Start</span>, <span class="ident">PollNext::Left</span>) =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InternalState::LeftFinished</span>;
+<span class="kw">impl </span>InternalState {
+    <span class="kw">fn </span>finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ps: PollNext) {
+        <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>, ps) {
+            (InternalState::Start, PollNext::Left) =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= InternalState::LeftFinished;
             }
-            (<span class="ident">InternalState::Start</span>, <span class="ident">PollNext::Right</span>) =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InternalState::RightFinished</span>;
+            (InternalState::Start, PollNext::Right) =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= InternalState::RightFinished;
             }
-            (<span class="ident">InternalState::LeftFinished</span>, <span class="ident">PollNext::Right</span>)
-            <span class="op">|</span> (<span class="ident">InternalState::RightFinished</span>, <span class="ident">PollNext::Left</span>) =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">InternalState::BothFinished</span>;
+            (InternalState::LeftFinished, PollNext::Right)
+            | (InternalState::RightFinished, PollNext::Left) =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= InternalState::BothFinished;
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Stream for the [`select_with_strategy()`] function. See function docs for details.</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;streams do nothing unless polled&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">project</span> <span class="op">=</span> <span class="ident">SelectWithStrategyProj</span>]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream1</span>: <span class="ident">St1</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream2</span>: <span class="ident">St2</span>,
-        <span class="ident">internal_state</span>: <span class="ident">InternalState</span>,
-        <span class="ident">state</span>: <span class="ident">State</span>,
-        <span class="ident">clos</span>: <span class="ident">Clos</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Stream for the [`select_with_strategy()`] function. See function docs for details.
+    </span><span class="attribute">#[must_use = <span class="string">&quot;streams do nothing unless polled&quot;</span>]
+    #[project = SelectWithStrategyProj]
+    </span><span class="kw">pub struct </span>SelectWithStrategy&lt;St1, St2, Clos, State&gt; {
+        <span class="attribute">#[pin]
+        </span>stream1: St1,
+        <span class="attribute">#[pin]
+        </span>stream2: St2,
+        internal_state: InternalState,
+        state: State,
+        clos: Clos,
     }
 }
 
-<span class="doccomment">/// This function will attempt to pull items from both streams. You provide a</span>
-<span class="doccomment">/// closure to tell [`SelectWithStrategy`] which stream to poll. The closure can</span>
-<span class="doccomment">/// store state on `SelectWithStrategy` to which it will receive a `&amp;mut` on every</span>
-<span class="doccomment">/// invocation. This allows basing the strategy on prior choices.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// After one of the two input streams completes, the remaining one will be</span>
-<span class="doccomment">/// polled exclusively. The returned stream completes when both input</span>
-<span class="doccomment">/// streams have completed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this function consumes both streams and returns a wrapped</span>
-<span class="doccomment">/// version of them.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Priority</span>
-<span class="doccomment">/// This example shows how to always prioritize the left stream.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # futures::executor::block_on(async {</span>
-<span class="doccomment">/// use futures::stream::{ repeat, select_with_strategy, PollNext, StreamExt };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let left = repeat(1);</span>
-<span class="doccomment">/// let right = repeat(2);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We don&#39;t need any state, so let&#39;s make it an empty tuple.</span>
-<span class="doccomment">/// // We must provide some type here, as there is no way for the compiler</span>
-<span class="doccomment">/// // to infer it. As we don&#39;t need to capture variables, we can just</span>
-<span class="doccomment">/// // use a function pointer instead of a closure.</span>
-<span class="doccomment">/// fn prio_left(_: &amp;mut ()) -&gt; PollNext { PollNext::Left }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut out = select_with_strategy(left, right, prio_left);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for _ in 0..100 {</span>
-<span class="doccomment">///     // Whenever we poll out, we will alwas get `1`.</span>
-<span class="doccomment">///     assert_eq!(1, out.select_next_some().await);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # });</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Round Robin</span>
-<span class="doccomment">/// This example shows how to select from both streams round robin.</span>
-<span class="doccomment">/// Note: this special case is provided by [`futures-util::stream::select`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # futures::executor::block_on(async {</span>
-<span class="doccomment">/// use futures::stream::{ repeat, select_with_strategy, PollNext, StreamExt };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let left = repeat(1);</span>
-<span class="doccomment">/// let right = repeat(2);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let rrobin = |last: &amp;mut PollNext| last.toggle();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut out = select_with_strategy(left, right, rrobin);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for _ in 0..100 {</span>
-<span class="doccomment">///     // We should be alternating now.</span>
-<span class="doccomment">///     assert_eq!(1, out.select_next_some().await);</span>
-<span class="doccomment">///     assert_eq!(2, out.select_next_some().await);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # });</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select_with_strategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>(
-    <span class="ident">stream1</span>: <span class="ident">St1</span>,
-    <span class="ident">stream2</span>: <span class="ident">St2</span>,
-    <span class="ident">which</span>: <span class="ident">Clos</span>,
-) -&gt; <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">Stream</span>,
-    <span class="ident">St2</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Clos</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">State</span>) -&gt; <span class="ident">PollNext</span>,
-    <span class="ident">State</span>: <span class="ident">Default</span>,
+<span class="doccomment">/// This function will attempt to pull items from both streams. You provide a
+/// closure to tell [`SelectWithStrategy`] which stream to poll. The closure can
+/// store state on `SelectWithStrategy` to which it will receive a `&amp;mut` on every
+/// invocation. This allows basing the strategy on prior choices.
+///
+/// After one of the two input streams completes, the remaining one will be
+/// polled exclusively. The returned stream completes when both input
+/// streams have completed.
+///
+/// Note that this function consumes both streams and returns a wrapped
+/// version of them.
+///
+/// ## Examples
+///
+/// ### Priority
+/// This example shows how to always prioritize the left stream.
+///
+/// ```rust
+/// # futures::executor::block_on(async {
+/// use futures::stream::{ repeat, select_with_strategy, PollNext, StreamExt };
+///
+/// let left = repeat(1);
+/// let right = repeat(2);
+///
+/// // We don&#39;t need any state, so let&#39;s make it an empty tuple.
+/// // We must provide some type here, as there is no way for the compiler
+/// // to infer it. As we don&#39;t need to capture variables, we can just
+/// // use a function pointer instead of a closure.
+/// fn prio_left(_: &amp;mut ()) -&gt; PollNext { PollNext::Left }
+///
+/// let mut out = select_with_strategy(left, right, prio_left);
+///
+/// for _ in 0..100 {
+///     // Whenever we poll out, we will alwas get `1`.
+///     assert_eq!(1, out.select_next_some().await);
+/// }
+/// # });
+/// ```
+///
+/// ### Round Robin
+/// This example shows how to select from both streams round robin.
+/// Note: this special case is provided by [`futures-util::stream::select`].
+///
+/// ```rust
+/// # futures::executor::block_on(async {
+/// use futures::stream::{ repeat, select_with_strategy, PollNext, StreamExt };
+///
+/// let left = repeat(1);
+/// let right = repeat(2);
+///
+/// let rrobin = |last: &amp;mut PollNext| last.toggle();
+///
+/// let mut out = select_with_strategy(left, right, rrobin);
+///
+/// for _ in 0..100 {
+///     // We should be alternating now.
+///     assert_eq!(1, out.select_next_some().await);
+///     assert_eq!(2, out.select_next_some().await);
+/// }
+/// # });
+/// ```
+</span><span class="kw">pub fn </span>select_with_strategy&lt;St1, St2, Clos, State&gt;(
+    stream1: St1,
+    stream2: St2,
+    which: Clos,
+) -&gt; SelectWithStrategy&lt;St1, St2, Clos, State&gt;
+<span class="kw">where
+    </span>St1: Stream,
+    St2: Stream&lt;Item = St1::Item&gt;,
+    Clos: FnMut(<span class="kw-2">&amp;mut </span>State) -&gt; PollNext,
+    State: Default,
 {
-    <span class="ident">assert_stream</span>::<span class="op">&lt;</span><span class="ident">St1::Item</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">SelectWithStrategy</span> {
-        <span class="ident">stream1</span>,
-        <span class="ident">stream2</span>,
-        <span class="ident">state</span>: <span class="ident">Default::default</span>(),
-        <span class="ident">internal_state</span>: <span class="ident">InternalState::Start</span>,
-        <span class="ident">clos</span>: <span class="ident">which</span>,
+    assert_stream::&lt;St1::Item, <span class="kw">_</span>&gt;(SelectWithStrategy {
+        stream1,
+        stream2,
+        state: Default::default(),
+        internal_state: InternalState::Start,
+        clos: which,
     })
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Acquires a reference to the underlying streams that this combinator is</span>
-    <span class="doccomment">/// pulling from.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">St1</span>, <span class="kw-2">&amp;</span><span class="ident">St2</span>) {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream2</span>)
+<span class="kw">impl</span>&lt;St1, St2, Clos, State&gt; SelectWithStrategy&lt;St1, St2, Clos, State&gt; {
+    <span class="doccomment">/// Acquires a reference to the underlying streams that this combinator is
+    /// pulling from.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>St1, <span class="kw-2">&amp;</span>St2) {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.stream1, <span class="kw-2">&amp;</span><span class="self">self</span>.stream2)
     }
 
-    <span class="doccomment">/// Acquires a mutable reference to the underlying streams that this</span>
-    <span class="doccomment">/// combinator is pulling from.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that care must be taken to avoid tampering with the state of the</span>
-    <span class="doccomment">/// stream which may otherwise confuse this combinator.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut</span> <span class="ident">St1</span>, <span class="kw-2">&amp;mut</span> <span class="ident">St2</span>) {
-        (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream1</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream2</span>)
+    <span class="doccomment">/// Acquires a mutable reference to the underlying streams that this
+    /// combinator is pulling from.
+    ///
+    /// Note that care must be taken to avoid tampering with the state of the
+    /// stream which may otherwise confuse this combinator.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut </span>St1, <span class="kw-2">&amp;mut </span>St2) {
+        (<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream1, <span class="kw-2">&amp;mut </span><span class="self">self</span>.stream2)
     }
 
-    <span class="doccomment">/// Acquires a pinned mutable reference to the underlying streams that this</span>
-    <span class="doccomment">/// combinator is pulling from.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that care must be taken to avoid tampering with the state of the</span>
-    <span class="doccomment">/// stream which may otherwise confuse this combinator.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_pin_mut</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; (<span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">St1</span><span class="op">&gt;</span>, <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">St2</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        (<span class="ident">this</span>.<span class="ident">stream1</span>, <span class="ident">this</span>.<span class="ident">stream2</span>)
+    <span class="doccomment">/// Acquires a pinned mutable reference to the underlying streams that this
+    /// combinator is pulling from.
+    ///
+    /// Note that care must be taken to avoid tampering with the state of the
+    /// stream which may otherwise confuse this combinator.
+    </span><span class="kw">pub fn </span>get_pin_mut(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; (Pin&lt;<span class="kw-2">&amp;mut </span>St1&gt;, Pin&lt;<span class="kw-2">&amp;mut </span>St2&gt;) {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        (this.stream1, this.stream2)
     }
 
-    <span class="doccomment">/// Consumes this combinator, returning the underlying streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this may discard intermediate state of this combinator, so</span>
-    <span class="doccomment">/// care should be taken to avoid losing resources when this is called.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">St1</span>, <span class="ident">St2</span>) {
-        (<span class="self">self</span>.<span class="ident">stream1</span>, <span class="self">self</span>.<span class="ident">stream2</span>)
+    <span class="doccomment">/// Consumes this combinator, returning the underlying streams.
+    ///
+    /// Note that this may discard intermediate state of this combinator, so
+    /// care should be taken to avoid losing resources when this is called.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; (St1, St2) {
+        (<span class="self">self</span>.stream1, <span class="self">self</span>.stream2)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">FusedStream</span> <span class="kw">for</span> <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">Stream</span>,
-    <span class="ident">St2</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Clos</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">State</span>) -&gt; <span class="ident">PollNext</span>,
+<span class="kw">impl</span>&lt;St1, St2, Clos, State&gt; FusedStream <span class="kw">for </span>SelectWithStrategy&lt;St1, St2, Clos, State&gt;
+<span class="kw">where
+    </span>St1: Stream,
+    St2: Stream&lt;Item = St1::Item&gt;,
+    Clos: FnMut(<span class="kw-2">&amp;mut </span>State) -&gt; PollNext,
 {
-    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">internal_state</span> {
-            <span class="ident">InternalState::BothFinished</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>is_terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.internal_state {
+            InternalState::BothFinished =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">poll_side</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>(
-    <span class="ident">select</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SelectWithStrategyProj</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>,
-    <span class="ident">side</span>: <span class="ident">PollNext</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">St1::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">Stream</span>,
-    <span class="ident">St2</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span><span class="op">&gt;</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>poll_side&lt;St1, St2, Clos, State&gt;(
+    select: <span class="kw-2">&amp;mut </span>SelectWithStrategyProj&lt;<span class="lifetime">&#39;_</span>, St1, St2, Clos, State&gt;,
+    side: PollNext,
+    cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;St1::Item&gt;&gt;
+<span class="kw">where
+    </span>St1: Stream,
+    St2: Stream&lt;Item = St1::Item&gt;,
 {
-    <span class="kw">match</span> <span class="ident">side</span> {
-        <span class="ident">PollNext::Left</span> =&gt; <span class="ident">select</span>.<span class="ident">stream1</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>),
-        <span class="ident">PollNext::Right</span> =&gt; <span class="ident">select</span>.<span class="ident">stream2</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>),
+    <span class="kw">match </span>side {
+        PollNext::Left =&gt; select.stream1.as_mut().poll_next(cx),
+        PollNext::Right =&gt; select.stream2.as_mut().poll_next(cx),
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">poll_inner</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>(
-    <span class="ident">select</span>: <span class="kw-2">&amp;mut</span> <span class="ident">SelectWithStrategyProj</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>,
-    <span class="ident">side</span>: <span class="ident">PollNext</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">St1::Item</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">Stream</span>,
-    <span class="ident">St2</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span><span class="op">&gt;</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>poll_inner&lt;St1, St2, Clos, State&gt;(
+    select: <span class="kw-2">&amp;mut </span>SelectWithStrategyProj&lt;<span class="lifetime">&#39;_</span>, St1, St2, Clos, State&gt;,
+    side: PollNext,
+    cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;St1::Item&gt;&gt;
+<span class="kw">where
+    </span>St1: Stream,
+    St2: Stream&lt;Item = St1::Item&gt;,
 {
-    <span class="kw">let</span> <span class="ident">first_done</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">poll_side</span>(<span class="ident">select</span>, <span class="ident">side</span>, <span class="ident">cx</span>) {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">item</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">item</span>)),
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-            <span class="ident">select</span>.<span class="ident">internal_state</span>.<span class="ident">finish</span>(<span class="ident">side</span>);
-            <span class="bool-val">true</span>
-        }
-        <span class="ident">Poll::Pending</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">let </span>first_done = <span class="kw">match </span>poll_side(select, side, cx) {
+        Poll::Ready(<span class="prelude-val">Some</span>(item)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(item)),
+        Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+            select.internal_state.finish(side);
+            <span class="bool-val">true
+        </span>}
+        Poll::Pending =&gt; <span class="bool-val">false</span>,
     };
-    <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">side</span>.<span class="ident">other</span>();
-    <span class="kw">match</span> <span class="ident">poll_side</span>(<span class="ident">select</span>, <span class="ident">other</span>, <span class="ident">cx</span>) {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-            <span class="ident">select</span>.<span class="ident">internal_state</span>.<span class="ident">finish</span>(<span class="ident">other</span>);
-            <span class="kw">if</span> <span class="ident">first_done</span> {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">Poll::Pending</span>
+    <span class="kw">let </span>other = side.other();
+    <span class="kw">match </span>poll_side(select, other, cx) {
+        Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+            select.internal_state.finish(other);
+            <span class="kw">if </span>first_done {
+                Poll::Ready(<span class="prelude-val">None</span>)
+            } <span class="kw">else </span>{
+                Poll::Pending
             }
         }
-        <span class="ident">a</span> =&gt; <span class="ident">a</span>,
+        a =&gt; a,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">Stream</span>,
-    <span class="ident">St2</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Clos</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">State</span>) -&gt; <span class="ident">PollNext</span>,
+<span class="kw">impl</span>&lt;St1, St2, Clos, State&gt; Stream <span class="kw">for </span>SelectWithStrategy&lt;St1, St2, Clos, State&gt;
+<span class="kw">where
+    </span>St1: Stream,
+    St2: Stream&lt;Item = St1::Item&gt;,
+    Clos: FnMut(<span class="kw-2">&amp;mut </span>State) -&gt; PollNext,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">St1::Item</span>;
+    <span class="kw">type </span>Item = St1::Item;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">St1::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;St1::Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">internal_state</span> {
-            <span class="ident">InternalState::Start</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">next_side</span> <span class="op">=</span> (<span class="ident">this</span>.<span class="ident">clos</span>)(<span class="ident">this</span>.<span class="ident">state</span>);
-                <span class="ident">poll_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>, <span class="ident">next_side</span>, <span class="ident">cx</span>)
+        <span class="kw">match </span>this.internal_state {
+            InternalState::Start =&gt; {
+                <span class="kw">let </span>next_side = (this.clos)(this.state);
+                poll_inner(<span class="kw-2">&amp;mut </span>this, next_side, cx)
             }
-            <span class="ident">InternalState::LeftFinished</span> =&gt; <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">stream2</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">internal_state</span> <span class="op">=</span> <span class="ident">InternalState::BothFinished</span>;
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+            InternalState::LeftFinished =&gt; <span class="kw">match </span>this.stream2.poll_next(cx) {
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+                    <span class="kw-2">*</span>this.internal_state = InternalState::BothFinished;
+                    Poll::Ready(<span class="prelude-val">None</span>)
                 }
-                <span class="ident">a</span> =&gt; <span class="ident">a</span>,
+                a =&gt; a,
             },
-            <span class="ident">InternalState::RightFinished</span> =&gt; <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">stream1</span>.<span class="ident">poll_next</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">internal_state</span> <span class="op">=</span> <span class="ident">InternalState::BothFinished</span>;
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+            InternalState::RightFinished =&gt; <span class="kw">match </span>this.stream1.poll_next(cx) {
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
+                    <span class="kw-2">*</span>this.internal_state = InternalState::BothFinished;
+                    Poll::Ready(<span class="prelude-val">None</span>)
                 }
-                <span class="ident">a</span> =&gt; <span class="ident">a</span>,
+                a =&gt; a,
             },
-            <span class="ident">InternalState::BothFinished</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            InternalState::BothFinished =&gt; Poll::Ready(<span class="prelude-val">None</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SelectWithStrategy</span><span class="op">&lt;</span><span class="ident">St1</span>, <span class="ident">St2</span>, <span class="ident">Clos</span>, <span class="ident">State</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">St1</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">St2</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">State</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;St1, St2, Clos, State&gt; fmt::Debug <span class="kw">for </span>SelectWithStrategy&lt;St1, St2, Clos, State&gt;
+<span class="kw">where
+    </span>St1: fmt::Debug,
+    St2: fmt::Debug,
+    State: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SelectWithStrategy&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;stream1&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream1</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;stream2&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream2</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;SelectWithStrategy&quot;</span>)
+            .field(<span class="string">&quot;stream1&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.stream1)
+            .field(<span class="string">&quot;stream2&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.stream2)
+            .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.state)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

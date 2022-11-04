@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/sqlite_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/sqlite_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -122,129 +122,129 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>},
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
-    <span class="ident">parser_database</span>::{<span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance},
+    diagnostics::{DatamodelError, Diagnostics, Span},
+    parser_database::{ReferentialAction, ScalarType},
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">const</span> <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>: <span class="kw-2">&amp;</span>[<span class="ident">NativeTypeConstructor</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
-<span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::GlobalKeyIndex</span>];
-<span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ConnectorCapability::AnyId</span>,
-    <span class="ident">ConnectorCapability::AutoIncrement</span>,
-    <span class="ident">ConnectorCapability::CompoundIds</span>,
-    <span class="ident">ConnectorCapability::SqlQueryRaw</span>,
-    <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
-    <span class="ident">ConnectorCapability::UpdateableId</span>,
-    <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
-    <span class="ident">ConnectorCapability::DecimalType</span>,
-    <span class="ident">ConnectorCapability::BackwardCompatibleQueryRaw</span>,
-    <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
-    <span class="ident">ConnectorCapability::NativeUpsert</span>,
+<span class="kw">const </span>NATIVE_TYPE_CONSTRUCTORS: <span class="kw-2">&amp;</span>[NativeTypeConstructor] = <span class="kw-2">&amp;</span>[];
+<span class="kw">const </span>CONSTRAINT_SCOPES: <span class="kw-2">&amp;</span>[ConstraintScope] = <span class="kw-2">&amp;</span>[ConstraintScope::GlobalKeyIndex];
+<span class="kw">const </span>CAPABILITIES: <span class="kw-2">&amp;</span>[ConnectorCapability] = <span class="kw-2">&amp;</span>[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::SqlQueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::ImplicitManyToManyRelation,
+    ConnectorCapability::DecimalType,
+    ConnectorCapability::BackwardCompatibleQueryRaw,
+    ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqliteDatamodelConnector</span>;
+<span class="kw">pub struct </span>SqliteDatamodelConnector;
 
-<span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">SqliteDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;sqlite&quot;</span>
+<span class="kw">impl </span>Connector <span class="kw">for </span>SqliteDatamodelConnector {
+    <span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;sqlite&quot;
+    </span>}
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;sqlite&quot;
+    </span>}
+
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
+        CAPABILITIES
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;sqlite&quot;</span>
+    <span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">10000
+    </span>}
+
+    <span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
+
+        SetNull | SetDefault | Cascade | Restrict | NoAction
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
-        <span class="ident">CAPABILITIES</span>
+    <span class="kw">fn </span>emulated_referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
+
+        Restrict | SetNull | Cascade
     }
 
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">10000</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
-
-        <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">SetDefault</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">NoAction</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">emulated_referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
-
-        <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">Cascade</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
+    <span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType {
         <span class="macro">unreachable!</span>(<span class="string">&quot;No native types on Sqlite&quot;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
-        <span class="ident">NativeTypeInstance::new</span>(())
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, _scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+        NativeTypeInstance::new(())
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+        _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        _scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+    <span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;) {
         <span class="macro">unreachable!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
-        <span class="ident">CONSTRAINT_SCOPES</span>
+    <span class="kw">fn </span>constraint_violation_scopes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
-        <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
+    <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
+        NATIVE_TYPE_CONSTRUCTORS
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">_args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_native_types_not_supported</span>(
-            <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">span</span>,
+        _name: <span class="kw-2">&amp;</span>str,
+        _args: <span class="kw-2">&amp;</span>[String],
+        span: Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        diagnostics.push_error(DatamodelError::new_native_types_not_supported(
+            <span class="self">self</span>.name().to_owned(),
+            span,
         ));
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">set_config_dir</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">std::path::Path</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">set_root</span> <span class="op">=</span> <span class="op">|</span><span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">std::path::Path::new</span>(<span class="ident">path</span>);
+    <span class="kw">fn </span>set_config_dir&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, config_dir: <span class="kw-2">&amp;</span>std::path::Path, url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">let </span>set_root = |path: <span class="kw-2">&amp;</span>str| {
+            <span class="kw">let </span>path = std::path::Path::new(path);
 
-            <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_relative</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">config_dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">to_str</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">unwrap</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+            <span class="kw">if </span>path.is_relative() {
+                <span class="prelude-val">Some</span>(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">set_root</span>(<span class="ident">url</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;file:&quot;</span>)) {
-            <span class="kw">return</span> <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;file:{}&quot;</span>, <span class="ident">path</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = set_root(url.trim_start_matches(<span class="string">&quot;file:&quot;</span>)) {
+            <span class="kw">return </span>Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;file:{}&quot;</span>, path));
         };
 
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">url</span>)
+        Cow::Borrowed(url)
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;file&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `file:`.&quot;</span>.<span class="ident">to_string</span>());
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span>!url.starts_with(<span class="string">&quot;file&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `file:`.&quot;</span>.to_string());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -109,116 +109,116 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `os_info`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Provides interfaces for getting information about the current operating system, such as type,</span>
-<span class="doccomment">//! version, edition and bitness.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `os_info`
+//!
+//! Provides interfaces for getting information about the current operating system, such as type,
+//! version, edition and bitness.
 
-<span class="attribute">#![<span class="ident">deny</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">unsafe_code</span>,
-    <span class="ident">missing_doc_code_examples</span>
-)]</span>
+</span><span class="attribute">#![deny(
+    missing_debug_implementations,
+    missing_docs,
+    unsafe_code,
+    missing_doc_code_examples
+)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;android/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+#[cfg(target_os = <span class="string">&quot;android&quot;</span>)]
+#[path = <span class="string">&quot;android/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;dragonfly/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;dragonfly&quot;</span>)]
+#[path = <span class="string">&quot;dragonfly/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;emscripten&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;emscripten/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;emscripten&quot;</span>)]
+#[path = <span class="string">&quot;emscripten/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;freebsd/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;freebsd&quot;</span>)]
+#[path = <span class="string">&quot;freebsd/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;illumos/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;illumos&quot;</span>)]
+#[path = <span class="string">&quot;illumos/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;linux/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;linux&quot;</span>)]
+#[path = <span class="string">&quot;linux/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;macos/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;macos&quot;</span>)]
+#[path = <span class="string">&quot;macos/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;netbsd/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;netbsd&quot;</span>)]
+#[path = <span class="string">&quot;netbsd/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;openbsd/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;openbsd&quot;</span>)]
+#[path = <span class="string">&quot;openbsd/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;redox/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;redox&quot;</span>)]
+#[path = <span class="string">&quot;redox/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;windows/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(windows)]
+#[path = <span class="string">&quot;windows/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;emscripten&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>
-)))]</span>
-<span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;unknown/mod.rs&quot;</span>]</span>
-<span class="kw">mod</span> <span class="ident">imp</span>;
+<span class="attribute">#[cfg(not(any(
+    target_os = <span class="string">&quot;android&quot;</span>,
+    target_os = <span class="string">&quot;dragonfly&quot;</span>,
+    target_os = <span class="string">&quot;emscripten&quot;</span>,
+    target_os = <span class="string">&quot;freebsd&quot;</span>,
+    target_os = <span class="string">&quot;illumos&quot;</span>,
+    target_os = <span class="string">&quot;linux&quot;</span>,
+    target_os = <span class="string">&quot;macos&quot;</span>,
+    target_os = <span class="string">&quot;netbsd&quot;</span>,
+    target_os = <span class="string">&quot;openbsd&quot;</span>,
+    target_os = <span class="string">&quot;redox&quot;</span>,
+    target_os = <span class="string">&quot;windows&quot;
+</span>)))]
+#[path = <span class="string">&quot;unknown/mod.rs&quot;</span>]
+</span><span class="kw">mod </span>imp;
 
-<span class="kw">mod</span> <span class="ident">bitness</span>;
-<span class="kw">mod</span> <span class="ident">info</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">windows</span>))]</span>
-<span class="kw">mod</span> <span class="ident">matcher</span>;
-<span class="kw">mod</span> <span class="ident">os_type</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;netbsd&quot;</span>,
-    <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>
-))]</span>
-<span class="kw">mod</span> <span class="ident">uname</span>;
-<span class="kw">mod</span> <span class="ident">version</span>;
+<span class="kw">mod </span>bitness;
+<span class="kw">mod </span>info;
+<span class="attribute">#[cfg(not(windows))]
+</span><span class="kw">mod </span>matcher;
+<span class="kw">mod </span>os_type;
+<span class="attribute">#[cfg(any(
+    target_os = <span class="string">&quot;dragonfly&quot;</span>,
+    target_os = <span class="string">&quot;freebsd&quot;</span>,
+    target_os = <span class="string">&quot;illumos&quot;</span>,
+    target_os = <span class="string">&quot;netbsd&quot;</span>,
+    target_os = <span class="string">&quot;openbsd&quot;
+</span>))]
+</span><span class="kw">mod </span>uname;
+<span class="kw">mod </span>version;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bitness::Bitness</span>, <span class="ident">info::Info</span>, <span class="ident">os_type::Type</span>, <span class="ident">version::Version</span>};
+<span class="kw">pub use crate</span>::{bitness::Bitness, info::Info, os_type::Type, version::Version};
 
-<span class="doccomment">/// Returns information about the current operating system (type, version, edition, etc.).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use os_info;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let info = os_info::get();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Print full information:</span>
-<span class="doccomment">/// println!(&quot;OS information: {}&quot;, info);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Print information separately:</span>
-<span class="doccomment">/// println!(&quot;Type: {}&quot;, info.os_type());</span>
-<span class="doccomment">/// println!(&quot;Version: {}&quot;, info.version());</span>
-<span class="doccomment">/// println!(&quot;Edition: {:?}&quot;, info.edition());</span>
-<span class="doccomment">/// println!(&quot;Codename: {:?}&quot;, info.codename());</span>
-<span class="doccomment">/// println!(&quot;Bitness: {}&quot;, info.bitness());</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">Info</span> {
-    <span class="ident">imp::current_platform</span>()
+<span class="doccomment">/// Returns information about the current operating system (type, version, edition, etc.).
+///
+/// # Examples
+///
+/// ```
+/// use os_info;
+///
+/// let info = os_info::get();
+///
+/// // Print full information:
+/// println!(&quot;OS information: {}&quot;, info);
+///
+/// // Print information separately:
+/// println!(&quot;Type: {}&quot;, info.os_type());
+/// println!(&quot;Version: {}&quot;, info.version());
+/// println!(&quot;Edition: {:?}&quot;, info.edition());
+/// println!(&quot;Codename: {:?}&quot;, info.codename());
+/// println!(&quot;Bitness: {}&quot;, info.bitness());
+/// ```
+</span><span class="kw">pub fn </span>get() -&gt; Info {
+    imp::current_platform()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

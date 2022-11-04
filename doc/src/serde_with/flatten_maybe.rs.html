@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/flatten_maybe.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flatten_maybe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/flatten_maybe.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>flatten_maybe.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../serde_with/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -84,91 +84,91 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Support deserializing from flattened and non-flattened representation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When working with different serialization formats, sometimes it is more idiomatic to flatten</span>
-<span class="doccomment">/// fields, while other formats prefer nesting. Using `#[serde(flatten)]` only the flattened form</span>
-<span class="doccomment">/// is supported.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This helper creates a function, which support deserializing from either the flattened or the</span>
-<span class="doccomment">/// nested form. It gives an error, when both forms are provided. The `flatten` attribute is</span>
-<span class="doccomment">/// required on the field such that the helper works. The serialization format will always be</span>
-<span class="doccomment">/// flattened.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::Deserialize;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// // Setup the types</span>
-<span class="doccomment">/// #[derive(Deserialize, Debug)]</span>
-<span class="doccomment">/// struct S {</span>
-<span class="doccomment">///     #[serde(flatten, deserialize_with = &quot;deserialize_t&quot;)]</span>
-<span class="doccomment">///     t: T,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Deserialize, Debug)]</span>
-<span class="doccomment">/// struct T {</span>
-<span class="doccomment">///     i: i32,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The macro creates custom deserialization code.</span>
-<span class="doccomment">/// // You need to specify a function name and the field name of the flattened field.</span>
-<span class="doccomment">/// serde_with::flattened_maybe!(deserialize_t, &quot;t&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // Supports both flattened</span>
-<span class="doccomment">/// let j = r#&quot; {&quot;i&quot;:1} &quot;#;</span>
-<span class="doccomment">/// assert!(serde_json::from_str::&lt;S&gt;(j).is_ok());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // and non-flattened versions.</span>
-<span class="doccomment">/// let j = r#&quot; {&quot;t&quot;:{&quot;i&quot;:1}} &quot;#;</span>
-<span class="doccomment">/// assert!(serde_json::from_str::&lt;S&gt;(j).is_ok());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Ensure that the value is given</span>
-<span class="doccomment">/// let j = r#&quot; {} &quot;#;</span>
-<span class="doccomment">/// assert!(serde_json::from_str::&lt;S&gt;(j).is_err());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // and only occurs once, not multiple times.</span>
-<span class="doccomment">/// let j = r#&quot; {&quot;i&quot;:1,&quot;t&quot;:{&quot;i&quot;:1}} &quot;#;</span>
-<span class="doccomment">/// assert!(serde_json::from_str::&lt;S&gt;(j).is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">flattened_maybe</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">literal</span>) =&gt; {
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">T</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">T</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
-            <span class="ident">D</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+</pre><pre class="rust"><code><span class="doccomment">/// Support deserializing from flattened and non-flattened representation
+///
+/// When working with different serialization formats, sometimes it is more idiomatic to flatten
+/// fields, while other formats prefer nesting. Using `#[serde(flatten)]` only the flattened form
+/// is supported.
+///
+/// This helper creates a function, which support deserializing from either the flattened or the
+/// nested form. It gives an error, when both forms are provided. The `flatten` attribute is
+/// required on the field such that the helper works. The serialization format will always be
+/// flattened.
+///
+/// # Examples
+///
+/// ```rust
+/// # use serde::Deserialize;
+/// #
+/// // Setup the types
+/// #[derive(Deserialize, Debug)]
+/// struct S {
+///     #[serde(flatten, deserialize_with = &quot;deserialize_t&quot;)]
+///     t: T,
+/// }
+///
+/// #[derive(Deserialize, Debug)]
+/// struct T {
+///     i: i32,
+/// }
+///
+/// // The macro creates custom deserialization code.
+/// // You need to specify a function name and the field name of the flattened field.
+/// serde_with::flattened_maybe!(deserialize_t, &quot;t&quot;);
+///
+/// # fn main() {
+/// // Supports both flattened
+/// let j = r#&quot; {&quot;i&quot;:1} &quot;#;
+/// assert!(serde_json::from_str::&lt;S&gt;(j).is_ok());
+///
+/// // and non-flattened versions.
+/// let j = r#&quot; {&quot;t&quot;:{&quot;i&quot;:1}} &quot;#;
+/// assert!(serde_json::from_str::&lt;S&gt;(j).is_ok());
+///
+/// // Ensure that the value is given
+/// let j = r#&quot; {} &quot;#;
+/// assert!(serde_json::from_str::&lt;S&gt;(j).is_err());
+///
+/// // and only occurs once, not multiple times.
+/// let j = r#&quot; {&quot;i&quot;:1,&quot;t&quot;:{&quot;i&quot;:1}} &quot;#;
+/// assert!(serde_json::from_str::&lt;S&gt;(j).is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>flattened_maybe {
+    (<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$field</span>:literal) =&gt; {
+        <span class="kw">fn </span><span class="macro-nonterminal">$</span><span class="kw">fn</span>&lt;<span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">T</span>, D&gt;(deserializer: D) -&gt; ::std::result::Result&lt;T, D::Error&gt;
+        <span class="kw">where
+            </span>T: <span class="macro-nonterminal">$crate::serde::Deserialize</span>&lt;<span class="lifetime">&#39;de</span>&gt;,
+            D: <span class="macro-nonterminal">$crate::serde::Deserializer</span>&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="kw">use</span> <span class="ident">::std</span>::{
-                <span class="ident">option::Option</span>::{<span class="self">self</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>},
-                <span class="ident">result::Result</span>::{<span class="self">self</span>, <span class="prelude-val">Err</span>, <span class="prelude-val">Ok</span>},
+            <span class="kw">use </span>::std::{
+                option::Option::{<span class="self">self</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>},
+                result::Result::{<span class="self">self</span>, <span class="prelude-val">Err</span>, <span class="prelude-val">Ok</span>},
             };
-            <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde</span>;
+            <span class="kw">use </span><span class="macro-nonterminal">$crate::serde</span>;
 
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserialize</span>)]</span>
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Both</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-                <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-                <span class="ident">flat</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-                <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)]</span>
-                <span class="ident">not_flat</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+            <span class="attribute">#[derive(<span class="macro-nonterminal">$crate::serde::Deserialize</span>)]
+            #[serde(<span class="kw">crate </span>= <span class="string">&quot;serde&quot;</span>)]
+            </span><span class="kw">pub struct </span>Both&lt;T&gt; {
+                <span class="attribute">#[serde(flatten)]
+                </span>flat: <span class="prelude-ty">Option</span>&lt;T&gt;,
+                <span class="attribute">#[serde(rename = <span class="macro-nonterminal">$field</span>)]
+                </span>not_flat: <span class="prelude-ty">Option</span>&lt;T&gt;,
             }
 
-            <span class="kw">let</span> <span class="ident">both</span>: <span class="ident">Both</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserialize::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-            <span class="kw">match</span> (<span class="ident">both</span>.<span class="ident">flat</span>, <span class="ident">both</span>.<span class="ident">not_flat</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">t</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">t</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">t</span>),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::de::Error::missing_field</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)),
-                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::de::Error::custom</span>(<span class="macro">concat!</span>(
+            <span class="kw">let </span>both: Both&lt;T&gt; = <span class="macro-nonterminal">$crate::serde::Deserialize::deserialize</span>(deserializer)<span class="question-mark">?</span>;
+            <span class="kw">match </span>(both.flat, both.not_flat) {
+                (<span class="prelude-val">Some</span>(t), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(t)) =&gt; <span class="prelude-val">Ok</span>(t),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$crate::serde::de::Error::missing_field</span>(<span class="macro-nonterminal">$field</span>)),
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="macro-nonterminal">$crate::serde::de::Error::custom</span>(<span class="macro">concat!</span>(
                     <span class="string">&quot;`&quot;</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,
-                    <span class="string">&quot;` is both flattened and not&quot;</span>
-                ))),
+                    <span class="macro-nonterminal">$field</span>,
+                    <span class="string">&quot;` is both flattened and not&quot;
+                </span>))),
             }
         }
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

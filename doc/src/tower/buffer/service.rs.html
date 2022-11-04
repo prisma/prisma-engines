@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -181,188 +181,188 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">future::ResponseFuture</span>,
-    <span class="ident">message::Message</span>,
-    <span class="ident">worker</span>::{<span class="ident">Handle</span>, <span class="ident">Worker</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    future::ResponseFuture,
+    message::Message,
+    worker::{Handle, Worker},
 };
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>, <span class="ident">OwnedSemaphorePermit</span>, <span class="ident">Semaphore</span>};
-<span class="kw">use</span> <span class="ident">tokio_util::sync::PollSemaphore</span>;
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::sync::{mpsc, oneshot, OwnedSemaphorePermit, Semaphore};
+<span class="kw">use </span>tokio_util::sync::PollSemaphore;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="doccomment">/// Adds an mpsc buffer in front of an inner service.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the module documentation for more details.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Adds an mpsc buffer in front of an inner service.
+///
+/// See the module documentation for more details.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Buffer&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
 {
-    <span class="comment">// Note: this actually _is_ bounded, but rather than using Tokio&#39;s bounded</span>
-    <span class="comment">// channel, we use Tokio&#39;s semaphore separately to implement the bound.</span>
-    <span class="ident">tx</span>: <span class="ident">mpsc::UnboundedSender</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="comment">// When the buffer&#39;s channel is full, we want to exert backpressure in</span>
-    <span class="comment">// `poll_ready`, so that callers such as load balancers could choose to call</span>
-    <span class="comment">// another service rather than waiting for buffer capacity.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Unfortunately, this can&#39;t be done easily using Tokio&#39;s bounded MPSC</span>
-    <span class="comment">// channel, because it doesn&#39;t expose a polling-based interface, only an</span>
-    <span class="comment">// `async fn ready`, which borrows the sender. Therefore, we implement our</span>
-    <span class="comment">// own bounded MPSC on top of the unbounded channel, using a semaphore to</span>
-    <span class="comment">// limit how many items are in the channel.</span>
-    <span class="ident">semaphore</span>: <span class="ident">PollSemaphore</span>,
-    <span class="comment">// The current semaphore permit, if one has been acquired.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This is acquired in `poll_ready` and taken in `call`.</span>
-    <span class="ident">permit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedSemaphorePermit</span><span class="op">&gt;</span>,
-    <span class="ident">handle</span>: <span class="ident">Handle</span>,
+    <span class="comment">// Note: this actually _is_ bounded, but rather than using Tokio&#39;s bounded
+    // channel, we use Tokio&#39;s semaphore separately to implement the bound.
+    </span>tx: mpsc::UnboundedSender&lt;Message&lt;Request, T::Future&gt;&gt;,
+    <span class="comment">// When the buffer&#39;s channel is full, we want to exert backpressure in
+    // `poll_ready`, so that callers such as load balancers could choose to call
+    // another service rather than waiting for buffer capacity.
+    //
+    // Unfortunately, this can&#39;t be done easily using Tokio&#39;s bounded MPSC
+    // channel, because it doesn&#39;t expose a polling-based interface, only an
+    // `async fn ready`, which borrows the sender. Therefore, we implement our
+    // own bounded MPSC on top of the unbounded channel, using a semaphore to
+    // limit how many items are in the channel.
+    </span>semaphore: PollSemaphore,
+    <span class="comment">// The current semaphore permit, if one has been acquired.
+    //
+    // This is acquired in `poll_ready` and taken in `call`.
+    </span>permit: <span class="prelude-ty">Option</span>&lt;OwnedSemaphorePermit&gt;,
+    handle: Handle,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Buffer&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
+    T::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
 {
-    <span class="doccomment">/// Creates a new [`Buffer`] wrapping `service`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `bound` gives the maximal number of requests that can be queued for the service before</span>
-    <span class="doccomment">/// backpressure is applied to callers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default Tokio executor is used to run the given service, which means that this method</span>
-    <span class="doccomment">/// must be called while on the Tokio runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # A note on choosing a `bound`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When [`Buffer`]&#39;s implementation of [`poll_ready`] returns [`Poll::Ready`], it reserves a</span>
-    <span class="doccomment">/// slot in the channel for the forthcoming [`call`]. However, if this call doesn&#39;t arrive,</span>
-    <span class="doccomment">/// this reserved slot may be held up for a long time. As a result, it&#39;s advisable to set</span>
-    <span class="doccomment">/// `bound` to be at least the maximum number of concurrent requests the [`Buffer`] will see.</span>
-    <span class="doccomment">/// If you do not, all the slots in the buffer may be held up by futures that have just called</span>
-    <span class="doccomment">/// [`poll_ready`] but will not issue a [`call`], which prevents other senders from issuing new</span>
-    <span class="doccomment">/// requests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Poll::Ready`]: std::task::Poll::Ready</span>
-    <span class="doccomment">/// [`call`]: crate::Service::call</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T::Future</span>: <span class="ident">Send</span>,
-        <span class="ident">T::Error</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
-        <span class="ident">Request</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Creates a new [`Buffer`] wrapping `service`.
+    ///
+    /// `bound` gives the maximal number of requests that can be queued for the service before
+    /// backpressure is applied to callers.
+    ///
+    /// The default Tokio executor is used to run the given service, which means that this method
+    /// must be called while on the Tokio runtime.
+    ///
+    /// # A note on choosing a `bound`
+    ///
+    /// When [`Buffer`]&#39;s implementation of [`poll_ready`] returns [`Poll::Ready`], it reserves a
+    /// slot in the channel for the forthcoming [`call`]. However, if this call doesn&#39;t arrive,
+    /// this reserved slot may be held up for a long time. As a result, it&#39;s advisable to set
+    /// `bound` to be at least the maximum number of concurrent requests the [`Buffer`] will see.
+    /// If you do not, all the slots in the buffer may be held up by futures that have just called
+    /// [`poll_ready`] but will not issue a [`call`], which prevents other senders from issuing new
+    /// requests.
+    ///
+    /// [`Poll::Ready`]: std::task::Poll::Ready
+    /// [`call`]: crate::Service::call
+    /// [`poll_ready`]: crate::Service::poll_ready
+    </span><span class="kw">pub fn </span>new(service: T, bound: usize) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Send + <span class="lifetime">&#39;static</span>,
+        T::Future: Send,
+        T::Error: Send + Sync,
+        Request: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">service</span>, <span class="ident">worker</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::pair</span>(<span class="ident">service</span>, <span class="ident">bound</span>);
-        <span class="ident">tokio::spawn</span>(<span class="ident">worker</span>);
-        <span class="ident">service</span>
+        <span class="kw">let </span>(service, worker) = <span class="self">Self</span>::pair(service, bound);
+        tokio::spawn(worker);
+        service
     }
 
-    <span class="doccomment">/// Creates a new [`Buffer`] wrapping `service`, but returns the background worker.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful if you do not want to spawn directly onto the tokio runtime</span>
-    <span class="doccomment">/// but instead want to use your own executor. This will return the [`Buffer`] and</span>
-    <span class="doccomment">/// the background `Worker` that you can then spawn.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span>(<span class="ident">service</span>: <span class="ident">T</span>, <span class="ident">bound</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T::Error</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
-        <span class="ident">Request</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Creates a new [`Buffer`] wrapping `service`, but returns the background worker.
+    ///
+    /// This is useful if you do not want to spawn directly onto the tokio runtime
+    /// but instead want to use your own executor. This will return the [`Buffer`] and
+    /// the background `Worker` that you can then spawn.
+    </span><span class="kw">pub fn </span>pair(service: T, bound: usize) -&gt; (Buffer&lt;T, Request&gt;, Worker&lt;T, Request&gt;)
+    <span class="kw">where
+        </span>T: Send + <span class="lifetime">&#39;static</span>,
+        T::Error: Send + Sync,
+        Request: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded_channel</span>();
-        <span class="kw">let</span> <span class="ident">semaphore</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Semaphore::new</span>(<span class="ident">bound</span>));
-        <span class="kw">let</span> (<span class="ident">handle</span>, <span class="ident">worker</span>) <span class="op">=</span> <span class="ident">Worker::new</span>(<span class="ident">service</span>, <span class="ident">rx</span>, <span class="kw-2">&amp;</span><span class="ident">semaphore</span>);
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Buffer</span> {
-            <span class="ident">tx</span>,
-            <span class="ident">handle</span>,
-            <span class="ident">semaphore</span>: <span class="ident">PollSemaphore::new</span>(<span class="ident">semaphore</span>),
-            <span class="ident">permit</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>(tx, rx) = mpsc::unbounded_channel();
+        <span class="kw">let </span>semaphore = Arc::new(Semaphore::new(bound));
+        <span class="kw">let </span>(handle, worker) = Worker::new(service, rx, <span class="kw-2">&amp;</span>semaphore);
+        <span class="kw">let </span>buffer = Buffer {
+            tx,
+            handle,
+            semaphore: PollSemaphore::new(semaphore),
+            permit: <span class="prelude-val">None</span>,
         };
-        (<span class="ident">buffer</span>, <span class="ident">worker</span>)
+        (buffer, worker)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_worker_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::BoxError</span> {
-        <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">get_error_on_closed</span>()
+    <span class="kw">fn </span>get_worker_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::BoxError {
+        <span class="self">self</span>.handle.get_error_on_closed()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Service&lt;Request&gt; <span class="kw">for </span>Buffer&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
+    T::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">T::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::BoxError</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span><span class="op">&lt;</span><span class="ident">T::Future</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = T::Response;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::BoxError;
+    <span class="kw">type </span>Future = ResponseFuture&lt;T::Future&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// First, check if the worker is still alive.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>() {
-            <span class="comment">// If the inner service has errored, then we error here.</span>
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">get_worker_error</span>()));
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="comment">// First, check if the worker is still alive.
+        </span><span class="kw">if </span><span class="self">self</span>.tx.is_closed() {
+            <span class="comment">// If the inner service has errored, then we error here.
+            </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="self">self</span>.get_worker_error()));
         }
 
-        <span class="comment">// Then, check if we&#39;ve already acquired a permit.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">permit</span>.<span class="ident">is_some</span>() {
-            <span class="comment">// We&#39;ve already reserved capacity to send a request. We&#39;re ready!</span>
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+        <span class="comment">// Then, check if we&#39;ve already acquired a permit.
+        </span><span class="kw">if </span><span class="self">self</span>.permit.is_some() {
+            <span class="comment">// We&#39;ve already reserved capacity to send a request. We&#39;re ready!
+            </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
         }
 
-        <span class="comment">// Finally, if we haven&#39;t already acquired a permit, poll the semaphore</span>
-        <span class="comment">// to acquire one. If we acquire a permit, then there&#39;s enough buffer</span>
-        <span class="comment">// capacity to send a new request. Otherwise, we need to wait for</span>
-        <span class="comment">// capacity.</span>
-        <span class="kw">let</span> <span class="ident">permit</span> <span class="op">=</span>
-            <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">semaphore</span>.<span class="ident">poll_acquire</span>(<span class="ident">cx</span>)).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">get_worker_error</span>())<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">permit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">permit</span>);
+        <span class="comment">// Finally, if we haven&#39;t already acquired a permit, poll the semaphore
+        // to acquire one. If we acquire a permit, then there&#39;s enough buffer
+        // capacity to send a new request. Otherwise, we need to wait for
+        // capacity.
+        </span><span class="kw">let </span>permit =
+            <span class="macro">ready!</span>(<span class="self">self</span>.semaphore.poll_acquire(cx)).ok_or_else(|| <span class="self">self</span>.get_worker_error())<span class="question-mark">?</span>;
+        <span class="self">self</span>.permit = <span class="prelude-val">Some</span>(permit);
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: Request) -&gt; <span class="self">Self</span>::Future {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;sending request to buffer worker&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_permit</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">permit</span>
-            .<span class="ident">take</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;buffer full; poll_ready must be called first&quot;</span>);
+        <span class="kw">let </span>_permit = <span class="self">self
+            </span>.permit
+            .take()
+            .expect(<span class="string">&quot;buffer full; poll_ready must be called first&quot;</span>);
 
-        <span class="comment">// get the current Span so that we can explicitly propagate it to the worker</span>
-        <span class="comment">// if we didn&#39;t do this, events on the worker related to this span wouldn&#39;t be counted</span>
-        <span class="comment">// towards that span since the worker would have no way of entering it.</span>
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracing::Span::current</span>();
+        <span class="comment">// get the current Span so that we can explicitly propagate it to the worker
+        // if we didn&#39;t do this, events on the worker related to this span wouldn&#39;t be counted
+        // towards that span since the worker would have no way of entering it.
+        </span><span class="kw">let </span>span = tracing::Span::current();
 
-        <span class="comment">// If we&#39;ve made it here, then a semaphore permit has already been</span>
-        <span class="comment">// acquired, so we can freely allocate a oneshot.</span>
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
+        <span class="comment">// If we&#39;ve made it here, then a semaphore permit has already been
+        // acquired, so we can freely allocate a oneshot.
+        </span><span class="kw">let </span>(tx, rx) = oneshot::channel();
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="ident">Message</span> {
-            <span class="ident">request</span>,
-            <span class="ident">span</span>,
-            <span class="ident">tx</span>,
-            <span class="ident">_permit</span>,
+        <span class="kw">match </span><span class="self">self</span>.tx.send(Message {
+            request,
+            span,
+            tx,
+            _permit,
         }) {
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">ResponseFuture::failed</span>(<span class="self">self</span>.<span class="ident">get_worker_error</span>()),
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">ResponseFuture::new</span>(<span class="ident">rx</span>),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; ResponseFuture::failed(<span class="self">self</span>.get_worker_error()),
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; ResponseFuture::new(rx),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Clone <span class="kw">for </span>Buffer&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">tx</span>: <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">clone</span>(),
-            <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),
-            <span class="ident">semaphore</span>: <span class="self">self</span>.<span class="ident">semaphore</span>.<span class="ident">clone</span>(),
-            <span class="comment">// The new clone hasn&#39;t acquired a permit yet. It will when it&#39;s</span>
-            <span class="comment">// next polled ready.</span>
-            <span class="ident">permit</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            tx: <span class="self">self</span>.tx.clone(),
+            handle: <span class="self">self</span>.handle.clone(),
+            semaphore: <span class="self">self</span>.semaphore.clone(),
+            <span class="comment">// The new clone hasn&#39;t acquired a permit yet. It will when it&#39;s
+            // next polled ready.
+            </span>permit: <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

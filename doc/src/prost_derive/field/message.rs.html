@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/prost-derive-0.9.0/src/field/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prost_derive/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/prost-derive-0.9.0/src/field/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prost_derive/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -132,139 +132,139 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn::Meta</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>anyhow::{bail, Error};
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::{quote, ToTokens};
+<span class="kw">use </span>syn::Meta;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">set_bool</span>, <span class="ident">set_option</span>, <span class="ident">tag_attr</span>, <span class="ident">word_attr</span>, <span class="ident">Label</span>};
+<span class="kw">use </span><span class="kw">crate</span>::field::{set_bool, set_option, tag_attr, word_attr, Label};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">Label</span>,
-    <span class="kw">pub</span> <span class="ident">tag</span>: <span class="ident">u32</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Field {
+    <span class="kw">pub </span>label: Label,
+    <span class="kw">pub </span>tag: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>], <span class="ident">inferred_tag</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">boxed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+<span class="kw">impl </span>Field {
+    <span class="kw">pub fn </span>new(attrs: <span class="kw-2">&amp;</span>[Meta], inferred_tag: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Field&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>message = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>label = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tag = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>boxed = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknown_attrs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>unknown_attrs = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attrs</span> {
-            <span class="kw">if</span> <span class="ident">word_attr</span>(<span class="string">&quot;message&quot;</span>, <span class="ident">attr</span>) {
-                <span class="ident">set_bool</span>(<span class="kw-2">&amp;mut</span> <span class="ident">message</span>, <span class="string">&quot;duplicate message attribute&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">word_attr</span>(<span class="string">&quot;boxed&quot;</span>, <span class="ident">attr</span>) {
-                <span class="ident">set_bool</span>(<span class="kw-2">&amp;mut</span> <span class="ident">boxed</span>, <span class="string">&quot;duplicate boxed attribute&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">tag_attr</span>(<span class="ident">attr</span>)<span class="question-mark">?</span> {
-                <span class="ident">set_option</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tag</span>, <span class="ident">t</span>, <span class="string">&quot;duplicate tag attributes&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">l</span>) <span class="op">=</span> <span class="ident">Label::from_attr</span>(<span class="ident">attr</span>) {
-                <span class="ident">set_option</span>(<span class="kw-2">&amp;mut</span> <span class="ident">label</span>, <span class="ident">l</span>, <span class="string">&quot;duplicate label attributes&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">unknown_attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
+        <span class="kw">for </span>attr <span class="kw">in </span>attrs {
+            <span class="kw">if </span>word_attr(<span class="string">&quot;message&quot;</span>, attr) {
+                set_bool(<span class="kw-2">&amp;mut </span>message, <span class="string">&quot;duplicate message attribute&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else if </span>word_attr(<span class="string">&quot;boxed&quot;</span>, attr) {
+                set_bool(<span class="kw-2">&amp;mut </span>boxed, <span class="string">&quot;duplicate boxed attribute&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(t) = tag_attr(attr)<span class="question-mark">? </span>{
+                set_option(<span class="kw-2">&amp;mut </span>tag, t, <span class="string">&quot;duplicate tag attributes&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(l) = Label::from_attr(attr) {
+                set_option(<span class="kw-2">&amp;mut </span>label, l, <span class="string">&quot;duplicate label attributes&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                unknown_attrs.push(attr);
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">message</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if </span>!message {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">match</span> <span class="ident">unknown_attrs</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; (),
-            <span class="number">1</span> =&gt; <span class="macro">bail!</span>(
+        <span class="kw">match </span>unknown_attrs.len() {
+            <span class="number">0 </span>=&gt; (),
+            <span class="number">1 </span>=&gt; <span class="macro">bail!</span>(
                 <span class="string">&quot;unknown attribute for message field: {:?}&quot;</span>,
-                <span class="ident">unknown_attrs</span>[<span class="number">0</span>]
+                unknown_attrs[<span class="number">0</span>]
             ),
-            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, <span class="ident">unknown_attrs</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, unknown_attrs),
         }
 
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tag</span>.<span class="ident">or</span>(<span class="ident">inferred_tag</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">tag</span>) =&gt; <span class="ident">tag</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;message field is missing a tag attribute&quot;</span>),
+        <span class="kw">let </span>tag = <span class="kw">match </span>tag.or(inferred_tag) {
+            <span class="prelude-val">Some</span>(tag) =&gt; tag,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;message field is missing a tag attribute&quot;</span>),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span> {
-            <span class="ident">label</span>: <span class="ident">label</span>.<span class="ident">unwrap_or</span>(<span class="ident">Label::Optional</span>),
-            <span class="ident">tag</span>,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Field {
+            label: label.unwrap_or(Label::Optional),
+            tag,
         }))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_oneof</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">field</span>) <span class="op">=</span> <span class="ident">Field::new</span>(<span class="ident">attrs</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">Label::from_attr</span>(<span class="ident">attr</span>).<span class="ident">is_some</span>()) {
+    <span class="kw">pub fn </span>new_oneof(attrs: <span class="kw-2">&amp;</span>[Meta]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Field&gt;, Error&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>field) = Field::new(attrs, <span class="prelude-val">None</span>)<span class="question-mark">? </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(attr) = attrs.iter().find(|attr| Label::from_attr(attr).is_some()) {
                 <span class="macro">bail!</span>(
                     <span class="string">&quot;invalid attribute for oneof field: {}&quot;</span>,
-                    <span class="ident">attr</span>.<span class="ident">path</span>().<span class="ident">into_token_stream</span>()
+                    attr.path().into_token_stream()
                 );
             }
-            <span class="ident">field</span>.<span class="ident">label</span> <span class="op">=</span> <span class="ident">Label::Required</span>;
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>))
-        } <span class="kw">else</span> {
+            field.label = Label::Required;
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(field))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>;
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">label</span> {
-            <span class="ident">Label::Optional</span> =&gt; <span class="macro">quote!</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) <span class="op">=</span> #<span class="ident">ident</span> {
-                    <span class="ident">::prost::encoding::message::encode</span>(#<span class="ident">tag</span>, <span class="ident">msg</span>, <span class="ident">buf</span>);
+    <span class="kw">pub fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">let </span>tag = <span class="self">self</span>.tag;
+        <span class="kw">match </span><span class="self">self</span>.label {
+            Label::Optional =&gt; <span class="macro">quote! </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>msg) = #ident {
+                    ::prost::encoding::message::encode(#tag, msg, buf);
                 }
             },
-            <span class="ident">Label::Required</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::encode</span>(#<span class="ident">tag</span>, <span class="kw-2">&amp;</span>#<span class="ident">ident</span>, <span class="ident">buf</span>);
+            Label::Required =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::encode(#tag, <span class="kw-2">&amp;</span>#ident, buf);
             },
-            <span class="ident">Label::Repeated</span> =&gt; <span class="macro">quote!</span> {
-                <span class="kw">for</span> <span class="ident">msg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>#<span class="ident">ident</span> {
-                    <span class="ident">::prost::encoding::message::encode</span>(#<span class="ident">tag</span>, <span class="ident">msg</span>, <span class="ident">buf</span>);
+            Label::Repeated =&gt; <span class="macro">quote! </span>{
+                <span class="kw">for </span>msg <span class="kw">in </span><span class="kw-2">&amp;</span>#ident {
+                    ::prost::encoding::message::encode(#tag, msg, buf);
                 }
             },
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">label</span> {
-            <span class="ident">Label::Optional</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::merge</span>(<span class="ident">wire_type</span>,
-                                                 #<span class="ident">ident</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">::core::default::Default::default</span>),
-                                                 <span class="ident">buf</span>,
-                                                 <span class="ident">ctx</span>)
+    <span class="kw">pub fn </span>merge(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">match </span><span class="self">self</span>.label {
+            Label::Optional =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::merge(wire_type,
+                                                 #ident.get_or_insert_with(::core::default::Default::default),
+                                                 buf,
+                                                 ctx)
             },
-            <span class="ident">Label::Required</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::merge</span>(<span class="ident">wire_type</span>, #<span class="ident">ident</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
+            Label::Required =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::merge(wire_type, #ident, buf, ctx)
             },
-            <span class="ident">Label::Repeated</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::merge_repeated</span>(<span class="ident">wire_type</span>, #<span class="ident">ident</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
-            },
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>;
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">label</span> {
-            <span class="ident">Label::Optional</span> =&gt; <span class="macro">quote!</span> {
-                #<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="ident">::prost::encoding::message::encoded_len</span>(#<span class="ident">tag</span>, <span class="ident">msg</span>))
-            },
-            <span class="ident">Label::Required</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::encoded_len</span>(#<span class="ident">tag</span>, <span class="kw-2">&amp;</span>#<span class="ident">ident</span>)
-            },
-            <span class="ident">Label::Repeated</span> =&gt; <span class="macro">quote!</span> {
-                <span class="ident">::prost::encoding::message::encoded_len_repeated</span>(#<span class="ident">tag</span>, <span class="kw-2">&amp;</span>#<span class="ident">ident</span>)
+            Label::Repeated =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::merge_repeated(wire_type, #ident, buf, ctx)
             },
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">label</span> {
-            <span class="ident">Label::Optional</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ident</span> <span class="op">=</span> <span class="ident">::core::option::Option::None</span>),
-            <span class="ident">Label::Required</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ident</span>.<span class="ident">clear</span>()),
-            <span class="ident">Label::Repeated</span> =&gt; <span class="macro">quote!</span>(#<span class="ident">ident</span>.<span class="ident">clear</span>()),
+    <span class="kw">pub fn </span>encoded_len(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">let </span>tag = <span class="self">self</span>.tag;
+        <span class="kw">match </span><span class="self">self</span>.label {
+            Label::Optional =&gt; <span class="macro">quote! </span>{
+                #ident.as_ref().map_or(<span class="number">0</span>, |msg| ::prost::encoding::message::encoded_len(#tag, msg))
+            },
+            Label::Required =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::encoded_len(#tag, <span class="kw-2">&amp;</span>#ident)
+            },
+            Label::Repeated =&gt; <span class="macro">quote! </span>{
+                ::prost::encoding::message::encoded_len_repeated(#tag, <span class="kw-2">&amp;</span>#ident)
+            },
+        }
+    }
+
+    <span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">match </span><span class="self">self</span>.label {
+            Label::Optional =&gt; <span class="macro">quote!</span>(#ident = ::core::option::Option::None),
+            Label::Required =&gt; <span class="macro">quote!</span>(#ident.clear()),
+            Label::Repeated =&gt; <span class="macro">quote!</span>(#ident.clear()),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prost_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prost_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

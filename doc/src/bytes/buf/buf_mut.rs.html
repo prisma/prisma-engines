@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-1.2.1/src/buf/buf_mut.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_mut.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bytes/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bytes-1.2.1/src/buf/buf_mut.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_mut.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bytes/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bytes/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1144,1151 +1144,1151 @@
 <span id="1144">1144</span>
 <span id="1145">1145</span>
 <span id="1146">1146</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::buf</span>::{<span class="ident">limit</span>, <span class="ident">Chain</span>, <span class="ident">Limit</span>, <span class="ident">UninitSlice</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::buf</span>::{<span class="ident">writer</span>, <span class="ident">Writer</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::buf::{limit, Chain, Limit, UninitSlice};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::buf::{writer, Writer};
 
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">cmp</span>, <span class="ident">mem</span>, <span class="ident">ptr</span>, <span class="ident">usize</span>};
+<span class="kw">use </span>core::{cmp, mem, ptr, usize};
 
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">vec::Vec</span>};
+<span class="kw">use </span>alloc::{boxed::Box, vec::Vec};
 
-<span class="doccomment">/// A trait for values that provide sequential write access to bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Write bytes to a buffer</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A buffer stores bytes in memory such that write operations are infallible.</span>
-<span class="doccomment">/// The underlying storage may or may not be in contiguous memory. A `BufMut`</span>
-<span class="doccomment">/// value is a cursor into the buffer. Writing to `BufMut` advances the cursor</span>
-<span class="doccomment">/// position.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The simplest `BufMut` is a `Vec&lt;u8&gt;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bytes::BufMut;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buf = vec![];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// buf.put(&amp;b&quot;hello world&quot;[..]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(buf, b&quot;hello world&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">BufMut</span> {
-    <span class="doccomment">/// Returns the number of bytes that can be written from the current</span>
-    <span class="doccomment">/// position until the end of the buffer is reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is greater than or equal to the length of the slice returned</span>
-    <span class="doccomment">/// by `chunk_mut()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Writing to a `BufMut` may involve allocating more memory on the fly.</span>
-    <span class="doccomment">/// Implementations may fail before reaching the number of bytes indicated</span>
-    <span class="doccomment">/// by this method if they encounter an allocation failure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut dst = [0; 10];</span>
-    <span class="doccomment">/// let mut buf = &amp;mut dst[..];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let original_remaining = buf.remaining_mut();</span>
-    <span class="doccomment">/// buf.put(&amp;b&quot;hello&quot;[..]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(original_remaining - 5, buf.remaining_mut());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Implementer notes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations of `remaining_mut` should ensure that the return value</span>
-    <span class="doccomment">/// does not change unless a call is made to `advance_mut` or any other</span>
-    <span class="doccomment">/// function that is documented to change the `BufMut`&#39;s current position.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `remaining_mut` may return value smaller than actual available space.</span>
-    <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+<span class="doccomment">/// A trait for values that provide sequential write access to bytes.
+///
+/// Write bytes to a buffer
+///
+/// A buffer stores bytes in memory such that write operations are infallible.
+/// The underlying storage may or may not be in contiguous memory. A `BufMut`
+/// value is a cursor into the buffer. Writing to `BufMut` advances the cursor
+/// position.
+///
+/// The simplest `BufMut` is a `Vec&lt;u8&gt;`.
+///
+/// ```
+/// use bytes::BufMut;
+///
+/// let mut buf = vec![];
+///
+/// buf.put(&amp;b&quot;hello world&quot;[..]);
+///
+/// assert_eq!(buf, b&quot;hello world&quot;);
+/// ```
+</span><span class="kw">pub unsafe trait </span>BufMut {
+    <span class="doccomment">/// Returns the number of bytes that can be written from the current
+    /// position until the end of the buffer is reached.
+    ///
+    /// This value is greater than or equal to the length of the slice returned
+    /// by `chunk_mut()`.
+    ///
+    /// Writing to a `BufMut` may involve allocating more memory on the fly.
+    /// Implementations may fail before reaching the number of bytes indicated
+    /// by this method if they encounter an allocation failure.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut dst = [0; 10];
+    /// let mut buf = &amp;mut dst[..];
+    ///
+    /// let original_remaining = buf.remaining_mut();
+    /// buf.put(&amp;b&quot;hello&quot;[..]);
+    ///
+    /// assert_eq!(original_remaining - 5, buf.remaining_mut());
+    /// ```
+    ///
+    /// # Implementer notes
+    ///
+    /// Implementations of `remaining_mut` should ensure that the return value
+    /// does not change unless a call is made to `advance_mut` or any other
+    /// function that is documented to change the `BufMut`&#39;s current position.
+    ///
+    /// # Note
+    ///
+    /// `remaining_mut` may return value smaller than actual available space.
+    </span><span class="kw">fn </span>remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="doccomment">/// Advance the internal cursor of the BufMut</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The next call to `chunk_mut` will return a slice starting `cnt` bytes</span>
-    <span class="doccomment">/// further into the underlying buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because there is no guarantee that the bytes</span>
-    <span class="doccomment">/// being advanced past have been initialized.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = Vec::with_capacity(16);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Write some data</span>
-    <span class="doccomment">/// buf.chunk_mut()[0..2].copy_from_slice(b&quot;he&quot;);</span>
-    <span class="doccomment">/// unsafe { buf.advance_mut(2) };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // write more bytes</span>
-    <span class="doccomment">/// buf.chunk_mut()[0..3].copy_from_slice(b&quot;llo&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// unsafe { buf.advance_mut(3); }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(5, buf.len());</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function **may** panic if `cnt &gt; self.remaining_mut()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Implementer notes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is recommended for implementations of `advance_mut` to panic if</span>
-    <span class="doccomment">/// `cnt &gt; self.remaining_mut()`. If the implementation does not panic,</span>
-    <span class="doccomment">/// the call must behave as if `cnt == self.remaining_mut()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A call with `cnt == 0` should never panic and be a no-op.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">advance_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>);
+    <span class="doccomment">/// Advance the internal cursor of the BufMut
+    ///
+    /// The next call to `chunk_mut` will return a slice starting `cnt` bytes
+    /// further into the underlying buffer.
+    ///
+    /// This function is unsafe because there is no guarantee that the bytes
+    /// being advanced past have been initialized.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = Vec::with_capacity(16);
+    ///
+    /// // Write some data
+    /// buf.chunk_mut()[0..2].copy_from_slice(b&quot;he&quot;);
+    /// unsafe { buf.advance_mut(2) };
+    ///
+    /// // write more bytes
+    /// buf.chunk_mut()[0..3].copy_from_slice(b&quot;llo&quot;);
+    ///
+    /// unsafe { buf.advance_mut(3); }
+    ///
+    /// assert_eq!(5, buf.len());
+    /// assert_eq!(buf, b&quot;hello&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function **may** panic if `cnt &gt; self.remaining_mut()`.
+    ///
+    /// # Implementer notes
+    ///
+    /// It is recommended for implementations of `advance_mut` to panic if
+    /// `cnt &gt; self.remaining_mut()`. If the implementation does not panic,
+    /// the call must behave as if `cnt == self.remaining_mut()`.
+    ///
+    /// A call with `cnt == 0` should never panic and be a no-op.
+    </span><span class="kw">unsafe fn </span>advance_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize);
 
-    <span class="doccomment">/// Returns true if there is space in `self` for more bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is equivalent to `self.remaining_mut() != 0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut dst = [0; 5];</span>
-    <span class="doccomment">/// let mut buf = &amp;mut dst[..];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(buf.has_remaining_mut());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buf.put(&amp;b&quot;hello&quot;[..]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!buf.has_remaining_mut());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">has_remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">remaining_mut</span>() <span class="op">&gt;</span> <span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns true if there is space in `self` for more bytes.
+    ///
+    /// This is equivalent to `self.remaining_mut() != 0`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut dst = [0; 5];
+    /// let mut buf = &amp;mut dst[..];
+    ///
+    /// assert!(buf.has_remaining_mut());
+    ///
+    /// buf.put(&amp;b&quot;hello&quot;[..]);
+    ///
+    /// assert!(!buf.has_remaining_mut());
+    /// ```
+    </span><span class="kw">fn </span>has_remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.remaining_mut() &gt; <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns a mutable slice starting at the current BufMut position and of</span>
-    <span class="doccomment">/// length between 0 and `BufMut::remaining_mut()`. Note that this *can* be shorter than the</span>
-    <span class="doccomment">/// whole remainder of the buffer (this allows non-continuous implementation).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a lower level function. Most operations are done with other</span>
-    <span class="doccomment">/// functions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned byte slice may represent uninitialized memory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = Vec::with_capacity(16);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// unsafe {</span>
-    <span class="doccomment">///     // MaybeUninit::as_mut_ptr</span>
-    <span class="doccomment">///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;h&#39;);</span>
-    <span class="doccomment">///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;e&#39;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.advance_mut(2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;l&#39;);</span>
-    <span class="doccomment">///     buf.chunk_mut()[2..].as_mut_ptr().write(b&#39;o&#39;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     buf.advance_mut(3);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(5, buf.len());</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;hello&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Implementer notes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should never panic. `chunk_mut` should return an empty</span>
-    <span class="doccomment">/// slice **if and only if** `remaining_mut()` returns 0. In other words,</span>
-    <span class="doccomment">/// `chunk_mut()` returning an empty slice implies that `remaining_mut()` will</span>
-    <span class="doccomment">/// return 0 and `remaining_mut()` returning 0 implies that `chunk_mut()` will</span>
-    <span class="doccomment">/// return an empty slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function may trigger an out-of-memory abort if it tries to allocate</span>
-    <span class="doccomment">/// memory and fails to do so.</span>
-    <span class="comment">// The `chunk_mut` method was previously called `bytes_mut`. This alias makes the</span>
-    <span class="comment">// rename more easily discoverable.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;bytes_mut&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UninitSlice</span>;
+    <span class="doccomment">/// Returns a mutable slice starting at the current BufMut position and of
+    /// length between 0 and `BufMut::remaining_mut()`. Note that this *can* be shorter than the
+    /// whole remainder of the buffer (this allows non-continuous implementation).
+    ///
+    /// This is a lower level function. Most operations are done with other
+    /// functions.
+    ///
+    /// The returned byte slice may represent uninitialized memory.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = Vec::with_capacity(16);
+    ///
+    /// unsafe {
+    ///     // MaybeUninit::as_mut_ptr
+    ///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;h&#39;);
+    ///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;e&#39;);
+    ///
+    ///     buf.advance_mut(2);
+    ///
+    ///     buf.chunk_mut()[0..].as_mut_ptr().write(b&#39;l&#39;);
+    ///     buf.chunk_mut()[1..].as_mut_ptr().write(b&#39;l&#39;);
+    ///     buf.chunk_mut()[2..].as_mut_ptr().write(b&#39;o&#39;);
+    ///
+    ///     buf.advance_mut(3);
+    /// }
+    ///
+    /// assert_eq!(5, buf.len());
+    /// assert_eq!(buf, b&quot;hello&quot;);
+    /// ```
+    ///
+    /// # Implementer notes
+    ///
+    /// This function should never panic. `chunk_mut` should return an empty
+    /// slice **if and only if** `remaining_mut()` returns 0. In other words,
+    /// `chunk_mut()` returning an empty slice implies that `remaining_mut()` will
+    /// return 0 and `remaining_mut()` returning 0 implies that `chunk_mut()` will
+    /// return an empty slice.
+    ///
+    /// This function may trigger an out-of-memory abort if it tries to allocate
+    /// memory and fails to do so.
+    </span><span class="comment">// The `chunk_mut` method was previously called `bytes_mut`. This alias makes the
+    // rename more easily discoverable.
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(alias = <span class="string">&quot;bytes_mut&quot;</span>))]
+    </span><span class="kw">fn </span>chunk_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>UninitSlice;
 
-    <span class="doccomment">/// Transfer bytes into `self` from `src` and advance the cursor by the</span>
-    <span class="doccomment">/// number of bytes written.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// buf.put_u8(b&#39;h&#39;);</span>
-    <span class="doccomment">/// buf.put(&amp;b&quot;ello&quot;[..]);</span>
-    <span class="doccomment">/// buf.put(&amp;b&quot; world&quot;[..]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;hello world&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `self` does not have enough capacity to contain `src`.</span>
-    <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident"><span class="kw">super</span>::Buf</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">src</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Transfer bytes into `self` from `src` and advance the cursor by the
+    /// number of bytes written.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    ///
+    /// buf.put_u8(b&#39;h&#39;);
+    /// buf.put(&amp;b&quot;ello&quot;[..]);
+    /// buf.put(&amp;b&quot; world&quot;[..]);
+    ///
+    /// assert_eq!(buf, b&quot;hello world&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Panics if `self` does not have enough capacity to contain `src`.
+    </span><span class="kw">fn </span>put&lt;T: <span class="kw">super</span>::Buf&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>src: T)
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">remaining_mut</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">src</span>.<span class="ident">remaining</span>());
+        <span class="macro">assert!</span>(<span class="self">self</span>.remaining_mut() &gt;= src.remaining());
 
-        <span class="kw">while</span> <span class="ident">src</span>.<span class="ident">has_remaining</span>() {
-            <span class="kw">let</span> <span class="ident">l</span>;
+        <span class="kw">while </span>src.has_remaining() {
+            <span class="kw">let </span>l;
 
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">chunk</span>();
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunk_mut</span>();
-                <span class="ident">l</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">s</span>.<span class="ident">len</span>(), <span class="ident">d</span>.<span class="ident">len</span>());
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span>s = src.chunk();
+                <span class="kw">let </span>d = <span class="self">self</span>.chunk_mut();
+                l = cmp::min(s.len(), d.len());
 
-                <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">s</span>.<span class="ident">as_ptr</span>(), <span class="ident">d</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">l</span>);
+                ptr::copy_nonoverlapping(s.as_ptr(), d.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8, l);
             }
 
-            <span class="ident">src</span>.<span class="ident">advance</span>(<span class="ident">l</span>);
-            <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">advance_mut</span>(<span class="ident">l</span>);
+            src.advance(l);
+            <span class="kw">unsafe </span>{
+                <span class="self">self</span>.advance_mut(l);
             }
         }
     }
 
-    <span class="doccomment">/// Transfer bytes into `self` from `src` and advance the cursor by the</span>
-    <span class="doccomment">/// number of bytes written.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `self` must have enough remaining capacity to contain all of `src`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut dst = [0; 6];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let mut buf = &amp;mut dst[..];</span>
-    <span class="doccomment">///     buf.put_slice(b&quot;hello&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     assert_eq!(1, buf.remaining_mut());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(b&quot;hello\0&quot;, &amp;dst);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">put_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">off</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Transfer bytes into `self` from `src` and advance the cursor by the
+    /// number of bytes written.
+    ///
+    /// `self` must have enough remaining capacity to contain all of `src`.
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut dst = [0; 6];
+    ///
+    /// {
+    ///     let mut buf = &amp;mut dst[..];
+    ///     buf.put_slice(b&quot;hello&quot;);
+    ///
+    ///     assert_eq!(1, buf.remaining_mut());
+    /// }
+    ///
+    /// assert_eq!(b&quot;hello\0&quot;, &amp;dst);
+    /// ```
+    </span><span class="kw">fn </span>put_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span><span class="kw-2">mut </span>off = <span class="number">0</span>;
 
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">remaining_mut</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">src</span>.<span class="ident">len</span>(),
+            <span class="self">self</span>.remaining_mut() &gt;= src.len(),
             <span class="string">&quot;buffer overflow; remaining = {}; src = {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">remaining_mut</span>(),
-            <span class="ident">src</span>.<span class="ident">len</span>()
+            <span class="self">self</span>.remaining_mut(),
+            src.len()
         );
 
-        <span class="kw">while</span> <span class="ident">off</span> <span class="op">&lt;</span> <span class="ident">src</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">cnt</span>;
+        <span class="kw">while </span>off &lt; src.len() {
+            <span class="kw">let </span>cnt;
 
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunk_mut</span>();
-                <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">dst</span>.<span class="ident">len</span>(), <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">off</span>);
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span>dst = <span class="self">self</span>.chunk_mut();
+                cnt = cmp::min(dst.len(), src.len() - off);
 
-                <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">src</span>[<span class="ident">off</span>..].<span class="ident">as_ptr</span>(), <span class="ident">dst</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">cnt</span>);
+                ptr::copy_nonoverlapping(src[off..].as_ptr(), dst.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8, cnt);
 
-                <span class="ident">off</span> <span class="op">+</span><span class="op">=</span> <span class="ident">cnt</span>;
+                off += cnt;
             }
 
-            <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">advance_mut</span>(<span class="ident">cnt</span>);
+            <span class="kw">unsafe </span>{
+                <span class="self">self</span>.advance_mut(cnt);
             }
         }
     }
 
-    <span class="doccomment">/// Put `cnt` bytes `val` into `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Logically equivalent to calling `self.put_u8(val)` `cnt` times, but may work faster.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `self` must have at least `cnt` remaining capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut dst = [0; 6];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let mut buf = &amp;mut dst[..];</span>
-    <span class="doccomment">///     buf.put_bytes(b&#39;a&#39;, 4);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     assert_eq!(2, buf.remaining_mut());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(b&quot;aaaa\0\0&quot;, &amp;dst);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u8</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">cnt</span> {
-            <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="ident">val</span>);
+    <span class="doccomment">/// Put `cnt` bytes `val` into `self`.
+    ///
+    /// Logically equivalent to calling `self.put_u8(val)` `cnt` times, but may work faster.
+    ///
+    /// `self` must have at least `cnt` remaining capacity.
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut dst = [0; 6];
+    ///
+    /// {
+    ///     let mut buf = &amp;mut dst[..];
+    ///     buf.put_bytes(b&#39;a&#39;, 4);
+    ///
+    ///     assert_eq!(2, buf.remaining_mut());
+    /// }
+    ///
+    /// assert_eq!(b&quot;aaaa\0\0&quot;, &amp;dst);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u8, cnt: usize) {
+        <span class="kw">for _ in </span><span class="number">0</span>..cnt {
+            <span class="self">self</span>.put_u8(val);
         }
     }
 
-    <span class="doccomment">/// Writes an unsigned 8 bit integer to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u8(0x01);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u8</span>) {
-        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> [<span class="ident">n</span>];
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>);
+    <span class="doccomment">/// Writes an unsigned 8 bit integer to `self`.
+    ///
+    /// The current position is advanced by 1.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u8(0x01);
+    /// assert_eq!(buf, b&quot;\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u8) {
+        <span class="kw">let </span>src = [n];
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>src);
     }
 
-    <span class="doccomment">/// Writes a signed 8 bit integer to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i8(0x01);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i8</span>) {
-        <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> [<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u8</span>];
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>)
+    <span class="doccomment">/// Writes a signed 8 bit integer to `self`.
+    ///
+    /// The current position is advanced by 1.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i8(0x01);
+    /// assert_eq!(buf, b&quot;\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i8) {
+        <span class="kw">let </span>src = [n <span class="kw">as </span>u8];
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>src)
     }
 
-    <span class="doccomment">/// Writes an unsigned 16 bit integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u16(0x0809);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x09&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 16 bit integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 2.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u16(0x0809);
+    /// assert_eq!(buf, b&quot;\x08\x09&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u16) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 16 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u16_le(0x0809);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x09\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u16_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 16 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 2.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u16_le(0x0809);
+    /// assert_eq!(buf, b&quot;\x09\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u16_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u16) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 16 bit integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i16(0x0809);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x09&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes a signed 16 bit integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 2.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i16(0x0809);
+    /// assert_eq!(buf, b&quot;\x08\x09&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i16) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 16 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 2.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i16_le(0x0809);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x09\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i16_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes a signed 16 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 2.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i16_le(0x0809);
+    /// assert_eq!(buf, b&quot;\x09\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i16_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i16) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 32 bit integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u32(0x0809A0A1);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x09\xA0\xA1&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 32 bit integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u32(0x0809A0A1);
+    /// assert_eq!(buf, b&quot;\x08\x09\xA0\xA1&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 32 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u32_le(0x0809A0A1);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\xA1\xA0\x09\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u32_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 32 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u32_le(0x0809A0A1);
+    /// assert_eq!(buf, b&quot;\xA1\xA0\x09\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u32_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 32 bit integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i32(0x0809A0A1);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x09\xA0\xA1&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes a signed 32 bit integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i32(0x0809A0A1);
+    /// assert_eq!(buf, b&quot;\x08\x09\xA0\xA1&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i32) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 32 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i32_le(0x0809A0A1);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\xA1\xA0\x09\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i32_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes a signed 32 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i32_le(0x0809A0A1);
+    /// assert_eq!(buf, b&quot;\xA1\xA0\x09\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i32_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i32) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 64 bit integer to `self` in the big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u64(0x0102030405060708);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 64 bit integer to `self` in the big-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u64(0x0102030405060708);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 64 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u64_le(0x0102030405060708);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x07\x06\x05\x04\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u64_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 64 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u64_le(0x0102030405060708);
+    /// assert_eq!(buf, b&quot;\x08\x07\x06\x05\x04\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u64_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 64 bit integer to `self` in the big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i64(0x0102030405060708);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes a signed 64 bit integer to `self` in the big-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i64(0x0102030405060708);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 64 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i64_le(0x0102030405060708);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x08\x07\x06\x05\x04\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i64_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes a signed 64 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i64_le(0x0102030405060708);
+    /// assert_eq!(buf, b&quot;\x08\x07\x06\x05\x04\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i64_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 128 bit integer to `self` in the big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 16.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u128(0x01020304050607080910111213141516);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x10\x11\x12\x13\x14\x15\x16&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u128</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 128 bit integer to `self` in the big-endian byte order.
+    ///
+    /// The current position is advanced by 16.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u128(0x01020304050607080910111213141516);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x10\x11\x12\x13\x14\x15\x16&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u128(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u128) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned 128 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 16.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_u128_le(0x01020304050607080910111213141516);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x16\x15\x14\x13\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u128_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u128</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes an unsigned 128 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 16.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_u128_le(0x01020304050607080910111213141516);
+    /// assert_eq!(buf, b&quot;\x16\x15\x14\x13\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_u128_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u128) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 128 bit integer to `self` in the big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 16.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i128(0x01020304050607080910111213141516);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x10\x11\x12\x13\x14\x15\x16&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i128</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>())
+    <span class="doccomment">/// Writes a signed 128 bit integer to `self` in the big-endian byte order.
+    ///
+    /// The current position is advanced by 16.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i128(0x01020304050607080910111213141516);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x10\x11\x12\x13\x14\x15\x16&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i128(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i128) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes())
     }
 
-    <span class="doccomment">/// Writes a signed 128 bit integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 16.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_i128_le(0x01020304050607080910111213141516);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x16\x15\x14\x13\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_i128_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i128</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>())
+    <span class="doccomment">/// Writes a signed 128 bit integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 16.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_i128_le(0x01020304050607080910111213141516);
+    /// assert_eq!(buf, b&quot;\x16\x15\x14\x13\x12\x11\x10\x09\x08\x07\x06\x05\x04\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_i128_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i128) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes())
     }
 
-    <span class="doccomment">/// Writes an unsigned n-byte integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by `nbytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_uint(0x010203, 3);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_uint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">nbytes</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>()[<span class="ident">mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">-</span> <span class="ident">nbytes</span>..]);
+    <span class="doccomment">/// Writes an unsigned n-byte integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by `nbytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_uint(0x010203, 3);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_uint(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64, nbytes: usize) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes()[mem::size_of_val(<span class="kw-2">&amp;</span>n) - nbytes..]);
     }
 
-    <span class="doccomment">/// Writes an unsigned n-byte integer to `self` in the little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by `nbytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_uint_le(0x010203, 3);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_uint_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>, <span class="ident">nbytes</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>()[<span class="number">0</span>..<span class="ident">nbytes</span>]);
+    <span class="doccomment">/// Writes an unsigned n-byte integer to `self` in the little-endian byte order.
+    ///
+    /// The current position is advanced by `nbytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_uint_le(0x010203, 3);
+    /// assert_eq!(buf, b&quot;\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_uint_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64, nbytes: usize) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes()[<span class="number">0</span>..nbytes]);
     }
 
-    <span class="doccomment">/// Writes low `nbytes` of a signed integer to `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by `nbytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_int(0x0504010203, 3);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x01\x02\x03&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self` or if `nbytes` is greater than 8.</span>
-    <span class="kw">fn</span> <span class="ident">put_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>, <span class="ident">nbytes</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_be_bytes</span>()[<span class="ident">mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) <span class="op">-</span> <span class="ident">nbytes</span>..]);
+    <span class="doccomment">/// Writes low `nbytes` of a signed integer to `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by `nbytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_int(0x0504010203, 3);
+    /// assert_eq!(buf, b&quot;\x01\x02\x03&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self` or if `nbytes` is greater than 8.
+    </span><span class="kw">fn </span>put_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64, nbytes: usize) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_be_bytes()[mem::size_of_val(<span class="kw-2">&amp;</span>n) - nbytes..]);
     }
 
-    <span class="doccomment">/// Writes low `nbytes` of a signed integer to `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by `nbytes`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_int_le(0x0504010203, 3);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x03\x02\x01&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self` or if `nbytes` is greater than 8.</span>
-    <span class="kw">fn</span> <span class="ident">put_int_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>, <span class="ident">nbytes</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>.<span class="ident">to_le_bytes</span>()[<span class="number">0</span>..<span class="ident">nbytes</span>]);
+    <span class="doccomment">/// Writes low `nbytes` of a signed integer to `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by `nbytes`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_int_le(0x0504010203, 3);
+    /// assert_eq!(buf, b&quot;\x03\x02\x01&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self` or if `nbytes` is greater than 8.
+    </span><span class="kw">fn </span>put_int_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64, nbytes: usize) {
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>n.to_le_bytes()[<span class="number">0</span>..nbytes]);
     }
 
-    <span class="doccomment">/// Writes  an IEEE754 single-precision (4 bytes) floating point number to</span>
-    <span class="doccomment">/// `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_f32(1.2f32);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x3F\x99\x99\x9A&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_f32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>.<span class="ident">put_u32</span>(<span class="ident">n</span>.<span class="ident">to_bits</span>());
+    <span class="doccomment">/// Writes  an IEEE754 single-precision (4 bytes) floating point number to
+    /// `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_f32(1.2f32);
+    /// assert_eq!(buf, b&quot;\x3F\x99\x99\x9A&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_f32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: f32) {
+        <span class="self">self</span>.put_u32(n.to_bits());
     }
 
-    <span class="doccomment">/// Writes  an IEEE754 single-precision (4 bytes) floating point number to</span>
-    <span class="doccomment">/// `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 4.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_f32_le(1.2f32);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x9A\x99\x99\x3F&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_f32_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f32</span>) {
-        <span class="self">self</span>.<span class="ident">put_u32_le</span>(<span class="ident">n</span>.<span class="ident">to_bits</span>());
+    <span class="doccomment">/// Writes  an IEEE754 single-precision (4 bytes) floating point number to
+    /// `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 4.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_f32_le(1.2f32);
+    /// assert_eq!(buf, b&quot;\x9A\x99\x99\x3F&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_f32_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: f32) {
+        <span class="self">self</span>.put_u32_le(n.to_bits());
     }
 
-    <span class="doccomment">/// Writes  an IEEE754 double-precision (8 bytes) floating point number to</span>
-    <span class="doccomment">/// `self` in big-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_f64(1.2f64);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x3F\xF3\x33\x33\x33\x33\x33\x33&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">put_u64</span>(<span class="ident">n</span>.<span class="ident">to_bits</span>());
+    <span class="doccomment">/// Writes  an IEEE754 double-precision (8 bytes) floating point number to
+    /// `self` in big-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_f64(1.2f64);
+    /// assert_eq!(buf, b&quot;\x3F\xF3\x33\x33\x33\x33\x33\x33&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: f64) {
+        <span class="self">self</span>.put_u64(n.to_bits());
     }
 
-    <span class="doccomment">/// Writes  an IEEE754 double-precision (8 bytes) floating point number to</span>
-    <span class="doccomment">/// `self` in little-endian byte order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The current position is advanced by 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![];</span>
-    <span class="doccomment">/// buf.put_f64_le(1.2f64);</span>
-    <span class="doccomment">/// assert_eq!(buf, b&quot;\x33\x33\x33\x33\x33\x33\xF3\x3F&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if there is not enough remaining capacity in</span>
-    <span class="doccomment">/// `self`.</span>
-    <span class="kw">fn</span> <span class="ident">put_f64_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">put_u64_le</span>(<span class="ident">n</span>.<span class="ident">to_bits</span>());
+    <span class="doccomment">/// Writes  an IEEE754 double-precision (8 bytes) floating point number to
+    /// `self` in little-endian byte order.
+    ///
+    /// The current position is advanced by 8.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut buf = vec![];
+    /// buf.put_f64_le(1.2f64);
+    /// assert_eq!(buf, b&quot;\x33\x33\x33\x33\x33\x33\xF3\x3F&quot;);
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// This function panics if there is not enough remaining capacity in
+    /// `self`.
+    </span><span class="kw">fn </span>put_f64_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: f64) {
+        <span class="self">self</span>.put_u64_le(n.to_bits());
     }
 
-    <span class="doccomment">/// Creates an adaptor which can write at most `limit` bytes to `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let arr = &amp;mut [0u8; 128][..];</span>
-    <span class="doccomment">/// assert_eq!(arr.remaining_mut(), 128);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let dst = arr.limit(10);</span>
-    <span class="doccomment">/// assert_eq!(dst.remaining_mut(), 10);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">limit</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Limit</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Creates an adaptor which can write at most `limit` bytes to `self`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let arr = &amp;mut [0u8; 128][..];
+    /// assert_eq!(arr.remaining_mut(), 128);
+    ///
+    /// let dst = arr.limit(10);
+    /// assert_eq!(dst.remaining_mut(), 10);
+    /// ```
+    </span><span class="kw">fn </span>limit(<span class="self">self</span>, limit: usize) -&gt; Limit&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">limit::new</span>(<span class="self">self</span>, <span class="ident">limit</span>)
+        limit::new(<span class="self">self</span>, limit)
     }
 
-    <span class="doccomment">/// Creates an adaptor which implements the `Write` trait for `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns a new value which implements `Write` by adapting</span>
-    <span class="doccomment">/// the `Write` trait functions to the `BufMut` trait functions. Given that</span>
-    <span class="doccomment">/// `BufMut` operations are infallible, none of the `Write` functions will</span>
-    <span class="doccomment">/// return with `Err`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">/// use std::io::Write;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut buf = vec![].writer();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let num = buf.write(&amp;b&quot;hello world&quot;[..]).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(11, num);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let buf = buf.into_inner();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(*buf, b&quot;hello world&quot;[..]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="self">self</span>) -&gt; <span class="ident">Writer</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Creates an adaptor which implements the `Write` trait for `self`.
+    ///
+    /// This function returns a new value which implements `Write` by adapting
+    /// the `Write` trait functions to the `BufMut` trait functions. Given that
+    /// `BufMut` operations are infallible, none of the `Write` functions will
+    /// return with `Err`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    /// use std::io::Write;
+    ///
+    /// let mut buf = vec![].writer();
+    ///
+    /// let num = buf.write(&amp;b&quot;hello world&quot;[..]).unwrap();
+    /// assert_eq!(11, num);
+    ///
+    /// let buf = buf.into_inner();
+    ///
+    /// assert_eq!(*buf, b&quot;hello world&quot;[..]);
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>writer(<span class="self">self</span>) -&gt; Writer&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">writer::new</span>(<span class="self">self</span>)
+        writer::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Creates an adapter which will chain this buffer with another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `BufMut` instance will first write to all bytes from</span>
-    <span class="doccomment">/// `self`. Afterwards, it will write to `next`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bytes::BufMut;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut a = [0u8; 5];</span>
-    <span class="doccomment">/// let mut b = [0u8; 6];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut chain = (&amp;mut a[..]).chain_mut(&amp;mut b[..]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// chain.put_slice(b&quot;hello world&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&amp;a[..], b&quot;hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&amp;b[..], b&quot; world&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">chain_mut</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">BufMut</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">next</span>: <span class="ident">U</span>) -&gt; <span class="ident">Chain</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Creates an adapter which will chain this buffer with another.
+    ///
+    /// The returned `BufMut` instance will first write to all bytes from
+    /// `self`. Afterwards, it will write to `next`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use bytes::BufMut;
+    ///
+    /// let mut a = [0u8; 5];
+    /// let mut b = [0u8; 6];
+    ///
+    /// let mut chain = (&amp;mut a[..]).chain_mut(&amp;mut b[..]);
+    ///
+    /// chain.put_slice(b&quot;hello world&quot;);
+    ///
+    /// assert_eq!(&amp;a[..], b&quot;hello&quot;);
+    /// assert_eq!(&amp;b[..], b&quot; world&quot;);
+    /// ```
+    </span><span class="kw">fn </span>chain_mut&lt;U: BufMut&gt;(<span class="self">self</span>, next: U) -&gt; Chain&lt;<span class="self">Self</span>, U&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Chain::new</span>(<span class="self">self</span>, <span class="ident">next</span>)
+        Chain::new(<span class="self">self</span>, next)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">deref_forward_bufmut</span> {
+<span class="macro">macro_rules! </span>deref_forward_bufmut {
     () =&gt; {
-        <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">remaining_mut</span>()
+        <span class="kw">fn </span>remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+            (<span class="kw-2">**</span><span class="self">self</span>).remaining_mut()
         }
 
-        <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UninitSlice</span> {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">chunk_mut</span>()
+        <span class="kw">fn </span>chunk_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>UninitSlice {
+            (<span class="kw-2">**</span><span class="self">self</span>).chunk_mut()
         }
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">advance_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">advance_mut</span>(<span class="ident">cnt</span>)
+        <span class="kw">unsafe fn </span>advance_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+            (<span class="kw-2">**</span><span class="self">self</span>).advance_mut(cnt)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_slice</span>(<span class="ident">src</span>)
+        <span class="kw">fn </span>put_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span>[u8]) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_slice(src)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u8</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u8</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u8) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u8(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i8</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i8</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i8(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i8) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i8(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u16</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u16) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u16(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u16_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u16</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u16_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u16_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u16) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u16_le(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i16</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i16(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i16) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i16(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i16_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i16</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i16_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i16_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i16) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i16_le(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u32</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u32(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u32_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u32_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u32_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u32) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u32_le(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i32</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i32) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i32(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i32_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i32_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i32_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i32) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i32_le(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u64</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u64(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_u64_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_u64_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_u64_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_u64_le(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i64</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i64(n)
         }
 
-        <span class="kw">fn</span> <span class="ident">put_i64_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i64</span>) {
-            (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">put_i64_le</span>(<span class="ident">n</span>)
+        <span class="kw">fn </span>put_i64_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: i64) {
+            (<span class="kw-2">**</span><span class="self">self</span>).put_i64_le(n)
         }
     };
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
+<span class="kw">unsafe impl</span>&lt;T: BufMut + <span class="question-mark">?</span>Sized&gt; BufMut <span class="kw">for </span><span class="kw-2">&amp;mut </span>T {
     <span class="macro">deref_forward_bufmut!</span>();
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">unsafe impl</span>&lt;T: BufMut + <span class="question-mark">?</span>Sized&gt; BufMut <span class="kw">for </span>Box&lt;T&gt; {
     <span class="macro">deref_forward_bufmut!</span>();
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>()
+<span class="kw">unsafe impl </span>BufMut <span class="kw">for </span><span class="kw-2">&amp;mut </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UninitSlice</span> {
-        <span class="comment">// UninitSlice is repr(transparent), so safe to transmute</span>
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>UninitSlice {
+        <span class="comment">// UninitSlice is repr(transparent), so safe to transmute
+        </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span>[u8] <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">advance_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="comment">// Lifetime dance taken from `impl Write for &amp;mut [u8]`.</span>
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="ident">core::mem::replace</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> []).<span class="ident">split_at_mut</span>(<span class="ident">cnt</span>);
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">b</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>advance_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="comment">// Lifetime dance taken from `impl Write for &amp;mut [u8]`.
+        </span><span class="kw">let </span>(<span class="kw">_</span>, b) = core::mem::replace(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>[]).split_at_mut(cnt);
+        <span class="kw-2">*</span><span class="self">self </span>= b;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">put_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>[..<span class="ident">src</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="ident">src</span>);
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">advance_mut</span>(<span class="ident">src</span>.<span class="ident">len</span>());
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>put_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>[..src.len()].copy_from_slice(src);
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.advance_mut(src.len());
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">put_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u8</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">remaining_mut</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">cnt</span>);
-        <span class="kw">unsafe</span> {
-            <span class="ident">ptr::write_bytes</span>(<span class="self">self</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">val</span>, <span class="ident">cnt</span>);
-            <span class="self">self</span>.<span class="ident">advance_mut</span>(<span class="ident">cnt</span>);
+    <span class="kw">fn </span>put_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u8, cnt: usize) {
+        <span class="macro">assert!</span>(<span class="self">self</span>.remaining_mut() &gt;= cnt);
+        <span class="kw">unsafe </span>{
+            ptr::write_bytes(<span class="self">self</span>.as_mut_ptr(), val, cnt);
+            <span class="self">self</span>.advance_mut(cnt);
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BufMut</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="comment">// A vector can never have more than isize::MAX bytes</span>
-        <span class="ident">core::isize::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>()
+<span class="kw">unsafe impl </span>BufMut <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="comment">// A vector can never have more than isize::MAX bytes
+        </span>core::isize::MAX <span class="kw">as </span>usize - <span class="self">self</span>.len()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">advance_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="ident">len</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>advance_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">let </span>remaining = <span class="self">self</span>.capacity() - len;
 
         <span class="macro">assert!</span>(
-            <span class="ident">cnt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">remaining</span>,
+            cnt &lt;= remaining,
             <span class="string">&quot;cannot advance past `remaining_mut`: {:?} &lt;= {:?}&quot;</span>,
-            <span class="ident">cnt</span>,
-            <span class="ident">remaining</span>
+            cnt,
+            remaining
         );
 
-        <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">len</span> <span class="op">+</span> <span class="ident">cnt</span>);
+        <span class="self">self</span>.set_len(len + cnt);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">UninitSlice</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">reserve</span>(<span class="number">64</span>); <span class="comment">// Grow the vec</span>
-        }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>UninitSlice {
+        <span class="kw">if </span><span class="self">self</span>.capacity() == <span class="self">self</span>.len() {
+            <span class="self">self</span>.reserve(<span class="number">64</span>); <span class="comment">// Grow the vec
+        </span>}
 
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>();
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>cap = <span class="self">self</span>.capacity();
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
 
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut_ptr</span>();
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="ident">UninitSlice::from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">cap</span>)[<span class="ident">len</span>..] }
+        <span class="kw">let </span>ptr = <span class="self">self</span>.as_mut_ptr();
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut </span>UninitSlice::from_raw_parts_mut(ptr, cap)[len..] }
     }
 
-    <span class="comment">// Specialize these methods so they can skip checking `remaining_mut`</span>
-    <span class="comment">// and `advance_mut`.</span>
-    <span class="kw">fn</span> <span class="ident">put</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident"><span class="kw">super</span>::Buf</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">src</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="comment">// Specialize these methods so they can skip checking `remaining_mut`
+    // and `advance_mut`.
+    </span><span class="kw">fn </span>put&lt;T: <span class="kw">super</span>::Buf&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>src: T)
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="comment">// In case the src isn&#39;t contiguous, reserve upfront</span>
-        <span class="self">self</span>.<span class="ident">reserve</span>(<span class="ident">src</span>.<span class="ident">remaining</span>());
+        <span class="comment">// In case the src isn&#39;t contiguous, reserve upfront
+        </span><span class="self">self</span>.reserve(src.remaining());
 
-        <span class="kw">while</span> <span class="ident">src</span>.<span class="ident">has_remaining</span>() {
-            <span class="kw">let</span> <span class="ident">l</span>;
+        <span class="kw">while </span>src.has_remaining() {
+            <span class="kw">let </span>l;
 
-            <span class="comment">// a block to contain the src.bytes() borrow</span>
-            {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">chunk</span>();
-                <span class="ident">l</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>();
-                <span class="self">self</span>.<span class="ident">extend_from_slice</span>(<span class="ident">s</span>);
+            <span class="comment">// a block to contain the src.bytes() borrow
+            </span>{
+                <span class="kw">let </span>s = src.chunk();
+                l = s.len();
+                <span class="self">self</span>.extend_from_slice(s);
             }
 
-            <span class="ident">src</span>.<span class="ident">advance</span>(<span class="ident">l</span>);
+            src.advance(l);
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">put_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">extend_from_slice</span>(<span class="ident">src</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>put_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>.extend_from_slice(src);
     }
 
-    <span class="kw">fn</span> <span class="ident">put_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">u8</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>().<span class="ident">checked_add</span>(<span class="ident">cnt</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">resize</span>(<span class="ident">new_len</span>, <span class="ident">val</span>);
+    <span class="kw">fn </span>put_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: u8, cnt: usize) {
+        <span class="kw">let </span>new_len = <span class="self">self</span>.len().checked_add(cnt).unwrap();
+        <span class="self">self</span>.resize(new_len, val);
     }
 }
 
-<span class="comment">// The existence of this function makes the compiler catch if the BufMut</span>
-<span class="comment">// trait is &quot;object-safe&quot; or not.</span>
-<span class="kw">fn</span> <span class="ident">_assert_trait_object</span>(<span class="ident">_b</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">BufMut</span>) {}
+<span class="comment">// The existence of this function makes the compiler catch if the BufMut
+// trait is &quot;object-safe&quot; or not.
+</span><span class="kw">fn </span>_assert_trait_object(_b: <span class="kw-2">&amp;</span><span class="kw">dyn </span>BufMut) {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bytes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bytes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

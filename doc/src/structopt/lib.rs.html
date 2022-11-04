@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/structopt-0.3.26/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../structopt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../structopt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../structopt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/structopt-0.3.26/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../structopt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../structopt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../structopt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1236,1243 +1236,1243 @@
 <span id="1236">1236</span>
 <span id="1237">1237</span>
 <span id="1238">1238</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Guillaume Pinot (@TeXitoi) &lt;texitoi@texitoi.eu&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Guillaume Pinot (@TeXitoi) &lt;texitoi@texitoi.eu&gt;
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">forbid</span>(<span class="ident">unsafe_code</span>)]</span>
+</span><span class="attribute">#![deny(missing_docs)]
+#![forbid(unsafe_code)]
 
-<span class="doccomment">//! This crate defines the `StructOpt` trait and its custom derive.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Maintenance</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As clap v3 is now out, and the structopt features are integrated</span>
-<span class="doccomment">//! into (almost as-is), structopt is now in maintenance mode: no new</span>
-<span class="doccomment">//! feature will be added.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Bugs will be fixed, and documentation improvements will be accepted.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you want to disable all the `clap` features (colors,</span>
-<span class="doccomment">//! suggestions, ..) add `default-features = false` to the `structopt`</span>
-<span class="doccomment">//! dependency:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! structopt = { version = &quot;0.3&quot;, default-features = false }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Support for [`paw`](https://github.com/rust-cli/paw) (the</span>
-<span class="doccomment">//! `Command line argument paw-rser abstraction for main`) is disabled</span>
-<span class="doccomment">//! by default, but can be enabled in the `structopt` dependency</span>
-<span class="doccomment">//! with the feature `paw`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! structopt = { version = &quot;0.3&quot;, features = [ &quot;paw&quot; ] }</span>
-<span class="doccomment">//! paw = &quot;1.0&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Table of Contents</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [How to `derive(StructOpt)`](#how-to-derivestructopt)</span>
-<span class="doccomment">//! - [Attributes](#attributes)</span>
-<span class="doccomment">//!     - [Raw methods](#raw-methods)</span>
-<span class="doccomment">//!     - [Magical methods](#magical-methods)</span>
-<span class="doccomment">//! - Arguments</span>
-<span class="doccomment">//!     - [Type magic](#type-magic)</span>
-<span class="doccomment">//!     - [Specifying argument types](#specifying-argument-types)</span>
-<span class="doccomment">//!     - [Default values](#default-values)</span>
-<span class="doccomment">//!     - [Help messages](#help-messages)</span>
-<span class="doccomment">//!     - [Environment variable fallback](#environment-variable-fallback)</span>
-<span class="doccomment">//! - [Skipping fields](#skipping-fields)</span>
-<span class="doccomment">//! - [Subcommands](#subcommands)</span>
-<span class="doccomment">//!     - [Optional subcommands](#optional-subcommands)</span>
-<span class="doccomment">//!     - [External subcommands](#external-subcommands)</span>
-<span class="doccomment">//!     - [Flattening subcommands](#flattening-subcommands)</span>
-<span class="doccomment">//! - [Flattening](#flattening)</span>
-<span class="doccomment">//! - [Custom string parsers](#custom-string-parsers)</span>
-<span class="doccomment">//! - [Generics](#generics)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## How to `derive(StructOpt)`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First, let&#39;s look at the example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use std::path::PathBuf;</span>
-<span class="doccomment">//! use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, StructOpt)]</span>
-<span class="doccomment">//! #[structopt(name = &quot;example&quot;, about = &quot;An example of StructOpt usage.&quot;)]</span>
-<span class="doccomment">//! struct Opt {</span>
-<span class="doccomment">//!     /// Activate debug mode</span>
-<span class="doccomment">//!     // short and long flags (-d, --debug) will be deduced from the field&#39;s name</span>
-<span class="doccomment">//!     #[structopt(short, long)]</span>
-<span class="doccomment">//!     debug: bool,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// Set speed</span>
-<span class="doccomment">//!     // we don&#39;t want to name it &quot;speed&quot;, need to look smart</span>
-<span class="doccomment">//!     #[structopt(short = &quot;v&quot;, long = &quot;velocity&quot;, default_value = &quot;42&quot;)]</span>
-<span class="doccomment">//!     speed: f64,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// Input file</span>
-<span class="doccomment">//!     #[structopt(parse(from_os_str))]</span>
-<span class="doccomment">//!     input: PathBuf,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// Output file, stdout if not present</span>
-<span class="doccomment">//!     #[structopt(parse(from_os_str))]</span>
-<span class="doccomment">//!     output: Option&lt;PathBuf&gt;,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// Where to write the output: to `stdout` or `file`</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     out_type: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// File name: only required when `out-type` is set to `file`</span>
-<span class="doccomment">//!     #[structopt(name = &quot;FILE&quot;, required_if(&quot;out-type&quot;, &quot;file&quot;))]</span>
-<span class="doccomment">//!     file_name: Option&lt;String&gt;,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//! #   /*</span>
-<span class="doccomment">//!     let opt = Opt::from_args();</span>
-<span class="doccomment">//! #   */</span>
-<span class="doccomment">//! #   let opt = Opt::from_iter(&amp;[&quot;binary&quot;, &quot;-o&quot;, &quot;stdout&quot;, &quot;input&quot;]);</span>
-<span class="doccomment">//!     println!(&quot;{:?}&quot;, opt);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! So `derive(StructOpt)` tells Rust to generate a command line parser,</span>
-<span class="doccomment">//! and the various `structopt` attributes are simply</span>
-<span class="doccomment">//! used for additional parameters.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First, define a struct, whatever its name. This structure</span>
-<span class="doccomment">//! corresponds to a `clap::App`, its fields correspond to `clap::Arg`</span>
-<span class="doccomment">//! (unless they&#39;re [subcommands](#subcommands)),</span>
-<span class="doccomment">//! and you can adjust these apps and args by `#[structopt(...)]` [attributes](#attributes).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Note:**</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//! Keep in mind that `StructOpt` trait is more than just `from_args` method.</span>
-<span class="doccomment">//! It has a number of additional features, including access to underlying</span>
-<span class="doccomment">//! `clap::App` via `StructOpt::clap()`. See the</span>
-<span class="doccomment">//! [trait&#39;s reference documentation](trait.StructOpt.html).</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Attributes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can control the way `structopt` translates your struct into an actual</span>
-<span class="doccomment">//! [`clap::App`] invocation via `#[structopt(...)]` attributes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The attributes fall into two categories:</span>
-<span class="doccomment">//! - `structopt`&#39;s own [magical methods](#magical-methods).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    They are used by `structopt` itself. They come mostly in</span>
-<span class="doccomment">//!    `attr = [&quot;whatever&quot;]` form, but some `attr(args...)` also exist.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`raw` attributes](#raw-methods).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     They represent explicit `clap::Arg/App` method calls.</span>
-<span class="doccomment">//!     They are what used to be explicit `#[structopt(raw(...))]` attrs in pre-0.3 `structopt`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Every `structopt attribute` looks like comma-separated sequence of methods:</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[derive(structopt::StructOpt)] struct S {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #[structopt(</span>
-<span class="doccomment">//!     short, // method with no arguments - always magical</span>
-<span class="doccomment">//!     long = &quot;--long-option&quot;, // method with one argument</span>
-<span class="doccomment">//!     required_if(&quot;out&quot;, &quot;file&quot;), // method with one and more args</span>
-<span class="doccomment">//!     parse(from_os_str = path::to::parser) // some magical methods have their own syntax</span>
-<span class="doccomment">//! )]</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # s: () } mod path { pub(crate) mod to { pub(crate) fn parser(_: &amp;std::ffi::OsStr) {} }}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `#[structopt(...)]` attributes can be placed on top of `struct`, `enum`,</span>
-<span class="doccomment">//! `struct` field or `enum` variant. Attributes on top of `struct` or `enum`</span>
-<span class="doccomment">//! represent `clap::App` method calls, field or variant attributes correspond</span>
-<span class="doccomment">//! to `clap::Arg` method calls.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In other words, the `Opt` struct from the example above</span>
-<span class="doccomment">//! will be turned into this (*details omitted*):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::clap::{Arg, App};</span>
-<span class="doccomment">//! App::new(&quot;example&quot;)</span>
-<span class="doccomment">//!     .version(&quot;0.2.0&quot;)</span>
-<span class="doccomment">//!     .about(&quot;An example of StructOpt usage.&quot;)</span>
-<span class="doccomment">//! .arg(Arg::with_name(&quot;debug&quot;)</span>
-<span class="doccomment">//!     .help(&quot;Activate debug mode&quot;)</span>
-<span class="doccomment">//!     .short(&quot;debug&quot;)</span>
-<span class="doccomment">//!     .long(&quot;debug&quot;))</span>
-<span class="doccomment">//! .arg(Arg::with_name(&quot;speed&quot;)</span>
-<span class="doccomment">//!     .help(&quot;Set speed&quot;)</span>
-<span class="doccomment">//!     .short(&quot;v&quot;)</span>
-<span class="doccomment">//!     .long(&quot;velocity&quot;)</span>
-<span class="doccomment">//!     .default_value(&quot;42&quot;))</span>
-<span class="doccomment">//! // and so on</span>
-<span class="doccomment">//! # ;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Raw methods</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! They are the reason why `structopt` is so flexible. **Every and each method from</span>
-<span class="doccomment">//! `clap::App/Arg` can be used this way!** See the [`clap::App`</span>
-<span class="doccomment">//! methods](https://docs.rs/clap/2/clap/struct.App.html) and [`clap::Arg`</span>
-<span class="doccomment">//! methods](https://docs.rs/clap/2/clap/struct.Arg.html).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[derive(structopt::StructOpt)] struct S {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #[structopt(</span>
-<span class="doccomment">//!     global = true, // name = arg form, neat for one-arg methods</span>
-<span class="doccomment">//!     required_if(&quot;out&quot;, &quot;file&quot;) // name(arg1, arg2, ...) form.</span>
-<span class="doccomment">//! )]</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # s: String }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The first form can only be used for methods which take only one argument.</span>
-<span class="doccomment">//! The second form must be used with multi-arg methods, but can also be used with</span>
-<span class="doccomment">//! single-arg methods. These forms are identical otherwise.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As long as `method_name` is not one of the magical methods -</span>
-<span class="doccomment">//! it will be translated into a mere method call.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Note:**</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &quot;Raw methods&quot; are direct replacement for pre-0.3 structopt&#39;s</span>
-<span class="doccomment">//! `#[structopt(raw(...))]` attributes, any time you would have used a `raw()` attribute</span>
-<span class="doccomment">//! in 0.2 you should use raw method in 0.3.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unfortunately, old raw attributes collide with `clap::Arg::raw` method. To explicitly</span>
-<span class="doccomment">//! warn users of this change we allow `#[structopt(raw())]` only with `true` or `false`</span>
-<span class="doccomment">//! literals (this method is supposed to be called only with `true` anyway).</span>
-<span class="doccomment">//! __________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Magical methods</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! They are the reason why `structopt` is so easy to use and convenient in most cases.</span>
-<span class="doccomment">//! Many of them have defaults, some of them get used even if not mentioned.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Methods may be used on &quot;top level&quot; (on top of a `struct`, `enum` or `enum` variant)</span>
-<span class="doccomment">//! and/or on &quot;field-level&quot; (on top of a `struct` field or *inside* of an enum variant).</span>
-<span class="doccomment">//! Top level (non-magical) methods correspond to `App::method` calls, field-level methods</span>
-<span class="doccomment">//! are `Arg::method` calls.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! #[structopt(top_level)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     #[structopt(field_level)]</span>
-<span class="doccomment">//!     field: u32</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[structopt(top_level)]</span>
-<span class="doccomment">//! enum Bar {</span>
-<span class="doccomment">//!     #[structopt(top_level)]</span>
-<span class="doccomment">//!     Pineapple {</span>
-<span class="doccomment">//!         #[structopt(field_level)]</span>
-<span class="doccomment">//!         chocolate: String</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     #[structopt(top_level)]</span>
-<span class="doccomment">//!     Orange,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `name`: `[name = expr]`</span>
-<span class="doccomment">//!   - On top level: `App::new(expr)`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     The binary name displayed in help messages. Defaults to the crate name given by Cargo.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   - On field-level: `Arg::with_name(expr)`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     The name for the argument the field stands for, this name appears in help messages.</span>
-<span class="doccomment">//!     Defaults to a name, deduced from a field, see also</span>
-<span class="doccomment">//!     [`rename_all`](#specifying-argument-types).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `version`: `[version = &quot;version&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on top level: `App::version(&quot;version&quot; or env!(CARGO_PKG_VERSION))`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     The version displayed in help messages.</span>
-<span class="doccomment">//!     Defaults to the crate version given by Cargo. If `CARGO_PKG_VERSION` is not</span>
-<span class="doccomment">//!     set no `.version()` calls will be generated unless requested.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `no_version`: `no_version`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on top level. Prevents default `App::version` call, i.e</span>
-<span class="doccomment">//!     when no `version = &quot;version&quot;` mentioned.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `author`: `author [= &quot;author&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on top level: `App::author(&quot;author&quot; or env!(CARGO_PKG_AUTHORS))`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Author/maintainer of the binary, this name appears in help messages.</span>
-<span class="doccomment">//!     Defaults to the crate author given by cargo, but only when `author` explicitly mentioned.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `about`: `about [= &quot;about&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on top level: `App::about(&quot;about&quot; or env!(CARGO_PKG_DESCRIPTION))`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Short description of the binary, appears in help messages.</span>
-<span class="doccomment">//!     Defaults to the crate description given by cargo,</span>
-<span class="doccomment">//!     but only when `about` explicitly mentioned.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`short`](#specifying-argument-types): `short [= &quot;short-opt-name&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`long`](#specifying-argument-types): `long [= &quot;long-opt-name&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`default_value`](#default-values): `default_value [= &quot;default value&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`rename_all`](#specifying-argument-types):</span>
-<span class="doccomment">//!     [`rename_all = &quot;kebab&quot;/&quot;snake&quot;/&quot;screaming-snake&quot;/&quot;camel&quot;/&quot;pascal&quot;/&quot;verbatim&quot;/&quot;lower&quot;/&quot;upper&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable both on top level and field level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`parse`](#custom-string-parsers): `parse(type [= path::to::parser::fn])`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`skip`](#skipping-fields): `skip [= expr]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`flatten`](#flattening): `flatten`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable on field-level or single-typed tuple variants.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`subcommand`](#subcommands): `subcommand`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`external_subcommand`](#external-subcommands)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on enum variants.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`env`](#environment-variable-fallback): `env [= str_literal]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable only on field-level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`rename_all_env`](#auto-deriving-environment-variables):</span>
-<span class="doccomment">//!     [`rename_all_env = &quot;kebab&quot;/&quot;snake&quot;/&quot;screaming-snake&quot;/&quot;camel&quot;/&quot;pascal&quot;/&quot;verbatim&quot;/&quot;lower&quot;/&quot;upper&quot;]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable both on top level and field level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`verbatim_doc_comment`](#doc-comment-preprocessing-and-structoptverbatim_doc_comment):</span>
-<span class="doccomment">//!     `verbatim_doc_comment`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Usable both on top level and field level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Type magic</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! One of major things that makes `structopt` so awesome is its type magic.</span>
-<span class="doccomment">//! Do you want optional positional argument? Use `Option&lt;T&gt;`! Or perhaps optional argument</span>
-<span class="doccomment">//! that optionally takes value (`[--opt=[val]]`)? Use `Option&lt;Option&lt;T&gt;&gt;`!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Here is the table of types and `clap` methods they correspond to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Type                         | Effect                                            | Added method call to `clap::Arg`</span>
-<span class="doccomment">//! -----------------------------|---------------------------------------------------|--------------------------------------</span>
-<span class="doccomment">//! `bool`                       | `true` if the flag is present                     | `.takes_value(false).multiple(false)`</span>
-<span class="doccomment">//! `Option&lt;T: FromStr&gt;`         | optional positional argument or option            | `.takes_value(true).multiple(false)`</span>
-<span class="doccomment">//! `Option&lt;Option&lt;T: FromStr&gt;&gt;` | optional option with optional value               | `.takes_value(true).multiple(false).min_values(0).max_values(1)`</span>
-<span class="doccomment">//! `Vec&lt;T: FromStr&gt;`            | list of options or the other positional arguments | `.takes_value(true).multiple(true)`</span>
-<span class="doccomment">//! `Option&lt;Vec&lt;T: FromStr&gt;`     | optional list of options                          | `.takes_values(true).multiple(true).min_values(0)`</span>
-<span class="doccomment">//! `T: FromStr`                 | required option or positional argument            | `.takes_value(true).multiple(false).required(!has_default)`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `FromStr` trait is used to convert the argument to the given</span>
-<span class="doccomment">//! type, and the `Arg::validator` method is set to a method using</span>
-<span class="doccomment">//! `to_string()` (`FromStr::Err` must implement `std::fmt::Display`).</span>
-<span class="doccomment">//! If you would like to use a custom string parser other than `FromStr`, see</span>
-<span class="doccomment">//! the [same titled section](#custom-string-parsers) below.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Important:**</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//! Pay attention that *only literal occurrence* of this types is special, for example</span>
-<span class="doccomment">//! `Option&lt;T&gt;` is special while `::std::option::Option&lt;T&gt;` is not.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you need to avoid special casing you can make a `type` alias and</span>
-<span class="doccomment">//! use it in place of the said type.</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Note:**</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//! `bool` cannot be used as positional argument unless you provide an explicit parser.</span>
-<span class="doccomment">//! If you need a positional bool, for example to parse `true` or `false`, you must</span>
-<span class="doccomment">//! annotate the field with explicit [`#[structopt(parse(...))]`](#custom-string-parsers).</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Thus, the `speed` argument is generated as:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # fn parse_validator&lt;T&gt;(_: String) -&gt; Result&lt;(), String&gt; { unimplemented!() }</span>
-<span class="doccomment">//! clap::Arg::with_name(&quot;speed&quot;)</span>
-<span class="doccomment">//!     .takes_value(true)</span>
-<span class="doccomment">//!     .multiple(false)</span>
-<span class="doccomment">//!     .required(false)</span>
-<span class="doccomment">//!     .validator(parse_validator::&lt;f64&gt;)</span>
-<span class="doccomment">//!     .short(&quot;v&quot;)</span>
-<span class="doccomment">//!     .long(&quot;velocity&quot;)</span>
-<span class="doccomment">//!     .help(&quot;Set speed&quot;)</span>
-<span class="doccomment">//!     .default_value(&quot;42&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Specifying argument types</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There are three types of arguments that can be supplied to each</span>
-<span class="doccomment">//! (sub-)command:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!  - short (e.g. `-h`),</span>
-<span class="doccomment">//!  - long (e.g. `--help`)</span>
-<span class="doccomment">//!  - and positional.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Like clap, structopt defaults to creating positional arguments.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you want to generate a long argument you can specify either</span>
-<span class="doccomment">//! `long = $NAME`, or just `long` to get a long flag generated using</span>
-<span class="doccomment">//! the field name.  The generated casing style can be modified using</span>
-<span class="doccomment">//! the `rename_all` attribute. See the `rename_all` example for more.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For short arguments, `short` will use the first letter of the</span>
-<span class="doccomment">//! field name by default, but just like the long option it&#39;s also</span>
-<span class="doccomment">//! possible to use a custom letter through `short = $LETTER`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If an argument is renamed using `name = $NAME` any following call to</span>
-<span class="doccomment">//! `short` or `long` will use the new name.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Attention**: If these arguments are used without an explicit name</span>
-<span class="doccomment">//! the resulting flag is going to be renamed using `kebab-case` if the</span>
-<span class="doccomment">//! `rename_all` attribute was not specified previously. The same is true</span>
-<span class="doccomment">//! for subcommands with implicit naming through the related data structure.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! #[structopt(rename_all = &quot;kebab-case&quot;)]</span>
-<span class="doccomment">//! struct Opt {</span>
-<span class="doccomment">//!     /// This option can be specified with something like `--foo-option</span>
-<span class="doccomment">//!     /// value` or `--foo-option=value`</span>
-<span class="doccomment">//!     #[structopt(long)]</span>
-<span class="doccomment">//!     foo_option: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// This option can be specified with something like `-b value` (but</span>
-<span class="doccomment">//!     /// not `--bar-option value`).</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     bar_option: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// This option can be specified either `--baz value` or `-z value`.</span>
-<span class="doccomment">//!     #[structopt(short = &quot;z&quot;, long = &quot;baz&quot;)]</span>
-<span class="doccomment">//!     baz_option: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// This option can be specified either by `--custom value` or</span>
-<span class="doccomment">//!     /// `-c value`.</span>
-<span class="doccomment">//!     #[structopt(name = &quot;custom&quot;, long, short)]</span>
-<span class="doccomment">//!     custom_option: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// This option is positional, meaning it is the first unadorned string</span>
-<span class="doccomment">//!     /// you provide (multiple others could follow).</span>
-<span class="doccomment">//!     my_positional: String,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     /// This option is skipped and will be filled with the default value</span>
-<span class="doccomment">//!     /// for its type (in this case 0).</span>
-<span class="doccomment">//!     #[structopt(skip)]</span>
-<span class="doccomment">//!     skipped: u32,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Opt::from_iter(</span>
-<span class="doccomment">//! #    &amp;[&quot;test&quot;, &quot;--foo-option&quot;, &quot;&quot;, &quot;-b&quot;, &quot;&quot;, &quot;--baz&quot;, &quot;&quot;, &quot;--custom&quot;, &quot;&quot;, &quot;positional&quot;]);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Default values</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In clap, default values for options can be specified via [`Arg::default_value`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Of course, you can use as a raw method:</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Opt {</span>
-<span class="doccomment">//!     #[structopt(default_value = &quot;&quot;, long)]</span>
-<span class="doccomment">//!     prefix: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is quite mundane and error-prone to type the `&quot;...&quot;` default by yourself,</span>
-<span class="doccomment">//! especially when the Rust ecosystem uses the [`Default`] trait for that.</span>
-<span class="doccomment">//! It would be wonderful to have `structopt` to take the `Default_default` and fill it</span>
-<span class="doccomment">//! for you. And yes, `structopt` can do that.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Unfortunately, `default_value` takes `&amp;str` but `Default::default`</span>
-<span class="doccomment">//! gives us some `Self` value. We need to map `Self` to `&amp;str` somehow.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `structopt` solves this problem via [`ToString`] trait.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To be able to use auto-default the type must implement *both* `Default` and `ToString`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Opt {</span>
-<span class="doccomment">//!     // just leave the `= &quot;...&quot;` part and structopt will figure it for you</span>
-<span class="doccomment">//!     #[structopt(default_value, long)]</span>
-<span class="doccomment">//!     prefix: String, // `String` implements both `Default` and `ToString`</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Default`]: https://doc.rust-lang.org/std/default/trait.Default.html</span>
-<span class="doccomment">//! [`ToString`]: https://doc.rust-lang.org/std/string/trait.ToString.html</span>
-<span class="doccomment">//! [`Arg::default_value`]: https://docs.rs/clap/2.33.0/clap/struct.Arg.html#method.default_value</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Help messages</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In clap, help messages for the whole binary can be specified</span>
-<span class="doccomment">//! via [`App::about`] and [`App::long_about`] while help messages</span>
-<span class="doccomment">//! for individual arguments can be specified via [`Arg::help`] and [`Arg::long_help`]&quot;.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `long_*` variants are used when user calls the program with</span>
-<span class="doccomment">//! `--help` and &quot;short&quot; variants are used with `-h` flag. In `structopt`,</span>
-<span class="doccomment">//! you can use them via [raw methods](#raw-methods), for example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! #[structopt(about = &quot;I am a program and I work, just pass `-h`&quot;)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     #[structopt(short, help = &quot;Pass `-h` and you&#39;ll see me!&quot;)]</span>
-<span class="doccomment">//!     bar: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For convenience, doc comments can be used instead of raw methods</span>
-<span class="doccomment">//! (this example works exactly like the one above):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! /// I am a program and I work, just pass `-h`</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     /// Pass `-h` and you&#39;ll see me!</span>
-<span class="doccomment">//!     bar: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Doc comments on [top-level](#magical-methods) will be turned into</span>
-<span class="doccomment">//! `App::about/long_about` call (see below), doc comments on field-level are</span>
-<span class="doccomment">//! `Arg::help/long_help` calls.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Important:**</span>
-<span class="doccomment">//! _________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Raw methods have priority over doc comments!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Top level doc comments always generate `App::about/long_about` calls!**</span>
-<span class="doccomment">//! If you really want to use the `App::help/long_help` methods (you likely don&#39;t),</span>
-<span class="doccomment">//! use a raw method to override the `App::about` call generated from the doc comment.</span>
-<span class="doccomment">//! __________________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### `long_help` and `--help`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A message passed to [`App::long_about`] or [`Arg::long_help`] will be displayed whenever</span>
-<span class="doccomment">//! your program is called with `--help` instead of `-h`. Of course, you can</span>
-<span class="doccomment">//! use them via raw methods as described [above](#help-messages).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The more convenient way is to use a so-called &quot;long&quot; doc comment:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! /// Hi there, I&#39;m Robo!</span>
-<span class="doccomment">//! ///</span>
-<span class="doccomment">//! /// I like beeping, stumbling, eating your electricity,</span>
-<span class="doccomment">//! /// and making records of you singing in a shower.</span>
-<span class="doccomment">//! /// Pay up, or I&#39;ll upload it to youtube!</span>
-<span class="doccomment">//! struct Robo {</span>
-<span class="doccomment">//!     /// Call my brother SkyNet.</span>
-<span class="doccomment">//!     ///</span>
-<span class="doccomment">//!     /// I am artificial superintelligence. I won&#39;t rest</span>
-<span class="doccomment">//!     /// until I&#39;ll have destroyed humanity. Enjoy your</span>
-<span class="doccomment">//!     /// pathetic existence, you mere mortals.</span>
-<span class="doccomment">//!     #[structopt(long)]</span>
-<span class="doccomment">//!     kill_all_humans: bool,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A long doc comment consists of three parts:</span>
-<span class="doccomment">//! * Short summary</span>
-<span class="doccomment">//! * A blank line (whitespace only)</span>
-<span class="doccomment">//! * Detailed description, all the rest</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In other words, &quot;long&quot; doc comment consists of two or more paragraphs,</span>
-<span class="doccomment">//! with the first being a summary and the rest being the detailed description.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **A long comment will result in two method calls**, `help(&lt;summary&gt;)` and</span>
-<span class="doccomment">//! `long_help(&lt;whole comment&gt;)`, so clap will display the summary with `-h`</span>
-<span class="doccomment">//! and the whole help message on `--help` (see below).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! So, the example above will be turned into this (details omitted):</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! clap::App::new(&quot;&lt;name&gt;&quot;)</span>
-<span class="doccomment">//!     .about(&quot;Hi there, I&#39;m Robo!&quot;)</span>
-<span class="doccomment">//!     .long_about(&quot;Hi there, I&#39;m Robo!\n\n\</span>
-<span class="doccomment">//!                  I like beeping, stumbling, eating your electricity,\</span>
-<span class="doccomment">//!                  and making records of you singing in a shower.\</span>
-<span class="doccomment">//!                  Pay up or I&#39;ll upload it to youtube!&quot;)</span>
-<span class="doccomment">//! // args...</span>
-<span class="doccomment">//! # ;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### `-h` vs `--help` (A.K.A `help()` vs `long_help()`)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `-h` flag is not the same as `--help`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! -h corresponds to `Arg::help/App::about` and requests short &quot;summary&quot; messages</span>
-<span class="doccomment">//! while --help corresponds to `Arg::long_help/App::long_about` and requests more</span>
-<span class="doccomment">//! detailed, descriptive messages.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is entirely up to `clap` what happens if you used only one of</span>
-<span class="doccomment">//! [`Arg::help`]/[`Arg::long_help`], see `clap`&#39;s documentation for these methods.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As of clap v2.33, if only a short message ([`Arg::help`]) or only</span>
-<span class="doccomment">//! a long ([`Arg::long_help`]) message is provided, clap will use it</span>
-<span class="doccomment">//! for both -h and --help. The same logic applies to `about/long_about`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Doc comment preprocessing and `#[structopt(verbatim_doc_comment)]`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `structopt` applies some preprocessing to doc comments to ease the most common uses:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * Strip leading and trailing whitespace from every line, if present.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * Strip leading and trailing blank lines, if present.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * Interpret each group of non-empty lines as a word-wrapped paragraph.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   We replace newlines within paragraphs with spaces to allow the output</span>
-<span class="doccomment">//!   to be re-wrapped to the terminal width.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * Strip any excess blank lines so that there is exactly one per paragraph break.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * If the first paragraph ends in exactly one period,</span>
-<span class="doccomment">//!   remove the trailing period (i.e. strip trailing periods but not trailing ellipses).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Sometimes you don&#39;t want this preprocessing to apply, for example the comment contains</span>
-<span class="doccomment">//! some ASCII art or markdown tables, you would need to preserve LFs along with</span>
-<span class="doccomment">//! blank lines and the leading/trailing whitespace. You can ask `structopt` to preserve them</span>
-<span class="doccomment">//! via `#[structopt(verbatim_doc_comment)]` attribute.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **This attribute must be applied to each field separately**, there&#39;s no global switch.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Important:**</span>
-<span class="doccomment">//! ______________</span>
-<span class="doccomment">//! Keep in mind that `structopt` will *still* remove one leading space from each</span>
-<span class="doccomment">//! line, even if this attribute is present, to allow for a space between</span>
-<span class="doccomment">//! `///` and the content.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Also, `structopt` will *still* remove leading and trailing blank lines so</span>
-<span class="doccomment">//! these formats are equivalent:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! /** This is a doc comment</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Hello! */</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! /**</span>
-<span class="doccomment">//! This is a doc comment</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Hello!</span>
-<span class="doccomment">//! */</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! /// This is a doc comment</span>
-<span class="doccomment">//! ///</span>
-<span class="doccomment">//! /// Hello!</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # mod m {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! ______________</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`App::about`]:      https://docs.rs/clap/2/clap/struct.App.html#method.about</span>
-<span class="doccomment">//! [`App::long_about`]: https://docs.rs/clap/2/clap/struct.App.html#method.long_about</span>
-<span class="doccomment">//! [`Arg::help`]:       https://docs.rs/clap/2/clap/struct.Arg.html#method.help</span>
-<span class="doccomment">//! [`Arg::long_help`]:  https://docs.rs/clap/2/clap/struct.Arg.html#method.long_help</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Environment variable fallback</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is possible to specify an environment variable fallback option for an arguments</span>
-<span class="doccomment">//! so that its value is taken from the specified environment variable if not</span>
-<span class="doccomment">//! given through the command-line:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     #[structopt(short, long, env = &quot;PARAMETER_VALUE&quot;)]</span>
-<span class="doccomment">//!     parameter_value: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! By default, values from the environment are shown in the help output (i.e. when invoking</span>
-<span class="doccomment">//! `--help`):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! $ cargo run -- --help</span>
-<span class="doccomment">//! ...</span>
-<span class="doccomment">//! OPTIONS:</span>
-<span class="doccomment">//!   -p, --parameter-value &lt;parameter-value&gt;     [env: PARAMETER_VALUE=env_value]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In some cases this may be undesirable, for example when being used for passing</span>
-<span class="doccomment">//! credentials or secret tokens. In those cases you can use `hide_env_values` to avoid</span>
-<span class="doccomment">//! having structopt emit the actual secret values:</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     #[structopt(long = &quot;secret&quot;, env = &quot;SECRET_VALUE&quot;, hide_env_values = true)]</span>
-<span class="doccomment">//!     secret_value: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Auto-deriving environment variables</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Environment variables tend to be called after the corresponding `struct`&#39;s field,</span>
-<span class="doccomment">//! as in example above. The field is `secret_value` and the env var is &quot;SECRET_VALUE&quot;;</span>
-<span class="doccomment">//! the name is the same, except casing is different.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It&#39;s pretty tedious and error-prone to type the same name twice,</span>
-<span class="doccomment">//! so you can ask `structopt` to do that for you.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     #[structopt(long = &quot;secret&quot;, env)]</span>
-<span class="doccomment">//!     secret_value: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It works just like `#[structopt(short/long)]`: if `env` is not set to some concrete</span>
-<span class="doccomment">//! value the value will be derived from the field&#39;s name. This is controlled by</span>
-<span class="doccomment">//! `#[structopt(rename_all_env)]`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `rename_all_env` works exactly as `rename_all` (including overriding)</span>
-<span class="doccomment">//! except default casing is `SCREAMING_SNAKE_CASE` instead of `kebab-case`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Skipping fields</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Sometimes you may want to add a field to your `Opt` struct that is not</span>
-<span class="doccomment">//! a command line option and `clap` should know nothing about it. You can ask</span>
-<span class="doccomment">//! `structopt` to skip the field entirely via `#[structopt(skip = value)]`</span>
-<span class="doccomment">//! (`value` must implement `Into&lt;FieldType&gt;`)</span>
-<span class="doccomment">//! or `#[structopt(skip)]` if you want assign the field with `Default::default()`</span>
-<span class="doccomment">//! (obviously, the field&#39;s type must implement `Default`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! pub struct Opt {</span>
-<span class="doccomment">//!     #[structopt(long, short)]</span>
-<span class="doccomment">//!     number: u32,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // these fields are to be assigned with Default::default()</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     #[structopt(skip)]</span>
-<span class="doccomment">//!     k: String,</span>
-<span class="doccomment">//!     #[structopt(skip)]</span>
-<span class="doccomment">//!     v: Vec&lt;u32&gt;,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // these fields get set explicitly</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     #[structopt(skip = vec![1, 2, 3])]</span>
-<span class="doccomment">//!     k2: Vec&lt;u32&gt;,</span>
-<span class="doccomment">//!     #[structopt(skip = &quot;cake&quot;)] // &amp;str implements Into&lt;String&gt;</span>
-<span class="doccomment">//!     v2: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Subcommands</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Some applications, especially large ones, split their functionality</span>
-<span class="doccomment">//! through the use of &quot;subcommands&quot;. Each of these act somewhat like a separate</span>
-<span class="doccomment">//! command, but is part of the larger group.</span>
-<span class="doccomment">//! One example is `git`, which has subcommands such as `add`, `commit`,</span>
-<span class="doccomment">//! and `clone`, to mention just a few.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `clap` has this functionality, and `structopt` supports it through enums:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # use std::path::PathBuf;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! #[structopt(about = &quot;the stupid content tracker&quot;)]</span>
-<span class="doccomment">//! enum Git {</span>
-<span class="doccomment">//!     Add {</span>
-<span class="doccomment">//!         #[structopt(short)]</span>
-<span class="doccomment">//!         interactive: bool,</span>
-<span class="doccomment">//!         #[structopt(short)]</span>
-<span class="doccomment">//!         patch: bool,</span>
-<span class="doccomment">//!         #[structopt(parse(from_os_str))]</span>
-<span class="doccomment">//!         files: Vec&lt;PathBuf&gt;,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Fetch {</span>
-<span class="doccomment">//!         #[structopt(long)]</span>
-<span class="doccomment">//!         dry_run: bool,</span>
-<span class="doccomment">//!         #[structopt(long)]</span>
-<span class="doccomment">//!         all: bool,</span>
-<span class="doccomment">//!         repository: Option&lt;String&gt;,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Commit {</span>
-<span class="doccomment">//!         #[structopt(short)]</span>
-<span class="doccomment">//!         message: Option&lt;String&gt;,</span>
-<span class="doccomment">//!         #[structopt(short)]</span>
-<span class="doccomment">//!         all: bool,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Using `derive(StructOpt)` on an enum instead of a struct will produce</span>
-<span class="doccomment">//! a `clap::App` that only takes subcommands. So `git add`, `git fetch`,</span>
-<span class="doccomment">//! and `git commit` would be commands allowed for the above example.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `structopt` also provides support for applications where certain flags</span>
-<span class="doccomment">//! need to apply to all subcommands, as well as nested subcommands:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct MakeCookie {</span>
-<span class="doccomment">//!     #[structopt(name = &quot;supervisor&quot;, default_value = &quot;Puck&quot;, long = &quot;supervisor&quot;)]</span>
-<span class="doccomment">//!     supervising_faerie: String,</span>
-<span class="doccomment">//!     /// The faerie tree this cookie is being made in.</span>
-<span class="doccomment">//!     tree: Option&lt;String&gt;,</span>
-<span class="doccomment">//!     #[structopt(subcommand)] // Note that we mark a field as a subcommand</span>
-<span class="doccomment">//!     cmd: Command,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! enum Command {</span>
-<span class="doccomment">//!     /// Pound acorns into flour for cookie dough.</span>
-<span class="doccomment">//!     Pound {</span>
-<span class="doccomment">//!         acorns: u32,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     /// Add magical sparkles -- the secret ingredient!</span>
-<span class="doccomment">//!     Sparkle {</span>
-<span class="doccomment">//!         #[structopt(short, parse(from_occurrences))]</span>
-<span class="doccomment">//!         magicality: u64,</span>
-<span class="doccomment">//!         #[structopt(short)]</span>
-<span class="doccomment">//!         color: String,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Finish(Finish),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Subcommand can also be externalized by using a 1-uple enum variant</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Finish {</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     time: u32,</span>
-<span class="doccomment">//!     #[structopt(subcommand)] // Note that we mark a field as a subcommand</span>
-<span class="doccomment">//!     finish_type: FinishType,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // subsubcommand!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! enum FinishType {</span>
-<span class="doccomment">//!     Glaze {</span>
-<span class="doccomment">//!         applications: u32,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Powder {</span>
-<span class="doccomment">//!         flavor: String,</span>
-<span class="doccomment">//!         dips: u32,</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Marking a field with `structopt(subcommand)` will add the subcommands of the</span>
-<span class="doccomment">//! designated enum to the current `clap::App`. The designated enum *must* also</span>
-<span class="doccomment">//! be derived `StructOpt`. So the above example would take the following</span>
-<span class="doccomment">//! commands:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! + `make-cookie pound 50`</span>
-<span class="doccomment">//! + `make-cookie sparkle -mmm --color &quot;green&quot;`</span>
-<span class="doccomment">//! + `make-cookie finish 130 glaze 3`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Optional subcommands</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Subcommands may be optional:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Foo {</span>
-<span class="doccomment">//!     file: String,</span>
-<span class="doccomment">//!     #[structopt(subcommand)]</span>
-<span class="doccomment">//!     cmd: Option&lt;Command&gt;,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! enum Command {</span>
-<span class="doccomment">//!     Bar,</span>
-<span class="doccomment">//!     Baz,</span>
-<span class="doccomment">//!     Quux,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### External subcommands</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Sometimes you want to support not only the set of well-known subcommands</span>
-<span class="doccomment">//! but you also want to allow other, user-driven subcommands. `clap` supports</span>
-<span class="doccomment">//! this via [`AppSettings::AllowExternalSubcommands`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `structopt` provides it&#39;s own dedicated syntax for that:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(Debug, PartialEq, StructOpt)]</span>
-<span class="doccomment">//! struct Opt {</span>
-<span class="doccomment">//!     #[structopt(subcommand)]</span>
-<span class="doccomment">//!     sub: Subcommands,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, PartialEq, StructOpt)]</span>
-<span class="doccomment">//! enum Subcommands {</span>
-<span class="doccomment">//!     // normal subcommand</span>
-<span class="doccomment">//!     Add,</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // `external_subcommand` tells structopt to put</span>
-<span class="doccomment">//!     // all the extra arguments into this Vec</span>
-<span class="doccomment">//!     #[structopt(external_subcommand)]</span>
-<span class="doccomment">//!     Other(Vec&lt;String&gt;),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // normal subcommand</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     Opt::from_iter(&amp;[&quot;test&quot;, &quot;add&quot;]),</span>
-<span class="doccomment">//!     Opt {</span>
-<span class="doccomment">//!         sub: Subcommands::Add</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     Opt::from_iter(&amp;[&quot;test&quot;, &quot;git&quot;, &quot;status&quot;]),</span>
-<span class="doccomment">//!     Opt {</span>
-<span class="doccomment">//!         sub: Subcommands::Other(vec![&quot;git&quot;.into(), &quot;status&quot;.into()])</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Please note that if you&#39;d wanted to allow &quot;no subcommands at all&quot; case</span>
-<span class="doccomment">//! // you should have used `sub: Option&lt;Subcommands&gt;` above</span>
-<span class="doccomment">//! assert!(Opt::from_iter_safe(&amp;[&quot;test&quot;]).is_err());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In other words, you just add an extra tuple variant marked with</span>
-<span class="doccomment">//! `#[structopt(subcommand)]`, and its type must be either</span>
-<span class="doccomment">//! `Vec&lt;String&gt;` or `Vec&lt;OsString&gt;`. `structopt` will detect `String` in this context</span>
-<span class="doccomment">//! and use appropriate `clap` API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`AppSettings::AllowExternalSubcommands`]: https://docs.rs/clap/2.32.0/clap/enum.AppSettings.html#variant.AllowExternalSubcommands</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Flattening subcommands</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is also possible to combine multiple enums of subcommands into one.</span>
-<span class="doccomment">//! All the subcommands will be on the same level.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! enum BaseCli {</span>
-<span class="doccomment">//!     Ghost10 {</span>
-<span class="doccomment">//!         arg1: i32,</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! enum Opt {</span>
-<span class="doccomment">//!     #[structopt(flatten)]</span>
-<span class="doccomment">//!     BaseCli(BaseCli),</span>
-<span class="doccomment">//!     Dex {</span>
-<span class="doccomment">//!         arg2: i32,</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! cli ghost10 42</span>
-<span class="doccomment">//! cli dex 42</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Flattening</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It can sometimes be useful to group related arguments in a substruct,</span>
-<span class="doccomment">//! while keeping the command-line interface flat. In these cases you can mark</span>
-<span class="doccomment">//! a field as `flatten` and give it another type that derives `StructOpt`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct Cmdline {</span>
-<span class="doccomment">//!     /// switch on verbosity</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     verbose: bool,</span>
-<span class="doccomment">//!     #[structopt(flatten)]</span>
-<span class="doccomment">//!     daemon_opts: DaemonOpts,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct DaemonOpts {</span>
-<span class="doccomment">//!     /// daemon user</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     user: String,</span>
-<span class="doccomment">//!     /// daemon group</span>
-<span class="doccomment">//!     #[structopt(short)]</span>
-<span class="doccomment">//!     group: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In this example, the derived `Cmdline` parser will support the options `-v`,</span>
-<span class="doccomment">//! `-u` and `-g`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This feature also makes it possible to define a `StructOpt` struct in a</span>
-<span class="doccomment">//! library, parse the corresponding arguments in the main argument parser, and</span>
-<span class="doccomment">//! pass off this struct to a handler provided by that library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Custom string parsers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If the field type does not have a `FromStr` implementation, or you would</span>
-<span class="doccomment">//! like to provide a custom parsing scheme other than `FromStr`, you may</span>
-<span class="doccomment">//! provide a custom string parser using `parse(...)` like this:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! use std::num::ParseIntError;</span>
-<span class="doccomment">//! use std::path::PathBuf;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn parse_hex(src: &amp;str) -&gt; Result&lt;u32, ParseIntError&gt; {</span>
-<span class="doccomment">//!     u32::from_str_radix(src, 16)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct HexReader {</span>
-<span class="doccomment">//!     #[structopt(short, parse(try_from_str = parse_hex))]</span>
-<span class="doccomment">//!     number: u32,</span>
-<span class="doccomment">//!     #[structopt(short, parse(from_os_str))]</span>
-<span class="doccomment">//!     output: PathBuf,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There are five kinds of custom parsers:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Kind              | Signature                             | Default                         |</span>
-<span class="doccomment">//! |-------------------|---------------------------------------|---------------------------------|</span>
-<span class="doccomment">//! | `from_str`        | `fn(&amp;str) -&gt; T`                       | `::std::convert::From::from`    |</span>
-<span class="doccomment">//! | `try_from_str`    | `fn(&amp;str) -&gt; Result&lt;T, E&gt;`            | `::std::str::FromStr::from_str` |</span>
-<span class="doccomment">//! | `from_os_str`     | `fn(&amp;OsStr) -&gt; T`                     | `::std::convert::From::from`    |</span>
-<span class="doccomment">//! | `try_from_os_str` | `fn(&amp;OsStr) -&gt; Result&lt;T, OsString&gt;`   | (no default function)           |</span>
-<span class="doccomment">//! | `from_occurrences`| `fn(u64) -&gt; T`                        | `value as T`                    |</span>
-<span class="doccomment">//! | `from_flag`       | `fn(bool) -&gt; T`                       | `::std::convert::From::from`    |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `from_occurrences` parser is special. Using `parse(from_occurrences)`</span>
-<span class="doccomment">//! results in the _number of flags occurrences_ being stored in the relevant</span>
-<span class="doccomment">//! field or being passed to the supplied function. In other words, it converts</span>
-<span class="doccomment">//! something like `-vvv` to `3`. This is equivalent to</span>
-<span class="doccomment">//! `.takes_value(false).multiple(true)`. Note that the default parser can only</span>
-<span class="doccomment">//! be used with fields of integer types (`u8`, `usize`, `i64`, etc.).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `from_flag` parser is also special. Using `parse(from_flag)` or</span>
-<span class="doccomment">//! `parse(from_flag = some_func)` will result in the field being treated as a</span>
-<span class="doccomment">//! flag even if it does not have type `bool`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When supplying a custom string parser, `bool` will not be treated specially:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Type        | Effect            | Added method call to `clap::Arg`</span>
-<span class="doccomment">//! ------------|-------------------|--------------------------------------</span>
-<span class="doccomment">//! `Option&lt;T&gt;` | optional argument | `.takes_value(true).multiple(false)`</span>
-<span class="doccomment">//! `Vec&lt;T&gt;`    | list of arguments | `.takes_value(true).multiple(true)`</span>
-<span class="doccomment">//! `T`         | required argument | `.takes_value(true).multiple(false).required(!has_default)`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In the `try_from_*` variants, the function will run twice on valid input:</span>
-<span class="doccomment">//! once to validate, and once to parse. Hence, make sure the function is</span>
-<span class="doccomment">//! side-effect-free.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Generics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Generic structs and enums can be used. They require explicit trait bounds</span>
-<span class="doccomment">//! on any generic types that will be used by the `StructOpt` derive macro. In</span>
-<span class="doccomment">//! some cases, associated types will require additional bounds. See the usage</span>
-<span class="doccomment">//! of `FromStr` below for an example of this.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! use std::{fmt, str::FromStr};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // a struct with single custom argument</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct GenericArgs&lt;T: FromStr&gt; where &lt;T as FromStr&gt;::Err: fmt::Display + fmt::Debug {</span>
-<span class="doccomment">//!     generic_arg_1: String,</span>
-<span class="doccomment">//!     generic_arg_2: String,</span>
-<span class="doccomment">//!     custom_arg_1: T,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! or</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use structopt::StructOpt;</span>
-<span class="doccomment">//! // a struct with multiple custom arguments in a substructure</span>
-<span class="doccomment">//! #[derive(StructOpt)]</span>
-<span class="doccomment">//! struct GenericArgs&lt;T: StructOpt&gt; {</span>
-<span class="doccomment">//!     generic_arg_1: String,</span>
-<span class="doccomment">//!     generic_arg_2: String,</span>
-<span class="doccomment">//!     #[structopt(flatten)]</span>
-<span class="doccomment">//!     custom_args: T,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! This crate defines the `StructOpt` trait and its custom derive.
+//!
+//! ## Maintenance
+//!
+//! As clap v3 is now out, and the structopt features are integrated
+//! into (almost as-is), structopt is now in maintenance mode: no new
+//! feature will be added.
+//!
+//! Bugs will be fixed, and documentation improvements will be accepted.
+//!
+//! ## Features
+//!
+//! If you want to disable all the `clap` features (colors,
+//! suggestions, ..) add `default-features = false` to the `structopt`
+//! dependency:
+//!
+//! ```toml
+//! [dependencies]
+//! structopt = { version = &quot;0.3&quot;, default-features = false }
+//! ```
+//!
+//! Support for [`paw`](https://github.com/rust-cli/paw) (the
+//! `Command line argument paw-rser abstraction for main`) is disabled
+//! by default, but can be enabled in the `structopt` dependency
+//! with the feature `paw`:
+//!
+//! ```toml
+//! [dependencies]
+//! structopt = { version = &quot;0.3&quot;, features = [ &quot;paw&quot; ] }
+//! paw = &quot;1.0&quot;
+//! ```
+//!
+//! # Table of Contents
+//!
+//! - [How to `derive(StructOpt)`](#how-to-derivestructopt)
+//! - [Attributes](#attributes)
+//!     - [Raw methods](#raw-methods)
+//!     - [Magical methods](#magical-methods)
+//! - Arguments
+//!     - [Type magic](#type-magic)
+//!     - [Specifying argument types](#specifying-argument-types)
+//!     - [Default values](#default-values)
+//!     - [Help messages](#help-messages)
+//!     - [Environment variable fallback](#environment-variable-fallback)
+//! - [Skipping fields](#skipping-fields)
+//! - [Subcommands](#subcommands)
+//!     - [Optional subcommands](#optional-subcommands)
+//!     - [External subcommands](#external-subcommands)
+//!     - [Flattening subcommands](#flattening-subcommands)
+//! - [Flattening](#flattening)
+//! - [Custom string parsers](#custom-string-parsers)
+//! - [Generics](#generics)
+//!
+//!
+//!
+//! ## How to `derive(StructOpt)`
+//!
+//! First, let&#39;s look at the example:
+//!
+//! ```
+//! use std::path::PathBuf;
+//! use structopt::StructOpt;
+//!
+//! #[derive(Debug, StructOpt)]
+//! #[structopt(name = &quot;example&quot;, about = &quot;An example of StructOpt usage.&quot;)]
+//! struct Opt {
+//!     /// Activate debug mode
+//!     // short and long flags (-d, --debug) will be deduced from the field&#39;s name
+//!     #[structopt(short, long)]
+//!     debug: bool,
+//!
+//!     /// Set speed
+//!     // we don&#39;t want to name it &quot;speed&quot;, need to look smart
+//!     #[structopt(short = &quot;v&quot;, long = &quot;velocity&quot;, default_value = &quot;42&quot;)]
+//!     speed: f64,
+//!
+//!     /// Input file
+//!     #[structopt(parse(from_os_str))]
+//!     input: PathBuf,
+//!
+//!     /// Output file, stdout if not present
+//!     #[structopt(parse(from_os_str))]
+//!     output: Option&lt;PathBuf&gt;,
+//!
+//!     /// Where to write the output: to `stdout` or `file`
+//!     #[structopt(short)]
+//!     out_type: String,
+//!
+//!     /// File name: only required when `out-type` is set to `file`
+//!     #[structopt(name = &quot;FILE&quot;, required_if(&quot;out-type&quot;, &quot;file&quot;))]
+//!     file_name: Option&lt;String&gt;,
+//! }
+//!
+//! fn main() {
+//! #   /*
+//!     let opt = Opt::from_args();
+//! #   */
+//! #   let opt = Opt::from_iter(&amp;[&quot;binary&quot;, &quot;-o&quot;, &quot;stdout&quot;, &quot;input&quot;]);
+//!     println!(&quot;{:?}&quot;, opt);
+//! }
+//! ```
+//!
+//! So `derive(StructOpt)` tells Rust to generate a command line parser,
+//! and the various `structopt` attributes are simply
+//! used for additional parameters.
+//!
+//! First, define a struct, whatever its name. This structure
+//! corresponds to a `clap::App`, its fields correspond to `clap::Arg`
+//! (unless they&#39;re [subcommands](#subcommands)),
+//! and you can adjust these apps and args by `#[structopt(...)]` [attributes](#attributes).
+//!
+//! **Note:**
+//! _________________
+//! Keep in mind that `StructOpt` trait is more than just `from_args` method.
+//! It has a number of additional features, including access to underlying
+//! `clap::App` via `StructOpt::clap()`. See the
+//! [trait&#39;s reference documentation](trait.StructOpt.html).
+//! _________________
+//!
+//! ## Attributes
+//!
+//! You can control the way `structopt` translates your struct into an actual
+//! [`clap::App`] invocation via `#[structopt(...)]` attributes.
+//!
+//! The attributes fall into two categories:
+//! - `structopt`&#39;s own [magical methods](#magical-methods).
+//!
+//!    They are used by `structopt` itself. They come mostly in
+//!    `attr = [&quot;whatever&quot;]` form, but some `attr(args...)` also exist.
+//!
+//! - [`raw` attributes](#raw-methods).
+//!
+//!     They represent explicit `clap::Arg/App` method calls.
+//!     They are what used to be explicit `#[structopt(raw(...))]` attrs in pre-0.3 `structopt`
+//!
+//! Every `structopt attribute` looks like comma-separated sequence of methods:
+//! ```
+//! # #[derive(structopt::StructOpt)] struct S {
+//! #
+//! #[structopt(
+//!     short, // method with no arguments - always magical
+//!     long = &quot;--long-option&quot;, // method with one argument
+//!     required_if(&quot;out&quot;, &quot;file&quot;), // method with one and more args
+//!     parse(from_os_str = path::to::parser) // some magical methods have their own syntax
+//! )]
+//! #
+//! # s: () } mod path { pub(crate) mod to { pub(crate) fn parser(_: &amp;std::ffi::OsStr) {} }}
+//! ```
+//!
+//! `#[structopt(...)]` attributes can be placed on top of `struct`, `enum`,
+//! `struct` field or `enum` variant. Attributes on top of `struct` or `enum`
+//! represent `clap::App` method calls, field or variant attributes correspond
+//! to `clap::Arg` method calls.
+//!
+//! In other words, the `Opt` struct from the example above
+//! will be turned into this (*details omitted*):
+//!
+//! ```
+//! # use structopt::clap::{Arg, App};
+//! App::new(&quot;example&quot;)
+//!     .version(&quot;0.2.0&quot;)
+//!     .about(&quot;An example of StructOpt usage.&quot;)
+//! .arg(Arg::with_name(&quot;debug&quot;)
+//!     .help(&quot;Activate debug mode&quot;)
+//!     .short(&quot;debug&quot;)
+//!     .long(&quot;debug&quot;))
+//! .arg(Arg::with_name(&quot;speed&quot;)
+//!     .help(&quot;Set speed&quot;)
+//!     .short(&quot;v&quot;)
+//!     .long(&quot;velocity&quot;)
+//!     .default_value(&quot;42&quot;))
+//! // and so on
+//! # ;
+//! ```
+//!
+//! ## Raw methods
+//!
+//! They are the reason why `structopt` is so flexible. **Every and each method from
+//! `clap::App/Arg` can be used this way!** See the [`clap::App`
+//! methods](https://docs.rs/clap/2/clap/struct.App.html) and [`clap::Arg`
+//! methods](https://docs.rs/clap/2/clap/struct.Arg.html).
+//!
+//! ```
+//! # #[derive(structopt::StructOpt)] struct S {
+//! #
+//! #[structopt(
+//!     global = true, // name = arg form, neat for one-arg methods
+//!     required_if(&quot;out&quot;, &quot;file&quot;) // name(arg1, arg2, ...) form.
+//! )]
+//! #
+//! # s: String }
+//! ```
+//!
+//! The first form can only be used for methods which take only one argument.
+//! The second form must be used with multi-arg methods, but can also be used with
+//! single-arg methods. These forms are identical otherwise.
+//!
+//! As long as `method_name` is not one of the magical methods -
+//! it will be translated into a mere method call.
+//!
+//! **Note:**
+//! _________________
+//!
+//! &quot;Raw methods&quot; are direct replacement for pre-0.3 structopt&#39;s
+//! `#[structopt(raw(...))]` attributes, any time you would have used a `raw()` attribute
+//! in 0.2 you should use raw method in 0.3.
+//!
+//! Unfortunately, old raw attributes collide with `clap::Arg::raw` method. To explicitly
+//! warn users of this change we allow `#[structopt(raw())]` only with `true` or `false`
+//! literals (this method is supposed to be called only with `true` anyway).
+//! __________________
+//!
+//! ## Magical methods
+//!
+//! They are the reason why `structopt` is so easy to use and convenient in most cases.
+//! Many of them have defaults, some of them get used even if not mentioned.
+//!
+//! Methods may be used on &quot;top level&quot; (on top of a `struct`, `enum` or `enum` variant)
+//! and/or on &quot;field-level&quot; (on top of a `struct` field or *inside* of an enum variant).
+//! Top level (non-magical) methods correspond to `App::method` calls, field-level methods
+//! are `Arg::method` calls.
+//!
+//! ```ignore
+//! #[structopt(top_level)]
+//! struct Foo {
+//!     #[structopt(field_level)]
+//!     field: u32
+//! }
+//!
+//! #[structopt(top_level)]
+//! enum Bar {
+//!     #[structopt(top_level)]
+//!     Pineapple {
+//!         #[structopt(field_level)]
+//!         chocolate: String
+//!     },
+//!
+//!     #[structopt(top_level)]
+//!     Orange,
+//! }
+//! ```
+//!
+//! - `name`: `[name = expr]`
+//!   - On top level: `App::new(expr)`.
+//!
+//!     The binary name displayed in help messages. Defaults to the crate name given by Cargo.
+//!
+//!   - On field-level: `Arg::with_name(expr)`.
+//!
+//!     The name for the argument the field stands for, this name appears in help messages.
+//!     Defaults to a name, deduced from a field, see also
+//!     [`rename_all`](#specifying-argument-types).
+//!
+//! - `version`: `[version = &quot;version&quot;]`
+//!
+//!     Usable only on top level: `App::version(&quot;version&quot; or env!(CARGO_PKG_VERSION))`.
+//!
+//!     The version displayed in help messages.
+//!     Defaults to the crate version given by Cargo. If `CARGO_PKG_VERSION` is not
+//!     set no `.version()` calls will be generated unless requested.
+//!
+//! - `no_version`: `no_version`
+//!
+//!     Usable only on top level. Prevents default `App::version` call, i.e
+//!     when no `version = &quot;version&quot;` mentioned.
+//!
+//! - `author`: `author [= &quot;author&quot;]`
+//!
+//!     Usable only on top level: `App::author(&quot;author&quot; or env!(CARGO_PKG_AUTHORS))`.
+//!
+//!     Author/maintainer of the binary, this name appears in help messages.
+//!     Defaults to the crate author given by cargo, but only when `author` explicitly mentioned.
+//!
+//! - `about`: `about [= &quot;about&quot;]`
+//!
+//!     Usable only on top level: `App::about(&quot;about&quot; or env!(CARGO_PKG_DESCRIPTION))`.
+//!
+//!     Short description of the binary, appears in help messages.
+//!     Defaults to the crate description given by cargo,
+//!     but only when `about` explicitly mentioned.
+//!
+//! - [`short`](#specifying-argument-types): `short [= &quot;short-opt-name&quot;]`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`long`](#specifying-argument-types): `long [= &quot;long-opt-name&quot;]`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`default_value`](#default-values): `default_value [= &quot;default value&quot;]`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`rename_all`](#specifying-argument-types):
+//!     [`rename_all = &quot;kebab&quot;/&quot;snake&quot;/&quot;screaming-snake&quot;/&quot;camel&quot;/&quot;pascal&quot;/&quot;verbatim&quot;/&quot;lower&quot;/&quot;upper&quot;]`
+//!
+//!     Usable both on top level and field level.
+//!
+//! - [`parse`](#custom-string-parsers): `parse(type [= path::to::parser::fn])`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`skip`](#skipping-fields): `skip [= expr]`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`flatten`](#flattening): `flatten`
+//!
+//!     Usable on field-level or single-typed tuple variants.
+//!
+//! - [`subcommand`](#subcommands): `subcommand`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`external_subcommand`](#external-subcommands)
+//!
+//!     Usable only on enum variants.
+//!
+//! - [`env`](#environment-variable-fallback): `env [= str_literal]`
+//!
+//!     Usable only on field-level.
+//!
+//! - [`rename_all_env`](#auto-deriving-environment-variables):
+//!     [`rename_all_env = &quot;kebab&quot;/&quot;snake&quot;/&quot;screaming-snake&quot;/&quot;camel&quot;/&quot;pascal&quot;/&quot;verbatim&quot;/&quot;lower&quot;/&quot;upper&quot;]`
+//!
+//!     Usable both on top level and field level.
+//!
+//! - [`verbatim_doc_comment`](#doc-comment-preprocessing-and-structoptverbatim_doc_comment):
+//!     `verbatim_doc_comment`
+//!
+//!     Usable both on top level and field level.
+//!
+//! ## Type magic
+//!
+//! One of major things that makes `structopt` so awesome is its type magic.
+//! Do you want optional positional argument? Use `Option&lt;T&gt;`! Or perhaps optional argument
+//! that optionally takes value (`[--opt=[val]]`)? Use `Option&lt;Option&lt;T&gt;&gt;`!
+//!
+//! Here is the table of types and `clap` methods they correspond to:
+//!
+//! Type                         | Effect                                            | Added method call to `clap::Arg`
+//! -----------------------------|---------------------------------------------------|--------------------------------------
+//! `bool`                       | `true` if the flag is present                     | `.takes_value(false).multiple(false)`
+//! `Option&lt;T: FromStr&gt;`         | optional positional argument or option            | `.takes_value(true).multiple(false)`
+//! `Option&lt;Option&lt;T: FromStr&gt;&gt;` | optional option with optional value               | `.takes_value(true).multiple(false).min_values(0).max_values(1)`
+//! `Vec&lt;T: FromStr&gt;`            | list of options or the other positional arguments | `.takes_value(true).multiple(true)`
+//! `Option&lt;Vec&lt;T: FromStr&gt;`     | optional list of options                          | `.takes_values(true).multiple(true).min_values(0)`
+//! `T: FromStr`                 | required option or positional argument            | `.takes_value(true).multiple(false).required(!has_default)`
+//!
+//! The `FromStr` trait is used to convert the argument to the given
+//! type, and the `Arg::validator` method is set to a method using
+//! `to_string()` (`FromStr::Err` must implement `std::fmt::Display`).
+//! If you would like to use a custom string parser other than `FromStr`, see
+//! the [same titled section](#custom-string-parsers) below.
+//!
+//! **Important:**
+//! _________________
+//! Pay attention that *only literal occurrence* of this types is special, for example
+//! `Option&lt;T&gt;` is special while `::std::option::Option&lt;T&gt;` is not.
+//!
+//! If you need to avoid special casing you can make a `type` alias and
+//! use it in place of the said type.
+//! _________________
+//!
+//! **Note:**
+//! _________________
+//! `bool` cannot be used as positional argument unless you provide an explicit parser.
+//! If you need a positional bool, for example to parse `true` or `false`, you must
+//! annotate the field with explicit [`#[structopt(parse(...))]`](#custom-string-parsers).
+//! _________________
+//!
+//! Thus, the `speed` argument is generated as:
+//!
+//! ```
+//! # fn parse_validator&lt;T&gt;(_: String) -&gt; Result&lt;(), String&gt; { unimplemented!() }
+//! clap::Arg::with_name(&quot;speed&quot;)
+//!     .takes_value(true)
+//!     .multiple(false)
+//!     .required(false)
+//!     .validator(parse_validator::&lt;f64&gt;)
+//!     .short(&quot;v&quot;)
+//!     .long(&quot;velocity&quot;)
+//!     .help(&quot;Set speed&quot;)
+//!     .default_value(&quot;42&quot;);
+//! ```
+//!
+//! ## Specifying argument types
+//!
+//! There are three types of arguments that can be supplied to each
+//! (sub-)command:
+//!
+//!  - short (e.g. `-h`),
+//!  - long (e.g. `--help`)
+//!  - and positional.
+//!
+//! Like clap, structopt defaults to creating positional arguments.
+//!
+//! If you want to generate a long argument you can specify either
+//! `long = $NAME`, or just `long` to get a long flag generated using
+//! the field name.  The generated casing style can be modified using
+//! the `rename_all` attribute. See the `rename_all` example for more.
+//!
+//! For short arguments, `short` will use the first letter of the
+//! field name by default, but just like the long option it&#39;s also
+//! possible to use a custom letter through `short = $LETTER`.
+//!
+//! If an argument is renamed using `name = $NAME` any following call to
+//! `short` or `long` will use the new name.
+//!
+//! **Attention**: If these arguments are used without an explicit name
+//! the resulting flag is going to be renamed using `kebab-case` if the
+//! `rename_all` attribute was not specified previously. The same is true
+//! for subcommands with implicit naming through the related data structure.
+//!
+//! ```
+//! use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! #[structopt(rename_all = &quot;kebab-case&quot;)]
+//! struct Opt {
+//!     /// This option can be specified with something like `--foo-option
+//!     /// value` or `--foo-option=value`
+//!     #[structopt(long)]
+//!     foo_option: String,
+//!
+//!     /// This option can be specified with something like `-b value` (but
+//!     /// not `--bar-option value`).
+//!     #[structopt(short)]
+//!     bar_option: String,
+//!
+//!     /// This option can be specified either `--baz value` or `-z value`.
+//!     #[structopt(short = &quot;z&quot;, long = &quot;baz&quot;)]
+//!     baz_option: String,
+//!
+//!     /// This option can be specified either by `--custom value` or
+//!     /// `-c value`.
+//!     #[structopt(name = &quot;custom&quot;, long, short)]
+//!     custom_option: String,
+//!
+//!     /// This option is positional, meaning it is the first unadorned string
+//!     /// you provide (multiple others could follow).
+//!     my_positional: String,
+//!
+//!     /// This option is skipped and will be filled with the default value
+//!     /// for its type (in this case 0).
+//!     #[structopt(skip)]
+//!     skipped: u32,
+//! }
+//!
+//! # Opt::from_iter(
+//! #    &amp;[&quot;test&quot;, &quot;--foo-option&quot;, &quot;&quot;, &quot;-b&quot;, &quot;&quot;, &quot;--baz&quot;, &quot;&quot;, &quot;--custom&quot;, &quot;&quot;, &quot;positional&quot;]);
+//! ```
+//!
+//! ## Default values
+//!
+//! In clap, default values for options can be specified via [`Arg::default_value`].
+//!
+//! Of course, you can use as a raw method:
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! struct Opt {
+//!     #[structopt(default_value = &quot;&quot;, long)]
+//!     prefix: String,
+//! }
+//! ```
+//!
+//! This is quite mundane and error-prone to type the `&quot;...&quot;` default by yourself,
+//! especially when the Rust ecosystem uses the [`Default`] trait for that.
+//! It would be wonderful to have `structopt` to take the `Default_default` and fill it
+//! for you. And yes, `structopt` can do that.
+//!
+//! Unfortunately, `default_value` takes `&amp;str` but `Default::default`
+//! gives us some `Self` value. We need to map `Self` to `&amp;str` somehow.
+//!
+//! `structopt` solves this problem via [`ToString`] trait.
+//!
+//! To be able to use auto-default the type must implement *both* `Default` and `ToString`:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! struct Opt {
+//!     // just leave the `= &quot;...&quot;` part and structopt will figure it for you
+//!     #[structopt(default_value, long)]
+//!     prefix: String, // `String` implements both `Default` and `ToString`
+//! }
+//! ```
+//!
+//! [`Default`]: https://doc.rust-lang.org/std/default/trait.Default.html
+//! [`ToString`]: https://doc.rust-lang.org/std/string/trait.ToString.html
+//! [`Arg::default_value`]: https://docs.rs/clap/2.33.0/clap/struct.Arg.html#method.default_value
+//!
+//!
+//! ## Help messages
+//!
+//! In clap, help messages for the whole binary can be specified
+//! via [`App::about`] and [`App::long_about`] while help messages
+//! for individual arguments can be specified via [`Arg::help`] and [`Arg::long_help`]&quot;.
+//!
+//! `long_*` variants are used when user calls the program with
+//! `--help` and &quot;short&quot; variants are used with `-h` flag. In `structopt`,
+//! you can use them via [raw methods](#raw-methods), for example:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! #[structopt(about = &quot;I am a program and I work, just pass `-h`&quot;)]
+//! struct Foo {
+//!     #[structopt(short, help = &quot;Pass `-h` and you&#39;ll see me!&quot;)]
+//!     bar: String,
+//! }
+//! ```
+//!
+//! For convenience, doc comments can be used instead of raw methods
+//! (this example works exactly like the one above):
+//!
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! /// I am a program and I work, just pass `-h`
+//! struct Foo {
+//!     /// Pass `-h` and you&#39;ll see me!
+//!     bar: String,
+//! }
+//! ```
+//!
+//! Doc comments on [top-level](#magical-methods) will be turned into
+//! `App::about/long_about` call (see below), doc comments on field-level are
+//! `Arg::help/long_help` calls.
+//!
+//! **Important:**
+//! _________________
+//!
+//! Raw methods have priority over doc comments!
+//!
+//! **Top level doc comments always generate `App::about/long_about` calls!**
+//! If you really want to use the `App::help/long_help` methods (you likely don&#39;t),
+//! use a raw method to override the `App::about` call generated from the doc comment.
+//! __________________
+//!
+//! ### `long_help` and `--help`
+//!
+//! A message passed to [`App::long_about`] or [`Arg::long_help`] will be displayed whenever
+//! your program is called with `--help` instead of `-h`. Of course, you can
+//! use them via raw methods as described [above](#help-messages).
+//!
+//! The more convenient way is to use a so-called &quot;long&quot; doc comment:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! /// Hi there, I&#39;m Robo!
+//! ///
+//! /// I like beeping, stumbling, eating your electricity,
+//! /// and making records of you singing in a shower.
+//! /// Pay up, or I&#39;ll upload it to youtube!
+//! struct Robo {
+//!     /// Call my brother SkyNet.
+//!     ///
+//!     /// I am artificial superintelligence. I won&#39;t rest
+//!     /// until I&#39;ll have destroyed humanity. Enjoy your
+//!     /// pathetic existence, you mere mortals.
+//!     #[structopt(long)]
+//!     kill_all_humans: bool,
+//! }
+//! ```
+//!
+//! A long doc comment consists of three parts:
+//! * Short summary
+//! * A blank line (whitespace only)
+//! * Detailed description, all the rest
+//!
+//! In other words, &quot;long&quot; doc comment consists of two or more paragraphs,
+//! with the first being a summary and the rest being the detailed description.
+//!
+//! **A long comment will result in two method calls**, `help(&lt;summary&gt;)` and
+//! `long_help(&lt;whole comment&gt;)`, so clap will display the summary with `-h`
+//! and the whole help message on `--help` (see below).
+//!
+//! So, the example above will be turned into this (details omitted):
+//! ```
+//! clap::App::new(&quot;&lt;name&gt;&quot;)
+//!     .about(&quot;Hi there, I&#39;m Robo!&quot;)
+//!     .long_about(&quot;Hi there, I&#39;m Robo!\n\n\
+//!                  I like beeping, stumbling, eating your electricity,\
+//!                  and making records of you singing in a shower.\
+//!                  Pay up or I&#39;ll upload it to youtube!&quot;)
+//! // args...
+//! # ;
+//! ```
+//!
+//! ### `-h` vs `--help` (A.K.A `help()` vs `long_help()`)
+//!
+//! The `-h` flag is not the same as `--help`.
+//!
+//! -h corresponds to `Arg::help/App::about` and requests short &quot;summary&quot; messages
+//! while --help corresponds to `Arg::long_help/App::long_about` and requests more
+//! detailed, descriptive messages.
+//!
+//! It is entirely up to `clap` what happens if you used only one of
+//! [`Arg::help`]/[`Arg::long_help`], see `clap`&#39;s documentation for these methods.
+//!
+//! As of clap v2.33, if only a short message ([`Arg::help`]) or only
+//! a long ([`Arg::long_help`]) message is provided, clap will use it
+//! for both -h and --help. The same logic applies to `about/long_about`.
+//!
+//! ### Doc comment preprocessing and `#[structopt(verbatim_doc_comment)]`
+//!
+//! `structopt` applies some preprocessing to doc comments to ease the most common uses:
+//!
+//! * Strip leading and trailing whitespace from every line, if present.
+//!
+//! * Strip leading and trailing blank lines, if present.
+//!
+//! * Interpret each group of non-empty lines as a word-wrapped paragraph.
+//!
+//!   We replace newlines within paragraphs with spaces to allow the output
+//!   to be re-wrapped to the terminal width.
+//!
+//! * Strip any excess blank lines so that there is exactly one per paragraph break.
+//!
+//! * If the first paragraph ends in exactly one period,
+//!   remove the trailing period (i.e. strip trailing periods but not trailing ellipses).
+//!
+//! Sometimes you don&#39;t want this preprocessing to apply, for example the comment contains
+//! some ASCII art or markdown tables, you would need to preserve LFs along with
+//! blank lines and the leading/trailing whitespace. You can ask `structopt` to preserve them
+//! via `#[structopt(verbatim_doc_comment)]` attribute.
+//!
+//! **This attribute must be applied to each field separately**, there&#39;s no global switch.
+//!
+//! **Important:**
+//! ______________
+//! Keep in mind that `structopt` will *still* remove one leading space from each
+//! line, even if this attribute is present, to allow for a space between
+//! `///` and the content.
+//!
+//! Also, `structopt` will *still* remove leading and trailing blank lines so
+//! these formats are equivalent:
+//!
+//! ```
+//! /** This is a doc comment
+//!
+//! Hello! */
+//!
+//! /**
+//! This is a doc comment
+//!
+//! Hello!
+//! */
+//!
+//! /// This is a doc comment
+//! ///
+//! /// Hello!
+//! #
+//! # mod m {}
+//! ```
+//! ______________
+//!
+//! [`App::about`]:      https://docs.rs/clap/2/clap/struct.App.html#method.about
+//! [`App::long_about`]: https://docs.rs/clap/2/clap/struct.App.html#method.long_about
+//! [`Arg::help`]:       https://docs.rs/clap/2/clap/struct.Arg.html#method.help
+//! [`Arg::long_help`]:  https://docs.rs/clap/2/clap/struct.Arg.html#method.long_help
+//!
+//! ## Environment variable fallback
+//!
+//! It is possible to specify an environment variable fallback option for an arguments
+//! so that its value is taken from the specified environment variable if not
+//! given through the command-line:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! struct Foo {
+//!     #[structopt(short, long, env = &quot;PARAMETER_VALUE&quot;)]
+//!     parameter_value: String,
+//! }
+//! ```
+//!
+//! By default, values from the environment are shown in the help output (i.e. when invoking
+//! `--help`):
+//!
+//! ```shell
+//! $ cargo run -- --help
+//! ...
+//! OPTIONS:
+//!   -p, --parameter-value &lt;parameter-value&gt;     [env: PARAMETER_VALUE=env_value]
+//! ```
+//!
+//! In some cases this may be undesirable, for example when being used for passing
+//! credentials or secret tokens. In those cases you can use `hide_env_values` to avoid
+//! having structopt emit the actual secret values:
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! struct Foo {
+//!     #[structopt(long = &quot;secret&quot;, env = &quot;SECRET_VALUE&quot;, hide_env_values = true)]
+//!     secret_value: String,
+//! }
+//! ```
+//!
+//! ### Auto-deriving environment variables
+//!
+//! Environment variables tend to be called after the corresponding `struct`&#39;s field,
+//! as in example above. The field is `secret_value` and the env var is &quot;SECRET_VALUE&quot;;
+//! the name is the same, except casing is different.
+//!
+//! It&#39;s pretty tedious and error-prone to type the same name twice,
+//! so you can ask `structopt` to do that for you.
+//!
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! #[derive(StructOpt)]
+//! struct Foo {
+//!     #[structopt(long = &quot;secret&quot;, env)]
+//!     secret_value: String,
+//! }
+//! ```
+//!
+//! It works just like `#[structopt(short/long)]`: if `env` is not set to some concrete
+//! value the value will be derived from the field&#39;s name. This is controlled by
+//! `#[structopt(rename_all_env)]`.
+//!
+//! `rename_all_env` works exactly as `rename_all` (including overriding)
+//! except default casing is `SCREAMING_SNAKE_CASE` instead of `kebab-case`.
+//!
+//! ## Skipping fields
+//!
+//! Sometimes you may want to add a field to your `Opt` struct that is not
+//! a command line option and `clap` should know nothing about it. You can ask
+//! `structopt` to skip the field entirely via `#[structopt(skip = value)]`
+//! (`value` must implement `Into&lt;FieldType&gt;`)
+//! or `#[structopt(skip)]` if you want assign the field with `Default::default()`
+//! (obviously, the field&#39;s type must implement `Default`).
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! pub struct Opt {
+//!     #[structopt(long, short)]
+//!     number: u32,
+//!
+//!     // these fields are to be assigned with Default::default()
+//!
+//!     #[structopt(skip)]
+//!     k: String,
+//!     #[structopt(skip)]
+//!     v: Vec&lt;u32&gt;,
+//!
+//!     // these fields get set explicitly
+//!
+//!     #[structopt(skip = vec![1, 2, 3])]
+//!     k2: Vec&lt;u32&gt;,
+//!     #[structopt(skip = &quot;cake&quot;)] // &amp;str implements Into&lt;String&gt;
+//!     v2: String,
+//! }
+//! ```
+//!
+//! ## Subcommands
+//!
+//! Some applications, especially large ones, split their functionality
+//! through the use of &quot;subcommands&quot;. Each of these act somewhat like a separate
+//! command, but is part of the larger group.
+//! One example is `git`, which has subcommands such as `add`, `commit`,
+//! and `clone`, to mention just a few.
+//!
+//! `clap` has this functionality, and `structopt` supports it through enums:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//!
+//! # use std::path::PathBuf;
+//! #[derive(StructOpt)]
+//! #[structopt(about = &quot;the stupid content tracker&quot;)]
+//! enum Git {
+//!     Add {
+//!         #[structopt(short)]
+//!         interactive: bool,
+//!         #[structopt(short)]
+//!         patch: bool,
+//!         #[structopt(parse(from_os_str))]
+//!         files: Vec&lt;PathBuf&gt;,
+//!     },
+//!     Fetch {
+//!         #[structopt(long)]
+//!         dry_run: bool,
+//!         #[structopt(long)]
+//!         all: bool,
+//!         repository: Option&lt;String&gt;,
+//!     },
+//!     Commit {
+//!         #[structopt(short)]
+//!         message: Option&lt;String&gt;,
+//!         #[structopt(short)]
+//!         all: bool,
+//!     },
+//! }
+//! ```
+//!
+//! Using `derive(StructOpt)` on an enum instead of a struct will produce
+//! a `clap::App` that only takes subcommands. So `git add`, `git fetch`,
+//! and `git commit` would be commands allowed for the above example.
+//!
+//! `structopt` also provides support for applications where certain flags
+//! need to apply to all subcommands, as well as nested subcommands:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! struct MakeCookie {
+//!     #[structopt(name = &quot;supervisor&quot;, default_value = &quot;Puck&quot;, long = &quot;supervisor&quot;)]
+//!     supervising_faerie: String,
+//!     /// The faerie tree this cookie is being made in.
+//!     tree: Option&lt;String&gt;,
+//!     #[structopt(subcommand)] // Note that we mark a field as a subcommand
+//!     cmd: Command,
+//! }
+//!
+//! #[derive(StructOpt)]
+//! enum Command {
+//!     /// Pound acorns into flour for cookie dough.
+//!     Pound {
+//!         acorns: u32,
+//!     },
+//!     /// Add magical sparkles -- the secret ingredient!
+//!     Sparkle {
+//!         #[structopt(short, parse(from_occurrences))]
+//!         magicality: u64,
+//!         #[structopt(short)]
+//!         color: String,
+//!     },
+//!     Finish(Finish),
+//! }
+//!
+//! // Subcommand can also be externalized by using a 1-uple enum variant
+//! #[derive(StructOpt)]
+//! struct Finish {
+//!     #[structopt(short)]
+//!     time: u32,
+//!     #[structopt(subcommand)] // Note that we mark a field as a subcommand
+//!     finish_type: FinishType,
+//! }
+//!
+//! // subsubcommand!
+//! #[derive(StructOpt)]
+//! enum FinishType {
+//!     Glaze {
+//!         applications: u32,
+//!     },
+//!     Powder {
+//!         flavor: String,
+//!         dips: u32,
+//!     }
+//! }
+//! ```
+//!
+//! Marking a field with `structopt(subcommand)` will add the subcommands of the
+//! designated enum to the current `clap::App`. The designated enum *must* also
+//! be derived `StructOpt`. So the above example would take the following
+//! commands:
+//!
+//! + `make-cookie pound 50`
+//! + `make-cookie sparkle -mmm --color &quot;green&quot;`
+//! + `make-cookie finish 130 glaze 3`
+//!
+//! ### Optional subcommands
+//!
+//! Subcommands may be optional:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! struct Foo {
+//!     file: String,
+//!     #[structopt(subcommand)]
+//!     cmd: Option&lt;Command&gt;,
+//! }
+//!
+//! #[derive(StructOpt)]
+//! enum Command {
+//!     Bar,
+//!     Baz,
+//!     Quux,
+//! }
+//! ```
+//!
+//! ### External subcommands
+//!
+//! Sometimes you want to support not only the set of well-known subcommands
+//! but you also want to allow other, user-driven subcommands. `clap` supports
+//! this via [`AppSettings::AllowExternalSubcommands`].
+//!
+//! `structopt` provides it&#39;s own dedicated syntax for that:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(Debug, PartialEq, StructOpt)]
+//! struct Opt {
+//!     #[structopt(subcommand)]
+//!     sub: Subcommands,
+//! }
+//!
+//! #[derive(Debug, PartialEq, StructOpt)]
+//! enum Subcommands {
+//!     // normal subcommand
+//!     Add,
+//!
+//!     // `external_subcommand` tells structopt to put
+//!     // all the extra arguments into this Vec
+//!     #[structopt(external_subcommand)]
+//!     Other(Vec&lt;String&gt;),
+//! }
+//!
+//! // normal subcommand
+//! assert_eq!(
+//!     Opt::from_iter(&amp;[&quot;test&quot;, &quot;add&quot;]),
+//!     Opt {
+//!         sub: Subcommands::Add
+//!     }
+//! );
+//!
+//! assert_eq!(
+//!     Opt::from_iter(&amp;[&quot;test&quot;, &quot;git&quot;, &quot;status&quot;]),
+//!     Opt {
+//!         sub: Subcommands::Other(vec![&quot;git&quot;.into(), &quot;status&quot;.into()])
+//!     }
+//! );
+//!
+//! // Please note that if you&#39;d wanted to allow &quot;no subcommands at all&quot; case
+//! // you should have used `sub: Option&lt;Subcommands&gt;` above
+//! assert!(Opt::from_iter_safe(&amp;[&quot;test&quot;]).is_err());
+//! ```
+//!
+//! In other words, you just add an extra tuple variant marked with
+//! `#[structopt(subcommand)]`, and its type must be either
+//! `Vec&lt;String&gt;` or `Vec&lt;OsString&gt;`. `structopt` will detect `String` in this context
+//! and use appropriate `clap` API.
+//!
+//! [`AppSettings::AllowExternalSubcommands`]: https://docs.rs/clap/2.32.0/clap/enum.AppSettings.html#variant.AllowExternalSubcommands
+//!
+//! ### Flattening subcommands
+//!
+//! It is also possible to combine multiple enums of subcommands into one.
+//! All the subcommands will be on the same level.
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! enum BaseCli {
+//!     Ghost10 {
+//!         arg1: i32,
+//!     }
+//! }
+//!
+//! #[derive(StructOpt)]
+//! enum Opt {
+//!     #[structopt(flatten)]
+//!     BaseCli(BaseCli),
+//!     Dex {
+//!         arg2: i32,
+//!     },
+//! }
+//! ```
+//!
+//! ```shell
+//! cli ghost10 42
+//! cli dex 42
+//! ```
+//!
+//! ## Flattening
+//!
+//! It can sometimes be useful to group related arguments in a substruct,
+//! while keeping the command-line interface flat. In these cases you can mark
+//! a field as `flatten` and give it another type that derives `StructOpt`:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! #[derive(StructOpt)]
+//! struct Cmdline {
+//!     /// switch on verbosity
+//!     #[structopt(short)]
+//!     verbose: bool,
+//!     #[structopt(flatten)]
+//!     daemon_opts: DaemonOpts,
+//! }
+//!
+//! #[derive(StructOpt)]
+//! struct DaemonOpts {
+//!     /// daemon user
+//!     #[structopt(short)]
+//!     user: String,
+//!     /// daemon group
+//!     #[structopt(short)]
+//!     group: String,
+//! }
+//! ```
+//!
+//! In this example, the derived `Cmdline` parser will support the options `-v`,
+//! `-u` and `-g`.
+//!
+//! This feature also makes it possible to define a `StructOpt` struct in a
+//! library, parse the corresponding arguments in the main argument parser, and
+//! pass off this struct to a handler provided by that library.
+//!
+//! ## Custom string parsers
+//!
+//! If the field type does not have a `FromStr` implementation, or you would
+//! like to provide a custom parsing scheme other than `FromStr`, you may
+//! provide a custom string parser using `parse(...)` like this:
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! use std::num::ParseIntError;
+//! use std::path::PathBuf;
+//!
+//! fn parse_hex(src: &amp;str) -&gt; Result&lt;u32, ParseIntError&gt; {
+//!     u32::from_str_radix(src, 16)
+//! }
+//!
+//! #[derive(StructOpt)]
+//! struct HexReader {
+//!     #[structopt(short, parse(try_from_str = parse_hex))]
+//!     number: u32,
+//!     #[structopt(short, parse(from_os_str))]
+//!     output: PathBuf,
+//! }
+//! ```
+//!
+//! There are five kinds of custom parsers:
+//!
+//! | Kind              | Signature                             | Default                         |
+//! |-------------------|---------------------------------------|---------------------------------|
+//! | `from_str`        | `fn(&amp;str) -&gt; T`                       | `::std::convert::From::from`    |
+//! | `try_from_str`    | `fn(&amp;str) -&gt; Result&lt;T, E&gt;`            | `::std::str::FromStr::from_str` |
+//! | `from_os_str`     | `fn(&amp;OsStr) -&gt; T`                     | `::std::convert::From::from`    |
+//! | `try_from_os_str` | `fn(&amp;OsStr) -&gt; Result&lt;T, OsString&gt;`   | (no default function)           |
+//! | `from_occurrences`| `fn(u64) -&gt; T`                        | `value as T`                    |
+//! | `from_flag`       | `fn(bool) -&gt; T`                       | `::std::convert::From::from`    |
+//!
+//! The `from_occurrences` parser is special. Using `parse(from_occurrences)`
+//! results in the _number of flags occurrences_ being stored in the relevant
+//! field or being passed to the supplied function. In other words, it converts
+//! something like `-vvv` to `3`. This is equivalent to
+//! `.takes_value(false).multiple(true)`. Note that the default parser can only
+//! be used with fields of integer types (`u8`, `usize`, `i64`, etc.).
+//!
+//! The `from_flag` parser is also special. Using `parse(from_flag)` or
+//! `parse(from_flag = some_func)` will result in the field being treated as a
+//! flag even if it does not have type `bool`.
+//!
+//! When supplying a custom string parser, `bool` will not be treated specially:
+//!
+//! Type        | Effect            | Added method call to `clap::Arg`
+//! ------------|-------------------|--------------------------------------
+//! `Option&lt;T&gt;` | optional argument | `.takes_value(true).multiple(false)`
+//! `Vec&lt;T&gt;`    | list of arguments | `.takes_value(true).multiple(true)`
+//! `T`         | required argument | `.takes_value(true).multiple(false).required(!has_default)`
+//!
+//! In the `try_from_*` variants, the function will run twice on valid input:
+//! once to validate, and once to parse. Hence, make sure the function is
+//! side-effect-free.
+//!
+//! ## Generics
+//!
+//! Generic structs and enums can be used. They require explicit trait bounds
+//! on any generic types that will be used by the `StructOpt` derive macro. In
+//! some cases, associated types will require additional bounds. See the usage
+//! of `FromStr` below for an example of this.
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! use std::{fmt, str::FromStr};
+//!
+//! // a struct with single custom argument
+//! #[derive(StructOpt)]
+//! struct GenericArgs&lt;T: FromStr&gt; where &lt;T as FromStr&gt;::Err: fmt::Display + fmt::Debug {
+//!     generic_arg_1: String,
+//!     generic_arg_2: String,
+//!     custom_arg_1: T,
+//! }
+//! ```
+//!
+//! or
+//!
+//! ```
+//! # use structopt::StructOpt;
+//! // a struct with multiple custom arguments in a substructure
+//! #[derive(StructOpt)]
+//! struct GenericArgs&lt;T: StructOpt&gt; {
+//!     generic_arg_1: String,
+//!     generic_arg_2: String,
+//!     #[structopt(flatten)]
+//!     custom_args: T,
+//! }
+//! ```
 
-<span class="comment">// those mains are for a reason</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_doctest_main</span>)]</span>
+</span><span class="comment">// those mains are for a reason
+</span><span class="attribute">#![allow(clippy::needless_doctest_main)]
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structopt_derive</span>::<span class="kw-2">*</span>;
+#[doc(hidden)]
+</span><span class="kw">pub use </span>structopt_derive::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">std::ffi::OsString</span>;
+<span class="kw">use </span>std::ffi::OsString;
 
-<span class="doccomment">/// Re-exports</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">clap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;paw&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">paw_dep</span> <span class="kw">as</span> <span class="ident">paw</span>;
+<span class="doccomment">/// Re-exports
+</span><span class="kw">pub use </span>clap;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;paw&quot;</span>)]
+</span><span class="kw">pub use </span>paw_dep <span class="kw">as </span>paw;
 
-<span class="doccomment">/// **This is NOT PUBLIC API**.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lazy_static</span>;
+<span class="doccomment">/// **This is NOT PUBLIC API**.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span>lazy_static;
 
-<span class="doccomment">/// A struct that is converted from command line arguments.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StructOpt</span> {
-    <span class="doccomment">/// Returns [`clap::App`] corresponding to the struct.</span>
-    <span class="kw">fn</span> <span class="ident">clap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>() -&gt; <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A struct that is converted from command line arguments.
+</span><span class="kw">pub trait </span>StructOpt {
+    <span class="doccomment">/// Returns [`clap::App`] corresponding to the struct.
+    </span><span class="kw">fn </span>clap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;() -&gt; clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;;
 
-    <span class="doccomment">/// Builds the struct from [`clap::ArgMatches`]. It&#39;s guaranteed to succeed</span>
-    <span class="doccomment">/// if `matches` originates from an `App` generated by [`StructOpt::clap`] called on</span>
-    <span class="doccomment">/// the same type, otherwise it must panic.</span>
-    <span class="kw">fn</span> <span class="ident">from_clap</span>(<span class="ident">matches</span>: <span class="kw-2">&amp;</span><span class="ident">clap::ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Builds the struct from [`clap::ArgMatches`]. It&#39;s guaranteed to succeed
+    /// if `matches` originates from an `App` generated by [`StructOpt::clap`] called on
+    /// the same type, otherwise it must panic.
+    </span><span class="kw">fn </span>from_clap(matches: <span class="kw-2">&amp;</span>clap::ArgMatches&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Builds the struct from the command line arguments ([`std::env::args_os`]).</span>
-    <span class="doccomment">/// Calls [`clap::Error::exit`] on failure, printing the error message and aborting the program.</span>
-    <span class="kw">fn</span> <span class="ident">from_args</span>() -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Builds the struct from the command line arguments ([`std::env::args_os`]).
+    /// Calls [`clap::Error::exit`] on failure, printing the error message and aborting the program.
+    </span><span class="kw">fn </span>from_args() -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident"><span class="self">Self</span>::from_clap</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::clap</span>().<span class="ident">get_matches</span>())
+        <span class="self">Self</span>::from_clap(<span class="kw-2">&amp;</span><span class="self">Self</span>::clap().get_matches())
     }
 
-    <span class="doccomment">/// Builds the struct from the command line arguments ([`std::env::args_os`]).</span>
-    <span class="doccomment">/// Unlike [`StructOpt::from_args`], returns [`clap::Error`] on failure instead of aborting the program,</span>
-    <span class="doccomment">/// so calling [`.exit`][clap::Error::exit] is up to you.</span>
-    <span class="kw">fn</span> <span class="ident">from_args_safe</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">clap::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Builds the struct from the command line arguments ([`std::env::args_os`]).
+    /// Unlike [`StructOpt::from_args`], returns [`clap::Error`] on failure instead of aborting the program,
+    /// so calling [`.exit`][clap::Error::exit] is up to you.
+    </span><span class="kw">fn </span>from_args_safe() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, clap::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident"><span class="self">Self</span>::clap</span>()
-            .<span class="ident">get_matches_safe</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">matches</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::from_clap</span>(<span class="kw-2">&amp;</span><span class="ident">matches</span>))
+        <span class="self">Self</span>::clap()
+            .get_matches_safe()
+            .map(|matches| <span class="self">Self</span>::from_clap(<span class="kw-2">&amp;</span>matches))
     }
 
-    <span class="doccomment">/// Gets the struct from any iterator such as a `Vec` of your making.</span>
-    <span class="doccomment">/// Print the error message and quit the program in case of failure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE**: The first argument will be parsed as the binary name unless</span>
-    <span class="doccomment">/// [`clap::AppSettings::NoBinaryName`] has been used.</span>
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I::Item</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Gets the struct from any iterator such as a `Vec` of your making.
+    /// Print the error message and quit the program in case of failure.
+    ///
+    /// **NOTE**: The first argument will be parsed as the binary name unless
+    /// [`clap::AppSettings::NoBinaryName`] has been used.
+    </span><span class="kw">fn </span>from_iter&lt;I&gt;(iter: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        I: IntoIterator,
+        I::Item: Into&lt;OsString&gt; + Clone,
     {
-        <span class="ident"><span class="self">Self</span>::from_clap</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::clap</span>().<span class="ident">get_matches_from</span>(<span class="ident">iter</span>))
+        <span class="self">Self</span>::from_clap(<span class="kw-2">&amp;</span><span class="self">Self</span>::clap().get_matches_from(iter))
     }
 
-    <span class="doccomment">/// Gets the struct from any iterator such as a `Vec` of your making.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`clap::Error`] in case of failure. This does *not* exit in the</span>
-    <span class="doccomment">/// case of `--help` or `--version`, to achieve the same behavior as</span>
-    <span class="doccomment">/// [`from_iter()`][StructOpt::from_iter] you must call [`.exit()`][clap::Error::exit] on the error value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE**: The first argument will be parsed as the binary name unless</span>
-    <span class="doccomment">/// [`clap::AppSettings::NoBinaryName`] has been used.</span>
-    <span class="kw">fn</span> <span class="ident">from_iter_safe</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iter</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">clap::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-        <span class="ident">I::Item</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
+    <span class="doccomment">/// Gets the struct from any iterator such as a `Vec` of your making.
+    ///
+    /// Returns a [`clap::Error`] in case of failure. This does *not* exit in the
+    /// case of `--help` or `--version`, to achieve the same behavior as
+    /// [`from_iter()`][StructOpt::from_iter] you must call [`.exit()`][clap::Error::exit] on the error value.
+    ///
+    /// **NOTE**: The first argument will be parsed as the binary name unless
+    /// [`clap::AppSettings::NoBinaryName`] has been used.
+    </span><span class="kw">fn </span>from_iter_safe&lt;I&gt;(iter: I) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, clap::Error&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        I: IntoIterator,
+        I::Item: Into&lt;OsString&gt; + Clone,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_clap</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::clap</span>().<span class="ident">get_matches_from_safe</span>(<span class="ident">iter</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_clap(<span class="kw-2">&amp;</span><span class="self">Self</span>::clap().get_matches_from_safe(iter)<span class="question-mark">?</span>))
     }
 }
 
-<span class="doccomment">/// This trait is NOT API. **SUBJECT TO CHANGE WITHOUT NOTICE!**.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StructOptInternal</span>: <span class="ident">StructOpt</span> {
-    <span class="kw">fn</span> <span class="ident">augment_clap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">app</span>: <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-        <span class="ident">app</span>
+<span class="doccomment">/// This trait is NOT API. **SUBJECT TO CHANGE WITHOUT NOTICE!**.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub trait </span>StructOptInternal: StructOpt {
+    <span class="kw">fn </span>augment_clap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(app: clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) -&gt; clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+        app
     }
 
-    <span class="kw">fn</span> <span class="ident">is_subcommand</span>() -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>is_subcommand() -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">from_subcommand</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">_sub</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">clap::ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">std::marker::Sized</span>,
+    <span class="kw">fn </span>from_subcommand&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(_sub: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>clap::ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: std::marker::Sized,
     {
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;T: StructOpt&gt; StructOpt <span class="kw">for </span>Box&lt;T&gt; {
+    <span class="kw">fn </span>clap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;() -&gt; clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+        &lt;T <span class="kw">as </span>StructOpt&gt;::clap()
+    }
+
+    <span class="kw">fn </span>from_clap(matches: <span class="kw-2">&amp;</span>clap::ArgMatches&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        Box::new(&lt;T <span class="kw">as </span>StructOpt&gt;::from_clap(matches))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StructOpt</span><span class="op">&gt;</span> <span class="ident">StructOpt</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>() -&gt; <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">StructOpt</span><span class="op">&gt;</span><span class="ident">::clap</span>()
+<span class="kw">impl</span>&lt;T: StructOptInternal&gt; StructOptInternal <span class="kw">for </span>Box&lt;T&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>is_subcommand() -&gt; bool {
+        &lt;T <span class="kw">as </span>StructOptInternal&gt;::is_subcommand()
     }
 
-    <span class="kw">fn</span> <span class="ident">from_clap</span>(<span class="ident">matches</span>: <span class="kw-2">&amp;</span><span class="ident">clap::ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Box::new</span>(<span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">StructOpt</span><span class="op">&gt;</span><span class="ident">::from_clap</span>(<span class="ident">matches</span>))
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StructOptInternal</span><span class="op">&gt;</span> <span class="ident">StructOptInternal</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">is_subcommand</span>() -&gt; <span class="ident">bool</span> {
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">StructOptInternal</span><span class="op">&gt;</span><span class="ident">::is_subcommand</span>()
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>from_subcommand&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(sub: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>clap::ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        &lt;T <span class="kw">as </span>StructOptInternal&gt;::from_subcommand(sub).map(Box::new)
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from_subcommand</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">sub</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">clap::ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">StructOptInternal</span><span class="op">&gt;</span><span class="ident">::from_subcommand</span>(<span class="ident">sub</span>).<span class="ident">map</span>(<span class="ident">Box::new</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">augment_clap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="ident">app</span>: <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="ident">clap::App</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-        <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">StructOptInternal</span><span class="op">&gt;</span><span class="ident">::augment_clap</span>(<span class="ident">app</span>)
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>augment_clap&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(app: clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) -&gt; clap::App&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+        &lt;T <span class="kw">as </span>StructOptInternal&gt;::augment_clap(app)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="structopt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="structopt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

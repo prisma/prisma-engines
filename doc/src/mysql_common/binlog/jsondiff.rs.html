@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/jsondiff.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jsondiff.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/jsondiff.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jsondiff.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -117,124 +117,124 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">convert::TryFrom</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>std::{borrow::Cow, convert::TryFrom, io};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw</span>::{<span class="ident">bytes::LenEnc</span>, <span class="ident">Const</span>, <span class="ident">RawBytes</span>, <span class="ident">RawInt</span>},
-    <span class="ident">proto::MyDeserialize</span>,
+<span class="kw">use crate</span>::{
+    io::ParseBuf,
+    misc::raw::{bytes::LenEnc, Const, RawBytes, RawInt},
+    proto::MyDeserialize,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::jsonb</span>;
+<span class="kw">use </span><span class="kw">super</span>::jsonb;
 
-<span class="doccomment">/// An operation kind of a JsonDiff object.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonDiffOperation</span> {
-    <span class="doccomment">/// The JSON value in the given path is replaced with a new value.</span>
-    <span class="ident">REPLACE</span>,
-    <span class="doccomment">/// Add a new element at the given path.</span>
-    <span class="ident">INSERT</span>,
-    <span class="doccomment">/// The JSON value at the given path is removed from an array or object.</span>
-    <span class="ident">REMOVE</span>,
+<span class="doccomment">/// An operation kind of a JsonDiff object.
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>JsonDiffOperation {
+    <span class="doccomment">/// The JSON value in the given path is replaced with a new value.
+    </span>REPLACE,
+    <span class="doccomment">/// Add a new element at the given path.
+    </span>INSERT,
+    <span class="doccomment">/// The JSON value at the given path is removed from an array or object.
+    </span>REMOVE,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown JsonDiff operation {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownJsonDiffOperation</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown JsonDiff operation {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownJsonDiffOperation(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownJsonDiffOperation</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownJsonDiffOperation</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownJsonDiffOperation&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownJsonDiffOperation) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonDiffOperation</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownJsonDiffOperation</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>JsonDiffOperation {
+    <span class="kw">type </span>Error = UnknownJsonDiffOperation;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::REPLACE</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INSERT</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::REMOVE</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownJsonDiffOperation</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::REPLACE),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INSERT),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::REMOVE),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownJsonDiffOperation(x)),
         }
     }
 }
 
-<span class="doccomment">/// A class that represents a logical change to a JSON document.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is used by row-based replication to send information about changes in JSON documents</span>
-<span class="doccomment">/// without sending the whole updated document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonDiff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">path</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">LenEnc</span><span class="op">&gt;</span>,
-    <span class="ident">operation</span>: <span class="ident">Const</span><span class="op">&lt;</span><span class="ident">JsonDiffOperation</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">jsonb::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A class that represents a logical change to a JSON document.
+///
+/// It is used by row-based replication to send information about changes in JSON documents
+/// without sending the whole updated document.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>JsonDiff&lt;<span class="lifetime">&#39;a</span>&gt; {
+    path: RawBytes&lt;<span class="lifetime">&#39;a</span>, LenEnc&gt;,
+    operation: Const&lt;JsonDiffOperation, u8&gt;,
+    value: <span class="prelude-ty">Option</span>&lt;jsonb::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">JsonDiff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the raw JsonDiff path.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">as_bytes</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonDiff&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns the raw JsonDiff path.
+    </span><span class="kw">pub fn </span>path(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.path.as_bytes()
     }
 
-    <span class="doccomment">/// Returns the JsonDiff path as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_str</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">as_str</span>()
+    <span class="doccomment">/// Returns the JsonDiff path as a string (lossy converted).
+    </span><span class="kw">pub fn </span>path_str(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.path.as_str()
     }
 
-    <span class="doccomment">/// Returns JsonDiff operation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">JsonDiffOperation</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">operation</span>
+    <span class="doccomment">/// Returns JsonDiff operation.
+    </span><span class="kw">pub fn </span>operation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; JsonDiffOperation {
+        <span class="kw-2">*</span><span class="self">self</span>.operation
     }
 
-    <span class="doccomment">/// Returns JsonDiff value (if any).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">jsonb::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns JsonDiff value (if any).
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>jsonb::Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.value.as_ref()
     }
 
-    <span class="doccomment">/// Returns a `&#39;static` version of `self`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">JsonDiff</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">JsonDiff</span> {
-            <span class="ident">path</span>: <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">into_owned</span>(),
-            <span class="ident">operation</span>: <span class="self">self</span>.<span class="ident">operation</span>,
-            <span class="ident">value</span>: <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into_owned</span>()),
+    <span class="doccomment">/// Returns a `&#39;static` version of `self`.
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; JsonDiff&lt;<span class="lifetime">&#39;static</span>&gt; {
+        JsonDiff {
+            path: <span class="self">self</span>.path.into_owned(),
+            operation: <span class="self">self</span>.operation,
+            value: <span class="self">self</span>.value.map(|x| x.into_owned()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonDiff</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>JsonDiff&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">operation</span>: <span class="ident">Const</span><span class="op">&lt;</span><span class="ident">JsonDiffOperation</span>, <span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">operation</span> <span class="op">!</span><span class="op">=</span> <span class="ident">JsonDiffOperation::REMOVE</span> {
-            <span class="kw">let</span> <span class="ident">len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(<span class="kw-2">*</span><span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>operation: Const&lt;JsonDiffOperation, u8&gt; = buf.parse(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>path = buf.parse(())<span class="question-mark">?</span>;
+        <span class="kw">let </span>value = <span class="kw">if </span><span class="kw-2">*</span>operation != JsonDiffOperation::REMOVE {
+            <span class="kw">let </span>len: RawInt&lt;LenEnc&gt; = buf.parse(())<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>value: ParseBuf = buf.parse(<span class="kw-2">*</span>len <span class="kw">as </span>usize)<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(value.parse(())<span class="question-mark">?</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">path</span>,
-            <span class="ident">operation</span>,
-            <span class="ident">value</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            path,
+            operation,
+            value,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

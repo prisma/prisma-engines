@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-schema-describer/src/parsers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-schema-describer/src/parsers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -84,91 +84,91 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Functions for parsing values from resultrows using regexes</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions for parsing values from resultrows using regexes
 
-<span class="kw">use</span> <span class="ident">bigdecimal::BigDecimal</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">tracing::debug</span>;
+</span><span class="kw">use </span>bigdecimal::BigDecimal;
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>psl::dml::PrismaValue;
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>tracing::debug;
 
-<span class="kw">static</span> <span class="ident">RE_NUM</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^&#39;?(-?\d+)&#39;?$&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;compile regex&quot;</span>));
-<span class="kw">static</span> <span class="ident">RE_FLOAT</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^&#39;?([^&#39;]+)&#39;?$&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;compile regex&quot;</span>));
+<span class="kw">static </span>RE_NUM: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;^&#39;?(-?\d+)&#39;?$&quot;</span>).expect(<span class="string">&quot;compile regex&quot;</span>));
+<span class="kw">static </span>RE_FLOAT: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r&quot;^&#39;?([^&#39;]+)&#39;?$&quot;</span>).expect(<span class="string">&quot;compile regex&quot;</span>));
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Parser</span> {
-    <span class="kw">fn</span> <span class="ident">re_num</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Regex</span> {
-        <span class="kw-2">&amp;</span><span class="ident">RE_NUM</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Parser {
+    <span class="kw">fn </span>re_num() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Regex {
+        <span class="kw-2">&amp;</span>RE_NUM
     }
 
-    <span class="kw">fn</span> <span class="ident">re_float</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Regex</span> {
-        <span class="kw-2">&amp;</span><span class="ident">RE_FLOAT</span>
+    <span class="kw">fn </span>re_float() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Regex {
+        <span class="kw-2">&amp;</span>RE_FLOAT
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_int</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::re_num</span>().<span class="ident">captures</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">num_str</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;get capture&quot;</span>).<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">num_rslt</span> <span class="op">=</span> <span class="ident">num_str</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>();
-        <span class="kw">match</span> <span class="ident">num_rslt</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">num</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">num</span>)),
+    <span class="kw">fn </span>parse_int(value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">let </span>captures = <span class="self">Self</span>::re_num().captures(value)<span class="question-mark">?</span>;
+        <span class="kw">let </span>num_str = captures.get(<span class="number">1</span>).expect(<span class="string">&quot;get capture&quot;</span>).as_str();
+        <span class="kw">let </span>num_rslt = num_str.parse::&lt;i64&gt;();
+        <span class="kw">match </span>num_rslt {
+            <span class="prelude-val">Ok</span>(num) =&gt; <span class="prelude-val">Some</span>(PrismaValue::Int(num)),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_big_int</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::re_num</span>().<span class="ident">captures</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">num_str</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;get capture&quot;</span>).<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">num_rslt</span> <span class="op">=</span> <span class="ident">num_str</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>();
-        <span class="kw">match</span> <span class="ident">num_rslt</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">num</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">num</span>)),
+    <span class="kw">fn </span>parse_big_int(value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">let </span>captures = <span class="self">Self</span>::re_num().captures(value)<span class="question-mark">?</span>;
+        <span class="kw">let </span>num_str = captures.get(<span class="number">1</span>).expect(<span class="string">&quot;get capture&quot;</span>).as_str();
+        <span class="kw">let </span>num_rslt = num_str.parse::&lt;i64&gt;();
+        <span class="kw">match </span>num_rslt {
+            <span class="prelude-val">Ok</span>(num) =&gt; <span class="prelude-val">Some</span>(PrismaValue::BigInt(num)),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_bool</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">to_lowercase</span>().<span class="ident">parse</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>)),
+    <span class="kw">fn </span>parse_bool(value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">match </span>value.to_lowercase().parse() {
+            <span class="prelude-val">Ok</span>(val) =&gt; <span class="prelude-val">Some</span>(PrismaValue::Boolean(val)),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_float</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">captures</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::re_float</span>().<span class="ident">captures</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">num_str</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;get capture&quot;</span>).<span class="ident">as_str</span>();
+    <span class="kw">fn </span>parse_float(value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">let </span>captures = <span class="self">Self</span>::re_float().captures(value)<span class="question-mark">?</span>;
+        <span class="kw">let </span>num_str = captures.get(<span class="number">1</span>).expect(<span class="string">&quot;get capture&quot;</span>).as_str();
 
-        <span class="kw">match</span> <span class="ident">BigDecimal::from_str</span>(<span class="ident">num_str</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">num</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>)),
+        <span class="kw">match </span>BigDecimal::from_str(num_str) {
+            <span class="prelude-val">Ok</span>(num) =&gt; <span class="prelude-val">Some</span>(PrismaValue::Float(num)),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="macro">debug!</span>(<span class="string">&quot;Couldn&#39;t parse float &#39;{}&#39;&quot;</span>, <span class="ident">value</span>);
-                <span class="prelude-val">None</span>
-            }
+                <span class="macro">debug!</span>(<span class="string">&quot;Couldn&#39;t parse float &#39;{}&#39;&quot;</span>, value);
+                <span class="prelude-val">None
+            </span>}
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">unquote_string</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">value</span>
-            .<span class="ident">trim_start_matches</span>(<span class="string">&#39;\&#39;&#39;</span>)
-            .<span class="ident">trim_end_matches</span>(<span class="string">&#39;\&#39;&#39;</span>)
-            .<span class="ident">trim_start_matches</span>(<span class="string">&#39;\\&#39;</span>)
-            .<span class="ident">trim_start_matches</span>(<span class="string">&#39;&quot;&#39;</span>)
-            .<span class="ident">trim_end_matches</span>(<span class="string">&#39;&quot;&#39;</span>)
-            .<span class="ident">trim_end_matches</span>(<span class="string">&#39;\\&#39;</span>)
-            .<span class="ident">into</span>()
+    <span class="kw">fn </span>unquote_string(value: <span class="kw-2">&amp;</span>str) -&gt; String {
+        value
+            .trim_start_matches(<span class="string">&#39;\&#39;&#39;</span>)
+            .trim_end_matches(<span class="string">&#39;\&#39;&#39;</span>)
+            .trim_start_matches(<span class="string">&#39;\\&#39;</span>)
+            .trim_start_matches(<span class="string">&#39;&quot;&#39;</span>)
+            .trim_end_matches(<span class="string">&#39;&quot;&#39;</span>)
+            .trim_end_matches(<span class="string">&#39;\\&#39;</span>)
+            .into()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::unquote_string</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::unquote_string;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unquoting_works</span>() {
-        <span class="kw">let</span> <span class="ident">quoted_str</span> <span class="op">=</span> <span class="string">&quot;&#39;abc $$ def&#39;&quot;</span>.<span class="ident">to_string</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>unquoting_works() {
+        <span class="kw">let </span>quoted_str = <span class="string">&quot;&#39;abc $$ def&#39;&quot;</span>.to_string();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="kw-2">&amp;</span><span class="ident">quoted_str</span>), <span class="string">&quot;abc $$ def&quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="kw-2">&amp;</span>quoted_str), <span class="string">&quot;abc $$ def&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">unquote_string</span>(<span class="string">&quot;heh &quot;</span>), <span class="string">&quot;heh &quot;</span>);
+        <span class="macro">assert_eq!</span>(unquote_string(<span class="string">&quot;heh &quot;</span>), <span class="string">&quot;heh &quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

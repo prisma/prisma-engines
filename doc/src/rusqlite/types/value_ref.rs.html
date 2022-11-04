@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/value_ref.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value_ref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/value_ref.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value_ref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -181,188 +181,188 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Type</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">FromSqlError</span>, <span class="ident">FromSqlResult</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{Type, Value};
+<span class="kw">use </span><span class="kw">crate</span>::types::{FromSqlError, FromSqlResult};
 
-<span class="doccomment">/// A non-owning [dynamic type value](http://sqlite.org/datatype3.html). Typically the</span>
-<span class="doccomment">/// memory backing this value is owned by SQLite.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`Value`](Value) for an owning dynamic type value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The value is a `NULL` value.</span>
-    <span class="ident">Null</span>,
-    <span class="doccomment">/// The value is a signed integer.</span>
-    <span class="ident">Integer</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// The value is a floating point number.</span>
-    <span class="ident">Real</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// The value is a text string.</span>
-    <span class="ident">Text</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]),
-    <span class="doccomment">/// The value is a blob of data</span>
-    <span class="ident">Blob</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]),
+<span class="doccomment">/// A non-owning [dynamic type value](http://sqlite.org/datatype3.html). Typically the
+/// memory backing this value is owned by SQLite.
+///
+/// See [`Value`](Value) for an owning dynamic type value.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The value is a `NULL` value.
+    </span>Null,
+    <span class="doccomment">/// The value is a signed integer.
+    </span>Integer(i64),
+    <span class="doccomment">/// The value is a floating point number.
+    </span>Real(f64),
+    <span class="doccomment">/// The value is a text string.
+    </span>Text(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
+    <span class="doccomment">/// The value is a blob of data
+    </span>Blob(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]),
 }
 
-<span class="kw">impl</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns SQLite fundamental datatype.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValueRef::Null</span> =&gt; <span class="ident">Type::Null</span>,
-            <span class="ident">ValueRef::Integer</span>(<span class="kw">_</span>) =&gt; <span class="ident">Type::Integer</span>,
-            <span class="ident">ValueRef::Real</span>(<span class="kw">_</span>) =&gt; <span class="ident">Type::Real</span>,
-            <span class="ident">ValueRef::Text</span>(<span class="kw">_</span>) =&gt; <span class="ident">Type::Text</span>,
-            <span class="ident">ValueRef::Blob</span>(<span class="kw">_</span>) =&gt; <span class="ident">Type::Blob</span>,
+<span class="kw">impl </span>ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="doccomment">/// Returns SQLite fundamental datatype.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>data_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Null =&gt; Type::Null,
+            ValueRef::Integer(<span class="kw">_</span>) =&gt; Type::Integer,
+            ValueRef::Real(<span class="kw">_</span>) =&gt; Type::Real,
+            ValueRef::Text(<span class="kw">_</span>) =&gt; Type::Text,
+            ValueRef::Blob(<span class="kw">_</span>) =&gt; Type::Blob,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// If `self` is case `Integer`, returns the integral value. Otherwise,</span>
-    <span class="doccomment">/// returns [`Err(Error::InvalidColumnType)`](crate::Error::</span>
-    <span class="doccomment">/// InvalidColumnType).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::InvalidType</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// If `self` is case `Integer`, returns the integral value. Otherwise,
+    /// returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;i64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Integer(i) =&gt; <span class="prelude-val">Ok</span>(i),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
 
-    <span class="doccomment">/// If `self` is case `Real`, returns the floating point value. Otherwise,</span>
-    <span class="doccomment">/// returns [`Err(Error::InvalidColumnType)`](crate::Error::</span>
-    <span class="doccomment">/// InvalidColumnType).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValueRef::Real</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::InvalidType</span>),
+    <span class="doccomment">/// If `self` is case `Real`, returns the floating point value. Otherwise,
+    /// returns [`Err(Error::InvalidColumnType)`](crate::Error::
+    /// InvalidColumnType).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;f64&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Real(f) =&gt; <span class="prelude-val">Ok</span>(f),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
 
-    <span class="doccomment">/// If `self` is case `Text`, returns the string value. Otherwise, returns</span>
-    <span class="doccomment">/// [`Err(Error::InvalidColumnType)`](crate::Error::InvalidColumnType).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValueRef::Text</span>(<span class="ident">t</span>) =&gt; {
-                <span class="ident">std::str::from_utf8</span>(<span class="ident">t</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+    <span class="doccomment">/// If `self` is case `Text`, returns the string value. Otherwise, returns
+    /// [`Err(Error::InvalidColumnType)`](crate::Error::InvalidColumnType).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Text(t) =&gt; {
+                std::str::from_utf8(t).map_err(|e| FromSqlError::Other(Box::new(e)))
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::InvalidType</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
 
-    <span class="doccomment">/// If `self` is case `Blob`, returns the byte slice. Otherwise, returns</span>
-    <span class="doccomment">/// [`Err(Error::InvalidColumnType)`](crate::Error::InvalidColumnType).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_blob</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ValueRef::Blob</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::InvalidType</span>),
+    <span class="doccomment">/// If `self` is case `Blob`, returns the byte slice. Otherwise, returns
+    /// [`Err(Error::InvalidColumnType)`](crate::Error::InvalidColumnType).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_blob(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FromSqlResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ValueRef::Blob(b) =&gt; <span class="prelude-val">Ok</span>(b),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromSqlError::InvalidType),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">borrowed</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">match</span> <span class="ident">borrowed</span> {
-            <span class="ident">ValueRef::Null</span> =&gt; <span class="ident">Value::Null</span>,
-            <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">Value::Integer</span>(<span class="ident">i</span>),
-            <span class="ident">ValueRef::Real</span>(<span class="ident">r</span>) =&gt; <span class="ident">Value::Real</span>(<span class="ident">r</span>),
-            <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">s</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid UTF-8&quot;</span>);
-                <span class="ident">Value::Text</span>(<span class="ident">s</span>.<span class="ident">to_string</span>())
+<span class="kw">impl </span>From&lt;ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>Value {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(borrowed: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Value {
+        <span class="kw">match </span>borrowed {
+            ValueRef::Null =&gt; Value::Null,
+            ValueRef::Integer(i) =&gt; Value::Integer(i),
+            ValueRef::Real(r) =&gt; Value::Real(r),
+            ValueRef::Text(s) =&gt; {
+                <span class="kw">let </span>s = std::str::from_utf8(s).expect(<span class="string">&quot;invalid UTF-8&quot;</span>);
+                Value::Text(s.to_string())
             }
-            <span class="ident">ValueRef::Blob</span>(<span class="ident">b</span>) =&gt; <span class="ident">Value::Blob</span>(<span class="ident">b</span>.<span class="ident">to_vec</span>()),
+            ValueRef::Blob(b) =&gt; Value::Blob(b.to_vec()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>str) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ValueRef::Text(s.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ValueRef::Blob</span>(<span class="ident">s</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; <span class="kw">for </span>ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span>[u8]) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ValueRef::Blob(s)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="ident">Value::Null</span> =&gt; <span class="ident">ValueRef::Null</span>,
-            <span class="ident">Value::Integer</span>(<span class="ident">i</span>) =&gt; <span class="ident">ValueRef::Integer</span>(<span class="ident">i</span>),
-            <span class="ident">Value::Real</span>(<span class="ident">r</span>) =&gt; <span class="ident">ValueRef::Real</span>(<span class="ident">r</span>),
-            <span class="ident">Value::Text</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()),
-            <span class="ident">Value::Blob</span>(<span class="kw-2">ref</span> <span class="ident">b</span>) =&gt; <span class="ident">ValueRef::Blob</span>(<span class="ident">b</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value&gt; <span class="kw">for </span>ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value) -&gt; ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            Value::Null =&gt; ValueRef::Null,
+            Value::Integer(i) =&gt; ValueRef::Integer(i),
+            Value::Real(r) =&gt; ValueRef::Real(r),
+            Value::Text(<span class="kw-2">ref </span>s) =&gt; ValueRef::Text(s.as_bytes()),
+            Value::Blob(<span class="kw-2">ref </span>b) =&gt; ValueRef::Blob(b),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; <span class="kw">for </span>ValueRef&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>T: Into&lt;ValueRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">into</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">ValueRef::Null</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(s: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">match </span>s {
+            <span class="prelude-val">Some</span>(x) =&gt; x.into(),
+            <span class="prelude-val">None </span>=&gt; ValueRef::Null,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;session&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="kw-2">*mut</span> <span class="ident"><span class="kw">crate</span>::ffi::sqlite3_value</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-        <span class="kw">use</span> <span class="ident">std::slice::from_raw_parts</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;functions&quot;</span>, feature = <span class="string">&quot;session&quot;</span>, feature = <span class="string">&quot;vtab&quot;</span>))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_value(value: <span class="kw-2">*mut </span><span class="kw">crate</span>::ffi::sqlite3_value) -&gt; ValueRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::ffi;
+        <span class="kw">use </span>std::slice::from_raw_parts;
 
-        <span class="kw">match</span> <span class="ident">ffi::sqlite3_value_type</span>(<span class="ident">value</span>) {
-            <span class="ident">ffi::SQLITE_NULL</span> =&gt; <span class="ident">ValueRef::Null</span>,
-            <span class="ident">ffi::SQLITE_INTEGER</span> =&gt; <span class="ident">ValueRef::Integer</span>(<span class="ident">ffi::sqlite3_value_int64</span>(<span class="ident">value</span>)),
-            <span class="ident">ffi::SQLITE_FLOAT</span> =&gt; <span class="ident">ValueRef::Real</span>(<span class="ident">ffi::sqlite3_value_double</span>(<span class="ident">value</span>)),
-            <span class="ident">ffi::SQLITE_TEXT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_value_text</span>(<span class="ident">value</span>);
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_value_bytes</span>(<span class="ident">value</span>);
+        <span class="kw">match </span>ffi::sqlite3_value_type(value) {
+            ffi::SQLITE_NULL =&gt; ValueRef::Null,
+            ffi::SQLITE_INTEGER =&gt; ValueRef::Integer(ffi::sqlite3_value_int64(value)),
+            ffi::SQLITE_FLOAT =&gt; ValueRef::Real(ffi::sqlite3_value_double(value)),
+            ffi::SQLITE_TEXT =&gt; {
+                <span class="kw">let </span>text = ffi::sqlite3_value_text(value);
+                <span class="kw">let </span>len = ffi::sqlite3_value_bytes(value);
                 <span class="macro">assert!</span>(
-                    <span class="op">!</span><span class="ident">text</span>.<span class="ident">is_null</span>(),
-                    <span class="string">&quot;unexpected SQLITE_TEXT value type with NULL data&quot;</span>
-                );
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">from_raw_parts</span>(<span class="ident">text</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
-                <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>)
+                    !text.is_null(),
+                    <span class="string">&quot;unexpected SQLITE_TEXT value type with NULL data&quot;
+                </span>);
+                <span class="kw">let </span>s = from_raw_parts(text <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize);
+                ValueRef::Text(s)
             }
-            <span class="ident">ffi::SQLITE_BLOB</span> =&gt; {
-                <span class="kw">let</span> (<span class="ident">blob</span>, <span class="ident">len</span>) <span class="op">=</span> (
-                    <span class="ident">ffi::sqlite3_value_blob</span>(<span class="ident">value</span>),
-                    <span class="ident">ffi::sqlite3_value_bytes</span>(<span class="ident">value</span>),
+            ffi::SQLITE_BLOB =&gt; {
+                <span class="kw">let </span>(blob, len) = (
+                    ffi::sqlite3_value_blob(value),
+                    ffi::sqlite3_value_bytes(value),
                 );
 
                 <span class="macro">assert!</span>(
-                    <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>,
-                    <span class="string">&quot;unexpected negative return from sqlite3_value_bytes&quot;</span>
-                );
-                <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                    len &gt;= <span class="number">0</span>,
+                    <span class="string">&quot;unexpected negative return from sqlite3_value_bytes&quot;
+                </span>);
+                <span class="kw">if </span>len &gt; <span class="number">0 </span>{
                     <span class="macro">assert!</span>(
-                        <span class="op">!</span><span class="ident">blob</span>.<span class="ident">is_null</span>(),
-                        <span class="string">&quot;unexpected SQLITE_BLOB value type with NULL data&quot;</span>
-                    );
-                    <span class="ident">ValueRef::Blob</span>(<span class="ident">from_raw_parts</span>(<span class="ident">blob</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>))
-                } <span class="kw">else</span> {
-                    <span class="comment">// The return value from sqlite3_value_blob() for a zero-length BLOB</span>
-                    <span class="comment">// is a NULL pointer.</span>
-                    <span class="ident">ValueRef::Blob</span>(<span class="kw-2">&amp;</span>[])
+                        !blob.is_null(),
+                        <span class="string">&quot;unexpected SQLITE_BLOB value type with NULL data&quot;
+                    </span>);
+                    ValueRef::Blob(from_raw_parts(blob <span class="kw">as </span><span class="kw-2">*const </span>u8, len <span class="kw">as </span>usize))
+                } <span class="kw">else </span>{
+                    <span class="comment">// The return value from sqlite3_value_blob() for a zero-length BLOB
+                    // is a NULL pointer.
+                    </span>ValueRef::Blob(<span class="kw-2">&amp;</span>[])
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;sqlite3_value_type returned invalid value&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;sqlite3_value_type returned invalid value&quot;</span>),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

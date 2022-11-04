@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-cli/src/main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_cli/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-cli/src/main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_cli/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_cli/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -466,473 +466,473 @@
 <span id="466">466</span>
 <span id="467">467</span>
 <span id="468">468</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::print_literal</span>)]</span> <span class="comment">// it is just wrong in this case</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::print_literal)] </span><span class="comment">// it is just wrong in this case
 
-<span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
+</span><span class="kw">mod </span>diagnose_migration_history;
 
-<span class="kw">use</span> <span class="ident">anyhow::Context</span>;
-<span class="kw">use</span> <span class="ident">colored::Colorize</span>;
-<span class="kw">use</span> <span class="ident">introspection_connector::CompositeTypeDepth</span>;
-<span class="kw">use</span> <span class="ident">migration_connector::BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">fs::File</span>, <span class="ident">io::Read</span>, <span class="ident">str::FromStr</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">structopt</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>anyhow::Context;
+<span class="kw">use </span>colored::Colorize;
+<span class="kw">use </span>introspection_connector::CompositeTypeDepth;
+<span class="kw">use </span>migration_connector::BoxFuture;
+<span class="kw">use </span>migration_core::json_rpc::types::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
+<span class="kw">use </span>structopt::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">version</span> <span class="op">=</span> <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>))]</span>
-<span class="kw">enum</span> <span class="ident">Command</span> {
-    <span class="doccomment">/// Introspect a database</span>
-    <span class="ident">Introspect</span> {
-        <span class="doccomment">/// URL of the database to introspect.</span>
-        <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-        <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// Path to the schema file to introspect for.</span>
-        <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;file-path&quot;</span>)]</span>
-        <span class="ident">file_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// How many layers of composite types we introspect before switching to Json.</span>
-        <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-        <span class="ident">composite_type_depth</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, StructOpt)]
+#[structopt(version = <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>))]
+</span><span class="kw">enum </span>Command {
+    <span class="doccomment">/// Introspect a database
+    </span>Introspect {
+        <span class="doccomment">/// URL of the database to introspect.
+        </span><span class="attribute">#[structopt(long)]
+        </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        <span class="doccomment">/// Path to the schema file to introspect for.
+        </span><span class="attribute">#[structopt(long = <span class="string">&quot;file-path&quot;</span>)]
+        </span>file_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        <span class="doccomment">/// How many layers of composite types we introspect before switching to Json.
+        </span><span class="attribute">#[structopt(long)]
+        </span>composite_type_depth: <span class="prelude-ty">Option</span>&lt;isize&gt;,
     },
-    <span class="doccomment">/// Generate DMMF from a schema, or directly from a database URL.</span>
-    <span class="ident">Dmmf</span>(<span class="ident">DmmfCommand</span>),
-    <span class="doccomment">/// Push a prisma schema directly to the database.</span>
-    <span class="ident">SchemaPush</span>(<span class="ident">SchemaPush</span>),
-    <span class="doccomment">/// DiagnoseMigrationHistory wrapper</span>
-    <span class="ident">DiagnoseMigrationHistory</span>(<span class="ident">DiagnoseMigrationHistory</span>),
-    <span class="doccomment">/// Counterpart to the CLI migrate diff.</span>
-    <span class="ident">MigrateDiff</span>(<span class="ident">MigrateDiff</span>),
-    <span class="doccomment">/// Validate the given data model.</span>
-    <span class="ident">ValidateDatamodel</span>(<span class="ident">ValidateDatamodel</span>),
-    <span class="doccomment">/// Clear the data and DDL of the given database.</span>
-    <span class="ident">ResetDatabase</span>(<span class="ident">ResetDatabase</span>),
-    <span class="doccomment">/// Clear the data and DDL of the given database.</span>
-    <span class="ident">CreateDatabase</span>(<span class="ident">CreateDatabase</span>),
-    <span class="doccomment">/// Create a new migration to the given directory.</span>
-    <span class="ident">CreateMigration</span>(<span class="ident">CreateMigration</span>),
-    <span class="doccomment">/// Apply all unapplied migrations from the given directory.</span>
-    <span class="ident">ApplyMigrations</span>(<span class="ident">ApplyMigrations</span>),
+    <span class="doccomment">/// Generate DMMF from a schema, or directly from a database URL.
+    </span>Dmmf(DmmfCommand),
+    <span class="doccomment">/// Push a prisma schema directly to the database.
+    </span>SchemaPush(SchemaPush),
+    <span class="doccomment">/// DiagnoseMigrationHistory wrapper
+    </span>DiagnoseMigrationHistory(DiagnoseMigrationHistory),
+    <span class="doccomment">/// Counterpart to the CLI migrate diff.
+    </span>MigrateDiff(MigrateDiff),
+    <span class="doccomment">/// Validate the given data model.
+    </span>ValidateDatamodel(ValidateDatamodel),
+    <span class="doccomment">/// Clear the data and DDL of the given database.
+    </span>ResetDatabase(ResetDatabase),
+    <span class="doccomment">/// Clear the data and DDL of the given database.
+    </span>CreateDatabase(CreateDatabase),
+    <span class="doccomment">/// Create a new migration to the given directory.
+    </span>CreateMigration(CreateMigration),
+    <span class="doccomment">/// Apply all unapplied migrations from the given directory.
+    </span>ApplyMigrations(ApplyMigrations),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DmmfCommand</span> {
-    <span class="doccomment">/// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`</span>
-    <span class="doccomment">/// env var, or just `query-engine`.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">env</span> <span class="op">=</span> <span class="string">&quot;PRISMA_BINARY_PATH&quot;</span>, <span class="ident">default_value</span> <span class="op">=</span> <span class="string">&quot;query-engine&quot;</span>)]</span>
-    <span class="ident">query_engine_binary_path</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// A database URL to introspect and generate DMMF for.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;url&quot;</span>)]</span>
-    <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Path of the prisma schema to generate DMMF for.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;file-path&quot;</span>)]</span>
-    <span class="ident">file_path</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, StructOpt)]
+</span><span class="kw">struct </span>DmmfCommand {
+    <span class="doccomment">/// The path to the `query-engine` binary. Defaults to the value of the `PRISMA_BINARY_PATH`
+    /// env var, or just `query-engine`.
+    </span><span class="attribute">#[structopt(env = <span class="string">&quot;PRISMA_BINARY_PATH&quot;</span>, default_value = <span class="string">&quot;query-engine&quot;</span>)]
+    </span>query_engine_binary_path: String,
+    <span class="doccomment">/// A database URL to introspect and generate DMMF for.
+    </span><span class="attribute">#[structopt(long = <span class="string">&quot;url&quot;</span>)]
+    </span>url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Path of the prisma schema to generate DMMF for.
+    </span><span class="attribute">#[structopt(long = <span class="string">&quot;file-path&quot;</span>)]
+    </span>file_path: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SchemaPush</span> {
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="ident">force</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, StructOpt)]
+</span><span class="kw">struct </span>SchemaPush {
+    schema_path: String,
+    <span class="attribute">#[structopt(long)]
+    </span>force: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DiagnoseMigrationHistory</span> {
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
-    <span class="ident">migrations_directory_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>DiagnoseMigrationHistory {
+    schema_path: String,
+    migrations_directory_path: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">DiffOutputType</span> {
-    <span class="ident">Summary</span>,
-    <span class="ident">Ddl</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">enum </span>DiffOutputType {
+    Summary,
+    Ddl,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DiffOutputType</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Summary</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>DiffOutputType {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Summary
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">DiffOutputType</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">std::io::Error</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>DiffOutputType {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= std::io::Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;summary&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Summary</span>),
-            <span class="string">&quot;ddl&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Ddl</span>),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">std::io::ErrorKind::InvalidInput</span>;
-                <span class="prelude-val">Err</span>(<span class="ident">std::io::Error::new</span>(<span class="ident">kind</span>, <span class="macro">format!</span>(<span class="string">&quot;Invalid output type: `{}`&quot;</span>, <span class="ident">s</span>)))
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;summary&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Summary),
+            <span class="string">&quot;ddl&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Ddl),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>kind = std::io::ErrorKind::InvalidInput;
+                <span class="prelude-val">Err</span>(std::io::Error::new(kind, <span class="macro">format!</span>(<span class="string">&quot;Invalid output type: `{}`&quot;</span>, s)))
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DiffOutputType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DiffOutputType::Summary</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;summary&quot;</span>),
-            <span class="ident">DiffOutputType::Ddl</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ddl&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DiffOutputType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            DiffOutputType::Summary =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;summary&quot;</span>),
+            DiffOutputType::Ddl =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ddl&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MigrateDiff</span> {
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;from-schema-datamodel&quot;</span>)]</span>
-    <span class="ident">from_schema_datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;to-schema-datamodel&quot;</span>)]</span>
-    <span class="ident">to_schema_datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+#[allow(dead_code)]
+</span><span class="kw">struct </span>MigrateDiff {
+    <span class="attribute">#[structopt(long = <span class="string">&quot;from-schema-datamodel&quot;</span>)]
+    </span>from_schema_datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;to-schema-datamodel&quot;</span>)]
+    </span>to_schema_datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;from-schema-datasource&quot;</span>)]</span>
-    <span class="ident">from_schema_datasource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;to-schema-datasource&quot;</span>)]</span>
-    <span class="ident">to_schema_datasource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;from-schema-datasource&quot;</span>)]
+    </span>from_schema_datasource: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;to-schema-datasource&quot;</span>)]
+    </span>to_schema_datasource: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;from-url&quot;</span>)]</span>
-    <span class="ident">from_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;to-url&quot;</span>)]</span>
-    <span class="ident">to_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;from-url&quot;</span>)]
+    </span>from_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;to-url&quot;</span>)]
+    </span>to_url: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;from-empty&quot;</span>)]</span>
-    <span class="ident">from_empty</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span> <span class="op">=</span> <span class="string">&quot;to-empty&quot;</span>)]</span>
-    <span class="ident">to_empty</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;from-empty&quot;</span>)]
+    </span>from_empty: bool,
+    <span class="attribute">#[structopt(long = <span class="string">&quot;to-empty&quot;</span>)]
+    </span>to_empty: bool,
 
-    <span class="doccomment">/// Output SQL (default: false). Otherwise will produce a summary.</span>
-    <span class="attribute">#[<span class="ident">structopt</span>(<span class="ident">long</span>)]</span>
-    <span class="ident">script</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Output SQL (default: false). Otherwise will produce a summary.
+    </span><span class="attribute">#[structopt(long)]
+    </span>script: bool,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ValidateDatamodel</span> {
-    <span class="doccomment">/// Path to the prisma data model.</span>
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>ValidateDatamodel {
+    <span class="doccomment">/// Path to the prisma data model.
+    </span>schema_path: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ResetDatabase</span> {
-    <span class="doccomment">/// Path to the prisma data model.</span>
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>ResetDatabase {
+    <span class="doccomment">/// Path to the prisma data model.
+    </span>schema_path: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CreateDatabase</span> {
-    <span class="doccomment">/// Path to the prisma data model.</span>
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>CreateDatabase {
+    <span class="doccomment">/// Path to the prisma data model.
+    </span>schema_path: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CreateMigration</span> {
-    <span class="doccomment">/// The filesystem path of the migrations directory to use</span>
-    <span class="ident">migrations_path</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The current prisma schema to use as a target for the generated migration</span>
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The user-given name for the migration.</span>
-    <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>CreateMigration {
+    <span class="doccomment">/// The filesystem path of the migrations directory to use
+    </span>migrations_path: String,
+    <span class="doccomment">/// The current prisma schema to use as a target for the generated migration
+    </span>schema_path: String,
+    <span class="doccomment">/// The user-given name for the migration.
+    </span>name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">StructOpt</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ApplyMigrations</span> {
-    <span class="doccomment">/// The location of the migrations directory.</span>
-    <span class="ident">migrations_directory_path</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The current prisma schema to use as a target for the generated migration</span>
-    <span class="ident">schema_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(StructOpt, Debug)]
+</span><span class="kw">struct </span>ApplyMigrations {
+    <span class="doccomment">/// The location of the migrations directory.
+    </span>migrations_directory_path: String,
+    <span class="doccomment">/// The current prisma schema to use as a target for the generated migration
+    </span>schema_path: String,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ApplyMigrations</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ApplyMigrationsInput</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">am</span>: <span class="ident">ApplyMigrations</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">migrations_directory_path</span>: <span class="ident">am</span>.<span class="ident">migrations_directory_path</span>,
+<span class="kw">impl </span>From&lt;ApplyMigrations&gt; <span class="kw">for </span>ApplyMigrationsInput {
+    <span class="kw">fn </span>from(am: ApplyMigrations) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            migrations_directory_path: am.migrations_directory_path,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">tokio::main</span>]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">init_logger</span>();
+<span class="attribute">#[tokio::main]
+</span><span class="kw">async fn </span>main() -&gt; anyhow::Result&lt;()&gt; {
+    init_logger();
 
-    <span class="kw">match</span> <span class="ident">Command::from_args</span>() {
-        <span class="ident">Command::DiagnoseMigrationHistory</span>(<span class="ident">cmd</span>) =&gt; <span class="ident">cmd</span>.<span class="ident">execute</span>().<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Command::Dmmf</span>(<span class="ident">cmd</span>) =&gt; <span class="ident">generate_dmmf</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Command::SchemaPush</span>(<span class="ident">cmd</span>) =&gt; <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Command::MigrateDiff</span>(<span class="ident">cmd</span>) =&gt; <span class="ident">migrate_diff</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="ident">Command::Introspect</span> {
-            <span class="ident">url</span>,
-            <span class="ident">file_path</span>,
-            <span class="ident">composite_type_depth</span>,
+    <span class="kw">match </span>Command::from_args() {
+        Command::DiagnoseMigrationHistory(cmd) =&gt; cmd.execute().<span class="kw">await</span><span class="question-mark">?</span>,
+        Command::Dmmf(cmd) =&gt; generate_dmmf(<span class="kw-2">&amp;</span>cmd).<span class="kw">await</span><span class="question-mark">?</span>,
+        Command::SchemaPush(cmd) =&gt; schema_push(<span class="kw-2">&amp;</span>cmd).<span class="kw">await</span><span class="question-mark">?</span>,
+        Command::MigrateDiff(cmd) =&gt; migrate_diff(<span class="kw-2">&amp;</span>cmd).<span class="kw">await</span><span class="question-mark">?</span>,
+        Command::Introspect {
+            url,
+            file_path,
+            composite_type_depth,
         } =&gt; {
-            <span class="kw">if</span> <span class="ident">url</span>.<span class="ident">as_ref</span>().<span class="ident">xor</span>(<span class="ident">file_path</span>.<span class="ident">as_ref</span>()).<span class="ident">is_none</span>() {
+            <span class="kw">if </span>url.as_ref().xor(file_path.as_ref()).is_none() {
                 <span class="macro">anyhow::bail!</span>(
                     <span class="string">&quot;{}&quot;</span>,
-                    <span class="string">&quot;Exactly one of --url or --file-path must be provided&quot;</span>.<span class="ident">bold</span>().<span class="ident">red</span>()
+                    <span class="string">&quot;Exactly one of --url or --file-path must be provided&quot;</span>.bold().red()
                 );
             }
 
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file_path</span>) <span class="op">=</span> <span class="ident">file_path</span> {
-                <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">file_path</span>)<span class="question-mark">?</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="ident">url</span> {
-                <span class="ident">minimal_schema_from_url</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)<span class="question-mark">?</span>
-            } <span class="kw">else</span> {
+            <span class="kw">let </span>schema = <span class="kw">if let </span><span class="prelude-val">Some</span>(file_path) = file_path {
+                read_datamodel_from_file(<span class="kw-2">&amp;</span>file_path)<span class="question-mark">?
+            </span>} <span class="kw">else if let </span><span class="prelude-val">Some</span>(url) = url {
+                minimal_schema_from_url(<span class="kw-2">&amp;</span>url)<span class="question-mark">?
+            </span>} <span class="kw">else </span>{
                 <span class="macro">unreachable!</span>()
             };
 
-            <span class="comment">//todo configurable</span>
-            <span class="kw">let</span> <span class="ident">introspected</span> <span class="op">=</span> <span class="ident">introspection_core::RpcImpl::introspect_internal</span>(
-                <span class="ident">schema</span>,
+            <span class="comment">//todo configurable
+            </span><span class="kw">let </span>introspected = introspection_core::RpcImpl::introspect_internal(
+                schema,
                 <span class="bool-val">false</span>,
-                <span class="ident">CompositeTypeDepth::from</span>(<span class="ident">composite_type_depth</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>)),
+                CompositeTypeDepth::from(composite_type_depth.unwrap_or(<span class="number">0</span>)),
             )
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>.<span class="ident">data</span>))<span class="question-mark">?</span>;
+            .<span class="kw">await
+            </span>.map_err(|err| <span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{:?}&quot;</span>, err.data))<span class="question-mark">?</span>;
 
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">introspected</span>.<span class="ident">datamodel</span>);
+            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span>introspected.datamodel);
         }
-        <span class="ident">Command::ValidateDatamodel</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">use</span> <span class="ident">std::io::Read</span> <span class="kw">as</span> <span class="kw">_</span>;
+        Command::ValidateDatamodel(cmd) =&gt; {
+            <span class="kw">use </span>std::io::Read <span class="kw">as _</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">expect</span>(<span class="string">&quot;error opening datamodel file&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>file = std::fs::File::open(<span class="kw-2">&amp;</span>cmd.schema_path).expect(<span class="string">&quot;error opening datamodel file&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">String::new</span>();
-            <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">datamodel</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>datamodel = String::new();
+            file.read_to_string(<span class="kw-2">&amp;mut </span>datamodel).unwrap();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">psl::parse_schema</span>(<span class="ident">datamodel</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = psl::parse_schema(datamodel) {
                 <span class="macro">println!</span>(<span class="string">&quot;{e}&quot;</span>);
             };
         }
-        <span class="ident">Command::ResetDatabase</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">schema</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        Command::ResetDatabase(cmd) =&gt; {
+            <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="comment">// TODO(MultiSchema): Perhaps read namespaces from the schema somehow.</span>
-            <span class="ident">api</span>.<span class="ident">reset</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="comment">// TODO(MultiSchema): Perhaps read namespaces from the schema somehow.
+            </span>api.reset(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="ident">Command::CreateDatabase</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">schema</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        Command::CreateDatabase(cmd) =&gt; {
+            <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="ident">api</span>.<span class="ident">create_database</span>(<span class="ident">CreateDatabaseParams</span> {
-                <span class="ident">datasource</span>: <span class="ident">DatasourceParam::SchemaString</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }),
+            api.create_database(CreateDatabaseParams {
+                datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="ident">Command::CreateMigration</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">prisma_schema</span> <span class="op">=</span>
-                <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
+        Command::CreateMigration(cmd) =&gt; {
+            <span class="kw">let </span>prisma_schema =
+                read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">prisma_schema</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(prisma_schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">CreateMigrationInput</span> {
-                <span class="ident">migrations_directory_path</span>: <span class="ident">cmd</span>.<span class="ident">migrations_path</span>,
-                <span class="ident">prisma_schema</span>,
-                <span class="ident">migration_name</span>: <span class="ident">cmd</span>.<span class="ident">name</span>,
-                <span class="ident">draft</span>: <span class="bool-val">true</span>,
+            <span class="kw">let </span>input = CreateMigrationInput {
+                migrations_directory_path: cmd.migrations_path,
+                prisma_schema,
+                migration_name: cmd.name,
+                draft: <span class="bool-val">true</span>,
             };
 
-            <span class="ident">api</span>.<span class="ident">create_migration</span>(<span class="ident">input</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            api.create_migration(input).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="ident">Command::ApplyMigrations</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">prisma_schema</span> <span class="op">=</span>
-                <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
+        Command::ApplyMigrations(cmd) =&gt; {
+            <span class="kw">let </span>prisma_schema =
+                read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">prisma_schema</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-            <span class="ident">api</span>.<span class="ident">apply_migrations</span>(<span class="ident">cmd</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(prisma_schema), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            api.apply_migrations(cmd.into()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">read_datamodel_from_file</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">fn </span>read_datamodel_from_file(path: <span class="kw-2">&amp;</span>str) -&gt; std::io::Result&lt;String&gt; {
+    <span class="kw">use </span>std::path::Path;
 
-    <span class="macro">eprintln!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="string">&quot;reading the prisma schema from&quot;</span>.<span class="ident">bold</span>(), <span class="ident">path</span>.<span class="ident">yellow</span>());
+    <span class="macro">eprintln!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="string">&quot;reading the prisma schema from&quot;</span>.bold(), path.yellow());
 
-    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">path</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>path = Path::new(path);
+    <span class="kw">let </span><span class="kw-2">mut </span>file = File::open(path)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">out</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>out = String::new();
+    file.read_to_string(<span class="kw-2">&amp;mut </span>out)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+    <span class="prelude-val">Ok</span>(out)
 }
 
-<span class="kw">fn</span> <span class="ident">minimal_schema_from_url</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">url</span>.<span class="ident">split</span>(<span class="string">&quot;://&quot;</span>).<span class="ident">next</span>() {
+<span class="kw">fn </span>minimal_schema_from_url(url: <span class="kw-2">&amp;</span>str) -&gt; anyhow::Result&lt;String&gt; {
+    <span class="kw">let </span>provider = <span class="kw">match </span>url.split(<span class="string">&quot;://&quot;</span>).next() {
         <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) =&gt; <span class="string">&quot;sqlite&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgres&quot;</span>) =&gt; <span class="string">&quot;postgresql&quot;</span>,
+        <span class="prelude-val">Some</span>(s) <span class="kw">if </span>s.starts_with(<span class="string">&quot;postgres&quot;</span>) =&gt; <span class="string">&quot;postgresql&quot;</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;mysql&quot;</span>) =&gt; <span class="string">&quot;mysql&quot;</span>,
         <span class="prelude-val">Some</span>(<span class="string">&quot;sqlserver&quot;</span>) =&gt; <span class="string">&quot;sqlserver&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb&quot;</span> <span class="op">|</span> <span class="string">&quot;mongodb+srv&quot;</span>) =&gt; <span class="string">&quot;mongodb&quot;</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Could not extract a provider from the URL&quot;</span>),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb&quot; </span>| <span class="string">&quot;mongodb+srv&quot;</span>) =&gt; <span class="string">&quot;mongodb&quot;</span>,
+        <span class="kw">_ </span>=&gt; <span class="macro">anyhow::bail!</span>(<span class="string">&quot;Could not extract a provider from the URL&quot;</span>),
     };
 
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>schema = <span class="macro">format!</span>(
         <span class="string">r#&quot;
             datasource db {{
               provider = &quot;{}&quot;
               url = &quot;{}&quot;
             }}
         &quot;#</span>,
-        <span class="ident">provider</span>, <span class="ident">url</span>
+        provider, url
     );
 
-    <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+    <span class="prelude-val">Ok</span>(schema)
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_dmmf</span>(<span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">DmmfCommand</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">schema_path</span>: <span class="ident">String</span> <span class="op">=</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">url</span>.<span class="ident">as_ref</span>() {
-            <span class="kw">let</span> <span class="ident">skeleton</span> <span class="op">=</span> <span class="ident">minimal_schema_from_url</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
-            <span class="comment">//todo make this configurable</span>
-            <span class="kw">let</span> <span class="ident">introspected</span> <span class="op">=</span>
-                <span class="ident">introspection_core::RpcImpl::introspect_internal</span>(<span class="ident">skeleton</span>, <span class="bool-val">false</span>, <span class="ident">CompositeTypeDepth::Infinite</span>)
-                    .<span class="kw">await</span>
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>.<span class="ident">data</span>))<span class="question-mark">?</span>;
+<span class="kw">async fn </span>generate_dmmf(cmd: <span class="kw-2">&amp;</span>DmmfCommand) -&gt; anyhow::Result&lt;()&gt; {
+    <span class="kw">let </span>schema_path: String = {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(url) = cmd.url.as_ref() {
+            <span class="kw">let </span>skeleton = minimal_schema_from_url(url)<span class="question-mark">?</span>;
+            <span class="comment">//todo make this configurable
+            </span><span class="kw">let </span>introspected =
+                introspection_core::RpcImpl::introspect_internal(skeleton, <span class="bool-val">false</span>, CompositeTypeDepth::Infinite)
+                    .<span class="kw">await
+                    </span>.map_err(|err| <span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{:?}&quot;</span>, err.data))<span class="question-mark">?</span>;
 
-            <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Schema was successfully introspected from database URL&quot;</span>.<span class="ident">green</span>());
+            <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Schema was successfully introspected from database URL&quot;</span>.green());
 
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;/tmp/prisma-test-cli-introspected.prisma&quot;</span>;
-            <span class="ident">std::fs::write</span>(<span class="ident">path</span>, <span class="ident">introspected</span>.<span class="ident">datamodel</span>)<span class="question-mark">?</span>;
-            <span class="ident">path</span>.<span class="ident">to_owned</span>()
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">file_path</span>) <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">file_path</span>.<span class="ident">as_ref</span>() {
-            <span class="ident">file_path</span>.<span class="ident">clone</span>()
-        } <span class="kw">else</span> {
+            <span class="kw">let </span>path = <span class="string">&quot;/tmp/prisma-test-cli-introspected.prisma&quot;</span>;
+            std::fs::write(path, introspected.datamodel)<span class="question-mark">?</span>;
+            path.to_owned()
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(file_path) = cmd.file_path.as_ref() {
+            file_path.clone()
+        } <span class="kw">else </span>{
             <span class="macro">eprintln!</span>(
                 <span class="string">&quot;{} {} {} {}&quot;</span>,
-                <span class="string">&quot;Please provide one of&quot;</span>.<span class="ident">yellow</span>(),
-                <span class="string">&quot;--url&quot;</span>.<span class="ident">bold</span>(),
-                <span class="string">&quot;or&quot;</span>.<span class="ident">yellow</span>(),
-                <span class="string">&quot;--file-path&quot;</span>.<span class="ident">bold</span>()
+                <span class="string">&quot;Please provide one of&quot;</span>.yellow(),
+                <span class="string">&quot;--url&quot;</span>.bold(),
+                <span class="string">&quot;or&quot;</span>.yellow(),
+                <span class="string">&quot;--file-path&quot;</span>.bold()
             );
-            <span class="ident">std::process::exit</span>(<span class="number">1</span>)
+            std::process::exit(<span class="number">1</span>)
         }
     };
 
     <span class="macro">eprintln!</span>(
         <span class="string">&quot;{} {}&quot;</span>,
-        <span class="string">&quot;Using the query engine binary at&quot;</span>.<span class="ident">yellow</span>(),
-        <span class="ident">cmd</span>.<span class="ident">query_engine_binary_path</span>.<span class="ident">bold</span>()
+        <span class="string">&quot;Using the query engine binary at&quot;</span>.yellow(),
+        cmd.query_engine_binary_path.bold()
     );
 
-    <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">std::process::Command::new</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">query_engine_binary_path</span>)
-        .<span class="ident">arg</span>(<span class="string">&quot;cli&quot;</span>)
-        .<span class="ident">arg</span>(<span class="string">&quot;dmmf&quot;</span>)
-        .<span class="ident">env</span>(<span class="string">&quot;PRISMA_DML_PATH&quot;</span>, <span class="ident">schema_path</span>)
-        .<span class="ident">spawn</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span>cmd = std::process::Command::new(<span class="kw-2">&amp;</span>cmd.query_engine_binary_path)
+        .arg(<span class="string">&quot;cli&quot;</span>)
+        .arg(<span class="string">&quot;dmmf&quot;</span>)
+        .env(<span class="string">&quot;PRISMA_DML_PATH&quot;</span>, schema_path)
+        .spawn()<span class="question-mark">?</span>;
 
-    <span class="ident">cmd</span>.<span class="ident">wait_with_output</span>()<span class="question-mark">?</span>;
+    cmd.wait_with_output()<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaPush</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">schema</span>.<span class="ident">clone</span>()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+<span class="kw">async fn </span>schema_push(cmd: <span class="kw-2">&amp;</span>SchemaPush) -&gt; anyhow::Result&lt;()&gt; {
+    <span class="kw">let </span>schema = read_datamodel_from_file(<span class="kw-2">&amp;</span>cmd.schema_path).context(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">Some</span>(schema.clone()), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">api</span>
-        .<span class="ident">schema_push</span>(<span class="ident">SchemaPushInput</span> {
-            <span class="ident">schema</span>,
-            <span class="ident">force</span>: <span class="ident">cmd</span>.<span class="ident">force</span>,
+    <span class="kw">let </span>response = api
+        .schema_push(SchemaPushInput {
+            schema,
+            force: cmd.force,
         })
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">warnings</span>.<span class="ident">is_empty</span>() {
-        <span class="macro">eprintln!</span>(<span class="string">&quot;⚠️  {}&quot;</span>, <span class="string">&quot;Warnings&quot;</span>.<span class="ident">bright_yellow</span>().<span class="ident">bold</span>());
+    <span class="kw">if </span>!response.warnings.is_empty() {
+        <span class="macro">eprintln!</span>(<span class="string">&quot;⚠️  {}&quot;</span>, <span class="string">&quot;Warnings&quot;</span>.bright_yellow().bold());
 
-        <span class="kw">for</span> <span class="ident">warning</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">warnings</span> {
-            <span class="macro">eprintln!</span>(<span class="string">&quot;- {}&quot;</span>, <span class="ident">warning</span>.<span class="ident">bright_yellow</span>())
+        <span class="kw">for </span>warning <span class="kw">in </span><span class="kw-2">&amp;</span>response.warnings {
+            <span class="macro">eprintln!</span>(<span class="string">&quot;- {}&quot;</span>, warning.bright_yellow())
         }
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">unexecutable</span>.<span class="ident">is_empty</span>() {
-        <span class="macro">eprintln!</span>(<span class="string">&quot;☢️  {}&quot;</span>, <span class="string">&quot;Unexecutable steps&quot;</span>.<span class="ident">bright_red</span>().<span class="ident">bold</span>());
+    <span class="kw">if </span>!response.unexecutable.is_empty() {
+        <span class="macro">eprintln!</span>(<span class="string">&quot;☢️  {}&quot;</span>, <span class="string">&quot;Unexecutable steps&quot;</span>.bright_red().bold());
 
-        <span class="kw">for</span> <span class="ident">unexecutable</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">unexecutable</span> {
-            <span class="macro">eprintln!</span>(<span class="string">&quot;- {}&quot;</span>, <span class="ident">unexecutable</span>.<span class="ident">bright_red</span>())
+        <span class="kw">for </span>unexecutable <span class="kw">in </span><span class="kw-2">&amp;</span>response.unexecutable {
+            <span class="macro">eprintln!</span>(<span class="string">&quot;- {}&quot;</span>, unexecutable.bright_red())
         }
     }
 
-    <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">executed_steps</span> <span class="op">&gt;</span> <span class="number">0</span> {
+    <span class="kw">if </span>response.executed_steps &gt; <span class="number">0 </span>{
         <span class="macro">eprintln!</span>(
             <span class="string">&quot;{}  {}&quot;</span>,
-            <span class="string">&quot;✔️&quot;</span>.<span class="ident">bold</span>(),
-            <span class="macro">format!</span>(<span class="string">&quot;Schema pushed to database. ({} steps)&quot;</span>, <span class="ident">response</span>.<span class="ident">executed_steps</span>).<span class="ident">green</span>()
+            <span class="string">&quot;✔️&quot;</span>.bold(),
+            <span class="macro">format!</span>(<span class="string">&quot;Schema pushed to database. ({} steps)&quot;</span>, response.executed_steps).green()
         );
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">unexecutable</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">response</span>.<span class="ident">warnings</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">response</span>.<span class="ident">executed_steps</span> <span class="op">==</span> <span class="number">0</span> {
+    } <span class="kw">else if </span>response.unexecutable.is_empty() &amp;&amp; response.warnings.is_empty() &amp;&amp; response.executed_steps == <span class="number">0 </span>{
         <span class="macro">eprintln!</span>(
             <span class="string">&quot;{}  {}&quot;</span>,
-            <span class="string">&quot;✔️&quot;</span>.<span class="ident">bold</span>(),
-            <span class="string">&quot;No changes to push. Prisma schema and database are in sync.&quot;</span>.<span class="ident">green</span>()
+            <span class="string">&quot;✔️&quot;</span>.bold(),
+            <span class="string">&quot;No changes to push. Prisma schema and database are in sync.&quot;</span>.green()
         );
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">eprintln!</span>(
             <span class="string">&quot;{}  {}&quot;</span>,
-            <span class="string">&quot;❌&quot;</span>.<span class="ident">bold</span>(),
-            <span class="string">&quot;The schema was not pushed. Pass the --force flag to ignore warnings.&quot;</span>
-        );
-        <span class="ident">std::process::exit</span>(<span class="number">1</span>);
+            <span class="string">&quot;❌&quot;</span>.bold(),
+            <span class="string">&quot;The schema was not pushed. Pass the --force flag to ignore warnings.&quot;
+        </span>);
+        std::process::exit(<span class="number">1</span>);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">struct</span> <span class="ident">DiffHost</span>;
+<span class="kw">struct </span>DiffHost;
 
-<span class="kw">impl</span> <span class="ident">migration_connector::ConnectorHost</span> <span class="kw">for</span> <span class="ident">DiffHost</span> {
-    <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">migration_core::CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">print!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>);
-        <span class="ident">Box::pin</span>(<span class="ident">std::future::ready</span>(<span class="prelude-val">Ok</span>(())))
+<span class="kw">impl </span>migration_connector::ConnectorHost <span class="kw">for </span>DiffHost {
+    <span class="kw">fn </span>print(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, migration_core::CoreResult&lt;()&gt;&gt; {
+        <span class="macro">print!</span>(<span class="string">&quot;{}&quot;</span>, s);
+        Box::pin(std::future::ready(<span class="prelude-val">Ok</span>(())))
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">migrate_diff</span>(<span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">MigrateDiff</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::<span class="kw-2">*</span>;
+<span class="kw">async fn </span>migrate_diff(cmd: <span class="kw-2">&amp;</span>MigrateDiff) -&gt; anyhow::Result&lt;()&gt; {
+    <span class="kw">use </span>migration_core::json_rpc::types::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">DiffHost</span>)))<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">to_schema_datamodel</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">to_schema_datamodel</span> {
-        <span class="ident">DiffTarget::SchemaDatamodel</span>(<span class="ident">SchemaContainer</span> {
-            <span class="ident">schema</span>: <span class="ident">to_schema_datamodel</span>.<span class="ident">clone</span>(),
+    <span class="kw">let </span>api = migration_core::migration_api(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Arc::new(DiffHost)))<span class="question-mark">?</span>;
+    <span class="kw">let </span>to = <span class="kw">if let </span><span class="prelude-val">Some</span>(to_schema_datamodel) = <span class="kw-2">&amp;</span>cmd.to_schema_datamodel {
+        DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: to_schema_datamodel.clone(),
         })
-    } <span class="kw">else</span> {
-        <span class="macro">todo!</span>(<span class="string">&quot;can&#39;t handle {:?} yet&quot;</span>, <span class="ident">cmd</span>)
+    } <span class="kw">else </span>{
+        <span class="macro">todo!</span>(<span class="string">&quot;can&#39;t handle {:?} yet&quot;</span>, cmd)
     };
-    <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">from_url</span> {
-        <span class="ident">DiffTarget::Url</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span>: <span class="ident">url</span>.<span class="ident">clone</span>() })
-    } <span class="kw">else</span> {
-        <span class="macro">todo!</span>(<span class="string">&quot;can&#39;t handle {:?} yet&quot;</span>, <span class="ident">cmd</span>)
-    };
-
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">DiffParams</span> {
-        <span class="ident">exit_code</span>: <span class="prelude-val">None</span>,
-        <span class="ident">from</span>,
-        <span class="ident">script</span>: <span class="ident">cmd</span>.<span class="ident">script</span>,
-        <span class="ident">shadow_database_url</span>: <span class="prelude-val">None</span>, <span class="comment">// TODO</span>
-        <span class="ident">to</span>,
+    <span class="kw">let </span>from = <span class="kw">if let </span><span class="prelude-val">Some</span>(url) = <span class="kw-2">&amp;</span>cmd.from_url {
+        DiffTarget::Url(UrlContainer { url: url.clone() })
+    } <span class="kw">else </span>{
+        <span class="macro">todo!</span>(<span class="string">&quot;can&#39;t handle {:?} yet&quot;</span>, cmd)
     };
 
-    <span class="ident">api</span>.<span class="ident">diff</span>(<span class="ident">input</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>input = DiffParams {
+        exit_code: <span class="prelude-val">None</span>,
+        from,
+        script: cmd.script,
+        shadow_database_url: <span class="prelude-val">None</span>, <span class="comment">// TODO
+        </span>to,
+    };
+
+    api.diff(input).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">init_logger</span>() {
-    <span class="kw">use</span> <span class="ident">tracing_error::ErrorLayer</span>;
-    <span class="kw">use</span> <span class="ident">tracing_subscriber::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">fn </span>init_logger() {
+    <span class="kw">use </span>tracing_error::ErrorLayer;
+    <span class="kw">use </span>tracing_subscriber::prelude::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">EnvFilter</span>, <span class="ident">FmtSubscriber</span>};
+    <span class="kw">use </span>tracing_subscriber::{EnvFilter, FmtSubscriber};
 
-    <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">FmtSubscriber::builder</span>()
-        .<span class="ident">with_env_filter</span>(<span class="ident">EnvFilter::from_default_env</span>())
-        .<span class="ident">with_ansi</span>(<span class="bool-val">true</span>)
-        .<span class="ident">with_writer</span>(<span class="ident">std::io::stderr</span>)
-        .<span class="ident">finish</span>()
-        .<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>())
-        .<span class="ident">with</span>(<span class="ident">migration_core::TimingsLayer::default</span>());
+    <span class="kw">let </span>subscriber = FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .with_ansi(<span class="bool-val">true</span>)
+        .with_writer(std::io::stderr)
+        .finish()
+        .with(ErrorLayer::default())
+        .with(migration_core::TimingsLayer::default());
 
-    <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">eprintln!</span>(<span class="string">&quot;Error initializing the global logger: {}&quot;</span>, <span class="ident">err</span>))
-        .<span class="ident">ok</span>();
+    tracing::subscriber::set_global_default(subscriber)
+        .map_err(|err| <span class="macro">eprintln!</span>(<span class="string">&quot;Error initializing the global logger: {}&quot;</span>, err))
+        .ok();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

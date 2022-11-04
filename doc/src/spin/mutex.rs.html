@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/spin-0.5.2/src/mutex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../spin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/spin-0.5.2/src/mutex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mutex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../spin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -386,393 +386,393 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>, <span class="ident">spin_loop_hint</span> <span class="kw">as</span> <span class="ident">cpu_relax</span>};
-<span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">core::marker::Sync</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Drop</span>, <span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::option::Option</span>::{<span class="self">self</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>};
-<span class="kw">use</span> <span class="ident">core::default::Default</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::sync::atomic::{AtomicBool, Ordering, spin_loop_hint <span class="kw">as </span>cpu_relax};
+<span class="kw">use </span>core::cell::UnsafeCell;
+<span class="kw">use </span>core::marker::Sync;
+<span class="kw">use </span>core::ops::{Drop, Deref, DerefMut};
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::option::Option::{<span class="self">self</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>};
+<span class="kw">use </span>core::default::Default;
 
-<span class="doccomment">/// This type provides MUTual EXclusion based on spinning.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Description</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The behaviour of these lock is similar to their namesakes in `std::sync`. they</span>
-<span class="doccomment">/// differ on the following:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The lock will not be poisoned in case of failure;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Simple examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use spin;</span>
-<span class="doccomment">/// let spin_mutex = spin::Mutex::new(0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Modify the data</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let mut data = spin_mutex.lock();</span>
-<span class="doccomment">///     *data = 2;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Read the data</span>
-<span class="doccomment">/// let answer =</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let data = spin_mutex.lock();</span>
-<span class="doccomment">///     *data</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(answer, 2);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Thread-safety example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use spin;</span>
-<span class="doccomment">/// use std::sync::{Arc, Barrier};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let numthreads = 1000;</span>
-<span class="doccomment">/// let spin_mutex = Arc::new(spin::Mutex::new(0));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We use a barrier to ensure the readout happens after all writing</span>
-<span class="doccomment">/// let barrier = Arc::new(Barrier::new(numthreads + 1));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for _ in (0..numthreads)</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let my_barrier = barrier.clone();</span>
-<span class="doccomment">///     let my_lock = spin_mutex.clone();</span>
-<span class="doccomment">///     std::thread::spawn(move||</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         let mut guard = my_lock.lock();</span>
-<span class="doccomment">///         *guard += 1;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         // Release the lock to prevent a deadlock</span>
-<span class="doccomment">///         drop(guard);</span>
-<span class="doccomment">///         my_barrier.wait();</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// barrier.wait();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let answer = { *spin_mutex.lock() };</span>
-<span class="doccomment">/// assert_eq!(answer, numthreads);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>
+<span class="doccomment">/// This type provides MUTual EXclusion based on spinning.
+///
+/// # Description
+///
+/// The behaviour of these lock is similar to their namesakes in `std::sync`. they
+/// differ on the following:
+///
+/// - The lock will not be poisoned in case of failure;
+///
+/// # Simple examples
+///
+/// ```
+/// use spin;
+/// let spin_mutex = spin::Mutex::new(0);
+///
+/// // Modify the data
+/// {
+///     let mut data = spin_mutex.lock();
+///     *data = 2;
+/// }
+///
+/// // Read the data
+/// let answer =
+/// {
+///     let data = spin_mutex.lock();
+///     *data
+/// };
+///
+/// assert_eq!(answer, 2);
+/// ```
+///
+/// # Thread-safety example
+///
+/// ```
+/// use spin;
+/// use std::sync::{Arc, Barrier};
+///
+/// let numthreads = 1000;
+/// let spin_mutex = Arc::new(spin::Mutex::new(0));
+///
+/// // We use a barrier to ensure the readout happens after all writing
+/// let barrier = Arc::new(Barrier::new(numthreads + 1));
+///
+/// for _ in (0..numthreads)
+/// {
+///     let my_barrier = barrier.clone();
+///     let my_lock = spin_mutex.clone();
+///     std::thread::spawn(move||
+///     {
+///         let mut guard = my_lock.lock();
+///         *guard += 1;
+///
+///         // Release the lock to prevent a deadlock
+///         drop(guard);
+///         my_barrier.wait();
+///     });
+/// }
+///
+/// barrier.wait();
+///
+/// let answer = { *spin_mutex.lock() };
+/// assert_eq!(answer, numthreads);
+/// ```
+</span><span class="kw">pub struct </span>Mutex&lt;T: <span class="question-mark">?</span>Sized&gt;
 {
-    <span class="ident">lock</span>: <span class="ident">AtomicBool</span>,
-    <span class="ident">data</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    lock: AtomicBool,
+    data: UnsafeCell&lt;T&gt;,
 }
 
-<span class="doccomment">/// A guard to which the protected data can be accessed</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When the guard falls out of scope it will release the lock.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="doccomment">/// A guard to which the protected data can be accessed
+///
+/// When the guard falls out of scope it will release the lock.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>MutexGuard&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized + <span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="ident">lock</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicBool</span>,
-    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>,
+    lock: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicBool,
+    data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T,
 }
 
-<span class="comment">// Same unsafe impls as `std::sync::Mutex`</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// Same unsafe impls as `std::sync::Mutex`
+</span><span class="kw">unsafe impl</span>&lt;T: <span class="question-mark">?</span>Sized + Send&gt; Sync <span class="kw">for </span>Mutex&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: <span class="question-mark">?</span>Sized + Send&gt; Send <span class="kw">for </span>Mutex&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;T&gt; Mutex&lt;T&gt;
 {
-    <span class="doccomment">/// Creates a new spinlock wrapping the supplied data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May be used statically:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use spin;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// static MUTEX: spin::Mutex&lt;()&gt; = spin::Mutex::new(());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn demo() {</span>
-    <span class="doccomment">///     let lock = MUTEX.lock();</span>
-    <span class="doccomment">///     // do something with lock</span>
-    <span class="doccomment">///     drop(lock);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">user_data</span>: <span class="ident">T</span>) -&gt; <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Creates a new spinlock wrapping the supplied data.
+    ///
+    /// May be used statically:
+    ///
+    /// ```
+    /// use spin;
+    ///
+    /// static MUTEX: spin::Mutex&lt;()&gt; = spin::Mutex::new(());
+    ///
+    /// fn demo() {
+    ///     let lock = MUTEX.lock();
+    ///     // do something with lock
+    ///     drop(lock);
+    /// }
+    /// ```
+    </span><span class="kw">pub const fn </span>new(user_data: T) -&gt; Mutex&lt;T&gt;
     {
-        <span class="ident">Mutex</span>
+        Mutex
         {
-            <span class="ident">lock</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">data</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">user_data</span>),
+            lock: AtomicBool::new(<span class="bool-val">false</span>),
+            data: UnsafeCell::new(user_data),
         }
     }
 
-    <span class="doccomment">/// Consumes this mutex, returning the underlying data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="comment">// We know statically that there are no outstanding references to</span>
-        <span class="comment">// `self` so there&#39;s no need to lock.</span>
-        <span class="kw">let</span> <span class="ident">Mutex</span> { <span class="ident">data</span>, .. } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">data</span>.<span class="ident">into_inner</span>()
+    <span class="doccomment">/// Consumes this mutex, returning the underlying data.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="comment">// We know statically that there are no outstanding references to
+        // `self` so there&#39;s no need to lock.
+        </span><span class="kw">let </span>Mutex { data, .. } = <span class="self">self</span>;
+        data.into_inner()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; Mutex&lt;T&gt;
 {
-    <span class="kw">fn</span> <span class="ident">obtain_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
+    <span class="kw">fn </span>obtain_lock(<span class="kw-2">&amp;</span><span class="self">self</span>)
     {
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">compare_and_swap</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="ident">Ordering::Acquire</span>) <span class="op">!</span><span class="op">=</span> <span class="bool-val">false</span>
-        {
-            <span class="comment">// Wait until the lock looks unlocked before retrying</span>
-            <span class="kw">while</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>)
+        <span class="kw">while </span><span class="self">self</span>.lock.compare_and_swap(<span class="bool-val">false</span>, <span class="bool-val">true</span>, Ordering::Acquire) != <span class="bool-val">false
+        </span>{
+            <span class="comment">// Wait until the lock looks unlocked before retrying
+            </span><span class="kw">while </span><span class="self">self</span>.lock.load(Ordering::Relaxed)
             {
-                <span class="ident">cpu_relax</span>();
+                cpu_relax();
             }
         }
     }
 
-    <span class="doccomment">/// Locks the spinlock and returns a guard.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value may be dereferenced for data access</span>
-    <span class="doccomment">/// and the lock will be dropped when the guard falls out of scope.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// let mylock = spin::Mutex::new(0);</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let mut data = mylock.lock();</span>
-    <span class="doccomment">///     // The lock is now locked and the data can be accessed</span>
-    <span class="doccomment">///     *data += 1;</span>
-    <span class="doccomment">///     // The lock is implicitly dropped</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Locks the spinlock and returns a guard.
+    ///
+    /// The returned value may be dereferenced for data access
+    /// and the lock will be dropped when the guard falls out of scope.
+    ///
+    /// ```
+    /// let mylock = spin::Mutex::new(0);
+    /// {
+    ///     let mut data = mylock.lock();
+    ///     // The lock is now locked and the data can be accessed
+    ///     *data += 1;
+    ///     // The lock is implicitly dropped
+    /// }
+    ///
+    /// ```
+    </span><span class="kw">pub fn </span>lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MutexGuard&lt;T&gt;
     {
-        <span class="self">self</span>.<span class="ident">obtain_lock</span>();
-        <span class="ident">MutexGuard</span>
+        <span class="self">self</span>.obtain_lock();
+        MutexGuard
         {
-            <span class="ident">lock</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">lock</span>,
-            <span class="ident">data</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() },
+            lock: <span class="kw-2">&amp;</span><span class="self">self</span>.lock,
+            data: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.data.get() },
         }
     }
 
-    <span class="doccomment">/// Force unlock the spinlock.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is *extremely* unsafe if the lock is not held by the current</span>
-    <span class="doccomment">/// thread. However, this can be useful in some instances for exposing the</span>
-    <span class="doccomment">/// lock to FFI that doesn&#39;t know how to deal with RAII.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the lock isn&#39;t held, this is a no-op.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">force_unlock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">Ordering::Release</span>);
+    <span class="doccomment">/// Force unlock the spinlock.
+    ///
+    /// This is *extremely* unsafe if the lock is not held by the current
+    /// thread. However, this can be useful in some instances for exposing the
+    /// lock to FFI that doesn&#39;t know how to deal with RAII.
+    ///
+    /// If the lock isn&#39;t held, this is a no-op.
+    </span><span class="kw">pub unsafe fn </span>force_unlock(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.lock.store(<span class="bool-val">false</span>, Ordering::Release);
     }
 
-    <span class="doccomment">/// Tries to lock the mutex. If it is already locked, it will return None. Otherwise it returns</span>
-    <span class="doccomment">/// a guard within Some.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Tries to lock the mutex. If it is already locked, it will return None. Otherwise it returns
+    /// a guard within Some.
+    </span><span class="kw">pub fn </span>try_lock(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;MutexGuard&lt;T&gt;&gt;
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">compare_and_swap</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="ident">Ordering::Acquire</span>) <span class="op">==</span> <span class="bool-val">false</span>
-        {
+        <span class="kw">if </span><span class="self">self</span>.lock.compare_and_swap(<span class="bool-val">false</span>, <span class="bool-val">true</span>, Ordering::Acquire) == <span class="bool-val">false
+        </span>{
             <span class="prelude-val">Some</span>(
-                <span class="ident">MutexGuard</span> {
-                    <span class="ident">lock</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">lock</span>,
-                    <span class="ident">data</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() },
+                MutexGuard {
+                    lock: <span class="kw-2">&amp;</span><span class="self">self</span>.lock,
+                    data: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.data.get() },
                 }
             )
         }
-        <span class="kw">else</span>
+        <span class="kw">else
+        </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Mutex&lt;T&gt;
+{
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result
+    {
+        <span class="kw">match </span><span class="self">self</span>.try_lock()
         {
-            <span class="prelude-val">None</span>
+            <span class="prelude-val">Some</span>(guard) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mutex {{ data: &quot;</span>)
+				.and_then(|()| (<span class="kw-2">&amp;*</span>guard).fmt(f))
+				.and_then(|()| <span class="macro">write!</span>(f, <span class="string">&quot;}}&quot;</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mutex {{ &lt;locked&gt; }}&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized + Default&gt; Default <span class="kw">for </span>Mutex&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; Mutex&lt;T&gt; {
+        Mutex::new(Default::default())
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; Deref <span class="kw">for </span>MutexGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span>
+    <span class="kw">type </span>Target = T;
+    <span class="kw">fn </span>deref&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>T { <span class="kw-2">&amp;*</span><span class="self">self</span>.data }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; DerefMut <span class="kw">for </span>MutexGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+{
+    <span class="kw">fn </span>deref_mut&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>T { <span class="kw-2">&amp;mut *</span><span class="self">self</span>.data }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt; Drop <span class="kw">for </span>MutexGuard&lt;<span class="lifetime">&#39;a</span>, T&gt;
+{
+    <span class="doccomment">/// The dropping of the MutexGuard will release the lock it was created from.
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_lock</span>()
-        {
-            <span class="prelude-val">Some</span>(<span class="ident">guard</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mutex {{ data: &quot;</span>)
-				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">guard</span>).<span class="ident">fmt</span>(<span class="ident">f</span>))
-				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;}}&quot;</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mutex {{ &lt;locked&gt; }}&quot;</span>),
-        }
+        <span class="self">self</span>.lock.store(<span class="bool-val">false</span>, Ordering::Release);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Mutex::new</span>(<span class="ident">Default::default</span>())
-    }
-}
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">T</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span> }
-}
+    <span class="kw">use </span>std::sync::mpsc::channel;
+    <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>std::sync::atomic::{AtomicUsize, Ordering};
+    <span class="kw">use </span>std::thread;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{
-    <span class="kw">fn</span> <span class="ident">deref_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">T</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span> }
-}
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-{
-    <span class="doccomment">/// The dropping of the MutexGuard will release the lock it was created from.</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
-    {
-        <span class="self">self</span>.<span class="ident">lock</span>.<span class="ident">store</span>(<span class="bool-val">false</span>, <span class="ident">Ordering::Release</span>);
-    }
-}
+    <span class="attribute">#[derive(Eq, PartialEq, Debug)]
+    </span><span class="kw">struct </span>NonCopy(i32);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::prelude::v1</span>::<span class="kw-2">*</span>;
-
-    <span class="kw">use</span> <span class="ident">std::sync::mpsc::channel</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
-
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">NonCopy</span>(<span class="ident">i32</span>);
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(());
-        <span class="ident">drop</span>(<span class="ident">m</span>.<span class="ident">lock</span>());
-        <span class="ident">drop</span>(<span class="ident">m</span>.<span class="ident">lock</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke() {
+        <span class="kw">let </span>m = Mutex::new(());
+        drop(m.lock());
+        drop(m.lock());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">lots_and_lots</span>() {
-        <span class="kw">static</span> <span class="ident">M</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>  <span class="op">=</span> <span class="ident">Mutex::new</span>(());
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">CNT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">const</span> <span class="ident">J</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1000</span>;
-        <span class="kw">const</span> <span class="ident">K</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">3</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>lots_and_lots() {
+        <span class="kw">static </span>M: Mutex&lt;()&gt;  = Mutex::new(());
+        <span class="kw">static </span><span class="kw-2">mut </span>CNT: u32 = <span class="number">0</span>;
+        <span class="kw">const </span>J: u32 = <span class="number">1000</span>;
+        <span class="kw">const </span>K: u32 = <span class="number">3</span>;
 
-        <span class="kw">fn</span> <span class="ident">inc</span>() {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">J</span> {
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">M</span>.<span class="ident">lock</span>();
-                    <span class="ident">CNT</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">fn </span>inc() {
+            <span class="kw">for _ in </span><span class="number">0</span>..J {
+                <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>_g = M.lock();
+                    CNT += <span class="number">1</span>;
                 }
             }
         }
 
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">K</span> {
-            <span class="kw">let</span> <span class="ident">tx2</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> { <span class="ident">inc</span>(); <span class="ident">tx2</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>(); });
-            <span class="kw">let</span> <span class="ident">tx2</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> { <span class="ident">inc</span>(); <span class="ident">tx2</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>(); });
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">for _ in </span><span class="number">0</span>..K {
+            <span class="kw">let </span>tx2 = tx.clone();
+            thread::spawn(<span class="kw">move</span>|| { inc(); tx2.send(()).unwrap(); });
+            <span class="kw">let </span>tx2 = tx.clone();
+            thread::spawn(<span class="kw">move</span>|| { inc(); tx2.send(()).unwrap(); });
         }
 
-        <span class="ident">drop</span>(<span class="ident">tx</span>);
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span> <span class="op">*</span> <span class="ident">K</span> {
-            <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+        drop(tx);
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">2 </span>* K {
+            rx.recv().unwrap();
         }
-        <span class="macro">assert_eq!</span>(<span class="kw">unsafe</span> {<span class="ident">CNT</span>}, <span class="ident">J</span> <span class="op">*</span> <span class="ident">K</span> <span class="op">*</span> <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw">unsafe </span>{CNT}, J * K * <span class="number">2</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_lock</span>() {
-        <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="number">42</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>try_lock() {
+        <span class="kw">let </span>mutex = Mutex::new(<span class="number">42</span>);
 
-        <span class="comment">// First lock succeeds</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">try_lock</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">r</span>), <span class="prelude-val">Some</span>(<span class="number">42</span>));
+        <span class="comment">// First lock succeeds
+        </span><span class="kw">let </span>a = mutex.try_lock();
+        <span class="macro">assert_eq!</span>(a.as_ref().map(|r| <span class="kw-2">**</span>r), <span class="prelude-val">Some</span>(<span class="number">42</span>));
 
-        <span class="comment">// Additional lock failes</span>
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">try_lock</span>();
-        <span class="macro">assert!</span>(<span class="ident">b</span>.<span class="ident">is_none</span>());
+        <span class="comment">// Additional lock failes
+        </span><span class="kw">let </span>b = mutex.try_lock();
+        <span class="macro">assert!</span>(b.is_none());
 
-        <span class="comment">// After dropping lock, it succeeds again</span>
-        <span class="ident">::core::mem::drop</span>(<span class="ident">a</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">try_lock</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">r</span>), <span class="prelude-val">Some</span>(<span class="number">42</span>));
+        <span class="comment">// After dropping lock, it succeeds again
+        </span>::core::mem::drop(a);
+        <span class="kw">let </span>c = mutex.try_lock();
+        <span class="macro">assert_eq!</span>(c.as_ref().map(|r| <span class="kw-2">**</span>r), <span class="prelude-val">Some</span>(<span class="number">42</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_into_inner</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">NonCopy</span>(<span class="number">10</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">into_inner</span>(), <span class="ident">NonCopy</span>(<span class="number">10</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_into_inner() {
+        <span class="kw">let </span>m = Mutex::new(NonCopy(<span class="number">10</span>));
+        <span class="macro">assert_eq!</span>(m.into_inner(), NonCopy(<span class="number">10</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_into_inner_drop</span>() {
-        <span class="kw">struct</span> <span class="ident">Foo</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>);
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Foo</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_into_inner_drop() {
+        <span class="kw">struct </span>Foo(Arc&lt;AtomicUsize&gt;);
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Foo {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="self">self</span>.<span class="number">0</span>.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
             }
         }
-        <span class="kw">let</span> <span class="ident">num_drops</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">Foo</span>(<span class="ident">num_drops</span>.<span class="ident">clone</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">num_drops</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="number">0</span>);
+        <span class="kw">let </span>num_drops = Arc::new(AtomicUsize::new(<span class="number">0</span>));
+        <span class="kw">let </span>m = Mutex::new(Foo(num_drops.clone()));
+        <span class="macro">assert_eq!</span>(num_drops.load(Ordering::SeqCst), <span class="number">0</span>);
         {
-            <span class="kw">let</span> <span class="ident">_inner</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">into_inner</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">num_drops</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="number">0</span>);
+            <span class="kw">let </span>_inner = m.into_inner();
+            <span class="macro">assert_eq!</span>(num_drops.load(Ordering::SeqCst), <span class="number">0</span>);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">num_drops</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(num_drops.load(Ordering::SeqCst), <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_arc_nested</span>() {
-        <span class="comment">// Tests nested mutexes and access</span>
-        <span class="comment">// to underlying data.</span>
-        <span class="kw">let</span> <span class="ident">arc</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">arc2</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">arc</span>));
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">arc2</span>.<span class="ident">lock</span>();
-            <span class="kw">let</span> <span class="ident">lock2</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
-            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">lock2</span>, <span class="number">1</span>);
-            <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_arc_nested() {
+        <span class="comment">// Tests nested mutexes and access
+        // to underlying data.
+        </span><span class="kw">let </span>arc = Arc::new(Mutex::new(<span class="number">1</span>));
+        <span class="kw">let </span>arc2 = Arc::new(Mutex::new(arc));
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move</span>|| {
+            <span class="kw">let </span>lock = arc2.lock();
+            <span class="kw">let </span>lock2 = lock.lock();
+            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>lock2, <span class="number">1</span>);
+            tx.send(()).unwrap();
         });
-        <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+        rx.recv().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_arc_access_in_unwind</span>() {
-        <span class="kw">let</span> <span class="ident">arc</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">arc2</span> <span class="op">=</span> <span class="ident">arc</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> -&gt; () {
-            <span class="kw">struct</span> <span class="ident">Unwinder</span> {
-                <span class="ident">i</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_arc_access_in_unwind() {
+        <span class="kw">let </span>arc = Arc::new(Mutex::new(<span class="number">1</span>));
+        <span class="kw">let </span>arc2 = arc.clone();
+        <span class="kw">let _ </span>= thread::spawn(<span class="kw">move</span>|| -&gt; () {
+            <span class="kw">struct </span>Unwinder {
+                i: Arc&lt;Mutex&lt;i32&gt;&gt;,
             }
-            <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Unwinder</span> {
-                <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                    <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">i</span>.<span class="ident">lock</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">impl </span>Drop <span class="kw">for </span>Unwinder {
+                <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                    <span class="kw-2">*</span><span class="self">self</span>.i.lock() += <span class="number">1</span>;
                 }
             }
-            <span class="kw">let</span> <span class="ident">_u</span> <span class="op">=</span> <span class="ident">Unwinder</span> { <span class="ident">i</span>: <span class="ident">arc2</span> };
+            <span class="kw">let </span>_u = Unwinder { i: arc2 };
             <span class="macro">panic!</span>();
-        }).<span class="ident">join</span>();
-        <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">arc</span>.<span class="ident">lock</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">lock</span>, <span class="number">2</span>);
+        }).join();
+        <span class="kw">let </span>lock = arc.lock();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>lock, <span class="number">2</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_unsized</span>() {
-        <span class="kw">let</span> <span class="ident">mutex</span>: <span class="kw-2">&amp;</span><span class="ident">Mutex</span><span class="op">&lt;</span>[<span class="ident">i32</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Mutex::new</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_unsized() {
+        <span class="kw">let </span>mutex: <span class="kw-2">&amp;</span>Mutex&lt;[i32]&gt; = <span class="kw-2">&amp;</span>Mutex::new([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
         {
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">mutex</span>.<span class="ident">lock</span>();
-            <span class="ident">b</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">4</span>;
-            <span class="ident">b</span>[<span class="number">2</span>] <span class="op">=</span> <span class="number">5</span>;
+            <span class="kw">let </span>b = <span class="kw-2">&amp;mut *</span>mutex.lock();
+            b[<span class="number">0</span>] = <span class="number">4</span>;
+            b[<span class="number">2</span>] = <span class="number">5</span>;
         }
-        <span class="kw">let</span> <span class="ident">comp</span>: <span class="kw-2">&amp;</span>[<span class="ident">i32</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">2</span>, <span class="number">5</span>];
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">mutex</span>.<span class="ident">lock</span>(), <span class="ident">comp</span>);
+        <span class="kw">let </span>comp: <span class="kw-2">&amp;</span>[i32] = <span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">2</span>, <span class="number">5</span>];
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>mutex.lock(), comp);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_force_lock</span>() {
-        <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(());
-        <span class="ident">::std::mem::forget</span>(<span class="ident">lock</span>.<span class="ident">lock</span>());
-        <span class="kw">unsafe</span> {
-            <span class="ident">lock</span>.<span class="ident">force_unlock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_force_lock() {
+        <span class="kw">let </span>lock = Mutex::new(());
+        ::std::mem::forget(lock.lock());
+        <span class="kw">unsafe </span>{
+            lock.force_unlock();
         } 
-        <span class="macro">assert!</span>(<span class="ident">lock</span>.<span class="ident">try_lock</span>().<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(lock.try_lock().is_some());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="spin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="spin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/group.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/group.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -635,439 +635,439 @@
 <span id="635">635</span>
 <span id="636">636</span>
 <span id="637">637</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>, <span class="prelude-ty">Result</span>};
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+</span><span class="kw">use </span>std::collections::BTreeMap;
+<span class="kw">use </span>std::fmt::{Debug, Formatter, <span class="prelude-ty">Result</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">yaml_rust::Yaml</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+</span><span class="kw">use </span>yaml_rust::Yaml;
 
-<span class="doccomment">/// `ArgGroup`s are a family of related [arguments] and way for you to express, &quot;Any of these</span>
-<span class="doccomment">/// arguments&quot;. By placing arguments in a logical group, you can create easier requirement and</span>
-<span class="doccomment">/// exclusion rules instead of having to list each argument individually, or when you want a rule</span>
-<span class="doccomment">/// to apply &quot;any but not all&quot; arguments.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For instance, you can make an entire `ArgGroup` required. If [`ArgGroup::multiple(true)`] is</span>
-<span class="doccomment">/// set, this means that at least one argument from that group must be present. If</span>
-<span class="doccomment">/// [`ArgGroup::multiple(false)`] is set (the default), one and *only* one must be present.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can also do things such as name an entire `ArgGroup` as a [conflict] or [requirement] for</span>
-<span class="doccomment">/// another argument, meaning any of the arguments that belong to that group will cause a failure</span>
-<span class="doccomment">/// if present, or must present respectively.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Perhaps the most common use of `ArgGroup`s is to require one and *only* one argument to be</span>
-<span class="doccomment">/// present out of a given set. Imagine that you had multiple arguments, and you want one of them</span>
-<span class="doccomment">/// to be required, but making all of them required isn&#39;t feasible because perhaps they conflict</span>
-<span class="doccomment">/// with each other. For example, lets say that you were building an application where one could</span>
-<span class="doccomment">/// set a given version number by supplying a string with an option argument, i.e.</span>
-<span class="doccomment">/// `--set-ver v1.2.3`, you also wanted to support automatically using a previous version number</span>
-<span class="doccomment">/// and simply incrementing one of the three numbers. So you create three flags `--major`,</span>
-<span class="doccomment">/// `--minor`, and `--patch`. All of these arguments shouldn&#39;t be used at one time but you want to</span>
-<span class="doccomment">/// specify that *at least one* of them is used. For this, you can create a group.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Finally, you may use `ArgGroup`s to pull a value from a group of arguments when you don&#39;t care</span>
-<span class="doccomment">/// exactly which argument was actually used at runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example demonstrates using an `ArgGroup` to ensure that one, and only one, of</span>
-<span class="doccomment">/// the arguments from the specified group is present at runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use clap::{App, ArgGroup, ErrorKind};</span>
-<span class="doccomment">/// let result = App::new(&quot;app&quot;)</span>
-<span class="doccomment">///     .args_from_usage(</span>
-<span class="doccomment">///         &quot;--set-ver [ver] &#39;set the version manually&#39;</span>
-<span class="doccomment">///          --major         &#39;auto increase major&#39;</span>
-<span class="doccomment">///          --minor         &#39;auto increase minor&#39;</span>
-<span class="doccomment">///          --patch         &#39;auto increase patch&#39;&quot;)</span>
-<span class="doccomment">///     .group(ArgGroup::with_name(&quot;vers&quot;)</span>
-<span class="doccomment">///          .args(&amp;[&quot;set-ver&quot;, &quot;major&quot;, &quot;minor&quot;, &quot;patch&quot;])</span>
-<span class="doccomment">///          .required(true))</span>
-<span class="doccomment">///     .get_matches_from_safe(vec![&quot;app&quot;, &quot;--major&quot;, &quot;--patch&quot;]);</span>
-<span class="doccomment">/// // Because we used two args in the group it&#39;s an error</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// let err = result.unwrap_err();</span>
-<span class="doccomment">/// assert_eq!(err.kind, ErrorKind::ArgumentConflict);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// This next example shows a passing parse of the same scenario</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use clap::{App, ArgGroup};</span>
-<span class="doccomment">/// let result = App::new(&quot;app&quot;)</span>
-<span class="doccomment">///     .args_from_usage(</span>
-<span class="doccomment">///         &quot;--set-ver [ver] &#39;set the version manually&#39;</span>
-<span class="doccomment">///          --major         &#39;auto increase major&#39;</span>
-<span class="doccomment">///          --minor         &#39;auto increase minor&#39;</span>
-<span class="doccomment">///          --patch         &#39;auto increase patch&#39;&quot;)</span>
-<span class="doccomment">///     .group(ArgGroup::with_name(&quot;vers&quot;)</span>
-<span class="doccomment">///          .args(&amp;[&quot;set-ver&quot;, &quot;major&quot;, &quot;minor&quot;,&quot;patch&quot;])</span>
-<span class="doccomment">///          .required(true))</span>
-<span class="doccomment">///     .get_matches_from_safe(vec![&quot;app&quot;, &quot;--major&quot;]);</span>
-<span class="doccomment">/// assert!(result.is_ok());</span>
-<span class="doccomment">/// let matches = result.unwrap();</span>
-<span class="doccomment">/// // We may not know which of the args was used, so we can test for the group...</span>
-<span class="doccomment">/// assert!(matches.is_present(&quot;vers&quot;));</span>
-<span class="doccomment">/// // we could also alternatively check each arg individually (not shown here)</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`ArgGroup::multiple(true)`]: ./struct.ArgGroup.html#method.multiple</span>
-<span class="doccomment">/// [arguments]: ./struct.Arg.html</span>
-<span class="doccomment">/// [conflict]: ./struct.Arg.html#method.conflicts_with</span>
-<span class="doccomment">/// [requirement]: ./struct.Arg.html#method.requires</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">required</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">requires</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">conflicts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">multiple</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// `ArgGroup`s are a family of related [arguments] and way for you to express, &quot;Any of these
+/// arguments&quot;. By placing arguments in a logical group, you can create easier requirement and
+/// exclusion rules instead of having to list each argument individually, or when you want a rule
+/// to apply &quot;any but not all&quot; arguments.
+///
+/// For instance, you can make an entire `ArgGroup` required. If [`ArgGroup::multiple(true)`] is
+/// set, this means that at least one argument from that group must be present. If
+/// [`ArgGroup::multiple(false)`] is set (the default), one and *only* one must be present.
+///
+/// You can also do things such as name an entire `ArgGroup` as a [conflict] or [requirement] for
+/// another argument, meaning any of the arguments that belong to that group will cause a failure
+/// if present, or must present respectively.
+///
+/// Perhaps the most common use of `ArgGroup`s is to require one and *only* one argument to be
+/// present out of a given set. Imagine that you had multiple arguments, and you want one of them
+/// to be required, but making all of them required isn&#39;t feasible because perhaps they conflict
+/// with each other. For example, lets say that you were building an application where one could
+/// set a given version number by supplying a string with an option argument, i.e.
+/// `--set-ver v1.2.3`, you also wanted to support automatically using a previous version number
+/// and simply incrementing one of the three numbers. So you create three flags `--major`,
+/// `--minor`, and `--patch`. All of these arguments shouldn&#39;t be used at one time but you want to
+/// specify that *at least one* of them is used. For this, you can create a group.
+///
+/// Finally, you may use `ArgGroup`s to pull a value from a group of arguments when you don&#39;t care
+/// exactly which argument was actually used at runtime.
+///
+/// # Examples
+///
+/// The following example demonstrates using an `ArgGroup` to ensure that one, and only one, of
+/// the arguments from the specified group is present at runtime.
+///
+/// ```rust
+/// # use clap::{App, ArgGroup, ErrorKind};
+/// let result = App::new(&quot;app&quot;)
+///     .args_from_usage(
+///         &quot;--set-ver [ver] &#39;set the version manually&#39;
+///          --major         &#39;auto increase major&#39;
+///          --minor         &#39;auto increase minor&#39;
+///          --patch         &#39;auto increase patch&#39;&quot;)
+///     .group(ArgGroup::with_name(&quot;vers&quot;)
+///          .args(&amp;[&quot;set-ver&quot;, &quot;major&quot;, &quot;minor&quot;, &quot;patch&quot;])
+///          .required(true))
+///     .get_matches_from_safe(vec![&quot;app&quot;, &quot;--major&quot;, &quot;--patch&quot;]);
+/// // Because we used two args in the group it&#39;s an error
+/// assert!(result.is_err());
+/// let err = result.unwrap_err();
+/// assert_eq!(err.kind, ErrorKind::ArgumentConflict);
+/// ```
+/// This next example shows a passing parse of the same scenario
+///
+/// ```rust
+/// # use clap::{App, ArgGroup};
+/// let result = App::new(&quot;app&quot;)
+///     .args_from_usage(
+///         &quot;--set-ver [ver] &#39;set the version manually&#39;
+///          --major         &#39;auto increase major&#39;
+///          --minor         &#39;auto increase minor&#39;
+///          --patch         &#39;auto increase patch&#39;&quot;)
+///     .group(ArgGroup::with_name(&quot;vers&quot;)
+///          .args(&amp;[&quot;set-ver&quot;, &quot;major&quot;, &quot;minor&quot;,&quot;patch&quot;])
+///          .required(true))
+///     .get_matches_from_safe(vec![&quot;app&quot;, &quot;--major&quot;]);
+/// assert!(result.is_ok());
+/// let matches = result.unwrap();
+/// // We may not know which of the args was used, so we can test for the group...
+/// assert!(matches.is_present(&quot;vers&quot;));
+/// // we could also alternatively check each arg individually (not shown here)
+/// ```
+/// [`ArgGroup::multiple(true)`]: ./struct.ArgGroup.html#method.multiple
+/// [arguments]: ./struct.Arg.html
+/// [conflict]: ./struct.Arg.html#method.conflicts_with
+/// [requirement]: ./struct.Arg.html#method.requires
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>args: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>required: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>requires: <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>conflicts: <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>multiple: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance of `ArgGroup` using a unique string name. The name will be used to</span>
-    <span class="doccomment">/// get values from the group or refer to the group inside of conflict and requirement rules.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, ArgGroup};</span>
-    <span class="doccomment">/// ArgGroup::with_name(&quot;config&quot;)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_name</span>(<span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgGroup</span> {
-            <span class="ident">name</span>: <span class="ident">n</span>,
-            <span class="ident">required</span>: <span class="bool-val">false</span>,
-            <span class="ident">args</span>: <span class="macro">vec!</span>[],
-            <span class="ident">requires</span>: <span class="prelude-val">None</span>,
-            <span class="ident">conflicts</span>: <span class="prelude-val">None</span>,
-            <span class="ident">multiple</span>: <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new instance of `ArgGroup` using a unique string name. The name will be used to
+    /// get values from the group or refer to the group inside of conflict and requirement rules.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, ArgGroup};
+    /// ArgGroup::with_name(&quot;config&quot;)
+    /// # ;
+    /// ```
+    </span><span class="kw">pub fn </span>with_name(n: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        ArgGroup {
+            name: n,
+            required: <span class="bool-val">false</span>,
+            args: <span class="macro">vec!</span>[],
+            requires: <span class="prelude-val">None</span>,
+            conflicts: <span class="prelude-val">None</span>,
+            multiple: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Creates a new instance of `ArgGroup` from a .yml (YAML) file.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// # #[macro_use]</span>
-    <span class="doccomment">/// # extern crate clap;</span>
-    <span class="doccomment">/// # use clap::ArgGroup;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let yml = load_yaml!(&quot;group.yml&quot;);</span>
-    <span class="doccomment">/// let ag = ArgGroup::from_yaml(yml);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_yaml</span>(<span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Yaml</span>) -&gt; <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ArgGroup::from</span>(<span class="ident">y</span>.<span class="ident">as_hash</span>().<span class="ident">unwrap</span>())
+    <span class="doccomment">/// Creates a new instance of `ArgGroup` from a .yml (YAML) file.
+    ///
+    /// # Examples
+    ///
+    /// ```ignore
+    /// # #[macro_use]
+    /// # extern crate clap;
+    /// # use clap::ArgGroup;
+    /// # fn main() {
+    /// let yml = load_yaml!(&quot;group.yml&quot;);
+    /// let ag = ArgGroup::from_yaml(yml);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+    </span><span class="kw">pub fn </span>from_yaml(y: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Yaml) -&gt; ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ArgGroup::from(y.as_hash().unwrap())
     }
 
-    <span class="doccomment">/// Adds an [argument] to this group by name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .arg(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .arg(&quot;color&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;]);</span>
-    <span class="doccomment">/// // maybe we don&#39;t know which of the two flags was used...</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;req_flags&quot;));</span>
-    <span class="doccomment">/// // but we can also check individually if needed</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;flag&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [argument]: ./struct.Arg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arg</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Adds an [argument] to this group by name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .arg(&quot;flag&quot;)
+    ///         .arg(&quot;color&quot;))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;]);
+    /// // maybe we don&#39;t know which of the two flags was used...
+    /// assert!(m.is_present(&quot;req_flags&quot;));
+    /// // but we can also check individually if needed
+    /// assert!(m.is_present(&quot;flag&quot;));
+    /// ```
+    /// [argument]: ./struct.Arg.html
+    </span><span class="kw">pub fn </span>arg(<span class="kw-2">mut </span><span class="self">self</span>, n: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">n</span>,
+            <span class="self">self</span>.name != n,
             <span class="string">&quot;ArgGroup &#39;{}&#39; can not have same name as arg inside it&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">name</span>
+            <span class="kw-2">&amp;*</span><span class="self">self</span>.name
         );
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">n</span>);
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.args.push(n);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds multiple [arguments] to this group by name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;]))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;]);</span>
-    <span class="doccomment">/// // maybe we don&#39;t know which of the two flags was used...</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;req_flags&quot;));</span>
-    <span class="doccomment">/// // but we can also check individually if needed</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;flag&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [arguments]: ./struct.Arg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="ident">ns</span> {
-            <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">arg</span>(<span class="ident">n</span>);
+    <span class="doccomment">/// Adds multiple [arguments] to this group by name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;]))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;]);
+    /// // maybe we don&#39;t know which of the two flags was used...
+    /// assert!(m.is_present(&quot;req_flags&quot;));
+    /// // but we can also check individually if needed
+    /// assert!(m.is_present(&quot;flag&quot;));
+    /// ```
+    /// [arguments]: ./struct.Arg.html
+    </span><span class="kw">pub fn </span>args(<span class="kw-2">mut </span><span class="self">self</span>, ns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str]) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>n <span class="kw">in </span>ns {
+            <span class="self">self </span>= <span class="self">self</span>.arg(n);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Allows more than one of the [&#39;Arg&#39;]s in this group to be used. (Default: `false`)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Notice in this example we use *both* the `-f` and `-c` flags which are both part of the</span>
-    <span class="doccomment">/// group</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;, &quot;-c&quot;]);</span>
-    <span class="doccomment">/// // maybe we don&#39;t know which of the two flags was used...</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;req_flags&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// In this next example, we show the default behavior (i.e. `multiple(false)) which will throw</span>
-    <span class="doccomment">/// an error if more than one of the args in the group was used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;]))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-f&quot;, &quot;-c&quot;]);</span>
-    <span class="doccomment">/// // Because we used both args in the group it&#39;s an error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::ArgumentConflict);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [&#39;Arg&#39;]: ./struct.Arg.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">multiple</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">multiple</span> <span class="op">=</span> <span class="ident">m</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Allows more than one of the [&#39;Arg&#39;]s in this group to be used. (Default: `false`)
+    ///
+    /// # Examples
+    ///
+    /// Notice in this example we use *both* the `-f` and `-c` flags which are both part of the
+    /// group
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;-f&quot;, &quot;-c&quot;]);
+    /// // maybe we don&#39;t know which of the two flags was used...
+    /// assert!(m.is_present(&quot;req_flags&quot;));
+    /// ```
+    /// In this next example, we show the default behavior (i.e. `multiple(false)) which will throw
+    /// an error if more than one of the args in the group was used.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;]))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-f&quot;, &quot;-c&quot;]);
+    /// // Because we used both args in the group it&#39;s an error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::ArgumentConflict);
+    /// ```
+    /// [&#39;Arg&#39;]: ./struct.Arg.html
+    </span><span class="kw">pub fn </span>multiple(<span class="kw-2">mut </span><span class="self">self</span>, m: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.multiple = m;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the group as required or not. A required group will be displayed in the usage string</span>
-    <span class="doccomment">/// of the application in the format `&lt;arg|arg2|arg3&gt;`. A required `ArgGroup` simply states</span>
-    <span class="doccomment">/// that one argument from this group *must* be present at runtime (unless</span>
-    <span class="doccomment">/// conflicting with another argument).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This setting only applies to the current [`App`] / [`SubCommand`], and not</span>
-    <span class="doccomment">/// globally.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** By default, [`ArgGroup::multiple`] is set to `false` which when combined with</span>
-    <span class="doccomment">/// `ArgGroup::required(true)` states, &quot;One and *only one* arg must be used from this group.</span>
-    <span class="doccomment">/// Use of more than one arg is an error.&quot; Vice setting `ArgGroup::multiple(true)` which</span>
-    <span class="doccomment">/// states, &#39;*At least* one arg from this group must be used. Using multiple is OK.&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .required(true))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;]);</span>
-    <span class="doccomment">/// // Because we didn&#39;t use any of the args in the group, it&#39;s an error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`ArgGroup::multiple`]: ./struct.ArgGroup.html#method.multiple</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">r</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">required</span> <span class="op">=</span> <span class="ident">r</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the group as required or not. A required group will be displayed in the usage string
+    /// of the application in the format `&lt;arg|arg2|arg3&gt;`. A required `ArgGroup` simply states
+    /// that one argument from this group *must* be present at runtime (unless
+    /// conflicting with another argument).
+    ///
+    /// **NOTE:** This setting only applies to the current [`App`] / [`SubCommand`], and not
+    /// globally.
+    ///
+    /// **NOTE:** By default, [`ArgGroup::multiple`] is set to `false` which when combined with
+    /// `ArgGroup::required(true)` states, &quot;One and *only one* arg must be used from this group.
+    /// Use of more than one arg is an error.&quot; Vice setting `ArgGroup::multiple(true)` which
+    /// states, &#39;*At least* one arg from this group must be used. Using multiple is OK.&quot;
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .required(true))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;]);
+    /// // Because we didn&#39;t use any of the args in the group, it&#39;s an error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);
+    /// ```
+    /// [`App`]: ./struct.App.html
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`ArgGroup::multiple`]: ./struct.ArgGroup.html#method.multiple
+    </span><span class="kw">pub fn </span>required(<span class="kw-2">mut </span><span class="self">self</span>, r: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.required = r;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the requirement rules of this group. This is not to be confused with a</span>
-    <span class="doccomment">/// [required group]. Requirement rules function just like [argument requirement rules], you</span>
-    <span class="doccomment">/// can name other arguments or groups that must be present when any one of the arguments from</span>
-    <span class="doccomment">/// this group is used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The name provided may be an argument, or group name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .requires(&quot;debug&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;]);</span>
-    <span class="doccomment">/// // because we used an arg from the group, and the group requires &quot;-d&quot; to be used, it&#39;s an</span>
-    <span class="doccomment">/// // error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [required group]: ./struct.ArgGroup.html#method.required</span>
-    <span class="doccomment">/// [argument requirement rules]: ./struct.Arg.html#method.requires</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">requires</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">reqs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">requires</span> {
-            <span class="ident">reqs</span>.<span class="ident">push</span>(<span class="ident">n</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">requires</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">n</span>]);
+    <span class="doccomment">/// Sets the requirement rules of this group. This is not to be confused with a
+    /// [required group]. Requirement rules function just like [argument requirement rules], you
+    /// can name other arguments or groups that must be present when any one of the arguments from
+    /// this group is used.
+    ///
+    /// **NOTE:** The name provided may be an argument, or group name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .requires(&quot;debug&quot;))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;]);
+    /// // because we used an arg from the group, and the group requires &quot;-d&quot; to be used, it&#39;s an
+    /// // error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);
+    /// ```
+    /// [required group]: ./struct.ArgGroup.html#method.required
+    /// [argument requirement rules]: ./struct.Arg.html#method.requires
+    </span><span class="kw">pub fn </span>requires(<span class="kw-2">mut </span><span class="self">self</span>, n: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>reqs) = <span class="self">self</span>.requires {
+            reqs.push(n);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.requires = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[n]);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the requirement rules of this group. This is not to be confused with a</span>
-    <span class="doccomment">/// [required group]. Requirement rules function just like [argument requirement rules], you</span>
-    <span class="doccomment">/// can name other arguments or groups that must be present when one of the arguments from this</span>
-    <span class="doccomment">/// group is used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The names provided may be an argument, or group name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;verb&quot;)</span>
-    <span class="doccomment">///         .short(&quot;v&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .requires_all(&amp;[&quot;debug&quot;, &quot;verb&quot;]))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-d&quot;]);</span>
-    <span class="doccomment">/// // because we used an arg from the group, and the group requires &quot;-d&quot; and &quot;-v&quot; to be used,</span>
-    <span class="doccomment">/// // yet we only used &quot;-d&quot; it&#39;s an error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [required group]: ./struct.ArgGroup.html#method.required</span>
-    <span class="doccomment">/// [argument requirement rules]: ./struct.Arg.html#method.requires_all</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">requires_all</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="ident">ns</span> {
-            <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">requires</span>(<span class="ident">n</span>);
+    <span class="doccomment">/// Sets the requirement rules of this group. This is not to be confused with a
+    /// [required group]. Requirement rules function just like [argument requirement rules], you
+    /// can name other arguments or groups that must be present when one of the arguments from this
+    /// group is used.
+    ///
+    /// **NOTE:** The names provided may be an argument, or group name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .arg(Arg::with_name(&quot;verb&quot;)
+    ///         .short(&quot;v&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .requires_all(&amp;[&quot;debug&quot;, &quot;verb&quot;]))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-d&quot;]);
+    /// // because we used an arg from the group, and the group requires &quot;-d&quot; and &quot;-v&quot; to be used,
+    /// // yet we only used &quot;-d&quot; it&#39;s an error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::MissingRequiredArgument);
+    /// ```
+    /// [required group]: ./struct.ArgGroup.html#method.required
+    /// [argument requirement rules]: ./struct.Arg.html#method.requires_all
+    </span><span class="kw">pub fn </span>requires_all(<span class="kw-2">mut </span><span class="self">self</span>, ns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str]) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>n <span class="kw">in </span>ns {
+            <span class="self">self </span>= <span class="self">self</span>.requires(n);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the exclusion rules of this group. Exclusion (aka conflict) rules function just like</span>
-    <span class="doccomment">/// [argument exclusion rules], you can name other arguments or groups that must *not* be</span>
-    <span class="doccomment">/// present when one of the arguments from this group are used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The name provided may be an argument, or group name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .conflicts_with(&quot;debug&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-d&quot;]);</span>
-    <span class="doccomment">/// // because we used an arg from the group, and the group conflicts with &quot;-d&quot;, it&#39;s an error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::ArgumentConflict);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [argument exclusion rules]: ./struct.Arg.html#method.conflicts_with</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conflicts_with</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">confs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">conflicts</span> {
-            <span class="ident">confs</span>.<span class="ident">push</span>(<span class="ident">n</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">conflicts</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">n</span>]);
+    <span class="doccomment">/// Sets the exclusion rules of this group. Exclusion (aka conflict) rules function just like
+    /// [argument exclusion rules], you can name other arguments or groups that must *not* be
+    /// present when one of the arguments from this group are used.
+    ///
+    /// **NOTE:** The name provided may be an argument, or group name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .conflicts_with(&quot;debug&quot;))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-d&quot;]);
+    /// // because we used an arg from the group, and the group conflicts with &quot;-d&quot;, it&#39;s an error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::ArgumentConflict);
+    /// ```
+    /// [argument exclusion rules]: ./struct.Arg.html#method.conflicts_with
+    </span><span class="kw">pub fn </span>conflicts_with(<span class="kw-2">mut </span><span class="self">self</span>, n: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>confs) = <span class="self">self</span>.conflicts {
+            confs.push(n);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.conflicts = <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[n]);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the exclusion rules of this group. Exclusion rules function just like</span>
-    <span class="doccomment">/// [argument exclusion rules], you can name other arguments or groups that must *not* be</span>
-    <span class="doccomment">/// present when one of the arguments from this group are used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The names provided may be an argument, or group name</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, ArgGroup, ErrorKind};</span>
-    <span class="doccomment">/// let result = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;color&quot;)</span>
-    <span class="doccomment">///         .short(&quot;c&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;verb&quot;)</span>
-    <span class="doccomment">///         .short(&quot;v&quot;))</span>
-    <span class="doccomment">///     .group(ArgGroup::with_name(&quot;req_flags&quot;)</span>
-    <span class="doccomment">///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])</span>
-    <span class="doccomment">///         .conflicts_with_all(&amp;[&quot;debug&quot;, &quot;verb&quot;]))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-v&quot;]);</span>
-    <span class="doccomment">/// // because we used an arg from the group, and the group conflicts with either &quot;-v&quot; or &quot;-d&quot;</span>
-    <span class="doccomment">/// // it&#39;s an error</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// let err = result.unwrap_err();</span>
-    <span class="doccomment">/// assert_eq!(err.kind, ErrorKind::ArgumentConflict);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [argument exclusion rules]: ./struct.Arg.html#method.conflicts_with_all</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">conflicts_with_all</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ns</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="ident">ns</span> {
-            <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conflicts_with</span>(<span class="ident">n</span>);
+    <span class="doccomment">/// Sets the exclusion rules of this group. Exclusion rules function just like
+    /// [argument exclusion rules], you can name other arguments or groups that must *not* be
+    /// present when one of the arguments from this group are used.
+    ///
+    /// **NOTE:** The names provided may be an argument, or group name
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, ArgGroup, ErrorKind};
+    /// let result = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;color&quot;)
+    ///         .short(&quot;c&quot;))
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .arg(Arg::with_name(&quot;verb&quot;)
+    ///         .short(&quot;v&quot;))
+    ///     .group(ArgGroup::with_name(&quot;req_flags&quot;)
+    ///         .args(&amp;[&quot;flag&quot;, &quot;color&quot;])
+    ///         .conflicts_with_all(&amp;[&quot;debug&quot;, &quot;verb&quot;]))
+    ///     .get_matches_from_safe(vec![&quot;myprog&quot;, &quot;-c&quot;, &quot;-v&quot;]);
+    /// // because we used an arg from the group, and the group conflicts with either &quot;-v&quot; or &quot;-d&quot;
+    /// // it&#39;s an error
+    /// assert!(result.is_err());
+    /// let err = result.unwrap_err();
+    /// assert_eq!(err.kind, ErrorKind::ArgumentConflict);
+    /// ```
+    /// [argument exclusion rules]: ./struct.Arg.html#method.conflicts_with_all
+    </span><span class="kw">pub fn </span>conflicts_with_all(<span class="kw-2">mut </span><span class="self">self</span>, ns: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str]) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>n <span class="kw">in </span>ns {
+            <span class="self">self </span>= <span class="self">self</span>.conflicts_with(n);
         }
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="prelude-ty">Result</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; <span class="prelude-ty">Result </span>{
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{{\n\
              \tname: {:?},\n\
              \targs: {:?},\n\
@@ -1075,122 +1075,122 @@
              \trequires: {:?},\n\
              \tconflicts: {:?},\n\
              }}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">args</span>, <span class="self">self</span>.<span class="ident">required</span>, <span class="self">self</span>.<span class="ident">requires</span>, <span class="self">self</span>.<span class="ident">conflicts</span>
+            <span class="self">self</span>.name, <span class="self">self</span>.args, <span class="self">self</span>.required, <span class="self">self</span>.requires, <span class="self">self</span>.conflicts
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;z</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgGroup</span> {
-            <span class="ident">name</span>: <span class="ident">g</span>.<span class="ident">name</span>,
-            <span class="ident">required</span>: <span class="ident">g</span>.<span class="ident">required</span>,
-            <span class="ident">args</span>: <span class="ident">g</span>.<span class="ident">args</span>.<span class="ident">clone</span>(),
-            <span class="ident">requires</span>: <span class="ident">g</span>.<span class="ident">requires</span>.<span class="ident">clone</span>(),
-            <span class="ident">conflicts</span>: <span class="ident">g</span>.<span class="ident">conflicts</span>.<span class="ident">clone</span>(),
-            <span class="ident">multiple</span>: <span class="ident">g</span>.<span class="ident">multiple</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;z</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(g: <span class="kw-2">&amp;</span><span class="lifetime">&#39;z </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        ArgGroup {
+            name: g.name,
+            required: g.required,
+            args: g.args.clone(),
+            requires: g.requires.clone(),
+            conflicts: g.conflicts.clone(),
+            multiple: g.multiple,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Yaml</span>, <span class="ident">Yaml</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Yaml</span>, <span class="ident">Yaml</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// We WANT this to panic on error...so expect() is good.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">ArgGroup::default</span>();
-        <span class="kw">let</span> <span class="ident">group_settings</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="ident">name_yml</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">keys</span>().<span class="ident">nth</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to get name&quot;</span>);
-            <span class="kw">let</span> <span class="ident">name_str</span> <span class="op">=</span> <span class="ident">name_yml</span>
-                .<span class="ident">as_str</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;failed to convert arg YAML name to str&quot;</span>);
-            <span class="ident">a</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name_str</span>;
-            <span class="ident">b</span>.<span class="ident">get</span>(<span class="ident">name_yml</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;failed to get name_str&quot;</span>)
-                .<span class="ident">as_hash</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;failed to convert to a hash&quot;</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">b</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BTreeMap&lt;Yaml, Yaml&gt;&gt; <span class="kw">for </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(b: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BTreeMap&lt;Yaml, Yaml&gt;) -&gt; <span class="self">Self </span>{
+        <span class="comment">// We WANT this to panic on error...so expect() is good.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>a = ArgGroup::default();
+        <span class="kw">let </span>group_settings = <span class="kw">if </span>b.len() == <span class="number">1 </span>{
+            <span class="kw">let </span>name_yml = b.keys().nth(<span class="number">0</span>).expect(<span class="string">&quot;failed to get name&quot;</span>);
+            <span class="kw">let </span>name_str = name_yml
+                .as_str()
+                .expect(<span class="string">&quot;failed to convert arg YAML name to str&quot;</span>);
+            a.name = name_str;
+            b.get(name_yml)
+                .expect(<span class="string">&quot;failed to get name_str&quot;</span>)
+                .as_hash()
+                .expect(<span class="string">&quot;failed to convert to a hash&quot;</span>)
+        } <span class="kw">else </span>{
+            b
         };
 
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">group_settings</span> {
-            <span class="ident">a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">k</span>.<span class="ident">as_str</span>().<span class="ident">unwrap</span>() {
-                <span class="string">&quot;required&quot;</span> =&gt; <span class="ident">a</span>.<span class="ident">required</span>(<span class="ident">v</span>.<span class="ident">as_bool</span>().<span class="ident">unwrap</span>()),
-                <span class="string">&quot;multiple&quot;</span> =&gt; <span class="ident">a</span>.<span class="ident">multiple</span>(<span class="ident">v</span>.<span class="ident">as_bool</span>().<span class="ident">unwrap</span>()),
-                <span class="string">&quot;args&quot;</span> =&gt; <span class="macro">yaml_vec_or_str!</span>(<span class="ident">v</span>, <span class="ident">a</span>, <span class="ident">arg</span>),
-                <span class="string">&quot;arg&quot;</span> =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ys</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">as_str</span>() {
-                        <span class="ident">a</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">arg</span>(<span class="ident">ys</span>);
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>group_settings {
+            a = <span class="kw">match </span>k.as_str().unwrap() {
+                <span class="string">&quot;required&quot; </span>=&gt; a.required(v.as_bool().unwrap()),
+                <span class="string">&quot;multiple&quot; </span>=&gt; a.multiple(v.as_bool().unwrap()),
+                <span class="string">&quot;args&quot; </span>=&gt; <span class="macro">yaml_vec_or_str!</span>(v, a, arg),
+                <span class="string">&quot;arg&quot; </span>=&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(ys) = v.as_str() {
+                        a = a.arg(ys);
                     }
-                    <span class="ident">a</span>
+                    a
                 }
-                <span class="string">&quot;requires&quot;</span> =&gt; <span class="macro">yaml_vec_or_str!</span>(<span class="ident">v</span>, <span class="ident">a</span>, <span class="ident">requires</span>),
-                <span class="string">&quot;conflicts_with&quot;</span> =&gt; <span class="macro">yaml_vec_or_str!</span>(<span class="ident">v</span>, <span class="ident">a</span>, <span class="ident">conflicts_with</span>),
-                <span class="string">&quot;name&quot;</span> =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ys</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">as_str</span>() {
-                        <span class="ident">a</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">ys</span>;
+                <span class="string">&quot;requires&quot; </span>=&gt; <span class="macro">yaml_vec_or_str!</span>(v, a, requires),
+                <span class="string">&quot;conflicts_with&quot; </span>=&gt; <span class="macro">yaml_vec_or_str!</span>(v, a, conflicts_with),
+                <span class="string">&quot;name&quot; </span>=&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(ys) = v.as_str() {
+                        a.name = ys;
                     }
-                    <span class="ident">a</span>
+                    a
                 }
-                <span class="ident">s</span> =&gt; <span class="macro">panic!</span>(
+                s =&gt; <span class="macro">panic!</span>(
                     <span class="string">&quot;Unknown ArgGroup setting &#39;{}&#39; in YAML file for \
                      ArgGroup &#39;{}&#39;&quot;</span>,
-                    <span class="ident">s</span>, <span class="ident">a</span>.<span class="ident">name</span>
+                    s, a.name
                 ),
             }
         }
 
-        <span class="ident">a</span>
+        a
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ArgGroup</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">yaml_rust::YamlLoader</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::ArgGroup;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+    </span><span class="kw">use </span>yaml_rust::YamlLoader;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">groups</span>() {
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">ArgGroup::with_name</span>(<span class="string">&quot;test&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a1&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a4&quot;</span>)
-            .<span class="ident">args</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
-            .<span class="ident">required</span>(<span class="bool-val">true</span>)
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c1&quot;</span>)
-            .<span class="ident">conflicts_with_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c4&quot;</span>)
-            .<span class="ident">requires</span>(<span class="string">&quot;r1&quot;</span>)
-            .<span class="ident">requires_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
-            .<span class="ident">requires</span>(<span class="string">&quot;r4&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>groups() {
+        <span class="kw">let </span>g = ArgGroup::with_name(<span class="string">&quot;test&quot;</span>)
+            .arg(<span class="string">&quot;a1&quot;</span>)
+            .arg(<span class="string">&quot;a4&quot;</span>)
+            .args(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
+            .required(<span class="bool-val">true</span>)
+            .conflicts_with(<span class="string">&quot;c1&quot;</span>)
+            .conflicts_with_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
+            .conflicts_with(<span class="string">&quot;c4&quot;</span>)
+            .requires(<span class="string">&quot;r1&quot;</span>)
+            .requires_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
+            .requires(<span class="string">&quot;r4&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
-        <span class="kw">let</span> <span class="ident">reqs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
-        <span class="kw">let</span> <span class="ident">confs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
+        <span class="kw">let </span>args = <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
+        <span class="kw">let </span>reqs = <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
+        <span class="kw">let </span>confs = <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
 
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">args</span>, <span class="ident">args</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">requires</span>, <span class="prelude-val">Some</span>(<span class="ident">reqs</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">conflicts</span>, <span class="prelude-val">Some</span>(<span class="ident">confs</span>));
+        <span class="macro">assert_eq!</span>(g.args, args);
+        <span class="macro">assert_eq!</span>(g.requires, <span class="prelude-val">Some</span>(reqs));
+        <span class="macro">assert_eq!</span>(g.conflicts, <span class="prelude-val">Some</span>(confs));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_debug</span>() {
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">ArgGroup::with_name</span>(<span class="string">&quot;test&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a1&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a4&quot;</span>)
-            .<span class="ident">args</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
-            .<span class="ident">required</span>(<span class="bool-val">true</span>)
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c1&quot;</span>)
-            .<span class="ident">conflicts_with_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c4&quot;</span>)
-            .<span class="ident">requires</span>(<span class="string">&quot;r1&quot;</span>)
-            .<span class="ident">requires_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
-            .<span class="ident">requires</span>(<span class="string">&quot;r4&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_debug() {
+        <span class="kw">let </span>g = ArgGroup::with_name(<span class="string">&quot;test&quot;</span>)
+            .arg(<span class="string">&quot;a1&quot;</span>)
+            .arg(<span class="string">&quot;a4&quot;</span>)
+            .args(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
+            .required(<span class="bool-val">true</span>)
+            .conflicts_with(<span class="string">&quot;c1&quot;</span>)
+            .conflicts_with_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
+            .conflicts_with(<span class="string">&quot;c4&quot;</span>)
+            .requires(<span class="string">&quot;r1&quot;</span>)
+            .requires_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
+            .requires(<span class="string">&quot;r4&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
-        <span class="kw">let</span> <span class="ident">reqs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
-        <span class="kw">let</span> <span class="ident">confs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
+        <span class="kw">let </span>args = <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
+        <span class="kw">let </span>reqs = <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
+        <span class="kw">let </span>confs = <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
 
-        <span class="kw">let</span> <span class="ident">debug_str</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>debug_str = <span class="macro">format!</span>(
             <span class="string">&quot;{{\n\
              \tname: \&quot;test\&quot;,\n\
              \targs: {:?},\n\
@@ -1198,42 +1198,42 @@
              \trequires: {:?},\n\
              \tconflicts: {:?},\n\
              }}&quot;</span>,
-            <span class="ident">args</span>,
+            args,
             <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">reqs</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">confs</span>)
+            <span class="prelude-val">Some</span>(reqs),
+            <span class="prelude-val">Some</span>(confs)
         );
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">g</span>), <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">debug_str</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, g), <span class="kw-2">&amp;*</span>debug_str);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from</span>() {
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">ArgGroup::with_name</span>(<span class="string">&quot;test&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a1&quot;</span>)
-            .<span class="ident">arg</span>(<span class="string">&quot;a4&quot;</span>)
-            .<span class="ident">args</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
-            .<span class="ident">required</span>(<span class="bool-val">true</span>)
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c1&quot;</span>)
-            .<span class="ident">conflicts_with_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
-            .<span class="ident">conflicts_with</span>(<span class="string">&quot;c4&quot;</span>)
-            .<span class="ident">requires</span>(<span class="string">&quot;r1&quot;</span>)
-            .<span class="ident">requires_all</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
-            .<span class="ident">requires</span>(<span class="string">&quot;r4&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from() {
+        <span class="kw">let </span>g = ArgGroup::with_name(<span class="string">&quot;test&quot;</span>)
+            .arg(<span class="string">&quot;a1&quot;</span>)
+            .arg(<span class="string">&quot;a4&quot;</span>)
+            .args(<span class="kw-2">&amp;</span>[<span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>])
+            .required(<span class="bool-val">true</span>)
+            .conflicts_with(<span class="string">&quot;c1&quot;</span>)
+            .conflicts_with_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>])
+            .conflicts_with(<span class="string">&quot;c4&quot;</span>)
+            .requires(<span class="string">&quot;r1&quot;</span>)
+            .requires_all(<span class="kw-2">&amp;</span>[<span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>])
+            .requires(<span class="string">&quot;r4&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
-        <span class="kw">let</span> <span class="ident">reqs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
-        <span class="kw">let</span> <span class="ident">confs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
+        <span class="kw">let </span>args = <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
+        <span class="kw">let </span>reqs = <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
+        <span class="kw">let </span>confs = <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
 
-        <span class="kw">let</span> <span class="ident">g2</span> <span class="op">=</span> <span class="ident">ArgGroup::from</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">args</span>, <span class="ident">args</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">requires</span>, <span class="prelude-val">Some</span>(<span class="ident">reqs</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">g2</span>.<span class="ident">conflicts</span>, <span class="prelude-val">Some</span>(<span class="ident">confs</span>));
+        <span class="kw">let </span>g2 = ArgGroup::from(<span class="kw-2">&amp;</span>g);
+        <span class="macro">assert_eq!</span>(g2.args, args);
+        <span class="macro">assert_eq!</span>(g2.requires, <span class="prelude-val">Some</span>(reqs));
+        <span class="macro">assert_eq!</span>(g2.conflicts, <span class="prelude-val">Some</span>(confs));
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;yaml&quot;</span>, <span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_yaml</span>() {
-        <span class="kw">let</span> <span class="ident">g_yaml</span> <span class="op">=</span> <span class="string">&quot;name: test
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;yaml&quot;</span>)]
+    #[cfg_attr(feature = <span class="string">&quot;yaml&quot;</span>, test)]
+    </span><span class="kw">fn </span>test_yaml() {
+        <span class="kw">let </span>g_yaml = <span class="string">&quot;name: test
 args:
 - a1
 - a4
@@ -1249,28 +1249,28 @@ requires:
 - r2
 - r3
 - r4&quot;</span>;
-        <span class="kw">let</span> <span class="ident">yml</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">YamlLoader::load_from_str</span>(<span class="ident">g_yaml</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to load YAML file&quot;</span>)[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">ArgGroup::from_yaml</span>(<span class="ident">yml</span>);
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
-        <span class="kw">let</span> <span class="ident">reqs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
-        <span class="kw">let</span> <span class="ident">confs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">args</span>, <span class="ident">args</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">requires</span>, <span class="prelude-val">Some</span>(<span class="ident">reqs</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">g</span>.<span class="ident">conflicts</span>, <span class="prelude-val">Some</span>(<span class="ident">confs</span>));
+        <span class="kw">let </span>yml = <span class="kw-2">&amp;</span>YamlLoader::load_from_str(g_yaml).expect(<span class="string">&quot;failed to load YAML file&quot;</span>)[<span class="number">0</span>];
+        <span class="kw">let </span>g = ArgGroup::from_yaml(yml);
+        <span class="kw">let </span>args = <span class="macro">vec!</span>[<span class="string">&quot;a1&quot;</span>, <span class="string">&quot;a4&quot;</span>, <span class="string">&quot;a2&quot;</span>, <span class="string">&quot;a3&quot;</span>];
+        <span class="kw">let </span>reqs = <span class="macro">vec!</span>[<span class="string">&quot;r1&quot;</span>, <span class="string">&quot;r2&quot;</span>, <span class="string">&quot;r3&quot;</span>, <span class="string">&quot;r4&quot;</span>];
+        <span class="kw">let </span>confs = <span class="macro">vec!</span>[<span class="string">&quot;c1&quot;</span>, <span class="string">&quot;c2&quot;</span>, <span class="string">&quot;c3&quot;</span>, <span class="string">&quot;c4&quot;</span>];
+        <span class="macro">assert_eq!</span>(g.args, args);
+        <span class="macro">assert_eq!</span>(g.requires, <span class="prelude-val">Some</span>(reqs));
+        <span class="macro">assert_eq!</span>(g.conflicts, <span class="prelude-val">Some</span>(confs));
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ArgGroup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgGroup</span> {
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>,
-            <span class="ident">required</span>: <span class="self">self</span>.<span class="ident">required</span>,
-            <span class="ident">args</span>: <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">clone</span>(),
-            <span class="ident">requires</span>: <span class="self">self</span>.<span class="ident">requires</span>.<span class="ident">clone</span>(),
-            <span class="ident">conflicts</span>: <span class="self">self</span>.<span class="ident">conflicts</span>.<span class="ident">clone</span>(),
-            <span class="ident">multiple</span>: <span class="self">self</span>.<span class="ident">multiple</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Clone <span class="kw">for </span>ArgGroup&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        ArgGroup {
+            name: <span class="self">self</span>.name,
+            required: <span class="self">self</span>.required,
+            args: <span class="self">self</span>.args.clone(),
+            requires: <span class="self">self</span>.requires.clone(),
+            conflicts: <span class="self">self</span>.conflicts.clone(),
+            multiple: <span class="self">self</span>.multiple,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

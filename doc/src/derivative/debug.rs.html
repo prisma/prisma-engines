@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-2.2.0/src/debug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>debug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../derivative/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/derivative-2.2.0/src/debug.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>debug.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../derivative/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../derivative/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -223,230 +223,230 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro2;
 
-<span class="kw">use</span> <span class="ident">ast</span>;
-<span class="kw">use</span> <span class="ident">attr</span>;
-<span class="kw">use</span> <span class="ident">matcher</span>;
-<span class="kw">use</span> <span class="ident">syn</span>;
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
-<span class="kw">use</span> <span class="ident">utils</span>;
+<span class="kw">use </span>ast;
+<span class="kw">use </span>attr;
+<span class="kw">use </span>matcher;
+<span class="kw">use </span>syn;
+<span class="kw">use </span>syn::spanned::Spanned;
+<span class="kw">use </span>utils;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Input</span>) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">debug_trait_path</span> <span class="op">=</span> <span class="ident">debug_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">fmt_path</span> <span class="op">=</span> <span class="ident">fmt_path</span>();
+<span class="kw">pub fn </span>derive(input: <span class="kw-2">&amp;</span>ast::Input) -&gt; proc_macro2::TokenStream {
+    <span class="kw">let </span>debug_trait_path = debug_trait_path();
+    <span class="kw">let </span>fmt_path = fmt_path();
 
-    <span class="kw">let</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="macro">quote_spanned!</span> {<span class="ident">input</span>.<span class="ident">span</span>=&gt; <span class="ident">__f</span>};
+    <span class="kw">let </span>formatter = <span class="macro">quote_spanned! </span>{input.span=&gt; __f};
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">matcher::Matcher::new</span>(<span class="ident">matcher::BindingStyle::Ref</span>, <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">is_packed</span>)
-        .<span class="ident">with_field_filter</span>(<span class="op">|</span><span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">ignore_debug</span>())
-        .<span class="ident">build_arms</span>(<span class="ident">input</span>, <span class="string">&quot;__arg&quot;</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">arm_name</span>, <span class="ident">style</span>, <span class="ident">attrs</span>, <span class="ident">bis</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">field_prints</span> <span class="op">=</span> <span class="ident">bis</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">bi</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">ignore_debug</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>body = matcher::Matcher::new(matcher::BindingStyle::Ref, input.attrs.is_packed)
+        .with_field_filter(|f: <span class="kw-2">&amp;</span>ast::Field| !f.attrs.ignore_debug())
+        .build_arms(input, <span class="string">&quot;__arg&quot;</span>, |<span class="kw">_</span>, <span class="kw">_</span>, arm_name, style, attrs, bis| {
+            <span class="kw">let </span>field_prints = bis.iter().filter_map(|bi| {
+                <span class="kw">if </span>bi.field.attrs.ignore_debug() {
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="kw">if</span> <span class="ident">attrs</span>.<span class="ident">debug_transparent</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                        #<span class="ident">debug_trait_path::fmt</span>(<span class="ident">__arg_0</span>, #<span class="ident">formatter</span>)
+                <span class="kw">if </span>attrs.debug_transparent() {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                        #debug_trait_path::fmt(__arg_0, #formatter)
                     });
                 }
 
-                <span class="kw">let</span> <span class="ident">arg_expr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bi</span>.<span class="ident">expr</span>;
-                <span class="kw">let</span> <span class="ident">arg_ident</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bi</span>.<span class="ident">ident</span>;
+                <span class="kw">let </span>arg_expr = <span class="kw-2">&amp;</span>bi.expr;
+                <span class="kw">let </span>arg_ident = <span class="kw-2">&amp;</span>bi.ident;
 
-                <span class="kw">let</span> <span class="ident">dummy_debug</span> <span class="op">=</span> <span class="ident">bi</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">debug_format_with</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">format_fn</span><span class="op">|</span> {
-                    <span class="ident">format_with</span>(
-                        <span class="ident">bi</span>.<span class="ident">field</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">debug_bound</span>(),
-                        <span class="kw-2">&amp;</span><span class="ident">arg_expr</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">arg_ident</span>,
-                        <span class="ident">format_fn</span>,
-                        <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">clone</span>(),
+                <span class="kw">let </span>dummy_debug = bi.field.attrs.debug_format_with().map(|format_fn| {
+                    format_with(
+                        bi.field,
+                        <span class="kw-2">&amp;</span>input.attrs.debug_bound(),
+                        <span class="kw-2">&amp;</span>arg_expr,
+                        <span class="kw-2">&amp;</span>arg_ident,
+                        format_fn,
+                        input.generics.clone(),
                     )
                 });
-                <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bi</span>.<span class="ident">field</span>.<span class="ident">attrs</span>.<span class="ident">debug_format_with</span>().<span class="ident">is_some</span>() {
-                    <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                        <span class="kw-2">&amp;</span>#<span class="ident">arg_ident</span>
+                <span class="kw">let </span>expr = <span class="kw">if </span>bi.field.attrs.debug_format_with().is_some() {
+                    <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                        <span class="kw-2">&amp;</span>#arg_ident
                     }
-                } <span class="kw">else</span> {
-                    <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                        <span class="op">&amp;&amp;</span>#<span class="ident">arg_expr</span>
-                    }
-                };
-
-                <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">bi</span>.<span class="ident">field</span>.<span class="ident">ident</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
-                    <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                        #<span class="ident">dummy_debug</span>
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">__debug_trait_builder</span>.<span class="ident">field</span>(#<span class="ident">name</span>, #<span class="ident">expr</span>);
-                    }
-                } <span class="kw">else</span> {
-                    <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                        #<span class="ident">dummy_debug</span>
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">__debug_trait_builder</span>.<span class="ident">field</span>(#<span class="ident">expr</span>);
+                } <span class="kw">else </span>{
+                    <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                        &amp;&amp;#arg_expr
                     }
                 };
 
-                <span class="prelude-val">Some</span>(<span class="ident">builder</span>)
+                <span class="kw">let </span>builder = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = bi.field.ident {
+                    <span class="kw">let </span>name = name.to_string();
+                    <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                        #dummy_debug
+                        <span class="kw">let _ </span>= __debug_trait_builder.field(#name, #expr);
+                    }
+                } <span class="kw">else </span>{
+                    <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                        #dummy_debug
+                        <span class="kw">let _ </span>= __debug_trait_builder.field(#expr);
+                    }
+                };
+
+                <span class="prelude-val">Some</span>(builder)
             });
 
-            <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">style</span> {
-                <span class="ident">ast::Style::Struct</span> =&gt; <span class="string">&quot;debug_struct&quot;</span>,
-                <span class="ident">ast::Style::Tuple</span> <span class="op">|</span> <span class="ident">ast::Style::Unit</span> =&gt; <span class="string">&quot;debug_tuple&quot;</span>,
+            <span class="kw">let </span>method = <span class="kw">match </span>style {
+                ast::Style::Struct =&gt; <span class="string">&quot;debug_struct&quot;</span>,
+                ast::Style::Tuple | ast::Style::Unit =&gt; <span class="string">&quot;debug_tuple&quot;</span>,
             };
-            <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">syn::Ident::new</span>(<span class="ident">method</span>, <span class="ident">proc_macro2::Span::call_site</span>());
+            <span class="kw">let </span>method = syn::Ident::new(method, proc_macro2::Span::call_site());
 
-            <span class="kw">if</span> <span class="ident">attrs</span>.<span class="ident">debug_transparent</span>() {
-                <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                    #(#<span class="ident">field_prints</span>)<span class="op">*</span>
+            <span class="kw">if </span>attrs.debug_transparent() {
+                <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                    #(#field_prints)*
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">arm_name</span>.<span class="ident">to_string</span>();
-                <span class="macro">quote_spanned!</span> {<span class="ident">arm_name</span>.<span class="ident">span</span>()=&gt;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">__debug_trait_builder</span> <span class="op">=</span> #<span class="ident">formatter</span>.#<span class="ident">method</span>(#<span class="ident">name</span>);
-                    #(#<span class="ident">field_prints</span>)<span class="op">*</span>
-                    <span class="ident">__debug_trait_builder</span>.<span class="ident">finish</span>()
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>name = arm_name.to_string();
+                <span class="macro">quote_spanned! </span>{arm_name.span()=&gt;
+                    <span class="kw">let </span><span class="kw-2">mut </span>__debug_trait_builder = #formatter.#method(#name);
+                    #(#field_prints)*
+                    __debug_trait_builder.finish()
                 }
             }
         });
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>input.ident;
 
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="ident">utils::build_impl_generics</span>(
-        <span class="ident">input</span>,
-        <span class="kw-2">&amp;</span><span class="ident">debug_trait_path</span>,
-        <span class="ident">needs_debug_bound</span>,
-        <span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">debug_bound</span>(),
-        <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">debug_bound</span>(),
+    <span class="kw">let </span>generics = utils::build_impl_generics(
+        input,
+        <span class="kw-2">&amp;</span>debug_trait_path,
+        needs_debug_bound,
+        |field| field.debug_bound(),
+        |input| input.debug_bound(),
     );
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    <span class="comment">// don&#39;t attach a span to prevent issue #58</span>
-    <span class="kw">let</span> <span class="ident">match_self</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>);
-    <span class="macro">quote_spanned!</span> {<span class="ident">input</span>.<span class="ident">span</span>=&gt;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unneeded_field_pattern</span>)]</span>
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">debug_trait_path</span> <span class="kw">for</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> #<span class="ident">fmt_path::Formatter</span>) -&gt; #<span class="ident">fmt_path::Result</span> {
-                #<span class="ident">match_self</span> {
-                    #<span class="ident">body</span>
+    <span class="comment">// don&#39;t attach a span to prevent issue #58
+    </span><span class="kw">let </span>match_self = <span class="macro">quote!</span>(<span class="kw">match </span><span class="kw-2">*</span><span class="self">self</span>);
+    <span class="macro">quote_spanned! </span>{input.span=&gt;
+        <span class="attribute">#[allow(unused_qualifications)]
+        #[allow(clippy::unneeded_field_pattern)]
+        </span><span class="kw">impl </span>#impl_generics #debug_trait_path <span class="kw">for </span>#name #ty_generics #where_clause {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, #formatter: <span class="kw-2">&amp;mut </span>#fmt_path::Formatter) -&gt; #fmt_path::Result {
+                #match_self {
+                    #body
                 }
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">needs_debug_bound</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">attr::Field</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span><span class="ident">attrs</span>.<span class="ident">ignore_debug</span>() <span class="op">&amp;&amp;</span> <span class="ident">attrs</span>.<span class="ident">debug_bound</span>().<span class="ident">is_none</span>()
+<span class="kw">fn </span>needs_debug_bound(attrs: <span class="kw-2">&amp;</span>attr::Field) -&gt; bool {
+    !attrs.ignore_debug() &amp;&amp; attrs.debug_bound().is_none()
 }
 
-<span class="doccomment">/// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.</span>
-<span class="kw">fn</span> <span class="ident">debug_trait_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::fmt::Debug</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::fmt::Debug</span>)
+<span class="doccomment">/// Return the path of the `Debug` trait, that is `::std::fmt::Debug`.
+</span><span class="kw">fn </span>debug_trait_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::fmt::Debug)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::fmt::Debug)
     }
 }
 
-<span class="doccomment">/// Return the path of the `fmt` module, that is `::std::fmt`.</span>
-<span class="kw">fn</span> <span class="ident">fmt_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::fmt</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::fmt</span>)
+<span class="doccomment">/// Return the path of the `fmt` module, that is `::std::fmt`.
+</span><span class="kw">fn </span>fmt_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::fmt)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::fmt)
     }
 }
 
-<span class="doccomment">/// Return the path of the `PhantomData` type, that is `::std::marker::PhantomData`.</span>
-<span class="kw">fn</span> <span class="ident">phantom_path</span>() -&gt; <span class="ident">syn::Path</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use_core&quot;</span>) {
-        <span class="macro">parse_quote!</span>(<span class="ident">::core::marker::PhantomData</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">parse_quote!</span>(<span class="ident">::std::marker::PhantomData</span>)
+<span class="doccomment">/// Return the path of the `PhantomData` type, that is `::std::marker::PhantomData`.
+</span><span class="kw">fn </span>phantom_path() -&gt; syn::Path {
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;use_core&quot;</span>) {
+        <span class="macro">parse_quote!</span>(::core::marker::PhantomData)
+    } <span class="kw">else </span>{
+        <span class="macro">parse_quote!</span>(::std::marker::PhantomData)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_with</span>(
-    <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>,
-    <span class="ident">bounds</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">syn::WherePredicate</span>]<span class="op">&gt;</span>,
-    <span class="ident">arg_expr</span>: <span class="kw-2">&amp;</span><span class="ident">proc_macro2::TokenStream</span>,
-    <span class="ident">arg_ident</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">format_fn</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Path</span>,
-    <span class="kw-2">mut</span> <span class="ident">generics</span>: <span class="ident">syn::Generics</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">debug_trait_path</span> <span class="op">=</span> <span class="ident">debug_trait_path</span>();
-    <span class="kw">let</span> <span class="ident">fmt_path</span> <span class="op">=</span> <span class="ident">fmt_path</span>();
-    <span class="kw">let</span> <span class="ident">phantom_path</span> <span class="op">=</span> <span class="ident">phantom_path</span>();
+<span class="kw">fn </span>format_with(
+    f: <span class="kw-2">&amp;</span>ast::Field,
+    bounds: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[syn::WherePredicate]&gt;,
+    arg_expr: <span class="kw-2">&amp;</span>proc_macro2::TokenStream,
+    arg_ident: <span class="kw-2">&amp;</span>syn::Ident,
+    format_fn: <span class="kw-2">&amp;</span>syn::Path,
+    <span class="kw-2">mut </span>generics: syn::Generics,
+) -&gt; proc_macro2::TokenStream {
+    <span class="kw">let </span>debug_trait_path = debug_trait_path();
+    <span class="kw">let </span>fmt_path = fmt_path();
+    <span class="kw">let </span>phantom_path = phantom_path();
 
-    <span class="ident">generics</span>
-        .<span class="ident">make_where_clause</span>()
-        .<span class="ident">predicates</span>
-        .<span class="ident">extend</span>(<span class="ident">f</span>.<span class="ident">attrs</span>.<span class="ident">debug_bound</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]).<span class="ident">iter</span>().<span class="ident">cloned</span>());
+    generics
+        .make_where_clause()
+        .predicates
+        .extend(f.attrs.debug_bound().unwrap_or(<span class="kw-2">&amp;</span>[]).iter().cloned());
 
-    <span class="ident">generics</span>
-        .<span class="ident">params</span>
-        .<span class="ident">push</span>(<span class="ident">syn::GenericParam::Lifetime</span>(<span class="ident">syn::LifetimeDef::new</span>(
+    generics
+        .params
+        .push(syn::GenericParam::Lifetime(syn::LifetimeDef::new(
             <span class="macro">parse_quote!</span>(<span class="lifetime">&#39;_derivative</span>),
         )));
-    <span class="kw">let</span> <span class="ident">where_predicates</span> <span class="op">=</span> <span class="ident">generics</span>
-        .<span class="ident">type_params</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bounds</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated::new</span>();
-            <span class="ident">bounds</span>.<span class="ident">push</span>(<span class="ident">syn::TypeParamBound::Lifetime</span>(<span class="ident">syn::Lifetime::new</span>(
+    <span class="kw">let </span>where_predicates = generics
+        .type_params()
+        .map(|ty| {
+            <span class="kw">let </span><span class="kw-2">mut </span>bounds = syn::punctuated::Punctuated::new();
+            bounds.push(syn::TypeParamBound::Lifetime(syn::Lifetime::new(
                 <span class="string">&quot;&#39;_derivative&quot;</span>,
-                <span class="ident">proc_macro2::Span::call_site</span>(),
+                proc_macro2::Span::call_site(),
             )));
 
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">syn::Path::from</span>(<span class="ident">syn::PathSegment::from</span>(<span class="ident">ty</span>.<span class="ident">ident</span>.<span class="ident">clone</span>()));
+            <span class="kw">let </span>path = syn::Path::from(syn::PathSegment::from(ty.ident.clone()));
 
-            <span class="ident">syn::WherePredicate::Type</span>(<span class="ident">syn::PredicateType</span> {
-                <span class="ident">lifetimes</span>: <span class="prelude-val">None</span>,
-                <span class="ident">bounded_ty</span>: <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> { <span class="ident">qself</span>: <span class="prelude-val">None</span>, <span class="ident">path</span> }),
-                <span class="ident">colon_token</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">bounds</span>,
+            syn::WherePredicate::Type(syn::PredicateType {
+                lifetimes: <span class="prelude-val">None</span>,
+                bounded_ty: syn::Type::Path(syn::TypePath { qself: <span class="prelude-val">None</span>, path }),
+                colon_token: Default::default(),
+                bounds,
             })
         })
-        .<span class="ident">chain</span>(<span class="ident">bounds</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()))
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">generics</span>
-        .<span class="ident">make_where_clause</span>()
-        .<span class="ident">predicates</span>
-        .<span class="ident">extend</span>(<span class="ident">where_predicates</span>);
+        .chain(bounds.iter().flat_map(|b| b.iter().cloned()))
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    generics
+        .make_where_clause()
+        .predicates
+        .extend(where_predicates);
 
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
-    <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">ty</span>;
+    <span class="kw">let </span>ty = f.ty;
 
-    <span class="comment">// Leave off the type parameter bounds, defaults, and attributes</span>
-    <span class="kw">let</span> <span class="ident">phantom</span> <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">tp</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">tp</span>.<span class="ident">ident</span>);
+    <span class="comment">// Leave off the type parameter bounds, defaults, and attributes
+    </span><span class="kw">let </span>phantom = generics.type_params().map(|tp| <span class="kw-2">&amp;</span>tp.ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctor_generics</span> <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">clone</span>();
-    <span class="kw-2">*</span><span class="ident">ctor_generics</span>
-        .<span class="ident">lifetimes_mut</span>()
-        .<span class="ident">last</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;There must be a &#39;_derivative lifetime&quot;</span>) <span class="op">=</span> <span class="ident">syn::LifetimeDef::new</span>(<span class="macro">parse_quote!</span>(<span class="lifetime">&#39;_</span>));
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">ctor_ty_generics</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">ctor_generics</span>.<span class="ident">split_for_impl</span>();
-    <span class="kw">let</span> <span class="ident">ctor_ty_generics</span> <span class="op">=</span> <span class="ident">ctor_ty_generics</span>.<span class="ident">as_turbofish</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>ctor_generics = generics.clone();
+    <span class="kw-2">*</span>ctor_generics
+        .lifetimes_mut()
+        .last()
+        .expect(<span class="string">&quot;There must be a &#39;_derivative lifetime&quot;</span>) = syn::LifetimeDef::new(<span class="macro">parse_quote!</span>(<span class="lifetime">&#39;_</span>));
+    <span class="kw">let </span>(<span class="kw">_</span>, ctor_ty_generics, <span class="kw">_</span>) = ctor_generics.split_for_impl();
+    <span class="kw">let </span>ctor_ty_generics = ctor_ty_generics.as_turbofish();
 
-    <span class="comment">// don&#39;t attach a span to prevent issue #58</span>
-    <span class="kw">let</span> <span class="ident">match_self</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>);
-    <span class="macro">quote_spanned!</span>(<span class="ident">format_fn</span>.<span class="ident">span</span>()=&gt;
-        <span class="kw">let</span> #<span class="ident">arg_ident</span> <span class="op">=</span> {
-            <span class="kw">struct</span> <span class="ident">Dummy</span> #<span class="ident">impl_generics</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;_derivative</span> #<span class="ident">ty</span>, #<span class="ident">phantom_path</span> <span class="op">&lt;</span>(#(#<span class="ident">phantom</span>,)<span class="kw-2">*</span>)<span class="op">&gt;</span>) #<span class="ident">where_clause</span>;
+    <span class="comment">// don&#39;t attach a span to prevent issue #58
+    </span><span class="kw">let </span>match_self = <span class="macro">quote!</span>(<span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>);
+    <span class="macro">quote_spanned!</span>(format_fn.span()=&gt;
+        <span class="kw">let </span>#arg_ident = {
+            <span class="kw">struct </span>Dummy #impl_generics (<span class="kw-2">&amp;</span><span class="lifetime">&#39;_derivative </span>#ty, #phantom_path &lt;(#(#phantom,)<span class="kw-2">*</span>)&gt;) #where_clause;
 
-            <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">debug_trait_path</span> <span class="kw">for</span> <span class="ident">Dummy</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">__f</span>: <span class="kw-2">&amp;mut</span> #<span class="ident">fmt_path::Formatter</span>) -&gt; #<span class="ident">fmt_path::Result</span> {
-                    #<span class="ident">match_self</span> {
-                        <span class="ident">this</span> =&gt; #<span class="ident">format_fn</span>(<span class="ident">this</span>, <span class="ident">__f</span>)
+            <span class="kw">impl </span>#impl_generics #debug_trait_path <span class="kw">for </span>Dummy #ty_generics #where_clause {
+                <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, __f: <span class="kw-2">&amp;mut </span>#fmt_path::Formatter) -&gt; #fmt_path::Result {
+                    #match_self {
+                        this =&gt; #format_fn(this, __f)
                     }
                 }
             }
 
-            <span class="ident">Dummy</span> #<span class="ident">ctor_ty_generics</span> (<span class="op">&amp;&amp;</span>#<span class="ident">arg_expr</span>, #<span class="ident">phantom_path</span>)
+            Dummy #ctor_ty_generics (&amp;&amp;#arg_expr, #phantom_path)
         };
     )
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="derivative" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="derivative" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

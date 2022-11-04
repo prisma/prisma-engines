@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -544,551 +544,551 @@
 <span id="544">544</span>
 <span id="545">545</span>
 <span id="546">546</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">command</span>;
-<span class="kw">mod</span> <span class="ident">stream_description</span>;
-<span class="kw">mod</span> <span class="ident">wire</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>command;
+<span class="kw">mod </span>stream_description;
+<span class="kw">mod </span>wire;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+<span class="kw">use </span>std::{
+    sync::Arc,
+    time::{Duration, Instant},
 };
 
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use </span>derivative::Derivative;
+<span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>tokio::sync::{mpsc, Mutex};
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::wire::Message</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::manager::PoolManager</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::oid::ObjectId</span>,
-    <span class="ident">cmap</span>::{
-        <span class="ident">options</span>::{<span class="ident">ConnectionOptions</span>, <span class="ident">StreamOptions</span>},
-        <span class="ident">PoolGeneration</span>,
+<span class="kw">use </span><span class="self">self</span>::wire::Message;
+<span class="kw">use </span><span class="kw">super</span>::manager::PoolManager;
+<span class="kw">use crate</span>::{
+    bson::oid::ObjectId,
+    cmap::{
+        options::{ConnectionOptions, StreamOptions},
+        PoolGeneration,
     },
-    <span class="ident">compression::Compressor</span>,
-    <span class="ident">error</span>::{<span class="ident">load_balanced_mode_mismatch</span>, <span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::cmap</span>::{
-        <span class="ident">CmapEventHandler</span>,
-        <span class="ident">ConnectionCheckedInEvent</span>,
-        <span class="ident">ConnectionCheckedOutEvent</span>,
-        <span class="ident">ConnectionClosedEvent</span>,
-        <span class="ident">ConnectionClosedReason</span>,
-        <span class="ident">ConnectionCreatedEvent</span>,
-        <span class="ident">ConnectionReadyEvent</span>,
+    compression::Compressor,
+    error::{load_balanced_mode_mismatch, Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    event::cmap::{
+        CmapEventHandler,
+        ConnectionCheckedInEvent,
+        ConnectionCheckedOutEvent,
+        ConnectionClosedEvent,
+        ConnectionClosedReason,
+        ConnectionCreatedEvent,
+        ConnectionReadyEvent,
     },
-    <span class="ident">options</span>::{<span class="ident">ServerAddress</span>, <span class="ident">TlsOptions</span>},
-    <span class="ident">runtime::AsyncStream</span>,
+    options::{ServerAddress, TlsOptions},
+    runtime::AsyncStream,
 };
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">command</span>::{<span class="ident">Command</span>, <span class="ident">RawCommand</span>, <span class="ident">RawCommandResponse</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">stream_description::StreamDescription</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">wire::next_request_id</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>command::{Command, RawCommand, RawCommandResponse};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>stream_description::StreamDescription;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>wire::next_request_id;
 
-<span class="doccomment">/// User-facing information about a connection to the database.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionInfo</span> {
-    <span class="doccomment">/// A driver-generated identifier that uniquely identifies the connection.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// User-facing information about a connection to the database.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionInfo {
+    <span class="doccomment">/// A driver-generated identifier that uniquely identifies the connection.
+    </span><span class="kw">pub </span>id: u32,
 
-    <span class="doccomment">/// A server-generated identifier that uniquely identifies the connection. Available on server</span>
-    <span class="doccomment">/// versions 4.2+. This may be used to correlate driver connections with server logs.</span>
-    <span class="kw">pub</span> <span class="ident">server_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A server-generated identifier that uniquely identifies the connection. Available on server
+    /// versions 4.2+. This may be used to correlate driver connections with server logs.
+    </span><span class="kw">pub </span>server_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="doccomment">/// The address that the connection is connected to.</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+    <span class="doccomment">/// The address that the connection is connected to.
+    </span><span class="kw">pub </span>address: ServerAddress,
 }
 
-<span class="doccomment">/// A wrapper around Stream that contains all the CMAP information needed to maintain a connection.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Connection</span> {
-    <span class="doccomment">/// Driver-generated ID for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">id</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Server-generated ID for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">server_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A wrapper around Stream that contains all the CMAP information needed to maintain a connection.
+</span><span class="attribute">#[derive(Derivative)]
+#[derivative(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Connection {
+    <span class="doccomment">/// Driver-generated ID for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
+    <span class="doccomment">/// Server-generated ID for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) server_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">generation</span>: <span class="ident">ConnectionGeneration</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) address: ServerAddress,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) generation: ConnectionGeneration,
 
-    <span class="doccomment">/// The cached StreamDescription from the connection&#39;s handshake.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">stream_description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StreamDescription</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The cached StreamDescription from the connection&#39;s handshake.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) stream_description: <span class="prelude-ty">Option</span>&lt;StreamDescription&gt;,
 
-    <span class="doccomment">/// Marks the time when the connection was last checked into the pool. This is used</span>
-    <span class="doccomment">/// to detect if the connection is idle.</span>
-    <span class="ident">ready_and_available_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Marks the time when the connection was last checked into the pool. This is used
+    /// to detect if the connection is idle.
+    </span>ready_and_available_time: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
 
-    <span class="doccomment">/// PoolManager used to check this connection back in when dropped.</span>
-    <span class="doccomment">/// None when checked into the pool.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">pool_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PoolManager</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// PoolManager used to check this connection back in when dropped.
+    /// None when checked into the pool.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) pool_manager: <span class="prelude-ty">Option</span>&lt;PoolManager&gt;,
 
-    <span class="doccomment">/// Whether or not a command is currently being run on this connection. This is set to `true`</span>
-    <span class="doccomment">/// right before sending bytes to the server and set back to `false` once a full response has</span>
-    <span class="doccomment">/// been read.</span>
-    <span class="ident">command_executing</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not a command is currently being run on this connection. This is set to `true`
+    /// right before sending bytes to the server and set back to `false` once a full response has
+    /// been read.
+    </span>command_executing: bool,
 
-    <span class="doccomment">/// Whether or not this connection has experienced a network error while reading or writing.</span>
-    <span class="doccomment">/// Once the connection has received an error, it should not be used again or checked back</span>
-    <span class="doccomment">/// into a pool.</span>
-    <span class="ident">error</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not this connection has experienced a network error while reading or writing.
+    /// Once the connection has received an error, it should not be used again or checked back
+    /// into a pool.
+    </span>error: bool,
 
-    <span class="ident">stream</span>: <span class="ident">AsyncStream</span>,
+    stream: AsyncStream,
 
-    <span class="doccomment">/// Compressor that the client will use before sending messages.</span>
-    <span class="doccomment">/// This compressor does not get used to decompress server messages.</span>
-    <span class="doccomment">/// The client will decompress server messages using whichever compressor</span>
-    <span class="doccomment">/// the server indicates in its message.  This compressor is the first</span>
-    <span class="doccomment">/// compressor in the client&#39;s compressor list that also appears in the</span>
-    <span class="doccomment">/// server&#39;s compressor list.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">compressor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Compressor</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Compressor that the client will use before sending messages.
+    /// This compressor does not get used to decompress server messages.
+    /// The client will decompress server messages using whichever compressor
+    /// the server indicates in its message.  This compressor is the first
+    /// compressor in the client&#39;s compressor list that also appears in the
+    /// server&#39;s compressor list.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) compressor: <span class="prelude-ty">Option</span>&lt;Compressor&gt;,
 
-    <span class="doccomment">/// If the connection is pinned to a cursor or transaction, the channel sender to return this</span>
-    <span class="doccomment">/// connection to the pin holder.</span>
-    <span class="ident">pinned_sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the connection is pinned to a cursor or transaction, the channel sender to return this
+    /// connection to the pin holder.
+    </span>pinned_sender: <span class="prelude-ty">Option</span>&lt;mpsc::Sender&lt;Connection&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
-    <span class="ident">handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CmapEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
+    </span>handler: <span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>CmapEventHandler&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">id</span>: <span class="ident">u32</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">generation</span>: <span class="ident">u32</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">stream_options</span> <span class="op">=</span> <span class="ident">StreamOptions</span> {
-            <span class="ident">address</span>: <span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connect_timeout</span>: <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">connect_timeout</span>),
-            <span class="ident">tls_options</span>: <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">tls_options</span>.<span class="ident">clone</span>()),
+<span class="kw">impl </span>Connection {
+    <span class="kw">async fn </span>new(
+        id: u32,
+        address: ServerAddress,
+        generation: u32,
+        options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>stream_options = StreamOptions {
+            address: address.clone(),
+            connect_timeout: options.as_ref().and_then(|opts| opts.connect_timeout),
+            tls_options: options.as_ref().and_then(|opts| opts.tls_options.clone()),
         };
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">id</span>,
-            <span class="ident">server_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">generation</span>: <span class="ident">ConnectionGeneration::Normal</span>(<span class="ident">generation</span>),
-            <span class="ident">pool_manager</span>: <span class="prelude-val">None</span>,
-            <span class="ident">command_executing</span>: <span class="bool-val">false</span>,
-            <span class="ident">ready_and_available_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">stream</span>: <span class="ident">AsyncStream::connect</span>(<span class="ident">stream_options</span>).<span class="kw">await</span><span class="question-mark">?</span>,
-            <span class="ident">address</span>,
-            <span class="ident">handler</span>: <span class="ident">options</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">options</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">event_handler</span>),
-            <span class="ident">stream_description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">error</span>: <span class="bool-val">false</span>,
-            <span class="ident">pinned_sender</span>: <span class="prelude-val">None</span>,
-            <span class="ident">compressor</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>conn = <span class="self">Self </span>{
+            id,
+            server_id: <span class="prelude-val">None</span>,
+            generation: ConnectionGeneration::Normal(generation),
+            pool_manager: <span class="prelude-val">None</span>,
+            command_executing: <span class="bool-val">false</span>,
+            ready_and_available_time: <span class="prelude-val">None</span>,
+            stream: AsyncStream::connect(stream_options).<span class="kw">await</span><span class="question-mark">?</span>,
+            address,
+            handler: options.and_then(|options| options.event_handler),
+            stream_description: <span class="prelude-val">None</span>,
+            error: <span class="bool-val">false</span>,
+            pinned_sender: <span class="prelude-val">None</span>,
+            compressor: <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
+        <span class="prelude-val">Ok</span>(conn)
     }
 
-    <span class="doccomment">/// Constructs and connects a new connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">generation</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pending_connection</span>.<span class="ident">generation</span> {
-            <span class="ident">PoolGeneration::Normal</span>(<span class="ident">gen</span>) =&gt; <span class="ident">gen</span>,
-            <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>) =&gt; <span class="number">0</span>, <span class="comment">/* Placeholder; will be overwritten in
+    <span class="doccomment">/// Constructs and connects a new connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>connect(pending_connection: PendingConnection) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>generation = <span class="kw">match </span>pending_connection.generation {
+            PoolGeneration::Normal(gen) =&gt; gen,
+            PoolGeneration::LoadBalanced(<span class="kw">_</span>) =&gt; <span class="number">0</span>, <span class="comment">/* Placeholder; will be overwritten in
                                                    * `ConnectionEstablisher::
-                                                   * establish_connection`. */</span>
-        };
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">pending_connection</span>.<span class="ident">id</span>,
-            <span class="ident">pending_connection</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">generation</span>,
-            <span class="ident">pending_connection</span>.<span class="ident">options</span>,
+                                                   * establish_connection`. */
+        </span>};
+        <span class="self">Self</span>::new(
+            pending_connection.id,
+            pending_connection.address.clone(),
+            generation,
+            pending_connection.options,
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Construct and connect a new connection used for monitoring.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_monitoring</span>(
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-        <span class="ident">tls_options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsOptions</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(
+    <span class="doccomment">/// Construct and connect a new connection used for monitoring.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect_monitoring(
+        address: ServerAddress,
+        connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+        tls_options: <span class="prelude-ty">Option</span>&lt;TlsOptions&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::new(
             <span class="number">0</span>,
-            <span class="ident">address</span>,
+            address,
             <span class="number">0</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">ConnectionOptions</span> {
-                <span class="ident">connect_timeout</span>,
-                <span class="ident">tls_options</span>,
-                <span class="ident">event_handler</span>: <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(ConnectionOptions {
+                connect_timeout,
+                tls_options,
+                event_handler: <span class="prelude-val">None</span>,
             }),
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new_testing</span>(
-        <span class="ident">id</span>: <span class="ident">u32</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">generation</span>: <span class="ident">u32</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">id</span>, <span class="ident">address</span>, <span class="ident">generation</span>, <span class="ident">options</span>).<span class="kw">await</span>
-    }
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>new_testing(
+        id: u32,
+        address: ServerAddress,
+        generation: u32,
+        options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::new(id, address, generation, options).<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionInfo</span> {
-        <span class="ident">ConnectionInfo</span> {
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">server_id</span>: <span class="self">self</span>.<span class="ident">server_id</span>,
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionInfo {
+        ConnectionInfo {
+            id: <span class="self">self</span>.id,
+            server_id: <span class="self">self</span>.server_id,
+            address: <span class="self">self</span>.address.clone(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">service_id</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+        <span class="self">self</span>.generation.service_id()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">address</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ServerAddress {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.address
     }
 
-    <span class="doccomment">/// Helper to mark the time that the connection was checked into the pool for the purpose of</span>
-    <span class="doccomment">/// detecting when it becomes idle.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">mark_as_available</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">pool_manager</span>.<span class="ident">take</span>();
-        <span class="self">self</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>());
+    <span class="doccomment">/// Helper to mark the time that the connection was checked into the pool for the purpose of
+    /// detecting when it becomes idle.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>mark_as_available(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.pool_manager.take();
+        <span class="self">self</span>.ready_and_available_time = <span class="prelude-val">Some</span>(Instant::now());
     }
 
-    <span class="doccomment">/// Helper to mark that the connection has been checked out of the pool. This ensures that the</span>
-    <span class="doccomment">/// connection is not marked as idle based on the time that it&#39;s checked out and that it has a</span>
-    <span class="doccomment">/// reference to the pool.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">mark_as_in_use</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">manager</span>: <span class="ident">PoolManager</span>) {
-        <span class="self">self</span>.<span class="ident">pool_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">manager</span>);
-        <span class="self">self</span>.<span class="ident">ready_and_available_time</span>.<span class="ident">take</span>();
+    <span class="doccomment">/// Helper to mark that the connection has been checked out of the pool. This ensures that the
+    /// connection is not marked as idle based on the time that it&#39;s checked out and that it has a
+    /// reference to the pool.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>mark_as_in_use(<span class="kw-2">&amp;mut </span><span class="self">self</span>, manager: PoolManager) {
+        <span class="self">self</span>.pool_manager = <span class="prelude-val">Some</span>(manager);
+        <span class="self">self</span>.ready_and_available_time.take();
     }
 
-    <span class="doccomment">/// Checks if the connection is idle.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ready_and_available_time</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ready_and_available_time</span><span class="op">|</span> {
-                <span class="ident">max_idle_time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">max_idle_time</span><span class="op">|</span> {
-                    <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">ready_and_available_time</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max_idle_time</span>
+    <span class="doccomment">/// Checks if the connection is idle.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_idle(<span class="kw-2">&amp;</span><span class="self">self</span>, max_idle_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; bool {
+        <span class="self">self</span>.ready_and_available_time
+            .and_then(|ready_and_available_time| {
+                max_idle_time.map(|max_idle_time| {
+                    Instant::now().duration_since(ready_and_available_time) &gt;= max_idle_time
                 })
             })
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// Checks if the connection is currently executing an operation.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_executing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">command_executing</span>
+    <span class="doccomment">/// Checks if the connection is currently executing an operation.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_executing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.command_executing
     }
 
-    <span class="doccomment">/// Checks if the connection experienced a network error and should be closed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_errored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">error</span>
+    <span class="doccomment">/// Checks if the connection experienced a network error and should be closed.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_errored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.error
     }
 
-    <span class="doccomment">/// Helper to create a `ConnectionCheckedOutEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_out_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCheckedOutEvent</span> {
-        <span class="ident">ConnectionCheckedOutEvent</span> {
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+    <span class="doccomment">/// Helper to create a `ConnectionCheckedOutEvent` for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>checked_out_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionCheckedOutEvent {
+        ConnectionCheckedOutEvent {
+            address: <span class="self">self</span>.address.clone(),
+            connection_id: <span class="self">self</span>.id,
         }
     }
 
-    <span class="doccomment">/// Helper to create a `ConnectionCheckedInEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">checked_in_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCheckedInEvent</span> {
-        <span class="ident">ConnectionCheckedInEvent</span> {
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+    <span class="doccomment">/// Helper to create a `ConnectionCheckedInEvent` for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>checked_in_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionCheckedInEvent {
+        ConnectionCheckedInEvent {
+            address: <span class="self">self</span>.address.clone(),
+            connection_id: <span class="self">self</span>.id,
         }
     }
 
-    <span class="doccomment">/// Helper to create a `ConnectionReadyEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ready_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionReadyEvent</span> {
-        <span class="ident">ConnectionReadyEvent</span> {
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+    <span class="doccomment">/// Helper to create a `ConnectionReadyEvent` for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ready_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionReadyEvent {
+        ConnectionReadyEvent {
+            address: <span class="self">self</span>.address.clone(),
+            connection_id: <span class="self">self</span>.id,
         }
     }
 
-    <span class="doccomment">/// Helper to create a `ConnectionClosedEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) -&gt; <span class="ident">ConnectionClosedEvent</span> {
-        <span class="ident">ConnectionClosedEvent</span> {
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">reason</span>,
+    <span class="doccomment">/// Helper to create a `ConnectionClosedEvent` for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>closed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, reason: ConnectionClosedReason) -&gt; ConnectionClosedEvent {
+        ConnectionClosedEvent {
+            address: <span class="self">self</span>.address.clone(),
+            connection_id: <span class="self">self</span>.id,
+            reason,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">message</span>: <span class="ident">Message</span>,
-        <span class="ident">to_compress</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">command_executing</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">async fn </span>send_message(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        message: Message,
+        to_compress: bool,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+        <span class="self">self</span>.command_executing = <span class="bool-val">true</span>;
 
-        <span class="comment">// If the client has agreed on a compressor with the server, and the command</span>
-        <span class="comment">// is the right type of command, then compress the message.</span>
-        <span class="kw">let</span> <span class="ident">write_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">compressor</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compressor</span>) <span class="kw">if</span> <span class="ident">to_compress</span> =&gt; {
-                <span class="ident">message</span>
-                    .<span class="ident">write_compressed_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>, <span class="ident">compressor</span>)
-                    .<span class="kw">await</span>
-            }
-            <span class="kw">_</span> =&gt; <span class="ident">message</span>.<span class="ident">write_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>).<span class="kw">await</span>,
+        <span class="comment">// If the client has agreed on a compressor with the server, and the command
+        // is the right type of command, then compress the message.
+        </span><span class="kw">let </span>write_result = <span class="kw">match </span><span class="self">self</span>.compressor {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>compressor) <span class="kw">if </span>to_compress =&gt; {
+                message
+                    .write_compressed_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream, compressor)
+                    .<span class="kw">await
+            </span>}
+            <span class="kw">_ </span>=&gt; message.write_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream).<span class="kw">await</span>,
         };
 
-        <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">write_result</span>.<span class="ident">is_err</span>();
-        <span class="ident">write_result</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.error = write_result.is_err();
+        write_result<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">response_message_result</span> <span class="op">=</span> <span class="ident">Message::read_from</span>(
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>,
-            <span class="self">self</span>.<span class="ident">stream_description</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">max_message_size_bytes</span>),
+        <span class="kw">let </span>response_message_result = Message::read_from(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.stream,
+            <span class="self">self</span>.stream_description
+                .as_ref()
+                .map(|d| d.max_message_size_bytes),
         )
         .<span class="kw">await</span>;
-        <span class="self">self</span>.<span class="ident">command_executing</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="ident">response_message_result</span>.<span class="ident">is_err</span>();
+        <span class="self">self</span>.command_executing = <span class="bool-val">false</span>;
+        <span class="self">self</span>.error = response_message_result.is_err();
 
-        <span class="ident">RawCommandResponse::new</span>(<span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">response_message_result</span><span class="question-mark">?</span>)
+        RawCommandResponse::new(<span class="self">self</span>.address.clone(), response_message_result<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Executes a `Command` and returns a `CommandResponse` containing the result from the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An `Ok(...)` result simply means the server received the command and that the driver</span>
-    <span class="doccomment">/// driver received the response; it does not imply anything about the success of the command</span>
-    <span class="doccomment">/// itself.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_command</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">command</span>: <span class="ident">Command</span>,
-        <span class="ident">request_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">to_compress</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">should_compress</span>();
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::with_command</span>(<span class="ident">command</span>, <span class="ident">request_id</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">message</span>, <span class="ident">to_compress</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Executes a `Command` and returns a `CommandResponse` containing the result from the server.
+    ///
+    /// An `Ok(...)` result simply means the server received the command and that the driver
+    /// driver received the response; it does not imply anything about the success of the command
+    /// itself.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>send_command(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        command: Command,
+        request_id: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;i32&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+        <span class="kw">let </span>to_compress = command.should_compress();
+        <span class="kw">let </span>message = Message::with_command(command, request_id.into())<span class="question-mark">?</span>;
+        <span class="self">self</span>.send_message(message, to_compress).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes a `RawCommand` and returns a `CommandResponse` containing the result from the</span>
-    <span class="doccomment">/// server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An `Ok(...)` result simply means the server received the command and that the driver</span>
-    <span class="doccomment">/// received the response; it does not imply anything about the success of the command</span>
-    <span class="doccomment">/// itself.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_raw_command</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">command</span>: <span class="ident">RawCommand</span>,
-        <span class="ident">request_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">to_compress</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">should_compress</span>();
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::with_raw_command</span>(<span class="ident">command</span>, <span class="ident">request_id</span>.<span class="ident">into</span>());
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">message</span>, <span class="ident">to_compress</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Executes a `RawCommand` and returns a `CommandResponse` containing the result from the
+    /// server.
+    ///
+    /// An `Ok(...)` result simply means the server received the command and that the driver
+    /// received the response; it does not imply anything about the success of the command
+    /// itself.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>send_raw_command(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        command: RawCommand,
+        request_id: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;i32&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+        <span class="kw">let </span>to_compress = command.should_compress();
+        <span class="kw">let </span>message = Message::with_raw_command(command, request_id.into());
+        <span class="self">self</span>.send_message(message, to_compress).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets the connection&#39;s StreamDescription.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">StreamDescription</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">stream_description</span>.<span class="ident">as_ref</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">ErrorKind::Internal</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Stream checked out but not handshaked&quot;</span>.<span class="ident">to_string</span>(),
+    <span class="doccomment">/// Gets the connection&#39;s StreamDescription.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>stream_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>StreamDescription&gt; {
+        <span class="self">self</span>.stream_description.as_ref().ok_or_else(|| {
+            ErrorKind::Internal {
+                message: <span class="string">&quot;Stream checked out but not handshaked&quot;</span>.to_string(),
             }
-            .<span class="ident">into</span>()
+            .into()
         })
     }
 
-    <span class="doccomment">/// Pin the connection, removing it from the normal connection pool.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pinned_sender</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::internal</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Pin the connection, removing it from the normal connection pool.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pin(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PinnedConnectionHandle&gt; {
+        <span class="kw">if </span><span class="self">self</span>.pinned_sender.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot pin an already-pinned connection (id = {})&quot;</span>,
-                <span class="self">self</span>.<span class="ident">id</span>
+                <span class="self">self</span>.id
             )));
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pool_manager</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::internal</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span><span class="self">self</span>.pool_manager.is_none() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::internal(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot pin a checked-in connection (id = {})&quot;</span>,
-                <span class="self">self</span>.<span class="ident">id</span>
+                <span class="self">self</span>.id
             )));
         }
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc::channel</span>(<span class="number">1</span>);
-        <span class="self">self</span>.<span class="ident">pinned_sender</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">PinnedConnectionHandle</span> {
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">receiver</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">rx</span>)),
+        <span class="kw">let </span>(tx, rx) = mpsc::channel(<span class="number">1</span>);
+        <span class="self">self</span>.pinned_sender = <span class="prelude-val">Some</span>(tx);
+        <span class="prelude-val">Ok</span>(PinnedConnectionHandle {
+            id: <span class="self">self</span>.id,
+            receiver: Arc::new(Mutex::new(rx)),
         })
     }
 
-    <span class="doccomment">/// Close this connection, emitting a `ConnectionClosedEvent` with the supplied reason.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">close_and_drop</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) {
-        <span class="self">self</span>.<span class="ident">close</span>(<span class="ident">reason</span>);
+    <span class="doccomment">/// Close this connection, emitting a `ConnectionClosedEvent` with the supplied reason.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>close_and_drop(<span class="kw-2">mut </span><span class="self">self</span>, reason: ConnectionClosedReason) {
+        <span class="self">self</span>.close(reason);
     }
 
-    <span class="doccomment">/// Close this connection, emitting a `ConnectionClosedEvent` with the supplied reason.</span>
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>) {
-        <span class="self">self</span>.<span class="ident">pool_manager</span>.<span class="ident">take</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">handler</span> {
-            <span class="ident">handler</span>.<span class="ident">handle_connection_closed_event</span>(<span class="self">self</span>.<span class="ident">closed_event</span>(<span class="ident">reason</span>));
+    <span class="doccomment">/// Close this connection, emitting a `ConnectionClosedEvent` with the supplied reason.
+    </span><span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, reason: ConnectionClosedReason) {
+        <span class="self">self</span>.pool_manager.take();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.handler {
+            handler.handle_connection_closed_event(<span class="self">self</span>.closed_event(reason));
         }
     }
 
-    <span class="doccomment">/// Nullify the inner state and return it in a new `Connection` for checking back in to</span>
-    <span class="doccomment">/// the pool.</span>
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Connection</span> {
-        <span class="ident">Connection</span> {
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">server_id</span>: <span class="self">self</span>.<span class="ident">server_id</span>,
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">generation</span>: <span class="self">self</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
-            <span class="ident">stream</span>: <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>, <span class="ident">AsyncStream::Null</span>),
-            <span class="ident">handler</span>: <span class="self">self</span>.<span class="ident">handler</span>.<span class="ident">take</span>(),
-            <span class="ident">stream_description</span>: <span class="self">self</span>.<span class="ident">stream_description</span>.<span class="ident">take</span>(),
-            <span class="ident">command_executing</span>: <span class="self">self</span>.<span class="ident">command_executing</span>,
-            <span class="ident">error</span>: <span class="self">self</span>.<span class="ident">error</span>,
-            <span class="ident">pool_manager</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ready_and_available_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pinned_sender</span>: <span class="self">self</span>.<span class="ident">pinned_sender</span>.<span class="ident">clone</span>(),
-            <span class="ident">compressor</span>: <span class="self">self</span>.<span class="ident">compressor</span>.<span class="ident">clone</span>(),
+    <span class="doccomment">/// Nullify the inner state and return it in a new `Connection` for checking back in to
+    /// the pool.
+    </span><span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Connection {
+        Connection {
+            id: <span class="self">self</span>.id,
+            server_id: <span class="self">self</span>.server_id,
+            address: <span class="self">self</span>.address.clone(),
+            generation: <span class="self">self</span>.generation.clone(),
+            stream: std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream, AsyncStream::Null),
+            handler: <span class="self">self</span>.handler.take(),
+            stream_description: <span class="self">self</span>.stream_description.take(),
+            command_executing: <span class="self">self</span>.command_executing,
+            error: <span class="self">self</span>.error,
+            pool_manager: <span class="prelude-val">None</span>,
+            ready_and_available_time: <span class="prelude-val">None</span>,
+            pinned_sender: <span class="self">self</span>.pinned_sender.clone(),
+            compressor: <span class="self">self</span>.compressor.clone(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Connection</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// If the connection has a pool manager, that means that the connection is</span>
-        <span class="comment">// being dropped when it&#39;s checked out. If the pool is still alive, it</span>
-        <span class="comment">// should check itself back in. Otherwise, the connection should close</span>
-        <span class="comment">// itself and emit a ConnectionClosed event (because the `close_and_drop`</span>
-        <span class="comment">// helper was not called explicitly).</span>
-        <span class="comment">//</span>
-        <span class="comment">// If the connection does not have a pool manager, then the connection is</span>
-        <span class="comment">// being dropped while it&#39;s not checked out. This means that the pool called</span>
-        <span class="comment">// the `close_and_drop` helper explicitly, so we don&#39;t add it back to the</span>
-        <span class="comment">// pool or emit any events.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pool_manager</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool_manager</span>.<span class="ident">take</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dropped_connection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sender</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pinned_sender</span>.<span class="ident">as_mut</span>() {
-                <span class="comment">// Preserve the pool manager and timestamp for pinned connections.</span>
-                <span class="ident">dropped_connection</span>.<span class="ident">pool_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pool_manager</span>.<span class="ident">clone</span>());
-                <span class="ident">dropped_connection</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ready_and_available_time</span>;
-                <span class="kw">match</span> <span class="ident">sender</span>.<span class="ident">try_send</span>(<span class="ident">dropped_connection</span>) {
+<span class="kw">impl </span>Drop <span class="kw">for </span>Connection {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// If the connection has a pool manager, that means that the connection is
+        // being dropped when it&#39;s checked out. If the pool is still alive, it
+        // should check itself back in. Otherwise, the connection should close
+        // itself and emit a ConnectionClosed event (because the `close_and_drop`
+        // helper was not called explicitly).
+        //
+        // If the connection does not have a pool manager, then the connection is
+        // being dropped while it&#39;s not checked out. This means that the pool called
+        // the `close_and_drop` helper explicitly, so we don&#39;t add it back to the
+        // pool or emit any events.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(pool_manager) = <span class="self">self</span>.pool_manager.take() {
+            <span class="kw">let </span><span class="kw-2">mut </span>dropped_connection = <span class="self">self</span>.take();
+            <span class="kw">let </span>result = <span class="kw">if let </span><span class="prelude-val">Some</span>(sender) = <span class="self">self</span>.pinned_sender.as_mut() {
+                <span class="comment">// Preserve the pool manager and timestamp for pinned connections.
+                </span>dropped_connection.pool_manager = <span class="prelude-val">Some</span>(pool_manager.clone());
+                dropped_connection.ready_and_available_time = <span class="self">self</span>.ready_and_available_time;
+                <span class="kw">match </span>sender.try_send(dropped_connection) {
                     <span class="prelude-val">Ok</span>(()) =&gt; <span class="prelude-val">Ok</span>(()),
-                    <span class="comment">// The connection has been unpinned and should be checked back in.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Closed</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) =&gt; {
-                        <span class="ident">conn</span>.<span class="ident">pinned_sender</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                        <span class="ident">conn</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                        <span class="ident">pool_manager</span>.<span class="ident">check_in</span>(<span class="ident">conn</span>)
+                    <span class="comment">// The connection has been unpinned and should be checked back in.
+                    </span><span class="prelude-val">Err</span>(mpsc::error::TrySendError::Closed(<span class="kw-2">mut </span>conn)) =&gt; {
+                        conn.pinned_sender = <span class="prelude-val">None</span>;
+                        conn.ready_and_available_time = <span class="prelude-val">None</span>;
+                        pool_manager.check_in(conn)
                     }
-                    <span class="comment">// The connection is being returned to the pin holder while another connection</span>
-                    <span class="comment">// is in the pin buffer; this should never happen.  Only possible action is to</span>
-                    <span class="comment">// check the connection back in.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">mpsc::error::TrySendError::Full</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>)) =&gt; {
-                        <span class="comment">// Panic in debug mode</span>
-                        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
+                    <span class="comment">// The connection is being returned to the pin holder while another connection
+                    // is in the pin buffer; this should never happen.  Only possible action is to
+                    // check the connection back in.
+                    </span><span class="prelude-val">Err</span>(mpsc::error::TrySendError::Full(<span class="kw-2">mut </span>conn)) =&gt; {
+                        <span class="comment">// Panic in debug mode
+                        </span><span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
                             <span class="macro">panic!</span>(
                                 <span class="string">&quot;buffer full when attempting to return a pinned connection (id = \
                                  {})&quot;</span>,
-                                <span class="ident">conn</span>.<span class="ident">id</span>
+                                conn.id
                             );
                         }
-                        <span class="comment">// TODO RUST-230 log an error in non-debug mode.</span>
-                        <span class="ident">conn</span>.<span class="ident">pinned_sender</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                        <span class="ident">conn</span>.<span class="ident">ready_and_available_time</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                        <span class="ident">pool_manager</span>.<span class="ident">check_in</span>(<span class="ident">conn</span>)
+                        <span class="comment">// TODO RUST-230 log an error in non-debug mode.
+                        </span>conn.pinned_sender = <span class="prelude-val">None</span>;
+                        conn.ready_and_available_time = <span class="prelude-val">None</span>;
+                        pool_manager.check_in(conn)
                     }
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">pool_manager</span>.<span class="ident">check_in</span>(<span class="ident">dropped_connection</span>)
+            } <span class="kw">else </span>{
+                pool_manager.check_in(dropped_connection)
             };
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="ident">result</span> {
-                <span class="comment">// the check in failed because the pool has been dropped, so we emit the event</span>
-                <span class="comment">// here and drop the connection.</span>
-                <span class="ident">conn</span>.<span class="ident">close</span>(<span class="ident">ConnectionClosedReason::PoolClosed</span>);
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">mut </span>conn) = result {
+                <span class="comment">// the check in failed because the pool has been dropped, so we emit the event
+                // here and drop the connection.
+                </span>conn.close(ConnectionClosedReason::PoolClosed);
             }
         }
     }
 }
 
-<span class="doccomment">/// A handle to a pinned connection - the connection itself can be retrieved or returned to the</span>
-<span class="doccomment">/// normal pool via this handle.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PinnedConnectionHandle</span> {
-    <span class="ident">id</span>: <span class="ident">u32</span>,
-    <span class="ident">receiver</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">mpsc::Receiver</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to a pinned connection - the connection itself can be retrieved or returned to the
+/// normal pool via this handle.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PinnedConnectionHandle {
+    id: u32,
+    receiver: Arc&lt;Mutex&lt;mpsc::Receiver&lt;Connection&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PinnedConnectionHandle</span> {
-    <span class="doccomment">/// Make a new `PinnedConnectionHandle` that refers to the same connection as this one.</span>
-    <span class="doccomment">/// Use with care and only when &quot;lending&quot; a handle in a way that can&#39;t be expressed as a</span>
-    <span class="doccomment">/// normal borrow.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">receiver</span>: <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>PinnedConnectionHandle {
+    <span class="doccomment">/// Make a new `PinnedConnectionHandle` that refers to the same connection as this one.
+    /// Use with care and only when &quot;lending&quot; a handle in a way that can&#39;t be expressed as a
+    /// normal borrow.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>replicate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            id: <span class="self">self</span>.id,
+            receiver: <span class="self">self</span>.receiver.clone(),
         }
     }
 
-    <span class="doccomment">/// Retrieve the pinned connection, blocking until it&#39;s available for use.  Will fail if the</span>
-    <span class="doccomment">/// connection has been unpinned.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-        <span class="ident">receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::internal</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Retrieve the pinned connection, blocking until it&#39;s available for use.  Will fail if the
+    /// connection has been unpinned.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>take_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>receiver = <span class="self">self</span>.receiver.lock().<span class="kw">await</span>;
+        receiver.recv().<span class="kw">await</span>.ok_or_else(|| {
+            Error::internal(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot take connection after unpin (id={})&quot;</span>,
-                <span class="self">self</span>.<span class="ident">id</span>
+                <span class="self">self</span>.id
             ))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">id</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.id
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ConnectionGeneration</span> {
-    <span class="ident">Normal</span>(<span class="ident">u32</span>),
-    <span class="ident">LoadBalanced</span> {
-        <span class="ident">generation</span>: <span class="ident">u32</span>,
-        <span class="ident">service_id</span>: <span class="ident">ObjectId</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ConnectionGeneration {
+    Normal(u32),
+    LoadBalanced {
+        generation: u32,
+        service_id: ObjectId,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionGeneration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConnectionGeneration::Normal</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">ConnectionGeneration::LoadBalanced</span> { <span class="ident">service_id</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">service_id</span>),
+<span class="kw">impl </span>ConnectionGeneration {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ConnectionGeneration::Normal(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            ConnectionGeneration::LoadBalanced { service_id, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>service_id),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current_generation</span>: <span class="kw-2">&amp;</span><span class="ident">PoolGeneration</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">current_generation</span>) {
-            (<span class="ident">ConnectionGeneration::Normal</span>(<span class="ident">cgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">pgen</span>)) =&gt; <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">pgen</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_stale(<span class="kw-2">&amp;</span><span class="self">self</span>, current_generation: <span class="kw-2">&amp;</span>PoolGeneration) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, current_generation) {
+            (ConnectionGeneration::Normal(cgen), PoolGeneration::Normal(pgen)) =&gt; cgen != pgen,
             (
-                <span class="ident">ConnectionGeneration::LoadBalanced</span> {
-                    <span class="ident">generation</span>: <span class="ident">cgen</span>,
-                    <span class="ident">service_id</span>,
+                ConnectionGeneration::LoadBalanced {
+                    generation: cgen,
+                    service_id,
                 },
-                <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="ident">gen_map</span>),
-            ) =&gt; <span class="ident">cgen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">gen_map</span>.<span class="ident">get</span>(<span class="ident">service_id</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
+                PoolGeneration::LoadBalanced(gen_map),
+            ) =&gt; cgen != gen_map.get(service_id).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
         }
     }
 }
 
-<span class="doccomment">/// Struct encapsulating the information needed to establish a `Connection`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Creating a `PendingConnection` contributes towards the total connection count of a pool, despite</span>
-<span class="doccomment">/// not actually making a TCP connection to the pool&#39;s endpoint. This models a &quot;pending&quot; Connection</span>
-<span class="doccomment">/// from the CMAP specification.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">PendingConnection</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">id</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">generation</span>: <span class="ident">PoolGeneration</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionOptions</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct encapsulating the information needed to establish a `Connection`.
+///
+/// Creating a `PendingConnection` contributes towards the total connection count of a pool, despite
+/// not actually making a TCP connection to the pool&#39;s endpoint. This models a &quot;pending&quot; Connection
+/// from the CMAP specification.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>PendingConnection {
+    <span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
+    <span class="kw">pub</span>(<span class="kw">super</span>) address: ServerAddress,
+    <span class="kw">pub</span>(<span class="kw">super</span>) generation: PoolGeneration,
+    <span class="kw">pub</span>(<span class="kw">super</span>) options: <span class="prelude-ty">Option</span>&lt;ConnectionOptions&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PendingConnection</span> {
-    <span class="doccomment">/// Helper to create a `ConnectionCreatedEvent` for the connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">created_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionCreatedEvent</span> {
-        <span class="ident">ConnectionCreatedEvent</span> {
-            <span class="ident">address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">connection_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+<span class="kw">impl </span>PendingConnection {
+    <span class="doccomment">/// Helper to create a `ConnectionCreatedEvent` for the connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>created_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionCreatedEvent {
+        ConnectionCreatedEvent {
+            address: <span class="self">self</span>.address.clone(),
+            connection_id: <span class="self">self</span>.id,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

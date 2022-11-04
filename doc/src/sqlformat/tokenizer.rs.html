@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/tokenizer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokenizer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/tokenizer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tokenizer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -942,857 +942,857 @@
 <span id="942">942</span>
 <span id="943">943</span>
 <span id="944">944</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">nom::branch::alt</span>;
-<span class="kw">use</span> <span class="ident">nom::bytes::complete</span>::{<span class="ident">tag</span>, <span class="ident">tag_no_case</span>, <span class="ident">take</span>, <span class="ident">take_until</span>, <span class="ident">take_while1</span>};
-<span class="kw">use</span> <span class="ident">nom::character::complete</span>::{<span class="ident">anychar</span>, <span class="ident">char</span>, <span class="ident">digit0</span>, <span class="ident">digit1</span>, <span class="ident">not_line_ending</span>};
-<span class="kw">use</span> <span class="ident">nom::combinator</span>::{<span class="ident">eof</span>, <span class="ident">opt</span>, <span class="ident">peek</span>, <span class="ident">recognize</span>, <span class="ident">verify</span>};
-<span class="kw">use</span> <span class="ident">nom::error::ParseError</span>;
-<span class="kw">use</span> <span class="ident">nom::error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>};
-<span class="kw">use</span> <span class="ident">nom::multi::many0</span>;
-<span class="kw">use</span> <span class="ident">nom::sequence</span>::{<span class="ident">terminated</span>, <span class="ident">tuple</span>};
-<span class="kw">use</span> <span class="ident">nom</span>::{<span class="ident">AsChar</span>, <span class="prelude-val">Err</span>, <span class="ident">IResult</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">unicode_categories::UnicodeCategories</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>nom::branch::alt;
+<span class="kw">use </span>nom::bytes::complete::{tag, tag_no_case, take, take_until, take_while1};
+<span class="kw">use </span>nom::character::complete::{anychar, char, digit0, digit1, not_line_ending};
+<span class="kw">use </span>nom::combinator::{eof, opt, peek, recognize, verify};
+<span class="kw">use </span>nom::error::ParseError;
+<span class="kw">use </span>nom::error::{Error, ErrorKind};
+<span class="kw">use </span>nom::multi::many0;
+<span class="kw">use </span>nom::sequence::{terminated, tuple};
+<span class="kw">use </span>nom::{AsChar, <span class="prelude-val">Err</span>, IResult};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>unicode_categories::UnicodeCategories;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tokenize</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">token</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tokenize(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>token = <span class="prelude-val">None</span>;
 
-    <span class="comment">// Keep processing the string until it is empty</span>
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">get_next_token</span>(<span class="ident">input</span>, <span class="ident">token</span>.<span class="ident">as_ref</span>()) {
-        <span class="ident">token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>.<span class="number">1</span>.<span class="ident">clone</span>());
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">result</span>.<span class="number">0</span>;
+    <span class="comment">// Keep processing the string until it is empty
+    </span><span class="kw">while let </span><span class="prelude-val">Ok</span>(result) = get_next_token(input, token.as_ref()) {
+        token = <span class="prelude-val">Some</span>(result.<span class="number">1</span>.clone());
+        input = result.<span class="number">0</span>;
 
-        <span class="ident">tokens</span>.<span class="ident">push</span>(<span class="ident">result</span>.<span class="number">1</span>);
+        tokens.push(result.<span class="number">1</span>);
     }
-    <span class="ident">tokens</span>
+    tokens
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">TokenKind</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="comment">// Only used for placeholder--there is a reason this isn&#39;t on the enum</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PlaceholderKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Token&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>kind: TokenKind,
+    <span class="kw">pub </span>value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="comment">// Only used for placeholder--there is a reason this isn&#39;t on the enum
+    </span><span class="kw">pub </span>key: <span class="prelude-ty">Option</span>&lt;PlaceholderKind&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TokenKind</span> {
-    <span class="ident">Whitespace</span>,
-    <span class="ident">String</span>,
-    <span class="ident">Reserved</span>,
-    <span class="ident">ReservedTopLevel</span>,
-    <span class="ident">ReservedTopLevelNoIndent</span>,
-    <span class="ident">ReservedNewline</span>,
-    <span class="ident">Operator</span>,
-    <span class="ident">OpenParen</span>,
-    <span class="ident">CloseParen</span>,
-    <span class="ident">LineComment</span>,
-    <span class="ident">BlockComment</span>,
-    <span class="ident">Number</span>,
-    <span class="ident">Placeholder</span>,
-    <span class="ident">Word</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TokenKind {
+    Whitespace,
+    String,
+    Reserved,
+    ReservedTopLevel,
+    ReservedTopLevelNoIndent,
+    ReservedNewline,
+    Operator,
+    OpenParen,
+    CloseParen,
+    LineComment,
+    BlockComment,
+    Number,
+    Placeholder,
+    Word,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">PlaceholderKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Named</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">ZeroIndexed</span>(<span class="ident">usize</span>),
-    <span class="ident">OneIndexed</span>(<span class="ident">usize</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>PlaceholderKind&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Named(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    ZeroIndexed(usize),
+    OneIndexed(usize),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PlaceholderKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">named</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PlaceholderKind::Named</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_ref</span>(),
-            <span class="kw">_</span> =&gt; <span class="string">&quot;&quot;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PlaceholderKind&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>named(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            PlaceholderKind::Named(val) =&gt; val.as_ref(),
+            <span class="kw">_ </span>=&gt; <span class="string">&quot;&quot;</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PlaceholderKind::ZeroIndexed</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">val</span>),
-            <span class="ident">PlaceholderKind::OneIndexed</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="op">-</span> <span class="number">1</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>indexed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            PlaceholderKind::ZeroIndexed(val) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>val),
+            PlaceholderKind::OneIndexed(val) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>val - <span class="number">1</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_next_token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">previous_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">get_whitespace_token</span>(<span class="ident">input</span>)
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_comment_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_string_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_open_paren_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_close_paren_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_placeholder_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_number_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_reserved_word_token</span>(<span class="ident">input</span>, <span class="ident">previous_token</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_word_token</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_operator_token</span>(<span class="ident">input</span>))
+<span class="kw">fn </span>get_next_token&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    previous_token: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    get_whitespace_token(input)
+        .or_else(|<span class="kw">_</span>| get_comment_token(input))
+        .or_else(|<span class="kw">_</span>| get_string_token(input))
+        .or_else(|<span class="kw">_</span>| get_open_paren_token(input))
+        .or_else(|<span class="kw">_</span>| get_close_paren_token(input))
+        .or_else(|<span class="kw">_</span>| get_placeholder_token(input))
+        .or_else(|<span class="kw">_</span>| get_number_token(input))
+        .or_else(|<span class="kw">_</span>| get_reserved_word_token(input, previous_token))
+        .or_else(|<span class="kw">_</span>| get_word_token(input))
+        .or_else(|<span class="kw">_</span>| get_operator_token(input))
 }
 
-<span class="kw">fn</span> <span class="ident">get_whitespace_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">take_while1</span>(<span class="ident">char::is_whitespace</span>)(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_whitespace_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    take_while1(char::is_whitespace)(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Whitespace</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::Whitespace,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_comment_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">get_line_comment_token</span>(<span class="ident">input</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">get_block_comment_token</span>(<span class="ident">input</span>))
+<span class="kw">fn </span>get_comment_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    get_line_comment_token(input).or_else(|<span class="kw">_</span>| get_block_comment_token(input))
 }
 
-<span class="kw">fn</span> <span class="ident">get_line_comment_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((<span class="ident">alt</span>((<span class="ident">tag</span>(<span class="string">&quot;#&quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;--&quot;</span>))), <span class="ident">not_line_ending</span>)))(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_line_comment_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    recognize(tuple((alt((tag(<span class="string">&quot;#&quot;</span>), tag(<span class="string">&quot;--&quot;</span>))), not_line_ending)))(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::LineComment</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::LineComment,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_block_comment_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-        <span class="ident">tag</span>(<span class="string">&quot;/*&quot;</span>),
-        <span class="ident">alt</span>((<span class="ident">take_until</span>(<span class="string">&quot;*/&quot;</span>), <span class="ident">recognize</span>(<span class="ident">many0</span>(<span class="ident">anychar</span>)))),
-        <span class="ident">opt</span>(<span class="ident">take</span>(<span class="number">2usize</span>)),
-    )))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_block_comment_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    recognize(tuple((
+        tag(<span class="string">&quot;/*&quot;</span>),
+        alt((take_until(<span class="string">&quot;*/&quot;</span>), recognize(many0(anychar)))),
+        opt(take(<span class="number">2usize</span>)),
+    )))(input)
+    .map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::BlockComment</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::BlockComment,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_till_escaping</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">desired</span>: <span class="ident">char</span>,
-    <span class="ident">escapes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">char</span>],
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>().<span class="ident">enumerate</span>().<span class="ident">peekable</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>();
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="ident">item</span>.<span class="number">1</span>);
-            <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; {
-                    <span class="comment">// escape?</span>
-                    <span class="kw">if</span> <span class="ident">escapes</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="number">1</span>) <span class="op">&amp;&amp;</span> <span class="ident">next</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">desired</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                        <span class="comment">// consume this and next char</span>
-                        <span class="ident">chars</span>.<span class="ident">next</span>();
+<span class="kw">pub fn </span>take_till_escaping&lt;<span class="lifetime">&#39;a</span>, Error: ParseError&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;(
+    desired: char,
+    escapes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[char],
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Error&gt; {
+    <span class="kw">move </span>|input: <span class="kw-2">&amp;</span>str| {
+        <span class="kw">let </span><span class="kw-2">mut </span>chars = input.chars().enumerate().peekable();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>item = chars.next();
+            <span class="kw">let </span>next = chars.peek().map(|item| item.<span class="number">1</span>);
+            <span class="kw">match </span>item {
+                <span class="prelude-val">Some</span>(item) =&gt; {
+                    <span class="comment">// escape?
+                    </span><span class="kw">if </span>escapes.contains(<span class="kw-2">&amp;</span>item.<span class="number">1</span>) &amp;&amp; next.map(|n| n == desired).unwrap_or(<span class="bool-val">false</span>) {
+                        <span class="comment">// consume this and next char
+                        </span>chars.next();
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">if</span> <span class="ident">item</span>.<span class="number">1</span> <span class="op">==</span> <span class="ident">desired</span> {
-                        <span class="kw">let</span> <span class="ident">byte_pos</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="ident">item</span>.<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">len</span>()).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">byte_pos</span>..], <span class="kw-2">&amp;</span><span class="ident">input</span>[..<span class="ident">byte_pos</span>]));
+                    <span class="kw">if </span>item.<span class="number">1 </span>== desired {
+                        <span class="kw">let </span>byte_pos = input.chars().take(item.<span class="number">0</span>).map(|c| c.len()).sum::&lt;usize&gt;();
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>input[byte_pos..], <span class="kw-2">&amp;</span>input[..byte_pos]));
                     }
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">input</span>));
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, input));
                 }
             }
         }
     }
 }
 
-<span class="comment">// This enables the following string patterns:</span>
-<span class="comment">// 1. backtick quoted string using `` to escape</span>
-<span class="comment">// 2. square bracket quoted string (SQL Server) using ]] to escape</span>
-<span class="comment">// 3. double quoted string using &quot;&quot; or \&quot; to escape</span>
-<span class="comment">// 4. single quoted string using &#39;&#39; or \&#39; to escape</span>
-<span class="comment">// 5. national character quoted string using N&#39;&#39; or N\&#39; to escape</span>
-<span class="kw">fn</span> <span class="ident">get_string_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;`&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;`&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;`&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+<span class="comment">// This enables the following string patterns:
+// 1. backtick quoted string using `` to escape
+// 2. square bracket quoted string (SQL Server) using ]] to escape
+// 3. double quoted string using &quot;&quot; or \&quot; to escape
+// 4. single quoted string using &#39;&#39; or \&#39; to escape
+// 5. national character quoted string using N&#39;&#39; or N\&#39; to escape
+</span><span class="kw">fn </span>get_string_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((
+        recognize(tuple((
+            char(<span class="string">&#39;`&#39;</span>),
+            take_till_escaping(<span class="string">&#39;`&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;`&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;[&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;]&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;]&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;[&#39;</span>),
+            take_till_escaping(<span class="string">&#39;]&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;]&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;&quot;&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;&quot;&#39;</span>),
+            take_till_escaping(<span class="string">&#39;&quot;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;&quot;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;\&#39;&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;\&#39;&#39;</span>),
+            take_till_escaping(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">tag</span>(<span class="string">&quot;N&#39;&quot;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            tag(<span class="string">&quot;N&#39;&quot;</span>),
+            take_till_escaping(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\&#39;&#39;</span>, <span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-    ))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+    ))(input)
+    .map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::String</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::String,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="comment">// Like above but it doesn&#39;t replace double quotes</span>
-<span class="kw">fn</span> <span class="ident">get_placeholder_string_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;`&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;`&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;`&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+<span class="comment">// Like above but it doesn&#39;t replace double quotes
+</span><span class="kw">fn </span>get_placeholder_string_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((
+        recognize(tuple((
+            char(<span class="string">&#39;`&#39;</span>),
+            take_till_escaping(<span class="string">&#39;`&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;`&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;[&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;]&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;]&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;[&#39;</span>),
+            take_till_escaping(<span class="string">&#39;]&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;]&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;&quot;&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;&quot;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;&quot;&#39;</span>),
+            take_till_escaping(<span class="string">&#39;&quot;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">char</span>(<span class="string">&#39;\&#39;&#39;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            char(<span class="string">&#39;\&#39;&#39;</span>),
+            take_till_escaping(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-            <span class="ident">tag</span>(<span class="string">&quot;N&#39;&quot;</span>),
-            <span class="ident">take_till_escaping</span>(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
-            <span class="ident">take</span>(<span class="number">1usize</span>),
+        recognize(tuple((
+            tag(<span class="string">&quot;N&#39;&quot;</span>),
+            take_till_escaping(<span class="string">&#39;\&#39;&#39;</span>, <span class="kw-2">&amp;</span>[<span class="string">&#39;\\&#39;</span>]),
+            take(<span class="number">1usize</span>),
         ))),
-    ))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+    ))(input)
+    .map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::String</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::String,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_open_paren_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((<span class="ident">tag</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">terminated</span>(<span class="ident">tag_no_case</span>(<span class="string">&quot;CASE&quot;</span>), <span class="ident">end_of_word</span>)))(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_open_paren_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((tag(<span class="string">&quot;(&quot;</span>), terminated(tag_no_case(<span class="string">&quot;CASE&quot;</span>), end_of_word)))(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::OpenParen</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::OpenParen,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_close_paren_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((<span class="ident">tag</span>(<span class="string">&quot;)&quot;</span>), <span class="ident">terminated</span>(<span class="ident">tag_no_case</span>(<span class="string">&quot;END&quot;</span>), <span class="ident">end_of_word</span>)))(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_close_paren_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((tag(<span class="string">&quot;)&quot;</span>), terminated(tag_no_case(<span class="string">&quot;END&quot;</span>), end_of_word)))(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::CloseParen</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::CloseParen,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_placeholder_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">get_ident_named_placeholder_token</span>,
-        <span class="ident">get_string_named_placeholder_token</span>,
-        <span class="ident">get_indexed_placeholder_token</span>,
-    ))(<span class="ident">input</span>)
+<span class="kw">fn </span>get_placeholder_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((
+        get_ident_named_placeholder_token,
+        get_string_named_placeholder_token,
+        get_indexed_placeholder_token,
+    ))(input)
 }
 
-<span class="kw">fn</span> <span class="ident">get_indexed_placeholder_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">recognize</span>(<span class="ident">tuple</span>((<span class="ident">alt</span>((<span class="ident">char</span>(<span class="string">&#39;?&#39;</span>), <span class="ident">char</span>(<span class="string">&#39;$&#39;</span>))), <span class="ident">digit1</span>))),
-        <span class="ident">recognize</span>(<span class="ident">char</span>(<span class="string">&#39;?&#39;</span>)),
-    ))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_indexed_placeholder_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((
+        recognize(tuple((alt((char(<span class="string">&#39;?&#39;</span>), char(<span class="string">&#39;$&#39;</span>))), digit1))),
+        recognize(char(<span class="string">&#39;?&#39;</span>)),
+    ))(input)
+    .map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Placeholder</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">token</span>[<span class="number">1</span>..].<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() {
-                        <span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">token</span>.<span class="ident">starts_with</span>(<span class="string">&#39;$&#39;</span>) {
-                            <span class="ident">PlaceholderKind::OneIndexed</span>(<span class="ident">index</span>)
-                        } <span class="kw">else</span> {
-                            <span class="ident">PlaceholderKind::ZeroIndexed</span>(<span class="ident">index</span>)
+            input,
+            Token {
+                kind: TokenKind::Placeholder,
+                value: token,
+                key: <span class="kw">if </span>token.len() &gt; <span class="number">1 </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(index) = token[<span class="number">1</span>..].parse::&lt;usize&gt;() {
+                        <span class="prelude-val">Some</span>(<span class="kw">if </span>token.starts_with(<span class="string">&#39;$&#39;</span>) {
+                            PlaceholderKind::OneIndexed(index)
+                        } <span class="kw">else </span>{
+                            PlaceholderKind::ZeroIndexed(index)
                         })
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                },
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>},
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_ident_named_placeholder_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-        <span class="ident">alt</span>((<span class="ident">char</span>(<span class="string">&#39;@&#39;</span>), <span class="ident">char</span>(<span class="string">&#39;:&#39;</span>))),
-        <span class="ident">take_while1</span>(<span class="op">|</span><span class="ident">item</span>: <span class="ident">char</span><span class="op">|</span> {
-            <span class="ident">item</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">item</span> <span class="op">==</span> <span class="string">&#39;.&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">item</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">item</span> <span class="op">==</span> <span class="string">&#39;$&#39;</span>
-        }),
-    )))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>[<span class="number">1</span>..]);
+<span class="kw">fn </span>get_ident_named_placeholder_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    recognize(tuple((
+        alt((char(<span class="string">&#39;@&#39;</span>), char(<span class="string">&#39;:&#39;</span>))),
+        take_while1(|item: char| {
+            item.is_alphanumeric() || item == <span class="string">&#39;.&#39; </span>|| item == <span class="string">&#39;_&#39; </span>|| item == <span class="string">&#39;$&#39;
+        </span>}),
+    )))(input)
+    .map(|(input, token)| {
+        <span class="kw">let </span>index = Cow::Borrowed(<span class="kw-2">&amp;</span>token[<span class="number">1</span>..]);
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Placeholder</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">Some</span>(<span class="ident">PlaceholderKind::Named</span>(<span class="ident">index</span>)),
+            input,
+            Token {
+                kind: TokenKind::Placeholder,
+                value: token,
+                key: <span class="prelude-val">Some</span>(PlaceholderKind::Named(index)),
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_string_named_placeholder_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((
-        <span class="ident">alt</span>((<span class="ident">char</span>(<span class="string">&#39;@&#39;</span>), <span class="ident">char</span>(<span class="string">&#39;:&#39;</span>))),
-        <span class="ident">get_placeholder_string_token</span>,
-    )))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span>
-            <span class="ident">get_escaped_placeholder_key</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>[<span class="number">2</span>..<span class="ident">token</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>], <span class="kw-2">&amp;</span><span class="ident">token</span>[<span class="ident">token</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..]);
+<span class="kw">fn </span>get_string_named_placeholder_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    recognize(tuple((
+        alt((char(<span class="string">&#39;@&#39;</span>), char(<span class="string">&#39;:&#39;</span>))),
+        get_placeholder_string_token,
+    )))(input)
+    .map(|(input, token)| {
+        <span class="kw">let </span>index =
+            get_escaped_placeholder_key(<span class="kw-2">&amp;</span>token[<span class="number">2</span>..token.len() - <span class="number">1</span>], <span class="kw-2">&amp;</span>token[token.len() - <span class="number">1</span>..]);
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Placeholder</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">Some</span>(<span class="ident">PlaceholderKind::Named</span>(<span class="ident">index</span>)),
+            input,
+            Token {
+                kind: TokenKind::Placeholder,
+                value: token,
+                key: <span class="prelude-val">Some</span>(PlaceholderKind::Named(index)),
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_escaped_placeholder_key</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">quote_char</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">Cow::Owned</span>(<span class="ident">key</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\{}&quot;</span>, <span class="ident">quote_char</span>), <span class="ident">quote_char</span>))
+<span class="kw">fn </span>get_escaped_placeholder_key&lt;<span class="lifetime">&#39;a</span>&gt;(key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, quote_char: <span class="kw-2">&amp;</span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    Cow::Owned(key.replace(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\\{}&quot;</span>, quote_char), quote_char))
 }
 
-<span class="kw">fn</span> <span class="ident">get_number_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((<span class="ident">opt</span>(<span class="ident">tag</span>(<span class="string">&quot;-&quot;</span>)), <span class="ident">alt</span>((<span class="ident">decimal_number</span>, <span class="ident">digit1</span>)))))(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_number_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    recognize(tuple((opt(tag(<span class="string">&quot;-&quot;</span>)), alt((decimal_number, digit1)))))(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Number</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::Number,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">decimal_number</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">recognize</span>(<span class="ident">tuple</span>((<span class="ident">digit1</span>, <span class="ident">tag</span>(<span class="string">&quot;.&quot;</span>), <span class="ident">digit0</span>)))(<span class="ident">input</span>)
+<span class="kw">fn </span>decimal_number(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    recognize(tuple((digit1, tag(<span class="string">&quot;.&quot;</span>), digit0)))(input)
 }
 
-<span class="kw">fn</span> <span class="ident">get_reserved_word_token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">previous_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// A reserved word cannot be preceded by a &quot;.&quot;</span>
-    <span class="comment">// this makes it so in &quot;my_table.from&quot;, &quot;from&quot; is not considered a reserved word</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span> <span class="ident">previous_token</span> {
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;.&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::IsNot</span>)));
+<span class="kw">fn </span>get_reserved_word_token&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    previous_token: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+) -&gt; IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="comment">// A reserved word cannot be preceded by a &quot;.&quot;
+    // this makes it so in &quot;my_table.from&quot;, &quot;from&quot; is not considered a reserved word
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(token) = previous_token {
+        <span class="kw">if </span>token.value == <span class="string">&quot;.&quot; </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::IsNot)));
         }
     }
 
-    <span class="ident">alt</span>((
-        <span class="ident">get_top_level_reserved_token</span>,
-        <span class="ident">get_newline_reserved_token</span>,
-        <span class="ident">get_top_level_reserved_token_no_indent</span>,
-        <span class="ident">get_plain_reserved_token</span>,
-    ))(<span class="ident">input</span>)
+    alt((
+        get_top_level_reserved_token,
+        get_newline_reserved_token,
+        get_top_level_reserved_token_no_indent,
+        get_plain_reserved_token,
+    ))(input)
 }
 
-<span class="comment">// We have to be a bit creative here for performance reasons</span>
-<span class="kw">fn</span> <span class="ident">get_uc_words</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">words</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">input</span>
-        .<span class="ident">split_whitespace</span>()
-        .<span class="ident">take</span>(<span class="ident">words</span>)
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-        .<span class="ident">join</span>(<span class="string">&quot; &quot;</span>)
-        .<span class="ident">to_ascii_uppercase</span>()
+<span class="comment">// We have to be a bit creative here for performance reasons
+</span><span class="kw">fn </span>get_uc_words(input: <span class="kw-2">&amp;</span>str, words: usize) -&gt; String {
+    input
+        .split_whitespace()
+        .take(words)
+        .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;()
+        .join(<span class="string">&quot; &quot;</span>)
+        .to_ascii_uppercase()
 }
 
-<span class="kw">fn</span> <span class="ident">get_top_level_reserved_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">uc_input</span> <span class="op">=</span> <span class="ident">get_uc_words</span>(<span class="ident">input</span>, <span class="number">3</span>);
-    <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ADD&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AFTER&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ALTER COLUMN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ALTER TABLE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DELETE FROM&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXCEPT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FETCH FIRST&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FROM&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GROUP BY&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GO&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HAVING&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INSERT INTO&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INSERT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LIMIT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MODIFY&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ORDER BY&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SELECT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SET CURRENT SCHEMA&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SET SCHEMA&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SET&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">alt</span>((
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UPDATE&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;VALUES&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WHERE&quot;</span>), <span class="ident">end_of_word</span>),
+<span class="kw">fn </span>get_top_level_reserved_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">3</span>);
+    <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
+        terminated(tag(<span class="string">&quot;ADD&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AFTER&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ALTER COLUMN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ALTER TABLE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;DELETE FROM&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;EXCEPT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;FETCH FIRST&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;FROM&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;GROUP BY&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;GO&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;HAVING&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;INSERT INTO&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;INSERT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;LIMIT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;MODIFY&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ORDER BY&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;SELECT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;SET CURRENT SCHEMA&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;SET SCHEMA&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;SET&quot;</span>), end_of_word),
+        alt((
+            terminated(tag(<span class="string">&quot;UPDATE&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;VALUES&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;WHERE&quot;</span>), end_of_word),
         )),
-    ))(<span class="kw-2">&amp;</span><span class="ident">uc_input</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="ident">token</span>)) <span class="op">=</span> <span class="ident">result</span> {
-        <span class="kw">let</span> <span class="ident">final_word</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">split</span>(<span class="string">&#39; &#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">input_end_pos</span> <span class="op">=</span>
-            <span class="ident">input</span>.<span class="ident">to_ascii_uppercase</span>().<span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="ident">final_word</span>).<span class="ident">unwrap</span>() <span class="op">+</span> <span class="ident">final_word</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> (<span class="ident">token</span>, <span class="ident">input</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split_at</span>(<span class="ident">input_end_pos</span>);
+    ))(<span class="kw-2">&amp;</span>uc_input);
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
+        <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
+        <span class="kw">let </span>input_end_pos =
+            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
+        <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::ReservedTopLevel</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::ReservedTopLevel,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::Alt</span>)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_newline_reserved_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">uc_input</span> <span class="op">=</span> <span class="ident">get_uc_words</span>(<span class="ident">input</span>, <span class="number">3</span>);
-    <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AND&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CROSS APPLY&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CROSS JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ELSE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INNER JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LEFT JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LEFT OUTER JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OR&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OUTER APPLY&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OUTER JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RIGHT JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RIGHT OUTER JOIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WHEN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;XOR&quot;</span>), <span class="ident">end_of_word</span>),
-    ))(<span class="kw-2">&amp;</span><span class="ident">uc_input</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="ident">token</span>)) <span class="op">=</span> <span class="ident">result</span> {
-        <span class="kw">let</span> <span class="ident">final_word</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">split</span>(<span class="string">&#39; &#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">input_end_pos</span> <span class="op">=</span>
-            <span class="ident">input</span>.<span class="ident">to_ascii_uppercase</span>().<span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="ident">final_word</span>).<span class="ident">unwrap</span>() <span class="op">+</span> <span class="ident">final_word</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> (<span class="ident">token</span>, <span class="ident">input</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split_at</span>(<span class="ident">input_end_pos</span>);
+<span class="kw">fn </span>get_newline_reserved_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">3</span>);
+    <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
+        terminated(tag(<span class="string">&quot;AND&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;CROSS APPLY&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;CROSS JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ELSE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;INNER JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;LEFT JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;LEFT OUTER JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;OR&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;OUTER APPLY&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;OUTER JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;RIGHT JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;RIGHT OUTER JOIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;WHEN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;XOR&quot;</span>), end_of_word),
+    ))(<span class="kw-2">&amp;</span>uc_input);
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
+        <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
+        <span class="kw">let </span>input_end_pos =
+            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
+        <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::ReservedNewline</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::ReservedNewline,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::Alt</span>)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_top_level_reserved_token_no_indent</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">uc_input</span> <span class="op">=</span> <span class="ident">get_uc_words</span>(<span class="ident">input</span>, <span class="number">2</span>);
-    <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INTERSECT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INTERSECT ALL&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MINUS&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UNION&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UNION ALL&quot;</span>), <span class="ident">end_of_word</span>),
-    ))(<span class="kw-2">&amp;</span><span class="ident">uc_input</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="ident">token</span>)) <span class="op">=</span> <span class="ident">result</span> {
-        <span class="kw">let</span> <span class="ident">final_word</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">split</span>(<span class="string">&#39; &#39;</span>).<span class="ident">last</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">input_end_pos</span> <span class="op">=</span>
-            <span class="ident">input</span>.<span class="ident">to_ascii_uppercase</span>().<span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="ident">final_word</span>).<span class="ident">unwrap</span>() <span class="op">+</span> <span class="ident">final_word</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> (<span class="ident">token</span>, <span class="ident">input</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split_at</span>(<span class="ident">input_end_pos</span>);
+<span class="kw">fn </span>get_top_level_reserved_token_no_indent(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">2</span>);
+    <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
+        terminated(tag(<span class="string">&quot;INTERSECT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;INTERSECT ALL&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;MINUS&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;UNION&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;UNION ALL&quot;</span>), end_of_word),
+    ))(<span class="kw-2">&amp;</span>uc_input);
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
+        <span class="kw">let </span>final_word = token.split(<span class="string">&#39; &#39;</span>).last().unwrap();
+        <span class="kw">let </span>input_end_pos =
+            input.to_ascii_uppercase().find(<span class="kw-2">&amp;</span>final_word).unwrap() + final_word.len();
+        <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::ReservedTopLevelNoIndent</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::ReservedTopLevelNoIndent,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::Alt</span>)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_plain_reserved_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">uc_input</span> <span class="op">=</span> <span class="ident">get_uc_words</span>(<span class="ident">input</span>, <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ACCESSIBLE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ACTION&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AGAINST&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AGGREGATE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ALGORITHM&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ALL&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ALTER&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ANALYSE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ANALYZE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AS&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ASC&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AUTOCOMMIT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;AUTO_INCREMENT&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;BACKUP&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;BEGIN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;BETWEEN&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;BINLOG&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;BOTH&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CASCADE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CASE&quot;</span>), <span class="ident">end_of_word</span>),
-        <span class="ident">alt</span>((
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHANGE&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHANGED&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHARACTER SET&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHARSET&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHECK&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CHECKSUM&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COLLATE&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COLLATION&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COLUMN&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COLUMNS&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COMMENT&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COMMIT&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COMMITTED&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;COMPRESSED&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CONCURRENT&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CONSTRAINT&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CONTAINS&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CONVERT&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CREATE&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CROSS&quot;</span>), <span class="ident">end_of_word</span>),
-            <span class="ident">alt</span>((
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DATABASE&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DATABASES&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DAY&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DAY_HOUR&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DAY_MINUTE&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DAY_SECOND&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DEFAULT&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DEFINER&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DELAYED&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DELETE&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DESC&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DESCRIBE&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DETERMINISTIC&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DISTINCT&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DISTINCTROW&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DIV&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DO&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DROP&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DUMPFILE&quot;</span>), <span class="ident">end_of_word</span>),
-                <span class="ident">alt</span>((
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DUPLICATE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;DYNAMIC&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ELSE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ENCLOSED&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;END&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ENGINE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ENGINES&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ENGINE_TYPE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ESCAPE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ESCAPED&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EVENTS&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXEC&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXECUTE&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXISTS&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXPLAIN&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;EXTENDED&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FAST&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FETCH&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FIELDS&quot;</span>), <span class="ident">end_of_word</span>),
-                    <span class="ident">alt</span>((
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FILE&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FIRST&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FIXED&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FLUSH&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FOR&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FORCE&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FOREIGN&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FULL&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FULLTEXT&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;FUNCTION&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GLOBAL&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GRANT&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GRANTS&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;GROUP_CONCAT&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HEAP&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HIGH_PRIORITY&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HOSTS&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HOUR&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HOUR_MINUTE&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;HOUR_SECOND&quot;</span>), <span class="ident">end_of_word</span>),
-                        <span class="ident">alt</span>((
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IDENTIFIED&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IF&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IFNULL&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IGNORE&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IN&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INDEX&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INDEXES&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INFILE&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INSERT&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INSERT_ID&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INSERT_METHOD&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INTERVAL&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INTO&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;INVOKER&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;IS&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ISOLATION&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;KEY&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;KEYS&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;KILL&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LAST_INSERT_ID&quot;</span>), <span class="ident">end_of_word</span>),
-                            <span class="ident">alt</span>((
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LEADING&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LEVEL&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LIKE&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LINEAR&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LINES&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOAD&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOCAL&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOCK&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOCKS&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOGS&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;LOW_PRIORITY&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MARIA&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MASTER&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MASTER_CONNECT_RETRY&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MASTER_HOST&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MASTER_LOG_FILE&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MATCH&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MAX_CONNECTIONS_PER_HOUR&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MAX_QUERIES_PER_HOUR&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MAX_ROWS&quot;</span>), <span class="ident">end_of_word</span>),
-                                <span class="ident">alt</span>((
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MAX_UPDATES_PER_HOUR&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MAX_USER_CONNECTIONS&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MEDIUM&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MERGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MINUTE&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MINUTE_SECOND&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MIN_ROWS&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MODE&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MODIFY&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MONTH&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MRG_MYISAM&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;MYISAM&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;NAMES&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;NATURAL&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;NOT&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;NOW()&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;NULL&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OFFSET&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ON DELETE&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ON UPDATE&quot;</span>), <span class="ident">end_of_word</span>),
-                                    <span class="ident">alt</span>((
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ON&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ONLY&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OPEN&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OPTIMIZE&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OPTION&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OPTIONALLY&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;OUTFILE&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PACK_KEYS&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PAGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PARTIAL&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PARTITION&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PARTITIONS&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PASSWORD&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PRIMARY&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PRIVILEGES&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PROCEDURE&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PROCESS&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PROCESSLIST&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;PURGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;QUICK&quot;</span>), <span class="ident">end_of_word</span>),
-                                        <span class="ident">alt</span>((
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RAID0&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RAID_CHUNKS&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RAID_CHUNKSIZE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RAID_TYPE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RANGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;READ&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;READ_ONLY&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;READ_WRITE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REFERENCES&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REGEXP&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RELOAD&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RENAME&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REPAIR&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REPEATABLE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REPLACE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REPLICATION&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RESET&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RESTORE&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RESTRICT&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RETURN&quot;</span>), <span class="ident">end_of_word</span>),
-                                            <span class="ident">alt</span>((
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RETURNS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;REVOKE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;RLIKE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ROLLBACK&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ROW&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ROWS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;ROW_FORMAT&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SECOND&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SECURITY&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SEPARATOR&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SERIALIZABLE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SESSION&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SHARE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SHOW&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SHUTDOWN&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SLAVE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SONAME&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SOUNDS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_AUTO_IS_NULL&quot;</span>), <span class="ident">end_of_word</span>),
-                                                <span class="ident">alt</span>((
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_BIG_RESULT&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_BIG_SELECTS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_BIG_TABLES&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_BUFFER_RESULT&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+<span class="kw">fn </span>get_plain_reserved_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">let </span>uc_input = get_uc_words(input, <span class="number">1</span>);
+    <span class="kw">let </span>result: IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; = alt((
+        terminated(tag(<span class="string">&quot;ACCESSIBLE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ACTION&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AGAINST&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AGGREGATE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ALGORITHM&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ALL&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ALTER&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ANALYSE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ANALYZE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AS&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;ASC&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AUTOCOMMIT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;AUTO_INCREMENT&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;BACKUP&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;BEGIN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;BETWEEN&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;BINLOG&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;BOTH&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;CASCADE&quot;</span>), end_of_word),
+        terminated(tag(<span class="string">&quot;CASE&quot;</span>), end_of_word),
+        alt((
+            terminated(tag(<span class="string">&quot;CHANGE&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CHANGED&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CHARACTER SET&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CHARSET&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CHECK&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CHECKSUM&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COLLATE&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COLLATION&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COLUMN&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COLUMNS&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COMMENT&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COMMIT&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COMMITTED&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;COMPRESSED&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CONCURRENT&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CONSTRAINT&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CONTAINS&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CONVERT&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CREATE&quot;</span>), end_of_word),
+            terminated(tag(<span class="string">&quot;CROSS&quot;</span>), end_of_word),
+            alt((
+                terminated(tag(<span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DATABASE&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DATABASES&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DAY&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DAY_HOUR&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DAY_MINUTE&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DAY_SECOND&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DEFAULT&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DEFINER&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DELAYED&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DELETE&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DESC&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DESCRIBE&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DETERMINISTIC&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DISTINCT&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DISTINCTROW&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DIV&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DO&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DROP&quot;</span>), end_of_word),
+                terminated(tag(<span class="string">&quot;DUMPFILE&quot;</span>), end_of_word),
+                alt((
+                    terminated(tag(<span class="string">&quot;DUPLICATE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;DYNAMIC&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ELSE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ENCLOSED&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;END&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ENGINE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ENGINES&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ENGINE_TYPE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ESCAPE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;ESCAPED&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EVENTS&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EXEC&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EXECUTE&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EXISTS&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EXPLAIN&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;EXTENDED&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;FAST&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;FETCH&quot;</span>), end_of_word),
+                    terminated(tag(<span class="string">&quot;FIELDS&quot;</span>), end_of_word),
+                    alt((
+                        terminated(tag(<span class="string">&quot;FILE&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FIRST&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FIXED&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FLUSH&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FOR&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FORCE&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FOREIGN&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FULL&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FULLTEXT&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;FUNCTION&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;GLOBAL&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;GRANT&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;GRANTS&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;GROUP_CONCAT&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HEAP&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HIGH_PRIORITY&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HOSTS&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HOUR&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HOUR_MINUTE&quot;</span>), end_of_word),
+                        terminated(tag(<span class="string">&quot;HOUR_SECOND&quot;</span>), end_of_word),
+                        alt((
+                            terminated(tag(<span class="string">&quot;IDENTIFIED&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;IF&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;IFNULL&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;IGNORE&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;IN&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INDEX&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INDEXES&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INFILE&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INSERT&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INSERT_ID&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INSERT_METHOD&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INTERVAL&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INTO&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;INVOKER&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;IS&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;ISOLATION&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;KEY&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;KEYS&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;KILL&quot;</span>), end_of_word),
+                            terminated(tag(<span class="string">&quot;LAST_INSERT_ID&quot;</span>), end_of_word),
+                            alt((
+                                terminated(tag(<span class="string">&quot;LEADING&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LEVEL&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LIKE&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LINEAR&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LINES&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOAD&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOCAL&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOCK&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOCKS&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOGS&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;LOW_PRIORITY&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MARIA&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MASTER&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MASTER_CONNECT_RETRY&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MASTER_HOST&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MASTER_LOG_FILE&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MATCH&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MAX_CONNECTIONS_PER_HOUR&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MAX_QUERIES_PER_HOUR&quot;</span>), end_of_word),
+                                terminated(tag(<span class="string">&quot;MAX_ROWS&quot;</span>), end_of_word),
+                                alt((
+                                    terminated(tag(<span class="string">&quot;MAX_UPDATES_PER_HOUR&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MAX_USER_CONNECTIONS&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MEDIUM&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MERGE&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MINUTE&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MINUTE_SECOND&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MIN_ROWS&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MODE&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MODIFY&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MONTH&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MRG_MYISAM&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;MYISAM&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;NAMES&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;NATURAL&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;NOT&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;NOW()&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;NULL&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;OFFSET&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;ON DELETE&quot;</span>), end_of_word),
+                                    terminated(tag(<span class="string">&quot;ON UPDATE&quot;</span>), end_of_word),
+                                    alt((
+                                        terminated(tag(<span class="string">&quot;ON&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;ONLY&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;OPEN&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;OPTIMIZE&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;OPTION&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;OPTIONALLY&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;OUTFILE&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PACK_KEYS&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PAGE&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PARTIAL&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PARTITION&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PARTITIONS&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PASSWORD&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PRIMARY&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PRIVILEGES&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PROCEDURE&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PROCESS&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PROCESSLIST&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;PURGE&quot;</span>), end_of_word),
+                                        terminated(tag(<span class="string">&quot;QUICK&quot;</span>), end_of_word),
+                                        alt((
+                                            terminated(tag(<span class="string">&quot;RAID0&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RAID_CHUNKS&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RAID_CHUNKSIZE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RAID_TYPE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RANGE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;READ&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;READ_ONLY&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;READ_WRITE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REFERENCES&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REGEXP&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RELOAD&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RENAME&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REPAIR&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REPEATABLE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REPLACE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;REPLICATION&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RESET&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RESTORE&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RESTRICT&quot;</span>), end_of_word),
+                                            terminated(tag(<span class="string">&quot;RETURN&quot;</span>), end_of_word),
+                                            alt((
+                                                terminated(tag(<span class="string">&quot;RETURNS&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;REVOKE&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;RLIKE&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;ROLLBACK&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;ROW&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;ROWS&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;ROW_FORMAT&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SECOND&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SECURITY&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SEPARATOR&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SERIALIZABLE&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SESSION&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SHARE&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SHOW&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SHUTDOWN&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SLAVE&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SONAME&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SOUNDS&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SQL&quot;</span>), end_of_word),
+                                                terminated(tag(<span class="string">&quot;SQL_AUTO_IS_NULL&quot;</span>), end_of_word),
+                                                alt((
+                                                    terminated(tag(<span class="string">&quot;SQL_BIG_RESULT&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;SQL_BIG_SELECTS&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;SQL_BIG_TABLES&quot;</span>), end_of_word),
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_BUFFER_RESULT&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_CACHE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_CALC_FOUND_ROWS&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(tag(<span class="string">&quot;SQL_CACHE&quot;</span>), end_of_word),
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_CALC_FOUND_ROWS&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_LOG_BIN&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_LOG_OFF&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_LOG_UPDATE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_LOW_PRIORITY_UPDATES&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(tag(<span class="string">&quot;SQL_LOG_BIN&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;SQL_LOG_OFF&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;SQL_LOG_UPDATE&quot;</span>), end_of_word),
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_LOW_PRIORITY_UPDATES&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_MAX_JOIN_SIZE&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_MAX_JOIN_SIZE&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_NO_CACHE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_QUOTE_SHOW_CREATE&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(tag(<span class="string">&quot;SQL_NO_CACHE&quot;</span>), end_of_word),
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_QUOTE_SHOW_CREATE&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_SAFE_UPDATES&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_SAFE_UPDATES&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_SELECT_LIMIT&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_SELECT_LIMIT&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_SLAVE_SKIP_COUNTER&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_SLAVE_SKIP_COUNTER&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(
-                                                        <span class="ident">tag</span>(<span class="string">&quot;SQL_SMALL_RESULT&quot;</span>),
-                                                        <span class="ident">end_of_word</span>,
+                                                    terminated(
+                                                        tag(<span class="string">&quot;SQL_SMALL_RESULT&quot;</span>),
+                                                        end_of_word,
                                                     ),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SQL_WARNINGS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;START&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STARTING&quot;</span>), <span class="ident">end_of_word</span>),
-                                                    <span class="ident">alt</span>((
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STATUS&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STOP&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STORAGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(
-                                                            <span class="ident">tag</span>(<span class="string">&quot;STRAIGHT_JOIN&quot;</span>),
-                                                            <span class="ident">end_of_word</span>,
+                                                    terminated(tag(<span class="string">&quot;SQL_WARNINGS&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;START&quot;</span>), end_of_word),
+                                                    terminated(tag(<span class="string">&quot;STARTING&quot;</span>), end_of_word),
+                                                    alt((
+                                                        terminated(tag(<span class="string">&quot;STATUS&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;STOP&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;STORAGE&quot;</span>), end_of_word),
+                                                        terminated(
+                                                            tag(<span class="string">&quot;STRAIGHT_JOIN&quot;</span>),
+                                                            end_of_word,
                                                         ),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STRING&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;STRIPED&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;SUPER&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TABLE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TABLES&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TEMPORARY&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TERMINATED&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;THEN&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TO&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TRAILING&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(
-                                                            <span class="ident">tag</span>(<span class="string">&quot;TRANSACTIONAL&quot;</span>),
-                                                            <span class="ident">end_of_word</span>,
+                                                        terminated(tag(<span class="string">&quot;STRING&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;STRIPED&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;SUPER&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TABLE&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TABLES&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TEMPORARY&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TERMINATED&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;THEN&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TO&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TRAILING&quot;</span>), end_of_word),
+                                                        terminated(
+                                                            tag(<span class="string">&quot;TRANSACTIONAL&quot;</span>),
+                                                            end_of_word,
                                                         ),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TRUE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TRUNCATE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TYPE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;TYPES&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UNCOMMITTED&quot;</span>), <span class="ident">end_of_word</span>),
-                                                        <span class="ident">alt</span>((
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UNIQUE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;UNLOCK&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(
-                                                                <span class="ident">tag</span>(<span class="string">&quot;UNSIGNED&quot;</span>),
-                                                                <span class="ident">end_of_word</span>,
+                                                        terminated(tag(<span class="string">&quot;TRUE&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TRUNCATE&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TYPE&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;TYPES&quot;</span>), end_of_word),
+                                                        terminated(tag(<span class="string">&quot;UNCOMMITTED&quot;</span>), end_of_word),
+                                                        alt((
+                                                            terminated(tag(<span class="string">&quot;UNIQUE&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;UNLOCK&quot;</span>), end_of_word),
+                                                            terminated(
+                                                                tag(<span class="string">&quot;UNSIGNED&quot;</span>),
+                                                                end_of_word,
                                                             ),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;USAGE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;USE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;USING&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(
-                                                                <span class="ident">tag</span>(<span class="string">&quot;VARIABLES&quot;</span>),
-                                                                <span class="ident">end_of_word</span>,
+                                                            terminated(tag(<span class="string">&quot;USAGE&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;USE&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;USING&quot;</span>), end_of_word),
+                                                            terminated(
+                                                                tag(<span class="string">&quot;VARIABLES&quot;</span>),
+                                                                end_of_word,
                                                             ),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;VIEW&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WHEN&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WITH&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WORK&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(<span class="ident">tag</span>(<span class="string">&quot;WRITE&quot;</span>), <span class="ident">end_of_word</span>),
-                                                            <span class="ident">terminated</span>(
-                                                                <span class="ident">tag</span>(<span class="string">&quot;YEAR_MONTH&quot;</span>),
-                                                                <span class="ident">end_of_word</span>,
+                                                            terminated(tag(<span class="string">&quot;VIEW&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;WHEN&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;WITH&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;WORK&quot;</span>), end_of_word),
+                                                            terminated(tag(<span class="string">&quot;WRITE&quot;</span>), end_of_word),
+                                                            terminated(
+                                                                tag(<span class="string">&quot;YEAR_MONTH&quot;</span>),
+                                                                end_of_word,
                                                             ),
                                                         )),
                                                     )),
@@ -1807,84 +1807,84 @@
                 )),
             )),
         )),
-    ))(<span class="kw-2">&amp;</span><span class="ident">uc_input</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="kw">_</span>, <span class="ident">token</span>)) <span class="op">=</span> <span class="ident">result</span> {
-        <span class="kw">let</span> <span class="ident">input_end_pos</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> (<span class="ident">token</span>, <span class="ident">input</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split_at</span>(<span class="ident">input_end_pos</span>);
+    ))(<span class="kw-2">&amp;</span>uc_input);
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="kw">_</span>, token)) = result {
+        <span class="kw">let </span>input_end_pos = token.len();
+        <span class="kw">let </span>(token, input) = input.split_at(input_end_pos);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Reserved</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::Reserved,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">input</span>, <span class="ident">ErrorKind::Alt</span>)))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Err::Error(Error::new(input, ErrorKind::Alt)))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_word_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">take_while1</span>(<span class="ident">is_word_character</span>)(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_word_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    take_while1(is_word_character)(input).map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Word</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::Word,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">get_operator_token</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">tag</span>(<span class="string">&quot;!=&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;&lt;&gt;&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;==&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;&lt;=&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;&gt;=&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!&lt;&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!&gt;&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;||&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;::&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;-&gt;&gt;&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;-&gt;&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;~~*&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;~~&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!~~*&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!~~&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;~*&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!~*&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;!~&quot;</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;:=&quot;</span>),
-        <span class="ident">recognize</span>(<span class="ident">verify</span>(<span class="ident">take</span>(<span class="number">1usize</span>), <span class="op">|</span><span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="ident">token</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;\n&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">token</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;\r&quot;</span>
-        })),
-    ))(<span class="ident">input</span>)
-    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">input</span>, <span class="ident">token</span>)<span class="op">|</span> {
+<span class="kw">fn </span>get_operator_token(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    alt((
+        tag(<span class="string">&quot;!=&quot;</span>),
+        tag(<span class="string">&quot;&lt;&gt;&quot;</span>),
+        tag(<span class="string">&quot;==&quot;</span>),
+        tag(<span class="string">&quot;&lt;=&quot;</span>),
+        tag(<span class="string">&quot;&gt;=&quot;</span>),
+        tag(<span class="string">&quot;!&lt;&quot;</span>),
+        tag(<span class="string">&quot;!&gt;&quot;</span>),
+        tag(<span class="string">&quot;||&quot;</span>),
+        tag(<span class="string">&quot;::&quot;</span>),
+        tag(<span class="string">&quot;-&gt;&gt;&quot;</span>),
+        tag(<span class="string">&quot;-&gt;&quot;</span>),
+        tag(<span class="string">&quot;~~*&quot;</span>),
+        tag(<span class="string">&quot;~~&quot;</span>),
+        tag(<span class="string">&quot;!~~*&quot;</span>),
+        tag(<span class="string">&quot;!~~&quot;</span>),
+        tag(<span class="string">&quot;~*&quot;</span>),
+        tag(<span class="string">&quot;!~*&quot;</span>),
+        tag(<span class="string">&quot;!~&quot;</span>),
+        tag(<span class="string">&quot;:=&quot;</span>),
+        recognize(verify(take(<span class="number">1usize</span>), |token: <span class="kw-2">&amp;</span>str| {
+            token != <span class="string">&quot;\n&quot; </span>&amp;&amp; token != <span class="string">&quot;\r&quot;
+        </span>})),
+    ))(input)
+    .map(|(input, token)| {
         (
-            <span class="ident">input</span>,
-            <span class="ident">Token</span> {
-                <span class="ident">kind</span>: <span class="ident">TokenKind::Operator</span>,
-                <span class="ident">value</span>: <span class="ident">token</span>,
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
+            input,
+            Token {
+                kind: TokenKind::Operator,
+                value: token,
+                key: <span class="prelude-val">None</span>,
             },
         )
     })
 }
 
-<span class="kw">fn</span> <span class="ident">end_of_word</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">peek</span>(<span class="ident">alt</span>((
-        <span class="ident">eof</span>,
-        <span class="ident">verify</span>(<span class="ident">take</span>(<span class="number">1usize</span>), <span class="op">|</span><span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="op">!</span><span class="ident">is_word_character</span>(<span class="ident">val</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
+<span class="kw">fn </span>end_of_word(input: <span class="kw-2">&amp;</span>str) -&gt; IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    peek(alt((
+        eof,
+        verify(take(<span class="number">1usize</span>), |val: <span class="kw-2">&amp;</span>str| {
+            !is_word_character(val.chars().next().unwrap())
         }),
-    )))(<span class="ident">input</span>)
+    )))(input)
 }
 
-<span class="kw">fn</span> <span class="ident">is_word_character</span>(<span class="ident">item</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">item</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">item</span>.<span class="ident">is_mark</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">item</span>.<span class="ident">is_punctuation_connector</span>()
+<span class="kw">fn </span>is_word_character(item: char) -&gt; bool {
+    item.is_alphanumeric() || item.is_mark() || item.is_punctuation_connector()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

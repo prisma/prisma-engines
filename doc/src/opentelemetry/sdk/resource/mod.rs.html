@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/resource/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/resource/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -278,283 +278,283 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # Resource</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A `Resource` is an immutable representation of the entity producing telemetry. For example, a</span>
-<span class="doccomment">//! process producing telemetry that is running in a container on Kubernetes has a Pod name, it is</span>
-<span class="doccomment">//! in a namespace, and possibly is part of a Deployment which also has a name. All three of these</span>
-<span class="doccomment">//! attributes can be included in the `Resource`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The primary purpose of resources as a first-class concept in the SDK is decoupling of discovery</span>
-<span class="doccomment">//! of resource information from exporters. This allows for independent development and easy</span>
-<span class="doccomment">//! customization for users that need to integrate with closed source environments. When used with</span>
-<span class="doccomment">//! distributed tracing, a resource can be associated with the [`TracerProvider`] when it is created.</span>
-<span class="doccomment">//! That association cannot be changed later. When associated with a `TracerProvider`, all `Span`s</span>
-<span class="doccomment">//! produced by any `Tracer` from the provider are associated with this `Resource`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Resource detectors</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `ResourceDetector`s are used to detect resource from runtime or environmental variables. The</span>
-<span class="doccomment">//! following `ResourceDetector`s are provided along with this SDK.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - EnvResourceDetector, detect resource from environmental variables.</span>
-<span class="doccomment">//! - OsResourceDetector, detect OS from runtime.</span>
-<span class="doccomment">//! - ProcessResourceDetector, detect process information</span>
-<span class="kw">mod</span> <span class="ident">env</span>;
-<span class="kw">mod</span> <span class="ident">os</span>;
-<span class="kw">mod</span> <span class="ident">process</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # Resource
+//!
+//! A `Resource` is an immutable representation of the entity producing telemetry. For example, a
+//! process producing telemetry that is running in a container on Kubernetes has a Pod name, it is
+//! in a namespace, and possibly is part of a Deployment which also has a name. All three of these
+//! attributes can be included in the `Resource`.
+//!
+//! The primary purpose of resources as a first-class concept in the SDK is decoupling of discovery
+//! of resource information from exporters. This allows for independent development and easy
+//! customization for users that need to integrate with closed source environments. When used with
+//! distributed tracing, a resource can be associated with the [`TracerProvider`] when it is created.
+//! That association cannot be changed later. When associated with a `TracerProvider`, all `Span`s
+//! produced by any `Tracer` from the provider are associated with this `Resource`.
+//!
+//! [`TracerProvider`]: crate::trace::TracerProvider
+//!
+//! # Resource detectors
+//!
+//! `ResourceDetector`s are used to detect resource from runtime or environmental variables. The
+//! following `ResourceDetector`s are provided along with this SDK.
+//!
+//! - EnvResourceDetector, detect resource from environmental variables.
+//! - OsResourceDetector, detect OS from runtime.
+//! - ProcessResourceDetector, detect process information
+</span><span class="kw">mod </span>env;
+<span class="kw">mod </span>os;
+<span class="kw">mod </span>process;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">env::EnvResourceDetector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">env::SdkProvidedResourceDetector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">os::OsResourceDetector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">process::ProcessResourceDetector</span>;
+<span class="kw">pub use </span>env::EnvResourceDetector;
+<span class="kw">pub use </span>env::SdkProvidedResourceDetector;
+<span class="kw">pub use </span>os::OsResourceDetector;
+<span class="kw">pub use </span>process::ProcessResourceDetector;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::attributes</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Value</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">btree_map</span>, <span class="ident">BTreeMap</span>};
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::attributes;
+<span class="kw">use crate</span>::{Key, KeyValue, Value};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::collections::{btree_map, BTreeMap};
+<span class="kw">use </span>std::ops::Deref;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Describes an entity about which identifying information and metadata is exposed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Items are sorted by their key, and are only overwritten if the value is an empty string.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Resource</span> {
-    <span class="ident">attrs</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">Key</span>, <span class="ident">Value</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Describes an entity about which identifying information and metadata is exposed.
+///
+/// Items are sorted by their key, and are only overwritten if the value is an empty string.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Resource {
+    attrs: BTreeMap&lt;Key, Value&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Resource</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_detectors</span>(
-            <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
-            <span class="macro">vec!</span>[<span class="ident">Box::new</span>(<span class="ident">EnvResourceDetector::new</span>())],
+<span class="kw">impl </span>Default <span class="kw">for </span>Resource {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_detectors(
+            Duration::from_secs(<span class="number">0</span>),
+            <span class="macro">vec!</span>[Box::new(EnvResourceDetector::new())],
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Resource</span> {
-    <span class="doccomment">/// Creates an empty resource.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">attrs</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>Resource {
+    <span class="doccomment">/// Creates an empty resource.
+    </span><span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            attrs: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Create a new `Resource` from key value pairs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Values are de-duplicated by key, and the first key-value pair with a non-empty string value</span>
-    <span class="doccomment">/// will be retained</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">kvs</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resource</span> <span class="op">=</span> <span class="ident">Resource::empty</span>();
+    <span class="doccomment">/// Create a new `Resource` from key value pairs.
+    ///
+    /// Values are de-duplicated by key, and the first key-value pair with a non-empty string value
+    /// will be retained
+    </span><span class="kw">pub fn </span>new&lt;T: IntoIterator&lt;Item = KeyValue&gt;&gt;(kvs: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>resource = Resource::empty();
 
-        <span class="kw">for</span> <span class="ident">kv</span> <span class="kw">in</span> <span class="ident">kvs</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">resource</span>.<span class="ident">attrs</span>.<span class="ident">insert</span>(<span class="ident">kv</span>.<span class="ident">key</span>, <span class="ident">kv</span>.<span class="ident">value</span>);
+        <span class="kw">for </span>kv <span class="kw">in </span>kvs.into_iter() {
+            resource.attrs.insert(kv.key, kv.value);
         }
 
-        <span class="ident">resource</span>
+        resource
     }
 
-    <span class="doccomment">/// Create a new `Resource` from resource detectors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// timeout will be applied to each detector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_detectors</span>(<span class="ident">timeout</span>: <span class="ident">Duration</span>, <span class="ident">detectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ResourceDetector</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resource</span> <span class="op">=</span> <span class="ident">Resource::empty</span>();
-        <span class="kw">for</span> <span class="ident">detector</span> <span class="kw">in</span> <span class="ident">detectors</span> {
-            <span class="kw">let</span> <span class="ident">detected_res</span> <span class="op">=</span> <span class="ident">detector</span>.<span class="ident">detect</span>(<span class="ident">timeout</span>);
-            <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">detected_res</span>.<span class="ident">into_iter</span>() {
-                <span class="comment">// using insert instead of merge to avoid clone.</span>
-                <span class="ident">resource</span>.<span class="ident">attrs</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+    <span class="doccomment">/// Create a new `Resource` from resource detectors.
+    ///
+    /// timeout will be applied to each detector.
+    </span><span class="kw">pub fn </span>from_detectors(timeout: Duration, detectors: Vec&lt;Box&lt;<span class="kw">dyn </span>ResourceDetector&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>resource = Resource::empty();
+        <span class="kw">for </span>detector <span class="kw">in </span>detectors {
+            <span class="kw">let </span>detected_res = detector.detect(timeout);
+            <span class="kw">for </span>(key, value) <span class="kw">in </span>detected_res.into_iter() {
+                <span class="comment">// using insert instead of merge to avoid clone.
+                </span>resource.attrs.insert(key, value);
             }
         }
 
-        <span class="ident">resource</span>
+        resource
     }
 
-    <span class="doccomment">/// Create a new `Resource` by combining two resources.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Keys from the `other` resource have priority over keys from this resource, even if the</span>
-    <span class="doccomment">/// updated value is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Deref</span><span class="op">&lt;</span><span class="ident">Target</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">other</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// Create a new `Resource` by combining two resources.
+    ///
+    /// Keys from the `other` resource have priority over keys from this resource, even if the
+    /// updated value is empty.
+    </span><span class="kw">pub fn </span>merge&lt;T: Deref&lt;Target = <span class="self">Self</span>&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.attrs.is_empty() {
+            <span class="kw">return </span>other.clone();
         }
-        <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">attrs</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resource</span> <span class="op">=</span> <span class="ident">Resource::empty</span>();
-
-        <span class="comment">// attrs from self take the less priority, even when the new value is empty.</span>
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>() {
-            <span class="ident">resource</span>.<span class="ident">attrs</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
-        }
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>() {
-            <span class="ident">resource</span>.<span class="ident">attrs</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
+        <span class="kw">if </span>other.attrs.is_empty() {
+            <span class="kw">return </span><span class="self">self</span>.clone();
         }
 
-        <span class="ident">resource</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>resource = Resource::empty();
+
+        <span class="comment">// attrs from self take the less priority, even when the new value is empty.
+        </span><span class="kw">for </span>(k, v) <span class="kw">in </span><span class="self">self</span>.attrs.iter() {
+            resource.attrs.insert(k.clone(), v.clone());
+        }
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>other.attrs.iter() {
+            resource.attrs.insert(k.clone(), v.clone());
+        }
+
+        resource
     }
 
-    <span class="doccomment">/// Returns the number of attributes for this resource</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the number of attributes for this resource
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.attrs.len()
     }
 
-    <span class="doccomment">/// Returns `true` if the resource contains no attributes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns `true` if the resource contains no attributes.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.attrs.is_empty()
     }
 
-    <span class="doccomment">/// Gets an iterator over the attributes of this resource, sorted by key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_iter</span>()
+    <span class="doccomment">/// Gets an iterator over the attributes of this resource, sorted by key.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.into_iter()
     }
 
-    <span class="doccomment">/// Retrieve the value from resource associate with given key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">cloned</span>()
+    <span class="doccomment">/// Retrieve the value from resource associate with given key.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: Key) -&gt; <span class="prelude-ty">Option</span>&lt;Value&gt; {
+        <span class="self">self</span>.attrs.get(<span class="kw-2">&amp;</span>key).cloned()
     }
 
-    <span class="doccomment">/// Encoded attributes</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">attributes::Encoder</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">into_iter</span>())
-    }
-}
-
-<span class="doccomment">/// An owned iterator over the entries of a `Resource`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span>(<span class="ident">btree_map::IntoIter</span><span class="op">&lt;</span><span class="ident">Key</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">Key</span>, <span class="ident">Value</span>);
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="doccomment">/// Encoded attributes
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;metrics&quot;</span>)))]
+    </span><span class="kw">pub fn </span>encoded(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;</span><span class="kw">dyn </span>attributes::Encoder) -&gt; String {
+        encoder.encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>.into_iter())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Resource</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">Key</span>, <span class="ident">Value</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span>;
+<span class="doccomment">/// An owned iterator over the entries of a `Resource`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoIter(btree_map::IntoIter&lt;Key, Value&gt;);
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IntoIter</span>(<span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">into_iter</span>())
+<span class="kw">impl </span>Iterator <span class="kw">for </span>IntoIter {
+    <span class="kw">type </span>Item = (Key, Value);
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
     }
 }
 
-<span class="doccomment">/// An iterator over the entries of a `Resource`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">btree_map::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Key</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>Resource {
+    <span class="kw">type </span>Item = (Key, Value);
+    <span class="kw">type </span>IntoIter = IntoIter;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Key</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span>);
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IntoIter(<span class="self">self</span>.attrs.into_iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Resource</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Key</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Value</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over the entries of a `Resource`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt;(btree_map::Iter&lt;<span class="lifetime">&#39;a</span>, Key, Value&gt;);
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter</span>(<span class="self">self</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Key, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value);
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
     }
 }
 
-<span class="doccomment">/// ResourceDetector detects OpenTelemetry resource information</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implementations of this trait can be passed to</span>
-<span class="doccomment">/// the `Resource::from_detectors` function to generate a Resource from the merged information.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ResourceDetector</span> {
-    <span class="doccomment">/// detect returns an initialized Resource based on gathered information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// timeout is used in case the detection operation takes too much time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If source information to construct a Resource is inaccessible, an empty Resource should be returned</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If source information to construct a Resource is invalid, for example,</span>
-    <span class="doccomment">/// missing required values. an empty Resource should be returned.</span>
-    <span class="kw">fn</span> <span class="ident">detect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Resource</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Resource {
+    <span class="kw">type </span>Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Key, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value);
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter(<span class="self">self</span>.attrs.iter())
+    }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::resource::EnvResourceDetector</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">time</span>};
+<span class="doccomment">/// ResourceDetector detects OpenTelemetry resource information
+///
+/// Implementations of this trait can be passed to
+/// the `Resource::from_detectors` function to generate a Resource from the merged information.
+</span><span class="kw">pub trait </span>ResourceDetector {
+    <span class="doccomment">/// detect returns an initialized Resource based on gathered information.
+    ///
+    /// timeout is used in case the detection operation takes too much time.
+    ///
+    /// If source information to construct a Resource is inaccessible, an empty Resource should be returned
+    ///
+    /// If source information to construct a Resource is invalid, for example,
+    /// missing required values. an empty Resource should be returned.
+    </span><span class="kw">fn </span>detect(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: Duration) -&gt; Resource;
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new_resource</span>() {
-        <span class="kw">let</span> <span class="ident">args_with_dupe_keys</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;&quot;</span>), <span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;final&quot;</span>)];
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::resource::EnvResourceDetector;
+    <span class="kw">use </span>std::collections::BTreeMap;
+    <span class="kw">use </span>std::{env, time};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected_attrs</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-        <span class="ident">expected_attrs</span>.<span class="ident">insert</span>(<span class="ident">Key::new</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;final&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>new_resource() {
+        <span class="kw">let </span>args_with_dupe_keys = <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;&quot;</span>), KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;final&quot;</span>)];
+
+        <span class="kw">let </span><span class="kw-2">mut </span>expected_attrs = BTreeMap::new();
+        expected_attrs.insert(Key::new(<span class="string">&quot;a&quot;</span>), Value::from(<span class="string">&quot;final&quot;</span>));
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Resource::new</span>(<span class="ident">args_with_dupe_keys</span>),
-            <span class="ident">Resource</span> {
-                <span class="ident">attrs</span>: <span class="ident">expected_attrs</span>
-            }
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">merge_resource</span>() {
-        <span class="kw">let</span> <span class="ident">resource_a</span> <span class="op">=</span> <span class="ident">Resource::new</span>(<span class="macro">vec!</span>[
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;&quot;</span>),
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;b&quot;</span>, <span class="string">&quot;b-value&quot;</span>),
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;d&quot;</span>, <span class="string">&quot;d-value&quot;</span>),
-        ]);
-
-        <span class="kw">let</span> <span class="ident">resource_b</span> <span class="op">=</span> <span class="ident">Resource::new</span>(<span class="macro">vec!</span>[
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;a-value&quot;</span>),
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;c&quot;</span>, <span class="string">&quot;c-value&quot;</span>),
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;d&quot;</span>, <span class="string">&quot;&quot;</span>),
-        ]);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected_attrs</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-        <span class="ident">expected_attrs</span>.<span class="ident">insert</span>(<span class="ident">Key::new</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;a-value&quot;</span>));
-        <span class="ident">expected_attrs</span>.<span class="ident">insert</span>(<span class="ident">Key::new</span>(<span class="string">&quot;b&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;b-value&quot;</span>));
-        <span class="ident">expected_attrs</span>.<span class="ident">insert</span>(<span class="ident">Key::new</span>(<span class="string">&quot;c&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;c-value&quot;</span>));
-        <span class="ident">expected_attrs</span>.<span class="ident">insert</span>(<span class="ident">Key::new</span>(<span class="string">&quot;d&quot;</span>), <span class="ident">Value::from</span>(<span class="string">&quot;&quot;</span>));
-
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">resource_a</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">resource_b</span>),
-            <span class="ident">Resource</span> {
-                <span class="ident">attrs</span>: <span class="ident">expected_attrs</span>
+            Resource::new(args_with_dupe_keys),
+            Resource {
+                attrs: expected_attrs
             }
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">detect_resource</span>() {
-        <span class="ident">env::set_var</span>(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>, <span class="string">&quot;key=value, k = v , a= x, a=z&quot;</span>);
-        <span class="ident">env::set_var</span>(<span class="string">&quot;irrelevant&quot;</span>.<span class="ident">to_uppercase</span>(), <span class="string">&quot;20200810&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>merge_resource() {
+        <span class="kw">let </span>resource_a = Resource::new(<span class="macro">vec!</span>[
+            KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;&quot;</span>),
+            KeyValue::new(<span class="string">&quot;b&quot;</span>, <span class="string">&quot;b-value&quot;</span>),
+            KeyValue::new(<span class="string">&quot;d&quot;</span>, <span class="string">&quot;d-value&quot;</span>),
+        ]);
 
-        <span class="kw">let</span> <span class="ident">detector</span> <span class="op">=</span> <span class="ident">EnvResourceDetector::new</span>();
-        <span class="kw">let</span> <span class="ident">resource</span> <span class="op">=</span>
-            <span class="ident">Resource::from_detectors</span>(<span class="ident">time::Duration::from_secs</span>(<span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">Box::new</span>(<span class="ident">detector</span>)]);
+        <span class="kw">let </span>resource_b = Resource::new(<span class="macro">vec!</span>[
+            KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;a-value&quot;</span>),
+            KeyValue::new(<span class="string">&quot;c&quot;</span>, <span class="string">&quot;c-value&quot;</span>),
+            KeyValue::new(<span class="string">&quot;d&quot;</span>, <span class="string">&quot;&quot;</span>),
+        ]);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>expected_attrs = BTreeMap::new();
+        expected_attrs.insert(Key::new(<span class="string">&quot;a&quot;</span>), Value::from(<span class="string">&quot;a-value&quot;</span>));
+        expected_attrs.insert(Key::new(<span class="string">&quot;b&quot;</span>), Value::from(<span class="string">&quot;b-value&quot;</span>));
+        expected_attrs.insert(Key::new(<span class="string">&quot;c&quot;</span>), Value::from(<span class="string">&quot;c-value&quot;</span>));
+        expected_attrs.insert(Key::new(<span class="string">&quot;d&quot;</span>), Value::from(<span class="string">&quot;&quot;</span>));
+
         <span class="macro">assert_eq!</span>(
-            <span class="ident">resource</span>,
-            <span class="ident">Resource::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;x&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;z&quot;</span>)
+            resource_a.merge(<span class="kw-2">&amp;</span>resource_b),
+            Resource {
+                attrs: expected_attrs
+            }
+        );
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>detect_resource() {
+        env::set_var(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>, <span class="string">&quot;key=value, k = v , a= x, a=z&quot;</span>);
+        env::set_var(<span class="string">&quot;irrelevant&quot;</span>.to_uppercase(), <span class="string">&quot;20200810&quot;</span>);
+
+        <span class="kw">let </span>detector = EnvResourceDetector::new();
+        <span class="kw">let </span>resource =
+            Resource::from_detectors(time::Duration::from_secs(<span class="number">5</span>), <span class="macro">vec!</span>[Box::new(detector)]);
+        <span class="macro">assert_eq!</span>(
+            resource,
+            Resource::new(<span class="macro">vec!</span>[
+                KeyValue::new(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>),
+                KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>),
+                KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;x&quot;</span>),
+                KeyValue::new(<span class="string">&quot;a&quot;</span>, <span class="string">&quot;z&quot;</span>)
             ])
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

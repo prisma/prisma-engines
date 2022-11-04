@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-types/src/serde_json_1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_json_1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../postgres_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-types/src/serde_json_1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_json_1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../postgres_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -71,78 +71,78 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FromSql</span>, <span class="ident">IsNull</span>, <span class="ident">ToSql</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">serde_1</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_json_1::Value</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">std::io::Read</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{FromSql, IsNull, ToSql, Type};
+<span class="kw">use </span>bytes::{BufMut, BytesMut};
+<span class="kw">use </span>serde_1::{Deserialize, Serialize};
+<span class="kw">use </span>serde_json_1::Value;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::io::Read;
 
-<span class="doccomment">/// A wrapper type to allow arbitrary `Serialize`/`Deserialize` types to convert to Postgres JSON values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// A wrapper type to allow arbitrary `Serialize`/`Deserialize` types to convert to Postgres JSON values.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Json&lt;T&gt;(<span class="kw">pub </span>T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Json&lt;T&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="kw-2">mut</span> <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ty</span> <span class="op">==</span> <span class="ident">Type::JSONB</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">1</span>];
-            <span class="ident">raw</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>)<span class="question-mark">?</span>;
-            <span class="comment">// We only support version 1 of the jsonb binary format</span>
-            <span class="kw">if</span> <span class="ident">b</span>[<span class="number">0</span>] <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;unsupported JSONB encoding version&quot;</span>.<span class="ident">into</span>());
+    <span class="kw">fn </span>from_sql(ty: <span class="kw-2">&amp;</span>Type, <span class="kw-2">mut </span>raw: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Json&lt;T&gt;, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">if </span><span class="kw-2">*</span>ty == Type::JSONB {
+            <span class="kw">let </span><span class="kw-2">mut </span>b = [<span class="number">0</span>; <span class="number">1</span>];
+            raw.read_exact(<span class="kw-2">&amp;mut </span>b)<span class="question-mark">?</span>;
+            <span class="comment">// We only support version 1 of the jsonb binary format
+            </span><span class="kw">if </span>b[<span class="number">0</span>] != <span class="number">1 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;unsupported JSONB encoding version&quot;</span>.into());
             }
         }
-        <span class="ident">serde_json_1::de::from_slice</span>(<span class="ident">raw</span>)
-            .<span class="ident">map</span>(<span class="ident">Json</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+        serde_json_1::de::from_slice(raw)
+            .map(Json)
+            .map_err(Into::into)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">JSON</span>, <span class="ident">JSONB</span>);
+    <span class="macro">accepts!</span>(JSON, JSONB);
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">Debug</span>,
+<span class="kw">impl</span>&lt;T&gt; ToSql <span class="kw">for </span>Json&lt;T&gt;
+<span class="kw">where
+    </span>T: Serialize + Debug,
 {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(
+    <span class="kw">fn </span>to_sql(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ty</span> <span class="op">==</span> <span class="ident">Type::JSONB</span> {
-            <span class="ident">out</span>.<span class="ident">put_u8</span>(<span class="number">1</span>);
+        ty: <span class="kw-2">&amp;</span>Type,
+        out: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">if </span><span class="kw-2">*</span>ty == Type::JSONB {
+            out.put_u8(<span class="number">1</span>);
         }
-        <span class="ident">serde_json_1::ser::to_writer</span>(<span class="ident">out</span>.<span class="ident">writer</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+        serde_json_1::ser::to_writer(out.writer(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(IsNull::No)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">JSON</span>, <span class="ident">JSONB</span>);
+    <span class="macro">accepts!</span>(JSON, JSONB);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Json</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="ident">::from_sql</span>(<span class="ident">ty</span>, <span class="ident">raw</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">json</span><span class="op">|</span> <span class="ident">json</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from_sql(ty: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Value, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        Json::&lt;Value&gt;::from_sql(ty, raw).map(|json| json.<span class="number">0</span>)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">JSON</span>, <span class="ident">JSONB</span>);
+    <span class="macro">accepts!</span>(JSON, JSONB);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(
+<span class="kw">impl </span>ToSql <span class="kw">for </span>Value {
+    <span class="kw">fn </span>to_sql(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Json</span>(<span class="self">self</span>).<span class="ident">to_sql</span>(<span class="ident">ty</span>, <span class="ident">out</span>)
+        ty: <span class="kw-2">&amp;</span>Type,
+        out: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        Json(<span class="self">self</span>).to_sql(ty, out)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">JSON</span>, <span class="ident">JSONB</span>);
+    <span class="macro">accepts!</span>(JSON, JSONB);
     <span class="macro">to_sql_checked!</span>();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="postgres_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="postgres_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

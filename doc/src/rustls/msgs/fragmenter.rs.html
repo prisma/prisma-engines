@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/fragmenter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fragmenter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/fragmenter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fragmenter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -166,173 +166,173 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base::Payload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">ProtocolVersion</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">BorrowedPlainMessage</span>, <span class="ident">PlainMessage</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::msgs::base::Payload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, ProtocolVersion};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::{BorrowedPlainMessage, PlainMessage};
+<span class="kw">use </span><span class="kw">crate</span>::Error;
+<span class="kw">use </span>std::collections::VecDeque;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_FRAGMENT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16384</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PACKET_OVERHEAD</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="number">2</span> <span class="op">+</span> <span class="number">2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_FRAGMENT_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAX_FRAGMENT_LEN</span> <span class="op">+</span> <span class="ident">PACKET_OVERHEAD</span>;
+<span class="kw">pub const </span>MAX_FRAGMENT_LEN: usize = <span class="number">16384</span>;
+<span class="kw">pub const </span>PACKET_OVERHEAD: usize = <span class="number">1 </span>+ <span class="number">2 </span>+ <span class="number">2</span>;
+<span class="kw">pub const </span>MAX_FRAGMENT_SIZE: usize = MAX_FRAGMENT_LEN + PACKET_OVERHEAD;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageFragmenter</span> {
-    <span class="ident">max_frag</span>: <span class="ident">usize</span>,
+<span class="kw">pub struct </span>MessageFragmenter {
+    max_frag: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">MessageFragmenter</span> {
-    <span class="doccomment">/// Make a new fragmenter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `max_fragment_size` is the maximum fragment size that will be produced --</span>
-    <span class="doccomment">/// this includes overhead. A `max_fragment_size` of 10 will produce TLS fragments</span>
-    <span class="doccomment">/// up to 10 bytes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_fragment_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">max_frag</span>: <span class="number">0</span> };
-        <span class="ident">new</span>.<span class="ident">set_max_fragment_size</span>(<span class="ident">max_fragment_size</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">new</span>)
+<span class="kw">impl </span>MessageFragmenter {
+    <span class="doccomment">/// Make a new fragmenter.
+    ///
+    /// `max_fragment_size` is the maximum fragment size that will be produced --
+    /// this includes overhead. A `max_fragment_size` of 10 will produce TLS fragments
+    /// up to 10 bytes.
+    </span><span class="kw">pub fn </span>new(max_fragment_size: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>new = <span class="self">Self </span>{ max_frag: <span class="number">0 </span>};
+        new.set_max_fragment_size(max_fragment_size)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(new)
     }
 
-    <span class="doccomment">/// Take the Message `msg` and re-fragment it into new</span>
-    <span class="doccomment">/// messages whose fragment is no more than max_frag.</span>
-    <span class="doccomment">/// The new messages are appended to the `out` deque.</span>
-    <span class="doccomment">/// Payloads are copied.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fragment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">PlainMessage</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">PlainMessage</span><span class="op">&gt;</span>) {
-        <span class="comment">// Non-fragment path</span>
-        <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">payload</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max_frag</span> {
-            <span class="ident">out</span>.<span class="ident">push_back</span>(<span class="ident">msg</span>);
+    <span class="doccomment">/// Take the Message `msg` and re-fragment it into new
+    /// messages whose fragment is no more than max_frag.
+    /// The new messages are appended to the `out` deque.
+    /// Payloads are copied.
+    </span><span class="kw">pub fn </span>fragment(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: PlainMessage, out: <span class="kw-2">&amp;mut </span>VecDeque&lt;PlainMessage&gt;) {
+        <span class="comment">// Non-fragment path
+        </span><span class="kw">if </span>msg.payload.<span class="number">0</span>.len() &lt;= <span class="self">self</span>.max_frag {
+            out.push_back(msg);
             <span class="kw">return</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">msg</span>.<span class="ident">payload</span>.<span class="number">0</span>.<span class="ident">chunks</span>(<span class="self">self</span>.<span class="ident">max_frag</span>) {
-            <span class="ident">out</span>.<span class="ident">push_back</span>(<span class="ident">PlainMessage</span> {
-                <span class="ident">typ</span>: <span class="ident">msg</span>.<span class="ident">typ</span>,
-                <span class="ident">version</span>: <span class="ident">msg</span>.<span class="ident">version</span>,
-                <span class="ident">payload</span>: <span class="ident">Payload</span>(<span class="ident">chunk</span>.<span class="ident">to_vec</span>()),
+        <span class="kw">for </span>chunk <span class="kw">in </span>msg.payload.<span class="number">0</span>.chunks(<span class="self">self</span>.max_frag) {
+            out.push_back(PlainMessage {
+                typ: msg.typ,
+                version: msg.version,
+                payload: Payload(chunk.to_vec()),
             });
         }
     }
 
-    <span class="doccomment">/// Enqueue borrowed fragments of (version, typ, payload) which</span>
-    <span class="doccomment">/// are no longer than max_frag onto the `out` deque.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fragment_borrow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Enqueue borrowed fragments of (version, typ, payload) which
+    /// are no longer than max_frag onto the `out` deque.
+    </span><span class="kw">pub fn </span>fragment_borrow&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">typ</span>: <span class="ident">ContentType</span>,
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
-        <span class="ident">payload</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-        <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">BorrowedPlainMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        typ: ContentType,
+        version: ProtocolVersion,
+        payload: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+        out: <span class="kw-2">&amp;mut </span>VecDeque&lt;BorrowedPlainMessage&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     ) {
-        <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">payload</span>.<span class="ident">chunks</span>(<span class="self">self</span>.<span class="ident">max_frag</span>) {
-            <span class="kw">let</span> <span class="ident">cm</span> <span class="op">=</span> <span class="ident">BorrowedPlainMessage</span> {
-                <span class="ident">typ</span>,
-                <span class="ident">version</span>,
-                <span class="ident">payload</span>: <span class="ident">chunk</span>,
+        <span class="kw">for </span>chunk <span class="kw">in </span>payload.chunks(<span class="self">self</span>.max_frag) {
+            <span class="kw">let </span>cm = BorrowedPlainMessage {
+                typ,
+                version,
+                payload: chunk,
             };
-            <span class="ident">out</span>.<span class="ident">push_back</span>(<span class="ident">cm</span>);
+            out.push_back(cm);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_fragment_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">max_frag</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">new</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">sz</span> @ <span class="number">32</span>..<span class="op">=</span><span class="ident">MAX_FRAGMENT_SIZE</span>) =&gt; <span class="ident">sz</span> <span class="op">-</span> <span class="ident">PACKET_OVERHEAD</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">MAX_FRAGMENT_LEN</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadMaxFragmentSize</span>),
+    <span class="kw">pub fn </span>set_max_fragment_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.max_frag = <span class="kw">match </span>new {
+            <span class="prelude-val">Some</span>(sz @ <span class="number">32</span>..=MAX_FRAGMENT_SIZE) =&gt; sz - PACKET_OVERHEAD,
+            <span class="prelude-val">None </span>=&gt; MAX_FRAGMENT_LEN,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadMaxFragmentSize),
         };
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">MessageFragmenter</span>, <span class="ident">PACKET_OVERHEAD</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base::Payload</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">ProtocolVersion</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message::PlainMessage</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{MessageFragmenter, PACKET_OVERHEAD};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::base::Payload;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, ProtocolVersion};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::message::PlainMessage;
+    <span class="kw">use </span>std::collections::VecDeque;
 
-    <span class="kw">fn</span> <span class="ident">msg_eq</span>(
-        <span class="ident">mm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PlainMessage</span><span class="op">&gt;</span>,
-        <span class="ident">total_len</span>: <span class="ident">usize</span>,
-        <span class="ident">typ</span>: <span class="kw-2">&amp;</span><span class="ident">ContentType</span>,
-        <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="ident">ProtocolVersion</span>,
-        <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
+    <span class="kw">fn </span>msg_eq(
+        mm: <span class="prelude-ty">Option</span>&lt;PlainMessage&gt;,
+        total_len: usize,
+        typ: <span class="kw-2">&amp;</span>ContentType,
+        version: <span class="kw-2">&amp;</span>ProtocolVersion,
+        bytes: <span class="kw-2">&amp;</span>[u8],
     ) {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">mm</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">m</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">into_unencrypted_opaque</span>()
-            .<span class="ident">encode</span>();
+        <span class="kw">let </span>m = mm.unwrap();
+        <span class="kw">let </span>buf = m
+            .clone()
+            .into_unencrypted_opaque()
+            .encode();
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">typ</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">version</span>, <span class="ident">version</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">payload</span>.<span class="number">0</span>, <span class="ident">bytes</span>.<span class="ident">to_vec</span>());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.typ, typ);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>m.version, version);
+        <span class="macro">assert_eq!</span>(m.payload.<span class="number">0</span>, bytes.to_vec());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">total_len</span>, <span class="ident">buf</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(total_len, buf.len());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() {
-        <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ContentType::Handshake</span>;
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">ProtocolVersion::TLSv1_2</span>;
-        <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">1</span>..<span class="number">70u8</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>,
-            <span class="ident">version</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="ident">data</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke() {
+        <span class="kw">let </span>typ = ContentType::Handshake;
+        <span class="kw">let </span>version = ProtocolVersion::TLSv1_2;
+        <span class="kw">let </span>data: Vec&lt;u8&gt; = (<span class="number">1</span>..<span class="number">70u8</span>).collect();
+        <span class="kw">let </span>m = PlainMessage {
+            typ,
+            version,
+            payload: Payload::new(data),
         };
 
-        <span class="kw">let</span> <span class="ident">frag</span> <span class="op">=</span> <span class="ident">MessageFragmenter::new</span>(<span class="prelude-val">Some</span>(<span class="number">32</span>)).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
-        <span class="ident">frag</span>.<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;mut</span> <span class="ident">q</span>);
-        <span class="ident">msg_eq</span>(
-            <span class="ident">q</span>.<span class="ident">pop_front</span>(),
+        <span class="kw">let </span>frag = MessageFragmenter::new(<span class="prelude-val">Some</span>(<span class="number">32</span>)).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>q = VecDeque::new();
+        frag.fragment(m, <span class="kw-2">&amp;mut </span>q);
+        msg_eq(
+            q.pop_front(),
             <span class="number">32</span>,
-            <span class="kw-2">&amp;</span><span class="ident">typ</span>,
-            <span class="kw-2">&amp;</span><span class="ident">version</span>,
+            <span class="kw-2">&amp;</span>typ,
+            <span class="kw-2">&amp;</span>version,
             <span class="kw-2">&amp;</span>[
                 <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">18</span>, <span class="number">19</span>, <span class="number">20</span>, <span class="number">21</span>, <span class="number">22</span>, <span class="number">23</span>,
                 <span class="number">24</span>, <span class="number">25</span>, <span class="number">26</span>, <span class="number">27</span>,
             ],
         );
-        <span class="ident">msg_eq</span>(
-            <span class="ident">q</span>.<span class="ident">pop_front</span>(),
+        msg_eq(
+            q.pop_front(),
             <span class="number">32</span>,
-            <span class="kw-2">&amp;</span><span class="ident">typ</span>,
-            <span class="kw-2">&amp;</span><span class="ident">version</span>,
+            <span class="kw-2">&amp;</span>typ,
+            <span class="kw-2">&amp;</span>version,
             <span class="kw-2">&amp;</span>[
                 <span class="number">28</span>, <span class="number">29</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">32</span>, <span class="number">33</span>, <span class="number">34</span>, <span class="number">35</span>, <span class="number">36</span>, <span class="number">37</span>, <span class="number">38</span>, <span class="number">39</span>, <span class="number">40</span>, <span class="number">41</span>, <span class="number">42</span>, <span class="number">43</span>, <span class="number">44</span>, <span class="number">45</span>, <span class="number">46</span>, <span class="number">47</span>, <span class="number">48</span>,
                 <span class="number">49</span>, <span class="number">50</span>, <span class="number">51</span>, <span class="number">52</span>, <span class="number">53</span>, <span class="number">54</span>,
             ],
         );
-        <span class="ident">msg_eq</span>(
-            <span class="ident">q</span>.<span class="ident">pop_front</span>(),
+        msg_eq(
+            q.pop_front(),
             <span class="number">20</span>,
-            <span class="kw-2">&amp;</span><span class="ident">typ</span>,
-            <span class="kw-2">&amp;</span><span class="ident">version</span>,
+            <span class="kw-2">&amp;</span>typ,
+            <span class="kw-2">&amp;</span>version,
             <span class="kw-2">&amp;</span>[<span class="number">55</span>, <span class="number">56</span>, <span class="number">57</span>, <span class="number">58</span>, <span class="number">59</span>, <span class="number">60</span>, <span class="number">61</span>, <span class="number">62</span>, <span class="number">63</span>, <span class="number">64</span>, <span class="number">65</span>, <span class="number">66</span>, <span class="number">67</span>, <span class="number">68</span>, <span class="number">69</span>],
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(q.len(), <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">non_fragment</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;</span>.<span class="ident">to_vec</span>()),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>non_fragment() {
+        <span class="kw">let </span>m = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;</span>.to_vec()),
         };
 
-        <span class="kw">let</span> <span class="ident">frag</span> <span class="op">=</span> <span class="ident">MessageFragmenter::new</span>(<span class="prelude-val">Some</span>(<span class="number">32</span>)).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
-        <span class="ident">frag</span>.<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;mut</span> <span class="ident">q</span>);
-        <span class="ident">msg_eq</span>(
-            <span class="ident">q</span>.<span class="ident">pop_front</span>(),
-            <span class="ident">PACKET_OVERHEAD</span> <span class="op">+</span> <span class="number">8</span>,
-            <span class="kw-2">&amp;</span><span class="ident">ContentType::Handshake</span>,
-            <span class="kw-2">&amp;</span><span class="ident">ProtocolVersion::TLSv1_2</span>,
+        <span class="kw">let </span>frag = MessageFragmenter::new(<span class="prelude-val">Some</span>(<span class="number">32</span>)).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>q = VecDeque::new();
+        frag.fragment(m, <span class="kw-2">&amp;mut </span>q);
+        msg_eq(
+            q.pop_front(),
+            PACKET_OVERHEAD + <span class="number">8</span>,
+            <span class="kw-2">&amp;</span>ContentType::Handshake,
+            <span class="kw-2">&amp;</span>ProtocolVersion::TLSv1_2,
             <span class="string">b&quot;\x01\x02\x03\x04\x05\x06\x07\x08&quot;</span>,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">q</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(q.len(), <span class="number">0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

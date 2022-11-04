@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/output_types/query_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_builder/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/output_types/query_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_builder/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -149,156 +149,156 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">input_types::fields::arguments</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>input_types::fields::arguments;
 
-<span class="doccomment">/// Builds the root `Query` type.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; (<span class="ident">OutputType</span>, <span class="ident">ObjectTypeStrongRef</span>) {
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">models</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="macro">vec!</span>[
-                <span class="ident">find_first_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>),
-                <span class="ident">all_items_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>),
-                <span class="ident">plain_aggregation_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>),
+<span class="doccomment">/// Builds the root `Query` type.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; (OutputType, ObjectTypeStrongRef) {
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = ctx
+        .models()
+        .into_iter()
+        .flat_map(|model| {
+            <span class="kw">let </span><span class="kw-2">mut </span>vec = <span class="macro">vec!</span>[
+                find_first_field(ctx, <span class="kw-2">&amp;</span>model),
+                all_items_field(ctx, <span class="kw-2">&amp;</span>model),
+                plain_aggregation_field(ctx, <span class="kw-2">&amp;</span>model),
             ];
 
-            <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">group_by_aggregation_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
-            <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec</span>, <span class="ident">find_unique_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>));
+            vec.push(group_by_aggregation_field(ctx, <span class="kw-2">&amp;</span>model));
+            append_opt(<span class="kw-2">&amp;mut </span>vec, find_unique_field(ctx, <span class="kw-2">&amp;</span>model));
 
-            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">enable_raw_queries</span> <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MongoDbQueryRaw</span>) {
-                <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">mongo_find_raw_field</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>));
-                <span class="ident">vec</span>.<span class="ident">push</span>(<span class="ident">mongo_aggregate_raw_field</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>));
+            <span class="kw">if </span>ctx.enable_raw_queries &amp;&amp; ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
+                vec.push(mongo_find_raw_field(<span class="kw-2">&amp;</span>model));
+                vec.push(mongo_aggregate_raw_field(<span class="kw-2">&amp;</span>model));
             }
 
-            <span class="ident">vec</span>
+            vec
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="string">&quot;Query&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="kw">let</span> <span class="ident">strong_ref</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">object_type</span>(<span class="ident">ident</span>, <span class="ident">fields</span>, <span class="prelude-val">None</span>));
+    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;Query&quot;</span>.to_owned(), PRISMA_NAMESPACE);
+    <span class="kw">let </span>strong_ref = Arc::new(object_type(ident, fields, <span class="prelude-val">None</span>));
 
-    (<span class="ident">OutputType::Object</span>(<span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">strong_ref</span>)), <span class="ident">strong_ref</span>)
+    (OutputType::Object(Arc::downgrade(<span class="kw-2">&amp;</span>strong_ref)), strong_ref)
 }
 
-<span class="doccomment">/// Builds a &quot;single&quot; query arity item field (e.g. &quot;user&quot;, &quot;post&quot; ...) for given model.</span>
-<span class="doccomment">/// Find one unique semantics.</span>
-<span class="kw">fn</span> <span class="ident">find_unique_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
-    <span class="ident">arguments::where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;findUnique{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
+<span class="doccomment">/// Builds a &quot;single&quot; query arity item field (e.g. &quot;user&quot;, &quot;post&quot; ...) for given model.
+/// Find one unique semantics.
+</span><span class="kw">fn </span>find_unique_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+    arguments::where_unique_argument(ctx, model).map(|arg| {
+        <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;findUnique{}&quot;</span>, model.name);
 
-        <span class="ident">field</span>(
-            <span class="ident">field_name</span>,
-            <span class="macro">vec!</span>[<span class="ident">arg</span>],
-            <span class="ident">OutputType::object</span>(<span class="ident">objects::model::map_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-                <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-                <span class="ident">tag</span>: <span class="ident">QueryTag::FindUnique</span>,
+        field(
+            field_name,
+            <span class="macro">vec!</span>[arg],
+            OutputType::object(objects::model::map_type(ctx, model)),
+            <span class="prelude-val">Some</span>(QueryInfo {
+                model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+                tag: QueryTag::FindUnique,
             }),
         )
-        .<span class="ident">nullable</span>()
+        .nullable()
     })
 }
 
-<span class="doccomment">/// Builds a find first item field for given model.</span>
-<span class="kw">fn</span> <span class="ident">find_first_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">arguments::relation_selection_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;findFirst{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
+<span class="doccomment">/// Builds a find first item field for given model.
+</span><span class="kw">fn </span>find_first_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    <span class="kw">let </span>args = arguments::relation_selection_arguments(ctx, model, <span class="bool-val">true</span>);
+    <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;findFirst{}&quot;</span>, model.name);
 
-    <span class="ident">field</span>(
-        <span class="ident">field_name</span>,
-        <span class="ident">args</span>,
-        <span class="ident">OutputType::object</span>(<span class="ident">objects::model::map_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>)),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-            <span class="ident">tag</span>: <span class="ident">QueryTag::FindFirst</span>,
+    field(
+        field_name,
+        args,
+        OutputType::object(objects::model::map_type(ctx, model)),
+        <span class="prelude-val">Some</span>(QueryInfo {
+            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            tag: QueryTag::FindFirst,
         }),
     )
-    .<span class="ident">nullable</span>()
+    .nullable()
 }
 
-<span class="doccomment">/// Builds a &quot;multiple&quot; query arity items field (e.g. &quot;users&quot;, &quot;posts&quot;, ...) for given model.</span>
-<span class="kw">fn</span> <span class="ident">all_items_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">arguments::relation_selection_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;findMany{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
-    <span class="kw">let</span> <span class="ident">object_type</span> <span class="op">=</span> <span class="ident">objects::model::map_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Builds a &quot;multiple&quot; query arity items field (e.g. &quot;users&quot;, &quot;posts&quot;, ...) for given model.
+</span><span class="kw">fn </span>all_items_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    <span class="kw">let </span>args = arguments::relation_selection_arguments(ctx, model, <span class="bool-val">true</span>);
+    <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;findMany{}&quot;</span>, model.name);
+    <span class="kw">let </span>object_type = objects::model::map_type(ctx, model);
 
-    <span class="ident">field</span>(
-        <span class="ident">field_name</span>,
-        <span class="ident">args</span>,
-        <span class="ident">OutputType::list</span>(<span class="ident">OutputType::object</span>(<span class="ident">object_type</span>)),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-            <span class="ident">tag</span>: <span class="ident">QueryTag::FindMany</span>,
-        }),
-    )
-}
-
-<span class="doccomment">/// Builds an &quot;aggregate&quot; query field (e.g. &quot;aggregateUser&quot;) for given model.</span>
-<span class="kw">fn</span> <span class="ident">plain_aggregation_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="ident">field</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;aggregate{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
-        <span class="ident">arguments::relation_selection_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="bool-val">false</span>),
-        <span class="ident">OutputType::object</span>(<span class="ident">aggregation::plain::aggregation_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>)),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-            <span class="ident">tag</span>: <span class="ident">QueryTag::Aggregate</span>,
+    field(
+        field_name,
+        args,
+        OutputType::list(OutputType::object(object_type)),
+        <span class="prelude-val">Some</span>(QueryInfo {
+            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            tag: QueryTag::FindMany,
         }),
     )
 }
 
-<span class="doccomment">/// Builds a &quot;group by&quot; aggregation query field (e.g. &quot;groupByUser&quot;) for given model.</span>
-<span class="kw">fn</span> <span class="ident">group_by_aggregation_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="ident">field</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;groupBy{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
-        <span class="ident">arguments::group_by_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>),
-        <span class="ident">OutputType::list</span>(<span class="ident">OutputType::object</span>(<span class="ident">aggregation::group_by::group_by_output_object_type</span>(
-            <span class="ident">ctx</span>, <span class="ident">model</span>,
+<span class="doccomment">/// Builds an &quot;aggregate&quot; query field (e.g. &quot;aggregateUser&quot;) for given model.
+</span><span class="kw">fn </span>plain_aggregation_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    field(
+        <span class="macro">format!</span>(<span class="string">&quot;aggregate{}&quot;</span>, model.name),
+        arguments::relation_selection_arguments(ctx, model, <span class="bool-val">false</span>),
+        OutputType::object(aggregation::plain::aggregation_object_type(ctx, model)),
+        <span class="prelude-val">Some</span>(QueryInfo {
+            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            tag: QueryTag::Aggregate,
+        }),
+    )
+}
+
+<span class="doccomment">/// Builds a &quot;group by&quot; aggregation query field (e.g. &quot;groupByUser&quot;) for given model.
+</span><span class="kw">fn </span>group_by_aggregation_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    field(
+        <span class="macro">format!</span>(<span class="string">&quot;groupBy{}&quot;</span>, model.name),
+        arguments::group_by_arguments(ctx, model),
+        OutputType::list(OutputType::object(aggregation::group_by::group_by_output_object_type(
+            ctx, model,
         ))),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-            <span class="ident">tag</span>: <span class="ident">QueryTag::GroupBy</span>,
+        <span class="prelude-val">Some</span>(QueryInfo {
+            model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+            tag: QueryTag::GroupBy,
         }),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">mongo_aggregate_raw_field</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;aggregate{}Raw&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
+<span class="kw">fn </span>mongo_aggregate_raw_field(model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;aggregate{}Raw&quot;</span>, model.name);
 
-    <span class="ident">field</span>(
-        <span class="ident">field_name</span>,
+    field(
+        field_name,
         <span class="macro">vec!</span>[
-            <span class="ident">input_field</span>(<span class="string">&quot;pipeline&quot;</span>, <span class="ident">InputType::list</span>(<span class="ident">InputType::json</span>()), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-            <span class="ident">input_field</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">InputType::json</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+            input_field(<span class="string">&quot;pipeline&quot;</span>, InputType::list(InputType::json()), <span class="prelude-val">None</span>).optional(),
+            input_field(<span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
         ],
-        <span class="ident">OutputType::json</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">tag</span>: <span class="ident">QueryTag::QueryRaw</span> {
-                <span class="ident">query_type</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>.<span class="ident">to_owned</span>()),
+        OutputType::json(),
+        <span class="prelude-val">Some</span>(QueryInfo {
+            tag: QueryTag::QueryRaw {
+                query_type: <span class="prelude-val">Some</span>(<span class="string">&quot;aggregateRaw&quot;</span>.to_owned()),
             },
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">clone</span>()),
+            model: <span class="prelude-val">Some</span>(model.clone()),
         }),
     )
 }
 
-<span class="kw">fn</span> <span class="ident">mongo_find_raw_field</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">OutputField</span> {
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;find{}Raw&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
+<span class="kw">fn </span>mongo_find_raw_field(model: <span class="kw-2">&amp;</span>ModelRef) -&gt; OutputField {
+    <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;find{}Raw&quot;</span>, model.name);
 
-    <span class="ident">field</span>(
-        <span class="ident">field_name</span>,
+    field(
+        field_name,
         <span class="macro">vec!</span>[
-            <span class="ident">input_field</span>(<span class="string">&quot;filter&quot;</span>, <span class="ident">InputType::json</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-            <span class="ident">input_field</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">InputType::json</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+            input_field(<span class="string">&quot;filter&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
+            input_field(<span class="string">&quot;options&quot;</span>, InputType::json(), <span class="prelude-val">None</span>).optional(),
         ],
-        <span class="ident">OutputType::json</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-            <span class="ident">tag</span>: <span class="ident">QueryTag::QueryRaw</span> {
-                <span class="ident">query_type</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>.<span class="ident">to_owned</span>()),
+        OutputType::json(),
+        <span class="prelude-val">Some</span>(QueryInfo {
+            tag: QueryTag::QueryRaw {
+                query_type: <span class="prelude-val">Some</span>(<span class="string">&quot;findRaw&quot;</span>.to_owned()),
             },
-            <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">model</span>.<span class="ident">clone</span>()),
+            model: <span class="prelude-val">Some</span>(model.clone()),
         }),
     )
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/builder/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/builder/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -826,833 +826,833 @@
 <span id="826">826</span>
 <span id="827">827</span>
 <span id="828">828</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Builder types to compose layers and services</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Builder types to compose layers and services
 
-<span class="kw">use</span> <span class="ident">tower_layer</span>::{<span class="ident">Identity</span>, <span class="ident">Layer</span>, <span class="ident">Stack</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+</span><span class="kw">use </span>tower_layer::{Identity, Layer, Stack};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Declaratively construct [`Service`] values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ServiceBuilder`] provides a [builder-like interface][builder] for composing</span>
-<span class="doccomment">/// layers to be applied to a [`Service`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Service</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [`Service`] is a trait representing an asynchronous function of a request</span>
-<span class="doccomment">/// to a response. It is similar to `async fn(Request) -&gt; Result&lt;Response, Error&gt;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [`Service`] is typically bound to a single transport, such as a TCP</span>
-<span class="doccomment">/// connection.  It defines how _all_ inbound or outbound requests are handled</span>
-<span class="doccomment">/// by that connection.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [builder]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Order</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The order in which layers are added impacts how requests are handled. Layers</span>
-<span class="doccomment">/// that are added first will be called with the request first. The argument to</span>
-<span class="doccomment">/// `service` will be last to see the request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # // this (and other) doctest is ignored because we don&#39;t have a way</span>
-<span class="doccomment">/// # // to say that it should only be run with cfg(feature = &quot;...&quot;)</span>
-<span class="doccomment">/// # use tower::Service;</span>
-<span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]</span>
-<span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-<span class="doccomment">/// ServiceBuilder::new()</span>
-<span class="doccomment">///     .buffer(100)</span>
-<span class="doccomment">///     .concurrency_limit(10)</span>
-<span class="doccomment">///     .service(svc)</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In the above example, the buffer layer receives the request first followed</span>
-<span class="doccomment">/// by `concurrency_limit`. `buffer` enables up to 100 request to be in-flight</span>
-<span class="doccomment">/// **on top of** the requests that have already been forwarded to the next</span>
-<span class="doccomment">/// layer. Combined with `concurrency_limit`, this allows up to 110 requests to be</span>
-<span class="doccomment">/// in-flight.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tower::Service;</span>
-<span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]</span>
-<span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-<span class="doccomment">/// ServiceBuilder::new()</span>
-<span class="doccomment">///     .concurrency_limit(10)</span>
-<span class="doccomment">///     .buffer(100)</span>
-<span class="doccomment">///     .service(svc)</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The above example is similar, but the order of layers is reversed. Now,</span>
-<span class="doccomment">/// `concurrency_limit` applies first and only allows 10 requests to be in-flight</span>
-<span class="doccomment">/// total.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [`Service`] stack with a single layer:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tower::Service;</span>
-<span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;limit&quot;)]</span>
-<span class="doccomment">/// # use tower::limit::concurrency::ConcurrencyLimitLayer;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;limit&quot;)]</span>
-<span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-<span class="doccomment">/// ServiceBuilder::new()</span>
-<span class="doccomment">///     .concurrency_limit(5)</span>
-<span class="doccomment">///     .service(svc);</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [`Service`] stack with _multiple_ layers that contain rate limiting,</span>
-<span class="doccomment">/// in-flight request limits, and a channel-backed, clonable [`Service`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tower::Service;</span>
-<span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-<span class="doccomment">/// # use std::time::Duration;</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]</span>
-<span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-<span class="doccomment">/// ServiceBuilder::new()</span>
-<span class="doccomment">///     .buffer(5)</span>
-<span class="doccomment">///     .concurrency_limit(5)</span>
-<span class="doccomment">///     .rate_limit(5, Duration::from_secs(1))</span>
-<span class="doccomment">///     .service(svc);</span>
-<span class="doccomment">/// # ;</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Service`]: crate::Service</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="ident">layer</span>: <span class="ident">L</span>,
+<span class="doccomment">/// Declaratively construct [`Service`] values.
+///
+/// [`ServiceBuilder`] provides a [builder-like interface][builder] for composing
+/// layers to be applied to a [`Service`].
+///
+/// # Service
+///
+/// A [`Service`] is a trait representing an asynchronous function of a request
+/// to a response. It is similar to `async fn(Request) -&gt; Result&lt;Response, Error&gt;`.
+///
+/// A [`Service`] is typically bound to a single transport, such as a TCP
+/// connection.  It defines how _all_ inbound or outbound requests are handled
+/// by that connection.
+///
+/// [builder]: https://doc.rust-lang.org/1.0.0/style/ownership/builders.html
+///
+/// # Order
+///
+/// The order in which layers are added impacts how requests are handled. Layers
+/// that are added first will be called with the request first. The argument to
+/// `service` will be last to see the request.
+///
+/// ```
+/// # // this (and other) doctest is ignored because we don&#39;t have a way
+/// # // to say that it should only be run with cfg(feature = &quot;...&quot;)
+/// # use tower::Service;
+/// # use tower::builder::ServiceBuilder;
+/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]
+/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+/// ServiceBuilder::new()
+///     .buffer(100)
+///     .concurrency_limit(10)
+///     .service(svc)
+/// # ;
+/// # }
+/// ```
+///
+/// In the above example, the buffer layer receives the request first followed
+/// by `concurrency_limit`. `buffer` enables up to 100 request to be in-flight
+/// **on top of** the requests that have already been forwarded to the next
+/// layer. Combined with `concurrency_limit`, this allows up to 110 requests to be
+/// in-flight.
+///
+/// ```
+/// # use tower::Service;
+/// # use tower::builder::ServiceBuilder;
+/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]
+/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+/// ServiceBuilder::new()
+///     .concurrency_limit(10)
+///     .buffer(100)
+///     .service(svc)
+/// # ;
+/// # }
+/// ```
+///
+/// The above example is similar, but the order of layers is reversed. Now,
+/// `concurrency_limit` applies first and only allows 10 requests to be in-flight
+/// total.
+///
+/// # Examples
+///
+/// A [`Service`] stack with a single layer:
+///
+/// ```
+/// # use tower::Service;
+/// # use tower::builder::ServiceBuilder;
+/// # #[cfg(feature = &quot;limit&quot;)]
+/// # use tower::limit::concurrency::ConcurrencyLimitLayer;
+/// # #[cfg(feature = &quot;limit&quot;)]
+/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+/// ServiceBuilder::new()
+///     .concurrency_limit(5)
+///     .service(svc);
+/// # ;
+/// # }
+/// ```
+///
+/// A [`Service`] stack with _multiple_ layers that contain rate limiting,
+/// in-flight request limits, and a channel-backed, clonable [`Service`]:
+///
+/// ```
+/// # use tower::Service;
+/// # use tower::builder::ServiceBuilder;
+/// # use std::time::Duration;
+/// # #[cfg(all(feature = &quot;buffer&quot;, feature = &quot;limit&quot;))]
+/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+/// ServiceBuilder::new()
+///     .buffer(5)
+///     .concurrency_limit(5)
+///     .rate_limit(5, Duration::from_secs(1))
+///     .service(svc);
+/// # ;
+/// # }
+/// ```
+///
+/// [`Service`]: crate::Service
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>ServiceBuilder&lt;L&gt; {
+    layer: L,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>ServiceBuilder&lt;Identity&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new [`ServiceBuilder`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ServiceBuilder</span> {
-            <span class="ident">layer</span>: <span class="ident">Identity::new</span>(),
+<span class="kw">impl </span>ServiceBuilder&lt;Identity&gt; {
+    <span class="doccomment">/// Create a new [`ServiceBuilder`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        ServiceBuilder {
+            layer: Identity::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add a new layer `T` into the [`ServiceBuilder`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with the service provided by a user-defined</span>
-    <span class="doccomment">/// [`Layer`]. The provided layer must implement the [`Layer`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::Layer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">layer</span>: <span class="ident">T</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">ServiceBuilder</span> {
-            <span class="ident">layer</span>: <span class="ident">Stack::new</span>(<span class="ident">layer</span>, <span class="self">self</span>.<span class="ident">layer</span>),
+<span class="kw">impl</span>&lt;L&gt; ServiceBuilder&lt;L&gt; {
+    <span class="doccomment">/// Add a new layer `T` into the [`ServiceBuilder`].
+    ///
+    /// This wraps the inner service with the service provided by a user-defined
+    /// [`Layer`]. The provided layer must implement the [`Layer`] trait.
+    ///
+    /// [`Layer`]: crate::Layer
+    </span><span class="kw">pub fn </span>layer&lt;T&gt;(<span class="self">self</span>, layer: T) -&gt; ServiceBuilder&lt;Stack&lt;T, L&gt;&gt; {
+        ServiceBuilder {
+            layer: Stack::new(layer, <span class="self">self</span>.layer),
         }
     }
 
-    <span class="doccomment">/// Optionally add a new layer `T` into the [`ServiceBuilder`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # use tower::Service;</span>
-    <span class="doccomment">/// # use tower::builder::ServiceBuilder;</span>
-    <span class="doccomment">/// # use tower::timeout::TimeoutLayer;</span>
-    <span class="doccomment">/// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {</span>
-    <span class="doccomment">/// # let timeout = Some(Duration::new(10, 0));</span>
-    <span class="doccomment">/// // Apply a timeout if configured</span>
-    <span class="doccomment">/// ServiceBuilder::new()</span>
-    <span class="doccomment">///     .option_layer(timeout.map(TimeoutLayer::new))</span>
-    <span class="doccomment">///     .service(svc)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option_layer</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Optionally add a new layer `T` into the [`ServiceBuilder`].
+    ///
+    /// ```
+    /// # use std::time::Duration;
+    /// # use tower::Service;
+    /// # use tower::builder::ServiceBuilder;
+    /// # use tower::timeout::TimeoutLayer;
+    /// # async fn wrap&lt;S&gt;(svc: S) where S: Service&lt;(), Error = &amp;&#39;static str&gt; + &#39;static + Send, S::Future: Send {
+    /// # let timeout = Some(Duration::new(10, 0));
+    /// // Apply a timeout if configured
+    /// ServiceBuilder::new()
+    ///     .option_layer(timeout.map(TimeoutLayer::new))
+    ///     .service(svc)
+    /// # ;
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>option_layer&lt;T&gt;(
         <span class="self">self</span>,
-        <span class="ident">layer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::Either</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Identity</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::option_layer</span>(<span class="ident">layer</span>))
+        layer: <span class="prelude-ty">Option</span>&lt;T&gt;,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::Either&lt;T, Identity&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::option_layer(layer))
     }
 
-    <span class="doccomment">/// Add a [`Layer`] built from a function that accepts a service and returns another service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for [`layer_fn`] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`layer_fn`]: crate::layer::layer_fn</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">layer_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::layer::LayerFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::layer::layer_fn</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Add a [`Layer`] built from a function that accepts a service and returns another service.
+    ///
+    /// See the documentation for [`layer_fn`] for more details.
+    ///
+    /// [`layer_fn`]: crate::layer::layer_fn
+    </span><span class="kw">pub fn </span>layer_fn&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::layer::LayerFn&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::layer::layer_fn(f))
     }
 
-    <span class="doccomment">/// Buffer requests when the next layer is not ready.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`Buffer`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Buffer`]: crate::buffer</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;buffer&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;buffer&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Buffer requests when the next layer is not ready.
+    ///
+    /// This wraps the inner service with an instance of the [`Buffer`]
+    /// middleware.
+    ///
+    /// [`Buffer`]: crate::buffer
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;buffer&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;buffer&quot;</span>)))]
+    </span><span class="kw">pub fn </span>buffer&lt;Request&gt;(
         <span class="self">self</span>,
-        <span class="ident">bound</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::buffer::BufferLayer</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::buffer::BufferLayer::new</span>(<span class="ident">bound</span>))
+        bound: usize,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::buffer::BufferLayer&lt;Request&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::buffer::BufferLayer::new(bound))
     }
 
-    <span class="doccomment">/// Limit the max number of in-flight requests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A request is in-flight from the time the request is received until the</span>
-    <span class="doccomment">/// response future completes. This includes the time spent in the next</span>
-    <span class="doccomment">/// layers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the</span>
-    <span class="doccomment">/// [`ConcurrencyLimit`] middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ConcurrencyLimit`]: crate::limit::concurrency</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">concurrency_limit</span>(
+    <span class="doccomment">/// Limit the max number of in-flight requests.
+    ///
+    /// A request is in-flight from the time the request is received until the
+    /// response future completes. This includes the time spent in the next
+    /// layers.
+    ///
+    /// This wraps the inner service with an instance of the
+    /// [`ConcurrencyLimit`] middleware.
+    ///
+    /// [`ConcurrencyLimit`]: crate::limit::concurrency
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;limit&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;limit&quot;</span>)))]
+    </span><span class="kw">pub fn </span>concurrency_limit(
         <span class="self">self</span>,
-        <span class="ident">max</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::ConcurrencyLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::limit::ConcurrencyLimitLayer::new</span>(<span class="ident">max</span>))
+        max: usize,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::limit::ConcurrencyLimitLayer, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::limit::ConcurrencyLimitLayer::new(max))
     }
 
-    <span class="doccomment">/// Drop requests when the next layer is unable to respond to requests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Usually, when a service or middleware does not have capacity to process a</span>
-    <span class="doccomment">/// request (i.e., [`poll_ready`] returns [`Pending`]), the caller waits until</span>
-    <span class="doccomment">/// capacity becomes available.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LoadShed`] immediately responds with an error when the next layer is</span>
-    <span class="doccomment">/// out of capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`LoadShed`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LoadShed`]: crate::load_shed</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">/// [`Pending`]: std::task::Poll::Pending</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load-shed&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_shed</span>(<span class="self">self</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::load_shed::LoadShedLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::load_shed::LoadShedLayer::new</span>())
+    <span class="doccomment">/// Drop requests when the next layer is unable to respond to requests.
+    ///
+    /// Usually, when a service or middleware does not have capacity to process a
+    /// request (i.e., [`poll_ready`] returns [`Pending`]), the caller waits until
+    /// capacity becomes available.
+    ///
+    /// [`LoadShed`] immediately responds with an error when the next layer is
+    /// out of capacity.
+    ///
+    /// This wraps the inner service with an instance of the [`LoadShed`]
+    /// middleware.
+    ///
+    /// [`LoadShed`]: crate::load_shed
+    /// [`poll_ready`]: crate::Service::poll_ready
+    /// [`Pending`]: std::task::Poll::Pending
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;load-shed&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;load-shed&quot;</span>)))]
+    </span><span class="kw">pub fn </span>load_shed(<span class="self">self</span>) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::load_shed::LoadShedLayer, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::load_shed::LoadShedLayer::new())
     }
 
-    <span class="doccomment">/// Limit requests to at most `num` per the given duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`RateLimit`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RateLimit`]: crate::limit::rate</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;limit&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit</span>(
+    <span class="doccomment">/// Limit requests to at most `num` per the given duration.
+    ///
+    /// This wraps the inner service with an instance of the [`RateLimit`]
+    /// middleware.
+    ///
+    /// [`RateLimit`]: crate::limit::rate
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;limit&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;limit&quot;</span>)))]
+    </span><span class="kw">pub fn </span>rate_limit(
         <span class="self">self</span>,
-        <span class="ident">num</span>: <span class="ident">u64</span>,
-        <span class="ident">per</span>: <span class="ident">std::time::Duration</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::limit::RateLimitLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::limit::RateLimitLayer::new</span>(<span class="ident">num</span>, <span class="ident">per</span>))
+        num: u64,
+        per: std::time::Duration,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::limit::RateLimitLayer, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::limit::RateLimitLayer::new(num, per))
     }
 
-    <span class="doccomment">/// Retry failed requests according to the given [retry policy][policy].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `policy` determines which failed requests will be retried. It must</span>
-    <span class="doccomment">/// implement the [`retry::Policy`][policy] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`Retry`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Retry`]: crate::retry</span>
-    <span class="doccomment">/// [policy]: crate::retry::Policy</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;retry&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">policy</span>: <span class="ident">P</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::retry::RetryLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::retry::RetryLayer::new</span>(<span class="ident">policy</span>))
+    <span class="doccomment">/// Retry failed requests according to the given [retry policy][policy].
+    ///
+    /// `policy` determines which failed requests will be retried. It must
+    /// implement the [`retry::Policy`][policy] trait.
+    ///
+    /// This wraps the inner service with an instance of the [`Retry`]
+    /// middleware.
+    ///
+    /// [`Retry`]: crate::retry
+    /// [policy]: crate::retry::Policy
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;retry&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;retry&quot;</span>)))]
+    </span><span class="kw">pub fn </span>retry&lt;P&gt;(<span class="self">self</span>, policy: P) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::retry::RetryLayer&lt;P&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::retry::RetryLayer::new(policy))
     }
 
-    <span class="doccomment">/// Fail requests that take longer than `timeout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the next layer takes more than `timeout` to respond to a request,</span>
-    <span class="doccomment">/// processing is terminated and an error is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`timeout`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`timeout`]: crate::timeout</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;timeout&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(
+    <span class="doccomment">/// Fail requests that take longer than `timeout`.
+    ///
+    /// If the next layer takes more than `timeout` to respond to a request,
+    /// processing is terminated and an error is returned.
+    ///
+    /// This wraps the inner service with an instance of the [`timeout`]
+    /// middleware.
+    ///
+    /// [`timeout`]: crate::timeout
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;timeout&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;timeout&quot;</span>)))]
+    </span><span class="kw">pub fn </span>timeout(
         <span class="self">self</span>,
-        <span class="ident">timeout</span>: <span class="ident">std::time::Duration</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::timeout::TimeoutLayer</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::timeout::TimeoutLayer::new</span>(<span class="ident">timeout</span>))
+        timeout: std::time::Duration,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::timeout::TimeoutLayer, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::timeout::TimeoutLayer::new(timeout))
     }
 
-    <span class="doccomment">/// Conditionally reject requests based on `predicate`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `predicate` must implement the [`Predicate`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`Filter`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::filter</span>
-    <span class="doccomment">/// [`Predicate`]: crate::filter::Predicate</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Conditionally reject requests based on `predicate`.
+    ///
+    /// `predicate` must implement the [`Predicate`] trait.
+    ///
+    /// This wraps the inner service with an instance of the [`Filter`]
+    /// middleware.
+    ///
+    /// [`Filter`]: crate::filter
+    /// [`Predicate`]: crate::filter::Predicate
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;filter&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;filter&quot;</span>)))]
+    </span><span class="kw">pub fn </span>filter&lt;P&gt;(
         <span class="self">self</span>,
-        <span class="ident">predicate</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::FilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::filter::FilterLayer::new</span>(<span class="ident">predicate</span>))
+        predicate: P,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::filter::FilterLayer&lt;P&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::filter::FilterLayer::new(predicate))
     }
 
-    <span class="doccomment">/// Conditionally reject requests based on an asynchronous `predicate`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `predicate` must implement the [`AsyncPredicate`] trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`AsyncFilter`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncFilter`]: crate::filter::AsyncFilter</span>
-    <span class="doccomment">/// [`AsyncPredicate`]: crate::filter::AsyncPredicate</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;filter&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_async</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Conditionally reject requests based on an asynchronous `predicate`.
+    ///
+    /// `predicate` must implement the [`AsyncPredicate`] trait.
+    ///
+    /// This wraps the inner service with an instance of the [`AsyncFilter`]
+    /// middleware.
+    ///
+    /// [`AsyncFilter`]: crate::filter::AsyncFilter
+    /// [`AsyncPredicate`]: crate::filter::AsyncPredicate
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;filter&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;filter&quot;</span>)))]
+    </span><span class="kw">pub fn </span>filter_async&lt;P&gt;(
         <span class="self">self</span>,
-        <span class="ident">predicate</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::filter::AsyncFilterLayer</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::filter::AsyncFilterLayer::new</span>(<span class="ident">predicate</span>))
+        predicate: P,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::filter::AsyncFilterLayer&lt;P&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::filter::AsyncFilterLayer::new(predicate))
     }
 
-    <span class="doccomment">/// Map one request type to another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`MapRequest`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Changing the type of a request:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">/// use tower::ServiceExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), ()&gt; {</span>
-    <span class="doccomment">/// // Suppose we have some `Service` whose request type is `String`:</span>
-    <span class="doccomment">/// let string_svc = tower::service_fn(|request: String| async move {</span>
-    <span class="doccomment">///     println!(&quot;request: {}&quot;, request);</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // ...but we want to call that service with a `usize`. What do we do?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let usize_svc = ServiceBuilder::new()</span>
-    <span class="doccomment">///      // Add a middlware that converts the request type to a `String`:</span>
-    <span class="doccomment">///     .map_request(|request: usize| format!(&quot;{}&quot;, request))</span>
-    <span class="doccomment">///     // ...and wrap the string service with that middleware:</span>
-    <span class="doccomment">///     .service(string_svc);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, we can call that service with a `usize`:</span>
-    <span class="doccomment">/// usize_svc.oneshot(42).await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Modifying the request value:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">/// use tower::ServiceExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), ()&gt; {</span>
-    <span class="doccomment">/// // A service that takes a number and returns it:</span>
-    <span class="doccomment">/// let svc = tower::service_fn(|request: usize| async move {</span>
-    <span class="doccomment">///    Ok(request)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let svc = ServiceBuilder::new()</span>
-    <span class="doccomment">///      // Add a middleware that adds 1 to each request</span>
-    <span class="doccomment">///     .map_request(|request: usize| request + 1)</span>
-    <span class="doccomment">///     .service(svc);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let response = svc.oneshot(1).await?;</span>
-    <span class="doccomment">/// assert_eq!(response, 2);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MapRequest`]: crate::util::MapRequest</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_request</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R1</span>, <span class="ident">R2</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Map one request type to another.
+    ///
+    /// This wraps the inner service with an instance of the [`MapRequest`]
+    /// middleware.
+    ///
+    /// # Examples
+    ///
+    /// Changing the type of a request:
+    ///
+    /// ```rust
+    /// use tower::ServiceBuilder;
+    /// use tower::ServiceExt;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), ()&gt; {
+    /// // Suppose we have some `Service` whose request type is `String`:
+    /// let string_svc = tower::service_fn(|request: String| async move {
+    ///     println!(&quot;request: {}&quot;, request);
+    ///     Ok(())
+    /// });
+    ///
+    /// // ...but we want to call that service with a `usize`. What do we do?
+    ///
+    /// let usize_svc = ServiceBuilder::new()
+    ///      // Add a middlware that converts the request type to a `String`:
+    ///     .map_request(|request: usize| format!(&quot;{}&quot;, request))
+    ///     // ...and wrap the string service with that middleware:
+    ///     .service(string_svc);
+    ///
+    /// // Now, we can call that service with a `usize`:
+    /// usize_svc.oneshot(42).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Modifying the request value:
+    ///
+    /// ```rust
+    /// use tower::ServiceBuilder;
+    /// use tower::ServiceExt;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), ()&gt; {
+    /// // A service that takes a number and returns it:
+    /// let svc = tower::service_fn(|request: usize| async move {
+    ///    Ok(request)
+    /// });
+    ///
+    /// let svc = ServiceBuilder::new()
+    ///      // Add a middleware that adds 1 to each request
+    ///     .map_request(|request: usize| request + 1)
+    ///     .service(svc);
+    ///
+    /// let response = svc.oneshot(1).await?;
+    /// assert_eq!(response, 2);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`MapRequest`]: crate::util::MapRequest
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>map_request&lt;F, R1, R2&gt;(
         <span class="self">self</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapRequestLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">R1</span>) -&gt; <span class="ident">R2</span> <span class="op">+</span> <span class="ident">Clone</span>,
+        f: F,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::MapRequestLayer&lt;F&gt;, L&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(R1) -&gt; R2 + Clone,
     {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapRequestLayer::new</span>(<span class="ident">f</span>))
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::MapRequestLayer::new(f))
     }
 
-    <span class="doccomment">/// Map one response type to another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`MapResponse`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`map_response` combinator] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MapResponse`]: crate::util::MapResponse</span>
-    <span class="doccomment">/// [`map_response` combinator]: crate::util::ServiceExt::map_response</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Map one response type to another.
+    ///
+    /// This wraps the inner service with an instance of the [`MapResponse`]
+    /// middleware.
+    ///
+    /// See the documentation for the [`map_response` combinator] for details.
+    ///
+    /// [`MapResponse`]: crate::util::MapResponse
+    /// [`map_response` combinator]: crate::util::ServiceExt::map_response
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>map_response&lt;F&gt;(
         <span class="self">self</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResponseLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapResponseLayer::new</span>(<span class="ident">f</span>))
+        f: F,
+    ) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::MapResponseLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::MapResponseLayer::new(f))
     }
 
-    <span class="doccomment">/// Map one error type to another.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`MapErr`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`map_err` combinator] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MapErr`]: crate::util::MapErr</span>
-    <span class="doccomment">/// [`map_err` combinator]: crate::util::ServiceExt::map_err</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_err</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapErrLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapErrLayer::new</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Map one error type to another.
+    ///
+    /// This wraps the inner service with an instance of the [`MapErr`]
+    /// middleware.
+    ///
+    /// See the documentation for the [`map_err` combinator] for details.
+    ///
+    /// [`MapErr`]: crate::util::MapErr
+    /// [`map_err` combinator]: crate::util::ServiceExt::map_err
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>map_err&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::MapErrLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::MapErrLayer::new(f))
     }
 
-    <span class="doccomment">/// Composes a function that transforms futures produced by the service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`MapFutureLayer`] middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`map_future`] combinator for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MapFutureLayer`]: crate::util::MapFutureLayer</span>
-    <span class="doccomment">/// [`map_future`]: crate::util::ServiceExt::map_future</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_future</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapFutureLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapFutureLayer::new</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Composes a function that transforms futures produced by the service.
+    ///
+    /// This wraps the inner service with an instance of the [`MapFutureLayer`] middleware.
+    ///
+    /// See the documentation for the [`map_future`] combinator for details.
+    ///
+    /// [`MapFutureLayer`]: crate::util::MapFutureLayer
+    /// [`map_future`]: crate::util::ServiceExt::map_future
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>map_future&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::MapFutureLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::MapFutureLayer::new(f))
     }
 
-    <span class="doccomment">/// Apply an asynchronous function after the service, regardless of whether the future</span>
-    <span class="doccomment">/// succeeds or fails.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`Then`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is similar to the [`map_response`] and [`map_err`] functions,</span>
-    <span class="doccomment">/// except that the *same* function is invoked when the service&#39;s future</span>
-    <span class="doccomment">/// completes, whether it completes successfully or fails. This function</span>
-    <span class="doccomment">/// takes the [`Result`] returned by the service&#39;s future, and returns a</span>
-    <span class="doccomment">/// [`Result`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`then` combinator] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Then`]: crate::util::Then</span>
-    <span class="doccomment">/// [`then` combinator]: crate::util::ServiceExt::then</span>
-    <span class="doccomment">/// [`map_response`]: ServiceBuilder::map_response</span>
-    <span class="doccomment">/// [`map_err`]: ServiceBuilder::map_err</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::ThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::ThenLayer::new</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Apply an asynchronous function after the service, regardless of whether the future
+    /// succeeds or fails.
+    ///
+    /// This wraps the inner service with an instance of the [`Then`]
+    /// middleware.
+    ///
+    /// This is similar to the [`map_response`] and [`map_err`] functions,
+    /// except that the *same* function is invoked when the service&#39;s future
+    /// completes, whether it completes successfully or fails. This function
+    /// takes the [`Result`] returned by the service&#39;s future, and returns a
+    /// [`Result`].
+    ///
+    /// See the documentation for the [`then` combinator] for details.
+    ///
+    /// [`Then`]: crate::util::Then
+    /// [`then` combinator]: crate::util::ServiceExt::then
+    /// [`map_response`]: ServiceBuilder::map_response
+    /// [`map_err`]: ServiceBuilder::map_err
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>then&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::ThenLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::ThenLayer::new(f))
     }
 
-    <span class="doccomment">/// Executes a new future after this service&#39;s future resolves. This does</span>
-    <span class="doccomment">/// not alter the behaviour of the [`poll_ready`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to change the [`Response`] type of the service</span>
-    <span class="doccomment">/// into a different type. You can use this method to chain along a computation once the</span>
-    <span class="doccomment">/// service&#39;s response has been resolved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`AndThen`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`and_then` combinator] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Response`]: crate::Service::Response</span>
-    <span class="doccomment">/// [`poll_ready`]: crate::Service::poll_ready</span>
-    <span class="doccomment">/// [`and_then` combinator]: crate::util::ServiceExt::and_then</span>
-    <span class="doccomment">/// [`AndThen`]: crate::util::AndThen</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::AndThenLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::AndThenLayer::new</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Executes a new future after this service&#39;s future resolves. This does
+    /// not alter the behaviour of the [`poll_ready`] method.
+    ///
+    /// This method can be used to change the [`Response`] type of the service
+    /// into a different type. You can use this method to chain along a computation once the
+    /// service&#39;s response has been resolved.
+    ///
+    /// This wraps the inner service with an instance of the [`AndThen`]
+    /// middleware.
+    ///
+    /// See the documentation for the [`and_then` combinator] for details.
+    ///
+    /// [`Response`]: crate::Service::Response
+    /// [`poll_ready`]: crate::Service::poll_ready
+    /// [`and_then` combinator]: crate::util::ServiceExt::and_then
+    /// [`AndThen`]: crate::util::AndThen
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>and_then&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::AndThenLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::AndThenLayer::new(f))
     }
 
-    <span class="doccomment">/// Maps this service&#39;s result type (`Result&lt;Self::Response, Self::Error&gt;`)</span>
-    <span class="doccomment">/// to a different value, regardless of whether the future succeeds or</span>
-    <span class="doccomment">/// fails.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This wraps the inner service with an instance of the [`MapResult`]</span>
-    <span class="doccomment">/// middleware.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation for the [`map_result` combinator] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`map_result` combinator]: crate::util::ServiceExt::map_result</span>
-    <span class="doccomment">/// [`MapResult`]: crate::util::MapResult</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_result</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">Stack</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::MapResultLayer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::MapResultLayer::new</span>(<span class="ident">f</span>))
+    <span class="doccomment">/// Maps this service&#39;s result type (`Result&lt;Self::Response, Self::Error&gt;`)
+    /// to a different value, regardless of whether the future succeeds or
+    /// fails.
+    ///
+    /// This wraps the inner service with an instance of the [`MapResult`]
+    /// middleware.
+    ///
+    /// See the documentation for the [`map_result` combinator] for details.
+    ///
+    /// [`map_result` combinator]: crate::util::ServiceExt::map_result
+    /// [`MapResult`]: crate::util::MapResult
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>map_result&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; ServiceBuilder&lt;Stack&lt;<span class="kw">crate</span>::util::MapResultLayer&lt;F&gt;, L&gt;&gt; {
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::MapResultLayer::new(f))
     }
 
-    <span class="doccomment">/// Returns the underlying `Layer` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">L</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>
+    <span class="doccomment">/// Returns the underlying `Layer` implementation.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; L {
+        <span class="self">self</span>.layer
     }
 
-    <span class="doccomment">/// Wrap the service `S` with the middleware provided by this</span>
-    <span class="doccomment">/// [`ServiceBuilder`]&#39;s [`Layer`]&#39;s, returning a new [`Service`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::Layer</span>
-    <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">service</span>: <span class="ident">S</span>) -&gt; <span class="ident">L::Service</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Wrap the service `S` with the middleware provided by this
+    /// [`ServiceBuilder`]&#39;s [`Layer`]&#39;s, returning a new [`Service`].
+    ///
+    /// [`Layer`]: crate::Layer
+    /// [`Service`]: crate::Service
+    </span><span class="kw">pub fn </span>service&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, service: S) -&gt; L::Service
+    <span class="kw">where
+        </span>L: Layer&lt;S&gt;,
     {
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">layer</span>(<span class="ident">service</span>)
+        <span class="self">self</span>.layer.layer(service)
     }
 
-    <span class="doccomment">/// Wrap the async function `F` with the middleware provided by this [`ServiceBuilder`]&#39;s</span>
-    <span class="doccomment">/// [`Layer`]s, returning a new [`Service`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a convenience method which is equivalent to calling</span>
-    <span class="doccomment">/// [`ServiceBuilder::service`] with a [`service_fn`], like this:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tower::{ServiceBuilder, service_fn};</span>
-    <span class="doccomment">/// # async fn handler_fn(_: ()) -&gt; Result&lt;(), ()&gt; { Ok(()) }</span>
-    <span class="doccomment">/// # let _ = {</span>
-    <span class="doccomment">/// ServiceBuilder::new()</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">///     .service(service_fn(handler_fn))</span>
-    <span class="doccomment">/// # };</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// use tower::{ServiceBuilder, ServiceExt, BoxError, service_fn};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), BoxError&gt; {</span>
-    <span class="doccomment">/// async fn handle(request: &amp;&#39;static str) -&gt; Result&lt;&amp;&#39;static str, BoxError&gt; {</span>
-    <span class="doccomment">///    Ok(request)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let svc = ServiceBuilder::new()</span>
-    <span class="doccomment">///     .buffer(1024)</span>
-    <span class="doccomment">///     .timeout(Duration::from_secs(10))</span>
-    <span class="doccomment">///     .service_fn(handle);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let response = svc.oneshot(&quot;foo&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(response, &quot;foo&quot;);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Layer`]: crate::Layer</span>
-    <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="doccomment">/// [`service_fn`]: crate::service_fn</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">service_fn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">L::Service</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::util::ServiceFn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Wrap the async function `F` with the middleware provided by this [`ServiceBuilder`]&#39;s
+    /// [`Layer`]s, returning a new [`Service`].
+    ///
+    /// This is a convenience method which is equivalent to calling
+    /// [`ServiceBuilder::service`] with a [`service_fn`], like this:
+    ///
+    /// ```rust
+    /// # use tower::{ServiceBuilder, service_fn};
+    /// # async fn handler_fn(_: ()) -&gt; Result&lt;(), ()&gt; { Ok(()) }
+    /// # let _ = {
+    /// ServiceBuilder::new()
+    ///     // ...
+    ///     .service(service_fn(handler_fn))
+    /// # };
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use std::time::Duration;
+    /// use tower::{ServiceBuilder, ServiceExt, BoxError, service_fn};
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), BoxError&gt; {
+    /// async fn handle(request: &amp;&#39;static str) -&gt; Result&lt;&amp;&#39;static str, BoxError&gt; {
+    ///    Ok(request)
+    /// }
+    ///
+    /// let svc = ServiceBuilder::new()
+    ///     .buffer(1024)
+    ///     .timeout(Duration::from_secs(10))
+    ///     .service_fn(handle);
+    ///
+    /// let response = svc.oneshot(&quot;foo&quot;).await?;
+    ///
+    /// assert_eq!(response, &quot;foo&quot;);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Layer`]: crate::Layer
+    /// [`Service`]: crate::Service
+    /// [`service_fn`]: crate::service_fn
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>service_fn&lt;F&gt;(<span class="self">self</span>, f: F) -&gt; L::Service
+    <span class="kw">where
+        </span>L: Layer&lt;<span class="kw">crate</span>::util::ServiceFn&lt;F&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">service</span>(<span class="ident"><span class="kw">crate</span>::util::service_fn</span>(<span class="ident">f</span>))
+        <span class="self">self</span>.service(<span class="kw">crate</span>::util::service_fn(f))
     }
 
-    <span class="doccomment">/// Check that the builder implements `Clone`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Doesn&#39;t actually change the builder but serves as a type check.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = ServiceBuilder::new()</span>
-    <span class="doccomment">///     // Do something before processing the request</span>
-    <span class="doccomment">///     .map_request(|request: String| {</span>
-    <span class="doccomment">///         println!(&quot;got request!&quot;);</span>
-    <span class="doccomment">///         request</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     // Ensure our `ServiceBuilder` can be cloned</span>
-    <span class="doccomment">///     .check_clone()</span>
-    <span class="doccomment">///     // Do something after processing the request</span>
-    <span class="doccomment">///     .map_response(|response: String| {</span>
-    <span class="doccomment">///         println!(&quot;got response!&quot;);</span>
-    <span class="doccomment">///         response</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_clone</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Check that the builder implements `Clone`.
+    ///
+    /// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.
+    ///
+    /// Doesn&#39;t actually change the builder but serves as a type check.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use tower::ServiceBuilder;
+    ///
+    /// let builder = ServiceBuilder::new()
+    ///     // Do something before processing the request
+    ///     .map_request(|request: String| {
+    ///         println!(&quot;got request!&quot;);
+    ///         request
+    ///     })
+    ///     // Ensure our `ServiceBuilder` can be cloned
+    ///     .check_clone()
+    ///     // Do something after processing the request
+    ///     .map_response(|response: String| {
+    ///         println!(&quot;got response!&quot;);
+    ///         response
+    ///     });
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>check_clone(<span class="self">self</span>) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: Clone,
     {
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Check that the builder when given a service of type `S` produces a service that implements</span>
-    <span class="doccomment">/// `Clone`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Doesn&#39;t actually change the builder but serves as a type check.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # #[derive(Clone)]</span>
-    <span class="doccomment">/// # struct MyService;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// let builder = ServiceBuilder::new()</span>
-    <span class="doccomment">///     // Do something before processing the request</span>
-    <span class="doccomment">///     .map_request(|request: String| {</span>
-    <span class="doccomment">///         println!(&quot;got request!&quot;);</span>
-    <span class="doccomment">///         request</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///     // Ensure that the service produced when given a `MyService` implements</span>
-    <span class="doccomment">///     .check_service_clone::&lt;MyService&gt;()</span>
-    <span class="doccomment">///     // Do something after processing the request</span>
-    <span class="doccomment">///     .map_response(|response: String| {</span>
-    <span class="doccomment">///         println!(&quot;got response!&quot;);</span>
-    <span class="doccomment">///         response</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service_clone</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Check that the builder when given a service of type `S` produces a service that implements
+    /// `Clone`.
+    ///
+    /// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.
+    ///
+    /// Doesn&#39;t actually change the builder but serves as a type check.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use tower::ServiceBuilder;
+    ///
+    /// # #[derive(Clone)]
+    /// # struct MyService;
+    /// #
+    /// let builder = ServiceBuilder::new()
+    ///     // Do something before processing the request
+    ///     .map_request(|request: String| {
+    ///         println!(&quot;got request!&quot;);
+    ///         request
+    ///     })
+    ///     // Ensure that the service produced when given a `MyService` implements
+    ///     .check_service_clone::&lt;MyService&gt;()
+    ///     // Do something after processing the request
+    ///     .map_response(|response: String| {
+    ///         println!(&quot;got response!&quot;);
+    ///         response
+    ///     });
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>check_service_clone&lt;S&gt;(<span class="self">self</span>) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>L: Layer&lt;S&gt;,
+        L::Service: Clone,
     {
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Check that the builder when given a service of type `S` produces a service with the given</span>
-    <span class="doccomment">/// request, response, and error types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Doesn&#39;t actually change the builder but serves as a type check.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tower::ServiceBuilder;</span>
-    <span class="doccomment">/// use std::task::{Poll, Context};</span>
-    <span class="doccomment">/// use tower::{Service, ServiceExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // An example service</span>
-    <span class="doccomment">/// struct MyService;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl Service&lt;Request&gt; for MyService {</span>
-    <span class="doccomment">///   type Response = Response;</span>
-    <span class="doccomment">///   type Error = Error;</span>
-    <span class="doccomment">///   type Future = futures_util::future::Ready&lt;Result&lt;Response, Error&gt;&gt;;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-    <span class="doccomment">///       // ...</span>
-    <span class="doccomment">///       # todo!()</span>
-    <span class="doccomment">///   }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   fn call(&amp;mut self, request: Request) -&gt; Self::Future {</span>
-    <span class="doccomment">///       // ...</span>
-    <span class="doccomment">///       # todo!()</span>
-    <span class="doccomment">///   }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct Request;</span>
-    <span class="doccomment">/// struct Response;</span>
-    <span class="doccomment">/// struct Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct WrappedResponse(Response);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let builder = ServiceBuilder::new()</span>
-    <span class="doccomment">///     // At this point in the builder if given a `MyService` it produces a service that</span>
-    <span class="doccomment">///     // accepts `Request`s, produces `Response`s, and fails with `Error`s</span>
-    <span class="doccomment">///     .check_service::&lt;MyService, Request, Response, Error&gt;()</span>
-    <span class="doccomment">///     // Wrap responses in `WrappedResponse`</span>
-    <span class="doccomment">///     .map_response(|response: Response| WrappedResponse(response))</span>
-    <span class="doccomment">///     // Now the response type will be `WrappedResponse`</span>
-    <span class="doccomment">///     .check_service::&lt;MyService, _, WrappedResponse, _&gt;();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_service</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Response</span> <span class="op">=</span> <span class="ident">U</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Check that the builder when given a service of type `S` produces a service with the given
+    /// request, response, and error types.
+    ///
+    /// This can be useful when debugging type errors in `ServiceBuilder`s with lots of layers.
+    ///
+    /// Doesn&#39;t actually change the builder but serves as a type check.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use tower::ServiceBuilder;
+    /// use std::task::{Poll, Context};
+    /// use tower::{Service, ServiceExt};
+    ///
+    /// // An example service
+    /// struct MyService;
+    ///
+    /// impl Service&lt;Request&gt; for MyService {
+    ///   type Response = Response;
+    ///   type Error = Error;
+    ///   type Future = futures_util::future::Ready&lt;Result&lt;Response, Error&gt;&gt;;
+    ///
+    ///   fn poll_ready(&amp;mut self, cx: &amp;mut Context&lt;&#39;_&gt;) -&gt; Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+    ///       // ...
+    ///       # todo!()
+    ///   }
+    ///
+    ///   fn call(&amp;mut self, request: Request) -&gt; Self::Future {
+    ///       // ...
+    ///       # todo!()
+    ///   }
+    /// }
+    ///
+    /// struct Request;
+    /// struct Response;
+    /// struct Error;
+    ///
+    /// struct WrappedResponse(Response);
+    ///
+    /// let builder = ServiceBuilder::new()
+    ///     // At this point in the builder if given a `MyService` it produces a service that
+    ///     // accepts `Request`s, produces `Response`s, and fails with `Error`s
+    ///     .check_service::&lt;MyService, Request, Response, Error&gt;()
+    ///     // Wrap responses in `WrappedResponse`
+    ///     .map_response(|response: Response| WrappedResponse(response))
+    ///     // Now the response type will be `WrappedResponse`
+    ///     .check_service::&lt;MyService, _, WrappedResponse, _&gt;();
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>check_service&lt;S, T, U, E&gt;(<span class="self">self</span>) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>L: Layer&lt;S&gt;,
+        L::Service: Service&lt;T, Response = U, Error = E&gt;,
     {
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// This wraps the inner service with the [`Layer`] returned by [`BoxService::layer()`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See that method for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tower::{Service, ServiceBuilder, BoxError, util::BoxService};</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Request;</span>
-    <span class="doccomment">/// # struct Response;</span>
-    <span class="doccomment">/// # impl Response {</span>
-    <span class="doccomment">/// #     fn new() -&gt; Self { Self }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service: BoxService&lt;Request, Response, BoxError&gt; = ServiceBuilder::new()</span>
-    <span class="doccomment">///     .boxed()</span>
-    <span class="doccomment">///     .load_shed()</span>
-    <span class="doccomment">///     .concurrency_limit(64)</span>
-    <span class="doccomment">///     .timeout(Duration::from_secs(10))</span>
-    <span class="doccomment">///     .service_fn(|req: Request| async {</span>
-    <span class="doccomment">///         Ok::&lt;_, BoxError&gt;(Response::new())</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">/// # let service = assert_service(service);</span>
-    <span class="doccomment">/// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S</span>
-    <span class="doccomment">/// # where S: Service&lt;R&gt; { svc }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`BoxService::layer()`]: crate::util::BoxService::layer()</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boxed</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// This wraps the inner service with the [`Layer`] returned by [`BoxService::layer()`].
+    ///
+    /// See that method for more details.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use tower::{Service, ServiceBuilder, BoxError, util::BoxService};
+    /// use std::time::Duration;
+    /// #
+    /// # struct Request;
+    /// # struct Response;
+    /// # impl Response {
+    /// #     fn new() -&gt; Self { Self }
+    /// # }
+    ///
+    /// let service: BoxService&lt;Request, Response, BoxError&gt; = ServiceBuilder::new()
+    ///     .boxed()
+    ///     .load_shed()
+    ///     .concurrency_limit(64)
+    ///     .timeout(Duration::from_secs(10))
+    ///     .service_fn(|req: Request| async {
+    ///         Ok::&lt;_, BoxError&gt;(Response::new())
+    ///     });
+    /// # let service = assert_service(service);
+    /// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S
+    /// # where S: Service&lt;R&gt; { svc }
+    /// ```
+    ///
+    /// [`BoxService::layer()`]: crate::util::BoxService::layer()
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>boxed&lt;S, R&gt;(
         <span class="self">self</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
-        <span class="ident">Stack</span><span class="op">&lt;</span>
-            <span class="ident">tower_layer::LayerFn</span><span class="op">&lt;</span>
+    ) -&gt; ServiceBuilder&lt;
+        Stack&lt;
+            tower_layer::LayerFn&lt;
                 <span class="kw">fn</span>(
-                    <span class="ident">L::Service</span>,
-                ) -&gt; <span class="ident"><span class="kw">crate</span>::util::BoxService</span><span class="op">&lt;</span>
-                    <span class="ident">R</span>,
-                    <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span>,
-                    <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>,
-                <span class="op">&gt;</span>,
-            <span class="op">&gt;</span>,
-            <span class="ident">L</span>,
-        <span class="op">&gt;</span>,
-    <span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+                    L::Service,
+                ) -&gt; <span class="kw">crate</span>::util::BoxService&lt;
+                    R,
+                    &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Response,
+                    &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Error,
+                &gt;,
+            &gt;,
+            L,
+        &gt;,
+    &gt;
+    <span class="kw">where
+        </span>L: Layer&lt;S&gt;,
+        L::Service: Service&lt;R&gt; + Send + <span class="lifetime">&#39;static</span>,
+        &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Future: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::BoxService::layer</span>())
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::BoxService::layer())
     }
 
-    <span class="doccomment">/// This wraps the inner service with the [`Layer`] returned by [`BoxCloneService::layer()`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is similar to the [`boxed`] method, but it requires that `Self` implement</span>
-    <span class="doccomment">/// [`Clone`], and the returned boxed service implements [`Clone`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`BoxCloneService`] for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tower::{Service, ServiceBuilder, BoxError, util::BoxCloneService};</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Request;</span>
-    <span class="doccomment">/// # struct Response;</span>
-    <span class="doccomment">/// # impl Response {</span>
-    <span class="doccomment">/// #     fn new() -&gt; Self { Self }</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let service: BoxCloneService&lt;Request, Response, BoxError&gt; = ServiceBuilder::new()</span>
-    <span class="doccomment">///     .boxed_clone()</span>
-    <span class="doccomment">///     .load_shed()</span>
-    <span class="doccomment">///     .concurrency_limit(64)</span>
-    <span class="doccomment">///     .timeout(Duration::from_secs(10))</span>
-    <span class="doccomment">///     .service_fn(|req: Request| async {</span>
-    <span class="doccomment">///         Ok::&lt;_, BoxError&gt;(Response::new())</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">/// # let service = assert_service(service);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The boxed service can still be cloned.</span>
-    <span class="doccomment">/// service.clone();</span>
-    <span class="doccomment">/// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S</span>
-    <span class="doccomment">/// # where S: Service&lt;R&gt; { svc }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`BoxCloneService::layer()`]: crate::util::BoxCloneService::layer()</span>
-    <span class="doccomment">/// [`BoxCloneService`]: crate::util::BoxCloneService</span>
-    <span class="doccomment">/// [`boxed`]: Self::boxed</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;util&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boxed_clone</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">R</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// This wraps the inner service with the [`Layer`] returned by [`BoxCloneService::layer()`].
+    ///
+    /// This is similar to the [`boxed`] method, but it requires that `Self` implement
+    /// [`Clone`], and the returned boxed service implements [`Clone`].
+    ///
+    /// See [`BoxCloneService`] for more details.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use tower::{Service, ServiceBuilder, BoxError, util::BoxCloneService};
+    /// use std::time::Duration;
+    /// #
+    /// # struct Request;
+    /// # struct Response;
+    /// # impl Response {
+    /// #     fn new() -&gt; Self { Self }
+    /// # }
+    ///
+    /// let service: BoxCloneService&lt;Request, Response, BoxError&gt; = ServiceBuilder::new()
+    ///     .boxed_clone()
+    ///     .load_shed()
+    ///     .concurrency_limit(64)
+    ///     .timeout(Duration::from_secs(10))
+    ///     .service_fn(|req: Request| async {
+    ///         Ok::&lt;_, BoxError&gt;(Response::new())
+    ///     });
+    /// # let service = assert_service(service);
+    ///
+    /// // The boxed service can still be cloned.
+    /// service.clone();
+    /// # fn assert_service&lt;S, R&gt;(svc: S) -&gt; S
+    /// # where S: Service&lt;R&gt; { svc }
+    /// ```
+    ///
+    /// [`BoxCloneService::layer()`]: crate::util::BoxCloneService::layer()
+    /// [`BoxCloneService`]: crate::util::BoxCloneService
+    /// [`boxed`]: Self::boxed
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;util&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;util&quot;</span>)))]
+    </span><span class="kw">pub fn </span>boxed_clone&lt;S, R&gt;(
         <span class="self">self</span>,
-    ) -&gt; <span class="ident">ServiceBuilder</span><span class="op">&lt;</span>
-        <span class="ident">Stack</span><span class="op">&lt;</span>
-            <span class="ident">tower_layer::LayerFn</span><span class="op">&lt;</span>
+    ) -&gt; ServiceBuilder&lt;
+        Stack&lt;
+            tower_layer::LayerFn&lt;
                 <span class="kw">fn</span>(
-                    <span class="ident">L::Service</span>,
-                ) -&gt; <span class="ident"><span class="kw">crate</span>::util::BoxCloneService</span><span class="op">&lt;</span>
-                    <span class="ident">R</span>,
-                    <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span>,
-                    <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span>,
-                <span class="op">&gt;</span>,
-            <span class="op">&gt;</span>,
-            <span class="ident">L</span>,
-        <span class="op">&gt;</span>,
-    <span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">L::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="op">&lt;</span><span class="ident">L::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+                    L::Service,
+                ) -&gt; <span class="kw">crate</span>::util::BoxCloneService&lt;
+                    R,
+                    &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Response,
+                    &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Error,
+                &gt;,
+            &gt;,
+            L,
+        &gt;,
+    &gt;
+    <span class="kw">where
+        </span>L: Layer&lt;S&gt;,
+        L::Service: Service&lt;R&gt; + Clone + Send + <span class="lifetime">&#39;static</span>,
+        &lt;L::Service <span class="kw">as </span>Service&lt;R&gt;&gt;::Future: Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">layer</span>(<span class="ident"><span class="kw">crate</span>::util::BoxCloneService::layer</span>())
+        <span class="self">self</span>.layer(<span class="kw">crate</span>::util::BoxCloneService::layer())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ServiceBuilder&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;L: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>ServiceBuilder&lt;L&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;ServiceBuilder&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.layer).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServiceBuilder</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, L&gt; Layer&lt;S&gt; <span class="kw">for </span>ServiceBuilder&lt;L&gt;
+<span class="kw">where
+    </span>L: Layer&lt;S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">L::Service</span>;
+    <span class="kw">type </span>Service = L::Service;
 
-    <span class="kw">fn</span> <span class="ident">layer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inner</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Service</span> {
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">layer</span>(<span class="ident">inner</span>)
+    <span class="kw">fn </span>layer(<span class="kw-2">&amp;</span><span class="self">self</span>, inner: S) -&gt; <span class="self">Self</span>::Service {
+        <span class="self">self</span>.layer.layer(inner)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

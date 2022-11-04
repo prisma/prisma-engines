@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.6/src/array_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_queue/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.6/src/array_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_queue/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -534,541 +534,541 @@
 <span id="534">534</span>
 <span id="535">535</span>
 <span id="536">536</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The implementation is based on Dmitry Vyukov&#39;s bounded MPMC queue.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Source:</span>
-<span class="doccomment">//!   - &lt;http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The implementation is based on Dmitry Vyukov&#39;s bounded MPMC queue.
+//!
+//! Source:
+//!   - &lt;http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue&gt;
 
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+</span><span class="kw">use </span>alloc::boxed::Box;
+<span class="kw">use </span>core::cell::UnsafeCell;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::mem::MaybeUninit;
+<span class="kw">use </span>core::sync::atomic::{<span class="self">self</span>, AtomicUsize, Ordering};
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils</span>::{<span class="ident">Backoff</span>, <span class="ident">CachePadded</span>};
+<span class="kw">use </span>crossbeam_utils::{Backoff, CachePadded};
 
-<span class="doccomment">/// A slot in a queue.</span>
-<span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The current stamp.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the stamp equals the tail, this node will be next written to. If it equals head + 1,</span>
-    <span class="doccomment">/// this node will be next read from.</span>
-    <span class="ident">stamp</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// A slot in a queue.
+</span><span class="kw">struct </span>Slot&lt;T&gt; {
+    <span class="doccomment">/// The current stamp.
+    ///
+    /// If the stamp equals the tail, this node will be next written to. If it equals head + 1,
+    /// this node will be next read from.
+    </span>stamp: AtomicUsize,
 
-    <span class="doccomment">/// The value in this slot.</span>
-    <span class="ident">value</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The value in this slot.
+    </span>value: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
 }
 
-<span class="doccomment">/// A bounded multi-producer multi-consumer queue.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This queue allocates a fixed-capacity buffer on construction, which is used to store pushed</span>
-<span class="doccomment">/// elements. The queue cannot hold more elements than the buffer allows. Attempting to push an</span>
-<span class="doccomment">/// element into a full queue will fail. Alternatively, [`force_push`] makes it possible for</span>
-<span class="doccomment">/// this queue to be used as a ring-buffer. Having a buffer allocated upfront makes this queue</span>
-<span class="doccomment">/// a bit faster than [`SegQueue`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`force_push`]: ArrayQueue::force_push</span>
-<span class="doccomment">/// [`SegQueue`]: super::SegQueue</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let q = ArrayQueue::new(2);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(q.push(&#39;a&#39;), Ok(()));</span>
-<span class="doccomment">/// assert_eq!(q.push(&#39;b&#39;), Ok(()));</span>
-<span class="doccomment">/// assert_eq!(q.push(&#39;c&#39;), Err(&#39;c&#39;));</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Some(&#39;a&#39;));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer and a lap, but packed into a</span>
-    <span class="doccomment">/// single `usize`. The lower bits represent the index, while the upper bits represent the lap.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Elements are popped from the head of the queue.</span>
-    <span class="ident">head</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A bounded multi-producer multi-consumer queue.
+///
+/// This queue allocates a fixed-capacity buffer on construction, which is used to store pushed
+/// elements. The queue cannot hold more elements than the buffer allows. Attempting to push an
+/// element into a full queue will fail. Alternatively, [`force_push`] makes it possible for
+/// this queue to be used as a ring-buffer. Having a buffer allocated upfront makes this queue
+/// a bit faster than [`SegQueue`].
+///
+/// [`force_push`]: ArrayQueue::force_push
+/// [`SegQueue`]: super::SegQueue
+///
+/// # Examples
+///
+/// ```
+/// use crossbeam_queue::ArrayQueue;
+///
+/// let q = ArrayQueue::new(2);
+///
+/// assert_eq!(q.push(&#39;a&#39;), Ok(()));
+/// assert_eq!(q.push(&#39;b&#39;), Ok(()));
+/// assert_eq!(q.push(&#39;c&#39;), Err(&#39;c&#39;));
+/// assert_eq!(q.pop(), Some(&#39;a&#39;));
+/// ```
+</span><span class="kw">pub struct </span>ArrayQueue&lt;T&gt; {
+    <span class="doccomment">/// The head of the queue.
+    ///
+    /// This value is a &quot;stamp&quot; consisting of an index into the buffer and a lap, but packed into a
+    /// single `usize`. The lower bits represent the index, while the upper bits represent the lap.
+    ///
+    /// Elements are popped from the head of the queue.
+    </span>head: CachePadded&lt;AtomicUsize&gt;,
 
-    <span class="doccomment">/// The tail of the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer and a lap, but packed into a</span>
-    <span class="doccomment">/// single `usize`. The lower bits represent the index, while the upper bits represent the lap.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Elements are pushed into the tail of the queue.</span>
-    <span class="ident">tail</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The tail of the queue.
+    ///
+    /// This value is a &quot;stamp&quot; consisting of an index into the buffer and a lap, but packed into a
+    /// single `usize`. The lower bits represent the index, while the upper bits represent the lap.
+    ///
+    /// Elements are pushed into the tail of the queue.
+    </span>tail: CachePadded&lt;AtomicUsize&gt;,
 
-    <span class="doccomment">/// The buffer holding slots.</span>
-    <span class="ident">buffer</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// The buffer holding slots.
+    </span>buffer: Box&lt;[Slot&lt;T&gt;]&gt;,
 
-    <span class="doccomment">/// The queue capacity.</span>
-    <span class="ident">cap</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The queue capacity.
+    </span>cap: usize,
 
-    <span class="doccomment">/// A stamp with the value of `{ lap: 1, index: 0 }`.</span>
-    <span class="ident">one_lap</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// A stamp with the value of `{ lap: 1, index: 0 }`.
+    </span>one_lap: usize,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>ArrayQueue&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>ArrayQueue&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new bounded queue with the given capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the capacity is zero.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::&lt;i32&gt;::new(100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="ident">cap</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity must be non-zero&quot;</span>);
+<span class="kw">impl</span>&lt;T&gt; ArrayQueue&lt;T&gt; {
+    <span class="doccomment">/// Creates a new bounded queue with the given capacity.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the capacity is zero.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::&lt;i32&gt;::new(100);
+    /// ```
+    </span><span class="kw">pub fn </span>new(cap: usize) -&gt; ArrayQueue&lt;T&gt; {
+        <span class="macro">assert!</span>(cap &gt; <span class="number">0</span>, <span class="string">&quot;capacity must be non-zero&quot;</span>);
 
-        <span class="comment">// Head is initialized to `{ lap: 0, index: 0 }`.</span>
-        <span class="comment">// Tail is initialized to `{ lap: 0, index: 0 }`.</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// Head is initialized to `{ lap: 0, index: 0 }`.
+        // Tail is initialized to `{ lap: 0, index: 0 }`.
+        </span><span class="kw">let </span>head = <span class="number">0</span>;
+        <span class="kw">let </span>tail = <span class="number">0</span>;
 
-        <span class="comment">// Allocate a buffer of `cap` slots initialized</span>
-        <span class="comment">// with stamps.</span>
-        <span class="kw">let</span> <span class="ident">buffer</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]<span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">cap</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-                <span class="comment">// Set the stamp to `{ lap: 0, index: i }`.</span>
-                <span class="ident">Slot</span> {
-                    <span class="ident">stamp</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">i</span>),
-                    <span class="ident">value</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">MaybeUninit::uninit</span>()),
+        <span class="comment">// Allocate a buffer of `cap` slots initialized
+        // with stamps.
+        </span><span class="kw">let </span>buffer: Box&lt;[Slot&lt;T&gt;]&gt; = (<span class="number">0</span>..cap)
+            .map(|i| {
+                <span class="comment">// Set the stamp to `{ lap: 0, index: i }`.
+                </span>Slot {
+                    stamp: AtomicUsize::new(i),
+                    value: UnsafeCell::new(MaybeUninit::uninit()),
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// One lap is the smallest power of two greater than `cap`.</span>
-        <span class="kw">let</span> <span class="ident">one_lap</span> <span class="op">=</span> (<span class="ident">cap</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">next_power_of_two</span>();
+        <span class="comment">// One lap is the smallest power of two greater than `cap`.
+        </span><span class="kw">let </span>one_lap = (cap + <span class="number">1</span>).next_power_of_two();
 
-        <span class="ident">ArrayQueue</span> {
-            <span class="ident">buffer</span>,
-            <span class="ident">cap</span>,
-            <span class="ident">one_lap</span>,
-            <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="ident">head</span>)),
-            <span class="ident">tail</span>: <span class="ident">CachePadded::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="ident">tail</span>)),
+        ArrayQueue {
+            buffer,
+            cap,
+            one_lap,
+            head: CachePadded::new(AtomicUsize::new(head)),
+            tail: CachePadded::new(AtomicUsize::new(tail)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_or_else</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">T</span>, <span class="ident">usize</span>, <span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>push_or_else&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>value: T, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt;
+    <span class="kw">where
+        </span>F: Fn(T, usize, usize, <span class="kw-2">&amp;</span>Slot&lt;T&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Deconstruct the tail.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">loop </span>{
+            <span class="comment">// Deconstruct the tail.
+            </span><span class="kw">let </span>index = tail &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
+            <span class="kw">let </span>lap = tail &amp; !(<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                <span class="comment">// Same lap, incremented index.</span>
-                <span class="comment">// Set to `{ lap: lap, index: index + 1 }`.</span>
-                <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// One lap forward, index wraps around to zero.</span>
-                <span class="comment">// Set to `{ lap: lap.wrapping_add(1), index: 0 }`.</span>
-                <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
+            <span class="kw">let </span>new_tail = <span class="kw">if </span>index + <span class="number">1 </span>&lt; <span class="self">self</span>.cap {
+                <span class="comment">// Same lap, incremented index.
+                // Set to `{ lap: lap, index: index + 1 }`.
+                </span>tail + <span class="number">1
+            </span>} <span class="kw">else </span>{
+                <span class="comment">// One lap forward, index wraps around to zero.
+                // Set to `{ lap: lap.wrapping_add(1), index: 0 }`.
+                </span>lap.wrapping_add(<span class="self">self</span>.one_lap)
             };
 
-            <span class="comment">// Inspect the corresponding slot.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) };
-            <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// Inspect the corresponding slot.
+            </span><span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+            <span class="kw">let </span>slot = <span class="kw">unsafe </span>{ <span class="self">self</span>.buffer.get_unchecked(index) };
+            <span class="kw">let </span>stamp = slot.stamp.load(Ordering::Acquire);
 
-            <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">stamp</span> {
-                <span class="comment">// Try moving the tail.</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">tail</span>,
-                    <span class="ident">new_tail</span>,
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+            <span class="comment">// If the tail and the stamp match, we may attempt to push.
+            </span><span class="kw">if </span>tail == stamp {
+                <span class="comment">// Try moving the tail.
+                </span><span class="kw">match </span><span class="self">self</span>.tail.compare_exchange_weak(
+                    tail,
+                    new_tail,
+                    Ordering::SeqCst,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Write the value into the slot and update the stamp.</span>
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>));
+                        <span class="comment">// Write the value into the slot and update the stamp.
+                        </span><span class="kw">unsafe </span>{
+                            slot.value.get().write(MaybeUninit::new(value));
                         }
-                        <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">Ordering::Release</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                        slot.stamp.store(tail + <span class="number">1</span>, Ordering::Release);
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">t</span>) =&gt; {
-                        <span class="ident">tail</span> <span class="op">=</span> <span class="ident">t</span>;
-                        <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                    <span class="prelude-val">Err</span>(t) =&gt; {
+                        tail = t;
+                        backoff.spin();
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="ident">value</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">value</span>, <span class="ident">tail</span>, <span class="ident">new_tail</span>, <span class="ident">slot</span>)<span class="question-mark">?</span>;
-                <span class="ident">backoff</span>.<span class="ident">spin</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            } <span class="kw">else if </span>stamp.wrapping_add(<span class="self">self</span>.one_lap) == tail + <span class="number">1 </span>{
+                atomic::fence(Ordering::SeqCst);
+                value = f(value, tail, new_tail, slot)<span class="question-mark">?</span>;
+                backoff.spin();
+                tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
+            } <span class="kw">else </span>{
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.
+                </span>backoff.snooze();
+                tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
             }
         }
     }
 
-    <span class="doccomment">/// Attempts to push an element into the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is full, the element is returned back as an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(q.push(10), Ok(()));</span>
-    <span class="doccomment">/// assert_eq!(q.push(20), Err(20));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">push_or_else</span>(<span class="ident">value</span>, <span class="op">|</span><span class="ident">v</span>, <span class="ident">tail</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+    <span class="doccomment">/// Attempts to push an element into the queue.
+    ///
+    /// If the queue is full, the element is returned back as an error.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(1);
+    ///
+    /// assert_eq!(q.push(10), Ok(()));
+    /// assert_eq!(q.push(20), Err(20));
+    /// ```
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt; {
+        <span class="self">self</span>.push_or_else(value, |v, tail, <span class="kw">_</span>, <span class="kw">_</span>| {
+            <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::Relaxed);
 
-            <span class="comment">// If the head lags one lap behind the tail as well...</span>
-            <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                <span class="comment">// ...then the queue is full.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">v</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
+            <span class="comment">// If the head lags one lap behind the tail as well...
+            </span><span class="kw">if </span>head.wrapping_add(<span class="self">self</span>.one_lap) == tail {
+                <span class="comment">// ...then the queue is full.
+                </span><span class="prelude-val">Err</span>(v)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(v)
             }
         })
     }
 
-    <span class="doccomment">/// Pushes an element into the queue, replacing the oldest element if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is full, the oldest element is replaced and returned,</span>
-    <span class="doccomment">/// otherwise `None` is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(2);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(q.force_push(10), None);</span>
-    <span class="doccomment">/// assert_eq!(q.force_push(20), None);</span>
-    <span class="doccomment">/// assert_eq!(q.force_push(30), Some(10));</span>
-    <span class="doccomment">/// assert_eq!(q.pop(), Some(20));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">force_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">push_or_else</span>(<span class="ident">value</span>, <span class="op">|</span><span class="ident">v</span>, <span class="ident">tail</span>, <span class="ident">new_tail</span>, <span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
-            <span class="kw">let</span> <span class="ident">new_head</span> <span class="op">=</span> <span class="ident">new_tail</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
+    <span class="doccomment">/// Pushes an element into the queue, replacing the oldest element if necessary.
+    ///
+    /// If the queue is full, the oldest element is replaced and returned,
+    /// otherwise `None` is returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(2);
+    ///
+    /// assert_eq!(q.force_push(10), None);
+    /// assert_eq!(q.force_push(20), None);
+    /// assert_eq!(q.force_push(30), Some(10));
+    /// assert_eq!(q.pop(), Some(20));
+    /// ```
+    </span><span class="kw">pub fn </span>force_push(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.push_or_else(value, |v, tail, new_tail, slot| {
+            <span class="kw">let </span>head = tail.wrapping_sub(<span class="self">self</span>.one_lap);
+            <span class="kw">let </span>new_head = new_tail.wrapping_sub(<span class="self">self</span>.one_lap);
 
-            <span class="comment">// Try moving the head.</span>
-            <span class="kw">if</span> <span class="self">self</span>
-                .<span class="ident">head</span>
-                .<span class="ident">compare_exchange_weak</span>(<span class="ident">head</span>, <span class="ident">new_head</span>, <span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::Relaxed</span>)
-                .<span class="ident">is_ok</span>()
+            <span class="comment">// Try moving the head.
+            </span><span class="kw">if </span><span class="self">self
+                </span>.head
+                .compare_exchange_weak(head, new_head, Ordering::SeqCst, Ordering::Relaxed)
+                .is_ok()
             {
-                <span class="comment">// Move the tail.</span>
-                <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">store</span>(<span class="ident">new_tail</span>, <span class="ident">Ordering::SeqCst</span>);
+                <span class="comment">// Move the tail.
+                </span><span class="self">self</span>.tail.store(new_tail, Ordering::SeqCst);
 
-                <span class="comment">// Swap the previous value.</span>
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">v</span>)).<span class="ident">assume_init</span>() };
+                <span class="comment">// Swap the previous value.
+                </span><span class="kw">let </span>old = <span class="kw">unsafe </span>{ slot.value.get().replace(MaybeUninit::new(v)).assume_init() };
 
-                <span class="comment">// Update the stamp.</span>
-                <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">Ordering::Release</span>);
+                <span class="comment">// Update the stamp.
+                </span>slot.stamp.store(tail + <span class="number">1</span>, Ordering::Release);
 
-                <span class="prelude-val">Err</span>(<span class="ident">old</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
+                <span class="prelude-val">Err</span>(old)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(v)
             }
         })
-        .<span class="ident">err</span>()
+        .err()
     }
 
-    <span class="doccomment">/// Attempts to pop an element from the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is empty, `None` is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(1);</span>
-    <span class="doccomment">/// assert_eq!(q.push(10), Ok(()));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(q.pop(), Some(10));</span>
-    <span class="doccomment">/// assert!(q.pop().is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+    <span class="doccomment">/// Attempts to pop an element from the queue.
+    ///
+    /// If the queue is empty, `None` is returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(1);
+    /// assert_eq!(q.push(10), Ok(()));
+    ///
+    /// assert_eq!(q.pop(), Some(10));
+    /// assert!(q.pop().is_none());
+    /// ```
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.load(Ordering::Relaxed);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Deconstruct the head.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">loop </span>{
+            <span class="comment">// Deconstruct the head.
+            </span><span class="kw">let </span>index = head &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
+            <span class="kw">let </span>lap = head &amp; !(<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-            <span class="comment">// Inspect the corresponding slot.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) };
-            <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// Inspect the corresponding slot.
+            </span><span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+            <span class="kw">let </span>slot = <span class="kw">unsafe </span>{ <span class="self">self</span>.buffer.get_unchecked(index) };
+            <span class="kw">let </span>stamp = slot.stamp.load(Ordering::Acquire);
 
-            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.</span>
-            <span class="kw">if</span> <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">stamp</span> {
-                <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, index: index + 1 }`.</span>
-                    <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), index: 0 }`.</span>
-                    <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
+            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.
+            </span><span class="kw">if </span>head + <span class="number">1 </span>== stamp {
+                <span class="kw">let </span>new = <span class="kw">if </span>index + <span class="number">1 </span>&lt; <span class="self">self</span>.cap {
+                    <span class="comment">// Same lap, incremented index.
+                    // Set to `{ lap: lap, index: index + 1 }`.
+                    </span>head + <span class="number">1
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// One lap forward, index wraps around to zero.
+                    // Set to `{ lap: lap.wrapping_add(1), index: 0 }`.
+                    </span>lap.wrapping_add(<span class="self">self</span>.one_lap)
                 };
 
-                <span class="comment">// Try moving the head.</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">head</span>,
-                    <span class="ident">new</span>,
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+                <span class="comment">// Try moving the head.
+                </span><span class="kw">match </span><span class="self">self</span>.head.compare_exchange_weak(
+                    head,
+                    new,
+                    Ordering::SeqCst,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Read the value from the slot and update the stamp.</span>
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>() };
-                        <span class="ident">slot</span>.<span class="ident">stamp</span>
-                            .<span class="ident">store</span>(<span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>), <span class="ident">Ordering::Release</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>);
+                        <span class="comment">// Read the value from the slot and update the stamp.
+                        </span><span class="kw">let </span>msg = <span class="kw">unsafe </span>{ slot.value.get().read().assume_init() };
+                        slot.stamp
+                            .store(head.wrapping_add(<span class="self">self</span>.one_lap), Ordering::Release);
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(msg);
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
-                        <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
-                        <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                    <span class="prelude-val">Err</span>(h) =&gt; {
+                        head = h;
+                        backoff.spin();
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span> <span class="op">==</span> <span class="ident">head</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            } <span class="kw">else if </span>stamp == head {
+                atomic::fence(Ordering::SeqCst);
+                <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
 
-                <span class="comment">// If the tail equals the head, that means the channel is empty.</span>
-                <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">head</span> {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="comment">// If the tail equals the head, that means the channel is empty.
+                </span><span class="kw">if </span>tail == head {
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="ident">backoff</span>.<span class="ident">spin</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+                backoff.spin();
+                head = <span class="self">self</span>.head.load(Ordering::Relaxed);
+            } <span class="kw">else </span>{
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.
+                </span>backoff.snooze();
+                head = <span class="self">self</span>.head.load(Ordering::Relaxed);
             }
         }
     }
 
-    <span class="doccomment">/// Returns the capacity of the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::&lt;i32&gt;::new(100);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(q.capacity(), 100);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">cap</span>
+    <span class="doccomment">/// Returns the capacity of the queue.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::&lt;i32&gt;::new(100);
+    ///
+    /// assert_eq!(q.capacity(), 100);
+    /// ```
+    </span><span class="kw">pub fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.cap
     }
 
-    <span class="doccomment">/// Returns `true` if the queue is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(100);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(q.is_empty());</span>
-    <span class="doccomment">/// q.push(1).unwrap();</span>
-    <span class="doccomment">/// assert!(!q.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns `true` if the queue is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(100);
+    ///
+    /// assert!(q.is_empty());
+    /// q.push(1).unwrap();
+    /// assert!(!q.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
 
-        <span class="comment">// Is the tail lagging one lap behind head?</span>
-        <span class="comment">// Is the tail equal to the head?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the head changes just before we load the tail, that means there was a moment</span>
-        <span class="comment">// when the channel was not empty, so it is safe to just return `false`.</span>
-        <span class="ident">tail</span> <span class="op">==</span> <span class="ident">head</span>
+        <span class="comment">// Is the tail lagging one lap behind head?
+        // Is the tail equal to the head?
+        //
+        // Note: If the head changes just before we load the tail, that means there was a moment
+        // when the channel was not empty, so it is safe to just return `false`.
+        </span>tail == head
     }
 
-    <span class="doccomment">/// Returns `true` if the queue is full.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(!q.is_full());</span>
-    <span class="doccomment">/// q.push(1).unwrap();</span>
-    <span class="doccomment">/// assert!(q.is_full());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns `true` if the queue is full.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(1);
+    ///
+    /// assert!(!q.is_full());
+    /// q.push(1).unwrap();
+    /// assert!(q.is_full());
+    /// ```
+    </span><span class="kw">pub fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
 
-        <span class="comment">// Is the head lagging one lap behind tail?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the tail changes just before we load the head, that means there was a moment</span>
-        <span class="comment">// when the queue was not full, so it is safe to just return `false`.</span>
-        <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span>
+        <span class="comment">// Is the head lagging one lap behind tail?
+        //
+        // Note: If the tail changes just before we load the head, that means there was a moment
+        // when the queue was not full, so it is safe to just return `false`.
+        </span>head.wrapping_add(<span class="self">self</span>.one_lap) == tail
     }
 
-    <span class="doccomment">/// Returns the number of elements in the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::ArrayQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = ArrayQueue::new(100);</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(10).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(20).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Load the tail, then load the head.</span>
-            <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns the number of elements in the queue.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::ArrayQueue;
+    ///
+    /// let q = ArrayQueue::new(100);
+    /// assert_eq!(q.len(), 0);
+    ///
+    /// q.push(10).unwrap();
+    /// assert_eq!(q.len(), 1);
+    ///
+    /// q.push(20).unwrap();
+    /// assert_eq!(q.len(), 2);
+    /// ```
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">loop </span>{
+            <span class="comment">// Load the tail, then load the head.
+            </span><span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+            <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
 
-            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-                <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.
+            </span><span class="kw">if </span><span class="self">self</span>.tail.load(Ordering::SeqCst) == tail {
+                <span class="kw">let </span>hix = head &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
+                <span class="kw">let </span>tix = tail &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-                <span class="kw">return</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&lt;</span> <span class="ident">tix</span> {
-                    <span class="ident">tix</span> <span class="op">-</span> <span class="ident">hix</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&gt;</span> <span class="ident">tix</span> {
-                    <span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">tix</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">head</span> {
-                    <span class="number">0</span>
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">cap</span>
+                <span class="kw">return if </span>hix &lt; tix {
+                    tix - hix
+                } <span class="kw">else if </span>hix &gt; tix {
+                    <span class="self">self</span>.cap - hix + tix
+                } <span class="kw">else if </span>tail == head {
+                    <span class="number">0
+                </span>} <span class="kw">else </span>{
+                    <span class="self">self</span>.cap
                 };
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Get the index of the head.</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">get_mut</span>();
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>ArrayQueue&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Get the index of the head.
+        </span><span class="kw">let </span>head = <span class="kw-2">*</span><span class="self">self</span>.head.get_mut();
+        <span class="kw">let </span>tail = <span class="kw-2">*</span><span class="self">self</span>.tail.get_mut();
 
-        <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let </span>hix = head &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
+        <span class="kw">let </span>tix = tail &amp; (<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&lt;</span> <span class="ident">tix</span> {
-            <span class="ident">tix</span> <span class="op">-</span> <span class="ident">hix</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&gt;</span> <span class="ident">tix</span> {
-            <span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">tix</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">head</span> {
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cap</span>
+        <span class="kw">let </span>len = <span class="kw">if </span>hix &lt; tix {
+            tix - hix
+        } <span class="kw">else if </span>hix &gt; tix {
+            <span class="self">self</span>.cap - hix + tix
+        } <span class="kw">else if </span>tail == head {
+            <span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cap
         };
 
-        <span class="comment">// Loop over all slots that hold a message and drop them.</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
-            <span class="comment">// Compute the index of the next slot holding a message.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span>
-            } <span class="kw">else</span> {
-                <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">cap</span>
+        <span class="comment">// Loop over all slots that hold a message and drop them.
+        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
+            <span class="comment">// Compute the index of the next slot holding a message.
+            </span><span class="kw">let </span>index = <span class="kw">if </span>hix + i &lt; <span class="self">self</span>.cap {
+                hix + i
+            } <span class="kw">else </span>{
+                hix + i - <span class="self">self</span>.cap
             };
 
-            <span class="kw">unsafe</span> {
-                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-                <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span>);
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>();
-                <span class="ident">value</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">drop_in_place</span>();
+            <span class="kw">unsafe </span>{
+                <span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+                <span class="kw">let </span>slot = <span class="self">self</span>.buffer.get_unchecked_mut(index);
+                <span class="kw">let </span>value = <span class="kw-2">&amp;mut *</span>slot.value.get();
+                value.as_mut_ptr().drop_in_place();
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;ArrayQueue { .. }&quot;</span>)
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>ArrayQueue&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;ArrayQueue { .. }&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; IntoIterator <span class="kw">for </span>ArrayQueue&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>IntoIter = IntoIter&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IntoIter</span> { <span class="ident">value</span>: <span class="self">self</span> }
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IntoIter { value: <span class="self">self </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">ArrayQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoIter&lt;T&gt; {
+    value: ArrayQueue&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; Iterator <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">value</span>;
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">get_mut</span>();
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">get_mut</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">value</span>.<span class="ident">tail</span>.<span class="ident">get_mut</span>() {
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="ident">value</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="ident">value</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="comment">// SAFETY: We have mutable access to this, so we can read without</span>
-            <span class="comment">// worrying about concurrency. Furthermore, we know this is</span>
-            <span class="comment">// initialized because it is the value pointed at by `value.head`</span>
-            <span class="comment">// and this is a non-empty queue.</span>
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">value</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-                <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span>);
-                <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>value = <span class="kw-2">&amp;mut </span><span class="self">self</span>.value;
+        <span class="kw">let </span>head = <span class="kw-2">*</span>value.head.get_mut();
+        <span class="kw">if </span>value.head.get_mut() != value.tail.get_mut() {
+            <span class="kw">let </span>index = head &amp; (value.one_lap - <span class="number">1</span>);
+            <span class="kw">let </span>lap = head &amp; !(value.one_lap - <span class="number">1</span>);
+            <span class="comment">// SAFETY: We have mutable access to this, so we can read without
+            // worrying about concurrency. Furthermore, we know this is
+            // initialized because it is the value pointed at by `value.head`
+            // and this is a non-empty queue.
+            </span><span class="kw">let </span>val = <span class="kw">unsafe </span>{
+                <span class="macro">debug_assert!</span>(index &lt; value.buffer.len());
+                <span class="kw">let </span>slot = value.buffer.get_unchecked_mut(index);
+                slot.value.get().read().assume_init()
             };
-            <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="ident">value</span>.<span class="ident">cap</span> {
-                <span class="comment">// Same lap, incremented index.</span>
-                <span class="comment">// Set to `{ lap: lap, index: index + 1 }`.</span>
-                <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// One lap forward, index wraps around to zero.</span>
-                <span class="comment">// Set to `{ lap: lap.wrapping_add(1), index: 0 }`.</span>
-                <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="ident">value</span>.<span class="ident">one_lap</span>)
+            <span class="kw">let </span>new = <span class="kw">if </span>index + <span class="number">1 </span>&lt; value.cap {
+                <span class="comment">// Same lap, incremented index.
+                // Set to `{ lap: lap, index: index + 1 }`.
+                </span>head + <span class="number">1
+            </span>} <span class="kw">else </span>{
+                <span class="comment">// One lap forward, index wraps around to zero.
+                // Set to `{ lap: lap.wrapping_add(1), index: 0 }`.
+                </span>lap.wrapping_add(value.one_lap)
             };
-            <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">new</span>;
-            <span class="ident">Option::Some</span>(<span class="ident">val</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Option::None</span>
+            <span class="kw-2">*</span>value.head.get_mut() = new;
+            Option::Some(val)
+        } <span class="kw">else </span>{
+            Option::None
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_queue" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_queue" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

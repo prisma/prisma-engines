@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/create.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/create.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -117,58 +117,58 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ArgumentListLookup</span>, <span class="ident">ParsedField</span>, <span class="ident">ParsedInputList</span>, <span class="ident">ParsedInputMap</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ArgumentListLookup, ParsedField, ParsedInputList, ParsedInputMap,
 };
-<span class="kw">use</span> <span class="ident">connector::IntoFilter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
-<span class="kw">use</span> <span class="ident">schema::ConnectorContext</span>;
-<span class="kw">use</span> <span class="ident">schema_builder::constants::args</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">write_args_parser</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>connector::IntoFilter;
+<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>schema::ConnectorContext;
+<span class="kw">use </span>schema_builder::constants::args;
+<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
+<span class="kw">use </span>write_args_parser::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
+<span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
+</span><span class="kw">pub fn </span>create_record(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model: ModelRef,
+    <span class="kw-2">mut </span>field: ParsedField,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    graph.flag_transactional();
 
-    <span class="kw">let</span> <span class="ident">data_map</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="ident">ParsedInputMap::default</span>(),
+    <span class="kw">let </span>data_map = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
+        <span class="prelude-val">Some</span>(data) =&gt; data.value.try_into()<span class="question-mark">?</span>,
+        <span class="prelude-val">None </span>=&gt; ParsedInputMap::default(),
     };
 
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create::create_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(<span class="kw-2">&amp;</span>model), data_map)<span class="question-mark">?</span>;
 
-    <span class="comment">// Follow-up read query on the write</span>
-    <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>, <span class="ident">model</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">read_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>));
+    <span class="comment">// Follow-up read query on the write
+    </span><span class="kw">let </span>read_query = read::find_unique(field, model.clone())<span class="question-mark">?</span>;
+    <span class="kw">let </span>read_node = graph.create_node(Query::Read(read_query));
 
-    <span class="ident">graph</span>.<span class="ident">add_result_node</span>(<span class="kw-2">&amp;</span><span class="ident">read_node</span>);
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(
-                        <span class="string">&quot;Expected a valid parent ID to be present for create follow-up read query.&quot;</span>.<span class="ident">to_string</span>(),
+    graph.add_result_node(<span class="kw-2">&amp;</span>read_node);
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>create_node,
+        <span class="kw-2">&amp;</span>read_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            model.primary_identifier(),
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>read_node, <span class="kw-2">mut </span>parent_ids| {
+                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::AssertionError(
+                        <span class="string">&quot;Expected a valid parent ID to be present for create follow-up read query.&quot;</span>.to_string(),
                     )),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RecordQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rq</span>))) <span class="op">=</span> <span class="ident">read_node</span> {
-                    <span class="ident">rq</span>.<span class="ident">add_filter</span>(<span class="ident">parent_id</span>.<span class="ident">filter</span>());
+                <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RecordQuery(<span class="kw-2">ref mut </span>rq))) = read_node {
+                    rq.add_filter(parent_id.filter());
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">read_node</span>)
+                <span class="prelude-val">Ok</span>(read_node)
             }),
         ),
     )<span class="question-mark">?</span>;
@@ -176,65 +176,65 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_many_records</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">_connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
+<span class="doccomment">/// Creates a create record query and adds it to the query graph, together with it&#39;s nested queries and companion read query.
+</span><span class="kw">pub fn </span>create_many_records(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    _connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model: ModelRef,
+    <span class="kw-2">mut </span>field: ParsedField,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    graph.flag_transactional();
 
-    <span class="kw">let</span> <span class="ident">data_list</span>: <span class="ident">ParsedInputList</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::DATA</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
+    <span class="kw">let </span>data_list: ParsedInputList = <span class="kw">match </span>field.arguments.lookup(args::DATA) {
+        <span class="prelude-val">Some</span>(data) =&gt; data.value.try_into()<span class="question-mark">?</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="macro">vec!</span>[],
     };
 
-    <span class="kw">let</span> <span class="ident">skip_duplicates</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::SKIP_DUPLICATES</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">arg</span>) =&gt; <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">let </span>skip_duplicates: bool = <span class="kw">match </span>field.arguments.lookup(args::SKIP_DUPLICATES) {
+        <span class="prelude-val">Some</span>(arg) =&gt; arg.value.try_into()<span class="question-mark">?</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">data_list</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">data_value</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">data_map</span> <span class="op">=</span> <span class="ident">data_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
+    <span class="kw">let </span>args = data_list
+        .into_iter()
+        .map(|data_value| {
+            <span class="kw">let </span>data_map = data_value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, data_map)<span class="question-mark">?</span>.args;
 
-            <span class="ident">args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">args</span>)
+            args.add_datetimes(<span class="kw-2">&amp;</span>model);
+            <span class="prelude-val">Ok</span>(args)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">CreateManyRecords</span> {
-        <span class="ident">model</span>,
-        <span class="ident">args</span>,
-        <span class="ident">skip_duplicates</span>,
+    <span class="kw">let </span>query = CreateManyRecords {
+        model,
+        args,
+        skip_duplicates,
     };
 
-    <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::CreateManyRecords</span>(<span class="ident">query</span>)));
+    graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_record_node</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">create_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">create_args</span>.<span class="ident">args</span>;
+<span class="kw">pub fn </span>create_record_node(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model: ModelRef,
+    data_map: ParsedInputMap,
+) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
+    <span class="kw">let </span>create_args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, data_map)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>args = create_args.args;
 
-    <span class="ident">args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
+    args.add_datetimes(<span class="kw-2">&amp;</span>model);
 
-    <span class="kw">let</span> <span class="ident">cr</span> <span class="op">=</span> <span class="ident">CreateRecord</span> { <span class="ident">model</span>, <span class="ident">args</span> };
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::CreateRecord</span>(<span class="ident">cr</span>)));
+    <span class="kw">let </span>cr = CreateRecord { model, args };
+    <span class="kw">let </span>create_node = graph.create_node(Query::Write(WriteQuery::CreateRecord(cr)));
 
-    <span class="kw">for</span> (<span class="ident">relation_field</span>, <span class="ident">data_map</span>) <span class="kw">in</span> <span class="ident">create_args</span>.<span class="ident">nested</span> {
-        <span class="ident">nested::connect_nested_query</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">create_node</span>, <span class="ident">relation_field</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+    <span class="kw">for </span>(relation_field, data_map) <span class="kw">in </span>create_args.nested {
+        nested::connect_nested_query(graph, connector_ctx, create_node, relation_field, data_map)<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">create_node</span>)
+    <span class="prelude-val">Ok</span>(create_node)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

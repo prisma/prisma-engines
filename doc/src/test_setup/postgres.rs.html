@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/test-setup/src/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../test_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../test_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -83,90 +83,90 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">AnyError</span>, <span class="ident">Tags</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, AnyError, Tags};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
+<span class="kw">use </span>url::Url;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_postgres_tags</span>(<span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="kw">async</span> {
-        <span class="kw">let</span> <span class="ident">quaint</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">database_url</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">Tags::Postgres</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">quaint</span>.<span class="ident">version</span>().<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>())<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_postgres_tags(database_url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;BitFlags&lt;Tags&gt;, String&gt; {
+    <span class="kw">let </span>fut = <span class="kw">async </span>{
+        <span class="kw">let </span>quaint = Quaint::new(database_url).<span class="kw">await</span>.map_err(|err| err.to_string())<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tags = Tags::Postgres.into();
+        <span class="kw">let </span>version = quaint.version().<span class="kw">await</span>.map_err(|err| err.to_string())<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">version</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">tags</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
-                <span class="macro">eprintln!</span>(<span class="string">&quot;version: {:?}&quot;</span>, <span class="ident">version</span>);
+        <span class="kw">match </span>version {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(tags),
+            <span class="prelude-val">Some</span>(version) =&gt; {
+                <span class="macro">eprintln!</span>(<span class="string">&quot;version: {:?}&quot;</span>, version);
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;9.&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres9</span>;
+                <span class="kw">if </span>version.contains(<span class="string">&quot;9.&quot;</span>) {
+                    tags |= Tags::Postgres9;
                 }
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;12.&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres12</span>;
+                <span class="kw">if </span>version.contains(<span class="string">&quot;12.&quot;</span>) {
+                    tags |= Tags::Postgres12;
                 }
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;14.&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres14</span>;
+                <span class="kw">if </span>version.contains(<span class="string">&quot;14.&quot;</span>) {
+                    tags |= Tags::Postgres14;
                 }
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;PostgreSQL 15&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::Postgres15</span>;
+                <span class="kw">if </span>version.contains(<span class="string">&quot;PostgreSQL 15&quot;</span>) {
+                    tags |= Tags::Postgres15;
                 }
 
-                <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>) {
-                    <span class="ident">tags</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Tags::CockroachDb</span>;
+                <span class="kw">if </span>version.contains(<span class="string">&quot;CockroachDB&quot;</span>) {
+                    tags |= Tags::CockroachDb;
                 }
 
-                <span class="macro">eprintln!</span>(<span class="string">&quot;Inferred tags: {:?}&quot;</span>, <span class="ident">tags</span>);
+                <span class="macro">eprintln!</span>(<span class="string">&quot;Inferred tags: {:?}&quot;</span>, tags);
 
-                <span class="prelude-val">Ok</span>(<span class="ident">tags</span>)
+                <span class="prelude-val">Ok</span>(tags)
             }
         }
     };
 
-    <span class="ident">tok</span>(<span class="ident">fut</span>)
+    tok(fut)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_database</span>(<span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Quaint</span>, <span class="ident">String</span>), <span class="ident">AnyError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span> <span class="op">=</span> <span class="ident">database_url</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">postgres_db_url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">clone</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>create_postgres_database(database_url: <span class="kw-2">&amp;</span>str, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(Quaint, String), AnyError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>url: Url = database_url.parse()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>postgres_db_url = url.clone();
 
-    <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="ident">db_name</span>);
-    <span class="ident">postgres_db_url</span>.<span class="ident">set_path</span>(<span class="string">&quot;/postgres&quot;</span>);
+    url.set_path(db_name);
+    postgres_db_url.set_path(<span class="string">&quot;/postgres&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">drop</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>drop = <span class="macro">format!</span>(
         <span class="string">r#&quot;
         DROP DATABASE IF EXISTS &quot;{db_name}&quot;;
         &quot;#</span>,
-        <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>,
+        db_name = db_name,
     );
 
-    <span class="kw">let</span> <span class="ident">recreate</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>recreate = <span class="macro">format!</span>(
         <span class="string">r#&quot;
         CREATE DATABASE &quot;{db_name}&quot;;
         &quot;#</span>,
-        <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">db_name</span>,
+        db_name = db_name,
     );
 
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">postgres_db_url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>conn = Quaint::new(postgres_db_url.as_str()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="comment">// The two commands have to be run separately on postgres.</span>
-    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">recreate</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="comment">// The two commands have to be run separately on postgres.
+    </span>conn.raw_cmd(<span class="kw-2">&amp;</span>drop).<span class="kw">await</span><span class="question-mark">?</span>;
+    conn.raw_cmd(<span class="kw-2">&amp;</span>recreate).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>()
-        .<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>)
-        .<span class="ident">append_pair</span>(<span class="string">&quot;schema&quot;</span>, <span class="string">&quot;prisma-tests&quot;</span>);
+    url.query_pairs_mut()
+        .append_pair(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>)
+        .append_pair(<span class="string">&quot;schema&quot;</span>, <span class="string">&quot;prisma-tests&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">url_str</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">to_string</span>();
+    <span class="kw">let </span>url_str = url.to_string();
 
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">url_str</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>conn = Quaint::new(<span class="kw-2">&amp;</span>url_str).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;CREATE SCHEMA \&quot;prisma-tests\&quot;&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    conn.raw_cmd(<span class="string">&quot;CREATE SCHEMA \&quot;prisma-tests\&quot;&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">conn</span>, <span class="ident">url_str</span>))
+    <span class="prelude-val">Ok</span>((conn, url_str))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="test_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

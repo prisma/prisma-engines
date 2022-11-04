@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_async/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_async/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -307,314 +307,314 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">url::ParseError</span>;
+</span><span class="kw">pub use </span>url::ParseError;
 
-<span class="kw">use</span> <span class="ident">mysql_common</span>::{
-    <span class="ident">named_params::MixedParamsError</span>, <span class="ident">params::MissingNamedParameterError</span>,
-    <span class="ident">proto::codec::error::PacketCodecError</span>, <span class="ident">row::Row</span>, <span class="ident">value::Value</span>,
+<span class="kw">use </span>mysql_common::{
+    named_params::MixedParamsError, params::MissingNamedParameterError,
+    proto::codec::error::PacketCodecError, row::Row, value::Value,
 };
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io</span>, <span class="ident">result</span>};
+<span class="kw">use </span>std::{io, result};
 
-<span class="doccomment">/// Result type alias for this library.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Result type alias for this library.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = result::Result&lt;T, Error&gt;;
 
-<span class="doccomment">/// This type enumerates library errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Driver error: `{}&#39;&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Driver</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">DriverError</span>),
+<span class="doccomment">/// This type enumerates library errors.
+</span><span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="attribute">#[error(<span class="string">&quot;Driver error: `{}&#39;&quot;</span>, _0)]
+    </span>Driver(<span class="attribute">#[source] </span>DriverError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Input/output error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">IoError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Input/output error: {}&quot;</span>, _0)]
+    </span>Io(<span class="attribute">#[source] </span>IoError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Other error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Other</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Other error: {}&quot;</span>, _0)]
+    </span>Other(<span class="attribute">#[source] </span>Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Server error: `{}&#39;&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Server</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">ServerError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Server error: `{}&#39;&quot;</span>, _0)]
+    </span>Server(<span class="attribute">#[source] </span>ServerError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;URL error: `{}&#39;&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Url</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">UrlError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;URL error: `{}&#39;&quot;</span>, _0)]
+    </span>Url(<span class="attribute">#[source] </span>UrlError),
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Returns true if the error means that connection is broken.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fatal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::Driver</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error::Io</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error::Other</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error::Url</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">Error::Server</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Returns true if the error means that connection is broken.
+    </span><span class="kw">pub fn </span>is_fatal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::Driver(<span class="kw">_</span>) | Error::Io(<span class="kw">_</span>) | Error::Other(<span class="kw">_</span>) | Error::Url(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            Error::Server(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="doccomment">/// This type enumerates IO errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IoError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Input/output error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">io::Error</span>),
+<span class="doccomment">/// This type enumerates IO errors.
+</span><span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>IoError {
+    <span class="attribute">#[error(<span class="string">&quot;Input/output error: {}&quot;</span>, _0)]
+    </span>Io(<span class="attribute">#[source] </span>io::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;TLS error: `{}&#39;&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Tls</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">native_tls::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;TLS error: `{}&#39;&quot;</span>, _0)]
+    </span>Tls(<span class="attribute">#[source] </span>native_tls::Error),
 }
 
-<span class="doccomment">/// This type represents MySql server error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;ERROR {} ({}): {}&quot;</span>, <span class="ident">state</span>, <span class="ident">code</span>, <span class="ident">message</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerError</span> {
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">u16</span>,
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">state</span>: <span class="ident">String</span>,
+<span class="doccomment">/// This type represents MySql server error.
+</span><span class="attribute">#[derive(Debug, Error, Clone, Eq, PartialEq)]
+#[error(<span class="string">&quot;ERROR {} ({}): {}&quot;</span>, state, code, message)]
+</span><span class="kw">pub struct </span>ServerError {
+    <span class="kw">pub </span>code: u16,
+    <span class="kw">pub </span>message: String,
+    <span class="kw">pub </span>state: String,
 }
 
-<span class="doccomment">/// This type enumerates connection URL errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UrlError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Connection URL parameter `{}&#39; requires feature `{}&#39;&quot;</span>, <span class="ident">param</span>, <span class="ident">feature</span>)]</span>
-    <span class="ident">FeatureRequired</span> { <span class="ident">feature</span>: <span class="ident">String</span>, <span class="ident">param</span>: <span class="ident">String</span> },
+<span class="doccomment">/// This type enumerates connection URL errors.
+</span><span class="attribute">#[derive(Debug, Error, Clone, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>UrlError {
+    <span class="attribute">#[error(<span class="string">&quot;Connection URL parameter `{}&#39; requires feature `{}&#39;&quot;</span>, param, feature)]
+    </span>FeatureRequired { feature: String, param: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid or incomplete connection URL&quot;</span>)]</span>
-    <span class="ident">Invalid</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Invalid or incomplete connection URL&quot;</span>)]
+    </span>Invalid,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid value `{}&#39; for connection URL parameter `{}&#39;&quot;</span>, <span class="ident">value</span>, <span class="ident">param</span>)]</span>
-    <span class="ident">InvalidParamValue</span> { <span class="ident">param</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Invalid value `{}&#39; for connection URL parameter `{}&#39;&quot;</span>, value, param)]
+    </span>InvalidParamValue { param: String, value: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid pool constraints: pool_min ({}) &gt; pool_max ({}).&quot;</span>, <span class="ident">min</span>, <span class="ident">max</span>)]</span>
-    <span class="ident">InvalidPoolConstraints</span> { <span class="ident">min</span>: <span class="ident">usize</span>, <span class="ident">max</span>: <span class="ident">usize</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Invalid pool constraints: pool_min ({}) &gt; pool_max ({}).&quot;</span>, min, max)]
+    </span>InvalidPoolConstraints { min: usize, max: usize },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;URL parse error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">Parse</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">ParseError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;URL parse error: {}&quot;</span>, _0)]
+    </span>Parse(<span class="attribute">#[source] </span>ParseError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown connection URL parameter `{}&#39;&quot;</span>, <span class="ident">param</span>)]</span>
-    <span class="ident">UnknownParameter</span> { <span class="ident">param</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Unknown connection URL parameter `{}&#39;&quot;</span>, param)]
+    </span>UnknownParameter { param: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unsupported connection URL scheme `{}&#39;&quot;</span>, <span class="ident">scheme</span>)]</span>
-    <span class="ident">UnsupportedScheme</span> { <span class="ident">scheme</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Unsupported connection URL scheme `{}&#39;&quot;</span>, scheme)]
+    </span>UnsupportedScheme { scheme: String },
 }
 
-<span class="doccomment">/// This type enumerates driver errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DriverError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Can&#39;t parse server version from string `{}&#39;.&quot;</span>, <span class="ident">version_string</span>)]</span>
-    <span class="ident">CantParseServerVersion</span> { <span class="ident">version_string</span>: <span class="ident">String</span> },
+<span class="doccomment">/// This type enumerates driver errors.
+</span><span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>DriverError {
+    <span class="attribute">#[error(<span class="string">&quot;Can&#39;t parse server version from string `{}&#39;.&quot;</span>, version_string)]
+    </span>CantParseServerVersion { version_string: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Connection to the server is closed.&quot;</span>)]</span>
-    <span class="ident">ConnectionClosed</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Connection to the server is closed.&quot;</span>)]
+    </span>ConnectionClosed,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error converting from mysql value.&quot;</span>)]</span>
-    <span class="ident">FromValue</span> { <span class="ident">value</span>: <span class="ident">Value</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Error converting from mysql value.&quot;</span>)]
+    </span>FromValue { value: Value },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error converting from mysql row.&quot;</span>)]</span>
-    <span class="ident">FromRow</span> { <span class="ident">row</span>: <span class="ident">Row</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Error converting from mysql row.&quot;</span>)]
+    </span>FromRow { row: Row },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Missing named parameter `{}&#39;.&quot;</span>, <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>))]</span>
-    <span class="ident">MissingNamedParam</span> { <span class="ident">name</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Missing named parameter `{}&#39;.&quot;</span>, String::from_utf8_lossy(<span class="kw-2">&amp;</span>name))]
+    </span>MissingNamedParam { name: Vec&lt;u8&gt; },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Named and positional parameters mixed in one statement.&quot;</span>)]</span>
-    <span class="ident">MixedParams</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Named and positional parameters mixed in one statement.&quot;</span>)]
+    </span>MixedParams,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Named parameters supplied for positional query.&quot;</span>)]</span>
-    <span class="ident">NamedParamsForPositionalQuery</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Named parameters supplied for positional query.&quot;</span>)]
+    </span>NamedParamsForPositionalQuery,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Transactions couldn&#39;t be nested.&quot;</span>)]</span>
-    <span class="ident">NestedTransaction</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Transactions couldn&#39;t be nested.&quot;</span>)]
+    </span>NestedTransaction,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Packet out of order.&quot;</span>)]</span>
-    <span class="ident">PacketOutOfOrder</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Packet out of order.&quot;</span>)]
+    </span>PacketOutOfOrder,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Pool was disconnected.&quot;</span>)]</span>
-    <span class="ident">PoolDisconnected</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Pool was disconnected.&quot;</span>)]
+    </span>PoolDisconnected,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;`SET TRANSACTION READ (ONLY|WRITE)&#39; is not supported in your MySQL version.&quot;</span>)]</span>
-    <span class="ident">ReadOnlyTransNotSupported</span>,
+    <span class="attribute">#[error(<span class="string">&quot;`SET TRANSACTION READ (ONLY|WRITE)&#39; is not supported in your MySQL version.&quot;</span>)]
+    </span>ReadOnlyTransNotSupported,
 
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(
         <span class="string">&quot;Statement takes {} parameters but {} was supplied.&quot;</span>,
-        <span class="ident">required</span>,
-        <span class="ident">supplied</span>
-    )]</span>
-    <span class="ident">StmtParamsMismatch</span> { <span class="ident">required</span>: <span class="ident">u16</span>, <span class="ident">supplied</span>: <span class="ident">u16</span> },
+        required,
+        supplied
+    )]
+    </span>StmtParamsMismatch { required: u16, supplied: u16 },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unexpected packet.&quot;</span>)]</span>
-    <span class="ident">UnexpectedPacket</span> { <span class="ident">payload</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Unexpected packet.&quot;</span>)]
+    </span>UnexpectedPacket { payload: Vec&lt;u8&gt; },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown authentication plugin `{}&#39;.&quot;</span>, <span class="ident">name</span>)]</span>
-    <span class="ident">UnknownAuthPlugin</span> { <span class="ident">name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Unknown authentication plugin `{}&#39;.&quot;</span>, name)]
+    </span>UnknownAuthPlugin { name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Packet too large.&quot;</span>)]</span>
-    <span class="ident">PacketTooLarge</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Packet too large.&quot;</span>)]
+    </span>PacketTooLarge,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Bad compressed packet header.&quot;</span>)]</span>
-    <span class="ident">BadCompressedPacketHeader</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Bad compressed packet header.&quot;</span>)]
+    </span>BadCompressedPacketHeader,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Named pipe connections temporary disabled (see tokio-rs/tokio#3118)&quot;</span>)]</span>
-    <span class="ident">NamedPipesDisabled</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Named pipe connections temporary disabled (see tokio-rs/tokio#3118)&quot;</span>)]
+    </span>NamedPipesDisabled,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;`mysql_old_password` plugin is insecure and disabled by default&quot;</span>)]</span>
-    <span class="ident">MysqlOldPasswordDisabled</span>,
+    <span class="attribute">#[error(<span class="string">&quot;`mysql_old_password` plugin is insecure and disabled by default&quot;</span>)]
+    </span>MysqlOldPasswordDisabled,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;LOCAL INFILE error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">LocalInfile</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">LocalInfileError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;LOCAL INFILE error: {}&quot;</span>, _0)]
+    </span>LocalInfile(<span class="attribute">#[from] </span>LocalInfileError),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LocalInfileError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The given path is not in the while list: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">PathIsNotInTheWhiteList</span>(<span class="ident">String</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error reading `INFILE` data: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">ReadError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">io::Error</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Can&#39;t handle local infile request. Handler is not specified.&quot;</span>)]</span>
-    <span class="ident">NoHandler</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-    <span class="ident">OtherError</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>LocalInfileError {
+    <span class="attribute">#[error(<span class="string">&quot;The given path is not in the while list: {}&quot;</span>, _0)]
+    </span>PathIsNotInTheWhiteList(String),
+    <span class="attribute">#[error(<span class="string">&quot;Error reading `INFILE` data: {}&quot;</span>, _0)]
+    </span>ReadError(<span class="attribute">#[from] </span>io::Error),
+    <span class="attribute">#[error(<span class="string">&quot;Can&#39;t handle local infile request. Handler is not specified.&quot;</span>)]
+    </span>NoHandler,
+    <span class="attribute">#[error(transparent)]
+    </span>OtherError(Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">LocalInfileError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">other</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">err</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl </span>LocalInfileError {
+    <span class="kw">pub fn </span>other&lt;T&gt;(err: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::OtherError</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))
+        <span class="self">Self</span>::OtherError(Box::new(err))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LocalInfileError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">LocalInfileError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Driver</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;LocalInfileError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: LocalInfileError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Driver(err.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DriverError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">DriverError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Driver</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;DriverError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: DriverError) -&gt; <span class="self">Self </span>{
+        Error::Driver(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">io</span>: <span class="ident">IoError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Io</span>(<span class="ident">io</span>)
+<span class="kw">impl </span>From&lt;IoError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(io: IoError) -&gt; <span class="self">Self </span>{
+        Error::Io(io)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">IoError::Io</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;io::Error&gt; <span class="kw">for </span>IoError {
+    <span class="kw">fn </span>from(err: io::Error) -&gt; <span class="self">Self </span>{
+        IoError::Io(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Io</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;io::Error&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: io::Error) -&gt; <span class="self">Self </span>{
+        Error::Io(err.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ServerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ServerError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Server</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;ServerError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: ServerError) -&gt; <span class="self">Self </span>{
+        Error::Server(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UrlError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">UrlError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Url</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;UrlError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: UrlError) -&gt; <span class="self">Self </span>{
+        Error::Url(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">native_tls::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">native_tls::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">IoError::Tls</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;native_tls::Error&gt; <span class="kw">for </span>IoError {
+    <span class="kw">fn </span>from(err: native_tls::Error) -&gt; <span class="self">Self </span>{
+        IoError::Tls(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mysql_common::packets::ServerError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServerError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">packet</span>: <span class="ident">mysql_common::packets::ServerError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ServerError</span> {
-            <span class="ident">code</span>: <span class="ident">packet</span>.<span class="ident">error_code</span>(),
-            <span class="ident">message</span>: <span class="ident">packet</span>.<span class="ident">message_str</span>().<span class="ident">into</span>(),
-            <span class="ident">state</span>: <span class="ident">packet</span>.<span class="ident">sql_state_str</span>().<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;mysql_common::packets::ServerError&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>ServerError {
+    <span class="kw">fn </span>from(packet: mysql_common::packets::ServerError&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        ServerError {
+            code: packet.error_code(),
+            message: packet.message_str().into(),
+            state: packet.sql_state_str().into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mysql_common::packets::ServerError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">packet</span>: <span class="ident">mysql_common::packets::ServerError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Server</span>(<span class="ident">packet</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;mysql_common::packets::ServerError&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(packet: mysql_common::packets::ServerError&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="self">Self </span>{
+        Error::Server(packet.into())
     }
 }
 
-<span class="comment">// For convenience</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Error</span>, <span class="ident"><span class="kw">crate</span>::io::Stream</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">err</span>, <span class="kw">_</span>): (<span class="ident">Error</span>, <span class="ident"><span class="kw">crate</span>::io::Stream</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">err</span>
+<span class="comment">// For convenience
+</span><span class="kw">impl </span>From&lt;(Error, <span class="kw">crate</span>::io::Stream)&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from((err, <span class="kw">_</span>): (Error, <span class="kw">crate</span>::io::Stream)) -&gt; <span class="self">Self </span>{
+        err
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MissingNamedParameterError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DriverError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">MissingNamedParameterError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DriverError::MissingNamedParam</span> { <span class="ident">name</span>: <span class="ident">err</span>.<span class="number">0</span> }
+<span class="kw">impl </span>From&lt;MissingNamedParameterError&gt; <span class="kw">for </span>DriverError {
+    <span class="kw">fn </span>from(err: MissingNamedParameterError) -&gt; <span class="self">Self </span>{
+        DriverError::MissingNamedParam { name: err.<span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MissingNamedParameterError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">MissingNamedParameterError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Driver</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;MissingNamedParameterError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: MissingNamedParameterError) -&gt; <span class="self">Self </span>{
+        Error::Driver(err.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MixedParamsError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DriverError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">_err</span>: <span class="ident">MixedParamsError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DriverError::MixedParams</span>
+<span class="kw">impl </span>From&lt;MixedParamsError&gt; <span class="kw">for </span>DriverError {
+    <span class="kw">fn </span>from(_err: MixedParamsError) -&gt; <span class="self">Self </span>{
+        DriverError::MixedParams
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MixedParamsError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">MixedParamsError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Driver</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;MixedParamsError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: MixedParamsError) -&gt; <span class="self">Self </span>{
+        Error::Driver(err.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UrlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ParseError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">UrlError::Parse</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;ParseError&gt; <span class="kw">for </span>UrlError {
+    <span class="kw">fn </span>from(err: ParseError) -&gt; <span class="self">Self </span>{
+        UrlError::Parse(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParseError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ParseError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Url</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;ParseError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: ParseError) -&gt; <span class="self">Self </span>{
+        Error::Url(err.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PacketCodecError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">PacketCodecError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">PacketCodecError::Io</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">into</span>(),
-            <span class="ident">PacketCodecError::PacketTooLarge</span> =&gt; {
-                <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;packet too large&quot;</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;PacketCodecError&gt; <span class="kw">for </span>IoError {
+    <span class="kw">fn </span>from(err: PacketCodecError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>err {
+            PacketCodecError::Io(err) =&gt; err.into(),
+            PacketCodecError::PacketTooLarge =&gt; {
+                io::Error::new(io::ErrorKind::Other, <span class="string">&quot;packet too large&quot;</span>).into()
             }
-            <span class="ident">PacketCodecError::PacketsOutOfSync</span> =&gt; {
-                <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;packet out of order&quot;</span>).<span class="ident">into</span>()
+            PacketCodecError::PacketsOutOfSync =&gt; {
+                io::Error::new(io::ErrorKind::Other, <span class="string">&quot;packet out of order&quot;</span>).into()
             }
-            <span class="ident">PacketCodecError::BadCompressedPacketHeader</span> =&gt; {
-                <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;bad compressed packet header&quot;</span>).<span class="ident">into</span>()
+            PacketCodecError::BadCompressedPacketHeader =&gt; {
+                io::Error::new(io::ErrorKind::Other, <span class="string">&quot;bad compressed packet header&quot;</span>).into()
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">PacketCodecError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">PacketCodecError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Error::Io</span>(<span class="ident">err</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;PacketCodecError&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(err: PacketCodecError) -&gt; <span class="self">Self </span>{
+        Error::Io(err.into())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

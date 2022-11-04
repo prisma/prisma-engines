@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -320,327 +320,327 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">// Copyright (c) 2013-2015, Kang Seonghoon.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+// Copyright (c) 2013-2015, Kang Seonghoon.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! Internal utilities.</span>
+</span><span class="doccomment">//! Internal utilities.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">str</span>, <span class="ident">char</span>, <span class="ident">mem</span>};
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::convert::Into</span>;
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
-<span class="kw">use</span> <span class="ident">types</span>;
+</span><span class="kw">use </span>std::{str, char, mem};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::convert::Into;
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>types;
 
-<span class="doccomment">/// Unchecked conversion to `char`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_char</span>(<span class="ident">ch</span>: <span class="ident">u32</span>) -&gt; <span class="ident">char</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">char::from_u32</span>(<span class="ident">ch</span>).<span class="ident">is_some</span>());
-    <span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>(<span class="ident">ch</span>) }
+<span class="doccomment">/// Unchecked conversion to `char`.
+</span><span class="kw">pub fn </span>as_char(ch: u32) -&gt; char {
+    <span class="macro">debug_assert!</span>(char::from_u32(ch).is_some());
+    <span class="kw">unsafe </span>{ mem::transmute(ch) }
 }
 
-<span class="doccomment">/// External iterator for a string&#39;s characters with its corresponding byte offset range.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StrCharIndexIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">chars</span>: <span class="ident">str::Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>,
+<span class="doccomment">/// External iterator for a string&#39;s characters with its corresponding byte offset range.
+</span><span class="kw">pub struct </span>StrCharIndexIterator&lt;<span class="lifetime">&#39;r</span>&gt; {
+    index: usize,
+    chars: str::Chars&lt;<span class="lifetime">&#39;r</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">StrCharIndexIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> ((<span class="ident">usize</span>,<span class="ident">usize</span>), <span class="ident">char</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; Iterator <span class="kw">for </span>StrCharIndexIterator&lt;<span class="lifetime">&#39;r</span>&gt; {
+    <span class="kw">type </span>Item = ((usize,usize), char);
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>((<span class="ident">usize</span>,<span class="ident">usize</span>), <span class="ident">char</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ch</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chars</span>.<span class="ident">next</span>() {
-            <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">prev</span> <span class="op">+</span> <span class="ident">ch</span>.<span class="ident">len_utf8</span>();
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span> <span class="ident">next</span>;
-            <span class="prelude-val">Some</span>(((<span class="ident">prev</span>, <span class="ident">next</span>), <span class="ident">ch</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="doccomment">/// A trait providing an `index_iter` method.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StrCharIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">index_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StrCharIndexIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">StrCharIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">str</span> {
-    <span class="doccomment">/// Iterates over each character with corresponding byte offset range.</span>
-    <span class="kw">fn</span> <span class="ident">index_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StrCharIndexIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> {
-        <span class="ident">StrCharIndexIterator</span> { <span class="ident">index</span>: <span class="number">0</span>, <span class="ident">chars</span>: <span class="self">self</span>.<span class="ident">chars</span>() }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;((usize,usize), char)&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ch) = <span class="self">self</span>.chars.next() {
+            <span class="kw">let </span>prev = <span class="self">self</span>.index;
+            <span class="kw">let </span>next = prev + ch.len_utf8();
+            <span class="self">self</span>.index = next;
+            <span class="prelude-val">Some</span>(((prev, next), ch))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="doccomment">/// A helper struct for the stateful decoder DSL.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StatefulDecoderHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">St</span>, <span class="ident">Data</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The current buffer.</span>
-    <span class="kw">pub</span> <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// The current index to the buffer.</span>
-    <span class="kw">pub</span> <span class="ident">pos</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The output buffer.</span>
-    <span class="kw">pub</span> <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> (<span class="ident">types::StringWriter</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>),
-    <span class="doccomment">/// The last codec error. The caller will later collect this.</span>
-    <span class="kw">pub</span> <span class="ident">err</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">types::CodecError</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The additional data attached for the use from transition functions.</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Data</span>,
-    <span class="doccomment">/// A marker for the phantom type parameter `St`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">St</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A trait providing an `index_iter` method.
+</span><span class="kw">pub trait </span>StrCharIndex&lt;<span class="lifetime">&#39;r</span>&gt; {
+    <span class="kw">fn </span>index_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StrCharIndexIterator&lt;<span class="lifetime">&#39;r</span>&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">St</span>: <span class="ident">Default</span>, <span class="ident">Data</span><span class="op">&gt;</span> <span class="ident">StatefulDecoderHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">St</span>, <span class="ident">Data</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Makes a new decoder context out of given buffer and output callback.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> (<span class="ident">types::StringWriter</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>),
-               <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Data</span>) -&gt; <span class="ident">StatefulDecoderHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">St</span>, <span class="ident">Data</span><span class="op">&gt;</span> {
-        <span class="ident">StatefulDecoderHelper</span> { <span class="ident">buf</span>: <span class="ident">buf</span>, <span class="ident">pos</span>: <span class="number">0</span>, <span class="ident">output</span>: <span class="ident">output</span>, <span class="ident">err</span>: <span class="prelude-val">None</span>,
-                                <span class="ident">data</span>: <span class="ident">data</span>, <span class="ident">_marker</span>: <span class="ident">PhantomData</span> }
-    }
-
-    <span class="doccomment">/// Reads one byte from the buffer if any.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">pos</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) =&gt; { <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>; <span class="prelude-val">Some</span>(<span class="ident">c</span>) }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="doccomment">/// Resets back to the initial state.</span>
-    <span class="doccomment">/// This should be the last expr in the rules.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">St</span> {
-        <span class="ident">Default::default</span>()
-    }
-
-    <span class="doccomment">/// Writes one Unicode scalar value to the output.</span>
-    <span class="doccomment">/// There is intentionally no check for `c`, so the caller should ensure that it&#39;s valid.</span>
-    <span class="doccomment">/// If this is the last expr in the rules, also resets back to the initial state.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">u32</span>) -&gt; <span class="ident">St</span> {
-        <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">write_char</span>(<span class="kw">unsafe</span> {<span class="ident">mem::transmute</span>(<span class="ident">c</span>)});
-        <span class="ident">Default::default</span>()
-    }
-
-    <span class="doccomment">/// Writes a Unicode string to the output.</span>
-    <span class="doccomment">/// If this is the last expr in the rules, also resets back to the initial state.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">St</span> {
-        <span class="self">self</span>.<span class="ident">output</span>.<span class="ident">write_str</span>(<span class="ident">s</span>);
-        <span class="ident">Default::default</span>()
-    }
-
-    <span class="doccomment">/// Issues a codec error with given message at the current position.</span>
-    <span class="doccomment">/// If this is the last expr in the rules, also resets back to the initial state.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">err</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">St</span> {
-        <span class="self">self</span>.<span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">types::CodecError</span> { <span class="ident">upto</span>: <span class="self">self</span>.<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="ident">msg</span>.<span class="ident">into</span>() });
-        <span class="ident">Default::default</span>()
-    }
-
-    <span class="doccomment">/// Issues a codec error with given message at the current position minus `backup` bytes.</span>
-    <span class="doccomment">/// If this is the last expr in the rules, also resets back to the initial state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be used to implement &quot;prepending byte to the stream&quot; in the Encoding spec,</span>
-    <span class="doccomment">/// which corresponds to `ctx.backup_and_err(1, ...)`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backup_and_err</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">backup</span>: <span class="ident">usize</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">St</span> {
-        <span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">backup</span> <span class="kw">as</span> <span class="ident">isize</span>;
-        <span class="self">self</span>.<span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">types::CodecError</span> { <span class="ident">upto</span>: <span class="ident">upto</span>, <span class="ident">cause</span>: <span class="ident">msg</span>.<span class="ident">into</span>() });
-        <span class="ident">Default::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; StrCharIndex&lt;<span class="lifetime">&#39;r</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;r </span>str {
+    <span class="doccomment">/// Iterates over each character with corresponding byte offset range.
+    </span><span class="kw">fn </span>index_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StrCharIndexIterator&lt;<span class="lifetime">&#39;r</span>&gt; {
+        StrCharIndexIterator { index: <span class="number">0</span>, chars: <span class="self">self</span>.chars() }
     }
 }
 
-<span class="doccomment">/// Defines a stateful decoder from given state machine.</span>
-<span class="macro">macro_rules!</span> <span class="ident">stateful_decoder</span> {
+<span class="doccomment">/// A helper struct for the stateful decoder DSL.
+</span><span class="kw">pub struct </span>StatefulDecoderHelper&lt;<span class="lifetime">&#39;a</span>, St, Data: <span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The current buffer.
+    </span><span class="kw">pub </span>buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// The current index to the buffer.
+    </span><span class="kw">pub </span>pos: usize,
+    <span class="doccomment">/// The output buffer.
+    </span><span class="kw">pub </span>output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>(types::StringWriter + <span class="lifetime">&#39;a</span>),
+    <span class="doccomment">/// The last codec error. The caller will later collect this.
+    </span><span class="kw">pub </span>err: <span class="prelude-ty">Option</span>&lt;types::CodecError&gt;,
+    <span class="doccomment">/// The additional data attached for the use from transition functions.
+    </span><span class="kw">pub </span>data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data,
+    <span class="doccomment">/// A marker for the phantom type parameter `St`.
+    </span>_marker: PhantomData&lt;St&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, St: Default, Data&gt; StatefulDecoderHelper&lt;<span class="lifetime">&#39;a</span>, St, Data&gt; {
+    <span class="doccomment">/// Makes a new decoder context out of given buffer and output callback.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>new(buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], output: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>(types::StringWriter + <span class="lifetime">&#39;a</span>),
+               data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data) -&gt; StatefulDecoderHelper&lt;<span class="lifetime">&#39;a</span>, St, Data&gt; {
+        StatefulDecoderHelper { buf: buf, pos: <span class="number">0</span>, output: output, err: <span class="prelude-val">None</span>,
+                                data: data, _marker: PhantomData }
+    }
+
+    <span class="doccomment">/// Reads one byte from the buffer if any.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="kw">match </span><span class="self">self</span>.buf.get(<span class="self">self</span>.pos) {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) =&gt; { <span class="self">self</span>.pos += <span class="number">1</span>; <span class="prelude-val">Some</span>(c) }
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Resets back to the initial state.
+    /// This should be the last expr in the rules.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; St {
+        Default::default()
+    }
+
+    <span class="doccomment">/// Writes one Unicode scalar value to the output.
+    /// There is intentionally no check for `c`, so the caller should ensure that it&#39;s valid.
+    /// If this is the last expr in the rules, also resets back to the initial state.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>emit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, c: u32) -&gt; St {
+        <span class="self">self</span>.output.write_char(<span class="kw">unsafe </span>{mem::transmute(c)});
+        Default::default()
+    }
+
+    <span class="doccomment">/// Writes a Unicode string to the output.
+    /// If this is the last expr in the rules, also resets back to the initial state.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>emit_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; St {
+        <span class="self">self</span>.output.write_str(s);
+        Default::default()
+    }
+
+    <span class="doccomment">/// Issues a codec error with given message at the current position.
+    /// If this is the last expr in the rules, also resets back to the initial state.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>err(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; St {
+        <span class="self">self</span>.err = <span class="prelude-val">Some</span>(types::CodecError { upto: <span class="self">self</span>.pos <span class="kw">as </span>isize, cause: msg.into() });
+        Default::default()
+    }
+
+    <span class="doccomment">/// Issues a codec error with given message at the current position minus `backup` bytes.
+    /// If this is the last expr in the rules, also resets back to the initial state.
+    ///
+    /// This should be used to implement &quot;prepending byte to the stream&quot; in the Encoding spec,
+    /// which corresponds to `ctx.backup_and_err(1, ...)`.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>backup_and_err(<span class="kw-2">&amp;mut </span><span class="self">self</span>, backup: usize, msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; St {
+        <span class="kw">let </span>upto = <span class="self">self</span>.pos <span class="kw">as </span>isize - backup <span class="kw">as </span>isize;
+        <span class="self">self</span>.err = <span class="prelude-val">Some</span>(types::CodecError { upto: upto, cause: msg.into() });
+        Default::default()
+    }
+}
+
+<span class="doccomment">/// Defines a stateful decoder from given state machine.
+</span><span class="macro">macro_rules! </span>stateful_decoder {
     (
-        <span class="ident">module</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stmod</span>:<span class="ident">ident</span>; <span class="comment">// should be unique from other existing identifiers</span>
-        $(<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">item</span>)<span class="op">*</span> <span class="comment">// will only be visible from state functions</span>
-    <span class="ident">initial</span>:
-        <span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>:<span class="ident">ident</span>: <span class="ident">Context</span>) {
-            $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inilhs</span>:<span class="ident">pat</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inirhs</span>:<span class="ident">expr</span>),<span class="op">+</span>;)<span class="op">+</span>
-            <span class="kw">final</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inifin</span>:<span class="ident">expr</span>),<span class="op">+</span>;
+        module <span class="macro-nonterminal">$stmod</span>:ident; <span class="comment">// should be unique from other existing identifiers
+        </span>$(internal <span class="macro-nonterminal">$item</span>:item)* <span class="comment">// will only be visible from state functions
+    </span>initial:
+        state <span class="macro-nonterminal">$inist</span>:ident(<span class="macro-nonterminal">$inictx</span>:ident: Context) {
+            $(case $(<span class="macro-nonterminal">$inilhs</span>:pat),+ =&gt; $(<span class="macro-nonterminal">$inirhs</span>:expr),+;)+
+            <span class="kw">final </span>=&gt; $(<span class="macro-nonterminal">$inifin</span>:expr),+;
         }
-    <span class="ident">checkpoint</span>:
-        $(<span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckctx</span>:<span class="ident">ident</span>: <span class="ident">Context</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckty</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) {
-            $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cklhs</span>:<span class="ident">pat</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckrhs</span>:<span class="ident">expr</span>),<span class="op">+</span>;)<span class="op">+</span>
-            <span class="kw">final</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckfin</span>:<span class="ident">expr</span>),<span class="op">+</span>;
-        })<span class="op">*</span>
-    <span class="ident">transient</span>:
-        $(<span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span>:<span class="ident">ident</span>: <span class="ident">Context</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) {
-            $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lhs</span>:<span class="ident">pat</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>:<span class="ident">expr</span>),<span class="op">+</span>;)<span class="op">+</span>
-            <span class="kw">final</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fin</span>:<span class="ident">expr</span>),<span class="op">+</span>;
-        })<span class="op">*</span>
+    checkpoint:
+        $(state <span class="macro-nonterminal">$ckst</span>:ident(<span class="macro-nonterminal">$ckctx</span>:ident: Context $(, <span class="macro-nonterminal">$ckarg</span>:ident: <span class="macro-nonterminal">$ckty</span>:ty)<span class="kw-2">*</span>) {
+            $(case $(<span class="macro-nonterminal">$cklhs</span>:pat),+ =&gt; $(<span class="macro-nonterminal">$ckrhs</span>:expr),+;)+
+            <span class="kw">final </span>=&gt; $(<span class="macro-nonterminal">$ckfin</span>:expr),+;
+        })*
+    transient:
+        $(state <span class="macro-nonterminal">$st</span>:ident(<span class="macro-nonterminal">$ctx</span>:ident: Context $(, <span class="macro-nonterminal">$arg</span>:ident: <span class="macro-nonterminal">$ty</span>:ty)<span class="kw-2">*</span>) {
+            $(case $(<span class="macro-nonterminal">$lhs</span>:pat),+ =&gt; $(<span class="macro-nonterminal">$rhs</span>:expr),+;)+
+            <span class="kw">final </span>=&gt; $(<span class="macro-nonterminal">$fin</span>:expr),+;
+        })*
     ) =&gt; (
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stmod</span> {
-            <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::State</span>::<span class="kw-2">*</span>;
+        <span class="attribute">#[allow(non_snake_case)]
+        </span><span class="kw">mod </span><span class="macro-nonterminal">$stmod </span>{
+            <span class="kw">pub use </span><span class="self">self</span>::State::<span class="kw-2">*</span>;
 
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">State</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>,
+            <span class="attribute">#[derive(PartialEq, Clone, Copy)]
+            </span><span class="kw">pub enum </span>State {
+                <span class="macro-nonterminal">$inist</span>,
                 $(
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckty</span>)<span class="kw-2">*</span>),
-                )<span class="op">*</span>
+                    <span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckty</span>)<span class="kw-2">*</span>),
+                )*
                 $(
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)<span class="kw-2">*</span>),
-                )<span class="op">*</span>
+                    <span class="macro-nonterminal">$st</span>(() $(, <span class="macro-nonterminal">$ty</span>)<span class="kw-2">*</span>),
+                )*
             }
 
-            <span class="kw">impl</span> <span class="ident">::std::default::Default</span> <span class="kw">for</span> <span class="ident">State</span> {
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">State</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span> }
+            <span class="kw">impl </span>::std::default::Default <span class="kw">for </span>State {
+                <span class="attribute">#[inline(always)] </span><span class="kw">fn </span>default() -&gt; State { <span class="macro-nonterminal">$inist </span>}
             }
 
-            <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">internal</span> {
-                <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Data</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">::util::StatefulDecoderHelper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">super</span>::State</span>, <span class="ident">Data</span><span class="op">&gt;</span>;
+            <span class="kw">pub mod </span>internal {
+                <span class="kw">pub type </span>Context&lt;<span class="lifetime">&#39;a</span>, Data&gt; = ::util::StatefulDecoderHelper&lt;<span class="lifetime">&#39;a</span>, <span class="kw">super</span>::State, Data&gt;;
 
-                $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>)<span class="op">*</span>
+                $(<span class="macro-nonterminal">$item</span>)*
             }
 
-            <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">start</span> {
-                <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::internal</span>::<span class="kw-2">*</span>;
+            <span class="kw">pub mod </span>start {
+                <span class="kw">use </span><span class="kw">super</span>::internal::<span class="kw-2">*</span>;
 
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">super</span>::State</span> {
-                    <span class="comment">// prohibits all kind of recursions, including self-recursions</span>
-                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::transient</span>::<span class="kw-2">*</span>;
-                    <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>.<span class="ident">read</span>() {
-                        <span class="prelude-val">None</span> =&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>,
-                        <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="kw">match</span> <span class="ident">c</span> { $($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inilhs</span>)<span class="op">|</span><span class="op">+</span> =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inirhs</span>);<span class="op">+</span> })<span class="op">+</span> },
+                <span class="attribute">#[inline(always)]
+                </span><span class="kw">pub fn </span><span class="macro-nonterminal">$inist</span>&lt;T&gt;(<span class="macro-nonterminal">$inictx</span>: <span class="kw-2">&amp;mut </span>Context&lt;T&gt;) -&gt; <span class="kw">super</span>::State {
+                    <span class="comment">// prohibits all kind of recursions, including self-recursions
+                    </span><span class="attribute">#[allow(unused_imports)] </span><span class="kw">use </span><span class="kw">super</span>::transient::<span class="kw-2">*</span>;
+                    <span class="kw">match </span><span class="macro-nonterminal">$inictx</span>.read() {
+                        <span class="prelude-val">None </span>=&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$inist</span>,
+                        <span class="prelude-val">Some</span>(c) =&gt; <span class="kw">match </span>c { $($(<span class="macro-nonterminal">$inilhs</span>)|+ =&gt; { $(<span class="macro-nonterminal">$inirhs</span>);+ })+ },
                     }
                 }
 
                 $(
-                    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                    <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckty</span>)<span class="kw-2">*</span>) -&gt; <span class="ident"><span class="kw">super</span>::State</span> {
-                        <span class="comment">// prohibits all kind of recursions, including self-recursions</span>
-                        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::transient</span>::<span class="kw-2">*</span>;
-                        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckctx</span>.<span class="ident">read</span>() {
-                            <span class="prelude-val">None</span> =&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="kw">match</span> <span class="ident">c</span> { $($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cklhs</span>)<span class="op">|</span><span class="op">+</span> =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckrhs</span>);<span class="op">+</span> })<span class="op">+</span> },
+                    <span class="attribute">#[inline(always)]
+                    </span><span class="kw">pub fn </span><span class="macro-nonterminal">$ckst</span>&lt;T&gt;(<span class="macro-nonterminal">$ckctx</span>: <span class="kw-2">&amp;mut </span>Context&lt;T&gt; $(, <span class="macro-nonterminal">$ckarg</span>: <span class="macro-nonterminal">$ckty</span>)<span class="kw-2">*</span>) -&gt; <span class="kw">super</span>::State {
+                        <span class="comment">// prohibits all kind of recursions, including self-recursions
+                        </span><span class="attribute">#[allow(unused_imports)] </span><span class="kw">use </span><span class="kw">super</span>::transient::<span class="kw-2">*</span>;
+                        <span class="kw">match </span><span class="macro-nonterminal">$ckctx</span>.read() {
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>),
+                            <span class="prelude-val">Some</span>(c) =&gt; <span class="kw">match </span>c { $($(<span class="macro-nonterminal">$cklhs</span>)|+ =&gt; { $(<span class="macro-nonterminal">$ckrhs</span>);+ })+ },
                         }
                     }
-                )<span class="op">*</span>
+                )*
             }
 
-            <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">transient</span> {
-                <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::internal</span>::<span class="kw-2">*</span>;
+            <span class="kw">pub mod </span>transient {
+                <span class="kw">use </span><span class="kw">super</span>::internal::<span class="kw-2">*</span>;
 
-                <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">super</span>::State</span> {
-                    <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span> <span class="comment">// do not recurse further</span>
-                }
-
-                $(
-                    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-                    <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckty</span>)<span class="kw-2">*</span>) -&gt; <span class="ident"><span class="kw">super</span>::State</span> {
-                        <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>) <span class="comment">// do not recurse further</span>
-                    }
-                )<span class="op">*</span>
+                <span class="attribute">#[inline(always)]
+                #[allow(dead_code)]
+                </span><span class="kw">pub fn </span><span class="macro-nonterminal">$inist</span>&lt;T&gt;(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;T&gt;) -&gt; <span class="kw">super</span>::State {
+                    <span class="kw">super</span>::<span class="macro-nonterminal">$inist </span><span class="comment">// do not recurse further
+                </span>}
 
                 $(
-                    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-                    <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)<span class="kw-2">*</span>) -&gt; <span class="ident"><span class="kw">super</span>::State</span> {
-                        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>.<span class="ident">read</span>() {
-                            <span class="prelude-val">None</span> =&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="kw">match</span> <span class="ident">c</span> { $($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lhs</span>)<span class="op">|</span><span class="op">+</span> =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>);<span class="op">+</span> })<span class="op">+</span> },
+                    <span class="attribute">#[inline(always)]
+                    #[allow(dead_code)]
+                    </span><span class="kw">pub fn </span><span class="macro-nonterminal">$ckst</span>&lt;T&gt;(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;T&gt; $(, <span class="macro-nonterminal">$ckarg</span>: <span class="macro-nonterminal">$ckty</span>)<span class="kw-2">*</span>) -&gt; <span class="kw">super</span>::State {
+                        <span class="kw">super</span>::<span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>) <span class="comment">// do not recurse further
+                    </span>}
+                )*
+
+                $(
+                    <span class="attribute">#[inline(always)]
+                    </span><span class="kw">pub fn </span><span class="macro-nonterminal">$st</span>&lt;T&gt;(<span class="macro-nonterminal">$ctx</span>: <span class="kw-2">&amp;mut </span>Context&lt;T&gt; $(, <span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$ty</span>)<span class="kw-2">*</span>) -&gt; <span class="kw">super</span>::State {
+                        <span class="kw">match </span><span class="macro-nonterminal">$inictx</span>.read() {
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">super</span>::<span class="macro-nonterminal">$st</span>(() $(, <span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>),
+                            <span class="prelude-val">Some</span>(c) =&gt; <span class="kw">match </span>c { $($(<span class="macro-nonterminal">$lhs</span>)|+ =&gt; { $(<span class="macro-nonterminal">$rhs</span>);+ })+ },
                         }
                     }
-                )<span class="op">*</span>
+                )*
             }
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_feed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">st</span>: <span class="ident">State</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::types::StringWriter</span>,
-                               <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; (<span class="ident">State</span>, <span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">::types::CodecError</span><span class="op">&gt;</span>) {
-                <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
+            <span class="kw">pub fn </span>raw_feed&lt;T&gt;(<span class="kw-2">mut </span>st: State, input: <span class="kw-2">&amp;</span>[u8], output: <span class="kw-2">&amp;mut </span>::types::StringWriter,
+                               data: <span class="kw-2">&amp;</span>T) -&gt; (State, usize, <span class="prelude-ty">Option</span>&lt;::types::CodecError&gt;) {
+                output.writer_hint(input.len());
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">::util::StatefulDecoderHelper::new</span>(<span class="ident">input</span>, <span class="ident">output</span>, <span class="ident">data</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processed</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>ctx = ::util::StatefulDecoderHelper::new(input, output, data);
+                <span class="kw">let </span><span class="kw-2">mut </span>processed = <span class="number">0</span>;
 
-                <span class="kw">let</span> <span class="ident">st_</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">st</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>,
+                <span class="kw">let </span>st_ = <span class="kw">match </span>st {
+                    <span class="macro-nonterminal">$inist </span>=&gt; <span class="macro-nonterminal">$inist</span>,
                     $(
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>) =&gt; <span class="ident">start</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>),
-                    )<span class="op">*</span>
+                        <span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>) =&gt; start::<span class="macro-nonterminal">$ckst</span>(<span class="kw-2">&amp;mut </span>ctx $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>),
+                    )*
                     $(
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>) =&gt; <span class="ident">transient</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>),
-                    )<span class="op">*</span>
+                        <span class="macro-nonterminal">$st</span>(() $(, <span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>) =&gt; transient::<span class="macro-nonterminal">$st</span>(<span class="kw-2">&amp;mut </span>ctx $(, <span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>),
+                    )*
                 };
-                <span class="kw">match</span> (<span class="ident">ctx</span>.<span class="ident">err</span>.<span class="ident">take</span>(), <span class="ident">st_</span>) {
-                    (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>) $(<span class="op">|</span> (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(..)))<span class="op">*</span> =&gt; { <span class="ident">st</span> <span class="op">=</span> <span class="ident">st_</span>; <span class="ident">processed</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pos</span>; }
-                    <span class="comment">// XXX splitting the match case improves the performance somehow, but why?</span>
-                    (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; { <span class="kw">return</span> (<span class="ident">st_</span>, <span class="ident">processed</span>, <span class="prelude-val">None</span>); }
-                    (<span class="prelude-val">Some</span>(<span class="ident">err</span>), <span class="kw">_</span>) =&gt; { <span class="kw">return</span> (<span class="ident">st_</span>, <span class="ident">processed</span>, <span class="prelude-val">Some</span>(<span class="ident">err</span>)); }
+                <span class="kw">match </span>(ctx.err.take(), st_) {
+                    (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$inist</span>) $(| (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$ckst</span>(..)))* =&gt; { st = st_; processed = ctx.pos; }
+                    <span class="comment">// XXX splitting the match case improves the performance somehow, but why?
+                    </span>(<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; { <span class="kw">return </span>(st_, processed, <span class="prelude-val">None</span>); }
+                    (<span class="prelude-val">Some</span>(err), <span class="kw">_</span>) =&gt; { <span class="kw">return </span>(st_, processed, <span class="prelude-val">Some</span>(err)); }
                 }
 
-                <span class="kw">while</span> <span class="ident">ctx</span>.<span class="ident">pos</span> <span class="op">&lt;</span> <span class="ident">ctx</span>.<span class="ident">buf</span>.<span class="ident">len</span>() {
-                    <span class="kw">let</span> <span class="ident">st_</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">st</span> {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span> =&gt; <span class="ident">start</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>),
+                <span class="kw">while </span>ctx.pos &lt; ctx.buf.len() {
+                    <span class="kw">let </span>st_ = <span class="kw">match </span>st {
+                        <span class="macro-nonterminal">$inist </span>=&gt; start::<span class="macro-nonterminal">$inist</span>(<span class="kw-2">&amp;mut </span>ctx),
                         $(
-                            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>) =&gt; <span class="ident">start</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>),
-                        )<span class="op">*</span>
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                            <span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>) =&gt; start::<span class="macro-nonterminal">$ckst</span>(<span class="kw-2">&amp;mut </span>ctx $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>),
+                        )*
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     };
-                    <span class="kw">match</span> (<span class="ident">ctx</span>.<span class="ident">err</span>.<span class="ident">take</span>(), <span class="ident">st_</span>) {
-                        (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>) $(<span class="op">|</span> (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(..)))<span class="op">*</span> =&gt; { <span class="ident">st</span> <span class="op">=</span> <span class="ident">st_</span>; <span class="ident">processed</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">pos</span>; }
-                        <span class="comment">// XXX splitting the match case improves the performance somehow, but why?</span>
-                        (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; { <span class="kw">return</span> (<span class="ident">st_</span>, <span class="ident">processed</span>, <span class="prelude-val">None</span>); }
-                        (<span class="prelude-val">Some</span>(<span class="ident">err</span>), <span class="kw">_</span>) =&gt; { <span class="kw">return</span> (<span class="ident">st_</span>, <span class="ident">processed</span>, <span class="prelude-val">Some</span>(<span class="ident">err</span>)); }
+                    <span class="kw">match </span>(ctx.err.take(), st_) {
+                        (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$inist</span>) $(| (<span class="prelude-val">None</span>, <span class="macro-nonterminal">$ckst</span>(..)))* =&gt; { st = st_; processed = ctx.pos; }
+                        <span class="comment">// XXX splitting the match case improves the performance somehow, but why?
+                        </span>(<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; { <span class="kw">return </span>(st_, processed, <span class="prelude-val">None</span>); }
+                        (<span class="prelude-val">Some</span>(err), <span class="kw">_</span>) =&gt; { <span class="kw">return </span>(st_, processed, <span class="prelude-val">Some</span>(err)); }
                     }
                 }
 
-                (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="prelude-val">None</span>)
+                (st, processed, <span class="prelude-val">None</span>)
             }
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_finish</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">st</span>: <span class="ident">State</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::types::StringWriter</span>,
-                                 <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; (<span class="ident">State</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">::types::CodecError</span><span class="op">&gt;</span>) {
-                <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_mut</span>, <span class="ident">unused_variables</span>)]</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">::util::StatefulDecoderHelper::new</span>(<span class="kw-2">&amp;</span>[], <span class="ident">output</span>, <span class="ident">data</span>);
-                <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">::std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>) {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span> =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inifin</span>);<span class="op">+</span> },
+            <span class="kw">pub fn </span>raw_finish&lt;T&gt;(<span class="kw-2">mut </span>st: State, output: <span class="kw-2">&amp;mut </span>::types::StringWriter,
+                                 data: <span class="kw-2">&amp;</span>T) -&gt; (State, <span class="prelude-ty">Option</span>&lt;::types::CodecError&gt;) {
+                <span class="attribute">#![allow(unused_mut, unused_variables)]
+                </span><span class="kw">let </span><span class="kw-2">mut </span>ctx = ::util::StatefulDecoderHelper::new(<span class="kw-2">&amp;</span>[], output, data);
+                <span class="kw">let </span>st = <span class="kw">match </span>::std::mem::replace(<span class="kw-2">&amp;mut </span>st, <span class="macro-nonterminal">$inist</span>) {
+                    <span class="macro-nonterminal">$inist </span>=&gt; { <span class="kw">let </span><span class="macro-nonterminal">$inictx </span>= <span class="kw-2">&amp;mut </span>ctx; $(<span class="macro-nonterminal">$inifin</span>);+ },
                     $(
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckst</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckarg</span>)<span class="kw-2">*</span>) =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckctx</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ckfin</span>);<span class="op">+</span> },
-                    )<span class="op">*</span>
+                        <span class="macro-nonterminal">$ckst</span>(() $(, <span class="macro-nonterminal">$ckarg</span>)<span class="kw-2">*</span>) =&gt; { <span class="kw">let </span><span class="macro-nonterminal">$ckctx </span>= <span class="kw-2">&amp;mut </span>ctx; $(<span class="macro-nonterminal">$ckfin</span>);+ },
+                    )*
                     $(
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(() $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>) =&gt; { <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fin</span>);<span class="op">+</span> },
-                    )<span class="op">*</span>
+                        <span class="macro-nonterminal">$st</span>(() $(, <span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>) =&gt; { <span class="kw">let </span><span class="macro-nonterminal">$ctx </span>= <span class="kw-2">&amp;mut </span>ctx; $(<span class="macro-nonterminal">$fin</span>);+ },
+                    )*
                 };
-                (<span class="ident">st</span>, <span class="ident">ctx</span>.<span class="ident">err</span>.<span class="ident">take</span>())
+                (st, ctx.err.take())
             }
         }
     );
 
-    <span class="comment">// simplified rules: no checkpoint and default final actions</span>
-    (
-        <span class="ident">module</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stmod</span>:<span class="ident">ident</span>; <span class="comment">// should be unique from other existing identifiers</span>
-        $(<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>:<span class="ident">item</span>)<span class="op">*</span> <span class="comment">// will only be visible from state functions</span>
-    <span class="ident">initial</span>:
-        <span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>:<span class="ident">ident</span>: <span class="ident">Context</span>) {
-            $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inilhs</span>:<span class="ident">pat</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inirhs</span>:<span class="ident">expr</span>),<span class="op">+</span>;)<span class="op">+</span>
+    <span class="comment">// simplified rules: no checkpoint and default final actions
+    </span>(
+        module <span class="macro-nonterminal">$stmod</span>:ident; <span class="comment">// should be unique from other existing identifiers
+        </span>$(internal <span class="macro-nonterminal">$item</span>:item)* <span class="comment">// will only be visible from state functions
+    </span>initial:
+        state <span class="macro-nonterminal">$inist</span>:ident(<span class="macro-nonterminal">$inictx</span>:ident: Context) {
+            $(case $(<span class="macro-nonterminal">$inilhs</span>:pat),+ =&gt; $(<span class="macro-nonterminal">$inirhs</span>:expr),+;)+
         }
-    <span class="ident">transient</span>:
-        $(<span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>:<span class="ident">ident</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span>:<span class="ident">ident</span>: <span class="ident">Context</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) {
-            $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lhs</span>:<span class="ident">pat</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>:<span class="ident">expr</span>),<span class="op">+</span>;)<span class="op">+</span>
-        })<span class="op">*</span>
+    transient:
+        $(state <span class="macro-nonterminal">$st</span>:ident(<span class="macro-nonterminal">$ctx</span>:ident: Context $(, <span class="macro-nonterminal">$arg</span>:ident: <span class="macro-nonterminal">$ty</span>:ty)<span class="kw-2">*</span>) {
+            $(case $(<span class="macro-nonterminal">$lhs</span>:pat),+ =&gt; $(<span class="macro-nonterminal">$rhs</span>:expr),+;)+
+        })*
     ) =&gt; (
-        <span class="macro">stateful_decoder!</span> {
-            <span class="ident">module</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stmod</span>;
-            $(<span class="ident">internal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>)<span class="op">*</span>
-        <span class="ident">initial</span>:
-            <span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inist</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>: <span class="ident">Context</span>) {
-                $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inilhs</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inirhs</span>),<span class="op">+</span>;)<span class="op">+</span>
-                <span class="kw">final</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">inictx</span>.<span class="ident">reset</span>();
+        <span class="macro">stateful_decoder! </span>{
+            module <span class="macro-nonterminal">$stmod</span>;
+            $(internal <span class="macro-nonterminal">$item</span>)*
+        initial:
+            state <span class="macro-nonterminal">$inist</span>(<span class="macro-nonterminal">$inictx</span>: Context) {
+                $(case $(<span class="macro-nonterminal">$inilhs</span>),+ =&gt; $(<span class="macro-nonterminal">$inirhs</span>),+;)+
+                <span class="kw">final </span>=&gt; <span class="macro-nonterminal">$inictx</span>.reset();
             }
-        <span class="ident">checkpoint</span>:
-        <span class="ident">transient</span>:
-            $(<span class="ident">state</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">st</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span>: <span class="ident">Context</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)<span class="kw-2">*</span>) {
-                $(<span class="ident">case</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lhs</span>),<span class="op">+</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>),<span class="op">+</span>;)<span class="op">+</span>
-                <span class="kw">final</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;incomplete sequence&quot;</span>);
-            })<span class="op">*</span>
+        checkpoint:
+        transient:
+            $(state <span class="macro-nonterminal">$st</span>(<span class="macro-nonterminal">$ctx</span>: Context $(, <span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$ty</span>)<span class="kw-2">*</span>) {
+                $(case $(<span class="macro-nonterminal">$lhs</span>),+ =&gt; $(<span class="macro-nonterminal">$rhs</span>),+;)+
+                <span class="kw">final </span>=&gt; <span class="macro-nonterminal">$ctx</span>.err(<span class="string">&quot;incomplete sequence&quot;</span>);
+            })*
         }
     );
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

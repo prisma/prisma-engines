@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -289,296 +289,296 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::unexpected_buf_eof</span>,
-    <span class="ident">packets</span>::{<span class="ident">Column</span>, <span class="ident">NullBitmap</span>},
-    <span class="ident">proto</span>::{<span class="ident">Binary</span>, <span class="ident">MyDeserialize</span>, <span class="ident">Text</span>},
-    <span class="ident">value</span>::{
-        <span class="ident">convert</span>::{<span class="ident">from_value</span>, <span class="ident">from_value_opt</span>, <span class="ident">FromValue</span>, <span class="ident">FromValueError</span>},
-        <span class="ident">BinValue</span>, <span class="ident">SerializationSide</span>, <span class="ident">TextValue</span>, <span class="ident">Value</span>, <span class="ident">ValueDeserializer</span>,
+</span><span class="kw">use crate</span>::{
+    io::ParseBuf,
+    misc::unexpected_buf_eof,
+    packets::{Column, NullBitmap},
+    proto::{Binary, MyDeserialize, Text},
+    value::{
+        convert::{from_value, from_value_opt, FromValue, FromValueError},
+        BinValue, SerializationSide, TextValue, Value, ValueDeserializer,
     },
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">ops::Index</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{borrow::Cow, fmt, io, marker::PhantomData, ops::Index, sync::Arc};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">convert</span>;
+<span class="kw">pub mod </span>convert;
 
-<span class="doccomment">/// Client side representation of a MySql row.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It allows you to move column values out of a row with `Row::take` method but note that it</span>
-<span class="doccomment">/// makes row incomplete. Calls to `from_row_opt` on incomplete row will return</span>
-<span class="doccomment">/// `Error::FromRowError` and also numerical indexing on taken columns will panic.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Row</span> {
-    <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>,
+<span class="doccomment">/// Client side representation of a MySql row.
+///
+/// It allows you to move column values out of a row with `Row::take` method but note that it
+/// makes row incomplete. Calls to `from_row_opt` on incomplete row will return
+/// `Error::FromRowError` and also numerical indexing on taken columns will panic.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Row {
+    values: Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;,
+    columns: Arc&lt;[Column]&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">debug</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Row&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">val</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>()) {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">val</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; {
-                    <span class="ident">debug</span>.<span class="ident">field</span>(<span class="ident">column</span>.<span class="ident">name_str</span>().<span class="ident">as_ref</span>(), <span class="ident">val</span>);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Row {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>debug = f.debug_struct(<span class="string">&quot;Row&quot;</span>);
+        <span class="kw">for </span>(val, column) <span class="kw">in </span><span class="self">self</span>.values.iter().zip(<span class="self">self</span>.columns.iter()) {
+            <span class="kw">match </span><span class="kw-2">*</span>val {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>val) =&gt; {
+                    debug.field(column.name_str().as_ref(), val);
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="ident">debug</span>.<span class="ident">field</span>(<span class="ident">column</span>.<span class="ident">name_str</span>().<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="string">&quot;&lt;taken&gt;&quot;</span>);
+                <span class="prelude-val">None </span>=&gt; {
+                    debug.field(column.name_str().as_ref(), <span class="kw-2">&amp;</span><span class="string">&quot;&lt;taken&gt;&quot;</span>);
                 }
             }
         }
-        <span class="ident">debug</span>.<span class="ident">finish</span>()
+        debug.finish()
     }
 }
 
-<span class="doccomment">/// Creates `Row` from values and columns.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_row</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>, <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Row</span> {
-    <span class="macro">assert!</span>(<span class="ident">values</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">len</span>());
-    <span class="ident">Row</span> {
-        <span class="ident">values</span>: <span class="ident">values</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-        <span class="ident">columns</span>,
+<span class="doccomment">/// Creates `Row` from values and columns.
+</span><span class="kw">pub fn </span>new_row(values: Vec&lt;Value&gt;, columns: Arc&lt;[Column]&gt;) -&gt; Row {
+    <span class="macro">assert!</span>(values.len() == columns.len());
+    Row {
+        values: values.into_iter().map(<span class="prelude-val">Some</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(),
+        columns,
     }
 }
 
-<span class="doccomment">/// Creates `Row` from values (cells may be missing).</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_row_raw</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Row</span> {
-    <span class="macro">assert!</span>(<span class="ident">values</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">len</span>());
-    <span class="ident">Row</span> { <span class="ident">values</span>, <span class="ident">columns</span> }
+<span class="doccomment">/// Creates `Row` from values (cells may be missing).
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub fn </span>new_row_raw(values: Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt;, columns: Arc&lt;[Column]&gt;) -&gt; Row {
+    <span class="macro">assert!</span>(values.len() == columns.len());
+    Row { values, columns }
 }
 
-<span class="kw">impl</span> <span class="ident">Row</span> {
-    <span class="doccomment">/// Returns length of a row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">len</span>()
+<span class="kw">impl </span>Row {
+    <span class="doccomment">/// Returns length of a row.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.values.len()
     }
 
-    <span class="doccomment">/// Returns true if the row has a length of 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns true if the row has a length of 0.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.values.is_empty()
     }
 
-    <span class="doccomment">/// Returns columns of this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Column</span>] {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>
+    <span class="doccomment">/// Returns columns of this row.
+    </span><span class="kw">pub fn </span>columns_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Column] {
+        <span class="kw-2">&amp;*</span><span class="self">self</span>.columns
     }
 
-    <span class="doccomment">/// Returns columns of this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Returns columns of this row.
+    </span><span class="kw">pub fn </span>columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;[Column]&gt; {
+        <span class="self">self</span>.columns.clone()
     }
 
-    <span class="doccomment">/// Returns reference to the value of a column with index `index` if it exists and wasn&#39;t taken</span>
-    <span class="doccomment">/// by `Row::take` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Non panicking version of `row[usize]`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>())
+    <span class="doccomment">/// Returns reference to the value of a column with index `index` if it exists and wasn&#39;t taken
+    /// by `Row::take` method.
+    ///
+    /// Non panicking version of `row[usize]`.
+    </span><span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Value&gt; {
+        <span class="self">self</span>.values.get(index).and_then(|x| x.as_ref())
     }
 
-    <span class="doccomment">/// Will copy value at index `index` if it was not taken by `Row::take` earlier,</span>
-    <span class="doccomment">/// then will convert it to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromValue</span>,
-        <span class="ident">I</span>: <span class="ident">ColumnIndex</span>,
+    <span class="doccomment">/// Will copy value at index `index` if it was not taken by `Row::take` earlier,
+    /// then will convert it to `T`.
+    </span><span class="kw">pub fn </span>get&lt;T, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, index: I) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span>T: FromValue,
+        I: ColumnIndex,
     {
-        <span class="ident">index</span>.<span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">values</span>
-                .<span class="ident">get</span>(<span class="ident">idx</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>.<span class="ident">clone</span>()))
+        index.idx(<span class="kw-2">&amp;*</span><span class="self">self</span>.columns).and_then(|idx| {
+            <span class="self">self</span>.values
+                .get(idx)
+                .and_then(|x| x.as_ref())
+                .map(|x| from_value::&lt;T&gt;(x.clone()))
         })
     }
 
-    <span class="doccomment">/// Will copy value at index `index` if it was not taken by `Row::take` or `Row::take_opt`</span>
-    <span class="doccomment">/// earlier, then will attempt convert it to `T`. Unlike `Row::get`, `Row::get_opt` will</span>
-    <span class="doccomment">/// allow you to directly handle errors if the value could not be converted to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_opt</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromValue</span>,
-        <span class="ident">I</span>: <span class="ident">ColumnIndex</span>,
+    <span class="doccomment">/// Will copy value at index `index` if it was not taken by `Row::take` or `Row::take_opt`
+    /// earlier, then will attempt convert it to `T`. Unlike `Row::get`, `Row::get_opt` will
+    /// allow you to directly handle errors if the value could not be converted to `T`.
+    </span><span class="kw">pub fn </span>get_opt&lt;T, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, index: I) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T, FromValueError&gt;&gt;
+    <span class="kw">where
+        </span>T: FromValue,
+        I: ColumnIndex,
     {
-        <span class="ident">index</span>
-            .<span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">get</span>(<span class="ident">idx</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>.<span class="ident">clone</span>()))
+        index
+            .idx(<span class="kw-2">&amp;*</span><span class="self">self</span>.columns)
+            .and_then(|idx| <span class="self">self</span>.values.get(idx))
+            .and_then(|x| x.as_ref())
+            .map(|x| from_value_opt::&lt;T&gt;(x.clone()))
     }
 
-    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then</span>
-    <span class="doccomment">/// will converts it to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromValue</span>,
-        <span class="ident">I</span>: <span class="ident">ColumnIndex</span>,
+    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then
+    /// will converts it to `T`.
+    </span><span class="kw">pub fn </span>take&lt;T, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: I) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span>T: FromValue,
+        I: ColumnIndex,
     {
-        <span class="ident">index</span>.<span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">values</span>
-                .<span class="ident">get_mut</span>(<span class="ident">idx</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">take</span>())
-                .<span class="ident">map</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)
+        index.idx(<span class="kw-2">&amp;*</span><span class="self">self</span>.columns).and_then(|idx| {
+            <span class="self">self</span>.values
+                .get_mut(idx)
+                .and_then(|x| x.take())
+                .map(from_value::&lt;T&gt;)
         })
     }
 
-    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then</span>
-    <span class="doccomment">/// will attempt to convert it to `T`. Unlike `Row::take`, `Row::take_opt` will allow you to</span>
-    <span class="doccomment">/// directly handle errors if the value could not be converted to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_opt</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">FromValue</span>,
-        <span class="ident">I</span>: <span class="ident">ColumnIndex</span>,
+    <span class="doccomment">/// Will take value of a column with index `index` if it exists and wasn&#39;t taken earlier then
+    /// will attempt to convert it to `T`. Unlike `Row::take`, `Row::take_opt` will allow you to
+    /// directly handle errors if the value could not be converted to `T`.
+    </span><span class="kw">pub fn </span>take_opt&lt;T, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: I) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T, FromValueError&gt;&gt;
+    <span class="kw">where
+        </span>T: FromValue,
+        I: ColumnIndex,
     {
-        <span class="ident">index</span>
-            .<span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">columns</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">get_mut</span>(<span class="ident">idx</span>))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">take</span>())
-            .<span class="ident">map</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)
+        index
+            .idx(<span class="kw-2">&amp;*</span><span class="self">self</span>.columns)
+            .and_then(|idx| <span class="self">self</span>.values.get_mut(idx))
+            .and_then(|x| x.take())
+            .map(from_value_opt::&lt;T&gt;)
     }
 
-    <span class="doccomment">/// Unwraps values of a row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if any of columns was taken by `take` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t unwrap row if some of columns was taken&quot;</span>))
-            .<span class="ident">collect</span>()
+    <span class="doccomment">/// Unwraps values of a row.
+    ///
+    /// # Panics
+    ///
+    /// Panics if any of columns was taken by `take` method.
+    </span><span class="kw">pub fn </span>unwrap(<span class="self">self</span>) -&gt; Vec&lt;Value&gt; {
+        <span class="self">self</span>.values
+            .into_iter()
+            .map(|x| x.expect(<span class="string">&quot;Can&#39;t unwrap row if some of columns was taken&quot;</span>))
+            .collect()
     }
 
-    <span class="doccomment">/// Unwraps values as is (taken cells will be `None`).</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_raw</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>
+    <span class="doccomment">/// Unwraps values as is (taken cells will be `None`).
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>unwrap_raw(<span class="self">self</span>) -&gt; Vec&lt;<span class="prelude-ty">Option</span>&lt;Value&gt;&gt; {
+        <span class="self">self</span>.values
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">place</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">Value</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>[<span class="ident">index</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Value</span>;
-
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">values</span>[<span class="ident">index</span>].<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>place(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: Value) {
+        <span class="self">self</span>.values[index] = <span class="prelude-val">Some</span>(value);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Value</span>;
+<span class="kw">impl </span>Index&lt;usize&gt; <span class="kw">for </span>Row {
+    <span class="kw">type </span>Output = Value;
 
-    <span class="kw">fn</span> <span class="ident">index</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="ident">Value</span> {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">name_ref</span>() <span class="op">==</span> <span class="ident">index</span>.<span class="ident">as_bytes</span>() {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">values</span>[<span class="ident">i</span>].<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span>Value {
+        <span class="self">self</span>.values[index].as_ref().unwrap()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Index&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Row {
+    <span class="kw">type </span>Output = Value;
+
+    <span class="kw">fn </span>index&lt;<span class="lifetime">&#39;r</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;r </span><span class="self">self</span>, index: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;r </span>Value {
+        <span class="kw">for </span>(i, column) <span class="kw">in </span><span class="self">self</span>.columns.iter().enumerate() {
+            <span class="kw">if </span>column.name_ref() == index.as_bytes() {
+                <span class="kw">return </span><span class="self">self</span>.values[i].as_ref().unwrap();
             }
         }
-        <span class="macro">panic!</span>(<span class="string">&quot;No such column: `{}` in row {:?}&quot;</span>, <span class="ident">index</span>, <span class="self">self</span>);
+        <span class="macro">panic!</span>(<span class="string">&quot;No such column: `{}` in row {:?}&quot;</span>, index, <span class="self">self</span>);
     }
 }
 
-<span class="doccomment">/// Things that may be used as an index of a row column.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ColumnIndex</span> {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">Column</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Things that may be used as an index of a row column.
+</span><span class="kw">pub trait </span>ColumnIndex {
+    <span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[Column]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">ColumnIndex</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">Column</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">columns</span>.<span class="ident">len</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
+<span class="kw">impl </span>ColumnIndex <span class="kw">for </span>usize {
+    <span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[Column]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self </span>&gt;= columns.len() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>)
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ColumnIndex</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">Column</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">name_ref</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">as_bytes</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ColumnIndex <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: <span class="kw-2">&amp;</span>[Column]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">for </span>(i, c) <span class="kw">in </span>columns.iter().enumerate() {
+            <span class="kw">if </span>c.name_ref() == <span class="self">self</span>.as_bytes() {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(i);
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Row deserializer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `S` – serialization side (see [`SerializationSide`]);</span>
-<span class="doccomment">/// `P` – protocol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">Row</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">S</span>, <span class="ident">P</span>)<span class="op">&gt;</span>);
+<span class="doccomment">/// Row deserializer.
+///
+/// `S` – serialization side (see [`SerializationSide`]);
+/// `P` – protocol.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>RowDeserializer&lt;S, P&gt;(Row, PhantomData&lt;(S, P)&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">Row</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;S, P&gt; RowDeserializer&lt;S, P&gt; {
+    <span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; Row {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;S, P&gt; From&lt;RowDeserializer&lt;S, P&gt;&gt; <span class="kw">for </span>Row {
+    <span class="kw">fn </span>from(x: RowDeserializer&lt;S, P&gt;) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Text</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RowDeserializer&lt;T, Text&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = Arc&lt;[Column]&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">columns</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">columns</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>deserialize(columns: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::with_capacity(columns.len());
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">columns</span>.<span class="ident">len</span>() {
-            <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(
-                <span class="ident">ValueDeserializer</span>::<span class="op">&lt;</span><span class="ident">TextValue</span><span class="op">&gt;</span><span class="ident">::deserialize</span>((), <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>)<span class="question-mark">?</span>.<span class="number">0</span>,
+        <span class="kw">for _ in </span><span class="number">0</span>..columns.len() {
+            values.push(<span class="prelude-val">Some</span>(
+                ValueDeserializer::&lt;TextValue&gt;::deserialize((), <span class="kw-2">&amp;mut *</span>buf)<span class="question-mark">?</span>.<span class="number">0</span>,
             ))
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">Row</span> { <span class="ident">values</span>, <span class="ident">columns</span> }, <span class="ident">PhantomData</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(Row { values, columns }, PhantomData))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">S</span>: <span class="ident">SerializationSide</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Binary</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, S: SerializationSide&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RowDeserializer&lt;S, Binary&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = Arc&lt;[Column]&gt;;
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">columns</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Value</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>deserialize(columns: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Value::<span class="kw-2">*</span>;
 
-        <span class="ident">buf</span>.<span class="ident">checked_eat_u8</span>().<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)<span class="question-mark">?</span>;
+        buf.checked_eat_u8().ok_or_else(unexpected_buf_eof)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">bitmap</span> <span class="op">=</span> <span class="ident">NullBitmap</span>::<span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">columns</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">columns</span>.<span class="ident">len</span>());
+        <span class="kw">let </span>bitmap = NullBitmap::&lt;S, Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt;::deserialize(columns.len(), <span class="kw-2">&amp;mut *</span>buf)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>values = Vec::with_capacity(columns.len());
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">bitmap</span>.<span class="ident">is_null</span>(<span class="ident">i</span>) {
-                <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(<span class="ident">NULL</span>))
-            } <span class="kw">else</span> {
-                <span class="ident">values</span>.<span class="ident">push</span>(<span class="prelude-val">Some</span>(
-                    <span class="ident">ValueDeserializer</span>::<span class="op">&lt;</span><span class="ident">BinValue</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(
-                        (<span class="ident">column</span>.<span class="ident">column_type</span>(), <span class="ident">column</span>.<span class="ident">flags</span>()),
-                        <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>,
-                    )<span class="question-mark">?</span>
-                    .<span class="number">0</span>,
+        <span class="kw">for </span>(i, column) <span class="kw">in </span>columns.iter().enumerate() {
+            <span class="kw">if </span>bitmap.is_null(i) {
+                values.push(<span class="prelude-val">Some</span>(NULL))
+            } <span class="kw">else </span>{
+                values.push(<span class="prelude-val">Some</span>(
+                    ValueDeserializer::&lt;BinValue&gt;::deserialize(
+                        (column.column_type(), column.flags()),
+                        <span class="kw-2">&amp;mut *</span>buf,
+                    )<span class="question-mark">?
+                    </span>.<span class="number">0</span>,
                 ));
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">Row</span> { <span class="ident">values</span>, <span class="ident">columns</span> }, <span class="ident">PhantomData</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(Row { values, columns }, PhantomData))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

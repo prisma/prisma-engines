@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/description/topology/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/description/topology/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -870,877 +870,877 @@
 <span id="870">870</span>
 <span id="871">871</span>
 <span id="872">872</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">server_selection</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>server_selection;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>std::{
+    collections::{HashMap, HashSet},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::oid::ObjectId</span>,
-    <span class="ident">client::ClusterTime</span>,
-    <span class="ident">cmap::Command</span>,
-    <span class="ident">options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">ServerAddress</span>},
-    <span class="ident">sdam</span>::{
-        <span class="ident">description::server</span>::{<span class="ident">ServerDescription</span>, <span class="ident">ServerType</span>},
-        <span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>,
+<span class="kw">use crate</span>::{
+    bson::oid::ObjectId,
+    client::ClusterTime,
+    cmap::Command,
+    options::{ClientOptions, ServerAddress},
+    sdam::{
+        description::server::{ServerDescription, ServerType},
+        DEFAULT_HEARTBEAT_FREQUENCY,
     },
-    <span class="ident">selection_criteria</span>::{<span class="ident">ReadPreference</span>, <span class="ident">SelectionCriteria</span>},
+    selection_criteria::{ReadPreference, SelectionCriteria},
 };
 
-<span class="doccomment">/// The possible types for a topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TopologyType</span> {
-    <span class="doccomment">/// A single mongod server.</span>
-    <span class="ident">Single</span>,
+<span class="doccomment">/// The possible types for a topology.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>TopologyType {
+    <span class="doccomment">/// A single mongod server.
+    </span>Single,
 
-    <span class="doccomment">/// A replica set with no primary.</span>
-    <span class="ident">ReplicaSetNoPrimary</span>,
+    <span class="doccomment">/// A replica set with no primary.
+    </span>ReplicaSetNoPrimary,
 
-    <span class="doccomment">/// A replica set with a primary.</span>
-    <span class="ident">ReplicaSetWithPrimary</span>,
+    <span class="doccomment">/// A replica set with a primary.
+    </span>ReplicaSetWithPrimary,
 
-    <span class="doccomment">/// A sharded topology.</span>
-    <span class="ident">Sharded</span>,
+    <span class="doccomment">/// A sharded topology.
+    </span>Sharded,
 
-    <span class="doccomment">/// A load balanced topology.</span>
-    <span class="ident">LoadBalanced</span>,
+    <span class="doccomment">/// A load balanced topology.
+    </span>LoadBalanced,
 
-    <span class="doccomment">/// A topology whose type is not known.</span>
-    <span class="ident">Unknown</span>,
+    <span class="doccomment">/// A topology whose type is not known.
+    </span>Unknown,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">impl</span> <span class="ident">TopologyType</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Single</span> =&gt; <span class="string">&quot;Single&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ReplicaSetNoPrimary</span> =&gt; <span class="string">&quot;ReplicaSetNoPrimary&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ReplicaSetWithPrimary</span> =&gt; <span class="string">&quot;ReplicaSetWithPrimary&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Sharded</span> =&gt; <span class="string">&quot;Sharded&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::LoadBalanced</span> =&gt; <span class="string">&quot;LoadBalanced&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;Unknown&quot;</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">impl </span>TopologyType {
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Single =&gt; <span class="string">&quot;Single&quot;</span>,
+            <span class="self">Self</span>::ReplicaSetNoPrimary =&gt; <span class="string">&quot;ReplicaSetNoPrimary&quot;</span>,
+            <span class="self">Self</span>::ReplicaSetWithPrimary =&gt; <span class="string">&quot;ReplicaSetWithPrimary&quot;</span>,
+            <span class="self">Self</span>::Sharded =&gt; <span class="string">&quot;Sharded&quot;</span>,
+            <span class="self">Self</span>::LoadBalanced =&gt; <span class="string">&quot;LoadBalanced&quot;</span>,
+            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;Unknown&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TopologyType</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TopologyType::Unknown</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>TopologyType {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        TopologyType::Unknown
     }
 }
 
-<span class="doccomment">/// A description of the most up-to-date information known about a topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyDescription</span> {
-    <span class="doccomment">/// Whether or not the topology was initialized with a single seed.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">single_seed</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A description of the most up-to-date information known about a topology.
+</span><span class="attribute">#[derive(Debug, Clone, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyDescription {
+    <span class="doccomment">/// Whether or not the topology was initialized with a single seed.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) single_seed: bool,
 
-    <span class="doccomment">/// The current type of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">topology_type</span>: <span class="ident">TopologyType</span>,
+    <span class="doccomment">/// The current type of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) topology_type: TopologyType,
 
-    <span class="doccomment">/// The replica set name of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">set_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The replica set name of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) set_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The highest replica set version the driver has seen by a member of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_set_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The highest replica set version the driver has seen by a member of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) max_set_version: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 
-    <span class="doccomment">/// The highest replica set election id the driver has seen by a member of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_election_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The highest replica set election id the driver has seen by a member of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) max_election_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 
-    <span class="doccomment">/// Describes the compatibility issue between the driver and server with regards to the</span>
-    <span class="doccomment">/// respective supported wire versions.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">compatibility_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Describes the compatibility issue between the driver and server with regards to the
+    /// respective supported wire versions.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) compatibility_error: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Whether or not this topology supports sessions, and if so, what the logicalSessionTimeout</span>
-    <span class="doccomment">/// is for them.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">session_support_status</span>: <span class="ident">SessionSupportStatus</span>,
+    <span class="doccomment">/// Whether or not this topology supports sessions, and if so, what the logicalSessionTimeout
+    /// is for them.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) session_support_status: SessionSupportStatus,
 
-    <span class="doccomment">/// Whether or not this topology supports transactions.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">transaction_support_status</span>: <span class="ident">TransactionSupportStatus</span>,
+    <span class="doccomment">/// Whether or not this topology supports transactions.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) transaction_support_status: TransactionSupportStatus,
 
-    <span class="doccomment">/// The highest reported cluster time by any server in this topology.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The highest reported cluster time by any server in this topology.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
 
-    <span class="doccomment">/// The amount of latency beyond that of the suitable server with the minimum latency that is</span>
-    <span class="doccomment">/// acceptable for a read operation.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">local_threshold</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The amount of latency beyond that of the suitable server with the minimum latency that is
+    /// acceptable for a read operation.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) local_threshold: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// The maximum amount of time to wait before checking a given server by sending server check.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">heartbeat_freq</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum amount of time to wait before checking a given server by sending server check.
+    </span><span class="attribute">#[serde(skip)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) heartbeat_freq: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// The server descriptions of each member of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">servers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">ServerDescription</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server descriptions of each member of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) servers: HashMap&lt;ServerAddress, ServerDescription&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Since we only use TopologyDescription equality to determine whether to wake up server</span>
-        <span class="comment">// selection operations to try to select again, the only fields we care about are the ones</span>
-        <span class="comment">// checked by the server selection algorithm.</span>
-        <span class="self">self</span>.<span class="ident">compatibility_error</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">compatibility_error</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">servers</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">servers</span>
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">topology_type</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="comment">// Since we only use TopologyDescription equality to determine whether to wake up server
+        // selection operations to try to select again, the only fields we care about are the ones
+        // checked by the server selection algorithm.
+        </span><span class="self">self</span>.compatibility_error == other.compatibility_error
+            &amp;&amp; <span class="self">self</span>.servers == other.servers
+            &amp;&amp; <span class="self">self</span>.topology_type == other.topology_type
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="ident"><span class="kw">crate</span>::error::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">verify_max_staleness</span>(
-            <span class="ident">options</span>
-                .<span class="ident">selection_criteria</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">criteria</span><span class="op">|</span> <span class="ident">criteria</span>.<span class="ident">max_staleness</span>()),
+<span class="kw">impl </span>TopologyDescription {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: ClientOptions) -&gt; <span class="kw">crate</span>::error::Result&lt;<span class="self">Self</span>&gt; {
+        verify_max_staleness(
+            options
+                .selection_criteria
+                .as_ref()
+                .and_then(|criteria| criteria.max_staleness()),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">topology_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">direct_connection</span> {
-            <span class="ident">TopologyType::Single</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">repl_set_name</span>.<span class="ident">is_some</span>() {
-            <span class="ident">TopologyType::ReplicaSetNoPrimary</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-            <span class="ident">TopologyType::LoadBalanced</span>
-        } <span class="kw">else</span> {
-            <span class="ident">TopologyType::Unknown</span>
+        <span class="kw">let </span>topology_type = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = options.direct_connection {
+            TopologyType::Single
+        } <span class="kw">else if </span>options.repl_set_name.is_some() {
+            TopologyType::ReplicaSetNoPrimary
+        } <span class="kw">else if </span>options.load_balanced.unwrap_or(<span class="bool-val">false</span>) {
+            TopologyType::LoadBalanced
+        } <span class="kw">else </span>{
+            TopologyType::Unknown
         };
 
-        <span class="kw">let</span> <span class="ident">servers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">hosts</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">address</span><span class="op">|</span> (<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">ServerDescription::new</span>(<span class="ident">address</span>, <span class="prelude-val">None</span>)))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>servers: HashMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = options
+            .hosts
+            .into_iter()
+            .map(|address| (address.clone(), ServerDescription::new(address, <span class="prelude-val">None</span>)))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">session_support_status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">topology_type</span> <span class="op">==</span> <span class="ident">TopologyType::LoadBalanced</span> {
-            <span class="ident">SessionSupportStatus::Supported</span> {
-                <span class="ident">logical_session_timeout</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>session_support_status = <span class="kw">if </span>topology_type == TopologyType::LoadBalanced {
+            SessionSupportStatus::Supported {
+                logical_session_timeout: <span class="prelude-val">None</span>,
             }
-        } <span class="kw">else</span> {
-            <span class="ident">SessionSupportStatus::Undetermined</span>
+        } <span class="kw">else </span>{
+            SessionSupportStatus::Undetermined
         };
-        <span class="kw">let</span> <span class="ident">transaction_support_status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">topology_type</span> <span class="op">==</span> <span class="ident">TopologyType::LoadBalanced</span> {
-            <span class="ident">TransactionSupportStatus::Supported</span>
-        } <span class="kw">else</span> {
-            <span class="ident">TransactionSupportStatus::Undetermined</span>
+        <span class="kw">let </span>transaction_support_status = <span class="kw">if </span>topology_type == TopologyType::LoadBalanced {
+            TransactionSupportStatus::Supported
+        } <span class="kw">else </span>{
+            TransactionSupportStatus::Undetermined
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">single_seed</span>: <span class="ident">servers</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
-            <span class="ident">topology_type</span>,
-            <span class="ident">set_name</span>: <span class="ident">options</span>.<span class="ident">repl_set_name</span>,
-            <span class="ident">max_set_version</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_election_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">compatibility_error</span>: <span class="prelude-val">None</span>,
-            <span class="ident">session_support_status</span>,
-            <span class="ident">transaction_support_status</span>,
-            <span class="ident">cluster_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">local_threshold</span>: <span class="ident">options</span>.<span class="ident">local_threshold</span>,
-            <span class="ident">heartbeat_freq</span>: <span class="ident">options</span>.<span class="ident">heartbeat_freq</span>,
-            <span class="ident">servers</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            single_seed: servers.len() == <span class="number">1</span>,
+            topology_type,
+            set_name: options.repl_set_name,
+            max_set_version: <span class="prelude-val">None</span>,
+            max_election_id: <span class="prelude-val">None</span>,
+            compatibility_error: <span class="prelude-val">None</span>,
+            session_support_status,
+            transaction_support_status,
+            cluster_time: <span class="prelude-val">None</span>,
+            local_threshold: options.local_threshold,
+            heartbeat_freq: options.heartbeat_freq,
+            servers,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">single_seed</span>: <span class="bool-val">false</span>,
-            <span class="ident">topology_type</span>: <span class="ident">TopologyType::Unknown</span>,
-            <span class="ident">set_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_set_version</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_election_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">compatibility_error</span>: <span class="prelude-val">None</span>,
-            <span class="ident">session_support_status</span>: <span class="ident">SessionSupportStatus::Undetermined</span>,
-            <span class="ident">transaction_support_status</span>: <span class="ident">TransactionSupportStatus::Undetermined</span>,
-            <span class="ident">cluster_time</span>: <span class="prelude-val">None</span>,
-            <span class="ident">local_threshold</span>: <span class="prelude-val">None</span>,
-            <span class="ident">heartbeat_freq</span>: <span class="prelude-val">None</span>,
-            <span class="ident">servers</span>: <span class="ident">HashMap::new</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_empty() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            single_seed: <span class="bool-val">false</span>,
+            topology_type: TopologyType::Unknown,
+            set_name: <span class="prelude-val">None</span>,
+            max_set_version: <span class="prelude-val">None</span>,
+            max_election_id: <span class="prelude-val">None</span>,
+            compatibility_error: <span class="prelude-val">None</span>,
+            session_support_status: SessionSupportStatus::Undetermined,
+            transaction_support_status: TransactionSupportStatus::Undetermined,
+            cluster_time: <span class="prelude-val">None</span>,
+            local_threshold: <span class="prelude-val">None</span>,
+            heartbeat_freq: <span class="prelude-val">None</span>,
+            servers: HashMap::new(),
         }
     }
 
-    <span class="doccomment">/// Gets the topology type of the cluster.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyType</span> {
-        <span class="self">self</span>.<span class="ident">topology_type</span>
+    <span class="doccomment">/// Gets the topology type of the cluster.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>topology_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyType {
+        <span class="self">self</span>.topology_type
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">keys</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_addresses(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>ServerAddress&gt; {
+        <span class="self">self</span>.servers.keys()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ClusterTime&gt; {
+        <span class="self">self</span>.cluster_time.as_ref()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_server_description</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_server_description(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">get</span>(<span class="ident">address</span>)
+        address: <span class="kw-2">&amp;</span>ServerAddress,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerDescription&gt; {
+        <span class="self">self</span>.servers.get(address)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_command_with_read_pref</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_command_with_read_pref&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
+        address: <span class="kw-2">&amp;</span>ServerAddress,
+        command: <span class="kw-2">&amp;mut </span>Command&lt;T&gt;,
+        criteria: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">get_server_description</span>(<span class="ident">address</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sd</span><span class="op">|</span> <span class="ident">sd</span>.<span class="ident">server_type</span>)
-            .<span class="ident">unwrap_or</span>(<span class="ident">ServerType::Unknown</span>);
+        <span class="kw">let </span>server_type = <span class="self">self
+            </span>.get_server_description(address)
+            .map(|sd| sd.server_type)
+            .unwrap_or(ServerType::Unknown);
 
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">topology_type</span>, <span class="ident">server_type</span>) {
-            (<span class="ident">TopologyType::Sharded</span>, <span class="ident">ServerType::Mongos</span>)
-            <span class="op">|</span> (<span class="ident">TopologyType::Single</span>, <span class="ident">ServerType::Mongos</span>)
-            <span class="op">|</span> (<span class="ident">TopologyType::LoadBalanced</span>, <span class="kw">_</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">update_command_read_pref_for_mongos</span>(<span class="ident">command</span>, <span class="ident">criteria</span>)
+        <span class="kw">match </span>(<span class="self">self</span>.topology_type, server_type) {
+            (TopologyType::Sharded, ServerType::Mongos)
+            | (TopologyType::Single, ServerType::Mongos)
+            | (TopologyType::LoadBalanced, <span class="kw">_</span>) =&gt; {
+                <span class="self">self</span>.update_command_read_pref_for_mongos(command, criteria)
             }
-            (<span class="ident">TopologyType::Single</span>, <span class="ident">ServerType::Standalone</span>) =&gt; {}
-            (<span class="ident">TopologyType::Single</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">specified_read_pref</span> <span class="op">=</span> <span class="ident">criteria</span>
-                    .<span class="ident">and_then</span>(<span class="ident">SelectionCriteria::as_read_pref</span>)
-                    .<span class="ident">map</span>(<span class="ident">Clone::clone</span>);
+            (TopologyType::Single, ServerType::Standalone) =&gt; {}
+            (TopologyType::Single, <span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>specified_read_pref = criteria
+                    .and_then(SelectionCriteria::as_read_pref)
+                    .map(Clone::clone);
 
-                <span class="kw">let</span> <span class="ident">resolved_read_pref</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">specified_read_pref</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">ReadPreference::Primary</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">ReadPreference::PrimaryPreferred</span> {
-                        <span class="ident">options</span>: <span class="ident">Default::default</span>(),
+                <span class="kw">let </span>resolved_read_pref = <span class="kw">match </span>specified_read_pref {
+                    <span class="prelude-val">Some</span>(ReadPreference::Primary) | <span class="prelude-val">None </span>=&gt; ReadPreference::PrimaryPreferred {
+                        options: Default::default(),
                     },
-                    <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="ident">other</span>,
+                    <span class="prelude-val">Some</span>(other) =&gt; other,
                 };
 
-                <span class="ident">command</span>.<span class="ident">set_read_preference</span>(<span class="ident">resolved_read_pref</span>)
+                command.set_read_preference(resolved_read_pref)
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">read_pref</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">criteria</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">rp</span>)) =&gt; <span class="ident">rp</span>.<span class="ident">clone</span>(),
-                    <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::Predicate</span>(<span class="kw">_</span>)) =&gt; <span class="ident">ReadPreference::PrimaryPreferred</span> {
-                        <span class="ident">options</span>: <span class="ident">Default::default</span>(),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>read_pref = <span class="kw">match </span>criteria {
+                    <span class="prelude-val">Some</span>(SelectionCriteria::ReadPreference(rp)) =&gt; rp.clone(),
+                    <span class="prelude-val">Some</span>(SelectionCriteria::Predicate(<span class="kw">_</span>)) =&gt; ReadPreference::PrimaryPreferred {
+                        options: Default::default(),
                     },
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">ReadPreference::Primary</span>,
+                    <span class="prelude-val">None </span>=&gt; ReadPreference::Primary,
                 };
-                <span class="ident">command</span>.<span class="ident">set_read_preference</span>(<span class="ident">read_pref</span>)
+                command.set_read_preference(read_pref)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">update_command_read_pref_for_mongos</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>update_command_read_pref_for_mongos&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
+        command: <span class="kw-2">&amp;mut </span>Command&lt;T&gt;,
+        criteria: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">criteria</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">rp</span>)) =&gt; <span class="ident">rp</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+        <span class="kw">let </span>read_preference = <span class="kw">match </span>criteria {
+            <span class="prelude-val">Some</span>(SelectionCriteria::ReadPreference(rp)) =&gt; rp,
+            <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
         };
-        <span class="kw">match</span> <span class="ident">read_preference</span> {
-            <span class="ident">ReadPreference::Secondary</span> { .. }
-            <span class="op">|</span> <span class="ident">ReadPreference::PrimaryPreferred</span> { .. }
-            <span class="op">|</span> <span class="ident">ReadPreference::Nearest</span> { .. }
-            <span class="op">|</span> <span class="ident">ReadPreference::SecondaryPreferred</span> { .. } =&gt; {
-                <span class="ident">command</span>.<span class="ident">set_read_preference</span>(<span class="ident">read_preference</span>.<span class="ident">clone</span>())
+        <span class="kw">match </span>read_preference {
+            ReadPreference::Secondary { .. }
+            | ReadPreference::PrimaryPreferred { .. }
+            | ReadPreference::Nearest { .. }
+            | ReadPreference::SecondaryPreferred { .. } =&gt; {
+                command.set_read_preference(read_preference.clone())
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
     }
 
-    <span class="doccomment">/// Gets the heartbeat frequency.</span>
-    <span class="kw">fn</span> <span class="ident">heartbeat_frequency</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">heartbeat_freq</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>)
+    <span class="doccomment">/// Gets the heartbeat frequency.
+    </span><span class="kw">fn </span>heartbeat_frequency(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Duration {
+        <span class="self">self</span>.heartbeat_freq.unwrap_or(DEFAULT_HEARTBEAT_FREQUENCY)
     }
 
-    <span class="doccomment">/// Check the cluster for a compatibility error, and record the error message if one is found.</span>
-    <span class="kw">fn</span> <span class="ident">check_compatibility</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">compatibility_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Check the cluster for a compatibility error, and record the error message if one is found.
+    </span><span class="kw">fn </span>check_compatibility(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.compatibility_error = <span class="prelude-val">None</span>;
 
-        <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">values</span>() {
-            <span class="kw">let</span> <span class="ident">error_message</span> <span class="op">=</span> <span class="ident">server</span>.<span class="ident">compatibility_error_message</span>();
+        <span class="kw">for </span>server <span class="kw">in </span><span class="self">self</span>.servers.values() {
+            <span class="kw">let </span>error_message = server.compatibility_error_message();
 
-            <span class="kw">if</span> <span class="ident">error_message</span>.<span class="ident">is_some</span>() {
-                <span class="self">self</span>.<span class="ident">compatibility_error</span> <span class="op">=</span> <span class="ident">error_message</span>;
+            <span class="kw">if </span>error_message.is_some() {
+                <span class="self">self</span>.compatibility_error = error_message;
                 <span class="kw">return</span>;
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compatibility_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">compatibility_error</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compatibility_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.compatibility_error.as_ref()
     }
 
-    <span class="doccomment">/// Update the ServerDescription&#39;s round trip time based on the rolling average.</span>
-    <span class="kw">fn</span> <span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerDescription</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_rtt</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">server_desc</span><span class="op">|</span> <span class="ident">server_desc</span>.<span class="ident">average_round_trip_time</span>)
+    <span class="doccomment">/// Update the ServerDescription&#39;s round trip time based on the rolling average.
+    </span><span class="kw">fn </span>update_round_trip_time(<span class="kw-2">&amp;</span><span class="self">self</span>, server_description: <span class="kw-2">&amp;mut </span>ServerDescription) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(old_rtt) = <span class="self">self
+            </span>.servers
+            .get(<span class="kw-2">&amp;</span>server_description.address)
+            .and_then(|server_desc| server_desc.average_round_trip_time)
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_rtt</span>) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">average_round_trip_time</span> {
-                <span class="ident">server_description</span>.<span class="ident">average_round_trip_time</span> <span class="op">=</span>
-                    <span class="prelude-val">Some</span>((<span class="ident">new_rtt</span> <span class="op">/</span> <span class="number">5</span>) <span class="op">+</span> (<span class="ident">old_rtt</span> <span class="op">*</span> <span class="number">4</span> <span class="op">/</span> <span class="number">5</span>));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(new_rtt) = server_description.average_round_trip_time {
+                server_description.average_round_trip_time =
+                    <span class="prelude-val">Some</span>((new_rtt / <span class="number">5</span>) + (old_rtt * <span class="number">4 </span>/ <span class="number">5</span>));
             }
         }
     }
 
-    <span class="doccomment">/// Updates the topology&#39;s logical session timeout value based on the server&#39;s value for it.</span>
-    <span class="kw">fn</span> <span class="ident">update_session_support_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">server_description</span>.<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TopologyType::Single</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
-                <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Unsupported</span> {
-                    <span class="ident">logical_session_timeout</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Updates the topology&#39;s logical session timeout value based on the server&#39;s value for it.
+    </span><span class="kw">fn </span>update_session_support_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: <span class="kw-2">&amp;</span>ServerDescription) {
+        <span class="kw">if </span>!server_description.server_type.is_data_bearing() {
+            <span class="kw">if let </span>TopologyType::Single = <span class="self">self</span>.topology_type {
+                <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
+                    logical_session_timeout: <span class="prelude-val">None</span>,
                 };
             }
             <span class="kw">return</span>;
         }
 
-        <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">logical_session_timeout</span>().<span class="ident">ok</span>().<span class="ident">flatten</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">session_support_status</span> {
-                <span class="ident">SessionSupportStatus::Supported</span> {
-                    <span class="ident">logical_session_timeout</span>: <span class="ident">topology_timeout</span>,
+        <span class="kw">match </span>server_description.logical_session_timeout().ok().flatten() {
+            <span class="prelude-val">Some</span>(timeout) =&gt; <span class="kw">match </span><span class="self">self</span>.session_support_status {
+                SessionSupportStatus::Supported {
+                    logical_session_timeout: topology_timeout,
                 } =&gt; {
-                    <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Supported</span> {
-                        <span class="ident">logical_session_timeout</span>: <span class="ident">std::cmp::min</span>(<span class="prelude-val">Some</span>(<span class="ident">timeout</span>), <span class="ident">topology_timeout</span>),
+                    <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
+                        logical_session_timeout: std::cmp::min(<span class="prelude-val">Some</span>(timeout), topology_timeout),
                     };
                 }
-                <span class="ident">SessionSupportStatus::Undetermined</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Supported</span> {
-                        <span class="ident">logical_session_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">timeout</span>),
+                SessionSupportStatus::Undetermined =&gt; {
+                    <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
+                        logical_session_timeout: <span class="prelude-val">Some</span>(timeout),
                     }
                 }
-                <span class="ident">SessionSupportStatus::Unsupported</span> { .. } =&gt; {
-                    <span class="comment">// Check if the timeout is now reported on all servers, and, if so, assign the</span>
-                    <span class="comment">// topology&#39;s timeout to the minimum.</span>
-                    <span class="kw">let</span> <span class="ident">min_timeout</span> <span class="op">=</span> <span class="self">self</span>
-                        .<span class="ident">servers</span>
-                        .<span class="ident">values</span>()
-                        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>())
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">logical_session_timeout</span>().<span class="ident">ok</span>().<span class="ident">flatten</span>())
-                        .<span class="ident">min</span>()
-                        .<span class="ident">flatten</span>();
+                SessionSupportStatus::Unsupported { .. } =&gt; {
+                    <span class="comment">// Check if the timeout is now reported on all servers, and, if so, assign the
+                    // topology&#39;s timeout to the minimum.
+                    </span><span class="kw">let </span>min_timeout = <span class="self">self
+                        </span>.servers
+                        .values()
+                        .filter(|s| s.server_type.is_data_bearing())
+                        .map(|s| s.logical_session_timeout().ok().flatten())
+                        .min()
+                        .flatten();
 
-                    <span class="kw">match</span> <span class="ident">min_timeout</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) =&gt; {
-                            <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Supported</span> {
-                                <span class="ident">logical_session_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">timeout</span>),
+                    <span class="kw">match </span>min_timeout {
+                        <span class="prelude-val">Some</span>(timeout) =&gt; {
+                            <span class="self">self</span>.session_support_status = SessionSupportStatus::Supported {
+                                logical_session_timeout: <span class="prelude-val">Some</span>(timeout),
                             }
                         }
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Unsupported</span> {
-                                <span class="ident">logical_session_timeout</span>: <span class="prelude-val">None</span>,
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
+                                logical_session_timeout: <span class="prelude-val">None</span>,
                             }
                         }
                     }
                 }
             },
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">server_description</span>.<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>()
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">==</span> <span class="ident">TopologyType::Single</span> =&gt;
+            <span class="prelude-val">None </span><span class="kw">if </span>server_description.server_type.is_data_bearing()
+                || <span class="self">self</span>.topology_type == TopologyType::Single =&gt;
             {
-                <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Unsupported</span> {
-                    <span class="ident">logical_session_timeout</span>: <span class="prelude-val">None</span>,
+                <span class="self">self</span>.session_support_status = SessionSupportStatus::Unsupported {
+                    logical_session_timeout: <span class="prelude-val">None</span>,
                 }
             }
-            <span class="prelude-val">None</span> =&gt; {}
+            <span class="prelude-val">None </span>=&gt; {}
         }
     }
 
-    <span class="doccomment">/// Updates the topology&#39;s transaction support status based on its session support status and</span>
-    <span class="doccomment">/// the server description&#39;s max wire version.</span>
-    <span class="kw">fn</span> <span class="ident">update_transaction_support_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(
-            <span class="self">self</span>.<span class="ident">session_support_status</span>,
-            <span class="ident">SessionSupportStatus::Supported</span> { .. }
+    <span class="doccomment">/// Updates the topology&#39;s transaction support status based on its session support status and
+    /// the server description&#39;s max wire version.
+    </span><span class="kw">fn </span>update_transaction_support_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: <span class="kw-2">&amp;</span>ServerDescription) {
+        <span class="kw">if </span>!<span class="macro">matches!</span>(
+            <span class="self">self</span>.session_support_status,
+            SessionSupportStatus::Supported { .. }
         ) {
-            <span class="self">self</span>.<span class="ident">transaction_support_status</span> <span class="op">=</span> <span class="ident">TransactionSupportStatus::Unsupported</span>;
+            <span class="self">self</span>.transaction_support_status = TransactionSupportStatus::Unsupported;
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>)) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">max_wire_version</span>() {
-            <span class="self">self</span>.<span class="ident">transaction_support_status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">max_wire_version</span> <span class="op">&lt;</span> <span class="number">7</span>
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">max_wire_version</span> <span class="op">&lt;</span> <span class="number">8</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">==</span> <span class="ident">TopologyType::Sharded</span>)
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(max_wire_version)) = server_description.max_wire_version() {
+            <span class="self">self</span>.transaction_support_status = <span class="kw">if </span>max_wire_version &lt; <span class="number">7
+                </span>|| (max_wire_version &lt; <span class="number">8 </span>&amp;&amp; <span class="self">self</span>.topology_type == TopologyType::Sharded)
             {
-                <span class="ident">TransactionSupportStatus::Unsupported</span>
-            } <span class="kw">else</span> {
-                <span class="ident">TransactionSupportStatus::Supported</span>
+                TransactionSupportStatus::Unsupported
+            } <span class="kw">else </span>{
+                TransactionSupportStatus::Supported
             }
         }
     }
 
-    <span class="doccomment">/// Sets the topology&#39;s cluster time to the provided one if it is higher than the currently</span>
-    <span class="doccomment">/// recorded one.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cluster_time</span>: <span class="kw-2">&amp;</span><span class="ident">ClusterTime</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">as_ref</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cluster_time</span>) {
+    <span class="doccomment">/// Sets the topology&#39;s cluster time to the provided one if it is higher than the currently
+    /// recorded one.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>advance_cluster_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cluster_time: <span class="kw-2">&amp;</span>ClusterTime) {
+        <span class="kw">if </span><span class="self">self</span>.cluster_time.as_ref() &gt;= <span class="prelude-val">Some</span>(cluster_time) {
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">cluster_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cluster_time</span>.<span class="ident">clone</span>());
+        <span class="self">self</span>.cluster_time = <span class="prelude-val">Some</span>(cluster_time.clone());
     }
 
-    <span class="doccomment">/// Returns the diff between this topology description and the provided one, or `None` if</span>
-    <span class="doccomment">/// they are equal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `TopologyDescriptionDiff` refers to the changes reflected in the provided</span>
-    <span class="doccomment">/// description. For example, if the provided description has a server in it that this</span>
-    <span class="doccomment">/// description does not, it will be returned in the `added_addresses` field.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">diff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TopologyDescription</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TopologyDescriptionDiff</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">other</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Returns the diff between this topology description and the provided one, or `None` if
+    /// they are equal.
+    ///
+    /// The returned `TopologyDescriptionDiff` refers to the changes reflected in the provided
+    /// description. For example, if the provided description has a server in it that this
+    /// description does not, it will be returned in the `added_addresses` field.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>diff&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TopologyDescription,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;TopologyDescriptionDiff&gt; {
+        <span class="kw">if </span><span class="self">self </span>== other {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">addresses</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">server_addresses</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">other_addresses</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">server_addresses</span>().<span class="ident">collect</span>();
+        <span class="kw">let </span>addresses: HashSet&lt;<span class="kw-2">&amp;</span>ServerAddress&gt; = <span class="self">self</span>.server_addresses().collect();
+        <span class="kw">let </span>other_addresses: HashSet&lt;<span class="kw-2">&amp;</span>ServerAddress&gt; = other.server_addresses().collect();
 
-        <span class="kw">let</span> <span class="ident">changed_servers</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">address</span>, <span class="ident">description</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">servers</span>.<span class="ident">get</span>(<span class="ident">address</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">other_description</span>) <span class="kw">if</span> <span class="ident">description</span> <span class="op">!</span><span class="op">=</span> <span class="ident">other_description</span> =&gt; {
-                    <span class="prelude-val">Some</span>((<span class="ident">address</span>, (<span class="ident">description</span>, <span class="ident">other_description</span>)))
+        <span class="kw">let </span>changed_servers = <span class="self">self
+            </span>.servers
+            .iter()
+            .filter_map(|(address, description)| <span class="kw">match </span>other.servers.get(address) {
+                <span class="prelude-val">Some</span>(other_description) <span class="kw">if </span>description != other_description =&gt; {
+                    <span class="prelude-val">Some</span>((address, (description, other_description)))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             });
 
-        <span class="prelude-val">Some</span>(<span class="ident">TopologyDescriptionDiff</span> {
-            <span class="ident">removed_addresses</span>: <span class="ident">addresses</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">other_addresses</span>).<span class="ident">cloned</span>().<span class="ident">collect</span>(),
-            <span class="ident">added_addresses</span>: <span class="ident">other_addresses</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">addresses</span>).<span class="ident">cloned</span>().<span class="ident">collect</span>(),
-            <span class="ident">changed_servers</span>: <span class="ident">changed_servers</span>.<span class="ident">collect</span>(),
+        <span class="prelude-val">Some</span>(TopologyDescriptionDiff {
+            removed_addresses: addresses.difference(<span class="kw-2">&amp;</span>other_addresses).cloned().collect(),
+            added_addresses: other_addresses.difference(<span class="kw-2">&amp;</span>addresses).cloned().collect(),
+            changed_servers: changed_servers.collect(),
         })
     }
 
-    <span class="doccomment">/// Syncs the set of servers in the description to those in `hosts`. Servers in the set not</span>
-    <span class="doccomment">/// already present in the cluster will be added, and servers in the cluster not present in the</span>
-    <span class="doccomment">/// set will be removed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_hosts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hosts</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">add_new_servers_from_addresses</span>(<span class="ident">hosts</span>.<span class="ident">iter</span>());
-        <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">host</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">hosts</span>.<span class="ident">contains</span>(<span class="ident">host</span>));
+    <span class="doccomment">/// Syncs the set of servers in the description to those in `hosts`. Servers in the set not
+    /// already present in the cluster will be added, and servers in the cluster not present in the
+    /// set will be removed.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sync_hosts(<span class="kw-2">&amp;mut </span><span class="self">self</span>, hosts: <span class="kw-2">&amp;</span>HashSet&lt;ServerAddress&gt;) {
+        <span class="self">self</span>.add_new_servers_from_addresses(hosts.iter());
+        <span class="self">self</span>.servers.retain(|host, <span class="kw">_</span>| hosts.contains(host));
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionSupportStatus</span> {
-        <span class="self">self</span>.<span class="ident">session_support_status</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>session_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SessionSupportStatus {
+        <span class="self">self</span>.session_support_status
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransactionSupportStatus</span> {
-        <span class="self">self</span>.<span class="ident">transaction_support_status</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>transaction_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionSupportStatus {
+        <span class="self">self</span>.transaction_support_status
     }
 
-    <span class="doccomment">/// Update the topology based on the new information about the topology contained by the</span>
-    <span class="doccomment">/// ServerDescription.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Ignore updates from servers not currently in the cluster.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="doccomment">/// Update the topology based on the new information about the topology contained by the
+    /// ServerDescription.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="comment">// Ignore updates from servers not currently in the cluster.
+        </span><span class="kw">if </span>!<span class="self">self</span>.servers.contains_key(<span class="kw-2">&amp;</span>server_description.address) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="comment">// Update the round trip time on the server description to the weighted average as described</span>
-        <span class="comment">// by the spec.</span>
-        <span class="self">self</span>.<span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;mut</span> <span class="ident">server_description</span>);
+        <span class="comment">// Update the round trip time on the server description to the weighted average as described
+        // by the spec.
+        </span><span class="self">self</span>.update_round_trip_time(<span class="kw-2">&amp;mut </span>server_description);
 
-        <span class="comment">// Replace the old info about the server with the new info.</span>
-        <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">insert</span>(
-            <span class="ident">server_description</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-            <span class="ident">server_description</span>.<span class="ident">clone</span>(),
+        <span class="comment">// Replace the old info about the server with the new info.
+        </span><span class="self">self</span>.servers.insert(
+            server_description.address.clone(),
+            server_description.clone(),
         );
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TopologyType::LoadBalanced</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
-            <span class="comment">// Load-balanced topologies don&#39;t have real server updates; attempting to update based</span>
-            <span class="comment">// on the synthesized one causes incorrect behavior.</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if let </span>TopologyType::LoadBalanced = <span class="self">self</span>.topology_type {
+            <span class="comment">// Load-balanced topologies don&#39;t have real server updates; attempting to update based
+            // on the synthesized one causes incorrect behavior.
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="comment">// Update the topology&#39;s min logicalSessionTimeout.</span>
-        <span class="self">self</span>.<span class="ident">update_session_support_status</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>);
+        <span class="comment">// Update the topology&#39;s min logicalSessionTimeout.
+        </span><span class="self">self</span>.update_session_support_status(<span class="kw-2">&amp;</span>server_description);
 
-        <span class="comment">// Update the topology&#39;s transaction support status.</span>
-        <span class="self">self</span>.<span class="ident">update_transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>);
+        <span class="comment">// Update the topology&#39;s transaction support status.
+        </span><span class="self">self</span>.update_transaction_support_status(<span class="kw-2">&amp;</span>server_description);
 
-        <span class="comment">// Update the topology&#39;s max reported $clusterTime.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cluster_time</span>) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">cluster_time</span>().<span class="ident">ok</span>().<span class="ident">flatten</span>() {
-            <span class="self">self</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>);
+        <span class="comment">// Update the topology&#39;s max reported $clusterTime.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cluster_time) = server_description.cluster_time().ok().flatten() {
+            <span class="self">self</span>.advance_cluster_time(cluster_time);
         }
 
-        <span class="comment">// Update the topology description based on the current topology type.</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
-            <span class="ident">TopologyType::Single</span> <span class="op">|</span> <span class="ident">TopologyType::LoadBalanced</span> =&gt; {}
-            <span class="ident">TopologyType::Unknown</span> =&gt; <span class="self">self</span>.<span class="ident">update_unknown_topology</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>,
-            <span class="ident">TopologyType::Sharded</span> =&gt; <span class="self">self</span>.<span class="ident">update_sharded_topology</span>(<span class="ident">server_description</span>),
-            <span class="ident">TopologyType::ReplicaSetNoPrimary</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_replica_set_no_primary_topology</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>
+        <span class="comment">// Update the topology description based on the current topology type.
+        </span><span class="kw">match </span><span class="self">self</span>.topology_type {
+            TopologyType::Single | TopologyType::LoadBalanced =&gt; {}
+            TopologyType::Unknown =&gt; <span class="self">self</span>.update_unknown_topology(server_description)<span class="question-mark">?</span>,
+            TopologyType::Sharded =&gt; <span class="self">self</span>.update_sharded_topology(server_description),
+            TopologyType::ReplicaSetNoPrimary =&gt; {
+                <span class="self">self</span>.update_replica_set_no_primary_topology(server_description)<span class="question-mark">?
+            </span>}
+            TopologyType::ReplicaSetWithPrimary =&gt; {
+                <span class="self">self</span>.update_replica_set_with_primary_topology(server_description)<span class="question-mark">?</span>;
             }
-            <span class="ident">TopologyType::ReplicaSetWithPrimary</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_replica_set_with_primary_topology</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>;
-            }
         }
 
-        <span class="comment">// Record any compatibility error.</span>
-        <span class="self">self</span>.<span class="ident">check_compatibility</span>();
+        <span class="comment">// Record any compatibility error.
+        </span><span class="self">self</span>.check_compatibility();
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Update the Unknown topology description based on the server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_unknown_topology</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
-            <span class="ident">ServerType::Unknown</span> <span class="op">|</span> <span class="ident">ServerType::RsGhost</span> =&gt; {}
-            <span class="ident">ServerType::Standalone</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_unknown_with_standalone_server</span>(<span class="ident">server_description</span>)
+    <span class="doccomment">/// Update the Unknown topology description based on the server description.
+    </span><span class="kw">fn </span>update_unknown_topology(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">match </span>server_description.server_type {
+            ServerType::Unknown | ServerType::RsGhost =&gt; {}
+            ServerType::Standalone =&gt; {
+                <span class="self">self</span>.update_unknown_with_standalone_server(server_description)
             }
-            <span class="ident">ServerType::Mongos</span> =&gt; <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::Sharded</span>,
-            <span class="ident">ServerType::RsPrimary</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::ReplicaSetWithPrimary</span>;
-                <span class="self">self</span>.<span class="ident">update_rs_from_primary_server</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>;
+            ServerType::Mongos =&gt; <span class="self">self</span>.topology_type = TopologyType::Sharded,
+            ServerType::RsPrimary =&gt; {
+                <span class="self">self</span>.topology_type = TopologyType::ReplicaSetWithPrimary;
+                <span class="self">self</span>.update_rs_from_primary_server(server_description)<span class="question-mark">?</span>;
             }
-            <span class="ident">ServerType::RsSecondary</span> <span class="op">|</span> <span class="ident">ServerType::RsArbiter</span> <span class="op">|</span> <span class="ident">ServerType::RsOther</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::ReplicaSetNoPrimary</span>;
-                <span class="self">self</span>.<span class="ident">update_rs_without_primary_server</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>;
+            ServerType::RsSecondary | ServerType::RsArbiter | ServerType::RsOther =&gt; {
+                <span class="self">self</span>.topology_type = TopologyType::ReplicaSetNoPrimary;
+                <span class="self">self</span>.update_rs_without_primary_server(server_description)<span class="question-mark">?</span>;
             }
-            <span class="ident">ServerType::LoadBalancer</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.<span class="ident">to_string</span>())
-            }
-        }
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Update the Sharded topology description based on the server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_sharded_topology</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
-        <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
-            <span class="ident">ServerType::Unknown</span> <span class="op">|</span> <span class="ident">ServerType::Mongos</span> =&gt; {}
-            <span class="kw">_</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-            }
-        }
-    }
-
-    <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_replica_set_no_primary_topology</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
-            <span class="ident">ServerType::Unknown</span> <span class="op">|</span> <span class="ident">ServerType::RsGhost</span> =&gt; {}
-            <span class="ident">ServerType::Standalone</span> <span class="op">|</span> <span class="ident">ServerType::Mongos</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-            }
-            <span class="ident">ServerType::RsPrimary</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::ReplicaSetWithPrimary</span>;
-                <span class="self">self</span>.<span class="ident">update_rs_from_primary_server</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>
-            }
-            <span class="ident">ServerType::RsSecondary</span> <span class="op">|</span> <span class="ident">ServerType::RsArbiter</span> <span class="op">|</span> <span class="ident">ServerType::RsOther</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_rs_without_primary_server</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>;
-            }
-            <span class="ident">ServerType::LoadBalancer</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.<span class="ident">to_string</span>())
+            ServerType::LoadBalancer =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_replica_set_with_primary_topology</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
-            <span class="ident">ServerType::Unknown</span> <span class="op">|</span> <span class="ident">ServerType::RsGhost</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+    <span class="doccomment">/// Update the Sharded topology description based on the server description.
+    </span><span class="kw">fn </span>update_sharded_topology(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: ServerDescription) {
+        <span class="kw">match </span>server_description.server_type {
+            ServerType::Unknown | ServerType::Mongos =&gt; {}
+            <span class="kw">_ </span>=&gt; {
+                <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
             }
-            <span class="ident">ServerType::Standalone</span> <span class="op">|</span> <span class="ident">ServerType::Mongos</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-                <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+        }
+    }
+
+    <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the server description.
+    </span><span class="kw">fn </span>update_replica_set_no_primary_topology(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">match </span>server_description.server_type {
+            ServerType::Unknown | ServerType::RsGhost =&gt; {}
+            ServerType::Standalone | ServerType::Mongos =&gt; {
+                <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
             }
-            <span class="ident">ServerType::RsPrimary</span> =&gt; <span class="self">self</span>.<span class="ident">update_rs_from_primary_server</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>,
-            <span class="ident">ServerType::RsSecondary</span> <span class="op">|</span> <span class="ident">ServerType::RsArbiter</span> <span class="op">|</span> <span class="ident">ServerType::RsOther</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">update_rs_with_primary_from_member</span>(<span class="ident">server_description</span>)<span class="question-mark">?</span>;
+            ServerType::RsPrimary =&gt; {
+                <span class="self">self</span>.topology_type = TopologyType::ReplicaSetWithPrimary;
+                <span class="self">self</span>.update_rs_from_primary_server(server_description)<span class="question-mark">?
+            </span>}
+            ServerType::RsSecondary | ServerType::RsArbiter | ServerType::RsOther =&gt; {
+                <span class="self">self</span>.update_rs_without_primary_server(server_description)<span class="question-mark">?</span>;
             }
-            <span class="ident">ServerType::LoadBalancer</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.<span class="ident">to_string</span>())
+            ServerType::LoadBalancer =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Update the Unknown topology description based on the Standalone server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_unknown_with_standalone_server</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">single_seed</span> {
-            <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::Single</span>;
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-        }
-    }
-
-    <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the non-primary server</span>
-    <span class="doccomment">/// description.</span>
-    <span class="kw">fn</span> <span class="ident">update_rs_without_primary_server</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-        }
-
-        <span class="self">self</span>.<span class="ident">add_new_servers</span>(<span class="ident">server_description</span>.<span class="ident">known_hosts</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">if</span> <span class="ident">server_description</span>.<span class="ident">invalid_me</span>()<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
+    <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the server description.
+    </span><span class="kw">fn </span>update_replica_set_with_primary_topology(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">match </span>server_description.server_type {
+            ServerType::Unknown | ServerType::RsGhost =&gt; {
+                <span class="self">self</span>.record_primary_state();
+            }
+            ServerType::Standalone | ServerType::Mongos =&gt; {
+                <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+                <span class="self">self</span>.record_primary_state();
+            }
+            ServerType::RsPrimary =&gt; <span class="self">self</span>.update_rs_from_primary_server(server_description)<span class="question-mark">?</span>,
+            ServerType::RsSecondary | ServerType::RsArbiter | ServerType::RsOther =&gt; {
+                <span class="self">self</span>.update_rs_with_primary_from_member(server_description)<span class="question-mark">?</span>;
+            }
+            ServerType::LoadBalancer =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;cannot transition to a load balancer&quot;</span>.to_string())
+            }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the non-primary server</span>
-    <span class="doccomment">/// description.</span>
-    <span class="kw">fn</span> <span class="ident">update_rs_with_primary_from_member</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-            <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+    <span class="doccomment">/// Update the Unknown topology description based on the Standalone server description.
+    </span><span class="kw">fn </span>update_unknown_with_standalone_server(<span class="kw-2">&amp;mut </span><span class="self">self</span>, server_description: ServerDescription) {
+        <span class="kw">if </span><span class="self">self</span>.single_seed {
+            <span class="self">self</span>.topology_type = TopologyType::Single;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+        }
+    }
 
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the non-primary server
+    /// description.
+    </span><span class="kw">fn </span>update_rs_without_primary_server(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span><span class="self">self</span>.set_name.is_none() {
+            <span class="self">self</span>.set_name = server_description.set_name()<span class="question-mark">?</span>;
+        } <span class="kw">else if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">if</span> <span class="ident">server_description</span>.<span class="ident">invalid_me</span>()<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-            <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+        <span class="self">self</span>.add_new_servers(server_description.known_hosts()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span>server_description.invalid_me()<span class="question-mark">? </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Update the replica set topology description based on the RSPrimary server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_rs_from_primary_server</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span> {
-            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>);
-            <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+    <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the non-primary server
+    /// description.
+    </span><span class="kw">fn </span>update_rs_with_primary_from_member(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+            <span class="self">self</span>.record_primary_state();
 
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_set_version</span>) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_version</span>()<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_election_id</span>) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">election_id</span>()<span class="question-mark">?</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">topology_max_set_version</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_set_version</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">topology_max_election_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_election_id</span> {
-                        <span class="kw">if</span> <span class="ident">topology_max_set_version</span> <span class="op">&gt;</span> <span class="ident">server_set_version</span>
-                            <span class="op">|</span><span class="op">|</span> (<span class="ident">topology_max_set_version</span> <span class="op">==</span> <span class="ident">server_set_version</span>
-                                <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">topology_max_election_id</span> <span class="op">&gt;</span> <span class="ident">server_election_id</span>)
+        <span class="kw">if </span>server_description.invalid_me()<span class="question-mark">? </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+            <span class="self">self</span>.record_primary_state();
+
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Update the replica set topology description based on the RSPrimary server description.
+    </span><span class="kw">fn </span>update_rs_from_primary_server(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        server_description: ServerDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span><span class="self">self</span>.set_name.is_none() {
+            <span class="self">self</span>.set_name = server_description.set_name()<span class="question-mark">?</span>;
+        } <span class="kw">else if </span><span class="self">self</span>.set_name != server_description.set_name()<span class="question-mark">? </span>{
+            <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>server_description.address);
+            <span class="self">self</span>.record_primary_state();
+
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
+        }
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(server_set_version) = server_description.set_version()<span class="question-mark">? </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(server_election_id) = server_description.election_id()<span class="question-mark">? </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(topology_max_set_version) = <span class="self">self</span>.max_set_version {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>topology_max_election_id) = <span class="self">self</span>.max_election_id {
+                        <span class="kw">if </span>topology_max_set_version &gt; server_set_version
+                            || (topology_max_set_version == server_set_version
+                                &amp;&amp; <span class="kw-2">*</span>topology_max_election_id &gt; server_election_id)
                         {
-                            <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">insert</span>(
-                                <span class="ident">server_description</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-                                <span class="ident">ServerDescription::new</span>(<span class="ident">server_description</span>.<span class="ident">address</span>, <span class="prelude-val">None</span>),
+                            <span class="self">self</span>.servers.insert(
+                                server_description.address.clone(),
+                                ServerDescription::new(server_description.address, <span class="prelude-val">None</span>),
                             );
-                            <span class="self">self</span>.<span class="ident">record_primary_state</span>();
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                            <span class="self">self</span>.record_primary_state();
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                         }
                     }
                 }
 
-                <span class="self">self</span>.<span class="ident">max_election_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">server_election_id</span>);
+                <span class="self">self</span>.max_election_id = <span class="prelude-val">Some</span>(server_election_id);
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_set_version</span>) <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_version</span>()<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="self">self</span>
-                .<span class="ident">max_set_version</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">topology_max_set_version</span><span class="op">|</span> <span class="ident">server_set_version</span> <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">topology_max_set_version</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(server_set_version) = server_description.set_version()<span class="question-mark">? </span>{
+            <span class="kw">if </span><span class="self">self
+                </span>.max_set_version
+                .as_ref()
+                .map(|topology_max_set_version| server_set_version &gt; <span class="kw-2">*</span>topology_max_set_version)
+                .unwrap_or(<span class="bool-val">true</span>)
             {
-                <span class="self">self</span>.<span class="ident">max_set_version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">server_set_version</span>);
+                <span class="self">self</span>.max_set_version = <span class="prelude-val">Some</span>(server_set_version);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">addresses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
+        <span class="kw">let </span>addresses: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self</span>.servers.keys().cloned().collect();
 
-        <span class="comment">// If any other servers are RSPrimary, replace them with an unknown server decscription,</span>
-        <span class="comment">// which will cause them to be updated by a new server check.</span>
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">addresses</span>.<span class="ident">clone</span>() {
-            <span class="kw">if</span> <span class="ident">address</span> <span class="op">==</span> <span class="ident">server_description</span>.<span class="ident">address</span> {
+        <span class="comment">// If any other servers are RSPrimary, replace them with an unknown server decscription,
+        // which will cause them to be updated by a new server check.
+        </span><span class="kw">for </span>address <span class="kw">in </span>addresses.clone() {
+            <span class="kw">if </span>address == server_description.address {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ServerType::RsPrimary</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>).<span class="ident">unwrap</span>().<span class="ident">server_type</span> {
-                <span class="self">self</span>.<span class="ident">servers</span>
-                    .<span class="ident">insert</span>(<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">ServerDescription::new</span>(<span class="ident">address</span>, <span class="prelude-val">None</span>));
+            <span class="kw">if let </span>ServerType::RsPrimary = <span class="self">self</span>.servers.get(<span class="kw-2">&amp;</span>address).unwrap().server_type {
+                <span class="self">self</span>.servers
+                    .insert(address.clone(), ServerDescription::new(address, <span class="prelude-val">None</span>));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">add_new_servers</span>(<span class="ident">server_description</span>.<span class="ident">known_hosts</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">known_hosts</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">known_hosts</span>()<span class="question-mark">?</span>.<span class="ident">collect</span>();
+        <span class="self">self</span>.add_new_servers(server_description.known_hosts()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>known_hosts: HashSet&lt;<span class="kw">_</span>&gt; = server_description.known_hosts()<span class="question-mark">?</span>.collect();
 
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">addresses</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">known_hosts</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>.<span class="ident">to_string</span>()) {
-                <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>);
+        <span class="kw">for </span>address <span class="kw">in </span>addresses {
+            <span class="kw">if </span>!known_hosts.contains(<span class="kw-2">&amp;</span>address.to_string()) {
+                <span class="self">self</span>.servers.remove(<span class="kw-2">&amp;</span>address);
             }
         }
 
-        <span class="self">self</span>.<span class="ident">record_primary_state</span>();
+        <span class="self">self</span>.record_primary_state();
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Inspect the topology for a primary server, and update the topology type to</span>
-    <span class="doccomment">/// ReplicaSetNoPrimary if none is found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should only be called on a replica set topology.</span>
-    <span class="kw">fn</span> <span class="ident">record_primary_state</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">server</span>.<span class="ident">server_type</span> <span class="op">==</span> <span class="ident">ServerType::RsPrimary</span>)
+    <span class="doccomment">/// Inspect the topology for a primary server, and update the topology type to
+    /// ReplicaSetNoPrimary if none is found.
+    ///
+    /// This should only be called on a replica set topology.
+    </span><span class="kw">fn </span>record_primary_state(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.topology_type = <span class="kw">if </span><span class="self">self
+            </span>.servers
+            .values()
+            .any(|server| server.server_type == ServerType::RsPrimary)
         {
-            <span class="ident">TopologyType::ReplicaSetWithPrimary</span>
-        } <span class="kw">else</span> {
-            <span class="ident">TopologyType::ReplicaSetNoPrimary</span>
+            TopologyType::ReplicaSetWithPrimary
+        } <span class="kw">else </span>{
+            TopologyType::ReplicaSetNoPrimary
         };
     }
 
-    <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.</span>
-    <span class="kw">fn</span> <span class="ident">add_new_servers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">servers</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">servers</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">servers</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">server</span><span class="op">|</span> <span class="ident">ServerAddress::parse</span>(<span class="ident">server</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_string</span>()))
-            .<span class="ident">collect</span>();
+    <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.
+    </span><span class="kw">fn </span>add_new_servers&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        servers: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">let </span>servers: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, String&gt; = servers
+            .map(|server| ServerAddress::parse(server).map_err(|e| e.to_string()))
+            .collect();
 
-        <span class="self">self</span>.<span class="ident">add_new_servers_from_addresses</span>(<span class="ident">servers</span><span class="question-mark">?</span>.<span class="ident">iter</span>());
+        <span class="self">self</span>.add_new_servers_from_addresses(servers<span class="question-mark">?</span>.iter());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.</span>
-    <span class="kw">fn</span> <span class="ident">add_new_servers_from_addresses</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">servers</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerAddress</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.
+    </span><span class="kw">fn </span>add_new_servers_from_addresses&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        servers: <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerAddress&gt;,
     ) {
-        <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="ident">servers</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">contains_key</span>(<span class="ident">server</span>) {
-                <span class="self">self</span>.<span class="ident">servers</span>
-                    .<span class="ident">insert</span>(<span class="ident">server</span>.<span class="ident">clone</span>(), <span class="ident">ServerDescription::new</span>(<span class="ident">server</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>));
+        <span class="kw">for </span>server <span class="kw">in </span>servers {
+            <span class="kw">if </span>!<span class="self">self</span>.servers.contains_key(server) {
+                <span class="self">self</span>.servers
+                    .insert(server.clone(), ServerDescription::new(server.clone(), <span class="prelude-val">None</span>));
             }
         }
     }
 }
 
-<span class="doccomment">/// Enum representing whether sessions are supported by the topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SessionSupportStatus</span> {
-    <span class="doccomment">/// It is not known yet whether the topology supports sessions. This is possible if no</span>
-    <span class="doccomment">/// data-bearing servers have updated the `TopologyDescription` yet.</span>
-    <span class="ident">Undetermined</span>,
+<span class="doccomment">/// Enum representing whether sessions are supported by the topology.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SessionSupportStatus {
+    <span class="doccomment">/// It is not known yet whether the topology supports sessions. This is possible if no
+    /// data-bearing servers have updated the `TopologyDescription` yet.
+    </span>Undetermined,
 
-    <span class="doccomment">/// Sessions are not supported by this topology. This is possible if there is a data-bearing</span>
-    <span class="doccomment">/// server in the deployment that does not support sessions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// While standalones do not support sessions, they still do report a logical session timeout,</span>
-    <span class="doccomment">/// so it is stored here if necessary.</span>
-    <span class="ident">Unsupported</span> {
-        <span class="ident">logical_session_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sessions are not supported by this topology. This is possible if there is a data-bearing
+    /// server in the deployment that does not support sessions.
+    ///
+    /// While standalones do not support sessions, they still do report a logical session timeout,
+    /// so it is stored here if necessary.
+    </span>Unsupported {
+        logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
     },
 
-    <span class="doccomment">/// Sessions are supported by this topology. This is the minimum timeout of all data-bearing</span>
-    <span class="doccomment">/// servers in the deployment.</span>
-    <span class="ident">Supported</span> {
-        <span class="ident">logical_session_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sessions are supported by this topology. This is the minimum timeout of all data-bearing
+    /// servers in the deployment.
+    </span>Supported {
+        logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SessionSupportStatus</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Undetermined</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>SessionSupportStatus {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Undetermined
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SessionSupportStatus</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">logical_session_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Undetermined</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::Unsupported</span> {
-                <span class="ident">logical_session_timeout</span>,
-            } =&gt; <span class="kw-2">*</span><span class="ident">logical_session_timeout</span>,
-            <span class="ident"><span class="self">Self</span>::Supported</span> {
-                <span class="ident">logical_session_timeout</span>,
-            } =&gt; <span class="kw-2">*</span><span class="ident">logical_session_timeout</span>,
+<span class="kw">impl </span>SessionSupportStatus {
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>logical_session_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Undetermined =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::Unsupported {
+                logical_session_timeout,
+            } =&gt; <span class="kw-2">*</span>logical_session_timeout,
+            <span class="self">Self</span>::Supported {
+                logical_session_timeout,
+            } =&gt; <span class="kw-2">*</span>logical_session_timeout,
         }
     }
 }
 
-<span class="doccomment">/// Enum representing whether transactions are supported by the topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TransactionSupportStatus</span> {
-    <span class="doccomment">/// It is not known yet whether the topology supports transactions. This is possible if no</span>
-    <span class="doccomment">/// data-bearing servers have updated the `TopologyDescription` yet.</span>
-    <span class="ident">Undetermined</span>,
+<span class="doccomment">/// Enum representing whether transactions are supported by the topology.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TransactionSupportStatus {
+    <span class="doccomment">/// It is not known yet whether the topology supports transactions. This is possible if no
+    /// data-bearing servers have updated the `TopologyDescription` yet.
+    </span>Undetermined,
 
-    <span class="doccomment">/// Transactions are not supported by this topology.</span>
-    <span class="ident">Unsupported</span>,
+    <span class="doccomment">/// Transactions are not supported by this topology.
+    </span>Unsupported,
 
-    <span class="doccomment">/// Transactions are supported by this topology. A topology supports transactions if it</span>
-    <span class="doccomment">/// supports sessions and its maxWireVersion &gt;= 7. If the topology is sharded, maxWireVersion</span>
-    <span class="doccomment">/// must be &gt;= 8 for transactions to be supported.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that meeting these conditions does not guarantee that a deployment</span>
-    <span class="doccomment">/// supports transactions; any other missing qualification will be reported by the server.</span>
-    <span class="ident">Supported</span>,
+    <span class="doccomment">/// Transactions are supported by this topology. A topology supports transactions if it
+    /// supports sessions and its maxWireVersion &gt;= 7. If the topology is sharded, maxWireVersion
+    /// must be &gt;= 8 for transactions to be supported.
+    ///
+    /// Note that meeting these conditions does not guarantee that a deployment
+    /// supports transactions; any other missing qualification will be reported by the server.
+    </span>Supported,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TransactionSupportStatus</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Undetermined</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>TransactionSupportStatus {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Undetermined
     }
 }
 
-<span class="doccomment">/// A struct representing the diff between two `TopologyDescription`s.</span>
-<span class="doccomment">/// Returned from `TopologyDescription::diff`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyDescriptionDiff</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">removed_addresses</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerAddress</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">added_addresses</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerAddress</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">changed_servers</span>:
-        <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerAddress</span>, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerDescription</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerDescription</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// A struct representing the diff between two `TopologyDescription`s.
+/// Returned from `TopologyDescription::diff`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyDescriptionDiff&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) removed_addresses: HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerAddress&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) added_addresses: HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerAddress&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) changed_servers:
+        HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerAddress, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ServerDescription)&gt;,
 }
 
-<span class="kw">fn</span> <span class="ident">verify_max_staleness</span>(<span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">verify_max_staleness_inner</span>(<span class="ident">max_staleness</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::error::ErrorKind::InvalidArgument</span> { <span class="ident">message</span>: <span class="ident">s</span> }.<span class="ident">into</span>())
+<span class="kw">fn </span>verify_max_staleness(max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="kw">crate</span>::error::Result&lt;()&gt; {
+    verify_max_staleness_inner(max_staleness)
+        .map_err(|s| <span class="kw">crate</span>::error::ErrorKind::InvalidArgument { message: s }.into())
 }
 
-<span class="kw">fn</span> <span class="ident">verify_max_staleness_inner</span>(<span class="ident">max_staleness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">max_staleness</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">staleness</span><span class="op">|</span> <span class="ident">staleness</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="ident">staleness</span> <span class="op">&lt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">90</span>))
-        .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+<span class="kw">fn </span>verify_max_staleness_inner(max_staleness: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; std::result::Result&lt;(), String&gt; {
+    <span class="kw">if </span>max_staleness
+        .map(|staleness| staleness &gt; Duration::from_secs(<span class="number">0</span>) &amp;&amp; staleness &lt; Duration::from_secs(<span class="number">90</span>))
+        .unwrap_or(<span class="bool-val">false</span>)
     {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;max staleness cannot be both positive and below 90 seconds&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;max staleness cannot be both positive and below 90 seconds&quot;</span>.into());
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/div128.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>div128.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/div128.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>div128.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -462,250 +462,250 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Optimized division algorithms for u128.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Fast Algorithms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The more optimized algorithms for calculating the divisor constants are</span>
-<span class="doccomment">//! based off of the paper &quot;Division by Invariant Integers Using Multiplication&quot;,</span>
-<span class="doccomment">//! by T. Granlund and P. Montgomery, in &quot;Proc. of the SIGPLAN94 Conference</span>
-<span class="doccomment">//! on Programming Language Design and Implementation&quot;, available online</span>
-<span class="doccomment">//! [here](https://gmplib.org/~tege/divcnst-pldi94.pdf).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This approach is derived from the Rust algorithm for formatting 128-bit</span>
-<span class="doccomment">//! values, and therefore is similarly dual-licensed under MIT/Apache-2.0.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Fallback Algorithms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The slower algorithms in this module are derived off of `dtolnay/itoa`</span>
-<span class="doccomment">//! and Rust&#39;s compiler-builtins crate. This copies a specific</span>
-<span class="doccomment">//! path of LLVM&#39;s `__udivmodti4` intrinsic, which does division/</span>
-<span class="doccomment">//! modulus for u128 in a single step. Rust implements both division</span>
-<span class="doccomment">//! and modulus in terms of this intrinsic, but calls the intrinsic</span>
-<span class="doccomment">//! twice for subsequent division and modulus operations on the same</span>
-<span class="doccomment">//! dividend/divisor, leading to significant performance overhead.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module calculates the optimal divisors for each radix,</span>
-<span class="doccomment">//! and exports a general-purpose division algorithm for u128 where</span>
-<span class="doccomment">//! the divisor can fit in a u64. The moderate algorithm is derived from</span>
-<span class="doccomment">//! dtolnay/itoa, which can be found</span>
-<span class="doccomment">//! [here](https://github.com/dtolnay/itoa/blob/master/src/udiv128.rs), which</span>
-<span class="doccomment">//! in turn is derived from Rust&#39;s compiler-builtins crate, which can be found</span>
-<span class="doccomment">//! [here](https://github.com/rust-lang-nursery/compiler-builtins/blob/master/src/int/udiv.rs).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Licensing for these routines is therefore subject to an MIT/Illinois</span>
-<span class="doccomment">//! dual license (a BSD-like license), while the rest of the module is</span>
-<span class="doccomment">//! subject to an MIT/Apache-2.0 dual-license.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Generation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`etc/div128.py`] for the script to generate the divisors and the</span>
-<span class="doccomment">//! constants, and the division algorithm.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`etc/div128.py`]: https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-util/etc/div128.py</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Optimized division algorithms for u128.
+//!
+//! # Fast Algorithms
+//!
+//! The more optimized algorithms for calculating the divisor constants are
+//! based off of the paper &quot;Division by Invariant Integers Using Multiplication&quot;,
+//! by T. Granlund and P. Montgomery, in &quot;Proc. of the SIGPLAN94 Conference
+//! on Programming Language Design and Implementation&quot;, available online
+//! [here](https://gmplib.org/~tege/divcnst-pldi94.pdf).
+//!
+//! This approach is derived from the Rust algorithm for formatting 128-bit
+//! values, and therefore is similarly dual-licensed under MIT/Apache-2.0.
+//!
+//! # Fallback Algorithms
+//!
+//! The slower algorithms in this module are derived off of `dtolnay/itoa`
+//! and Rust&#39;s compiler-builtins crate. This copies a specific
+//! path of LLVM&#39;s `__udivmodti4` intrinsic, which does division/
+//! modulus for u128 in a single step. Rust implements both division
+//! and modulus in terms of this intrinsic, but calls the intrinsic
+//! twice for subsequent division and modulus operations on the same
+//! dividend/divisor, leading to significant performance overhead.
+//!
+//! This module calculates the optimal divisors for each radix,
+//! and exports a general-purpose division algorithm for u128 where
+//! the divisor can fit in a u64. The moderate algorithm is derived from
+//! dtolnay/itoa, which can be found
+//! [here](https://github.com/dtolnay/itoa/blob/master/src/udiv128.rs), which
+//! in turn is derived from Rust&#39;s compiler-builtins crate, which can be found
+//! [here](https://github.com/rust-lang-nursery/compiler-builtins/blob/master/src/int/udiv.rs).
+//!
+//! Licensing for these routines is therefore subject to an MIT/Illinois
+//! dual license (a BSD-like license), while the rest of the module is
+//! subject to an MIT/Apache-2.0 dual-license.
+//!
+//! # Generation
+//!
+//! See [`etc/div128.py`] for the script to generate the divisors and the
+//! constants, and the division algorithm.
+//!
+//! [`etc/div128.py`]: https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-util/etc/div128.py
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
+</span><span class="attribute">#![cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+#![cfg(feature = <span class="string">&quot;write&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assert::debug_assert_radix</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mul::mulhi</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::assert::debug_assert_radix;
+<span class="kw">use </span><span class="kw">crate</span>::mul::mulhi;
 
-<span class="doccomment">/// Calculate a div/remainder algorithm optimized for power-of-two radixes.</span>
-<span class="doccomment">/// This is trivial: the number of digits we process is `64 / log2(radix)`.</span>
-<span class="doccomment">/// Therefore, the `shr` is `log2(radix) * digits`, and the mask is just the</span>
-<span class="doccomment">/// lower `shr` bits of the digits.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>: <span class="ident">u128</span>, <span class="ident">mask</span>: <span class="ident">u64</span>, <span class="ident">shr</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="kw">let</span> <span class="ident">quot</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shr</span>;
-    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">mask</span> <span class="op">&amp;</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>;
-    (<span class="ident">quot</span>, <span class="ident">rem</span>)
+<span class="doccomment">/// Calculate a div/remainder algorithm optimized for power-of-two radixes.
+/// This is trivial: the number of digits we process is `64 / log2(radix)`.
+/// Therefore, the `shr` is `log2(radix) * digits`, and the mask is just the
+/// lower `shr` bits of the digits.
+</span><span class="attribute">#[inline]
+#[allow(clippy::many_single_char_names)]
+</span><span class="kw">pub const fn </span>pow2_u128_divrem(n: u128, mask: u64, shr: u32) -&gt; (u128, u64) {
+    <span class="kw">let </span>quot = n &gt;&gt; shr;
+    <span class="kw">let </span>rem = mask &amp; n <span class="kw">as </span>u64;
+    (quot, rem)
 }
 
-<span class="doccomment">/// Fast division/remainder algorithm for u128, without a fast native approximation.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fast_u128_divrem</span>(
-    <span class="ident">n</span>: <span class="ident">u128</span>,
-    <span class="ident">d</span>: <span class="ident">u64</span>,
-    <span class="ident">fast</span>: <span class="ident">u128</span>,
-    <span class="ident">fast_shr</span>: <span class="ident">u32</span>,
-    <span class="ident">factor</span>: <span class="ident">u128</span>,
-    <span class="ident">factor_shr</span>: <span class="ident">u32</span>,
-) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="kw">let</span> <span class="ident">quot</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">fast</span> {
-        ((<span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fast_shr</span>) <span class="kw">as</span> <span class="ident">u64</span> <span class="op">/</span> (<span class="ident">d</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fast_shr</span>)) <span class="kw">as</span> <span class="ident">u128</span>
-    } <span class="kw">else</span> {
-        <span class="ident">mulhi</span>::<span class="op">&lt;</span><span class="ident">u128</span>, <span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">n</span>, <span class="ident">factor</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">factor_shr</span>
+<span class="doccomment">/// Fast division/remainder algorithm for u128, without a fast native approximation.
+</span><span class="attribute">#[inline]
+#[allow(clippy::many_single_char_names)]
+</span><span class="kw">pub fn </span>fast_u128_divrem(
+    n: u128,
+    d: u64,
+    fast: u128,
+    fast_shr: u32,
+    factor: u128,
+    factor_shr: u32,
+) -&gt; (u128, u64) {
+    <span class="kw">let </span>quot = <span class="kw">if </span>n &lt; fast {
+        ((n &gt;&gt; fast_shr) <span class="kw">as </span>u64 / (d &gt;&gt; fast_shr)) <span class="kw">as </span>u128
+    } <span class="kw">else </span>{
+        mulhi::&lt;u128, u64&gt;(n, factor) &gt;&gt; factor_shr
     };
-    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">-</span> <span class="ident">quot</span> <span class="op">*</span> <span class="ident">d</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-    (<span class="ident">quot</span>, <span class="ident">rem</span>)
+    <span class="kw">let </span>rem = (n - quot * d <span class="kw">as </span>u128) <span class="kw">as </span>u64;
+    (quot, rem)
 }
 
-<span class="doccomment">/// Fast division/remainder algorithm for u128, without a fast native approximation.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>: <span class="ident">u128</span>, <span class="ident">d</span>: <span class="ident">u64</span>, <span class="ident">factor</span>: <span class="ident">u128</span>, <span class="ident">factor_shr</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="kw">let</span> <span class="ident">quot</span> <span class="op">=</span> <span class="ident">mulhi</span>::<span class="op">&lt;</span><span class="ident">u128</span>, <span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">n</span>, <span class="ident">factor</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">factor_shr</span>;
-    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">-</span> <span class="ident">quot</span> <span class="op">*</span> <span class="ident">d</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-    (<span class="ident">quot</span>, <span class="ident">rem</span>)
+<span class="doccomment">/// Fast division/remainder algorithm for u128, without a fast native approximation.
+</span><span class="attribute">#[inline]
+#[allow(clippy::many_single_char_names)]
+</span><span class="kw">pub fn </span>moderate_u128_divrem(n: u128, d: u64, factor: u128, factor_shr: u32) -&gt; (u128, u64) {
+    <span class="kw">let </span>quot = mulhi::&lt;u128, u64&gt;(n, factor) &gt;&gt; factor_shr;
+    <span class="kw">let </span>rem = (n - quot * d <span class="kw">as </span>u128) <span class="kw">as </span>u64;
+    (quot, rem)
 }
 
-<span class="doccomment">/// Optimized fallback division/remainder algorithm for u128.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is because the codegen for u128 divrem is very inefficient in Rust,</span>
-<span class="doccomment">/// calling both `__udivmodti4` twice internally, rather than a single time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is still a fair bit slower than the optimized algorithms described</span>
-<span class="doccomment">/// in the above paper, but this is a suitable fallback when we cannot use</span>
-<span class="doccomment">/// the faster algorithm.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>: <span class="ident">u128</span>, <span class="ident">d</span>: <span class="ident">u64</span>, <span class="ident">d_ctlz</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="comment">// Ensure we have the correct number of leading zeros passed.</span>
-    <span class="macro">debug_assert_eq!</span>(<span class="ident">d_ctlz</span>, <span class="ident">d</span>.<span class="ident">leading_zeros</span>());
+<span class="doccomment">/// Optimized fallback division/remainder algorithm for u128.
+///
+/// This is because the codegen for u128 divrem is very inefficient in Rust,
+/// calling both `__udivmodti4` twice internally, rather than a single time.
+///
+/// This is still a fair bit slower than the optimized algorithms described
+/// in the above paper, but this is a suitable fallback when we cannot use
+/// the faster algorithm.
+</span><span class="attribute">#[inline]
+#[allow(clippy::many_single_char_names)]
+</span><span class="kw">pub fn </span>slow_u128_divrem(n: u128, d: u64, d_ctlz: u32) -&gt; (u128, u64) {
+    <span class="comment">// Ensure we have the correct number of leading zeros passed.
+    </span><span class="macro">debug_assert_eq!</span>(d_ctlz, d.leading_zeros());
 
-    <span class="comment">// Optimize if we can divide using u64 first.</span>
-    <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> (<span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-    <span class="kw">if</span> <span class="ident">high</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">return</span> ((<span class="ident">low</span> <span class="op">/</span> <span class="ident">d</span>) <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">low</span> <span class="op">%</span> <span class="ident">d</span>);
+    <span class="comment">// Optimize if we can divide using u64 first.
+    </span><span class="kw">let </span>high = (n &gt;&gt; <span class="number">64</span>) <span class="kw">as </span>u64;
+    <span class="kw">if </span>high == <span class="number">0 </span>{
+        <span class="kw">let </span>low = n <span class="kw">as </span>u64;
+        <span class="kw">return </span>((low / d) <span class="kw">as </span>u128, low % d);
     }
 
-    <span class="comment">// sr = 1 + u64::BITS + d.leading_zeros() - high.leading_zeros();</span>
-    <span class="kw">let</span> <span class="ident">sr</span> <span class="op">=</span> <span class="number">65</span> <span class="op">+</span> <span class="ident">d_ctlz</span> <span class="op">-</span> <span class="ident">high</span>.<span class="ident">leading_zeros</span>();
+    <span class="comment">// sr = 1 + u64::BITS + d.leading_zeros() - high.leading_zeros();
+    </span><span class="kw">let </span>sr = <span class="number">65 </span>+ d_ctlz - high.leading_zeros();
 
-    <span class="comment">// 1 &lt;= sr &lt;= u64::BITS - 1</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">128</span> <span class="op">-</span> <span class="ident">sr</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">sr</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// 1 &lt;= sr &lt;= u64::BITS - 1
+    </span><span class="kw">let </span><span class="kw-2">mut </span>q: u128 = n &lt;&lt; (<span class="number">128 </span>- sr);
+    <span class="kw">let </span><span class="kw-2">mut </span>r: u128 = n &gt;&gt; sr;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry: u64 = <span class="number">0</span>;
 
-    <span class="comment">// Don&#39;t use a range because they may generate references to memcpy in unoptimized code</span>
-    <span class="comment">// Loop invariants:  r &lt; d; carry is 0 or 1</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">sr</span> {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="comment">// Don&#39;t use a range because they may generate references to memcpy in unoptimized code
+    // Loop invariants:  r &lt; d; carry is 0 or 1
+    </span><span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+    <span class="kw">while </span>i &lt; sr {
+        i += <span class="number">1</span>;
 
-        <span class="comment">// r:q = ((r:q) &lt;&lt; 1) | carry</span>
-        <span class="ident">r</span> <span class="op">=</span> (<span class="ident">r</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">|</span> (<span class="ident">q</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">127</span>);
-        <span class="ident">q</span> <span class="op">=</span> (<span class="ident">q</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">|</span> <span class="ident">carry</span> <span class="kw">as</span> <span class="ident">u128</span>;
+        <span class="comment">// r:q = ((r:q) &lt;&lt; 1) | carry
+        </span>r = (r &lt;&lt; <span class="number">1</span>) | (q &gt;&gt; <span class="number">127</span>);
+        q = (q &lt;&lt; <span class="number">1</span>) | carry <span class="kw">as </span>u128;
 
-        <span class="comment">// carry = 0</span>
-        <span class="comment">// if r &gt;= d {</span>
-        <span class="comment">//     r -= d;</span>
-        <span class="comment">//     carry = 1;</span>
-        <span class="comment">// }</span>
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u128</span>).<span class="ident">wrapping_sub</span>(<span class="ident">r</span>).<span class="ident">wrapping_sub</span>(<span class="number">1</span>) <span class="kw">as</span> <span class="ident">i128</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">127</span>;
-        <span class="ident">carry</span> <span class="op">=</span> (<span class="ident">s</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">r</span> <span class="op">-</span><span class="op">=</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&amp;</span> <span class="ident">s</span> <span class="kw">as</span> <span class="ident">u128</span>;
+        <span class="comment">// carry = 0
+        // if r &gt;= d {
+        //     r -= d;
+        //     carry = 1;
+        // }
+        </span><span class="kw">let </span>s = (d <span class="kw">as </span>u128).wrapping_sub(r).wrapping_sub(<span class="number">1</span>) <span class="kw">as </span>i128 &gt;&gt; <span class="number">127</span>;
+        carry = (s &amp; <span class="number">1</span>) <span class="kw">as </span>u64;
+        r -= (d <span class="kw">as </span>u128) &amp; s <span class="kw">as </span>u128;
     }
 
-    ((<span class="ident">q</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">|</span> <span class="ident">carry</span> <span class="kw">as</span> <span class="ident">u128</span>, <span class="ident">r</span> <span class="kw">as</span> <span class="ident">u64</span>)
+    ((q &lt;&lt; <span class="number">1</span>) | carry <span class="kw">as </span>u128, r <span class="kw">as </span>u64)
 }
 
-<span class="doccomment">/// Calculate the div/remainder of a value based on the radix.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This uses the largest divisor possible for the given size,</span>
-<span class="doccomment">/// and uses various fast-path approximations for different types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. Powers-of-two can be cleanly split into 2 64-bit products.</span>
-<span class="doccomment">/// 2. Division that can be simulated as if by multiplication by a constant.</span>
-<span class="doccomment">/// 3. Cases of 2. with a power-of-two divisor.</span>
-<span class="doccomment">/// 4. Fallback cases.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This returns the quotient and the remainder.</span>
-<span class="doccomment">/// For the number of digits processed, see</span>
-<span class="doccomment">/// [min_step](crate::step::min_step).</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u128_divrem</span>(<span class="ident">n</span>: <span class="ident">u128</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
+<span class="doccomment">/// Calculate the div/remainder of a value based on the radix.
+///
+/// This uses the largest divisor possible for the given size,
+/// and uses various fast-path approximations for different types.
+///
+/// 1. Powers-of-two can be cleanly split into 2 64-bit products.
+/// 2. Division that can be simulated as if by multiplication by a constant.
+/// 3. Cases of 2. with a power-of-two divisor.
+/// 4. Fallback cases.
+///
+/// This returns the quotient and the remainder.
+/// For the number of digits processed, see
+/// [min_step](crate::step::min_step).
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>u128_divrem(n: u128, radix: u32) -&gt; (u128, u64) {
+    debug_assert_radix(radix);
 
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) {
-        <span class="kw">match</span> <span class="ident">radix</span> {
-            <span class="number">2</span> =&gt; <span class="ident">u128_divrem_2</span>(<span class="ident">n</span>),
-            <span class="number">3</span> =&gt; <span class="ident">u128_divrem_3</span>(<span class="ident">n</span>),
-            <span class="number">4</span> =&gt; <span class="ident">u128_divrem_4</span>(<span class="ident">n</span>),
-            <span class="number">5</span> =&gt; <span class="ident">u128_divrem_5</span>(<span class="ident">n</span>),
-            <span class="number">6</span> =&gt; <span class="ident">u128_divrem_6</span>(<span class="ident">n</span>),
-            <span class="number">7</span> =&gt; <span class="ident">u128_divrem_7</span>(<span class="ident">n</span>),
-            <span class="number">8</span> =&gt; <span class="ident">u128_divrem_8</span>(<span class="ident">n</span>),
-            <span class="number">9</span> =&gt; <span class="ident">u128_divrem_9</span>(<span class="ident">n</span>),
-            <span class="number">10</span> =&gt; <span class="ident">u128_divrem_10</span>(<span class="ident">n</span>),
-            <span class="number">11</span> =&gt; <span class="ident">u128_divrem_11</span>(<span class="ident">n</span>),
-            <span class="number">12</span> =&gt; <span class="ident">u128_divrem_12</span>(<span class="ident">n</span>),
-            <span class="number">13</span> =&gt; <span class="ident">u128_divrem_13</span>(<span class="ident">n</span>),
-            <span class="number">14</span> =&gt; <span class="ident">u128_divrem_14</span>(<span class="ident">n</span>),
-            <span class="number">15</span> =&gt; <span class="ident">u128_divrem_15</span>(<span class="ident">n</span>),
-            <span class="number">16</span> =&gt; <span class="ident">u128_divrem_16</span>(<span class="ident">n</span>),
-            <span class="number">17</span> =&gt; <span class="ident">u128_divrem_17</span>(<span class="ident">n</span>),
-            <span class="number">18</span> =&gt; <span class="ident">u128_divrem_18</span>(<span class="ident">n</span>),
-            <span class="number">19</span> =&gt; <span class="ident">u128_divrem_19</span>(<span class="ident">n</span>),
-            <span class="number">20</span> =&gt; <span class="ident">u128_divrem_20</span>(<span class="ident">n</span>),
-            <span class="number">21</span> =&gt; <span class="ident">u128_divrem_21</span>(<span class="ident">n</span>),
-            <span class="number">22</span> =&gt; <span class="ident">u128_divrem_22</span>(<span class="ident">n</span>),
-            <span class="number">23</span> =&gt; <span class="ident">u128_divrem_23</span>(<span class="ident">n</span>),
-            <span class="number">24</span> =&gt; <span class="ident">u128_divrem_24</span>(<span class="ident">n</span>),
-            <span class="number">25</span> =&gt; <span class="ident">u128_divrem_25</span>(<span class="ident">n</span>),
-            <span class="number">26</span> =&gt; <span class="ident">u128_divrem_26</span>(<span class="ident">n</span>),
-            <span class="number">27</span> =&gt; <span class="ident">u128_divrem_27</span>(<span class="ident">n</span>),
-            <span class="number">28</span> =&gt; <span class="ident">u128_divrem_28</span>(<span class="ident">n</span>),
-            <span class="number">29</span> =&gt; <span class="ident">u128_divrem_29</span>(<span class="ident">n</span>),
-            <span class="number">30</span> =&gt; <span class="ident">u128_divrem_30</span>(<span class="ident">n</span>),
-            <span class="number">31</span> =&gt; <span class="ident">u128_divrem_31</span>(<span class="ident">n</span>),
-            <span class="number">32</span> =&gt; <span class="ident">u128_divrem_32</span>(<span class="ident">n</span>),
-            <span class="number">33</span> =&gt; <span class="ident">u128_divrem_33</span>(<span class="ident">n</span>),
-            <span class="number">34</span> =&gt; <span class="ident">u128_divrem_34</span>(<span class="ident">n</span>),
-            <span class="number">35</span> =&gt; <span class="ident">u128_divrem_35</span>(<span class="ident">n</span>),
-            <span class="number">36</span> =&gt; <span class="ident">u128_divrem_36</span>(<span class="ident">n</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) {
+        <span class="kw">match </span>radix {
+            <span class="number">2 </span>=&gt; u128_divrem_2(n),
+            <span class="number">3 </span>=&gt; u128_divrem_3(n),
+            <span class="number">4 </span>=&gt; u128_divrem_4(n),
+            <span class="number">5 </span>=&gt; u128_divrem_5(n),
+            <span class="number">6 </span>=&gt; u128_divrem_6(n),
+            <span class="number">7 </span>=&gt; u128_divrem_7(n),
+            <span class="number">8 </span>=&gt; u128_divrem_8(n),
+            <span class="number">9 </span>=&gt; u128_divrem_9(n),
+            <span class="number">10 </span>=&gt; u128_divrem_10(n),
+            <span class="number">11 </span>=&gt; u128_divrem_11(n),
+            <span class="number">12 </span>=&gt; u128_divrem_12(n),
+            <span class="number">13 </span>=&gt; u128_divrem_13(n),
+            <span class="number">14 </span>=&gt; u128_divrem_14(n),
+            <span class="number">15 </span>=&gt; u128_divrem_15(n),
+            <span class="number">16 </span>=&gt; u128_divrem_16(n),
+            <span class="number">17 </span>=&gt; u128_divrem_17(n),
+            <span class="number">18 </span>=&gt; u128_divrem_18(n),
+            <span class="number">19 </span>=&gt; u128_divrem_19(n),
+            <span class="number">20 </span>=&gt; u128_divrem_20(n),
+            <span class="number">21 </span>=&gt; u128_divrem_21(n),
+            <span class="number">22 </span>=&gt; u128_divrem_22(n),
+            <span class="number">23 </span>=&gt; u128_divrem_23(n),
+            <span class="number">24 </span>=&gt; u128_divrem_24(n),
+            <span class="number">25 </span>=&gt; u128_divrem_25(n),
+            <span class="number">26 </span>=&gt; u128_divrem_26(n),
+            <span class="number">27 </span>=&gt; u128_divrem_27(n),
+            <span class="number">28 </span>=&gt; u128_divrem_28(n),
+            <span class="number">29 </span>=&gt; u128_divrem_29(n),
+            <span class="number">30 </span>=&gt; u128_divrem_30(n),
+            <span class="number">31 </span>=&gt; u128_divrem_31(n),
+            <span class="number">32 </span>=&gt; u128_divrem_32(n),
+            <span class="number">33 </span>=&gt; u128_divrem_33(n),
+            <span class="number">34 </span>=&gt; u128_divrem_34(n),
+            <span class="number">35 </span>=&gt; u128_divrem_35(n),
+            <span class="number">36 </span>=&gt; u128_divrem_36(n),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>) {
-        <span class="kw">match</span> <span class="ident">radix</span> {
-            <span class="number">2</span> =&gt; <span class="ident">u128_divrem_2</span>(<span class="ident">n</span>),
-            <span class="number">4</span> =&gt; <span class="ident">u128_divrem_4</span>(<span class="ident">n</span>),
-            <span class="number">8</span> =&gt; <span class="ident">u128_divrem_8</span>(<span class="ident">n</span>),
-            <span class="number">10</span> =&gt; <span class="ident">u128_divrem_10</span>(<span class="ident">n</span>),
-            <span class="number">16</span> =&gt; <span class="ident">u128_divrem_16</span>(<span class="ident">n</span>),
-            <span class="number">32</span> =&gt; <span class="ident">u128_divrem_32</span>(<span class="ident">n</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    } <span class="kw">else if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;power-of-two&quot;</span>) {
+        <span class="kw">match </span>radix {
+            <span class="number">2 </span>=&gt; u128_divrem_2(n),
+            <span class="number">4 </span>=&gt; u128_divrem_4(n),
+            <span class="number">8 </span>=&gt; u128_divrem_8(n),
+            <span class="number">10 </span>=&gt; u128_divrem_10(n),
+            <span class="number">16 </span>=&gt; u128_divrem_16(n),
+            <span class="number">32 </span>=&gt; u128_divrem_32(n),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
-    } <span class="kw">else</span> {
-        <span class="ident">u128_divrem_10</span>(<span class="ident">n</span>)
+    } <span class="kw">else </span>{
+        u128_divrem_10(n)
     }
 }
 
-<span class="comment">// AUTO-GENERATED</span>
-<span class="comment">// These functions were auto-generated by `etc/div128.py`.</span>
-<span class="comment">// Do not edit them unless there is a good reason to.</span>
-<span class="comment">// Preferably, edit the source code to generate the constants.</span>
-<span class="comment">//</span>
-<span class="comment">// The seemingly magical values are all derived there, and are explained</span>
-<span class="comment">// in the function signatures of the functions they call.</span>
+<span class="comment">// AUTO-GENERATED
+// These functions were auto-generated by `etc/div128.py`.
+// Do not edit them unless there is a good reason to.
+// Preferably, edit the source code to generate the constants.
+//
+// The seemingly magical values are all derived there, and are explained
+// in the function signatures of the functions they call.
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u128_divrem_2</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
+</span><span class="attribute">#[inline]
+</span><span class="kw">const fn </span>u128_divrem_2(n: u128) -&gt; (u128, u64) {
+    pow2_u128_divrem(n, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_3</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">12157665459056928801</span>, <span class="number">0</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_3(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">12157665459056928801</span>, <span class="number">0</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u128_divrem_4</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">const fn </span>u128_divrem_4(n: u128) -&gt; (u128, u64) {
+    pow2_u128_divrem(n, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_5</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">7450580596923828125</span>, <span class="number">105312291668557186697918027683670432319</span>, <span class="number">61</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_5(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">7450580596923828125</span>, <span class="number">105312291668557186697918027683670432319</span>, <span class="number">61</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_6</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_6(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">4738381338321616896</span>,
         <span class="number">309485009821345068724781056</span>,
         <span class="number">24</span>,
@@ -714,25 +714,25 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_7</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">3909821048582988049</span>, <span class="number">200683792729517998822275406364627986707</span>, <span class="number">61</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_7(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">3909821048582988049</span>, <span class="number">200683792729517998822275406364627986707</span>, <span class="number">61</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u128_divrem_8</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>, <span class="number">9223372036854775807</span>, <span class="number">63</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">const fn </span>u128_divrem_8(n: u128) -&gt; (u128, u64) {
+    pow2_u128_divrem(n, <span class="number">9223372036854775807</span>, <span class="number">63</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_9</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">12157665459056928801</span>, <span class="number">0</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_9(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">12157665459056928801</span>, <span class="number">0</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_10</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_10(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">10000000000000000000</span>,
         <span class="number">9671406556917033397649408</span>,
         <span class="number">19</span>,
@@ -741,25 +741,25 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_11</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">5559917313492231481</span>, <span class="number">1</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_11(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">5559917313492231481</span>, <span class="number">1</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_12</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">2218611106740436992</span>, <span class="number">3</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_12(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">2218611106740436992</span>, <span class="number">3</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_13</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">8650415919381337933</span>, <span class="number">181410402513790565292660635782582404765</span>, <span class="number">62</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_13(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">8650415919381337933</span>, <span class="number">181410402513790565292660635782582404765</span>, <span class="number">62</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_14</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_14(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">2177953337809371136</span>,
         <span class="number">1208925819614629174706176</span>,
         <span class="number">16</span>,
@@ -768,25 +768,25 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_15</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">6568408355712890625</span>, <span class="number">1866504587258795246613513364166764993</span>, <span class="number">55</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_15(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">6568408355712890625</span>, <span class="number">1866504587258795246613513364166764993</span>, <span class="number">55</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u128_divrem_16</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">const fn </span>u128_divrem_16(n: u128) -&gt; (u128, u64) {
+    pow2_u128_divrem(n, <span class="number">18446744073709551615</span>, <span class="number">64</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_17</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">2862423051509815793</span>, <span class="number">68529153692836345537218837732158950089</span>, <span class="number">59</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_17(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">2862423051509815793</span>, <span class="number">68529153692836345537218837732158950089</span>, <span class="number">59</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_18</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_18(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">6746640616477458432</span>,
         <span class="number">604462909807314587353088</span>,
         <span class="number">15</span>,
@@ -795,15 +795,15 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_19</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">15181127029874798299</span>, <span class="number">25842538415601616733690423925257626679</span>, <span class="number">60</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_19(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">15181127029874798299</span>, <span class="number">25842538415601616733690423925257626679</span>, <span class="number">60</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_20</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_20(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">1638400000000000000</span>,
         <span class="number">4951760157141521099596496896</span>,
         <span class="number">28</span>,
@@ -812,25 +812,25 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_21</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">3243919932521508681</span>, <span class="number">120939747781233590383781714337497669585</span>, <span class="number">60</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_21(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">3243919932521508681</span>, <span class="number">120939747781233590383781714337497669585</span>, <span class="number">60</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_22</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">6221821273427820544</span>, <span class="number">1</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_22(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">6221821273427820544</span>, <span class="number">1</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_23</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">11592836324538749809</span>, <span class="number">270731922700393644432243678371210997949</span>, <span class="number">63</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_23(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">11592836324538749809</span>, <span class="number">270731922700393644432243678371210997949</span>, <span class="number">63</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_24</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_24(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">876488338465357824</span>,
         <span class="number">10141204801825835211973625643008</span>,
         <span class="number">39</span>,
@@ -839,15 +839,15 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_25</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">1490116119384765625</span>, <span class="number">131640364585696483372397534604588040399</span>, <span class="number">59</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_25(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">1490116119384765625</span>, <span class="number">131640364585696483372397534604588040399</span>, <span class="number">59</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_26</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_26(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">2481152873203736576</span>,
         <span class="number">151115727451828646838272</span>,
         <span class="number">13</span>,
@@ -856,15 +856,15 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_27</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">4052555153018976267</span>, <span class="number">2</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_27(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">4052555153018976267</span>, <span class="number">2</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_28</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_28(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">6502111422497947648</span>,
         <span class="number">1237940039285380274899124224</span>,
         <span class="number">26</span>,
@@ -873,35 +873,35 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_29</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">10260628712958602189</span>, <span class="number">152941450056053853841698190746050519297</span>, <span class="number">62</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_29(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">10260628712958602189</span>, <span class="number">152941450056053853841698190746050519297</span>, <span class="number">62</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_30</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">15943230000000000000</span>, <span class="number">0</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_30(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">15943230000000000000</span>, <span class="number">0</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_31</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">787662783788549761</span>, <span class="number">124519929891402176328714857711808162537</span>, <span class="number">58</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_31(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">787662783788549761</span>, <span class="number">124519929891402176328714857711808162537</span>, <span class="number">58</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">u128_divrem_32</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">pow2_u128_divrem</span>(<span class="ident">n</span>, <span class="number">1152921504606846975</span>, <span class="number">60</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">const fn </span>u128_divrem_32(n: u128) -&gt; (u128, u64) {
+    pow2_u128_divrem(n, <span class="number">1152921504606846975</span>, <span class="number">60</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_33</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">slow_u128_divrem</span>(<span class="ident">n</span>, <span class="number">1667889514952984961</span>, <span class="number">3</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_33(n: u128) -&gt; (u128, u64) {
+    slow_u128_divrem(n, <span class="number">1667889514952984961</span>, <span class="number">3</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_34</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_34(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">2386420683693101056</span>,
         <span class="number">75557863725914323419136</span>,
         <span class="number">12</span>,
@@ -910,15 +910,15 @@
     )
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_35</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">moderate_u128_divrem</span>(<span class="ident">n</span>, <span class="number">3379220508056640625</span>, <span class="number">116097442450503652080238494022501325491</span>, <span class="number">60</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_35(n: u128) -&gt; (u128, u64) {
+    moderate_u128_divrem(n, <span class="number">3379220508056640625</span>, <span class="number">116097442450503652080238494022501325491</span>, <span class="number">60</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">u128_divrem_36</span>(<span class="ident">n</span>: <span class="ident">u128</span>) -&gt; (<span class="ident">u128</span>, <span class="ident">u64</span>) {
-    <span class="ident">fast_u128_divrem</span>(
-        <span class="ident">n</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>u128_divrem_36(n: u128) -&gt; (u128, u64) {
+    fast_u128_divrem(
+        n,
         <span class="number">4738381338321616896</span>,
         <span class="number">309485009821345068724781056</span>,
         <span class="number">24</span>,
@@ -927,4 +927,4 @@
     )
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

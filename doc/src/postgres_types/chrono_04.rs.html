@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-types/src/chrono_04.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chrono_04.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../postgres_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-types/src/chrono_04.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chrono_04.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../postgres_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../postgres_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -153,160 +153,160 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">chrono_04</span>::{<span class="ident">DateTime</span>, <span class="ident">Duration</span>, <span class="ident">FixedOffset</span>, <span class="ident">Local</span>, <span class="ident">NaiveDate</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">NaiveTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">postgres_protocol::types</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>chrono_04::{DateTime, Duration, FixedOffset, Local, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+<span class="kw">use </span>postgres_protocol::types;
+<span class="kw">use </span>std::error::Error;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FromSql</span>, <span class="ident">IsNull</span>, <span class="ident">ToSql</span>, <span class="ident">Type</span>};
+<span class="kw">use crate</span>::{FromSql, IsNull, ToSql, Type};
 
-<span class="kw">fn</span> <span class="ident">base</span>() -&gt; <span class="ident">NaiveDateTime</span> {
-    <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>).<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+<span class="kw">fn </span>base() -&gt; NaiveDateTime {
+    NaiveDate::from_ymd(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>).and_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveDateTime</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">types::timestamp_from_sql</span>(<span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="ident">base</span>()
-            .<span class="ident">checked_add_signed</span>(<span class="ident">Duration::microseconds</span>(<span class="ident">t</span>))
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;value too large to decode&quot;</span>.<span class="ident">into</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>NaiveDateTime {
+    <span class="kw">fn </span>from_sql(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;NaiveDateTime, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>t = types::timestamp_from_sql(raw)<span class="question-mark">?</span>;
+        base()
+            .checked_add_signed(Duration::microseconds(t))
+            .ok_or_else(|| <span class="string">&quot;value too large to decode&quot;</span>.into())
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMP</span>);
+    <span class="macro">accepts!</span>(TIMESTAMP);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">signed_duration_since</span>(<span class="ident">base</span>()).<span class="ident">num_microseconds</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.<span class="ident">into</span>()),
+<span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveDateTime {
+    <span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, w: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>time = <span class="kw">match </span><span class="self">self</span>.signed_duration_since(base()).num_microseconds() {
+            <span class="prelude-val">Some</span>(time) =&gt; time,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.into()),
         };
-        <span class="ident">types::timestamp_to_sql</span>(<span class="ident">time</span>, <span class="ident">w</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+        types::timestamp_to_sql(time, w);
+        <span class="prelude-val">Ok</span>(IsNull::No)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMP</span>);
+    <span class="macro">accepts!</span>(TIMESTAMP);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">naive</span> <span class="op">=</span> <span class="ident">NaiveDateTime::from_sql</span>(<span class="ident">type_</span>, <span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">DateTime::from_utc</span>(<span class="ident">naive</span>, <span class="ident">Utc</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>DateTime&lt;Utc&gt; {
+    <span class="kw">fn </span>from_sql(type_: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime&lt;Utc&gt;, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>naive = NaiveDateTime::from_sql(type_, raw)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(DateTime::from_utc(naive, Utc))
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(
+<span class="kw">impl </span>ToSql <span class="kw">for </span>DateTime&lt;Utc&gt; {
+    <span class="kw">fn </span>to_sql(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">naive_utc</span>().<span class="ident">to_sql</span>(<span class="ident">type_</span>, <span class="ident">w</span>)
+        type_: <span class="kw-2">&amp;</span>Type,
+        w: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="self">self</span>.naive_utc().to_sql(type_, w)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">utc</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_sql</span>(<span class="ident">type_</span>, <span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">utc</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Local</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>DateTime&lt;Local&gt; {
+    <span class="kw">fn </span>from_sql(type_: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime&lt;Local&gt;, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>utc = DateTime::&lt;Utc&gt;::from_sql(type_, raw)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(utc.with_timezone(<span class="kw-2">&amp;</span>Local))
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(
+<span class="kw">impl </span>ToSql <span class="kw">for </span>DateTime&lt;Local&gt; {
+    <span class="kw">fn </span>to_sql(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>).<span class="ident">to_sql</span>(<span class="ident">type_</span>, <span class="ident">w</span>)
+        type_: <span class="kw-2">&amp;</span>Type,
+        w: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="self">self</span>.with_timezone(<span class="kw-2">&amp;</span>Utc).to_sql(type_, w)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(
-        <span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">utc</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_sql</span>(<span class="ident">type_</span>, <span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">utc</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">FixedOffset::east</span>(<span class="number">0</span>)))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>DateTime&lt;FixedOffset&gt; {
+    <span class="kw">fn </span>from_sql(
+        type_: <span class="kw-2">&amp;</span>Type,
+        raw: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime&lt;FixedOffset&gt;, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>utc = DateTime::&lt;Utc&gt;::from_sql(type_, raw)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(utc.with_timezone(<span class="kw-2">&amp;</span>FixedOffset::east(<span class="number">0</span>)))
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(
+<span class="kw">impl </span>ToSql <span class="kw">for </span>DateTime&lt;FixedOffset&gt; {
+    <span class="kw">fn </span>to_sql(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">type_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>,
-        <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>).<span class="ident">to_sql</span>(<span class="ident">type_</span>, <span class="ident">w</span>)
+        type_: <span class="kw-2">&amp;</span>Type,
+        w: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="self">self</span>.with_timezone(<span class="kw-2">&amp;</span>Utc).to_sql(type_, w)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIMESTAMPTZ</span>);
+    <span class="macro">accepts!</span>(TIMESTAMPTZ);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveDate</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">jd</span> <span class="op">=</span> <span class="ident">types::date_from_sql</span>(<span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="ident">base</span>()
-            .<span class="ident">date</span>()
-            .<span class="ident">checked_add_signed</span>(<span class="ident">Duration::days</span>(<span class="ident">i64::from</span>(<span class="ident">jd</span>)))
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;value too large to decode&quot;</span>.<span class="ident">into</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>NaiveDate {
+    <span class="kw">fn </span>from_sql(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;NaiveDate, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>jd = types::date_from_sql(raw)<span class="question-mark">?</span>;
+        base()
+            .date()
+            .checked_add_signed(Duration::days(i64::from(jd)))
+            .ok_or_else(|| <span class="string">&quot;value too large to decode&quot;</span>.into())
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">DATE</span>);
+    <span class="macro">accepts!</span>(DATE);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">jd</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">signed_duration_since</span>(<span class="ident">base</span>().<span class="ident">date</span>()).<span class="ident">num_days</span>();
-        <span class="kw">if</span> <span class="ident">jd</span> <span class="op">&gt;</span> <span class="ident">i64::from</span>(<span class="ident">i32::max_value</span>()) <span class="op">|</span><span class="op">|</span> <span class="ident">jd</span> <span class="op">&lt;</span> <span class="ident">i64::from</span>(<span class="ident">i32::min_value</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.<span class="ident">into</span>());
+<span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveDate {
+    <span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, w: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>jd = <span class="self">self</span>.signed_duration_since(base().date()).num_days();
+        <span class="kw">if </span>jd &gt; i64::from(i32::max_value()) || jd &lt; i64::from(i32::min_value()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.into());
         }
 
-        <span class="ident">types::date_to_sql</span>(<span class="ident">jd</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">w</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+        types::date_to_sql(jd <span class="kw">as </span>i32, w);
+        <span class="prelude-val">Ok</span>(IsNull::No)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">DATE</span>);
+    <span class="macro">accepts!</span>(DATE);
     <span class="macro">to_sql_checked!</span>();
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveTime</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">usec</span> <span class="op">=</span> <span class="ident">types::time_from_sql</span>(<span class="ident">raw</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) <span class="op">+</span> <span class="ident">Duration::microseconds</span>(<span class="ident">usec</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>NaiveTime {
+    <span class="kw">fn </span>from_sql(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;NaiveTime, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>usec = types::time_from_sql(raw)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) + Duration::microseconds(usec))
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIME</span>);
+    <span class="macro">accepts!</span>(TIME);
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">delta</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">signed_duration_since</span>(<span class="ident">NaiveTime::from_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">delta</span>.<span class="ident">num_microseconds</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">time</span>) =&gt; <span class="ident">time</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.<span class="ident">into</span>()),
+<span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveTime {
+    <span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, w: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt; {
+        <span class="kw">let </span>delta = <span class="self">self</span>.signed_duration_since(NaiveTime::from_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>));
+        <span class="kw">let </span>time = <span class="kw">match </span>delta.num_microseconds() {
+            <span class="prelude-val">Some</span>(time) =&gt; time,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;value too large to transmit&quot;</span>.into()),
         };
-        <span class="ident">types::time_to_sql</span>(<span class="ident">time</span>, <span class="ident">w</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+        types::time_to_sql(time, w);
+        <span class="prelude-val">Ok</span>(IsNull::No)
     }
 
-    <span class="macro">accepts!</span>(<span class="ident">TIME</span>);
+    <span class="macro">accepts!</span>(TIME);
     <span class="macro">to_sql_checked!</span>();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="postgres_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="postgres_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

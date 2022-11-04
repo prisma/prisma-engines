@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -799,806 +799,806 @@
 <span id="799">799</span>
 <span id="800">800</span>
 <span id="801">801</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A lightweight metrics facade.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `metrics` crate provides a single metrics API that abstracts over the actual metrics</span>
-<span class="doccomment">//! implementation.  Libraries can use the metrics API provided by this crate, and the consumer of</span>
-<span class="doccomment">//! those libraries can choose the metrics implementation that is most suitable for its use case.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Overview</span>
-<span class="doccomment">//! `metrics` exposes two main concepts: emitting a metric, and recording it.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Metric types, or kinds</span>
-<span class="doccomment">//! This crate supports three fundamental metric types, or kinds: counters, gauges, and histograms.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Counters</span>
-<span class="doccomment">//! A counter is a cumulative metric that represents a monotonically increasing value which can only</span>
-<span class="doccomment">//! be increased or be reset to zero on restart. For example, you might use a counter to</span>
-<span class="doccomment">//! represent the number of operations performed, or the number of errors that have occurred.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Counters are unsigned 64-bit integers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you have a value that goes up and down over time, consider using a gauge.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Gauges</span>
-<span class="doccomment">//! A gauge is a metric that can go up and down, arbitrarily, over time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Gauges are typically used for measured, external values, such as temperature, throughput, or</span>
-<span class="doccomment">//! things like current memory usage.  Even if the value is monotonically increasing, but there is</span>
-<span class="doccomment">//! no way to store the delta in order to properly figure out how much to increment by, then a gauge</span>
-<span class="doccomment">//! might be a suitable choice.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Gauges support two modes: incremental updates, or absolute updates.  This allows callers to use</span>
-<span class="doccomment">//! them for external measurements -- where no delta can be computed -- as well as internal measurements.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Gauges are floating-point 64-bit numbers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Histograms</span>
-<span class="doccomment">//! A histogram stores an arbitrary number of observations of a specific measurement and provides</span>
-<span class="doccomment">//! statistical analysis over the observed values.  Typically, measurements such as request latency</span>
-<span class="doccomment">//! are recorded with histograms: a specific action that is repeated over and over which can have a</span>
-<span class="doccomment">//! varying result each time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Histograms are used to explore the distribution of values, allowing a caller to understand the</span>
-<span class="doccomment">//! modalities of the distribution, such as whether or not all values are grouped close together, or</span>
-<span class="doccomment">//! spread evenly, or even whether or not there are multiple groupings or clusters.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Colloquially, histograms are usually associated with percentiles, although by definition, they</span>
-<span class="doccomment">//! specifically deal with bucketed or binned values: how many values fell within 0-10, how many</span>
-<span class="doccomment">//! fell within 11-20, and so on and so forth.  Percentiles, commonly associated with &quot;summaries&quot;,</span>
-<span class="doccomment">//! deal with understanding how much of a distribution falls below or at a particular percentage of</span>
-<span class="doccomment">//! that distribution: 50% of requests are slower than 500ms, 99% of requests are slower than</span>
-<span class="doccomment">//! 2450ms, and so on and so forth.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! While we use the term &quot;histogram&quot; in `metrics`, we enforce no particular usage of true</span>
-<span class="doccomment">//! histograms or summaries.  The choice of output is based entirely on the exporter being used to</span>
-<span class="doccomment">//! ship your metric data out of your application.  For example, if you&#39;re using</span>
-<span class="doccomment">//! [metrics-exporter-prometheus], Prometheus supports both histograms and summaries, and the</span>
-<span class="doccomment">//! exporter can be configured to output our &quot;histogram&quot; data as either.  Other exporters may choose</span>
-<span class="doccomment">//! to stick to using summaries, as is traditional, in order to generate percentile data.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Histograms take floating-point 64-bit numbers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Emission</span>
-<span class="doccomment">//! Metrics are emitted by utilizing the registration or emission macros.  There is a macro for</span>
-<span class="doccomment">//! registering and emitting each fundamental metric type:</span>
-<span class="doccomment">//! - [`register_counter!`], [`counter!`], and [`increment_counter!`] for counters</span>
-<span class="doccomment">//! - [`register_gauge!`], [`gauge!`], [`increment_gauge!`], and [`decrement_gauge!`] for gauges</span>
-<span class="doccomment">//! - [`register_histogram!`] and [`histogram!`] for histograms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, metrics can be described -- setting either the unit of measure or long-form</span>
-<span class="doccomment">//! description -- by using the `describe_*` macros:</span>
-<span class="doccomment">//! - [`describe_counter!`] for counters</span>
-<span class="doccomment">//! - [`describe_gauge!`] for gauges</span>
-<span class="doccomment">//! - [`describe_histogram!`] for histograms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In order to register or emit a metric, you need a way to record these events, which is where</span>
-<span class="doccomment">//! [`Recorder`] comes into play.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Recording</span>
-<span class="doccomment">//! The [`Recorder`] trait defines the interface between the registration/emission macros, and</span>
-<span class="doccomment">//! exporters, which is how we refer to concrete implementations of [`Recorder`].  The trait defines</span>
-<span class="doccomment">//! what the exporters are doing -- recording -- but ultimately exporters are sending data from your</span>
-<span class="doccomment">//! application to somewhere else: whether it be a third-party service or logging via standard out.</span>
-<span class="doccomment">//! It&#39;s &quot;exporting&quot; the metric data out of your application.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Each metric type is usually reserved for a specific type of use case, whether it be tracking a</span>
-<span class="doccomment">//! single value or allowing the summation of multiple values, and the respective macros elaborate</span>
-<span class="doccomment">//! more on the usage and invariants provided by each.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## In libraries</span>
-<span class="doccomment">//! Libraries need only include the `metrics` crate to emit metrics.  When an executable installs a</span>
-<span class="doccomment">//! recorder, all included crates which emitting metrics will now emit their metrics to that record,</span>
-<span class="doccomment">//! which allows library authors to seamless emit their own metrics without knowing or caring which</span>
-<span class="doccomment">//! exporter implementation is chosen, or even if one is installed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In cases where no global recorder is installed, a &quot;noop&quot; recorder lives in its place, which has</span>
-<span class="doccomment">//! an incredibly very low overhead: an atomic load and comparison.  Libraries can safely instrument</span>
-<span class="doccomment">//! their code without fear of ruining baseline performance.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! By default, a &quot;noop&quot; recorder is present so that the macros can work even if no exporter has</span>
-<span class="doccomment">//! been installed.  This recorder has extremely low overhead -- a relaxed load and conditional --</span>
-<span class="doccomment">//! and so, practically speaking, the overhead when no exporter is installed is extremely low.  You</span>
-<span class="doccomment">//! can safely instrument applications knowing that you won&#39;t pay a heavy performance cost even if</span>
-<span class="doccomment">//! you&#39;re not shipping metrics.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use metrics::{counter, histogram};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # use std::time::Instant;</span>
-<span class="doccomment">//! # pub fn run_query(_: &amp;str) -&gt; u64 { 42 }</span>
-<span class="doccomment">//! pub fn process(query: &amp;str) -&gt; u64 {</span>
-<span class="doccomment">//!     let start = Instant::now();</span>
-<span class="doccomment">//!     let row_count = run_query(query);</span>
-<span class="doccomment">//!     let delta = start.elapsed();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     histogram!(&quot;process.query_time&quot;, delta);</span>
-<span class="doccomment">//!     counter!(&quot;process.query_row_count&quot;, row_count);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     row_count</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # fn main() {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## In executables</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Executables, which themselves can emit their own metrics, are intended to install a global</span>
-<span class="doccomment">//! recorder so that metrics can actually be recorded and exported somewhere.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Initialization of the global recorder isn&#39;t required for macros to function, but any metrics</span>
-<span class="doccomment">//! emitted before a global recorder is installed will not be recorded, so initialization and</span>
-<span class="doccomment">//! installation of an exporter should happen as early as possible in the application lifecycle.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Warning</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The metrics system may only be initialized once.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For most use cases, you&#39;ll be using an off-the-shelf exporter implementation that hooks up to an</span>
-<span class="doccomment">//! existing metrics collection system, or interacts with the existing systems/processes that you use.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Out of the box, some exporter implementations are available for you to use:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [metrics-exporter-tcp] - outputs metrics to clients over TCP</span>
-<span class="doccomment">//! * [metrics-exporter-prometheus] - serves a Prometheus scrape endpoint</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can also implement your own recorder if a suitable one doesn&#39;t already exist.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Development</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The primary interface with `metrics` is through the [`Recorder`] trait, so we&#39;ll show examples</span>
-<span class="doccomment">//! below of the trait and implementation notes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Installing a basic recorder</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Here&#39;s a basic example which writes metrics in text form via the `log` crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # use metrics::{SetRecorderError, NoopRecorder as LogRecorder};</span>
-<span class="doccomment">//! // Recorders are installed by calling the [`set_recorder`] function.  Recorders should provide a</span>
-<span class="doccomment">//! // function that wraps the creation and installation of the recorder:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! static RECORDER: LogRecorder = LogRecorder;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! pub fn init() -&gt; Result&lt;(), SetRecorderError&gt; {</span>
-<span class="doccomment">//!     metrics::set_recorder(&amp;RECORDER)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # fn main() {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! ## Keys</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All metrics are, in essence, the combination of a metric type and metric identifier, such as a</span>
-<span class="doccomment">//! histogram called &quot;response_latency&quot;.  You could conceivably have multiple metrics with the same</span>
-<span class="doccomment">//! name, so long as they are of different types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As the types are enforced/limited by the [`Recorder`] trait itself, the remaining piece is the</span>
-<span class="doccomment">//! identifier, which we handle by using [`Key`]. Keys hold both the metric name, and potentially,</span>
-<span class="doccomment">//! labels related to the metric. The metric name and labels are always string values.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Internally, `metrics` uses a clone-on-write &quot;smart pointer&quot; for these values to optimize cases</span>
-<span class="doccomment">//! where the values are static strings, which can provide significant performance benefits.  These</span>
-<span class="doccomment">//! smart pointers can also hold owned `String` values, though, so users can mix and match static</span>
-<span class="doccomment">//! strings and owned strings without issue.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Two [`Key`] objects can be checked for equality and considered to point to the same metric if</span>
-<span class="doccomment">//! they are equal.  Equality checks both the name of the key and the labels of a key.  Labels are</span>
-<span class="doccomment">//! _not_ sorted prior to checking for equality, but insertion order is maintained, so any [`Key`]</span>
-<span class="doccomment">//! constructed from the same set of labels in the same order should be equal.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It is an implementation detail if a recorder wishes to do an deeper equality check that ignores</span>
-<span class="doccomment">//! the order of labels, but practically speaking, metric emission, and thus labels, should be</span>
-<span class="doccomment">//! fixed in ordering in nearly all cases, and so it typically is not a problem.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Registration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Recorders must handle the &quot;registration&quot; of a metric.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In practice, registration solves two potential problems: providing metadata for a metric, and</span>
-<span class="doccomment">//! creating an entry for a metric even though it has not been emitted yet.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Callers may wish to provide a human-readable description of what the metric is, or provide the</span>
-<span class="doccomment">//! units the metrics uses.  Additionally, users may wish to register their metrics so that they</span>
-<span class="doccomment">//! show up in the output of the installed exporter even if the metrics have yet to be emitted.</span>
-<span class="doccomment">//! This allows callers to ensure the metrics output is stable, or allows them to expose all of the</span>
-<span class="doccomment">//! potential metrics a system has to offer, again, even if they have not all yet been emitted.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As you can see from the trait, the registration methods treats the metadata as optional, and</span>
-<span class="doccomment">//! the macros allow users to mix and match whichever fields they want to provide.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When a metric is registered, the expectation is that it will show up in output with a default</span>
-<span class="doccomment">//! value, so, for example, a counter should be initialized to zero, a histogram would have no</span>
-<span class="doccomment">//! values, and so on.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Emission</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Likewise, recorders must handle the emission of metrics as well.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Comparatively speaking, emission is not too different from registration: you have access to the</span>
-<span class="doccomment">//! same [`Key`] as well as the value being emitted.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For recorders which temporarily buffer or hold on to values before exporting, a typical approach</span>
-<span class="doccomment">//! would be to utilize atomic variables for the storage.  For counters and gauges, this can be done</span>
-<span class="doccomment">//! simply by using types like [`AtomicU64`](std::sync::atomic::AtomicU64).  For histograms, this can be</span>
-<span class="doccomment">//! slightly tricky as you must hold on to all of the distinct values.  In our helper crate,</span>
-<span class="doccomment">//! [`metrics-util`][metrics-util], we&#39;ve provided a type called [`AtomicBucket`][AtomicBucket].  For</span>
-<span class="doccomment">//! exporters that will want to get all of the current values in a batch, while clearing the bucket so</span>
-<span class="doccomment">//! that values aren&#39;t processed again, [AtomicBucket] provides a simple interface to do so, as well as</span>
-<span class="doccomment">//! optimized performance on both the insertion and read side.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Combined together, exporter authors can use [`Handle`][Handle], also from the `metrics-util`</span>
-<span class="doccomment">//! crate, which provides a consolidated type for holding metric data.  These types, and many more</span>
-<span class="doccomment">//! from the `metrics-util` crate, form the basis of typical exporter behavior and have been exposed</span>
-<span class="doccomment">//! to help you quickly build a new exporter.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Installing recorders</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In order to actually use an exporter, it must be installed as the &quot;global&quot; recorder.  This is a</span>
-<span class="doccomment">//! static recorder that the registration and emission macros refer to behind-the-scenes.  `metrics`</span>
-<span class="doccomment">//! provides a few methods to do so: [`set_recorder`], [`set_boxed_recorder`], and [`set_recorder_racy`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Primarily, you&#39;ll use [`set_boxed_recorder`] to pass a boxed version of the exporter to be</span>
-<span class="doccomment">//! installed.  This is due to the fact that most exporters won&#39;t be able to be constructed</span>
-<span class="doccomment">//! statically.  If you could construct your exporter statically, though, then you could instead</span>
-<span class="doccomment">//! choose [`set_recorder`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Similarly, [`set_recorder_racy`] takes a static reference, but is also not thread safe, and</span>
-<span class="doccomment">//! should only be used on platforms which do not support atomic operations, such as embedded</span>
-<span class="doccomment">//! environments.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! As users of `metrics`, you&#39;ll typically see exporters provide methods to install themselves that</span>
-<span class="doccomment">//! hide the nitty gritty details.  These methods will usually be aptly named, such as `install`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [metrics-exporter-tcp]: https://docs.rs/metrics-exporter-tcp</span>
-<span class="doccomment">//! [metrics-exporter-prometheus]: https://docs.rs/metrics-exporter-prometheus</span>
-<span class="doccomment">//! [metrics-util]: https://docs.rs/metrics-util</span>
-<span class="doccomment">//! [AtomicBucket]: https://docs.rs/metrics-util/0.5.0/metrics_util/struct.AtomicBucket.html</span>
-<span class="doccomment">//! [Handle]: https://docs.rs/metrics-util/0.5.0/metrics_util/enum.Handle.html</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A lightweight metrics facade.
+//!
+//! The `metrics` crate provides a single metrics API that abstracts over the actual metrics
+//! implementation.  Libraries can use the metrics API provided by this crate, and the consumer of
+//! those libraries can choose the metrics implementation that is most suitable for its use case.
+//!
+//! # Overview
+//! `metrics` exposes two main concepts: emitting a metric, and recording it.
+//!
+//! ## Metric types, or kinds
+//! This crate supports three fundamental metric types, or kinds: counters, gauges, and histograms.
+//!
+//! ### Counters
+//! A counter is a cumulative metric that represents a monotonically increasing value which can only
+//! be increased or be reset to zero on restart. For example, you might use a counter to
+//! represent the number of operations performed, or the number of errors that have occurred.
+//!
+//! Counters are unsigned 64-bit integers.
+//!
+//! If you have a value that goes up and down over time, consider using a gauge.
+//!
+//! ### Gauges
+//! A gauge is a metric that can go up and down, arbitrarily, over time.
+//!
+//! Gauges are typically used for measured, external values, such as temperature, throughput, or
+//! things like current memory usage.  Even if the value is monotonically increasing, but there is
+//! no way to store the delta in order to properly figure out how much to increment by, then a gauge
+//! might be a suitable choice.
+//!
+//! Gauges support two modes: incremental updates, or absolute updates.  This allows callers to use
+//! them for external measurements -- where no delta can be computed -- as well as internal measurements.
+//!
+//! Gauges are floating-point 64-bit numbers.
+//!
+//! ### Histograms
+//! A histogram stores an arbitrary number of observations of a specific measurement and provides
+//! statistical analysis over the observed values.  Typically, measurements such as request latency
+//! are recorded with histograms: a specific action that is repeated over and over which can have a
+//! varying result each time.
+//!
+//! Histograms are used to explore the distribution of values, allowing a caller to understand the
+//! modalities of the distribution, such as whether or not all values are grouped close together, or
+//! spread evenly, or even whether or not there are multiple groupings or clusters.
+//!
+//! Colloquially, histograms are usually associated with percentiles, although by definition, they
+//! specifically deal with bucketed or binned values: how many values fell within 0-10, how many
+//! fell within 11-20, and so on and so forth.  Percentiles, commonly associated with &quot;summaries&quot;,
+//! deal with understanding how much of a distribution falls below or at a particular percentage of
+//! that distribution: 50% of requests are slower than 500ms, 99% of requests are slower than
+//! 2450ms, and so on and so forth.
+//!
+//! While we use the term &quot;histogram&quot; in `metrics`, we enforce no particular usage of true
+//! histograms or summaries.  The choice of output is based entirely on the exporter being used to
+//! ship your metric data out of your application.  For example, if you&#39;re using
+//! [metrics-exporter-prometheus], Prometheus supports both histograms and summaries, and the
+//! exporter can be configured to output our &quot;histogram&quot; data as either.  Other exporters may choose
+//! to stick to using summaries, as is traditional, in order to generate percentile data.
+//!
+//! Histograms take floating-point 64-bit numbers.
+//!
+//! ## Emission
+//! Metrics are emitted by utilizing the registration or emission macros.  There is a macro for
+//! registering and emitting each fundamental metric type:
+//! - [`register_counter!`], [`counter!`], and [`increment_counter!`] for counters
+//! - [`register_gauge!`], [`gauge!`], [`increment_gauge!`], and [`decrement_gauge!`] for gauges
+//! - [`register_histogram!`] and [`histogram!`] for histograms
+//!
+//! Additionally, metrics can be described -- setting either the unit of measure or long-form
+//! description -- by using the `describe_*` macros:
+//! - [`describe_counter!`] for counters
+//! - [`describe_gauge!`] for gauges
+//! - [`describe_histogram!`] for histograms
+//!
+//! In order to register or emit a metric, you need a way to record these events, which is where
+//! [`Recorder`] comes into play.
+//!
+//! ## Recording
+//! The [`Recorder`] trait defines the interface between the registration/emission macros, and
+//! exporters, which is how we refer to concrete implementations of [`Recorder`].  The trait defines
+//! what the exporters are doing -- recording -- but ultimately exporters are sending data from your
+//! application to somewhere else: whether it be a third-party service or logging via standard out.
+//! It&#39;s &quot;exporting&quot; the metric data out of your application.
+//!
+//! Each metric type is usually reserved for a specific type of use case, whether it be tracking a
+//! single value or allowing the summation of multiple values, and the respective macros elaborate
+//! more on the usage and invariants provided by each.
+//!
+//! # Getting Started
+//!
+//! ## In libraries
+//! Libraries need only include the `metrics` crate to emit metrics.  When an executable installs a
+//! recorder, all included crates which emitting metrics will now emit their metrics to that record,
+//! which allows library authors to seamless emit their own metrics without knowing or caring which
+//! exporter implementation is chosen, or even if one is installed.
+//!
+//! In cases where no global recorder is installed, a &quot;noop&quot; recorder lives in its place, which has
+//! an incredibly very low overhead: an atomic load and comparison.  Libraries can safely instrument
+//! their code without fear of ruining baseline performance.
+//!
+//! By default, a &quot;noop&quot; recorder is present so that the macros can work even if no exporter has
+//! been installed.  This recorder has extremely low overhead -- a relaxed load and conditional --
+//! and so, practically speaking, the overhead when no exporter is installed is extremely low.  You
+//! can safely instrument applications knowing that you won&#39;t pay a heavy performance cost even if
+//! you&#39;re not shipping metrics.
+//!
+//! ### Examples
+//!
+//! ```rust
+//! use metrics::{counter, histogram};
+//!
+//! # use std::time::Instant;
+//! # pub fn run_query(_: &amp;str) -&gt; u64 { 42 }
+//! pub fn process(query: &amp;str) -&gt; u64 {
+//!     let start = Instant::now();
+//!     let row_count = run_query(query);
+//!     let delta = start.elapsed();
+//!
+//!     histogram!(&quot;process.query_time&quot;, delta);
+//!     counter!(&quot;process.query_row_count&quot;, row_count);
+//!
+//!     row_count
+//! }
+//! # fn main() {}
+//! ```
+//!
+//! ## In executables
+//!
+//! Executables, which themselves can emit their own metrics, are intended to install a global
+//! recorder so that metrics can actually be recorded and exported somewhere.
+//!
+//! Initialization of the global recorder isn&#39;t required for macros to function, but any metrics
+//! emitted before a global recorder is installed will not be recorded, so initialization and
+//! installation of an exporter should happen as early as possible in the application lifecycle.
+//!
+//! ### Warning
+//!
+//! The metrics system may only be initialized once.
+//!
+//! For most use cases, you&#39;ll be using an off-the-shelf exporter implementation that hooks up to an
+//! existing metrics collection system, or interacts with the existing systems/processes that you use.
+//!
+//! Out of the box, some exporter implementations are available for you to use:
+//!
+//! * [metrics-exporter-tcp] - outputs metrics to clients over TCP
+//! * [metrics-exporter-prometheus] - serves a Prometheus scrape endpoint
+//!
+//! You can also implement your own recorder if a suitable one doesn&#39;t already exist.
+//!
+//! # Development
+//!
+//! The primary interface with `metrics` is through the [`Recorder`] trait, so we&#39;ll show examples
+//! below of the trait and implementation notes.
+//!
+//! ## Installing a basic recorder
+//!
+//! Here&#39;s a basic example which writes metrics in text form via the `log` crate.
+//!
+//! ```no_run
+//! # use metrics::{SetRecorderError, NoopRecorder as LogRecorder};
+//! // Recorders are installed by calling the [`set_recorder`] function.  Recorders should provide a
+//! // function that wraps the creation and installation of the recorder:
+//!
+//! static RECORDER: LogRecorder = LogRecorder;
+//!
+//! pub fn init() -&gt; Result&lt;(), SetRecorderError&gt; {
+//!     metrics::set_recorder(&amp;RECORDER)
+//! }
+//! # fn main() {}
+//! ```
+//! ## Keys
+//!
+//! All metrics are, in essence, the combination of a metric type and metric identifier, such as a
+//! histogram called &quot;response_latency&quot;.  You could conceivably have multiple metrics with the same
+//! name, so long as they are of different types.
+//!
+//! As the types are enforced/limited by the [`Recorder`] trait itself, the remaining piece is the
+//! identifier, which we handle by using [`Key`]. Keys hold both the metric name, and potentially,
+//! labels related to the metric. The metric name and labels are always string values.
+//!
+//! Internally, `metrics` uses a clone-on-write &quot;smart pointer&quot; for these values to optimize cases
+//! where the values are static strings, which can provide significant performance benefits.  These
+//! smart pointers can also hold owned `String` values, though, so users can mix and match static
+//! strings and owned strings without issue.
+//!
+//! Two [`Key`] objects can be checked for equality and considered to point to the same metric if
+//! they are equal.  Equality checks both the name of the key and the labels of a key.  Labels are
+//! _not_ sorted prior to checking for equality, but insertion order is maintained, so any [`Key`]
+//! constructed from the same set of labels in the same order should be equal.
+//!
+//! It is an implementation detail if a recorder wishes to do an deeper equality check that ignores
+//! the order of labels, but practically speaking, metric emission, and thus labels, should be
+//! fixed in ordering in nearly all cases, and so it typically is not a problem.
+//!
+//! ## Registration
+//!
+//! Recorders must handle the &quot;registration&quot; of a metric.
+//!
+//! In practice, registration solves two potential problems: providing metadata for a metric, and
+//! creating an entry for a metric even though it has not been emitted yet.
+//!
+//! Callers may wish to provide a human-readable description of what the metric is, or provide the
+//! units the metrics uses.  Additionally, users may wish to register their metrics so that they
+//! show up in the output of the installed exporter even if the metrics have yet to be emitted.
+//! This allows callers to ensure the metrics output is stable, or allows them to expose all of the
+//! potential metrics a system has to offer, again, even if they have not all yet been emitted.
+//!
+//! As you can see from the trait, the registration methods treats the metadata as optional, and
+//! the macros allow users to mix and match whichever fields they want to provide.
+//!
+//! When a metric is registered, the expectation is that it will show up in output with a default
+//! value, so, for example, a counter should be initialized to zero, a histogram would have no
+//! values, and so on.
+//!
+//! ## Emission
+//!
+//! Likewise, recorders must handle the emission of metrics as well.
+//!
+//! Comparatively speaking, emission is not too different from registration: you have access to the
+//! same [`Key`] as well as the value being emitted.
+//!
+//! For recorders which temporarily buffer or hold on to values before exporting, a typical approach
+//! would be to utilize atomic variables for the storage.  For counters and gauges, this can be done
+//! simply by using types like [`AtomicU64`](std::sync::atomic::AtomicU64).  For histograms, this can be
+//! slightly tricky as you must hold on to all of the distinct values.  In our helper crate,
+//! [`metrics-util`][metrics-util], we&#39;ve provided a type called [`AtomicBucket`][AtomicBucket].  For
+//! exporters that will want to get all of the current values in a batch, while clearing the bucket so
+//! that values aren&#39;t processed again, [AtomicBucket] provides a simple interface to do so, as well as
+//! optimized performance on both the insertion and read side.
+//!
+//! Combined together, exporter authors can use [`Handle`][Handle], also from the `metrics-util`
+//! crate, which provides a consolidated type for holding metric data.  These types, and many more
+//! from the `metrics-util` crate, form the basis of typical exporter behavior and have been exposed
+//! to help you quickly build a new exporter.
+//!
+//! ## Installing recorders
+//!
+//! In order to actually use an exporter, it must be installed as the &quot;global&quot; recorder.  This is a
+//! static recorder that the registration and emission macros refer to behind-the-scenes.  `metrics`
+//! provides a few methods to do so: [`set_recorder`], [`set_boxed_recorder`], and [`set_recorder_racy`].
+//!
+//! Primarily, you&#39;ll use [`set_boxed_recorder`] to pass a boxed version of the exporter to be
+//! installed.  This is due to the fact that most exporters won&#39;t be able to be constructed
+//! statically.  If you could construct your exporter statically, though, then you could instead
+//! choose [`set_recorder`].
+//!
+//! Similarly, [`set_recorder_racy`] takes a static reference, but is also not thread safe, and
+//! should only be used on platforms which do not support atomic operations, such as embedded
+//! environments.
+//!
+//! As users of `metrics`, you&#39;ll typically see exporters provide methods to install themselves that
+//! hide the nitty gritty details.  These methods will usually be aptly named, such as `install`.
+//!
+//! [metrics-exporter-tcp]: https://docs.rs/metrics-exporter-tcp
+//! [metrics-exporter-prometheus]: https://docs.rs/metrics-exporter-prometheus
+//! [metrics-util]: https://docs.rs/metrics-util
+//! [AtomicBucket]: https://docs.rs/metrics-util/0.5.0/metrics_util/struct.AtomicBucket.html
+//! [Handle]: https://docs.rs/metrics-util/0.5.0/metrics_util/enum.Handle.html
+</span><span class="attribute">#![deny(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg), deny(rustdoc::broken_intra_doc_links))]
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::common</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>common;
+<span class="kw">pub use </span><span class="self">self</span>::common::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">cow</span>;
+<span class="kw">mod </span>cow;
 
-<span class="kw">mod</span> <span class="ident">handles</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::handles</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>handles;
+<span class="kw">pub use </span><span class="self">self</span>::handles::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">key</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::key</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>key;
+<span class="kw">pub use </span><span class="self">self</span>::key::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">label</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::label</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>label;
+<span class="kw">pub use </span><span class="self">self</span>::label::<span class="kw-2">*</span>;
 
-<span class="kw">mod</span> <span class="ident">recorder</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::recorder</span>::<span class="kw-2">*</span>;
+<span class="kw">mod </span>recorder;
+<span class="kw">pub use </span><span class="self">self</span>::recorder::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Describes a counter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Counters represent a single monotonic value, which means the value can only be incremented, not</span>
-<span class="doccomment">/// decremented, and always starts out with an initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be described with a free-form string, and optionally, a unit can be provided to</span>
-<span class="doccomment">/// describe the value and/or rate of the metric measurements.  Whether or not the installed</span>
-<span class="doccomment">/// recorder does anything with the description, or optional unit, is implementation defined.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::describe_counter;</span>
-<span class="doccomment">/// # use metrics::Unit;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic counter:</span>
-<span class="doccomment">/// describe_counter!(&quot;some_metric_name&quot;, &quot;my favorite counter&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Providing a unit for a counter:</span>
-<span class="doccomment">/// describe_counter!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite counter&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// describe_counter!(name, &quot;my favorite counter&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// describe_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite counter&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::describe_counter</span>;
+<span class="doccomment">/// Describes a counter.
+///
+/// Counters represent a single monotonic value, which means the value can only be incremented, not
+/// decremented, and always starts out with an initial value of zero.
+///
+/// Metrics can be described with a free-form string, and optionally, a unit can be provided to
+/// describe the value and/or rate of the metric measurements.  Whether or not the installed
+/// recorder does anything with the description, or optional unit, is implementation defined.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::describe_counter;
+/// # use metrics::Unit;
+/// # fn main() {
+/// // A basic counter:
+/// describe_counter!(&quot;some_metric_name&quot;, &quot;my favorite counter&quot;);
+///
+/// // Providing a unit for a counter:
+/// describe_counter!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite counter&quot;);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// describe_counter!(name, &quot;my favorite counter&quot;);
+///
+/// describe_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite counter&quot;);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::describe_counter;
 
-<span class="doccomment">/// Describes a gauge.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Gauges represent a single value that can go up or down over time, and always starts out with an</span>
-<span class="doccomment">/// initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be described with a free-form string, and optionally, a unit can be provided to</span>
-<span class="doccomment">/// describe the value and/or rate of the metric measurements.  Whether or not the installed</span>
-<span class="doccomment">/// recorder does anything with the description, or optional unit, is implementation defined.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::describe_gauge;</span>
-<span class="doccomment">/// # use metrics::Unit;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic gauge:</span>
-<span class="doccomment">/// describe_gauge!(&quot;some_metric_name&quot;, &quot;my favorite gauge&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Providing a unit for a gauge:</span>
-<span class="doccomment">/// describe_gauge!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite gauge&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// describe_gauge!(name, &quot;my favorite gauge&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// describe_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite gauge&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::describe_gauge</span>;
+<span class="doccomment">/// Describes a gauge.
+///
+/// Gauges represent a single value that can go up or down over time, and always starts out with an
+/// initial value of zero.
+///
+/// Metrics can be described with a free-form string, and optionally, a unit can be provided to
+/// describe the value and/or rate of the metric measurements.  Whether or not the installed
+/// recorder does anything with the description, or optional unit, is implementation defined.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::describe_gauge;
+/// # use metrics::Unit;
+/// # fn main() {
+/// // A basic gauge:
+/// describe_gauge!(&quot;some_metric_name&quot;, &quot;my favorite gauge&quot;);
+///
+/// // Providing a unit for a gauge:
+/// describe_gauge!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite gauge&quot;);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// describe_gauge!(name, &quot;my favorite gauge&quot;);
+///
+/// describe_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite gauge&quot;);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::describe_gauge;
 
-<span class="doccomment">/// Describes a histogram.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Histograms measure the distribution of values for a given set of measurements, and start with no</span>
-<span class="doccomment">/// initial values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be described with a free-form string, and optionally, a unit can be provided to</span>
-<span class="doccomment">/// describe the value and/or rate of the metric measurements.  Whether or not the installed</span>
-<span class="doccomment">/// recorder does anything with the description, or optional unit, is implementation defined.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::describe_histogram;</span>
-<span class="doccomment">/// # use metrics::Unit;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic histogram:</span>
-<span class="doccomment">/// describe_histogram!(&quot;some_metric_name&quot;, &quot;my favorite histogram&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Providing a unit for a histogram:</span>
-<span class="doccomment">/// describe_histogram!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite histogram&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// describe_histogram!(name, &quot;my favorite histogram&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// describe_histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite histogram&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::describe_histogram</span>;
+<span class="doccomment">/// Describes a histogram.
+///
+/// Histograms measure the distribution of values for a given set of measurements, and start with no
+/// initial values.
+///
+/// Metrics can be described with a free-form string, and optionally, a unit can be provided to
+/// describe the value and/or rate of the metric measurements.  Whether or not the installed
+/// recorder does anything with the description, or optional unit, is implementation defined.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::describe_histogram;
+/// # use metrics::Unit;
+/// # fn main() {
+/// // A basic histogram:
+/// describe_histogram!(&quot;some_metric_name&quot;, &quot;my favorite histogram&quot;);
+///
+/// // Providing a unit for a histogram:
+/// describe_histogram!(&quot;some_metric_name&quot;, Unit::Bytes, &quot;my favorite histogram&quot;);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// describe_histogram!(name, &quot;my favorite histogram&quot;);
+///
+/// describe_histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), &quot;my favorite histogram&quot;);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::describe_histogram;
 
-<span class="doccomment">/// Registers a counter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Counters represent a single monotonic value, which means the value can only be incremented, not</span>
-<span class="doccomment">/// decremented, and always starts out with an initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be registered, which provides a handle to directly update that metric.  For</span>
-<span class="doccomment">/// counters, [`Counter`] is provided which can be incremented or set to an absolute value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::register_counter;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic counter:</span>
-<span class="doccomment">/// let counter = register_counter!(&quot;some_metric_name&quot;);</span>
-<span class="doccomment">/// counter.increment(1);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// let counter = register_counter!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">/// counter.absolute(42);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// let counter = register_counter!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">/// counter.increment(123);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,</span>
-<span class="doccomment">/// // a unit or description can still be passed in their respective positions:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// let counter = register_counter!(&quot;some_metric_name&quot;, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// let counter = register_counter!(name);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let counter = register_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::register_counter</span>;
+<span class="doccomment">/// Registers a counter.
+///
+/// Counters represent a single monotonic value, which means the value can only be incremented, not
+/// decremented, and always starts out with an initial value of zero.
+///
+/// Metrics can be registered, which provides a handle to directly update that metric.  For
+/// counters, [`Counter`] is provided which can be incremented or set to an absolute value.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::register_counter;
+/// # fn main() {
+/// // A basic counter:
+/// let counter = register_counter!(&quot;some_metric_name&quot;);
+/// counter.increment(1);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// let counter = register_counter!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);
+/// counter.absolute(42);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// let counter = register_counter!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);
+/// counter.increment(123);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,
+/// // a unit or description can still be passed in their respective positions:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// let counter = register_counter!(&quot;some_metric_name&quot;, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// let counter = register_counter!(name);
+///
+/// let counter = register_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::register_counter;
 
-<span class="doccomment">/// Registers a gauge.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Gauges represent a single value that can go up or down over time, and always starts out with an</span>
-<span class="doccomment">/// initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be registered, which provides a handle to directly update that metric.  For gauges,</span>
-<span class="doccomment">/// [`Gauge`] is provided which can be incremented, decrement, or set to an absolute value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::register_gauge;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic gauge:</span>
-<span class="doccomment">/// let gauge = register_gauge!(&quot;some_metric_name&quot;);</span>
-<span class="doccomment">/// gauge.increment(1.0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// let gauge = register_gauge!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">/// gauge.decrement(42.0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// let gauge = register_gauge!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">/// gauge.increment(3.14);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,</span>
-<span class="doccomment">/// // a unit or description can still be passed in their respective positions:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// let gauge = register_gauge!(&quot;some_metric_name&quot;, &amp;labels);</span>
-<span class="doccomment">/// gauge.set(1337.0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// let gauge = register_gauge!(name);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let gauge = register_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::register_gauge</span>;
+<span class="doccomment">/// Registers a gauge.
+///
+/// Gauges represent a single value that can go up or down over time, and always starts out with an
+/// initial value of zero.
+///
+/// Metrics can be registered, which provides a handle to directly update that metric.  For gauges,
+/// [`Gauge`] is provided which can be incremented, decrement, or set to an absolute value.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::register_gauge;
+/// # fn main() {
+/// // A basic gauge:
+/// let gauge = register_gauge!(&quot;some_metric_name&quot;);
+/// gauge.increment(1.0);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// let gauge = register_gauge!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);
+/// gauge.decrement(42.0);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// let gauge = register_gauge!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);
+/// gauge.increment(3.14);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,
+/// // a unit or description can still be passed in their respective positions:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// let gauge = register_gauge!(&quot;some_metric_name&quot;, &amp;labels);
+/// gauge.set(1337.0);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// let gauge = register_gauge!(name);
+///
+/// let gauge = register_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::register_gauge;
 
-<span class="doccomment">/// Registers a histogram.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Histograms measure the distribution of values for a given set of measurements, and start with no</span>
-<span class="doccomment">/// initial values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metrics can be registered, which provides a handle to directly update that metric.  For</span>
-<span class="doccomment">/// histograms, [`Histogram`] is provided which can record values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::register_histogram;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic histogram:</span>
-<span class="doccomment">/// let histogram = register_histogram!(&quot;some_metric_name&quot;);</span>
-<span class="doccomment">/// histogram.record(1.0);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// let histogram = register_histogram!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// let histogram = register_histogram!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,</span>
-<span class="doccomment">/// // a unit or description can still be passed in their respective positions:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// let histogram = register_histogram!(&quot;some_metric_name&quot;, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// let histogram = register_histogram!(name);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let histogram = register_histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::register_histogram</span>;
+<span class="doccomment">/// Registers a histogram.
+///
+/// Histograms measure the distribution of values for a given set of measurements, and start with no
+/// initial values.
+///
+/// Metrics can be registered, which provides a handle to directly update that metric.  For
+/// histograms, [`Histogram`] is provided which can record values.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::register_histogram;
+/// # fn main() {
+/// // A basic histogram:
+/// let histogram = register_histogram!(&quot;some_metric_name&quot;);
+/// histogram.record(1.0);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// let histogram = register_histogram!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// let histogram = register_histogram!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs.  In this scenario,
+/// // a unit or description can still be passed in their respective positions:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// let histogram = register_histogram!(&quot;some_metric_name&quot;, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// let histogram = register_histogram!(name);
+///
+/// let histogram = register_histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::register_histogram;
 
-<span class="doccomment">/// Increments a counter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Counters represent a single monotonic value, which means the value can only be incremented, not</span>
-<span class="doccomment">/// decremented, and always starts out with an initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::counter;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic counter:</span>
-<span class="doccomment">/// counter!(&quot;some_metric_name&quot;, 12);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// counter!(&quot;some_metric_name&quot;, 12, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// counter!(&quot;some_metric_name&quot;, 12, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// counter!(&quot;some_metric_name&quot;, 12, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// counter!(name, 12);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 12);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::counter</span>;
+<span class="doccomment">/// Increments a counter.
+///
+/// Counters represent a single monotonic value, which means the value can only be incremented, not
+/// decremented, and always starts out with an initial value of zero.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::counter;
+/// # fn main() {
+/// // A basic counter:
+/// counter!(&quot;some_metric_name&quot;, 12);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// counter!(&quot;some_metric_name&quot;, 12, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// counter!(&quot;some_metric_name&quot;, 12, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// counter!(&quot;some_metric_name&quot;, 12, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// counter!(name, 12);
+///
+/// counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 12);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::counter;
 
-<span class="doccomment">/// Increments a counter by one.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Counters represent a single monotonic value, which means the value can only be incremented, not</span>
-<span class="doccomment">/// decremented, and always starts out with an initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::increment_counter;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic increment:</span>
-<span class="doccomment">/// increment_counter!(&quot;some_metric_name&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// increment_counter!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// increment_counter!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// increment_counter!(&quot;some_metric_name&quot;, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// increment_counter!(name);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// increment_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::increment_counter</span>;
+<span class="doccomment">/// Increments a counter by one.
+///
+/// Counters represent a single monotonic value, which means the value can only be incremented, not
+/// decremented, and always starts out with an initial value of zero.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::increment_counter;
+/// # fn main() {
+/// // A basic increment:
+/// increment_counter!(&quot;some_metric_name&quot;);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// increment_counter!(&quot;some_metric_name&quot;, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// increment_counter!(&quot;some_metric_name&quot;, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// increment_counter!(&quot;some_metric_name&quot;, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// increment_counter!(name);
+///
+/// increment_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;));
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::increment_counter;
 
-<span class="doccomment">/// Sets a counter to an absolute value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Counters represent a single monotonic value, which means the value can only be incremented, not</span>
-<span class="doccomment">/// decremented, and will always start out with an initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using this macro, users can specify an absolute value for the counter instead of the typical</span>
-<span class="doccomment">/// delta.  This can be useful when dealing with forwarding metrics from an external system into the</span>
-<span class="doccomment">/// normal application metrics, without having to track the delta of the metrics from the external</span>
-<span class="doccomment">/// system.  Users should beware, though, that implementations will enforce the monotonicity</span>
-<span class="doccomment">/// property of counters by refusing to update the value unless it is greater than current value of</span>
-<span class="doccomment">/// the counter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::absolute_counter;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic counter:</span>
-<span class="doccomment">/// absolute_counter!(&quot;some_metric_name&quot;, 12);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// absolute_counter!(&quot;some_metric_name&quot;, 13, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// absolute_counter!(&quot;some_metric_name&quot;, 13, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// absolute_counter!(&quot;some_metric_name&quot;, 14, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// absolute_counter!(name, 15);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// absolute_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 16);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::absolute_counter</span>;
+<span class="doccomment">/// Sets a counter to an absolute value.
+///
+/// Counters represent a single monotonic value, which means the value can only be incremented, not
+/// decremented, and will always start out with an initial value of zero.
+///
+/// Using this macro, users can specify an absolute value for the counter instead of the typical
+/// delta.  This can be useful when dealing with forwarding metrics from an external system into the
+/// normal application metrics, without having to track the delta of the metrics from the external
+/// system.  Users should beware, though, that implementations will enforce the monotonicity
+/// property of counters by refusing to update the value unless it is greater than current value of
+/// the counter.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::absolute_counter;
+/// # fn main() {
+/// // A basic counter:
+/// absolute_counter!(&quot;some_metric_name&quot;, 12);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// absolute_counter!(&quot;some_metric_name&quot;, 13, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// absolute_counter!(&quot;some_metric_name&quot;, 13, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// absolute_counter!(&quot;some_metric_name&quot;, 14, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// absolute_counter!(name, 15);
+///
+/// absolute_counter!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 16);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::absolute_counter;
 
-<span class="doccomment">/// Updates a gauge.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Gauges represent a single value that can go up or down over time, and always starts out with an</span>
-<span class="doccomment">/// initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::gauge;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic gauge:</span>
-<span class="doccomment">/// gauge!(&quot;some_metric_name&quot;, 42.2222);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// gauge!(name, 800.85);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::gauge</span>;
+<span class="doccomment">/// Updates a gauge.
+///
+/// Gauges represent a single value that can go up or down over time, and always starts out with an
+/// initial value of zero.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::gauge;
+/// # fn main() {
+/// // A basic gauge:
+/// gauge!(&quot;some_metric_name&quot;, 42.2222);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// gauge!(name, 800.85);
+///
+/// gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::gauge;
 
-<span class="doccomment">/// Increments a gauge.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Gauges represent a single value that can go up or down over time, and always starts out with an</span>
-<span class="doccomment">/// initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::increment_gauge;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic gauge:</span>
-<span class="doccomment">/// increment_gauge!(&quot;some_metric_name&quot;, 42.2222);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// increment_gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// increment_gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// increment_gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// increment_gauge!(name, 800.85);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// increment_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::increment_gauge</span>;
+<span class="doccomment">/// Increments a gauge.
+///
+/// Gauges represent a single value that can go up or down over time, and always starts out with an
+/// initial value of zero.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::increment_gauge;
+/// # fn main() {
+/// // A basic gauge:
+/// increment_gauge!(&quot;some_metric_name&quot;, 42.2222);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// increment_gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// increment_gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// increment_gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// increment_gauge!(name, 800.85);
+///
+/// increment_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::increment_gauge;
 
-<span class="doccomment">/// Decrements a gauge.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Gauges represent a single value that can go up or down over time, and always starts out with an</span>
-<span class="doccomment">/// initial value of zero.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::decrement_gauge;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic gauge:</span>
-<span class="doccomment">/// decrement_gauge!(&quot;some_metric_name&quot;, 42.2222);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// decrement_gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// decrement_gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// decrement_gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// decrement_gauge!(name, 800.85);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// decrement_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::decrement_gauge</span>;
+<span class="doccomment">/// Decrements a gauge.
+///
+/// Gauges represent a single value that can go up or down over time, and always starts out with an
+/// initial value of zero.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::decrement_gauge;
+/// # fn main() {
+/// // A basic gauge:
+/// decrement_gauge!(&quot;some_metric_name&quot;, 42.2222);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// decrement_gauge!(&quot;some_metric_name&quot;, 66.6666, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// decrement_gauge!(&quot;some_metric_name&quot;, 66.6666, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// decrement_gauge!(&quot;some_metric_name&quot;, 42.42, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// decrement_gauge!(name, 800.85);
+///
+/// decrement_gauge!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::decrement_gauge;
 
-<span class="doccomment">/// Records a histogram.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Histograms measure the distribution of values for a given set of measurements, and start with no</span>
-<span class="doccomment">/// initial values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Implicit conversions</span>
-<span class="doccomment">/// Histograms are represented as `f64` values, but often come from another source, such as a time</span>
-<span class="doccomment">/// measurement.  By default, `histogram!` will accept a `f64` directly or a</span>
-<span class="doccomment">/// [`Duration`](std::time::Duration), which uses the floating-point number of seconds represents by</span>
-<span class="doccomment">/// the duration.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// External libraries and applications can create their own conversions by implementing the</span>
-<span class="doccomment">/// [`IntoF64`] trait for their types, which is required for the value being passed to `histogram!`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Metric names are shown below using string literals, but they can also be owned `String` values,</span>
-<span class="doccomment">/// which includes using macros such as `format!` directly at the callsite. String literals are</span>
-<span class="doccomment">/// preferred for performance where possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use metrics::histogram;</span>
-<span class="doccomment">/// # use std::time::Duration;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// // A basic histogram:</span>
-<span class="doccomment">/// histogram!(&quot;some_metric_name&quot;, 34.3);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // An implicit conversion from `Duration`:</span>
-<span class="doccomment">/// let d = Duration::from_millis(17);</span>
-<span class="doccomment">/// histogram!(&quot;some_metric_name&quot;, d);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Specifying labels inline, including using constants for either the key or value:</span>
-<span class="doccomment">/// histogram!(&quot;some_metric_name&quot;, 38.0, &quot;service&quot; =&gt; &quot;http&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;</span>
-<span class="doccomment">/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;</span>
-<span class="doccomment">/// histogram!(&quot;some_metric_name&quot;, 38.0, SERVICE_LABEL =&gt; SERVICE_HTTP);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can also pass labels by giving a vector or slice of key/value pairs:</span>
-<span class="doccomment">/// let dynamic_val = &quot;woo&quot;;</span>
-<span class="doccomment">/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];</span>
-<span class="doccomment">/// histogram!(&quot;some_metric_name&quot;, 1337.5, &amp;labels);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // As mentioned in the documentation, metric names also can be owned strings, including ones</span>
-<span class="doccomment">/// // generated at the callsite via things like `format!`:</span>
-<span class="doccomment">/// let name = String::from(&quot;some_owned_metric_name&quot;);</span>
-<span class="doccomment">/// histogram!(name, 800.85);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics_macros::histogram</span>;
+<span class="doccomment">/// Records a histogram.
+///
+/// Histograms measure the distribution of values for a given set of measurements, and start with no
+/// initial values.
+///
+/// # Implicit conversions
+/// Histograms are represented as `f64` values, but often come from another source, such as a time
+/// measurement.  By default, `histogram!` will accept a `f64` directly or a
+/// [`Duration`](std::time::Duration), which uses the floating-point number of seconds represents by
+/// the duration.
+///
+/// External libraries and applications can create their own conversions by implementing the
+/// [`IntoF64`] trait for their types, which is required for the value being passed to `histogram!`.
+///
+/// Metric names are shown below using string literals, but they can also be owned `String` values,
+/// which includes using macros such as `format!` directly at the callsite. String literals are
+/// preferred for performance where possible.
+///
+/// # Example
+/// ```
+/// # use metrics::histogram;
+/// # use std::time::Duration;
+/// # fn main() {
+/// // A basic histogram:
+/// histogram!(&quot;some_metric_name&quot;, 34.3);
+///
+/// // An implicit conversion from `Duration`:
+/// let d = Duration::from_millis(17);
+/// histogram!(&quot;some_metric_name&quot;, d);
+///
+/// // Specifying labels inline, including using constants for either the key or value:
+/// histogram!(&quot;some_metric_name&quot;, 38.0, &quot;service&quot; =&gt; &quot;http&quot;);
+///
+/// const SERVICE_LABEL: &amp;&#39;static str = &quot;service&quot;;
+/// const SERVICE_HTTP: &amp;&#39;static str = &quot;http&quot;;
+/// histogram!(&quot;some_metric_name&quot;, 38.0, SERVICE_LABEL =&gt; SERVICE_HTTP);
+///
+/// // We can also pass labels by giving a vector or slice of key/value pairs:
+/// let dynamic_val = &quot;woo&quot;;
+/// let labels = [(&quot;dynamic_key&quot;, format!(&quot;{}!&quot;, dynamic_val))];
+/// histogram!(&quot;some_metric_name&quot;, 1337.5, &amp;labels);
+///
+/// // As mentioned in the documentation, metric names also can be owned strings, including ones
+/// // generated at the callsite via things like `format!`:
+/// let name = String::from(&quot;some_owned_metric_name&quot;);
+/// histogram!(name, 800.85);
+///
+/// histogram!(format!(&quot;{}_via_format&quot;, &quot;name&quot;), 3.14);
+/// # }
+/// ```
+</span><span class="kw">pub use </span>metrics_macros::histogram;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/linux/lsb_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsb_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../os_info/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/linux/lsb_release.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lsb_release.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../os_info/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -480,487 +480,487 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
-</pre><pre class="rust"><code><span class="comment">// spell-checker:ignore codename, noarch, rhel, ootpa, maipo</span>
+</pre><pre class="rust"><code><span class="comment">// spell-checker:ignore codename, noarch, rhel, ootpa, maipo
 
-<span class="kw">use</span> <span class="ident">std::process::Command</span>;
+</span><span class="kw">use </span>std::process::Command;
 
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+<span class="kw">use </span>log::{debug, trace};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">matcher::Matcher</span>, <span class="ident">Info</span>, <span class="ident">Type</span>, <span class="ident">Version</span>};
+<span class="kw">use crate</span>::{matcher::Matcher, Info, Type, Version};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Info</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">release</span> <span class="op">=</span> <span class="ident">retrieve</span>()<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>get() -&gt; <span class="prelude-ty">Option</span>&lt;Info&gt; {
+    <span class="kw">let </span>release = retrieve()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">release</span>.<span class="ident">version</span>.<span class="ident">as_deref</span>() {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>) =&gt; <span class="ident">Version::Rolling</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">Version::Custom</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">Version::Unknown</span>,
+    <span class="kw">let </span>version = <span class="kw">match </span>release.version.as_deref() {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>) =&gt; Version::Rolling(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Some</span>(v) =&gt; Version::Custom(v.to_owned()),
+        <span class="prelude-val">None </span>=&gt; Version::Unknown,
     };
 
-    <span class="kw">let</span> <span class="ident">os_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">release</span>.<span class="ident">distribution</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_ref</span>) {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>) =&gt; <span class="ident">Type::Amazon</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>) =&gt; <span class="ident">Type::Arch</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;CentOS&quot;</span>) =&gt; <span class="ident">Type::CentOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>) =&gt; <span class="ident">Type::Debian</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>) =&gt; <span class="ident">Type::EndeavourOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora Linux&quot;</span>) =&gt; <span class="ident">Type::Fedora</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Garuda&quot;</span>) =&gt; <span class="ident">Type::Garuda</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Gentoo&quot;</span>) =&gt; <span class="ident">Type::Gentoo</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>) =&gt; <span class="ident">Type::Mint</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>) =&gt; <span class="ident">Type::Manjaro</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>) =&gt; <span class="ident">Type::Mariner</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>) =&gt; <span class="ident">Type::NixOS</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>) =&gt; <span class="ident">Type::openSUSE</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>) =&gt; <span class="ident">Type::OracleLinux</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>) =&gt; <span class="ident">Type::Pop</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>) =&gt; <span class="ident">Type::Raspbian</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>) =&gt; <span class="ident">Type::RedHatEnterprise</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>) =&gt; <span class="ident">Type::Solus</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>) =&gt; <span class="ident">Type::SUSE</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>) =&gt; <span class="ident">Type::Ubuntu</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">Type::Linux</span>,
+    <span class="kw">let </span>os_type = <span class="kw">match </span>release.distribution.as_ref().map(String::as_ref) {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>) | <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>) =&gt; Type::Amazon,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>) =&gt; Type::Arch,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;CentOS&quot;</span>) =&gt; Type::CentOS,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>) =&gt; Type::Debian,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>) =&gt; Type::EndeavourOS,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>) | <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora Linux&quot;</span>) =&gt; Type::Fedora,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Garuda&quot;</span>) =&gt; Type::Garuda,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Gentoo&quot;</span>) =&gt; Type::Gentoo,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>) =&gt; Type::Mint,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>) =&gt; Type::Manjaro,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>) =&gt; Type::Mariner,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>) =&gt; Type::NixOS,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>) =&gt; Type::openSUSE,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>) =&gt; Type::OracleLinux,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>) =&gt; Type::Pop,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>) =&gt; Type::Raspbian,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>) | <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>) =&gt; Type::RedHatEnterprise,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>) =&gt; Type::Solus,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>) =&gt; Type::SUSE,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>) =&gt; Type::Ubuntu,
+        <span class="kw">_ </span>=&gt; Type::Linux,
     };
 
-    <span class="prelude-val">Some</span>(<span class="ident">Info</span> {
-        <span class="ident">os_type</span>,
-        <span class="ident">version</span>,
-        <span class="ident">codename</span>: <span class="ident">release</span>.<span class="ident">codename</span>,
-        ..<span class="ident">Default::default</span>()
+    <span class="prelude-val">Some</span>(Info {
+        os_type,
+        version,
+        codename: release.codename,
+        ..Default::default()
     })
 }
 
-<span class="kw">struct</span> <span class="ident">LsbRelease</span> {
-    <span class="kw">pub</span> <span class="ident">distribution</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">codename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>LsbRelease {
+    <span class="kw">pub </span>distribution: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>version: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>codename: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">fn</span> <span class="ident">retrieve</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LsbRelease</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">Command::new</span>(<span class="string">&quot;lsb_release&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;-a&quot;</span>).<span class="ident">output</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>) =&gt; {
-            <span class="macro">trace!</span>(<span class="string">&quot;lsb_release command returned {:?}&quot;</span>, <span class="ident">output</span>);
-            <span class="prelude-val">Some</span>(<span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>.<span class="ident">stdout</span>)))
+<span class="kw">fn </span>retrieve() -&gt; <span class="prelude-ty">Option</span>&lt;LsbRelease&gt; {
+    <span class="kw">match </span>Command::new(<span class="string">&quot;lsb_release&quot;</span>).arg(<span class="string">&quot;-a&quot;</span>).output() {
+        <span class="prelude-val">Ok</span>(output) =&gt; {
+            <span class="macro">trace!</span>(<span class="string">&quot;lsb_release command returned {:?}&quot;</span>, output);
+            <span class="prelude-val">Some</span>(parse(<span class="kw-2">&amp;</span>String::from_utf8_lossy(<span class="kw-2">&amp;</span>output.stdout)))
         }
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-            <span class="macro">debug!</span>(<span class="string">&quot;lsb_release command failed with {:?}&quot;</span>, <span class="ident">e</span>);
-            <span class="prelude-val">None</span>
-        }
+        <span class="prelude-val">Err</span>(e) =&gt; {
+            <span class="macro">debug!</span>(<span class="string">&quot;lsb_release command failed with {:?}&quot;</span>, e);
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">LsbRelease</span> {
-    <span class="macro">trace!</span>(<span class="string">&quot;Trying to parse {:?}&quot;</span>, <span class="ident">output</span>);
+<span class="kw">fn </span>parse(output: <span class="kw-2">&amp;</span>str) -&gt; LsbRelease {
+    <span class="macro">trace!</span>(<span class="string">&quot;Trying to parse {:?}&quot;</span>, output);
 
-    <span class="kw">let</span> <span class="ident">distribution</span> <span class="op">=</span> <span class="ident">Matcher::PrefixedWord</span> {
-        <span class="ident">prefix</span>: <span class="string">&quot;Distributor ID:&quot;</span>,
+    <span class="kw">let </span>distribution = Matcher::PrefixedWord {
+        prefix: <span class="string">&quot;Distributor ID:&quot;</span>,
     }
-    .<span class="ident">find</span>(<span class="ident">output</span>);
+    .find(output);
 
-    <span class="kw">let</span> <span class="ident">codename</span> <span class="op">=</span> <span class="ident">Matcher::PrefixedWord</span> {
-        <span class="ident">prefix</span>: <span class="string">&quot;Codename:&quot;</span>,
+    <span class="kw">let </span>codename = Matcher::PrefixedWord {
+        prefix: <span class="string">&quot;Codename:&quot;</span>,
     }
-    .<span class="ident">find</span>(<span class="ident">output</span>)
-    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;n/a&quot;</span>);
+    .find(output)
+    .filter(|c| c != <span class="string">&quot;n/a&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">Matcher::PrefixedVersion</span> { <span class="ident">prefix</span>: <span class="string">&quot;Release:&quot;</span> }.<span class="ident">find</span>(<span class="ident">output</span>);
+    <span class="kw">let </span>version = Matcher::PrefixedVersion { prefix: <span class="string">&quot;Release:&quot; </span>}.find(output);
 
     <span class="macro">trace!</span>(
         <span class="string">&quot;Parsed as &#39;{:?}&#39; distribution and &#39;{:?}&#39; version&quot;</span>,
-        <span class="ident">distribution</span>,
-        <span class="ident">version</span>
+        distribution,
+        version
     );
 
-    <span class="ident">LsbRelease</span> {
-        <span class="ident">distribution</span>,
-        <span class="ident">version</span>,
-        <span class="ident">codename</span>,
+    LsbRelease {
+        distribution,
+        version,
+        codename,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>pretty_assertions::assert_eq;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debian</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;7.8&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;wheezy&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>debian() {
+        <span class="kw">let </span>parse_results = parse(file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Debian&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;7.8&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;wheezy&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">arch</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">arch_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>arch() {
+        <span class="kw">let </span>parse_results = parse(arch_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Arch&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fedora</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">fedora_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;26&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;TwentySix&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>fedora() {
+        <span class="kw">let </span>parse_results = parse(fedora_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Fedora&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;26&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;TwentySix&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ubuntu</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">ubuntu_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;16.04&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;xenial&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ubuntu() {
+        <span class="kw">let </span>parse_results = parse(ubuntu_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Ubuntu&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;16.04&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;xenial&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mint</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">mint_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;20&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;ulyana&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>mint() {
+        <span class="kw">let </span>parse_results = parse(mint_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Linuxmint&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;20&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;ulyana&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">nixos</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">nixos_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>nixos() {
+        <span class="kw">let </span>parse_results = parse(nixos_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;NixOS&quot;</span>.to_string()));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_results</span>.<span class="ident">version</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;21.05pre275822.916ee862e87&quot;</span>.<span class="ident">to_string</span>())
+            parse_results.version,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;21.05pre275822.916ee862e87&quot;</span>.to_string())
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;okapi&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;okapi&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">amazon1</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">amazon1_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;2018.03&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>amazon1() {
+        <span class="kw">let </span>parse_results = parse(amazon1_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;AmazonAMI&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;2018.03&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">amazon2</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">amazon2_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Karoo&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>amazon2() {
+        <span class="kw">let </span>parse_results = parse(amazon2_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Amazon&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;Karoo&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">redhat_enterprise_8</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">rhel8_file</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>redhat_enterprise_8() {
+        <span class="kw">let </span>parse_results = parse(rhel8_file());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_results</span>.<span class="ident">distribution</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>.<span class="ident">to_string</span>())
+            parse_results.distribution,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterprise&quot;</span>.to_string())
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;8.1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Ootpa&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;8.1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;Ootpa&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">redhat_enterprise_7</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">rhel7_file</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>redhat_enterprise_7() {
+        <span class="kw">let </span>parse_results = parse(rhel7_file());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_results</span>.<span class="ident">distribution</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>.<span class="ident">to_string</span>())
+            parse_results.distribution,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>.to_string())
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;7.7&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Maipo&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;7.7&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;Maipo&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">redhat_enterprise_6</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">rhel6_file</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>redhat_enterprise_6() {
+        <span class="kw">let </span>parse_results = parse(rhel6_file());
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_results</span>.<span class="ident">distribution</span>,
-            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>.<span class="ident">to_string</span>())
+            parse_results.distribution,
+            <span class="prelude-val">Some</span>(<span class="string">&quot;RedHatEnterpriseServer&quot;</span>.to_string())
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;6.10&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Santiago&quot;</span>.<span class="ident">to_string</span>()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;6.10&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;Santiago&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">suse_enterprise_15_1</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">suse_enterprise15_1_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;15.1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>suse_enterprise_15_1() {
+        <span class="kw">let </span>parse_results = parse(suse_enterprise15_1_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;15.1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">suse_enterprise_12_5</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">suse_enterprise12_5_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;12.5&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>suse_enterprise_12_5() {
+        <span class="kw">let </span>parse_results = parse(suse_enterprise12_5_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;SUSE&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;12.5&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">open_suse_15_1</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">open_suse_15_1_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;15.1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>open_suse_15_1() {
+        <span class="kw">let </span>parse_results = parse(open_suse_15_1_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;openSUSE&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;15.1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oracle_linux_7_5</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">oracle_server_linux_7_5_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;7.5&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>oracle_linux_7_5() {
+        <span class="kw">let </span>parse_results = parse(oracle_server_linux_7_5_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;7.5&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">oracle_linux_8_1</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">oracle_server_linux_8_1_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;8.1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>oracle_linux_8_1() {
+        <span class="kw">let </span>parse_results = parse(oracle_server_linux_8_1_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;OracleServer&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;8.1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pop_os_20_04_lts</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">pop_os_20_04_lts_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;20.04&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;focal&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pop_os_20_04_lts() {
+        <span class="kw">let </span>parse_results = parse(pop_os_20_04_lts_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Pop&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;20.04&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;focal&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">solus_4_1</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">solus_4_1_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;4.1&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;fortitude&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>solus_4_1() {
+        <span class="kw">let </span>parse_results = parse(solus_4_1_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Solus&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;4.1&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;fortitude&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">manjaro</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">manjaro_19_0_2_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;19.0.2&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>manjaro() {
+        <span class="kw">let </span>parse_results = parse(manjaro_19_0_2_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;ManjaroLinux&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;19.0.2&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mariner</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">mariner_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;2.0.20220210&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>mariner() {
+        <span class="kw">let </span>parse_results = parse(mariner_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;2.0.20220210&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">Some</span>(<span class="string">&quot;Mariner&quot;</span>.to_string()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">endeavouros</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">endeavouros_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>endeavouros() {
+        <span class="kw">let </span>parse_results = parse(endeavouros_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;EndeavourOS&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;rolling&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">raspbian</span>() {
-        <span class="kw">let</span> <span class="ident">parse_results</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">raspberry_os_file</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">distribution</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;10&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">parse_results</span>.<span class="ident">codename</span>, <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>raspbian() {
+        <span class="kw">let </span>parse_results = parse(raspberry_os_file());
+        <span class="macro">assert_eq!</span>(parse_results.distribution, <span class="prelude-val">Some</span>(<span class="string">&quot;Raspbian&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.version, <span class="prelude-val">Some</span>(<span class="string">&quot;10&quot;</span>.to_string()));
+        <span class="macro">assert_eq!</span>(parse_results.codename, <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;\nDistributor ID:	Debian\n\
          Description:	Debian GNU/Linux 7.8 (wheezy)\n\
          Release:	7.8\n\
          Codename:	wheezy\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">arch_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>arch_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;\nLSB Version:	1.4\n\
          Distributor ID:	Arch\n\
          Description:	Arch Linux\n\
          Release:	rolling\n\
-         Codename:	n/a&quot;</span>
-    }
+         Codename:	n/a&quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">fedora_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>fedora_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;\nLSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch\n\
          Distributor ID: Fedora\n\
          Description:    Fedora release 26 (Twenty Six)\n\
          Release:    26\n\
          Codename:   TwentySix\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">ubuntu_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>ubuntu_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;Distributor ID: Ubuntu\n\
          Description:    Ubuntu 16.04.5 LTS\n\
          Release:        16.04\n\
-         Codename:       xenial&quot;</span>
-    }
+         Codename:       xenial&quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">mint_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>mint_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;Distributor ID:	Linuxmint\n\
          Description:	    Linux Mint 20\n\
          Release:	        20\n\
-         Codename:	        ulyana&quot;</span>
-    }
+         Codename:	        ulyana&quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">nixos_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>nixos_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;Distributor ID: NixOS\n\
          Description:    NixOS 21.05 (Okapi)\n\
          Release:        21.05pre275822.916ee862e87\n\
-         Codename:       okapi&quot;</span>
-    }
+         Codename:       okapi&quot;
+    </span>}
 
-    <span class="comment">// Amazon Linux 1 uses a separate Distributor ID and Release format from Amazon Linux 2</span>
-    <span class="kw">fn</span> <span class="ident">amazon1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="comment">// Amazon Linux 1 uses a separate Distributor ID and Release format from Amazon Linux 2
+    </span><span class="kw">fn </span>amazon1_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:base-4.0-amd64:base-4.0-noarch:core-4.0-amd64:core-4.0-noarch\n\
          Distributor ID:	AmazonAMI\n\
          Description:	Amazon Linux AMI release 2018.03\n\
          Release:	2018.03\n\
          Codename:	n/a\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="comment">// Amazon Linux 2 uses a separate Distributor ID and Release format from Amazon Linux 1</span>
-    <span class="kw">fn</span> <span class="ident">amazon2_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="comment">// Amazon Linux 2 uses a separate Distributor ID and Release format from Amazon Linux 1
+    </span><span class="kw">fn </span>amazon2_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	Amazon\n\
          Description:	Amazon Linux release 2 (Karoo)\n\
          Release:	2\n\
          Codename:	Karoo\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">rhel8_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>rhel8_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	RedHatEnterprise\n\
          Description:	Red Hat Enterprise Linux release 8.1 (Ootpa)\n\
          Release:	8.1\n\
          Codename:	Ootpa\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">rhel7_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>rhel7_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
          Distributor ID:	RedHatEnterpriseServer\n\
          Description:	Red Hat Enterprise Linux Server release 7.7 (Maipo)\n\
          Release:	7.7\n\
          Codename:	Maipo\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">rhel6_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>rhel6_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:base-4.0-amd64:base-4.0-noarch:core-4.0-amd64:core-4.0-noarch:graphics-4.0-amd64:graphics-4.0-noarch:printing-4.0-amd64:printing-4.0-noarch\n\
         Distributor ID:	RedHatEnterpriseServer\n\
         Description:	Red Hat Enterprise Linux Server release 6.10 (Santiago)\n\
         Release:	6.10\n\
         Codename:	Santiago\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">suse_enterprise15_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>suse_enterprise15_1_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	SUSE\n\
         Description:	SUSE Linux Enterprise Server 15 SP1\n\
         Release:	15.1\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">suse_enterprise12_5_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>suse_enterprise12_5_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	SUSE\n\
         Description:	SUSE Linux Enterprise Server 12 SP5\n\
         Release:	12.5\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">raspberry_os_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>raspberry_os_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:   n/a\n\
          Distributor ID: Raspbian\n\
          Description:    Raspbian GNU/Linux 10 (buster)\n\
          Release:        10\n\
          Codename:       n/a\n\
-         &quot;</span>
-    }
+         &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">open_suse_15_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>open_suse_15_1_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	n/a\n\
         Distributor ID:	openSUSE\n\
         Description:	openSUSE Leap 15.1\n\
         Release:	15.1\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">oracle_server_linux_7_5_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>oracle_server_linux_7_5_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
         Distributor ID:	OracleServer\n\
         Description:	Oracle Linux Server release 7.5\n\
         Release:	7.5\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">oracle_server_linux_8_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>oracle_server_linux_8_1_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	:core-4.1-amd64:core-4.1-noarch\n\
         Distributor ID:	OracleServer\n\
         Description:	Oracle Linux Server release 8.1\n\
         Release:	8.1\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">pop_os_20_04_lts_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>pop_os_20_04_lts_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;No LSB modules are available.\n\
         Distributor ID: Pop\n\
         Description: Pop!_OS 20.04 LTS\n\
         Release: 20.04\n\
         Codename: focal\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">solus_4_1_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>solus_4_1_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	1.4\n\
         Distributor ID:	Solus\n\
         Description:	Solus\n\
         Release:	4.1\n\
         Codename:	fortitude\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">manjaro_19_0_2_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>manjaro_19_0_2_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:    n/a\n\
         Distributor ID: ManjaroLinux\n\
         Description:    Manjaro Linux\n\
         Release:        19.0.2\n\
         Codename:       n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">mariner_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>mariner_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:    n/a\n\
         Distributor ID: Mariner\n\
         Description:    CBL-Mariner 2.0.20220210\n\
         Release:        2.0.20220210\n\
         Codename:       Mariner\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">endeavouros_file</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+    <span class="kw">fn </span>endeavouros_file() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
         <span class="string">&quot;LSB Version:	1.4\n\
         Distributor ID:	EndeavourOS\n\
         Description:	EndeavourOS Linux\n\
         Release:	rolling\n\
         Codename:	n/a\n\
-        &quot;</span>
-    }
+        &quot;
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

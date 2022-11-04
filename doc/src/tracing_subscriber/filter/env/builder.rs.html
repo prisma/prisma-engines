@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/env/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -324,329 +324,329 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">directive</span>::{<span class="self">self</span>, <span class="ident">Directive</span>},
-    <span class="ident">EnvFilter</span>, <span class="ident">FromEnvError</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    directive::{<span class="self">self</span>, Directive},
+    EnvFilter, FromEnvError,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::RwLock</span>;
-<span class="kw">use</span> <span class="ident">std::env</span>;
-<span class="kw">use</span> <span class="ident">thread_local::ThreadLocal</span>;
-<span class="kw">use</span> <span class="ident">tracing::level_filters::STATIC_MAX_LEVEL</span>;
+<span class="kw">use </span><span class="kw">crate</span>::sync::RwLock;
+<span class="kw">use </span>std::env;
+<span class="kw">use </span>thread_local::ThreadLocal;
+<span class="kw">use </span>tracing::level_filters::STATIC_MAX_LEVEL;
 
-<span class="doccomment">/// A [builder] for constructing new [`EnvFilter`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [builder]: https://rust-unofficial.github.io/patterns/patterns/creational/builder.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="ident">regex</span>: <span class="ident">bool</span>,
-    <span class="ident">env</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">default_directive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A [builder] for constructing new [`EnvFilter`]s.
+///
+/// [builder]: https://rust-unofficial.github.io/patterns/patterns/creational/builder.html
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Builder {
+    regex: bool,
+    env: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    default_directive: <span class="prelude-ty">Option</span>&lt;Directive&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// Sets whether span field values can be matched with regular expressions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this is `true`, field filter directives will be interpreted as</span>
-    <span class="doccomment">/// regular expressions if they are not able to be interpreted as a `bool`,</span>
-    <span class="doccomment">/// `i64`, `u64`, or `f64` literal. If this is `false,` those field values</span>
-    <span class="doccomment">/// will be interpreted as literal [`std::fmt::Debug`] output instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, regular expressions are enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: when [`EnvFilter`]s are constructed from untrusted inputs,</span>
-    <span class="doccomment">/// disabling regular expressions is strongly encouraged.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_regex</span>(<span class="self">self</span>, <span class="ident">regex</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">regex</span>, ..<span class="self">self</span> }
+<span class="kw">impl </span>Builder {
+    <span class="doccomment">/// Sets whether span field values can be matched with regular expressions.
+    ///
+    /// If this is `true`, field filter directives will be interpreted as
+    /// regular expressions if they are not able to be interpreted as a `bool`,
+    /// `i64`, `u64`, or `f64` literal. If this is `false,` those field values
+    /// will be interpreted as literal [`std::fmt::Debug`] output instead.
+    ///
+    /// By default, regular expressions are enabled.
+    ///
+    /// **Note**: when [`EnvFilter`]s are constructed from untrusted inputs,
+    /// disabling regular expressions is strongly encouraged.
+    </span><span class="kw">pub fn </span>with_regex(<span class="self">self</span>, regex: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ regex, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Sets a default [filtering directive] that will be added to the filter if</span>
-    <span class="doccomment">/// the parsed string or environment variable contains no filter directives.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, there is no default directive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If [`parse`], [`parse_lossy`], [`from_env`], or [`from_env_lossy`] are</span>
-    <span class="doccomment">/// called with an empty string or environment variable, the default</span>
-    <span class="doccomment">/// directive is used instead:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::INFO.into())</span>
-    <span class="doccomment">///     .parse(&quot;&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, filter), &quot;info&quot;);</span>
-    <span class="doccomment">/// # Ok(()) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the `lossy` variants ([`parse_lossy`] and [`from_env_lossy`])</span>
-    <span class="doccomment">/// will ignore any invalid directives. If all directives in a filter</span>
-    <span class="doccomment">/// string or environment variable are invalid, those methods will also use</span>
-    <span class="doccomment">/// the default directive:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::INFO.into())</span>
-    <span class="doccomment">///     .parse_lossy(&quot;some_target=fake level,foo::bar=lolwut&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, filter), &quot;info&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the string or environment variable contains valid filtering</span>
-    <span class="doccomment">/// directives, the default directive is not used:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(LevelFilter::INFO.into())</span>
-    <span class="doccomment">///     .parse_lossy(&quot;foo=trace&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The default directive is *not* used:</span>
-    <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, filter), &quot;foo=trace&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parsing a more complex default directive from a string:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// use tracing_subscriber::filter::{EnvFilter, LevelFilter};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let default = &quot;myapp=debug&quot;.parse()</span>
-    <span class="doccomment">///     .expect(&quot;hard-coded default directive should be valid&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let filter = EnvFilter::builder()</span>
-    <span class="doccomment">///     .with_default_directive(default)</span>
-    <span class="doccomment">///     .parse(&quot;&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(format!(&quot;{}&quot;, filter), &quot;myapp=debug&quot;);</span>
-    <span class="doccomment">/// # Ok(()) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`parse_lossy`]: Self::parse_lossy</span>
-    <span class="doccomment">/// [`from_env_lossy`]: Self::from_env_lossy</span>
-    <span class="doccomment">/// [`parse`]: Self::parse</span>
-    <span class="doccomment">/// [`from_env`]: Self::from_env</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_default_directive</span>(<span class="self">self</span>, <span class="ident">default_directive</span>: <span class="ident">Directive</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">default_directive</span>: <span class="prelude-val">Some</span>(<span class="ident">default_directive</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets a default [filtering directive] that will be added to the filter if
+    /// the parsed string or environment variable contains no filter directives.
+    ///
+    /// By default, there is no default directive.
+    ///
+    /// # Examples
+    ///
+    /// If [`parse`], [`parse_lossy`], [`from_env`], or [`from_env_lossy`] are
+    /// called with an empty string or environment variable, the default
+    /// directive is used instead:
+    ///
+    /// ```rust
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// let filter = EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::INFO.into())
+    ///     .parse(&quot;&quot;)?;
+    ///
+    /// assert_eq!(format!(&quot;{}&quot;, filter), &quot;info&quot;);
+    /// # Ok(()) }
+    /// ```
+    ///
+    /// Note that the `lossy` variants ([`parse_lossy`] and [`from_env_lossy`])
+    /// will ignore any invalid directives. If all directives in a filter
+    /// string or environment variable are invalid, those methods will also use
+    /// the default directive:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// let filter = EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::INFO.into())
+    ///     .parse_lossy(&quot;some_target=fake level,foo::bar=lolwut&quot;);
+    ///
+    /// assert_eq!(format!(&quot;{}&quot;, filter), &quot;info&quot;);
+    /// ```
+    ///
+    ///
+    /// If the string or environment variable contains valid filtering
+    /// directives, the default directive is not used:
+    ///
+    /// ```rust
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// let filter = EnvFilter::builder()
+    ///     .with_default_directive(LevelFilter::INFO.into())
+    ///     .parse_lossy(&quot;foo=trace&quot;);
+    ///
+    /// // The default directive is *not* used:
+    /// assert_eq!(format!(&quot;{}&quot;, filter), &quot;foo=trace&quot;);
+    /// ```
+    ///
+    /// Parsing a more complex default directive from a string:
+    ///
+    /// ```rust
+    /// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// use tracing_subscriber::filter::{EnvFilter, LevelFilter};
+    ///
+    /// let default = &quot;myapp=debug&quot;.parse()
+    ///     .expect(&quot;hard-coded default directive should be valid&quot;);
+    ///
+    /// let filter = EnvFilter::builder()
+    ///     .with_default_directive(default)
+    ///     .parse(&quot;&quot;)?;
+    ///
+    /// assert_eq!(format!(&quot;{}&quot;, filter), &quot;myapp=debug&quot;);
+    /// # Ok(()) }
+    /// ```
+    ///
+    /// [`parse_lossy`]: Self::parse_lossy
+    /// [`from_env_lossy`]: Self::from_env_lossy
+    /// [`parse`]: Self::parse
+    /// [`from_env`]: Self::from_env
+    </span><span class="kw">pub fn </span>with_default_directive(<span class="self">self</span>, default_directive: Directive) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            default_directive: <span class="prelude-val">Some</span>(default_directive),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the name of the environment variable used by the [`from_env`],</span>
-    <span class="doccomment">/// [`from_env_lossy`], and [`try_from_env`] methods.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, this is the value of [`EnvFilter::DEFAULT_ENV`]</span>
-    <span class="doccomment">/// (`RUST_LOG`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`from_env`]: Self::from_env</span>
-    <span class="doccomment">/// [`from_env_lossy`]: Self::from_env_lossy</span>
-    <span class="doccomment">/// [`try_from_env`]: Self::try_from_env</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_env_var</span>(<span class="self">self</span>, <span class="ident">var</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">env</span>: <span class="prelude-val">Some</span>(<span class="ident">var</span>.<span class="ident">to_string</span>()),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the name of the environment variable used by the [`from_env`],
+    /// [`from_env_lossy`], and [`try_from_env`] methods.
+    ///
+    /// By default, this is the value of [`EnvFilter::DEFAULT_ENV`]
+    /// (`RUST_LOG`).
+    ///
+    /// [`from_env`]: Self::from_env
+    /// [`from_env_lossy`]: Self::from_env_lossy
+    /// [`try_from_env`]: Self::try_from_env
+    </span><span class="kw">pub fn </span>with_env_var(<span class="self">self</span>, var: <span class="kw">impl </span>ToString) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            env: <span class="prelude-val">Some</span>(var.to_string()),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the given string,</span>
-    <span class="doccomment">/// *ignoring* any that are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_lossy</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dirs</span>: <span class="ident">S</span>) -&gt; <span class="ident">EnvFilter</span> {
-        <span class="kw">let</span> <span class="ident">directives</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">Directive::parse</span>(<span class="ident">s</span>, <span class="self">self</span>.<span class="ident">regex</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="macro">eprintln!</span>(<span class="string">&quot;ignoring `{}`: {}&quot;</span>, <span class="ident">s</span>, <span class="ident">err</span>);
-                    <span class="prelude-val">None</span>
-                }
+    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the given string,
+    /// *ignoring* any that are invalid.
+    </span><span class="kw">pub fn </span>parse_lossy&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, dirs: S) -&gt; EnvFilter {
+        <span class="kw">let </span>directives = dirs
+            .as_ref()
+            .split(<span class="string">&#39;,&#39;</span>)
+            .filter(|s| !s.is_empty())
+            .filter_map(|s| <span class="kw">match </span>Directive::parse(s, <span class="self">self</span>.regex) {
+                <span class="prelude-val">Ok</span>(d) =&gt; <span class="prelude-val">Some</span>(d),
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="macro">eprintln!</span>(<span class="string">&quot;ignoring `{}`: {}&quot;</span>, s, err);
+                    <span class="prelude-val">None
+                </span>}
             });
-        <span class="self">self</span>.<span class="ident">from_directives</span>(<span class="ident">directives</span>)
+        <span class="self">self</span>.from_directives(directives)
     }
 
-    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the given string,</span>
-    <span class="doccomment">/// or an error if any are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dirs</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnvFilter</span>, <span class="ident">directive::ParseError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">dirs</span> <span class="op">=</span> <span class="ident">dirs</span>.<span class="ident">as_ref</span>();
-        <span class="kw">if</span> <span class="ident">dirs</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">from_directives</span>(<span class="ident">std::iter::empty</span>()));
+    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the given string,
+    /// or an error if any are invalid.
+    </span><span class="kw">pub fn </span>parse&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, dirs: S) -&gt; <span class="prelude-ty">Result</span>&lt;EnvFilter, directive::ParseError&gt; {
+        <span class="kw">let </span>dirs = dirs.as_ref();
+        <span class="kw">if </span>dirs.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.from_directives(std::iter::empty()));
         }
-        <span class="kw">let</span> <span class="ident">directives</span> <span class="op">=</span> <span class="ident">dirs</span>
-            .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Directive::parse</span>(<span class="ident">s</span>, <span class="self">self</span>.<span class="ident">regex</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">from_directives</span>(<span class="ident">directives</span>))
+        <span class="kw">let </span>directives = dirs
+            .split(<span class="string">&#39;,&#39;</span>)
+            .filter(|s| !s.is_empty())
+            .map(|s| Directive::parse(s, <span class="self">self</span>.regex))
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.from_directives(directives))
     }
 
-    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the configured</span>
-    <span class="doccomment">/// environment variable, ignoring any directives that are invalid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EnvFilter</span> {
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="self">self</span>.<span class="ident">env_var_name</span>()).<span class="ident">unwrap_or_default</span>();
-        <span class="self">self</span>.<span class="ident">parse_lossy</span>(<span class="ident">var</span>)
+    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the configured
+    /// environment variable, ignoring any directives that are invalid.
+    </span><span class="kw">pub fn </span>from_env_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EnvFilter {
+        <span class="kw">let </span>var = env::var(<span class="self">self</span>.env_var_name()).unwrap_or_default();
+        <span class="self">self</span>.parse_lossy(var)
     }
 
-    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the in the configured</span>
-    <span class="doccomment">/// environment variable, or an error if the environment variable is not set</span>
-    <span class="doccomment">/// or contains invalid directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnvFilter</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="self">self</span>.<span class="ident">env_var_name</span>()).<span class="ident">unwrap_or_default</span>();
-        <span class="self">self</span>.<span class="ident">parse</span>(<span class="ident">var</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the in the configured
+    /// environment variable, or an error if the environment variable is not set
+    /// or contains invalid directives.
+    </span><span class="kw">pub fn </span>from_env(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;EnvFilter, FromEnvError&gt; {
+        <span class="kw">let </span>var = env::var(<span class="self">self</span>.env_var_name()).unwrap_or_default();
+        <span class="self">self</span>.parse(var).map_err(Into::into)
     }
 
-    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the in the configured</span>
-    <span class="doccomment">/// environment variable, or an error if the environment variable is not set</span>
-    <span class="doccomment">/// or contains invalid directives.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_env</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EnvFilter</span>, <span class="ident">FromEnvError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="self">self</span>.<span class="ident">env_var_name</span>())<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parse</span>(<span class="ident">var</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="doccomment">/// Returns a new [`EnvFilter`] from the directives in the in the configured
+    /// environment variable, or an error if the environment variable is not set
+    /// or contains invalid directives.
+    </span><span class="kw">pub fn </span>try_from_env(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;EnvFilter, FromEnvError&gt; {
+        <span class="kw">let </span>var = env::var(<span class="self">self</span>.env_var_name())<span class="question-mark">?</span>;
+        <span class="self">self</span>.parse(var).map_err(Into::into)
     }
 
-    <span class="comment">// TODO(eliza): consider making this a public API?</span>
-    <span class="comment">// Clippy doesn&#39;t love this naming, because it suggests that `from_` methods</span>
-    <span class="comment">// should not take a `Self`...but in this case, it&#39;s the `EnvFilter` that is</span>
-    <span class="comment">// being constructed &quot;from&quot; the directives, rather than the builder itself.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_directives</span>(
+    <span class="comment">// TODO(eliza): consider making this a public API?
+    // Clippy doesn&#39;t love this naming, because it suggests that `from_` methods
+    // should not take a `Self`...but in this case, it&#39;s the `EnvFilter` that is
+    // being constructed &quot;from&quot; the directives, rather than the builder itself.
+    </span><span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_directives(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">directives</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Directive</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">EnvFilter</span> {
-        <span class="kw">use</span> <span class="ident">tracing::Level</span>;
+        directives: <span class="kw">impl </span>IntoIterator&lt;Item = Directive&gt;,
+    ) -&gt; EnvFilter {
+        <span class="kw">use </span>tracing::Level;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">directives</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">disabled</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">directive</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">directives</span> {
-            <span class="kw">if</span> <span class="ident">directive</span>.<span class="ident">level</span> <span class="op">&gt;</span> <span class="ident">STATIC_MAX_LEVEL</span> {
-                <span class="ident">disabled</span>.<span class="ident">push</span>(<span class="ident">directive</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>directives: Vec&lt;<span class="kw">_</span>&gt; = directives.into_iter().collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>disabled = Vec::new();
+        <span class="kw">for </span>directive <span class="kw">in </span><span class="kw-2">&amp;mut </span>directives {
+            <span class="kw">if </span>directive.level &gt; STATIC_MAX_LEVEL {
+                disabled.push(directive.clone());
             }
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">regex</span> {
-                <span class="ident">directive</span>.<span class="ident">deregexify</span>();
+            <span class="kw">if </span>!<span class="self">self</span>.regex {
+                directive.deregexify();
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">disabled</span>.<span class="ident">is_empty</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>)]</span>
-            <span class="kw">use</span> <span class="ident">ansi_term</span>::{<span class="ident">Color</span>, <span class="ident">Style</span>};
-            <span class="comment">// NOTE: We can&#39;t use a configured `MakeWriter` because the EnvFilter</span>
-            <span class="comment">// has no knowledge of any underlying subscriber or collector, which</span>
-            <span class="comment">// may or may not use a `MakeWriter`.</span>
-            <span class="kw">let</span> <span class="ident">warn</span> <span class="op">=</span> <span class="op">|</span><span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>))]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;warning: {}&quot;</span>, <span class="ident">msg</span>);
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>)]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="ident">bold</span> <span class="op">=</span> <span class="ident">Style::new</span>().<span class="ident">bold</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">warning</span> <span class="op">=</span> <span class="ident">Color::Yellow</span>.<span class="ident">paint</span>(<span class="string">&quot;warning&quot;</span>);
-                    <span class="ident">warning</span>.<span class="ident">style_ref_mut</span>().<span class="ident">is_bold</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, <span class="ident">warning</span>, <span class="ident">bold</span>.<span class="ident">paint</span>(<span class="string">&quot;:&quot;</span>), <span class="ident">bold</span>.<span class="ident">paint</span>(<span class="ident">msg</span>))
+        <span class="kw">if </span>!disabled.is_empty() {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;ansi_term&quot;</span>)]
+            </span><span class="kw">use </span>ansi_term::{Color, Style};
+            <span class="comment">// NOTE: We can&#39;t use a configured `MakeWriter` because the EnvFilter
+            // has no knowledge of any underlying subscriber or collector, which
+            // may or may not use a `MakeWriter`.
+            </span><span class="kw">let </span>warn = |msg: <span class="kw-2">&amp;</span>str| {
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;ansi_term&quot;</span>))]
+                </span><span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;warning: {}&quot;</span>, msg);
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ansi_term&quot;</span>)]
+                </span><span class="kw">let </span>msg = {
+                    <span class="kw">let </span>bold = Style::new().bold();
+                    <span class="kw">let </span><span class="kw-2">mut </span>warning = Color::Yellow.paint(<span class="string">&quot;warning&quot;</span>);
+                    warning.style_ref_mut().is_bold = <span class="bool-val">true</span>;
+                    <span class="macro">format!</span>(<span class="string">&quot;{}{} {}&quot;</span>, warning, bold.paint(<span class="string">&quot;:&quot;</span>), bold.paint(msg))
                 };
-                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
+                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, msg);
             };
-            <span class="kw">let</span> <span class="ident">ctx_prefixed</span> <span class="op">=</span> <span class="op">|</span><span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>))]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">prefix</span>, <span class="ident">msg</span>);
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>)]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">equal</span> <span class="op">=</span> <span class="ident">Color::Fixed</span>(<span class="number">21</span>).<span class="ident">paint</span>(<span class="string">&quot;=&quot;</span>); <span class="comment">// dark blue</span>
-                    <span class="ident">equal</span>.<span class="ident">style_ref_mut</span>().<span class="ident">is_bold</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="macro">format!</span>(<span class="string">&quot; {} {} {}&quot;</span>, <span class="ident">equal</span>, <span class="ident">Style::new</span>().<span class="ident">bold</span>().<span class="ident">paint</span>(<span class="ident">prefix</span>), <span class="ident">msg</span>)
+            <span class="kw">let </span>ctx_prefixed = |prefix: <span class="kw-2">&amp;</span>str, msg: <span class="kw-2">&amp;</span>str| {
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;ansi_term&quot;</span>))]
+                </span><span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, prefix, msg);
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ansi_term&quot;</span>)]
+                </span><span class="kw">let </span>msg = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>equal = Color::Fixed(<span class="number">21</span>).paint(<span class="string">&quot;=&quot;</span>); <span class="comment">// dark blue
+                    </span>equal.style_ref_mut().is_bold = <span class="bool-val">true</span>;
+                    <span class="macro">format!</span>(<span class="string">&quot; {} {} {}&quot;</span>, equal, Style::new().bold().paint(prefix), msg)
                 };
-                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
+                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, msg);
             };
-            <span class="kw">let</span> <span class="ident">ctx_help</span> <span class="op">=</span> <span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="ident">ctx_prefixed</span>(<span class="string">&quot;help:&quot;</span>, <span class="ident">msg</span>);
-            <span class="kw">let</span> <span class="ident">ctx_note</span> <span class="op">=</span> <span class="op">|</span><span class="ident">msg</span><span class="op">|</span> <span class="ident">ctx_prefixed</span>(<span class="string">&quot;note:&quot;</span>, <span class="ident">msg</span>);
-            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="op">|</span><span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>))]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;note: {}&quot;</span>, <span class="ident">msg</span>);
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi_term&quot;</span>)]</span>
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">Color::Fixed</span>(<span class="number">21</span>).<span class="ident">paint</span>(<span class="string">&quot;|&quot;</span>);
-                    <span class="ident">pipe</span>.<span class="ident">style_ref_mut</span>().<span class="ident">is_bold</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="macro">format!</span>(<span class="string">&quot; {} {}&quot;</span>, <span class="ident">pipe</span>, <span class="ident">msg</span>)
+            <span class="kw">let </span>ctx_help = |msg| ctx_prefixed(<span class="string">&quot;help:&quot;</span>, msg);
+            <span class="kw">let </span>ctx_note = |msg| ctx_prefixed(<span class="string">&quot;note:&quot;</span>, msg);
+            <span class="kw">let </span>ctx = |msg: <span class="kw-2">&amp;</span>str| {
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;ansi_term&quot;</span>))]
+                </span><span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;note: {}&quot;</span>, msg);
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ansi_term&quot;</span>)]
+                </span><span class="kw">let </span>msg = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>pipe = Color::Fixed(<span class="number">21</span>).paint(<span class="string">&quot;|&quot;</span>);
+                    pipe.style_ref_mut().is_bold = <span class="bool-val">true</span>;
+                    <span class="macro">format!</span>(<span class="string">&quot; {} {}&quot;</span>, pipe, msg)
                 };
-                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
+                <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, msg);
             };
-            <span class="ident">warn</span>(<span class="string">&quot;some trace filter directives would enable traces that are disabled statically&quot;</span>);
-            <span class="kw">for</span> <span class="ident">directive</span> <span class="kw">in</span> <span class="ident">disabled</span> {
-                <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">target</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">directive</span>.<span class="ident">target</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;the `{}` target&quot;</span>, <span class="ident">target</span>)
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;all targets&quot;</span>.<span class="ident">into</span>()
+            warn(<span class="string">&quot;some trace filter directives would enable traces that are disabled statically&quot;</span>);
+            <span class="kw">for </span>directive <span class="kw">in </span>disabled {
+                <span class="kw">let </span>target = <span class="kw">if let </span><span class="prelude-val">Some</span>(target) = <span class="kw-2">&amp;</span>directive.target {
+                    <span class="macro">format!</span>(<span class="string">&quot;the `{}` target&quot;</span>, target)
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;all targets&quot;</span>.into()
                 };
-                <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">directive</span>
-                    .<span class="ident">level</span>
-                    .<span class="ident">into_level</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;=off would not have enabled any filters&quot;</span>);
-                <span class="ident">ctx</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="kw">let </span>level = directive
+                    .level
+                    .into_level()
+                    .expect(<span class="string">&quot;=off would not have enabled any filters&quot;</span>);
+                ctx(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;`{}` would enable the {} level for {}&quot;</span>,
-                    <span class="ident">directive</span>, <span class="ident">level</span>, <span class="ident">target</span>
+                    directive, level, target
                 ));
             }
-            <span class="ident">ctx_note</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;the static max level is `{}`&quot;</span>, <span class="ident">STATIC_MAX_LEVEL</span>));
-            <span class="kw">let</span> <span class="ident">help_msg</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">feature</span>, <span class="ident">filter</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">STATIC_MAX_LEVEL</span>.<span class="ident">into_level</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::TRACE</span>) =&gt; <span class="macro">unreachable!</span>(
-                        <span class="string">&quot;if the max level is trace, no static filtering features are enabled&quot;</span>
-                    ),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::DEBUG</span>) =&gt; (<span class="string">&quot;max_level_debug&quot;</span>, <span class="ident">Level::TRACE</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::INFO</span>) =&gt; (<span class="string">&quot;max_level_info&quot;</span>, <span class="ident">Level::DEBUG</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::WARN</span>) =&gt; (<span class="string">&quot;max_level_warn&quot;</span>, <span class="ident">Level::INFO</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">Level::ERROR</span>) =&gt; (<span class="string">&quot;max_level_error&quot;</span>, <span class="ident">Level::WARN</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> (<span class="string">&quot;max_level_off&quot;</span>, <span class="ident">String::new</span>()),
+            ctx_note(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;the static max level is `{}`&quot;</span>, STATIC_MAX_LEVEL));
+            <span class="kw">let </span>help_msg = || {
+                <span class="kw">let </span>(feature, filter) = <span class="kw">match </span>STATIC_MAX_LEVEL.into_level() {
+                    <span class="prelude-val">Some</span>(Level::TRACE) =&gt; <span class="macro">unreachable!</span>(
+                        <span class="string">&quot;if the max level is trace, no static filtering features are enabled&quot;
+                    </span>),
+                    <span class="prelude-val">Some</span>(Level::DEBUG) =&gt; (<span class="string">&quot;max_level_debug&quot;</span>, Level::TRACE),
+                    <span class="prelude-val">Some</span>(Level::INFO) =&gt; (<span class="string">&quot;max_level_info&quot;</span>, Level::DEBUG),
+                    <span class="prelude-val">Some</span>(Level::WARN) =&gt; (<span class="string">&quot;max_level_warn&quot;</span>, Level::INFO),
+                    <span class="prelude-val">Some</span>(Level::ERROR) =&gt; (<span class="string">&quot;max_level_error&quot;</span>, Level::WARN),
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>(<span class="string">&quot;max_level_off&quot;</span>, String::new()),
                 };
-                (<span class="ident">feature</span>, <span class="macro">format!</span>(<span class="string">&quot;{} &quot;</span>, <span class="ident">filter</span>))
+                (feature, <span class="macro">format!</span>(<span class="string">&quot;{} &quot;</span>, filter))
             };
-            <span class="kw">let</span> (<span class="ident">feature</span>, <span class="ident">earlier_level</span>) <span class="op">=</span> <span class="ident">help_msg</span>();
-            <span class="ident">ctx_help</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            <span class="kw">let </span>(feature, earlier_level) = help_msg();
+            ctx_help(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;to enable {}logging, remove the `{}` feature&quot;</span>,
-                <span class="ident">earlier_level</span>, <span class="ident">feature</span>
+                earlier_level, feature
             ));
         }
 
-        <span class="kw">let</span> (<span class="ident">dynamics</span>, <span class="ident">statics</span>) <span class="op">=</span> <span class="ident">Directive::make_tables</span>(<span class="ident">directives</span>);
-        <span class="kw">let</span> <span class="ident">has_dynamics</span> <span class="op">=</span> <span class="op">!</span><span class="ident">dynamics</span>.<span class="ident">is_empty</span>();
+        <span class="kw">let </span>(dynamics, statics) = Directive::make_tables(directives);
+        <span class="kw">let </span>has_dynamics = !dynamics.is_empty();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">EnvFilter</span> {
-            <span class="ident">statics</span>,
-            <span class="ident">dynamics</span>,
-            <span class="ident">has_dynamics</span>,
-            <span class="ident">by_id</span>: <span class="ident">RwLock::new</span>(<span class="ident">Default::default</span>()),
-            <span class="ident">by_cs</span>: <span class="ident">RwLock::new</span>(<span class="ident">Default::default</span>()),
-            <span class="ident">scope</span>: <span class="ident">ThreadLocal::new</span>(),
-            <span class="ident">regex</span>: <span class="self">self</span>.<span class="ident">regex</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>filter = EnvFilter {
+            statics,
+            dynamics,
+            has_dynamics,
+            by_id: RwLock::new(Default::default()),
+            by_cs: RwLock::new(Default::default()),
+            scope: ThreadLocal::new(),
+            regex: <span class="self">self</span>.regex,
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">has_dynamics</span> <span class="op">&amp;&amp;</span> <span class="ident">filter</span>.<span class="ident">statics</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">default</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">default_directive</span> {
-                <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">add_directive</span>(<span class="ident">default</span>.<span class="ident">clone</span>());
+        <span class="kw">if </span>!has_dynamics &amp;&amp; filter.statics.is_empty() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>default) = <span class="self">self</span>.default_directive {
+                filter = filter.add_directive(default.clone());
             }
         }
 
-        <span class="ident">filter</span>
+        filter
     }
 
-    <span class="kw">fn</span> <span class="ident">env_var_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">env</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="ident">EnvFilter::DEFAULT_ENV</span>)
+    <span class="kw">fn </span>env_var_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.env.as_deref().unwrap_or(EnvFilter::DEFAULT_ENV)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">regex</span>: <span class="bool-val">true</span>,
-            <span class="ident">env</span>: <span class="prelude-val">None</span>,
-            <span class="ident">default_directive</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Builder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            regex: <span class="bool-val">true</span>,
+            env: <span class="prelude-val">None</span>,
+            default_directive: <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

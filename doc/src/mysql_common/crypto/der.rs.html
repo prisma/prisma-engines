@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/crypto/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/crypto/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -145,140 +145,140 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">base64</span>::{<span class="ident">decode_config</span>, <span class="ident">CharacterSet</span>, <span class="ident">Config</span>};
-<span class="kw">use</span> <span class="ident">num_bigint::BigUint</span>;
-<span class="kw">use</span> <span class="ident">regex::bytes::Regex</span>;
-<span class="kw">use</span> <span class="ident">std::mem::size_of</span>;
+</span><span class="kw">use </span>base64::{decode_config, CharacterSet, Config};
+<span class="kw">use </span>num_bigint::BigUint;
+<span class="kw">use </span>regex::bytes::Regex;
+<span class="kw">use </span>std::mem::size_of;
 
-<span class="doccomment">/// Type of a der-encoded public key.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PubKeyFileType</span> {
-    <span class="ident">Pkcs1</span>,
-    <span class="ident">Pkcs8</span>,
+<span class="doccomment">/// Type of a der-encoded public key.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>PubKeyFileType {
+    Pkcs1,
+    Pkcs8,
 }
 
-<span class="doccomment">/// Converts pem encoded RSA public key to der.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pem_to_der</span>(<span class="ident">pem</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">PubKeyFileType</span>) {
-    <span class="kw">let</span> <span class="ident">pkcs1_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
+<span class="doccomment">/// Converts pem encoded RSA public key to der.
+</span><span class="kw">pub fn </span>pem_to_der(pem: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; (Vec&lt;u8&gt;, PubKeyFileType) {
+    <span class="kw">let </span>pkcs1_re = Regex::new(
         <span class="string">&quot;-----BEGIN RSA PUBLIC KEY-----\
          ([^-]*)\
          -----END RSA PUBLIC KEY-----&quot;</span>,
     )
-    .<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">pkcs8_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
+    .unwrap();
+    <span class="kw">let </span>pkcs8_re = Regex::new(
         <span class="string">&quot;-----BEGIN PUBLIC KEY-----\
          ([^-]*)\
          -----END PUBLIC KEY-----&quot;</span>,
     )
-    .<span class="ident">unwrap</span>();
+    .unwrap();
 
-    <span class="kw">let</span> (<span class="ident">captures</span>, <span class="ident">key_file_type</span>) <span class="op">=</span> <span class="ident">pkcs1_re</span>
-        .<span class="ident">captures</span>(<span class="ident">pem</span>.<span class="ident">as_ref</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">captures</span><span class="op">|</span> (<span class="ident">captures</span>, <span class="ident">PubKeyFileType::Pkcs1</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">pkcs8_re</span>
-                .<span class="ident">captures</span>(<span class="ident">pem</span>.<span class="ident">as_ref</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">captures</span><span class="op">|</span> (<span class="ident">captures</span>, <span class="ident">PubKeyFileType::Pkcs8</span>))
-                .<span class="ident">expect</span>(<span class="string">&quot;valid PEM is mandatory here&quot;</span>)
+    <span class="kw">let </span>(captures, key_file_type) = pkcs1_re
+        .captures(pem.as_ref())
+        .map(|captures| (captures, PubKeyFileType::Pkcs1))
+        .unwrap_or_else(|| {
+            pkcs8_re
+                .captures(pem.as_ref())
+                .map(|captures| (captures, PubKeyFileType::Pkcs8))
+                .expect(<span class="string">&quot;valid PEM is mandatory here&quot;</span>)
         });
-    <span class="kw">let</span> <span class="ident">pem_body</span> <span class="op">=</span> <span class="ident">captures</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_bytes</span>();
-    <span class="kw">let</span> <span class="ident">pem_body</span> <span class="op">=</span> <span class="ident">pem_body</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">!</span><span class="string">b&quot; \n\t\r\x0b\x0c&quot;</span>.<span class="ident">contains</span>(<span class="ident">x</span>))
-        .<span class="ident">cloned</span>()
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>pem_body = captures.get(<span class="number">1</span>).unwrap().as_bytes();
+    <span class="kw">let </span>pem_body = pem_body
+        .iter()
+        .filter(|x| !<span class="string">b&quot; \n\t\r\x0b\x0c&quot;</span>.contains(x))
+        .cloned()
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">let</span> <span class="ident">base64_config</span> <span class="op">=</span> <span class="ident">Config::new</span>(<span class="ident">CharacterSet::Standard</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">der</span> <span class="op">=</span> <span class="ident">decode_config</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pem_body</span>, <span class="ident">base64_config</span>).<span class="ident">expect</span>(<span class="string">&quot;valid base64 is mandatory here&quot;</span>);
+    <span class="kw">let </span>base64_config = Config::new(CharacterSet::Standard, <span class="bool-val">true</span>);
+    <span class="kw">let </span>der = decode_config(<span class="kw-2">&amp;*</span>pem_body, base64_config).expect(<span class="string">&quot;valid base64 is mandatory here&quot;</span>);
 
-    (<span class="ident">der</span>, <span class="ident">key_file_type</span>)
+    (der, key_file_type)
 }
 
-<span class="kw">fn</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">x</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">x_le</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_bytes_le</span>();
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">x_le</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>().<span class="ident">take</span>(<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()) {
-        <span class="ident">y</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">i</span>);
+<span class="kw">fn </span>big_uint_to_usize(x: BigUint) -&gt; usize {
+    <span class="kw">let </span><span class="kw-2">mut </span>y = <span class="number">0</span>;
+    <span class="kw">let </span>x_le = x.to_bytes_le();
+    <span class="kw">for </span>(i, b) <span class="kw">in </span>x_le.into_iter().enumerate().take(size_of::&lt;usize&gt;()) {
+        y += (b <span class="kw">as </span>usize) &lt;&lt; (<span class="number">8 </span>* i);
     }
-    <span class="ident">y</span>
+    y
 }
 
-<span class="doccomment">/// der bytes -&gt; (len, rest of der bytes)</span>
-<span class="kw">fn</span> <span class="ident">parse_len</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="kw">if</span> <span class="ident">der</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">0x80</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="ident">der</span>[<span class="number">0</span>] <span class="op">&amp;</span> (<span class="op">!</span><span class="number">0x80</span>)) <span class="kw">as</span> <span class="ident">usize</span>;
-        (<span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..<span class="op">=</span><span class="ident">len</span>]), <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>..])
-    } <span class="kw">else</span> {
-        (<span class="ident">BigUint::from</span>(<span class="ident">der</span>[<span class="number">0</span>]), <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..])
-    }
-}
-
-<span class="doccomment">/// der bytes -&gt; (sequence bytes, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_sequence</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x30</span>, <span class="string">&quot;expecting SEQUENCE in primitive encoding&quot;</span>);
-    <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
-    <span class="kw">let</span> (<span class="ident">sequence_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
-    <span class="kw">let</span> <span class="ident">sequence_len</span> <span class="op">=</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">sequence_len</span>);
-    (<span class="kw-2">&amp;</span><span class="ident">der</span>[..<span class="ident">sequence_len</span>], <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="ident">sequence_len</span>..])
-}
-
-<span class="doccomment">/// der bytes -&gt; (unused bits, bytes of bit string, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_bit_string</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">u8</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x03</span>, <span class="string">&quot;expecting BIT STRING in primitive encoding&quot;</span>);
-    <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
-    <span class="kw">let</span> (<span class="ident">bit_string_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
-    <span class="kw">let</span> <span class="ident">bit_string_len</span> <span class="op">=</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">bit_string_len</span>);
-    <span class="kw">let</span> <span class="ident">unused_bits</span> <span class="op">=</span> <span class="ident">der</span>[<span class="number">0</span>];
-    (<span class="ident">unused_bits</span>, <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..<span class="ident">bit_string_len</span>], <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="ident">bit_string_len</span>..])
-}
-
-<span class="doccomment">/// der bytes -&gt; (uint, rest of der bytes)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_uint</span>(<span class="kw-2">mut</span> <span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="macro">assert_eq!</span>(<span class="ident">der</span>[<span class="number">0</span>], <span class="number">0x02</span>, <span class="string">&quot;expecting INTEGER&quot;</span>);
-    <span class="ident">der</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="number">1</span>..];
-    <span class="kw">let</span> (<span class="ident">uint_len</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_len</span>(<span class="ident">der</span>);
-    <span class="kw">let</span> <span class="ident">uint_len</span> <span class="op">=</span> <span class="ident">big_uint_to_usize</span>(<span class="ident">uint_len</span>);
-    <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">der</span>[..<span class="ident">uint_len</span>]);
-    (<span class="ident">out</span>, <span class="kw-2">&amp;</span><span class="ident">der</span>[<span class="ident">uint_len</span>..])
-}
-
-<span class="doccomment">/// Extracts modulus and exponent from pkcs1 der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="kw">let</span> (<span class="ident">pub_key_fields</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">der</span>);
-    <span class="kw">let</span> (<span class="ident">modulus</span>, <span class="ident">pub_key_fields</span>) <span class="op">=</span> <span class="ident">parse_uint</span>(<span class="ident">pub_key_fields</span>);
-    <span class="kw">let</span> (<span class="ident">exponent</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_uint</span>(<span class="ident">pub_key_fields</span>);
-    (<span class="ident">modulus</span>, <span class="ident">exponent</span>)
-}
-
-<span class="doccomment">/// Extracts modulus and exponent from pkcs8 der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="kw">let</span> (<span class="ident">seq_data</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">der</span>);
-    <span class="comment">// ignore algorithm</span>
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">der</span>) <span class="op">=</span> <span class="ident">parse_sequence</span>(<span class="ident">seq_data</span>);
-    <span class="kw">let</span> (<span class="ident">unused_bits</span>, <span class="ident">pub_key</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">parse_bit_string</span>(<span class="ident">der</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">unused_bits</span>, <span class="number">0</span>, <span class="string">&quot;expecting no unused bits&quot;</span>);
-    <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">pub_key</span>)
-}
-
-<span class="doccomment">/// Extracts modulus and exponent from specified der public key representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_pub_key</span>(<span class="ident">der</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">file_type</span>: <span class="ident">PubKeyFileType</span>) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="kw">match</span> <span class="ident">file_type</span> {
-        <span class="ident">PubKeyFileType::Pkcs1</span> =&gt; <span class="ident">parse_pub_key_pkcs1</span>(<span class="ident">der</span>),
-        <span class="ident">PubKeyFileType::Pkcs8</span> =&gt; <span class="ident">parse_pub_key_pkcs8</span>(<span class="ident">der</span>),
+<span class="doccomment">/// der bytes -&gt; (len, rest of der bytes)
+</span><span class="kw">fn </span>parse_len(der: <span class="kw-2">&amp;</span>[u8]) -&gt; (BigUint, <span class="kw-2">&amp;</span>[u8]) {
+    <span class="kw">if </span>der[<span class="number">0</span>] &amp; <span class="number">0x80 </span>&gt; <span class="number">0 </span>{
+        <span class="kw">let </span>len = (der[<span class="number">0</span>] &amp; (!<span class="number">0x80</span>)) <span class="kw">as </span>usize;
+        (BigUint::from_bytes_be(<span class="kw-2">&amp;</span>der[<span class="number">1</span>..=len]), <span class="kw-2">&amp;</span>der[len + <span class="number">1</span>..])
+    } <span class="kw">else </span>{
+        (BigUint::from(der[<span class="number">0</span>]), <span class="kw-2">&amp;</span>der[<span class="number">1</span>..])
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_pem_to_der</span>() {
-    <span class="kw">const</span> <span class="ident">PEM_DATA</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">br&quot;-----BEGIN PUBLIC KEY-----
+<span class="doccomment">/// der bytes -&gt; (sequence bytes, rest of der bytes)
+</span><span class="kw">pub fn </span>parse_sequence(<span class="kw-2">mut </span>der: <span class="kw-2">&amp;</span>[u8]) -&gt; (<span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[u8]) {
+    <span class="macro">assert_eq!</span>(der[<span class="number">0</span>], <span class="number">0x30</span>, <span class="string">&quot;expecting SEQUENCE in primitive encoding&quot;</span>);
+    der = <span class="kw-2">&amp;</span>der[<span class="number">1</span>..];
+    <span class="kw">let </span>(sequence_len, der) = parse_len(der);
+    <span class="kw">let </span>sequence_len = big_uint_to_usize(sequence_len);
+    (<span class="kw-2">&amp;</span>der[..sequence_len], <span class="kw-2">&amp;</span>der[sequence_len..])
+}
+
+<span class="doccomment">/// der bytes -&gt; (unused bits, bytes of bit string, rest of der bytes)
+</span><span class="kw">pub fn </span>parse_bit_string(<span class="kw-2">mut </span>der: <span class="kw-2">&amp;</span>[u8]) -&gt; (u8, <span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[u8]) {
+    <span class="macro">assert_eq!</span>(der[<span class="number">0</span>], <span class="number">0x03</span>, <span class="string">&quot;expecting BIT STRING in primitive encoding&quot;</span>);
+    der = <span class="kw-2">&amp;</span>der[<span class="number">1</span>..];
+    <span class="kw">let </span>(bit_string_len, der) = parse_len(der);
+    <span class="kw">let </span>bit_string_len = big_uint_to_usize(bit_string_len);
+    <span class="kw">let </span>unused_bits = der[<span class="number">0</span>];
+    (unused_bits, <span class="kw-2">&amp;</span>der[<span class="number">1</span>..bit_string_len], <span class="kw-2">&amp;</span>der[bit_string_len..])
+}
+
+<span class="doccomment">/// der bytes -&gt; (uint, rest of der bytes)
+</span><span class="kw">pub fn </span>parse_uint(<span class="kw-2">mut </span>der: <span class="kw-2">&amp;</span>[u8]) -&gt; (BigUint, <span class="kw-2">&amp;</span>[u8]) {
+    <span class="macro">assert_eq!</span>(der[<span class="number">0</span>], <span class="number">0x02</span>, <span class="string">&quot;expecting INTEGER&quot;</span>);
+    der = <span class="kw-2">&amp;</span>der[<span class="number">1</span>..];
+    <span class="kw">let </span>(uint_len, der) = parse_len(der);
+    <span class="kw">let </span>uint_len = big_uint_to_usize(uint_len);
+    <span class="kw">let </span>out = BigUint::from_bytes_be(<span class="kw-2">&amp;</span>der[..uint_len]);
+    (out, <span class="kw-2">&amp;</span>der[uint_len..])
+}
+
+<span class="doccomment">/// Extracts modulus and exponent from pkcs1 der public key representation
+</span><span class="kw">pub fn </span>parse_pub_key_pkcs1(der: <span class="kw-2">&amp;</span>[u8]) -&gt; (BigUint, BigUint) {
+    <span class="kw">let </span>(pub_key_fields, <span class="kw">_</span>) = parse_sequence(der);
+    <span class="kw">let </span>(modulus, pub_key_fields) = parse_uint(pub_key_fields);
+    <span class="kw">let </span>(exponent, <span class="kw">_</span>) = parse_uint(pub_key_fields);
+    (modulus, exponent)
+}
+
+<span class="doccomment">/// Extracts modulus and exponent from pkcs8 der public key representation
+</span><span class="kw">pub fn </span>parse_pub_key_pkcs8(der: <span class="kw-2">&amp;</span>[u8]) -&gt; (BigUint, BigUint) {
+    <span class="kw">let </span>(seq_data, <span class="kw">_</span>) = parse_sequence(der);
+    <span class="comment">// ignore algorithm
+    </span><span class="kw">let </span>(<span class="kw">_</span>, der) = parse_sequence(seq_data);
+    <span class="kw">let </span>(unused_bits, pub_key, <span class="kw">_</span>) = parse_bit_string(der);
+    <span class="macro">assert_eq!</span>(unused_bits, <span class="number">0</span>, <span class="string">&quot;expecting no unused bits&quot;</span>);
+    parse_pub_key_pkcs1(pub_key)
+}
+
+<span class="doccomment">/// Extracts modulus and exponent from specified der public key representation
+</span><span class="kw">pub fn </span>parse_pub_key(der: <span class="kw-2">&amp;</span>[u8], file_type: PubKeyFileType) -&gt; (BigUint, BigUint) {
+    <span class="kw">match </span>file_type {
+        PubKeyFileType::Pkcs1 =&gt; parse_pub_key_pkcs1(der),
+        PubKeyFileType::Pkcs8 =&gt; parse_pub_key_pkcs8(der),
+    }
+}
+
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_pem_to_der() {
+    <span class="kw">const </span>PEM_DATA: <span class="kw-2">&amp;</span>[u8] = <span class="string">br&quot;-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxSKOcxiet8lLMn8ImyUE
 bGGKob5EdRz/4wdiw12ED0GfKKTKhVnodFCfm1mdy7bKOX5QxL9skrvYodpW43eR
 R5bfOzIgy1qIB8RYb6qOXRBw1oA4snBDqtUjDv/lbHLJN+IbzM4oU+e3Lt9rXyLX
@@ -288,9 +288,9 @@ C8W3Z7Xx7He2QDJsEWAqX197efw0L6j8X8Tyd8Uwb7zUB1tfMGhHfm9EwejPAtzx
 YQIDAQAB
 -----END PUBLIC KEY-----&quot;</span>;
 
-    <span class="kw">let</span> (<span class="ident">_der</span>, <span class="ident">key_type</span>) <span class="op">=</span> <span class="ident">pem_to_der</span>(<span class="ident">PEM_DATA</span>);
+    <span class="kw">let </span>(_der, key_type) = pem_to_der(PEM_DATA);
 
-    <span class="macro">assert_eq!</span>(<span class="ident">key_type</span>, <span class="ident">PubKeyFileType::Pkcs8</span>);
+    <span class="macro">assert_eq!</span>(key_type, PubKeyFileType::Pkcs8);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

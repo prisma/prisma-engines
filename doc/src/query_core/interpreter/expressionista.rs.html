@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/expressionista.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expressionista.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/expressionista.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expressionista.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -462,469 +462,469 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">expression</span>::<span class="kw-2">*</span>, <span class="ident">ComputationResult</span>, <span class="ident">DiffResult</span>, <span class="ident">Env</span>, <span class="ident">ExpressionResult</span>, <span class="ident">InterpretationResult</span>, <span class="ident">InterpreterError</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    expression::<span class="kw-2">*</span>, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_graph</span>::<span class="kw-2">*</span>, <span class="ident">Query</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::SelectionResult</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">convert::TryInto</span>};
+<span class="kw">use crate</span>::{query_graph::<span class="kw-2">*</span>, Query};
+<span class="kw">use </span>prisma_models::SelectionResult;
+<span class="kw">use </span>std::{collections::VecDeque, convert::TryInto};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Expressionista</span>;
+<span class="kw">pub struct </span>Expressionista;
 
-<span class="doccomment">/// Helper accumulator struct.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">IfNodeAcc</span> {
-    <span class="ident">then</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
-    <span class="ident">_else</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
-    <span class="ident">other</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Helper accumulator struct.
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>IfNodeAcc {
+    then: <span class="prelude-ty">Option</span>&lt;(EdgeRef, NodeRef)&gt;,
+    _else: <span class="prelude-ty">Option</span>&lt;(EdgeRef, NodeRef)&gt;,
+    other: Vec&lt;(EdgeRef, NodeRef)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Expressionista</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate</span>(<span class="kw-2">mut</span> <span class="ident">graph</span>: <span class="ident">QueryGraph</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="ident">graph</span>
-            .<span class="ident">root_nodes</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">root_node</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="kw-2">&amp;mut</span> <span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">root_node</span>, <span class="macro">vec!</span>[]))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">res</span> })
+<span class="kw">impl </span>Expressionista {
+    <span class="kw">pub fn </span>translate(<span class="kw-2">mut </span>graph: QueryGraph) -&gt; InterpretationResult&lt;Expression&gt; {
+        graph
+            .root_nodes()
+            .into_iter()
+            .map(|root_node| <span class="self">Self</span>::build_expression(<span class="kw-2">&amp;mut </span>graph, <span class="kw-2">&amp;</span>root_node, <span class="macro">vec!</span>[]))
+            .collect::&lt;InterpretationResult&lt;Vec&lt;Expression&gt;&gt;&gt;()
+            .map(|res| Expression::Sequence { seq: res })
     }
 
-    <span class="kw">fn</span> <span class="ident">build_expression</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">graph</span>
-            .<span class="ident">node_content</span>(<span class="ident">node</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Node content {} was empty&quot;</span>, <span class="ident">node</span>.<span class="ident">id</span>()))
+    <span class="kw">fn </span>build_expression(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        <span class="kw">match </span>graph
+            .node_content(node)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Node content {} was empty&quot;</span>, node.id()))
         {
-            <span class="ident">Node::Query</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::build_query_expression</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
-            <span class="ident">Node::Flow</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::build_flow_expression</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
-            <span class="ident">Node::Computation</span>(<span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::build_computation_expression</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
-            <span class="ident">Node::Empty</span> =&gt; <span class="ident"><span class="self">Self</span>::build_empty_expression</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
+            Node::Query(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::build_query_expression(graph, node, parent_edges),
+            Node::Flow(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::build_flow_expression(graph, node, parent_edges),
+            Node::Computation(<span class="kw">_</span>) =&gt; <span class="self">Self</span>::build_computation_expression(graph, node, parent_edges),
+            Node::Empty =&gt; <span class="self">Self</span>::build_empty_expression(graph, node, parent_edges),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">build_query_expression</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="ident">graph</span>.<span class="ident">mark_visited</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
+    <span class="kw">fn </span>build_query_expression(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        graph.mark_visited(<span class="kw-2">&amp;</span>node);
 
-        <span class="comment">// Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.</span>
-        <span class="kw">let</span> <span class="ident">direct_children</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">direct_child_pairs</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
+        <span class="comment">// Child edges are ordered, evaluation order is low to high in the graph, unless other rules override.
+        </span><span class="kw">let </span>direct_children = graph.direct_child_pairs(<span class="kw-2">&amp;</span>node);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child_expressions</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::process_children</span>(<span class="ident">graph</span>, <span class="ident">direct_children</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>child_expressions = <span class="self">Self</span>::process_children(graph, direct_children)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">is_result</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">is_result_node</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">node_id</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">id</span>();
-        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">pluck_node</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">into_expr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">node</span>: <span class="ident">Node</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">node</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Query</span> { <span class="ident">query</span> })
+        <span class="kw">let </span>is_result = graph.is_result_node(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>node_id = node.id();
+        <span class="kw">let </span>node = graph.pluck_node(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>into_expr = Box::new(|node: Node| {
+            <span class="kw">let </span>query: Box&lt;Query&gt; = Box::new(node.try_into()<span class="question-mark">?</span>);
+            <span class="prelude-val">Ok</span>(Expression::Query { query })
         });
 
-        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>expr = <span class="self">Self</span>::transform_node(graph, parent_edges, node, into_expr)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">child_expressions</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">expr</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">node_binding_name</span> <span class="op">=</span> <span class="ident">node_id</span>;
+        <span class="kw">if </span>child_expressions.is_empty() {
+            <span class="prelude-val">Ok</span>(expr)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>node_binding_name = node_id;
 
-            <span class="comment">// Add a final statement to the evaluation if the current node has child nodes and is supposed to be the</span>
-            <span class="comment">// final result, to make sure it propagates upwards.</span>
-            <span class="kw">if</span> <span class="ident">is_result</span> {
-                <span class="ident">child_expressions</span>.<span class="ident">push</span>(<span class="ident">Expression::Get</span> {
-                    <span class="ident">binding_name</span>: <span class="ident">node_binding_name</span>.<span class="ident">clone</span>(),
+            <span class="comment">// Add a final statement to the evaluation if the current node has child nodes and is supposed to be the
+            // final result, to make sure it propagates upwards.
+            </span><span class="kw">if </span>is_result {
+                child_expressions.push(Expression::Get {
+                    binding_name: node_binding_name.clone(),
                 });
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Let</span> {
-                <span class="ident">bindings</span>: <span class="macro">vec!</span>[<span class="ident">Binding</span> {
-                    <span class="ident">name</span>: <span class="ident">node_binding_name</span>,
-                    <span class="ident">expr</span>,
+            <span class="prelude-val">Ok</span>(Expression::Let {
+                bindings: <span class="macro">vec!</span>[Binding {
+                    name: node_binding_name,
+                    expr,
                 }],
-                <span class="ident">expressions</span>: <span class="ident">child_expressions</span>,
+                expressions: child_expressions,
             })
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">process_children</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="kw-2">mut</span> <span class="ident">child_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Find the positions of all result returning graph nodes.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result_positions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_pairs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">ix</span>, (<span class="kw">_</span>, <span class="ident">child_node</span>))<span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">graph</span>.<span class="ident">subgraph_contains_result</span>(<span class="kw-2">&amp;</span><span class="ident">child_node</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">ix</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+    <span class="kw">fn </span>process_children(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        <span class="kw-2">mut </span>child_pairs: Vec&lt;(EdgeRef, NodeRef)&gt;,
+    ) -&gt; InterpretationResult&lt;Vec&lt;Expression&gt;&gt; {
+        <span class="comment">// Find the positions of all result returning graph nodes.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result_positions: Vec&lt;usize&gt; = child_pairs
+            .iter()
+            .enumerate()
+            .filter_map(|(ix, (<span class="kw">_</span>, child_node))| {
+                <span class="kw">if </span>graph.subgraph_contains_result(<span class="kw-2">&amp;</span>child_node) {
+                    <span class="prelude-val">Some</span>(ix)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// Start removing the highest indices first to not invalidate subsequent removals.</span>
-        <span class="ident">result_positions</span>.<span class="ident">sort_unstable</span>();
-        <span class="ident">result_positions</span>.<span class="ident">reverse</span>();
+        <span class="comment">// Start removing the highest indices first to not invalidate subsequent removals.
+        </span>result_positions.sort_unstable();
+        result_positions.reverse();
 
-        <span class="kw">let</span> <span class="ident">result_subgraphs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result_positions</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">child_pairs</span>.<span class="ident">remove</span>(<span class="ident">pos</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>result_subgraphs: Vec&lt;(EdgeRef, NodeRef)&gt; = result_positions
+            .into_iter()
+            .map(|pos| child_pairs.remove(pos))
+            .collect();
 
-        <span class="comment">// Because we split from right to left, everything remaining in `child_pairs`</span>
-        <span class="comment">// doesn&#39;t belong into results, and is executed before all result scopes.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expressions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_pairs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">node</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
-                <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">edges</span>)
+        <span class="comment">// Because we split from right to left, everything remaining in `child_pairs`
+        // doesn&#39;t belong into results, and is executed before all result scopes.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>expressions: Vec&lt;Expression&gt; = child_pairs
+            .into_iter()
+            .map(|(<span class="kw">_</span>, node)| {
+                <span class="kw">let </span>edges = graph.incoming_edges(<span class="kw-2">&amp;</span>node);
+                <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>node, edges)
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;InterpretationResult&lt;Vec&lt;Expression&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="comment">// Fold result scopes into one expression.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">result_subgraphs</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">result_exp</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::fold_result_scopes</span>(<span class="ident">graph</span>, <span class="ident">result_subgraphs</span>)<span class="question-mark">?</span>;
-            <span class="ident">expressions</span>.<span class="ident">push</span>(<span class="ident">result_exp</span>);
+        <span class="comment">// Fold result scopes into one expression.
+        </span><span class="kw">if </span>!result_subgraphs.is_empty() {
+            <span class="kw">let </span>result_exp = <span class="self">Self</span>::fold_result_scopes(graph, result_subgraphs)<span class="question-mark">?</span>;
+            expressions.push(result_exp);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">expressions</span>)
+        <span class="prelude-val">Ok</span>(expressions)
     }
 
-    <span class="kw">fn</span> <span class="ident">build_empty_expression</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="ident">graph</span>.<span class="ident">mark_visited</span>(<span class="ident">node</span>);
+    <span class="kw">fn </span>build_empty_expression(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        graph.mark_visited(node);
 
-        <span class="kw">let</span> <span class="ident">child_pairs</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">direct_child_pairs</span>(<span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_pairs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">node</span>)<span class="op">|</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>child_pairs = graph.direct_child_pairs(node);
+        <span class="kw">let </span>exprs: Vec&lt;Expression&gt; = child_pairs
+            .into_iter()
+            .map(|(<span class="kw">_</span>, node)| <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>node, graph.incoming_edges(<span class="kw-2">&amp;</span>node)))
+            .collect::&lt;InterpretationResult&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">into_expr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">_node</span>: <span class="ident">Node</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Expression::Sequence</span> { <span class="ident">seq</span>: <span class="ident">exprs</span> }));
-        <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">Node::Empty</span>, <span class="ident">into_expr</span>)
+        <span class="kw">let </span>into_expr = Box::new(<span class="kw">move </span>|_node: Node| <span class="prelude-val">Ok</span>(Expression::Sequence { seq: exprs }));
+        <span class="self">Self</span>::transform_node(graph, parent_edges, Node::Empty, into_expr)
     }
 
-    <span class="kw">fn</span> <span class="ident">build_computation_expression</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="ident">graph</span>.<span class="ident">mark_visited</span>(<span class="ident">node</span>);
+    <span class="kw">fn </span>build_computation_expression(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        graph.mark_visited(node);
 
-        <span class="kw">let</span> <span class="ident">node_id</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">id</span>();
-        <span class="kw">let</span> <span class="ident">child_pairs</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">direct_child_pairs</span>(<span class="ident">node</span>);
+        <span class="kw">let </span>node_id = node.id();
+        <span class="kw">let </span>child_pairs = graph.direct_child_pairs(node);
 
-        <span class="kw">let</span> <span class="ident">exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_pairs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">node</span>)<span class="op">|</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>exprs: Vec&lt;Expression&gt; = child_pairs
+            .into_iter()
+            .map(|(<span class="kw">_</span>, node)| <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>node, graph.incoming_edges(<span class="kw-2">&amp;</span>node)))
+            .collect::&lt;InterpretationResult&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">pluck_node</span>(<span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">into_expr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">node</span>: <span class="ident">Node</span><span class="op">|</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Func</span> {
-                <span class="ident">func</span>: <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">node</span> {
-                    <span class="ident">Node::Computation</span>(<span class="ident">Computation::Diff</span>(<span class="ident">DiffNode</span> { <span class="ident">left</span>, <span class="ident">right</span> })) =&gt; {
-                        <span class="kw">let</span> <span class="ident">left_diff</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">left</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>).<span class="ident">collect</span>();
-                        <span class="kw">let</span> <span class="ident">right_diff</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">left</span>).<span class="ident">collect</span>();
+        <span class="kw">let </span>node = graph.pluck_node(node);
+        <span class="kw">let </span>into_expr = Box::new(<span class="kw">move </span>|node: Node| {
+            <span class="prelude-val">Ok</span>(Expression::Func {
+                func: Box::new(<span class="kw">move </span>|<span class="kw">_</span>| <span class="kw">match </span>node {
+                    Node::Computation(Computation::Diff(DiffNode { left, right })) =&gt; {
+                        <span class="kw">let </span>left_diff: Vec&lt;<span class="kw-2">&amp;</span>SelectionResult&gt; = left.difference(<span class="kw-2">&amp;</span>right).collect();
+                        <span class="kw">let </span>right_diff: Vec&lt;<span class="kw-2">&amp;</span>SelectionResult&gt; = right.difference(<span class="kw-2">&amp;</span>left).collect();
 
-                        <span class="prelude-val">Ok</span>(<span class="ident">Expression::Return</span> {
-                            <span class="ident">result</span>: <span class="ident">Box::new</span>(<span class="ident">ExpressionResult::Computation</span>(<span class="ident">ComputationResult::Diff</span>(<span class="ident">DiffResult</span> {
-                                <span class="ident">left</span>: <span class="ident">left_diff</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Clone::clone</span>).<span class="ident">collect</span>(),
-                                <span class="ident">right</span>: <span class="ident">right_diff</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Clone::clone</span>).<span class="ident">collect</span>(),
+                        <span class="prelude-val">Ok</span>(Expression::Return {
+                            result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
+                                left: left_diff.into_iter().map(Clone::clone).collect(),
+                                right: right_diff.into_iter().map(Clone::clone).collect(),
                             }))),
                         })
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 }),
             })
         });
 
-        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>expr = <span class="self">Self</span>::transform_node(graph, parent_edges, node, into_expr)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">exprs</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">expr</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">node_binding_name</span> <span class="op">=</span> <span class="ident">node_id</span>;
+        <span class="kw">if </span>exprs.is_empty() {
+            <span class="prelude-val">Ok</span>(expr)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>node_binding_name = node_id;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Let</span> {
-                <span class="ident">bindings</span>: <span class="macro">vec!</span>[<span class="ident">Binding</span> {
-                    <span class="ident">name</span>: <span class="ident">node_binding_name</span>,
-                    <span class="ident">expr</span>,
+            <span class="prelude-val">Ok</span>(Expression::Let {
+                bindings: <span class="macro">vec!</span>[Binding {
+                    name: node_binding_name,
+                    expr,
                 }],
-                <span class="ident">expressions</span>: <span class="ident">exprs</span>,
+                expressions: exprs,
             })
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">build_flow_expression</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="ident">graph</span>.<span class="ident">mark_visited</span>(<span class="ident">node</span>);
+    <span class="kw">fn </span>build_flow_expression(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        graph.mark_visited(node);
 
-        <span class="kw">match</span> <span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="ident">node</span>).<span class="ident">unwrap</span>() {
-            <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) =&gt; <span class="ident"><span class="self">Self</span>::translate_if_node</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
-            <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) =&gt; <span class="ident"><span class="self">Self</span>::translate_return_node</span>(<span class="ident">graph</span>, <span class="ident">node</span>, <span class="ident">parent_edges</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">match </span>graph.node_content(node).unwrap() {
+            Node::Flow(Flow::If(<span class="kw">_</span>)) =&gt; <span class="self">Self</span>::translate_if_node(graph, node, parent_edges),
+            Node::Flow(Flow::Return(<span class="kw">_</span>)) =&gt; <span class="self">Self</span>::translate_return_node(graph, node, parent_edges),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">translate_if_node</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">child_pairs</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">direct_child_pairs</span>(<span class="ident">node</span>);
+    <span class="kw">fn </span>translate_if_node(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        <span class="kw">let </span>child_pairs = graph.direct_child_pairs(node);
 
-        <span class="kw">let</span> <span class="ident">if_node_info</span> <span class="op">=</span> <span class="ident">child_pairs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">IfNodeAcc::default</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, (<span class="ident">edge</span>, <span class="ident">node</span>)<span class="op">|</span> {
-                <span class="kw">match</span> <span class="ident">graph</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Then</span>) =&gt; <span class="ident">acc</span>.<span class="ident">then</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">edge</span>, <span class="ident">node</span>)),
-                    <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::Else</span>) =&gt; <span class="ident">acc</span>.<span class="ident">_else</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">edge</span>, <span class="ident">node</span>)),
-                    <span class="kw">_</span> =&gt; <span class="ident">acc</span>.<span class="ident">other</span>.<span class="ident">push</span>((<span class="ident">edge</span>, <span class="ident">node</span>)),
+        <span class="kw">let </span>if_node_info = child_pairs
+            .into_iter()
+            .fold(IfNodeAcc::default(), |<span class="kw-2">mut </span>acc, (edge, node)| {
+                <span class="kw">match </span>graph.edge_content(<span class="kw-2">&amp;</span>edge) {
+                    <span class="prelude-val">Some</span>(QueryGraphDependency::Then) =&gt; acc.then = <span class="prelude-val">Some</span>((edge, node)),
+                    <span class="prelude-val">Some</span>(QueryGraphDependency::Else) =&gt; acc._else = <span class="prelude-val">Some</span>((edge, node)),
+                    <span class="kw">_ </span>=&gt; acc.other.push((edge, node)),
                 };
 
-                <span class="ident">acc</span>
+                acc
             });
 
-        <span class="kw">let</span> <span class="ident">then_pair</span> <span class="op">=</span> <span class="ident">if_node_info</span>
-            .<span class="ident">then</span>
-            .<span class="ident">expect</span>(<span class="string">&quot;Expected if-node to always have a then edge to another node.&quot;</span>);
+        <span class="kw">let </span>then_pair = if_node_info
+            .then
+            .expect(<span class="string">&quot;Expected if-node to always have a then edge to another node.&quot;</span>);
 
-        <span class="comment">// Build expressions for both arms.</span>
-        <span class="kw">let</span> <span class="ident">then_expr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">then_pair</span>.<span class="number">1</span>, <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">then_pair</span>.<span class="number">1</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">else_expr</span> <span class="op">=</span> <span class="ident">if_node_info</span>
-            .<span class="ident">_else</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">node</span>)<span class="op">|</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Build expressions for both arms.
+        </span><span class="kw">let </span>then_expr = <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>then_pair.<span class="number">1</span>, graph.incoming_edges(<span class="kw-2">&amp;</span>then_pair.<span class="number">1</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>else_expr = if_node_info
+            ._else
+            .into_iter()
+            .map(|(<span class="kw">_</span>, node)| <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>node, graph.incoming_edges(<span class="kw-2">&amp;</span>node)))
+            .collect::&lt;InterpretationResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">child_expressions</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::process_children</span>(<span class="ident">graph</span>, <span class="ident">if_node_info</span>.<span class="ident">other</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>child_expressions = <span class="self">Self</span>::process_children(graph, if_node_info.other)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">node_id</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">id</span>();
-        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">pluck_node</span>(<span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">into_expr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">node</span>: <span class="ident">Node</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">flow</span>: <span class="ident">Flow</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>node_id = node.id();
+        <span class="kw">let </span>node = graph.pluck_node(node);
+        <span class="kw">let </span>into_expr = Box::new(<span class="kw">move </span>|node: Node| {
+            <span class="kw">let </span>flow: Flow = node.try_into()<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Flow::If</span>(<span class="ident">cond_fn</span>) <span class="op">=</span> <span class="ident">flow</span> {
-                <span class="kw">let</span> <span class="ident">if_expr</span> <span class="op">=</span> <span class="ident">Expression::If</span> {
-                    <span class="ident">func</span>: <span class="ident">cond_fn</span>,
-                    <span class="ident">then</span>: <span class="macro">vec!</span>[<span class="ident">then_expr</span>],
-                    <span class="ident">else_</span>: <span class="ident">else_expr</span>,
+            <span class="kw">if let </span>Flow::If(cond_fn) = flow {
+                <span class="kw">let </span>if_expr = Expression::If {
+                    func: cond_fn,
+                    then: <span class="macro">vec!</span>[then_expr],
+                    else_: else_expr,
                 };
 
-                <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">child_expressions</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">Expression::Let</span> {
-                        <span class="ident">bindings</span>: <span class="macro">vec!</span>[<span class="ident">Binding</span> {
-                            <span class="ident">name</span>: <span class="ident">node_id</span>,
-                            <span class="ident">expr</span>: <span class="ident">if_expr</span>,
+                <span class="kw">let </span>expr = <span class="kw">if </span>!child_expressions.is_empty() {
+                    Expression::Let {
+                        bindings: <span class="macro">vec!</span>[Binding {
+                            name: node_id,
+                            expr: if_expr,
                         }],
-                        <span class="ident">expressions</span>: <span class="ident">child_expressions</span>,
+                        expressions: child_expressions,
                     }
-                } <span class="kw">else</span> {
-                    <span class="ident">if_expr</span>
+                } <span class="kw">else </span>{
+                    if_expr
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">expr</span>)
-            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(expr)
+            } <span class="kw">else </span>{
                 <span class="macro">unreachable!</span>()
             }
         });
 
-        <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>)
+        <span class="self">Self</span>::transform_node(graph, parent_edges, node, into_expr)
     }
 
-    <span class="kw">fn</span> <span class="ident">translate_return_node</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">direct_children</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">direct_child_pairs</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">child_expressions</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::process_children</span>(<span class="ident">graph</span>, <span class="ident">direct_children</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>translate_return_node(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        node: <span class="kw-2">&amp;</span>NodeRef,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        <span class="kw">let </span>direct_children = graph.direct_child_pairs(<span class="kw-2">&amp;</span>node);
+        <span class="kw">let </span>child_expressions = <span class="self">Self</span>::process_children(graph, direct_children)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">into_expr</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">node</span>: <span class="ident">Node</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">flow</span>: <span class="ident">Flow</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>into_expr = Box::new(<span class="kw">move </span>|node: Node| {
+            <span class="kw">let </span>flow: Flow = node.try_into()<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Flow::Return</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">flow</span> {
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">r</span>) =&gt; <span class="ident">Box::new</span>(<span class="ident">ExpressionResult::FixedResult</span>(<span class="ident">r</span>)),
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">Box::new</span>(<span class="ident">ExpressionResult::Empty</span>),
+            <span class="kw">if let </span>Flow::Return(result) = flow {
+                <span class="kw">let </span>result = <span class="kw">match </span>result {
+                    <span class="prelude-val">Some</span>(r) =&gt; Box::new(ExpressionResult::FixedResult(r)),
+                    <span class="prelude-val">None </span>=&gt; Box::new(ExpressionResult::Empty),
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Expression::Return</span> { <span class="ident">result</span> })
-            } <span class="kw">else</span> {
+                <span class="prelude-val">Ok</span>(Expression::Return { result })
+            } <span class="kw">else </span>{
                 <span class="macro">unreachable!</span>()
             }
         });
 
-        <span class="kw">let</span> <span class="ident">node_binding_name</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">id</span>();
-        <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">pluck_node</span>(<span class="ident">node</span>);
-        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::transform_node</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>, <span class="ident">node</span>, <span class="ident">into_expr</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>node_binding_name = node.id();
+        <span class="kw">let </span>node = graph.pluck_node(node);
+        <span class="kw">let </span>expr = <span class="self">Self</span>::transform_node(graph, parent_edges, node, into_expr)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">child_expressions</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">expr</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Let</span> {
-                <span class="ident">bindings</span>: <span class="macro">vec!</span>[<span class="ident">Binding</span> {
-                    <span class="ident">name</span>: <span class="ident">node_binding_name</span>,
-                    <span class="ident">expr</span>,
+        <span class="kw">if </span>child_expressions.is_empty() {
+            <span class="prelude-val">Ok</span>(expr)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(Expression::Let {
+                bindings: <span class="macro">vec!</span>[Binding {
+                    name: node_binding_name,
+                    expr,
                 }],
-                <span class="ident">expressions</span>: <span class="ident">child_expressions</span>,
+                expressions: child_expressions,
             })
         }
     }
 
-    <span class="doccomment">/// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,</span>
-    <span class="doccomment">/// builds an expression directly. `into_expr` does the final expression building based on the node coming in.</span>
-    <span class="kw">fn</span> <span class="ident">transform_node</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-        <span class="ident">node</span>: <span class="ident">Node</span>,
-        <span class="ident">into_expr</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">parent_edges</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">into_expr</span>(<span class="ident">node</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Collect all parent ID dependency tuples (transformers).</span>
-            <span class="kw">let</span> <span class="ident">parent_id_deps</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::collect_parent_transformers</span>(<span class="ident">graph</span>, <span class="ident">parent_edges</span>);
+    <span class="doccomment">/// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
+    /// builds an expression directly. `into_expr` does the final expression building based on the node coming in.
+    </span><span class="kw">fn </span>transform_node(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+        node: Node,
+        into_expr: Box&lt;<span class="kw">dyn </span>FnOnce(Node) -&gt; InterpretationResult&lt;Expression&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        <span class="kw">if </span>parent_edges.is_empty() {
+            into_expr(node)
+        } <span class="kw">else </span>{
+            <span class="comment">// Collect all parent ID dependency tuples (transformers).
+            </span><span class="kw">let </span>parent_id_deps = <span class="self">Self</span>::collect_parent_transformers(graph, parent_edges);
 
-            <span class="comment">// If there is at least one parent ID dependency we build a func to run the transformer(s),</span>
-            <span class="comment">// else just render a flat query expression.</span>
-            <span class="kw">if</span> <span class="ident">parent_id_deps</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">into_expr</span>(<span class="ident">node</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Expression::Func</span> {
-                    <span class="ident">func</span>: <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">env</span>: <span class="ident">Env</span><span class="op">|</span> {
-                        <span class="comment">// Run transformers in order on the query to retrieve the final, transformed, query.</span>
-                        <span class="kw">let</span> <span class="ident">node</span>: <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">=</span>
-                            <span class="ident">parent_id_deps</span>
-                                .<span class="ident">into_iter</span>()
-                                .<span class="ident">try_fold</span>(<span class="ident">node</span>, <span class="op">|</span><span class="ident">node</span>, (<span class="ident">parent_binding_name</span>, <span class="ident">dependency</span>)<span class="op">|</span> {
-                                    <span class="kw">let</span> <span class="ident">binding</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">env</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">parent_binding_name</span>) {
-                                        <span class="prelude-val">Some</span>(<span class="ident">binding</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">binding</span>),
-                                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">InterpreterError::EnvVarNotFound</span>(<span class="macro">format!</span>(
+            <span class="comment">// If there is at least one parent ID dependency we build a func to run the transformer(s),
+            // else just render a flat query expression.
+            </span><span class="kw">if </span>parent_id_deps.is_empty() {
+                into_expr(node)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Ok</span>(Expression::Func {
+                    func: Box::new(<span class="kw">move </span>|env: Env| {
+                        <span class="comment">// Run transformers in order on the query to retrieve the final, transformed, query.
+                        </span><span class="kw">let </span>node: InterpretationResult&lt;Node&gt; =
+                            parent_id_deps
+                                .into_iter()
+                                .try_fold(node, |node, (parent_binding_name, dependency)| {
+                                    <span class="kw">let </span>binding = <span class="kw">match </span>env.get(<span class="kw-2">&amp;</span>parent_binding_name) {
+                                        <span class="prelude-val">Some</span>(binding) =&gt; <span class="prelude-val">Ok</span>(binding),
+                                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(InterpreterError::EnvVarNotFound(<span class="macro">format!</span>(
                                             <span class="string">&quot;Expected parent binding &#39;{}&#39; to be present.&quot;</span>,
-                                            <span class="ident">parent_binding_name</span>
+                                            parent_binding_name
                                         ))),
                                     }<span class="question-mark">?</span>;
 
-                                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dependency</span> {
-                                        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">selection</span>, <span class="ident">f</span>) =&gt; <span class="ident">binding</span>
-                                            .<span class="ident">as_selection_results</span>(<span class="kw-2">&amp;</span><span class="ident">selection</span>)
-                                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parent_selections</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">f</span>(<span class="ident">node</span>, <span class="ident">parent_selections</span>)<span class="question-mark">?</span>)),
+                                    <span class="kw">let </span>res = <span class="kw">match </span>dependency {
+                                        QueryGraphDependency::ProjectedDataDependency(selection, f) =&gt; binding
+                                            .as_selection_results(<span class="kw-2">&amp;</span>selection)
+                                            .and_then(|parent_selections| <span class="prelude-val">Ok</span>(f(node, parent_selections)<span class="question-mark">?</span>)),
 
-                                        <span class="ident">QueryGraphDependency::DataDependency</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">f</span>(<span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">binding</span>)<span class="question-mark">?</span>),
+                                        QueryGraphDependency::DataDependency(f) =&gt; <span class="prelude-val">Ok</span>(f(node, <span class="kw-2">&amp;</span>binding)<span class="question-mark">?</span>),
 
-                                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                                     };
 
-                                    <span class="prelude-val">Ok</span>(<span class="ident">res</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                                        <span class="ident">InterpreterError::InterpretationError</span>(
-                                            <span class="macro">format!</span>(<span class="string">&quot;Error for binding &#39;{}&#39;&quot;</span>, <span class="ident">parent_binding_name</span>),
-                                            <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>)),
+                                    <span class="prelude-val">Ok</span>(res.map_err(|err| {
+                                        InterpreterError::InterpretationError(
+                                            <span class="macro">format!</span>(<span class="string">&quot;Error for binding &#39;{}&#39;&quot;</span>, parent_binding_name),
+                                            <span class="prelude-val">Some</span>(Box::new(err)),
                                         )
                                     })<span class="question-mark">?</span>)
                                 });
 
-                        <span class="ident">into_expr</span>(<span class="ident">node</span><span class="question-mark">?</span>)
+                        into_expr(node<span class="question-mark">?</span>)
                     }),
                 })
             }
         }
     }
 
-    <span class="doccomment">/// Collects all edge dependencies that perform a node transformation based on the parent.</span>
-    <span class="kw">fn</span> <span class="ident">collect_parent_transformers</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">parent_edges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EdgeRef</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryGraphDependency</span>)<span class="op">&gt;</span> {
-        <span class="ident">parent_edges</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">graph</span>.<span class="ident">pluck_edge</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>) {
-                <span class="ident">x</span> @ <span class="ident">QueryGraphDependency::DataDependency</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">parent_binding_name</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">id</span>();
-                    <span class="prelude-val">Some</span>((<span class="ident">parent_binding_name</span>, <span class="ident">x</span>))
+    <span class="doccomment">/// Collects all edge dependencies that perform a node transformation based on the parent.
+    </span><span class="kw">fn </span>collect_parent_transformers(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        parent_edges: Vec&lt;EdgeRef&gt;,
+    ) -&gt; Vec&lt;(String, QueryGraphDependency)&gt; {
+        parent_edges
+            .into_iter()
+            .filter_map(|edge| <span class="kw">match </span>graph.pluck_edge(<span class="kw-2">&amp;</span>edge) {
+                x @ QueryGraphDependency::DataDependency(<span class="kw">_</span>) =&gt; {
+                    <span class="kw">let </span>parent_binding_name = graph.edge_source(<span class="kw-2">&amp;</span>edge).id();
+                    <span class="prelude-val">Some</span>((parent_binding_name, x))
                 }
-                <span class="ident">x</span> @ <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">parent_binding_name</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">id</span>();
-                    <span class="prelude-val">Some</span>((<span class="ident">parent_binding_name</span>, <span class="ident">x</span>))
+                x @ QueryGraphDependency::ProjectedDataDependency(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">let </span>parent_binding_name = graph.edge_source(<span class="kw-2">&amp;</span>edge).id();
+                    <span class="prelude-val">Some</span>((parent_binding_name, x))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="kw">fn</span> <span class="ident">fold_result_scopes</span>(
-        <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-        <span class="ident">result_subgraphs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EdgeRef</span>, <span class="ident">NodeRef</span>)<span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> {
-        <span class="comment">// if the subgraphs all point to the same result node, we fold them in sequence</span>
-        <span class="comment">// if not, we can separate them with a getfirstnonempty</span>
-        <span class="kw">let</span> <span class="ident">bindings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Binding</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result_subgraphs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">node</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">id</span>();
-                <span class="kw">let</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
-                <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::build_expression</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">edges</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>fold_result_scopes(
+        graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+        result_subgraphs: Vec&lt;(EdgeRef, NodeRef)&gt;,
+    ) -&gt; InterpretationResult&lt;Expression&gt; {
+        <span class="comment">// if the subgraphs all point to the same result node, we fold them in sequence
+        // if not, we can separate them with a getfirstnonempty
+        </span><span class="kw">let </span>bindings: Vec&lt;Binding&gt; = result_subgraphs
+            .into_iter()
+            .map(|(<span class="kw">_</span>, node)| {
+                <span class="kw">let </span>name = node.id();
+                <span class="kw">let </span>edges = graph.incoming_edges(<span class="kw-2">&amp;</span>node);
+                <span class="kw">let </span>expr = <span class="self">Self</span>::build_expression(graph, <span class="kw-2">&amp;</span>node, edges)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Binding</span> { <span class="ident">name</span>, <span class="ident">expr</span> })
+                <span class="prelude-val">Ok</span>(Binding { name, expr })
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">InterpretationResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Binding</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;InterpretationResult&lt;Vec&lt;Binding&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">result_binding_names</span> <span class="op">=</span> <span class="ident">bindings</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">result_nodes</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">result_nodes</span>();
+        <span class="kw">let </span>result_binding_names = bindings.iter().map(|b| b.name.clone()).collect();
+        <span class="kw">let </span>result_nodes = graph.result_nodes();
 
-        <span class="kw">if</span> <span class="ident">result_nodes</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exprs</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bindings</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">binding</span><span class="op">|</span> <span class="ident">Expression::Let</span> {
-                    <span class="ident">bindings</span>: <span class="macro">vec!</span>[<span class="ident">binding</span>],
-                    <span class="ident">expressions</span>: <span class="macro">vec!</span>[],
+        <span class="kw">if </span>result_nodes.len() == <span class="number">1 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>exprs: VecDeque&lt;Expression&gt; = bindings
+                .into_iter()
+                .map(|binding| Expression::Let {
+                    bindings: <span class="macro">vec!</span>[binding],
+                    expressions: <span class="macro">vec!</span>[],
                 })
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Expression::Let</span> { <span class="ident">bindings</span>, <span class="ident">expressions</span> }) <span class="op">=</span> <span class="ident">exprs</span>.<span class="ident">back_mut</span>() {
-                <span class="ident">expressions</span>.<span class="ident">push</span>(<span class="ident">Expression::Get</span> {
-                    <span class="ident">binding_name</span>: <span class="ident">bindings</span>
-                        .<span class="ident">last</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
-                        .<span class="ident">expect</span>(<span class="string">&quot;Expected let binding to have at least one expr.&quot;</span>),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(Expression::Let { bindings, expressions }) = exprs.back_mut() {
+                expressions.push(Expression::Get {
+                    binding_name: bindings
+                        .last()
+                        .map(|b| b.name.clone())
+                        .expect(<span class="string">&quot;Expected let binding to have at least one expr.&quot;</span>),
                 })
             }
 
-            <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">exprs</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">exprs</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident">first</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">next</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Expression::Let</span> {
-                    <span class="ident">bindings</span>: <span class="kw">_</span>,
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">expressions</span>,
-                } <span class="op">=</span> <span class="ident">acc</span>
+            <span class="kw">let </span>first = exprs.pop_front().unwrap();
+            <span class="kw">let </span>folded = exprs.into_iter().fold(first, |<span class="kw-2">mut </span>acc, next| {
+                <span class="kw">if let </span>Expression::Let {
+                    bindings: <span class="kw">_</span>,
+                    <span class="kw-2">ref mut </span>expressions,
+                } = acc
                 {
-                    <span class="ident">expressions</span>.<span class="ident">push</span>(<span class="ident">next</span>);
+                    expressions.push(next);
                 }
 
-                <span class="ident">acc</span>
+                acc
             });
 
-            <span class="prelude-val">Ok</span>(<span class="ident">folded</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Expression::Let</span> {
-                <span class="ident">bindings</span>,
-                <span class="ident">expressions</span>: <span class="macro">vec!</span>[<span class="ident">Expression::GetFirstNonEmpty</span> {
-                    <span class="ident">binding_names</span>: <span class="ident">result_binding_names</span>,
+            <span class="prelude-val">Ok</span>(folded)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(Expression::Let {
+                bindings,
+                expressions: <span class="macro">vec!</span>[Expression::GetFirstNonEmpty {
+                    binding_names: result_binding_names,
                 }],
             })
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

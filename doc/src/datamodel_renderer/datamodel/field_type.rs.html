@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/field_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/field_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -123,130 +123,130 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value</span>::{<span class="ident">Constant</span>, <span class="ident">Text</span>};
+<span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Text};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">FieldKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Required</span>(<span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Optional</span>(<span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Array</span>(<span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">RequiredUnsupported</span>(<span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">OptionalUnsupported</span>(<span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">ArrayUnsupported</span>(<span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>FieldKind&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Required(Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    Optional(Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    Array(Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    RequiredUnsupported(Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
+    OptionalUnsupported(Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
+    ArrayUnsupported(Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;),
 }
 
-<span class="doccomment">/// A type of a field in the datamodel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">FieldKind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A type of a field in the datamodel.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>FieldType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    inner: FieldKind&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FieldType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The field is required, rendered with only the name of the</span>
-    <span class="doccomment">/// type. For example: `Int`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The name will be sanitized, removing unsupported characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Constant::new</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
-            <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized</span> { <span class="ident">sanitized</span> }) =&gt; <span class="ident">sanitized</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FieldType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The field is required, rendered with only the name of the
+    /// type. For example: `Int`.
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    </span><span class="kw">pub fn </span>required(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = <span class="kw">match </span>Constant::new(name) {
+            <span class="prelude-val">Ok</span>(name) =&gt; name,
+            <span class="prelude-val">Err</span>(<span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized { sanitized }) =&gt; sanitized,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; Constant::new_no_validate(Cow::Borrowed(name)),
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::Required</span>(<span class="ident">name</span>),
+        <span class="self">Self </span>{
+            inner: FieldKind::Required(name),
         }
     }
 
-    <span class="doccomment">/// The field is optional, rendered with a question mark after the</span>
-    <span class="doccomment">/// type name. For example: `Int?`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The name will be sanitized, removing unsupported characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Constant::new</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
-            <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized</span> { <span class="ident">sanitized</span> }) =&gt; <span class="ident">sanitized</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)),
+    <span class="doccomment">/// The field is optional, rendered with a question mark after the
+    /// type name. For example: `Int?`.
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    </span><span class="kw">pub fn </span>optional(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = <span class="kw">match </span>Constant::new(name) {
+            <span class="prelude-val">Ok</span>(name) =&gt; name,
+            <span class="prelude-val">Err</span>(<span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized { sanitized }) =&gt; sanitized,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; Constant::new_no_validate(Cow::Borrowed(name)),
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::Optional</span>(<span class="ident">name</span>),
+        <span class="self">Self </span>{
+            inner: FieldKind::Optional(name),
         }
     }
 
-    <span class="doccomment">/// The field is an array, rendered with square brackets after the</span>
-    <span class="doccomment">/// type name. For example: `Int[]`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The name will be sanitized, removing unsupported characters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Constant::new</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
-            <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized</span> { <span class="ident">sanitized</span> }) =&gt; <span class="ident">sanitized</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)),
+    <span class="doccomment">/// The field is an array, rendered with square brackets after the
+    /// type name. For example: `Int[]`.
+    ///
+    /// The name will be sanitized, removing unsupported characters.
+    </span><span class="kw">pub fn </span>array(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = <span class="kw">match </span>Constant::new(name) {
+            <span class="prelude-val">Ok</span>(name) =&gt; name,
+            <span class="prelude-val">Err</span>(<span class="kw">crate</span>::value::ConstantNameValidationError::WasSanitized { sanitized }) =&gt; sanitized,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; Constant::new_no_validate(Cow::Borrowed(name)),
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::Array</span>(<span class="ident">name</span>),
+        <span class="self">Self </span>{
+            inner: FieldKind::Array(name),
         }
     }
 
-    <span class="doccomment">/// The field is required, but not supported by Prisma, rendered</span>
-    <span class="doccomment">/// as `Unsupported(ts_vector)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::RequiredUnsupported</span>(<span class="ident">Text</span>(<span class="ident">name</span>)),
+    <span class="doccomment">/// The field is required, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)`.
+    </span><span class="kw">pub fn </span>required_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: FieldKind::RequiredUnsupported(Text(name)),
         }
     }
 
-    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered</span>
-    <span class="doccomment">/// as `Unsupported(ts_vector)?`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">optional_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::OptionalUnsupported</span>(<span class="ident">Text</span>(<span class="ident">name</span>)),
+    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)?`.
+    </span><span class="kw">pub fn </span>optional_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: FieldKind::OptionalUnsupported(Text(name)),
         }
     }
 
-    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered</span>
-    <span class="doccomment">/// as `Unsupported(ts_vector)?`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">FieldKind::ArrayUnsupported</span>(<span class="ident">Text</span>(<span class="ident">name</span>)),
+    <span class="doccomment">/// The field is optional, but not supported by Prisma, rendered
+    /// as `Unsupported(ts_vector)?`.
+    </span><span class="kw">pub fn </span>array_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: FieldKind::ArrayUnsupported(Text(name)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FieldType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">FieldKind::Required</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">FieldKind::Optional</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;?&quot;</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>FieldType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            FieldKind::Required(<span class="kw-2">ref </span>t) =&gt; t.fmt(f),
+            FieldKind::Optional(<span class="kw-2">ref </span>t) =&gt; {
+                t.fmt(f)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;?&quot;</span>)
             }
-            <span class="ident">FieldKind::Array</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;[]&quot;</span>)
+            FieldKind::Array(<span class="kw-2">ref </span>t) =&gt; {
+                t.fmt(f)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;[]&quot;</span>)
             }
-            <span class="ident">FieldKind::RequiredUnsupported</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)
+            FieldKind::RequiredUnsupported(<span class="kw-2">ref </span>t) =&gt; {
+                f.write_str(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
+                t.fmt(f)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;)&quot;</span>)
             }
-            <span class="ident">FieldKind::OptionalUnsupported</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)?&quot;</span>)
+            FieldKind::OptionalUnsupported(<span class="kw-2">ref </span>t) =&gt; {
+                f.write_str(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
+                t.fmt(f)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;)?&quot;</span>)
             }
-            <span class="ident">FieldKind::ArrayUnsupported</span>(<span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">t</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)[]&quot;</span>)
+            FieldKind::ArrayUnsupported(<span class="kw-2">ref </span>t) =&gt; {
+                f.write_str(<span class="string">&quot;Unsupported(&quot;</span>)<span class="question-mark">?</span>;
+                t.fmt(f)<span class="question-mark">?</span>;
+                f.write_str(<span class="string">&quot;)[]&quot;</span>)
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/local/tz_info/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/local/tz_info/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../chrono/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -332,339 +332,339 @@
 <span id="332">332</span>
 <span id="333">333</span>
 <span id="334">334</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">ErrorKind</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>;
-<span class="kw">use</span> <span class="ident">std::num::ParseIntError</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>::{<span class="self">self</span>, <span class="ident">FromStr</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::io::{<span class="self">self</span>, ErrorKind};
+<span class="kw">use </span>std::iter;
+<span class="kw">use </span>std::num::ParseIntError;
+<span class="kw">use </span>std::str::{<span class="self">self</span>, FromStr};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rule::TransitionRule</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::timezone</span>::{<span class="ident">LeapSecond</span>, <span class="ident">LocalTimeType</span>, <span class="ident">TimeZone</span>, <span class="ident">Transition</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Error</span>;
+<span class="kw">use </span><span class="kw">super</span>::rule::TransitionRule;
+<span class="kw">use </span><span class="kw">super</span>::timezone::{LeapSecond, LocalTimeType, TimeZone, Transition};
+<span class="kw">use </span><span class="kw">super</span>::Error;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::map_clone</span>)]</span> <span class="comment">// MSRV: 1.36</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TimeZone</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>);
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">footer</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">version</span> {
-        <span class="ident">Version::V1</span> =&gt; <span class="kw">match</span> <span class="ident">cursor</span>.<span class="ident">is_empty</span>() {
-            <span class="bool-val">true</span> =&gt; (<span class="ident">state</span>, <span class="prelude-val">None</span>),
-            <span class="bool-val">false</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;remaining data after end of TZif v1 data block&quot;</span>))
+<span class="attribute">#[allow(clippy::map_clone)] </span><span class="comment">// MSRV: 1.36
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;TimeZone, Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(bytes);
+    <span class="kw">let </span>state = State::new(<span class="kw-2">&amp;mut </span>cursor, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(state, footer) = <span class="kw">match </span>state.header.version {
+        Version::V1 =&gt; <span class="kw">match </span>cursor.is_empty() {
+            <span class="bool-val">true </span>=&gt; (state, <span class="prelude-val">None</span>),
+            <span class="bool-val">false </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;remaining data after end of TZif v1 data block&quot;</span>))
             }
         },
-        <span class="ident">Version::V2</span> <span class="op">|</span> <span class="ident">Version::V3</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-            (<span class="ident">state</span>, <span class="prelude-val">Some</span>(<span class="ident">cursor</span>.<span class="ident">remaining</span>()))
+        Version::V2 | Version::V3 =&gt; {
+            <span class="kw">let </span>state = State::new(<span class="kw-2">&amp;mut </span>cursor, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+            (state, <span class="prelude-val">Some</span>(cursor.remaining()))
         }
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">transitions</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">transition_count</span>);
-    <span class="kw">for</span> (<span class="ident">arr_time</span>, <span class="kw-2">&amp;</span><span class="ident">local_time_type_index</span>) <span class="kw">in</span>
-        <span class="ident">state</span>.<span class="ident">transition_times</span>.<span class="ident">chunks_exact</span>(<span class="ident">state</span>.<span class="ident">time_size</span>).<span class="ident">zip</span>(<span class="ident">state</span>.<span class="ident">transition_types</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>transitions = Vec::with_capacity(state.header.transition_count);
+    <span class="kw">for </span>(arr_time, <span class="kw-2">&amp;</span>local_time_type_index) <span class="kw">in
+        </span>state.transition_times.chunks_exact(state.time_size).zip(state.transition_types)
     {
-        <span class="kw">let</span> <span class="ident">unix_leap_time</span> <span class="op">=</span>
-            <span class="ident">state</span>.<span class="ident">parse_time</span>(<span class="kw-2">&amp;</span><span class="ident">arr_time</span>[<span class="number">0</span>..<span class="ident">state</span>.<span class="ident">time_size</span>], <span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">version</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">local_time_type_index</span> <span class="op">=</span> <span class="ident">local_time_type_index</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">transitions</span>.<span class="ident">push</span>(<span class="ident">Transition::new</span>(<span class="ident">unix_leap_time</span>, <span class="ident">local_time_type_index</span>));
+        <span class="kw">let </span>unix_leap_time =
+            state.parse_time(<span class="kw-2">&amp;</span>arr_time[<span class="number">0</span>..state.time_size], state.header.version)<span class="question-mark">?</span>;
+        <span class="kw">let </span>local_time_type_index = local_time_type_index <span class="kw">as </span>usize;
+        transitions.push(Transition::new(unix_leap_time, local_time_type_index));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">local_time_types</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">type_count</span>);
-    <span class="kw">for</span> <span class="ident">arr</span> <span class="kw">in</span> <span class="ident">state</span>.<span class="ident">local_time_types</span>.<span class="ident">chunks_exact</span>(<span class="number">6</span>) {
-        <span class="kw">let</span> <span class="ident">ut_offset</span> <span class="op">=</span> <span class="ident">read_be_i32</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[..<span class="number">4</span>])<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>local_time_types = Vec::with_capacity(state.header.type_count);
+    <span class="kw">for </span>arr <span class="kw">in </span>state.local_time_types.chunks_exact(<span class="number">6</span>) {
+        <span class="kw">let </span>ut_offset = read_be_i32(<span class="kw-2">&amp;</span>arr[..<span class="number">4</span>])<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">is_dst</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">arr</span>[<span class="number">4</span>] {
-            <span class="number">0</span> =&gt; <span class="bool-val">false</span>,
-            <span class="number">1</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid DST indicator&quot;</span>)),
+        <span class="kw">let </span>is_dst = <span class="kw">match </span>arr[<span class="number">4</span>] {
+            <span class="number">0 </span>=&gt; <span class="bool-val">false</span>,
+            <span class="number">1 </span>=&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid DST indicator&quot;</span>)),
         };
 
-        <span class="kw">let</span> <span class="ident">char_index</span> <span class="op">=</span> <span class="ident">arr</span>[<span class="number">5</span>] <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">char_index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">char_count</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid time zone name char index&quot;</span>));
+        <span class="kw">let </span>char_index = arr[<span class="number">5</span>] <span class="kw">as </span>usize;
+        <span class="kw">if </span>char_index &gt;= state.header.char_count {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid time zone name char index&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">names</span>[<span class="ident">char_index</span>..].<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">b&#39;\0&#39;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="ident">position</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid time zone name char index&quot;</span>)),
+        <span class="kw">let </span>position = <span class="kw">match </span>state.names[char_index..].iter().position(|<span class="kw-2">&amp;</span>c| c == <span class="string">b&#39;\0&#39;</span>) {
+            <span class="prelude-val">Some</span>(position) =&gt; position,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid time zone name char index&quot;</span>)),
         };
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">names</span>[<span class="ident">char_index</span>..<span class="ident">char_index</span> <span class="op">+</span> <span class="ident">position</span>];
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">name</span>.<span class="ident">is_empty</span>() { <span class="prelude-val">Some</span>(<span class="ident">name</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
-        <span class="ident">local_time_types</span>.<span class="ident">push</span>(<span class="ident">LocalTimeType::new</span>(<span class="ident">ut_offset</span>, <span class="ident">is_dst</span>, <span class="ident">name</span>)<span class="question-mark">?</span>);
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>state.names[char_index..char_index + position];
+        <span class="kw">let </span>name = <span class="kw">if </span>!name.is_empty() { <span class="prelude-val">Some</span>(name) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
+        local_time_types.push(LocalTimeType::new(ut_offset, is_dst, name)<span class="question-mark">?</span>);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">leap_seconds</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">leap_count</span>);
-    <span class="kw">for</span> <span class="ident">arr</span> <span class="kw">in</span> <span class="ident">state</span>.<span class="ident">leap_seconds</span>.<span class="ident">chunks_exact</span>(<span class="ident">state</span>.<span class="ident">time_size</span> <span class="op">+</span> <span class="number">4</span>) {
-        <span class="kw">let</span> <span class="ident">unix_leap_time</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">parse_time</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="number">0</span>..<span class="ident">state</span>.<span class="ident">time_size</span>], <span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">version</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">correction</span> <span class="op">=</span> <span class="ident">read_be_i32</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[<span class="ident">state</span>.<span class="ident">time_size</span>..<span class="ident">state</span>.<span class="ident">time_size</span> <span class="op">+</span> <span class="number">4</span>])<span class="question-mark">?</span>;
-        <span class="ident">leap_seconds</span>.<span class="ident">push</span>(<span class="ident">LeapSecond::new</span>(<span class="ident">unix_leap_time</span>, <span class="ident">correction</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>leap_seconds = Vec::with_capacity(state.header.leap_count);
+    <span class="kw">for </span>arr <span class="kw">in </span>state.leap_seconds.chunks_exact(state.time_size + <span class="number">4</span>) {
+        <span class="kw">let </span>unix_leap_time = state.parse_time(<span class="kw-2">&amp;</span>arr[<span class="number">0</span>..state.time_size], state.header.version)<span class="question-mark">?</span>;
+        <span class="kw">let </span>correction = read_be_i32(<span class="kw-2">&amp;</span>arr[state.time_size..state.time_size + <span class="number">4</span>])<span class="question-mark">?</span>;
+        leap_seconds.push(LeapSecond::new(unix_leap_time, correction));
     }
 
-    <span class="kw">let</span> <span class="ident">std_walls_iter</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">std_walls</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>).<span class="ident">chain</span>(<span class="ident">iter::repeat</span>(<span class="number">0</span>));
-    <span class="kw">let</span> <span class="ident">ut_locals_iter</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">ut_locals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>).<span class="ident">chain</span>(<span class="ident">iter::repeat</span>(<span class="number">0</span>));
-    <span class="kw">if</span> <span class="ident">std_walls_iter</span>.<span class="ident">zip</span>(<span class="ident">ut_locals_iter</span>).<span class="ident">take</span>(<span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">type_count</span>).<span class="ident">any</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span> <span class="op">==</span> (<span class="number">0</span>, <span class="number">1</span>)) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(
+    <span class="kw">let </span>std_walls_iter = state.std_walls.iter().map(|<span class="kw-2">&amp;</span>i| i).chain(iter::repeat(<span class="number">0</span>));
+    <span class="kw">let </span>ut_locals_iter = state.ut_locals.iter().map(|<span class="kw-2">&amp;</span>i| i).chain(iter::repeat(<span class="number">0</span>));
+    <span class="kw">if </span>std_walls_iter.zip(ut_locals_iter).take(state.header.type_count).any(|pair| pair == (<span class="number">0</span>, <span class="number">1</span>)) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(
             <span class="string">&quot;invalid couple of standard/wall and UT/local indicators&quot;</span>,
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">extra_rule</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">footer</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">footer</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">footer</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="ident">footer</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">footer</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">&amp;&amp;</span> <span class="ident">footer</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>)) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid footer&quot;</span>));
+    <span class="kw">let </span>extra_rule = <span class="kw">match </span>footer {
+        <span class="prelude-val">Some</span>(footer) =&gt; {
+            <span class="kw">let </span>footer = str::from_utf8(footer)<span class="question-mark">?</span>;
+            <span class="kw">if </span>!(footer.starts_with(<span class="string">&#39;\n&#39;</span>) &amp;&amp; footer.ends_with(<span class="string">&#39;\n&#39;</span>)) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid footer&quot;</span>));
             }
 
-            <span class="kw">let</span> <span class="ident">tz_string</span> <span class="op">=</span> <span class="ident">footer</span>.<span class="ident">trim_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_whitespace</span>());
-            <span class="kw">if</span> <span class="ident">tz_string</span>.<span class="ident">starts_with</span>(<span class="string">&#39;:&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">tz_string</span>.<span class="ident">contains</span>(<span class="string">&#39;\0&#39;</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid footer&quot;</span>));
+            <span class="kw">let </span>tz_string = footer.trim_matches(|c: char| c.is_ascii_whitespace());
+            <span class="kw">if </span>tz_string.starts_with(<span class="string">&#39;:&#39;</span>) || tz_string.contains(<span class="string">&#39;\0&#39;</span>) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid footer&quot;</span>));
             }
 
-            <span class="kw">match</span> <span class="ident">tz_string</span>.<span class="ident">is_empty</span>() {
-                <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
-                <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">TransitionRule::from_tz_string</span>(
-                    <span class="ident">tz_string</span>.<span class="ident">as_bytes</span>(),
-                    <span class="ident">state</span>.<span class="ident">header</span>.<span class="ident">version</span> <span class="op">==</span> <span class="ident">Version::V3</span>,
+            <span class="kw">match </span>tz_string.is_empty() {
+                <span class="bool-val">true </span>=&gt; <span class="prelude-val">None</span>,
+                <span class="bool-val">false </span>=&gt; <span class="prelude-val">Some</span>(TransitionRule::from_tz_string(
+                    tz_string.as_bytes(),
+                    state.header.version == Version::V3,
                 )<span class="question-mark">?</span>),
             }
         }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">TimeZone::new</span>(<span class="ident">transitions</span>, <span class="ident">local_time_types</span>, <span class="ident">leap_seconds</span>, <span class="ident">extra_rule</span>)
+    TimeZone::new(transitions, local_time_types, leap_seconds, extra_rule)
 }
 
-<span class="doccomment">/// TZif data blocks</span>
-<span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">header</span>: <span class="ident">Header</span>,
-    <span class="doccomment">/// Time size in bytes</span>
-    <span class="ident">time_size</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Transition times data block</span>
-    <span class="ident">transition_times</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Transition types data block</span>
-    <span class="ident">transition_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Local time types data block</span>
-    <span class="ident">local_time_types</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Time zone names data block</span>
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Leap seconds data block</span>
-    <span class="ident">leap_seconds</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// UT/local indicators data block</span>
-    <span class="ident">std_walls</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Standard/wall indicators data block</span>
-    <span class="ident">ut_locals</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+<span class="doccomment">/// TZif data blocks
+</span><span class="kw">struct </span>State&lt;<span class="lifetime">&#39;a</span>&gt; {
+    header: Header,
+    <span class="doccomment">/// Time size in bytes
+    </span>time_size: usize,
+    <span class="doccomment">/// Transition times data block
+    </span>transition_times: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Transition types data block
+    </span>transition_types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Local time types data block
+    </span>local_time_types: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Time zone names data block
+    </span>names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Leap seconds data block
+    </span>leap_seconds: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// UT/local indicators data block
+    </span>std_walls: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Standard/wall indicators data block
+    </span>ut_locals: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Read TZif data blocks</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">first</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header::new</span>(<span class="ident">cursor</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">time_size</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">first</span> {
-            <span class="bool-val">true</span> =&gt; <span class="number">4</span>, <span class="comment">// We always parse V1 first</span>
-            <span class="bool-val">false</span> =&gt; <span class="number">8</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; State&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Read TZif data blocks
+    </span><span class="kw">fn </span>new(cursor: <span class="kw-2">&amp;mut </span>Cursor&lt;<span class="lifetime">&#39;a</span>&gt;, first: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>header = Header::new(cursor)<span class="question-mark">?</span>;
+        <span class="kw">let </span>time_size = <span class="kw">match </span>first {
+            <span class="bool-val">true </span>=&gt; <span class="number">4</span>, <span class="comment">// We always parse V1 first
+            </span><span class="bool-val">false </span>=&gt; <span class="number">8</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">time_size</span>,
-            <span class="ident">transition_times</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">transition_count</span> <span class="op">*</span> <span class="ident">time_size</span>)<span class="question-mark">?</span>,
-            <span class="ident">transition_types</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">transition_count</span>)<span class="question-mark">?</span>,
-            <span class="ident">local_time_types</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">type_count</span> <span class="op">*</span> <span class="number">6</span>)<span class="question-mark">?</span>,
-            <span class="ident">names</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">char_count</span>)<span class="question-mark">?</span>,
-            <span class="ident">leap_seconds</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">leap_count</span> <span class="op">*</span> (<span class="ident">time_size</span> <span class="op">+</span> <span class="number">4</span>))<span class="question-mark">?</span>,
-            <span class="ident">std_walls</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">std_wall_count</span>)<span class="question-mark">?</span>,
-            <span class="ident">ut_locals</span>: <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="ident">header</span>.<span class="ident">ut_local_count</span>)<span class="question-mark">?</span>,
-            <span class="ident">header</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            time_size,
+            transition_times: cursor.read_exact(header.transition_count * time_size)<span class="question-mark">?</span>,
+            transition_types: cursor.read_exact(header.transition_count)<span class="question-mark">?</span>,
+            local_time_types: cursor.read_exact(header.type_count * <span class="number">6</span>)<span class="question-mark">?</span>,
+            names: cursor.read_exact(header.char_count)<span class="question-mark">?</span>,
+            leap_seconds: cursor.read_exact(header.leap_count * (time_size + <span class="number">4</span>))<span class="question-mark">?</span>,
+            std_walls: cursor.read_exact(header.std_wall_count)<span class="question-mark">?</span>,
+            ut_locals: cursor.read_exact(header.ut_local_count)<span class="question-mark">?</span>,
+            header,
         })
     }
 
-    <span class="doccomment">/// Parse time values</span>
-    <span class="kw">fn</span> <span class="ident">parse_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">arr</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">version</span>: <span class="ident">Version</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">version</span> {
-            <span class="ident">Version::V1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">read_be_i32</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>[..<span class="number">4</span>])<span class="question-mark">?</span>.<span class="ident">into</span>()),
-            <span class="ident">Version::V2</span> <span class="op">|</span> <span class="ident">Version::V3</span> =&gt; <span class="ident">read_be_i64</span>(<span class="ident">arr</span>),
+    <span class="doccomment">/// Parse time values
+    </span><span class="kw">fn </span>parse_time(<span class="kw-2">&amp;</span><span class="self">self</span>, arr: <span class="kw-2">&amp;</span>[u8], version: Version) -&gt; <span class="prelude-ty">Result</span>&lt;i64, Error&gt; {
+        <span class="kw">match </span>version {
+            Version::V1 =&gt; <span class="prelude-val">Ok</span>(read_be_i32(<span class="kw-2">&amp;</span>arr[..<span class="number">4</span>])<span class="question-mark">?</span>.into()),
+            Version::V2 | Version::V3 =&gt; read_be_i64(arr),
         }
     }
 }
 
-<span class="doccomment">/// TZif header</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Header</span> {
-    <span class="doccomment">/// TZif version</span>
-    <span class="ident">version</span>: <span class="ident">Version</span>,
-    <span class="doccomment">/// Number of UT/local indicators</span>
-    <span class="ident">ut_local_count</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Number of standard/wall indicators</span>
-    <span class="ident">std_wall_count</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Number of leap-second records</span>
-    <span class="ident">leap_count</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Number of transition times</span>
-    <span class="ident">transition_count</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Number of local time type records</span>
-    <span class="ident">type_count</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Number of time zone names bytes</span>
-    <span class="ident">char_count</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// TZif header
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Header {
+    <span class="doccomment">/// TZif version
+    </span>version: Version,
+    <span class="doccomment">/// Number of UT/local indicators
+    </span>ut_local_count: usize,
+    <span class="doccomment">/// Number of standard/wall indicators
+    </span>std_wall_count: usize,
+    <span class="doccomment">/// Number of leap-second records
+    </span>leap_count: usize,
+    <span class="doccomment">/// Number of transition times
+    </span>transition_count: usize,
+    <span class="doccomment">/// Number of local time type records
+    </span>type_count: usize,
+    <span class="doccomment">/// Number of time zone names bytes
+    </span>char_count: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Cursor</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">magic</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="number">4</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">magic</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="string">b&quot;TZif&quot;</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid magic number&quot;</span>));
+<span class="kw">impl </span>Header {
+    <span class="kw">fn </span>new(cursor: <span class="kw-2">&amp;mut </span>Cursor) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>magic = cursor.read_exact(<span class="number">4</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>magic != <span class="kw-2">*</span><span class="string">b&quot;TZif&quot; </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid magic number&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="number">1</span>)<span class="question-mark">?</span> {
-            [<span class="number">0x00</span>] =&gt; <span class="ident">Version::V1</span>,
-            [<span class="number">0x32</span>] =&gt; <span class="ident">Version::V2</span>,
-            [<span class="number">0x33</span>] =&gt; <span class="ident">Version::V3</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedTzFile</span>(<span class="string">&quot;unsupported TZif version&quot;</span>)),
+        <span class="kw">let </span>version = <span class="kw">match </span>cursor.read_exact(<span class="number">1</span>)<span class="question-mark">? </span>{
+            [<span class="number">0x00</span>] =&gt; Version::V1,
+            [<span class="number">0x32</span>] =&gt; Version::V2,
+            [<span class="number">0x33</span>] =&gt; Version::V3,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnsupportedTzFile(<span class="string">&quot;unsupported TZif version&quot;</span>)),
         };
 
-        <span class="ident">cursor</span>.<span class="ident">read_exact</span>(<span class="number">15</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ut_local_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">std_wall_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">leap_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">transition_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">type_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">char_count</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">read_be_u32</span>()<span class="question-mark">?</span>;
+        cursor.read_exact(<span class="number">15</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ut_local_count = cursor.read_be_u32()<span class="question-mark">?</span>;
+        <span class="kw">let </span>std_wall_count = cursor.read_be_u32()<span class="question-mark">?</span>;
+        <span class="kw">let </span>leap_count = cursor.read_be_u32()<span class="question-mark">?</span>;
+        <span class="kw">let </span>transition_count = cursor.read_be_u32()<span class="question-mark">?</span>;
+        <span class="kw">let </span>type_count = cursor.read_be_u32()<span class="question-mark">?</span>;
+        <span class="kw">let </span>char_count = cursor.read_be_u32()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="op">!</span>(<span class="ident">type_count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">char_count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-            <span class="op">&amp;&amp;</span> (<span class="ident">ut_local_count</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ut_local_count</span> <span class="op">==</span> <span class="ident">type_count</span>)
-            <span class="op">&amp;&amp;</span> (<span class="ident">std_wall_count</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">std_wall_count</span> <span class="op">==</span> <span class="ident">type_count</span>))
+        <span class="kw">if </span>!(type_count != <span class="number">0
+            </span>&amp;&amp; char_count != <span class="number">0
+            </span>&amp;&amp; (ut_local_count == <span class="number">0 </span>|| ut_local_count == type_count)
+            &amp;&amp; (std_wall_count == <span class="number">0 </span>|| std_wall_count == type_count))
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidTzFile</span>(<span class="string">&quot;invalid header&quot;</span>));
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidTzFile(<span class="string">&quot;invalid header&quot;</span>));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">version</span>,
-            <span class="ident">ut_local_count</span>: <span class="ident">ut_local_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">std_wall_count</span>: <span class="ident">std_wall_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">leap_count</span>: <span class="ident">leap_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">transition_count</span>: <span class="ident">transition_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">type_count</span>: <span class="ident">type_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">char_count</span>: <span class="ident">char_count</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            version,
+            ut_local_count: ut_local_count <span class="kw">as </span>usize,
+            std_wall_count: std_wall_count <span class="kw">as </span>usize,
+            leap_count: leap_count <span class="kw">as </span>usize,
+            transition_count: transition_count <span class="kw">as </span>usize,
+            type_count: type_count <span class="kw">as </span>usize,
+            char_count: char_count <span class="kw">as </span>usize,
         })
     }
 }
 
-<span class="doccomment">/// A `Cursor` contains a slice of a buffer and a read count.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Slice representing the remaining data to be read</span>
-    <span class="ident">remaining</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Number of already read bytes</span>
-    <span class="ident">read_count</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A `Cursor` contains a slice of a buffer and a read count.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Cursor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Slice representing the remaining data to be read
+    </span>remaining: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Number of already read bytes
+    </span>read_count: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new `Cursor` from remaining data</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">remaining</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">remaining</span>, <span class="ident">read_count</span>: <span class="number">0</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cursor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Construct a new `Cursor` from remaining data
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(remaining: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ remaining, read_count: <span class="number">0 </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">remaining</span>().<span class="ident">get</span>(<span class="number">0</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>peek(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>u8&gt; {
+        <span class="self">self</span>.remaining().get(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Returns remaining data</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">remaining</span>
+    <span class="doccomment">/// Returns remaining data
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.remaining
     }
 
-    <span class="doccomment">/// Returns `true` if data is remaining</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns `true` if data is remaining
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.remaining.is_empty()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_be_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="self">self</span>.<span class="ident">read_exact</span>(<span class="number">4</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">u32::from_be_bytes</span>(<span class="ident">buf</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_be_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u32, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">4</span>];
+        buf.copy_from_slice(<span class="self">self</span>.read_exact(<span class="number">4</span>)<span class="question-mark">?</span>);
+        <span class="prelude-val">Ok</span>(u32::from_be_bytes(buf))
     }
 
-    <span class="doccomment">/// Read exactly `count` bytes, reducing remaining data and incrementing read count</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">get</span>(..<span class="ident">count</span>), <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">get</span>(<span class="ident">count</span>..)) {
-            (<span class="prelude-val">Some</span>(<span class="ident">result</span>), <span class="prelude-val">Some</span>(<span class="ident">remaining</span>)) =&gt; {
-                <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">remaining</span>;
-                <span class="self">self</span>.<span class="ident">read_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    <span class="doccomment">/// Read exactly `count` bytes, reducing remaining data and incrementing read count
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_exact(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], io::Error&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>.remaining.get(..count), <span class="self">self</span>.remaining.get(count..)) {
+            (<span class="prelude-val">Some</span>(result), <span class="prelude-val">Some</span>(remaining)) =&gt; {
+                <span class="self">self</span>.remaining = remaining;
+                <span class="self">self</span>.read_count += count;
+                <span class="prelude-val">Ok</span>(result)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">ErrorKind::UnexpectedEof</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(io::Error::from(ErrorKind::UnexpectedEof)),
         }
     }
 
-    <span class="doccomment">/// Read bytes and compare them to the provided tag</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_tag</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="ident">tag</span>.<span class="ident">len</span>())<span class="question-mark">?</span> <span class="op">==</span> <span class="ident">tag</span> {
+    <span class="doccomment">/// Read bytes and compare them to the provided tag
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.read_exact(tag.len())<span class="question-mark">? </span>== tag {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">io::Error::from</span>(<span class="ident">ErrorKind::InvalidData</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(io::Error::from(ErrorKind::InvalidData))
         }
     }
 
-    <span class="doccomment">/// Read bytes if the remaining data is prefixed by the provided tag</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_optional_tag</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">starts_with</span>(<span class="ident">tag</span>) {
-            <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="ident">tag</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
+    <span class="doccomment">/// Read bytes if the remaining data is prefixed by the provided tag
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_optional_tag(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tag: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;bool, io::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.remaining.starts_with(tag) {
+            <span class="self">self</span>.read_exact(tag.len())<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
         }
     }
 
-    <span class="doccomment">/// Read bytes as long as the provided predicate is true</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_while</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>(<span class="ident">x</span>)) {
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="ident">position</span>),
+    <span class="doccomment">/// Read bytes as long as the provided predicate is true
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_while&lt;F: Fn(<span class="kw-2">&amp;</span>u8) -&gt; bool&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], io::Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.remaining.iter().position(|x| !f(x)) {
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.read_exact(<span class="self">self</span>.remaining.len()),
+            <span class="prelude-val">Some</span>(position) =&gt; <span class="self">self</span>.read_exact(position),
         }
     }
 
-    <span class="comment">// Parse an integer out of the ASCII digits</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_int</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&lt;</span><span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseIntError</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_while</span>(<span class="ident">u8::is_ascii_digit</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">str::from_utf8</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>)
+    <span class="comment">// Parse an integer out of the ASCII digits
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_int&lt;T: FromStr&lt;<span class="prelude-val">Err </span>= ParseIntError&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+        <span class="kw">let </span>bytes = <span class="self">self</span>.read_while(u8::is_ascii_digit)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(str::from_utf8(bytes)<span class="question-mark">?</span>.parse()<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Read bytes until the provided predicate is true</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_until</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="ident">f</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="self">self</span>.<span class="ident">remaining</span>.<span class="ident">len</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="ident">position</span>),
+    <span class="doccomment">/// Read bytes until the provided predicate is true
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_until&lt;F: Fn(<span class="kw-2">&amp;</span>u8) -&gt; bool&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], io::Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.remaining.iter().position(f) {
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.read_exact(<span class="self">self</span>.remaining.len()),
+            <span class="prelude-val">Some</span>(position) =&gt; <span class="self">self</span>.read_exact(position),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_be_i32</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSlice</span>(<span class="string">&quot;too short for i32&quot;</span>));
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_be_i32(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;i32, Error&gt; {
+    <span class="kw">if </span>bytes.len() != <span class="number">4 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSlice(<span class="string">&quot;too short for i32&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-    <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">i32::from_be_bytes</span>(<span class="ident">buf</span>))
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">4</span>];
+    buf.copy_from_slice(bytes);
+    <span class="prelude-val">Ok</span>(i32::from_be_bytes(buf))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_be_i64</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">8</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSlice</span>(<span class="string">&quot;too short for i64&quot;</span>));
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_be_i64(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;i64, Error&gt; {
+    <span class="kw">if </span>bytes.len() != <span class="number">8 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSlice(<span class="string">&quot;too short for i64&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-    <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">i64::from_be_bytes</span>(<span class="ident">buf</span>))
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+    buf.copy_from_slice(bytes);
+    <span class="prelude-val">Ok</span>(i64::from_be_bytes(buf))
 }
 
-<span class="doccomment">/// TZif version</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Version</span> {
-    <span class="doccomment">/// Version 1</span>
-    <span class="ident">V1</span>,
-    <span class="doccomment">/// Version 2</span>
-    <span class="ident">V2</span>,
-    <span class="doccomment">/// Version 3</span>
-    <span class="ident">V3</span>,
+<span class="doccomment">/// TZif version
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">enum </span>Version {
+    <span class="doccomment">/// Version 1
+    </span>V1,
+    <span class="doccomment">/// Version 2
+    </span>V2,
+    <span class="doccomment">/// Version 3
+    </span>V3,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

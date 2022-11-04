@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/stringprep-0.1.2/src/tables.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tables.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../stringprep/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../stringprep/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../stringprep/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/stringprep-0.1.2/src/tables.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tables.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../stringprep/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../stringprep/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../stringprep/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -199,206 +199,206 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Character Tables</span>
-<span class="kw">use</span> <span class="ident">unicode_bidi</span>::{<span class="ident">bidi_class</span>, <span class="ident">BidiClass</span>};
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::str::Chars</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Character Tables
+</span><span class="kw">use </span>unicode_bidi::{bidi_class, BidiClass};
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::str::Chars;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rfc3454</span>;
+<span class="kw">use </span><span class="kw">super</span>::rfc3454;
 
-<span class="doccomment">/// A.1 Unassigned code points in Unicode 3.2</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unassigned_code_point</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">rfc3454::A_1</span>
-        .<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">start</span>, <span class="ident">end</span>)<span class="op">|</span> <span class="kw">if</span> <span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">c</span> {
-            <span class="ident">Ordering::Greater</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">c</span> {
-            <span class="ident">Ordering::Less</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Ordering::Equal</span>
+<span class="doccomment">/// A.1 Unassigned code points in Unicode 3.2
+</span><span class="kw">pub fn </span>unassigned_code_point(c: char) -&gt; bool {
+    rfc3454::A_1
+        .binary_search_by(|<span class="kw-2">&amp;</span>(start, end)| <span class="kw">if </span>start &gt; c {
+            Ordering::Greater
+        } <span class="kw">else if </span>end &lt; c {
+            Ordering::Less
+        } <span class="kw">else </span>{
+            Ordering::Equal
         })
-        .<span class="ident">is_ok</span>()
+        .is_ok()
 }
 
-<span class="doccomment">/// B.1 Commonly mapped to nothing</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commonly_mapped_to_nothing</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{00AD}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{034F}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{1806}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{180B}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{180C}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{180D}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{200B}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{200C}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{200D}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2060}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE00}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE01}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FE02}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE03}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE04}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE05}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE06}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE07}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FE08}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE09}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE0A}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE0B}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE0C}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE0D}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FE0E}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FE0F}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FEFF}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// B.1 Commonly mapped to nothing
+</span><span class="kw">pub fn </span>commonly_mapped_to_nothing(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{00AD}&#39; </span>| <span class="string">&#39;\u{034F}&#39; </span>| <span class="string">&#39;\u{1806}&#39; </span>| <span class="string">&#39;\u{180B}&#39; </span>| <span class="string">&#39;\u{180C}&#39; </span>| <span class="string">&#39;\u{180D}&#39; </span>|
+        <span class="string">&#39;\u{200B}&#39; </span>| <span class="string">&#39;\u{200C}&#39; </span>| <span class="string">&#39;\u{200D}&#39; </span>| <span class="string">&#39;\u{2060}&#39; </span>| <span class="string">&#39;\u{FE00}&#39; </span>| <span class="string">&#39;\u{FE01}&#39; </span>|
+        <span class="string">&#39;\u{FE02}&#39; </span>| <span class="string">&#39;\u{FE03}&#39; </span>| <span class="string">&#39;\u{FE04}&#39; </span>| <span class="string">&#39;\u{FE05}&#39; </span>| <span class="string">&#39;\u{FE06}&#39; </span>| <span class="string">&#39;\u{FE07}&#39; </span>|
+        <span class="string">&#39;\u{FE08}&#39; </span>| <span class="string">&#39;\u{FE09}&#39; </span>| <span class="string">&#39;\u{FE0A}&#39; </span>| <span class="string">&#39;\u{FE0B}&#39; </span>| <span class="string">&#39;\u{FE0C}&#39; </span>| <span class="string">&#39;\u{FE0D}&#39; </span>|
+        <span class="string">&#39;\u{FE0E}&#39; </span>| <span class="string">&#39;\u{FE0F}&#39; </span>| <span class="string">&#39;\u{FEFF}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// B.2 Mapping for case-folding used with NFKC.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_fold_for_nfkc</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">CaseFoldForNfkc</span> {
-    <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rfc3454::B_2</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>, <span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="number">0</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">idx</span>) =&gt; <span class="ident">FoldInner::Chars</span>(<span class="ident">rfc3454::B_2</span>[<span class="ident">idx</span>].<span class="number">1</span>.<span class="ident">chars</span>()),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">FoldInner::Char</span>(<span class="prelude-val">Some</span>(<span class="ident">c</span>)),
+<span class="doccomment">/// B.2 Mapping for case-folding used with NFKC.
+</span><span class="kw">pub fn </span>case_fold_for_nfkc(c: char) -&gt; CaseFoldForNfkc {
+    <span class="kw">let </span>inner = <span class="kw">match </span>rfc3454::B_2.binary_search_by_key(<span class="kw-2">&amp;</span>c, |e| e.<span class="number">0</span>) {
+        <span class="prelude-val">Ok</span>(idx) =&gt; FoldInner::Chars(rfc3454::B_2[idx].<span class="number">1</span>.chars()),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; FoldInner::Char(<span class="prelude-val">Some</span>(c)),
     };
-    <span class="ident">CaseFoldForNfkc</span>(<span class="ident">inner</span>)
+    CaseFoldForNfkc(inner)
 }
 
-<span class="kw">enum</span> <span class="ident">FoldInner</span> {
-    <span class="ident">Chars</span>(<span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
-    <span class="ident">Char</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>),
+<span class="kw">enum </span>FoldInner {
+    Chars(Chars&lt;<span class="lifetime">&#39;static</span>&gt;),
+    Char(<span class="prelude-ty">Option</span>&lt;char&gt;),
 }
 
-<span class="doccomment">/// The iterator returned by `case_fold_for_nfkc`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CaseFoldForNfkc</span>(<span class="ident">FoldInner</span>);
+<span class="doccomment">/// The iterator returned by `case_fold_for_nfkc`.
+</span><span class="kw">pub struct </span>CaseFoldForNfkc(FoldInner);
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">CaseFoldForNfkc</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>CaseFoldForNfkc {
+    <span class="kw">type </span>Item = char;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">FoldInner::Chars</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">next</span>(),
-            <span class="ident">FoldInner::Char</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ch</span>) =&gt; <span class="ident">ch</span>.<span class="ident">take</span>(),
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            FoldInner::Chars(<span class="kw-2">ref mut </span>it) =&gt; it.next(),
+            FoldInner::Char(<span class="kw-2">ref mut </span>ch) =&gt; ch.take(),
         }
     }
 }
 
-<span class="doccomment">/// C.1.1 ASCII space characters</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ascii_space_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>
-}
+<span class="doccomment">/// C.1.1 ASCII space characters
+</span><span class="kw">pub fn </span>ascii_space_character(c: char) -&gt; bool {
+    c == <span class="string">&#39; &#39;
+</span>}
 
-<span class="doccomment">/// C.1.2 Non-ASCII space characters</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_ascii_space_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{00A0}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{1680}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2000}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2001}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2002}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2003}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2004}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2005}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2006}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2007}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2008}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{2009}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{200A}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{200B}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{202F}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{205F}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{3000}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.1.2 Non-ASCII space characters
+</span><span class="kw">pub fn </span>non_ascii_space_character(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{00A0}&#39; </span>| <span class="string">&#39;\u{1680}&#39; </span>| <span class="string">&#39;\u{2000}&#39; </span>| <span class="string">&#39;\u{2001}&#39; </span>| <span class="string">&#39;\u{2002}&#39; </span>| <span class="string">&#39;\u{2003}&#39; </span>|
+        <span class="string">&#39;\u{2004}&#39; </span>| <span class="string">&#39;\u{2005}&#39; </span>| <span class="string">&#39;\u{2006}&#39; </span>| <span class="string">&#39;\u{2007}&#39; </span>| <span class="string">&#39;\u{2008}&#39; </span>| <span class="string">&#39;\u{2009}&#39; </span>|
+        <span class="string">&#39;\u{200A}&#39; </span>| <span class="string">&#39;\u{200B}&#39; </span>| <span class="string">&#39;\u{202F}&#39; </span>| <span class="string">&#39;\u{205F}&#39; </span>| <span class="string">&#39;\u{3000}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.2.1 ASCII control characters</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ascii_control_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{0000}&#39;</span>...<span class="string">&#39;\u{001F}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{007F}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.2.1 ASCII control characters
+</span><span class="kw">pub fn </span>ascii_control_character(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{0000}&#39;</span>...<span class="string">&#39;\u{001F}&#39; </span>|
+        <span class="string">&#39;\u{007F}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.2.2 Non-ASCII control characters</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_ascii_control_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{0080}&#39;</span>...<span class="string">&#39;\u{009F}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{06DD}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{070F}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{180E}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{200C}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{200D}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2028}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2029}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2060}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2061}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2062}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2063}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{206A}&#39;</span>...<span class="string">&#39;\u{206F}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FEFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FFF9}&#39;</span>...<span class="string">&#39;\u{FFFC}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{1D173}&#39;</span>...<span class="string">&#39;\u{1D17A}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.2.2 Non-ASCII control characters
+</span><span class="kw">pub fn </span>non_ascii_control_character(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{0080}&#39;</span>...<span class="string">&#39;\u{009F}&#39; </span>|
+        <span class="string">&#39;\u{06DD}&#39; </span>|
+        <span class="string">&#39;\u{070F}&#39; </span>|
+        <span class="string">&#39;\u{180E}&#39; </span>|
+        <span class="string">&#39;\u{200C}&#39; </span>|
+        <span class="string">&#39;\u{200D}&#39; </span>|
+        <span class="string">&#39;\u{2028}&#39; </span>|
+        <span class="string">&#39;\u{2029}&#39; </span>|
+        <span class="string">&#39;\u{2060}&#39; </span>|
+        <span class="string">&#39;\u{2061}&#39; </span>|
+        <span class="string">&#39;\u{2062}&#39; </span>|
+        <span class="string">&#39;\u{2063}&#39; </span>|
+        <span class="string">&#39;\u{206A}&#39;</span>...<span class="string">&#39;\u{206F}&#39; </span>|
+        <span class="string">&#39;\u{FEFF}&#39; </span>|
+        <span class="string">&#39;\u{FFF9}&#39;</span>...<span class="string">&#39;\u{FFFC}&#39; </span>|
+        <span class="string">&#39;\u{1D173}&#39;</span>...<span class="string">&#39;\u{1D17A}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.3 Private use</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private_use</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{E000}&#39;</span>...<span class="string">&#39;\u{F8FF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{F0000}&#39;</span>...<span class="string">&#39;\u{FFFFD}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{100000}&#39;</span>...<span class="string">&#39;\u{10FFFD}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.3 Private use
+</span><span class="kw">pub fn </span>private_use(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{E000}&#39;</span>...<span class="string">&#39;\u{F8FF}&#39; </span>|
+        <span class="string">&#39;\u{F0000}&#39;</span>...<span class="string">&#39;\u{FFFFD}&#39; </span>|
+        <span class="string">&#39;\u{100000}&#39;</span>...<span class="string">&#39;\u{10FFFD}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.4 Non-character code points</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_character_code_point</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{FDD0}&#39;</span>...<span class="string">&#39;\u{FDEF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FFFE}&#39;</span>...<span class="string">&#39;\u{FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{1FFFE}&#39;</span>...<span class="string">&#39;\u{1FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{2FFFE}&#39;</span>...<span class="string">&#39;\u{2FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{3FFFE}&#39;</span>...<span class="string">&#39;\u{3FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{4FFFE}&#39;</span>...<span class="string">&#39;\u{4FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{5FFFE}&#39;</span>...<span class="string">&#39;\u{5FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{6FFFE}&#39;</span>...<span class="string">&#39;\u{6FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{7FFFE}&#39;</span>...<span class="string">&#39;\u{7FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{8FFFE}&#39;</span>...<span class="string">&#39;\u{8FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{9FFFE}&#39;</span>...<span class="string">&#39;\u{9FFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{AFFFE}&#39;</span>...<span class="string">&#39;\u{AFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{BFFFE}&#39;</span>...<span class="string">&#39;\u{BFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{CFFFE}&#39;</span>...<span class="string">&#39;\u{CFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{DFFFE}&#39;</span>...<span class="string">&#39;\u{DFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{EFFFE}&#39;</span>...<span class="string">&#39;\u{EFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{FFFFE}&#39;</span>...<span class="string">&#39;\u{FFFFF}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{10FFFE}&#39;</span>...<span class="string">&#39;\u{10FFFF}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.4 Non-character code points
+</span><span class="kw">pub fn </span>non_character_code_point(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{FDD0}&#39;</span>...<span class="string">&#39;\u{FDEF}&#39; </span>|
+        <span class="string">&#39;\u{FFFE}&#39;</span>...<span class="string">&#39;\u{FFFF}&#39; </span>|
+        <span class="string">&#39;\u{1FFFE}&#39;</span>...<span class="string">&#39;\u{1FFFF}&#39; </span>|
+        <span class="string">&#39;\u{2FFFE}&#39;</span>...<span class="string">&#39;\u{2FFFF}&#39; </span>|
+        <span class="string">&#39;\u{3FFFE}&#39;</span>...<span class="string">&#39;\u{3FFFF}&#39; </span>|
+        <span class="string">&#39;\u{4FFFE}&#39;</span>...<span class="string">&#39;\u{4FFFF}&#39; </span>|
+        <span class="string">&#39;\u{5FFFE}&#39;</span>...<span class="string">&#39;\u{5FFFF}&#39; </span>|
+        <span class="string">&#39;\u{6FFFE}&#39;</span>...<span class="string">&#39;\u{6FFFF}&#39; </span>|
+        <span class="string">&#39;\u{7FFFE}&#39;</span>...<span class="string">&#39;\u{7FFFF}&#39; </span>|
+        <span class="string">&#39;\u{8FFFE}&#39;</span>...<span class="string">&#39;\u{8FFFF}&#39; </span>|
+        <span class="string">&#39;\u{9FFFE}&#39;</span>...<span class="string">&#39;\u{9FFFF}&#39; </span>|
+        <span class="string">&#39;\u{AFFFE}&#39;</span>...<span class="string">&#39;\u{AFFFF}&#39; </span>|
+        <span class="string">&#39;\u{BFFFE}&#39;</span>...<span class="string">&#39;\u{BFFFF}&#39; </span>|
+        <span class="string">&#39;\u{CFFFE}&#39;</span>...<span class="string">&#39;\u{CFFFF}&#39; </span>|
+        <span class="string">&#39;\u{DFFFE}&#39;</span>...<span class="string">&#39;\u{DFFFF}&#39; </span>|
+        <span class="string">&#39;\u{EFFFE}&#39;</span>...<span class="string">&#39;\u{EFFFF}&#39; </span>|
+        <span class="string">&#39;\u{FFFFE}&#39;</span>...<span class="string">&#39;\u{FFFFF}&#39; </span>|
+        <span class="string">&#39;\u{10FFFE}&#39;</span>...<span class="string">&#39;\u{10FFFF}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.5 Surrogate codes</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">surrogate_code</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="comment">// forbidden by rust</span>
-        <span class="comment">/*&#39;\u{D800}&#39;...&#39;\u{DFFF}&#39; =&gt; true,*/</span>
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.5 Surrogate codes
+</span><span class="kw">pub fn </span>surrogate_code(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="comment">// forbidden by rust
+        /*&#39;\u{D800}&#39;...&#39;\u{DFFF}&#39; =&gt; true,*/
+        </span><span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.6 Inappropriate for plain text</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inappropriate_for_plain_text</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{FFF9}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FFFA}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FFFB}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FFFC}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{FFFD}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.6 Inappropriate for plain text
+</span><span class="kw">pub fn </span>inappropriate_for_plain_text(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{FFF9}&#39; </span>| <span class="string">&#39;\u{FFFA}&#39; </span>| <span class="string">&#39;\u{FFFB}&#39; </span>| <span class="string">&#39;\u{FFFC}&#39; </span>| <span class="string">&#39;\u{FFFD}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.7 Inappropriate for canonical representation</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inappropriate_for_canonical_representation</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{2FF0}&#39;</span>...<span class="string">&#39;\u{2FFB}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.7 Inappropriate for canonical representation
+</span><span class="kw">pub fn </span>inappropriate_for_canonical_representation(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{2FF0}&#39;</span>...<span class="string">&#39;\u{2FFB}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.8 Change display properties or are deprecated</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">change_display_properties_or_deprecated</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{0340}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{0341}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{200E}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{200F}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{202A}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{202B}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{202C}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{202D}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{202E}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{206A}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{206B}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{206C}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{206D}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{206E}&#39;</span> <span class="op">|</span> <span class="string">&#39;\u{206F}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.8 Change display properties or are deprecated
+</span><span class="kw">pub fn </span>change_display_properties_or_deprecated(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{0340}&#39; </span>| <span class="string">&#39;\u{0341}&#39; </span>| <span class="string">&#39;\u{200E}&#39; </span>| <span class="string">&#39;\u{200F}&#39; </span>| <span class="string">&#39;\u{202A}&#39; </span>| <span class="string">&#39;\u{202B}&#39; </span>|
+        <span class="string">&#39;\u{202C}&#39; </span>| <span class="string">&#39;\u{202D}&#39; </span>| <span class="string">&#39;\u{202E}&#39; </span>| <span class="string">&#39;\u{206A}&#39; </span>| <span class="string">&#39;\u{206B}&#39; </span>| <span class="string">&#39;\u{206C}&#39; </span>|
+        <span class="string">&#39;\u{206D}&#39; </span>| <span class="string">&#39;\u{206E}&#39; </span>| <span class="string">&#39;\u{206F}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// C.9 Tagging characters</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tagging_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">&#39;\u{E0001}&#39;</span> <span class="op">|</span>
-        <span class="string">&#39;\u{E0020}&#39;</span>...<span class="string">&#39;\u{E007F}&#39;</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// C.9 Tagging characters
+</span><span class="kw">pub fn </span>tagging_character(c: char) -&gt; bool {
+    <span class="kw">match </span>c {
+        <span class="string">&#39;\u{E0001}&#39; </span>|
+        <span class="string">&#39;\u{E0020}&#39;</span>...<span class="string">&#39;\u{E007F}&#39; </span>=&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// D.1 Characters with bidirectional property &quot;R&quot; or &quot;AL&quot;</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bidi_r_or_al</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">bidi_class</span>(<span class="ident">c</span>) {
-        <span class="ident">BidiClass::R</span> <span class="op">|</span> <span class="ident">BidiClass::AL</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// D.1 Characters with bidirectional property &quot;R&quot; or &quot;AL&quot;
+</span><span class="kw">pub fn </span>bidi_r_or_al(c: char) -&gt; bool {
+    <span class="kw">match </span>bidi_class(c) {
+        BidiClass::R | BidiClass::AL =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// D.2 Characters with bidirectional property &quot;L&quot;</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bidi_l</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">bidi_class</span>(<span class="ident">c</span>) {
-        <span class="ident">BidiClass::L</span> =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// D.2 Characters with bidirectional property &quot;L&quot;
+</span><span class="kw">pub fn </span>bidi_l(c: char) -&gt; bool {
+    <span class="kw">match </span>bidi_class(c) {
+        BidiClass::L =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="stringprep" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="stringprep" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

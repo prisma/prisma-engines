@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-rustls-0.23.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-rustls-0.23.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -506,513 +506,513 @@
 <span id="506">506</span>
 <span id="507">507</span>
 <span id="508">508</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Asynchronous TLS/SSL streams for Tokio using [Rustls](https://github.com/ctz/rustls).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Why do I need to call `poll_flush`?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Most TLS implementations will have an internal buffer to improve throughput,</span>
-<span class="doccomment">//! and rustls is no exception.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When we write data to `TlsStream`, we always write rustls buffer first,</span>
-<span class="doccomment">//! then take out rustls encrypted data packet, and write it to data channel (like TcpStream).</span>
-<span class="doccomment">//! When data channel is pending, some data may remain in rustls buffer.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `tokio-rustls` To keep it simple and correct, [TlsStream] will behave like `BufWriter`.</span>
-<span class="doccomment">//! For `TlsStream&lt;TcpStream&gt;`, this means that data written by `poll_write` is not guaranteed to be written to `TcpStream`.</span>
-<span class="doccomment">//! You must call `poll_flush` to ensure that it is written to `TcpStream`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You should call `poll_flush` at the appropriate time,</span>
-<span class="doccomment">//! such as when a period of `poll_write` write is complete and there is no more data to write.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Why don&#39;t we write during `poll_read`?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! We did this in the early days of `tokio-rustls`, but it caused some bugs.</span>
-<span class="doccomment">//! We can solve these bugs through some solutions, but this will cause performance degradation (reverse false wakeup).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! And reverse write will also prevent us implement full duplex in the future.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! see &lt;https://github.com/tokio-rs/tls/issues/40&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Why can&#39;t we handle it like `native-tls`?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When data channel returns to pending, `native-tls` will falsely report the number of bytes it consumes.</span>
-<span class="doccomment">//! This means that if data written by `poll_write` is not actually written to data channel, it will not return `Ready`.</span>
-<span class="doccomment">//! Thus avoiding the call of `poll_flush`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! but which does not conform to convention of `AsyncWrite` trait.</span>
-<span class="doccomment">//! This means that if you give inconsistent data in two `poll_write`, it may cause unexpected behavior.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! see &lt;https://github.com/tokio-rs/tls/issues/41&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Asynchronous TLS/SSL streams for Tokio using [Rustls](https://github.com/ctz/rustls).
+//!
+//! # Why do I need to call `poll_flush`?
+//!
+//! Most TLS implementations will have an internal buffer to improve throughput,
+//! and rustls is no exception.
+//!
+//! When we write data to `TlsStream`, we always write rustls buffer first,
+//! then take out rustls encrypted data packet, and write it to data channel (like TcpStream).
+//! When data channel is pending, some data may remain in rustls buffer.
+//!
+//! `tokio-rustls` To keep it simple and correct, [TlsStream] will behave like `BufWriter`.
+//! For `TlsStream&lt;TcpStream&gt;`, this means that data written by `poll_write` is not guaranteed to be written to `TcpStream`.
+//! You must call `poll_flush` to ensure that it is written to `TcpStream`.
+//!
+//! You should call `poll_flush` at the appropriate time,
+//! such as when a period of `poll_write` write is complete and there is no more data to write.
+//!
+//! ## Why don&#39;t we write during `poll_read`?
+//!
+//! We did this in the early days of `tokio-rustls`, but it caused some bugs.
+//! We can solve these bugs through some solutions, but this will cause performance degradation (reverse false wakeup).
+//!
+//! And reverse write will also prevent us implement full duplex in the future.
+//!
+//! see &lt;https://github.com/tokio-rs/tls/issues/40&gt;
+//!
+//! ## Why can&#39;t we handle it like `native-tls`?
+//!
+//! When data channel returns to pending, `native-tls` will falsely report the number of bytes it consumes.
+//! This means that if data written by `poll_write` is not actually written to data channel, it will not return `Ready`.
+//! Thus avoiding the call of `poll_flush`.
+//!
+//! but which does not conform to convention of `AsyncWrite` trait.
+//! This means that if you give inconsistent data in two `poll_write`, it may cause unexpected behavior.
+//!
+//! see &lt;https://github.com/tokio-rs/tls/issues/41&gt;
 
-<span class="macro">macro_rules!</span> <span class="ident">ready</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span> ) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="ident">std::task::Poll::Ready</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="ident">std::task::Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">std::task::Poll::Pending</span>,
+</span><span class="macro">macro_rules! </span>ready {
+    ( <span class="macro-nonterminal">$e</span>:expr ) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+            std::task::Poll::Ready(t) =&gt; t,
+            std::task::Poll::Pending =&gt; <span class="kw">return </span>std::task::Poll::Pending,
         }
     };
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">server</span>;
+<span class="kw">pub mod </span>client;
+<span class="kw">mod </span>common;
+<span class="kw">pub mod </span>server;
 
-<span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">MidHandshake</span>, <span class="ident">Stream</span>, <span class="ident">TlsState</span>};
-<span class="kw">use</span> <span class="ident">rustls</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ClientConnection</span>, <span class="ident">CommonState</span>, <span class="ident">ServerConfig</span>, <span class="ident">ServerConnection</span>};
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">RawFd</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">AsRawSocket</span>, <span class="ident">RawSocket</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+<span class="kw">use </span>common::{MidHandshake, Stream, TlsState};
+<span class="kw">use </span>rustls::{ClientConfig, ClientConnection, CommonState, ServerConfig, ServerConnection};
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::io;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>std::os::unix::io::{AsRawFd, RawFd};
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">use </span>std::os::windows::io::{AsRawSocket, RawSocket};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rustls</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">webpki</span>;
+<span class="kw">pub use </span>rustls;
+<span class="kw">pub use </span>webpki;
 
-<span class="doccomment">/// A wrapper around a `rustls::ClientConfig`, providing an async `connect` method.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsConnector</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-    <span class="ident">early_data</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A wrapper around a `rustls::ClientConfig`, providing an async `connect` method.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>TlsConnector {
+    inner: Arc&lt;ClientConfig&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;early-data&quot;</span>)]
+    </span>early_data: bool,
 }
 
-<span class="doccomment">/// A wrapper around a `rustls::ServerConfig`, providing an async `accept` method.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsAcceptor</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A wrapper around a `rustls::ServerConfig`, providing an async `accept` method.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>TlsAcceptor {
+    inner: Arc&lt;ServerConfig&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsConnector</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>) -&gt; <span class="ident">TlsConnector</span> {
-        <span class="ident">TlsConnector</span> {
-            <span class="ident">inner</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-            <span class="ident">early_data</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>From&lt;Arc&lt;ClientConfig&gt;&gt; <span class="kw">for </span>TlsConnector {
+    <span class="kw">fn </span>from(inner: Arc&lt;ClientConfig&gt;) -&gt; TlsConnector {
+        TlsConnector {
+            inner,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;early-data&quot;</span>)]
+            </span>early_data: <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>) -&gt; <span class="ident">TlsAcceptor</span> {
-        <span class="ident">TlsAcceptor</span> { <span class="ident">inner</span> }
+<span class="kw">impl </span>From&lt;Arc&lt;ServerConfig&gt;&gt; <span class="kw">for </span>TlsAcceptor {
+    <span class="kw">fn </span>from(inner: Arc&lt;ServerConfig&gt;) -&gt; TlsAcceptor {
+        TlsAcceptor { inner }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TlsConnector</span> {
-    <span class="doccomment">/// Enable 0-RTT.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you want to use 0-RTT,</span>
-    <span class="doccomment">/// You must also set `ClientConfig.enable_early_data` to `true`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">early_data</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TlsConnector</span> {
-        <span class="self">self</span>.<span class="ident">early_data</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
+<span class="kw">impl </span>TlsConnector {
+    <span class="doccomment">/// Enable 0-RTT.
+    ///
+    /// If you want to use 0-RTT,
+    /// You must also set `ClientConfig.enable_early_data` to `true`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;early-data&quot;</span>)]
+    </span><span class="kw">pub fn </span>early_data(<span class="kw-2">mut </span><span class="self">self</span>, flag: bool) -&gt; TlsConnector {
+        <span class="self">self</span>.early_data = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>connect&lt;IO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, domain: rustls::ServerName, stream: IO) -&gt; Connect&lt;IO&gt;
+    <span class="kw">where
+        </span>IO: AsyncRead + AsyncWrite + Unpin,
+    {
+        <span class="self">self</span>.connect_with(domain, stream, |<span class="kw">_</span>| ())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">rustls::ServerName</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) -&gt; <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="kw">pub fn </span>connect_with&lt;IO, F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, domain: rustls::ServerName, stream: IO, f: F) -&gt; Connect&lt;IO&gt;
+    <span class="kw">where
+        </span>IO: AsyncRead + AsyncWrite + Unpin,
+        F: FnOnce(<span class="kw-2">&amp;mut </span>ClientConnection),
     {
-        <span class="self">self</span>.<span class="ident">connect_with</span>(<span class="ident">domain</span>, <span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">domain</span>: <span class="ident">rustls::ServerName</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ClientConnection</span>),
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ClientConnection::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(), <span class="ident">domain</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">session</span>) =&gt; <span class="ident">session</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">Connect</span>(<span class="ident">MidHandshake::Error</span> {
-                    <span class="ident">io</span>: <span class="ident">stream</span>,
-                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?</span>
-                    <span class="comment">// Probably not...</span>
-                    <span class="ident">error</span>: <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">error</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>session = <span class="kw">match </span>ClientConnection::new(<span class="self">self</span>.inner.clone(), domain) {
+            <span class="prelude-val">Ok</span>(session) =&gt; session,
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">return </span>Connect(MidHandshake::Error {
+                    io: stream,
+                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?
+                    // Probably not...
+                    </span>error: io::Error::new(io::ErrorKind::Other, error),
                 });
             }
         };
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">session</span>);
+        f(<span class="kw-2">&amp;mut </span>session);
 
-        <span class="ident">Connect</span>(<span class="ident">MidHandshake::Handshaking</span>(<span class="ident">client::TlsStream</span> {
-            <span class="ident">io</span>: <span class="ident">stream</span>,
+        Connect(MidHandshake::Handshaking(client::TlsStream {
+            io: stream,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>))]</span>
-            <span class="ident">state</span>: <span class="ident">TlsState::Stream</span>,
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;early-data&quot;</span>))]
+            </span>state: TlsState::Stream,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-            <span class="ident">state</span>: <span class="kw">if</span> <span class="self">self</span>.<span class="ident">early_data</span> <span class="op">&amp;&amp;</span> <span class="ident">session</span>.<span class="ident">early_data</span>().<span class="ident">is_some</span>() {
-                <span class="ident">TlsState::EarlyData</span>(<span class="number">0</span>, <span class="ident">Vec::new</span>())
-            } <span class="kw">else</span> {
-                <span class="ident">TlsState::Stream</span>
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;early-data&quot;</span>)]
+            </span>state: <span class="kw">if </span><span class="self">self</span>.early_data &amp;&amp; session.early_data().is_some() {
+                TlsState::EarlyData(<span class="number">0</span>, Vec::new())
+            } <span class="kw">else </span>{
+                TlsState::Stream
             },
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;early-data&quot;</span>)]</span>
-            <span class="ident">early_waker</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;early-data&quot;</span>)]
+            </span>early_waker: <span class="prelude-val">None</span>,
 
-            <span class="ident">session</span>,
+            session,
         }))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TlsAcceptor</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl </span>TlsAcceptor {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>accept&lt;IO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: IO) -&gt; Accept&lt;IO&gt;
+    <span class="kw">where
+        </span>IO: AsyncRead + AsyncWrite + Unpin,
     {
-        <span class="self">self</span>.<span class="ident">accept_with</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+        <span class="self">self</span>.accept_with(stream, |<span class="kw">_</span>| ())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">accept_with</span><span class="op">&lt;</span><span class="ident">IO</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">IO</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ServerConnection</span>),
+    <span class="kw">pub fn </span>accept_with&lt;IO, F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: IO, f: F) -&gt; Accept&lt;IO&gt;
+    <span class="kw">where
+        </span>IO: AsyncRead + AsyncWrite + Unpin,
+        F: FnOnce(<span class="kw-2">&amp;mut </span>ServerConnection),
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ServerConnection::new</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">session</span>) =&gt; <span class="ident">session</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">Accept</span>(<span class="ident">MidHandshake::Error</span> {
-                    <span class="ident">io</span>: <span class="ident">stream</span>,
-                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?</span>
-                    <span class="comment">// Probably not...</span>
-                    <span class="ident">error</span>: <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">error</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>session = <span class="kw">match </span>ServerConnection::new(<span class="self">self</span>.inner.clone()) {
+            <span class="prelude-val">Ok</span>(session) =&gt; session,
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">return </span>Accept(MidHandshake::Error {
+                    io: stream,
+                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?
+                    // Probably not...
+                    </span>error: io::Error::new(io::ErrorKind::Other, error),
                 });
             }
         };
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">session</span>);
+        f(<span class="kw-2">&amp;mut </span>session);
 
-        <span class="ident">Accept</span>(<span class="ident">MidHandshake::Handshaking</span>(<span class="ident">server::TlsStream</span> {
-            <span class="ident">session</span>,
-            <span class="ident">io</span>: <span class="ident">stream</span>,
-            <span class="ident">state</span>: <span class="ident">TlsState::Stream</span>,
+        Accept(MidHandshake::Handshaking(server::TlsStream {
+            session,
+            io: stream,
+            state: TlsState::Stream,
         }))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LazyConfigAcceptor</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="ident">acceptor</span>: <span class="ident">rustls::server::Acceptor</span>,
-    <span class="ident">io</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>LazyConfigAcceptor&lt;IO&gt; {
+    acceptor: rustls::server::Acceptor,
+    io: <span class="prelude-ty">Option</span>&lt;IO&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">LazyConfigAcceptor</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;IO&gt; LazyConfigAcceptor&lt;IO&gt;
+<span class="kw">where
+    </span>IO: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">acceptor</span>: <span class="ident">rustls::server::Acceptor</span>, <span class="ident">io</span>: <span class="ident">IO</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">acceptor</span>,
-            <span class="ident">io</span>: <span class="prelude-val">Some</span>(<span class="ident">io</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(acceptor: rustls::server::Acceptor, io: IO) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            acceptor,
+            io: <span class="prelude-val">Some</span>(io),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">LazyConfigAcceptor</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;IO&gt; Future <span class="kw">for </span>LazyConfigAcceptor&lt;IO&gt;
+<span class="kw">where
+    </span>IO: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StartHandshake</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;StartHandshake&lt;IO&gt;, io::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">io</span>.<span class="ident">as_mut</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">io</span>) =&gt; <span class="ident">io</span>,
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                        <span class="ident">io::ErrorKind::Other</span>,
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.get_mut();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>io = <span class="kw">match </span>this.io.as_mut() {
+                <span class="prelude-val">Some</span>(io) =&gt; io,
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(
+                        io::ErrorKind::Other,
                         <span class="string">&quot;acceptor cannot be polled after acceptance&quot;</span>,
                     )))
                 }
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">common::SyncReadAdapter</span> { <span class="ident">io</span>, <span class="ident">cx</span> };
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">acceptor</span>.<span class="ident">read_tls</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>) {
-                <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::UnexpectedEof</span>.<span class="ident">into</span>()).<span class="ident">into</span>(),
+            <span class="kw">let </span><span class="kw-2">mut </span>reader = common::SyncReadAdapter { io, cx };
+            <span class="kw">match </span>this.acceptor.read_tls(<span class="kw-2">&amp;mut </span>reader) {
+                <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(io::ErrorKind::UnexpectedEof.into()).into(),
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
+                <span class="prelude-val">Err</span>(e) <span class="kw">if </span>e.kind() == io::ErrorKind::WouldBlock =&gt; <span class="kw">return </span>Poll::Pending,
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(e).into(),
             }
 
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">acceptor</span>.<span class="ident">accept</span>() {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">accepted</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">io</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">StartHandshake</span> { <span class="ident">accepted</span>, <span class="ident">io</span> }));
+            <span class="kw">match </span>this.acceptor.accept() {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(accepted)) =&gt; {
+                    <span class="kw">let </span>io = this.io.take().unwrap();
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(StartHandshake { accepted, io }));
                 }
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">continue</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">err</span>)))
+                <span class="prelude-val">Err</span>(err) =&gt; {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(io::ErrorKind::InvalidInput, err)))
                 }
             }
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StartHandshake</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="ident">accepted</span>: <span class="ident">rustls::server::Accepted</span>,
-    <span class="ident">io</span>: <span class="ident">IO</span>,
+<span class="kw">pub struct </span>StartHandshake&lt;IO&gt; {
+    accepted: rustls::server::Accepted,
+    io: IO,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">StartHandshake</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;IO&gt; StartHandshake&lt;IO&gt;
+<span class="kw">where
+    </span>IO: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">client_hello</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">rustls::server::ClientHello</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">accepted</span>.<span class="ident">client_hello</span>()
+    <span class="kw">pub fn </span>client_hello(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; rustls::server::ClientHello&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.accepted.client_hello()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_stream</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">into_stream_with</span>(<span class="ident">config</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+    <span class="kw">pub fn </span>into_stream(<span class="self">self</span>, config: Arc&lt;ServerConfig&gt;) -&gt; Accept&lt;IO&gt; {
+        <span class="self">self</span>.into_stream_with(config, |<span class="kw">_</span>| ())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_stream_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ServerConnection</span>),
+    <span class="kw">pub fn </span>into_stream_with&lt;F&gt;(<span class="self">self</span>, config: Arc&lt;ServerConfig&gt;, f: F) -&gt; Accept&lt;IO&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>ServerConnection),
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">accepted</span>.<span class="ident">into_connection</span>(<span class="ident">config</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">Accept</span>(<span class="ident">MidHandshake::Error</span> {
-                    <span class="ident">io</span>: <span class="self">self</span>.<span class="ident">io</span>,
-                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?</span>
-                    <span class="comment">// Probably not...</span>
-                    <span class="ident">error</span>: <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">error</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span><span class="self">self</span>.accepted.into_connection(config) {
+            <span class="prelude-val">Ok</span>(conn) =&gt; conn,
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">return </span>Accept(MidHandshake::Error {
+                    io: <span class="self">self</span>.io,
+                    <span class="comment">// TODO(eliza): should this really return an `io::Error`?
+                    // Probably not...
+                    </span>error: io::Error::new(io::ErrorKind::Other, error),
                 });
             }
         };
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
+        f(<span class="kw-2">&amp;mut </span>conn);
 
-        <span class="ident">Accept</span>(<span class="ident">MidHandshake::Handshaking</span>(<span class="ident">server::TlsStream</span> {
-            <span class="ident">session</span>: <span class="ident">conn</span>,
-            <span class="ident">io</span>: <span class="self">self</span>.<span class="ident">io</span>,
-            <span class="ident">state</span>: <span class="ident">TlsState::Stream</span>,
+        Accept(MidHandshake::Handshaking(server::TlsStream {
+            session: conn,
+            io: <span class="self">self</span>.io,
+            state: TlsState::Stream,
         }))
     }
 }
 
-<span class="doccomment">/// Future returned from `TlsConnector::connect` which will resolve</span>
-<span class="doccomment">/// once the connection handshake has finished.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="ident">MidHandshake</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Future returned from `TlsConnector::connect` which will resolve
+/// once the connection handshake has finished.
+</span><span class="kw">pub struct </span>Connect&lt;IO&gt;(MidHandshake&lt;client::TlsStream&lt;IO&gt;&gt;);
 
-<span class="doccomment">/// Future returned from `TlsAcceptor::accept` which will resolve</span>
-<span class="doccomment">/// once the accept handshake has finished.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="ident">MidHandshake</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Future returned from `TlsAcceptor::accept` which will resolve
+/// once the accept handshake has finished.
+</span><span class="kw">pub struct </span>Accept&lt;IO&gt;(MidHandshake&lt;server::TlsStream&lt;IO&gt;&gt;);
 
-<span class="doccomment">/// Like [Connect], but returns `IO` on failure.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FallibleConnect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="ident">MidHandshake</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Like [Connect], but returns `IO` on failure.
+</span><span class="kw">pub struct </span>FallibleConnect&lt;IO&gt;(MidHandshake&lt;client::TlsStream&lt;IO&gt;&gt;);
 
-<span class="doccomment">/// Like [Accept], but returns `IO` on failure.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FallibleAccept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="ident">MidHandshake</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Like [Accept], but returns `IO` on failure.
+</span><span class="kw">pub struct </span>FallibleAccept&lt;IO&gt;(MidHandshake&lt;server::TlsStream&lt;IO&gt;&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_fallible</span>(<span class="self">self</span>) -&gt; <span class="ident">FallibleConnect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="ident">FallibleConnect</span>(<span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;IO&gt; Connect&lt;IO&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>into_fallible(<span class="self">self</span>) -&gt; FallibleConnect&lt;IO&gt; {
+        FallibleConnect(<span class="self">self</span>.<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">MidHandshake::Handshaking</span>(<span class="ident">sess</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sess</span>.<span class="ident">get_ref</span>().<span class="number">0</span>),
-            <span class="ident">MidHandshake::Error</span> { <span class="ident">io</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">io</span>),
-            <span class="ident">MidHandshake::End</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IO&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            MidHandshake::Handshaking(sess) =&gt; <span class="prelude-val">Some</span>(sess.get_ref().<span class="number">0</span>),
+            MidHandshake::Error { io, .. } =&gt; <span class="prelude-val">Some</span>(io),
+            MidHandshake::End =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">MidHandshake::Handshaking</span>(<span class="ident">sess</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sess</span>.<span class="ident">get_mut</span>().<span class="number">0</span>),
-            <span class="ident">MidHandshake::Error</span> { <span class="ident">io</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">io</span>),
-            <span class="ident">MidHandshake::End</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_fallible</span>(<span class="self">self</span>) -&gt; <span class="ident">FallibleAccept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="ident">FallibleAccept</span>(<span class="self">self</span>.<span class="number">0</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">MidHandshake::Handshaking</span>(<span class="ident">sess</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sess</span>.<span class="ident">get_ref</span>().<span class="number">0</span>),
-            <span class="ident">MidHandshake::Error</span> { <span class="ident">io</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">io</span>),
-            <span class="ident">MidHandshake::End</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">IO</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">MidHandshake::Handshaking</span>(<span class="ident">sess</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sess</span>.<span class="ident">get_mut</span>().<span class="number">0</span>),
-            <span class="ident">MidHandshake::Error</span> { <span class="ident">io</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">io</span>),
-            <span class="ident">MidHandshake::End</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>IO&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0 </span>{
+            MidHandshake::Handshaking(sess) =&gt; <span class="prelude-val">Some</span>(sess.get_mut().<span class="number">0</span>),
+            MidHandshake::Error { io, .. } =&gt; <span class="prelude-val">Some</span>(io),
+            MidHandshake::End =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Connect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;IO&gt; Accept&lt;IO&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>into_fallible(<span class="self">self</span>) -&gt; FallibleAccept&lt;IO&gt; {
+        FallibleAccept(<span class="self">self</span>.<span class="number">0</span>)
+    }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="ident">err</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">err</span>)
+    <span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IO&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>{
+            MidHandshake::Handshaking(sess) =&gt; <span class="prelude-val">Some</span>(sess.get_ref().<span class="number">0</span>),
+            MidHandshake::Error { io, .. } =&gt; <span class="prelude-val">Some</span>(io),
+            MidHandshake::End =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>IO&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0 </span>{
+            MidHandshake::Handshaking(sess) =&gt; <span class="prelude-val">Some</span>(sess.get_mut().<span class="number">0</span>),
+            MidHandshake::Error { io, .. } =&gt; <span class="prelude-val">Some</span>(io),
+            MidHandshake::End =&gt; <span class="prelude-val">None</span>,
+        }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;IO: AsyncRead + AsyncWrite + Unpin&gt; Future <span class="kw">for </span>Connect&lt;IO&gt; {
+    <span class="kw">type </span>Output = io::Result&lt;client::TlsStream&lt;IO&gt;&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span>(<span class="ident">err</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">err</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll(cx).map_err(|(err, <span class="kw">_</span>)| err)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">FallibleConnect</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, (<span class="ident">io::Error</span>, <span class="ident">IO</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;IO: AsyncRead + AsyncWrite + Unpin&gt; Future <span class="kw">for </span>Accept&lt;IO&gt; {
+    <span class="kw">type </span>Output = io::Result&lt;server::TlsStream&lt;IO&gt;&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll(cx).map_err(|(err, <span class="kw">_</span>)| err)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">FallibleAccept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, (<span class="ident">io::Error</span>, <span class="ident">IO</span>)<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;IO: AsyncRead + AsyncWrite + Unpin&gt; Future <span class="kw">for </span>FallibleConnect&lt;IO&gt; {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;client::TlsStream&lt;IO&gt;, (io::Error, IO)&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll(cx)
     }
 }
 
-<span class="doccomment">/// Unified TLS stream type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This abstracts over the inner `client::TlsStream` and `server::TlsStream`, so you can use</span>
-<span class="doccomment">/// a single type to keep both client- and server-initiated TLS-encrypted connections.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">Client</span>(<span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Server</span>(<span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
+<span class="kw">impl</span>&lt;IO: AsyncRead + AsyncWrite + Unpin&gt; Future <span class="kw">for </span>FallibleAccept&lt;IO&gt; {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;server::TlsStream&lt;IO&gt;, (io::Error, IO)&gt;;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll(cx)
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="ident">CommonState</span>) {
-        <span class="kw">use</span> <span class="ident">TlsStream</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Client</span>(<span class="ident">io</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
-                (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">session</span>)
+<span class="doccomment">/// Unified TLS stream type
+///
+/// This abstracts over the inner `client::TlsStream` and `server::TlsStream`, so you can use
+/// a single type to keep both client- and server-initiated TLS-encrypted connections.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TlsStream&lt;T&gt; {
+    Client(client::TlsStream&lt;T&gt;),
+    Server(server::TlsStream&lt;T&gt;),
+}
+
+<span class="kw">impl</span>&lt;T&gt; TlsStream&lt;T&gt; {
+    <span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>T, <span class="kw-2">&amp;</span>CommonState) {
+        <span class="kw">use </span>TlsStream::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Client(io) =&gt; {
+                <span class="kw">let </span>(io, session) = io.get_ref();
+                (io, <span class="kw-2">&amp;*</span>session)
             }
-            <span class="ident">Server</span>(<span class="ident">io</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
-                (<span class="ident">io</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">session</span>)
-            }
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>) {
-        <span class="kw">use</span> <span class="ident">TlsStream</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Client</span>(<span class="ident">io</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_mut</span>();
-                (<span class="ident">io</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
-            }
-            <span class="ident">Server</span>(<span class="ident">io</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">io</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_mut</span>();
-                (<span class="ident">io</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
+            Server(io) =&gt; {
+                <span class="kw">let </span>(io, session) = io.get_ref();
+                (io, <span class="kw-2">&amp;*</span>session)
             }
         }
     }
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">client::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Client</span>(<span class="ident">s</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">server::TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Server</span>(<span class="ident">s</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsRawFd</span>,
-{
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
-        <span class="self">self</span>.<span class="ident">get_ref</span>().<span class="number">0</span>.<span class="ident">as_raw_fd</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">AsRawSocket</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsRawSocket</span>,
-{
-    <span class="kw">fn</span> <span class="ident">as_raw_socket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawSocket</span> {
-        <span class="self">self</span>.<span class="ident">get_ref</span>().<span class="number">0</span>.<span class="ident">as_raw_socket</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+    <span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;mut </span>T, <span class="kw-2">&amp;mut </span>CommonState) {
+        <span class="kw">use </span>TlsStream::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Client(io) =&gt; {
+                <span class="kw">let </span>(io, session) = io.get_mut();
+                (io, <span class="kw-2">&amp;mut *</span>session)
+            }
+            Server(io) =&gt; {
+                <span class="kw">let </span>(io, session) = io.get_mut();
+                (io, <span class="kw-2">&amp;mut *</span>session)
+            }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;client::TlsStream&lt;T&gt;&gt; <span class="kw">for </span>TlsStream&lt;T&gt; {
+    <span class="kw">fn </span>from(s: client::TlsStream&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Client(s)
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; From&lt;server::TlsStream&lt;T&gt;&gt; <span class="kw">for </span>TlsStream&lt;T&gt; {
+    <span class="kw">fn </span>from(s: server::TlsStream&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Server(s)
+    }
+}
+
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">impl</span>&lt;S&gt; AsRawFd <span class="kw">for </span>TlsStream&lt;S&gt;
+<span class="kw">where
+    </span>S: AsRawFd,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+    <span class="kw">fn </span>as_raw_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawFd {
+        <span class="self">self</span>.get_ref().<span class="number">0</span>.as_raw_fd()
+    }
+}
+
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">impl</span>&lt;S&gt; AsRawSocket <span class="kw">for </span>TlsStream&lt;S&gt;
+<span class="kw">where
+    </span>S: AsRawSocket,
+{
+    <span class="kw">fn </span>as_raw_socket(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawSocket {
+        <span class="self">self</span>.get_ref().<span class="number">0</span>.as_raw_socket()
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; AsyncRead <span class="kw">for </span>TlsStream&lt;T&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            TlsStream::Client(x) =&gt; Pin::new(x).poll_read(cx, buf),
+            TlsStream::Server(x) =&gt; Pin::new(x).poll_read(cx, buf),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; AsyncWrite <span class="kw">for </span>TlsStream&lt;T&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            TlsStream::Client(x) =&gt; Pin::new(x).poll_write(cx, buf),
+            TlsStream::Server(x) =&gt; Pin::new(x).poll_write(cx, buf),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            TlsStream::Client(x) =&gt; Pin::new(x).poll_flush(cx),
+            TlsStream::Server(x) =&gt; Pin::new(x).poll_flush(cx),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">TlsStream::Client</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
-            <span class="ident">TlsStream::Server</span>(<span class="ident">x</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">x</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            TlsStream::Client(x) =&gt; Pin::new(x).poll_shutdown(cx),
+            TlsStream::Server(x) =&gt; Pin::new(x).poll_shutdown(cx),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/static_assertions-1.1.0/src/const_assert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>const_assert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/static_assertions-1.1.0/src/const_assert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>const_assert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../static_assertions/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../static_assertions/index.html">
                         <img src="https://raw.githubusercontent.com/nvzqz/static-assertions-rs/assets/Icon.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -109,114 +109,114 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
-</pre><pre class="rust"><code><span class="doccomment">/// Asserts that constant expressions evaluate to `true`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Constant expressions can be ensured to have certain properties via this</span>
-<span class="doccomment">/// macro If the expression evaluates to `false`, the file will fail to compile.</span>
-<span class="doccomment">/// This is synonymous to [`static_assert` in C++][static_assert].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Alternatives</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There also exists [`const_assert_eq`](macro.const_assert_eq.html) for</span>
-<span class="doccomment">/// validating whether a sequence of expressions are equal to one another.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A common use case is to guarantee properties about a constant value that&#39;s</span>
-<span class="doccomment">/// generated via meta-programming.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const VALUE: i32 = // ...</span>
-<span class="doccomment">/// # 3;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const_assert!(VALUE &gt;= 2);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Inputs are type-checked as booleans:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const_assert!(!0);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Despite this being a macro, we see this produces a type error:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```txt</span>
-<span class="doccomment">///   | const_assert!(!0);</span>
-<span class="doccomment">///   |               ^^ expected bool, found integral variable</span>
-<span class="doccomment">///   |</span>
-<span class="doccomment">///   = note: expected type `bool`</span>
-<span class="doccomment">///              found type `{integer}`</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following fails to compile because multiplying by 5 does not have an</span>
-<span class="doccomment">/// identity property:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const_assert!(5 * 5 == 5);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [static_assert]: http://en.cppreference.com/w/cpp/language/static_assert</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">const_assert</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">eq_op</span>)]</span>
-        <span class="kw">const</span> <span class="kw">_</span>: [(); <span class="number">0</span> <span class="op">-</span> <span class="op">!</span>{ <span class="kw">const</span> <span class="ident">ASSERT</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>; <span class="ident">ASSERT</span> } <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> [];
+</pre><pre class="rust"><code><span class="doccomment">/// Asserts that constant expressions evaluate to `true`.
+///
+/// Constant expressions can be ensured to have certain properties via this
+/// macro If the expression evaluates to `false`, the file will fail to compile.
+/// This is synonymous to [`static_assert` in C++][static_assert].
+///
+/// # Alternatives
+///
+/// There also exists [`const_assert_eq`](macro.const_assert_eq.html) for
+/// validating whether a sequence of expressions are equal to one another.
+///
+/// # Examples
+///
+/// A common use case is to guarantee properties about a constant value that&#39;s
+/// generated via meta-programming.
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const VALUE: i32 = // ...
+/// # 3;
+///
+/// const_assert!(VALUE &gt;= 2);
+/// ```
+///
+/// Inputs are type-checked as booleans:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const_assert!(!0);
+/// ```
+///
+/// Despite this being a macro, we see this produces a type error:
+///
+/// ```txt
+///   | const_assert!(!0);
+///   |               ^^ expected bool, found integral variable
+///   |
+///   = note: expected type `bool`
+///              found type `{integer}`
+/// ```
+///
+/// The following fails to compile because multiplying by 5 does not have an
+/// identity property:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const_assert!(5 * 5 == 5);
+/// ```
+///
+/// [static_assert]: http://en.cppreference.com/w/cpp/language/static_assert
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>const_assert {
+    (<span class="macro-nonterminal">$x</span>:expr $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="attribute">#[allow(unknown_lints, eq_op)]
+        </span><span class="kw">const _</span>: [(); <span class="number">0 </span>- !{ <span class="kw">const </span>ASSERT: bool = <span class="macro-nonterminal">$x</span>; ASSERT } <span class="kw">as </span>usize] = [];
     };
 }
 
-<span class="doccomment">/// Asserts that constants are equal in value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This works as a shorthand for `const_assert!(a == b)`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const TWO: usize = 2;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const_assert_eq!(TWO * TWO, TWO + TWO);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Just because 2 × 2 = 2 + 2 doesn&#39;t mean it holds true for other numbers:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const_assert_eq!(4 + 4, 4 * 4);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">const_assert_eq</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">const_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>);
+<span class="doccomment">/// Asserts that constants are equal in value.
+///
+/// # Examples
+///
+/// This works as a shorthand for `const_assert!(a == b)`:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const TWO: usize = 2;
+///
+/// const_assert_eq!(TWO * TWO, TWO + TWO);
+/// ```
+///
+/// Just because 2 × 2 = 2 + 2 doesn&#39;t mean it holds true for other numbers:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const_assert_eq!(4 + 4, 4 * 4);
+/// ```
+</span><span class="attribute">#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>const_assert_eq {
+    (<span class="macro-nonterminal">$x</span>:expr, <span class="macro-nonterminal">$y</span>:expr $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">const_assert!</span>(<span class="macro-nonterminal">$x </span>== <span class="macro-nonterminal">$y</span>);
     };
 }
 
-<span class="doccomment">/// Asserts that constants are **not** equal in value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This works as a shorthand for `const_assert!(a != b)`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const NUM: usize = 32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const_assert_ne!(NUM * NUM, 64);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example fails to compile because 2 is magic and 2 × 2 = 2 + 2:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate static_assertions; fn main() {}</span>
-<span class="doccomment">/// const_assert_ne!(2 + 2, 2 * 2);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">const_assert_ne</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">const_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> <span class="op">!</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">y</span>);
+<span class="doccomment">/// Asserts that constants are **not** equal in value.
+///
+/// # Examples
+///
+/// This works as a shorthand for `const_assert!(a != b)`:
+///
+/// ```
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const NUM: usize = 32;
+///
+/// const_assert_ne!(NUM * NUM, 64);
+/// ```
+///
+/// The following example fails to compile because 2 is magic and 2 × 2 = 2 + 2:
+///
+/// ```compile_fail
+/// # #[macro_use] extern crate static_assertions; fn main() {}
+/// const_assert_ne!(2 + 2, 2 * 2);
+/// ```
+</span><span class="attribute">#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>const_assert_ne {
+    (<span class="macro-nonterminal">$x</span>:expr, <span class="macro-nonterminal">$y</span>:expr $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">const_assert!</span>(<span class="macro-nonterminal">$x </span>!= <span class="macro-nonterminal">$y</span>);
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="static_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="static_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

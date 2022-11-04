@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/md-5-0.10.4/src/compress.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compress.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../md5/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../md5/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/md-5-0.10.4/src/compress.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compress.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../md5/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../md5/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../md5/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -165,170 +165,170 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>, <span class="ident">clippy::unreadable_literal</span>)]</span>
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::many_single_char_names, clippy::unreadable_literal)]
+</span><span class="kw">use </span>core::convert::TryInto;
 
-<span class="kw">const</span> <span class="ident">RC</span>: [<span class="ident">u32</span>; <span class="number">64</span>] <span class="op">=</span> [
-    <span class="comment">// round 1</span>
-    <span class="number">0xd76aa478</span>, <span class="number">0xe8c7b756</span>, <span class="number">0x242070db</span>, <span class="number">0xc1bdceee</span>, <span class="number">0xf57c0faf</span>, <span class="number">0x4787c62a</span>, <span class="number">0xa8304613</span>, <span class="number">0xfd469501</span>,
+<span class="kw">const </span>RC: [u32; <span class="number">64</span>] = [
+    <span class="comment">// round 1
+    </span><span class="number">0xd76aa478</span>, <span class="number">0xe8c7b756</span>, <span class="number">0x242070db</span>, <span class="number">0xc1bdceee</span>, <span class="number">0xf57c0faf</span>, <span class="number">0x4787c62a</span>, <span class="number">0xa8304613</span>, <span class="number">0xfd469501</span>,
     <span class="number">0x698098d8</span>, <span class="number">0x8b44f7af</span>, <span class="number">0xffff5bb1</span>, <span class="number">0x895cd7be</span>, <span class="number">0x6b901122</span>, <span class="number">0xfd987193</span>, <span class="number">0xa679438e</span>, <span class="number">0x49b40821</span>,
-    <span class="comment">// round 2</span>
-    <span class="number">0xf61e2562</span>, <span class="number">0xc040b340</span>, <span class="number">0x265e5a51</span>, <span class="number">0xe9b6c7aa</span>, <span class="number">0xd62f105d</span>, <span class="number">0x02441453</span>, <span class="number">0xd8a1e681</span>, <span class="number">0xe7d3fbc8</span>,
+    <span class="comment">// round 2
+    </span><span class="number">0xf61e2562</span>, <span class="number">0xc040b340</span>, <span class="number">0x265e5a51</span>, <span class="number">0xe9b6c7aa</span>, <span class="number">0xd62f105d</span>, <span class="number">0x02441453</span>, <span class="number">0xd8a1e681</span>, <span class="number">0xe7d3fbc8</span>,
     <span class="number">0x21e1cde6</span>, <span class="number">0xc33707d6</span>, <span class="number">0xf4d50d87</span>, <span class="number">0x455a14ed</span>, <span class="number">0xa9e3e905</span>, <span class="number">0xfcefa3f8</span>, <span class="number">0x676f02d9</span>, <span class="number">0x8d2a4c8a</span>,
-    <span class="comment">// round 3</span>
-    <span class="number">0xfffa3942</span>, <span class="number">0x8771f681</span>, <span class="number">0x6d9d6122</span>, <span class="number">0xfde5380c</span>, <span class="number">0xa4beea44</span>, <span class="number">0x4bdecfa9</span>, <span class="number">0xf6bb4b60</span>, <span class="number">0xbebfbc70</span>,
+    <span class="comment">// round 3
+    </span><span class="number">0xfffa3942</span>, <span class="number">0x8771f681</span>, <span class="number">0x6d9d6122</span>, <span class="number">0xfde5380c</span>, <span class="number">0xa4beea44</span>, <span class="number">0x4bdecfa9</span>, <span class="number">0xf6bb4b60</span>, <span class="number">0xbebfbc70</span>,
     <span class="number">0x289b7ec6</span>, <span class="number">0xeaa127fa</span>, <span class="number">0xd4ef3085</span>, <span class="number">0x04881d05</span>, <span class="number">0xd9d4d039</span>, <span class="number">0xe6db99e5</span>, <span class="number">0x1fa27cf8</span>, <span class="number">0xc4ac5665</span>,
-    <span class="comment">// round 4</span>
-    <span class="number">0xf4292244</span>, <span class="number">0x432aff97</span>, <span class="number">0xab9423a7</span>, <span class="number">0xfc93a039</span>, <span class="number">0x655b59c3</span>, <span class="number">0x8f0ccc92</span>, <span class="number">0xffeff47d</span>, <span class="number">0x85845dd1</span>,
+    <span class="comment">// round 4
+    </span><span class="number">0xf4292244</span>, <span class="number">0x432aff97</span>, <span class="number">0xab9423a7</span>, <span class="number">0xfc93a039</span>, <span class="number">0x655b59c3</span>, <span class="number">0x8f0ccc92</span>, <span class="number">0xffeff47d</span>, <span class="number">0x85845dd1</span>,
     <span class="number">0x6fa87e4f</span>, <span class="number">0xfe2ce6e0</span>, <span class="number">0xa3014314</span>, <span class="number">0x4e0811a1</span>, <span class="number">0xf7537e82</span>, <span class="number">0xbd3af235</span>, <span class="number">0x2ad7d2bb</span>, <span class="number">0xeb86d391</span>,
 ];
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_f</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">y</span>) <span class="op">|</span> (<span class="op">!</span><span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">z</span>))
-        .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">c</span>)
-        .<span class="ident">rotate_left</span>(<span class="ident">s</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">x</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>op_f(w: u32, x: u32, y: u32, z: u32, m: u32, c: u32, s: u32) -&gt; u32 {
+    ((x &amp; y) | (!x &amp; z))
+        .wrapping_add(w)
+        .wrapping_add(m)
+        .wrapping_add(c)
+        .rotate_left(s)
+        .wrapping_add(x)
 }
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_g</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    ((<span class="ident">x</span> <span class="op">&amp;</span> <span class="ident">z</span>) <span class="op">|</span> (<span class="ident">y</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">z</span>))
-        .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">c</span>)
-        .<span class="ident">rotate_left</span>(<span class="ident">s</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">x</span>)
-}
-
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_h</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    (<span class="ident">x</span> <span class="op">^</span> <span class="ident">y</span> <span class="op">^</span> <span class="ident">z</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">c</span>)
-        .<span class="ident">rotate_left</span>(<span class="ident">s</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">x</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>op_g(w: u32, x: u32, y: u32, z: u32, m: u32, c: u32, s: u32) -&gt; u32 {
+    ((x &amp; z) | (y &amp; !z))
+        .wrapping_add(w)
+        .wrapping_add(m)
+        .wrapping_add(c)
+        .rotate_left(s)
+        .wrapping_add(x)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">op_i</span>(<span class="ident">w</span>: <span class="ident">u32</span>, <span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">y</span>: <span class="ident">u32</span>, <span class="ident">z</span>: <span class="ident">u32</span>, <span class="ident">m</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">s</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    (<span class="ident">y</span> <span class="op">^</span> (<span class="ident">x</span> <span class="op">|</span> <span class="op">!</span><span class="ident">z</span>))
-        .<span class="ident">wrapping_add</span>(<span class="ident">w</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">m</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">c</span>)
-        .<span class="ident">rotate_left</span>(<span class="ident">s</span>)
-        .<span class="ident">wrapping_add</span>(<span class="ident">x</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>op_h(w: u32, x: u32, y: u32, z: u32, m: u32, c: u32, s: u32) -&gt; u32 {
+    (x ^ y ^ z)
+        .wrapping_add(w)
+        .wrapping_add(m)
+        .wrapping_add(c)
+        .rotate_left(s)
+        .wrapping_add(x)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress_block</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">64</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">state</span>[<span class="number">0</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">state</span>[<span class="number">1</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">state</span>[<span class="number">2</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">state</span>[<span class="number">3</span>];
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>op_i(w: u32, x: u32, y: u32, z: u32, m: u32, c: u32, s: u32) -&gt; u32 {
+    (y ^ (x | !z))
+        .wrapping_add(w)
+        .wrapping_add(m)
+        .wrapping_add(c)
+        .rotate_left(s)
+        .wrapping_add(x)
+}
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0u32</span>; <span class="number">16</span>];
-    <span class="kw">for</span> (<span class="ident">o</span>, <span class="ident">chunk</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">input</span>.<span class="ident">chunks_exact</span>(<span class="number">4</span>)) {
-        <span class="kw-2">*</span><span class="ident">o</span> <span class="op">=</span> <span class="ident">u32::from_le_bytes</span>(<span class="ident">chunk</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>compress_block(state: <span class="kw-2">&amp;mut </span>[u32; <span class="number">4</span>], input: <span class="kw-2">&amp;</span>[u8; <span class="number">64</span>]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>a = state[<span class="number">0</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>b = state[<span class="number">1</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>c = state[<span class="number">2</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>d = state[<span class="number">3</span>];
+
+    <span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u32</span>; <span class="number">16</span>];
+    <span class="kw">for </span>(o, chunk) <span class="kw">in </span>data.iter_mut().zip(input.chunks_exact(<span class="number">4</span>)) {
+        <span class="kw-2">*</span>o = u32::from_le_bytes(chunk.try_into().unwrap());
     }
 
-    <span class="comment">// round 1</span>
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">0</span>], <span class="ident">RC</span>[<span class="number">0</span>], <span class="number">7</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">1</span>], <span class="ident">RC</span>[<span class="number">1</span>], <span class="number">12</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">2</span>], <span class="ident">RC</span>[<span class="number">2</span>], <span class="number">17</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">3</span>], <span class="ident">RC</span>[<span class="number">3</span>], <span class="number">22</span>);
+    <span class="comment">// round 1
+    </span>a = op_f(a, b, c, d, data[<span class="number">0</span>], RC[<span class="number">0</span>], <span class="number">7</span>);
+    d = op_f(d, a, b, c, data[<span class="number">1</span>], RC[<span class="number">1</span>], <span class="number">12</span>);
+    c = op_f(c, d, a, b, data[<span class="number">2</span>], RC[<span class="number">2</span>], <span class="number">17</span>);
+    b = op_f(b, c, d, a, data[<span class="number">3</span>], RC[<span class="number">3</span>], <span class="number">22</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">4</span>], <span class="ident">RC</span>[<span class="number">4</span>], <span class="number">7</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">5</span>], <span class="ident">RC</span>[<span class="number">5</span>], <span class="number">12</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">6</span>], <span class="ident">RC</span>[<span class="number">6</span>], <span class="number">17</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">7</span>], <span class="ident">RC</span>[<span class="number">7</span>], <span class="number">22</span>);
+    a = op_f(a, b, c, d, data[<span class="number">4</span>], RC[<span class="number">4</span>], <span class="number">7</span>);
+    d = op_f(d, a, b, c, data[<span class="number">5</span>], RC[<span class="number">5</span>], <span class="number">12</span>);
+    c = op_f(c, d, a, b, data[<span class="number">6</span>], RC[<span class="number">6</span>], <span class="number">17</span>);
+    b = op_f(b, c, d, a, data[<span class="number">7</span>], RC[<span class="number">7</span>], <span class="number">22</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">8</span>], <span class="ident">RC</span>[<span class="number">8</span>], <span class="number">7</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">9</span>], <span class="ident">RC</span>[<span class="number">9</span>], <span class="number">12</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">10</span>], <span class="ident">RC</span>[<span class="number">10</span>], <span class="number">17</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">11</span>], <span class="ident">RC</span>[<span class="number">11</span>], <span class="number">22</span>);
+    a = op_f(a, b, c, d, data[<span class="number">8</span>], RC[<span class="number">8</span>], <span class="number">7</span>);
+    d = op_f(d, a, b, c, data[<span class="number">9</span>], RC[<span class="number">9</span>], <span class="number">12</span>);
+    c = op_f(c, d, a, b, data[<span class="number">10</span>], RC[<span class="number">10</span>], <span class="number">17</span>);
+    b = op_f(b, c, d, a, data[<span class="number">11</span>], RC[<span class="number">11</span>], <span class="number">22</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">12</span>], <span class="ident">RC</span>[<span class="number">12</span>], <span class="number">7</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">13</span>], <span class="ident">RC</span>[<span class="number">13</span>], <span class="number">12</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">14</span>], <span class="ident">RC</span>[<span class="number">14</span>], <span class="number">17</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">15</span>], <span class="ident">RC</span>[<span class="number">15</span>], <span class="number">22</span>);
+    a = op_f(a, b, c, d, data[<span class="number">12</span>], RC[<span class="number">12</span>], <span class="number">7</span>);
+    d = op_f(d, a, b, c, data[<span class="number">13</span>], RC[<span class="number">13</span>], <span class="number">12</span>);
+    c = op_f(c, d, a, b, data[<span class="number">14</span>], RC[<span class="number">14</span>], <span class="number">17</span>);
+    b = op_f(b, c, d, a, data[<span class="number">15</span>], RC[<span class="number">15</span>], <span class="number">22</span>);
 
-    <span class="comment">// round 2</span>
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">1</span>], <span class="ident">RC</span>[<span class="number">16</span>], <span class="number">5</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">6</span>], <span class="ident">RC</span>[<span class="number">17</span>], <span class="number">9</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">11</span>], <span class="ident">RC</span>[<span class="number">18</span>], <span class="number">14</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">0</span>], <span class="ident">RC</span>[<span class="number">19</span>], <span class="number">20</span>);
+    <span class="comment">// round 2
+    </span>a = op_g(a, b, c, d, data[<span class="number">1</span>], RC[<span class="number">16</span>], <span class="number">5</span>);
+    d = op_g(d, a, b, c, data[<span class="number">6</span>], RC[<span class="number">17</span>], <span class="number">9</span>);
+    c = op_g(c, d, a, b, data[<span class="number">11</span>], RC[<span class="number">18</span>], <span class="number">14</span>);
+    b = op_g(b, c, d, a, data[<span class="number">0</span>], RC[<span class="number">19</span>], <span class="number">20</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">5</span>], <span class="ident">RC</span>[<span class="number">20</span>], <span class="number">5</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">10</span>], <span class="ident">RC</span>[<span class="number">21</span>], <span class="number">9</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">15</span>], <span class="ident">RC</span>[<span class="number">22</span>], <span class="number">14</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">4</span>], <span class="ident">RC</span>[<span class="number">23</span>], <span class="number">20</span>);
+    a = op_g(a, b, c, d, data[<span class="number">5</span>], RC[<span class="number">20</span>], <span class="number">5</span>);
+    d = op_g(d, a, b, c, data[<span class="number">10</span>], RC[<span class="number">21</span>], <span class="number">9</span>);
+    c = op_g(c, d, a, b, data[<span class="number">15</span>], RC[<span class="number">22</span>], <span class="number">14</span>);
+    b = op_g(b, c, d, a, data[<span class="number">4</span>], RC[<span class="number">23</span>], <span class="number">20</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">9</span>], <span class="ident">RC</span>[<span class="number">24</span>], <span class="number">5</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">14</span>], <span class="ident">RC</span>[<span class="number">25</span>], <span class="number">9</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">3</span>], <span class="ident">RC</span>[<span class="number">26</span>], <span class="number">14</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">8</span>], <span class="ident">RC</span>[<span class="number">27</span>], <span class="number">20</span>);
+    a = op_g(a, b, c, d, data[<span class="number">9</span>], RC[<span class="number">24</span>], <span class="number">5</span>);
+    d = op_g(d, a, b, c, data[<span class="number">14</span>], RC[<span class="number">25</span>], <span class="number">9</span>);
+    c = op_g(c, d, a, b, data[<span class="number">3</span>], RC[<span class="number">26</span>], <span class="number">14</span>);
+    b = op_g(b, c, d, a, data[<span class="number">8</span>], RC[<span class="number">27</span>], <span class="number">20</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">13</span>], <span class="ident">RC</span>[<span class="number">28</span>], <span class="number">5</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">2</span>], <span class="ident">RC</span>[<span class="number">29</span>], <span class="number">9</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">7</span>], <span class="ident">RC</span>[<span class="number">30</span>], <span class="number">14</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_g</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">12</span>], <span class="ident">RC</span>[<span class="number">31</span>], <span class="number">20</span>);
+    a = op_g(a, b, c, d, data[<span class="number">13</span>], RC[<span class="number">28</span>], <span class="number">5</span>);
+    d = op_g(d, a, b, c, data[<span class="number">2</span>], RC[<span class="number">29</span>], <span class="number">9</span>);
+    c = op_g(c, d, a, b, data[<span class="number">7</span>], RC[<span class="number">30</span>], <span class="number">14</span>);
+    b = op_g(b, c, d, a, data[<span class="number">12</span>], RC[<span class="number">31</span>], <span class="number">20</span>);
 
-    <span class="comment">// round 3</span>
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">5</span>], <span class="ident">RC</span>[<span class="number">32</span>], <span class="number">4</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">8</span>], <span class="ident">RC</span>[<span class="number">33</span>], <span class="number">11</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">11</span>], <span class="ident">RC</span>[<span class="number">34</span>], <span class="number">16</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">14</span>], <span class="ident">RC</span>[<span class="number">35</span>], <span class="number">23</span>);
+    <span class="comment">// round 3
+    </span>a = op_h(a, b, c, d, data[<span class="number">5</span>], RC[<span class="number">32</span>], <span class="number">4</span>);
+    d = op_h(d, a, b, c, data[<span class="number">8</span>], RC[<span class="number">33</span>], <span class="number">11</span>);
+    c = op_h(c, d, a, b, data[<span class="number">11</span>], RC[<span class="number">34</span>], <span class="number">16</span>);
+    b = op_h(b, c, d, a, data[<span class="number">14</span>], RC[<span class="number">35</span>], <span class="number">23</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">1</span>], <span class="ident">RC</span>[<span class="number">36</span>], <span class="number">4</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">4</span>], <span class="ident">RC</span>[<span class="number">37</span>], <span class="number">11</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">7</span>], <span class="ident">RC</span>[<span class="number">38</span>], <span class="number">16</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">10</span>], <span class="ident">RC</span>[<span class="number">39</span>], <span class="number">23</span>);
+    a = op_h(a, b, c, d, data[<span class="number">1</span>], RC[<span class="number">36</span>], <span class="number">4</span>);
+    d = op_h(d, a, b, c, data[<span class="number">4</span>], RC[<span class="number">37</span>], <span class="number">11</span>);
+    c = op_h(c, d, a, b, data[<span class="number">7</span>], RC[<span class="number">38</span>], <span class="number">16</span>);
+    b = op_h(b, c, d, a, data[<span class="number">10</span>], RC[<span class="number">39</span>], <span class="number">23</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">13</span>], <span class="ident">RC</span>[<span class="number">40</span>], <span class="number">4</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">0</span>], <span class="ident">RC</span>[<span class="number">41</span>], <span class="number">11</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">3</span>], <span class="ident">RC</span>[<span class="number">42</span>], <span class="number">16</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">6</span>], <span class="ident">RC</span>[<span class="number">43</span>], <span class="number">23</span>);
+    a = op_h(a, b, c, d, data[<span class="number">13</span>], RC[<span class="number">40</span>], <span class="number">4</span>);
+    d = op_h(d, a, b, c, data[<span class="number">0</span>], RC[<span class="number">41</span>], <span class="number">11</span>);
+    c = op_h(c, d, a, b, data[<span class="number">3</span>], RC[<span class="number">42</span>], <span class="number">16</span>);
+    b = op_h(b, c, d, a, data[<span class="number">6</span>], RC[<span class="number">43</span>], <span class="number">23</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">9</span>], <span class="ident">RC</span>[<span class="number">44</span>], <span class="number">4</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">12</span>], <span class="ident">RC</span>[<span class="number">45</span>], <span class="number">11</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">15</span>], <span class="ident">RC</span>[<span class="number">46</span>], <span class="number">16</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_h</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">2</span>], <span class="ident">RC</span>[<span class="number">47</span>], <span class="number">23</span>);
+    a = op_h(a, b, c, d, data[<span class="number">9</span>], RC[<span class="number">44</span>], <span class="number">4</span>);
+    d = op_h(d, a, b, c, data[<span class="number">12</span>], RC[<span class="number">45</span>], <span class="number">11</span>);
+    c = op_h(c, d, a, b, data[<span class="number">15</span>], RC[<span class="number">46</span>], <span class="number">16</span>);
+    b = op_h(b, c, d, a, data[<span class="number">2</span>], RC[<span class="number">47</span>], <span class="number">23</span>);
 
-    <span class="comment">// round 4</span>
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">0</span>], <span class="ident">RC</span>[<span class="number">48</span>], <span class="number">6</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">7</span>], <span class="ident">RC</span>[<span class="number">49</span>], <span class="number">10</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">14</span>], <span class="ident">RC</span>[<span class="number">50</span>], <span class="number">15</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">5</span>], <span class="ident">RC</span>[<span class="number">51</span>], <span class="number">21</span>);
+    <span class="comment">// round 4
+    </span>a = op_i(a, b, c, d, data[<span class="number">0</span>], RC[<span class="number">48</span>], <span class="number">6</span>);
+    d = op_i(d, a, b, c, data[<span class="number">7</span>], RC[<span class="number">49</span>], <span class="number">10</span>);
+    c = op_i(c, d, a, b, data[<span class="number">14</span>], RC[<span class="number">50</span>], <span class="number">15</span>);
+    b = op_i(b, c, d, a, data[<span class="number">5</span>], RC[<span class="number">51</span>], <span class="number">21</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">12</span>], <span class="ident">RC</span>[<span class="number">52</span>], <span class="number">6</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">3</span>], <span class="ident">RC</span>[<span class="number">53</span>], <span class="number">10</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">10</span>], <span class="ident">RC</span>[<span class="number">54</span>], <span class="number">15</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">1</span>], <span class="ident">RC</span>[<span class="number">55</span>], <span class="number">21</span>);
+    a = op_i(a, b, c, d, data[<span class="number">12</span>], RC[<span class="number">52</span>], <span class="number">6</span>);
+    d = op_i(d, a, b, c, data[<span class="number">3</span>], RC[<span class="number">53</span>], <span class="number">10</span>);
+    c = op_i(c, d, a, b, data[<span class="number">10</span>], RC[<span class="number">54</span>], <span class="number">15</span>);
+    b = op_i(b, c, d, a, data[<span class="number">1</span>], RC[<span class="number">55</span>], <span class="number">21</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">8</span>], <span class="ident">RC</span>[<span class="number">56</span>], <span class="number">6</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">15</span>], <span class="ident">RC</span>[<span class="number">57</span>], <span class="number">10</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">6</span>], <span class="ident">RC</span>[<span class="number">58</span>], <span class="number">15</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">13</span>], <span class="ident">RC</span>[<span class="number">59</span>], <span class="number">21</span>);
+    a = op_i(a, b, c, d, data[<span class="number">8</span>], RC[<span class="number">56</span>], <span class="number">6</span>);
+    d = op_i(d, a, b, c, data[<span class="number">15</span>], RC[<span class="number">57</span>], <span class="number">10</span>);
+    c = op_i(c, d, a, b, data[<span class="number">6</span>], RC[<span class="number">58</span>], <span class="number">15</span>);
+    b = op_i(b, c, d, a, data[<span class="number">13</span>], RC[<span class="number">59</span>], <span class="number">21</span>);
 
-    <span class="ident">a</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">data</span>[<span class="number">4</span>], <span class="ident">RC</span>[<span class="number">60</span>], <span class="number">6</span>);
-    <span class="ident">d</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">data</span>[<span class="number">11</span>], <span class="ident">RC</span>[<span class="number">61</span>], <span class="number">10</span>);
-    <span class="ident">c</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">data</span>[<span class="number">2</span>], <span class="ident">RC</span>[<span class="number">62</span>], <span class="number">15</span>);
-    <span class="ident">b</span> <span class="op">=</span> <span class="ident">op_i</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">a</span>, <span class="ident">data</span>[<span class="number">9</span>], <span class="ident">RC</span>[<span class="number">63</span>], <span class="number">21</span>);
+    a = op_i(a, b, c, d, data[<span class="number">4</span>], RC[<span class="number">60</span>], <span class="number">6</span>);
+    d = op_i(d, a, b, c, data[<span class="number">11</span>], RC[<span class="number">61</span>], <span class="number">10</span>);
+    c = op_i(c, d, a, b, data[<span class="number">2</span>], RC[<span class="number">62</span>], <span class="number">15</span>);
+    b = op_i(b, c, d, a, data[<span class="number">9</span>], RC[<span class="number">63</span>], <span class="number">21</span>);
 
-    <span class="ident">state</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">state</span>[<span class="number">0</span>].<span class="ident">wrapping_add</span>(<span class="ident">a</span>);
-    <span class="ident">state</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">state</span>[<span class="number">1</span>].<span class="ident">wrapping_add</span>(<span class="ident">b</span>);
-    <span class="ident">state</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">state</span>[<span class="number">2</span>].<span class="ident">wrapping_add</span>(<span class="ident">c</span>);
-    <span class="ident">state</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">state</span>[<span class="number">3</span>].<span class="ident">wrapping_add</span>(<span class="ident">d</span>);
+    state[<span class="number">0</span>] = state[<span class="number">0</span>].wrapping_add(a);
+    state[<span class="number">1</span>] = state[<span class="number">1</span>].wrapping_add(b);
+    state[<span class="number">2</span>] = state[<span class="number">2</span>].wrapping_add(c);
+    state[<span class="number">3</span>] = state[<span class="number">3</span>].wrapping_add(d);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u32</span>; <span class="number">4</span>], <span class="ident">blocks</span>: <span class="kw-2">&amp;</span>[[<span class="ident">u8</span>; <span class="number">64</span>]]) {
-    <span class="kw">for</span> <span class="ident">block</span> <span class="kw">in</span> <span class="ident">blocks</span> {
-        <span class="ident">compress_block</span>(<span class="ident">state</span>, <span class="ident">block</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>compress(state: <span class="kw-2">&amp;mut </span>[u32; <span class="number">4</span>], blocks: <span class="kw-2">&amp;</span>[[u8; <span class="number">64</span>]]) {
+    <span class="kw">for </span>block <span class="kw">in </span>blocks {
+        compress_block(state, block)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="md5" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="md5" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

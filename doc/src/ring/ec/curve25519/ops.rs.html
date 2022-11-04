@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/curve25519/ops.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ops.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/curve25519/ops.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ops.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -153,160 +153,160 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Elliptic curve operations on the birationally equivalent curves Curve25519</span>
-<span class="doccomment">//! and Edwards25519.</span>
+</span><span class="doccomment">//! Elliptic curve operations on the birationally equivalent curves Curve25519
+//! and Edwards25519.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::scalar</span>::{<span class="ident">MaskedScalar</span>, <span class="ident">Scalar</span>, <span class="ident">SCALAR_LEN</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bssl</span>, <span class="ident">error</span>,
-    <span class="ident">limb</span>::{<span class="ident">Limb</span>, <span class="ident">LIMB_BITS</span>},
+</span><span class="kw">pub use </span><span class="kw">super</span>::scalar::{MaskedScalar, Scalar, SCALAR_LEN};
+<span class="kw">use crate</span>::{
+    bssl, error,
+    limb::{Limb, LIMB_BITS},
 };
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use </span>core::marker::PhantomData;
 
-<span class="comment">// Elem&lt;T&gt;` is `fe` in curve25519/internal.h.</span>
-<span class="comment">// Elem&lt;L&gt; is `fe_loose` in curve25519/internal.h.</span>
-<span class="comment">// Keep this in sync with curve25519/internal.h.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span> {
-    <span class="ident">limbs</span>: [<span class="ident">Limb</span>; <span class="ident">ELEM_LIMBS</span>], <span class="comment">// This is called `v` in the C code.</span>
-    <span class="ident">encoding</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="comment">// Elem&lt;T&gt;` is `fe` in curve25519/internal.h.
+// Elem&lt;L&gt; is `fe_loose` in curve25519/internal.h.
+// Keep this in sync with curve25519/internal.h.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>Elem&lt;E: Encoding&gt; {
+    limbs: [Limb; ELEM_LIMBS], <span class="comment">// This is called `v` in the C code.
+    </span>encoding: PhantomData&lt;E&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Encoding</span> {}
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">T</span>;
-<span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">pub trait </span>Encoding {}
+<span class="kw">pub struct </span>T;
+<span class="kw">impl </span>Encoding <span class="kw">for </span>T {}
 
-<span class="kw">const</span> <span class="ident">ELEM_LIMBS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span> <span class="op">*</span> <span class="number">64</span> <span class="op">/</span> <span class="ident">LIMB_BITS</span>;
+<span class="kw">const </span>ELEM_LIMBS: usize = <span class="number">5 </span>* <span class="number">64 </span>/ LIMB_BITS;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limbs</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;E: Encoding&gt; Elem&lt;E&gt; {
+    <span class="kw">fn </span>zero() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limbs: Default::default(),
+            encoding: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">negate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">GFp_x25519_fe_neg</span>(<span class="self">self</span>);
+<span class="kw">impl </span>Elem&lt;T&gt; {
+    <span class="kw">fn </span>negate(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            GFp_x25519_fe_neg(<span class="self">self</span>);
         }
     }
 }
 
-<span class="comment">// An encoding of a curve point. If on Curve25519, it should be encoded as</span>
-<span class="comment">// described in Section 5 of [RFC 7748]. If on Edwards25519, it should be</span>
-<span class="comment">// encoded as described in section 5.1.2 of [RFC 8032].</span>
-<span class="comment">//</span>
-<span class="comment">// [RFC 7748] https://tools.ietf.org/html/rfc7748#section-5</span>
-<span class="comment">// [RFC 8032] https://tools.ietf.org/html/rfc8032#section-5.1.2</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EncodedPoint</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">ELEM_LEN</span>];
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELEM_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="comment">// An encoding of a curve point. If on Curve25519, it should be encoded as
+// described in Section 5 of [RFC 7748]. If on Edwards25519, it should be
+// encoded as described in section 5.1.2 of [RFC 8032].
+//
+// [RFC 7748] https://tools.ietf.org/html/rfc7748#section-5
+// [RFC 8032] https://tools.ietf.org/html/rfc8032#section-5.1.2
+</span><span class="kw">pub type </span>EncodedPoint = [u8; ELEM_LEN];
+<span class="kw">pub const </span>ELEM_LEN: usize = <span class="number">32</span>;
 
-<span class="comment">// Keep this in sync with `ge_p3` in curve25519/internal.h.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExtPoint</span> {
-    <span class="ident">x</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">y</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">z</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">t</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="comment">// Keep this in sync with `ge_p3` in curve25519/internal.h.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>ExtPoint {
+    x: Elem&lt;T&gt;,
+    y: Elem&lt;T&gt;,
+    z: Elem&lt;T&gt;,
+    t: Elem&lt;T&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ExtPoint</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_at_infinity</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">x</span>: <span class="ident">Elem::zero</span>(),
-            <span class="ident">y</span>: <span class="ident">Elem::zero</span>(),
-            <span class="ident">z</span>: <span class="ident">Elem::zero</span>(),
-            <span class="ident">t</span>: <span class="ident">Elem::zero</span>(),
+<span class="kw">impl </span>ExtPoint {
+    <span class="kw">pub fn </span>new_at_infinity() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            x: Elem::zero(),
+            y: Elem::zero(),
+            z: Elem::zero(),
+            t: Elem::zero(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_encoded_point_vartime</span>(<span class="ident">encoded</span>: <span class="kw-2">&amp;</span><span class="ident">EncodedPoint</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">point</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new_at_infinity</span>();
+    <span class="kw">pub fn </span>from_encoded_point_vartime(encoded: <span class="kw-2">&amp;</span>EncodedPoint) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>point = <span class="self">Self</span>::new_at_infinity();
 
-        <span class="ident">Result::from</span>(<span class="kw">unsafe</span> { <span class="ident">GFp_x25519_ge_frombytes_vartime</span>(<span class="kw-2">&amp;mut</span> <span class="ident">point</span>, <span class="ident">encoded</span>) })
-            .<span class="ident">map</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">point</span>)
+        Result::from(<span class="kw">unsafe </span>{ GFp_x25519_ge_frombytes_vartime(<span class="kw-2">&amp;mut </span>point, encoded) })
+            .map(|()| point)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_encoded_point</span>(<span class="self">self</span>) -&gt; <span class="ident">EncodedPoint</span> {
-        <span class="ident">encode_point</span>(<span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
+    <span class="kw">pub fn </span>into_encoded_point(<span class="self">self</span>) -&gt; EncodedPoint {
+        encode_point(<span class="self">self</span>.x, <span class="self">self</span>.y, <span class="self">self</span>.z)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert_vartime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">x</span>.<span class="ident">negate</span>();
-        <span class="self">self</span>.<span class="ident">t</span>.<span class="ident">negate</span>();
+    <span class="kw">pub fn </span>invert_vartime(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.x.negate();
+        <span class="self">self</span>.t.negate();
     }
 }
 
-<span class="comment">// Keep this in sync with `ge_p2` in curve25519/internal.h.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Point</span> {
-    <span class="ident">x</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">y</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">z</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="comment">// Keep this in sync with `ge_p2` in curve25519/internal.h.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>Point {
+    x: Elem&lt;T&gt;,
+    y: Elem&lt;T&gt;,
+    z: Elem&lt;T&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Point</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_at_infinity</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">x</span>: <span class="ident">Elem::zero</span>(),
-            <span class="ident">y</span>: <span class="ident">Elem::zero</span>(),
-            <span class="ident">z</span>: <span class="ident">Elem::zero</span>(),
+<span class="kw">impl </span>Point {
+    <span class="kw">pub fn </span>new_at_infinity() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            x: Elem::zero(),
+            y: Elem::zero(),
+            z: Elem::zero(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_encoded_point</span>(<span class="self">self</span>) -&gt; <span class="ident">EncodedPoint</span> {
-        <span class="ident">encode_point</span>(<span class="self">self</span>.<span class="ident">x</span>, <span class="self">self</span>.<span class="ident">y</span>, <span class="self">self</span>.<span class="ident">z</span>)
+    <span class="kw">pub fn </span>into_encoded_point(<span class="self">self</span>) -&gt; EncodedPoint {
+        encode_point(<span class="self">self</span>.x, <span class="self">self</span>.y, <span class="self">self</span>.z)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">encode_point</span>(<span class="ident">x</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">y</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">z</span>: <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">EncodedPoint</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">ELEM_LEN</span>];
+<span class="kw">fn </span>encode_point(x: Elem&lt;T&gt;, y: Elem&lt;T&gt;, z: Elem&lt;T&gt;) -&gt; EncodedPoint {
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = [<span class="number">0</span>; ELEM_LEN];
 
-    <span class="kw">let</span> <span class="ident">sign_bit</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">recip</span> <span class="op">=</span> <span class="ident">Elem::zero</span>();
-        <span class="ident">GFp_x25519_fe_invert</span>(<span class="kw-2">&amp;mut</span> <span class="ident">recip</span>, <span class="kw-2">&amp;</span><span class="ident">z</span>);
+    <span class="kw">let </span>sign_bit: u8 = <span class="kw">unsafe </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>recip = Elem::zero();
+        GFp_x25519_fe_invert(<span class="kw-2">&amp;mut </span>recip, <span class="kw-2">&amp;</span>z);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x_over_z</span> <span class="op">=</span> <span class="ident">Elem::zero</span>();
-        <span class="ident">GFp_x25519_fe_mul_ttt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x_over_z</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="ident">recip</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>x_over_z = Elem::zero();
+        GFp_x25519_fe_mul_ttt(<span class="kw-2">&amp;mut </span>x_over_z, <span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>recip);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">y_over_z</span> <span class="op">=</span> <span class="ident">Elem::zero</span>();
-        <span class="ident">GFp_x25519_fe_mul_ttt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">y_over_z</span>, <span class="kw-2">&amp;</span><span class="ident">y</span>, <span class="kw-2">&amp;</span><span class="ident">recip</span>);
-        <span class="ident">GFp_x25519_fe_tobytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>, <span class="kw-2">&amp;</span><span class="ident">y_over_z</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>y_over_z = Elem::zero();
+        GFp_x25519_fe_mul_ttt(<span class="kw-2">&amp;mut </span>y_over_z, <span class="kw-2">&amp;</span>y, <span class="kw-2">&amp;</span>recip);
+        GFp_x25519_fe_tobytes(<span class="kw-2">&amp;mut </span>bytes, <span class="kw-2">&amp;</span>y_over_z);
 
-        <span class="ident">GFp_x25519_fe_isnegative</span>(<span class="kw-2">&amp;</span><span class="ident">x_over_z</span>)
+        GFp_x25519_fe_isnegative(<span class="kw-2">&amp;</span>x_over_z)
     };
 
-    <span class="comment">// The preceding computations must execute in constant time, but this</span>
-    <span class="comment">// doesn&#39;t need to.</span>
-    <span class="ident">bytes</span>[<span class="ident">ELEM_LEN</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">sign_bit</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
+    <span class="comment">// The preceding computations must execute in constant time, but this
+    // doesn&#39;t need to.
+    </span>bytes[ELEM_LEN - <span class="number">1</span>] ^= sign_bit &lt;&lt; <span class="number">7</span>;
 
-    <span class="ident">bytes</span>
+    bytes
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_fe_invert</span>(<span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">z</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_fe_isnegative</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_fe_mul_ttt</span>(<span class="ident">h</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_fe_neg</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_fe_tobytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EncodedPoint</span>, <span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-    <span class="kw">fn</span> <span class="ident">GFp_x25519_ge_frombytes_vartime</span>(<span class="ident">h</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtPoint</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">EncodedPoint</span>) -&gt; <span class="ident">bssl::Result</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">fn </span>GFp_x25519_fe_invert(out: <span class="kw-2">&amp;mut </span>Elem&lt;T&gt;, z: <span class="kw-2">&amp;</span>Elem&lt;T&gt;);
+    <span class="kw">fn </span>GFp_x25519_fe_isnegative(elem: <span class="kw-2">&amp;</span>Elem&lt;T&gt;) -&gt; u8;
+    <span class="kw">fn </span>GFp_x25519_fe_mul_ttt(h: <span class="kw-2">&amp;mut </span>Elem&lt;T&gt;, f: <span class="kw-2">&amp;</span>Elem&lt;T&gt;, g: <span class="kw-2">&amp;</span>Elem&lt;T&gt;);
+    <span class="kw">fn </span>GFp_x25519_fe_neg(f: <span class="kw-2">&amp;mut </span>Elem&lt;T&gt;);
+    <span class="kw">fn </span>GFp_x25519_fe_tobytes(bytes: <span class="kw-2">&amp;mut </span>EncodedPoint, elem: <span class="kw-2">&amp;</span>Elem&lt;T&gt;);
+    <span class="kw">fn </span>GFp_x25519_ge_frombytes_vartime(h: <span class="kw-2">&amp;mut </span>ExtPoint, s: <span class="kw-2">&amp;</span>EncodedPoint) -&gt; bssl::Result;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

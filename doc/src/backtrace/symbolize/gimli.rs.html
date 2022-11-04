@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.66/src/symbolize/gimli.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gimli.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../backtrace/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.66/src/symbolize/gimli.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gimli.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../backtrace/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../backtrace/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -460,467 +460,467 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Support for symbolication using the `gimli` crate on crates.io</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is the default symbolication implementation for Rust.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Support for symbolication using the `gimli` crate on crates.io
+//!
+//! This is the default symbolication implementation for Rust.
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::gimli::read::EndianSlice</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::gimli::NativeEndian</span> <span class="kw">as</span> <span class="ident">Endian</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::mmap::Mmap</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::stash::Stash</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BytesOrWideString</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ResolveWhat</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SymbolName</span>;
-<span class="kw">use</span> <span class="ident">addr2line::gimli</span>;
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::u32</span>;
-<span class="kw">use</span> <span class="ident">libc::c_void</span>;
-<span class="kw">use</span> <span class="ident">mystd::ffi::OsString</span>;
-<span class="kw">use</span> <span class="ident">mystd::fs::File</span>;
-<span class="kw">use</span> <span class="ident">mystd::path::Path</span>;
-<span class="kw">use</span> <span class="ident">mystd::prelude::v1</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span><span class="self">self</span>::gimli::read::EndianSlice;
+<span class="kw">use </span><span class="self">self</span>::gimli::NativeEndian <span class="kw">as </span>Endian;
+<span class="kw">use </span><span class="self">self</span>::mmap::Mmap;
+<span class="kw">use </span><span class="self">self</span>::stash::Stash;
+<span class="kw">use </span><span class="kw">super</span>::BytesOrWideString;
+<span class="kw">use </span><span class="kw">super</span>::ResolveWhat;
+<span class="kw">use </span><span class="kw">super</span>::SymbolName;
+<span class="kw">use </span>addr2line::gimli;
+<span class="kw">use </span>core::convert::TryInto;
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::u32;
+<span class="kw">use </span>libc::c_void;
+<span class="kw">use </span>mystd::ffi::OsString;
+<span class="kw">use </span>mystd::fs::File;
+<span class="kw">use </span>mystd::path::Path;
+<span class="kw">use </span>mystd::prelude::v1::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">backtrace_in_libstd</span>)]</span>
-<span class="kw">mod</span> <span class="ident">mystd</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(backtrace_in_libstd)]
+</span><span class="kw">mod </span>mystd {
+    <span class="kw">pub use crate</span>::<span class="kw-2">*</span>;
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">backtrace_in_libstd</span>))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span> <span class="kw">as</span> <span class="ident">mystd</span>;
+<span class="attribute">#[cfg(not(backtrace_in_libstd))]
+</span><span class="kw">extern crate </span>std <span class="kw">as </span>mystd;
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> {
-        <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;gimli/mmap_windows.rs&quot;</span>]</span>
-        <span class="kw">mod</span> <span class="ident">mmap</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;solaris&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>,
-    ))]</span> {
-        <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;gimli/mmap_unix.rs&quot;</span>]</span>
-        <span class="kw">mod</span> <span class="ident">mmap</span>;
-    } <span class="kw">else</span> {
-        <span class="attribute">#[<span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;gimli/mmap_fake.rs&quot;</span>]</span>
-        <span class="kw">mod</span> <span class="ident">mmap</span>;
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(windows)] </span>{
+        <span class="attribute">#[path = <span class="string">&quot;gimli/mmap_windows.rs&quot;</span>]
+        </span><span class="kw">mod </span>mmap;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(any(
+        target_os = <span class="string">&quot;android&quot;</span>,
+        target_os = <span class="string">&quot;freebsd&quot;</span>,
+        target_os = <span class="string">&quot;fuchsia&quot;</span>,
+        target_os = <span class="string">&quot;haiku&quot;</span>,
+        target_os = <span class="string">&quot;ios&quot;</span>,
+        target_os = <span class="string">&quot;linux&quot;</span>,
+        target_os = <span class="string">&quot;macos&quot;</span>,
+        target_os = <span class="string">&quot;openbsd&quot;</span>,
+        target_os = <span class="string">&quot;solaris&quot;</span>,
+        target_os = <span class="string">&quot;illumos&quot;</span>,
+    ))] </span>{
+        <span class="attribute">#[path = <span class="string">&quot;gimli/mmap_unix.rs&quot;</span>]
+        </span><span class="kw">mod </span>mmap;
+    } <span class="kw">else </span>{
+        <span class="attribute">#[path = <span class="string">&quot;gimli/mmap_fake.rs&quot;</span>]
+        </span><span class="kw">mod </span>mmap;
     }
 }
 
-<span class="kw">mod</span> <span class="ident">stash</span>;
+<span class="kw">mod </span>stash;
 
-<span class="kw">const</span> <span class="ident">MAPPINGS_CACHE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="kw">const </span>MAPPINGS_CACHE_SIZE: usize = <span class="number">4</span>;
 
-<span class="kw">struct</span> <span class="ident">Mapping</span> {
-    <span class="comment">// &#39;static lifetime is a lie to hack around lack of support for self-referential structs.</span>
-    <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">_map</span>: <span class="ident">Mmap</span>,
-    <span class="ident">_stash</span>: <span class="ident">Stash</span>,
+<span class="kw">struct </span>Mapping {
+    <span class="comment">// &#39;static lifetime is a lie to hack around lack of support for self-referential structs.
+    </span>cx: Context&lt;<span class="lifetime">&#39;static</span>&gt;,
+    _map: Mmap,
+    _stash: Stash,
 }
 
-<span class="kw">enum</span> <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">A</span>(<span class="ident">A</span>),
-    <span class="ident">B</span>(<span class="ident">B</span>),
+<span class="kw">enum </span>Either&lt;A, B&gt; {
+    <span class="attribute">#[allow(dead_code)]
+    </span>A(A),
+    B(B),
 }
 
-<span class="kw">impl</span> <span class="ident">Mapping</span> {
-    <span class="doccomment">/// Creates a `Mapping` by ensuring that the `data` specified is used to</span>
-    <span class="doccomment">/// create a `Context` and it can only borrow from that or the `Stash` of</span>
-    <span class="doccomment">/// decompressed sections or auxiliary data.</span>
-    <span class="kw">fn</span> <span class="ident">mk</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">Mmap</span>, <span class="ident">mk</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stash</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>Mapping {
+    <span class="doccomment">/// Creates a `Mapping` by ensuring that the `data` specified is used to
+    /// create a `Context` and it can only borrow from that or the `Stash` of
+    /// decompressed sections or auxiliary data.
+    </span><span class="kw">fn </span>mk&lt;F&gt;(data: Mmap, mk: F) -&gt; <span class="prelude-ty">Option</span>&lt;Mapping&gt;
+    <span class="kw">where
+        </span>F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Stash) -&gt; <span class="prelude-ty">Option</span>&lt;Context&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">Mapping::mk_or_other</span>(<span class="ident">data</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">data</span>, <span class="ident">stash</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">mk</span>(<span class="ident">data</span>, <span class="ident">stash</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">Either::B</span>(<span class="ident">cx</span>))
+        Mapping::mk_or_other(data, <span class="kw">move </span>|data, stash| {
+            <span class="kw">let </span>cx = mk(data, stash)<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(Either::B(cx))
         })
     }
 
-    <span class="doccomment">/// Creates a `Mapping` from `data`, or if the closure decides to, returns a</span>
-    <span class="doccomment">/// different mapping.</span>
-    <span class="kw">fn</span> <span class="ident">mk_or_other</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">Mmap</span>, <span class="ident">mk</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mapping</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Stash</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Either</span><span class="op">&lt;</span><span class="ident">Mapping</span>, <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Creates a `Mapping` from `data`, or if the closure decides to, returns a
+    /// different mapping.
+    </span><span class="kw">fn </span>mk_or_other&lt;F&gt;(data: Mmap, mk: F) -&gt; <span class="prelude-ty">Option</span>&lt;Mapping&gt;
+    <span class="kw">where
+        </span>F: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Stash) -&gt; <span class="prelude-ty">Option</span>&lt;Either&lt;Mapping, Context&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">stash</span> <span class="op">=</span> <span class="ident">Stash::new</span>();
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mk</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">stash</span>)<span class="question-mark">?</span> {
-            <span class="ident">Either::A</span>(<span class="ident">mapping</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">mapping</span>),
-            <span class="ident">Either::B</span>(<span class="ident">cx</span>) =&gt; <span class="ident">cx</span>,
+        <span class="kw">let </span>stash = Stash::new();
+        <span class="kw">let </span>cx = <span class="kw">match </span>mk(<span class="kw-2">&amp;</span>data, <span class="kw-2">&amp;</span>stash)<span class="question-mark">? </span>{
+            Either::A(mapping) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(mapping),
+            Either::B(cx) =&gt; cx,
         };
-        <span class="prelude-val">Some</span>(<span class="ident">Mapping</span> {
-            <span class="comment">// Convert to &#39;static lifetimes since the symbols should</span>
-            <span class="comment">// only borrow `map` and `stash` and we&#39;re preserving them below.</span>
-            <span class="ident">cx</span>: <span class="kw">unsafe</span> { <span class="ident">core::mem::transmute</span>::<span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">cx</span>) },
-            <span class="ident">_map</span>: <span class="ident">data</span>,
-            <span class="ident">_stash</span>: <span class="ident">stash</span>,
+        <span class="prelude-val">Some</span>(Mapping {
+            <span class="comment">// Convert to &#39;static lifetimes since the symbols should
+            // only borrow `map` and `stash` and we&#39;re preserving them below.
+            </span>cx: <span class="kw">unsafe </span>{ core::mem::transmute::&lt;Context&lt;<span class="lifetime">&#39;_</span>&gt;, Context&lt;<span class="lifetime">&#39;static</span>&gt;&gt;(cx) },
+            _map: data,
+            _stash: stash,
         })
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">dwarf</span>: <span class="ident">addr2line::Context</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">object</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Context&lt;<span class="lifetime">&#39;a</span>&gt; {
+    dwarf: addr2line::Context&lt;EndianSlice&lt;<span class="lifetime">&#39;a</span>, Endian&gt;&gt;,
+    object: Object&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">stash</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Stash</span>,
-        <span class="ident">object</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
-        <span class="ident">sup</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">gimli::Dwarf::load</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, ()<span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">section</span>(<span class="ident">stash</span>, <span class="ident">id</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
-            <span class="prelude-val">Ok</span>(<span class="ident">EndianSlice::new</span>(<span class="ident">data</span>, <span class="ident">Endian</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>&gt; Context&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="kw">fn </span>new(
+        stash: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Stash,
+        object: Object&lt;<span class="lifetime">&#39;data</span>&gt;,
+        sup: <span class="prelude-ty">Option</span>&lt;Object&lt;<span class="lifetime">&#39;data</span>&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Context&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sections = gimli::Dwarf::load(|id| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, ()&gt; {
+            <span class="kw">let </span>data = object.section(stash, id.name()).unwrap_or(<span class="kw-2">&amp;</span>[]);
+            <span class="prelude-val">Ok</span>(EndianSlice::new(data, Endian))
         })
-        .<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        .ok()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sup</span>) <span class="op">=</span> <span class="ident">sup</span> {
-            <span class="ident">sections</span>
-                .<span class="ident">load_sup</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw">_</span>, ()<span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">sup</span>.<span class="ident">section</span>(<span class="ident">stash</span>, <span class="ident">id</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
-                    <span class="prelude-val">Ok</span>(<span class="ident">EndianSlice::new</span>(<span class="ident">data</span>, <span class="ident">Endian</span>))
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sup) = sup {
+            sections
+                .load_sup(|id| -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, ()&gt; {
+                    <span class="kw">let </span>data = sup.section(stash, id.name()).unwrap_or(<span class="kw-2">&amp;</span>[]);
+                    <span class="prelude-val">Ok</span>(EndianSlice::new(data, Endian))
                 })
-                .<span class="ident">ok</span>()<span class="question-mark">?</span>;
+                .ok()<span class="question-mark">?</span>;
         }
-        <span class="kw">let</span> <span class="ident">dwarf</span> <span class="op">=</span> <span class="ident">addr2line::Context::from_dwarf</span>(<span class="ident">sections</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>dwarf = addr2line::Context::from_dwarf(sections).ok()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">Context</span> { <span class="ident">dwarf</span>, <span class="ident">object</span> })
+        <span class="prelude-val">Some</span>(Context { dwarf, object })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">mmap</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Mmap</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">metadata</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">len</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="kw">unsafe</span> { <span class="ident">Mmap::map</span>(<span class="kw-2">&amp;</span><span class="ident">file</span>, <span class="ident">len</span>) }
+<span class="kw">fn </span>mmap(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Option</span>&lt;Mmap&gt; {
+    <span class="kw">let </span>file = File::open(path).ok()<span class="question-mark">?</span>;
+    <span class="kw">let </span>len = file.metadata().ok()<span class="question-mark">?</span>.len().try_into().ok()<span class="question-mark">?</span>;
+    <span class="kw">unsafe </span>{ Mmap::map(<span class="kw-2">&amp;</span>file, len) }
 }
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> {
-        <span class="kw">mod</span> <span class="ident">coff</span>;
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::coff::Object</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;tvos&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;watchos&quot;</span>,
-    ))]</span> {
-        <span class="kw">mod</span> <span class="ident">macho</span>;
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::macho::Object</span>;
-    } <span class="kw">else</span> {
-        <span class="kw">mod</span> <span class="ident">elf</span>;
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::elf::Object</span>;
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(windows)] </span>{
+        <span class="kw">mod </span>coff;
+        <span class="kw">use </span><span class="self">self</span>::coff::Object;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(any(
+        target_os = <span class="string">&quot;macos&quot;</span>,
+        target_os = <span class="string">&quot;ios&quot;</span>,
+        target_os = <span class="string">&quot;tvos&quot;</span>,
+        target_os = <span class="string">&quot;watchos&quot;</span>,
+    ))] </span>{
+        <span class="kw">mod </span>macho;
+        <span class="kw">use </span><span class="self">self</span>::macho::Object;
+    } <span class="kw">else </span>{
+        <span class="kw">mod </span>elf;
+        <span class="kw">use </span><span class="self">self</span>::elf::Object;
     }
 }
 
-<span class="macro">cfg_if::cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_windows</span>;
-        <span class="kw">use</span> <span class="ident">libs_windows::native_libraries</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;tvos&quot;</span>,
-        <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;watchos&quot;</span>,
-    ))]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_macos</span>;
-        <span class="kw">use</span> <span class="ident">libs_macos::native_libraries</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;illumos&quot;</span>)]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_illumos</span>;
-        <span class="kw">use</span> <span class="ident">libs_illumos::native_libraries</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-        <span class="ident">any</span>(
-            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;linux&quot;</span>,
-            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;fuchsia&quot;</span>,
-            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-            <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;openbsd&quot;</span>,
-            <span class="ident">all</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;android&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dl_iterate_phdr&quot;</span>),
+<span class="macro">cfg_if::cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(windows)] </span>{
+        <span class="kw">mod </span>libs_windows;
+        <span class="kw">use </span>libs_windows::native_libraries;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(any(
+        target_os = <span class="string">&quot;macos&quot;</span>,
+        target_os = <span class="string">&quot;ios&quot;</span>,
+        target_os = <span class="string">&quot;tvos&quot;</span>,
+        target_os = <span class="string">&quot;watchos&quot;</span>,
+    ))] </span>{
+        <span class="kw">mod </span>libs_macos;
+        <span class="kw">use </span>libs_macos::native_libraries;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(target_os = <span class="string">&quot;illumos&quot;</span>)] </span>{
+        <span class="kw">mod </span>libs_illumos;
+        <span class="kw">use </span>libs_illumos::native_libraries;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(all(
+        any(
+            target_os = <span class="string">&quot;linux&quot;</span>,
+            target_os = <span class="string">&quot;fuchsia&quot;</span>,
+            target_os = <span class="string">&quot;freebsd&quot;</span>,
+            target_os = <span class="string">&quot;openbsd&quot;</span>,
+            all(target_os = <span class="string">&quot;android&quot;</span>, feature = <span class="string">&quot;dl_iterate_phdr&quot;</span>),
         ),
-        <span class="ident">not</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;uclibc&quot;</span>),
-    ))]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_dl_iterate_phdr</span>;
-        <span class="kw">use</span> <span class="ident">libs_dl_iterate_phdr::native_libraries</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_env</span> <span class="op">=</span> <span class="string">&quot;libnx&quot;</span>)]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_libnx</span>;
-        <span class="kw">use</span> <span class="ident">libs_libnx::native_libraries</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;haiku&quot;</span>)]</span> {
-        <span class="kw">mod</span> <span class="ident">libs_haiku</span>;
-        <span class="kw">use</span> <span class="ident">libs_haiku::native_libraries</span>;
-    } <span class="kw">else</span> {
-        <span class="comment">// Everything else should doesn&#39;t know how to load native libraries.</span>
-        <span class="kw">fn</span> <span class="ident">native_libraries</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span> {
-            <span class="ident">Vec::new</span>()
+        not(target_env = <span class="string">&quot;uclibc&quot;</span>),
+    ))] </span>{
+        <span class="kw">mod </span>libs_dl_iterate_phdr;
+        <span class="kw">use </span>libs_dl_iterate_phdr::native_libraries;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(target_env = <span class="string">&quot;libnx&quot;</span>)] </span>{
+        <span class="kw">mod </span>libs_libnx;
+        <span class="kw">use </span>libs_libnx::native_libraries;
+    } <span class="kw">else if </span><span class="attribute">#[cfg(target_os = <span class="string">&quot;haiku&quot;</span>)] </span>{
+        <span class="kw">mod </span>libs_haiku;
+        <span class="kw">use </span>libs_haiku::native_libraries;
+    } <span class="kw">else </span>{
+        <span class="comment">// Everything else should doesn&#39;t know how to load native libraries.
+        </span><span class="kw">fn </span>native_libraries() -&gt; Vec&lt;Library&gt; {
+            Vec::new()
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Cache</span> {
-    <span class="doccomment">/// All known shared libraries that have been loaded.</span>
-    <span class="ident">libraries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Library</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">struct </span>Cache {
+    <span class="doccomment">/// All known shared libraries that have been loaded.
+    </span>libraries: Vec&lt;Library&gt;,
 
-    <span class="doccomment">/// Mappings cache where we retain parsed dwarf information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This list has a fixed capacity for its entire lifetime which never</span>
-    <span class="doccomment">/// increases. The `usize` element of each pair is an index into `libraries`</span>
-    <span class="doccomment">/// above where `usize::max_value()` represents the current executable. The</span>
-    <span class="doccomment">/// `Mapping` is corresponding parsed dwarf information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this is basically an LRU cache and we&#39;ll be shifting things</span>
-    <span class="doccomment">/// around in here as we symbolize addresses.</span>
-    <span class="ident">mappings</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Mapping</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Mappings cache where we retain parsed dwarf information.
+    ///
+    /// This list has a fixed capacity for its entire lifetime which never
+    /// increases. The `usize` element of each pair is an index into `libraries`
+    /// above where `usize::max_value()` represents the current executable. The
+    /// `Mapping` is corresponding parsed dwarf information.
+    ///
+    /// Note that this is basically an LRU cache and we&#39;ll be shifting things
+    /// around in here as we symbolize addresses.
+    </span>mappings: Vec&lt;(usize, Mapping)&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">Library</span> {
-    <span class="ident">name</span>: <span class="ident">OsString</span>,
-    <span class="doccomment">/// Segments of this library loaded into memory, and where they&#39;re loaded.</span>
-    <span class="ident">segments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LibrarySegment</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The &quot;bias&quot; of this library, typically where it&#39;s loaded into memory.</span>
-    <span class="doccomment">/// This value is added to each segment&#39;s stated address to get the actual</span>
-    <span class="doccomment">/// virtual memory address that the segment is loaded into. Additionally</span>
-    <span class="doccomment">/// this bias is subtracted from real virtual memory addresses to index into</span>
-    <span class="doccomment">/// debuginfo and the symbol table.</span>
-    <span class="ident">bias</span>: <span class="ident">usize</span>,
+<span class="kw">struct </span>Library {
+    name: OsString,
+    <span class="doccomment">/// Segments of this library loaded into memory, and where they&#39;re loaded.
+    </span>segments: Vec&lt;LibrarySegment&gt;,
+    <span class="doccomment">/// The &quot;bias&quot; of this library, typically where it&#39;s loaded into memory.
+    /// This value is added to each segment&#39;s stated address to get the actual
+    /// virtual memory address that the segment is loaded into. Additionally
+    /// this bias is subtracted from real virtual memory addresses to index into
+    /// debuginfo and the symbol table.
+    </span>bias: usize,
 }
 
-<span class="kw">struct</span> <span class="ident">LibrarySegment</span> {
-    <span class="doccomment">/// The stated address of this segment in the object file. This is not</span>
-    <span class="doccomment">/// actually where the segment is loaded, but rather this address plus the</span>
-    <span class="doccomment">/// containing library&#39;s `bias` is where to find it.</span>
-    <span class="ident">stated_virtual_memory_address</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The size of this segment in memory.</span>
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="kw">struct </span>LibrarySegment {
+    <span class="doccomment">/// The stated address of this segment in the object file. This is not
+    /// actually where the segment is loaded, but rather this address plus the
+    /// containing library&#39;s `bias` is where to find it.
+    </span>stated_virtual_memory_address: usize,
+    <span class="doccomment">/// The size of this segment in memory.
+    </span>len: usize,
 }
 
-<span class="comment">// unsafe because this is required to be externally synchronized</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clear_symbol_cache</span>() {
-    <span class="ident">Cache::with_global</span>(<span class="op">|</span><span class="ident">cache</span><span class="op">|</span> <span class="ident">cache</span>.<span class="ident">mappings</span>.<span class="ident">clear</span>());
+<span class="comment">// unsafe because this is required to be externally synchronized
+</span><span class="kw">pub unsafe fn </span>clear_symbol_cache() {
+    Cache::with_global(|cache| cache.mappings.clear());
 }
 
-<span class="kw">impl</span> <span class="ident">Cache</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Cache</span> {
-        <span class="ident">Cache</span> {
-            <span class="ident">mappings</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">MAPPINGS_CACHE_SIZE</span>),
-            <span class="ident">libraries</span>: <span class="ident">native_libraries</span>(),
+<span class="kw">impl </span>Cache {
+    <span class="kw">fn </span>new() -&gt; Cache {
+        Cache {
+            mappings: Vec::with_capacity(MAPPINGS_CACHE_SIZE),
+            libraries: native_libraries(),
         }
     }
 
-    <span class="comment">// unsafe because this is required to be externally synchronized</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">with_global</span>(<span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>)) {
-        <span class="comment">// A very small, very simple LRU cache for debug info mappings.</span>
-        <span class="comment">//</span>
-        <span class="comment">// The hit rate should be very high, since the typical stack doesn&#39;t cross</span>
-        <span class="comment">// between many shared libraries.</span>
-        <span class="comment">//</span>
-        <span class="comment">// The `addr2line::Context` structures are pretty expensive to create. Its</span>
-        <span class="comment">// cost is expected to be amortized by subsequent `locate` queries, which</span>
-        <span class="comment">// leverage the structures built when constructing `addr2line::Context`s to</span>
-        <span class="comment">// get nice speedups. If we didn&#39;t have this cache, that amortization would</span>
-        <span class="comment">// never happen, and symbolicating backtraces would be ssssllllooooowwww.</span>
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">MAPPINGS_CACHE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="comment">// unsafe because this is required to be externally synchronized
+    </span><span class="kw">unsafe fn </span>with_global(f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span><span class="self">Self</span>)) {
+        <span class="comment">// A very small, very simple LRU cache for debug info mappings.
+        //
+        // The hit rate should be very high, since the typical stack doesn&#39;t cross
+        // between many shared libraries.
+        //
+        // The `addr2line::Context` structures are pretty expensive to create. Its
+        // cost is expected to be amortized by subsequent `locate` queries, which
+        // leverage the structures built when constructing `addr2line::Context`s to
+        // get nice speedups. If we didn&#39;t have this cache, that amortization would
+        // never happen, and symbolicating backtraces would be ssssllllooooowwww.
+        </span><span class="kw">static </span><span class="kw-2">mut </span>MAPPINGS_CACHE: <span class="prelude-ty">Option</span>&lt;Cache&gt; = <span class="prelude-val">None</span>;
 
-        <span class="ident">f</span>(<span class="ident">MAPPINGS_CACHE</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Cache::new</span>()))
+        f(MAPPINGS_CACHE.get_or_insert_with(|| Cache::new()))
     }
 
-    <span class="kw">fn</span> <span class="ident">avma_to_svma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="kw-2">*const</span> <span class="ident">u8</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">libraries</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">lib</span>)<span class="op">|</span> {
-                <span class="comment">// First up, test if this `lib` has any segment containing the</span>
-                <span class="comment">// `addr` (handling relocation). If this check passes then we</span>
-                <span class="comment">// can continue below and actually translate the address.</span>
-                <span class="comment">//</span>
-                <span class="comment">// Note that we&#39;re using `wrapping_add` here to avoid overflow</span>
-                <span class="comment">// checks. It&#39;s been seen in the wild that the SVMA + bias</span>
-                <span class="comment">// computation overflows. It seems a bit odd that would happen</span>
-                <span class="comment">// but there&#39;s not a huge amount we can do about it other than</span>
-                <span class="comment">// probably just ignore those segments since they&#39;re likely</span>
-                <span class="comment">// pointing off into space. This originally came up in</span>
-                <span class="comment">// rust-lang/backtrace-rs#329.</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">lib</span>.<span class="ident">segments</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">svma</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">stated_virtual_memory_address</span>;
-                    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">svma</span>.<span class="ident">wrapping_add</span>(<span class="ident">lib</span>.<span class="ident">bias</span>);
-                    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">wrapping_add</span>(<span class="ident">s</span>.<span class="ident">len</span>);
-                    <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">addr</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">address</span> <span class="op">&amp;&amp;</span> <span class="ident">address</span> <span class="op">&lt;</span> <span class="ident">end</span>
+    <span class="kw">fn </span>avma_to_svma(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: <span class="kw-2">*const </span>u8) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">*const </span>u8)&gt; {
+        <span class="self">self</span>.libraries
+            .iter()
+            .enumerate()
+            .filter_map(|(i, lib)| {
+                <span class="comment">// First up, test if this `lib` has any segment containing the
+                // `addr` (handling relocation). If this check passes then we
+                // can continue below and actually translate the address.
+                //
+                // Note that we&#39;re using `wrapping_add` here to avoid overflow
+                // checks. It&#39;s been seen in the wild that the SVMA + bias
+                // computation overflows. It seems a bit odd that would happen
+                // but there&#39;s not a huge amount we can do about it other than
+                // probably just ignore those segments since they&#39;re likely
+                // pointing off into space. This originally came up in
+                // rust-lang/backtrace-rs#329.
+                </span><span class="kw">if </span>!lib.segments.iter().any(|s| {
+                    <span class="kw">let </span>svma = s.stated_virtual_memory_address;
+                    <span class="kw">let </span>start = svma.wrapping_add(lib.bias);
+                    <span class="kw">let </span>end = start.wrapping_add(s.len);
+                    <span class="kw">let </span>address = addr <span class="kw">as </span>usize;
+                    start &lt;= address &amp;&amp; address &lt; end
                 }) {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="comment">// Now that we know `lib` contains `addr`, we can offset with</span>
-                <span class="comment">// the bias to find the stated virtual memory address.</span>
-                <span class="kw">let</span> <span class="ident">svma</span> <span class="op">=</span> (<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">wrapping_sub</span>(<span class="ident">lib</span>.<span class="ident">bias</span>);
-                <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">svma</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>))
+                <span class="comment">// Now that we know `lib` contains `addr`, we can offset with
+                // the bias to find the stated virtual memory address.
+                </span><span class="kw">let </span>svma = (addr <span class="kw">as </span>usize).wrapping_sub(lib.bias);
+                <span class="prelude-val">Some</span>((i, svma <span class="kw">as </span><span class="kw-2">*const </span>u8))
             })
-            .<span class="ident">next</span>()
+            .next()
     }
 
-    <span class="kw">fn</span> <span class="ident">mapping_for_lib</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">lib</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">idx</span> <span class="op">==</span> <span class="ident">lib</span>);
+    <span class="kw">fn </span>mapping_for_lib&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, lib: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>idx = <span class="self">self</span>.mappings.iter().position(|(idx, <span class="kw">_</span>)| <span class="kw-2">*</span>idx == lib);
 
-        <span class="comment">// Invariant: after this conditional completes without early returning</span>
-        <span class="comment">// from an error, the cache entry for this path is at index 0.</span>
+        <span class="comment">// Invariant: after this conditional completes without early returning
+        // from an error, the cache entry for this path is at index 0.
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>) <span class="op">=</span> <span class="ident">idx</span> {
-            <span class="comment">// When the mapping is already in the cache, move it to the front.</span>
-            <span class="kw">if</span> <span class="ident">idx</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">remove</span>(<span class="ident">idx</span>);
-                <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">entry</span>);
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(idx) = idx {
+            <span class="comment">// When the mapping is already in the cache, move it to the front.
+            </span><span class="kw">if </span>idx != <span class="number">0 </span>{
+                <span class="kw">let </span>entry = <span class="self">self</span>.mappings.remove(idx);
+                <span class="self">self</span>.mappings.insert(<span class="number">0</span>, entry);
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// When the mapping is not in the cache, create a new mapping,</span>
-            <span class="comment">// insert it into the front of the cache, and evict the oldest cache</span>
-            <span class="comment">// entry if necessary.</span>
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">libraries</span>[<span class="ident">lib</span>].<span class="ident">name</span>;
-            <span class="kw">let</span> <span class="ident">mapping</span> <span class="op">=</span> <span class="ident">Mapping::new</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="comment">// When the mapping is not in the cache, create a new mapping,
+            // insert it into the front of the cache, and evict the oldest cache
+            // entry if necessary.
+            </span><span class="kw">let </span>name = <span class="kw-2">&amp;</span><span class="self">self</span>.libraries[lib].name;
+            <span class="kw">let </span>mapping = Mapping::new(name.as_ref())<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">MAPPINGS_CACHE_SIZE</span> {
-                <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">pop</span>();
+            <span class="kw">if </span><span class="self">self</span>.mappings.len() == MAPPINGS_CACHE_SIZE {
+                <span class="self">self</span>.mappings.pop();
             }
 
-            <span class="self">self</span>.<span class="ident">mappings</span>.<span class="ident">insert</span>(<span class="number">0</span>, (<span class="ident">lib</span>, <span class="ident">mapping</span>));
+            <span class="self">self</span>.mappings.insert(<span class="number">0</span>, (lib, mapping));
         }
 
-        <span class="kw">let</span> <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">mappings</span>[<span class="number">0</span>].<span class="number">1</span>.<span class="ident">cx</span>;
-        <span class="comment">// don&#39;t leak the `&#39;static` lifetime, make sure it&#39;s scoped to just</span>
-        <span class="comment">// ourselves</span>
-        <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">cx</span>) })
+        <span class="kw">let </span>cx: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;static</span>&gt; = <span class="kw-2">&amp;mut </span><span class="self">self</span>.mappings[<span class="number">0</span>].<span class="number">1</span>.cx;
+        <span class="comment">// don&#39;t leak the `&#39;static` lifetime, make sure it&#39;s scoped to just
+        // ourselves
+        </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ mem::transmute::&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;static</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Context&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(cx) })
     }
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="ident">what</span>: <span class="ident">ResolveWhat</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cb</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Symbol</span>)) {
-    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">what</span>.<span class="ident">address_or_ip</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">call</span> <span class="op">=</span> <span class="op">|</span><span class="ident">sym</span>: <span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
-        <span class="comment">// Extend the lifetime of `sym` to `&#39;static` since we are unfortunately</span>
-        <span class="comment">// required to here, but it&#39;s only ever going out as a reference so no</span>
-        <span class="comment">// reference to it should be persisted beyond this frame anyway.</span>
-        <span class="kw">let</span> <span class="ident">sym</span> <span class="op">=</span> <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">sym</span>);
-        (<span class="ident">cb</span>)(<span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Symbol</span> { <span class="ident">inner</span>: <span class="ident">sym</span> });
+<span class="kw">pub unsafe fn </span>resolve(what: ResolveWhat&lt;<span class="lifetime">&#39;_</span>&gt;, cb: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span><span class="kw">super</span>::Symbol)) {
+    <span class="kw">let </span>addr = what.address_or_ip();
+    <span class="kw">let </span><span class="kw-2">mut </span>call = |sym: Symbol&lt;<span class="lifetime">&#39;_</span>&gt;| {
+        <span class="comment">// Extend the lifetime of `sym` to `&#39;static` since we are unfortunately
+        // required to here, but it&#39;s only ever going out as a reference so no
+        // reference to it should be persisted beyond this frame anyway.
+        </span><span class="kw">let </span>sym = mem::transmute::&lt;Symbol&lt;<span class="lifetime">&#39;_</span>&gt;, Symbol&lt;<span class="lifetime">&#39;static</span>&gt;&gt;(sym);
+        (cb)(<span class="kw-2">&amp;</span><span class="kw">super</span>::Symbol { inner: sym });
     };
 
-    <span class="ident">Cache::with_global</span>(<span class="op">|</span><span class="ident">cache</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">lib</span>, <span class="ident">addr</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">avma_to_svma</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">pair</span>) =&gt; <span class="ident">pair</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    Cache::with_global(|cache| {
+        <span class="kw">let </span>(lib, addr) = <span class="kw">match </span>cache.avma_to_svma(addr <span class="kw">as </span><span class="kw-2">*const </span>u8) {
+            <span class="prelude-val">Some</span>(pair) =&gt; pair,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-        <span class="comment">// Finally, get a cached mapping or create a new mapping for this file, and</span>
-        <span class="comment">// evaluate the DWARF info to find the file/line/name for this address.</span>
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache</span>.<span class="ident">mapping_for_lib</span>(<span class="ident">lib</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">cx</span>) =&gt; <span class="ident">cx</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        <span class="comment">// Finally, get a cached mapping or create a new mapping for this file, and
+        // evaluate the DWARF info to find the file/line/name for this address.
+        </span><span class="kw">let </span>cx = <span class="kw">match </span>cache.mapping_for_lib(lib) {
+            <span class="prelude-val">Some</span>(cx) =&gt; cx,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_frames</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">frames</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">dwarf</span>.<span class="ident">find_frames</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>) {
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">frame</span>)) <span class="op">=</span> <span class="ident">frames</span>.<span class="ident">next</span>() {
-                <span class="ident">any_frames</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">frame</span>.<span class="ident">function</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">slice</span>()),
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">cx</span>.<span class="ident">object</span>.<span class="ident">search_symtab</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>any_frames = <span class="bool-val">false</span>;
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>frames) = cx.dwarf.find_frames(addr <span class="kw">as </span>u64) {
+            <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(frame)) = frames.next() {
+                any_frames = <span class="bool-val">true</span>;
+                <span class="kw">let </span>name = <span class="kw">match </span>frame.function {
+                    <span class="prelude-val">Some</span>(f) =&gt; <span class="prelude-val">Some</span>(f.name.slice()),
+                    <span class="prelude-val">None </span>=&gt; cx.object.search_symtab(addr <span class="kw">as </span>u64),
                 };
-                <span class="ident">call</span>(<span class="ident">Symbol::Frame</span> {
-                    <span class="ident">addr</span>: <span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-                    <span class="ident">location</span>: <span class="ident">frame</span>.<span class="ident">location</span>,
-                    <span class="ident">name</span>,
+                call(Symbol::Frame {
+                    addr: addr <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
+                    location: frame.location,
+                    name,
                 });
             }
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">any_frames</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">object_cx</span>, <span class="ident">object_addr</span>)) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">object</span>.<span class="ident">search_object_map</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">frames</span>) <span class="op">=</span> <span class="ident">object_cx</span>.<span class="ident">dwarf</span>.<span class="ident">find_frames</span>(<span class="ident">object_addr</span>) {
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">frame</span>)) <span class="op">=</span> <span class="ident">frames</span>.<span class="ident">next</span>() {
-                        <span class="ident">any_frames</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                        <span class="ident">call</span>(<span class="ident">Symbol::Frame</span> {
-                            <span class="ident">addr</span>: <span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-                            <span class="ident">location</span>: <span class="ident">frame</span>.<span class="ident">location</span>,
-                            <span class="ident">name</span>: <span class="ident">frame</span>.<span class="ident">function</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">slice</span>()),
+        <span class="kw">if </span>!any_frames {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((object_cx, object_addr)) = cx.object.search_object_map(addr <span class="kw">as </span>u64) {
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>frames) = object_cx.dwarf.find_frames(object_addr) {
+                    <span class="kw">while let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(frame)) = frames.next() {
+                        any_frames = <span class="bool-val">true</span>;
+                        call(Symbol::Frame {
+                            addr: addr <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
+                            location: frame.location,
+                            name: frame.function.map(|f| f.name.slice()),
                         });
                     }
                 }
             }
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">any_frames</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">object</span>.<span class="ident">search_symtab</span>(<span class="ident">addr</span> <span class="kw">as</span> <span class="ident">u64</span>) {
-                <span class="ident">call</span>(<span class="ident">Symbol::Symtab</span> {
-                    <span class="ident">addr</span>: <span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-                    <span class="ident">name</span>,
+        <span class="kw">if </span>!any_frames {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = cx.object.search_symtab(addr <span class="kw">as </span>u64) {
+                call(Symbol::Symtab {
+                    addr: addr <span class="kw">as </span><span class="kw-2">*mut </span>c_void,
+                    name,
                 });
             }
         }
     });
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// We were able to locate frame information for this symbol, and</span>
-    <span class="doccomment">/// `addr2line`&#39;s frame internally has all the nitty gritty details.</span>
-    <span class="ident">Frame</span> {
-        <span class="ident">addr</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
-        <span class="ident">location</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">addr2line::Location</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
+<span class="kw">pub enum </span>Symbol&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// We were able to locate frame information for this symbol, and
+    /// `addr2line`&#39;s frame internally has all the nitty gritty details.
+    </span>Frame {
+        addr: <span class="kw-2">*mut </span>c_void,
+        location: <span class="prelude-ty">Option</span>&lt;addr2line::Location&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
     },
-    <span class="doccomment">/// Couldn&#39;t find debug information, but we found it in the symbol table of</span>
-    <span class="doccomment">/// the elf executable.</span>
-    <span class="ident">Symtab</span> { <span class="ident">addr</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] },
+    <span class="doccomment">/// Couldn&#39;t find debug information, but we found it in the symbol table of
+    /// the elf executable.
+    </span>Symtab { addr: <span class="kw-2">*mut </span>c_void, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] },
 }
 
-<span class="kw">impl</span> <span class="ident">Symbol</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SymbolName</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">name</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">SymbolName::new</span>(<span class="ident">name</span>))
+<span class="kw">impl </span>Symbol&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SymbolName&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { name, .. } =&gt; {
+                <span class="kw">let </span>name = name.as_ref()<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>(SymbolName::new(name))
             }
-            <span class="ident">Symbol::Symtab</span> { <span class="ident">name</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">SymbolName::new</span>(<span class="ident">name</span>)),
+            Symbol::Symtab { name, .. } =&gt; <span class="prelude-val">Some</span>(SymbolName::new(name)),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">c_void</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">addr</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">addr</span>),
-            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*mut </span>c_void&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { addr, .. } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>addr),
+            Symbol::Symtab { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BytesOrWideString</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">file</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">BytesOrWideString::Bytes</span>(<span class="ident">file</span>.<span class="ident">as_bytes</span>()))
+    <span class="kw">pub fn </span>filename_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BytesOrWideString&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { location, .. } =&gt; {
+                <span class="kw">let </span>file = location.as_ref()<span class="question-mark">?</span>.file<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>(BytesOrWideString::Bytes(file.as_bytes()))
             }
-            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
+            Symbol::Symtab { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">file</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">Path::new</span>(<span class="ident">file</span>))
+    <span class="kw">pub fn </span>filename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Path&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { location, .. } =&gt; {
+                <span class="kw">let </span>file = location.as_ref()<span class="question-mark">?</span>.file<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>(Path::new(file))
             }
-            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
+            Symbol::Symtab { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lineno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">line</span>,
-            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>lineno(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { location, .. } =&gt; location.as_ref()<span class="question-mark">?</span>.line,
+            Symbol::Symtab { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">colno</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Symbol::Frame</span> { <span class="ident">location</span>, .. } =&gt; <span class="ident">location</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">column</span>,
-            <span class="ident">Symbol::Symtab</span> { .. } =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>colno(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Symbol::Frame { location, .. } =&gt; location.as_ref()<span class="question-mark">?</span>.column,
+            Symbol::Symtab { .. } =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="backtrace" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="backtrace" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

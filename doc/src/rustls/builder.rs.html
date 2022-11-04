@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -266,273 +266,273 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx</span>::{<span class="ident">SupportedKxGroup</span>, <span class="ident">ALL_KX_GROUPS</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>::{<span class="ident">SupportedCipherSuite</span>, <span class="ident">DEFAULT_CIPHER_SUITES</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::versions</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::kx::{SupportedKxGroup, ALL_KX_GROUPS};
+<span class="kw">use </span><span class="kw">crate</span>::suites::{SupportedCipherSuite, DEFAULT_CIPHER_SUITES};
+<span class="kw">use </span><span class="kw">crate</span>::versions;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="doccomment">/// Building a [`ServerConfig`] or [`ClientConfig`] in a linker-friendly and</span>
-<span class="doccomment">/// complete way.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Linker-friendly: meaning unused cipher suites, protocol</span>
-<span class="doccomment">/// versions, key exchange mechanisms, etc. can be discarded</span>
-<span class="doccomment">/// by the linker as they&#39;ll be unreferenced.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Complete: the type system ensures all decisions required to run a</span>
-<span class="doccomment">/// server or client have been made by the time the process finishes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example, to make a [`ServerConfig`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use rustls::ServerConfig;</span>
-<span class="doccomment">/// # let certs = vec![];</span>
-<span class="doccomment">/// # let private_key = rustls::PrivateKey(vec![]);</span>
-<span class="doccomment">/// ServerConfig::builder()</span>
-<span class="doccomment">///     .with_safe_default_cipher_suites()</span>
-<span class="doccomment">///     .with_safe_default_kx_groups()</span>
-<span class="doccomment">///     .with_safe_default_protocol_versions()</span>
-<span class="doccomment">///     .unwrap()</span>
-<span class="doccomment">///     .with_no_client_auth()</span>
-<span class="doccomment">///     .with_single_cert(certs, private_key)</span>
-<span class="doccomment">///     .expect(&quot;bad certificate/key&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This may be shortened to:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use rustls::ServerConfig;</span>
-<span class="doccomment">/// # let certs = vec![];</span>
-<span class="doccomment">/// # let private_key = rustls::PrivateKey(vec![]);</span>
-<span class="doccomment">/// ServerConfig::builder()</span>
-<span class="doccomment">///     .with_safe_defaults()</span>
-<span class="doccomment">///     .with_no_client_auth()</span>
-<span class="doccomment">///     .with_single_cert(certs, private_key)</span>
-<span class="doccomment">///     .expect(&quot;bad certificate/key&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To make a [`ClientConfig`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use rustls::ClientConfig;</span>
-<span class="doccomment">/// # let root_certs = rustls::RootCertStore::empty();</span>
-<span class="doccomment">/// # let certs = vec![];</span>
-<span class="doccomment">/// # let private_key = rustls::PrivateKey(vec![]);</span>
-<span class="doccomment">/// ClientConfig::builder()</span>
-<span class="doccomment">///     .with_safe_default_cipher_suites()</span>
-<span class="doccomment">///     .with_safe_default_kx_groups()</span>
-<span class="doccomment">///     .with_safe_default_protocol_versions()</span>
-<span class="doccomment">///     .unwrap()</span>
-<span class="doccomment">///     .with_root_certificates(root_certs)</span>
-<span class="doccomment">///     .with_single_cert(certs, private_key)</span>
-<span class="doccomment">///     .expect(&quot;bad certificate/key&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This may be shortened to:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use rustls::ClientConfig;</span>
-<span class="doccomment">/// # let root_certs = rustls::RootCertStore::empty();</span>
-<span class="doccomment">/// ClientConfig::builder()</span>
-<span class="doccomment">///     .with_safe_defaults()</span>
-<span class="doccomment">///     .with_root_certificates(root_certs)</span>
-<span class="doccomment">///     .with_no_client_auth();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The types used here fit together like this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. Call [`ClientConfig::builder()`] or [`ServerConfig::builder()`] to initialize a builder.</span>
-<span class="doccomment">/// 1. You must make a decision on which cipher suites to use, typically</span>
-<span class="doccomment">///    by calling [`ConfigBuilder&lt;S, WantsCipherSuites&gt;::with_safe_default_cipher_suites()`].</span>
-<span class="doccomment">/// 2. Now you must make a decision</span>
-<span class="doccomment">///    on key exchange groups: typically by calling</span>
-<span class="doccomment">///    [`ConfigBuilder&lt;S, WantsKxGroups&gt;::with_safe_default_kx_groups()`].</span>
-<span class="doccomment">/// 3. Now you must make</span>
-<span class="doccomment">///    a decision on which protocol versions to support, typically by calling</span>
-<span class="doccomment">///    [`ConfigBuilder&lt;S, WantsVersions&gt;::with_safe_default_protocol_versions()`].</span>
-<span class="doccomment">/// 5. Now see [`ConfigBuilder&lt;ClientConfig, WantsVerifier&gt;`] or</span>
-<span class="doccomment">///    [`ConfigBuilder&lt;ServerConfig, WantsVerifier&gt;`] for further steps.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ServerConfig`]: crate::ServerConfig</span>
-<span class="doccomment">/// [`ClientConfig`]: crate::ClientConfig</span>
-<span class="doccomment">/// [`ClientConfig::builder()`]: crate::ClientConfig::builder()</span>
-<span class="doccomment">/// [`ServerConfig::builder()`]: crate::ServerConfig::builder()</span>
-<span class="doccomment">/// [`ConfigBuilder&lt;ClientConfig, WantsVerifier&gt;`]: struct.ConfigBuilder.html#impl-3</span>
-<span class="doccomment">/// [`ConfigBuilder&lt;ServerConfig, WantsVerifier&gt;`]: struct.ConfigBuilder.html#impl-6</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">Side</span>: <span class="ident">ConfigSide</span>, <span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">side</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Side</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Building a [`ServerConfig`] or [`ClientConfig`] in a linker-friendly and
+/// complete way.
+///
+/// Linker-friendly: meaning unused cipher suites, protocol
+/// versions, key exchange mechanisms, etc. can be discarded
+/// by the linker as they&#39;ll be unreferenced.
+///
+/// Complete: the type system ensures all decisions required to run a
+/// server or client have been made by the time the process finishes.
+///
+/// Example, to make a [`ServerConfig`]:
+///
+/// ```no_run
+/// # use rustls::ServerConfig;
+/// # let certs = vec![];
+/// # let private_key = rustls::PrivateKey(vec![]);
+/// ServerConfig::builder()
+///     .with_safe_default_cipher_suites()
+///     .with_safe_default_kx_groups()
+///     .with_safe_default_protocol_versions()
+///     .unwrap()
+///     .with_no_client_auth()
+///     .with_single_cert(certs, private_key)
+///     .expect(&quot;bad certificate/key&quot;);
+/// ```
+///
+/// This may be shortened to:
+///
+/// ```no_run
+/// # use rustls::ServerConfig;
+/// # let certs = vec![];
+/// # let private_key = rustls::PrivateKey(vec![]);
+/// ServerConfig::builder()
+///     .with_safe_defaults()
+///     .with_no_client_auth()
+///     .with_single_cert(certs, private_key)
+///     .expect(&quot;bad certificate/key&quot;);
+/// ```
+///
+/// To make a [`ClientConfig`]:
+///
+/// ```no_run
+/// # use rustls::ClientConfig;
+/// # let root_certs = rustls::RootCertStore::empty();
+/// # let certs = vec![];
+/// # let private_key = rustls::PrivateKey(vec![]);
+/// ClientConfig::builder()
+///     .with_safe_default_cipher_suites()
+///     .with_safe_default_kx_groups()
+///     .with_safe_default_protocol_versions()
+///     .unwrap()
+///     .with_root_certificates(root_certs)
+///     .with_single_cert(certs, private_key)
+///     .expect(&quot;bad certificate/key&quot;);
+/// ```
+///
+/// This may be shortened to:
+///
+/// ```
+/// # use rustls::ClientConfig;
+/// # let root_certs = rustls::RootCertStore::empty();
+/// ClientConfig::builder()
+///     .with_safe_defaults()
+///     .with_root_certificates(root_certs)
+///     .with_no_client_auth();
+/// ```
+///
+/// The types used here fit together like this:
+///
+/// 1. Call [`ClientConfig::builder()`] or [`ServerConfig::builder()`] to initialize a builder.
+/// 1. You must make a decision on which cipher suites to use, typically
+///    by calling [`ConfigBuilder&lt;S, WantsCipherSuites&gt;::with_safe_default_cipher_suites()`].
+/// 2. Now you must make a decision
+///    on key exchange groups: typically by calling
+///    [`ConfigBuilder&lt;S, WantsKxGroups&gt;::with_safe_default_kx_groups()`].
+/// 3. Now you must make
+///    a decision on which protocol versions to support, typically by calling
+///    [`ConfigBuilder&lt;S, WantsVersions&gt;::with_safe_default_protocol_versions()`].
+/// 5. Now see [`ConfigBuilder&lt;ClientConfig, WantsVerifier&gt;`] or
+///    [`ConfigBuilder&lt;ServerConfig, WantsVerifier&gt;`] for further steps.
+///
+/// [`ServerConfig`]: crate::ServerConfig
+/// [`ClientConfig`]: crate::ClientConfig
+/// [`ClientConfig::builder()`]: crate::ClientConfig::builder()
+/// [`ServerConfig::builder()`]: crate::ServerConfig::builder()
+/// [`ConfigBuilder&lt;ClientConfig, WantsVerifier&gt;`]: struct.ConfigBuilder.html#impl-3
+/// [`ConfigBuilder&lt;ServerConfig, WantsVerifier&gt;`]: struct.ConfigBuilder.html#impl-6
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>ConfigBuilder&lt;Side: ConfigSide, State&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) state: State,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) side: PhantomData&lt;Side&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Side</span>: <span class="ident">ConfigSide</span>, <span class="ident">State</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">Side</span>, <span class="ident">State</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">side_name</span> <span class="op">=</span> <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">Side</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">side_name</span> <span class="op">=</span> <span class="ident">side_name</span>
-            .<span class="ident">split</span>(<span class="string">&quot;::&quot;</span>)
-            .<span class="ident">last</span>()
-            .<span class="ident">unwrap_or</span>(<span class="ident">side_name</span>);
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;ConfigBuilder&lt;{}, _&gt;&quot;</span>, <span class="ident">side_name</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;Side: ConfigSide, State: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>ConfigBuilder&lt;Side, State&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>side_name = std::any::type_name::&lt;Side&gt;();
+        <span class="kw">let </span>side_name = side_name
+            .split(<span class="string">&quot;::&quot;</span>)
+            .last()
+            .unwrap_or(side_name);
+        f.debug_struct(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;ConfigBuilder&lt;{}, _&gt;&quot;</span>, side_name))
+            .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.state)
+            .finish()
     }
 }
 
-<span class="doccomment">/// Config builder state where the caller must supply cipher suites.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsCipherSuites</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) ());
+<span class="doccomment">/// Config builder state where the caller must supply cipher suites.
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsCipherSuites(<span class="kw">pub</span>(<span class="kw">crate</span>) ());
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ConfigSide</span><span class="op">&gt;</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsCipherSuites</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Start side-specific config with defaults for underlying cryptography.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If used, this will enable all safe supported cipher suites ([`DEFAULT_CIPHER_SUITES`]), all</span>
-    <span class="doccomment">/// safe supported key exchange groups ([`ALL_KX_GROUPS`]) and all safe supported protocol</span>
-    <span class="doccomment">/// versions ([`DEFAULT_VERSIONS`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These are safe defaults, useful for 99% of applications.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DEFAULT_VERSIONS`]: versions::DEFAULT_VERSIONS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_safe_defaults</span>(<span class="self">self</span>) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVerifier</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsVerifier</span> {
-                <span class="ident">cipher_suites</span>: <span class="ident">DEFAULT_CIPHER_SUITES</span>.<span class="ident">to_vec</span>(),
-                <span class="ident">kx_groups</span>: <span class="ident">ALL_KX_GROUPS</span>.<span class="ident">to_vec</span>(),
-                <span class="ident">versions</span>: <span class="ident">versions::EnabledVersions::new</span>(<span class="ident">versions::DEFAULT_VERSIONS</span>),
+<span class="kw">impl</span>&lt;S: ConfigSide&gt; ConfigBuilder&lt;S, WantsCipherSuites&gt; {
+    <span class="doccomment">/// Start side-specific config with defaults for underlying cryptography.
+    ///
+    /// If used, this will enable all safe supported cipher suites ([`DEFAULT_CIPHER_SUITES`]), all
+    /// safe supported key exchange groups ([`ALL_KX_GROUPS`]) and all safe supported protocol
+    /// versions ([`DEFAULT_VERSIONS`]).
+    ///
+    /// These are safe defaults, useful for 99% of applications.
+    ///
+    /// [`DEFAULT_VERSIONS`]: versions::DEFAULT_VERSIONS
+    </span><span class="kw">pub fn </span>with_safe_defaults(<span class="self">self</span>) -&gt; ConfigBuilder&lt;S, WantsVerifier&gt; {
+        ConfigBuilder {
+            state: WantsVerifier {
+                cipher_suites: DEFAULT_CIPHER_SUITES.to_vec(),
+                kx_groups: ALL_KX_GROUPS.to_vec(),
+                versions: versions::EnabledVersions::new(versions::DEFAULT_VERSIONS),
             },
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
+            side: <span class="self">self</span>.side,
         }
     }
 
-    <span class="doccomment">/// Choose a specific set of cipher suites.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_cipher_suites</span>(
+    <span class="doccomment">/// Choose a specific set of cipher suites.
+    </span><span class="kw">pub fn </span>with_cipher_suites(
         <span class="self">self</span>,
-        <span class="ident">cipher_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsKxGroups</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsKxGroups</span> {
-                <span class="ident">cipher_suites</span>: <span class="ident">cipher_suites</span>.<span class="ident">to_vec</span>(),
+        cipher_suites: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+    ) -&gt; ConfigBuilder&lt;S, WantsKxGroups&gt; {
+        ConfigBuilder {
+            state: WantsKxGroups {
+                cipher_suites: cipher_suites.to_vec(),
             },
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
+            side: <span class="self">self</span>.side,
         }
     }
 
-    <span class="doccomment">/// Choose the default set of cipher suites ([`DEFAULT_CIPHER_SUITES`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this default provides only high-quality suites: there is no need</span>
-    <span class="doccomment">/// to filter out low-, export- or NULL-strength cipher suites: rustls does not</span>
-    <span class="doccomment">/// implement these.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_safe_default_cipher_suites</span>(<span class="self">self</span>) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsKxGroups</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_cipher_suites</span>(<span class="ident">DEFAULT_CIPHER_SUITES</span>)
+    <span class="doccomment">/// Choose the default set of cipher suites ([`DEFAULT_CIPHER_SUITES`]).
+    ///
+    /// Note that this default provides only high-quality suites: there is no need
+    /// to filter out low-, export- or NULL-strength cipher suites: rustls does not
+    /// implement these.
+    </span><span class="kw">pub fn </span>with_safe_default_cipher_suites(<span class="self">self</span>) -&gt; ConfigBuilder&lt;S, WantsKxGroups&gt; {
+        <span class="self">self</span>.with_cipher_suites(DEFAULT_CIPHER_SUITES)
     }
 }
 
-<span class="doccomment">/// Config builder state where the caller must supply key exchange groups.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsKxGroups</span> {
-    <span class="ident">cipher_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Config builder state where the caller must supply key exchange groups.
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsKxGroups {
+    cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ConfigSide</span><span class="op">&gt;</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsKxGroups</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Choose a specific set of key exchange groups.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_kx_groups</span>(
+<span class="kw">impl</span>&lt;S: ConfigSide&gt; ConfigBuilder&lt;S, WantsKxGroups&gt; {
+    <span class="doccomment">/// Choose a specific set of key exchange groups.
+    </span><span class="kw">pub fn </span>with_kx_groups(
         <span class="self">self</span>,
-        <span class="ident">kx_groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span>],
-    ) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVersions</span><span class="op">&gt;</span> {
-        <span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsVersions</span> {
-                <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-                <span class="ident">kx_groups</span>: <span class="ident">kx_groups</span>.<span class="ident">to_vec</span>(),
+        kx_groups: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup],
+    ) -&gt; ConfigBuilder&lt;S, WantsVersions&gt; {
+        ConfigBuilder {
+            state: WantsVersions {
+                cipher_suites: <span class="self">self</span>.state.cipher_suites,
+                kx_groups: kx_groups.to_vec(),
             },
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
+            side: <span class="self">self</span>.side,
         }
     }
 
-    <span class="doccomment">/// Choose the default set of key exchange groups ([`ALL_KX_GROUPS`]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a safe default: rustls doesn&#39;t implement any poor-quality groups.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_safe_default_kx_groups</span>(<span class="self">self</span>) -&gt; <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVersions</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_kx_groups</span>(<span class="kw-2">&amp;</span><span class="ident">ALL_KX_GROUPS</span>)
+    <span class="doccomment">/// Choose the default set of key exchange groups ([`ALL_KX_GROUPS`]).
+    ///
+    /// This is a safe default: rustls doesn&#39;t implement any poor-quality groups.
+    </span><span class="kw">pub fn </span>with_safe_default_kx_groups(<span class="self">self</span>) -&gt; ConfigBuilder&lt;S, WantsVersions&gt; {
+        <span class="self">self</span>.with_kx_groups(<span class="kw-2">&amp;</span>ALL_KX_GROUPS)
     }
 }
 
-<span class="doccomment">/// Config builder state where the caller must supply TLS protocol versions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsVersions</span> {
-    <span class="ident">cipher_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>,
-    <span class="ident">kx_groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Config builder state where the caller must supply TLS protocol versions.
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsVersions {
+    cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
+    kx_groups: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ConfigSide</span><span class="op">&gt;</span> <span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVersions</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Accept the default protocol versions: both TLS1.2 and TLS1.3 are enabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_safe_default_protocol_versions</span>(
+<span class="kw">impl</span>&lt;S: ConfigSide&gt; ConfigBuilder&lt;S, WantsVersions&gt; {
+    <span class="doccomment">/// Accept the default protocol versions: both TLS1.2 and TLS1.3 are enabled.
+    </span><span class="kw">pub fn </span>with_safe_default_protocol_versions(
         <span class="self">self</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVerifier</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">with_protocol_versions</span>(<span class="ident">versions::DEFAULT_VERSIONS</span>)
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ConfigBuilder&lt;S, WantsVerifier&gt;, Error&gt; {
+        <span class="self">self</span>.with_protocol_versions(versions::DEFAULT_VERSIONS)
     }
 
-    <span class="doccomment">/// Use a specific set of protocol versions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_protocol_versions</span>(
+    <span class="doccomment">/// Use a specific set of protocol versions.
+    </span><span class="kw">pub fn </span>with_protocol_versions(
         <span class="self">self</span>,
-        <span class="ident">versions</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">versions::SupportedProtocolVersion</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ConfigBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">WantsVerifier</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_usable_suite</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="ident">suite</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span> {
-            <span class="kw">if</span> <span class="ident">versions</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">suite</span>.<span class="ident">version</span>()) {
-                <span class="ident">any_usable_suite</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        versions: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>versions::SupportedProtocolVersion],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ConfigBuilder&lt;S, WantsVerifier&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>any_usable_suite = <span class="bool-val">false</span>;
+        <span class="kw">for </span>suite <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.state.cipher_suites {
+            <span class="kw">if </span>versions.contains(<span class="kw-2">&amp;</span>suite.version()) {
+                any_usable_suite = <span class="bool-val">true</span>;
                 <span class="kw">break</span>;
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">any_usable_suite</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::General</span>(<span class="string">&quot;no usable cipher suites configured&quot;</span>.<span class="ident">into</span>()));
+        <span class="kw">if </span>!any_usable_suite {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::General(<span class="string">&quot;no usable cipher suites configured&quot;</span>.into()));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::General</span>(<span class="string">&quot;no kx groups configured&quot;</span>.<span class="ident">into</span>()));
+        <span class="kw">if </span><span class="self">self</span>.state.kx_groups.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::General(<span class="string">&quot;no kx groups configured&quot;</span>.into()));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ConfigBuilder</span> {
-            <span class="ident">state</span>: <span class="ident">WantsVerifier</span> {
-                <span class="ident">cipher_suites</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cipher_suites</span>,
-                <span class="ident">kx_groups</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">kx_groups</span>,
-                <span class="ident">versions</span>: <span class="ident">versions::EnabledVersions::new</span>(<span class="ident">versions</span>),
+        <span class="prelude-val">Ok</span>(ConfigBuilder {
+            state: WantsVerifier {
+                cipher_suites: <span class="self">self</span>.state.cipher_suites,
+                kx_groups: <span class="self">self</span>.state.kx_groups,
+                versions: versions::EnabledVersions::new(versions),
             },
-            <span class="ident">side</span>: <span class="self">self</span>.<span class="ident">side</span>,
+            side: <span class="self">self</span>.side,
         })
     }
 }
 
-<span class="doccomment">/// Config builder state where the caller must supply a verifier.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For more information, see the [`ConfigBuilder`] documentation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WantsVerifier</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cipher_suites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SupportedCipherSuite</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">kx_groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">versions</span>: <span class="ident">versions::EnabledVersions</span>,
+<span class="doccomment">/// Config builder state where the caller must supply a verifier.
+///
+/// For more information, see the [`ConfigBuilder`] documentation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>WantsVerifier {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) cipher_suites: Vec&lt;SupportedCipherSuite&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) kx_groups: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) versions: versions::EnabledVersions,
 }
 
-<span class="doccomment">/// Helper trait to abstract [`ConfigBuilder`] over building a [`ClientConfig`] or [`ServerConfig`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ClientConfig`]: crate::ClientConfig</span>
-<span class="doccomment">/// [`ServerConfig`]: crate::ServerConfig</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConfigSide</span>: <span class="ident">sealed::Sealed</span> {}
+<span class="doccomment">/// Helper trait to abstract [`ConfigBuilder`] over building a [`ClientConfig`] or [`ServerConfig`].
+///
+/// [`ClientConfig`]: crate::ClientConfig
+/// [`ServerConfig`]: crate::ServerConfig
+</span><span class="kw">pub trait </span>ConfigSide: sealed::Sealed {}
 
-<span class="kw">impl</span> <span class="ident">ConfigSide</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ClientConfig</span> {}
-<span class="kw">impl</span> <span class="ident">ConfigSide</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ServerConfig</span> {}
+<span class="kw">impl </span>ConfigSide <span class="kw">for </span><span class="kw">crate</span>::ClientConfig {}
+<span class="kw">impl </span>ConfigSide <span class="kw">for </span><span class="kw">crate</span>::ServerConfig {}
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ClientConfig</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::ServerConfig</span> {}
+<span class="kw">mod </span>sealed {
+    <span class="kw">pub trait </span>Sealed {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw">crate</span>::ClientConfig {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw">crate</span>::ServerConfig {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

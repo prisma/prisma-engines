@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/parser/parse_schema.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse_schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/parser/parse_schema.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse_schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -102,109 +102,109 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">parse_composite_type::parse_composite_type</span>, <span class="ident">parse_enum::parse_enum</span>, <span class="ident">parse_model::parse_model</span>,
-    <span class="ident">parse_source_and_generator::parse_config_block</span>, <span class="ident">PrismaDatamodelParser</span>, <span class="ident">Rule</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    parse_composite_type::parse_composite_type, parse_enum::parse_enum, parse_model::parse_model,
+    parse_source_and_generator::parse_config_block, PrismaDatamodelParser, Rule,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
-<span class="kw">use</span> <span class="ident">pest::Parser</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics};
+<span class="kw">use </span>pest::Parser;
 
-<span class="doccomment">/// Parse a PSL string and return its AST.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="ident">SchemaAst</span> {
-    <span class="kw">let</span> <span class="ident">datamodel_result</span> <span class="op">=</span> <span class="ident">PrismaDatamodelParser::parse</span>(<span class="ident">Rule::schema</span>, <span class="ident">datamodel_string</span>);
+<span class="doccomment">/// Parse a PSL string and return its AST.
+</span><span class="kw">pub fn </span>parse_schema(datamodel_string: <span class="kw-2">&amp;</span>str, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; SchemaAst {
+    <span class="kw">let </span>datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 
-    <span class="kw">match</span> <span class="ident">datamodel_result</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">datamodel_wrapped</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datamodel_wrapped</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">top_level_definitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Top</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">into_inner</span>().<span class="ident">peekable</span>();
+    <span class="kw">match </span>datamodel_result {
+        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>datamodel_wrapped) =&gt; {
+            <span class="kw">let </span>datamodel = datamodel_wrapped.next().unwrap();
+            <span class="kw">let </span><span class="kw-2">mut </span>top_level_definitions: Vec&lt;Top&gt; = <span class="macro">vec!</span>[];
+            <span class="kw">let </span><span class="kw-2">mut </span>pending_block_comment = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>pairs = datamodel.into_inner().peekable();
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>) <span class="op">=</span> <span class="ident">pairs</span>.<span class="ident">next</span>() {
-                <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">as_rule</span>() {
-                    <span class="ident">Rule::model_declaration</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">clone</span>().<span class="ident">into_inner</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">pair</span>.<span class="ident">as_rule</span>(), <span class="ident">Rule::TYPE_KEYWORD</span> <span class="op">|</span> <span class="ident">Rule::MODEL_KEYWORD</span>) ).<span class="ident">expect</span>(<span class="string">&quot;Expected model or type keyword&quot;</span>);
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(current) = pairs.next() {
+                <span class="kw">match </span>current.as_rule() {
+                    Rule::model_declaration =&gt; {
+                        <span class="kw">let </span>keyword = current.clone().into_inner().find(|pair| <span class="macro">matches!</span>(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD) ).expect(<span class="string">&quot;Expected model or type keyword&quot;</span>);
 
-                        <span class="kw">match</span> <span class="ident">keyword</span>.<span class="ident">as_rule</span>() {
-                            <span class="ident">Rule::TYPE_KEYWORD</span> =&gt; {
-                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::CompositeType</span>(<span class="ident">parse_composite_type</span>(<span class="ident">current</span>, <span class="ident">pending_block_comment</span>.<span class="ident">take</span>(), <span class="ident">diagnostics</span>)))
+                        <span class="kw">match </span>keyword.as_rule() {
+                            Rule::TYPE_KEYWORD =&gt; {
+                                top_level_definitions.push(Top::CompositeType(parse_composite_type(current, pending_block_comment.take(), diagnostics)))
                             }
-                            <span class="ident">Rule::MODEL_KEYWORD</span> =&gt; {
-                                <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Model</span>(<span class="ident">parse_model</span>(<span class="ident">current</span>, <span class="ident">pending_block_comment</span>.<span class="ident">take</span>(), <span class="ident">diagnostics</span>)))
+                            Rule::MODEL_KEYWORD =&gt; {
+                                top_level_definitions.push(Top::Model(parse_model(current, pending_block_comment.take(), diagnostics)))
                             }
-                            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                         }
 
                     },
-                    <span class="ident">Rule::enum_declaration</span> =&gt; <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">Top::Enum</span>(<span class="ident">parse_enum</span>(<span class="ident">current</span>,<span class="ident">pending_block_comment</span>.<span class="ident">take</span>(),  <span class="ident">diagnostics</span>))),
-                    <span class="ident">Rule::config_block</span> =&gt; {
-                        <span class="ident">top_level_definitions</span>.<span class="ident">push</span>(<span class="ident">parse_config_block</span>(<span class="ident">current</span>, <span class="ident">diagnostics</span>));
+                    Rule::enum_declaration =&gt; top_level_definitions.push(Top::Enum(parse_enum(current,pending_block_comment.take(),  diagnostics))),
+                    Rule::config_block =&gt; {
+                        top_level_definitions.push(parse_config_block(current, diagnostics));
                     },
-                    <span class="ident">Rule::type_alias</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DatamodelError::new_validation_error</span>(
+                    Rule::type_alias =&gt; {
+                        <span class="kw">let </span>error = DatamodelError::new_validation_error(
                             <span class="string">&quot;Invalid type definition. Please check the documentation in https://pris.ly/d/composite-types&quot;</span>,
-                            <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>()
+                            current.as_span().into()
                         );
 
-                        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                        diagnostics.push_error(error);
                     }
-                    <span class="ident">Rule::comment_block</span> =&gt; {
-                        <span class="kw">match</span> <span class="ident">pairs</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">as_rule</span>()) {
-                            <span class="prelude-val">Some</span>(<span class="ident">Rule::empty_lines</span>) =&gt; {
-                                <span class="comment">// free floating</span>
+                    Rule::comment_block =&gt; {
+                        <span class="kw">match </span>pairs.peek().map(|b| b.as_rule()) {
+                            <span class="prelude-val">Some</span>(Rule::empty_lines) =&gt; {
+                                <span class="comment">// free floating
+                            </span>}
+                            <span class="prelude-val">Some</span>(Rule::model_declaration) | <span class="prelude-val">Some</span>(Rule::enum_declaration) | <span class="prelude-val">Some</span>(Rule::config_block) =&gt; {
+                                pending_block_comment = <span class="prelude-val">Some</span>(current);
                             }
-                            <span class="prelude-val">Some</span>(<span class="ident">Rule::model_declaration</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::enum_declaration</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">Rule::config_block</span>) =&gt; {
-                                <span class="ident">pending_block_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current</span>);
-                            }
-                            <span class="kw">_</span> =&gt; (),
+                            <span class="kw">_ </span>=&gt; (),
                         }
                     },
-                    <span class="ident">Rule::EOI</span> =&gt; {}
-                    <span class="ident">Rule::CATCH_ALL</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                    Rule::EOI =&gt; {}
+                    Rule::CATCH_ALL =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
                         <span class="string">&quot;This line is invalid. It does not start with any known Prisma schema keyword.&quot;</span>,
-                        <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                        current.as_span().into(),
                     )),
-                    <span class="ident">Rule::arbitrary_block</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+                    Rule::arbitrary_block =&gt; diagnostics.push_error(DatamodelError::new_validation_error(
                         <span class="string">&quot;This block is invalid. It does not start with any known Prisma schema keyword. Valid keywords include \&#39;model\&#39;, \&#39;enum\&#39;, \&#39;datasource\&#39; and \&#39;generator\&#39;.&quot;</span>,
-                        <span class="ident">current</span>.<span class="ident">as_span</span>().<span class="ident">into</span>(),
+                        current.as_span().into(),
                     )),
-                    <span class="ident">Rule::empty_lines</span> =&gt; (),
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                    Rule::empty_lines =&gt; (),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 }
             }
 
-            <span class="ident">SchemaAst</span> {
-                <span class="ident">tops</span>: <span class="ident">top_level_definitions</span>,
+            SchemaAst {
+                tops: top_level_definitions,
             }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">location</span>: <span class="ident">pest::Span</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">location</span> {
-                <span class="ident">pest::error::InputLocation::Pos</span>(<span class="ident">pos</span>) =&gt; <span class="ident">pest::Span::new</span>(<span class="ident">datamodel_string</span>, <span class="ident">pos</span>, <span class="ident">pos</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">pest::error::InputLocation::Span</span>((<span class="ident">from</span>, <span class="ident">to</span>)) =&gt; <span class="ident">pest::Span::new</span>(<span class="ident">datamodel_string</span>, <span class="ident">from</span>, <span class="ident">to</span>).<span class="ident">unwrap</span>(),
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="kw">let </span>location: pest::Span&lt;<span class="lifetime">&#39;_</span>&gt; = <span class="kw">match </span>err.location {
+                pest::error::InputLocation::Pos(pos) =&gt; pest::Span::new(datamodel_string, pos, pos).unwrap(),
+                pest::error::InputLocation::Span((from, to)) =&gt; pest::Span::new(datamodel_string, from, to).unwrap(),
             };
 
-            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">variant</span> {
-                <span class="ident">pest::error::ErrorVariant::ParsingError</span> { <span class="ident">positives</span>, .. } =&gt; <span class="ident">get_expected_from_error</span>(<span class="kw-2">&amp;</span><span class="ident">positives</span>),
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not construct parsing error. This should never happend.&quot;</span>),
+            <span class="kw">let </span>expected = <span class="kw">match </span>err.variant {
+                pest::error::ErrorVariant::ParsingError { positives, .. } =&gt; get_expected_from_error(<span class="kw-2">&amp;</span>positives),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not construct parsing error. This should never happend.&quot;</span>),
             };
 
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="ident">expected</span>, <span class="ident">location</span>.<span class="ident">into</span>()));
+            diagnostics.push_error(DatamodelError::new_parser_error(expected, location.into()));
 
-            <span class="ident">SchemaAst</span> { <span class="ident">tops</span>: <span class="ident">Vec::new</span>() }
+            SchemaAst { tops: Vec::new() }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_expected_from_error</span>(<span class="ident">positives</span>: <span class="kw-2">&amp;</span>[<span class="ident">Rule</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">use</span> <span class="ident">std::fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">positives</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">6</span>);
+<span class="kw">fn </span>get_expected_from_error(positives: <span class="kw-2">&amp;</span>[Rule]) -&gt; String {
+    <span class="kw">use </span>std::fmt::Write <span class="kw">as _</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(positives.len() * <span class="number">6</span>);
 
-    <span class="kw">for</span> <span class="ident">positive</span> <span class="kw">in</span> <span class="ident">positives</span> {
-        <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">positive</span>).<span class="ident">unwrap</span>();
+    <span class="kw">for </span>positive <span class="kw">in </span>positives {
+        <span class="macro">write!</span>(out, <span class="string">&quot;{:?}&quot;</span>, positive).unwrap();
     }
 
-    <span class="ident">out</span>
+    out
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

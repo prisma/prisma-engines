@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/visit/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../petgraph/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -132,137 +132,137 @@
 <span id="132">132</span>
 <span id="133">133</span>
 </pre><pre class="rust"><code>
-<span class="doccomment">/// Define a trait as usual, and a macro that can be used to instantiate</span>
-<span class="doccomment">/// implementations of it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There *must* be section markers in the trait defition:</span>
-<span class="doccomment">/// @section type for associated types</span>
-<span class="doccomment">/// @section self for methods</span>
-<span class="doccomment">/// @section nodelegate for arbitrary tail that is not forwarded.</span>
-<span class="macro">macro_rules!</span> <span class="ident">trait_template</span> {
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="kw">pub</span> <span class="kw">trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">macro_rules!</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">extra</span>:<span class="ident">tt</span>) =&gt; {
-                <span class="macro-nonterminal">$</span><span class="macro">m!</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">extra</span>
-                    <span class="kw">pub</span> <span class="kw">trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>)<span class="op">*</span>
+<span class="doccomment">/// Define a trait as usual, and a macro that can be used to instantiate
+/// implementations of it.
+///
+/// There *must* be section markers in the trait defition:
+/// @section type for associated types
+/// @section self for methods
+/// @section nodelegate for arbitrary tail that is not forwarded.
+</span><span class="macro">macro_rules! </span>trait_template {
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$doc</span>:meta]</span>)* <span class="kw">pub trait </span><span class="macro-nonterminal">$name</span>:ident $(<span class="macro-nonterminal">$methods</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">macro_rules! </span><span class="macro-nonterminal">$name </span>{
+            (<span class="macro-nonterminal">$m</span>:ident <span class="macro-nonterminal">$extra</span>:tt) =&gt; {
+                <span class="macro-nonterminal">$</span><span class="macro">m! </span>{
+                    <span class="macro-nonterminal">$extra
+                    </span><span class="kw">pub trait </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$methods</span>)*
                 }
             }
         }
 
-        <span class="macro">remove_sections!</span> { [] 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">methods</span>)<span class="op">*</span>
+        <span class="macro">remove_sections! </span>{ [] 
+            $(<span class="attribute">#[<span class="macro-nonterminal">$doc</span>]</span>)*
+            <span class="kw">pub trait </span><span class="macro-nonterminal">$name </span>$(<span class="macro-nonterminal">$methods</span>)*
 
-            <span class="comment">// This is where the trait definition is reproduced by the macro.</span>
-            <span class="comment">// It makes the source links point to this place!</span>
-            <span class="comment">//</span>
-            <span class="comment">// I&#39;m sorry, you&#39;ll have to find the source by looking at the</span>
-            <span class="comment">// source of the module the trait is defined in.</span>
-            <span class="comment">//</span>
-            <span class="comment">// We use this nifty macro so that we can automatically generate</span>
-            <span class="comment">// delegation trait impls and implement the graph traits for more</span>
-            <span class="comment">// types and combinators.</span>
-        }
+            <span class="comment">// This is where the trait definition is reproduced by the macro.
+            // It makes the source links point to this place!
+            //
+            // I&#39;m sorry, you&#39;ll have to find the source by looking at the
+            // source of the module the trait is defined in.
+            //
+            // We use this nifty macro so that we can automatically generate
+            // delegation trait impls and implement the graph traits for more
+            // types and combinators.
+        </span>}
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">remove_sections_inner</span> {
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>]) =&gt; {
-        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="op">*</span>
+<span class="macro">macro_rules! </span>remove_sections_inner {
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>]) =&gt; {
+        $(<span class="macro-nonterminal">$stack</span>)*
     };
-    <span class="comment">// escape the following tt</span>
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] @<span class="ident">escape</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">_x</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>);
+    <span class="comment">// escape the following tt
+    </span>([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>] @escape <span class="macro-nonterminal">$_x</span>:tt $(<span class="macro-nonterminal">$t</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$stack</span>)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$t</span>)<span class="kw-2">*</span>);
     };
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] @<span class="ident">section</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>)<span class="kw-2">*</span>);
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>] @section <span class="macro-nonterminal">$x</span>:ident $(<span class="macro-nonterminal">$t</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$stack</span>)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$t</span>)<span class="kw-2">*</span>);
     };
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>] <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">remove_sections_inner!</span>([$(<span class="macro-nonterminal">$stack</span>)* <span class="macro-nonterminal">$t</span>] $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
 }
 
-<span class="comment">// This is the outer layer, just find the { } of the actual trait definition</span>
-<span class="comment">// recurse once into { }, but not more.</span>
-<span class="macro">macro_rules!</span> <span class="ident">remove_sections</span> {
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>]) =&gt; {
-        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="op">*</span>
+<span class="comment">// This is the outer layer, just find the { } of the actual trait definition
+// recurse once into { }, but not more.
+</span><span class="macro">macro_rules! </span>remove_sections {
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>]) =&gt; {
+        $(<span class="macro-nonterminal">$stack</span>)*
     };
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="op">*</span> }) =&gt; {
-        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="op">*</span> {
-            <span class="macro">remove_sections_inner!</span>([] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>] { $(<span class="macro-nonterminal">$tail</span>:tt)* }) =&gt; {
+        $(<span class="macro-nonterminal">$stack</span>)* {
+            <span class="macro">remove_sections_inner!</span>([] $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
         }
     };
-    ([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">remove_sections!</span>([$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stack</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    ([$(<span class="macro-nonterminal">$stack</span>:tt)<span class="kw-2">*</span>] <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">remove_sections!</span>([$(<span class="macro-nonterminal">$stack</span>)* <span class="macro-nonterminal">$t</span>] $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">deref</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="kw-2">*</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
+<span class="macro">macro_rules! </span>deref {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; (<span class="kw-2">*</span><span class="macro-nonterminal">$e</span>);
 }
-<span class="macro">macro_rules!</span> <span class="ident">deref_twice</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; (<span class="kw-2">*</span><span class="kw-2">*</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>);
+<span class="macro">macro_rules! </span>deref_twice {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; (<span class="kw-2">**</span><span class="macro-nonterminal">$e</span>);
 }
 
-<span class="doccomment">/// Implement a trait by delegation. By default as if we are delegating</span>
-<span class="doccomment">/// from &amp;G to G.</span>
-<span class="macro">macro_rules!</span> <span class="ident">delegate_impl</span> {
-    ([] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">delegate_impl!</span> { [[<span class="lifetime">&#39;a</span>, <span class="ident">G</span>], <span class="ident">G</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">G</span>, <span class="ident">deref</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> }
+<span class="doccomment">/// Implement a trait by delegation. By default as if we are delegating
+/// from &amp;G to G.
+</span><span class="macro">macro_rules! </span>delegate_impl {
+    ([] $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">delegate_impl! </span>{ [[<span class="lifetime">&#39;a</span>, G], G, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>G, deref] $(<span class="macro-nonterminal">$rest</span>)* }
     };
-    ([[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_type</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_wrap</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_map</span>:<span class="ident">ident</span>]
-     <span class="kw">pub</span> <span class="kw">trait</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sup</span>:<span class="ident">ident</span>)<span class="op">*</span> $(<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">more_sup</span>:<span class="ident">ident</span>)<span class="op">*</span> {
+    ([[$(<span class="macro-nonterminal">$param</span>:tt)<span class="kw-2">*</span>], <span class="macro-nonterminal">$self_type</span>:ident, <span class="macro-nonterminal">$self_wrap</span>:ty, <span class="macro-nonterminal">$self_map</span>:ident]
+     <span class="kw">pub trait </span><span class="macro-nonterminal">$name</span>:ident $(: <span class="macro-nonterminal">$sup</span>:ident)* $(+ <span class="macro-nonterminal">$more_sup</span>:ident)* {
 
-        <span class="comment">// &quot;Escaped&quot; associated types. Stripped before making the `trait`</span>
-        <span class="comment">// itself, but forwarded when delegating impls.</span>
+        <span class="comment">// &quot;Escaped&quot; associated types. Stripped before making the `trait`
+        // itself, but forwarded when delegating impls.
+        </span>$(
+        @escape [<span class="kw">type </span><span class="macro-nonterminal">$assoc_name_ext</span>:ident]
+        <span class="comment">// Associated types. Forwarded.
+        </span>)*
         $(
-        @<span class="ident">escape</span> [<span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name_ext</span>:<span class="ident">ident</span>]
-        <span class="comment">// Associated types. Forwarded.</span>
-        )<span class="op">*</span>
-        $(
-        @<span class="ident">section</span> <span class="kw">type</span>
-        $(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">_assoc_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name</span>:<span class="ident">ident</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_bound</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>;
-        )<span class="op">+</span>
-        )<span class="op">*</span>
-        <span class="comment">// Methods. Forwarded. Using $self_map!(self) around the self argument.</span>
-        <span class="comment">// Methods must use receiver `self` or explicit type like `self: &amp;Self`</span>
-        <span class="comment">// &amp;self and &amp;mut self are _not_ supported.</span>
-        $(
-        @<span class="ident">section</span> <span class="self">self</span>
-        $(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">_method_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>:<span class="ident">ident</span>(<span class="self">self</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_selftype</span>:<span class="ident">ty</span>)<span class="op">*</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">marg</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">marg_ty</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mret</span>:<span class="ident">ty</span>;
-        )<span class="op">+</span>
-        )<span class="op">*</span>
-        <span class="comment">// Arbitrary tail that is ignored when forwarding.</span>
-        $(
-        @<span class="ident">section</span> <span class="ident">nodelegate</span>
-        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="op">*</span>
-        )<span class="op">*</span>
+        @section <span class="kw">type
+        </span>$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$_assoc_attr</span>:meta]</span>)*
+            <span class="kw">type </span><span class="macro-nonterminal">$assoc_name</span>:ident $(: <span class="macro-nonterminal">$assoc_bound</span>:ty)<span class="kw-2">*</span>;
+        )+
+        )*
+        <span class="comment">// Methods. Forwarded. Using $self_map!(self) around the self argument.
+        // Methods must use receiver `self` or explicit type like `self: &amp;Self`
+        // &amp;self and &amp;mut self are _not_ supported.
+        </span>$(
+        @section <span class="self">self
+        </span>$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$_method_attr</span>:meta]</span>)*
+            <span class="kw">fn </span><span class="macro-nonterminal">$method_name</span>:ident(<span class="self">self </span>$(: <span class="macro-nonterminal">$self_selftype</span>:ty)* $(,<span class="macro-nonterminal">$marg</span>:ident : <span class="macro-nonterminal">$marg_ty</span>:ty)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$mret</span>:ty;
+        )+
+        )*
+        <span class="comment">// Arbitrary tail that is ignored when forwarding.
+        </span>$(
+        @section nodelegate
+        $(<span class="macro-nonterminal">$tail</span>:tt)*
+        )*
     }) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_wrap</span> <span class="kw">where</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_type</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$param</span>)<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">$name </span><span class="kw">for </span><span class="macro-nonterminal">$self_wrap </span><span class="kw">where </span><span class="macro-nonterminal">$self_type</span>: <span class="macro-nonterminal">$name </span>{
             $(
             $(
-                <span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_type</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name</span>;
-            )<span class="op">*</span>
-            )<span class="op">*</span>
+                <span class="kw">type </span><span class="macro-nonterminal">$assoc_name </span>= <span class="macro-nonterminal">$self_type</span>::<span class="macro-nonterminal">$assoc_name</span>;
+            )*
+            )*
             $(
-                <span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name_ext</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_type</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">assoc_name_ext</span>;
-            )<span class="op">*</span>
+                <span class="kw">type </span><span class="macro-nonterminal">$assoc_name_ext </span>= <span class="macro-nonterminal">$self_type</span>::<span class="macro-nonterminal">$assoc_name_ext</span>;
+            )*
             $(
             $(
-                <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>(<span class="self">self</span> $(: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">self_selftype</span>)<span class="op">*</span> $(,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">marg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">marg_ty</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">mret</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro">self_map!</span>(<span class="macro-nonterminal">self</span>).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method_name</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">marg</span>),<span class="kw-2">*</span>)
+                <span class="kw">fn </span><span class="macro-nonterminal">$method_name</span>(<span class="self">self </span>$(: <span class="macro-nonterminal">$self_selftype</span>)* $(,<span class="macro-nonterminal">$marg</span>: <span class="macro-nonterminal">$marg_ty</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$mret </span>{
+                    <span class="macro-nonterminal">$</span><span class="macro">self_map!</span>(<span class="macro-nonterminal">self</span>).<span class="macro-nonterminal">$method_name</span>($(<span class="macro-nonterminal">$marg</span>),<span class="kw-2">*</span>)
                 }
-            )<span class="op">*</span>
-            )<span class="op">*</span>
+            )*
+            )*
         }
     }
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

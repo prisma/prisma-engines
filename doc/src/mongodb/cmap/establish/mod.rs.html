@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/establish/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/establish/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -114,121 +114,121 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">handshake</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>handshake;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::handshake::Handshaker</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">conn</span>::{<span class="ident">ConnectionGeneration</span>, <span class="ident">PendingConnection</span>},
-    <span class="ident">options::ConnectionPoolOptions</span>,
-    <span class="ident">Connection</span>,
-    <span class="ident">PoolGeneration</span>,
+<span class="kw">use </span><span class="self">self</span>::handshake::Handshaker;
+<span class="kw">use super</span>::{
+    conn::{ConnectionGeneration, PendingConnection},
+    options::ConnectionPoolOptions,
+    Connection,
+    PoolGeneration,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client</span>::{<span class="ident">auth::Credential</span>, <span class="ident">options::ServerApi</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">MongoError</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">runtime::HttpClient</span>,
-    <span class="ident">sdam::HandshakePhase</span>,
+<span class="kw">use crate</span>::{
+    client::{auth::Credential, options::ServerApi},
+    error::{Error <span class="kw">as </span>MongoError, ErrorKind},
+    runtime::HttpClient,
+    sdam::HandshakePhase,
 };
 
-<span class="doccomment">/// Contains the logic to establish a connection, including handshaking, authenticating, and</span>
-<span class="doccomment">/// potentially more.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ConnectionEstablisher</span> {
-    <span class="doccomment">/// Contains the logic for handshaking a connection.</span>
-    <span class="ident">handshaker</span>: <span class="ident">Handshaker</span>,
-    <span class="ident">http_client</span>: <span class="ident">HttpClient</span>,
-    <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
-    <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Contains the logic to establish a connection, including handshaking, authenticating, and
+/// potentially more.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ConnectionEstablisher {
+    <span class="doccomment">/// Contains the logic for handshaking a connection.
+    </span>handshaker: Handshaker,
+    http_client: HttpClient,
+    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
+    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionEstablisher</span> {
-    <span class="doccomment">/// Creates a new ConnectionEstablisher from the given options.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">http_client</span>: <span class="ident">HttpClient</span>, <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">handshaker</span> <span class="op">=</span> <span class="ident">Handshaker::new</span>(<span class="ident">options</span>.<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>));
+<span class="kw">impl </span>ConnectionEstablisher {
+    <span class="doccomment">/// Creates a new ConnectionEstablisher from the given options.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(http_client: HttpClient, options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ConnectionPoolOptions&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>handshaker = Handshaker::new(options.cloned().map(Into::into));
 
-        <span class="self">Self</span> {
-            <span class="ident">handshaker</span>,
-            <span class="ident">http_client</span>,
-            <span class="ident">credential</span>: <span class="ident">options</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">options</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">credential</span>.<span class="ident">clone</span>()),
-            <span class="ident">server_api</span>: <span class="ident">options</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">options</span><span class="op">|</span> <span class="ident">options</span>.<span class="ident">server_api</span>.<span class="ident">clone</span>()),
+        <span class="self">Self </span>{
+            handshaker,
+            http_client,
+            credential: options.and_then(|options| options.credential.clone()),
+            server_api: options.and_then(|options| options.server_api.clone()),
         }
     }
 
-    <span class="doccomment">/// Establishes a connection.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">establish_connection</span>(
+    <span class="doccomment">/// Establishes a connection.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>establish_connection(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pending_connection</span>: <span class="ident">PendingConnection</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Connection</span>, <span class="ident">EstablishError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pool_gen</span> <span class="op">=</span> <span class="ident">pending_connection</span>.<span class="ident">generation</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::connect</span>(<span class="ident">pending_connection</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">EstablishError::pre_hello</span>(<span class="ident">e</span>, <span class="ident">pool_gen</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
+        pending_connection: PendingConnection,
+    ) -&gt; std::result::Result&lt;Connection, EstablishError&gt; {
+        <span class="kw">let </span>pool_gen = pending_connection.generation.clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect(pending_connection)
+            .<span class="kw">await
+            </span>.map_err(|e| EstablishError::pre_hello(e, pool_gen.clone()))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">handshake</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">handshaker</span>
-            .<span class="ident">handshake</span>(<span class="kw-2">&amp;mut</span> <span class="ident">connection</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">EstablishError::pre_hello</span>(<span class="ident">e</span>, <span class="ident">pool_gen</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">service_id</span> <span class="op">=</span> <span class="ident">handshake</span>.<span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span>;
+        <span class="kw">let </span>handshake = <span class="self">self
+            </span>.handshaker
+            .handshake(<span class="kw-2">&amp;mut </span>connection, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>)
+            .<span class="kw">await
+            </span>.map_err(|e| EstablishError::pre_hello(e, pool_gen.clone()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>service_id = handshake.hello_reply.command_response.service_id;
 
-        <span class="comment">// If the handshake response had a `serviceId` field, this is a connection to a load</span>
-        <span class="comment">// balancer and must derive its generation from the service_generations map.</span>
-        <span class="kw">match</span> (<span class="ident">pool_gen</span>, <span class="ident">service_id</span>) {
-            (<span class="ident">PoolGeneration::Normal</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; {}
-            (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="ident">gen_map</span>), <span class="prelude-val">Some</span>(<span class="ident">service_id</span>)) =&gt; {
-                <span class="ident">connection</span>.<span class="ident">generation</span> <span class="op">=</span> <span class="ident">ConnectionGeneration::LoadBalanced</span> {
-                    <span class="ident">generation</span>: <span class="kw-2">*</span><span class="ident">gen_map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">service_id</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0</span>),
-                    <span class="ident">service_id</span>,
+        <span class="comment">// If the handshake response had a `serviceId` field, this is a connection to a load
+        // balancer and must derive its generation from the service_generations map.
+        </span><span class="kw">match </span>(pool_gen, service_id) {
+            (PoolGeneration::Normal(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; {}
+            (PoolGeneration::LoadBalanced(gen_map), <span class="prelude-val">Some</span>(service_id)) =&gt; {
+                connection.generation = ConnectionGeneration::LoadBalanced {
+                    generation: <span class="kw-2">*</span>gen_map.get(<span class="kw-2">&amp;</span>service_id).unwrap_or(<span class="kw-2">&amp;</span><span class="number">0</span>),
+                    service_id,
                 };
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">EstablishError::post_hello</span>(
-                    <span class="ident">ErrorKind::Internal</span> {
-                        <span class="ident">message</span>: <span class="string">&quot;load-balanced mode mismatch&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(EstablishError::post_hello(
+                    ErrorKind::Internal {
+                        message: <span class="string">&quot;load-balanced mode mismatch&quot;</span>.to_string(),
                     }
-                    .<span class="ident">into</span>(),
-                    <span class="ident">connection</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
+                    .into(),
+                    connection.generation.clone(),
                 ));
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">credential</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">credential</span> {
-            <span class="ident">credential</span>
-                .<span class="ident">authenticate_stream</span>(
-                    <span class="kw-2">&amp;mut</span> <span class="ident">connection</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http_client</span>,
-                    <span class="self">self</span>.<span class="ident">server_api</span>.<span class="ident">as_ref</span>(),
-                    <span class="ident">handshake</span>.<span class="ident">first_round</span>,
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>credential) = <span class="self">self</span>.credential {
+            credential
+                .authenticate_stream(
+                    <span class="kw-2">&amp;mut </span>connection,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.http_client,
+                    <span class="self">self</span>.server_api.as_ref(),
+                    handshake.first_round,
                 )
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">EstablishError::post_hello</span>(<span class="ident">e</span>, <span class="ident">connection</span>.<span class="ident">generation</span>.<span class="ident">clone</span>()))<span class="question-mark">?</span>
-        }
+                .<span class="kw">await
+                </span>.map_err(|e| EstablishError::post_hello(e, connection.generation.clone()))<span class="question-mark">?
+        </span>}
 
-        <span class="prelude-val">Ok</span>(<span class="ident">connection</span>)
+        <span class="prelude-val">Ok</span>(connection)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EstablishError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cause</span>: <span class="ident">MongoError</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">handshake_phase</span>: <span class="ident">HandshakePhase</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EstablishError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) cause: MongoError,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) handshake_phase: HandshakePhase,
 }
 
-<span class="kw">impl</span> <span class="ident">EstablishError</span> {
-    <span class="kw">fn</span> <span class="ident">pre_hello</span>(<span class="ident">cause</span>: <span class="ident">MongoError</span>, <span class="ident">generation</span>: <span class="ident">PoolGeneration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cause</span>,
-            <span class="ident">handshake_phase</span>: <span class="ident">HandshakePhase::PreHello</span> { <span class="ident">generation</span> },
+<span class="kw">impl </span>EstablishError {
+    <span class="kw">fn </span>pre_hello(cause: MongoError, generation: PoolGeneration) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cause,
+            handshake_phase: HandshakePhase::PreHello { generation },
         }
     }
-    <span class="kw">fn</span> <span class="ident">post_hello</span>(<span class="ident">cause</span>: <span class="ident">MongoError</span>, <span class="ident">generation</span>: <span class="ident">ConnectionGeneration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cause</span>,
-            <span class="ident">handshake_phase</span>: <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span> },
+    <span class="kw">fn </span>post_hello(cause: MongoError, generation: ConnectionGeneration) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cause,
+            handshake_phase: HandshakePhase::PostHello { generation },
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

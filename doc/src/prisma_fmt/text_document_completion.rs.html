@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/text_document_completion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>text_document_completion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_fmt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/text_document_completion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>text_document_completion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_fmt/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -75,82 +75,82 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">log</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">RelationMode</span>},
-    <span class="ident">parse_configuration</span>,
-    <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>},
-    <span class="ident">Diagnostics</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>log::<span class="kw-2">*</span>;
+<span class="kw">use </span>lsp_types::<span class="kw-2">*</span>;
+<span class="kw">use </span>psl::{
+    datamodel_connector::{Connector, RelationMode},
+    parse_configuration,
+    parser_database::{ast, ParserDatabase, SourceFile},
+    Diagnostics,
 };
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">empty_completion_list</span>() -&gt; <span class="ident">CompletionList</span> {
-    <span class="ident">CompletionList</span> {
-        <span class="ident">is_incomplete</span>: <span class="bool-val">true</span>,
-        <span class="ident">items</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>empty_completion_list() -&gt; CompletionList {
+    CompletionList {
+        is_incomplete: <span class="bool-val">true</span>,
+        items: Vec::new(),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">completion</span>(<span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">params</span>: <span class="ident">CompletionParams</span>) -&gt; <span class="ident">CompletionList</span> {
-    <span class="kw">let</span> <span class="ident">source_file</span> <span class="op">=</span> <span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">schema</span>.<span class="ident">into_boxed_str</span>()));
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>completion(schema: String, params: CompletionParams) -&gt; CompletionList {
+    <span class="kw">let </span>source_file = SourceFile::new_allocated(Arc::from(schema.into_boxed_str()));
 
-    <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::position_to_offset</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">text_document_position</span>.<span class="ident">position</span>, <span class="ident">source_file</span>.<span class="ident">as_str</span>()) {
-            <span class="ident">pos</span>
-        } <span class="kw">else</span> {
+    <span class="kw">let </span>position =
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(pos) = <span class="kw">super</span>::position_to_offset(<span class="kw-2">&amp;</span>params.text_document_position.position, source_file.as_str()) {
+            pos
+        } <span class="kw">else </span>{
             <span class="macro">warn!</span>(<span class="string">&quot;Received a position outside of the document boundaries in CompletionParams&quot;</span>);
-            <span class="kw">return</span> <span class="ident">empty_completion_list</span>();
+            <span class="kw">return </span>empty_completion_list();
         };
 
-    <span class="kw">let</span> (<span class="ident">connector</span>, <span class="ident">relation_mode</span>) <span class="op">=</span> <span class="ident">parse_configuration</span>(<span class="ident">source_file</span>.<span class="ident">as_str</span>())
-        .<span class="ident">ok</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">conf</span><span class="op">|</span> <span class="ident">conf</span>.<span class="ident">datasources</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">datasource</span><span class="op">|</span> (<span class="ident">datasource</span>.<span class="ident">active_connector</span>, <span class="ident">datasource</span>.<span class="ident">relation_mode</span>()))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">psl::datamodel_connector::EmptyDatamodelConnector</span>, <span class="ident">Default::default</span>()));
+    <span class="kw">let </span>(connector, relation_mode) = parse_configuration(source_file.as_str())
+        .ok()
+        .and_then(|conf| conf.datasources.into_iter().next())
+        .map(|datasource| (datasource.active_connector, datasource.relation_mode()))
+        .unwrap_or_else(|| (<span class="kw-2">&amp;</span>psl::datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">CompletionList</span> {
-        <span class="ident">is_incomplete</span>: <span class="bool-val">false</span>,
-        <span class="ident">items</span>: <span class="ident">Vec::new</span>(),
+    <span class="kw">let </span><span class="kw-2">mut </span>list = CompletionList {
+        is_incomplete: <span class="bool-val">false</span>,
+        items: Vec::new(),
     };
 
-    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diag</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
-        <span class="ident">ParserDatabase::new</span>(<span class="ident">source_file</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diag</span>)
+    <span class="kw">let </span>db = {
+        <span class="kw">let </span><span class="kw-2">mut </span>diag = Diagnostics::new();
+        ParserDatabase::new(source_file, <span class="kw-2">&amp;mut </span>diag)
     };
 
-    <span class="ident">push_ast_completions</span>(<span class="kw-2">&amp;mut</span> <span class="ident">list</span>, <span class="ident">connector</span>, <span class="ident">relation_mode</span>, <span class="kw-2">&amp;</span><span class="ident">db</span>, <span class="ident">position</span>);
+    push_ast_completions(<span class="kw-2">&amp;mut </span>list, connector, relation_mode, <span class="kw-2">&amp;</span>db, position);
 
-    <span class="ident">list</span>
+    list
 }
 
-<span class="comment">// Completion is implemented for:</span>
-<span class="comment">// - referential actions (onDelete and onUpdate arguments)</span>
-<span class="comment">// - default arguments on scalar fields (based on connector capabilities for the `map: ...` argument).</span>
-<span class="kw">fn</span> <span class="ident">push_ast_completions</span>(
-    <span class="ident">completion_list</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompletionList</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">_relation_mode</span>: <span class="ident">RelationMode</span>,
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>,
-    <span class="ident">position</span>: <span class="ident">usize</span>,
+<span class="comment">// Completion is implemented for:
+// - referential actions (onDelete and onUpdate arguments)
+// - default arguments on scalar fields (based on connector capabilities for the `map: ...` argument).
+</span><span class="kw">fn </span>push_ast_completions(
+    completion_list: <span class="kw-2">&amp;mut </span>CompletionList,
+    connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+    _relation_mode: RelationMode,
+    db: <span class="kw-2">&amp;</span>ParserDatabase,
+    position: usize,
 ) {
-    <span class="kw">match</span> <span class="ident">db</span>.<span class="ident">ast</span>().<span class="ident">find_at_position</span>(<span class="ident">position</span>) {
-        <span class="ident">ast::SchemaPosition::Model</span>(
-            <span class="ident">_model_id</span>,
-            <span class="ident">ast::ModelPosition::Field</span>(<span class="kw">_</span>, <span class="ident">ast::FieldPosition::Attribute</span>(<span class="string">&quot;relation&quot;</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">attr_name</span>))),
-        ) <span class="kw">if</span> <span class="ident">attr_name</span> <span class="op">==</span> <span class="string">&quot;onDelete&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">attr_name</span> <span class="op">==</span> <span class="string">&quot;onUpdate&quot;</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">referential_action</span> <span class="kw">in</span> <span class="ident">connector</span>.<span class="ident">referential_actions</span>().<span class="ident">iter</span>() {
-                <span class="ident">completion_list</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">CompletionItem</span> {
-                    <span class="ident">label</span>: <span class="ident">referential_action</span>.<span class="ident">as_str</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CompletionItemKind::ENUM</span>),
-                    <span class="comment">// what is the difference between detail and documentation?</span>
-                    <span class="ident">detail</span>: <span class="prelude-val">Some</span>(<span class="ident">referential_action</span>.<span class="ident">documentation</span>().<span class="ident">to_owned</span>()),
-                    ..<span class="ident">Default::default</span>()
+    <span class="kw">match </span>db.ast().find_at_position(position) {
+        ast::SchemaPosition::Model(
+            _model_id,
+            ast::ModelPosition::Field(<span class="kw">_</span>, ast::FieldPosition::Attribute(<span class="string">&quot;relation&quot;</span>, <span class="kw">_</span>, <span class="prelude-val">Some</span>(attr_name))),
+        ) <span class="kw">if </span>attr_name == <span class="string">&quot;onDelete&quot; </span>|| attr_name == <span class="string">&quot;onUpdate&quot; </span>=&gt; {
+            <span class="kw">for </span>referential_action <span class="kw">in </span>connector.referential_actions().iter() {
+                completion_list.items.push(CompletionItem {
+                    label: referential_action.as_str().to_owned(),
+                    kind: <span class="prelude-val">Some</span>(CompletionItemKind::ENUM),
+                    <span class="comment">// what is the difference between detail and documentation?
+                    </span>detail: <span class="prelude-val">Some</span>(referential_action.documentation().to_owned()),
+                    ..Default::default()
                 });
             }
         }
-        <span class="ident">position</span> =&gt; <span class="ident">connector</span>.<span class="ident">push_completions</span>(<span class="ident">db</span>, <span class="ident">position</span>, <span class="ident">completion_list</span>),
+        position =&gt; connector.push_completions(db, position, completion_list),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/mongodb-schema-describer/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/mongodb-schema-describer/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -121,128 +121,128 @@
 <span id="121">121</span>
 <span id="122">122</span>
 <span id="123">123</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The MongoDB Schema describer.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A common place to query all the possible schema data we can from a MongoDB instance.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The MongoDB Schema describer.
+//!
+//! A common place to query all the possible schema data we can from a MongoDB instance.
 
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+</span><span class="attribute">#![deny(missing_docs)]
 
-<span class="kw">mod</span> <span class="ident">schema</span>;
-<span class="kw">mod</span> <span class="ident">walkers</span>;
+</span><span class="kw">mod </span>schema;
+<span class="kw">mod </span>walkers;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">walkers</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>schema::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>walkers::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">futures::stream::TryStreamExt</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>};
+<span class="kw">use </span>futures::stream::TryStreamExt;
+<span class="kw">use </span>mongodb::bson::{Bson, Document};
 
-<span class="doccomment">/// Describe the contents of the given database. Only bothers about the schema, meaning the</span>
-<span class="doccomment">/// collection names and indexes created. Does a bit of magic to the indexes, so if having a</span>
-<span class="doccomment">/// full-text index, the field info is sanitized for Prisma&#39;s use cases. We do not return `_fts` or</span>
-<span class="doccomment">/// `_ftsx` fields, replacing them with the actual fields used to build the full-text index.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Be aware these text fields might not come back in the same order used when initialized.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">mongodb::Client</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">mongodb::error::Result</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">MongoSchema::default</span>();
-    <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">database</span>(<span class="ident">db_name</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">list_collections</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Describe the contents of the given database. Only bothers about the schema, meaning the
+/// collection names and indexes created. Does a bit of magic to the indexes, so if having a
+/// full-text index, the field info is sanitized for Prisma&#39;s use cases. We do not return `_fts` or
+/// `_ftsx` fields, replacing them with the actual fields used to build the full-text index.
+///
+/// Be aware these text fields might not come back in the same order used when initialized.
+</span><span class="kw">pub async fn </span>describe(client: <span class="kw-2">&amp;</span>mongodb::Client, db_name: <span class="kw-2">&amp;</span>str) -&gt; mongodb::error::Result&lt;MongoSchema&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>schema = MongoSchema::default();
+    <span class="kw">let </span>database = client.database(db_name);
+    <span class="kw">let </span><span class="kw-2">mut </span>cursor = database.list_collections(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">collection</span>) <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-        <span class="kw">let</span> <span class="ident">collection_name</span> <span class="op">=</span> <span class="ident">collection</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">collection</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">collection_name</span>);
-        <span class="kw">let</span> <span class="ident">collection_id</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">push_collection</span>(<span class="ident">collection_name</span>);
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(collection) = cursor.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+        <span class="kw">let </span>collection_name = collection.name;
+        <span class="kw">let </span>collection = database.collection::&lt;Document&gt;(<span class="kw-2">&amp;</span>collection_name);
+        <span class="kw">let </span>collection_id = schema.push_collection(collection_name);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes_cursor</span> <span class="op">=</span> <span class="ident">collection</span>.<span class="ident">list_indexes</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>indexes_cursor = collection.list_indexes(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">indexes_cursor</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">unwrap_or_default</span>();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(index) = indexes_cursor.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
+            <span class="kw">let </span>options = index.options.unwrap_or_default();
 
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">name</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+            <span class="kw">let </span>name = <span class="kw">match </span>options.name {
+                <span class="prelude-val">Some</span>(name) =&gt; name,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">options</span>.<span class="ident">unique</span>, <span class="ident">options</span>.<span class="ident">text_index_version</span>.<span class="ident">as_ref</span>()) {
-                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">IndexType::Unique</span>,
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">IndexType::Fulltext</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">IndexType::Normal</span>,
+            <span class="kw">let </span>r#type = <span class="kw">match </span>(options.unique, options.text_index_version.as_ref()) {
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; IndexType::Unique,
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; IndexType::Fulltext,
+                <span class="kw">_ </span>=&gt; IndexType::Normal,
             };
 
-            <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_id_&quot;</span> {
-                <span class="kw">continue</span>; <span class="comment">// do not introspect or diff these</span>
-            }
+            <span class="kw">if </span>name == <span class="string">&quot;_id_&quot; </span>{
+                <span class="kw">continue</span>; <span class="comment">// do not introspect or diff these
+            </span>}
 
-            <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">partial_filter_expression</span>.<span class="ident">is_some</span>() {
+            <span class="kw">if </span>options.partial_filter_expression.is_some() {
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">as_field</span> <span class="op">=</span> <span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>): (<span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">Bson</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_i32</span>() {
-                    <span class="prelude-val">Some</span>(<span class="op">-</span><span class="number">1</span>) =&gt; <span class="ident">IndexFieldProperty::Descending</span>,
-                    <span class="kw">_</span> =&gt; <span class="ident">IndexFieldProperty::Ascending</span>,
+            <span class="kw">let </span>as_field = |(k, v): (<span class="kw-2">&amp;</span>String, <span class="kw-2">&amp;</span>Bson)| {
+                <span class="kw">let </span>property = <span class="kw">match </span>v.as_i32() {
+                    <span class="prelude-val">Some</span>(-<span class="number">1</span>) =&gt; IndexFieldProperty::Descending,
+                    <span class="kw">_ </span>=&gt; IndexFieldProperty::Ascending,
                 };
 
-                <span class="ident">IndexField</span> {
-                    <span class="ident">name</span>: <span class="ident">k</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">property</span>,
+                IndexField {
+                    name: k.to_string(),
+                    property,
                 }
             };
 
-            <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_fulltext</span>() {
-                <span class="kw">let</span> <span class="ident">is_fts</span> <span class="op">=</span> <span class="op">|</span><span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;_fts&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;_ftsx&quot;</span>;
+            <span class="kw">let </span>fields = <span class="kw">if </span>r#type.is_fulltext() {
+                <span class="kw">let </span>is_fts = |k: <span class="kw-2">&amp;</span>str| k == <span class="string">&quot;_fts&quot; </span>|| k == <span class="string">&quot;_ftsx&quot;</span>;
 
-                <span class="comment">// First we take all items that are not using the special fulltext keys,</span>
-                <span class="comment">// stopping when we find the first one.</span>
-                <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">take_while</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">k</span>)).<span class="ident">map</span>(<span class="ident">as_field</span>);
+                <span class="comment">// First we take all items that are not using the special fulltext keys,
+                // stopping when we find the first one.
+                </span><span class="kw">let </span>head = index.keys.iter().take_while(|(k, <span class="kw">_</span>)| !is_fts(k)).map(as_field);
 
-                <span class="comment">// Then go through the weights, we have the fields presented as part of the</span>
-                <span class="comment">// fulltext index here.</span>
-                <span class="kw">let</span> <span class="ident">middle</span> <span class="op">=</span> <span class="ident">options</span>
-                    .<span class="ident">weights</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">weights</span><span class="op">|</span> <span class="ident">weights</span>.<span class="ident">keys</span>())
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">IndexField</span> {
-                        <span class="ident">name</span>: <span class="ident">k</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">property</span>: <span class="ident">IndexFieldProperty::Text</span>,
+                <span class="comment">// Then go through the weights, we have the fields presented as part of the
+                // fulltext index here.
+                </span><span class="kw">let </span>middle = options
+                    .weights
+                    .iter()
+                    .flat_map(|weights| weights.keys())
+                    .map(|k| IndexField {
+                        name: k.to_string(),
+                        property: IndexFieldProperty::Text,
                     });
 
-                <span class="comment">// And in the end add whatever fields were left in the index keys that are not</span>
-                <span class="comment">// special fulltext keys.</span>
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">index</span>
-                    .<span class="ident">keys</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">skip_while</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">k</span>))
-                    .<span class="ident">skip_while</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">is_fts</span>(<span class="ident">k</span>))
-                    .<span class="ident">map</span>(<span class="ident">as_field</span>);
+                <span class="comment">// And in the end add whatever fields were left in the index keys that are not
+                // special fulltext keys.
+                </span><span class="kw">let </span>tail = index
+                    .keys
+                    .iter()
+                    .skip_while(|(k, <span class="kw">_</span>)| !is_fts(k))
+                    .skip_while(|(k, <span class="kw">_</span>)| is_fts(k))
+                    .map(as_field);
 
-                <span class="ident">head</span>.<span class="ident">chain</span>(<span class="ident">middle</span>).<span class="ident">chain</span>(<span class="ident">tail</span>).<span class="ident">collect</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">index</span>.<span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">as_field</span>).<span class="ident">collect</span>()
+                head.chain(middle).chain(tail).collect()
+            } <span class="kw">else </span>{
+                index.keys.iter().map(as_field).collect()
             };
 
-            <span class="ident">schema</span>.<span class="ident">push_index</span>(<span class="ident">collection_id</span>, <span class="ident">name</span>, <span class="ident">r#type</span>, <span class="ident">fields</span>);
+            schema.push_index(collection_id, name, r#type, fields);
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+    <span class="prelude-val">Ok</span>(schema)
 }
-<span class="doccomment">/// Get the version.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">mongodb::Client</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">mongodb::error::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">database</span>(<span class="ident">db_name</span>);
-    <span class="kw">use</span> <span class="ident">mongodb::bson::doc</span>;
-    <span class="kw">let</span> <span class="ident">version_cmd</span> <span class="op">=</span> <span class="macro">doc!</span> {<span class="string">&quot;buildInfo&quot;</span>: <span class="number">1</span>};
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">run_command</span>(<span class="ident">version_cmd</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">res</span>
-        .<span class="ident">get</span>(<span class="string">&quot;versionArray&quot;</span>)
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">as_array</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_i32</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>())
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-        .<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>);
+<span class="doccomment">/// Get the version.
+</span><span class="kw">pub async fn </span>version(client: <span class="kw-2">&amp;</span>mongodb::Client, db_name: <span class="kw-2">&amp;</span>str) -&gt; mongodb::error::Result&lt;String&gt; {
+    <span class="kw">let </span>database = client.database(db_name);
+    <span class="kw">use </span>mongodb::bson::doc;
+    <span class="kw">let </span>version_cmd = <span class="macro">doc! </span>{<span class="string">&quot;buildInfo&quot;</span>: <span class="number">1</span>};
+    <span class="kw">let </span>res = database.run_command(version_cmd, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>version = res
+        .get(<span class="string">&quot;versionArray&quot;</span>)
+        .unwrap()
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|s| s.as_i32().unwrap().to_string())
+        .collect::&lt;Vec&lt;String&gt;&gt;()
+        .join(<span class="string">&quot;.&quot;</span>);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">version</span>)
+    <span class="prelude-val">Ok</span>(version)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

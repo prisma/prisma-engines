@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/pooled/manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/pooled/manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -232,239 +232,239 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::MssqlUrl</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::MysqlUrl</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::PostgresUrl</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">IsolationLevel</span>, <span class="ident">Queryable</span>, <span class="ident">Transaction</span>, <span class="ident">TransactionCapable</span>},
-    <span class="ident">error::Error</span>,
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::connector::MssqlUrl;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::connector::MysqlUrl;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::connector::PostgresUrl;
+<span class="kw">use crate</span>::{
+    ast,
+    connector::{<span class="self">self</span>, IsolationLevel, Queryable, Transaction, TransactionCapable},
+    error::Error,
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">mobc</span>::{<span class="ident">Connection</span> <span class="kw">as</span> <span class="ident">MobcPooled</span>, <span class="ident">Manager</span>};
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>mobc::{Connection <span class="kw">as </span>MobcPooled, Manager};
 
-<span class="doccomment">/// A connection from the pool. Implements</span>
-<span class="doccomment">/// [Queryable](connector/trait.Queryable.html).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PooledConnection</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">MobcPooled</span><span class="op">&lt;</span><span class="ident">QuaintManager</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A connection from the pool. Implements
+/// [Queryable](connector/trait.Queryable.html).
+</span><span class="kw">pub struct </span>PooledConnection {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: MobcPooled&lt;QuaintManager&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TransactionCapable</span> <span class="kw">for</span> <span class="ident">PooledConnection</span> {}
+<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>PooledConnection {}
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">PooledConnection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">connector::ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="kw">await</span>
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Queryable <span class="kw">for </span>PooledConnection {
+    <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: ast::Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;connector::ResultSet&gt; {
+        <span class="self">self</span>.inner.query(q).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[ast::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;connector::ResultSet&gt; {
+        <span class="self">self</span>.inner.query_raw(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[ast::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;connector::ResultSet&gt; {
+        <span class="self">self</span>.inner.query_raw_typed(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, q: ast::Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute(q).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[ast::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute_raw(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[ast::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.inner.execute_raw_typed(sql, params).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.raw_cmd(cmd).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+        <span class="self">self</span>.inner.version().<span class="kw">await
+    </span>}
+
+    <span class="kw">fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_healthy()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">connector::ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
+    <span class="kw">async fn </span>server_reset_query(<span class="kw-2">&amp;</span><span class="self">self</span>, tx: <span class="kw-2">&amp;</span>Transaction&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.server_reset_query(tx).<span class="kw">await
+    </span>}
+
+    <span class="kw">fn </span>begin_statement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="self">self</span>.inner.begin_statement()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">connector::ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">query_raw_typed</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.set_tx_isolation_level(isolation_level).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute</span>(<span class="ident">q</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">execute_raw_typed</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">raw_cmd</span>(<span class="ident">cmd</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">version</span>().<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_healthy</span>()
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_reset_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">server_reset_query</span>(<span class="ident">tx</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">begin_statement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">begin_statement</span>()
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tx_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_tx_isolation_level</span>(<span class="ident">isolation_level</span>).<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">requires_isolation_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">requires_isolation_first</span>()
+    <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.requires_isolation_first()
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QuaintManager</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-    <span class="ident">Mysql</span> { <span class="ident">url</span>: <span class="ident">MysqlUrl</span> },
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub enum </span>QuaintManager {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    </span>Mysql { url: MysqlUrl },
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="ident">Postgres</span> { <span class="ident">url</span>: <span class="ident">PostgresUrl</span> },
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span>Postgres { url: PostgresUrl },
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
-    <span class="ident">Sqlite</span> { <span class="ident">url</span>: <span class="ident">String</span>, <span class="ident">db_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    </span>Sqlite { url: String, db_name: String },
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="ident">Mssql</span> { <span class="ident">url</span>: <span class="ident">MssqlUrl</span> },
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span>Mssql { url: MssqlUrl },
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Manager</span> <span class="kw">for</span> <span class="ident">QuaintManager</span> {
-    <span class="kw">type</span> <span class="ident">Connection</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Queryable</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Manager <span class="kw">for </span>QuaintManager {
+    <span class="kw">type </span>Connection = Box&lt;<span class="kw">dyn </span>Queryable&gt;;
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
-            <span class="ident">QuaintManager::Sqlite</span> { <span class="ident">url</span>, .. } =&gt; {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Sqlite</span>;
+    <span class="kw">async fn </span>connect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>::Connection&gt; {
+        <span class="kw">let </span>conn = <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+            </span>QuaintManager::Sqlite { url, .. } =&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::connector::Sqlite;
 
-                <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Sqlite::new</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>conn = Sqlite::new(url)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">conn</span>) <span class="kw">as</span> <span class="ident"><span class="self">Self</span>::Connection</span>)
+                <span class="prelude-val">Ok</span>(Box::new(conn) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-            <span class="ident">QuaintManager::Mysql</span> { <span class="ident">url</span> } =&gt; {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Mysql</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">Mysql::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as</span> <span class="ident"><span class="self">Self</span>::Connection</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+            </span>QuaintManager::Mysql { url } =&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::connector::Mysql;
+                <span class="prelude-val">Ok</span>(Box::new(Mysql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-            <span class="ident">QuaintManager::Postgres</span> { <span class="ident">url</span> } =&gt; {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::PostgreSql</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">PostgreSql::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as</span> <span class="ident"><span class="self">Self</span>::Connection</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+            </span>QuaintManager::Postgres { url } =&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::connector::PostgreSql;
+                <span class="prelude-val">Ok</span>(Box::new(PostgreSql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-            <span class="ident">QuaintManager::Mssql</span> { <span class="ident">url</span> } =&gt; {
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector::Mssql</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">Mssql::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as</span> <span class="ident"><span class="self">Self</span>::Connection</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+            </span>QuaintManager::Mssql { url } =&gt; {
+                <span class="kw">use </span><span class="kw">crate</span>::connector::Mssql;
+                <span class="prelude-val">Ok</span>(Box::new(Mssql::new(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>) <span class="kw">as </span><span class="self">Self</span>::Connection)
             }
         };
 
-        <span class="ident">conn</span>.<span class="ident">iter</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">tracing::debug!</span>(<span class="string">&quot;Acquired database connection.&quot;</span>));
+        conn.iter()
+            .for_each(|<span class="kw">_</span>| <span class="macro">tracing::debug!</span>(<span class="string">&quot;Acquired database connection.&quot;</span>));
 
-        <span class="ident">conn</span>
+        conn
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Connection</span><span class="op">&gt;</span> {
-        <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT 1&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
+    <span class="kw">async fn </span>check(<span class="kw-2">&amp;</span><span class="self">self</span>, conn: <span class="self">Self</span>::Connection) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>::Connection&gt; {
+        conn.raw_cmd(<span class="string">&quot;SELECT 1&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(conn)
     }
 
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Connection</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">conn</span>.<span class="ident">is_healthy</span>()
+    <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, conn: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Connection) -&gt; bool {
+        conn.is_healthy()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pooled::Quaint</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::pooled::Quaint;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mysql_default_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_MYSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_MYSQL connection string not set.&quot;</span>);
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    </span><span class="kw">async fn </span>mysql_default_connection_limit() {
+        <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_MYSQL&quot;</span>).expect(<span class="string">&quot;TEST_MYSQL connection string not set.&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">num_cpus::get_physical</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(num_cpus::get_physical() * <span class="number">2 </span>+ <span class="number">1</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mysql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mysql_custom_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;mysql&quot;</span>)]
+    </span><span class="kw">async fn </span>mysql_custom_connection_limit() {
+        <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{}?connection_limit=10&quot;</span>,
-            <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_MYSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_MYSQL connection string not set.&quot;</span>)
+            std::env::var(<span class="string">&quot;TEST_MYSQL&quot;</span>).expect(<span class="string">&quot;TEST_MYSQL connection string not set.&quot;</span>)
         );
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="number">10</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">10</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">psql_default_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_PSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_PSQL connection string not set.&quot;</span>);
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">async fn </span>psql_default_connection_limit() {
+        <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_PSQL&quot;</span>).expect(<span class="string">&quot;TEST_PSQL connection string not set.&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">num_cpus::get_physical</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(num_cpus::get_physical() * <span class="number">2 </span>+ <span class="number">1</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">psql_custom_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;postgresql&quot;</span>)]
+    </span><span class="kw">async fn </span>psql_custom_connection_limit() {
+        <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{}?connection_limit=10&quot;</span>,
-            <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_PSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_PSQL connection string not set.&quot;</span>)
+            std::env::var(<span class="string">&quot;TEST_PSQL&quot;</span>).expect(<span class="string">&quot;TEST_PSQL connection string not set.&quot;</span>)
         );
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="number">10</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">10</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mssql_default_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_MSSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_MSSQL connection string not set.&quot;</span>);
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span><span class="kw">async fn </span>mssql_default_connection_limit() {
+        <span class="kw">let </span>conn_string = std::env::var(<span class="string">&quot;TEST_MSSQL&quot;</span>).expect(<span class="string">&quot;TEST_MSSQL connection string not set.&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">num_cpus::get_physical</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(num_cpus::get_physical() * <span class="number">2 </span>+ <span class="number">1</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mssql_custom_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;mssql&quot;</span>)]
+    </span><span class="kw">async fn </span>mssql_custom_connection_limit() {
+        <span class="kw">let </span>conn_string = <span class="macro">format!</span>(
             <span class="string">&quot;{};connectionLimit=10&quot;</span>,
-            <span class="ident">std::env::var</span>(<span class="string">&quot;TEST_MSSQL&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;TEST_MSSQL connection string not set.&quot;</span>)
+            std::env::var(<span class="string">&quot;TEST_MSSQL&quot;</span>).expect(<span class="string">&quot;TEST_MSSQL connection string not set.&quot;</span>)
         );
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="number">10</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">10</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_default_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;file:db/test.db&quot;</span>,);
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    </span><span class="kw">async fn </span>test_default_connection_limit() {
+        <span class="kw">let </span>conn_string = <span class="macro">format!</span>(<span class="string">&quot;file:db/test.db&quot;</span>,);
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">num_cpus::get_physical</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(num_cpus::get_physical() * <span class="number">2 </span>+ <span class="number">1</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_custom_connection_limit</span>() {
-        <span class="kw">let</span> <span class="ident">conn_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;file:db/test.db?connection_limit=10&quot;</span>,);
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Quaint::builder</span>(<span class="kw-2">&amp;</span><span class="ident">conn_string</span>).<span class="ident">unwrap</span>().<span class="ident">build</span>();
+    <span class="attribute">#[tokio::test]
+    #[cfg(feature = <span class="string">&quot;sqlite&quot;</span>)]
+    </span><span class="kw">async fn </span>test_custom_connection_limit() {
+        <span class="kw">let </span>conn_string = <span class="macro">format!</span>(<span class="string">&quot;file:db/test.db?connection_limit=10&quot;</span>,);
+        <span class="kw">let </span>pool = Quaint::builder(<span class="kw-2">&amp;</span>conn_string).unwrap().build();
 
-        <span class="macro">assert_eq!</span>(<span class="number">10</span>, <span class="ident">pool</span>.<span class="ident">capacity</span>().<span class="kw">await</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">10</span>, pool.capacity().<span class="kw">await as </span>usize);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

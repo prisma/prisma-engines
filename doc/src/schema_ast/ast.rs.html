@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_ast/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_ast/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">argument</span>;
-<span class="kw">mod</span> <span class="ident">attribute</span>;
-<span class="kw">mod</span> <span class="ident">comment</span>;
-<span class="kw">mod</span> <span class="ident">composite_type</span>;
-<span class="kw">mod</span> <span class="ident">config</span>;
-<span class="kw">mod</span> <span class="ident">r#enum</span>;
-<span class="kw">mod</span> <span class="ident">expression</span>;
-<span class="kw">mod</span> <span class="ident">field</span>;
-<span class="kw">mod</span> <span class="ident">find_at_position</span>;
-<span class="kw">mod</span> <span class="ident">generator_config</span>;
-<span class="kw">mod</span> <span class="ident">identifier</span>;
-<span class="kw">mod</span> <span class="ident">indentation_type</span>;
-<span class="kw">mod</span> <span class="ident">model</span>;
-<span class="kw">mod</span> <span class="ident">newline_type</span>;
-<span class="kw">mod</span> <span class="ident">source_config</span>;
-<span class="kw">mod</span> <span class="ident">top</span>;
-<span class="kw">mod</span> <span class="ident">traits</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>argument;
+<span class="kw">mod </span>attribute;
+<span class="kw">mod </span>comment;
+<span class="kw">mod </span>composite_type;
+<span class="kw">mod </span>config;
+<span class="kw">mod </span>r#enum;
+<span class="kw">mod </span>expression;
+<span class="kw">mod </span>field;
+<span class="kw">mod </span>find_at_position;
+<span class="kw">mod </span>generator_config;
+<span class="kw">mod </span>identifier;
+<span class="kw">mod </span>indentation_type;
+<span class="kw">mod </span>model;
+<span class="kw">mod </span>newline_type;
+<span class="kw">mod </span>source_config;
+<span class="kw">mod </span>top;
+<span class="kw">mod </span>traits;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::comment::Comment</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::comment::Comment;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">argument</span>::{<span class="ident">Argument</span>, <span class="ident">ArgumentsList</span>, <span class="ident">EmptyArgument</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">attribute</span>::{<span class="ident">Attribute</span>, <span class="ident">AttributeContainer</span>, <span class="ident">AttributeId</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeId</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config::ConfigBlockProperty</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expression::Expression</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::{<span class="ident">Field</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">find_at_position</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generator_config::GeneratorConfig</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">identifier::Identifier</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indentation_type::IndentationType</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::{<span class="ident">FieldId</span>, <span class="ident">Model</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">newline_type::NewlineType</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">r#enum</span>::{<span class="ident">Enum</span>, <span class="ident">EnumValue</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">source_config::SourceConfig</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">top::Top</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>};
+<span class="kw">pub use </span>argument::{Argument, ArgumentsList, EmptyArgument};
+<span class="kw">pub use </span>attribute::{Attribute, AttributeContainer, AttributeId};
+<span class="kw">pub use </span>composite_type::{CompositeType, CompositeTypeId};
+<span class="kw">pub use </span>config::ConfigBlockProperty;
+<span class="kw">pub use </span>diagnostics::Span;
+<span class="kw">pub use </span>expression::Expression;
+<span class="kw">pub use </span>field::{Field, FieldArity, FieldType};
+<span class="kw">pub use </span>find_at_position::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>generator_config::GeneratorConfig;
+<span class="kw">pub use </span>identifier::Identifier;
+<span class="kw">pub use </span>indentation_type::IndentationType;
+<span class="kw">pub use </span>model::{FieldId, Model};
+<span class="kw">pub use </span>newline_type::NewlineType;
+<span class="kw">pub use </span>r#enum::{Enum, EnumValue};
+<span class="kw">pub use </span>source_config::SourceConfig;
+<span class="kw">pub use </span>top::Top;
+<span class="kw">pub use </span>traits::{WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan};
 
-<span class="doccomment">/// AST representation of a prisma schema.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This module is used internally to represent an AST. The AST&#39;s nodes can be used</span>
-<span class="doccomment">/// during validation of a schema, especially when implementing custom attributes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The AST is not validated, also fields and attributes are not resolved. Every node is</span>
-<span class="doccomment">/// annotated with its location in the text representation.</span>
-<span class="doccomment">/// Basically, the AST is an object oriented representation of the datamodel&#39;s text.</span>
-<span class="doccomment">/// Schema = Datamodel + Generators + Datasources</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaAst</span> {
-    <span class="doccomment">/// All models, enums, composite types, datasources, generators and type aliases.</span>
-    <span class="kw">pub</span> <span class="ident">tops</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Top</span><span class="op">&gt;</span>,
+<span class="doccomment">/// AST representation of a prisma schema.
+///
+/// This module is used internally to represent an AST. The AST&#39;s nodes can be used
+/// during validation of a schema, especially when implementing custom attributes.
+///
+/// The AST is not validated, also fields and attributes are not resolved. Every node is
+/// annotated with its location in the text representation.
+/// Basically, the AST is an object oriented representation of the datamodel&#39;s text.
+/// Schema = Datamodel + Generators + Datasources
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SchemaAst {
+    <span class="doccomment">/// All models, enums, composite types, datasources, generators and type aliases.
+    </span><span class="kw">pub </span>tops: Vec&lt;Top&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SchemaAst</span> {
-    <span class="doccomment">/// Iterate over all the top-level items in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_tops</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TopId</span>, <span class="kw-2">&amp;</span><span class="ident">Top</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tops</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">top_idx</span>, <span class="ident">top</span>)<span class="op">|</span> (<span class="ident">top_idx_to_top_id</span>(<span class="ident">top_idx</span>, <span class="ident">top</span>), <span class="ident">top</span>))
+<span class="kw">impl </span>SchemaAst {
+    <span class="doccomment">/// Iterate over all the top-level items in the schema.
+    </span><span class="kw">pub fn </span>iter_tops(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (TopId, <span class="kw-2">&amp;</span>Top)&gt; {
+        <span class="self">self</span>.tops
+            .iter()
+            .enumerate()
+            .map(|(top_idx, top)| (top_idx_to_top_id(top_idx, top), top))
     }
 
-    <span class="doccomment">/// Iterate over all the datasource blocks in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sources</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">SourceConfig</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tops</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">top</span><span class="op">|</span> <span class="ident">top</span>.<span class="ident">as_source</span>())
+    <span class="doccomment">/// Iterate over all the datasource blocks in the schema.
+    </span><span class="kw">pub fn </span>sources(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>SourceConfig&gt; {
+        <span class="self">self</span>.tops.iter().filter_map(|top| top.as_source())
     }
 
-    <span class="doccomment">/// Iterate over all the generator blocks in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generators</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GeneratorConfig</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tops</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">top</span><span class="op">|</span> <span class="ident">top</span>.<span class="ident">as_generator</span>())
-    }
-}
-
-<span class="doccomment">/// An opaque identifier for a model in a schema AST. Use the</span>
-<span class="doccomment">/// `schema[model_id]` syntax to resolve the id to an `ast::Model`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModelId</span>(<span class="ident">u32</span>);
-
-<span class="kw">impl</span> <span class="ident">ModelId</span> {
-    <span class="doccomment">/// Used for range bounds when iterating over BTrees.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">ModelId</span> <span class="op">=</span> <span class="ident">ModelId</span>(<span class="number">0</span>);
-    <span class="doccomment">/// Used for range bounds when iterating over BTrees.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX</span>: <span class="ident">ModelId</span> <span class="op">=</span> <span class="ident">ModelId</span>(<span class="ident">u32::MAX</span>);
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">ModelId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SchemaAst</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Model</span>;
-
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">ModelId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">tops</span>[<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">as_model</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Iterate over all the generator blocks in the schema.
+    </span><span class="kw">pub fn </span>generators(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>GeneratorConfig&gt; {
+        <span class="self">self</span>.tops.iter().filter_map(|top| top.as_generator())
     }
 }
 
-<span class="doccomment">/// An opaque identifier for an enum in a schema AST.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumId</span>(<span class="ident">u32</span>);
+<span class="doccomment">/// An opaque identifier for a model in a schema AST. Use the
+/// `schema[model_id]` syntax to resolve the id to an `ast::Model`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>ModelId(u32);
 
-<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">EnumId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SchemaAst</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Enum</span>;
+<span class="kw">impl </span>ModelId {
+    <span class="doccomment">/// Used for range bounds when iterating over BTrees.
+    </span><span class="kw">pub const </span>ZERO: ModelId = ModelId(<span class="number">0</span>);
+    <span class="doccomment">/// Used for range bounds when iterating over BTrees.
+    </span><span class="kw">pub const </span>MAX: ModelId = ModelId(u32::MAX);
+}
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">EnumId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">tops</span>[<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">as_enum</span>().<span class="ident">unwrap</span>()
+<span class="kw">impl </span>std::ops::Index&lt;ModelId&gt; <span class="kw">for </span>SchemaAst {
+    <span class="kw">type </span>Output = Model;
+
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: ModelId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.tops[index.<span class="number">0 </span><span class="kw">as </span>usize].as_model().unwrap()
     }
 }
 
-<span class="doccomment">/// An opaque identifier for a generator block in a schema AST.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GeneratorId</span>(<span class="ident">u32</span>);
+<span class="doccomment">/// An opaque identifier for an enum in a schema AST.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>EnumId(u32);
 
-<span class="doccomment">/// An opaque identifier for a datasource blèck in a schema AST.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SourceId</span>(<span class="ident">u32</span>);
+<span class="kw">impl </span>std::ops::Index&lt;EnumId&gt; <span class="kw">for </span>SchemaAst {
+    <span class="kw">type </span>Output = Enum;
 
-<span class="doccomment">/// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`</span>
-<span class="doccomment">/// syntax to resolve the id to an `ast::Top`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TopId</span> {
-    <span class="doccomment">/// A composite type</span>
-    <span class="ident">CompositeType</span>(<span class="ident">CompositeTypeId</span>),
-    <span class="doccomment">/// A model declaration</span>
-    <span class="ident">Model</span>(<span class="ident">ModelId</span>),
-    <span class="doccomment">/// An enum declaration</span>
-    <span class="ident">Enum</span>(<span class="ident">EnumId</span>),
-    <span class="doccomment">/// A generator block</span>
-    <span class="ident">Generator</span>(<span class="ident">GeneratorId</span>),
-    <span class="doccomment">/// A datasource block</span>
-    <span class="ident">Source</span>(<span class="ident">SourceId</span>),
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: EnumId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.tops[index.<span class="number">0 </span><span class="kw">as </span>usize].as_enum().unwrap()
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">TopId</span> {
-    <span class="doccomment">/// Try to interpret the top as an enum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_enum_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TopId::Enum</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// An opaque identifier for a generator block in a schema AST.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>GeneratorId(u32);
+
+<span class="doccomment">/// An opaque identifier for a datasource blèck in a schema AST.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>SourceId(u32);
+
+<span class="doccomment">/// An identifier for a top-level item in a schema AST. Use the `schema[top_id]`
+/// syntax to resolve the id to an `ast::Top`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub enum </span>TopId {
+    <span class="doccomment">/// A composite type
+    </span>CompositeType(CompositeTypeId),
+    <span class="doccomment">/// A model declaration
+    </span>Model(ModelId),
+    <span class="doccomment">/// An enum declaration
+    </span>Enum(EnumId),
+    <span class="doccomment">/// A generator block
+    </span>Generator(GeneratorId),
+    <span class="doccomment">/// A datasource block
+    </span>Source(SourceId),
+}
+
+<span class="kw">impl </span>TopId {
+    <span class="doccomment">/// Try to interpret the top as an enum.
+    </span><span class="kw">pub fn </span>as_enum_id(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;EnumId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            TopId::Enum(id) =&gt; <span class="prelude-val">Some</span>(id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the top as a model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_model_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TopId::Model</span>(<span class="ident">model_id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model_id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the top as a model.
+    </span><span class="kw">pub fn </span>as_model_id(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModelId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            TopId::Model(model_id) =&gt; <span class="prelude-val">Some</span>(model_id),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Try to interpret the top as a composite type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_type_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompositeTypeId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TopId::CompositeType</span>(<span class="ident">ctid</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">ctid</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Try to interpret the top as a composite type.
+    </span><span class="kw">pub fn </span>as_composite_type_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeTypeId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            TopId::CompositeType(ctid) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>ctid),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">TopId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SchemaAst</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Top</span>;
+<span class="kw">impl </span>std::ops::Index&lt;TopId&gt; <span class="kw">for </span>SchemaAst {
+    <span class="kw">type </span>Output = Top;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">TopId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span> {
-            <span class="ident">TopId::CompositeType</span>(<span class="ident">CompositeTypeId</span>(<span class="ident">idx</span>)) =&gt; <span class="ident">idx</span>,
-            <span class="ident">TopId::Enum</span>(<span class="ident">EnumId</span>(<span class="ident">idx</span>)) =&gt; <span class="ident">idx</span>,
-            <span class="ident">TopId::Model</span>(<span class="ident">ModelId</span>(<span class="ident">idx</span>)) =&gt; <span class="ident">idx</span>,
-            <span class="ident">TopId::Generator</span>(<span class="ident">GeneratorId</span>(<span class="ident">idx</span>)) =&gt; <span class="ident">idx</span>,
-            <span class="ident">TopId::Source</span>(<span class="ident">SourceId</span>(<span class="ident">idx</span>)) =&gt; <span class="ident">idx</span>,
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: TopId) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="kw">let </span>idx = <span class="kw">match </span>index {
+            TopId::CompositeType(CompositeTypeId(idx)) =&gt; idx,
+            TopId::Enum(EnumId(idx)) =&gt; idx,
+            TopId::Model(ModelId(idx)) =&gt; idx,
+            TopId::Generator(GeneratorId(idx)) =&gt; idx,
+            TopId::Source(SourceId(idx)) =&gt; idx,
         };
 
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tops</span>[<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">usize</span>]
+        <span class="kw-2">&amp;</span><span class="self">self</span>.tops[idx <span class="kw">as </span>usize]
     }
 }
 
-<span class="kw">fn</span> <span class="ident">top_idx_to_top_id</span>(<span class="ident">top_idx</span>: <span class="ident">usize</span>, <span class="ident">top</span>: <span class="kw-2">&amp;</span><span class="ident">Top</span>) -&gt; <span class="ident">TopId</span> {
-    <span class="kw">match</span> <span class="ident">top</span> {
-        <span class="ident">Top::Enum</span>(<span class="kw">_</span>) =&gt; <span class="ident">TopId::Enum</span>(<span class="ident">EnumId</span>(<span class="ident">top_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)),
-        <span class="ident">Top::Model</span>(<span class="kw">_</span>) =&gt; <span class="ident">TopId::Model</span>(<span class="ident">ModelId</span>(<span class="ident">top_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)),
-        <span class="ident">Top::Source</span>(<span class="kw">_</span>) =&gt; <span class="ident">TopId::Source</span>(<span class="ident">SourceId</span>(<span class="ident">top_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)),
-        <span class="ident">Top::Generator</span>(<span class="kw">_</span>) =&gt; <span class="ident">TopId::Generator</span>(<span class="ident">GeneratorId</span>(<span class="ident">top_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)),
-        <span class="ident">Top::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">TopId::CompositeType</span>(<span class="ident">CompositeTypeId</span>(<span class="ident">top_idx</span> <span class="kw">as</span> <span class="ident">u32</span>)),
+<span class="kw">fn </span>top_idx_to_top_id(top_idx: usize, top: <span class="kw-2">&amp;</span>Top) -&gt; TopId {
+    <span class="kw">match </span>top {
+        Top::Enum(<span class="kw">_</span>) =&gt; TopId::Enum(EnumId(top_idx <span class="kw">as </span>u32)),
+        Top::Model(<span class="kw">_</span>) =&gt; TopId::Model(ModelId(top_idx <span class="kw">as </span>u32)),
+        Top::Source(<span class="kw">_</span>) =&gt; TopId::Source(SourceId(top_idx <span class="kw">as </span>u32)),
+        Top::Generator(<span class="kw">_</span>) =&gt; TopId::Generator(GeneratorId(top_idx <span class="kw">as </span>u32)),
+        Top::CompositeType(<span class="kw">_</span>) =&gt; TopId::CompositeType(CompositeTypeId(top_idx <span class="kw">as </span>u32)),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

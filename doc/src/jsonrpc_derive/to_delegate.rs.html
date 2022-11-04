@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/to_delegate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_delegate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/to_delegate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_delegate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -509,516 +509,516 @@
 <span id="509">509</span>
 <span id="510">510</span>
 <span id="511">511</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashSet;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::params_style::ParamStyle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rpc_attr::RpcMethodAttribute</span>;
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-	<span class="ident">parse_quote</span>,
-	<span class="ident">punctuated::Punctuated</span>,
-	<span class="ident">visit</span>::{<span class="self">self</span>, <span class="ident">Visit</span>},
-	<span class="prelude-ty">Result</span>, <span class="ident">Token</span>,
+<span class="kw">use </span><span class="kw">crate</span>::params_style::ParamStyle;
+<span class="kw">use </span><span class="kw">crate</span>::rpc_attr::RpcMethodAttribute;
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::{
+	parse_quote,
+	punctuated::Punctuated,
+	visit::{<span class="self">self</span>, Visit},
+	<span class="prelude-ty">Result</span>, Token,
 };
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MethodRegistration</span> {
-	<span class="ident">Standard</span> {
-		<span class="ident">method</span>: <span class="ident">RpcMethod</span>,
-		<span class="ident">has_metadata</span>: <span class="ident">bool</span>,
+<span class="kw">pub enum </span>MethodRegistration {
+	Standard {
+		method: RpcMethod,
+		has_metadata: bool,
 	},
-	<span class="ident">PubSub</span> {
-		<span class="ident">name</span>: <span class="ident">String</span>,
-		<span class="ident">subscribes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcMethod</span><span class="op">&gt;</span>,
-		<span class="ident">unsubscribe</span>: <span class="ident">RpcMethod</span>,
+	PubSub {
+		name: String,
+		subscribes: Vec&lt;RpcMethod&gt;,
+		unsubscribe: RpcMethod,
 	},
-	<span class="ident">Notification</span> {
-		<span class="ident">method</span>: <span class="ident">RpcMethod</span>,
-		<span class="ident">has_metadata</span>: <span class="ident">bool</span>,
+	Notification {
+		method: RpcMethod,
+		has_metadata: bool,
 	},
 }
 
-<span class="kw">impl</span> <span class="ident">MethodRegistration</span> {
-	<span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proc_macro2::TokenStream</span><span class="op">&gt;</span> {
-		<span class="kw">match</span> <span class="self">self</span> {
-			<span class="ident">MethodRegistration::Standard</span> { <span class="ident">method</span>, <span class="ident">has_metadata</span> } =&gt; {
-				<span class="kw">let</span> <span class="ident">rpc_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">name</span>();
-				<span class="kw">let</span> <span class="ident">add_method</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">has_metadata</span> {
-					<span class="macro">quote!</span>(<span class="ident">add_method_with_meta</span>)
-				} <span class="kw">else</span> {
-					<span class="macro">quote!</span>(<span class="ident">add_method</span>)
+<span class="kw">impl </span>MethodRegistration {
+	<span class="kw">fn </span>generate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;proc_macro2::TokenStream&gt; {
+		<span class="kw">match </span><span class="self">self </span>{
+			MethodRegistration::Standard { method, has_metadata } =&gt; {
+				<span class="kw">let </span>rpc_name = <span class="kw-2">&amp;</span>method.name();
+				<span class="kw">let </span>add_method = <span class="kw">if </span><span class="kw-2">*</span>has_metadata {
+					<span class="macro">quote!</span>(add_method_with_meta)
+				} <span class="kw">else </span>{
+					<span class="macro">quote!</span>(add_method)
 				};
-				<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">generate_delegate_closure</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">add_aliases</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">generate_add_aliases</span>();
+				<span class="kw">let </span>closure = method.generate_delegate_closure(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
+				<span class="kw">let </span>add_aliases = method.generate_add_aliases();
 
-				<span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
-					<span class="ident">del</span>.#<span class="ident">add_method</span>(#<span class="ident">rpc_name</span>, #<span class="ident">closure</span>);
-					#<span class="ident">add_aliases</span>
+				<span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+					del.#add_method(#rpc_name, #closure);
+					#add_aliases
 				})
 			}
-			<span class="ident">MethodRegistration::PubSub</span> {
-				<span class="ident">name</span>,
-				<span class="ident">subscribes</span>,
-				<span class="ident">unsubscribe</span>,
+			MethodRegistration::PubSub {
+				name,
+				subscribes,
+				unsubscribe,
 			} =&gt; {
-				<span class="kw">let</span> <span class="ident">unsub_name</span> <span class="op">=</span> <span class="ident">unsubscribe</span>.<span class="ident">name</span>();
-				<span class="kw">let</span> <span class="ident">unsub_method_ident</span> <span class="op">=</span> <span class="ident">unsubscribe</span>.<span class="ident">ident</span>();
-				<span class="kw">let</span> <span class="ident">unsub_closure</span> <span class="op">=</span> <span class="macro">quote!</span> {
-					<span class="kw">move</span> <span class="op">|</span><span class="ident">base</span>, <span class="ident">id</span>, <span class="ident">meta</span><span class="op">|</span> {
-						<span class="kw">use</span> <span class="ident"><span class="self">self</span>::_futures</span>::{<span class="ident">FutureExt</span>, <span class="ident">TryFutureExt</span>};
-						<span class="ident"><span class="self">self</span>::_jsonrpc_core::WrapFuture::into_future</span>(
-							<span class="self">Self</span>::#<span class="ident">unsub_method_ident</span>(<span class="ident">base</span>, <span class="ident">meta</span>, <span class="ident">id</span>)
+				<span class="kw">let </span>unsub_name = unsubscribe.name();
+				<span class="kw">let </span>unsub_method_ident = unsubscribe.ident();
+				<span class="kw">let </span>unsub_closure = <span class="macro">quote! </span>{
+					<span class="kw">move </span>|base, id, meta| {
+						<span class="kw">use </span><span class="self">self</span>::_futures::{FutureExt, TryFutureExt};
+						<span class="self">self</span>::_jsonrpc_core::WrapFuture::into_future(
+							<span class="self">Self</span>::#unsub_method_ident(base, meta, id)
 						)
-							.<span class="ident">map_ok</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">_jsonrpc_core::to_value</span>(<span class="ident">value</span>)
-									.<span class="ident">expect</span>(<span class="string">&quot;Expected always-serializable type; qed&quot;</span>))
-							.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+							.map_ok(|value| _jsonrpc_core::to_value(value)
+									.expect(<span class="string">&quot;Expected always-serializable type; qed&quot;</span>))
+							.map_err(Into::into)
 					}
 				};
 
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_subscriptions</span> <span class="op">=</span> <span class="ident">proc_macro2::TokenStream::new</span>();
+				<span class="kw">let </span><span class="kw-2">mut </span>add_subscriptions = proc_macro2::TokenStream::new();
 
-				<span class="kw">for</span> <span class="ident">subscribe</span> <span class="kw">in</span> <span class="ident">subscribes</span>.<span class="ident">iter</span>() {
-					<span class="kw">let</span> <span class="ident">sub_name</span> <span class="op">=</span> <span class="ident">subscribe</span>.<span class="ident">name</span>();
-					<span class="kw">let</span> <span class="ident">sub_closure</span> <span class="op">=</span> <span class="ident">subscribe</span>.<span class="ident">generate_delegate_closure</span>(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
-					<span class="kw">let</span> <span class="ident">sub_aliases</span> <span class="op">=</span> <span class="ident">subscribe</span>.<span class="ident">generate_add_aliases</span>();
+				<span class="kw">for </span>subscribe <span class="kw">in </span>subscribes.iter() {
+					<span class="kw">let </span>sub_name = subscribe.name();
+					<span class="kw">let </span>sub_closure = subscribe.generate_delegate_closure(<span class="bool-val">true</span>)<span class="question-mark">?</span>;
+					<span class="kw">let </span>sub_aliases = subscribe.generate_add_aliases();
 
-					<span class="ident">add_subscriptions</span> <span class="op">=</span> <span class="macro">quote!</span> {
-						#<span class="ident">add_subscriptions</span>
-						<span class="ident">del</span>.<span class="ident">add_subscription</span>(
-							#<span class="ident">name</span>,
-							(#<span class="ident">sub_name</span>, #<span class="ident">sub_closure</span>),
-							(#<span class="ident">unsub_name</span>, #<span class="ident">unsub_closure</span>),
+					add_subscriptions = <span class="macro">quote! </span>{
+						#add_subscriptions
+						del.add_subscription(
+							#name,
+							(#sub_name, #sub_closure),
+							(#unsub_name, #unsub_closure),
 						);
-						#<span class="ident">sub_aliases</span>
+						#sub_aliases
 					};
 				}
 
-				<span class="kw">let</span> <span class="ident">unsub_aliases</span> <span class="op">=</span> <span class="ident">unsubscribe</span>.<span class="ident">generate_add_aliases</span>();
+				<span class="kw">let </span>unsub_aliases = unsubscribe.generate_add_aliases();
 
-				<span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
-					#<span class="ident">add_subscriptions</span>
-					#<span class="ident">unsub_aliases</span>
+				<span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+					#add_subscriptions
+					#unsub_aliases
 				})
 			}
-			<span class="ident">MethodRegistration::Notification</span> { <span class="ident">method</span>, <span class="ident">has_metadata</span> } =&gt; {
-				<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">name</span>();
-				<span class="kw">let</span> <span class="ident">add_notification</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">has_metadata</span> {
-					<span class="macro">quote!</span>(<span class="ident">add_notification_with_meta</span>)
-				} <span class="kw">else</span> {
-					<span class="macro">quote!</span>(<span class="ident">add_notification</span>)
+			MethodRegistration::Notification { method, has_metadata } =&gt; {
+				<span class="kw">let </span>name = <span class="kw-2">&amp;</span>method.name();
+				<span class="kw">let </span>add_notification = <span class="kw">if </span><span class="kw-2">*</span>has_metadata {
+					<span class="macro">quote!</span>(add_notification_with_meta)
+				} <span class="kw">else </span>{
+					<span class="macro">quote!</span>(add_notification)
 				};
-				<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">generate_delegate_closure</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">add_aliases</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">generate_add_aliases</span>();
+				<span class="kw">let </span>closure = method.generate_delegate_closure(<span class="bool-val">false</span>)<span class="question-mark">?</span>;
+				<span class="kw">let </span>add_aliases = method.generate_add_aliases();
 
-				<span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
-					<span class="ident">del</span>.#<span class="ident">add_notification</span>(#<span class="ident">name</span>, #<span class="ident">closure</span>);
-					#<span class="ident">add_aliases</span>
+				<span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+					del.#add_notification(#name, #closure);
+					#add_aliases
 				})
 			}
 		}
 	}
 }
 
-<span class="kw">const</span> <span class="ident">SUBSCRIBER_TYPE_IDENT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Subscriber&quot;</span>;
-<span class="kw">const</span> <span class="ident">METADATA_CLOSURE_ARG</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;meta&quot;</span>;
-<span class="kw">const</span> <span class="ident">SUBSCRIBER_CLOSURE_ARG</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;subscriber&quot;</span>;
+<span class="kw">const </span>SUBSCRIBER_TYPE_IDENT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Subscriber&quot;</span>;
+<span class="kw">const </span>METADATA_CLOSURE_ARG: <span class="kw-2">&amp;</span>str = <span class="string">&quot;meta&quot;</span>;
+<span class="kw">const </span>SUBSCRIBER_CLOSURE_ARG: <span class="kw-2">&amp;</span>str = <span class="string">&quot;subscriber&quot;</span>;
 
-<span class="comment">// tuples are limited to 16 fields: the maximum supported by `serde::Deserialize`</span>
-<span class="kw">const</span> <span class="ident">TUPLE_FIELD_NAMES</span>: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">16</span>] <span class="op">=</span> [
+<span class="comment">// tuples are limited to 16 fields: the maximum supported by `serde::Deserialize`
+</span><span class="kw">const </span>TUPLE_FIELD_NAMES: [<span class="kw-2">&amp;</span>str; <span class="number">16</span>] = [
 	<span class="string">&quot;a&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;c&quot;</span>, <span class="string">&quot;d&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;f&quot;</span>, <span class="string">&quot;g&quot;</span>, <span class="string">&quot;h&quot;</span>, <span class="string">&quot;i&quot;</span>, <span class="string">&quot;j&quot;</span>, <span class="string">&quot;k&quot;</span>, <span class="string">&quot;l&quot;</span>, <span class="string">&quot;m&quot;</span>, <span class="string">&quot;n&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;p&quot;</span>,
 ];
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_trait_item_method</span>(
-	<span class="ident">methods</span>: <span class="kw-2">&amp;</span>[<span class="ident">MethodRegistration</span>],
-	<span class="ident">trait_item</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>,
-	<span class="ident">has_metadata</span>: <span class="ident">bool</span>,
-	<span class="ident">has_pubsub_methods</span>: <span class="ident">bool</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::TraitItemMethod</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">io_delegate_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_pubsub_methods</span> {
-		<span class="macro">quote!</span>(<span class="ident">_jsonrpc_pubsub::IoDelegate</span>)
-	} <span class="kw">else</span> {
-		<span class="macro">quote!</span>(<span class="ident">_jsonrpc_core::IoDelegate</span>)
+<span class="kw">pub fn </span>generate_trait_item_method(
+	methods: <span class="kw-2">&amp;</span>[MethodRegistration],
+	trait_item: <span class="kw-2">&amp;</span>syn::ItemTrait,
+	has_metadata: bool,
+	has_pubsub_methods: bool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;syn::TraitItemMethod&gt; {
+	<span class="kw">let </span>io_delegate_type = <span class="kw">if </span>has_pubsub_methods {
+		<span class="macro">quote!</span>(_jsonrpc_pubsub::IoDelegate)
+	} <span class="kw">else </span>{
+		<span class="macro">quote!</span>(_jsonrpc_core::IoDelegate)
 	};
-	<span class="kw">let</span> <span class="ident">add_methods</span> <span class="op">=</span> <span class="ident">methods</span>
-		.<span class="ident">iter</span>()
-		.<span class="ident">map</span>(<span class="ident">MethodRegistration::generate</span>)
-		.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-	<span class="kw">let</span> <span class="ident">to_delegate_body</span> <span class="op">=</span> <span class="macro">quote!</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">del</span> <span class="op">=</span> #<span class="ident">io_delegate_type::new</span>(<span class="self">self</span>.<span class="ident">into</span>());
-		#(#<span class="ident">add_methods</span>)<span class="op">*</span>
-		<span class="ident">del</span>
+	<span class="kw">let </span>add_methods = methods
+		.iter()
+		.map(MethodRegistration::generate)
+		.collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
+	<span class="kw">let </span>to_delegate_body = <span class="macro">quote! </span>{
+		<span class="kw">let </span><span class="kw-2">mut </span>del = #io_delegate_type::new(<span class="self">self</span>.into());
+		#(#add_methods)*
+		del
 	};
 
-	<span class="kw">let</span> <span class="ident">method</span>: <span class="ident">syn::TraitItemMethod</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_metadata</span> {
-		<span class="macro">parse_quote!</span> {
-			<span class="doccomment">/// Create an `IoDelegate`, wiring rpc calls to the trait methods.</span>
-			<span class="kw">fn</span> <span class="ident">to_delegate</span>(<span class="self">self</span>) -&gt; #<span class="ident">io_delegate_type</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Metadata</span><span class="op">&gt;</span> {
-				#<span class="ident">to_delegate_body</span>
+	<span class="kw">let </span>method: syn::TraitItemMethod = <span class="kw">if </span>has_metadata {
+		<span class="macro">parse_quote! </span>{
+			<span class="doccomment">/// Create an `IoDelegate`, wiring rpc calls to the trait methods.
+			</span><span class="kw">fn </span>to_delegate(<span class="self">self</span>) -&gt; #io_delegate_type&lt;<span class="self">Self</span>, <span class="self">Self</span>::Metadata&gt; {
+				#to_delegate_body
 			}
 		}
-	} <span class="kw">else</span> {
-		<span class="macro">parse_quote!</span> {
-			<span class="doccomment">/// Create an `IoDelegate`, wiring rpc calls to the trait methods.</span>
-			<span class="kw">fn</span> <span class="ident">to_delegate</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">_jsonrpc_core::Metadata</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; #<span class="ident">io_delegate_type</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">M</span><span class="op">&gt;</span> {
-				#<span class="ident">to_delegate_body</span>
+	} <span class="kw">else </span>{
+		<span class="macro">parse_quote! </span>{
+			<span class="doccomment">/// Create an `IoDelegate`, wiring rpc calls to the trait methods.
+			</span><span class="kw">fn </span>to_delegate&lt;M: _jsonrpc_core::Metadata&gt;(<span class="self">self</span>) -&gt; #io_delegate_type&lt;<span class="self">Self</span>, M&gt; {
+				#to_delegate_body
 			}
 		}
 	};
 
-	<span class="kw">let</span> <span class="ident">predicates</span> <span class="op">=</span> <span class="ident">generate_where_clause_serialization_predicates</span>(<span class="kw-2">&amp;</span><span class="ident">trait_item</span>, <span class="bool-val">false</span>);
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">method</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">clone</span>();
-	<span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">generics</span>.<span class="ident">make_where_clause</span>().<span class="ident">predicates</span>.<span class="ident">extend</span>(<span class="ident">predicates</span>);
-	<span class="prelude-val">Ok</span>(<span class="ident">method</span>)
+	<span class="kw">let </span>predicates = generate_where_clause_serialization_predicates(<span class="kw-2">&amp;</span>trait_item, <span class="bool-val">false</span>);
+	<span class="kw">let </span><span class="kw-2">mut </span>method = method.clone();
+	method.sig.generics.make_where_clause().predicates.extend(predicates);
+	<span class="prelude-val">Ok</span>(method)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RpcMethod</span> {
-	<span class="kw">pub</span> <span class="ident">attr</span>: <span class="ident">RpcMethodAttribute</span>,
-	<span class="kw">pub</span> <span class="ident">trait_item</span>: <span class="ident">syn::TraitItemMethod</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>RpcMethod {
+	<span class="kw">pub </span>attr: RpcMethodAttribute,
+	<span class="kw">pub </span>trait_item: syn::TraitItemMethod,
 }
 
-<span class="kw">impl</span> <span class="ident">RpcMethod</span> {
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attr</span>: <span class="ident">RpcMethodAttribute</span>, <span class="ident">trait_item</span>: <span class="ident">syn::TraitItemMethod</span>) -&gt; <span class="ident">RpcMethod</span> {
-		<span class="ident">RpcMethod</span> { <span class="ident">attr</span>, <span class="ident">trait_item</span> }
+<span class="kw">impl </span>RpcMethod {
+	<span class="kw">pub fn </span>new(attr: RpcMethodAttribute, trait_item: syn::TraitItemMethod) -&gt; RpcMethod {
+		RpcMethod { attr, trait_item }
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RpcMethodAttribute</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attr</span>
+	<span class="kw">pub fn </span>attr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RpcMethodAttribute {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.attr
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attr</span>.<span class="ident">name</span>
+	<span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.attr.name
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ident</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span> {
-		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trait_item</span>.<span class="ident">sig</span>.<span class="ident">ident</span>
+	<span class="kw">pub fn </span>ident(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>syn::Ident {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.trait_item.sig.ident
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pubsub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">attr</span>.<span class="ident">is_pubsub</span>()
+	<span class="kw">pub fn </span>is_pubsub(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.attr.is_pubsub()
 	}
 
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subscriber_arg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">trait_item</span>
-			.<span class="ident">sig</span>
-			.<span class="ident">inputs</span>
-			.<span class="ident">iter</span>()
-			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span> {
-				<span class="ident">syn::FnArg::Typed</span>(<span class="ident">ty</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">ty</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
-				<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+	<span class="kw">pub fn </span>subscriber_arg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;syn::Type&gt; {
+		<span class="self">self</span>.trait_item
+			.sig
+			.inputs
+			.iter()
+			.filter_map(|arg| <span class="kw">match </span>arg {
+				syn::FnArg::Typed(ty) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>ty.ty.clone()),
+				<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 			})
-			.<span class="ident">find</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">ty</span> {
-					<span class="kw">if</span> <span class="ident">path</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">SUBSCRIBER_TYPE_IDENT</span>) {
-						<span class="kw">return</span> <span class="bool-val">true</span>;
+			.find(|ty| {
+				<span class="kw">if let </span>syn::Type::Path(path) = ty {
+					<span class="kw">if </span>path.path.segments.iter().any(|s| s.ident == SUBSCRIBER_TYPE_IDENT) {
+						<span class="kw">return </span><span class="bool-val">true</span>;
 					}
 				}
-				<span class="bool-val">false</span>
-			})
+				<span class="bool-val">false
+			</span>})
 	}
 
-	<span class="kw">fn</span> <span class="ident">generate_delegate_closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">is_subscribe</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proc_macro2::TokenStream</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-			.<span class="ident">trait_item</span>
-			.<span class="ident">sig</span>
-			.<span class="ident">inputs</span>
-			.<span class="ident">iter</span>()
-			.<span class="ident">cloned</span>()
-			.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span> {
-				<span class="ident">syn::FnArg::Typed</span>(<span class="ident">ty</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">ty</span>.<span class="ident">ty</span>),
-				<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+	<span class="kw">fn </span>generate_delegate_closure(<span class="kw-2">&amp;</span><span class="self">self</span>, is_subscribe: bool) -&gt; <span class="prelude-ty">Result</span>&lt;proc_macro2::TokenStream&gt; {
+		<span class="kw">let </span><span class="kw-2">mut </span>param_types: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+			</span>.trait_item
+			.sig
+			.inputs
+			.iter()
+			.cloned()
+			.filter_map(|arg| <span class="kw">match </span>arg {
+				syn::FnArg::Typed(ty) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>ty.ty),
+				<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 			})
-			.<span class="ident">collect</span>();
+			.collect();
 
-		<span class="comment">// special args are those which are not passed directly via rpc params: metadata, subscriber</span>
-		<span class="kw">let</span> <span class="ident">special_args</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::special_args</span>(<span class="kw-2">&amp;</span><span class="ident">param_types</span>);
-		<span class="ident">param_types</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="ident">special_args</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">sty</span>)<span class="op">|</span> <span class="ident">sty</span> <span class="op">==</span> <span class="ident">ty</span>).<span class="ident">is_none</span>());
-		<span class="kw">if</span> <span class="ident">param_types</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">TUPLE_FIELD_NAMES</span>.<span class="ident">len</span>() {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trait_item</span>,
-				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Maximum supported number of params is {}&quot;</span>, <span class="ident">TUPLE_FIELD_NAMES</span>.<span class="ident">len</span>()),
+		<span class="comment">// special args are those which are not passed directly via rpc params: metadata, subscriber
+		</span><span class="kw">let </span>special_args = <span class="self">Self</span>::special_args(<span class="kw-2">&amp;</span>param_types);
+		param_types.retain(|ty| special_args.iter().find(|(<span class="kw">_</span>, sty)| sty == ty).is_none());
+		<span class="kw">if </span>param_types.len() &gt; TUPLE_FIELD_NAMES.len() {
+			<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+				<span class="kw-2">&amp;</span><span class="self">self</span>.trait_item,
+				<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Maximum supported number of params is {}&quot;</span>, TUPLE_FIELD_NAMES.len()),
 			));
 		}
-		<span class="kw">let</span> <span class="ident">tuple_fields</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="ident">TUPLE_FIELD_NAMES</span>
-			.<span class="ident">iter</span>()
-			.<span class="ident">take</span>(<span class="ident">param_types</span>.<span class="ident">len</span>())
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">ident</span>(<span class="ident">name</span>))
-			.<span class="ident">collect</span>());
-		<span class="kw">let</span> <span class="ident">param_types</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">param_types</span>;
-		<span class="kw">let</span> <span class="ident">parse_params</span> <span class="op">=</span> {
-			<span class="comment">// last arguments that are `Option`-s are optional &#39;trailing&#39; arguments</span>
-			<span class="kw">let</span> <span class="ident">trailing_args_num</span> <span class="op">=</span> <span class="ident">param_types</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">is_option_type</span>(<span class="ident">t</span>)).<span class="ident">count</span>();
-			<span class="kw">if</span> <span class="ident">trailing_args_num</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-				<span class="self">self</span>.<span class="ident">params_with_trailing</span>(<span class="ident">trailing_args_num</span>, <span class="ident">param_types</span>, <span class="ident">tuple_fields</span>)
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="ident">param_types</span>.<span class="ident">is_empty</span>() {
-				<span class="macro">quote!</span> { <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">expect_no_params</span>(); }
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attr</span>.<span class="ident">params_style</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">ParamStyle::Raw</span>) {
-				<span class="macro">quote!</span> { <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">_jsonrpc_core::Result</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Ok</span>((<span class="ident">params</span>,)); }
-			} <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attr</span>.<span class="ident">params_style</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">ParamStyle::Positional</span>) {
-				<span class="macro">quote!</span> { <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>(#(#<span class="ident">param_types</span>, )<span class="kw-2">*</span>)<span class="op">&gt;</span>(); }
-			} <span class="kw">else</span>
-			<span class="comment">/* if self.attr.params_style == Some(ParamStyle::Named) */</span>
-			{
+		<span class="kw">let </span>tuple_fields: <span class="kw-2">&amp;</span>Vec&lt;<span class="kw">_</span>&gt; = <span class="kw-2">&amp;</span>(TUPLE_FIELD_NAMES
+			.iter()
+			.take(param_types.len())
+			.map(|name| ident(name))
+			.collect());
+		<span class="kw">let </span>param_types = <span class="kw-2">&amp;</span>param_types;
+		<span class="kw">let </span>parse_params = {
+			<span class="comment">// last arguments that are `Option`-s are optional &#39;trailing&#39; arguments
+			</span><span class="kw">let </span>trailing_args_num = param_types.iter().rev().take_while(|t| is_option_type(t)).count();
+			<span class="kw">if </span>trailing_args_num != <span class="number">0 </span>{
+				<span class="self">self</span>.params_with_trailing(trailing_args_num, param_types, tuple_fields)
+			} <span class="kw">else if </span>param_types.is_empty() {
+				<span class="macro">quote! </span>{ <span class="kw">let </span>params = params.expect_no_params(); }
+			} <span class="kw">else if </span><span class="self">self</span>.attr.params_style == <span class="prelude-val">Some</span>(ParamStyle::Raw) {
+				<span class="macro">quote! </span>{ <span class="kw">let </span>params: _jsonrpc_core::Result&lt;<span class="kw">_</span>&gt; = <span class="prelude-val">Ok</span>((params,)); }
+			} <span class="kw">else if </span><span class="self">self</span>.attr.params_style == <span class="prelude-val">Some</span>(ParamStyle::Positional) {
+				<span class="macro">quote! </span>{ <span class="kw">let </span>params = params.parse::&lt;(#(#param_types, )<span class="kw-2">*</span>)&gt;(); }
+			} <span class="kw">else
+			</span><span class="comment">/* if self.attr.params_style == Some(ParamStyle::Named) */
+			</span>{
 				<span class="macro">unimplemented!</span>(<span class="string">&quot;Server side named parameters are not implemented&quot;</span>);
 			}
 		};
 
-		<span class="kw">let</span> <span class="ident">method_ident</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ident</span>();
-		<span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trait_item</span>.<span class="ident">sig</span>.<span class="ident">output</span>;
-		<span class="kw">let</span> <span class="ident">extra_closure_args</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">special_args</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="number">0</span>).<span class="ident">collect</span>();
-		<span class="kw">let</span> <span class="ident">extra_method_types</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">special_args</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="number">1</span>).<span class="ident">collect</span>();
+		<span class="kw">let </span>method_ident = <span class="self">self</span>.ident();
+		<span class="kw">let </span>result = <span class="kw-2">&amp;</span><span class="self">self</span>.trait_item.sig.output;
+		<span class="kw">let </span>extra_closure_args: <span class="kw-2">&amp;</span>Vec&lt;<span class="kw">_</span>&gt; = <span class="kw-2">&amp;</span>special_args.iter().cloned().map(|arg| arg.<span class="number">0</span>).collect();
+		<span class="kw">let </span>extra_method_types: <span class="kw-2">&amp;</span>Vec&lt;<span class="kw">_</span>&gt; = <span class="kw-2">&amp;</span>special_args.iter().cloned().map(|arg| arg.<span class="number">1</span>).collect();
 
-		<span class="kw">let</span> <span class="ident">closure_args</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="ident">base</span>, <span class="ident">params</span>, #(#<span class="ident">extra_closure_args</span>), <span class="op">*</span> };
-		<span class="kw">let</span> <span class="ident">method_sig</span> <span class="op">=</span> <span class="macro">quote!</span> { <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>, #(#<span class="ident">extra_method_types</span>, ) <span class="op">*</span> #(#<span class="ident">param_types</span>), <span class="kw-2">*</span>) #<span class="ident">result</span> };
-		<span class="kw">let</span> <span class="ident">method_call</span> <span class="op">=</span> <span class="macro">quote!</span> { (<span class="ident">base</span>, #(#<span class="ident">extra_closure_args</span>, )<span class="op">*</span> #(#<span class="ident">tuple_fields</span>), <span class="kw-2">*</span>) };
-		<span class="kw">let</span> <span class="ident">match_params</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_subscribe</span> {
-			<span class="macro">quote!</span> {
-				<span class="prelude-val">Ok</span>((#(#<span class="ident">tuple_fields</span>, )<span class="kw-2">*</span>)) =&gt; {
-					<span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">_jsonrpc_pubsub::typed::Subscriber::new</span>(<span class="ident">subscriber</span>);
-					(<span class="ident">method</span>)#<span class="ident">method_call</span>
+		<span class="kw">let </span>closure_args = <span class="macro">quote! </span>{ base, params, #(#extra_closure_args), * };
+		<span class="kw">let </span>method_sig = <span class="macro">quote! </span>{ <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="self">Self</span>, #(#extra_method_types, ) * #(#param_types), <span class="kw-2">*</span>) #result };
+		<span class="kw">let </span>method_call = <span class="macro">quote! </span>{ (base, #(#extra_closure_args, )* #(#tuple_fields), <span class="kw-2">*</span>) };
+		<span class="kw">let </span>match_params = <span class="kw">if </span>is_subscribe {
+			<span class="macro">quote! </span>{
+				<span class="prelude-val">Ok</span>((#(#tuple_fields, )<span class="kw-2">*</span>)) =&gt; {
+					<span class="kw">let </span>subscriber = _jsonrpc_pubsub::typed::Subscriber::new(subscriber);
+					(method)#method_call
 				},
-				<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-					<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">subscriber</span>.<span class="ident">reject</span>(<span class="ident">e</span>);
-					<span class="kw">return</span>
-				}
+				<span class="prelude-val">Err</span>(e) =&gt; {
+					<span class="kw">let _ </span>= subscriber.reject(e);
+					<span class="kw">return
+				</span>}
 			}
-		} <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attr</span>.<span class="ident">is_notification</span>() {
-			<span class="macro">quote!</span> {
-				<span class="prelude-val">Ok</span>((#(#<span class="ident">tuple_fields</span>, )<span class="kw-2">*</span>)) =&gt; {
-					(<span class="ident">method</span>)#<span class="ident">method_call</span>
+		} <span class="kw">else if </span><span class="self">self</span>.attr.is_notification() {
+			<span class="macro">quote! </span>{
+				<span class="prelude-val">Ok</span>((#(#tuple_fields, )<span class="kw-2">*</span>)) =&gt; {
+					(method)#method_call
 				},
 				<span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
 			}
-		} <span class="kw">else</span> {
-			<span class="macro">quote!</span> {
-				<span class="prelude-val">Ok</span>((#(#<span class="ident">tuple_fields</span>, )<span class="kw-2">*</span>)) =&gt; {
-					<span class="kw">use</span> <span class="ident"><span class="self">self</span>::_futures</span>::{<span class="ident">FutureExt</span>, <span class="ident">TryFutureExt</span>};
-					<span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident"><span class="self">self</span>::_jsonrpc_core::WrapFuture::into_future</span>((<span class="ident">method</span>)#<span class="ident">method_call</span>)
-						.<span class="ident">map_ok</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">_jsonrpc_core::to_value</span>(<span class="ident">value</span>)
-							.<span class="ident">expect</span>(<span class="string">&quot;Expected always-serializable type; qed&quot;</span>))
-						.<span class="ident">map_err</span>(<span class="ident">Into::into</span> <span class="kw">as</span> <span class="kw">fn</span>(<span class="kw">_</span>) -&gt; <span class="ident">_jsonrpc_core::Error</span>);
-					<span class="ident">_futures::future::Either::Left</span>(<span class="ident">fut</span>)
+		} <span class="kw">else </span>{
+			<span class="macro">quote! </span>{
+				<span class="prelude-val">Ok</span>((#(#tuple_fields, )<span class="kw-2">*</span>)) =&gt; {
+					<span class="kw">use </span><span class="self">self</span>::_futures::{FutureExt, TryFutureExt};
+					<span class="kw">let </span>fut = <span class="self">self</span>::_jsonrpc_core::WrapFuture::into_future((method)#method_call)
+						.map_ok(|value| _jsonrpc_core::to_value(value)
+							.expect(<span class="string">&quot;Expected always-serializable type; qed&quot;</span>))
+						.map_err(Into::into <span class="kw">as fn</span>(<span class="kw">_</span>) -&gt; _jsonrpc_core::Error);
+					_futures::future::Either::Left(fut)
 				},
-				<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">_futures::future::Either::Right</span>(<span class="ident">_futures::future::ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
+				<span class="prelude-val">Err</span>(e) =&gt; _futures::future::Either::Right(_futures::future::ready(<span class="prelude-val">Err</span>(e))),
 			}
 		};
 
-		<span class="prelude-val">Ok</span>(<span class="macro">quote!</span> {
-			<span class="kw">move</span> <span class="op">|</span>#<span class="ident">closure_args</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span> <span class="kw-2">&amp;</span>(<span class="self">Self</span>::#<span class="ident">method_ident</span> <span class="kw">as</span> #<span class="ident">method_sig</span>);
-				#<span class="ident">parse_params</span>
-				<span class="kw">match</span> <span class="ident">params</span> {
-					#<span class="ident">match_params</span>
+		<span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
+			<span class="kw">move </span>|#closure_args| {
+				<span class="kw">let </span>method = <span class="kw-2">&amp;</span>(<span class="self">Self</span>::#method_ident <span class="kw">as </span>#method_sig);
+				#parse_params
+				<span class="kw">match </span>params {
+					#match_params
 				}
 			}
 		})
 	}
 
-	<span class="kw">fn</span> <span class="ident">special_args</span>(<span class="ident">param_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Type</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">syn::Ident</span>, <span class="ident">syn::Type</span>)<span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">meta_arg</span> <span class="op">=</span> <span class="ident">param_types</span>.<span class="ident">first</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> {
-			<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">ty</span> <span class="op">==</span> <span class="macro">parse_quote!</span>(<span class="ident"><span class="self">Self</span>::Metadata</span>) {
-				<span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">clone</span>())
-			} <span class="kw">else</span> {
-				<span class="prelude-val">None</span>
-			}
+	<span class="kw">fn </span>special_args(param_types: <span class="kw-2">&amp;</span>[syn::Type]) -&gt; Vec&lt;(syn::Ident, syn::Type)&gt; {
+		<span class="kw">let </span>meta_arg = param_types.first().and_then(|ty| {
+			<span class="kw">if </span><span class="kw-2">*</span>ty == <span class="macro">parse_quote!</span>(<span class="self">Self</span>::Metadata) {
+				<span class="prelude-val">Some</span>(ty.clone())
+			} <span class="kw">else </span>{
+				<span class="prelude-val">None
+			</span>}
 		});
-		<span class="kw">let</span> <span class="ident">subscriber_arg</span> <span class="op">=</span> <span class="ident">param_types</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> {
-			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">ty</span> {
-				<span class="kw">if</span> <span class="ident">path</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">SUBSCRIBER_TYPE_IDENT</span>) {
-					<span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">clone</span>())
-				} <span class="kw">else</span> {
-					<span class="prelude-val">None</span>
-				}
-			} <span class="kw">else</span> {
-				<span class="prelude-val">None</span>
-			}
+		<span class="kw">let </span>subscriber_arg = param_types.get(<span class="number">1</span>).and_then(|ty| {
+			<span class="kw">if let </span>syn::Type::Path(path) = ty {
+				<span class="kw">if </span>path.path.segments.iter().any(|s| s.ident == SUBSCRIBER_TYPE_IDENT) {
+					<span class="prelude-val">Some</span>(ty.clone())
+				} <span class="kw">else </span>{
+					<span class="prelude-val">None
+				</span>}
+			} <span class="kw">else </span>{
+				<span class="prelude-val">None
+			</span>}
 		});
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">special_args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">meta</span>) <span class="op">=</span> <span class="ident">meta_arg</span> {
-			<span class="ident">special_args</span>.<span class="ident">push</span>((<span class="ident">ident</span>(<span class="ident">METADATA_CLOSURE_ARG</span>), <span class="ident">meta</span>.<span class="ident">clone</span>()));
+		<span class="kw">let </span><span class="kw-2">mut </span>special_args = Vec::new();
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(meta) = meta_arg {
+			special_args.push((ident(METADATA_CLOSURE_ARG), meta.clone()));
 		}
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">subscriber</span>) <span class="op">=</span> <span class="ident">subscriber_arg</span> {
-			<span class="ident">special_args</span>.<span class="ident">push</span>((<span class="ident">ident</span>(<span class="ident">SUBSCRIBER_CLOSURE_ARG</span>), <span class="ident">subscriber</span>.<span class="ident">clone</span>()));
+		<span class="kw">if let </span><span class="prelude-val">Some</span>(subscriber) = subscriber_arg {
+			special_args.push((ident(SUBSCRIBER_CLOSURE_ARG), subscriber.clone()));
 		}
-		<span class="ident">special_args</span>
+		special_args
 	}
 
-	<span class="kw">fn</span> <span class="ident">params_with_trailing</span>(
+	<span class="kw">fn </span>params_with_trailing(
 		<span class="kw-2">&amp;</span><span class="self">self</span>,
-		<span class="ident">trailing_args_num</span>: <span class="ident">usize</span>,
-		<span class="ident">param_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Type</span>],
-		<span class="ident">tuple_fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Ident</span>],
-	) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-		<span class="kw">let</span> <span class="ident">total_args_num</span> <span class="op">=</span> <span class="ident">param_types</span>.<span class="ident">len</span>();
-		<span class="kw">let</span> <span class="ident">required_args_num</span> <span class="op">=</span> <span class="ident">total_args_num</span> <span class="op">-</span> <span class="ident">trailing_args_num</span>;
+		trailing_args_num: usize,
+		param_types: <span class="kw-2">&amp;</span>[syn::Type],
+		tuple_fields: <span class="kw-2">&amp;</span>[syn::Ident],
+	) -&gt; proc_macro2::TokenStream {
+		<span class="kw">let </span>total_args_num = param_types.len();
+		<span class="kw">let </span>required_args_num = total_args_num - trailing_args_num;
 
-		<span class="kw">let</span> <span class="ident">switch_branches</span> <span class="op">=</span> (<span class="number">0</span>..<span class="op">=</span><span class="ident">trailing_args_num</span>)
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">passed_trailing_args_num</span><span class="op">|</span> {
-				<span class="kw">let</span> <span class="ident">passed_args_num</span> <span class="op">=</span> <span class="ident">required_args_num</span> <span class="op">+</span> <span class="ident">passed_trailing_args_num</span>;
-				<span class="kw">let</span> <span class="ident">passed_param_types</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">param_types</span>[..<span class="ident">passed_args_num</span>];
-				<span class="kw">let</span> <span class="ident">passed_tuple_fields</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">tuple_fields</span>[..<span class="ident">passed_args_num</span>];
-				<span class="kw">let</span> <span class="ident">missed_args_num</span> <span class="op">=</span> <span class="ident">total_args_num</span> <span class="op">-</span> <span class="ident">passed_args_num</span>;
-				<span class="kw">let</span> <span class="ident">missed_params_values</span> <span class="op">=</span> <span class="ident">::std::iter::repeat</span>(<span class="macro">quote!</span> { <span class="prelude-val">None</span> })
-					.<span class="ident">take</span>(<span class="ident">missed_args_num</span>)
-					.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+		<span class="kw">let </span>switch_branches = (<span class="number">0</span>..=trailing_args_num)
+			.map(|passed_trailing_args_num| {
+				<span class="kw">let </span>passed_args_num = required_args_num + passed_trailing_args_num;
+				<span class="kw">let </span>passed_param_types = <span class="kw-2">&amp;</span>param_types[..passed_args_num];
+				<span class="kw">let </span>passed_tuple_fields = <span class="kw-2">&amp;</span>tuple_fields[..passed_args_num];
+				<span class="kw">let </span>missed_args_num = total_args_num - passed_args_num;
+				<span class="kw">let </span>missed_params_values = ::std::iter::repeat(<span class="macro">quote! </span>{ <span class="prelude-val">None </span>})
+					.take(missed_args_num)
+					.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-				<span class="kw">if</span> <span class="ident">passed_args_num</span> <span class="op">==</span> <span class="number">0</span> {
-					<span class="macro">quote!</span> {
-						#<span class="ident">passed_args_num</span> =&gt; <span class="ident">params</span>.<span class="ident">expect_no_params</span>()
-							.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> (#(#<span class="ident">missed_params_values</span>, ) <span class="kw-2">*</span>))
-							.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+				<span class="kw">if </span>passed_args_num == <span class="number">0 </span>{
+					<span class="macro">quote! </span>{
+						#passed_args_num =&gt; params.expect_no_params()
+							.map(|<span class="kw">_</span>| (#(#missed_params_values, ) <span class="kw-2">*</span>))
+							.map_err(Into::into)
 					}
-				} <span class="kw">else</span> {
-					<span class="macro">quote!</span> {
-						#<span class="ident">passed_args_num</span> =&gt; <span class="ident">params</span>.<span class="ident">parse</span>::<span class="op">&lt;</span>(#(#<span class="ident">passed_param_types</span>, )<span class="kw-2">*</span>)<span class="op">&gt;</span>()
-							.<span class="ident">map</span>(<span class="op">|</span>(#(#<span class="ident">passed_tuple_fields</span>,)<span class="kw-2">*</span>)<span class="op">|</span>
-								(#(#<span class="ident">passed_tuple_fields</span>, )<span class="op">*</span> #(#<span class="ident">missed_params_values</span>, )<span class="kw-2">*</span>))
-							.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+				} <span class="kw">else </span>{
+					<span class="macro">quote! </span>{
+						#passed_args_num =&gt; params.parse::&lt;(#(#passed_param_types, )<span class="kw-2">*</span>)&gt;()
+							.map(|(#(#passed_tuple_fields,)<span class="kw-2">*</span>)|
+								(#(#passed_tuple_fields, )* #(#missed_params_values, )<span class="kw-2">*</span>))
+							.map_err(Into::into)
 					}
 				}
 			})
-			.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+			.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-		<span class="macro">quote!</span> {
-			<span class="kw">let</span> <span class="ident">passed_args_num</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">params</span> {
-				<span class="ident">_jsonrpc_core::Params::Array</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">len</span>()),
-				<span class="ident">_jsonrpc_core::Params::None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>),
-				<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">_jsonrpc_core::Error::invalid_params</span>(<span class="string">&quot;`params` should be an array&quot;</span>))
+		<span class="macro">quote! </span>{
+			<span class="kw">let </span>passed_args_num = <span class="kw">match </span>params {
+				_jsonrpc_core::Params::Array(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Ok</span>(v.len()),
+				_jsonrpc_core::Params::None =&gt; <span class="prelude-val">Ok</span>(<span class="number">0</span>),
+				<span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(_jsonrpc_core::Error::invalid_params(<span class="string">&quot;`params` should be an array&quot;</span>))
 			};
 
-			<span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">passed_args_num</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">passed_args_num</span><span class="op">|</span> {
-				<span class="kw">match</span> <span class="ident">passed_args_num</span> {
-					<span class="kw">_</span> <span class="kw">if</span> <span class="ident">passed_args_num</span> <span class="op">&lt;</span> #<span class="ident">required_args_num</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">_jsonrpc_core::Error::invalid_params</span>(
-						<span class="macro">format!</span>(<span class="string">&quot;`params` should have at least {} argument(s)&quot;</span>, #<span class="ident">required_args_num</span>))),
-					#(#<span class="ident">switch_branches</span>),<span class="kw-2">*</span>,
-					<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">_jsonrpc_core::Error::invalid_params_with_details</span>(
-						<span class="macro">format!</span>(<span class="string">&quot;Expected from {} to {} parameters.&quot;</span>, #<span class="ident">required_args_num</span>, #<span class="ident">total_args_num</span>),
-						<span class="macro">format!</span>(<span class="string">&quot;Got: {}&quot;</span>, <span class="ident">passed_args_num</span>))),
+			<span class="kw">let </span>params = passed_args_num.and_then(|passed_args_num| {
+				<span class="kw">match </span>passed_args_num {
+					<span class="kw">_ if </span>passed_args_num &lt; #required_args_num =&gt; <span class="prelude-val">Err</span>(_jsonrpc_core::Error::invalid_params(
+						<span class="macro">format!</span>(<span class="string">&quot;`params` should have at least {} argument(s)&quot;</span>, #required_args_num))),
+					#(#switch_branches),<span class="kw-2">*</span>,
+					<span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(_jsonrpc_core::Error::invalid_params_with_details(
+						<span class="macro">format!</span>(<span class="string">&quot;Expected from {} to {} parameters.&quot;</span>, #required_args_num, #total_args_num),
+						<span class="macro">format!</span>(<span class="string">&quot;Got: {}&quot;</span>, passed_args_num))),
 				}
 			});
 		}
 	}
 
-	<span class="kw">fn</span> <span class="ident">generate_add_aliases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-		<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>();
-		<span class="kw">let</span> <span class="ident">add_aliases</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-			.<span class="ident">attr</span>
-			.<span class="ident">aliases</span>
-			.<span class="ident">iter</span>()
-			.<span class="ident">map</span>(<span class="op">|</span><span class="ident">alias</span><span class="op">|</span> <span class="macro">quote!</span> { <span class="ident">del</span>.<span class="ident">add_alias</span>(#<span class="ident">alias</span>, #<span class="ident">name</span>); })
-			.<span class="ident">collect</span>();
-		<span class="macro">quote!</span> { #(#<span class="ident">add_aliases</span>)<span class="op">*</span> }
+	<span class="kw">fn </span>generate_add_aliases(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; proc_macro2::TokenStream {
+		<span class="kw">let </span>name = <span class="self">self</span>.name();
+		<span class="kw">let </span>add_aliases: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+			</span>.attr
+			.aliases
+			.iter()
+			.map(|alias| <span class="macro">quote! </span>{ del.add_alias(#alias, #name); })
+			.collect();
+		<span class="macro">quote! </span>{ #(#add_aliases)* }
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">ident</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">syn::Ident</span> {
-	<span class="ident">syn::Ident::new</span>(<span class="ident">s</span>, <span class="ident">proc_macro2::Span::call_site</span>())
+<span class="kw">fn </span>ident(s: <span class="kw-2">&amp;</span>str) -&gt; syn::Ident {
+	syn::Ident::new(s, proc_macro2::Span::call_site())
 }
 
-<span class="kw">fn</span> <span class="ident">is_option_type</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Type</span>) -&gt; <span class="ident">bool</span> {
-	<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">ty</span> {
-		<span class="ident">path</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Option&quot;</span>)
-	} <span class="kw">else</span> {
-		<span class="bool-val">false</span>
-	}
+<span class="kw">fn </span>is_option_type(ty: <span class="kw-2">&amp;</span>syn::Type) -&gt; bool {
+	<span class="kw">if let </span>syn::Type::Path(path) = ty {
+		path.path.segments.first().map_or(<span class="bool-val">false</span>, |t| t.ident == <span class="string">&quot;Option&quot;</span>)
+	} <span class="kw">else </span>{
+		<span class="bool-val">false
+	</span>}
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_where_clause_serialization_predicates</span>(
-	<span class="ident">item_trait</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>,
-	<span class="ident">client</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::WherePredicate</span><span class="op">&gt;</span> {
-	<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-	<span class="kw">struct</span> <span class="ident">FindTyParams</span> {
-		<span class="ident">trait_generics</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
-		<span class="ident">server_to_client_type_params</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
-		<span class="ident">client_to_server_type_params</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span>,
-		<span class="ident">visiting_return_type</span>: <span class="ident">bool</span>,
-		<span class="ident">visiting_fn_arg</span>: <span class="ident">bool</span>,
-		<span class="ident">visiting_subscriber_arg</span>: <span class="ident">bool</span>,
+<span class="kw">pub fn </span>generate_where_clause_serialization_predicates(
+	item_trait: <span class="kw-2">&amp;</span>syn::ItemTrait,
+	client: bool,
+) -&gt; Vec&lt;syn::WherePredicate&gt; {
+	<span class="attribute">#[derive(Default)]
+	</span><span class="kw">struct </span>FindTyParams {
+		trait_generics: HashSet&lt;syn::Ident&gt;,
+		server_to_client_type_params: HashSet&lt;syn::Ident&gt;,
+		client_to_server_type_params: HashSet&lt;syn::Ident&gt;,
+		visiting_return_type: bool,
+		visiting_fn_arg: bool,
+		visiting_subscriber_arg: bool,
 	}
-	<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">Visit</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FindTyParams</span> {
-		<span class="kw">fn</span> <span class="ident">visit_type_param</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty_param</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">syn::TypeParam</span>) {
-			<span class="self">self</span>.<span class="ident">trait_generics</span>.<span class="ident">insert</span>(<span class="ident">ty_param</span>.<span class="ident">ident</span>.<span class="ident">clone</span>());
+	<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ast</span>&gt; Visit&lt;<span class="lifetime">&#39;ast</span>&gt; <span class="kw">for </span>FindTyParams {
+		<span class="kw">fn </span>visit_type_param(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty_param: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>syn::TypeParam) {
+			<span class="self">self</span>.trait_generics.insert(ty_param.ident.clone());
 		}
-		<span class="kw">fn</span> <span class="ident">visit_return_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">return_type</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">syn::ReturnType</span>) {
-			<span class="self">self</span>.<span class="ident">visiting_return_type</span> <span class="op">=</span> <span class="bool-val">true</span>;
-			<span class="ident">visit::visit_return_type</span>(<span class="self">self</span>, <span class="ident">return_type</span>);
-			<span class="self">self</span>.<span class="ident">visiting_return_type</span> <span class="op">=</span> <span class="bool-val">false</span>
+		<span class="kw">fn </span>visit_return_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, return_type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>syn::ReturnType) {
+			<span class="self">self</span>.visiting_return_type = <span class="bool-val">true</span>;
+			visit::visit_return_type(<span class="self">self</span>, return_type);
+			<span class="self">self</span>.visiting_return_type = <span class="bool-val">false
+		</span>}
+		<span class="kw">fn </span>visit_path_segment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, segment: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>syn::PathSegment) {
+			<span class="self">self</span>.visiting_subscriber_arg =
+				<span class="self">self</span>.visiting_subscriber_arg || (<span class="self">self</span>.visiting_fn_arg &amp;&amp; segment.ident == SUBSCRIBER_TYPE_IDENT);
+			visit::visit_path_segment(<span class="self">self</span>, segment);
+			<span class="self">self</span>.visiting_subscriber_arg = <span class="self">self</span>.visiting_subscriber_arg &amp;&amp; segment.ident != SUBSCRIBER_TYPE_IDENT;
 		}
-		<span class="kw">fn</span> <span class="ident">visit_path_segment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">segment</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">syn::PathSegment</span>) {
-			<span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> <span class="op">=</span>
-				<span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">visiting_fn_arg</span> <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">SUBSCRIBER_TYPE_IDENT</span>);
-			<span class="ident">visit::visit_path_segment</span>(<span class="self">self</span>, <span class="ident">segment</span>);
-			<span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> <span class="op">&amp;&amp;</span> <span class="ident">segment</span>.<span class="ident">ident</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SUBSCRIBER_TYPE_IDENT</span>;
-		}
-		<span class="kw">fn</span> <span class="ident">visit_ident</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">syn::Ident</span>) {
-			<span class="kw">if</span> <span class="self">self</span>.<span class="ident">trait_generics</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-				<span class="kw">if</span> <span class="self">self</span>.<span class="ident">visiting_return_type</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> {
-					<span class="self">self</span>.<span class="ident">server_to_client_type_params</span>.<span class="ident">insert</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
+		<span class="kw">fn </span>visit_ident(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>syn::Ident) {
+			<span class="kw">if </span><span class="self">self</span>.trait_generics.contains(<span class="kw-2">&amp;</span>ident) {
+				<span class="kw">if </span><span class="self">self</span>.visiting_return_type || <span class="self">self</span>.visiting_subscriber_arg {
+					<span class="self">self</span>.server_to_client_type_params.insert(ident.clone());
 				}
-				<span class="kw">if</span> <span class="self">self</span>.<span class="ident">visiting_fn_arg</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visiting_subscriber_arg</span> {
-					<span class="self">self</span>.<span class="ident">client_to_server_type_params</span>.<span class="ident">insert</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
+				<span class="kw">if </span><span class="self">self</span>.visiting_fn_arg &amp;&amp; !<span class="self">self</span>.visiting_subscriber_arg {
+					<span class="self">self</span>.client_to_server_type_params.insert(ident.clone());
 				}
 			}
 		}
-		<span class="kw">fn</span> <span class="ident">visit_fn_arg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">syn::FnArg</span>) {
-			<span class="self">self</span>.<span class="ident">visiting_fn_arg</span> <span class="op">=</span> <span class="bool-val">true</span>;
-			<span class="ident">visit::visit_fn_arg</span>(<span class="self">self</span>, <span class="ident">arg</span>);
-			<span class="self">self</span>.<span class="ident">visiting_fn_arg</span> <span class="op">=</span> <span class="bool-val">false</span>;
+		<span class="kw">fn </span>visit_fn_arg(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>syn::FnArg) {
+			<span class="self">self</span>.visiting_fn_arg = <span class="bool-val">true</span>;
+			visit::visit_fn_arg(<span class="self">self</span>, arg);
+			<span class="self">self</span>.visiting_fn_arg = <span class="bool-val">false</span>;
 		}
 	}
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">FindTyParams::default</span>();
-	<span class="ident">visitor</span>.<span class="ident">visit_item_trait</span>(<span class="ident">item_trait</span>);
+	<span class="kw">let </span><span class="kw-2">mut </span>visitor = FindTyParams::default();
+	visitor.visit_item_trait(item_trait);
 
-	<span class="kw">let</span> <span class="ident">additional_where_clause</span> <span class="op">=</span> <span class="ident">item_trait</span>.<span class="ident">generics</span>.<span class="ident">where_clause</span>.<span class="ident">clone</span>();
+	<span class="kw">let </span>additional_where_clause = item_trait.generics.where_clause.clone();
 
-	<span class="ident">item_trait</span>
-		.<span class="ident">generics</span>
-		.<span class="ident">type_params</span>()
-		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">ty_path</span> <span class="op">=</span> <span class="ident">syn::TypePath</span> {
-				<span class="ident">qself</span>: <span class="prelude-val">None</span>,
-				<span class="ident">path</span>: <span class="ident">ty</span>.<span class="ident">ident</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+	item_trait
+		.generics
+		.type_params()
+		.map(|ty| {
+			<span class="kw">let </span>ty_path = syn::TypePath {
+				qself: <span class="prelude-val">None</span>,
+				path: ty.ident.clone().into(),
 			};
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bounds</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">syn::TypeParamBound</span>, <span class="macro">Token!</span>[<span class="op">+</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>);
-			<span class="comment">// add json serialization trait bounds</span>
-			<span class="kw">if</span> <span class="ident">client</span> {
-				<span class="kw">if</span> <span class="ident">visitor</span>.<span class="ident">server_to_client_type_params</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ty</span>.<span class="ident">ident</span>) {
-					<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_core::serde::de::DeserializeOwned</span>))
+			<span class="kw">let </span><span class="kw-2">mut </span>bounds: Punctuated&lt;syn::TypeParamBound, <span class="macro">Token!</span>[+]&gt; = <span class="macro">parse_quote!</span>(Send + Sync + <span class="lifetime">&#39;static</span>);
+			<span class="comment">// add json serialization trait bounds
+			</span><span class="kw">if </span>client {
+				<span class="kw">if </span>visitor.server_to_client_type_params.contains(<span class="kw-2">&amp;</span>ty.ident) {
+					bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_core::serde::de::DeserializeOwned))
 				}
-				<span class="kw">if</span> <span class="ident">visitor</span>.<span class="ident">client_to_server_type_params</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ty</span>.<span class="ident">ident</span>) {
-					<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_core::serde::Serialize</span>))
+				<span class="kw">if </span>visitor.client_to_server_type_params.contains(<span class="kw-2">&amp;</span>ty.ident) {
+					bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_core::serde::Serialize))
 				}
-			} <span class="kw">else</span> {
-				<span class="kw">if</span> <span class="ident">visitor</span>.<span class="ident">server_to_client_type_params</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ty</span>.<span class="ident">ident</span>) {
-					<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_core::serde::Serialize</span>))
+			} <span class="kw">else </span>{
+				<span class="kw">if </span>visitor.server_to_client_type_params.contains(<span class="kw-2">&amp;</span>ty.ident) {
+					bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_core::serde::Serialize))
 				}
-				<span class="kw">if</span> <span class="ident">visitor</span>.<span class="ident">client_to_server_type_params</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ty</span>.<span class="ident">ident</span>) {
-					<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_core::serde::de::DeserializeOwned</span>))
+				<span class="kw">if </span>visitor.client_to_server_type_params.contains(<span class="kw-2">&amp;</span>ty.ident) {
+					bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_core::serde::de::DeserializeOwned))
 				}
 			}
 
-			<span class="comment">// add the trait bounds specified by the user in where clause.</span>
-			<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">additional_where_clause</span> {
-				<span class="kw">for</span> <span class="ident">predicate</span> <span class="kw">in</span> <span class="ident">where_clause</span>.<span class="ident">predicates</span>.<span class="ident">iter</span>() {
-					<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::WherePredicate::Type</span>(<span class="ident">where_ty</span>) <span class="op">=</span> <span class="ident">predicate</span> {
-						<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Type::Path</span>(<span class="kw-2">ref</span> <span class="ident">predicate</span>) <span class="op">=</span> <span class="ident">where_ty</span>.<span class="ident">bounded_ty</span> {
-							<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">predicate</span> <span class="op">==</span> <span class="ident">ty_path</span> {
-								<span class="ident">bounds</span>.<span class="ident">extend</span>(<span class="ident">where_ty</span>.<span class="ident">bounds</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>());
+			<span class="comment">// add the trait bounds specified by the user in where clause.
+			</span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>where_clause) = additional_where_clause {
+				<span class="kw">for </span>predicate <span class="kw">in </span>where_clause.predicates.iter() {
+					<span class="kw">if let </span>syn::WherePredicate::Type(where_ty) = predicate {
+						<span class="kw">if let </span>syn::Type::Path(<span class="kw-2">ref </span>predicate) = where_ty.bounded_ty {
+							<span class="kw">if </span><span class="kw-2">*</span>predicate == ty_path {
+								bounds.extend(where_ty.bounds.clone().into_iter());
 							}
 						}
 					}
 				}
 			}
 
-			<span class="ident">syn::WherePredicate::Type</span>(<span class="ident">syn::PredicateType</span> {
-				<span class="ident">lifetimes</span>: <span class="prelude-val">None</span>,
-				<span class="ident">bounded_ty</span>: <span class="ident">syn::Type::Path</span>(<span class="ident">ty_path</span>),
-				<span class="ident">colon_token</span>: <span class="op">&lt;</span><span class="macro">Token!</span>[:]<span class="op">&gt;</span><span class="ident">::default</span>(),
-				<span class="ident">bounds</span>,
+			syn::WherePredicate::Type(syn::PredicateType {
+				lifetimes: <span class="prelude-val">None</span>,
+				bounded_ty: syn::Type::Path(ty_path),
+				colon_token: &lt;<span class="macro">Token!</span>[:]&gt;::default(),
+				bounds,
 			})
 		})
-		.<span class="ident">collect</span>()
+		.collect()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

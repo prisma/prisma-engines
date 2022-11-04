@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -363,36 +363,36 @@
 <span id="363">363</span>
 <span id="364">364</span>
 <span id="365">365</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros.md&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(deprecated)]
+#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros.md&quot;</span>)]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">internal</span>;
+#[macro_use]
+#[doc(hidden)]
+</span><span class="kw">pub mod </span>internal;
 
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="kw">mod </span>tests;
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/BitArr_type.md&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">BitArr</span> {
-	(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span> $(,)<span class="question-mark">?</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span>::<span class="op">&lt;</span>
-			[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::mem::elts</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>
-		<span class="op">&gt;</span>
+<span class="attribute">#[macro_export]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/BitArr_type.md&quot;</span>)]
+</span><span class="macro">macro_rules! </span>BitArr {
+	(<span class="kw">for </span><span class="macro-nonterminal">$len</span>:expr, <span class="kw">in </span><span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty $(,)<span class="question-mark">?</span>) =&gt; {
+		<span class="macro-nonterminal">$crate::array::BitArray</span>::&lt;
+			[<span class="macro-nonterminal">$store</span>; <span class="macro-nonterminal">$crate::mem::elts</span>::&lt;<span class="macro-nonterminal">$store</span>&gt;(<span class="macro-nonterminal">$len</span>)], <span class="macro-nonterminal">$order
+		</span>&gt;
 	};
 
-	(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span> $(,)<span class="question-mark">?</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>)
+	(<span class="kw">for </span><span class="macro-nonterminal">$len</span>:expr, <span class="kw">in </span><span class="macro-nonterminal">$store</span>:ty $(,)<span class="question-mark">?</span>) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>)
 	};
 
-	(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="ident">usize</span>)
+	(<span class="kw">for </span><span class="macro-nonterminal">$len</span>:expr) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span>usize)
 	};
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitarr_value.md&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">bitarr</span> {
+<span class="attribute">#[macro_export]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitarr_value.md&quot;</span>)]
+</span><span class="macro">macro_rules! </span>bitarr {
 	<span class="comment">/* `const`-expression constructors.
 	 *
 	 * These arms expand to expressions which are guaranteed to be valid in
@@ -409,47 +409,47 @@
 	 * All valid invocations with a leading `const` will remain valid if the
 	 * `const` is removed, though their expansion may change to no longer be
 	 * valid in `const` contexts.
-	 */</span>
+	 */
 
-	<span class="comment">//  Bit-sequencing requires detecting `Cell` separately from other types.</span>
-	<span class="comment">//  See below.</span>
+	//  Bit-sequencing requires detecting `Cell` separately from other types.
+	//  See below.
 
-	(<span class="kw">const</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> [<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>; <span class="ident">ELTS</span>];
-		<span class="kw">const</span> <span class="ident">DATA</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
+	</span>(<span class="kw">const </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>Data = [Cell&lt;<span class="macro-nonterminal">$store</span>&gt;; ELTS];
+		<span class="kw">const </span>DATA: Data = <span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
 
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span><span class="ident">Data</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
-		<span class="ident">This</span> { <span class="ident">data</span>: <span class="ident">DATA</span>, ..<span class="ident">This::ZERO</span> }
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;Data, <span class="macro-nonterminal">$order</span>&gt;;
+		This { data: DATA, ..This::ZERO }
 	}};
-	(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; <span class="ident">ELTS</span>];
-		<span class="kw">const</span> <span class="ident">DATA</span>: <span class="ident">Data</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
+	(<span class="kw">const </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>Data = [<span class="macro-nonterminal">$store</span>; ELTS];
+		<span class="kw">const </span>DATA: Data = <span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
 
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span><span class="ident">Data</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
-		<span class="ident">This</span> { <span class="ident">data</span>: <span class="ident">DATA</span>, ..<span class="ident">This::ZERO</span> }
-	}};
-
-	<span class="comment">//  Bit-repetition is agnostic to types, so it only needs two arms.</span>
-
-	(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Mem</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::store::BitStore</span><span class="op">&gt;</span><span class="ident">::Mem</span>;
-
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::mem::elts</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="kw">const</span> <span class="ident">ELEM</span>: <span class="ident">Mem</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__extend_bool!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>);
-		<span class="kw">const</span> <span class="ident">DATA</span>: [<span class="ident">Mem</span>; <span class="ident">ELTS</span>] <span class="op">=</span> [<span class="ident">ELEM</span>; <span class="ident">ELTS</span>];
-
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; <span class="ident">ELTS</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
-		<span class="kw">unsafe</span> { <span class="ident">core::mem::transmute</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">This</span><span class="op">&gt;</span>(<span class="ident">DATA</span>) }
-	}};
-	(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;Data, <span class="macro-nonterminal">$order</span>&gt;;
+		This { data: DATA, ..This::ZERO }
 	}};
 
-	(<span class="kw">const</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
+	<span class="comment">//  Bit-repetition is agnostic to types, so it only needs two arms.
+
+	</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Mem = &lt;<span class="macro-nonterminal">$store </span><span class="kw">as </span><span class="macro-nonterminal">$crate::store::BitStore</span>&gt;::Mem;
+
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$crate::mem::elts</span>::&lt;<span class="macro-nonterminal">$store</span>&gt;(<span class="macro-nonterminal">$len</span>);
+		<span class="kw">const </span>ELEM: Mem = <span class="macro-nonterminal">$</span><span class="macro">crate::__extend_bool!</span>(<span class="macro-nonterminal">$val</span>, <span class="macro-nonterminal">$store</span>);
+		<span class="kw">const </span>DATA: [Mem; ELTS] = [ELEM; ELTS];
+
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;[<span class="macro-nonterminal">$store</span>; ELTS], <span class="macro-nonterminal">$order</span>&gt;;
+		<span class="kw">unsafe </span>{ core::mem::transmute::&lt;<span class="kw">_</span>, This&gt;(DATA) }
+	}};
+	(<span class="kw">const </span><span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
+	}};
+
+	(<span class="kw">const </span>$(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	}};
 
 	<span class="comment">/* Non-`const` constructors.
@@ -457,9 +457,9 @@
 	 * These expansions are allowed to produce code that does not run in `const`
 	 * contexts. While it is *likely* that the expansions will be evaluated at
 	 * compile-time, they won’t do so while the `const` engine is active.
-	 */</span>
+	 */
 
-	<span class="comment">/* Bit-sequence encoding.
+	/* Bit-sequence encoding.
 	 *
 	 * This requires four arms to the `const` section’s one, because of how both
 	 * the ordering and storage arguments may be provided. As macros operate
@@ -475,258 +475,258 @@
 	 * `Cell&lt;$store&gt;` uses literal detection to extract the interior type width.
 	 * This cannot be done by `:ty` or `:path`, as these are opaque, and
 	 * `:ident` does not match `Cell&lt;_&gt;`.
-	 */</span>
+	 */
 
-	(<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
+	</span>(Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
 
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> [<span class="ident">Celled</span>; <span class="ident">ELTS</span>];
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span><span class="ident">Data</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>Data = [Celled; ELTS];
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;Data, <span class="macro-nonterminal">$order</span>&gt;;
 
-		<span class="ident">This::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>))
+		This::new(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>))
 	}};
-	(<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
+	(Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
 
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span>[<span class="ident">Celled</span>; <span class="ident">ELTS</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;[Celled; ELTS], <span class="macro-nonterminal">$order</span>&gt;;
 
-		<span class="ident">This::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>))
-	}};
-
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; <span class="ident">ELTS</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
-
-		<span class="ident">This::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>))
-	}};
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">ELTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">type</span> <span class="ident">This</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::array::BitArray</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>; <span class="ident">ELTS</span>], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>;
-
-		<span class="ident">This::new</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>))
+		This::new(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>))
 	}};
 
+	(<span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;[<span class="macro-nonterminal">$store</span>; ELTS], <span class="macro-nonterminal">$order</span>&gt;;
 
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+		This::new(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>))
 	}};
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+	(<span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>ELTS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count_elts!</span>(<span class="macro-nonterminal">$store</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">type </span>This = <span class="macro-nonterminal">$crate::array::BitArray</span>&lt;[<span class="macro-nonterminal">$store</span>; ELTS], <span class="macro-nonterminal">$order</span>&gt;;
+
+		This::new(<span class="macro-nonterminal">$</span><span class="macro">crate::__encode_bits!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>))
 	}};
-	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
+
+
+	(<span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
+	}};
+	(<span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
+	}};
+	($(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	};
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bits.md&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">bits</span> {
+<span class="attribute">#[macro_export]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bits.md&quot;</span>)]
+</span><span class="macro">macro_rules! </span>bits {
 	<span class="comment">/* `&amp;&#39;static` constructors.
 	 *
 	 * Like the `bitarr!(const …)` arms, these arms must expand to code that is
 	 * valid in `const` contexts. As such, they can only accept `$order`
 	 * arguments that are one of the `LocalBits`, `Lsb0`, or `Msb0` literals.
 	 * Once the underlying `static BitArray` is created,
-	 */</span>
-	(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
-		<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="ident">Celled</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		 <span class="kw-2">&amp;mut</span> <span class="ident">DATA</span>[.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>]
+	 */
+	</span>(<span class="kw">static </span><span class="kw-2">mut </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
+		<span class="kw">static </span><span class="kw-2">mut </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span>Celled, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		 <span class="kw-2">&amp;mut </span>DATA[.. <span class="macro-nonterminal">$len</span>]
 	}};
-	(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="ident">DATA</span>.<span class="ident">get_unchecked_mut</span>(.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+	(<span class="kw">static </span><span class="kw-2">mut </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">static </span><span class="kw-2">mut </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		DATA.get_unchecked_mut(.. <span class="macro-nonterminal">$len</span>)
 	}};
 
-	(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
+	(<span class="kw">static </span><span class="kw-2">mut </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
 
-		<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">BITS</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(
-			<span class="ident">DATA</span>.<span class="ident">get_unchecked_mut</span>(.. <span class="ident">BITS</span>)
-				<span class="kw">as</span> <span class="kw-2">*mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
-				<span class="kw">as</span> <span class="kw-2">*mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="ident">Celled</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
+		<span class="kw">static </span><span class="kw-2">mut </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">BITS</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;mut *</span>(
+			DATA.get_unchecked_mut(.. BITS)
+				<span class="kw">as </span><span class="kw-2">*mut </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>&gt;
+				<span class="kw">as </span><span class="kw-2">*mut </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;Celled, <span class="macro-nonterminal">$order</span>&gt;
 		)
 	}};
-	(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">BITS</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="ident">DATA</span>.<span class="ident">get_unchecked_mut</span>(.. <span class="ident">BITS</span>)
+	(<span class="kw">static </span><span class="kw-2">mut </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">static </span><span class="kw-2">mut </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">BITS</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		DATA.get_unchecked_mut(.. BITS)
 	}};
 
-	(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="ident">DATA</span>.<span class="ident">get_unchecked_mut</span>(.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+	(<span class="kw">static </span><span class="kw-2">mut </span><span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">static </span><span class="kw-2">mut </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		DATA.get_unchecked_mut(.. <span class="macro-nonterminal">$len</span>)
 	}};
-	(<span class="kw">static</span> <span class="kw-2">mut</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw">static</span> <span class="kw-2">mut</span> <span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
+	(<span class="kw">static </span><span class="kw-2">mut </span>$(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw">static </span><span class="kw-2">mut </span><span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	}};
 
-	(<span class="kw">static</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
-		<span class="kw">static</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw-2">&amp;</span><span class="kw-2">*</span>(
-				<span class="ident">DATA</span>.<span class="ident">get_unchecked</span>(.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
-					<span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
-					<span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="ident">Celled</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
+	(<span class="kw">static </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
+		<span class="kw">static </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw-2">&amp;*</span>(
+				DATA.get_unchecked(.. <span class="macro-nonterminal">$len</span>)
+					<span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>&gt;
+					<span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;Celled, <span class="macro-nonterminal">$order</span>&gt;
 			)
 		}
 	}};
-	(<span class="kw">static</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::macros::internal::core</span>;
-		<span class="kw">type</span> <span class="ident">Celled</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>;
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
+	(<span class="kw">static </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">use </span><span class="macro-nonterminal">$crate::macros::internal::core</span>;
+		<span class="kw">type </span>Celled = core::cell::Cell&lt;<span class="macro-nonterminal">$store</span>&gt;;
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
 
-		<span class="kw">static</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">BITS</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">unsafe</span> {
-			<span class="kw-2">&amp;</span><span class="kw-2">*</span>(
-				<span class="ident">DATA</span>.<span class="ident">get_unchecked</span>(.. <span class="ident">BITS</span>)
-					<span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
-					<span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::slice::BitSlice</span><span class="op">&lt;</span><span class="ident">Celled</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span>
+		<span class="kw">static </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">BITS</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">unsafe </span>{
+			<span class="kw-2">&amp;*</span>(
+				DATA.get_unchecked(.. BITS)
+					<span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>&gt;
+					<span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::slice::BitSlice</span>&lt;Celled, <span class="macro-nonterminal">$order</span>&gt;
 			)
 		}
 	}};
 
-	(<span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">static</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="kw">unsafe</span> { <span class="ident">DATA</span>.<span class="ident">get_unchecked</span>(.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>) }
+	(<span class="kw">static </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">static </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		<span class="kw">unsafe </span>{ DATA.get_unchecked(.. <span class="macro-nonterminal">$len</span>) }
 	}};
-	(<span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw">static</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>);
-		<span class="kw">unsafe</span> { <span class="ident">DATA</span>.<span class="ident">get_unchecked</span>(.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>) }
-	}};
-
-	(<span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">static</span> <span class="ident">DATA</span>: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for</span> <span class="macro-nonterminal">BITS</span>, <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>) <span class="op">=</span>
-			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw">unsafe</span> { <span class="ident">DATA</span>.<span class="ident">get_unchecked</span>(.. <span class="ident">BITS</span>) }
-	}};
-	(<span class="kw">static</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw">static</span> <span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
+	(<span class="kw">static </span><span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw">static </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">$len</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>);
+		<span class="kw">unsafe </span>{ DATA.get_unchecked(.. <span class="macro-nonterminal">$len</span>) }
 	}};
 
-	<span class="comment">//  Repetition syntax `[bit ; count]`.</span>
-	<span class="comment">//  NOTE: `count` must be a `const`, as this is a non-allocating macro.</span>
-
-	<span class="comment">//  Sequence syntax `[bit (, bit)*]` or `[(bit ,)*]`.</span>
-
-	<span class="comment">//  Explicit order and store.</span>
-
-	(<span class="kw-2">mut</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	(<span class="kw">static </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">static </span>DATA: <span class="macro-nonterminal">$</span><span class="macro">crate::BitArr!</span>(<span class="kw">for </span><span class="macro-nonterminal">BITS</span>, <span class="kw">in </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>) =
+			<span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="kw">const </span><span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw">unsafe </span>{ DATA.get_unchecked(.. BITS) }
 	}};
-	(<span class="kw-2">mut</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	(<span class="kw">static </span>$(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw">static </span><span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	}};
 
-	(<span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	<span class="comment">//  Repetition syntax `[bit ; count]`.
+	//  NOTE: `count` must be a `const`, as this is a non-allocating macro.
+
+	//  Sequence syntax `[bit (, bit)*]` or `[(bit ,)*]`.
+
+	//  Explicit order and store.
+
+	</span>(<span class="kw-2">mut </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
 	}};
-	(<span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	(<span class="kw-2">mut </span>Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
 	}};
 
-	<span class="comment">//  Explicit order and store.</span>
-	(<span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)[.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>]
+	(<span class="kw-2">mut </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
 	}};
-	<span class="comment">//  Default order and store.</span>
-	(<span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw-2">mut</span> <span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+	(<span class="kw-2">mut </span><span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
+	}};
+
+	<span class="comment">//  Explicit order and store.
+	</span>(<span class="kw-2">mut </span><span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)[.. <span class="macro-nonterminal">$len</span>]
+	}};
+	<span class="comment">//  Default order and store.
+	</span>(<span class="kw-2">mut </span><span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw-2">mut </span><span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
 	};
 
-	<span class="comment">//  Default order and store.</span>
-	(<span class="kw-2">mut</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw-2">mut</span> <span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
+	<span class="comment">//  Default order and store.
+	</span>(<span class="kw-2">mut </span>$(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="kw-2">mut </span><span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	};
 
-	<span class="comment">//  Repeat everything from above, but now immutable.</span>
+	<span class="comment">//  Repeat everything from above, but now immutable.
 
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {{
-		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)[.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>]
+	</span>(<span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {{
+		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)[.. <span class="macro-nonterminal">$len</span>]
 	}};
 
-	(<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	(Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
 	}};
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
-	}};
-
-	(<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
-	}};
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">path</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {{
-		<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>);
-		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)[.. <span class="ident">BITS</span>]
+	(<span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:ident; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
 	}};
 
-	<span class="comment">//  Default order and store.</span>
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
-	};
-	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">usize</span>, <span class="ident">Lsb0</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>),<span class="kw-2">*</span>)
-	};
-}
+	(Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
+	}};
+	(<span class="macro-nonterminal">$store</span>:ident, <span class="macro-nonterminal">$order</span>:path; $(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {{
+		<span class="kw">const </span>BITS: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::__count!</span>($(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>);
+		<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro">crate::bitarr!</span>(<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)[.. BITS]
+	}};
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitvec.md&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">bitvec</span> {
-	<span class="comment">//  First, capture the repetition syntax, as it is permitted to use runtime</span>
-	<span class="comment">//  values for the repetition count.</span>
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ty</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::vec::BitVec</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span><span class="op">&gt;</span><span class="ident">::repeat</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
+	<span class="comment">//  Default order and store.
+	</span>(<span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
 	};
-	<span class="comment">// Capture `Cell&lt;T&gt;` patterns and prevent them from being parsed as</span>
-	<span class="comment">// comparisons. Guess we didn&#39;t escape Most Vexing Parse after all.</span>
-	(<span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span>:<span class="ident">ident</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span>:<span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::vec::BitVec::from_bitslice</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">store</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">order</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>))
-	};
-	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitvec!</span>(<span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::order::Lsb0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>)
-	};
-
-	<span class="comment">//  Delegate all others to the `bits!` macro.</span>
-	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::vec::BitVec::from_bitslice</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>))
+	($(<span class="macro-nonterminal">$val</span>:expr),* $(,)<span class="question-mark">?</span>) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">usize</span>, Lsb0; $(<span class="macro-nonterminal">$val</span>),<span class="kw-2">*</span>)
 	};
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitbox.md&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">bitbox</span> {
-	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-		<span class="macro-nonterminal">$</span><span class="macro">crate::bitvec!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>).<span class="ident">into_boxed_bitslice</span>()
+<span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitvec.md&quot;</span>)]
+</span><span class="macro">macro_rules! </span>bitvec {
+	<span class="comment">//  First, capture the repetition syntax, as it is permitted to use runtime
+	//  values for the repetition count.
+	</span>(<span class="macro-nonterminal">$store</span>:ty, <span class="macro-nonterminal">$order</span>:ty; <span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {
+		<span class="macro-nonterminal">$crate::vec::BitVec</span>::&lt;<span class="macro-nonterminal">$store</span>, <span class="macro-nonterminal">$order</span>&gt;::repeat(<span class="macro-nonterminal">$val </span>!= <span class="number">0</span>, <span class="macro-nonterminal">$len</span>)
+	};
+	<span class="comment">// Capture `Cell&lt;T&gt;` patterns and prevent them from being parsed as
+	// comparisons. Guess we didn&#39;t escape Most Vexing Parse after all.
+	</span>(Cell&lt;<span class="macro-nonterminal">$store</span>:ident&gt;, <span class="macro-nonterminal">$order</span>:ident $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {
+		<span class="macro-nonterminal">$crate::vec::BitVec::from_bitslice</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>(<span class="macro-nonterminal">Cell</span>&lt;<span class="macro-nonterminal">$store</span>&gt;, <span class="macro-nonterminal">$order </span>$(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>))
+	};
+	(<span class="macro-nonterminal">$val</span>:expr; <span class="macro-nonterminal">$len</span>:expr) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitvec!</span>(<span class="macro-nonterminal">usize</span>, <span class="macro-nonterminal">$crate::order::Lsb0</span>; <span class="macro-nonterminal">$val</span>; <span class="macro-nonterminal">$len</span>)
+	};
+
+	<span class="comment">//  Delegate all others to the `bits!` macro.
+	</span>($(<span class="macro-nonterminal">$arg</span>:tt)<span class="kw-2">*</span>) =&gt; {
+		<span class="macro-nonterminal">$crate::vec::BitVec::from_bitslice</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::bits!</span>($(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>))
+	};
+}
+
+<span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/macros/bitbox.md&quot;</span>)]
+</span><span class="macro">macro_rules! </span>bitbox {
+	($(<span class="macro-nonterminal">$arg</span>:tt)<span class="kw-2">*</span>) =&gt; {
+		<span class="macro-nonterminal">$</span><span class="macro">crate::bitvec!</span>($(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>).into_boxed_bitslice()
 	};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/notification.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>notification.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/notification.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>notification.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -328,310 +328,310 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::DeserializeOwned</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{de::DeserializeOwned, Serialize};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Notification</span> {
-    <span class="kw">type</span> <span class="ident">Params</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Serialize</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+<span class="kw">pub trait </span>Notification {
+    <span class="kw">type </span>Params: DeserializeOwned + Serialize;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">lsp_notification</span> {
+<span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>lsp_notification {
     (<span class="string">&quot;$/cancelRequest&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::Cancel</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::Cancel
+    </span>};
     (<span class="string">&quot;initialized&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::Initialized</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::Initialized
+    </span>};
     (<span class="string">&quot;exit&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::Exit</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::Exit
+    </span>};
 
     (<span class="string">&quot;window/showMessage&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::ShowMessage</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::ShowMessage
+    </span>};
     (<span class="string">&quot;window/logMessage&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::LogMessage</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::LogMessage
+    </span>};
     (<span class="string">&quot;window/workDoneProgress/cancel&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::WorkDoneProgressCancel</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::WorkDoneProgressCancel
+    </span>};
 
     (<span class="string">&quot;telemetry/event&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::TelemetryEvent</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::TelemetryEvent
+    </span>};
 
     (<span class="string">&quot;textDocument/didOpen&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidOpenTextDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidOpenTextDocument
+    </span>};
     (<span class="string">&quot;textDocument/didChange&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidChangeTextDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidChangeTextDocument
+    </span>};
     (<span class="string">&quot;textDocument/willSave&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::WillSaveTextDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::WillSaveTextDocument
+    </span>};
     (<span class="string">&quot;textDocument/didSave&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidSaveTextDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidSaveTextDocument
+    </span>};
     (<span class="string">&quot;textDocument/didClose&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidCloseTextDocument</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidCloseTextDocument
+    </span>};
     (<span class="string">&quot;textDocument/publishDiagnostics&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::PublishDiagnostics</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::PublishDiagnostics
+    </span>};
 
     (<span class="string">&quot;workspace/didChangeConfiguration&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidChangeConfiguration</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidChangeConfiguration
+    </span>};
     (<span class="string">&quot;workspace/didChangeWatchedFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidChangeWatchedFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidChangeWatchedFiles
+    </span>};
     (<span class="string">&quot;workspace/didChangeWorkspaceFolders&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidChangeWorkspaceFolders</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidChangeWorkspaceFolders
+    </span>};
     (<span class="string">&quot;$/progress&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::Progress</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::Progress
+    </span>};
     (<span class="string">&quot;workspace/didCreateFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidCreateFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidCreateFiles
+    </span>};
     (<span class="string">&quot;workspace/didRenameFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidRenameFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidRenameFiles
+    </span>};
     (<span class="string">&quot;workspace/didDeleteFiles&quot;</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::notification::DidDeleteFiles</span>
-    };
+        <span class="macro-nonterminal">$crate::notification::DidDeleteFiles
+    </span>};
 }
 
-<span class="doccomment">/// The base protocol now offers support for request cancellation. To cancel a request,</span>
-<span class="doccomment">/// a notification message with the following properties is sent:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A request that got canceled still needs to return from the server and send a response back.</span>
-<span class="doccomment">/// It can not be left open / hanging. This is in line with the JSON RPC protocol that requires</span>
-<span class="doccomment">/// that every request sends a response back. In addition it allows for returning partial results on cancel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Cancel</span> {}
+<span class="doccomment">/// The base protocol now offers support for request cancellation. To cancel a request,
+/// a notification message with the following properties is sent:
+///
+/// A request that got canceled still needs to return from the server and send a response back.
+/// It can not be left open / hanging. This is in line with the JSON RPC protocol that requires
+/// that every request sends a response back. In addition it allows for returning partial results on cancel.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Cancel {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">Cancel</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CancelParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$/cancelRequest&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>Cancel {
+    <span class="kw">type </span>Params = CancelParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;$/cancelRequest&quot;</span>;
 }
 
-<span class="doccomment">/// The initialized notification is sent from the client to the server after the client received</span>
-<span class="doccomment">/// the result of the initialize request but before the client is sending any other request or</span>
-<span class="doccomment">/// notification to the server. The server can use the initialized notification for example to</span>
-<span class="doccomment">/// dynamically register capabilities.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Initialized</span> {}
+<span class="doccomment">/// The initialized notification is sent from the client to the server after the client received
+/// the result of the initialize request but before the client is sending any other request or
+/// notification to the server. The server can use the initialized notification for example to
+/// dynamically register capabilities.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Initialized {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">Initialized</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">InitializedParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;initialized&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>Initialized {
+    <span class="kw">type </span>Params = InitializedParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;initialized&quot;</span>;
 }
 
-<span class="doccomment">/// A notification to ask the server to exit its process.</span>
-<span class="doccomment">/// The server should exit with success code 0 if the shutdown request has been received before;</span>
-<span class="doccomment">/// otherwise with error code 1.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Exit</span> {}
+<span class="doccomment">/// A notification to ask the server to exit its process.
+/// The server should exit with success code 0 if the shutdown request has been received before;
+/// otherwise with error code 1.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Exit {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">Exit</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> ();
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;exit&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>Exit {
+    <span class="kw">type </span>Params = ();
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;exit&quot;</span>;
 }
 
-<span class="doccomment">/// The show message notification is sent from a server to a client to ask the client to display a particular message</span>
-<span class="doccomment">/// in the user interface.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShowMessage</span> {}
+<span class="doccomment">/// The show message notification is sent from a server to a client to ask the client to display a particular message
+/// in the user interface.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ShowMessage {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">ShowMessage</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ShowMessageParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/showMessage&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>ShowMessage {
+    <span class="kw">type </span>Params = ShowMessageParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/showMessage&quot;</span>;
 }
 
-<span class="doccomment">/// The log message notification is sent from the server to the client to ask the client to log a particular message.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LogMessage</span> {}
+<span class="doccomment">/// The log message notification is sent from the server to the client to ask the client to log a particular message.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>LogMessage {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">LogMessage</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">LogMessageParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/logMessage&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>LogMessage {
+    <span class="kw">type </span>Params = LogMessageParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/logMessage&quot;</span>;
 }
 
-<span class="doccomment">/// The telemetry notification is sent from the server to the client to ask the client to log a telemetry event.</span>
-<span class="doccomment">/// The protocol doesn&#39;t specify the payload since no interpretation of the data happens in the protocol. Most clients even don&#39;t handle</span>
-<span class="doccomment">/// the event directly but forward them to the extensions owning the corresponding server issuing the event.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TelemetryEvent</span> {}
+<span class="doccomment">/// The telemetry notification is sent from the server to the client to ask the client to log a telemetry event.
+/// The protocol doesn&#39;t specify the payload since no interpretation of the data happens in the protocol. Most clients even don&#39;t handle
+/// the event directly but forward them to the extensions owning the corresponding server issuing the event.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TelemetryEvent {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">TelemetryEvent</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">serde_json::Value</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;telemetry/event&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>TelemetryEvent {
+    <span class="kw">type </span>Params = serde_json::Value;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;telemetry/event&quot;</span>;
 }
 
-<span class="doccomment">/// A notification sent from the client to the server to signal the change of configuration settings.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidChangeConfiguration</span> {}
+<span class="doccomment">/// A notification sent from the client to the server to signal the change of configuration settings.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidChangeConfiguration {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidChangeConfiguration</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidChangeConfigurationParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didChangeConfiguration&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidChangeConfiguration {
+    <span class="kw">type </span>Params = DidChangeConfigurationParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didChangeConfiguration&quot;</span>;
 }
 
-<span class="doccomment">/// The document open notification is sent from the client to the server to signal newly opened text documents.</span>
-<span class="doccomment">/// The document&#39;s truth is now managed by the client and the server must not try to read the document&#39;s truth</span>
-<span class="doccomment">/// using the document&#39;s uri.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidOpenTextDocument</span> {}
+<span class="doccomment">/// The document open notification is sent from the client to the server to signal newly opened text documents.
+/// The document&#39;s truth is now managed by the client and the server must not try to read the document&#39;s truth
+/// using the document&#39;s uri.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidOpenTextDocument {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidOpenTextDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidOpenTextDocumentParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/didOpen&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidOpenTextDocument {
+    <span class="kw">type </span>Params = DidOpenTextDocumentParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/didOpen&quot;</span>;
 }
 
-<span class="doccomment">/// The document change notification is sent from the client to the server to signal changes to a text document.</span>
-<span class="doccomment">/// In 2.0 the shape of the params has changed to include proper version numbers and language ids.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidChangeTextDocument</span> {}
+<span class="doccomment">/// The document change notification is sent from the client to the server to signal changes to a text document.
+/// In 2.0 the shape of the params has changed to include proper version numbers and language ids.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidChangeTextDocument {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidChangeTextDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidChangeTextDocumentParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/didChange&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidChangeTextDocument {
+    <span class="kw">type </span>Params = DidChangeTextDocumentParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/didChange&quot;</span>;
 }
 
-<span class="doccomment">/// The document will save notification is sent from the client to the server before the document</span>
-<span class="doccomment">/// is actually saved.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WillSaveTextDocument</span> {}
+<span class="doccomment">/// The document will save notification is sent from the client to the server before the document
+/// is actually saved.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WillSaveTextDocument {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">WillSaveTextDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">WillSaveTextDocumentParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/willSave&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>WillSaveTextDocument {
+    <span class="kw">type </span>Params = WillSaveTextDocumentParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/willSave&quot;</span>;
 }
 
-<span class="doccomment">/// The document close notification is sent from the client to the server when the document got closed in the client.</span>
-<span class="doccomment">/// The document&#39;s truth now exists where the document&#39;s uri points to (e.g. if the document&#39;s uri is a file uri</span>
-<span class="doccomment">/// the truth now exists on disk).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidCloseTextDocument</span> {}
+<span class="doccomment">/// The document close notification is sent from the client to the server when the document got closed in the client.
+/// The document&#39;s truth now exists where the document&#39;s uri points to (e.g. if the document&#39;s uri is a file uri
+/// the truth now exists on disk).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidCloseTextDocument {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidCloseTextDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidCloseTextDocumentParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/didClose&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidCloseTextDocument {
+    <span class="kw">type </span>Params = DidCloseTextDocumentParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/didClose&quot;</span>;
 }
 
-<span class="doccomment">/// The document save notification is sent from the client to the server when the document was saved in the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidSaveTextDocument</span> {}
+<span class="doccomment">/// The document save notification is sent from the client to the server when the document was saved in the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidSaveTextDocument {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidSaveTextDocument</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidSaveTextDocumentParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/didSave&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidSaveTextDocument {
+    <span class="kw">type </span>Params = DidSaveTextDocumentParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/didSave&quot;</span>;
 }
 
-<span class="doccomment">/// The watched files notification is sent from the client to the server when the client detects changes to files and folders</span>
-<span class="doccomment">/// watched by the language client (note although the name suggest that only file events are sent it is about file system events which include folders as well).</span>
-<span class="doccomment">/// It is recommended that servers register for these file system events using the registration mechanism.</span>
-<span class="doccomment">/// In former implementations clients pushed file events without the server actively asking for it.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidChangeWatchedFiles</span> {}
+<span class="doccomment">/// The watched files notification is sent from the client to the server when the client detects changes to files and folders
+/// watched by the language client (note although the name suggest that only file events are sent it is about file system events which include folders as well).
+/// It is recommended that servers register for these file system events using the registration mechanism.
+/// In former implementations clients pushed file events without the server actively asking for it.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidChangeWatchedFiles {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidChangeWatchedFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidChangeWatchedFilesParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didChangeWatchedFiles&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidChangeWatchedFiles {
+    <span class="kw">type </span>Params = DidChangeWatchedFilesParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didChangeWatchedFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The workspace/didChangeWorkspaceFolders notification is sent from the client to the server to inform the server</span>
-<span class="doccomment">/// about workspace folder configuration changes</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidChangeWorkspaceFolders</span> {}
+<span class="doccomment">/// The workspace/didChangeWorkspaceFolders notification is sent from the client to the server to inform the server
+/// about workspace folder configuration changes
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidChangeWorkspaceFolders {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidChangeWorkspaceFolders</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DidChangeWorkspaceFoldersParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didChangeWorkspaceFolders&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidChangeWorkspaceFolders {
+    <span class="kw">type </span>Params = DidChangeWorkspaceFoldersParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didChangeWorkspaceFolders&quot;</span>;
 }
 
-<span class="doccomment">/// Diagnostics notification are sent from the server to the client to signal results of validation runs.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PublishDiagnostics</span> {}
+<span class="doccomment">/// Diagnostics notification are sent from the server to the client to signal results of validation runs.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>PublishDiagnostics {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">PublishDiagnostics</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">PublishDiagnosticsParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;textDocument/publishDiagnostics&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>PublishDiagnostics {
+    <span class="kw">type </span>Params = PublishDiagnosticsParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;textDocument/publishDiagnostics&quot;</span>;
 }
 
-<span class="doccomment">/// The progress notification is sent from the server to the client to ask</span>
-<span class="doccomment">/// the client to indicate progress.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Progress</span> {}
+<span class="doccomment">/// The progress notification is sent from the server to the client to ask
+/// the client to indicate progress.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Progress {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">Progress</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">ProgressParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$/progress&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>Progress {
+    <span class="kw">type </span>Params = ProgressParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;$/progress&quot;</span>;
 }
 
-<span class="doccomment">/// The `window/workDoneProgress/cancel` notification is sent from the client</span>
-<span class="doccomment">/// to the server to cancel a progress initiated on the server side using the `window/workDoneProgress/create`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WorkDoneProgressCancel</span> {}
+<span class="doccomment">/// The `window/workDoneProgress/cancel` notification is sent from the client
+/// to the server to cancel a progress initiated on the server side using the `window/workDoneProgress/create`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>WorkDoneProgressCancel {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">WorkDoneProgressCancel</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">WorkDoneProgressCancelParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;window/workDoneProgress/cancel&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>WorkDoneProgressCancel {
+    <span class="kw">type </span>Params = WorkDoneProgressCancelParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;window/workDoneProgress/cancel&quot;</span>;
 }
 
-<span class="doccomment">/// The did create files notification is sent from the client to the server when files were created from within the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidCreateFiles</span> {}
+<span class="doccomment">/// The did create files notification is sent from the client to the server when files were created from within the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidCreateFiles {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidCreateFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">CreateFilesParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didCreateFiles&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidCreateFiles {
+    <span class="kw">type </span>Params = CreateFilesParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didCreateFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The did rename files notification is sent from the client to the server when files were renamed from within the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidRenameFiles</span> {}
+<span class="doccomment">/// The did rename files notification is sent from the client to the server when files were renamed from within the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidRenameFiles {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidRenameFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">RenameFilesParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didRenameFiles&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidRenameFiles {
+    <span class="kw">type </span>Params = RenameFilesParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didRenameFiles&quot;</span>;
 }
 
-<span class="doccomment">/// The did delete files notification is sent from the client to the server when files were deleted from within the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DidDeleteFiles</span> {}
+<span class="doccomment">/// The did delete files notification is sent from the client to the server when files were deleted from within the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>DidDeleteFiles {}
 
-<span class="kw">impl</span> <span class="ident">Notification</span> <span class="kw">for</span> <span class="ident">DidDeleteFiles</span> {
-    <span class="kw">type</span> <span class="ident">Params</span> <span class="op">=</span> <span class="ident">DeleteFilesParams</span>;
-    <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;workspace/didDeleteFiles&quot;</span>;
+<span class="kw">impl </span>Notification <span class="kw">for </span>DidDeleteFiles {
+    <span class="kw">type </span>Params = DeleteFilesParams;
+    <span class="kw">const </span>METHOD: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;workspace/didDeleteFiles&quot;</span>;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">fake_call</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>()
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">Notification</span>,
-        <span class="ident">N::Params</span>: <span class="ident">serde::Serialize</span>,
+    <span class="kw">fn </span>fake_call&lt;N&gt;()
+    <span class="kw">where
+        </span>N: Notification,
+        N::Params: serde::Serialize,
     {
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">check_macro</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">tt</span>) =&gt; {
-            <span class="comment">// check whether the macro name matches the method</span>
-            <span class="macro">assert_eq!</span>(<span class="op">&lt;</span><span class="macro">lsp_notification!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="kw">as</span> <span class="ident">Notification</span><span class="op">&gt;</span><span class="ident">::METHOD</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
-            <span class="comment">// test whether type checking passes for each component</span>
-            <span class="ident">fake_call</span>::<span class="op">&lt;</span><span class="macro">lsp_notification!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)<span class="op">&gt;</span>();
+    <span class="macro">macro_rules! </span>check_macro {
+        (<span class="macro-nonterminal">$name</span>:tt) =&gt; {
+            <span class="comment">// check whether the macro name matches the method
+            </span><span class="macro">assert_eq!</span>(&lt;<span class="macro">lsp_notification!</span>(<span class="macro-nonterminal">$name</span>) <span class="kw">as </span>Notification&gt;::METHOD, <span class="macro-nonterminal">$name</span>);
+            <span class="comment">// test whether type checking passes for each component
+            </span>fake_call::&lt;<span class="macro">lsp_notification!</span>(<span class="macro-nonterminal">$name</span>)&gt;();
         };
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">check_macro_definitions</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>check_macro_definitions() {
         <span class="macro">check_macro!</span>(<span class="string">&quot;$/cancelRequest&quot;</span>);
         <span class="macro">check_macro!</span>(<span class="string">&quot;$/progress&quot;</span>);
         <span class="macro">check_macro!</span>(<span class="string">&quot;initialized&quot;</span>);
@@ -654,9 +654,9 @@
         <span class="macro">check_macro!</span>(<span class="string">&quot;workspace/didDeleteFiles&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;proposed&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">check_proposed_macro_definitions</span>() {}
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;proposed&quot;</span>)]
+    </span><span class="kw">fn </span>check_proposed_macro_definitions() {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

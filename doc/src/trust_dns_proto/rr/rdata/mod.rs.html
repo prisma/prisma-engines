@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -65,44 +65,44 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! All record data structures and related serialization methods</span>
+</span><span class="doccomment">//! All record data structures and related serialization methods
 
-<span class="comment">// TODO: these should each be it&#39;s own struct, it would make parsing and decoding a little cleaner</span>
-<span class="comment">//  and also a little more ergonomic when accessing.</span>
-<span class="comment">// each of these module&#39;s has the parser for that rdata embedded, to keep the file sizes down...</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">a</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">aaaa</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">caa</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">csync</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hinfo</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mx</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">name</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">naptr</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">null</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">openpgpkey</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">opt</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">soa</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">srv</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sshfp</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">svcb</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tlsa</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">txt</span>;
+</span><span class="comment">// TODO: these should each be it&#39;s own struct, it would make parsing and decoding a little cleaner
+//  and also a little more ergonomic when accessing.
+// each of these module&#39;s has the parser for that rdata embedded, to keep the file sizes down...
+</span><span class="kw">pub mod </span>a;
+<span class="kw">pub mod </span>aaaa;
+<span class="kw">pub mod </span>caa;
+<span class="kw">pub mod </span>csync;
+<span class="kw">pub mod </span>hinfo;
+<span class="kw">pub mod </span>mx;
+<span class="kw">pub mod </span>name;
+<span class="kw">pub mod </span>naptr;
+<span class="kw">pub mod </span>null;
+<span class="kw">pub mod </span>openpgpkey;
+<span class="kw">pub mod </span>opt;
+<span class="kw">pub mod </span>soa;
+<span class="kw">pub mod </span>srv;
+<span class="kw">pub mod </span>sshfp;
+<span class="kw">pub mod </span>svcb;
+<span class="kw">pub mod </span>tlsa;
+<span class="kw">pub mod </span>txt;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::caa::CAA</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::csync::CSYNC</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::hinfo::HINFO</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::mx::MX</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::naptr::NAPTR</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::null::NULL</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::openpgpkey::OPENPGPKEY</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::opt::OPT</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::soa::SOA</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::srv::SRV</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sshfp::SSHFP</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::svcb::SVCB</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::tlsa::TLSA</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::txt::TXT</span>;
+<span class="kw">pub use </span><span class="self">self</span>::caa::CAA;
+<span class="kw">pub use </span><span class="self">self</span>::csync::CSYNC;
+<span class="kw">pub use </span><span class="self">self</span>::hinfo::HINFO;
+<span class="kw">pub use </span><span class="self">self</span>::mx::MX;
+<span class="kw">pub use </span><span class="self">self</span>::naptr::NAPTR;
+<span class="kw">pub use </span><span class="self">self</span>::null::NULL;
+<span class="kw">pub use </span><span class="self">self</span>::openpgpkey::OPENPGPKEY;
+<span class="kw">pub use </span><span class="self">self</span>::opt::OPT;
+<span class="kw">pub use </span><span class="self">self</span>::soa::SOA;
+<span class="kw">pub use </span><span class="self">self</span>::srv::SRV;
+<span class="kw">pub use </span><span class="self">self</span>::sshfp::SSHFP;
+<span class="kw">pub use </span><span class="self">self</span>::svcb::SVCB;
+<span class="kw">pub use </span><span class="self">self</span>::tlsa::TLSA;
+<span class="kw">pub use </span><span class="self">self</span>::txt::TXT;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

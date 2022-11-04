@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/disconnect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/disconnect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -95,102 +95,102 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use</span> <span class="ident">prisma_models::RelationFieldRef</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>prisma_models::RelationFieldRef;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Only for many to many relations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Creates a disconnect node in the graph and creates edges to `parent_node` and `child_node`.</span>
-<span class="doccomment">/// By default, the connect node assumes that both the parent and the child node results</span>
-<span class="doccomment">/// are convertible to IDs, as the edges perform a transformation on the connect node to</span>
-<span class="doccomment">/// inject the required IDs after the parents executed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting graph (dashed indicates that those nodes and edges are not created in this function):</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// ┌──      Parent       ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │                              │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           ▼                  ▼</span>
-<span class="doccomment">/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐  ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │         Child             Result   │</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘  └ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           ▼</span>
-<span class="doccomment">/// │  ┌─────────────────┐</span>
-<span class="doccomment">/// └─▶│   Disconnect    │</span>
-<span class="doccomment">///    └─────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disconnect_records_node</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> {
-    <span class="macro">assert!</span>(<span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>());
+<span class="doccomment">/// Only for many to many relations.
+///
+/// Creates a disconnect node in the graph and creates edges to `parent_node` and `child_node`.
+/// By default, the connect node assumes that both the parent and the child node results
+/// are convertible to IDs, as the edges perform a transformation on the connect node to
+/// inject the required IDs after the parents executed.
+///
+/// The resulting graph (dashed indicates that those nodes and edges are not created in this function):
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent       ─ ─ ─ ─ ─
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │
+/// │           │
+/// │                              │
+/// │           │
+/// │           ▼                  ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐  ┌ ─ ─ ─ ─ ─ ─
+/// │         Child             Result   │
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘  └ ─ ─ ─ ─ ─ ─
+/// │           │
+/// │           │
+/// │           │
+/// │           ▼
+/// │  ┌─────────────────┐
+/// └─▶│   Disconnect    │
+///    └─────────────────┘
+/// ```
+</span><span class="kw">pub fn </span>disconnect_records_node(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    child_node: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+) -&gt; QueryGraphBuilderResult&lt;NodeRef&gt; {
+    <span class="macro">assert!</span>(parent_relation_field.relation().is_many_to_many());
 
-    <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">child_model_id</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+    <span class="kw">let </span>parent_model_id = parent_relation_field.model().primary_identifier();
+    <span class="kw">let </span>child_model_id = parent_relation_field.related_model().primary_identifier();
 
-    <span class="kw">let</span> <span class="ident">disconnect</span> <span class="op">=</span> <span class="ident">WriteQuery::DisconnectRecords</span>(<span class="ident">DisconnectRecords</span> {
-        <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
-        <span class="ident">child_ids</span>: <span class="macro">vec!</span>[],
-        <span class="ident">relation_field</span>: <span class="ident">Arc::clone</span>(<span class="ident">parent_relation_field</span>),
+    <span class="kw">let </span>disconnect = WriteQuery::DisconnectRecords(DisconnectRecords {
+        parent_id: <span class="prelude-val">None</span>,
+        child_ids: <span class="macro">vec!</span>[],
+        relation_field: Arc::clone(parent_relation_field),
     });
 
-    <span class="kw">let</span> <span class="ident">disconnect_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">disconnect</span>));
-    <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>disconnect_node = graph.create_node(Query::Write(disconnect));
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
 
-    <span class="comment">// Edge from parent to disconnect.</span>
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="ident">parent_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">disconnect_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">parent_model_id</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">disconnect_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+    <span class="comment">// Edge from parent to disconnect.
+    </span>graph.create_edge(
+        parent_node,
+        <span class="kw-2">&amp;</span>disconnect_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            parent_model_id,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>disconnect_node, <span class="kw-2">mut </span>parent_ids| {
+                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                         <span class="string">&quot;No parent record was found for a nested disconnect on relation &#39;{}&#39;.&quot;</span>,
-                        <span class="ident">relation_name</span>
+                        relation_name
                     ))),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::DisconnectRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>))) <span class="op">=</span> <span class="ident">disconnect_node</span> {
-                    <span class="ident">c</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parent_id</span>);
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::DisconnectRecords(<span class="kw-2">ref mut </span>c))) = disconnect_node {
+                    c.parent_id = <span class="prelude-val">Some</span>(parent_id);
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">disconnect_node</span>)
+                <span class="prelude-val">Ok</span>(disconnect_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// Edge from child to disconnect.</span>
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">child_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">disconnect_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">child_model_id</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">disconnect_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::DisconnectRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>))) <span class="op">=</span> <span class="ident">disconnect_node</span> {
-                    <span class="ident">c</span>.<span class="ident">child_ids</span> <span class="op">=</span> <span class="ident">child_ids</span>;
+    <span class="comment">// Edge from child to disconnect.
+    </span>graph.create_edge(
+        <span class="kw-2">&amp;</span>child_node,
+        <span class="kw-2">&amp;</span>disconnect_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            child_model_id,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>disconnect_node, child_ids| {
+                <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::DisconnectRecords(<span class="kw-2">ref mut </span>c))) = disconnect_node {
+                    c.child_ids = child_ids;
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">disconnect_node</span>)
+                <span class="prelude-val">Ok</span>(disconnect_node)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">disconnect_node</span>)
+    <span class="prelude-val">Ok</span>(disconnect_node)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

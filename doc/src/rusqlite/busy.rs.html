@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/busy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>busy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/busy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>busy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -174,181 +174,181 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
-</pre><pre class="rust"><code><span class="doccomment">///! Busy handler (when the database is locked)</span>
-<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_int</span>, <span class="ident">c_void</span>};
-<span class="kw">use</span> <span class="ident">std::panic::catch_unwind</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="doccomment">///! Busy handler (when the database is locked)
+</span><span class="kw">use </span>std::convert::TryInto;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::os::raw::{c_int, c_void};
+<span class="kw">use </span>std::panic::catch_unwind;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="ident">InnerConnection</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use crate</span>::{Connection, InnerConnection, <span class="prelude-ty">Result</span>};
 
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="doccomment">/// Set a busy handler that sleeps for a specified amount of time when a</span>
-    <span class="doccomment">/// table is locked. The handler will sleep multiple times until at</span>
-    <span class="doccomment">/// least &quot;ms&quot; milliseconds of sleeping have accumulated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this routine with an argument equal to zero turns off all busy</span>
-    <span class="doccomment">/// handlers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There can only be a single busy handler for a particular database</span>
-    <span class="doccomment">/// connection at any given moment. If another busy handler was defined</span>
-    <span class="doccomment">/// (using [`busy_handler`](Connection::busy_handler)) prior to calling this</span>
-    <span class="doccomment">/// routine, that other busy handler is cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Newly created connections currently have a default busy timeout of</span>
-    <span class="doccomment">/// 5000ms, but this may be subject to change.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ms</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">timeout</span>
-            .<span class="ident">as_secs</span>()
-            .<span class="ident">checked_mul</span>(<span class="number">1000</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">checked_add</span>(<span class="ident">timeout</span>.<span class="ident">subsec_millis</span>().<span class="ident">into</span>()))
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>())
-            .<span class="ident">expect</span>(<span class="string">&quot;too big&quot;</span>);
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>().<span class="ident">busy_timeout</span>(<span class="ident">ms</span>)
+<span class="kw">impl </span>Connection {
+    <span class="doccomment">/// Set a busy handler that sleeps for a specified amount of time when a
+    /// table is locked. The handler will sleep multiple times until at
+    /// least &quot;ms&quot; milliseconds of sleeping have accumulated.
+    ///
+    /// Calling this routine with an argument equal to zero turns off all busy
+    /// handlers.
+    ///
+    /// There can only be a single busy handler for a particular database
+    /// connection at any given moment. If another busy handler was defined
+    /// (using [`busy_handler`](Connection::busy_handler)) prior to calling this
+    /// routine, that other busy handler is cleared.
+    ///
+    /// Newly created connections currently have a default busy timeout of
+    /// 5000ms, but this may be subject to change.
+    </span><span class="kw">pub fn </span>busy_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>ms: i32 = timeout
+            .as_secs()
+            .checked_mul(<span class="number">1000</span>)
+            .and_then(|t| t.checked_add(timeout.subsec_millis().into()))
+            .and_then(|t| t.try_into().ok())
+            .expect(<span class="string">&quot;too big&quot;</span>);
+        <span class="self">self</span>.db.borrow_mut().busy_timeout(ms)
     }
 
-    <span class="doccomment">/// Register a callback to handle `SQLITE_BUSY` errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the busy callback is `None`, then `SQLITE_BUSY` is returned</span>
-    <span class="doccomment">/// immediately upon encountering the lock. The argument to the busy</span>
-    <span class="doccomment">/// handler callback is the number of times that the</span>
-    <span class="doccomment">/// busy handler has been invoked previously for the</span>
-    <span class="doccomment">/// same locking event. If the busy callback returns `false`, then no</span>
-    <span class="doccomment">/// additional attempts are made to access the</span>
-    <span class="doccomment">/// database and `SQLITE_BUSY` is returned to the</span>
-    <span class="doccomment">/// application. If the callback returns `true`, then another attempt</span>
-    <span class="doccomment">/// is made to access the database and the cycle repeats.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There can only be a single busy handler defined for each database</span>
-    <span class="doccomment">/// connection. Setting a new busy handler clears any previously set</span>
-    <span class="doccomment">/// handler. Note that calling [`busy_timeout()`](Connection::busy_timeout)</span>
-    <span class="doccomment">/// or evaluating `PRAGMA busy_timeout=N` will change the busy handler</span>
-    <span class="doccomment">/// and thus clear any previously set busy handler.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Newly created connections default to a</span>
-    <span class="doccomment">/// [`busy_timeout()`](Connection::busy_timeout) handler with a timeout</span>
-    <span class="doccomment">/// of 5000ms, although this is subject to change.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">callback</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">i32</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">busy_handler_callback</span>(<span class="ident">p_arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">count</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">c_int</span> {
-            <span class="kw">let</span> <span class="ident">handler_fn</span>: <span class="kw">fn</span>(<span class="ident">i32</span>) -&gt; <span class="ident">bool</span> <span class="op">=</span> <span class="ident">mem::transmute</span>(<span class="ident">p_arg</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">handler_fn</span>(<span class="ident">count</span>)) {
-                <span class="number">1</span>
-            } <span class="kw">else</span> {
-                <span class="number">0</span>
-            }
+    <span class="doccomment">/// Register a callback to handle `SQLITE_BUSY` errors.
+    ///
+    /// If the busy callback is `None`, then `SQLITE_BUSY` is returned
+    /// immediately upon encountering the lock. The argument to the busy
+    /// handler callback is the number of times that the
+    /// busy handler has been invoked previously for the
+    /// same locking event. If the busy callback returns `false`, then no
+    /// additional attempts are made to access the
+    /// database and `SQLITE_BUSY` is returned to the
+    /// application. If the callback returns `true`, then another attempt
+    /// is made to access the database and the cycle repeats.
+    ///
+    /// There can only be a single busy handler defined for each database
+    /// connection. Setting a new busy handler clears any previously set
+    /// handler. Note that calling [`busy_timeout()`](Connection::busy_timeout)
+    /// or evaluating `PRAGMA busy_timeout=N` will change the busy handler
+    /// and thus clear any previously set busy handler.
+    ///
+    /// Newly created connections default to a
+    /// [`busy_timeout()`](Connection::busy_timeout) handler with a timeout
+    /// of 5000ms, although this is subject to change.
+    </span><span class="kw">pub fn </span>busy_handler(<span class="kw-2">&amp;</span><span class="self">self</span>, callback: <span class="prelude-ty">Option</span>&lt;<span class="kw">fn</span>(i32) -&gt; bool&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>busy_handler_callback(p_arg: <span class="kw-2">*mut </span>c_void, count: c_int) -&gt; c_int {
+            <span class="kw">let </span>handler_fn: <span class="kw">fn</span>(i32) -&gt; bool = mem::transmute(p_arg);
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) = catch_unwind(|| handler_fn(count)) {
+                <span class="number">1
+            </span>} <span class="kw">else </span>{
+                <span class="number">0
+            </span>}
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>();
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">callback</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="kw">unsafe</span> {
-                <span class="ident">ffi::sqlite3_busy_handler</span>(<span class="ident">c</span>.<span class="ident">db</span>(), <span class="prelude-val">Some</span>(<span class="ident">busy_handler_callback</span>), <span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>c = <span class="self">self</span>.db.borrow_mut();
+        <span class="kw">let </span>r = <span class="kw">match </span>callback {
+            <span class="prelude-val">Some</span>(f) =&gt; <span class="kw">unsafe </span>{
+                ffi::sqlite3_busy_handler(c.db(), <span class="prelude-val">Some</span>(busy_handler_callback), f <span class="kw">as </span><span class="kw-2">*mut </span>c_void)
             },
-            <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_busy_handler</span>(<span class="ident">c</span>.<span class="ident">db</span>(), <span class="prelude-val">None</span>, <span class="ident">ptr::null_mut</span>()) },
+            <span class="prelude-val">None </span>=&gt; <span class="kw">unsafe </span>{ ffi::sqlite3_busy_handler(c.db(), <span class="prelude-val">None</span>, ptr::null_mut()) },
         };
-        <span class="ident">c</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
+        c.decode_result(r)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">InnerConnection</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">busy_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_busy_timeout</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">timeout</span>) };
-        <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
+<span class="kw">impl </span>InnerConnection {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>busy_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: c_int) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ ffi::sqlite3_busy_timeout(<span class="self">self</span>.db, timeout) };
+        <span class="self">self</span>.decode_result(r)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
-    <span class="kw">use</span> <span class="ident">std::sync::mpsc::sync_channel</span>;
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
+    <span class="kw">use </span>std::sync::mpsc::sync_channel;
+    <span class="kw">use </span>std::thread;
+    <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="ident">Error</span>, <span class="ident">ErrorCode</span>, <span class="prelude-ty">Result</span>, <span class="ident">TransactionBehavior</span>};
+    <span class="kw">use crate</span>::{Connection, Error, ErrorCode, <span class="prelude-ty">Result</span>, TransactionBehavior};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_busy</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;test.db3&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_busy() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>temp_dir = tempfile::tempdir().unwrap();
+        <span class="kw">let </span>path = temp_dir.path().join(<span class="string">&quot;test.db3&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db1</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">tx1</span> <span class="op">=</span> <span class="ident">db1</span>.<span class="ident">transaction_with_behavior</span>(<span class="ident">TransactionBehavior::Exclusive</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">db2</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">r</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db2</span>.<span class="ident">query_row</span>(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unreachable!</span>());
-        <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">unwrap_err</span>() {
-            <span class="ident">Error::SqliteFailure</span>(<span class="ident">err</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">err</span>.<span class="ident">code</span>, <span class="ident">ErrorCode::DatabaseBusy</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>db1 = Connection::open(<span class="kw-2">&amp;</span>path)<span class="question-mark">?</span>;
+        <span class="kw">let </span>tx1 = db1.transaction_with_behavior(TransactionBehavior::Exclusive)<span class="question-mark">?</span>;
+        <span class="kw">let </span>db2 = Connection::open(<span class="kw-2">&amp;</span>path)<span class="question-mark">?</span>;
+        <span class="kw">let </span>r: <span class="prelude-ty">Result</span>&lt;()&gt; = db2.query_row(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], |<span class="kw">_</span>| <span class="macro">unreachable!</span>());
+        <span class="kw">match </span>r.unwrap_err() {
+            Error::SqliteFailure(err, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(err.code, ErrorCode::DatabaseBusy);
             }
-            <span class="ident">err</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, <span class="ident">err</span>),
+            err =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected error {}&quot;</span>, err),
         }
-        <span class="ident">tx1</span>.<span class="ident">rollback</span>()
+        tx1.rollback()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span>]</span> <span class="comment">// FIXME: unstable</span>
-    <span class="kw">fn</span> <span class="ident">test_busy_timeout</span>() {
-        <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;test.db3&quot;</span>);
+    <span class="attribute">#[test]
+    #[ignore] </span><span class="comment">// FIXME: unstable
+    </span><span class="kw">fn </span>test_busy_timeout() {
+        <span class="kw">let </span>temp_dir = tempfile::tempdir().unwrap();
+        <span class="kw">let </span>path = temp_dir.path().join(<span class="string">&quot;test.db3&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">db2</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="ident">db2</span>.<span class="ident">busy_timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>db2 = Connection::open(<span class="kw-2">&amp;</span>path).unwrap();
+        db2.busy_timeout(Duration::from_secs(<span class="number">1</span>)).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">rx</span>, <span class="ident">tx</span>) <span class="op">=</span> <span class="ident">sync_channel</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db1</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">tx1</span> <span class="op">=</span> <span class="ident">db1</span>
-                .<span class="ident">transaction_with_behavior</span>(<span class="ident">TransactionBehavior::Exclusive</span>)
-                .<span class="ident">unwrap</span>();
-            <span class="ident">rx</span>.<span class="ident">send</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-            <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-            <span class="ident">tx1</span>.<span class="ident">rollback</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(rx, tx) = sync_channel(<span class="number">0</span>);
+        <span class="kw">let </span>child = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>db1 = Connection::open(<span class="kw-2">&amp;</span>path).unwrap();
+            <span class="kw">let </span>tx1 = db1
+                .transaction_with_behavior(TransactionBehavior::Exclusive)
+                .unwrap();
+            rx.send(<span class="number">1</span>).unwrap();
+            thread::sleep(Duration::from_millis(<span class="number">100</span>));
+            tx1.rollback().unwrap();
         });
 
-        <span class="macro">assert_eq!</span>(<span class="ident">tx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>(), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">db2</span>
-            .<span class="ident">query_row</span>(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">i32</span><span class="op">&gt;</span>(<span class="number">0</span>))
-            .<span class="ident">expect</span>(<span class="string">&quot;unexpected error&quot;</span>);
+        <span class="macro">assert_eq!</span>(tx.recv().unwrap(), <span class="number">1</span>);
+        <span class="kw">let _ </span>= db2
+            .query_row(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], |row| row.get::&lt;<span class="kw">_</span>, i32&gt;(<span class="number">0</span>))
+            .expect(<span class="string">&quot;unexpected error&quot;</span>);
 
-        <span class="ident">child</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+        child.join().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span>]</span> <span class="comment">// FIXME: unstable</span>
-    <span class="kw">fn</span> <span class="ident">test_busy_handler</span>() {
-        <span class="kw">static</span> <span class="ident">CALLED</span>: <span class="ident">AtomicBool</span> <span class="op">=</span> <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>);
-        <span class="kw">fn</span> <span class="ident">busy_handler</span>(<span class="kw">_</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-            <span class="ident">CALLED</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Relaxed</span>);
-            <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-            <span class="bool-val">true</span>
-        }
+    <span class="attribute">#[test]
+    #[ignore] </span><span class="comment">// FIXME: unstable
+    </span><span class="kw">fn </span>test_busy_handler() {
+        <span class="kw">static </span>CALLED: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
+        <span class="kw">fn </span>busy_handler(<span class="kw">_</span>: i32) -&gt; bool {
+            CALLED.store(<span class="bool-val">true</span>, Ordering::Relaxed);
+            thread::sleep(Duration::from_millis(<span class="number">100</span>));
+            <span class="bool-val">true
+        </span>}
 
-        <span class="kw">let</span> <span class="ident">temp_dir</span> <span class="op">=</span> <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">temp_dir</span>.<span class="ident">path</span>().<span class="ident">join</span>(<span class="string">&quot;test.db3&quot;</span>);
+        <span class="kw">let </span>temp_dir = tempfile::tempdir().unwrap();
+        <span class="kw">let </span>path = temp_dir.path().join(<span class="string">&quot;test.db3&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">db2</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="ident">db2</span>.<span class="ident">busy_handler</span>(<span class="prelude-val">Some</span>(<span class="ident">busy_handler</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>db2 = Connection::open(<span class="kw-2">&amp;</span>path).unwrap();
+        db2.busy_handler(<span class="prelude-val">Some</span>(busy_handler)).unwrap();
 
-        <span class="kw">let</span> (<span class="ident">rx</span>, <span class="ident">tx</span>) <span class="op">=</span> <span class="ident">sync_channel</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db1</span> <span class="op">=</span> <span class="ident">Connection::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">tx1</span> <span class="op">=</span> <span class="ident">db1</span>
-                .<span class="ident">transaction_with_behavior</span>(<span class="ident">TransactionBehavior::Exclusive</span>)
-                .<span class="ident">unwrap</span>();
-            <span class="ident">rx</span>.<span class="ident">send</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
-            <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-            <span class="ident">tx1</span>.<span class="ident">rollback</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(rx, tx) = sync_channel(<span class="number">0</span>);
+        <span class="kw">let </span>child = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>db1 = Connection::open(<span class="kw-2">&amp;</span>path).unwrap();
+            <span class="kw">let </span>tx1 = db1
+                .transaction_with_behavior(TransactionBehavior::Exclusive)
+                .unwrap();
+            rx.send(<span class="number">1</span>).unwrap();
+            thread::sleep(Duration::from_millis(<span class="number">100</span>));
+            tx1.rollback().unwrap();
         });
 
-        <span class="macro">assert_eq!</span>(<span class="ident">tx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>(), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">db2</span>
-            .<span class="ident">query_row</span>(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">i32</span><span class="op">&gt;</span>(<span class="number">0</span>))
-            .<span class="ident">expect</span>(<span class="string">&quot;unexpected error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">CALLED</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(tx.recv().unwrap(), <span class="number">1</span>);
+        <span class="kw">let _ </span>= db2
+            .query_row(<span class="string">&quot;PRAGMA schema_version&quot;</span>, [], |row| row.get::&lt;<span class="kw">_</span>, i32&gt;(<span class="number">0</span>))
+            .expect(<span class="string">&quot;unexpected error&quot;</span>);
+        <span class="macro">assert_eq!</span>(CALLED.load(Ordering::Relaxed), <span class="bool-val">true</span>);
 
-        <span class="ident">child</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+        child.join().unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/asynchronous-codec-0.6.0/src/framed_read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../asynchronous_codec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../asynchronous_codec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../asynchronous_codec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/asynchronous-codec-0.6.0/src/framed_read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>framed_read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../asynchronous_codec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../asynchronous_codec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../asynchronous_codec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -271,278 +271,278 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::fuse::Fuse</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Decoder</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::fuse::Fuse;
+<span class="kw">use </span><span class="kw">super</span>::Decoder;
 
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-<span class="kw">use</span> <span class="ident">futures_util::io::AsyncRead</span>;
-<span class="kw">use</span> <span class="ident">futures_util::ready</span>;
-<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">Stream</span>, <span class="ident">TryStreamExt</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>futures_sink::Sink;
+<span class="kw">use </span>futures_util::io::AsyncRead;
+<span class="kw">use </span>futures_util::ready;
+<span class="kw">use </span>futures_util::stream::{Stream, TryStreamExt};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::marker::Unpin;
+<span class="kw">use </span>std::ops::{Deref, DerefMut};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="doccomment">/// A `Stream` of messages decoded from an `AsyncRead`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use asynchronous_codec::{BytesCodec, FramedRead};</span>
-<span class="doccomment">/// use futures::TryStreamExt;</span>
-<span class="doccomment">/// use bytes::{Bytes};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let buf = [3u8; 3];</span>
-<span class="doccomment">/// let mut framed = FramedRead::new(&amp;buf[..], BytesCodec);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # futures::executor::block_on(async move {</span>
-<span class="doccomment">/// if let Some(bytes) = framed.try_next().await? {</span>
-<span class="doccomment">///     assert_eq!(bytes, Bytes::copy_from_slice(&amp;buf[..]));</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;_, std::io::Error&gt;(())</span>
-<span class="doccomment">/// # }).unwrap();</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">Fuse</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A `Stream` of messages decoded from an `AsyncRead`.
+///
+/// # Example
+/// ```
+/// use asynchronous_codec::{BytesCodec, FramedRead};
+/// use futures::TryStreamExt;
+/// use bytes::{Bytes};
+///
+/// let buf = [3u8; 3];
+/// let mut framed = FramedRead::new(&amp;buf[..], BytesCodec);
+///
+/// # futures::executor::block_on(async move {
+/// if let Some(bytes) = framed.try_next().await? {
+///     assert_eq!(bytes, Bytes::copy_from_slice(&amp;buf[..]));
+/// }
+/// # Ok::&lt;_, std::io::Error&gt;(())
+/// # }).unwrap();
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>FramedRead&lt;T, D&gt; {
+    inner: FramedRead2&lt;Fuse&lt;T, D&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T, D&gt; Deref <span class="kw">for </span>FramedRead&lt;T, D&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+<span class="kw">impl</span>&lt;T, D&gt; DerefMut <span class="kw">for </span>FramedRead&lt;T, D&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span>,
-    <span class="ident">D</span>: <span class="ident">Decoder</span>,
+<span class="kw">impl</span>&lt;T, D&gt; FramedRead&lt;T, D&gt;
+<span class="kw">where
+    </span>T: AsyncRead,
+    D: Decoder,
 {
-    <span class="doccomment">/// Creates a new `FramedRead` transport with the given `Decoder`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">decoder</span>: <span class="ident">D</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">framed_read_2</span>(<span class="ident">Fuse::new</span>(<span class="ident">inner</span>, <span class="ident">decoder</span>), <span class="prelude-val">None</span>),
+    <span class="doccomment">/// Creates a new `FramedRead` transport with the given `Decoder`.
+    </span><span class="kw">pub fn </span>new(inner: T, decoder: D) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: framed_read_2(Fuse::new(inner, decoder), <span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Creates a new `FramedRead` from [`FramedReadParts`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`FramedRead::into_parts`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span>(
-        <span class="ident">FramedReadParts</span> {
-            <span class="ident">io</span>,
-            <span class="ident">decoder</span>,
-            <span class="ident">buffer</span>,
+    <span class="doccomment">/// Creates a new `FramedRead` from [`FramedReadParts`].
+    ///
+    /// See also [`FramedRead::into_parts`].
+    </span><span class="kw">pub fn </span>from_parts(
+        FramedReadParts {
+            io,
+            decoder,
+            buffer,
             ..
-        }: <span class="ident">FramedReadParts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">framed_read_2</span>(<span class="ident">Fuse::new</span>(<span class="ident">io</span>, <span class="ident">decoder</span>), <span class="prelude-val">Some</span>(<span class="ident">buffer</span>)),
+        }: FramedReadParts&lt;T, D&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: framed_read_2(Fuse::new(io, decoder), <span class="prelude-val">Some</span>(buffer)),
         }
     }
 
-    <span class="doccomment">/// Consumes the `FramedRead`, returning its parts such that a</span>
-    <span class="doccomment">/// new `FramedRead` may be constructed, possibly with a different decoder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`FramedRead::from_parts`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; <span class="ident">FramedReadParts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">fuse</span>, <span class="ident">buffer</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_parts</span>();
-        <span class="ident">FramedReadParts</span> {
-            <span class="ident">io</span>: <span class="ident">fuse</span>.<span class="ident">t</span>,
-            <span class="ident">decoder</span>: <span class="ident">fuse</span>.<span class="ident">u</span>,
-            <span class="ident">buffer</span>,
-            <span class="ident">_priv</span>: (),
+    <span class="doccomment">/// Consumes the `FramedRead`, returning its parts such that a
+    /// new `FramedRead` may be constructed, possibly with a different decoder.
+    ///
+    /// See also [`FramedRead::from_parts`].
+    </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; FramedReadParts&lt;T, D&gt; {
+        <span class="kw">let </span>(fuse, buffer) = <span class="self">self</span>.inner.into_parts();
+        FramedReadParts {
+            io: fuse.t,
+            decoder: fuse.u,
+            buffer,
+            _priv: (),
         }
     }
 
-    <span class="doccomment">/// Consumes the `FramedRead`, returning its underlying I/O stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that data that has already been read but not yet consumed</span>
-    <span class="doccomment">/// by the decoder is dropped. To retain any such potentially</span>
-    <span class="doccomment">/// buffered data, use [`FramedRead::into_parts()`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">into_parts</span>().<span class="ident">io</span>
+    <span class="doccomment">/// Consumes the `FramedRead`, returning its underlying I/O stream.
+    ///
+    /// Note that data that has already been read but not yet consumed
+    /// by the decoder is dropped. To retain any such potentially
+    /// buffered data, use [`FramedRead::into_parts()`].
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.into_parts().io
     }
 
-    <span class="doccomment">/// Returns a reference to the underlying decoder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that care should be taken to not tamper with the underlying decoder</span>
-    <span class="doccomment">/// as it may corrupt the stream of frames otherwise being worked with.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">D</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">u</span>
+    <span class="doccomment">/// Returns a reference to the underlying decoder.
+    ///
+    /// Note that care should be taken to not tamper with the underlying decoder
+    /// as it may corrupt the stream of frames otherwise being worked with.
+    </span><span class="kw">pub fn </span>decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>D {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.u
     }
 
-    <span class="doccomment">/// Returns a mutable reference to the underlying decoder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that care should be taken to not tamper with the underlying decoder</span>
-    <span class="doccomment">/// as it may corrupt the stream of frames otherwise being worked with.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decoder_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">D</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">u</span>
+    <span class="doccomment">/// Returns a mutable reference to the underlying decoder.
+    ///
+    /// Note that care should be taken to not tamper with the underlying decoder
+    /// as it may corrupt the stream of frames otherwise being worked with.
+    </span><span class="kw">pub fn </span>decoder_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>D {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner.u
     }
 
-    <span class="doccomment">/// Returns a reference to the read buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BytesMut</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">buffer</span>
+    <span class="doccomment">/// Returns a reference to the read buffer.
+    </span><span class="kw">pub fn </span>read_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BytesMut {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.buffer
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">D</span>: <span class="ident">Decoder</span>,
+<span class="kw">impl</span>&lt;T, D&gt; Stream <span class="kw">for </span>FramedRead&lt;T, D&gt;
+<span class="kw">where
+    </span>T: AsyncRead + Unpin,
+    D: Decoder,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">D::Item</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;D::Item, D::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">try_poll_next_unpin</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="self">self</span>.inner.try_poll_next_unpin(cx)
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner</span>: <span class="ident">T</span>,
-        <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
+<span class="macro">pin_project! </span>{
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>FramedRead2&lt;T&gt; {
+        <span class="attribute">#[pin]
+        </span>inner: T,
+        buffer: BytesMut,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>FramedRead2&lt;T&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+<span class="kw">impl</span>&lt;T&gt; DerefMut <span class="kw">for </span>FramedRead2&lt;T&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">const</span> <span class="ident">INITIAL_CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="number">1024</span>;
+<span class="kw">const </span>INITIAL_CAPACITY: usize = <span class="number">8 </span>* <span class="number">1024</span>;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framed_read_2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">buffer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span>) -&gt; <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">FramedRead2</span> {
-        <span class="ident">inner</span>,
-        <span class="ident">buffer</span>: <span class="ident">buffer</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">BytesMut::with_capacity</span>(<span class="ident">INITIAL_CAPACITY</span>)),
+<span class="kw">pub fn </span>framed_read_2&lt;T&gt;(inner: T, buffer: <span class="prelude-ty">Option</span>&lt;BytesMut&gt;) -&gt; FramedRead2&lt;T&gt; {
+    FramedRead2 {
+        inner,
+        buffer: buffer.unwrap_or_else(|| BytesMut::with_capacity(INITIAL_CAPACITY)),
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Decoder</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;T&gt; Stream <span class="kw">for </span>FramedRead2&lt;T&gt;
+<span class="kw">where
+    </span>T: AsyncRead + Decoder + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::Item</span>, <span class="ident">T::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T::Item, T::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>;
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="kw-2">&amp;mut *</span><span class="self">self</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>)));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(item) = this.inner.decode(<span class="kw-2">&amp;mut </span>this.buffer)<span class="question-mark">? </span>{
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item)));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">INITIAL_CAPACITY</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; INITIAL_CAPACITY];
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>))<span class="question-mark">?</span>;
-            <span class="ident">this</span>.<span class="ident">buffer</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">n</span>]);
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>n = <span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span>this.inner).poll_read(cx, <span class="kw-2">&amp;mut </span>buf))<span class="question-mark">?</span>;
+            this.buffer.extend_from_slice(<span class="kw-2">&amp;</span>buf[..n]);
 
-            <span class="kw">let</span> <span class="ident">ended</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span>;
+            <span class="kw">let </span>ended = n == <span class="number">0</span>;
 
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>))),
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">ended</span> =&gt; {
-                    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
-                    } <span class="kw">else</span> {
-                        <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">decode_eof</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>))),
-                            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buffer</span>.<span class="ident">is_empty</span>() =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-                            <span class="prelude-val">None</span> =&gt; {
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                                    <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+            <span class="kw">match </span>this.inner.decode(<span class="kw-2">&amp;mut </span>this.buffer)<span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(item) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item))),
+                <span class="prelude-val">None </span><span class="kw">if </span>ended =&gt; {
+                    <span class="kw">if </span>this.buffer.is_empty() {
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
+                    } <span class="kw">else </span>{
+                        <span class="kw">match </span>this.inner.decode_eof(<span class="kw-2">&amp;mut </span>this.buffer)<span class="question-mark">? </span>{
+                            <span class="prelude-val">Some</span>(item) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item))),
+                            <span class="prelude-val">None </span><span class="kw">if </span>this.buffer.is_empty() =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+                            <span class="prelude-val">None </span>=&gt; {
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(io::Error::new(
+                                    io::ErrorKind::UnexpectedEof,
                                     <span class="string">&quot;bytes remaining in stream&quot;</span>,
                                 )
-                                .<span class="ident">into</span>())));
+                                .into())));
                             }
                         }
                     }
                 }
-                <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+                <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;T, I&gt; Sink&lt;I&gt; <span class="kw">for </span>FramedRead2&lt;T&gt;
+<span class="kw">where
+    </span>T: Sink&lt;I&gt; + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">T::Error</span>;
+    <span class="kw">type </span>Error = T::Error;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_ready(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.project().inner.poll_ready(cx)
     }
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">start_send</span>(<span class="ident">item</span>)
+    <span class="kw">fn </span>start_send(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, item: I) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.project().inner.start_send(item)
     }
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.project().inner.poll_flush(cx)
     }
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_close</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_close(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.project().inner.poll_close(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FramedRead2</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">T</span>, <span class="ident">BytesMut</span>) {
-        (<span class="self">self</span>.<span class="ident">inner</span>, <span class="self">self</span>.<span class="ident">buffer</span>)
+<span class="kw">impl</span>&lt;T&gt; FramedRead2&lt;T&gt; {
+    <span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; (T, BytesMut) {
+        (<span class="self">self</span>.inner, <span class="self">self</span>.buffer)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BytesMut</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>
+    <span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BytesMut {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.buffer
     }
 }
 
-<span class="doccomment">/// The parts obtained from (FramedRead::into_parts).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FramedReadParts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The underlying I/O stream.</span>
-    <span class="kw">pub</span> <span class="ident">io</span>: <span class="ident">T</span>,
-    <span class="doccomment">/// The frame decoder.</span>
-    <span class="kw">pub</span> <span class="ident">decoder</span>: <span class="ident">D</span>,
-    <span class="doccomment">/// The buffer of data that has been read from `io` but not</span>
-    <span class="doccomment">/// yet consumed by `decoder`.</span>
-    <span class="kw">pub</span> <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
-    <span class="doccomment">/// Keep the constructor private.</span>
-    <span class="ident">_priv</span>: (),
+<span class="doccomment">/// The parts obtained from (FramedRead::into_parts).
+</span><span class="kw">pub struct </span>FramedReadParts&lt;T, D&gt; {
+    <span class="doccomment">/// The underlying I/O stream.
+    </span><span class="kw">pub </span>io: T,
+    <span class="doccomment">/// The frame decoder.
+    </span><span class="kw">pub </span>decoder: D,
+    <span class="doccomment">/// The buffer of data that has been read from `io` but not
+    /// yet consumed by `decoder`.
+    </span><span class="kw">pub </span>buffer: BytesMut,
+    <span class="doccomment">/// Keep the constructor private.
+    </span>_priv: (),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">FramedReadParts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Changes the decoder in `FramedReadParts`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_decoder</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FramedReadParts</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">Decoder</span>,
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">D</span>) -&gt; <span class="ident">E</span>,
+<span class="kw">impl</span>&lt;T, D&gt; FramedReadParts&lt;T, D&gt; {
+    <span class="doccomment">/// Changes the decoder in `FramedReadParts`.
+    </span><span class="kw">pub fn </span>map_decoder&lt;E, F&gt;(<span class="self">self</span>, f: F) -&gt; FramedReadParts&lt;T, E&gt;
+    <span class="kw">where
+        </span>E: Decoder,
+        F: FnOnce(D) -&gt; E,
     {
-        <span class="ident">FramedReadParts</span> {
-            <span class="ident">io</span>: <span class="self">self</span>.<span class="ident">io</span>,
-            <span class="ident">decoder</span>: <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">decoder</span>),
-            <span class="ident">buffer</span>: <span class="self">self</span>.<span class="ident">buffer</span>,
-            <span class="ident">_priv</span>: (),
+        FramedReadParts {
+            io: <span class="self">self</span>.io,
+            decoder: f(<span class="self">self</span>.decoder),
+            buffer: <span class="self">self</span>.buffer,
+            _priv: (),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="asynchronous_codec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="asynchronous_codec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

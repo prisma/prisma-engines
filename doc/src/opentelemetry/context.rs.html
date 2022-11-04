@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -383,388 +383,388 @@
 <span id="381">381</span>
 <span id="382">382</span>
 <span id="383">383</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any</span>::{<span class="ident">Any</span>, <span class="ident">TypeId</span>};
-<span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasherDefault</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::any::{Any, TypeId};
+<span class="kw">use </span>std::cell::RefCell;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::hash::{BuildHasherDefault, Hasher};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="macro">thread_local!</span> {
-    <span class="kw">static</span> <span class="ident">CURRENT_CONTEXT</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="ident">Context::default</span>());
-    <span class="kw">static</span> <span class="ident">DEFAULT_CONTEXT</span>: <span class="ident">Context</span> <span class="op">=</span> <span class="ident">Context::default</span>();
+<span class="macro">thread_local! </span>{
+    <span class="kw">static </span>CURRENT_CONTEXT: RefCell&lt;Context&gt; = RefCell::new(Context::default());
+    <span class="kw">static </span>DEFAULT_CONTEXT: Context = Context::default();
 }
 
-<span class="doccomment">/// An execution-scoped collection of values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [`Context`] is a propagation mechanism which carries execution-scoped</span>
-<span class="doccomment">/// values across API boundaries and between logically associated execution</span>
-<span class="doccomment">/// units. Cross-cutting concerns access their data in-process using the same</span>
-<span class="doccomment">/// shared context object.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Context`]s are immutable, and their write operations result in the creation</span>
-<span class="doccomment">/// of a new context containing the original values and the new specified values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Context state</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Concerns can create and retrieve their local state in the current execution</span>
-<span class="doccomment">/// state represented by a context through the [`get`] and [`with_value`]</span>
-<span class="doccomment">/// methods. It is recommended to use application-specific types when storing new</span>
-<span class="doccomment">/// context values to avoid unintentionally overwriting existing state.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Managing the current context</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Contexts can be associated with the caller&#39;s current execution unit on a</span>
-<span class="doccomment">/// given thread via the [`attach`] method, and previous contexts can be restored</span>
-<span class="doccomment">/// by dropping the returned [`ContextGuard`]. Context can be nested, and will</span>
-<span class="doccomment">/// restore their parent outer context when detached on drop. To access the</span>
-<span class="doccomment">/// values of the context, a snapshot can be created via the [`Context::current`]</span>
-<span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Context::current`]: Context::current()</span>
-<span class="doccomment">/// [`get`]: Context::get()</span>
-<span class="doccomment">/// [`with_value`]: Context::with_value()</span>
-<span class="doccomment">/// [`attach`]: Context::attach()</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::Context;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Application-specific `a` and `b` values</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-<span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-<span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-<span class="doccomment">/// struct ValueB(u64);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let _outer_guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Only value a has been set</span>
-<span class="doccomment">/// let current = Context::current();</span>
-<span class="doccomment">/// assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-<span class="doccomment">/// assert_eq!(current.get::&lt;ValueB&gt;(), None);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let _inner_guard = Context::current_with_value(ValueB(42)).attach();</span>
-<span class="doccomment">///     // Both values are set in inner context</span>
-<span class="doccomment">///     let current = Context::current();</span>
-<span class="doccomment">///     assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-<span class="doccomment">///     assert_eq!(current.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Resets to only the `a` value when inner guard is dropped</span>
-<span class="doccomment">/// let current = Context::current();</span>
-<span class="doccomment">/// assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-<span class="doccomment">/// assert_eq!(current.get::&lt;ValueB&gt;(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">entries</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">TypeId</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">BuildHasherDefault</span><span class="op">&lt;</span><span class="ident">IdHasher</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An execution-scoped collection of values.
+///
+/// A [`Context`] is a propagation mechanism which carries execution-scoped
+/// values across API boundaries and between logically associated execution
+/// units. Cross-cutting concerns access their data in-process using the same
+/// shared context object.
+///
+/// [`Context`]s are immutable, and their write operations result in the creation
+/// of a new context containing the original values and the new specified values.
+///
+/// ## Context state
+///
+/// Concerns can create and retrieve their local state in the current execution
+/// state represented by a context through the [`get`] and [`with_value`]
+/// methods. It is recommended to use application-specific types when storing new
+/// context values to avoid unintentionally overwriting existing state.
+///
+/// ## Managing the current context
+///
+/// Contexts can be associated with the caller&#39;s current execution unit on a
+/// given thread via the [`attach`] method, and previous contexts can be restored
+/// by dropping the returned [`ContextGuard`]. Context can be nested, and will
+/// restore their parent outer context when detached on drop. To access the
+/// values of the context, a snapshot can be created via the [`Context::current`]
+/// method.
+///
+/// [`Context::current`]: Context::current()
+/// [`get`]: Context::get()
+/// [`with_value`]: Context::with_value()
+/// [`attach`]: Context::attach()
+///
+/// # Examples
+///
+/// ```
+/// use opentelemetry::Context;
+///
+/// // Application-specific `a` and `b` values
+/// #[derive(Debug, PartialEq)]
+/// struct ValueA(&amp;&#39;static str);
+/// #[derive(Debug, PartialEq)]
+/// struct ValueB(u64);
+///
+/// let _outer_guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();
+///
+/// // Only value a has been set
+/// let current = Context::current();
+/// assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+/// assert_eq!(current.get::&lt;ValueB&gt;(), None);
+///
+/// {
+///     let _inner_guard = Context::current_with_value(ValueB(42)).attach();
+///     // Both values are set in inner context
+///     let current = Context::current();
+///     assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+///     assert_eq!(current.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));
+/// }
+///
+/// // Resets to only the `a` value when inner guard is dropped
+/// let current = Context::current();
+/// assert_eq!(current.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+/// assert_eq!(current.get::&lt;ValueB&gt;(), None);
+/// ```
+</span><span class="attribute">#[derive(Clone, Default)]
+</span><span class="kw">pub struct </span>Context {
+    entries: HashMap&lt;TypeId, Arc&lt;<span class="kw">dyn </span>Any + Sync + Send&gt;, BuildHasherDefault&lt;IdHasher&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Creates an empty `Context`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The context is initially created with a capacity of 0, so it will not</span>
-    <span class="doccomment">/// allocate. Use [`with_value`] to create a new context that has entries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`with_value`]: Context::with_value()</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Context::default</span>()
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Creates an empty `Context`.
+    ///
+    /// The context is initially created with a capacity of 0, so it will not
+    /// allocate. Use [`with_value`] to create a new context that has entries.
+    ///
+    /// [`with_value`]: Context::with_value()
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Context::default()
     }
 
-    <span class="doccomment">/// Returns an immutable snapshot of the current thread&#39;s context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn do_work() {</span>
-    <span class="doccomment">///     assert_eq!(Context::current().get(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let _guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();</span>
-    <span class="doccomment">/// do_work()</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">get_current</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">clone</span>())
+    <span class="doccomment">/// Returns an immutable snapshot of the current thread&#39;s context.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    ///
+    /// fn do_work() {
+    ///     assert_eq!(Context::current().get(), Some(&amp;ValueA(&quot;a&quot;)));
+    /// }
+    ///
+    /// let _guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();
+    /// do_work()
+    /// ```
+    </span><span class="kw">pub fn </span>current() -&gt; <span class="self">Self </span>{
+        get_current(|cx| cx.clone())
     }
 
-    <span class="doccomment">/// Returns a clone of the current thread&#39;s context with the given value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a more efficient form of `Context::current().with_value(value)`</span>
-    <span class="doccomment">/// as it avoids the intermediate context clone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Given some value types defined in your application</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueB(u64);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can create and attach context with the first value set to &quot;a&quot;</span>
-    <span class="doccomment">/// let _guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // And create another context based on the fist with a new value</span>
-    <span class="doccomment">/// let all_current_and_b = Context::current_with_value(ValueB(42));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The second context now contains all the current values and the addition</span>
-    <span class="doccomment">/// assert_eq!(all_current_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(all_current_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_context</span> <span class="op">=</span> <span class="ident">Context::current</span>();
-        <span class="ident">new_context</span>
-            .<span class="ident">entries</span>
-            .<span class="ident">insert</span>(<span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(), <span class="ident">Arc::new</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Returns a clone of the current thread&#39;s context with the given value.
+    ///
+    /// This is a more efficient form of `Context::current().with_value(value)`
+    /// as it avoids the intermediate context clone.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// // Given some value types defined in your application
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueB(u64);
+    ///
+    /// // You can create and attach context with the first value set to &quot;a&quot;
+    /// let _guard = Context::new().with_value(ValueA(&quot;a&quot;)).attach();
+    ///
+    /// // And create another context based on the fist with a new value
+    /// let all_current_and_b = Context::current_with_value(ValueB(42));
+    ///
+    /// // The second context now contains all the current values and the addition
+    /// assert_eq!(all_current_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    /// assert_eq!(all_current_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));
+    /// ```
+    </span><span class="kw">pub fn </span>current_with_value&lt;T: <span class="lifetime">&#39;static </span>+ Send + Sync&gt;(value: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>new_context = Context::current();
+        new_context
+            .entries
+            .insert(TypeId::of::&lt;T&gt;(), Arc::new(value));
 
-        <span class="ident">new_context</span>
+        new_context
     }
 
-    <span class="doccomment">/// Returns a reference to the entry for the corresponding value type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Given some value types defined in your application</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct MyUser();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let cx = Context::new().with_value(ValueA(&quot;a&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Values can be queried by type</span>
-    <span class="doccomment">/// assert_eq!(cx.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // And return none if not yet set</span>
-    <span class="doccomment">/// assert_eq!(cx.get::&lt;MyUser&gt;(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">entries</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rc</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">rc</span>).<span class="ident">downcast_ref</span>())
+    <span class="doccomment">/// Returns a reference to the entry for the corresponding value type.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// // Given some value types defined in your application
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    /// #[derive(Debug, PartialEq)]
+    /// struct MyUser();
+    ///
+    /// let cx = Context::new().with_value(ValueA(&quot;a&quot;));
+    ///
+    /// // Values can be queried by type
+    /// assert_eq!(cx.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    ///
+    /// // And return none if not yet set
+    /// assert_eq!(cx.get::&lt;MyUser&gt;(), None);
+    /// ```
+    </span><span class="kw">pub fn </span>get&lt;T: <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+        <span class="self">self</span>.entries
+            .get(<span class="kw-2">&amp;</span>TypeId::of::&lt;T&gt;())
+            .and_then(|rc| (<span class="kw-2">&amp;*</span>rc).downcast_ref())
     }
 
-    <span class="doccomment">/// Returns a copy of the context with the new value included.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Given some value types defined in your application</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueB(u64);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can create a context with the first value set to &quot;a&quot;</span>
-    <span class="doccomment">/// let cx_with_a = Context::new().with_value(ValueA(&quot;a&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // And create another context based on the fist with a new value</span>
-    <span class="doccomment">/// let cx_with_a_and_b = cx_with_a.with_value(ValueB(42));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The first context is still available and unmodified</span>
-    <span class="doccomment">/// assert_eq!(cx_with_a.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(cx_with_a.get::&lt;ValueB&gt;(), None);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The second context now contains both values</span>
-    <span class="doccomment">/// assert_eq!(cx_with_a_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(cx_with_a_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_context</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="ident">new_context</span>
-            .<span class="ident">entries</span>
-            .<span class="ident">insert</span>(<span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(), <span class="ident">Arc::new</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Returns a copy of the context with the new value included.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// // Given some value types defined in your application
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueB(u64);
+    ///
+    /// // You can create a context with the first value set to &quot;a&quot;
+    /// let cx_with_a = Context::new().with_value(ValueA(&quot;a&quot;));
+    ///
+    /// // And create another context based on the fist with a new value
+    /// let cx_with_a_and_b = cx_with_a.with_value(ValueB(42));
+    ///
+    /// // The first context is still available and unmodified
+    /// assert_eq!(cx_with_a.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    /// assert_eq!(cx_with_a.get::&lt;ValueB&gt;(), None);
+    ///
+    /// // The second context now contains both values
+    /// assert_eq!(cx_with_a_and_b.get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    /// assert_eq!(cx_with_a_and_b.get::&lt;ValueB&gt;(), Some(&amp;ValueB(42)));
+    /// ```
+    </span><span class="kw">pub fn </span>with_value&lt;T: <span class="lifetime">&#39;static </span>+ Send + Sync&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>new_context = <span class="self">self</span>.clone();
+        new_context
+            .entries
+            .insert(TypeId::of::&lt;T&gt;(), Arc::new(value));
 
-        <span class="ident">new_context</span>
+        new_context
     }
 
-    <span class="doccomment">/// Replaces the current context on this thread with this context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Dropping the returned [`ContextGuard`] will reset the current context to the</span>
-    <span class="doccomment">/// previous value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Set the current thread context</span>
-    <span class="doccomment">/// let cx_guard = my_cx.attach();</span>
-    <span class="doccomment">/// assert_eq!(Context::current().get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Drop the guard to restore the previous context</span>
-    <span class="doccomment">/// drop(cx_guard);</span>
-    <span class="doccomment">/// assert_eq!(Context::current().get::&lt;ValueA&gt;(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Guards do not need to be explicitly dropped:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_function() -&gt; String {</span>
-    <span class="doccomment">///     // attach a context the duration of this function.</span>
-    <span class="doccomment">///     let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));</span>
-    <span class="doccomment">///     // NOTE: a variable name after the underscore is **required** or rust</span>
-    <span class="doccomment">///     // will drop the guard, restoring the previous context _immediately_.</span>
-    <span class="doccomment">///     let _guard = my_cx.attach();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // anything happening in functions we call can still access my_cx...</span>
-    <span class="doccomment">///     my_other_function();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // returning from the function drops the guard, exiting the span.</span>
-    <span class="doccomment">///     return &quot;Hello world&quot;.to_owned();</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_other_function() {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// Sub-scopes may be created to limit the duration for which the span is</span>
-    <span class="doccomment">/// entered:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::Context;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[derive(Debug, PartialEq)]</span>
-    <span class="doccomment">/// struct ValueA(&amp;&#39;static str);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let _guard = my_cx.attach();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // the current context can access variables in</span>
-    <span class="doccomment">///     assert_eq!(Context::current().get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // exiting the scope drops the guard, detaching the context.</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // this is back in the default empty context</span>
-    <span class="doccomment">/// assert_eq!(Context::current().get::&lt;ValueA&gt;(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attach</span>(<span class="self">self</span>) -&gt; <span class="ident">ContextGuard</span> {
-        <span class="kw">let</span> <span class="ident">previous_cx</span> <span class="op">=</span> <span class="ident">CURRENT_CONTEXT</span>
-            .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">current</span>.<span class="ident">replace</span>(<span class="self">self</span>))
-            .<span class="ident">ok</span>();
+    <span class="doccomment">/// Replaces the current context on this thread with this context.
+    ///
+    /// Dropping the returned [`ContextGuard`] will reset the current context to the
+    /// previous value.
+    ///
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    ///
+    /// let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));
+    ///
+    /// // Set the current thread context
+    /// let cx_guard = my_cx.attach();
+    /// assert_eq!(Context::current().get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    ///
+    /// // Drop the guard to restore the previous context
+    /// drop(cx_guard);
+    /// assert_eq!(Context::current().get::&lt;ValueA&gt;(), None);
+    /// ```
+    ///
+    /// Guards do not need to be explicitly dropped:
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    ///
+    /// fn my_function() -&gt; String {
+    ///     // attach a context the duration of this function.
+    ///     let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));
+    ///     // NOTE: a variable name after the underscore is **required** or rust
+    ///     // will drop the guard, restoring the previous context _immediately_.
+    ///     let _guard = my_cx.attach();
+    ///
+    ///     // anything happening in functions we call can still access my_cx...
+    ///     my_other_function();
+    ///
+    ///     // returning from the function drops the guard, exiting the span.
+    ///     return &quot;Hello world&quot;.to_owned();
+    /// }
+    ///
+    /// fn my_other_function() {
+    ///     // ...
+    /// }
+    /// ```
+    /// Sub-scopes may be created to limit the duration for which the span is
+    /// entered:
+    ///
+    /// ```
+    /// use opentelemetry::Context;
+    ///
+    /// #[derive(Debug, PartialEq)]
+    /// struct ValueA(&amp;&#39;static str);
+    ///
+    /// let my_cx = Context::new().with_value(ValueA(&quot;a&quot;));
+    ///
+    /// {
+    ///     let _guard = my_cx.attach();
+    ///
+    ///     // the current context can access variables in
+    ///     assert_eq!(Context::current().get::&lt;ValueA&gt;(), Some(&amp;ValueA(&quot;a&quot;)));
+    ///
+    ///     // exiting the scope drops the guard, detaching the context.
+    /// }
+    ///
+    /// // this is back in the default empty context
+    /// assert_eq!(Context::current().get::&lt;ValueA&gt;(), None);
+    /// ```
+    </span><span class="kw">pub fn </span>attach(<span class="self">self</span>) -&gt; ContextGuard {
+        <span class="kw">let </span>previous_cx = CURRENT_CONTEXT
+            .try_with(|current| current.replace(<span class="self">self</span>))
+            .ok();
 
-        <span class="ident">ContextGuard</span> {
-            <span class="ident">previous_cx</span>,
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+        ContextGuard {
+            previous_cx,
+            _marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Context&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;entries&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">len</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Context {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Context&quot;</span>)
+            .field(<span class="string">&quot;entries&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.entries.len())
+            .finish()
     }
 }
 
-<span class="doccomment">/// A guard that resets the current context to the prior context when dropped.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ContextGuard</span> {
-    <span class="ident">previous_cx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>,
-    <span class="comment">// ensure this type is !Send as it relies on thread locals</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span>,
+<span class="doccomment">/// A guard that resets the current context to the prior context when dropped.
+</span><span class="attribute">#[allow(missing_debug_implementations)]
+</span><span class="kw">pub struct </span>ContextGuard {
+    previous_cx: <span class="prelude-ty">Option</span>&lt;Context&gt;,
+    <span class="comment">// ensure this type is !Send as it relies on thread locals
+    </span>_marker: PhantomData&lt;<span class="kw-2">*const </span>()&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ContextGuard</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">previous_cx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">previous_cx</span>.<span class="ident">take</span>() {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">CURRENT_CONTEXT</span>.<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">current</span>.<span class="ident">replace</span>(<span class="ident">previous_cx</span>));
+<span class="kw">impl </span>Drop <span class="kw">for </span>ContextGuard {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(previous_cx) = <span class="self">self</span>.previous_cx.take() {
+            <span class="kw">let _ </span>= CURRENT_CONTEXT.try_with(|current| current.replace(previous_cx));
         }
     }
 }
 
-<span class="doccomment">/// Executes a closure with a reference to this thread&#39;s current context.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: This function will panic if you attempt to attach another context</span>
-<span class="doccomment">/// while the context is still borrowed.</span>
-<span class="kw">fn</span> <span class="ident">get_current</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">T</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span> {
-    <span class="ident">CURRENT_CONTEXT</span>
-        .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">cx</span>.<span class="ident">borrow</span>()))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DEFAULT_CONTEXT</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">cx</span>)))
+<span class="doccomment">/// Executes a closure with a reference to this thread&#39;s current context.
+///
+/// Note: This function will panic if you attempt to attach another context
+/// while the context is still borrowed.
+</span><span class="kw">fn </span>get_current&lt;F: FnMut(<span class="kw-2">&amp;</span>Context) -&gt; T, T&gt;(<span class="kw-2">mut </span>f: F) -&gt; T {
+    CURRENT_CONTEXT
+        .try_with(|cx| f(<span class="kw-2">&amp;*</span>cx.borrow()))
+        .unwrap_or_else(|<span class="kw">_</span>| DEFAULT_CONTEXT.with(|cx| f(<span class="kw-2">&amp;*</span>cx)))
 }
 
-<span class="doccomment">/// With TypeIds as keys, there&#39;s no need to hash them. They are already hashes</span>
-<span class="doccomment">/// themselves, coming from the compiler. The IdHasher holds the u64 of</span>
-<span class="doccomment">/// the TypeId, and then returns it, instead of doing any bit fiddling.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">IdHasher</span>(<span class="ident">u64</span>);
+<span class="doccomment">/// With TypeIds as keys, there&#39;s no need to hash them. They are already hashes
+/// themselves, coming from the compiler. The IdHasher holds the u64 of
+/// the TypeId, and then returns it, instead of doing any bit fiddling.
+</span><span class="attribute">#[derive(Clone, Default, Debug)]
+</span><span class="kw">struct </span>IdHasher(u64);
 
-<span class="kw">impl</span> <span class="ident">Hasher</span> <span class="kw">for</span> <span class="ident">IdHasher</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">impl </span>Hasher <span class="kw">for </span>IdHasher {
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[u8]) {
         <span class="macro">unreachable!</span>(<span class="string">&quot;TypeId calls write_u64&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">id</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>write_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u64) {
+        <span class="self">self</span>.<span class="number">0 </span>= id;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>finish(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">nested_contexts</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ValueA</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">ValueB</span>(<span class="ident">u64</span>);
-        <span class="kw">let</span> <span class="ident">_outer_guard</span> <span class="op">=</span> <span class="ident">Context::new</span>().<span class="ident">with_value</span>(<span class="ident">ValueA</span>(<span class="string">&quot;a&quot;</span>)).<span class="ident">attach</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>nested_contexts() {
+        <span class="attribute">#[derive(Debug, PartialEq)]
+        </span><span class="kw">struct </span>ValueA(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
+        <span class="attribute">#[derive(Debug, PartialEq)]
+        </span><span class="kw">struct </span>ValueB(u64);
+        <span class="kw">let </span>_outer_guard = Context::new().with_value(ValueA(<span class="string">&quot;a&quot;</span>)).attach();
 
-        <span class="comment">// Only value `a` is set</span>
-        <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">Context::current</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ValueA</span>(<span class="string">&quot;a&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">ValueB</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+        <span class="comment">// Only value `a` is set
+        </span><span class="kw">let </span>current = Context::current();
+        <span class="macro">assert_eq!</span>(current.get(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ValueA(<span class="string">&quot;a&quot;</span>)));
+        <span class="macro">assert_eq!</span>(current.get::&lt;ValueB&gt;(), <span class="prelude-val">None</span>);
 
         {
-            <span class="kw">let</span> <span class="ident">_inner_guard</span> <span class="op">=</span> <span class="ident">Context::current_with_value</span>(<span class="ident">ValueB</span>(<span class="number">42</span>)).<span class="ident">attach</span>();
-            <span class="comment">// Both values are set in inner context</span>
-            <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">Context::current</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ValueA</span>(<span class="string">&quot;a&quot;</span>)));
-            <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ValueB</span>(<span class="number">42</span>)));
+            <span class="kw">let </span>_inner_guard = Context::current_with_value(ValueB(<span class="number">42</span>)).attach();
+            <span class="comment">// Both values are set in inner context
+            </span><span class="kw">let </span>current = Context::current();
+            <span class="macro">assert_eq!</span>(current.get(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ValueA(<span class="string">&quot;a&quot;</span>)));
+            <span class="macro">assert_eq!</span>(current.get(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ValueB(<span class="number">42</span>)));
         }
 
-        <span class="comment">// Resets to only value `a` when inner guard is dropped</span>
-        <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">Context::current</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ValueA</span>(<span class="string">&quot;a&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">current</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">ValueB</span><span class="op">&gt;</span>(), <span class="prelude-val">None</span>);
+        <span class="comment">// Resets to only value `a` when inner guard is dropped
+        </span><span class="kw">let </span>current = Context::current();
+        <span class="macro">assert_eq!</span>(current.get(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ValueA(<span class="string">&quot;a&quot;</span>)));
+        <span class="macro">assert_eq!</span>(current.get::&lt;ValueB&gt;(), <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

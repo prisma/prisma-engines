@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/byte.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>byte.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/byte.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>byte.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -781,423 +781,423 @@
 <span id="781">781</span>
 <span id="782">782</span>
 <span id="783">783</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module containing parsers specialized on byte streams.</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ascii</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Module containing parsers specialized on byte streams.
+</span><span class="kw">extern crate </span>ascii;
 
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+<span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::ascii::AsciiChar</span>;
+<span class="kw">use </span><span class="self">self</span>::ascii::AsciiChar;
 
-<span class="kw">use</span> <span class="ident">combinator</span>::{<span class="ident">satisfy</span>, <span class="ident">skip_many</span>, <span class="ident">token</span>, <span class="ident">tokens</span>, <span class="ident">Expected</span>, <span class="ident">Satisfy</span>, <span class="ident">SkipMany</span>, <span class="ident">Token</span>};
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">Info</span>, <span class="ident">ParseError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">parser::range</span>::{<span class="ident">take_fn</span>, <span class="ident">TakeRange</span>};
-<span class="kw">use</span> <span class="ident">parser::sequence::With</span>;
-<span class="kw">use</span> <span class="ident">stream</span>::{<span class="ident">FullRangeStream</span>, <span class="ident">RangeStream</span>, <span class="ident">Stream</span>, <span class="ident">StreamOnce</span>};
-<span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="kw">use </span>combinator::{satisfy, skip_many, token, tokens, Expected, Satisfy, SkipMany, Token};
+<span class="kw">use </span>error::{ConsumedResult, Info, ParseError, Tracked};
+<span class="kw">use </span>parser::range::{take_fn, TakeRange};
+<span class="kw">use </span>parser::sequence::With;
+<span class="kw">use </span>stream::{FullRangeStream, RangeStream, Stream, StreamOnce};
+<span class="kw">use </span>Parser;
 
-<span class="kw">use</span> <span class="ident">error::FastResult</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>error::FastResult::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Parses a byte and succeeds if the byte is equal to `c`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::byte;</span>
-<span class="doccomment">/// assert_eq!(byte(b&#39;!&#39;).parse(&amp;b&quot;!&quot;[..]), Ok((b&#39;!&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(byte(b&#39;A&#39;).parse(&amp;b&quot;&quot;[..]).is_err());</span>
-<span class="doccomment">/// assert!(byte(b&#39;A&#39;).parse(&amp;b&quot;!&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">byte</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">c</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Token</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a byte and succeeds if the byte is equal to `c`.
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::byte;
+/// assert_eq!(byte(b&#39;!&#39;).parse(&amp;b&quot;!&quot;[..]), Ok((b&#39;!&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(byte(b&#39;A&#39;).parse(&amp;b&quot;&quot;[..]).is_err());
+/// assert!(byte(b&#39;A&#39;).parse(&amp;b&quot;!&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>byte&lt;I&gt;(c: u8) -&gt; Token&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">token</span>(<span class="ident">c</span>)
+    token(c)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Digit</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser! </span>{ Digit(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
 
-<span class="macro">macro_rules!</span> <span class="ident">byte_parser</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="macro">static_fn!</span> {
-            (<span class="ident">c</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> { <span class="ident">AsciiChar::from</span>(<span class="ident">c</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) }
+<span class="macro">macro_rules! </span>byte_parser {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$ty</span>:ident, <span class="macro-nonterminal">$f</span>:ident) =&gt; {{
+        <span class="kw">let </span>f = <span class="macro">static_fn! </span>{
+            (c, u8) -&gt; bool { AsciiChar::from(c).map(|c| c.<span class="macro-nonterminal">$f</span>()).unwrap_or(<span class="bool-val">false</span>) }
         };
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>(<span class="ident">satisfy</span>(<span class="ident">f</span>).<span class="ident">expected</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>)), <span class="ident">PhantomData</span>)
+        <span class="macro-nonterminal">$ty</span>(satisfy(f).expected(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>)), PhantomData)
     }};
 }
 
-<span class="doccomment">/// Parses a base-10 digit (0–9).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::digit;</span>
-<span class="doccomment">/// assert_eq!(digit().parse(&amp;b&quot;9&quot;[..]), Ok((b&#39;9&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(digit().parse(&amp;b&quot;A&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a base-10 digit (0–9).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::digit;
+/// assert_eq!(digit().parse(&amp;b&quot;9&quot;[..]), Ok((b&#39;9&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(digit().parse(&amp;b&quot;A&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>digit&lt;I&gt;() -&gt; Digit&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">digit</span>, <span class="ident">Digit</span>, <span class="ident">is_digit</span>)
+    <span class="macro">byte_parser!</span>(digit, Digit, is_digit)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Space</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser! </span>{ Space(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
 
-<span class="doccomment">/// Parses a `b&#39; &#39;`, `b&#39;\t&#39;`, `b&#39;\n&#39;` or `&#39;b\&#39;r&#39;`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::space;</span>
-<span class="doccomment">/// assert_eq!(space().parse(&amp;b&quot; &quot;[..]), Ok((b&#39; &#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert_eq!(space().parse(&amp;b&quot;  &quot;[..]), Ok((b&#39; &#39;, &amp;b&quot; &quot;[..])));</span>
-<span class="doccomment">/// assert!(space().parse(&amp;b&quot;!&quot;[..]).is_err());</span>
-<span class="doccomment">/// assert!(space().parse(&amp;b&quot;&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a `b&#39; &#39;`, `b&#39;\t&#39;`, `b&#39;\n&#39;` or `&#39;b\&#39;r&#39;`.
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::space;
+/// assert_eq!(space().parse(&amp;b&quot; &quot;[..]), Ok((b&#39; &#39;, &amp;b&quot;&quot;[..])));
+/// assert_eq!(space().parse(&amp;b&quot;  &quot;[..]), Ok((b&#39; &#39;, &amp;b&quot; &quot;[..])));
+/// assert!(space().parse(&amp;b&quot;!&quot;[..]).is_err());
+/// assert!(space().parse(&amp;b&quot;&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>space&lt;I&gt;() -&gt; Space&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">space</span>, <span class="ident">Space</span>, <span class="ident">is_whitespace</span>)
+    <span class="macro">byte_parser!</span>(space, Space, is_whitespace)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Spaces</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">SkipMany</span><span class="op">&lt;</span><span class="ident">Space</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Skips over [`space`] zero or more times</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`space`]: fn.space.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::spaces;</span>
-<span class="doccomment">/// assert_eq!(spaces().parse(&amp;b&quot;&quot;[..]), Ok(((), &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert_eq!(spaces().parse(&amp;b&quot;   &quot;[..]), Ok(((), &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Spaces</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ Spaces(), u8, Expected&lt;SkipMany&lt;Space&lt;I&gt;&gt;&gt; }
+<span class="doccomment">/// Skips over [`space`] zero or more times
+///
+/// [`space`]: fn.space.html
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::spaces;
+/// assert_eq!(spaces().parse(&amp;b&quot;&quot;[..]), Ok(((), &amp;b&quot;&quot;[..])));
+/// assert_eq!(spaces().parse(&amp;b&quot;   &quot;[..]), Ok(((), &amp;b&quot;&quot;[..])));
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>spaces&lt;I&gt;() -&gt; Spaces&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">Spaces</span>(<span class="ident">skip_many</span>(<span class="ident">space</span>()).<span class="ident">expected</span>(<span class="string">&quot;whitespaces&quot;</span>), <span class="ident">PhantomData</span>)
+    Spaces(skip_many(space()).expected(<span class="string">&quot;whitespaces&quot;</span>), PhantomData)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Newline</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser! </span>{ Newline(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
 
-<span class="doccomment">/// Parses a newline byte (`b&#39;\n&#39;`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::newline;</span>
-<span class="doccomment">/// assert_eq!(newline().parse(&amp;b&quot;\n&quot;[..]), Ok((b&#39;\n&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(newline().parse(&amp;b&quot;\r&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses a newline byte (`b&#39;\n&#39;`).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::newline;
+/// assert_eq!(newline().parse(&amp;b&quot;\n&quot;[..]), Ok((b&#39;\n&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(newline().parse(&amp;b&quot;\r&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>newline&lt;I&gt;() -&gt; Newline&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">Newline</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">b&#39;\n&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;lf newline&quot;</span>),
-        <span class="ident">PhantomData</span>,
+    Newline(
+        satisfy(<span class="macro">static_fn!</span>((ch, u8) -&gt; bool { ch == <span class="string">b&#39;\n&#39; </span>})).expected(<span class="string">&quot;lf newline&quot;</span>),
+        PhantomData,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">CrLf</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">With</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Newline</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser! </span>{ CrLf(), u8, Expected&lt;With&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;, Newline&lt;I&gt;&gt;&gt; }
 
-<span class="doccomment">/// Parses carriage return and newline (`&amp;b&quot;\r\n&quot;`), returning the newline byte.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::crlf;</span>
-<span class="doccomment">/// assert_eq!(crlf().parse(&amp;b&quot;\r\n&quot;[..]), Ok((b&#39;\n&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(crlf().parse(&amp;b&quot;\r&quot;[..]).is_err());</span>
-<span class="doccomment">/// assert!(crlf().parse(&amp;b&quot;\n&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crlf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">CrLf</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses carriage return and newline (`&amp;b&quot;\r\n&quot;`), returning the newline byte.
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::crlf;
+/// assert_eq!(crlf().parse(&amp;b&quot;\r\n&quot;[..]), Ok((b&#39;\n&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(crlf().parse(&amp;b&quot;\r&quot;[..]).is_err());
+/// assert!(crlf().parse(&amp;b&quot;\n&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>crlf&lt;I&gt;() -&gt; CrLf&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">CrLf</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">b&#39;\r&#39;</span> }))
-            .<span class="ident">with</span>(<span class="ident">newline</span>())
-            .<span class="ident">expected</span>(<span class="string">&quot;crlf newline&quot;</span>),
-        <span class="ident">PhantomData</span>,
+    CrLf(
+        satisfy(<span class="macro">static_fn!</span>((ch, u8) -&gt; bool { ch == <span class="string">b&#39;\r&#39; </span>}))
+            .with(newline())
+            .expected(<span class="string">&quot;crlf newline&quot;</span>),
+        PhantomData,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Tab</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses a tab byte (`b&#39;\t&#39;`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::tab;</span>
-<span class="doccomment">/// assert_eq!(tab().parse(&amp;b&quot;\t&quot;[..]), Ok((b&#39;\t&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(tab().parse(&amp;b&quot; &quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Tab</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ Tab(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses a tab byte (`b&#39;\t&#39;`).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::tab;
+/// assert_eq!(tab().parse(&amp;b&quot;\t&quot;[..]), Ok((b&#39;\t&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(tab().parse(&amp;b&quot; &quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>tab&lt;I&gt;() -&gt; Tab&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">Tab</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">==</span> <span class="string">b&#39;\t&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;tab&quot;</span>),
-        <span class="ident">PhantomData</span>,
+    Tab(
+        satisfy(<span class="macro">static_fn!</span>((ch, u8) -&gt; bool { ch == <span class="string">b&#39;\t&#39; </span>})).expected(<span class="string">&quot;tab&quot;</span>),
+        PhantomData,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Upper</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses an uppercase ASCII letter (A–Z).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::upper;</span>
-<span class="doccomment">/// assert_eq!(upper().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(upper().parse(&amp;b&quot;a&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Upper</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ Upper(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses an uppercase ASCII letter (A–Z).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::upper;
+/// assert_eq!(upper().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(upper().parse(&amp;b&quot;a&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>upper&lt;I&gt;() -&gt; Upper&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">upper</span>, <span class="ident">Upper</span>, <span class="ident">is_uppercase</span>)
+    <span class="macro">byte_parser!</span>(upper, Upper, is_uppercase)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Lower</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses an lowercase ASCII letter (a–z).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::lower;</span>
-<span class="doccomment">/// assert_eq!(lower().parse(&amp;b&quot;a&quot;[..]), Ok((b&#39;a&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(lower().parse(&amp;b&quot;A&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Lower</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ Lower(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses an lowercase ASCII letter (a–z).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::lower;
+/// assert_eq!(lower().parse(&amp;b&quot;a&quot;[..]), Ok((b&#39;a&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(lower().parse(&amp;b&quot;A&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>lower&lt;I&gt;() -&gt; Lower&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">lower</span>, <span class="ident">Lower</span>, <span class="ident">is_lowercase</span>)
+    <span class="macro">byte_parser!</span>(lower, Lower, is_lowercase)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">AlphaNum</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses either an ASCII alphabet letter or digit (a–z, A–Z, 0–9).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::alpha_num;</span>
-<span class="doccomment">/// assert_eq!(alpha_num().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert_eq!(alpha_num().parse(&amp;b&quot;1&quot;[..]), Ok((b&#39;1&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(alpha_num().parse(&amp;b&quot;!&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">alpha_num</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">AlphaNum</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ AlphaNum(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses either an ASCII alphabet letter or digit (a–z, A–Z, 0–9).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::alpha_num;
+/// assert_eq!(alpha_num().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));
+/// assert_eq!(alpha_num().parse(&amp;b&quot;1&quot;[..]), Ok((b&#39;1&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(alpha_num().parse(&amp;b&quot;!&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>alpha_num&lt;I&gt;() -&gt; AlphaNum&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">alpha_num</span>, <span class="ident">AlphaNum</span>, <span class="ident">is_alphanumeric</span>)
+    <span class="macro">byte_parser!</span>(alpha_num, AlphaNum, is_alphanumeric)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">Letter</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses an ASCII alphabet letter (a–z, A–Z).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::letter;</span>
-<span class="doccomment">/// assert_eq!(letter().parse(&amp;b&quot;a&quot;[..]), Ok((b&#39;a&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert_eq!(letter().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(letter().parse(&amp;b&quot;9&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">Letter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ Letter(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses an ASCII alphabet letter (a–z, A–Z).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::letter;
+/// assert_eq!(letter().parse(&amp;b&quot;a&quot;[..]), Ok((b&#39;a&#39;, &amp;b&quot;&quot;[..])));
+/// assert_eq!(letter().parse(&amp;b&quot;A&quot;[..]), Ok((b&#39;A&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(letter().parse(&amp;b&quot;9&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>letter&lt;I&gt;() -&gt; Letter&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">letter</span>, <span class="ident">Letter</span>, <span class="ident">is_alphabetic</span>)
+    <span class="macro">byte_parser!</span>(letter, Letter, is_alphabetic)
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">OctDigit</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
+<span class="macro">impl_token_parser! </span>{ OctDigit(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
 
-<span class="doccomment">/// Parses an octal digit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::oct_digit;</span>
-<span class="doccomment">/// assert_eq!(oct_digit().parse(&amp;b&quot;7&quot;[..]), Ok((b&#39;7&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(oct_digit().parse(&amp;b&quot;8&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oct_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">OctDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses an octal digit.
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::oct_digit;
+/// assert_eq!(oct_digit().parse(&amp;b&quot;7&quot;[..]), Ok((b&#39;7&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(oct_digit().parse(&amp;b&quot;8&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>oct_digit&lt;I&gt;() -&gt; OctDigit&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">OctDigit</span>(
-        <span class="ident">satisfy</span>(<span class="macro">static_fn!</span>((<span class="ident">ch</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> { <span class="ident">ch</span> <span class="op">&gt;</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">b&#39;7&#39;</span> })).<span class="ident">expected</span>(<span class="string">&quot;octal digit&quot;</span>),
-        <span class="ident">PhantomData</span>,
+    OctDigit(
+        satisfy(<span class="macro">static_fn!</span>((ch, u8) -&gt; bool { ch &gt;= <span class="string">b&#39;0&#39; </span>&amp;&amp; ch &lt;= <span class="string">b&#39;7&#39; </span>})).expected(<span class="string">&quot;octal digit&quot;</span>),
+        PhantomData,
     )
 }
 
-<span class="macro">impl_token_parser!</span> { <span class="ident">HexDigit</span>(), <span class="ident">u8</span>, <span class="ident">Expected</span><span class="op">&lt;</span><span class="ident">Satisfy</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="kw">fn</span> (<span class="ident">u8</span>) -&gt; <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> }
-<span class="doccomment">/// Parses an ASCII hexdecimal digit (accepts both uppercase and lowercase).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::Parser;</span>
-<span class="doccomment">/// use combine::parser::byte::hex_digit;</span>
-<span class="doccomment">/// assert_eq!(hex_digit().parse(&amp;b&quot;F&quot;[..]), Ok((b&#39;F&#39;, &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// assert!(hex_digit().parse(&amp;b&quot;H&quot;[..]).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hex_digit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="ident">HexDigit</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="macro">impl_token_parser! </span>{ HexDigit(), u8, Expected&lt;Satisfy&lt;I, <span class="kw">fn </span>(u8) -&gt; bool&gt;&gt; }
+<span class="doccomment">/// Parses an ASCII hexdecimal digit (accepts both uppercase and lowercase).
+///
+/// ```
+/// use combine::Parser;
+/// use combine::parser::byte::hex_digit;
+/// assert_eq!(hex_digit().parse(&amp;b&quot;F&quot;[..]), Ok((b&#39;F&#39;, &amp;b&quot;&quot;[..])));
+/// assert!(hex_digit().parse(&amp;b&quot;H&quot;[..]).is_err());
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>hex_digit&lt;I&gt;() -&gt; HexDigit&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="macro">byte_parser!</span>(<span class="ident">hex_digit</span>, <span class="ident">HexDigit</span>, <span class="ident">is_hex</span>)
+    <span class="macro">byte_parser!</span>(hex_digit, HexDigit, is_hex)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>], <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>;
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Bytes&lt;I&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8], PhantomData&lt;I&gt;)
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span>, <span class="ident">Range</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; Parser <span class="kw">for </span>Bytes&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8, Range = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>];
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8];
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="ident">tokens</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>, <span class="ident">Info::Range</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
-            .<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">bytes</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">as_slice</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        tokens(|<span class="kw-2">&amp;</span>l, r| l == r, Info::Range(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.iter())
+            .parse_lazy(input)
+            .map(|bytes| bytes.as_slice())
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="ident">tokens</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>, <span class="ident">Info::Range</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>()).<span class="ident">add_error</span>(<span class="ident">errors</span>)
-    }
-}
-
-<span class="doccomment">/// Parses the bytes `s`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you have a stream implementing [`RangeStream`] such as `&amp;[u8]` you can also use the</span>
-<span class="doccomment">/// [`range`] parser which may be more efficient.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::parser::byte::bytes;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let result = bytes(&amp;b&quot;rust&quot;[..])</span>
-<span class="doccomment">///     .parse(&amp;b&quot;rust&quot;[..])</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(&amp;b&quot;rust&quot;[..]));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`RangeStream`]: ../stream/trait.RangeStream.html</span>
-<span class="doccomment">/// [`range`]: ../range/fn.range.html</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span>, <span class="ident">Range</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
-{
-    <span class="ident">Bytes</span>(<span class="ident">s</span>, <span class="ident">PhantomData</span>)
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BytesCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>], <span class="ident">C</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>)
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>;
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">BytesCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">u8</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span>, <span class="ident">Range</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
-{
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>];
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">1</span>;
-        <span class="ident">tokens</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">cmp</span>(<span class="ident">l</span>, <span class="ident">r</span>), <span class="ident">Info::Range</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>).<span class="ident">parse_lazy</span>(<span class="ident">input</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">cmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">1</span>;
-        <span class="ident">tokens</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">cmp</span>(<span class="ident">l</span>, <span class="ident">r</span>), <span class="ident">Info::Range</span>(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>()).<span class="ident">add_error</span>(<span class="ident">errors</span>)
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        tokens::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(|<span class="kw-2">&amp;</span>l, r| l == r, Info::Range(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.iter()).add_error(errors)
     }
 }
 
-<span class="doccomment">/// Parses the bytes `s` using `cmp` to compare each token.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you have a stream implementing [`RangeStream`] such as `&amp;[u8]` you can also use the</span>
-<span class="doccomment">/// [`range`] parser which may be more efficient.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::parser::byte::bytes_cmp;</span>
-<span class="doccomment">/// # use combine::stream::easy::Info;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// use std::ascii::AsciiExt;</span>
-<span class="doccomment">/// let result = bytes_cmp(&amp;b&quot;abc&quot;[..], |l, r| l.eq_ignore_ascii_case(&amp;r))</span>
-<span class="doccomment">///     .parse(&amp;b&quot;AbC&quot;[..]);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&amp;b&quot;abc&quot;[..], &amp;b&quot;&quot;[..])));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`RangeStream`]: ../stream/trait.RangeStream.html</span>
-<span class="doccomment">/// [`range`]: ../range/fn.range.html</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes_cmp</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>], <span class="ident">cmp</span>: <span class="ident">C</span>) -&gt; <span class="ident">BytesCmp</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">FnMut</span>(<span class="ident">u8</span>, <span class="ident">u8</span>) -&gt; <span class="ident">bool</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span>, <span class="ident">Range</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses the bytes `s`.
+///
+/// If you have a stream implementing [`RangeStream`] such as `&amp;[u8]` you can also use the
+/// [`range`] parser which may be more efficient.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::parser::byte::bytes;
+/// # fn main() {
+/// let result = bytes(&amp;b&quot;rust&quot;[..])
+///     .parse(&amp;b&quot;rust&quot;[..])
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(&amp;b&quot;rust&quot;[..]));
+/// # }
+/// ```
+///
+/// [`RangeStream`]: ../stream/trait.RangeStream.html
+/// [`range`]: ../range/fn.range.html
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>bytes&lt;<span class="lifetime">&#39;a</span>, I&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]) -&gt; Bytes&lt;I&gt;
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8, Range = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
 {
-    <span class="ident">BytesCmp</span>(<span class="ident">s</span>, <span class="ident">cmp</span>, <span class="ident">PhantomData</span>)
+    Bytes(s, PhantomData)
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">take_until</span> {
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>BytesCmp&lt;C, I&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8], C, PhantomData&lt;I&gt;)
+<span class="kw">where
+    </span>I: Stream&lt;Item = u8&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;;
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C, I&gt; Parser <span class="kw">for </span>BytesCmp&lt;C, I&gt;
+<span class="kw">where
+    </span>C: FnMut(u8, u8) -&gt; bool,
+    I: Stream&lt;Item = u8, Range = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+{
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8];
+    <span class="kw">type </span>PartialState = ();
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        <span class="kw">let </span>cmp = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">1</span>;
+        tokens(|<span class="kw-2">&amp;</span>l, r| cmp(l, r), Info::Range(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>).parse_lazy(input)
+    }
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="kw">let </span>cmp = <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">1</span>;
+        tokens::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(|<span class="kw-2">&amp;</span>l, r| cmp(l, r), Info::Range(<span class="self">self</span>.<span class="number">0</span>), <span class="self">self</span>.<span class="number">0</span>.iter()).add_error(errors)
+    }
+}
+
+<span class="doccomment">/// Parses the bytes `s` using `cmp` to compare each token.
+///
+/// If you have a stream implementing [`RangeStream`] such as `&amp;[u8]` you can also use the
+/// [`range`] parser which may be more efficient.
+///
+/// ```
+/// # extern crate combine;
+/// # use combine::*;
+/// # use combine::parser::byte::bytes_cmp;
+/// # use combine::stream::easy::Info;
+/// # fn main() {
+/// use std::ascii::AsciiExt;
+/// let result = bytes_cmp(&amp;b&quot;abc&quot;[..], |l, r| l.eq_ignore_ascii_case(&amp;r))
+///     .parse(&amp;b&quot;AbC&quot;[..]);
+/// assert_eq!(result, Ok((&amp;b&quot;abc&quot;[..], &amp;b&quot;&quot;[..])));
+/// # }
+/// ```
+///
+/// [`RangeStream`]: ../stream/trait.RangeStream.html
+/// [`range`]: ../range/fn.range.html
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>bytes_cmp&lt;<span class="lifetime">&#39;a</span>, C, I&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8], cmp: C) -&gt; BytesCmp&lt;C, I&gt;
+<span class="kw">where
+    </span>C: FnMut(u8, u8) -&gt; bool,
+    I: Stream&lt;Item = u8, Range = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+{
+    BytesCmp(s, cmp, PhantomData)
+}
+
+<span class="macro">macro_rules! </span>take_until {
     (
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">memchr</span>: <span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>: <span class="ident">ident</span>),<span class="op">+</span>
+        $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)*
+        <span class="macro-nonterminal">$type_name</span>: ident, <span class="macro-nonterminal">$func_name</span>: ident, <span class="macro-nonterminal">$memchr</span>: ident, $(<span class="macro-nonterminal">$param</span>: ident),+
     ) =&gt; {
         <span class="macro">parser!</span>{
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>;
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>[<span class="ident">I</span>]($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span> : <span class="ident">u8</span>),<span class="kw-2">*</span>)(<span class="ident">I</span>) -&gt; <span class="ident">I::Range</span>
-                <span class="kw">where</span> [
-                    <span class="ident">I</span>: <span class="ident">RangeStream</span> <span class="op">+</span> <span class="ident">FullRangeStream</span>,
-                    <span class="ident">I::Range</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">::stream::Range</span>,
+            <span class="attribute">#[derive(Clone)]
+            </span><span class="kw">pub struct </span><span class="macro-nonterminal">$type_name</span>;
+            <span class="attribute">#[inline(always)]
+            </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+            <span class="kw">pub fn </span><span class="macro-nonterminal">$func_name</span>[I]($(<span class="macro-nonterminal">$param </span>: u8),<span class="kw-2">*</span>)(I) -&gt; I::Range
+                <span class="kw">where </span>[
+                    I: RangeStream + FullRangeStream,
+                    I::Range: AsRef&lt;[u8]&gt; + ::stream::Range,
                 ]
             {
-                <span class="ident">take_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">haystack</span>: <span class="ident">I::Range</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">haystack</span> <span class="op">=</span> <span class="ident">haystack</span>.<span class="ident">as_ref</span>();
-                    <span class="kw">match</span> <span class="ident">::memchr</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">memchr</span>( $(<span class="kw-2">*</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">param</span>),<span class="op">+</span> , <span class="ident">haystack</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>),
-                        <span class="prelude-val">None</span> =&gt; <span class="ident">TakeRange::NotFound</span>(<span class="ident">haystack</span>.<span class="ident">len</span>()),
+                take_fn(<span class="kw">move </span>|haystack: I::Range| {
+                    <span class="kw">let </span>haystack = haystack.as_ref();
+                    <span class="kw">match </span>::memchr::<span class="macro-nonterminal">$memchr</span>( $(<span class="kw-2">*</span><span class="macro-nonterminal">$param</span>),+ , haystack) {
+                        <span class="prelude-val">Some</span>(i) =&gt; TakeRange::Found(i),
+                        <span class="prelude-val">None </span>=&gt; TakeRange::NotFound(haystack.len()),
                     }
                 })
             }
@@ -1205,364 +1205,364 @@
     }
 }
 
-<span class="macro">take_until!</span> {
-    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a` is found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `a` is not found, the parser will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate combine;</span>
-    <span class="doccomment">/// # use combine::parser::byte::take_until_byte;</span>
-    <span class="doccomment">/// # use combine::*;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut parser = take_until_byte(b&#39;\r&#39;);</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);</span>
-    <span class="doccomment">/// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;Hello, world\n&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TakeUntilByte</span>, <span class="ident">take_until_byte</span>, <span class="ident">memchr</span>, <span class="ident">a</span>
+<span class="macro">take_until! </span>{
+    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a` is found.
+    ///
+    /// If `a` is not found, the parser will return an error.
+    ///
+    /// ```
+    /// # extern crate combine;
+    /// # use combine::parser::byte::take_until_byte;
+    /// # use combine::*;
+    /// # fn main() {
+    /// let mut parser = take_until_byte(b&#39;\r&#39;);
+    /// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);
+    /// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));
+    /// let result = parser.parse(&quot;Hello, world\n&quot;);
+    /// assert!(result.is_err());
+    /// # }
+    /// ```
+    </span>TakeUntilByte, take_until_byte, memchr, a
 }
-<span class="macro">take_until!</span> {
-    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a` or `b` is found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `a` or `b` is not found, the parser will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate combine;</span>
-    <span class="doccomment">/// # use combine::parser::byte::take_until_byte2;</span>
-    <span class="doccomment">/// # use combine::*;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut parser = take_until_byte2(b&#39;\r&#39;, b&#39;\n&#39;);</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);</span>
-    <span class="doccomment">/// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;Hello, world\n&quot;);</span>
-    <span class="doccomment">/// assert_eq!(result, Ok((&quot;Hello, world&quot;, &quot;\n&quot;)));</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TakeUntilByte2</span>, <span class="ident">take_until_byte2</span>, <span class="ident">memchr2</span>, <span class="ident">a</span>, <span class="ident">b</span>
+<span class="macro">take_until! </span>{
+    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a` or `b` is found.
+    ///
+    /// If `a` or `b` is not found, the parser will return an error.
+    ///
+    /// ```
+    /// # extern crate combine;
+    /// # use combine::parser::byte::take_until_byte2;
+    /// # use combine::*;
+    /// # fn main() {
+    /// let mut parser = take_until_byte2(b&#39;\r&#39;, b&#39;\n&#39;);
+    /// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);
+    /// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));
+    /// let result = parser.parse(&quot;Hello, world\n&quot;);
+    /// assert_eq!(result, Ok((&quot;Hello, world&quot;, &quot;\n&quot;)));
+    /// # }
+    /// ```
+    </span>TakeUntilByte2, take_until_byte2, memchr2, a, b
 }
-<span class="macro">take_until!</span> {
-    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a`, &#39;b&#39; or `c` is found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `a`, &#39;b&#39; or `c` is not found, the parser will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate combine;</span>
-    <span class="doccomment">/// # use combine::parser::byte::take_until_byte3;</span>
-    <span class="doccomment">/// # use combine::*;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut parser = take_until_byte3(b&#39;\r&#39;, b&#39;\n&#39;, b&#39; &#39;);</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);</span>
-    <span class="doccomment">/// assert_eq!(result, Ok((&quot;To:&quot;, &quot; user@example.com\r\n&quot;)));</span>
-    <span class="doccomment">/// let result = parser.parse(&quot;Helloworld&quot;);</span>
-    <span class="doccomment">/// assert!(result.is_err());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TakeUntilByte3</span>, <span class="ident">take_until_byte3</span>, <span class="ident">memchr3</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>
+<span class="macro">take_until! </span>{
+    <span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `a`, &#39;b&#39; or `c` is found.
+    ///
+    /// If `a`, &#39;b&#39; or `c` is not found, the parser will return an error.
+    ///
+    /// ```
+    /// # extern crate combine;
+    /// # use combine::parser::byte::take_until_byte3;
+    /// # use combine::*;
+    /// # fn main() {
+    /// let mut parser = take_until_byte3(b&#39;\r&#39;, b&#39;\n&#39;, b&#39; &#39;);
+    /// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);
+    /// assert_eq!(result, Ok((&quot;To:&quot;, &quot; user@example.com\r\n&quot;)));
+    /// let result = parser.parse(&quot;Helloworld&quot;);
+    /// assert!(result.is_err());
+    /// # }
+    /// ```
+    </span>TakeUntilByte3, take_until_byte3, memchr3, a, b, c
 }
 
-<span class="macro">parser!</span> {
-<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `needle` is found.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `a`, &#39;b&#39; or `c` is not found, the parser will return an error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Optimized variant of [`take_until_range`](../range/fn.take_until_range.html)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use combine::*;</span>
-<span class="doccomment">/// use combine::parser::byte::take_until_bytes;</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     take_until_bytes(&amp;b&quot;\r\n&quot;[..]).easy_parse(&amp;b&quot;abc\r\n&quot;[..]).map(|(x, _)| x),</span>
-<span class="doccomment">///     Ok((&amp;b&quot;abc&quot;[..]))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// // Also works on strings as long as `needle` is UTF-8</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     take_until_bytes(&quot;\r\n&quot;.as_bytes()).easy_parse(&quot;abc\r\n&quot;).map(|(x, _)| x),</span>
-<span class="doccomment">///     Ok((&quot;abc&quot;))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until_bytes</span>[<span class="lifetime">&#39;a</span>, <span class="ident">I</span>](<span class="ident">needle</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>])(<span class="ident">I</span>) -&gt; <span class="ident">I::Range</span>
-<span class="kw">where</span> [
-    <span class="ident">I</span>: <span class="ident">RangeStream</span> <span class="op">+</span> <span class="ident">FullRangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">::stream::Range</span>,
+<span class="macro">parser! </span>{
+<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `needle` is found.
+///
+/// If `a`, &#39;b&#39; or `c` is not found, the parser will return an error.
+///
+/// Optimized variant of [`take_until_range`](../range/fn.take_until_range.html)
+///
+/// ```
+/// use combine::*;
+/// use combine::parser::byte::take_until_bytes;
+/// assert_eq!(
+///     take_until_bytes(&amp;b&quot;\r\n&quot;[..]).easy_parse(&amp;b&quot;abc\r\n&quot;[..]).map(|(x, _)| x),
+///     Ok((&amp;b&quot;abc&quot;[..]))
+/// );
+/// // Also works on strings as long as `needle` is UTF-8
+/// assert_eq!(
+///     take_until_bytes(&quot;\r\n&quot;.as_bytes()).easy_parse(&quot;abc\r\n&quot;).map(|(x, _)| x),
+///     Ok((&quot;abc&quot;))
+/// );
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take_until_bytes[<span class="lifetime">&#39;a</span>, I](needle: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8])(I) -&gt; I::Range
+<span class="kw">where </span>[
+    I: RangeStream + FullRangeStream,
+    I::Range: AsRef&lt;[u8]&gt; + ::stream::Range,
 ]
 {
-    <span class="ident">take_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">haystack</span>: <span class="ident">I::Range</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">haystack</span> <span class="op">=</span> <span class="ident">haystack</span>.<span class="ident">as_ref</span>();
-        <span class="kw">match</span> <span class="ident">memslice</span>(<span class="ident">needle</span>, <span class="ident">haystack</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">TakeRange::NotFound</span>(<span class="ident">haystack</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="ident">needle</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)),
+    take_fn(<span class="kw">move </span>|haystack: I::Range| {
+        <span class="kw">let </span>haystack = haystack.as_ref();
+        <span class="kw">match </span>memslice(needle, haystack) {
+            <span class="prelude-val">Some</span>(i) =&gt; TakeRange::Found(i),
+            <span class="prelude-val">None </span>=&gt; TakeRange::NotFound(haystack.len().saturating_sub(needle.len() - <span class="number">1</span>)),
         }
     })
 }
 
 }
 
-<span class="kw">fn</span> <span class="ident">memslice</span>(<span class="ident">needle</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">haystack</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="kw-2">&amp;</span><span class="ident">prefix</span>, <span class="ident">suffix</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">needle</span>.<span class="ident">split_first</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="number">0</span>),
+<span class="kw">fn </span>memslice(needle: <span class="kw-2">&amp;</span>[u8], haystack: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="kw">let </span>(<span class="kw-2">&amp;</span>prefix, suffix) = <span class="kw">match </span>needle.split_first() {
+        <span class="prelude-val">Some</span>(x) =&gt; x,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="number">0</span>),
     };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">::memchr::memchr_iter</span>(<span class="ident">prefix</span>, <span class="ident">haystack</span>);
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-        <span class="kw">if</span> <span class="ident">haystack</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..].<span class="ident">starts_with</span>(<span class="ident">suffix</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = ::memchr::memchr_iter(prefix, haystack);
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(i) = iter.next() {
+        <span class="kw">if </span>haystack[i + <span class="number">1</span>..].starts_with(suffix) {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(i);
         }
     }
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="doccomment">/// Parsers for decoding numbers in big-endian or little-endian order.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">num</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">stream::uncons</span>;
+<span class="doccomment">/// Parsers for decoding numbers in big-endian or little-endian order.
+</span><span class="kw">pub mod </span>num {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>stream::uncons;
 
-    <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">BE</span>, <span class="ident">LE</span>};
+    <span class="kw">use </span>byteorder::{ByteOrder, BE, LE};
 
-    <span class="kw">use</span> <span class="ident">lib::mem::size_of</span>;
+    <span class="kw">use </span>lib::mem::size_of;
 
-    <span class="macro">macro_rules!</span> <span class="ident">integer_parser</span> {
+    <span class="macro">macro_rules! </span>integer_parser {
         (
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="kw">pub</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>: <span class="ident">ident</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">be_name</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">le_name</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">read_name</span>: <span class="ident">ident</span>
+            $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)*
+            <span class="kw">pub </span><span class="macro-nonterminal">$type_name</span>: ident,
+            <span class="macro-nonterminal">$func_name</span>: ident, <span class="macro-nonterminal">$be_name</span>: ident, <span class="macro-nonterminal">$le_name</span>: ident, <span class="macro-nonterminal">$read_name</span>: ident
         ) =&gt; {
-            <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">B</span>, <span class="ident">I</span>)<span class="op">&gt;</span>);
+            <span class="attribute">#[derive(Clone)]
+            </span><span class="kw">pub struct </span><span class="macro-nonterminal">$type_name</span>&lt;B, I&gt;(PhantomData&lt;(B, I)&gt;);
 
-            <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">I</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-                <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
-                <span class="ident">B</span>: <span class="ident">ByteOrder</span>,
+            <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, B, I&gt; Parser <span class="kw">for </span><span class="macro-nonterminal">$type_name</span>&lt;B, I&gt;
+            <span class="kw">where
+                </span>I: Stream&lt;Item = u8&gt;,
+                I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+                B: ByteOrder,
             {
-                <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-                <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>;
-                <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+                <span class="kw">type </span>Input = I;
+                <span class="kw">type </span>Output = <span class="macro-nonterminal">$func_name</span>;
+                <span class="kw">type </span>PartialState = ();
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">parse_lazy</span>(
-                    <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>
-                    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> [<span class="number">0u8</span>; <span class="number">8</span>][..<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span>()];
-                    <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buffer</span> {
-                        <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">=</span> <span class="macro">ctry!</span>(<span class="ident">uncons</span>(<span class="ident">input</span>)).<span class="number">0</span>;
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>parse_lazy(
+                    <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                    input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input
+                    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+                    <span class="kw">let </span>buffer = <span class="kw-2">&amp;mut </span>[<span class="number">0u8</span>; <span class="number">8</span>][..size_of::&lt;<span class="self">Self</span>::Output&gt;()];
+                    <span class="kw">for </span>elem <span class="kw">in </span><span class="kw-2">&amp;mut *</span>buffer {
+                        <span class="kw-2">*</span>elem = <span class="macro">ctry!</span>(uncons(input)).<span class="number">0</span>;
                     }
-                    <span class="ident">ConsumedOk</span>(<span class="ident">B</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">read_name</span>(<span class="ident">buffer</span>))
+                    ConsumedOk(B::<span class="macro-nonterminal">$read_name</span>(buffer))
                 }
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>, <span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">I</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-                <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
-                <span class="ident">B</span>: <span class="ident">ByteOrder</span>,
+            $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span><span class="macro-nonterminal">$func_name</span>&lt;<span class="lifetime">&#39;a</span>, B, I&gt;() -&gt; <span class="macro-nonterminal">$type_name</span>&lt;B, I&gt;
+            <span class="kw">where
+                </span>I: Stream&lt;Item = u8&gt;,
+                I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+                B: ByteOrder,
             {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span>(<span class="ident">PhantomData</span>)
+                <span class="macro-nonterminal">$type_name</span>(PhantomData)
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">be_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span><span class="ident">BE</span>, <span class="ident">I</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-                <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+            $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span><span class="macro-nonterminal">$be_name</span>&lt;<span class="lifetime">&#39;a</span>, I&gt;() -&gt; <span class="macro-nonterminal">$type_name</span>&lt;BE, I&gt;
+            <span class="kw">where
+                </span>I: Stream&lt;Item = u8&gt;,
+                I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
             {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>()
+                <span class="macro-nonterminal">$func_name</span>()
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">le_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>() -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type_name</span><span class="op">&lt;</span><span class="ident">LE</span>, <span class="ident">I</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">I</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
-                <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span><span class="op">&gt;</span>,
+            $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+            <span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span><span class="macro-nonterminal">$le_name</span>&lt;<span class="lifetime">&#39;a</span>, I&gt;() -&gt; <span class="macro-nonterminal">$type_name</span>&lt;LE, I&gt;
+            <span class="kw">where
+                </span>I: Stream&lt;Item = u8&gt;,
+                I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
             {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">func_name</span>()
+                <span class="macro-nonterminal">$func_name</span>()
             }
         }
     }
 
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a u16 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::u16;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(u16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(u16::&lt;LE, _&gt;().parse(&amp;b&quot;\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">U16</span>, <span class="ident">u16</span>, <span class="ident">be_u16</span>, <span class="ident">le_u16</span>, <span class="ident">read_u16</span>
+        <span class="doccomment">/// Reads a u16 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::u16;
+        ///
+        /// assert_eq!(u16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(u16::&lt;LE, _&gt;().parse(&amp;b&quot;\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>U16, u16, be_u16, le_u16, read_u16
     );
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a u32 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::u32;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(u32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(u32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">U32</span>, <span class="ident">u32</span>, <span class="ident">be_u32</span>, <span class="ident">le_u32</span>, <span class="ident">read_u32</span>
+        <span class="doccomment">/// Reads a u32 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::u32;
+        ///
+        /// assert_eq!(u32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(u32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>U32, u32, be_u32, le_u32, read_u32
     );
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a u64 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::u64;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(u64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(u64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">U64</span>, <span class="ident">u64</span>, <span class="ident">be_u64</span>, <span class="ident">le_u64</span>, <span class="ident">read_u64</span>
+        <span class="doccomment">/// Reads a u64 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::u64;
+        ///
+        /// assert_eq!(u64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(u64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>U64, u64, be_u64, le_u64, read_u64
     );
 
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a i16 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::i16;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(i16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(i16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">I16</span>, <span class="ident">i16</span>, <span class="ident">be_i16</span>, <span class="ident">le_i16</span>, <span class="ident">read_i16</span>
+        <span class="doccomment">/// Reads a i16 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::i16;
+        ///
+        /// assert_eq!(i16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(i16::&lt;LE, _&gt;().parse(&amp;b&quot;\x01&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>I16, i16, be_i16, le_i16, read_i16
     );
 
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a i32 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::i32;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(i32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(i32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">I32</span>, <span class="ident">i32</span>, <span class="ident">be_i32</span>, <span class="ident">le_i32</span>, <span class="ident">read_i32</span>
+        <span class="doccomment">/// Reads a i32 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::i32;
+        ///
+        /// assert_eq!(i32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(i32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>I32, i32, be_i32, le_i32, read_i32
     );
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a i64 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::LE;</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::i64;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// assert_eq!(i64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(i64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">I64</span>, <span class="ident">i64</span>, <span class="ident">be_i64</span>, <span class="ident">le_i64</span>, <span class="ident">read_i64</span>
+        <span class="doccomment">/// Reads a i64 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::LE;
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::i64;
+        ///
+        /// assert_eq!(i64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0\0&quot;[..]), Ok((1, &amp;b&quot;&quot;[..])));
+        /// assert!(i64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>I64, i64, be_i64, le_i64, read_i64
     );
 
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a i32 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::{LE, ByteOrder};</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::f32;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let mut buf = [0; 4];</span>
-        <span class="doccomment">/// LE::write_f32(&amp;mut buf, 123.45);</span>
-        <span class="doccomment">/// assert_eq!(f32::&lt;LE, _&gt;().parse(&amp;buf[..]), Ok((123.45, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(f32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">F32</span>, <span class="ident">f32</span>, <span class="ident">be_f32</span>, <span class="ident">le_f32</span>, <span class="ident">read_f32</span>
+        <span class="doccomment">/// Reads a i32 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::{LE, ByteOrder};
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::f32;
+        ///
+        /// let mut buf = [0; 4];
+        /// LE::write_f32(&amp;mut buf, 123.45);
+        /// assert_eq!(f32::&lt;LE, _&gt;().parse(&amp;buf[..]), Ok((123.45, &amp;b&quot;&quot;[..])));
+        /// assert!(f32::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>F32, f32, be_f32, le_f32, read_f32
     );
     <span class="macro">integer_parser!</span>(
-        <span class="doccomment">/// Reads a i64 out of the byte stream with the specified endianess</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// ```</span>
-        <span class="doccomment">/// use combine::byteorder::{LE, ByteOrder};</span>
-        <span class="doccomment">/// use combine::Parser;</span>
-        <span class="doccomment">/// use combine::parser::byte::num::f64;</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// let mut buf = [0; 8];</span>
-        <span class="doccomment">/// LE::write_f64(&amp;mut buf, 123.45);</span>
-        <span class="doccomment">/// assert_eq!(f64::&lt;LE, _&gt;().parse(&amp;buf[..]), Ok((123.45, &amp;b&quot;&quot;[..])));</span>
-        <span class="doccomment">/// assert!(f64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());</span>
-        <span class="doccomment">/// ```</span>
-        <span class="kw">pub</span> <span class="ident">F64</span>, <span class="ident">f64</span>, <span class="ident">be_f64</span>, <span class="ident">le_f64</span>, <span class="ident">read_f64</span>
+        <span class="doccomment">/// Reads a i64 out of the byte stream with the specified endianess
+        ///
+        /// ```
+        /// use combine::byteorder::{LE, ByteOrder};
+        /// use combine::Parser;
+        /// use combine::parser::byte::num::f64;
+        ///
+        /// let mut buf = [0; 8];
+        /// LE::write_f64(&amp;mut buf, 123.45);
+        /// assert_eq!(f64::&lt;LE, _&gt;().parse(&amp;buf[..]), Ok((123.45, &amp;b&quot;&quot;[..])));
+        /// assert!(f64::&lt;LE, _&gt;().parse(&amp;b&quot;\x01\0\0\0\0\0\0&quot;[..]).is_err());
+        /// ```
+        </span><span class="kw">pub </span>F64, f64, be_f64, le_f64, read_f64
     );
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">mod</span> <span class="ident">tests</span> {
-        <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">stream::buffered::BufferedStream</span>;
-        <span class="kw">use</span> <span class="ident">stream::state::State</span>;
-        <span class="kw">use</span> <span class="ident">stream::IteratorStream</span>;
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">mod </span>tests {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
+        <span class="kw">use </span>stream::buffered::BufferedStream;
+        <span class="kw">use </span>stream::state::State;
+        <span class="kw">use </span>stream::IteratorStream;
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">no_rangestream</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-            <span class="ident">LE::write_f64</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="number">123.45</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>no_rangestream() {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+            LE::write_f64(<span class="kw-2">&amp;mut </span>buf, <span class="number">123.45</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">f64</span>::<span class="op">&lt;</span><span class="ident">LE</span>, <span class="kw">_</span><span class="op">&gt;</span>()
-                    .<span class="ident">parse</span>(<span class="ident">BufferedStream::new</span>(
-                        <span class="ident">State::new</span>(<span class="ident">IteratorStream::new</span>(<span class="ident">buf</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())),
-                        <span class="number">1</span>
-                    ))
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">t</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">t</span>),
+                f64::&lt;LE, <span class="kw">_</span>&gt;()
+                    .parse(BufferedStream::new(
+                        State::new(IteratorStream::new(buf.iter().cloned())),
+                        <span class="number">1
+                    </span>))
+                    .map(|(t, <span class="kw">_</span>)| t),
                 <span class="prelude-val">Ok</span>(<span class="number">123.45</span>)
             );
             <span class="macro">assert_eq!</span>(
-                <span class="ident">le_f64</span>()
-                    .<span class="ident">parse</span>(<span class="ident">BufferedStream::new</span>(
-                        <span class="ident">State::new</span>(<span class="ident">IteratorStream::new</span>(<span class="ident">buf</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())),
-                        <span class="number">1</span>
-                    ))
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">t</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">t</span>),
+                le_f64()
+                    .parse(BufferedStream::new(
+                        State::new(IteratorStream::new(buf.iter().cloned())),
+                        <span class="number">1
+                    </span>))
+                    .map(|(t, <span class="kw">_</span>)| t),
                 <span class="prelude-val">Ok</span>(<span class="number">123.45</span>)
             );
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-            <span class="ident">BE::write_f64</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="number">123.45</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+            BE::write_f64(<span class="kw-2">&amp;mut </span>buf, <span class="number">123.45</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">be_f64</span>()
-                    .<span class="ident">parse</span>(<span class="ident">BufferedStream::new</span>(
-                        <span class="ident">State::new</span>(<span class="ident">IteratorStream::new</span>(<span class="ident">buf</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())),
-                        <span class="number">1</span>
-                    ))
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">t</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">t</span>),
+                be_f64()
+                    .parse(BufferedStream::new(
+                        State::new(IteratorStream::new(buf.iter().cloned())),
+                        <span class="number">1
+                    </span>))
+                    .map(|(t, <span class="kw">_</span>)| t),
                 <span class="prelude-val">Ok</span>(<span class="number">123.45</span>)
             );
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">memslice_basic</span>() {
-        <span class="kw">let</span> <span class="ident">haystack</span> <span class="op">=</span> <span class="string">b&quot;abc123&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;&quot;</span>, <span class="ident">haystack</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;a&quot;</span>, <span class="ident">haystack</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;ab&quot;</span>, <span class="ident">haystack</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;c12&quot;</span>, <span class="ident">haystack</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>memslice_basic() {
+        <span class="kw">let </span>haystack = <span class="string">b&quot;abc123&quot;</span>;
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;&quot;</span>, haystack), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;a&quot;</span>, haystack), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;ab&quot;</span>, haystack), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;c12&quot;</span>, haystack), <span class="prelude-val">Some</span>(<span class="number">2</span>));
 
-        <span class="kw">let</span> <span class="ident">haystack2</span> <span class="op">=</span> <span class="string">b&quot;abcab2&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;abc&quot;</span>, <span class="ident">haystack2</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;ab2&quot;</span>, <span class="ident">haystack2</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="kw">let </span>haystack2 = <span class="string">b&quot;abcab2&quot;</span>;
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;abc&quot;</span>, haystack2), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;ab2&quot;</span>, haystack2), <span class="prelude-val">Some</span>(<span class="number">3</span>));
 
-        <span class="kw">let</span> <span class="ident">haystack3</span> <span class="op">=</span> <span class="string">b&quot;aaabaaaa&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">memslice</span>(<span class="string">b&quot;aaaa&quot;</span>, <span class="ident">haystack3</span>), <span class="prelude-val">Some</span>(<span class="number">4</span>));
+        <span class="kw">let </span>haystack3 = <span class="string">b&quot;aaabaaaa&quot;</span>;
+        <span class="macro">assert_eq!</span>(memslice(<span class="string">b&quot;aaaa&quot;</span>, haystack3), <span class="prelude-val">Some</span>(<span class="number">4</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

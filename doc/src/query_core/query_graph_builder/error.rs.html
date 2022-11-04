@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -84,91 +84,91 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">QueryGraphError</span>, <span class="ident">QueryParserError</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">DomainError</span>, <span class="ident">RelationFieldRef</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{QueryGraphError, QueryParserError};
+<span class="kw">use </span>prisma_models::{DomainError, RelationFieldRef};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryGraphBuilderError</span> {
-    <span class="doccomment">/// Logic error in the construction of the schema.</span>
-    <span class="doccomment">/// Not a user error.</span>
-    <span class="ident">SchemaError</span>(<span class="ident">String</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>QueryGraphBuilderError {
+    <span class="doccomment">/// Logic error in the construction of the schema.
+    /// Not a user error.
+    </span>SchemaError(String),
 
-    <span class="doccomment">/// User input error that was&#39;t (and can&#39;t) be caught</span>
-    <span class="doccomment">/// by the general validation during query document parsing.</span>
-    <span class="ident">InputError</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// User input error that was&#39;t (and can&#39;t) be caught
+    /// by the general validation during query document parsing.
+    </span>InputError(String),
 
-    <span class="doccomment">/// More specific input error for when an argument is missing for a field on a specific model.</span>
-    <span class="ident">MissingRequiredArgument</span> {
-        <span class="ident">argument_name</span>: <span class="ident">String</span>,
-        <span class="ident">field_name</span>: <span class="ident">String</span>,
-        <span class="ident">object_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// More specific input error for when an argument is missing for a field on a specific model.
+    </span>MissingRequiredArgument {
+        argument_name: String,
+        field_name: String,
+        object_name: String,
     },
 
-    <span class="doccomment">/// Wraps the initial parsing stage errors.</span>
-    <span class="ident">QueryParserError</span>(<span class="ident">QueryParserError</span>),
+    <span class="doccomment">/// Wraps the initial parsing stage errors.
+    </span>QueryParserError(QueryParserError),
 
-    <span class="doccomment">/// Wraps transformation errors from the prisma models.</span>
-    <span class="ident">DomainError</span>(<span class="ident">DomainError</span>),
+    <span class="doccomment">/// Wraps transformation errors from the prisma models.
+    </span>DomainError(DomainError),
 
-    <span class="doccomment">/// General assertion error.</span>
-    <span class="ident">AssertionError</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// General assertion error.
+    </span>AssertionError(String),
 
-    <span class="ident">RelationViolation</span>(<span class="ident">RelationViolation</span>),
+    RelationViolation(RelationViolation),
 
-    <span class="ident">RecordsNotConnected</span> {
-        <span class="ident">relation_name</span>: <span class="ident">String</span>,
-        <span class="ident">parent_name</span>: <span class="ident">String</span>,
-        <span class="comment">// parent_where: Option&lt;Box&lt;RecordFinderInfo&gt;&gt;,</span>
-        <span class="ident">child_name</span>: <span class="ident">String</span>,
-        <span class="comment">// child_where: Option&lt;Box&lt;RecordFinderInfo&gt;&gt;,</span>
-    },
+    RecordsNotConnected {
+        relation_name: String,
+        parent_name: String,
+        <span class="comment">// parent_where: Option&lt;Box&lt;RecordFinderInfo&gt;&gt;,
+        </span>child_name: String,
+        <span class="comment">// child_where: Option&lt;Box&lt;RecordFinderInfo&gt;&gt;,
+    </span>},
 
-    <span class="ident">RecordNotFound</span>(<span class="ident">String</span>),
+    RecordNotFound(String),
 
-    <span class="ident">QueryGraphError</span>(<span class="ident">QueryGraphError</span>),
+    QueryGraphError(QueryGraphError),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationViolation</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_a_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_b_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RelationViolation {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a_name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b_name: String,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RelationViolation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rf</span>: <span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>)
+<span class="kw">impl </span>From&lt;RelationFieldRef&gt; <span class="kw">for </span>RelationViolation {
+    <span class="kw">fn </span>from(rf: RelationFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from(<span class="kw-2">&amp;</span>rf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RelationViolation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">relation</span>();
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; <span class="kw">for </span>RelationViolation {
+    <span class="kw">fn </span>from(rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>relation = rf.relation();
 
-        <span class="self">Self</span> {
-            <span class="ident">relation_name</span>: <span class="ident">relation</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">model_a_name</span>: <span class="ident">relation</span>.<span class="ident">model_a</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">model_b_name</span>: <span class="ident">relation</span>.<span class="ident">model_b</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
+        <span class="self">Self </span>{
+            relation_name: relation.name.clone(),
+            model_a_name: relation.model_a().name.clone(),
+            model_b_name: relation.model_b().name.clone(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DomainError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryGraphBuilderError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">DomainError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QueryGraphBuilderError::DomainError</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;DomainError&gt; <span class="kw">for </span>QueryGraphBuilderError {
+    <span class="kw">fn </span>from(err: DomainError) -&gt; <span class="self">Self </span>{
+        QueryGraphBuilderError::DomainError(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueryParserError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryGraphBuilderError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">QueryParserError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QueryGraphBuilderError::QueryParserError</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;QueryParserError&gt; <span class="kw">for </span>QueryGraphBuilderError {
+    <span class="kw">fn </span>from(err: QueryParserError) -&gt; <span class="self">Self </span>{
+        QueryGraphBuilderError::QueryParserError(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QueryGraphError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryGraphBuilderError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">QueryGraphError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QueryGraphBuilderError::QueryGraphError</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;QueryGraphError&gt; <span class="kw">for </span>QueryGraphBuilderError {
+    <span class="kw">fn </span>from(err: QueryGraphError) -&gt; <span class="self">Self </span>{
+        QueryGraphBuilderError::QueryGraphError(err)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

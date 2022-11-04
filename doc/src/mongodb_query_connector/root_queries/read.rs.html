@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -163,170 +163,170 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::DecorateErrorWithFieldInformationExtension</span>, <span class="ident">output_meta</span>, <span class="ident">query_builder::MongoReadQueryBuilder</span>,
-    <span class="ident">vacuum_cursor</span>, <span class="ident">IntoBson</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    error::DecorateErrorWithFieldInformationExtension, output_meta, query_builder::MongoReadQueryBuilder,
+    vacuum_cursor, IntoBson,
 };
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">Filter</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationSelection</span>};
-<span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">bson::doc</span>, <span class="ident">options::FindOptions</span>, <span class="ident">ClientSession</span>, <span class="ident">Database</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info_span</span>, <span class="ident">Instrument</span>};
+<span class="kw">use </span>connector_interface::{Filter, QueryArguments, RelAggregationSelection};
+<span class="kw">use </span>mongodb::{bson::doc, options::FindOptions, ClientSession, Database};
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>tracing::{info_span, Instrument};
 
-<span class="doccomment">/// Finds a single record. Joins are not required at the moment because the selector is always a unique one.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_single_record</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-    <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-    <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="doccomment">/// Finds a single record. Joins are not required at the moment because the selector is always a unique one.
+</span><span class="kw">pub async fn </span>get_single_record&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    filter: <span class="kw-2">&amp;</span>Filter,
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
+    <span class="kw">let </span>coll = database.collection(model.db_name());
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findOne(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findOne(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">meta_mapping</span> <span class="op">=</span> <span class="ident">output_meta::from_selected_fields</span>(<span class="ident">selected_fields</span>, <span class="ident">aggregation_selections</span>);
-    <span class="kw">let</span> <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span> <span class="op">=</span> (<span class="ident">model</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">MongoReadQueryBuilder::from_args</span>(<span class="ident">query_arguments</span>)<span class="question-mark">?</span>
-        .<span class="ident">with_model_projection</span>(<span class="ident">selected_fields</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>
-        .<span class="ident">with_aggregation_selections</span>(<span class="ident">aggregation_selections</span>)<span class="question-mark">?</span>
-        .<span class="ident">build</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    <span class="kw">let </span>query_arguments: QueryArguments = (model.clone(), filter.clone()).into();
+    <span class="kw">let </span>query = MongoReadQueryBuilder::from_args(query_arguments)<span class="question-mark">?
+        </span>.with_model_projection(selected_fields.clone())<span class="question-mark">?
+        </span>.with_aggregation_selections(aggregation_selections)<span class="question-mark">?
+        </span>.build()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">coll</span>, <span class="ident">session</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>docs = query.execute(coll, session).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>docs.is_empty() {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selected_fields</span>
-            .<span class="ident">db_names</span>()
-            .<span class="ident">chain</span>(<span class="ident">aggregation_selections</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">db_alias</span>()))
-            .<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">docs</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">document_to_record</span>(<span class="ident">doc</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">meta_mapping</span>)<span class="question-mark">?</span>;
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields
+            .db_names()
+            .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
+            .collect();
+        <span class="kw">let </span>doc = docs.into_iter().next().unwrap();
+        <span class="kw">let </span>record = document_to_record(doc, <span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>meta_mapping)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SingleRecord</span> { <span class="ident">record</span>, <span class="ident">field_names</span> }))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(SingleRecord { record, field_names }))
     }
 }
 
-<span class="comment">// Checklist:</span>
-<span class="comment">// - [x] OrderBy scalar.</span>
-<span class="comment">// - [ ] OrderBy relation.</span>
-<span class="comment">// - [x] Skip, take</span>
-<span class="comment">// - [x] Cursor</span>
-<span class="comment">// - [x] Distinct select (inherently given from core).</span>
-<span class="comment">// - [x] Relation aggregation count</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_many_records</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-    <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="comment">// Checklist:
+// - [x] OrderBy scalar.
+// - [ ] OrderBy relation.
+// - [x] Skip, take
+// - [x] Cursor
+// - [x] Distinct select (inherently given from core).
+// - [x] Relation aggregation count
+</span><span class="kw">pub async fn </span>get_many_records&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    query_arguments: QueryArguments,
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+    aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
+    <span class="kw">let </span>coll = database.collection(model.db_name());
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+    <span class="kw">let </span>span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:db_query&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.statement&quot;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, <span class="ident">coll</span>.<span class="ident">name</span>())
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.statement&quot; </span>= <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;db.{}.findMany(*)&quot;</span>, coll.name())
     );
 
-    <span class="kw">let</span> <span class="ident">reverse_order</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-    <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selected_fields</span>
-        .<span class="ident">db_names</span>()
-        .<span class="ident">chain</span>(<span class="ident">aggregation_selections</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">db_alias</span>()))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>reverse_order = query_arguments.take.map(|t| t &lt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>);
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields
+        .db_names()
+        .chain(aggregation_selections.iter().map(|aggr_sel| aggr_sel.db_alias()))
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">meta_mapping</span> <span class="op">=</span> <span class="ident">output_meta::from_selected_fields</span>(<span class="ident">selected_fields</span>, <span class="ident">aggregation_selections</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">records</span> <span class="op">=</span> <span class="ident">ManyRecords::new</span>(<span class="ident">field_names</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>meta_mapping = output_meta::from_selected_fields(selected_fields, aggregation_selections);
+    <span class="kw">let </span><span class="kw-2">mut </span>records = ManyRecords::new(field_names.clone());
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="number">0</span>) <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">take</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">records</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="number">0</span>) = query_arguments.take {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(records);
     };
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">MongoReadQueryBuilder::from_args</span>(<span class="ident">query_arguments</span>)<span class="question-mark">?</span>
-        .<span class="ident">with_model_projection</span>(<span class="ident">selected_fields</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>
-        .<span class="ident">with_aggregation_selections</span>(<span class="ident">aggregation_selections</span>)<span class="question-mark">?</span>
-        .<span class="ident">build</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span>query = MongoReadQueryBuilder::from_args(query_arguments)<span class="question-mark">?
+        </span>.with_model_projection(selected_fields.clone())<span class="question-mark">?
+        </span>.with_aggregation_selections(aggregation_selections)<span class="question-mark">?
+        </span>.build()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">coll</span>, <span class="ident">session</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">for</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">docs</span> {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">document_to_record</span>(<span class="ident">doc</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">meta_mapping</span>)<span class="question-mark">?</span>;
-        <span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">record</span>)
+    <span class="kw">let </span>docs = query.execute(coll, session).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">for </span>doc <span class="kw">in </span>docs {
+        <span class="kw">let </span>record = document_to_record(doc, <span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>meta_mapping)<span class="question-mark">?</span>;
+        records.push(record)
     }
 
-    <span class="kw">if</span> <span class="ident">reverse_order</span> {
-        <span class="ident">records</span>.<span class="ident">reverse</span>();
+    <span class="kw">if </span>reverse_order {
+        records.reverse();
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">records</span>)
+    <span class="prelude-val">Ok</span>(records)
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">from_record_ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
+<span class="kw">pub async fn </span>get_related_m2m_record_ids&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    from_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
+    <span class="kw">if </span>from_record_ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[]);
     }
 
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>(<span class="ident">model</span>.<span class="ident">db_name</span>());
-    <span class="kw">let</span> <span class="ident">id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">from_record_ids</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            (<span class="kw-2">&amp;</span><span class="ident">id_field</span>, <span class="ident">p</span>.<span class="ident">values</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>())
-                .<span class="ident">into_bson</span>()
-                .<span class="ident">decorate_with_scalar_field_info</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>)
+    <span class="kw">let </span>model = from_field.model();
+    <span class="kw">let </span>coll = database.collection(model.db_name());
+    <span class="kw">let </span>id_field = pick_singular_id(<span class="kw-2">&amp;</span>model);
+    <span class="kw">let </span>ids = from_record_ids
+        .iter()
+        .map(|p| {
+            (<span class="kw-2">&amp;</span>id_field, p.values().next().unwrap())
+                .into_bson()
+                .decorate_with_scalar_field_info(<span class="kw-2">&amp;</span>id_field)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): { <span class="string">&quot;$in&quot;</span>: <span class="ident">ids</span> } };
+    <span class="kw">let </span>filter = <span class="macro">doc! </span>{ id_field.db_name(): { <span class="string">&quot;$in&quot;</span>: ids } };
 
-    <span class="comment">// Scalar field name where the relation ids list is on `model`.</span>
-    <span class="kw">let</span> <span class="ident">relation_ids_field_name</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">find_options</span> <span class="op">=</span> <span class="ident">FindOptions::builder</span>()
-        .<span class="ident">projection</span>(<span class="macro">doc!</span> { <span class="ident">id_field</span>.<span class="ident">db_name</span>(): <span class="number">1</span>, <span class="ident">relation_ids_field_name</span>: <span class="number">1</span> })
-        .<span class="ident">build</span>();
+    <span class="comment">// Scalar field name where the relation ids list is on `model`.
+    </span><span class="kw">let </span>relation_ids_field_name = from_field.relation_info.fields.get(<span class="number">0</span>).unwrap();
+    <span class="kw">let </span>find_options = FindOptions::builder()
+        .projection(<span class="macro">doc! </span>{ id_field.db_name(): <span class="number">1</span>, relation_ids_field_name: <span class="number">1 </span>})
+        .build();
 
-    <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">observing</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">coll</span>.<span class="ident">find_with_session</span>(<span class="ident">filter</span>, <span class="prelude-val">Some</span>(<span class="ident">find_options</span>), <span class="ident">session</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">vacuum_cursor</span>(<span class="ident">cursor</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">parent_id_meta</span> <span class="op">=</span> <span class="ident">output_meta::from_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">id_field</span>);
-    <span class="kw">let</span> <span class="ident">id_holder_field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">relation_ids_field_name</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">related_ids_holder_meta</span> <span class="op">=</span> <span class="ident">output_meta::from_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">id_holder_field</span>);
-    <span class="kw">let</span> <span class="ident">child_id_field</span> <span class="op">=</span> <span class="ident">pick_singular_id</span>(<span class="kw-2">&amp;</span><span class="ident">from_field</span>.<span class="ident">related_model</span>());
+    <span class="kw">let </span>cursor = observing(<span class="prelude-val">None</span>, || coll.find_with_session(filter, <span class="prelude-val">Some</span>(find_options), session)).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>docs = vacuum_cursor(cursor, session).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>parent_id_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_field);
+    <span class="kw">let </span>id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
+    <span class="kw">let </span>related_ids_holder_meta = output_meta::from_scalar_field(<span class="kw-2">&amp;</span>id_holder_field);
+    <span class="kw">let </span>child_id_field = pick_singular_id(<span class="kw-2">&amp;</span>from_field.related_model());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id_pairs</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">docs</span> {
-        <span class="kw">let</span> <span class="ident">id_value</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="ident">id_field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">id_value</span>, <span class="kw-2">&amp;</span><span class="ident">parent_id_meta</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>id_pairs = <span class="macro">vec!</span>[];
+    <span class="kw">for </span><span class="kw-2">mut </span>doc <span class="kw">in </span>docs {
+        <span class="kw">let </span>id_value = doc.remove(id_field.db_name()).unwrap();
+        <span class="kw">let </span>parent_id = value_from_bson(id_value, <span class="kw-2">&amp;</span>parent_id_meta)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">related_id_array</span> <span class="op">=</span> <span class="ident">doc</span>
-            .<span class="ident">remove</span>(<span class="ident">relation_ids_field_name</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Bson::Array</span>(<span class="macro">vec!</span>[]));
+        <span class="kw">let </span>related_id_array = doc
+            .remove(relation_ids_field_name)
+            .unwrap_or_else(|| Bson::Array(<span class="macro">vec!</span>[]));
 
-        <span class="kw">let</span> <span class="ident">child_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value_from_bson</span>(<span class="ident">related_id_array</span>, <span class="kw-2">&amp;</span><span class="ident">related_ids_holder_meta</span>)<span class="question-mark">?</span> {
-            <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>) =&gt; <span class="ident">vals</span>,
-            <span class="ident">val</span> =&gt; <span class="macro">vec!</span>[<span class="ident">val</span>],
+        <span class="kw">let </span>child_ids: Vec&lt;PrismaValue&gt; = <span class="kw">match </span>value_from_bson(related_id_array, <span class="kw-2">&amp;</span>related_ids_holder_meta)<span class="question-mark">? </span>{
+            PrismaValue::List(vals) =&gt; vals,
+            val =&gt; <span class="macro">vec!</span>[val],
         };
 
-        <span class="kw">let</span> <span class="ident">parent_projection</span> <span class="op">=</span> <span class="ident">SelectionResult::from</span>((<span class="ident">id_field</span>.<span class="ident">clone</span>(), <span class="ident">parent_id</span>));
+        <span class="kw">let </span>parent_projection = SelectionResult::from((id_field.clone(), parent_id));
 
-        <span class="kw">for</span> <span class="ident">child_id</span> <span class="kw">in</span> <span class="ident">child_ids</span> {
-            <span class="kw">let</span> <span class="ident">child_projection</span> <span class="op">=</span> <span class="ident">SelectionResult::from</span>((<span class="ident">child_id_field</span>.<span class="ident">clone</span>(), <span class="ident">child_id</span>));
-            <span class="ident">id_pairs</span>.<span class="ident">push</span>((<span class="ident">parent_projection</span>.<span class="ident">clone</span>(), <span class="ident">child_projection</span>));
+        <span class="kw">for </span>child_id <span class="kw">in </span>child_ids {
+            <span class="kw">let </span>child_projection = SelectionResult::from((child_id_field.clone(), child_id));
+            id_pairs.push((parent_projection.clone(), child_projection));
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">id_pairs</span>)
+    <span class="prelude-val">Ok</span>(id_pairs)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

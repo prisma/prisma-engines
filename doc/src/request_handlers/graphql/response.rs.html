@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -182,189 +182,189 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::HandlerError</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{
-    <span class="ident">response_ir</span>::{<span class="ident">Item</span>, <span class="ident">Map</span>, <span class="ident">ResponseData</span>},
-    <span class="ident">CoreError</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HandlerError;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>query_core::{
+    response_ir::{Item, Map, ResponseData},
+    CoreError,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">serde::Serialize</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GQLResponse</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;IndexMap::is_empty&quot;</span>)]</span>
-    <span class="ident">data</span>: <span class="ident">Map</span>,
+<span class="attribute">#[derive(Debug, serde::Serialize, Default, PartialEq)]
+</span><span class="kw">pub struct </span>GQLResponse {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;IndexMap::is_empty&quot;</span>)]
+    </span>data: Map,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Vec::is_empty&quot;</span>)]</span>
-    <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
+    </span>errors: Vec&lt;GQLError&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">serde::Serialize</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Vec::is_empty&quot;</span>)]</span>
-    <span class="ident">batch_result</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, serde::Serialize, Default, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>GQLBatchResponse {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
+    </span>batch_result: Vec&lt;GQLResponse&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Vec::is_empty&quot;</span>)]</span>
-    <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Vec::is_empty&quot;</span>)]
+    </span>errors: Vec&lt;GQLError&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GQLError</span> {
-    <span class="ident">error</span>: <span class="ident">String</span>,
-    <span class="ident">user_facing_error</span>: <span class="ident">user_facing_errors::Error</span>,
+<span class="attribute">#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]
+</span><span class="kw">pub struct </span>GQLError {
+    error: String,
+    user_facing_error: user_facing_errors::Error,
 }
 
-<span class="kw">impl</span> <span class="ident">GQLError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_known</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">error_code</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>GQLError {
+    <span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.user_facing_error.as_known().map(|err| err.error_code.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">message</span>()
+    <span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.user_facing_error.message()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">IndexMap::with_capacity</span>(<span class="ident">capacity</span>),
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl </span>GQLResponse {
+    <span class="kw">pub fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            data: IndexMap::with_capacity(capacity),
+            ..Default::default()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">Item</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">item</span>);
+    <span class="kw">pub fn </span>insert_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw">impl </span>Into&lt;String&gt;, item: Item) {
+        <span class="self">self</span>.data.insert(key.into(), item);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">into</span>());
+    <span class="kw">pub fn </span>insert_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: <span class="kw">impl </span>Into&lt;GQLError&gt;) {
+        <span class="self">self</span>.errors.push(error.into());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">remove</span>(<span class="ident">key</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub fn </span>take_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Item&gt; {
+        <span class="self">self</span>.data.remove(key.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">responses</span>
+    <span class="kw">pub fn </span>errors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>GQLError&gt; {
+        <span class="self">self</span>.errors.iter()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">GQLError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">responses</span>
+<span class="kw">impl </span>From&lt;HandlerError&gt; <span class="kw">for </span>GQLResponse {
+    <span class="kw">fn </span>from(err: HandlerError) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>responses = <span class="self">Self</span>::default();
+        responses.insert_error(err);
+        responses
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">GQLError::from</span>(<span class="ident">user_facing_errors::Error::from_dyn_error</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>))
+<span class="kw">impl </span>From&lt;GQLError&gt; <span class="kw">for </span>GQLResponse {
+    <span class="kw">fn </span>from(err: GQLError) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>responses = <span class="self">Self</span>::default();
+        responses.insert_error(err);
+        responses
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">responses</span>
+<span class="kw">impl </span>From&lt;HandlerError&gt; <span class="kw">for </span>GQLError {
+    <span class="kw">fn </span>from(other: HandlerError) -&gt; <span class="self">Self </span>{
+        GQLError::from(user_facing_errors::Error::from_dyn_error(<span class="kw-2">&amp;</span>other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="ident">GQLError</span> {
-        <span class="ident">GQLError</span> {
-            <span class="ident">error</span>: <span class="ident">err</span>.<span class="ident">message</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">user_facing_error</span>: <span class="ident">err</span>,
-        }
+<span class="kw">impl </span>From&lt;user_facing_errors::Error&gt; <span class="kw">for </span>GQLResponse {
+    <span class="kw">fn </span>from(err: user_facing_errors::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>responses = <span class="self">Self</span>::default();
+        responses.insert_error(err);
+        responses
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">GQLError</span> {
-        <span class="ident">GQLError</span> {
-            <span class="ident">error</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
-            <span class="ident">user_facing_error</span>: <span class="ident">err</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;user_facing_errors::Error&gt; <span class="kw">for </span>GQLError {
+    <span class="kw">fn </span>from(err: user_facing_errors::Error) -&gt; GQLError {
+        GQLError {
+            error: err.message().to_owned(),
+            user_facing_error: err,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">response</span>: <span class="ident">ResponseData</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">GQLResponse::with_capacity</span>(<span class="number">1</span>);
-
-        <span class="ident">gql_response</span>.<span class="ident">insert_data</span>(<span class="ident">response</span>.<span class="ident">key</span>, <span class="ident">response</span>.<span class="ident">data</span>);
-        <span class="ident">gql_response</span>
+<span class="kw">impl </span>From&lt;CoreError&gt; <span class="kw">for </span>GQLError {
+    <span class="kw">fn </span>from(err: CoreError) -&gt; GQLError {
+        GQLError {
+            error: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, err),
+            user_facing_error: err.into(),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">GQLResponse</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">GQLResponse::default</span>();
+<span class="kw">impl </span>From&lt;ResponseData&gt; <span class="kw">for </span>GQLResponse {
+    <span class="kw">fn </span>from(response: ResponseData) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>gql_response = GQLResponse::with_capacity(<span class="number">1</span>);
 
-        <span class="ident">gql_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">gql_response</span>
+        gql_response.insert_data(response.key, response.data);
+        gql_response
     }
 }
 
-<span class="doccomment">/// GQLBatchResponse converters</span>
+<span class="kw">impl </span>From&lt;CoreError&gt; <span class="kw">for </span>GQLResponse {
+    <span class="kw">fn </span>from(err: CoreError) -&gt; GQLResponse {
+        <span class="kw">let </span><span class="kw-2">mut </span>gql_response = GQLResponse::default();
 
-<span class="kw">impl</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_responses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span>) {
-        <span class="ident">responses</span>.<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">response</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">batch_result</span>.<span class="ident">push</span>(<span class="ident">response</span>);
+        gql_response.insert_error(err);
+        gql_response
+    }
+}
+
+<span class="doccomment">/// GQLBatchResponse converters
+
+</span><span class="kw">impl </span>GQLBatchResponse {
+    <span class="kw">pub fn </span>insert_responses(<span class="kw-2">&amp;mut </span><span class="self">self</span>, responses: Vec&lt;GQLResponse&gt;) {
+        responses.into_iter().for_each(|response| {
+            <span class="self">self</span>.batch_result.push(response);
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">into</span>());
+    <span class="kw">pub fn </span>insert_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: <span class="kw">impl </span>Into&lt;GQLError&gt;) {
+        <span class="self">self</span>.errors.push(error.into());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">errors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">GQLError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">iter</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">user_facing_errors::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">batch_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">batch_response</span>
+    <span class="kw">pub fn </span>errors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>GQLError&gt; {
+        <span class="self">self</span>.errors.iter()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CoreError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">CoreError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-
-        <span class="ident">batch_response</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">batch_response</span>
+<span class="kw">impl </span>From&lt;user_facing_errors::Error&gt; <span class="kw">for </span>GQLBatchResponse {
+    <span class="kw">fn </span>from(err: user_facing_errors::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>batch_response = <span class="self">Self</span>::default();
+        batch_response.insert_error(err);
+        batch_response
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HandlerError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">HandlerError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">responses</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">responses</span>.<span class="ident">insert_error</span>(<span class="ident">err</span>);
-        <span class="ident">responses</span>
+<span class="kw">impl </span>From&lt;CoreError&gt; <span class="kw">for </span>GQLBatchResponse {
+    <span class="kw">fn </span>from(err: CoreError) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>batch_response = <span class="self">Self</span>::default();
+
+        batch_response.insert_error(err);
+        batch_response
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GQLBatchResponse</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+<span class="kw">impl </span>From&lt;HandlerError&gt; <span class="kw">for </span>GQLBatchResponse {
+    <span class="kw">fn </span>from(err: HandlerError) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>responses = <span class="self">Self</span>::default();
+        responses.insert_error(err);
+        responses
+    }
+}
 
-        <span class="ident">batch_response</span>.<span class="ident">insert_responses</span>(<span class="ident">responses</span>);
-        <span class="ident">batch_response</span>
+<span class="kw">impl </span>From&lt;Vec&lt;GQLResponse&gt;&gt; <span class="kw">for </span>GQLBatchResponse {
+    <span class="kw">fn </span>from(responses: Vec&lt;GQLResponse&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>batch_response = <span class="self">Self</span>::default();
+
+        batch_response.insert_responses(responses);
+        batch_response
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

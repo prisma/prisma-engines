@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -471,476 +471,476 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">sdk</span>,
-    <span class="ident">trace</span>::{<span class="ident">Event</span>, <span class="ident">Link</span>, <span class="ident">Span</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceId</span>},
-    <span class="ident">Context</span>, <span class="ident">KeyValue</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    sdk,
+    trace::{Event, Link, Span, SpanId, SpanKind, StatusCode, TraceContextExt, TraceId},
+    Context, KeyValue,
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="doccomment">/// Interface for constructing `Span`s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The OpenTelemetry library achieves in-process context propagation of `Span`s</span>
-<span class="doccomment">/// by way of the `Tracer`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Tracer` is responsible for tracking the currently active `Span`, and</span>
-<span class="doccomment">/// exposes methods for creating and activating new `Spans`. The `Tracer` is</span>
-<span class="doccomment">/// configured with `Propagators` which support transferring span context across</span>
-<span class="doccomment">/// process boundaries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Tracer`s are generally expected to be used as singletons. Implementations</span>
-<span class="doccomment">/// SHOULD provide a single global default Tracer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Some applications may require multiple `Tracer` instances, e.g. to create</span>
-<span class="doccomment">/// `Span`s on behalf of other applications. Implementations MAY provide a</span>
-<span class="doccomment">/// global registry of Tracers for such applications.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Tracer` SHOULD allow end users to configure other tracing components</span>
-<span class="doccomment">/// that control how `Span`s are passed across process boundaries, including the</span>
-<span class="doccomment">/// binary and text format `Propagator`s used to serialize `Span`s created by</span>
-<span class="doccomment">/// the `Tracer`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## In Synchronous Code</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Spans can be created and nested manually:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{global, trace::{Span, Tracer, TraceContextExt}, Context};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let tracer = global::tracer(&quot;my-component&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let parent = tracer.start(&quot;foo&quot;);</span>
-<span class="doccomment">/// let parent_cx = Context::current_with_span(parent);</span>
-<span class="doccomment">/// let mut child = tracer.span_builder(&quot;bar&quot;).start_with_context(&amp;tracer, &amp;parent_cx);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // ...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// child.end();</span>
-<span class="doccomment">/// drop(parent_cx) // end parent</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Spans can also use the current thread&#39;s [`Context`] to track which span is active:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{global, trace::{SpanKind, Tracer}};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let tracer = global::tracer(&quot;my-component&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create simple spans with `in_span`</span>
-<span class="doccomment">/// tracer.in_span(&quot;foo&quot;, |_foo_cx| {</span>
-<span class="doccomment">///     // parent span is active</span>
-<span class="doccomment">///     tracer.in_span(&quot;bar&quot;, |_bar_cx| {</span>
-<span class="doccomment">///         // child span is now the active span and associated with the parent span</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">///     // child has ended, parent now the active span again</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// // parent has ended, no active spans</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // -- OR --</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // create complex spans with span builder and `with_span`</span>
-<span class="doccomment">/// let parent_span = tracer.span_builder(&quot;foo&quot;).with_kind(SpanKind::Server).start(&amp;tracer);</span>
-<span class="doccomment">/// tracer.with_span(parent_span, |_foo_cx| {</span>
-<span class="doccomment">///     // parent span is active</span>
-<span class="doccomment">///     let child_span = tracer.span_builder(&quot;bar&quot;).with_kind(SpanKind::Client).start(&amp;tracer);</span>
-<span class="doccomment">///     tracer.with_span(child_span, |_bar_cx| {</span>
-<span class="doccomment">///         // child span is now the active span and associated with the parent span</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">///     // child has ended, parent now the active span again</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// // parent has ended, no active spans</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Spans can also be marked as active, and the resulting guard allows for</span>
-<span class="doccomment">/// greater control over when the span is no longer considered active.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{global, trace::{Span, Tracer, mark_span_as_active}};</span>
-<span class="doccomment">/// let tracer = global::tracer(&quot;my-component&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let parent_span = tracer.start(&quot;foo&quot;);</span>
-<span class="doccomment">/// let parent_active = mark_span_as_active(parent_span);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     let child = tracer.start(&quot;bar&quot;);</span>
-<span class="doccomment">///     let _child_active = mark_span_as_active(child);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // do work in the context of the child span...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // exiting the scope drops the guard, child is no longer active</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// // Parent is active span again</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Parent can be dropped manually, or allowed to go out of scope as well.</span>
-<span class="doccomment">/// drop(parent_active);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // no active span</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## In Asynchronous Code</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you are instrumenting code that make use of [`std::future::Future`] or</span>
-<span class="doccomment">/// async/await, be sure to use the [`FutureExt`] trait. This is needed because</span>
-<span class="doccomment">/// the following example _will not_ work:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use opentelemetry::{global, trace::{Tracer, mark_span_as_active}};</span>
-<span class="doccomment">/// # let tracer = global::tracer(&quot;foo&quot;);</span>
-<span class="doccomment">/// # let span = tracer.start(&quot;foo-span&quot;);</span>
-<span class="doccomment">/// async {</span>
-<span class="doccomment">///     // Does not work</span>
-<span class="doccomment">///     let _g = mark_span_as_active(span);</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The context guard `_g` will not exit until the future generated by the</span>
-<span class="doccomment">/// `async` block is complete. Since futures can be entered and exited</span>
-<span class="doccomment">/// _multiple_ times without them completing, the span remains active for as</span>
-<span class="doccomment">/// long as the future exists, rather than only when it is polled, leading to</span>
-<span class="doccomment">/// very confusing and incorrect output.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In order to trace asynchronous code, the [`Future::with_context`] combinator</span>
-<span class="doccomment">/// can be used:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # async fn run() -&gt; Result&lt;(), ()&gt; {</span>
-<span class="doccomment">/// use opentelemetry::{trace::FutureExt, Context};</span>
-<span class="doccomment">/// let cx = Context::current();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let my_future = async {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// my_future</span>
-<span class="doccomment">///     .with_context(cx)</span>
-<span class="doccomment">///     .await;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Future::with_context`] attaches a context to the future, ensuring that the</span>
-<span class="doccomment">/// context&#39;s lifetime is as long as the future&#39;s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`FutureExt`]: crate::trace::FutureExt</span>
-<span class="doccomment">/// [`Future::with_context`]: crate::trace::FutureExt::with_context()</span>
-<span class="doccomment">/// [`Context`]: crate::Context</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Tracer</span> {
-    <span class="doccomment">/// The `Span` type used by this `Tracer`.</span>
-    <span class="kw">type</span> <span class="ident">Span</span>: <span class="ident">Span</span>;
+<span class="doccomment">/// Interface for constructing `Span`s.
+///
+/// The OpenTelemetry library achieves in-process context propagation of `Span`s
+/// by way of the `Tracer`.
+///
+/// The `Tracer` is responsible for tracking the currently active `Span`, and
+/// exposes methods for creating and activating new `Spans`. The `Tracer` is
+/// configured with `Propagators` which support transferring span context across
+/// process boundaries.
+///
+/// `Tracer`s are generally expected to be used as singletons. Implementations
+/// SHOULD provide a single global default Tracer.
+///
+/// Some applications may require multiple `Tracer` instances, e.g. to create
+/// `Span`s on behalf of other applications. Implementations MAY provide a
+/// global registry of Tracers for such applications.
+///
+/// The `Tracer` SHOULD allow end users to configure other tracing components
+/// that control how `Span`s are passed across process boundaries, including the
+/// binary and text format `Propagator`s used to serialize `Span`s created by
+/// the `Tracer`.
+///
+/// ## In Synchronous Code
+///
+/// Spans can be created and nested manually:
+///
+/// ```
+/// use opentelemetry::{global, trace::{Span, Tracer, TraceContextExt}, Context};
+///
+/// let tracer = global::tracer(&quot;my-component&quot;);
+///
+/// let parent = tracer.start(&quot;foo&quot;);
+/// let parent_cx = Context::current_with_span(parent);
+/// let mut child = tracer.span_builder(&quot;bar&quot;).start_with_context(&amp;tracer, &amp;parent_cx);
+///
+/// // ...
+///
+/// child.end();
+/// drop(parent_cx) // end parent
+/// ```
+///
+/// Spans can also use the current thread&#39;s [`Context`] to track which span is active:
+///
+/// ```
+/// use opentelemetry::{global, trace::{SpanKind, Tracer}};
+///
+/// let tracer = global::tracer(&quot;my-component&quot;);
+///
+/// // Create simple spans with `in_span`
+/// tracer.in_span(&quot;foo&quot;, |_foo_cx| {
+///     // parent span is active
+///     tracer.in_span(&quot;bar&quot;, |_bar_cx| {
+///         // child span is now the active span and associated with the parent span
+///     });
+///     // child has ended, parent now the active span again
+/// });
+/// // parent has ended, no active spans
+///
+/// // -- OR --
+///
+/// // create complex spans with span builder and `with_span`
+/// let parent_span = tracer.span_builder(&quot;foo&quot;).with_kind(SpanKind::Server).start(&amp;tracer);
+/// tracer.with_span(parent_span, |_foo_cx| {
+///     // parent span is active
+///     let child_span = tracer.span_builder(&quot;bar&quot;).with_kind(SpanKind::Client).start(&amp;tracer);
+///     tracer.with_span(child_span, |_bar_cx| {
+///         // child span is now the active span and associated with the parent span
+///     });
+///     // child has ended, parent now the active span again
+/// });
+/// // parent has ended, no active spans
+/// ```
+///
+/// Spans can also be marked as active, and the resulting guard allows for
+/// greater control over when the span is no longer considered active.
+///
+/// ```
+/// use opentelemetry::{global, trace::{Span, Tracer, mark_span_as_active}};
+/// let tracer = global::tracer(&quot;my-component&quot;);
+///
+/// let parent_span = tracer.start(&quot;foo&quot;);
+/// let parent_active = mark_span_as_active(parent_span);
+///
+/// {
+///     let child = tracer.start(&quot;bar&quot;);
+///     let _child_active = mark_span_as_active(child);
+///
+///     // do work in the context of the child span...
+///
+///     // exiting the scope drops the guard, child is no longer active
+/// }
+/// // Parent is active span again
+///
+/// // Parent can be dropped manually, or allowed to go out of scope as well.
+/// drop(parent_active);
+///
+/// // no active span
+/// ```
+///
+/// ## In Asynchronous Code
+///
+/// If you are instrumenting code that make use of [`std::future::Future`] or
+/// async/await, be sure to use the [`FutureExt`] trait. This is needed because
+/// the following example _will not_ work:
+///
+/// ```no_run
+/// # use opentelemetry::{global, trace::{Tracer, mark_span_as_active}};
+/// # let tracer = global::tracer(&quot;foo&quot;);
+/// # let span = tracer.start(&quot;foo-span&quot;);
+/// async {
+///     // Does not work
+///     let _g = mark_span_as_active(span);
+///     // ...
+/// };
+/// ```
+///
+/// The context guard `_g` will not exit until the future generated by the
+/// `async` block is complete. Since futures can be entered and exited
+/// _multiple_ times without them completing, the span remains active for as
+/// long as the future exists, rather than only when it is polled, leading to
+/// very confusing and incorrect output.
+///
+/// In order to trace asynchronous code, the [`Future::with_context`] combinator
+/// can be used:
+///
+/// ```
+/// # async fn run() -&gt; Result&lt;(), ()&gt; {
+/// use opentelemetry::{trace::FutureExt, Context};
+/// let cx = Context::current();
+///
+/// let my_future = async {
+///     // ...
+/// };
+///
+/// my_future
+///     .with_context(cx)
+///     .await;
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`Future::with_context`] attaches a context to the future, ensuring that the
+/// context&#39;s lifetime is as long as the future&#39;s.
+///
+/// [`FutureExt`]: crate::trace::FutureExt
+/// [`Future::with_context`]: crate::trace::FutureExt::with_context()
+/// [`Context`]: crate::Context
+</span><span class="kw">pub trait </span>Tracer {
+    <span class="doccomment">/// The `Span` type used by this `Tracer`.
+    </span><span class="kw">type </span>Span: Span;
 
-    <span class="doccomment">/// Starts a new `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default the currently active `Span` is set as the new `Span`&#39;s</span>
-    <span class="doccomment">/// parent. The `Tracer` MAY provide other default options for newly</span>
-    <span class="doccomment">/// created `Span`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `Span` creation MUST NOT set the newly created `Span` as the currently</span>
-    <span class="doccomment">/// active `Span` by default, but this functionality MAY be offered additionally</span>
-    <span class="doccomment">/// as a separate operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each span has zero or one parent spans and zero or more child spans, which</span>
-    <span class="doccomment">/// represent causally related operations. A tree of related spans comprises a</span>
-    <span class="doccomment">/// trace. A span is said to be a _root span_ if it does not have a parent. Each</span>
-    <span class="doccomment">/// trace includes a single root span, which is the shared ancestor of all other</span>
-    <span class="doccomment">/// spans in the trace. Implementations MUST provide an option to create a `Span` as</span>
-    <span class="doccomment">/// a root span, and MUST generate a new `TraceId` for each root span created.</span>
-    <span class="doccomment">/// For a Span with a parent, the `TraceId` MUST be the same as the parent.</span>
-    <span class="doccomment">/// Also, the child span MUST inherit all `TraceState` values of its parent by default.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `Span` is said to have a _remote parent_ if it is the child of a `Span`</span>
-    <span class="doccomment">/// created in another process. Each propagators&#39; deserialization must set</span>
-    <span class="doccomment">/// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the</span>
-    <span class="doccomment">/// parent is remote.</span>
-    <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Starts a new `Span`.
+    ///
+    /// By default the currently active `Span` is set as the new `Span`&#39;s
+    /// parent. The `Tracer` MAY provide other default options for newly
+    /// created `Span`s.
+    ///
+    /// `Span` creation MUST NOT set the newly created `Span` as the currently
+    /// active `Span` by default, but this functionality MAY be offered additionally
+    /// as a separate operation.
+    ///
+    /// Each span has zero or one parent spans and zero or more child spans, which
+    /// represent causally related operations. A tree of related spans comprises a
+    /// trace. A span is said to be a _root span_ if it does not have a parent. Each
+    /// trace includes a single root span, which is the shared ancestor of all other
+    /// spans in the trace. Implementations MUST provide an option to create a `Span` as
+    /// a root span, and MUST generate a new `TraceId` for each root span created.
+    /// For a Span with a parent, the `TraceId` MUST be the same as the parent.
+    /// Also, the child span MUST inherit all `TraceState` values of its parent by default.
+    ///
+    /// A `Span` is said to have a _remote parent_ if it is the child of a `Span`
+    /// created in another process. Each propagators&#39; deserialization must set
+    /// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the
+    /// parent is remote.
+    </span><span class="kw">fn </span>start&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; <span class="self">Self</span>::Span
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">start_with_context</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">Context::current</span>())
+        <span class="self">self</span>.start_with_context(name, <span class="kw-2">&amp;</span>Context::current())
     }
 
-    <span class="doccomment">/// Starts a new `Span` with a given context</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default the currently active `Span` is set as the new `Span`&#39;s</span>
-    <span class="doccomment">/// parent. The `Tracer` MAY provide other default options for newly</span>
-    <span class="doccomment">/// created `Span`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `Span` creation MUST NOT set the newly created `Span` as the currently</span>
-    <span class="doccomment">/// active `Span` by default, but this functionality MAY be offered additionally</span>
-    <span class="doccomment">/// as a separate operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each span has zero or one parent spans and zero or more child spans, which</span>
-    <span class="doccomment">/// represent causally related operations. A tree of related spans comprises a</span>
-    <span class="doccomment">/// trace. A span is said to be a _root span_ if it does not have a parent. Each</span>
-    <span class="doccomment">/// trace includes a single root span, which is the shared ancestor of all other</span>
-    <span class="doccomment">/// spans in the trace. Implementations MUST provide an option to create a `Span` as</span>
-    <span class="doccomment">/// a root span, and MUST generate a new `TraceId` for each root span created.</span>
-    <span class="doccomment">/// For a Span with a parent, the `TraceId` MUST be the same as the parent.</span>
-    <span class="doccomment">/// Also, the child span MUST inherit all `TraceState` values of its parent by default.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `Span` is said to have a _remote parent_ if it is the child of a `Span`</span>
-    <span class="doccomment">/// created in another process. Each propagators&#39; deserialization must set</span>
-    <span class="doccomment">/// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the</span>
-    <span class="doccomment">/// parent is remote.</span>
-    <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Starts a new `Span` with a given context
+    ///
+    /// By default the currently active `Span` is set as the new `Span`&#39;s
+    /// parent. The `Tracer` MAY provide other default options for newly
+    /// created `Span`s.
+    ///
+    /// `Span` creation MUST NOT set the newly created `Span` as the currently
+    /// active `Span` by default, but this functionality MAY be offered additionally
+    /// as a separate operation.
+    ///
+    /// Each span has zero or one parent spans and zero or more child spans, which
+    /// represent causally related operations. A tree of related spans comprises a
+    /// trace. A span is said to be a _root span_ if it does not have a parent. Each
+    /// trace includes a single root span, which is the shared ancestor of all other
+    /// spans in the trace. Implementations MUST provide an option to create a `Span` as
+    /// a root span, and MUST generate a new `TraceId` for each root span created.
+    /// For a Span with a parent, the `TraceId` MUST be the same as the parent.
+    /// Also, the child span MUST inherit all `TraceState` values of its parent by default.
+    ///
+    /// A `Span` is said to have a _remote parent_ if it is the child of a `Span`
+    /// created in another process. Each propagators&#39; deserialization must set
+    /// `is_remote` to true on a parent `SpanContext` so `Span` creation knows if the
+    /// parent is remote.
+    </span><span class="kw">fn </span>start_with_context&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T, parent_cx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="self">Self</span>::Span
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;;
 
-    <span class="doccomment">/// Creates a span builder</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An ergonomic way for attributes to be configured before the `Span` is started.</span>
-    <span class="kw">fn</span> <span class="ident">span_builder</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="ident">SpanBuilder</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Creates a span builder
+    ///
+    /// An ergonomic way for attributes to be configured before the `Span` is started.
+    </span><span class="kw">fn </span>span_builder&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: T) -&gt; SpanBuilder
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;;
 
-    <span class="doccomment">/// Create a span from a [SpanBuilder]</span>
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span> {
-        <span class="self">self</span>.<span class="ident">build_with_context</span>(<span class="ident">builder</span>, <span class="kw-2">&amp;</span><span class="ident">Context::current</span>())
+    <span class="doccomment">/// Create a span from a [SpanBuilder]
+    </span><span class="kw">fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, builder: SpanBuilder) -&gt; <span class="self">Self</span>::Span {
+        <span class="self">self</span>.build_with_context(builder, <span class="kw-2">&amp;</span>Context::current())
     }
 
-    <span class="doccomment">/// Create a span from a [SpanBuilder] with a parent context.</span>
-    <span class="kw">fn</span> <span class="ident">build_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">SpanBuilder</span>, <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident"><span class="self">Self</span>::Span</span>;
+    <span class="doccomment">/// Create a span from a [SpanBuilder] with a parent context.
+    </span><span class="kw">fn </span>build_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, builder: SpanBuilder, parent_cx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="self">Self</span>::Span;
 
-    <span class="doccomment">/// Start a new span and execute the given closure with reference to the span&#39;s</span>
-    <span class="doccomment">/// context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method starts a new span and sets it as the active span for the given</span>
-    <span class="doccomment">/// function. It then executes the body. It closes the span before returning the</span>
-    <span class="doccomment">/// execution result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{global, trace::{Span, Tracer, get_active_span}, KeyValue};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_function() {</span>
-    <span class="doccomment">///     // start an active span in one function</span>
-    <span class="doccomment">///     global::tracer(&quot;my-component&quot;).in_span(&quot;span-name&quot;, |_cx| {</span>
-    <span class="doccomment">///         // anything happening in functions we call can still access the active span...</span>
-    <span class="doccomment">///         my_other_function();</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_other_function() {</span>
-    <span class="doccomment">///     // call methods on the current span from</span>
-    <span class="doccomment">///     get_active_span(|span| {</span>
-    <span class="doccomment">///         span.add_event(&quot;An event!&quot;.to_string(), vec![KeyValue::new(&quot;happened&quot;, true)]);</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">in_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) -&gt; <span class="ident">T</span>,
-        <span class="ident"><span class="self">Self</span>::Span</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Start a new span and execute the given closure with reference to the span&#39;s
+    /// context.
+    ///
+    /// This method starts a new span and sets it as the active span for the given
+    /// function. It then executes the body. It closes the span before returning the
+    /// execution result.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{global, trace::{Span, Tracer, get_active_span}, KeyValue};
+    ///
+    /// fn my_function() {
+    ///     // start an active span in one function
+    ///     global::tracer(&quot;my-component&quot;).in_span(&quot;span-name&quot;, |_cx| {
+    ///         // anything happening in functions we call can still access the active span...
+    ///         my_other_function();
+    ///     })
+    /// }
+    ///
+    /// fn my_other_function() {
+    ///     // call methods on the current span from
+    ///     get_active_span(|span| {
+    ///         span.add_event(&quot;An event!&quot;.to_string(), vec![KeyValue::new(&quot;happened&quot;, true)]);
+    ///     })
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>in_span&lt;T, F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, f: F) -&gt; T
+    <span class="kw">where
+        </span>F: FnOnce(Context) -&gt; T,
+        <span class="self">Self</span>::Span: Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_span</span>(<span class="ident">span</span>);
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">clone</span>().<span class="ident">attach</span>();
-        <span class="ident">f</span>(<span class="ident">cx</span>)
+        <span class="kw">let </span>span = <span class="self">self</span>.start(name);
+        <span class="kw">let </span>cx = Context::current_with_span(span);
+        <span class="kw">let </span>_guard = cx.clone().attach();
+        f(cx)
     }
 
-    <span class="doccomment">/// Start a new span and execute the given closure with reference to the span&#39;s</span>
-    <span class="doccomment">/// context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method starts a new span and sets it as the active span for the given</span>
-    <span class="doccomment">/// function. It then executes the body. It closes the span before returning the</span>
-    <span class="doccomment">/// execution result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{global, trace::{Span, SpanKind, Tracer, get_active_span}, KeyValue};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_function() {</span>
-    <span class="doccomment">///     let tracer = global::tracer(&quot;my-component&quot;);</span>
-    <span class="doccomment">///     // start a span with custom attributes via span builder</span>
-    <span class="doccomment">///     let span = tracer.span_builder(&quot;span-name&quot;).with_kind(SpanKind::Server).start(&amp;tracer);</span>
-    <span class="doccomment">///     // Mark the span as active for the duration of the closure</span>
-    <span class="doccomment">///     global::tracer(&quot;my-component&quot;).with_span(span, |_cx| {</span>
-    <span class="doccomment">///         // anything happening in functions we call can still access the active span...</span>
-    <span class="doccomment">///         my_other_function();</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn my_other_function() {</span>
-    <span class="doccomment">///     // call methods on the current span from</span>
-    <span class="doccomment">///     get_active_span(|span| {</span>
-    <span class="doccomment">///         span.add_event(&quot;An event!&quot;.to_string(), vec![KeyValue::new(&quot;happened&quot;, true)]);</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">with_span</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="ident"><span class="self">Self</span>::Span</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">T</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">Context</span>) -&gt; <span class="ident">T</span>,
-        <span class="ident"><span class="self">Self</span>::Span</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Start a new span and execute the given closure with reference to the span&#39;s
+    /// context.
+    ///
+    /// This method starts a new span and sets it as the active span for the given
+    /// function. It then executes the body. It closes the span before returning the
+    /// execution result.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{global, trace::{Span, SpanKind, Tracer, get_active_span}, KeyValue};
+    ///
+    /// fn my_function() {
+    ///     let tracer = global::tracer(&quot;my-component&quot;);
+    ///     // start a span with custom attributes via span builder
+    ///     let span = tracer.span_builder(&quot;span-name&quot;).with_kind(SpanKind::Server).start(&amp;tracer);
+    ///     // Mark the span as active for the duration of the closure
+    ///     global::tracer(&quot;my-component&quot;).with_span(span, |_cx| {
+    ///         // anything happening in functions we call can still access the active span...
+    ///         my_other_function();
+    ///     })
+    /// }
+    ///
+    /// fn my_other_function() {
+    ///     // call methods on the current span from
+    ///     get_active_span(|span| {
+    ///         span.add_event(&quot;An event!&quot;.to_string(), vec![KeyValue::new(&quot;happened&quot;, true)]);
+    ///     })
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>with_span&lt;T, F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="self">Self</span>::Span, f: F) -&gt; T
+    <span class="kw">where
+        </span>F: FnOnce(Context) -&gt; T,
+        <span class="self">Self</span>::Span: Send + Sync + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::current_with_span</span>(<span class="ident">span</span>);
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">clone</span>().<span class="ident">attach</span>();
-        <span class="ident">f</span>(<span class="ident">cx</span>)
+        <span class="kw">let </span>cx = Context::current_with_span(span);
+        <span class="kw">let </span>_guard = cx.clone().attach();
+        f(cx)
     }
 }
 
-<span class="doccomment">/// `SpanBuilder` allows span attributes to be configured before the span</span>
-<span class="doccomment">/// has started.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::{</span>
-<span class="doccomment">///     global,</span>
-<span class="doccomment">///     trace::{TracerProvider, SpanBuilder, SpanKind, Tracer},</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let tracer = global::tracer(&quot;example-tracer&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The builder can be used to create a span directly with the tracer</span>
-<span class="doccomment">/// let _span = tracer.build(SpanBuilder {</span>
-<span class="doccomment">///     name: &quot;example-span-name&quot;.into(),</span>
-<span class="doccomment">///     span_kind: Some(SpanKind::Server),</span>
-<span class="doccomment">///     ..Default::default()</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Or used with builder pattern</span>
-<span class="doccomment">/// let _span = tracer</span>
-<span class="doccomment">///     .span_builder(&quot;example-span-name&quot;)</span>
-<span class="doccomment">///     .with_kind(SpanKind::Server)</span>
-<span class="doccomment">///     .start(&amp;tracer);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanBuilder</span> {
-    <span class="doccomment">/// Trace id, useful for integrations with external tracing systems.</span>
-    <span class="kw">pub</span> <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TraceId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span id, useful for integrations with external tracing systems.</span>
-    <span class="kw">pub</span> <span class="ident">span_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span kind</span>
-    <span class="kw">pub</span> <span class="ident">span_kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanKind</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span name</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span start time</span>
-    <span class="kw">pub</span> <span class="ident">start_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span end time</span>
-    <span class="kw">pub</span> <span class="ident">end_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span attributes</span>
-    <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span events</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span Links</span>
-    <span class="kw">pub</span> <span class="ident">links</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span status code</span>
-    <span class="kw">pub</span> <span class="ident">status_code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span status message</span>
-    <span class="kw">pub</span> <span class="ident">status_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Sampling result</span>
-    <span class="kw">pub</span> <span class="ident">sampling_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::SamplingResult</span><span class="op">&gt;</span>,
+<span class="doccomment">/// `SpanBuilder` allows span attributes to be configured before the span
+/// has started.
+///
+/// ```
+/// use opentelemetry::{
+///     global,
+///     trace::{TracerProvider, SpanBuilder, SpanKind, Tracer},
+/// };
+///
+/// let tracer = global::tracer(&quot;example-tracer&quot;);
+///
+/// // The builder can be used to create a span directly with the tracer
+/// let _span = tracer.build(SpanBuilder {
+///     name: &quot;example-span-name&quot;.into(),
+///     span_kind: Some(SpanKind::Server),
+///     ..Default::default()
+/// });
+///
+/// // Or used with builder pattern
+/// let _span = tracer
+///     .span_builder(&quot;example-span-name&quot;)
+///     .with_kind(SpanKind::Server)
+///     .start(&amp;tracer);
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>SpanBuilder {
+    <span class="doccomment">/// Trace id, useful for integrations with external tracing systems.
+    </span><span class="kw">pub </span>trace_id: <span class="prelude-ty">Option</span>&lt;TraceId&gt;,
+    <span class="doccomment">/// Span id, useful for integrations with external tracing systems.
+    </span><span class="kw">pub </span>span_id: <span class="prelude-ty">Option</span>&lt;SpanId&gt;,
+    <span class="doccomment">/// Span kind
+    </span><span class="kw">pub </span>span_kind: <span class="prelude-ty">Option</span>&lt;SpanKind&gt;,
+    <span class="doccomment">/// Span name
+    </span><span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+    <span class="doccomment">/// Span start time
+    </span><span class="kw">pub </span>start_time: <span class="prelude-ty">Option</span>&lt;SystemTime&gt;,
+    <span class="doccomment">/// Span end time
+    </span><span class="kw">pub </span>end_time: <span class="prelude-ty">Option</span>&lt;SystemTime&gt;,
+    <span class="doccomment">/// Span attributes
+    </span><span class="kw">pub </span>attributes: <span class="prelude-ty">Option</span>&lt;Vec&lt;KeyValue&gt;&gt;,
+    <span class="doccomment">/// Span events
+    </span><span class="kw">pub </span>events: <span class="prelude-ty">Option</span>&lt;Vec&lt;Event&gt;&gt;,
+    <span class="doccomment">/// Span Links
+    </span><span class="kw">pub </span>links: <span class="prelude-ty">Option</span>&lt;Vec&lt;Link&gt;&gt;,
+    <span class="doccomment">/// Span status code
+    </span><span class="kw">pub </span>status_code: <span class="prelude-ty">Option</span>&lt;StatusCode&gt;,
+    <span class="doccomment">/// Span status message
+    </span><span class="kw">pub </span>status_message: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
+    <span class="doccomment">/// Sampling result
+    </span><span class="kw">pub </span>sampling_result: <span class="prelude-ty">Option</span>&lt;sdk::trace::SamplingResult&gt;,
 }
 
-<span class="doccomment">/// SpanBuilder methods</span>
-<span class="kw">impl</span> <span class="ident">SpanBuilder</span> {
-    <span class="doccomment">/// Create a new span builder from a span name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            ..<span class="ident">Default::default</span>()
+<span class="doccomment">/// SpanBuilder methods
+</span><span class="kw">impl </span>SpanBuilder {
+    <span class="doccomment">/// Create a new span builder from a span name
+    </span><span class="kw">pub fn </span>from_name&lt;T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(name: T) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            name: name.into(),
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// Specify trace id to use if no parent context exists</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_id</span>(<span class="self">self</span>, <span class="ident">trace_id</span>: <span class="ident">TraceId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">trace_id</span>: <span class="prelude-val">Some</span>(<span class="ident">trace_id</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Specify trace id to use if no parent context exists
+    </span><span class="kw">pub fn </span>with_trace_id(<span class="self">self</span>, trace_id: TraceId) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            trace_id: <span class="prelude-val">Some</span>(trace_id),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign span id</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_id</span>(<span class="self">self</span>, <span class="ident">span_id</span>: <span class="ident">SpanId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">span_id</span>: <span class="prelude-val">Some</span>(<span class="ident">span_id</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign span id
+    </span><span class="kw">pub fn </span>with_span_id(<span class="self">self</span>, span_id: SpanId) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            span_id: <span class="prelude-val">Some</span>(span_id),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign span kind</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_kind</span>(<span class="self">self</span>, <span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">span_kind</span>: <span class="prelude-val">Some</span>(<span class="ident">span_kind</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign span kind
+    </span><span class="kw">pub fn </span>with_kind(<span class="self">self</span>, span_kind: SpanKind) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            span_kind: <span class="prelude-val">Some</span>(span_kind),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign span start time</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_start_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">start_time</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">start_time</span>: <span class="prelude-val">Some</span>(<span class="ident">start_time</span>.<span class="ident">into</span>()),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign span start time
+    </span><span class="kw">pub fn </span>with_start_time&lt;T: Into&lt;SystemTime&gt;&gt;(<span class="self">self</span>, start_time: T) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            start_time: <span class="prelude-val">Some</span>(start_time.into()),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign span end time</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_end_time</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">end_time</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">end_time</span>: <span class="prelude-val">Some</span>(<span class="ident">end_time</span>.<span class="ident">into</span>()),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign span end time
+    </span><span class="kw">pub fn </span>with_end_time&lt;T: Into&lt;SystemTime&gt;&gt;(<span class="self">self</span>, end_time: T) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            end_time: <span class="prelude-val">Some</span>(end_time.into()),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign span attributes</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_attributes</span>(<span class="self">self</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">attributes</span>: <span class="prelude-val">Some</span>(<span class="ident">attributes</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign span attributes
+    </span><span class="kw">pub fn </span>with_attributes(<span class="self">self</span>, attributes: Vec&lt;KeyValue&gt;) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            attributes: <span class="prelude-val">Some</span>(attributes),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign events</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_events</span>(<span class="self">self</span>, <span class="ident">events</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">events</span>: <span class="prelude-val">Some</span>(<span class="ident">events</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign events
+    </span><span class="kw">pub fn </span>with_events(<span class="self">self</span>, events: Vec&lt;Event&gt;) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            events: <span class="prelude-val">Some</span>(events),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign links</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_links</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">links</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">links</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">l</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">span_context</span>().<span class="ident">is_valid</span>());
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">links</span>: <span class="prelude-val">Some</span>(<span class="ident">links</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign links
+    </span><span class="kw">pub fn </span>with_links(<span class="self">self</span>, <span class="kw-2">mut </span>links: Vec&lt;Link&gt;) -&gt; <span class="self">Self </span>{
+        links.retain(|l| l.span_context().is_valid());
+        SpanBuilder {
+            links: <span class="prelude-val">Some</span>(links),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign status code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_code</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">status_code</span>: <span class="prelude-val">Some</span>(<span class="ident">code</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign status code
+    </span><span class="kw">pub fn </span>with_status_code(<span class="self">self</span>, code: StatusCode) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            status_code: <span class="prelude-val">Some</span>(code),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign status message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_status_message</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">status_message</span>: <span class="prelude-val">Some</span>(<span class="ident">message</span>.<span class="ident">into</span>()),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign status message
+    </span><span class="kw">pub fn </span>with_status_message&lt;T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(<span class="self">self</span>, message: T) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            status_message: <span class="prelude-val">Some</span>(message.into()),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Assign sampling result</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampling_result</span>(<span class="self">self</span>, <span class="ident">sampling_result</span>: <span class="ident">sdk::trace::SamplingResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanBuilder</span> {
-            <span class="ident">sampling_result</span>: <span class="prelude-val">Some</span>(<span class="ident">sampling_result</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Assign sampling result
+    </span><span class="kw">pub fn </span>with_sampling_result(<span class="self">self</span>, sampling_result: sdk::trace::SamplingResult) -&gt; <span class="self">Self </span>{
+        SpanBuilder {
+            sampling_result: <span class="prelude-val">Some</span>(sampling_result),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Builds a span with the given tracer from this configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">T::Span</span> {
-        <span class="ident">tracer</span>.<span class="ident">build_with_context</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">Context::current</span>())
+    <span class="doccomment">/// Builds a span with the given tracer from this configuration.
+    </span><span class="kw">pub fn </span>start&lt;T: Tracer&gt;(<span class="self">self</span>, tracer: <span class="kw-2">&amp;</span>T) -&gt; T::Span {
+        tracer.build_with_context(<span class="self">self</span>, <span class="kw-2">&amp;</span>Context::current())
     }
 
-    <span class="doccomment">/// Builds a span with the given tracer from this configuration and parent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_with_context</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Tracer</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">tracer</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">T::Span</span> {
-        <span class="ident">tracer</span>.<span class="ident">build_with_context</span>(<span class="self">self</span>, <span class="ident">parent_cx</span>)
+    <span class="doccomment">/// Builds a span with the given tracer from this configuration and parent.
+    </span><span class="kw">pub fn </span>start_with_context&lt;T: Tracer&gt;(<span class="self">self</span>, tracer: <span class="kw-2">&amp;</span>T, parent_cx: <span class="kw-2">&amp;</span>Context) -&gt; T::Span {
+        tracer.build_with_context(<span class="self">self</span>, parent_cx)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/rpc_request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc_request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/rpc_request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc_request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -143,150 +143,150 @@
 <span id="143">143</span>
 <span id="144">144</span>
 <span id="145">145</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AllHeaderTy</span>, <span class="ident">Encode</span>, <span class="ident">ALL_HEADERS_LEN_TX</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">tds::codec::ColumnData</span>, <span class="ident">BytesMutWithTypeInfo</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">enumflags2</span>::{<span class="ident">bitflags</span>, <span class="ident">BitFlags</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::BorrowMut</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{AllHeaderTy, Encode, ALL_HEADERS_LEN_TX};
+<span class="kw">use crate</span>::{tds::codec::ColumnData, BytesMutWithTypeInfo, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span>bytes::{BufMut, BytesMut};
+<span class="kw">use </span>enumflags2::{bitflags, BitFlags};
+<span class="kw">use </span>std::borrow::BorrowMut;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="attribute">#[<span class="ident">bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RpcStatus</span> {
-    <span class="ident">ByRefValue</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>,
-    <span class="ident">DefaultValue</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>,
-    <span class="comment">// reserved</span>
-    <span class="ident">Encrypted</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>,
+<span class="attribute">#[bitflags]
+#[repr(u8)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>RpcStatus {
+    ByRefValue = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>,
+    DefaultValue = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>,
+    <span class="comment">// reserved
+    </span>Encrypted = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>,
 }
 
-<span class="attribute">#[<span class="ident">bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u16</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RpcOption</span> {
-    <span class="ident">WithRecomp</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>,
-    <span class="ident">NoMeta</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>,
-    <span class="ident">ReuseMeta</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>,
+<span class="attribute">#[bitflags]
+#[repr(u16)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>RpcOption {
+    WithRecomp = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>,
+    NoMeta = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>,
+    ReuseMeta = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokenRpcRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">proc_id</span>: <span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">flags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">RpcOption</span><span class="op">&gt;</span>,
-    <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">transaction_desc</span>: [<span class="ident">u8</span>; <span class="number">8</span>],
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>TokenRpcRequest&lt;<span class="lifetime">&#39;a</span>&gt; {
+    proc_id: RpcProcIdValue&lt;<span class="lifetime">&#39;a</span>&gt;,
+    flags: BitFlags&lt;RpcOption&gt;,
+    params: Vec&lt;RpcParam&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    transaction_desc: [u8; <span class="number">8</span>],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TokenRpcRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">proc_id</span>: <span class="ident">I</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">transaction_desc</span>: [<span class="ident">u8</span>; <span class="number">8</span>]) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TokenRpcRequest&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new&lt;I&gt;(proc_id: I, params: Vec&lt;RpcParam&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, transaction_desc: [u8; <span class="number">8</span>]) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: Into&lt;RpcProcIdValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">proc_id</span>: <span class="ident">proc_id</span>.<span class="ident">into</span>(),
-            <span class="ident">flags</span>: <span class="ident">BitFlags::empty</span>(),
-            <span class="ident">params</span>,
-            <span class="ident">transaction_desc</span>,
+        <span class="self">Self </span>{
+            proc_id: proc_id.into(),
+            flags: BitFlags::empty(),
+            params,
+            transaction_desc,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">RpcStatus</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RpcParam&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    <span class="kw">pub </span>flags: BitFlags&lt;RpcStatus&gt;,
+    <span class="kw">pub </span>value: ColumnData&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="doccomment">/// 2.2.6.6 RPC Request</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RpcProcId</span> {
-    <span class="ident">CursorOpen</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">CursorFetch</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="ident">CursorClose</span> <span class="op">=</span> <span class="number">9</span>,
-    <span class="ident">ExecuteSQL</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="ident">Prepare</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="ident">Execute</span> <span class="op">=</span> <span class="number">12</span>,
-    <span class="ident">PrepExec</span> <span class="op">=</span> <span class="number">13</span>,
-    <span class="ident">Unprepare</span> <span class="op">=</span> <span class="number">15</span>,
+<span class="doccomment">/// 2.2.6.6 RPC Request
+</span><span class="attribute">#[allow(dead_code)]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>RpcProcId {
+    CursorOpen = <span class="number">2</span>,
+    CursorFetch = <span class="number">7</span>,
+    CursorClose = <span class="number">9</span>,
+    ExecuteSQL = <span class="number">10</span>,
+    Prepare = <span class="number">11</span>,
+    Execute = <span class="number">12</span>,
+    PrepExec = <span class="number">13</span>,
+    Unprepare = <span class="number">15</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Name</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">Id</span>(<span class="ident">RpcProcId</span>),
+<span class="attribute">#[derive(Debug)]
+#[allow(dead_code)]
+</span><span class="kw">pub enum </span>RpcProcIdValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Name(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    Id(RpcProcId),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S&gt; From&lt;S&gt; <span class="kw">for </span>RpcProcIdValue&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>S: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Name</span>(<span class="ident">s</span>.<span class="ident">into</span>())
+    <span class="kw">fn </span>from(s: S) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Name(s.into())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RpcProcId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcProcIdValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">id</span>: <span class="ident">RpcProcId</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Id</span>(<span class="ident">id</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;RpcProcId&gt; <span class="kw">for </span>RpcProcIdValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(id: RpcProcId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Id(id)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TokenRpcRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">ALL_HEADERS_LEN_TX</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">ALL_HEADERS_LEN_TX</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">4</span>);
-        <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">AllHeaderTy::TransactionDescriptor</span> <span class="kw">as</span> <span class="ident">u16</span>);
-        <span class="ident">dst</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transaction_desc</span>);
-        <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="number">1</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode&lt;BytesMut&gt; <span class="kw">for </span>TokenRpcRequest&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        dst.put_u32_le(ALL_HEADERS_LEN_TX <span class="kw">as </span>u32);
+        dst.put_u32_le(ALL_HEADERS_LEN_TX <span class="kw">as </span>u32 - <span class="number">4</span>);
+        dst.put_u16_le(AllHeaderTy::TransactionDescriptor <span class="kw">as </span>u16);
+        dst.put_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.transaction_desc);
+        dst.put_u32_le(<span class="number">1</span>);
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">proc_id</span> {
-            <span class="ident">RpcProcIdValue::Id</span>(<span class="kw-2">ref</span> <span class="ident">id</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> (<span class="number">0xffff_u32</span>) <span class="op">|</span> ((<span class="kw-2">*</span><span class="ident">id</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-                <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">val</span>);
+        <span class="kw">match </span><span class="self">self</span>.proc_id {
+            RpcProcIdValue::Id(<span class="kw-2">ref </span>id) =&gt; {
+                <span class="kw">let </span>val = (<span class="number">0xffff_u32</span>) | ((<span class="kw-2">*</span>id <span class="kw">as </span>u16) <span class="kw">as </span>u32) &lt;&lt; <span class="number">16</span>;
+                dst.put_u32_le(val);
             }
-            <span class="ident">RpcProcIdValue::Name</span>(<span class="kw-2">ref</span> <span class="ident">_name</span>) =&gt; {
-                <span class="comment">//let (left_bytes, _) = try!(write_varchar::&lt;u16&gt;(&amp;mut cursor, name, 0));</span>
-                <span class="comment">//assert_eq!(left_bytes, 0);</span>
-                <span class="macro">todo!</span>()
+            RpcProcIdValue::Name(<span class="kw-2">ref </span>_name) =&gt; {
+                <span class="comment">//let (left_bytes, _) = try!(write_varchar::&lt;u16&gt;(&amp;mut cursor, name, 0));
+                //assert_eq!(left_bytes, 0);
+                </span><span class="macro">todo!</span>()
             }
         }
 
-        <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">u16</span>);
+        dst.put_u16_le(<span class="self">self</span>.flags.bits() <span class="kw">as </span>u16);
 
-        <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">param</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>param <span class="kw">in </span><span class="self">self</span>.params.into_iter() {
+            param.encode(dst)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len_pos</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="number">0u8</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode&lt;BytesMut&gt; <span class="kw">for </span>RpcParam&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>len_pos = dst.len();
+        <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="number">0u8</span>;
 
-        <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">length</span>);
+        dst.put_u8(length);
 
-        <span class="kw">for</span> <span class="ident">codepoint</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">encode_utf16</span>() {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">codepoint</span>);
+        <span class="kw">for </span>codepoint <span class="kw">in </span><span class="self">self</span>.name.encode_utf16() {
+            length += <span class="number">1</span>;
+            dst.put_u16_le(codepoint);
         }
 
-        <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">bits</span>());
+        dst.put_u8(<span class="self">self</span>.flags.bits());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_fi</span> <span class="op">=</span> <span class="ident">BytesMutWithTypeInfo::new</span>(<span class="ident">dst</span>);
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst_fi</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dst_fi = BytesMutWithTypeInfo::new(dst);
+        <span class="self">self</span>.value.encode(<span class="kw-2">&amp;mut </span>dst_fi)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">borrow_mut</span>();
-        <span class="ident">dst</span>[<span class="ident">len_pos</span>] <span class="op">=</span> <span class="ident">length</span>;
+        <span class="kw">let </span>dst: <span class="kw-2">&amp;mut </span>[u8] = dst.borrow_mut();
+        dst[len_pos] = length;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

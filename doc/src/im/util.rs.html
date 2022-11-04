@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../im/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../im/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -140,147 +140,147 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="comment">// Every codebase needs a `util` module.</span>
+// Every codebase needs a `util` module.
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Bound</span>, <span class="ident">IndexMut</span>, <span class="ident">Range</span>, <span class="ident">RangeBounds</span>};
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::ops::{Bound, IndexMut, Range, RangeBounds};
+<span class="kw">use </span>std::ptr;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">refpool</span>::{<span class="ident">PoolClone</span>, <span class="ident">PoolDefault</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;pool&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>refpool::{PoolClone, PoolDefault};
 
-<span class="comment">// The `Ref` type is an alias for either `Rc` or `Arc`, user&#39;s choice.</span>
+<span class="comment">// The `Ref` type is an alias for either `Rc` or `Arc`, user&#39;s choice.
 
-<span class="comment">// `Arc` without refpool</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">threadsafe</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fakepool</span>::{<span class="ident">Arc</span> <span class="kw">as</span> <span class="ident">PoolRef</span>, <span class="ident">Pool</span>, <span class="ident">PoolClone</span>, <span class="ident">PoolDefault</span>};
+// `Arc` without refpool
+</span><span class="attribute">#[cfg(all(threadsafe))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::fakepool::{Arc <span class="kw">as </span>PoolRef, Pool, PoolClone, PoolDefault};
 
-<span class="comment">// `Ref` == `Arc` when threadsafe</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">threadsafe</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>;
+<span class="comment">// `Ref` == `Arc` when threadsafe
+</span><span class="attribute">#[cfg(threadsafe)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Ref&lt;A&gt; = std::sync::Arc&lt;A&gt;;
 
-<span class="comment">// `Rc` without refpool</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">threadsafe</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>)))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fakepool</span>::{<span class="ident">Pool</span>, <span class="ident">PoolClone</span>, <span class="ident">PoolDefault</span>, <span class="ident">Rc</span> <span class="kw">as</span> <span class="ident">PoolRef</span>};
+<span class="comment">// `Rc` without refpool
+</span><span class="attribute">#[cfg(all(not(threadsafe), not(feature = <span class="string">&quot;pool&quot;</span>)))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::fakepool::{Pool, PoolClone, PoolDefault, Rc <span class="kw">as </span>PoolRef};
 
-<span class="comment">// `Rc` with refpool</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">threadsafe</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">PoolRef</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">refpool::PoolRef</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">threadsafe</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;pool&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">refpool::Pool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>;
+<span class="comment">// `Rc` with refpool
+</span><span class="attribute">#[cfg(all(not(threadsafe), feature = <span class="string">&quot;pool&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>PoolRef&lt;A&gt; = refpool::PoolRef&lt;A&gt;;
+<span class="attribute">#[cfg(all(not(threadsafe), feature = <span class="string">&quot;pool&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Pool&lt;A&gt; = refpool::Pool&lt;A&gt;;
 
-<span class="comment">// `Ref` == `Rc` when not threadsafe</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">threadsafe</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::rc::Rc</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>;
+<span class="comment">// `Ref` == `Rc` when not threadsafe
+</span><span class="attribute">#[cfg(not(threadsafe))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Ref&lt;A&gt; = std::rc::Rc&lt;A&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_ref</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="ident">A</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clone_ref&lt;A&gt;(r: Ref&lt;A&gt;) -&gt; A
+<span class="kw">where
+    </span>A: Clone,
 {
-    <span class="ident">Ref::try_unwrap</span>(<span class="ident">r</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">r</span>).<span class="ident">clone</span>())
+    Ref::try_unwrap(r).unwrap_or_else(|r| (<span class="kw-2">*</span>r).clone())
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Side</span> {
-    <span class="ident">Left</span>,
-    <span class="ident">Right</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Side {
+    Left,
+    Right,
 }
 
-<span class="doccomment">/// Swap two values of anything implementing `IndexMut`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Like `slice::swap`, but more generic.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">swap_indices</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;mut</span> <span class="ident">V</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>)
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">V::Output</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Swap two values of anything implementing `IndexMut`.
+///
+/// Like `slice::swap`, but more generic.
+</span><span class="attribute">#[allow(unsafe_code)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>swap_indices&lt;V&gt;(vector: <span class="kw-2">&amp;mut </span>V, a: usize, b: usize)
+<span class="kw">where
+    </span>V: IndexMut&lt;usize&gt;,
+    V::Output: Sized,
 {
-    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
+    <span class="kw">if </span>a == b {
         <span class="kw">return</span>;
     }
-    <span class="comment">// so sorry, but there&#39;s no implementation for this in std that&#39;s</span>
-    <span class="comment">// sufficiently generic</span>
-    <span class="kw">let</span> <span class="ident">pa</span>: <span class="kw-2">*mut</span> <span class="ident">V::Output</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">vector</span>[<span class="ident">a</span>];
-    <span class="kw">let</span> <span class="ident">pb</span>: <span class="kw-2">*mut</span> <span class="ident">V::Output</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">vector</span>[<span class="ident">b</span>];
-    <span class="kw">unsafe</span> {
-        <span class="ident">ptr::swap</span>(<span class="ident">pa</span>, <span class="ident">pb</span>);
+    <span class="comment">// so sorry, but there&#39;s no implementation for this in std that&#39;s
+    // sufficiently generic
+    </span><span class="kw">let </span>pa: <span class="kw-2">*mut </span>V::Output = <span class="kw-2">&amp;mut </span>vector[a];
+    <span class="kw">let </span>pb: <span class="kw-2">*mut </span>V::Output = <span class="kw-2">&amp;mut </span>vector[b];
+    <span class="kw">unsafe </span>{
+        ptr::swap(pa, pb);
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">linear_search_by</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">cmp</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">usize</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">Ordering</span>,
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>linear_search_by&lt;<span class="lifetime">&#39;a</span>, A, I, F&gt;(iterable: I, <span class="kw-2">mut </span>cmp: F) -&gt; <span class="prelude-ty">Result</span>&lt;usize, usize&gt;
+<span class="kw">where
+    </span>A: <span class="lifetime">&#39;a</span>,
+    I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A&gt;,
+    F: FnMut(<span class="kw-2">&amp;</span>A) -&gt; Ordering,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">iterable</span> {
-        <span class="kw">match</span> <span class="ident">cmp</span>(<span class="ident">value</span>) {
-            <span class="ident">Ordering::Equal</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">pos</span>),
-            <span class="ident">Ordering::Greater</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">pos</span>),
-            <span class="ident">Ordering::Less</span> =&gt; {}
+    <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0</span>;
+    <span class="kw">for </span>value <span class="kw">in </span>iterable {
+        <span class="kw">match </span>cmp(value) {
+            Ordering::Equal =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(pos),
+            Ordering::Greater =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(pos),
+            Ordering::Less =&gt; {}
         }
-        <span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        pos += <span class="number">1</span>;
     }
-    <span class="prelude-val">Err</span>(<span class="ident">pos</span>)
+    <span class="prelude-val">Err</span>(pos)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_range</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">R</span>, <span class="ident">right_unbounded</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_range&lt;R&gt;(range: <span class="kw-2">&amp;</span>R, right_unbounded: usize) -&gt; Range&lt;usize&gt;
+<span class="kw">where
+    </span>R: RangeBounds&lt;usize&gt;,
 {
-    <span class="kw">let</span> <span class="ident">start_index</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">start_bound</span>() {
-        <span class="ident">Bound::Included</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span>,
-        <span class="ident">Bound::Excluded</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>,
-        <span class="ident">Bound::Unbounded</span> =&gt; <span class="number">0</span>,
+    <span class="kw">let </span>start_index = <span class="kw">match </span>range.start_bound() {
+        Bound::Included(i) =&gt; <span class="kw-2">*</span>i,
+        Bound::Excluded(i) =&gt; <span class="kw-2">*</span>i + <span class="number">1</span>,
+        Bound::Unbounded =&gt; <span class="number">0</span>,
     };
-    <span class="kw">let</span> <span class="ident">end_index</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range</span>.<span class="ident">end_bound</span>() {
-        <span class="ident">Bound::Included</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>,
-        <span class="ident">Bound::Excluded</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">*</span><span class="ident">i</span>,
-        <span class="ident">Bound::Unbounded</span> =&gt; <span class="ident">right_unbounded</span>,
+    <span class="kw">let </span>end_index = <span class="kw">match </span>range.end_bound() {
+        Bound::Included(i) =&gt; <span class="kw-2">*</span>i + <span class="number">1</span>,
+        Bound::Excluded(i) =&gt; <span class="kw-2">*</span>i,
+        Bound::Unbounded =&gt; right_unbounded,
     };
-    <span class="ident">start_index</span>..<span class="ident">end_index</span>
+    start_index..end_index
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">def_pool</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>),<span class="kw-2">*</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">pooltype</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// A memory pool for the appropriate node type.</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span>(<span class="ident">Pool</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">pooltype</span><span class="op">&gt;</span>);
+<span class="macro">macro_rules! </span>def_pool {
+    (<span class="macro-nonterminal">$name</span>:ident&lt;$(<span class="macro-nonterminal">$arg</span>:tt),<span class="kw-2">*</span>&gt;, <span class="macro-nonterminal">$pooltype</span>:ty) =&gt; {
+        <span class="doccomment">/// A memory pool for the appropriate node type.
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt;(Pool&lt;<span class="macro-nonterminal">$pooltype</span>&gt;);
 
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> {
-            <span class="doccomment">/// Create a new pool with the given size.</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="ident">Pool::new</span>(<span class="ident">size</span>))
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; {
+            <span class="doccomment">/// Create a new pool with the given size.
+            </span><span class="kw">pub fn </span>new(size: usize) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(Pool::new(size))
             }
 
-            <span class="doccomment">/// Fill the pool with preallocated chunks.</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fill</span>();
+            <span class="doccomment">/// Fill the pool with preallocated chunks.
+            </span><span class="kw">pub fn </span>fill(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+                <span class="self">self</span>.<span class="number">0</span>.fill();
             }
 
-            <span class="doccomment">///Get the current size of the pool.</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_pool_size</span>()
-            }
-        }
-
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-                <span class="ident"><span class="self">Self</span>::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::config::POOL_SIZE</span>)
+            <span class="doccomment">///Get the current size of the pool.
+            </span><span class="kw">pub fn </span>pool_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+                <span class="self">self</span>.<span class="number">0</span>.get_pool_size()
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>())
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; Default <span class="kw">for </span><span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; {
+            <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>::new(<span class="macro-nonterminal">$crate::config::POOL_SIZE</span>)
+            }
+        }
+
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; Clone <span class="kw">for </span><span class="macro-nonterminal">$name</span>&lt;$(<span class="macro-nonterminal">$arg</span>,)<span class="kw-2">*</span>&gt; {
+            <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span>.clone())
             }
         }
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

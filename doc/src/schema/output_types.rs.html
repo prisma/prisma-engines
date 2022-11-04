@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/output_types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>output_types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/output_types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>output_types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -188,195 +188,195 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>fmt::Debug;
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>std::{fmt, sync::Arc};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OutputType</span> {
-    <span class="ident">Enum</span>(<span class="ident">EnumTypeWeakRef</span>),
-    <span class="ident">List</span>(<span class="ident">OutputTypeRef</span>),
-    <span class="ident">Object</span>(<span class="ident">ObjectTypeWeakRef</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>OutputType {
+    Enum(EnumTypeWeakRef),
+    List(OutputTypeRef),
+    Object(ObjectTypeWeakRef),
+    Scalar(ScalarType),
 }
 
-<span class="kw">impl</span> <span class="ident">OutputType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list</span>(<span class="ident">containing</span>: <span class="ident">OutputType</span>) -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::List</span>(<span class="ident">Arc::new</span>(<span class="ident">containing</span>))
+<span class="kw">impl </span>OutputType {
+    <span class="kw">pub fn </span>list(containing: OutputType) -&gt; OutputType {
+        OutputType::List(Arc::new(containing))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="ident">containing</span>: <span class="ident">ObjectTypeWeakRef</span>) -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Object</span>(<span class="ident">containing</span>)
+    <span class="kw">pub fn </span>object(containing: ObjectTypeWeakRef) -&gt; OutputType {
+        OutputType::Object(containing)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::String</span>)
+    <span class="kw">pub fn </span>string() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::String)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Int</span>)
+    <span class="kw">pub fn </span>int() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Int)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bigint</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>)
+    <span class="kw">pub fn </span>bigint() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::BigInt)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Float</span>)
+    <span class="kw">pub fn </span>float() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Float)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimal</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>)
+    <span class="kw">pub fn </span>decimal() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Decimal)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>)
+    <span class="kw">pub fn </span>boolean() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Boolean)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_type</span>(<span class="ident">containing</span>: <span class="ident">EnumTypeWeakRef</span>) -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Enum</span>(<span class="ident">containing</span>)
+    <span class="kw">pub fn </span>enum_type(containing: EnumTypeWeakRef) -&gt; OutputType {
+        OutputType::Enum(containing)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_time</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>)
+    <span class="kw">pub fn </span>date_time() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::DateTime)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Json</span>)
+    <span class="kw">pub fn </span>json() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Json)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::UUID</span>)
+    <span class="kw">pub fn </span>uuid() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::UUID)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xml</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Xml</span>)
+    <span class="kw">pub fn </span>xml() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Xml)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span>() -&gt; <span class="ident">OutputType</span> {
-        <span class="ident">OutputType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>)
+    <span class="kw">pub fn </span>bytes() -&gt; OutputType {
+        OutputType::Scalar(ScalarType::Bytes)
     }
 
-    <span class="doccomment">/// Attempts to recurse through the type until an object type is found.</span>
-    <span class="doccomment">/// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_object_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">OutputType::Enum</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">OutputType::List</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">as_object_type</span>(),
-            <span class="ident">OutputType::Object</span>(<span class="ident">obj</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">obj</span>.<span class="ident">into_arc</span>()),
-            <span class="ident">OutputType::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Attempts to recurse through the type until an object type is found.
+    /// Returns Some(ObjectTypeStrongRef) if ab object type is found, None otherwise.
+    </span><span class="kw">pub fn </span>as_object_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectTypeStrongRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            OutputType::Enum(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            OutputType::List(inner) =&gt; inner.as_object_type(),
+            OutputType::Object(obj) =&gt; <span class="prelude-val">Some</span>(obj.into_arc()),
+            OutputType::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">OutputType::List</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, OutputType::List(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">OutputType::Object</span>(<span class="kw">_</span>))
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectType</span> {
-    <span class="kw">pub</span> <span class="ident">identifier</span>: <span class="ident">Identifier</span>,
-    <span class="ident">fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-
-    <span class="comment">// Object types can directly map to models.</span>
-    <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ObjectType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;ObjectType&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#Fields Cell#&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">pub fn </span>is_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, OutputType::Object(<span class="kw">_</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ObjectType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">identifier</span>: <span class="ident">ident</span>,
-            <span class="ident">fields</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">model</span>,
+<span class="kw">pub struct </span>ObjectType {
+    <span class="kw">pub </span>identifier: Identifier,
+    fields: OnceCell&lt;Vec&lt;OutputFieldRef&gt;&gt;,
+
+    <span class="comment">// Object types can directly map to models.
+    </span>model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;,
+}
+
+<span class="kw">impl </span>Debug <span class="kw">for </span>ObjectType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;ObjectType&quot;</span>)
+            .field(<span class="string">&quot;identifier&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.identifier)
+            .field(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#Fields Cell#&quot;</span>)
+            .field(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model)
+            .finish()
+    }
+}
+
+<span class="kw">impl </span>ObjectType {
+    <span class="kw">pub fn </span>new(ident: Identifier, model: <span class="prelude-ty">Option</span>&lt;ModelRef&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            identifier: ident,
+            fields: OnceCell::new(),
+            model,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.identifier
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="ident">OutputField</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">get_mut</span>().<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">Arc::new</span>(<span class="ident">field</span>));
+    <span class="kw">pub fn </span>add_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: OutputField) {
+        <span class="self">self</span>.fields.get_mut().unwrap().push(Arc::new(field));
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">get</span>().<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>get_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;OutputFieldRef&gt; {
+        <span class="self">self</span>.fields.get().unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">set</span>(<span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Arc::new</span>).<span class="ident">collect</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">pub fn </span>set_fields(<span class="kw-2">&amp;</span><span class="self">self</span>, fields: Vec&lt;OutputField&gt;) {
+        <span class="self">self</span>.fields.set(fields.into_iter().map(Arc::new).collect()).unwrap();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_fields</span>().<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">cloned</span>()
+    <span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;OutputFieldRef&gt; {
+        <span class="self">self</span>.get_fields().iter().find(|f| f.name == name).cloned()
     }
 
-    <span class="doccomment">/// True if fields are empty, false otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">get_fields</span>().<span class="ident">is_empty</span>()
+    <span class="doccomment">/// True if fields are empty, false otherwise.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.get_fields().is_empty()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OutputField</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">OutputTypeRef</span>,
-    <span class="kw">pub</span> <span class="ident">deprecation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Deprecation</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>OutputField {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>field_type: OutputTypeRef,
+    <span class="kw">pub </span>deprecation: <span class="prelude-ty">Option</span>&lt;Deprecation&gt;,
 
-    <span class="doccomment">/// Arguments are input fields, but positioned in context of an output field</span>
-    <span class="doccomment">/// instead of being attached to an input object.</span>
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputFieldRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Arguments are input fields, but positioned in context of an output field
+    /// instead of being attached to an input object.
+    </span><span class="kw">pub </span>arguments: Vec&lt;InputFieldRef&gt;,
 
-    <span class="doccomment">/// Indicates the presence of the field on the higher output objects.</span>
-    <span class="doccomment">/// States whether or not the field can be null.</span>
-    <span class="kw">pub</span> <span class="ident">is_nullable</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Indicates the presence of the field on the higher output objects.
+    /// States whether or not the field can be null.
+    </span><span class="kw">pub </span>is_nullable: bool,
 
-    <span class="doccomment">/// Relevant for resolving top level queries.</span>
-    <span class="kw">pub</span> <span class="ident">query_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryInfo</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Relevant for resolving top level queries.
+    </span><span class="kw">pub </span>query_info: <span class="prelude-ty">Option</span>&lt;QueryInfo&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">OutputField</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nullable</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">is_nullable</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>
+<span class="kw">impl </span>OutputField {
+    <span class="kw">pub fn </span>nullable(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.is_nullable = <span class="bool-val">true</span>;
+        <span class="self">self
+    </span>}
+
+    <span class="kw">pub fn </span>nullable_if(<span class="self">self</span>, condition: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>condition {
+            <span class="self">self</span>.nullable()
+        } <span class="kw">else </span>{
+            <span class="self">self
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nullable_if</span>(<span class="self">self</span>, <span class="ident">condition</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">condition</span> {
-            <span class="self">self</span>.<span class="ident">nullable</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deprecate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reason</span>: <span class="ident">T</span>, <span class="ident">since_version</span>: <span class="ident">S</span>, <span class="ident">planned_removal_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deprecate&lt;T, S&gt;(<span class="kw-2">mut </span><span class="self">self</span>, reason: T, since_version: S, planned_removal_version: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;String&gt;,
+        S: Into&lt;String&gt;,
     {
-        <span class="self">self</span>.<span class="ident">deprecation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Deprecation</span> {
-            <span class="ident">reason</span>: <span class="ident">reason</span>.<span class="ident">into</span>(),
-            <span class="ident">since_version</span>: <span class="ident">since_version</span>.<span class="ident">into</span>(),
-            <span class="ident">planned_removal_version</span>,
+        <span class="self">self</span>.deprecation = <span class="prelude-val">Some</span>(Deprecation {
+            reason: reason.into(),
+            since_version: since_version.into(),
+            planned_removal_version,
         });
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

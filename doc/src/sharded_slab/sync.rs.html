@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/sync.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/sync.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sync.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -138,145 +138,145 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::inner</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::inner::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;loom&quot;</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">inner</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">atomic</span> {
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">loom::sync::atomic</span>::<span class="kw-2">*</span>;
-        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering</span>;
+<span class="attribute">#[cfg(all(loom, any(test, feature = <span class="string">&quot;loom&quot;</span>)))]
+</span><span class="kw">mod </span>inner {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>atomic {
+        <span class="kw">pub use </span>loom::sync::atomic::<span class="kw-2">*</span>;
+        <span class="kw">pub use </span>std::sync::atomic::Ordering;
     }
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">loom</span>::{
-        <span class="ident">cell::UnsafeCell</span>, <span class="ident">hint</span>, <span class="ident">lazy_static</span>, <span class="ident">sync::Mutex</span>, <span class="ident">thread::yield_now</span>, <span class="ident">thread_local</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>loom::{
+        cell::UnsafeCell, hint, lazy_static, sync::Mutex, thread::yield_now, thread_local,
     };
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">alloc</span> {
-        <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-        <span class="kw">use</span> <span class="ident">loom::alloc</span>;
-        <span class="kw">use</span> <span class="ident">std::fmt</span>;
-        <span class="doccomment">/// Track allocations, detecting leaks</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// This is a version of `loom::alloc::Track` that adds a missing</span>
-        <span class="doccomment">/// `Default` impl.</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">alloc::Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>alloc {
+        <span class="attribute">#![allow(dead_code)]
+        </span><span class="kw">use </span>loom::alloc;
+        <span class="kw">use </span>std::fmt;
+        <span class="doccomment">/// Track allocations, detecting leaks
+        ///
+        /// This is a version of `loom::alloc::Track` that adds a missing
+        /// `Default` impl.
+        </span><span class="kw">pub struct </span>Track&lt;T&gt;(alloc::Track&lt;T&gt;);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="doccomment">/// Track a value for leaks</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-                <span class="ident">Track</span>(<span class="ident">alloc::Track::new</span>(<span class="ident">value</span>))
+        <span class="kw">impl</span>&lt;T&gt; Track&lt;T&gt; {
+            <span class="doccomment">/// Track a value for leaks
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>new(value: T) -&gt; Track&lt;T&gt; {
+                Track(alloc::Track::new(value))
             }
 
-            <span class="doccomment">/// Get a reference to the value</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_ref</span>()
+            <span class="doccomment">/// Get a reference to the value
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+                <span class="self">self</span>.<span class="number">0</span>.get_ref()
             }
 
-            <span class="doccomment">/// Get a mutable reference to the value</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_mut</span>()
+            <span class="doccomment">/// Get a mutable reference to the value
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+                <span class="self">self</span>.<span class="number">0</span>.get_mut()
             }
 
-            <span class="doccomment">/// Stop tracking the value for leaks</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_inner</span>()
-            }
-        }
-
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+            <span class="doccomment">/// Stop tracking the value for leaks
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+                <span class="self">self</span>.<span class="number">0</span>.into_inner()
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-                <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">T::default</span>())
+        <span class="kw">impl</span>&lt;T: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Track&lt;T&gt; {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                <span class="self">self</span>.<span class="number">0</span>.fmt(f)
+            }
+        }
+
+        <span class="kw">impl</span>&lt;T: Default&gt; Default <span class="kw">for </span>Track&lt;T&gt; {
+            <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+                <span class="self">Self</span>::new(T::default())
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">loom</span>, <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;loom&quot;</span>, <span class="ident">test</span>))))]</span>
-<span class="kw">mod</span> <span class="ident">inner</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std</span>::{
-        <span class="ident">sync</span>::{<span class="ident">atomic</span>, <span class="ident">Mutex</span>},
-        <span class="ident">thread::yield_now</span>,
-        <span class="ident">thread_local</span>,
+<span class="attribute">#[cfg(not(all(loom, any(feature = <span class="string">&quot;loom&quot;</span>, test))))]
+</span><span class="kw">mod </span>inner {
+    <span class="attribute">#![allow(dead_code)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>lazy_static::lazy_static;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::{
+        sync::{atomic, Mutex},
+        thread::yield_now,
+        thread_local,
     };
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">hint</span> {
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spin_loop</span>() {
-            <span class="comment">// MSRV: std::hint::spin_loop() stabilized in 1.49.0</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-            <span class="ident"><span class="kw">super</span>::atomic::spin_loop_hint</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>hint {
+        <span class="attribute">#[inline(always)]
+        </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spin_loop() {
+            <span class="comment">// MSRV: std::hint::spin_loop() stabilized in 1.49.0
+            </span><span class="attribute">#[allow(deprecated)]
+            </span><span class="kw">super</span>::atomic::spin_loop_hint()
         }
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">std::cell::UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>UnsafeCell&lt;T&gt;(std::cell::UnsafeCell&lt;T&gt;);
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="ident">UnsafeCell</span>(<span class="ident">std::cell::UnsafeCell::new</span>(<span class="ident">data</span>))
+    <span class="kw">impl</span>&lt;T&gt; UnsafeCell&lt;T&gt; {
+        <span class="kw">pub fn </span>new(data: T) -&gt; UnsafeCell&lt;T&gt; {
+            UnsafeCell(std::cell::UnsafeCell::new(data))
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">*const</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+        <span class="attribute">#[inline(always)]
+        </span><span class="kw">pub fn </span>with&lt;F, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F) -&gt; R
+        <span class="kw">where
+            </span>F: FnOnce(<span class="kw-2">*const </span>T) -&gt; R,
         {
-            <span class="ident">f</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>())
+            f(<span class="self">self</span>.<span class="number">0</span>.get())
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_mut</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+        <span class="attribute">#[inline(always)]
+        </span><span class="kw">pub fn </span>with_mut&lt;F, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F) -&gt; R
+        <span class="kw">where
+            </span>F: FnOnce(<span class="kw-2">*mut </span>T) -&gt; R,
         {
-            <span class="ident">f</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>())
+            f(<span class="self">self</span>.<span class="number">0</span>.get())
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">alloc</span> {
-        <span class="doccomment">/// Track allocations, detecting leaks</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="ident">value</span>: <span class="ident">T</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>alloc {
+        <span class="doccomment">/// Track allocations, detecting leaks
+        </span><span class="attribute">#[derive(Debug, Default)]
+        </span><span class="kw">pub struct </span>Track&lt;T&gt; {
+            value: T,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="doccomment">/// Track a value for leaks</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">Track</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-                <span class="ident">Track</span> { <span class="ident">value</span> }
+        <span class="kw">impl</span>&lt;T&gt; Track&lt;T&gt; {
+            <span class="doccomment">/// Track a value for leaks
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>new(value: T) -&gt; Track&lt;T&gt; {
+                Track { value }
             }
 
-            <span class="doccomment">/// Get a reference to the value</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
+            <span class="doccomment">/// Get a reference to the value
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+                <span class="kw-2">&amp;</span><span class="self">self</span>.value
             }
 
-            <span class="doccomment">/// Get a mutable reference to the value</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">value</span>
+            <span class="doccomment">/// Get a mutable reference to the value
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.value
             }
 
-            <span class="doccomment">/// Stop tracking the value for leaks</span>
-            <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-                <span class="self">self</span>.<span class="ident">value</span>
+            <span class="doccomment">/// Stop tracking the value for leaks
+            </span><span class="attribute">#[inline(always)]
+            </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+                <span class="self">self</span>.value
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

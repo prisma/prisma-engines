@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -315,322 +315,322 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains the functionality for change streams.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">options</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">session</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Contains the functionality for change streams.
+</span><span class="kw">pub mod </span>event;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>options;
+<span class="kw">pub mod </span>session;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">bson::RawDocumentBuf</span>;
-<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">Document</span>, <span class="ident">Timestamp</span>};
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>bson::RawDocumentBuf;
+<span class="kw">use </span>bson::{Document, Timestamp};
+<span class="kw">use </span>derivative::Derivative;
+<span class="kw">use </span>futures_core::{future::BoxFuture, Stream};
+<span class="kw">use </span>serde::de::DeserializeOwned;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>tokio::sync::oneshot;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">change_stream</span>::{
-        <span class="ident">event</span>::{<span class="ident">ChangeStreamEvent</span>, <span class="ident">ResumeToken</span>},
-        <span class="ident">options::ChangeStreamOptions</span>,
+<span class="kw">use crate</span>::{
+    change_stream::{
+        event::{ChangeStreamEvent, ResumeToken},
+        options::ChangeStreamOptions,
     },
-    <span class="ident">cursor</span>::{<span class="ident">stream_poll_next</span>, <span class="ident">BatchValue</span>, <span class="ident">CursorStream</span>, <span class="ident">NextInBatchFuture</span>},
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation::AggregateTarget</span>,
-    <span class="ident">ClientSession</span>,
-    <span class="ident">Cursor</span>,
+    cursor::{stream_poll_next, BatchValue, CursorStream, NextInBatchFuture},
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    operation::AggregateTarget,
+    ClientSession,
+    Cursor,
 };
 
-<span class="doccomment">/// A `ChangeStream` streams the ongoing changes of its associated collection, database or</span>
-<span class="doccomment">/// deployment. `ChangeStream` instances should be created with method `watch` against the relevant</span>
-<span class="doccomment">/// target.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `ChangeStream`s are &quot;resumable&quot;, meaning that they can be restarted at a given place in the</span>
-<span class="doccomment">/// stream of events. This is done automatically when the `ChangeStream` encounters certain</span>
-<span class="doccomment">/// [&quot;resumable&quot;](https://github.com/mongodb/specifications/blob/master/source/change-streams/change-streams.rst#resumable-error)</span>
-<span class="doccomment">/// errors, such as transient network failures. It can also be done manually by passing</span>
-<span class="doccomment">/// a [`ResumeToken`] retrieved from a past event into either the</span>
-<span class="doccomment">/// [`resume_after`](ChangeStreamOptions::resume_after) or</span>
-<span class="doccomment">/// [`start_after`](ChangeStreamOptions::start_after) (4.2+) options used to create the</span>
-<span class="doccomment">/// `ChangeStream`. Issuing a raw change stream aggregation is discouraged unless users wish to</span>
-<span class="doccomment">/// explicitly opt out of resumability.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `ChangeStream` can be iterated like any other [`Stream`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use futures::stream::StreamExt;</span>
-<span class="doccomment">/// # use mongodb::{Client, error::Result, bson::doc,</span>
-<span class="doccomment">/// # change_stream::event::ChangeStreamEvent};</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;async-std-runtime&quot;)]</span>
-<span class="doccomment">/// # use async_std::task;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio-runtime&quot;)]</span>
-<span class="doccomment">/// # use tokio::task;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn func() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);</span>
-<span class="doccomment">/// let mut change_stream = coll.watch(None, None).await?;</span>
-<span class="doccomment">/// let coll_ref = coll.clone();</span>
-<span class="doccomment">/// task::spawn(async move {</span>
-<span class="doccomment">///     coll_ref.insert_one(doc! { &quot;x&quot;: 1 }, None).await;</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// while let Some(event) = change_stream.next().await.transpose()? {</span>
-<span class="doccomment">///     println!(&quot;operation performed: {:?}, document: {:?}&quot;, event.operation_type, event.full_document);</span>
-<span class="doccomment">///     // operation performed: Insert, document: Some(Document({&quot;x&quot;: Int32(1)}))</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams) for more</span>
-<span class="doccomment">/// details. Also see the documentation on [usage recommendations](https://www.mongodb.com/docs/manual/administration/change-streams-production-recommendations/).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="doccomment">/// A `ChangeStream` streams the ongoing changes of its associated collection, database or
+/// deployment. `ChangeStream` instances should be created with method `watch` against the relevant
+/// target.
+///
+/// `ChangeStream`s are &quot;resumable&quot;, meaning that they can be restarted at a given place in the
+/// stream of events. This is done automatically when the `ChangeStream` encounters certain
+/// [&quot;resumable&quot;](https://github.com/mongodb/specifications/blob/master/source/change-streams/change-streams.rst#resumable-error)
+/// errors, such as transient network failures. It can also be done manually by passing
+/// a [`ResumeToken`] retrieved from a past event into either the
+/// [`resume_after`](ChangeStreamOptions::resume_after) or
+/// [`start_after`](ChangeStreamOptions::start_after) (4.2+) options used to create the
+/// `ChangeStream`. Issuing a raw change stream aggregation is discouraged unless users wish to
+/// explicitly opt out of resumability.
+///
+/// A `ChangeStream` can be iterated like any other [`Stream`]:
+///
+/// ```
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use futures::stream::StreamExt;
+/// # use mongodb::{Client, error::Result, bson::doc,
+/// # change_stream::event::ChangeStreamEvent};
+/// # #[cfg(feature = &quot;async-std-runtime&quot;)]
+/// # use async_std::task;
+/// # #[cfg(feature = &quot;tokio-runtime&quot;)]
+/// # use tokio::task;
+/// #
+/// # async fn func() -&gt; Result&lt;()&gt; {
+/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+/// # let coll = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);
+/// let mut change_stream = coll.watch(None, None).await?;
+/// let coll_ref = coll.clone();
+/// task::spawn(async move {
+///     coll_ref.insert_one(doc! { &quot;x&quot;: 1 }, None).await;
+/// });
+/// while let Some(event) = change_stream.next().await.transpose()? {
+///     println!(&quot;operation performed: {:?}, document: {:?}&quot;, event.operation_type, event.full_document);
+///     // operation performed: Insert, document: Some(Document({&quot;x&quot;: Int32(1)}))
+/// }
+/// #
+/// # Ok(())
+/// # }
+/// ```
+///
+/// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams) for more
+/// details. Also see the documentation on [usage recommendations](https://www.mongodb.com/docs/manual/administration/change-streams-production-recommendations/).
+</span><span class="attribute">#[derive(Derivative)]
+#[derivative(Debug)]
+</span><span class="kw">pub struct </span>ChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="doccomment">/// The cursor to iterate over event instances.</span>
-    <span class="ident">cursor</span>: <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The cursor to iterate over event instances.
+    </span>cursor: Cursor&lt;T&gt;,
 
-    <span class="doccomment">/// Arguments to `watch` that created this change stream.</span>
-    <span class="ident">args</span>: <span class="ident">WatchArgs</span>,
+    <span class="doccomment">/// Arguments to `watch` that created this change stream.
+    </span>args: WatchArgs,
 
-    <span class="doccomment">/// Dynamic information associated with this change stream.</span>
-    <span class="ident">data</span>: <span class="ident">ChangeStreamData</span>,
+    <span class="doccomment">/// Dynamic information associated with this change stream.
+    </span>data: ChangeStreamData,
 
-    <span class="doccomment">/// A pending future for a resume.</span>
-    <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
-    <span class="ident">pending_resume</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// A pending future for a resume.
+    </span><span class="attribute">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
+    </span>pending_resume: <span class="prelude-ty">Option</span>&lt;BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;T&gt;&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; ChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">args</span>: <span class="ident">WatchArgs</span>, <span class="ident">data</span>: <span class="ident">ChangeStreamData</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">pending_resume</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="self">Self</span> {
-            <span class="ident">cursor</span>,
-            <span class="ident">args</span>,
-            <span class="ident">data</span>,
-            <span class="ident">pending_resume</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(cursor: Cursor&lt;T&gt;, args: WatchArgs, data: ChangeStreamData) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>pending_resume: <span class="prelude-ty">Option</span>&lt;BoxFuture&lt;<span class="lifetime">&#39;static</span>, <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;T&gt;&gt;&gt;&gt; = <span class="prelude-val">None</span>;
+        <span class="self">Self </span>{
+            cursor,
+            args,
+            data,
+            pending_resume,
         }
     }
 
-    <span class="doccomment">/// Returns the cached resume token that can be used to resume after the most recently returned</span>
-    <span class="doccomment">/// change.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation</span>
-    <span class="doccomment">/// [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-token) for more</span>
-    <span class="doccomment">/// information on change stream resume tokens.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resume_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_token</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Returns the cached resume token that can be used to resume after the most recently returned
+    /// change.
+    ///
+    /// See the documentation
+    /// [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-token) for more
+    /// information on change stream resume tokens.
+    </span><span class="kw">pub fn </span>resume_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ResumeToken&gt; {
+        <span class="self">self</span>.data.resume_token.clone()
     }
 
-    <span class="doccomment">/// Update the type streamed values will be parsed as.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_type</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="ident">ChangeStream</span> {
-            <span class="ident">cursor</span>: <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">with_type</span>(),
-            <span class="ident">args</span>: <span class="self">self</span>.<span class="ident">args</span>,
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>,
-            <span class="ident">pending_resume</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Update the type streamed values will be parsed as.
+    </span><span class="kw">pub fn </span>with_type&lt;D: DeserializeOwned + Unpin + Send + Sync&gt;(<span class="self">self</span>) -&gt; ChangeStream&lt;D&gt; {
+        ChangeStream {
+            cursor: <span class="self">self</span>.cursor.with_type(),
+            args: <span class="self">self</span>.args,
+            data: <span class="self">self</span>.data,
+            pending_resume: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns whether the change stream will continue to receive events.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_exhausted</span>()
+    <span class="doccomment">/// Returns whether the change stream will continue to receive events.
+    </span><span class="kw">pub fn </span>is_alive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.cursor.is_exhausted()
     }
 
-    <span class="doccomment">/// Retrieves the next result from the change stream, if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Where calling `Stream::next` will internally loop until a change document is received,</span>
-    <span class="doccomment">/// this will make at most one request and return `None` if the returned document batch is</span>
-    <span class="doccomment">/// empty.  This method should be used when storing the resume token in order to ensure the</span>
-    <span class="doccomment">/// most up to date token is received, e.g.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use mongodb::{Client, Collection, bson::Document, error::Result};</span>
-    <span class="doccomment">/// # async fn func() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-    <span class="doccomment">/// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);</span>
-    <span class="doccomment">/// let mut change_stream = coll.watch(None, None).await?;</span>
-    <span class="doccomment">/// let mut resume_token = None;</span>
-    <span class="doccomment">/// while change_stream.is_alive() {</span>
-    <span class="doccomment">///     if let Some(event) = change_stream.next_if_any().await? {</span>
-    <span class="doccomment">///         // process event</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///     resume_token = change_stream.resume_token();</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next_if_any</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">NextInBatchFuture::new</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">BatchValue::Some</span> { <span class="ident">doc</span>, .. } =&gt; <span class="prelude-val">Some</span>(<span class="ident">bson::from_slice</span>(<span class="ident">doc</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>),
-            <span class="ident">BatchValue::Empty</span> <span class="op">|</span> <span class="ident">BatchValue::Exhausted</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Retrieves the next result from the change stream, if any.
+    ///
+    /// Where calling `Stream::next` will internally loop until a change document is received,
+    /// this will make at most one request and return `None` if the returned document batch is
+    /// empty.  This method should be used when storing the resume token in order to ensure the
+    /// most up to date token is received, e.g.
+    ///
+    /// ```
+    /// # use mongodb::{Client, Collection, bson::Document, error::Result};
+    /// # async fn func() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+    /// # let coll: Collection&lt;Document&gt; = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);
+    /// let mut change_stream = coll.watch(None, None).await?;
+    /// let mut resume_token = None;
+    /// while change_stream.is_alive() {
+    ///     if let Some(event) = change_stream.next_if_any().await? {
+    ///         // process event
+    ///     }
+    ///     resume_token = change_stream.resume_token();
+    /// }
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>next_if_any(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>NextInBatchFuture::new(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">? </span>{
+            BatchValue::Some { doc, .. } =&gt; <span class="prelude-val">Some</span>(bson::from_slice(doc.as_bytes())<span class="question-mark">?</span>),
+            BatchValue::Empty | BatchValue::Exhausted =&gt; <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_kill_watcher</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">set_kill_watcher</span>(<span class="ident">tx</span>);
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_kill_watcher(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tx: oneshot::Sender&lt;()&gt;) {
+        <span class="self">self</span>.cursor.set_kill_watcher(tx);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">current_batch</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current_batch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>VecDeque&lt;RawDocumentBuf&gt; {
+        <span class="self">self</span>.cursor.current_batch()
     }
 }
 
-<span class="doccomment">/// Arguments passed to a `watch` method, captured to allow resume.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WatchArgs</span> {
-    <span class="doccomment">/// The pipeline of stages to append to an initial `$changeStream` stage.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pipeline</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Arguments passed to a `watch` method, captured to allow resume.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WatchArgs {
+    <span class="doccomment">/// The pipeline of stages to append to an initial `$changeStream` stage.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) pipeline: Vec&lt;Document&gt;,
 
-    <span class="doccomment">/// The original target of the change stream.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">target</span>: <span class="ident">AggregateTarget</span>,
+    <span class="doccomment">/// The original target of the change stream.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) target: AggregateTarget,
 
-    <span class="doccomment">/// The options provided to the initial `$changeStream` stage.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The options provided to the initial `$changeStream` stage.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) options: <span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;,
 }
 
-<span class="doccomment">/// Dynamic change stream data needed for resume.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ChangeStreamData</span> {
-    <span class="doccomment">/// The `operationTime` returned by the initial `aggregate` command.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_operation_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Dynamic change stream data needed for resume.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ChangeStreamData {
+    <span class="doccomment">/// The `operationTime` returned by the initial `aggregate` command.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) initial_operation_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 
-    <span class="doccomment">/// The cached resume token.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">resume_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The cached resume token.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) resume_token: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
 
-    <span class="doccomment">/// Whether or not the change stream has attempted a resume, used to attempt a resume only</span>
-    <span class="doccomment">/// once.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">resume_attempted</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not the change stream has attempted a resume, used to attempt a resume only
+    /// once.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) resume_attempted: bool,
 
-    <span class="doccomment">/// Whether or not the change stream has returned a document, used to update resume token</span>
-    <span class="doccomment">/// during an automatic resume.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">document_returned</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether or not the change stream has returned a document, used to update resume token
+    /// during an automatic resume.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) document_returned: bool,
 
-    <span class="doccomment">/// The implicit session used to create the original cursor.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">implicit_session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The implicit session used to create the original cursor.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) implicit_session: <span class="prelude-ty">Option</span>&lt;ClientSession&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ChangeStreamData</span> {
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">initial_operation_time</span>: <span class="self">self</span>.<span class="ident">initial_operation_time</span>,
-            <span class="ident">resume_token</span>: <span class="self">self</span>.<span class="ident">resume_token</span>.<span class="ident">clone</span>(),
-            <span class="ident">resume_attempted</span>: <span class="self">self</span>.<span class="ident">resume_attempted</span>,
-            <span class="ident">document_returned</span>: <span class="self">self</span>.<span class="ident">document_returned</span>,
-            <span class="ident">implicit_session</span>: <span class="self">self</span>.<span class="ident">implicit_session</span>.<span class="ident">take</span>(),
+<span class="kw">impl </span>ChangeStreamData {
+    <span class="kw">fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            initial_operation_time: <span class="self">self</span>.initial_operation_time,
+            resume_token: <span class="self">self</span>.resume_token.clone(),
+            resume_attempted: <span class="self">self</span>.resume_attempted,
+            document_returned: <span class="self">self</span>.document_returned,
+            implicit_session: <span class="self">self</span>.implicit_session.take(),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_resume_token</span>(
-    <span class="ident">batch_value</span>: <span class="kw-2">&amp;</span><span class="ident">BatchValue</span>,
-    <span class="ident">batch_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">batch_value</span> {
-        <span class="ident">BatchValue::Some</span> { <span class="ident">doc</span>, <span class="ident">is_last</span> } =&gt; {
-            <span class="kw">let</span> <span class="ident">doc_token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;_id&quot;</span>)<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident">ResumeToken</span>(<span class="ident">val</span>.<span class="ident">to_raw_bson</span>()),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::MissingResumeToken</span>.<span class="ident">into</span>()),
+<span class="kw">fn </span>get_resume_token(
+    batch_value: <span class="kw-2">&amp;</span>BatchValue,
+    batch_token: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ResumeToken&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ResumeToken&gt;&gt; {
+    <span class="prelude-val">Ok</span>(<span class="kw">match </span>batch_value {
+        BatchValue::Some { doc, is_last } =&gt; {
+            <span class="kw">let </span>doc_token = <span class="kw">match </span>doc.get(<span class="string">&quot;_id&quot;</span>)<span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(val) =&gt; ResumeToken(val.to_raw_bson()),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::MissingResumeToken.into()),
             };
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">is_last</span> <span class="op">&amp;&amp;</span> <span class="ident">batch_token</span>.<span class="ident">is_some</span>() {
-                <span class="ident">batch_token</span>.<span class="ident">cloned</span>()
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">doc_token</span>)
+            <span class="kw">if </span><span class="kw-2">*</span>is_last &amp;&amp; batch_token.is_some() {
+                batch_token.cloned()
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(doc_token)
             }
         }
-        <span class="ident">BatchValue::Empty</span> =&gt; <span class="ident">batch_token</span>.<span class="ident">cloned</span>(),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        BatchValue::Empty =&gt; batch_token.cloned(),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     })
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CursorStream</span> <span class="kw">for</span> <span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; CursorStream <span class="kw">for </span>ChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">fn</span> <span class="ident">poll_next_in_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BatchValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">pending</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_resume</span>.<span class="ident">take</span>() {
-                <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pending</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                    <span class="ident">Poll::Pending</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">pending_resume</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pending</span>);
-                        <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+    <span class="kw">fn </span>poll_next_in_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;BatchValue&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>pending) = <span class="self">self</span>.pending_resume.take() {
+                <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span>pending).poll(cx) {
+                    Poll::Pending =&gt; {
+                        <span class="self">self</span>.pending_resume = <span class="prelude-val">Some</span>(pending);
+                        <span class="kw">return </span>Poll::Pending;
                     }
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">new_stream</span>)) =&gt; {
-                        <span class="comment">// Ensure that the old cursor is killed on the server selected for the new</span>
-                        <span class="comment">// one.</span>
-                        <span class="self">self</span>.<span class="ident">cursor</span>
-                            .<span class="ident">set_drop_address</span>(<span class="ident">new_stream</span>.<span class="ident">cursor</span>.<span class="ident">address</span>().<span class="ident">clone</span>());
-                        <span class="self">self</span>.<span class="ident">cursor</span> <span class="op">=</span> <span class="ident">new_stream</span>.<span class="ident">cursor</span>;
-                        <span class="self">self</span>.<span class="ident">args</span> <span class="op">=</span> <span class="ident">new_stream</span>.<span class="ident">args</span>;
-                        <span class="comment">// After a successful resume, another resume must be allowed.</span>
-                        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    Poll::Ready(<span class="prelude-val">Ok</span>(new_stream)) =&gt; {
+                        <span class="comment">// Ensure that the old cursor is killed on the server selected for the new
+                        // one.
+                        </span><span class="self">self</span>.cursor
+                            .set_drop_address(new_stream.cursor.address().clone());
+                        <span class="self">self</span>.cursor = new_stream.cursor;
+                        <span class="self">self</span>.args = new_stream.args;
+                        <span class="comment">// After a successful resume, another resume must be allowed.
+                        </span><span class="self">self</span>.data.resume_attempted = <span class="bool-val">false</span>;
                         <span class="kw">continue</span>;
                     }
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)),
+                    Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(e)),
                 }
             }
-            <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">poll_next_in_batch</span>(<span class="ident">cx</span>);
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">out</span> {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">bv</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>) <span class="op">=</span>
-                        <span class="ident">get_resume_token</span>(<span class="ident">bv</span>, <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">post_batch_resume_token</span>())<span class="question-mark">?</span>
-                    {
-                        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
+            <span class="kw">let </span>out = <span class="self">self</span>.cursor.poll_next_in_batch(cx);
+            <span class="kw">match </span><span class="kw-2">&amp;</span>out {
+                Poll::Ready(<span class="prelude-val">Ok</span>(bv)) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(token) =
+                        get_resume_token(bv, <span class="self">self</span>.cursor.post_batch_resume_token())<span class="question-mark">?
+                    </span>{
+                        <span class="self">self</span>.data.resume_token = <span class="prelude-val">Some</span>(token);
                     }
-                    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">bv</span>, <span class="ident">BatchValue::Some</span> { .. }) {
-                        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">document_returned</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                    <span class="kw">if </span><span class="macro">matches!</span>(bv, BatchValue::Some { .. }) {
+                        <span class="self">self</span>.data.document_returned = <span class="bool-val">true</span>;
                     }
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_resumable</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resume_attempted</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">client</span>().<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">clone</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>();
-                    <span class="ident">data</span>.<span class="ident">implicit_session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">take_implicit_session</span>();
-                    <span class="self">self</span>.<span class="ident">pending_resume</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                        <span class="kw">let</span> <span class="ident">new_stream</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">client</span>
-                            .<span class="ident">execute_watch</span>(<span class="ident">args</span>.<span class="ident">pipeline</span>, <span class="ident">args</span>.<span class="ident">options</span>, <span class="ident">args</span>.<span class="ident">target</span>, <span class="prelude-val">Some</span>(<span class="ident">data</span>))
+                Poll::Ready(<span class="prelude-val">Err</span>(e)) <span class="kw">if </span>e.is_resumable() &amp;&amp; !<span class="self">self</span>.data.resume_attempted =&gt; {
+                    <span class="self">self</span>.data.resume_attempted = <span class="bool-val">true</span>;
+                    <span class="kw">let </span>client = <span class="self">self</span>.cursor.client().clone();
+                    <span class="kw">let </span>args = <span class="self">self</span>.args.clone();
+                    <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="self">self</span>.data.take();
+                    data.implicit_session = <span class="self">self</span>.cursor.take_implicit_session();
+                    <span class="self">self</span>.pending_resume = <span class="prelude-val">Some</span>(Box::pin(<span class="kw">async move </span>{
+                        <span class="kw">let </span>new_stream: <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;ChangeStreamEvent&lt;()&gt;&gt;&gt; = client
+                            .execute_watch(args.pipeline, args.options, args.target, <span class="prelude-val">Some</span>(data))
                             .<span class="kw">await</span>;
-                        <span class="ident">new_stream</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">cs</span><span class="op">|</span> <span class="ident">cs</span>.<span class="ident">with_type</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
+                        new_stream.map(|cs| cs.with_type::&lt;T&gt;())
                     }));
-                    <span class="comment">// Iterate the loop so the new future gets polled and can register wakers.</span>
-                    <span class="kw">continue</span>;
+                    <span class="comment">// Iterate the loop so the new future gets polled and can register wakers.
+                    </span><span class="kw">continue</span>;
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
-            <span class="kw">return</span> <span class="ident">out</span>;
+            <span class="kw">return </span>out;
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; Stream <span class="kw">for </span>ChangeStream&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">stream_poll_next</span>(<span class="ident">Pin::into_inner</span>(<span class="self">self</span>), <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        stream_poll_next(Pin::into_inner(<span class="self">self</span>), cx)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

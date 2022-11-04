@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/rfc/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/rfc/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -173,178 +173,178 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Rules defined in [ISO 8601].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [ISO 8601]: https://www.iso.org/iso-8601-date-and-time-format.html</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Rules defined in [ISO 8601].
+//!
+//! [ISO 8601]: https://www.iso.org/iso-8601-date-and-time-format.html
 
-<span class="kw">use</span> <span class="ident">core::num</span>::{<span class="ident">NonZeroU16</span>, <span class="ident">NonZeroU8</span>};
+</span><span class="kw">use </span>core::num::{NonZeroU16, NonZeroU8};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator</span>::{<span class="ident">any_digit</span>, <span class="ident">ascii_char</span>, <span class="ident">exactly_n_digits</span>, <span class="ident">first_match</span>, <span class="ident">sign</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::ParsedItem</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Month</span>, <span class="ident">Weekday</span>};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::combinator::{any_digit, ascii_char, exactly_n_digits, first_match, sign};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::ParsedItem;
+<span class="kw">use crate</span>::{Month, Weekday};
 
-<span class="doccomment">/// What kind of format is being parsed. This is used to ensure each part of the format (date, time,</span>
-<span class="doccomment">/// offset) is the same kind.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ExtendedKind</span> {
-    <span class="doccomment">/// The basic format.</span>
-    <span class="ident">Basic</span>,
-    <span class="doccomment">/// The extended format.</span>
-    <span class="ident">Extended</span>,
-    <span class="doccomment">/// ¯\_(ツ)_/¯</span>
-    <span class="ident">Unknown</span>,
+<span class="doccomment">/// What kind of format is being parsed. This is used to ensure each part of the format (date, time,
+/// offset) is the same kind.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ExtendedKind {
+    <span class="doccomment">/// The basic format.
+    </span>Basic,
+    <span class="doccomment">/// The extended format.
+    </span>Extended,
+    <span class="doccomment">/// ¯\_(ツ)_/¯
+    </span>Unknown,
 }
 
-<span class="kw">impl</span> <span class="ident">ExtendedKind</span> {
-    <span class="doccomment">/// Is it possible that the format is extended?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">maybe_extended</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Extended</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Unknown</span>)
+<span class="kw">impl </span>ExtendedKind {
+    <span class="doccomment">/// Is it possible that the format is extended?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>maybe_extended(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Extended | <span class="self">Self</span>::Unknown)
     }
 
-    <span class="doccomment">/// Is the format known for certain to be extended?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_extended</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Extended</span>)
+    <span class="doccomment">/// Is the format known for certain to be extended?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>is_extended(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Extended)
     }
 
-    <span class="doccomment">/// If the kind is `Unknown`, make it `Basic`. Otherwise, do nothing. Returns `Some` if and only</span>
-    <span class="doccomment">/// if the kind is now `Basic`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">coerce_basic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Basic</span> =&gt; <span class="prelude-val">Some</span>(()),
-            <span class="ident"><span class="self">Self</span>::Extended</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Basic</span>;
+    <span class="doccomment">/// If the kind is `Unknown`, make it `Basic`. Otherwise, do nothing. Returns `Some` if and only
+    /// if the kind is now `Basic`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_basic(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Basic =&gt; <span class="prelude-val">Some</span>(()),
+            <span class="self">Self</span>::Extended =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::Unknown =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::Basic;
                 <span class="prelude-val">Some</span>(())
             }
         }
     }
 
-    <span class="doccomment">/// If the kind is `Unknown`, make it `Extended`. Otherwise, do nothing. Returns `Some` if and</span>
-    <span class="doccomment">/// only if the kind is now `Extended`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">coerce_extended</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Basic</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::Extended</span> =&gt; <span class="prelude-val">Some</span>(()),
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Extended</span>;
+    <span class="doccomment">/// If the kind is `Unknown`, make it `Extended`. Otherwise, do nothing. Returns `Some` if and
+    /// only if the kind is now `Extended`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>coerce_extended(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Basic =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::Extended =&gt; <span class="prelude-val">Some</span>(()),
+            <span class="self">Self</span>::Unknown =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::Extended;
                 <span class="prelude-val">Some</span>(())
             }
         }
     }
 }
 
-<span class="doccomment">/// Parse a possibly expanded year.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">year</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">i32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">sign</span>(<span class="ident">input</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">sign</span>)) =&gt; <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">val</span> <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="kw">if</span> <span class="ident">sign</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> { <span class="op">-</span><span class="ident">val</span> } <span class="kw">else</span> { <span class="ident">val</span> }
+<span class="doccomment">/// Parse a possibly expanded year.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>year(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, i32&gt;&gt; {
+    <span class="prelude-val">Some</span>(<span class="kw">match </span>sign(input) {
+        <span class="prelude-val">Some</span>(ParsedItem(input, sign)) =&gt; exactly_n_digits::&lt;<span class="number">6</span>, u32&gt;(input)<span class="question-mark">?</span>.map(|val| {
+            <span class="kw">let </span>val = val <span class="kw">as </span>i32;
+            <span class="kw">if </span>sign == <span class="string">b&#39;-&#39; </span>{ -val } <span class="kw">else </span>{ val }
         }),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span> <span class="kw">as</span> <span class="kw">_</span>),
+        <span class="prelude-val">None </span>=&gt; exactly_n_digits::&lt;<span class="number">4</span>, u32&gt;(input)<span class="question-mark">?</span>.map(|val| val <span class="kw">as _</span>),
     })
 }
 
-<span class="doccomment">/// Parse a month.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">month</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Month</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">first_match</span>(
+<span class="doccomment">/// Parse a month.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>month(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, Month&gt;&gt; {
+    first_match(
         [
-            (<span class="string">b&quot;01&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::January</span>),
-            (<span class="string">b&quot;02&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::February</span>),
-            (<span class="string">b&quot;03&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::March</span>),
-            (<span class="string">b&quot;04&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::April</span>),
-            (<span class="string">b&quot;05&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::May</span>),
-            (<span class="string">b&quot;06&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::June</span>),
-            (<span class="string">b&quot;07&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::July</span>),
-            (<span class="string">b&quot;08&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::August</span>),
-            (<span class="string">b&quot;09&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::September</span>),
-            (<span class="string">b&quot;10&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::October</span>),
-            (<span class="string">b&quot;11&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::November</span>),
-            (<span class="string">b&quot;12&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Month::December</span>),
+            (<span class="string">b&quot;01&quot;</span>.as_slice(), Month::January),
+            (<span class="string">b&quot;02&quot;</span>.as_slice(), Month::February),
+            (<span class="string">b&quot;03&quot;</span>.as_slice(), Month::March),
+            (<span class="string">b&quot;04&quot;</span>.as_slice(), Month::April),
+            (<span class="string">b&quot;05&quot;</span>.as_slice(), Month::May),
+            (<span class="string">b&quot;06&quot;</span>.as_slice(), Month::June),
+            (<span class="string">b&quot;07&quot;</span>.as_slice(), Month::July),
+            (<span class="string">b&quot;08&quot;</span>.as_slice(), Month::August),
+            (<span class="string">b&quot;09&quot;</span>.as_slice(), Month::September),
+            (<span class="string">b&quot;10&quot;</span>.as_slice(), Month::October),
+            (<span class="string">b&quot;11&quot;</span>.as_slice(), Month::November),
+            (<span class="string">b&quot;12&quot;</span>.as_slice(), Month::December),
         ],
         <span class="bool-val">true</span>,
-    )(<span class="ident">input</span>)
+    )(input)
 }
 
-<span class="doccomment">/// Parse a week number.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">week</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">NonZeroU8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Parse a week number.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>week(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, NonZeroU8&gt;&gt; {
+    exactly_n_digits::&lt;<span class="number">2</span>, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Parse a day of the month.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">day</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">NonZeroU8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Parse a day of the month.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>day(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, NonZeroU8&gt;&gt; {
+    exactly_n_digits::&lt;<span class="number">2</span>, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Parse a day of the week.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dayk</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Weekday</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">first_match</span>(
+<span class="doccomment">/// Parse a day of the week.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dayk(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, Weekday&gt;&gt; {
+    first_match(
         [
-            (<span class="string">b&quot;1&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Monday</span>),
-            (<span class="string">b&quot;2&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Tuesday</span>),
-            (<span class="string">b&quot;3&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Wednesday</span>),
-            (<span class="string">b&quot;4&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Thursday</span>),
-            (<span class="string">b&quot;5&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Friday</span>),
-            (<span class="string">b&quot;6&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Saturday</span>),
-            (<span class="string">b&quot;7&quot;</span>.<span class="ident">as_slice</span>(), <span class="ident">Weekday::Sunday</span>),
+            (<span class="string">b&quot;1&quot;</span>.as_slice(), Weekday::Monday),
+            (<span class="string">b&quot;2&quot;</span>.as_slice(), Weekday::Tuesday),
+            (<span class="string">b&quot;3&quot;</span>.as_slice(), Weekday::Wednesday),
+            (<span class="string">b&quot;4&quot;</span>.as_slice(), Weekday::Thursday),
+            (<span class="string">b&quot;5&quot;</span>.as_slice(), Weekday::Friday),
+            (<span class="string">b&quot;6&quot;</span>.as_slice(), Weekday::Saturday),
+            (<span class="string">b&quot;7&quot;</span>.as_slice(), Weekday::Sunday),
         ],
         <span class="bool-val">true</span>,
-    )(<span class="ident">input</span>)
+    )(input)
 }
 
-<span class="doccomment">/// Parse a day of the year.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dayo</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">NonZeroU16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">3</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Parse a day of the year.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dayo(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, NonZeroU16&gt;&gt; {
+    exactly_n_digits::&lt;<span class="number">3</span>, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Parse the hour.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hour</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Parse the hour.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>hour(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, u8&gt;&gt; {
+    exactly_n_digits::&lt;<span class="number">2</span>, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Parse the minute.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">min</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Parse the minute.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>min(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, u8&gt;&gt; {
+    exactly_n_digits::&lt;<span class="number">2</span>, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Parse a floating point number as its integer and optional fractional parts.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The number must have two digits before the decimal point. If a decimal point is present, at</span>
-<span class="doccomment">/// least one digit must follow.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The return type is a tuple of the integer part and optional fraction part.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">float</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, (<span class="ident">u8</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// Two digits before the decimal.</span>
-    <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">integer_part</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
+<span class="doccomment">/// Parse a floating point number as its integer and optional fractional parts.
+///
+/// The number must have two digits before the decimal point. If a decimal point is present, at
+/// least one digit must follow.
+///
+/// The return type is a tuple of the integer part and optional fraction part.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>float(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, (u8, <span class="prelude-ty">Option</span>&lt;f64&gt;)&gt;&gt; {
+    <span class="comment">// Two digits before the decimal.
+    </span><span class="kw">let </span>ParsedItem(input, integer_part) = <span class="kw">match </span>input {
         [
-            <span class="ident">first_digit</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>,
-            <span class="ident">second_digit</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>,
-            <span class="ident">input</span> @ ..,
-        ] =&gt; <span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">first_digit</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="op">*</span> <span class="number">10</span> <span class="op">+</span> (<span class="ident">second_digit</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>)),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            first_digit @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>,
+            second_digit @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>,
+            input @ ..,
+        ] =&gt; ParsedItem(input, (first_digit - <span class="string">b&#39;0&#39;</span>) * <span class="number">10 </span>+ (second_digit - <span class="string">b&#39;0&#39;</span>)),
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())) <span class="op">=</span> <span class="ident">decimal_sign</span>(<span class="ident">input</span>) {
-        <span class="comment">// Mandatory post-decimal digit.</span>
-        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">mut</span> <span class="ident">fractional_part</span>) <span class="op">=</span>
-            <span class="ident">any_digit</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">digit</span><span class="op">|</span> ((<span class="ident">digit</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">10.</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ParsedItem(input, ())) = decimal_sign(input) {
+        <span class="comment">// Mandatory post-decimal digit.
+        </span><span class="kw">let </span>ParsedItem(<span class="kw-2">mut </span>input, <span class="kw-2">mut </span>fractional_part) =
+            any_digit(input)<span class="question-mark">?</span>.map(|digit| ((digit - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>f64) / <span class="number">10.</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">divisor</span> <span class="op">=</span> <span class="number">10.</span>;
-        <span class="comment">// Any number of subsequent digits.</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">new_input</span>, <span class="ident">digit</span>)) <span class="op">=</span> <span class="ident">any_digit</span>(<span class="ident">input</span>) {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">new_input</span>;
-            <span class="ident">divisor</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10.</span>;
-            <span class="ident">fractional_part</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">digit</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="kw">as</span> <span class="ident">f64</span> <span class="op">/</span> <span class="ident">divisor</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>divisor = <span class="number">10.</span>;
+        <span class="comment">// Any number of subsequent digits.
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(ParsedItem(new_input, digit)) = any_digit(input) {
+            input = new_input;
+            divisor <span class="kw-2">*</span>= <span class="number">10.</span>;
+            fractional_part += (digit - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>f64 / divisor;
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">integer_part</span>, <span class="prelude-val">Some</span>(<span class="ident">fractional_part</span>))))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">integer_part</span>, <span class="prelude-val">None</span>)))
+        <span class="prelude-val">Some</span>(ParsedItem(input, (integer_part, <span class="prelude-val">Some</span>(fractional_part))))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(ParsedItem(input, (integer_part, <span class="prelude-val">None</span>)))
     }
 }
 
-<span class="doccomment">/// Parse a &quot;decimal sign&quot;, which is either a comma or a period.</span>
-<span class="kw">fn</span> <span class="ident">decimal_sign</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;.&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;,&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>))
+<span class="doccomment">/// Parse a &quot;decimal sign&quot;, which is either a comma or a period.
+</span><span class="kw">fn </span>decimal_sign(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    ascii_char::&lt;<span class="string">b&#39;.&#39;</span>&gt;(input).or_else(|| ascii_char::&lt;<span class="string">b&#39;,&#39;</span>&gt;(input))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

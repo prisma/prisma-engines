@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -198,205 +198,205 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">sql_trace::SqlTraceComment</span>,
-    <span class="ident">value_ext::IntoTypedJsonExtension</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>, <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    column_metadata, error::<span class="kw-2">*</span>, model_extensions::<span class="kw-2">*</span>, sql_info::SqlInfo, sql_trace::SqlTraceComment,
+    value_ext::IntoTypedJsonExtension, AliasedCondition, ColumnMetadata, SqlRow, ToSqlRow,
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">RecordFilter</span>};
-<span class="kw">use</span> <span class="ident">futures::future::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry::trace::TraceFlags</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">connector</span>::{<span class="self">self</span>, <span class="ident">Queryable</span>},
-    <span class="ident">pooled::PooledConnection</span>,
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>connector_interface::{filter::Filter, RecordFilter};
+<span class="kw">use </span>futures::future::FutureExt;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>opentelemetry::trace::TraceFlags;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::{
+    ast::<span class="kw-2">*</span>,
+    connector::{<span class="self">self</span>, Queryable},
+    pooled::PooledConnection,
 };
-<span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
+<span class="kw">use </span>tracing_futures::Instrument;
 
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Map</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">panic::AssertUnwindSafe</span>};
+<span class="kw">use </span>serde_json::{Map, Value};
+<span class="kw">use </span>std::{collections::HashMap, panic::AssertUnwindSafe};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::trace_parent_to_string</span>;
+<span class="kw">use </span><span class="kw">crate</span>::sql_trace::trace_parent_to_string;
 
-<span class="kw">use</span> <span class="ident">opentelemetry::trace::TraceContextExt</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">info_span</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
+<span class="kw">use </span>opentelemetry::trace::TraceContextExt;
+<span class="kw">use </span>tracing::{info_span, Span};
+<span class="kw">use </span>tracing_opentelemetry::OpenTelemetrySpanExt;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="ident">QueryExt</span> <span class="kw">for</span> <span class="ident">connector::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span> <span class="ident">QueryExt</span> <span class="kw">for</span> <span class="ident">PooledConnection</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;t</span>&gt; QueryExt <span class="kw">for </span>connector::Transaction&lt;<span class="lifetime">&#39;t</span>&gt; {}
+<span class="kw">impl </span>QueryExt <span class="kw">for </span>PooledConnection {}
 
-<span class="doccomment">/// An extension trait for Quaint&#39;s `Queryable`, offering certain Prisma-centric</span>
-<span class="doccomment">/// database operations on top of `Queryable`.</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">QueryExt</span>: <span class="ident">Queryable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// Filter and map the resulting types with the given identifiers.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter</span>(
+<span class="doccomment">/// An extension trait for Quaint&#39;s `Queryable`, offering certain Prisma-centric
+/// database operations on top of `Queryable`.
+</span><span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>QueryExt: Queryable + Send + Sync {
+    <span class="doccomment">/// Filter and map the resulting types with the given identifiers.
+    </span><span class="kw">async fn </span>filter(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;filter read query&quot;</span>);
+        q: Query&lt;<span class="lifetime">&#39;_</span>&gt;,
+        idents: <span class="kw-2">&amp;</span>[ColumnMetadata&lt;<span class="lifetime">&#39;_</span>&gt;],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SqlRow&gt;&gt; {
+        <span class="kw">let </span>span = <span class="macro">info_span!</span>(<span class="string">&quot;filter read query&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
-        <span class="kw">let</span> <span class="ident">span_ref</span> <span class="op">=</span> <span class="ident">otel_ctx</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">span_ctx</span> <span class="op">=</span> <span class="ident">span_ref</span>.<span class="ident">span_context</span>();
+        <span class="kw">let </span>otel_ctx = span.context();
+        <span class="kw">let </span>span_ref = otel_ctx.span();
+        <span class="kw">let </span>span_ctx = span_ref.span_context();
 
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">q</span>, <span class="ident">trace_id</span>) {
-            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">span_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">==</span> <span class="ident">TraceFlags::SAMPLED</span> =&gt; {
-                <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">span_ctx</span>))))
+        <span class="kw">let </span>q = <span class="kw">match </span>(q, trace_id) {
+            (Query::Select(x), <span class="kw">_</span>) <span class="kw">if </span>span_ctx.trace_flags() == TraceFlags::SAMPLED =&gt; {
+                Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
-            <span class="comment">// This is part of the required changes to pass a traceid</span>
-            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="ident">trace_id</span>) =&gt; <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>))),
-            (<span class="ident">q</span>, <span class="kw">_</span>) =&gt; <span class="ident">q</span>,
+            <span class="comment">// This is part of the required changes to pass a traceid
+            </span>(Query::Select(x), trace_id) =&gt; Query::Select(Box::from(x.add_trace_id(trace_id))),
+            (q, <span class="kw">_</span>) =&gt; q,
         };
 
-        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result_set = <span class="self">self</span>.query(q).instrument(span).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql_rows</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>sql_rows = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span> {
-            <span class="ident">sql_rows</span>.<span class="ident">push</span>(<span class="ident">row</span>.<span class="ident">to_sql_row</span>(<span class="ident">idents</span>)<span class="question-mark">?</span>);
+        <span class="kw">for </span>row <span class="kw">in </span>result_set {
+            sql_rows.push(row.to_sql_row(idents)<span class="question-mark">?</span>);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">sql_rows</span>)
+        <span class="prelude-val">Ok</span>(sql_rows)
     }
 
-    <span class="doccomment">/// Execute a singular SQL query in the database, returning an arbitrary</span>
-    <span class="doccomment">/// JSON `Value` as a result.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_json</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">_sql_info</span>: <span class="ident">SqlInfo</span>,
-        <span class="ident">_features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
-        <span class="kw-2">mut</span> <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident"><span class="kw">crate</span>::error::RawError</span><span class="op">&gt;</span> {
-        <span class="comment">// Unwrapping query &amp; params is safe since it&#39;s already passed the query parsing stage</span>
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">remove</span>(<span class="string">&quot;query&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">remove</span>(<span class="string">&quot;parameters&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">into_list</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">convert_lossy</span>).<span class="ident">collect_vec</span>();
-        <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="ident">AssertUnwindSafe</span>(<span class="self">self</span>.<span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>))
-            .<span class="ident">catch_unwind</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Execute a singular SQL query in the database, returning an arbitrary
+    /// JSON `Value` as a result.
+    </span><span class="kw">async fn </span>raw_json&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        _sql_info: SqlInfo,
+        _features: <span class="kw-2">&amp;</span>[PreviewFeature],
+        <span class="kw-2">mut </span>inputs: HashMap&lt;String, PrismaValue&gt;,
+    ) -&gt; std::result::Result&lt;Value, <span class="kw">crate</span>::error::RawError&gt; {
+        <span class="comment">// Unwrapping query &amp; params is safe since it&#39;s already passed the query parsing stage
+        </span><span class="kw">let </span>query = inputs.remove(<span class="string">&quot;query&quot;</span>).unwrap().into_string().unwrap();
+        <span class="kw">let </span>params = inputs.remove(<span class="string">&quot;parameters&quot;</span>).unwrap().into_list().unwrap();
+        <span class="kw">let </span>params = params.into_iter().map(convert_lossy).collect_vec();
+        <span class="kw">let </span>result_set = AssertUnwindSafe(<span class="self">self</span>.query_raw_typed(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>params))
+            .catch_unwind()
+            .<span class="kw">await</span><span class="question-mark">??</span>;
 
-        <span class="comment">// `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done</span>
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result_set</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="comment">// `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
+        </span><span class="kw">let </span>columns: Vec&lt;String&gt; = result_set.columns().iter().map(ToString::to_string).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">result_set</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">Map::new</span>();
+        <span class="kw">for </span>row <span class="kw">in </span>result_set.into_iter() {
+            <span class="kw">let </span><span class="kw-2">mut </span>object = Map::new();
 
-            <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">p_value</span>) <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">get</span>(<span class="ident">idx</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;f{}&quot;</span>, <span class="ident">idx</span>)).<span class="ident">clone</span>();
+            <span class="kw">for </span>(idx, p_value) <span class="kw">in </span>row.into_iter().enumerate() {
+                <span class="kw">let </span>column_name = columns.get(idx).unwrap_or(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;f{}&quot;</span>, idx)).clone();
 
-                <span class="ident">object</span>.<span class="ident">insert</span>(<span class="ident">column_name</span>, <span class="ident">p_value</span>.<span class="ident">as_typed_json</span>());
+                object.insert(column_name, p_value.as_typed_json());
             }
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">Value::Object</span>(<span class="ident">object</span>));
+            result.push(Value::Object(object));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Value::Array</span>(<span class="ident">result</span>))
+        <span class="prelude-val">Ok</span>(Value::Array(result))
     }
 
-    <span class="doccomment">/// Execute a singular SQL query in the database, returning the number of</span>
-    <span class="doccomment">/// affected rows.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_count</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-        <span class="ident">_features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident"><span class="kw">crate</span>::error::RawError</span><span class="op">&gt;</span> {
-        <span class="comment">// Unwrapping query &amp; params is safe since it&#39;s already passed the query parsing stage</span>
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">remove</span>(<span class="string">&quot;query&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">inputs</span>.<span class="ident">remove</span>(<span class="string">&quot;parameters&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">into_list</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">convert_lossy</span>).<span class="ident">collect_vec</span>();
-        <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">AssertUnwindSafe</span>(<span class="self">self</span>.<span class="ident">execute_raw_typed</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>))
-            .<span class="ident">catch_unwind</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Execute a singular SQL query in the database, returning the number of
+    /// affected rows.
+    </span><span class="kw">async fn </span>raw_count&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>inputs: HashMap&lt;String, PrismaValue&gt;,
+        _features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    ) -&gt; std::result::Result&lt;usize, <span class="kw">crate</span>::error::RawError&gt; {
+        <span class="comment">// Unwrapping query &amp; params is safe since it&#39;s already passed the query parsing stage
+        </span><span class="kw">let </span>query = inputs.remove(<span class="string">&quot;query&quot;</span>).unwrap().into_string().unwrap();
+        <span class="kw">let </span>params = inputs.remove(<span class="string">&quot;parameters&quot;</span>).unwrap().into_list().unwrap();
+        <span class="kw">let </span>params = params.into_iter().map(convert_lossy).collect_vec();
+        <span class="kw">let </span>changes = AssertUnwindSafe(<span class="self">self</span>.execute_raw_typed(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>params))
+            .catch_unwind()
+            .<span class="kw">await</span><span class="question-mark">??</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">changes</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        <span class="prelude-val">Ok</span>(changes <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Select one row from the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find</span>(
+    <span class="doccomment">/// Select one row from the database.
+    </span><span class="kw">async fn </span>find(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">q</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">meta</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">q</span>.<span class="ident">limit</span>(<span class="number">1</span>).<span class="ident">into</span>(), <span class="ident">meta</span>, <span class="ident">trace_id</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">next</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">SqlError::RecordDoesNotExist</span>)
+        q: Select&lt;<span class="lifetime">&#39;_</span>&gt;,
+        meta: <span class="kw-2">&amp;</span>[ColumnMetadata&lt;<span class="lifetime">&#39;_</span>&gt;],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;SqlRow&gt; {
+        <span class="self">self</span>.filter(q.limit(<span class="number">1</span>).into(), meta, trace_id)
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.into_iter()
+            .next()
+            .ok_or(SqlError::RecordDoesNotExist)
     }
 
-    <span class="doccomment">/// Process the record filter and either return directly with precomputed values,</span>
-    <span class="doccomment">/// or fetch IDs from the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_selectors</span>(
+    <span class="doccomment">/// Process the record filter and either return directly with precomputed values,
+    /// or fetch IDs from the database.
+    </span><span class="kw">async fn </span>filter_selectors(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>) <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">selectors</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">selectors</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">filter_ids</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-        }
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: RecordFilter,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SelectionResult&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(selectors) = record_filter.selectors {
+            <span class="prelude-val">Ok</span>(selectors)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.filter_ids(model, record_filter.filter, trace_id).<span class="kw">await
+        </span>}
     }
 
-    <span class="doccomment">/// Read the all columns as a (primary) identifier.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_ids</span>(
+    <span class="doccomment">/// Read the all columns as a (primary) identifier.
+    </span><span class="kw">async fn </span>filter_ids(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">filter</span>: <span class="ident">Filter</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">model_id</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">id_cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">as_columns</span>().<span class="ident">collect</span>();
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        filter: Filter,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SelectionResult&gt;&gt; {
+        <span class="kw">let </span>model_id: ModelProjection = model.primary_identifier().into();
+        <span class="kw">let </span>id_cols: Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; = model_id.as_columns().collect();
 
-        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">model</span>.<span class="ident">as_table</span>())
-            .<span class="ident">columns</span>(<span class="ident">id_cols</span>)
-            .<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>())
-            .<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>.<span class="ident">clone</span>())
-            .<span class="ident">so_that</span>(<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>));
+        <span class="kw">let </span>select = Select::from_table(model.as_table())
+            .columns(id_cols)
+            .append_trace(<span class="kw-2">&amp;</span>Span::current())
+            .add_trace_id(trace_id.clone())
+            .so_that(filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>));
 
-        <span class="self">self</span>.<span class="ident">select_ids</span>(<span class="ident">select</span>, <span class="ident">model_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-    }
+        <span class="self">self</span>.select_ids(select, model_id, trace_id).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_ids</span>(
+    <span class="kw">async fn </span>select_ids(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">select</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">model_id</span>: <span class="ident">ModelProjection</span>,
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
-                <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">type_identifier_with_arity</span>()],
-                <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">type_identifiers_with_arities</span>(),
-                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+        select: Select&lt;<span class="lifetime">&#39;_</span>&gt;,
+        model_id: ModelProjection,
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SelectionResult&gt;&gt; {
+        <span class="kw">let </span>idents: Vec&lt;<span class="kw">_</span>&gt; = model_id
+            .fields()
+            .flat_map(|f| <span class="kw">match </span>f {
+                Field::Scalar(sf) =&gt; <span class="macro">vec!</span>[sf.type_identifier_with_arity()],
+                Field::Relation(rf) =&gt; rf.type_identifiers_with_arities(),
+                Field::Composite(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="ident">field_names</span>.<span class="ident">as_slice</span>(), <span class="kw-2">&amp;</span><span class="ident">idents</span>);
+        <span class="kw">let </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = model_id.fields().map(|field| field.name()).collect();
+        <span class="kw">let </span>meta = column_metadata::create(field_names.as_slice(), <span class="kw-2">&amp;</span>idents);
 
-        <span class="comment">// TODO: Add tracing</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">select</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="comment">// TODO: Add tracing
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rows = <span class="self">self</span>.filter(select.into(), <span class="kw-2">&amp;</span>meta, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span>.<span class="ident">drain</span>(<span class="number">0</span>..) {
-            <span class="kw">let</span> <span class="ident">tuples</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">scalar_fields</span>().<span class="ident">zip</span>(<span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>()).<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">record_id</span>: <span class="ident">SelectionResult</span> <span class="op">=</span> <span class="ident">SelectionResult::new</span>(<span class="ident">tuples</span>);
+        <span class="kw">for </span>row <span class="kw">in </span>rows.drain(<span class="number">0</span>..) {
+            <span class="kw">let </span>tuples: Vec&lt;<span class="kw">_</span>&gt; = model_id.scalar_fields().zip(row.values.into_iter()).collect();
+            <span class="kw">let </span>record_id: SelectionResult = SelectionResult::new(tuples);
 
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">record_id</span>);
+            result.push(record_id);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+        <span class="prelude-val">Ok</span>(result)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

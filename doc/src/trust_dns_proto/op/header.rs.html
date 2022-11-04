@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/header.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>header.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/header.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>header.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -663,670 +663,670 @@
 <span id="663">663</span>
 <span id="664">664</span>
 <span id="665">665</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Message metadata</span>
+</span><span class="doccomment">//! Message metadata
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::From</span>, <span class="ident">fmt</span>};
+</span><span class="kw">use </span>std::{convert::From, fmt};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error</span>::<span class="kw-2">*</span>,
-    <span class="ident">op</span>::{<span class="ident">op_code::OpCode</span>, <span class="ident">response_code::ResponseCode</span>},
-    <span class="ident">serialize::binary</span>::<span class="kw-2">*</span>,
+<span class="kw">use crate</span>::{
+    error::<span class="kw-2">*</span>,
+    op::{op_code::OpCode, response_code::ResponseCode},
+    serialize::binary::<span class="kw-2">*</span>,
 };
 
-<span class="doccomment">/// Metadata for the `Message` struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 4.1.1. Header section format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The header contains the following fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                                    1  1  1  1  1  1</span>
-<span class="doccomment">///      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                      ID                       |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |QR|   Opcode  |AA|TC|RD|RA|ZZ|AD|CD|   RCODE   |  /// AD and CD from RFC4035</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    QDCOUNT / ZCOUNT           |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    ANCOUNT / PRCOUNT          |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    NSCOUNT / UPCOUNT          |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                    ARCOUNT / ADCOUNT          |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Z               Reserved for future use.  Must be zero in all queries</span>
-<span class="doccomment">///                 and responses.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Header</span> {
-    <span class="ident">id</span>: <span class="ident">u16</span>,
-    <span class="ident">message_type</span>: <span class="ident">MessageType</span>,
-    <span class="ident">op_code</span>: <span class="ident">OpCode</span>,
-    <span class="ident">authoritative</span>: <span class="ident">bool</span>,
-    <span class="ident">truncation</span>: <span class="ident">bool</span>,
-    <span class="ident">recursion_desired</span>: <span class="ident">bool</span>,
-    <span class="ident">recursion_available</span>: <span class="ident">bool</span>,
-    <span class="ident">authentic_data</span>: <span class="ident">bool</span>,
-    <span class="ident">checking_disabled</span>: <span class="ident">bool</span>,
-    <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>,
-    <span class="ident">query_count</span>: <span class="ident">u16</span>,
-    <span class="ident">answer_count</span>: <span class="ident">u16</span>,
-    <span class="ident">name_server_count</span>: <span class="ident">u16</span>,
-    <span class="ident">additional_count</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// Metadata for the `Message` struct.
+///
+/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+///
+/// ```text
+/// 4.1.1. Header section format
+///
+/// The header contains the following fields
+///
+///                                    1  1  1  1  1  1
+///      0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                      ID                       |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |QR|   Opcode  |AA|TC|RD|RA|ZZ|AD|CD|   RCODE   |  /// AD and CD from RFC4035
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    QDCOUNT / ZCOUNT           |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    ANCOUNT / PRCOUNT          |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    NSCOUNT / UPCOUNT          |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                    ARCOUNT / ADCOUNT          |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///
+/// where
+///
+/// Z               Reserved for future use.  Must be zero in all queries
+///                 and responses.
+///
+/// ```
+///
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Eq, Hash)]
+</span><span class="kw">pub struct </span>Header {
+    id: u16,
+    message_type: MessageType,
+    op_code: OpCode,
+    authoritative: bool,
+    truncation: bool,
+    recursion_desired: bool,
+    recursion_available: bool,
+    authentic_data: bool,
+    checking_disabled: bool,
+    response_code: ResponseCode,
+    query_count: u16,
+    answer_count: u16,
+    name_server_count: u16,
+    additional_count: u16,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Header {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{id}:{flags}:{code:?}:{answers}/{authorities}/{additionals}&quot;</span>,
-            <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span>,
-            <span class="ident">flags</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flags</span>(),
-            <span class="ident">code</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">response_code</span>,
-            <span class="ident">answers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">answer_count</span>,
-            <span class="ident">authorities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_server_count</span>,
-            <span class="ident">additionals</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">additional_count</span>,
+            id = <span class="self">self</span>.id,
+            flags = <span class="self">self</span>.flags(),
+            code = <span class="self">self</span>.response_code,
+            answers = <span class="self">self</span>.answer_count,
+            authorities = <span class="self">self</span>.name_server_count,
+            additionals = <span class="self">self</span>.additional_count,
         )
     }
 }
 
-<span class="doccomment">/// Message types are either Query (also Update) or Response</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageType</span> {
-    <span class="doccomment">/// Queries are Client requests, these are either Queries or Updates</span>
-    <span class="ident">Query</span>,
-    <span class="doccomment">/// Response message from the Server or upstream Resolver</span>
-    <span class="ident">Response</span>,
+<span class="doccomment">/// Message types are either Query (also Update) or Response
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Copy, Clone, Hash)]
+</span><span class="kw">pub enum </span>MessageType {
+    <span class="doccomment">/// Queries are Client requests, these are either Queries or Updates
+    </span>Query,
+    <span class="doccomment">/// Response message from the Server or upstream Resolver
+    </span>Response,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">MessageType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">MessageType::Query</span> =&gt; <span class="string">&quot;QUERY&quot;</span>,
-            <span class="ident">MessageType::Response</span> =&gt; <span class="string">&quot;RESPONSE&quot;</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MessageType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="self">self </span>{
+            MessageType::Query =&gt; <span class="string">&quot;QUERY&quot;</span>,
+            MessageType::Response =&gt; <span class="string">&quot;RESPONSE&quot;</span>,
         };
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
+        f.write_str(s)
     }
 }
 
-<span class="doccomment">/// All the flags of the request/response header</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Flags</span> {
-    <span class="ident">authoritative</span>: <span class="ident">bool</span>,
-    <span class="ident">truncation</span>: <span class="ident">bool</span>,
-    <span class="ident">recursion_desired</span>: <span class="ident">bool</span>,
-    <span class="ident">recursion_available</span>: <span class="ident">bool</span>,
-    <span class="ident">authentic_data</span>: <span class="ident">bool</span>,
-    <span class="ident">checking_disabled</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// All the flags of the request/response header
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Flags {
+    authoritative: bool,
+    truncation: bool,
+    recursion_desired: bool,
+    recursion_available: bool,
+    authentic_data: bool,
+    checking_disabled: bool,
 }
 
-<span class="doccomment">/// We are following the `dig` commands display format for the header flags</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example: &quot;RD,AA,RA;&quot; is Recursion-Desired, Authoritative-Answer, Recursion-Available.</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Flags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">SEPARATOR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;,&quot;</span>;
+<span class="doccomment">/// We are following the `dig` commands display format for the header flags
+///
+/// Example: &quot;RD,AA,RA;&quot; is Recursion-Desired, Authoritative-Answer, Recursion-Available.
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Flags {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">const </span>SEPARATOR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;,&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> [
-            (<span class="self">self</span>.<span class="ident">recursion_desired</span>, <span class="string">&quot;RD&quot;</span>),
-            (<span class="self">self</span>.<span class="ident">checking_disabled</span>, <span class="string">&quot;CD&quot;</span>),
-            (<span class="self">self</span>.<span class="ident">truncation</span>, <span class="string">&quot;TC&quot;</span>),
-            (<span class="self">self</span>.<span class="ident">authoritative</span>, <span class="string">&quot;AA&quot;</span>),
-            (<span class="self">self</span>.<span class="ident">recursion_available</span>, <span class="string">&quot;RA&quot;</span>),
-            (<span class="self">self</span>.<span class="ident">authentic_data</span>, <span class="string">&quot;AD&quot;</span>),
+        <span class="kw">let </span>flags = [
+            (<span class="self">self</span>.recursion_desired, <span class="string">&quot;RD&quot;</span>),
+            (<span class="self">self</span>.checking_disabled, <span class="string">&quot;CD&quot;</span>),
+            (<span class="self">self</span>.truncation, <span class="string">&quot;TC&quot;</span>),
+            (<span class="self">self</span>.authoritative, <span class="string">&quot;AA&quot;</span>),
+            (<span class="self">self</span>.recursion_available, <span class="string">&quot;RA&quot;</span>),
+            (<span class="self">self</span>.authentic_data, <span class="string">&quot;AD&quot;</span>),
         ];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">flags</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">flag</span>, <span class="ident">s</span>)<span class="op">|</span> <span class="kw">if</span> <span class="ident">flag</span> { <span class="prelude-val">Some</span>(<span class="ident">s</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> });
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = flags
+            .iter()
+            .cloned()
+            .filter_map(|(flag, s)| <span class="kw">if </span>flag { <span class="prelude-val">Some</span>(s) } <span class="kw">else </span>{ <span class="prelude-val">None </span>});
 
-        <span class="comment">// print first without a separator, then print the rest.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)<span class="question-mark">?</span>
-        }
-        <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">SEPARATOR</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="comment">// print first without a separator, then print the rest.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(s) = iter.next() {
+            f.write_str(s)<span class="question-mark">?
+        </span>}
+        <span class="kw">for </span>s <span class="kw">in </span>iter {
+            f.write_str(SEPARATOR)<span class="question-mark">?</span>;
+            f.write_str(s)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Header {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Header</span> {
-    <span class="comment">// TODO: we should make id, message_type and op_code all required and non-editable</span>
-    <span class="doccomment">/// A default Header, not very useful.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">id</span>: <span class="number">0</span>,
-            <span class="ident">message_type</span>: <span class="ident">MessageType::Query</span>,
-            <span class="ident">op_code</span>: <span class="ident">OpCode::Query</span>,
-            <span class="ident">authoritative</span>: <span class="bool-val">false</span>,
-            <span class="ident">truncation</span>: <span class="bool-val">false</span>,
-            <span class="ident">recursion_desired</span>: <span class="bool-val">false</span>,
-            <span class="ident">recursion_available</span>: <span class="bool-val">false</span>,
-            <span class="ident">authentic_data</span>: <span class="bool-val">false</span>,
-            <span class="ident">checking_disabled</span>: <span class="bool-val">false</span>,
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
-            <span class="ident">query_count</span>: <span class="number">0</span>,
-            <span class="ident">answer_count</span>: <span class="number">0</span>,
-            <span class="ident">name_server_count</span>: <span class="number">0</span>,
-            <span class="ident">additional_count</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Header {
+    <span class="comment">// TODO: we should make id, message_type and op_code all required and non-editable
+    </span><span class="doccomment">/// A default Header, not very useful.
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            id: <span class="number">0</span>,
+            message_type: MessageType::Query,
+            op_code: OpCode::Query,
+            authoritative: <span class="bool-val">false</span>,
+            truncation: <span class="bool-val">false</span>,
+            recursion_desired: <span class="bool-val">false</span>,
+            recursion_available: <span class="bool-val">false</span>,
+            authentic_data: <span class="bool-val">false</span>,
+            checking_disabled: <span class="bool-val">false</span>,
+            response_code: ResponseCode::NoError,
+            query_count: <span class="number">0</span>,
+            answer_count: <span class="number">0</span>,
+            name_server_count: <span class="number">0</span>,
+            additional_count: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Construct a new header based off the request header. This copies over the RD (recursion-desired)</span>
-    <span class="doccomment">///   and CD (checking-disabled), as well as the op_code and id of the request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See https://datatracker.ietf.org/doc/html/rfc6895#section-2</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// The AA, TC, RD, RA, and CD bits are each theoretically meaningful</span>
-    <span class="doccomment">///    only in queries or only in responses, depending on the bit.  The AD</span>
-    <span class="doccomment">///    bit was only meaningful in responses but is expected to have a</span>
-    <span class="doccomment">///    separate but related meaning in queries (see Section 5.7 of</span>
-    <span class="doccomment">///    [RFC6840]).  Only the RD and CD bits are expected to be copied from</span>
-    <span class="doccomment">///    the query to the response; however, some DNS implementations copy all</span>
-    <span class="doccomment">///    the query header as the initial value of the response header.  Thus,</span>
-    <span class="doccomment">///    any attempt to use a &quot;query&quot; bit with a different meaning in a</span>
-    <span class="doccomment">///    response or to define a query meaning for a &quot;response&quot; bit may be</span>
-    <span class="doccomment">///    dangerous, given the existing implementation.  Meanings for these</span>
-    <span class="doccomment">///    bits may only be assigned by a Standards Action.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">response_from_request</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">id</span>: <span class="ident">header</span>.<span class="ident">id</span>,
-            <span class="ident">message_type</span>: <span class="ident">MessageType::Response</span>,
-            <span class="ident">op_code</span>: <span class="ident">header</span>.<span class="ident">op_code</span>,
-            <span class="ident">authoritative</span>: <span class="bool-val">false</span>,
-            <span class="ident">truncation</span>: <span class="bool-val">false</span>,
-            <span class="ident">recursion_desired</span>: <span class="ident">header</span>.<span class="ident">recursion_desired</span>,
-            <span class="ident">recursion_available</span>: <span class="bool-val">false</span>,
-            <span class="ident">authentic_data</span>: <span class="bool-val">false</span>,
-            <span class="ident">checking_disabled</span>: <span class="ident">header</span>.<span class="ident">checking_disabled</span>,
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::default</span>(),
-            <span class="ident">query_count</span>: <span class="number">0</span>,
-            <span class="ident">answer_count</span>: <span class="number">0</span>,
-            <span class="ident">name_server_count</span>: <span class="number">0</span>,
-            <span class="ident">additional_count</span>: <span class="number">0</span>,
+    <span class="doccomment">/// Construct a new header based off the request header. This copies over the RD (recursion-desired)
+    ///   and CD (checking-disabled), as well as the op_code and id of the request.
+    ///
+    /// See https://datatracker.ietf.org/doc/html/rfc6895#section-2
+    ///
+    /// ```text
+    /// The AA, TC, RD, RA, and CD bits are each theoretically meaningful
+    ///    only in queries or only in responses, depending on the bit.  The AD
+    ///    bit was only meaningful in responses but is expected to have a
+    ///    separate but related meaning in queries (see Section 5.7 of
+    ///    [RFC6840]).  Only the RD and CD bits are expected to be copied from
+    ///    the query to the response; however, some DNS implementations copy all
+    ///    the query header as the initial value of the response header.  Thus,
+    ///    any attempt to use a &quot;query&quot; bit with a different meaning in a
+    ///    response or to define a query meaning for a &quot;response&quot; bit may be
+    ///    dangerous, given the existing implementation.  Meanings for these
+    ///    bits may only be assigned by a Standards Action.
+    /// ```
+    </span><span class="kw">pub fn </span>response_from_request(header: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            id: header.id,
+            message_type: MessageType::Response,
+            op_code: header.op_code,
+            authoritative: <span class="bool-val">false</span>,
+            truncation: <span class="bool-val">false</span>,
+            recursion_desired: header.recursion_desired,
+            recursion_available: <span class="bool-val">false</span>,
+            authentic_data: <span class="bool-val">false</span>,
+            checking_disabled: header.checking_disabled,
+            response_code: ResponseCode::default(),
+            query_count: <span class="number">0</span>,
+            answer_count: <span class="number">0</span>,
+            name_server_count: <span class="number">0</span>,
+            additional_count: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Length of the header, always 12 bytes</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>() -&gt; <span class="ident">usize</span> {
-        <span class="number">12</span> <span class="comment">/* this is always 12 bytes */</span>
-    }
+    <span class="doccomment">/// Length of the header, always 12 bytes
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>len() -&gt; usize {
+        <span class="number">12 </span><span class="comment">/* this is always 12 bytes */
+    </span>}
 
-    <span class="doccomment">/// Sets the id of the message, for queries this should be random.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">id</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the id of the message, for queries this should be random.
+    </span><span class="kw">pub fn </span>set_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.id = id;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the message type, Queries and Updates both use Query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message_type</span>: <span class="ident">MessageType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">message_type</span> <span class="op">=</span> <span class="ident">message_type</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the message type, Queries and Updates both use Query.
+    </span><span class="kw">pub fn </span>set_message_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, message_type: MessageType) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.message_type = message_type;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the operation code for the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_op_code</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">op_code</span>: <span class="ident">OpCode</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">op_code</span> <span class="op">=</span> <span class="ident">op_code</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the operation code for the message
+    </span><span class="kw">pub fn </span>set_op_code(<span class="kw-2">&amp;mut </span><span class="self">self</span>, op_code: OpCode) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.op_code = op_code;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// From the server is specifies that it is an authoritative response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_authoritative</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">authoritative</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">authoritative</span> <span class="op">=</span> <span class="ident">authoritative</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// From the server is specifies that it is an authoritative response.
+    </span><span class="kw">pub fn </span>set_authoritative(<span class="kw-2">&amp;mut </span><span class="self">self</span>, authoritative: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.authoritative = authoritative;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies that the records were too large for the payload.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See EDNS or TCP for resolutions to truncation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_truncated</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">truncated</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">truncation</span> <span class="op">=</span> <span class="ident">truncated</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies that the records were too large for the payload.
+    ///
+    /// See EDNS or TCP for resolutions to truncation.
+    </span><span class="kw">pub fn </span>set_truncated(<span class="kw-2">&amp;mut </span><span class="self">self</span>, truncated: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.truncation = truncated;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specify that the resolver should recursively request data from upstream DNS nodes</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recursion_desired</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">recursion_desired</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">recursion_desired</span> <span class="op">=</span> <span class="ident">recursion_desired</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specify that the resolver should recursively request data from upstream DNS nodes
+    </span><span class="kw">pub fn </span>set_recursion_desired(<span class="kw-2">&amp;mut </span><span class="self">self</span>, recursion_desired: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.recursion_desired = recursion_desired;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies that recursion is available from this or the remote resolver</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recursion_available</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">recursion_available</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">recursion_available</span> <span class="op">=</span> <span class="ident">recursion_available</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies that recursion is available from this or the remote resolver
+    </span><span class="kw">pub fn </span>set_recursion_available(<span class="kw-2">&amp;mut </span><span class="self">self</span>, recursion_available: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.recursion_available = recursion_available;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Specifies that the data is authentic, i.e. the resolver believes all data to be valid through DNSSec</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_authentic_data</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">authentic_data</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">authentic_data</span> <span class="op">=</span> <span class="ident">authentic_data</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Specifies that the data is authentic, i.e. the resolver believes all data to be valid through DNSSec
+    </span><span class="kw">pub fn </span>set_authentic_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>, authentic_data: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.authentic_data = authentic_data;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Used during recursive resolution to specified if a resolver should or should not validate DNSSec signatures</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_checking_disabled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">checking_disabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">checking_disabled</span> <span class="op">=</span> <span class="ident">checking_disabled</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Used during recursive resolution to specified if a resolver should or should not validate DNSSec signatures
+    </span><span class="kw">pub fn </span>set_checking_disabled(<span class="kw-2">&amp;mut </span><span class="self">self</span>, checking_disabled: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.checking_disabled = checking_disabled;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// A method to get all header flags (useful for Display purposes)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Flags</span> {
-        <span class="ident">Flags</span> {
-            <span class="ident">authoritative</span>: <span class="self">self</span>.<span class="ident">authoritative</span>,
-            <span class="ident">authentic_data</span>: <span class="self">self</span>.<span class="ident">authentic_data</span>,
-            <span class="ident">checking_disabled</span>: <span class="self">self</span>.<span class="ident">checking_disabled</span>,
-            <span class="ident">recursion_available</span>: <span class="self">self</span>.<span class="ident">recursion_available</span>,
-            <span class="ident">recursion_desired</span>: <span class="self">self</span>.<span class="ident">recursion_desired</span>,
-            <span class="ident">truncation</span>: <span class="self">self</span>.<span class="ident">truncation</span>,
+    <span class="doccomment">/// A method to get all header flags (useful for Display purposes)
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Flags {
+        Flags {
+            authoritative: <span class="self">self</span>.authoritative,
+            authentic_data: <span class="self">self</span>.authentic_data,
+            checking_disabled: <span class="self">self</span>.checking_disabled,
+            recursion_available: <span class="self">self</span>.recursion_available,
+            recursion_desired: <span class="self">self</span>.recursion_desired,
+            truncation: <span class="self">self</span>.truncation,
         }
     }
 
-    <span class="doccomment">/// The low response code (original response codes before EDNS extensions)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_response_code</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">response_code</span> <span class="op">=</span> <span class="ident">response_code</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// The low response code (original response codes before EDNS extensions)
+    </span><span class="kw">pub fn </span>set_response_code(<span class="kw-2">&amp;mut </span><span class="self">self</span>, response_code: ResponseCode) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.response_code = response_code;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// This combines the high and low response code values to form the complete ResponseCode from the EDNS record.
+    ///   The existing high order bits will be overwritten (if set), and `high_response_code` will be merge with
+    ///   the existing low order bits.
+    ///
+    /// This is intended for use during decoding.
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>merge_response_code(<span class="kw-2">&amp;mut </span><span class="self">self</span>, high_response_code: u8) {
+        <span class="self">self</span>.response_code = ResponseCode::from(high_response_code, <span class="self">self</span>.response_code.low());
     }
 
-    <span class="doccomment">/// This combines the high and low response code values to form the complete ResponseCode from the EDNS record.</span>
-    <span class="doccomment">///   The existing high order bits will be overwritten (if set), and `high_response_code` will be merge with</span>
-    <span class="doccomment">///   the existing low order bits.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for use during decoding.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_response_code</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">high_response_code</span>: <span class="ident">u8</span>) {
-        <span class="self">self</span>.<span class="ident">response_code</span> <span class="op">=</span> <span class="ident">ResponseCode::from</span>(<span class="ident">high_response_code</span>, <span class="self">self</span>.<span class="ident">response_code</span>.<span class="ident">low</span>());
+    <span class="doccomment">/// Number or query records in the message
+    </span><span class="kw">pub fn </span>set_query_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query_count: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.query_count = query_count;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Number of answer records in the message
+    </span><span class="kw">pub fn </span>set_answer_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, answer_count: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.answer_count = answer_count;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Number of name server records in the message
+    </span><span class="kw">pub fn </span>set_name_server_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name_server_count: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.name_server_count = name_server_count;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Number of additional records in the message
+    </span><span class="kw">pub fn </span>set_additional_count(<span class="kw-2">&amp;mut </span><span class="self">self</span>, additional_count: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.additional_count = additional_count;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// ```text
+    /// ID              A 16 bit identifier assigned by the program that
+    ///                 generates any kind of query.  This identifier is copied
+    ///                 the corresponding reply and can be used by the requester
+    ///                 to match up replies to outstanding queries.
+    /// ```
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.id
     }
 
-    <span class="doccomment">/// Number or query records in the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_query_count</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">query_count</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">query_count</span> <span class="op">=</span> <span class="ident">query_count</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// QR              A one bit field that specifies whether this message is a
+    ///                 query (0), or a response (1).
+    /// ```
+    </span><span class="kw">pub fn </span>message_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MessageType {
+        <span class="self">self</span>.message_type
     }
 
-    <span class="doccomment">/// Number of answer records in the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_answer_count</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">answer_count</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">answer_count</span> <span class="op">=</span> <span class="ident">answer_count</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// OPCODE          A four bit field that specifies kind of query in this
+    ///                 message.  This value is set by the originator of a query
+    ///                 and copied into the response.  The values are: &lt;see super::op_code&gt;
+    /// ```
+    </span><span class="kw">pub fn </span>op_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; OpCode {
+        <span class="self">self</span>.op_code
     }
 
-    <span class="doccomment">/// Number of name server records in the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_name_server_count</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name_server_count</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name_server_count</span> <span class="op">=</span> <span class="ident">name_server_count</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// AA              Authoritative Answer - this bit is valid in responses,
+    ///                 and specifies that the responding name server is an
+    ///                 authority for the domain name in question section.
+    ///
+    ///                 Note that the contents of the answer section may have
+    ///                 multiple owner names because of aliases.  The AA bit
+    ///                 corresponds to the name which matches the query name, or
+    ///                 the first owner name in the answer section.
+    /// ```
+    </span><span class="kw">pub fn </span>authoritative(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.authoritative
     }
 
-    <span class="doccomment">/// Number of additional records in the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_additional_count</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional_count</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">additional_count</span> <span class="op">=</span> <span class="ident">additional_count</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// TC              TrunCation - specifies that this message was truncated
+    ///                 due to length greater than that permitted on the
+    ///                 transmission channel.
+    /// ```
+    </span><span class="kw">pub fn </span>truncated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.truncation
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// ID              A 16 bit identifier assigned by the program that</span>
-    <span class="doccomment">///                 generates any kind of query.  This identifier is copied</span>
-    <span class="doccomment">///                 the corresponding reply and can be used by the requester</span>
-    <span class="doccomment">///                 to match up replies to outstanding queries.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">id</span>
+    <span class="doccomment">/// ```text
+    /// RD              Recursion Desired - this bit may be set in a query and
+    ///                 is copied into the response.  If RD is set, it directs
+    ///                 the name server to pursue the query recursively.
+    ///                 Recursive query support is optional.
+    /// ```
+    </span><span class="kw">pub fn </span>recursion_desired(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.recursion_desired
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// QR              A one bit field that specifies whether this message is a</span>
-    <span class="doccomment">///                 query (0), or a response (1).</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MessageType</span> {
-        <span class="self">self</span>.<span class="ident">message_type</span>
+    <span class="doccomment">/// ```text
+    /// RA              Recursion Available - this be is set or cleared in a
+    ///                 response, and denotes whether recursive query support is
+    ///                 available in the name server.
+    /// ```
+    </span><span class="kw">pub fn </span>recursion_available(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.recursion_available
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// OPCODE          A four bit field that specifies kind of query in this</span>
-    <span class="doccomment">///                 message.  This value is set by the originator of a query</span>
-    <span class="doccomment">///                 and copied into the response.  The values are: &lt;see super::op_code&gt;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">op_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OpCode</span> {
-        <span class="self">self</span>.<span class="ident">op_code</span>
+    <span class="doccomment">/// [RFC 4035, DNSSEC Resource Records, March 2005](https://tools.ietf.org/html/rfc4035#section-3.1.6)
+    ///
+    /// ```text
+    ///
+    /// 3.1.6.  The AD and CD Bits in an Authoritative Response
+    ///
+    ///   The CD and AD bits are designed for use in communication between
+    ///   security-aware resolvers and security-aware recursive name servers.
+    ///   These bits are for the most part not relevant to query processing by
+    ///   security-aware authoritative name servers.
+    ///
+    ///   A security-aware name server does not perform signature validation
+    ///   for authoritative data during query processing, even when the CD bit
+    ///   is clear.  A security-aware name server SHOULD clear the CD bit when
+    ///   composing an authoritative response.
+    ///
+    ///   A security-aware name server MUST NOT set the AD bit in a response
+    ///   unless the name server considers all RRsets in the Answer and
+    ///   Authority sections of the response to be authentic.  A security-aware
+    ///   name server&#39;s local policy MAY consider data from an authoritative
+    ///   zone to be authentic without further validation.  However, the name
+    ///   server MUST NOT do so unless the name server obtained the
+    ///   authoritative zone via secure means (such as a secure zone transfer
+    ///   mechanism) and MUST NOT do so unless this behavior has been
+    ///   configured explicitly.
+    ///
+    ///   A security-aware name server that supports recursion MUST follow the
+    ///   rules for the CD and AD bits given in Section 3.2 when generating a
+    ///   response that involves data obtained via recursion.
+    /// ```
+    </span><span class="kw">pub fn </span>authentic_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.authentic_data
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// AA              Authoritative Answer - this bit is valid in responses,</span>
-    <span class="doccomment">///                 and specifies that the responding name server is an</span>
-    <span class="doccomment">///                 authority for the domain name in question section.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                 Note that the contents of the answer section may have</span>
-    <span class="doccomment">///                 multiple owner names because of aliases.  The AA bit</span>
-    <span class="doccomment">///                 corresponds to the name which matches the query name, or</span>
-    <span class="doccomment">///                 the first owner name in the answer section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authoritative</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">authoritative</span>
+    <span class="doccomment">/// see `is_authentic_data()`
+    </span><span class="kw">pub fn </span>checking_disabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.checking_disabled
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// TC              TrunCation - specifies that this message was truncated</span>
-    <span class="doccomment">///                 due to length greater than that permitted on the</span>
-    <span class="doccomment">///                 transmission channel.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">truncation</span>
+    <span class="doccomment">/// ```text
+    /// RCODE           Response code - this 4 bit field is set as part of
+    ///                 responses.  The values have the following
+    ///                 interpretation: &lt;see super::response_code&gt;
+    /// ```
+    </span><span class="kw">pub fn </span>response_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ResponseCode {
+        <span class="self">self</span>.response_code
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RD              Recursion Desired - this bit may be set in a query and</span>
-    <span class="doccomment">///                 is copied into the response.  If RD is set, it directs</span>
-    <span class="doccomment">///                 the name server to pursue the query recursively.</span>
-    <span class="doccomment">///                 Recursive query support is optional.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recursion_desired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">recursion_desired</span>
+    <span class="doccomment">/// ```text
+    /// QDCOUNT         an unsigned 16 bit integer specifying the number of
+    ///                 entries in the question section.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// If this is a query, this will return the number of queries in the query section of the
+    </span><span class="comment">//   message, fo updates this represents the zone count (must be no more than 1).
+    </span><span class="kw">pub fn </span>query_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.query_count
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RA              Recursion Available - this be is set or cleared in a</span>
-    <span class="doccomment">///                 response, and denotes whether recursive query support is</span>
-    <span class="doccomment">///                 available in the name server.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recursion_available</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">recursion_available</span>
+    <span class="doccomment">/// ```text
+    /// ANCOUNT         an unsigned 16 bit integer specifying the number of
+    ///                 resource records in the answer section.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// For query responses this is the number of records in the answer section, should be 0 for
+    ///  requests, for updates this is the count of prerequisite records.
+    </span><span class="kw">pub fn </span>answer_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.answer_count
     }
 
-    <span class="doccomment">/// [RFC 4035, DNSSEC Resource Records, March 2005](https://tools.ietf.org/html/rfc4035#section-3.1.6)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.1.6.  The AD and CD Bits in an Authoritative Response</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The CD and AD bits are designed for use in communication between</span>
-    <span class="doccomment">///   security-aware resolvers and security-aware recursive name servers.</span>
-    <span class="doccomment">///   These bits are for the most part not relevant to query processing by</span>
-    <span class="doccomment">///   security-aware authoritative name servers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   A security-aware name server does not perform signature validation</span>
-    <span class="doccomment">///   for authoritative data during query processing, even when the CD bit</span>
-    <span class="doccomment">///   is clear.  A security-aware name server SHOULD clear the CD bit when</span>
-    <span class="doccomment">///   composing an authoritative response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   A security-aware name server MUST NOT set the AD bit in a response</span>
-    <span class="doccomment">///   unless the name server considers all RRsets in the Answer and</span>
-    <span class="doccomment">///   Authority sections of the response to be authentic.  A security-aware</span>
-    <span class="doccomment">///   name server&#39;s local policy MAY consider data from an authoritative</span>
-    <span class="doccomment">///   zone to be authentic without further validation.  However, the name</span>
-    <span class="doccomment">///   server MUST NOT do so unless the name server obtained the</span>
-    <span class="doccomment">///   authoritative zone via secure means (such as a secure zone transfer</span>
-    <span class="doccomment">///   mechanism) and MUST NOT do so unless this behavior has been</span>
-    <span class="doccomment">///   configured explicitly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   A security-aware name server that supports recursion MUST follow the</span>
-    <span class="doccomment">///   rules for the CD and AD bits given in Section 3.2 when generating a</span>
-    <span class="doccomment">///   response that involves data obtained via recursion.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authentic_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">authentic_data</span>
+    <span class="doccomment">/// for queries this is the nameservers which are authorities for the SOA of the Record
+    /// for updates this is the update record count
+    /// ```text
+    /// NSCOUNT         an unsigned 16 bit integer specifying the number of name
+    ///                 server resource records in the authority records
+    ///                 section.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// For query responses this is the number of authorities, or nameservers, in the name server
+    ///  section, for updates this is the number of update records being sent.
+    </span><span class="kw">pub fn </span>name_server_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.name_server_count
     }
 
-    <span class="doccomment">/// see `is_authentic_data()`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checking_disabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">checking_disabled</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RCODE           Response code - this 4 bit field is set as part of</span>
-    <span class="doccomment">///                 responses.  The values have the following</span>
-    <span class="doccomment">///                 interpretation: &lt;see super::response_code&gt;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">response_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ResponseCode</span> {
-        <span class="self">self</span>.<span class="ident">response_code</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// QDCOUNT         an unsigned 16 bit integer specifying the number of</span>
-    <span class="doccomment">///                 entries in the question section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this is a query, this will return the number of queries in the query section of the</span>
-    <span class="comment">//   message, fo updates this represents the zone count (must be no more than 1).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">query_count</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// ANCOUNT         an unsigned 16 bit integer specifying the number of</span>
-    <span class="doccomment">///                 resource records in the answer section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For query responses this is the number of records in the answer section, should be 0 for</span>
-    <span class="doccomment">///  requests, for updates this is the count of prerequisite records.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">answer_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">answer_count</span>
-    }
-
-    <span class="doccomment">/// for queries this is the nameservers which are authorities for the SOA of the Record</span>
-    <span class="doccomment">/// for updates this is the update record count</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// NSCOUNT         an unsigned 16 bit integer specifying the number of name</span>
-    <span class="doccomment">///                 server resource records in the authority records</span>
-    <span class="doccomment">///                 section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For query responses this is the number of authorities, or nameservers, in the name server</span>
-    <span class="doccomment">///  section, for updates this is the number of update records being sent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_server_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">name_server_count</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// ARCOUNT         an unsigned 16 bit integer specifying the number of</span>
-    <span class="doccomment">///                 resource records in the additional records section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the additional record section count, this section may include EDNS options.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">additional_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">additional_count</span>
+    <span class="doccomment">/// ```text
+    /// ARCOUNT         an unsigned 16 bit integer specifying the number of
+    ///                 resource records in the additional records section.
+    /// ```
+    ///
+    /// # Return value
+    ///
+    /// This is the additional record section count, this section may include EDNS options.
+    </span><span class="kw">pub fn </span>additional_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.additional_count
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">encoder</span>.<span class="ident">reserve</span>(<span class="number">12</span>)<span class="question-mark">?</span>; <span class="comment">// the 12 bytes for the following fields;</span>
+<span class="kw">impl </span>BinEncodable <span class="kw">for </span>Header {
+    <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        encoder.reserve(<span class="number">12</span>)<span class="question-mark">?</span>; <span class="comment">// the 12 bytes for the following fields;
 
-        <span class="comment">// Id</span>
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="self">self</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
+        // Id
+        </span>encoder.emit_u16(<span class="self">self</span>.id)<span class="question-mark">?</span>;
 
-        <span class="comment">// IsQuery, OpCode, Authoritative, Truncation, RecursionDesired</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q_opcd_a_t_r</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessageType::Response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">message_type</span> {
-            <span class="number">0x80</span>
-        } <span class="kw">else</span> {
-            <span class="number">0x00</span>
-        };
-        <span class="ident">q_opcd_a_t_r</span> <span class="op">|</span><span class="op">=</span> <span class="ident">u8::from</span>(<span class="self">self</span>.<span class="ident">op_code</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="ident">q_opcd_a_t_r</span> <span class="op">|</span><span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">authoritative</span> { <span class="number">0x4</span> } <span class="kw">else</span> { <span class="number">0x0</span> };
-        <span class="ident">q_opcd_a_t_r</span> <span class="op">|</span><span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">truncation</span> { <span class="number">0x2</span> } <span class="kw">else</span> { <span class="number">0x0</span> };
-        <span class="ident">q_opcd_a_t_r</span> <span class="op">|</span><span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">recursion_desired</span> { <span class="number">0x1</span> } <span class="kw">else</span> { <span class="number">0x0</span> };
-        <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">q_opcd_a_t_r</span>)<span class="question-mark">?</span>;
+        <span class="comment">// IsQuery, OpCode, Authoritative, Truncation, RecursionDesired
+        </span><span class="kw">let </span><span class="kw-2">mut </span>q_opcd_a_t_r: u8 = <span class="kw">if let </span>MessageType::Response = <span class="self">self</span>.message_type {
+            <span class="number">0x80
+        </span>} <span class="kw">else </span>{
+            <span class="number">0x00
+        </span>};
+        q_opcd_a_t_r |= u8::from(<span class="self">self</span>.op_code) &lt;&lt; <span class="number">3</span>;
+        q_opcd_a_t_r |= <span class="kw">if </span><span class="self">self</span>.authoritative { <span class="number">0x4 </span>} <span class="kw">else </span>{ <span class="number">0x0 </span>};
+        q_opcd_a_t_r |= <span class="kw">if </span><span class="self">self</span>.truncation { <span class="number">0x2 </span>} <span class="kw">else </span>{ <span class="number">0x0 </span>};
+        q_opcd_a_t_r |= <span class="kw">if </span><span class="self">self</span>.recursion_desired { <span class="number">0x1 </span>} <span class="kw">else </span>{ <span class="number">0x0 </span>};
+        encoder.emit(q_opcd_a_t_r)<span class="question-mark">?</span>;
 
-        <span class="comment">// IsRecursionAvailable, Triple 0&#39;s, ResponseCode</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r_z_ad_cd_rcod</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">recursion_available</span> {
-            <span class="number">0b1000_0000</span>
-        } <span class="kw">else</span> {
-            <span class="number">0b0000_0000</span>
-        };
-        <span class="ident">r_z_ad_cd_rcod</span> <span class="op">|</span><span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">authentic_data</span> {
-            <span class="number">0b0010_0000</span>
-        } <span class="kw">else</span> {
-            <span class="number">0b0000_0000</span>
-        };
-        <span class="ident">r_z_ad_cd_rcod</span> <span class="op">|</span><span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">checking_disabled</span> {
-            <span class="number">0b0001_0000</span>
-        } <span class="kw">else</span> {
-            <span class="number">0b0000_0000</span>
-        };
-        <span class="ident">r_z_ad_cd_rcod</span> <span class="op">|</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">response_code</span>.<span class="ident">low</span>();
-        <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">r_z_ad_cd_rcod</span>)<span class="question-mark">?</span>;
+        <span class="comment">// IsRecursionAvailable, Triple 0&#39;s, ResponseCode
+        </span><span class="kw">let </span><span class="kw-2">mut </span>r_z_ad_cd_rcod: u8 = <span class="kw">if </span><span class="self">self</span>.recursion_available {
+            <span class="number">0b1000_0000
+        </span>} <span class="kw">else </span>{
+            <span class="number">0b0000_0000
+        </span>};
+        r_z_ad_cd_rcod |= <span class="kw">if </span><span class="self">self</span>.authentic_data {
+            <span class="number">0b0010_0000
+        </span>} <span class="kw">else </span>{
+            <span class="number">0b0000_0000
+        </span>};
+        r_z_ad_cd_rcod |= <span class="kw">if </span><span class="self">self</span>.checking_disabled {
+            <span class="number">0b0001_0000
+        </span>} <span class="kw">else </span>{
+            <span class="number">0b0000_0000
+        </span>};
+        r_z_ad_cd_rcod |= <span class="self">self</span>.response_code.low();
+        encoder.emit(r_z_ad_cd_rcod)<span class="question-mark">?</span>;
 
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="self">self</span>.<span class="ident">query_count</span>)<span class="question-mark">?</span>;
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="self">self</span>.<span class="ident">answer_count</span>)<span class="question-mark">?</span>;
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="self">self</span>.<span class="ident">name_server_count</span>)<span class="question-mark">?</span>;
-        <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="self">self</span>.<span class="ident">additional_count</span>)<span class="question-mark">?</span>;
+        encoder.emit_u16(<span class="self">self</span>.query_count)<span class="question-mark">?</span>;
+        encoder.emit_u16(<span class="self">self</span>.answer_count)<span class="question-mark">?</span>;
+        encoder.emit_u16(<span class="self">self</span>.name_server_count)<span class="question-mark">?</span>;
+        encoder.emit_u16(<span class="self">self</span>.additional_count)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Header</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*it is valid for this to be any u16*/</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; BinDecodable&lt;<span class="lifetime">&#39;r</span>&gt; <span class="kw">for </span>Header {
+    <span class="kw">fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;r</span>&gt;) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>id = decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*it is valid for this to be any u16*/</span>);
 
-        <span class="kw">let</span> <span class="ident">q_opcd_a_t_r</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*used as a bitfield, this is safe*/</span>);
-        <span class="comment">// if the first bit is set</span>
-        <span class="kw">let</span> <span class="ident">message_type</span> <span class="op">=</span> <span class="kw">if</span> (<span class="number">0b1000_0000</span> <span class="op">&amp;</span> <span class="ident">q_opcd_a_t_r</span>) <span class="op">==</span> <span class="number">0b1000_0000</span> {
-            <span class="ident">MessageType::Response</span>
-        } <span class="kw">else</span> {
-            <span class="ident">MessageType::Query</span>
+        <span class="kw">let </span>q_opcd_a_t_r = decoder.pop()<span class="question-mark">?</span>.unverified(<span class="comment">/*used as a bitfield, this is safe*/</span>);
+        <span class="comment">// if the first bit is set
+        </span><span class="kw">let </span>message_type = <span class="kw">if </span>(<span class="number">0b1000_0000 </span>&amp; q_opcd_a_t_r) == <span class="number">0b1000_0000 </span>{
+            MessageType::Response
+        } <span class="kw">else </span>{
+            MessageType::Query
         };
-        <span class="comment">// the 4bit opcode, masked and then shifted right 3bits for the u8...</span>
-        <span class="kw">let</span> <span class="ident">op_code</span>: <span class="ident">OpCode</span> <span class="op">=</span> <span class="ident">OpCode::from_u8</span>((<span class="number">0b0111_1000</span> <span class="op">&amp;</span> <span class="ident">q_opcd_a_t_r</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">authoritative</span> <span class="op">=</span> (<span class="number">0b0000_0100</span> <span class="op">&amp;</span> <span class="ident">q_opcd_a_t_r</span>) <span class="op">==</span> <span class="number">0b0000_0100</span>;
-        <span class="kw">let</span> <span class="ident">truncation</span> <span class="op">=</span> (<span class="number">0b0000_0010</span> <span class="op">&amp;</span> <span class="ident">q_opcd_a_t_r</span>) <span class="op">==</span> <span class="number">0b0000_0010</span>;
-        <span class="kw">let</span> <span class="ident">recursion_desired</span> <span class="op">=</span> (<span class="number">0b0000_0001</span> <span class="op">&amp;</span> <span class="ident">q_opcd_a_t_r</span>) <span class="op">==</span> <span class="number">0b0000_0001</span>;
+        <span class="comment">// the 4bit opcode, masked and then shifted right 3bits for the u8...
+        </span><span class="kw">let </span>op_code: OpCode = OpCode::from_u8((<span class="number">0b0111_1000 </span>&amp; q_opcd_a_t_r) &gt;&gt; <span class="number">3</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>authoritative = (<span class="number">0b0000_0100 </span>&amp; q_opcd_a_t_r) == <span class="number">0b0000_0100</span>;
+        <span class="kw">let </span>truncation = (<span class="number">0b0000_0010 </span>&amp; q_opcd_a_t_r) == <span class="number">0b0000_0010</span>;
+        <span class="kw">let </span>recursion_desired = (<span class="number">0b0000_0001 </span>&amp; q_opcd_a_t_r) == <span class="number">0b0000_0001</span>;
 
-        <span class="kw">let</span> <span class="ident">r_z_ad_cd_rcod</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">pop</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*used as a bitfield, this is safe*/</span>); <span class="comment">// fail fast...</span>
+        <span class="kw">let </span>r_z_ad_cd_rcod = decoder.pop()<span class="question-mark">?</span>.unverified(<span class="comment">/*used as a bitfield, this is safe*/</span>); <span class="comment">// fail fast...
 
-        <span class="kw">let</span> <span class="ident">recursion_available</span> <span class="op">=</span> (<span class="number">0b1000_0000</span> <span class="op">&amp;</span> <span class="ident">r_z_ad_cd_rcod</span>) <span class="op">==</span> <span class="number">0b1000_0000</span>;
-        <span class="kw">let</span> <span class="ident">authentic_data</span> <span class="op">=</span> (<span class="number">0b0010_0000</span> <span class="op">&amp;</span> <span class="ident">r_z_ad_cd_rcod</span>) <span class="op">==</span> <span class="number">0b0010_0000</span>;
-        <span class="kw">let</span> <span class="ident">checking_disabled</span> <span class="op">=</span> (<span class="number">0b0001_0000</span> <span class="op">&amp;</span> <span class="ident">r_z_ad_cd_rcod</span>) <span class="op">==</span> <span class="number">0b0001_0000</span>;
-        <span class="kw">let</span> <span class="ident">response_code</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_1111</span> <span class="op">&amp;</span> <span class="ident">r_z_ad_cd_rcod</span>;
-        <span class="kw">let</span> <span class="ident">response_code</span> <span class="op">=</span> <span class="ident">ResponseCode::from_low</span>(<span class="ident">response_code</span>);
+        </span><span class="kw">let </span>recursion_available = (<span class="number">0b1000_0000 </span>&amp; r_z_ad_cd_rcod) == <span class="number">0b1000_0000</span>;
+        <span class="kw">let </span>authentic_data = (<span class="number">0b0010_0000 </span>&amp; r_z_ad_cd_rcod) == <span class="number">0b0010_0000</span>;
+        <span class="kw">let </span>checking_disabled = (<span class="number">0b0001_0000 </span>&amp; r_z_ad_cd_rcod) == <span class="number">0b0001_0000</span>;
+        <span class="kw">let </span>response_code: u8 = <span class="number">0b0000_1111 </span>&amp; r_z_ad_cd_rcod;
+        <span class="kw">let </span>response_code = ResponseCode::from_low(response_code);
 
-        <span class="comment">// TODO: We should pass these restrictions on, they can&#39;t be trusted, but that would seriously complicate the Header type..</span>
-        <span class="comment">// TODO: perhaps the read methods for BinDecodable should return Restrict?</span>
-        <span class="kw">let</span> <span class="ident">query_count</span> <span class="op">=</span>
-            <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*this must be verified when reading queries*/</span>);
-        <span class="kw">let</span> <span class="ident">answer_count</span> <span class="op">=</span>
-            <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*this must be evaluated when reading records*/</span>);
-        <span class="kw">let</span> <span class="ident">name_server_count</span> <span class="op">=</span>
-            <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*this must be evaluated when reading records*/</span>);
-        <span class="kw">let</span> <span class="ident">additional_count</span> <span class="op">=</span>
-            <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*this must be evaluated when reading records*/</span>);
+        <span class="comment">// TODO: We should pass these restrictions on, they can&#39;t be trusted, but that would seriously complicate the Header type..
+        // TODO: perhaps the read methods for BinDecodable should return Restrict?
+        </span><span class="kw">let </span>query_count =
+            decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*this must be verified when reading queries*/</span>);
+        <span class="kw">let </span>answer_count =
+            decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*this must be evaluated when reading records*/</span>);
+        <span class="kw">let </span>name_server_count =
+            decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*this must be evaluated when reading records*/</span>);
+        <span class="kw">let </span>additional_count =
+            decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*this must be evaluated when reading records*/</span>);
 
-        <span class="comment">// TODO: question, should this use the builder pattern instead? might be cleaner code, but</span>
-        <span class="comment">//  this guarantees that the Header is fully instantiated with all values...</span>
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">id</span>,
-            <span class="ident">message_type</span>,
-            <span class="ident">op_code</span>,
-            <span class="ident">authoritative</span>,
-            <span class="ident">truncation</span>,
-            <span class="ident">recursion_desired</span>,
-            <span class="ident">recursion_available</span>,
-            <span class="ident">authentic_data</span>,
-            <span class="ident">checking_disabled</span>,
-            <span class="ident">response_code</span>,
-            <span class="ident">query_count</span>,
-            <span class="ident">answer_count</span>,
-            <span class="ident">name_server_count</span>,
-            <span class="ident">additional_count</span>,
+        <span class="comment">// TODO: question, should this use the builder pattern instead? might be cleaner code, but
+        //  this guarantees that the Header is fully instantiated with all values...
+        </span><span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            id,
+            message_type,
+            op_code,
+            authoritative,
+            truncation,
+            recursion_desired,
+            recursion_available,
+            authentic_data,
+            checking_disabled,
+            response_code,
+            query_count,
+            answer_count,
+            name_server_count,
+            additional_count,
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_parse</span>() {
-    <span class="kw">let</span> <span class="ident">byte_vec</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="number">0x01</span>, <span class="number">0x10</span>, <span class="number">0xAA</span>, <span class="number">0x83</span>, <span class="comment">// 0b1010 1010 1000 0011</span>
-        <span class="number">0x88</span>, <span class="number">0x77</span>, <span class="number">0x66</span>, <span class="number">0x55</span>, <span class="number">0x44</span>, <span class="number">0x33</span>, <span class="number">0x22</span>, <span class="number">0x11</span>,
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_parse() {
+    <span class="kw">let </span>byte_vec = <span class="macro">vec!</span>[
+        <span class="number">0x01</span>, <span class="number">0x10</span>, <span class="number">0xAA</span>, <span class="number">0x83</span>, <span class="comment">// 0b1010 1010 1000 0011
+        </span><span class="number">0x88</span>, <span class="number">0x77</span>, <span class="number">0x66</span>, <span class="number">0x55</span>, <span class="number">0x44</span>, <span class="number">0x33</span>, <span class="number">0x22</span>, <span class="number">0x11</span>,
     ];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">byte_vec</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(<span class="kw-2">&amp;</span>byte_vec);
 
-    <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="ident">Header</span> {
-        <span class="ident">id</span>: <span class="number">0x0110</span>,
-        <span class="ident">message_type</span>: <span class="ident">MessageType::Response</span>,
-        <span class="ident">op_code</span>: <span class="ident">OpCode::Update</span>,
-        <span class="ident">authoritative</span>: <span class="bool-val">false</span>,
-        <span class="ident">truncation</span>: <span class="bool-val">true</span>,
-        <span class="ident">recursion_desired</span>: <span class="bool-val">false</span>,
-        <span class="ident">recursion_available</span>: <span class="bool-val">true</span>,
-        <span class="ident">authentic_data</span>: <span class="bool-val">false</span>,
-        <span class="ident">checking_disabled</span>: <span class="bool-val">false</span>,
-        <span class="ident">response_code</span>: <span class="ident">ResponseCode::NXDomain</span>,
-        <span class="ident">query_count</span>: <span class="number">0x8877</span>,
-        <span class="ident">answer_count</span>: <span class="number">0x6655</span>,
-        <span class="ident">name_server_count</span>: <span class="number">0x4433</span>,
-        <span class="ident">additional_count</span>: <span class="number">0x2211</span>,
+    <span class="kw">let </span>expect = Header {
+        id: <span class="number">0x0110</span>,
+        message_type: MessageType::Response,
+        op_code: OpCode::Update,
+        authoritative: <span class="bool-val">false</span>,
+        truncation: <span class="bool-val">true</span>,
+        recursion_desired: <span class="bool-val">false</span>,
+        recursion_available: <span class="bool-val">true</span>,
+        authentic_data: <span class="bool-val">false</span>,
+        checking_disabled: <span class="bool-val">false</span>,
+        response_code: ResponseCode::NXDomain,
+        query_count: <span class="number">0x8877</span>,
+        answer_count: <span class="number">0x6655</span>,
+        name_server_count: <span class="number">0x4433</span>,
+        additional_count: <span class="number">0x2211</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="ident">Header::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>got = Header::read(<span class="kw-2">&amp;mut </span>decoder).unwrap();
 
-    <span class="macro">assert_eq!</span>(<span class="ident">got</span>, <span class="ident">expect</span>);
+    <span class="macro">assert_eq!</span>(got, expect);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_write</span>() {
-    <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header</span> {
-        <span class="ident">id</span>: <span class="number">0x0110</span>,
-        <span class="ident">message_type</span>: <span class="ident">MessageType::Response</span>,
-        <span class="ident">op_code</span>: <span class="ident">OpCode::Update</span>,
-        <span class="ident">authoritative</span>: <span class="bool-val">false</span>,
-        <span class="ident">truncation</span>: <span class="bool-val">true</span>,
-        <span class="ident">recursion_desired</span>: <span class="bool-val">false</span>,
-        <span class="ident">recursion_available</span>: <span class="bool-val">true</span>,
-        <span class="ident">authentic_data</span>: <span class="bool-val">false</span>,
-        <span class="ident">checking_disabled</span>: <span class="bool-val">false</span>,
-        <span class="ident">response_code</span>: <span class="ident">ResponseCode::NXDomain</span>,
-        <span class="ident">query_count</span>: <span class="number">0x8877</span>,
-        <span class="ident">answer_count</span>: <span class="number">0x6655</span>,
-        <span class="ident">name_server_count</span>: <span class="number">0x4433</span>,
-        <span class="ident">additional_count</span>: <span class="number">0x2211</span>,
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_write() {
+    <span class="kw">let </span>header = Header {
+        id: <span class="number">0x0110</span>,
+        message_type: MessageType::Response,
+        op_code: OpCode::Update,
+        authoritative: <span class="bool-val">false</span>,
+        truncation: <span class="bool-val">true</span>,
+        recursion_desired: <span class="bool-val">false</span>,
+        recursion_available: <span class="bool-val">true</span>,
+        authentic_data: <span class="bool-val">false</span>,
+        checking_disabled: <span class="bool-val">false</span>,
+        response_code: ResponseCode::NXDomain,
+        query_count: <span class="number">0x8877</span>,
+        answer_count: <span class="number">0x6655</span>,
+        name_server_count: <span class="number">0x4433</span>,
+        additional_count: <span class="number">0x2211</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">expect</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="number">0x01</span>, <span class="number">0x10</span>, <span class="number">0xAA</span>, <span class="number">0x83</span>, <span class="comment">// 0b1010 1010 1000 0011</span>
-        <span class="number">0x88</span>, <span class="number">0x77</span>, <span class="number">0x66</span>, <span class="number">0x55</span>, <span class="number">0x44</span>, <span class="number">0x33</span>, <span class="number">0x22</span>, <span class="number">0x11</span>,
+    <span class="kw">let </span>expect: Vec&lt;u8&gt; = <span class="macro">vec!</span>[
+        <span class="number">0x01</span>, <span class="number">0x10</span>, <span class="number">0xAA</span>, <span class="number">0x83</span>, <span class="comment">// 0b1010 1010 1000 0011
+        </span><span class="number">0x88</span>, <span class="number">0x77</span>, <span class="number">0x66</span>, <span class="number">0x55</span>, <span class="number">0x44</span>, <span class="number">0x33</span>, <span class="number">0x22</span>, <span class="number">0x11</span>,
     ];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">512</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(<span class="number">512</span>);
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">header</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        header.emit(<span class="kw-2">&amp;mut </span>encoder).unwrap();
     }
 
-    <span class="macro">assert_eq!</span>(<span class="ident">bytes</span>, <span class="ident">expect</span>);
+    <span class="macro">assert_eq!</span>(bytes, expect);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

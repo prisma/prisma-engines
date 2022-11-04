@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -912,919 +912,919 @@
 <span id="912">912</span>
 <span id="913">913</span>
 <span id="914">914</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `radium` provides a series of helpers for a uniform API over both atomic</span>
-<span class="doccomment">//! types like [`AtomicUsize`], and non-atomic types like [`Cell&lt;T&gt;`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate is `#![no_std]`-compatible, and uses no non-core types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For details, see the documentation for [`Radium`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `types` module provides type names that are atomic where the target</span>
-<span class="doccomment">//! supports it, and fall back to `Cell` when the target does not.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `if_atomic!` macro provides a means of conditional compilation based on</span>
-<span class="doccomment">//! the presence of atomic instructions. It is a substitute for the</span>
-<span class="doccomment">//! `cfg(target_has_atomic)` or `cfg(accessible)` attribute tests, which are not</span>
-<span class="doccomment">//! yet stabilized.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ---</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **@kneecaw** - &lt;https://twitter.com/kneecaw/status/1132695060812849154&gt;</span>
-<span class="doccomment">//! &gt; Feelin&#39; lazy: Has someone already written a helper trait abstracting</span>
-<span class="doccomment">//! &gt; operations over `AtomicUsize` and `Cell&lt;usize&gt;` for generic code which may</span>
-<span class="doccomment">//! &gt; not care about atomicity?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **@ManishEarth** - &lt;https://twitter.com/ManishEarth/status/1132706585300496384&gt;</span>
-<span class="doccomment">//! &gt; no but call the crate radium</span>
-<span class="doccomment">//! &gt;</span>
-<span class="doccomment">//! &gt; (since people didn&#39;t care that it was radioactive and used it in everything)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`AtomicUsize`]: core::sync::atomic::AtomicUsize</span>
-<span class="doccomment">//! [`Cell&lt;T&gt;`]: core::cell::Cell</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `radium` provides a series of helpers for a uniform API over both atomic
+//! types like [`AtomicUsize`], and non-atomic types like [`Cell&lt;T&gt;`].
+//!
+//! This crate is `#![no_std]`-compatible, and uses no non-core types.
+//!
+//! For details, see the documentation for [`Radium`].
+//!
+//! The `types` module provides type names that are atomic where the target
+//! supports it, and fall back to `Cell` when the target does not.
+//!
+//! The `if_atomic!` macro provides a means of conditional compilation based on
+//! the presence of atomic instructions. It is a substitute for the
+//! `cfg(target_has_atomic)` or `cfg(accessible)` attribute tests, which are not
+//! yet stabilized.
+//!
+//! ---
+//!
+//! **@kneecaw** - &lt;https://twitter.com/kneecaw/status/1132695060812849154&gt;
+//! &gt; Feelin&#39; lazy: Has someone already written a helper trait abstracting
+//! &gt; operations over `AtomicUsize` and `Cell&lt;usize&gt;` for generic code which may
+//! &gt; not care about atomicity?
+//!
+//! **@ManishEarth** - &lt;https://twitter.com/ManishEarth/status/1132706585300496384&gt;
+//! &gt; no but call the crate radium
+//! &gt;
+//! &gt; (since people didn&#39;t care that it was radioactive and used it in everything)
+//!
+//! [`AtomicUsize`]: core::sync::atomic::AtomicUsize
+//! [`Cell&lt;T&gt;`]: core::cell::Cell
 
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unconditional_recursion</span>)]</span>
+</span><span class="attribute">#![no_std]
+#![deny(unconditional_recursion)]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
+#[macro_use]
+</span><span class="kw">mod </span>macros;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
+<span class="kw">pub mod </span>types;
 
-<span class="kw">use</span> <span class="ident">core::cell::Cell</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
+<span class="kw">use </span>core::cell::Cell;
+<span class="kw">use </span>core::sync::atomic::Ordering;
 
-<span class="macro">if_atomic!</span> {
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">8</span>) {
-        <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicI8</span>, <span class="ident">AtomicU8</span>};
+<span class="macro">if_atomic! </span>{
+    <span class="kw">if </span>atomic(<span class="number">8</span>) {
+        <span class="kw">use </span>core::sync::atomic::{AtomicBool, AtomicI8, AtomicU8};
     }
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">16</span>) {
-        <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicI16</span>, <span class="ident">AtomicU16</span>};
+    <span class="kw">if </span>atomic(<span class="number">16</span>) {
+        <span class="kw">use </span>core::sync::atomic::{AtomicI16, AtomicU16};
     }
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">32</span>) {
-        <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicI32</span>, <span class="ident">AtomicU32</span>};
+    <span class="kw">if </span>atomic(<span class="number">32</span>) {
+        <span class="kw">use </span>core::sync::atomic::{AtomicI32, AtomicU32};
     }
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">64</span>) {
-        <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicI64</span>, <span class="ident">AtomicU64</span>};
+    <span class="kw">if </span>atomic(<span class="number">64</span>) {
+        <span class="kw">use </span>core::sync::atomic::{AtomicI64, AtomicU64};
     }
-    <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">ptr</span>) {
-        <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicIsize</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>};
+    <span class="kw">if </span>atomic(ptr) {
+        <span class="kw">use </span>core::sync::atomic::{AtomicIsize, AtomicPtr, AtomicUsize};
     }
 }
 
-<span class="doccomment">/// A maybe-atomic shared mutable fundamental type `T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is implemented by both the [atomic wrapper] type for `T`, and by</span>
-<span class="doccomment">/// [`Cell&lt;T&gt;`], providing a consistent interface for interacting with the two</span>
-<span class="doccomment">/// types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait provides methods predicated on marker traits for the underlying</span>
-<span class="doccomment">/// fundamental. Only types which can be viewed as sequences of bits may use the</span>
-<span class="doccomment">/// functions for bit-wise arithmetic, and only types which can be used as</span>
-<span class="doccomment">/// integers may use the functions for numeric arithmetic. Use of these methods</span>
-<span class="doccomment">/// on insufficient underlying types (for example, `Radium::fetch_and` on an</span>
-<span class="doccomment">/// atomic or cell-wrapped pointer) will cause a compiler error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [atomic wrapper]: core::sync::atomic</span>
-<span class="doccomment">/// [`Cell&lt;T&gt;`]: core::cell::Cell</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Radium</span> {
-    <span class="kw">type</span> <span class="ident">Item</span>;
-    <span class="doccomment">/// Creates a new value of this type.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// A maybe-atomic shared mutable fundamental type `T`.
+///
+/// This trait is implemented by both the [atomic wrapper] type for `T`, and by
+/// [`Cell&lt;T&gt;`], providing a consistent interface for interacting with the two
+/// types.
+///
+/// This trait provides methods predicated on marker traits for the underlying
+/// fundamental. Only types which can be viewed as sequences of bits may use the
+/// functions for bit-wise arithmetic, and only types which can be used as
+/// integers may use the functions for numeric arithmetic. Use of these methods
+/// on insufficient underlying types (for example, `Radium::fetch_and` on an
+/// atomic or cell-wrapped pointer) will cause a compiler error.
+///
+/// [atomic wrapper]: core::sync::atomic
+/// [`Cell&lt;T&gt;`]: core::cell::Cell
+</span><span class="kw">pub trait </span>Radium {
+    <span class="kw">type </span>Item;
+    <span class="doccomment">/// Creates a new value of this type.
+    </span><span class="kw">fn </span>new(value: <span class="self">Self</span>::Item) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// If the underlying value is atomic, calls [`fence`] with the given</span>
-    <span class="doccomment">/// [`Ordering`]. Otherwise, does nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Ordering`]: core::sync::atomic::Ordering</span>
-    <span class="doccomment">/// [`fence`]: core::sync::atomic::fence</span>
-    <span class="kw">fn</span> <span class="ident">fence</span>(<span class="ident">order</span>: <span class="ident">Ordering</span>);
+    <span class="doccomment">/// If the underlying value is atomic, calls [`fence`] with the given
+    /// [`Ordering`]. Otherwise, does nothing.
+    ///
+    /// [`Ordering`]: core::sync::atomic::Ordering
+    /// [`fence`]: core::sync::atomic::fence
+    </span><span class="kw">fn </span>fence(order: Ordering);
 
-    <span class="doccomment">/// Returns a mutable reference to the underlying value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is safe because the mutable reference to `self` guarantees that no</span>
-    <span class="doccomment">/// other references exist to this value.</span>
-    <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Returns a mutable reference to the underlying value.
+    ///
+    /// This is safe because the mutable reference to `self` guarantees that no
+    /// other references exist to this value.
+    </span><span class="kw">fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Consumes the wrapper and returns the contained value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is safe as passing by value ensures no other references exist.</span>
-    <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Consumes the wrapper and returns the contained value.
+    ///
+    /// This is safe as passing by value ensures no other references exist.
+    </span><span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Load a value from this object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering values are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::load`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::load`]: core::sync::atomic::AtomicUsize::load</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Load a value from this object.
+    ///
+    /// Ordering values are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::load`].
+    ///
+    /// [`AtomicUsize::load`]: core::sync::atomic::AtomicUsize::load
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Store a value in this object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::store`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::store`]: core::sync::atomic::AtomicUsize::store</span>
-    <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>);
+    <span class="doccomment">/// Store a value in this object.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::store`].
+    ///
+    /// [`AtomicUsize::store`]: core::sync::atomic::AtomicUsize::store
+    </span><span class="kw">fn </span>store(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering);
 
-    <span class="doccomment">/// Swap with the value stored in this object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::swap`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::swap`]: core::sync::atomic::AtomicUsize::swap</span>
-    <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Swap with the value stored in this object.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::swap`].
+    ///
+    /// [`AtomicUsize::swap`]: core::sync::atomic::AtomicUsize::swap
+    </span><span class="kw">fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
-    <span class="doccomment">/// same as the `current` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value is always the previously-stored value. If it is equal to</span>
-    <span class="doccomment">/// `current`, then the value was updated with `new`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::compare_and_swap`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::compare_and_swap`]: core::sync::atomic::AtomicUsize::compare_and_swap</span>
-    <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use `compare_exchange` or `compare_exchange_weak` instead&quot;</span>]</span>
-    <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>)
-        -&gt; <span class="ident"><span class="self">Self</span>::Item</span>;
+    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the
+    /// same as the `current` value.
+    ///
+    /// The return value is always the previously-stored value. If it is equal to
+    /// `current`, then the value was updated with `new`.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::compare_and_swap`].
+    ///
+    /// [`AtomicUsize::compare_and_swap`]: core::sync::atomic::AtomicUsize::compare_and_swap
+    </span><span class="attribute">#[deprecated = <span class="string">&quot;Use `compare_exchange` or `compare_exchange_weak` instead&quot;</span>]
+    </span><span class="kw">fn </span>compare_and_swap(<span class="kw-2">&amp;</span><span class="self">self</span>, current: <span class="self">Self</span>::Item, new: <span class="self">Self</span>::Item, order: Ordering)
+        -&gt; <span class="self">Self</span>::Item;
 
-    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
-    <span class="doccomment">/// same as the `current` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value is a `Result` indicating whether the new value was</span>
-    <span class="doccomment">/// written, and containing the previously-stored value. On success, this</span>
-    <span class="doccomment">/// value is guaranteed to be equal to `current`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::compare_exchange`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::compare_exchange`]: core::sync::atomic::AtomicUsize::compare_exchange</span>
-    <span class="kw">fn</span> <span class="ident">compare_exchange</span>(
+    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the
+    /// same as the `current` value.
+    ///
+    /// The return value is a `Result` indicating whether the new value was
+    /// written, and containing the previously-stored value. On success, this
+    /// value is guaranteed to be equal to `current`.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::compare_exchange`].
+    ///
+    /// [`AtomicUsize::compare_exchange`]: core::sync::atomic::AtomicUsize::compare_exchange
+    </span><span class="kw">fn </span>compare_exchange(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
-        <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
-        <span class="ident">success</span>: <span class="ident">Ordering</span>,
-        <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+        current: <span class="self">Self</span>::Item,
+        new: <span class="self">Self</span>::Item,
+        success: Ordering,
+        failure: Ordering,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Item, <span class="self">Self</span>::Item&gt;;
 
-    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the</span>
-    <span class="doccomment">/// same as the `current` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike `compare_exchange`, this function is allowed to spuriously fail</span>
-    <span class="doccomment">/// even when the comparison succeeds, which can result in more efficient</span>
-    <span class="doccomment">/// code on some platforms. The return value is a `Result` indicating</span>
-    <span class="doccomment">/// whether the new value was written, and containing the previously-stored</span>
-    <span class="doccomment">/// value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::compare_exchange_weak`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::compare_exchange_weak`]: core::sync::atomic::AtomicUsize::compare_exchange_weak</span>
-    <span class="kw">fn</span> <span class="ident">compare_exchange_weak</span>(
+    <span class="doccomment">/// Stores a value into this object if the currently-stored value is the
+    /// same as the `current` value.
+    ///
+    /// Unlike `compare_exchange`, this function is allowed to spuriously fail
+    /// even when the comparison succeeds, which can result in more efficient
+    /// code on some platforms. The return value is a `Result` indicating
+    /// whether the new value was written, and containing the previously-stored
+    /// value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::compare_exchange_weak`].
+    ///
+    /// [`AtomicUsize::compare_exchange_weak`]: core::sync::atomic::AtomicUsize::compare_exchange_weak
+    </span><span class="kw">fn </span>compare_exchange_weak(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
-        <span class="ident">new</span>: <span class="ident"><span class="self">Self</span>::Item</span>,
-        <span class="ident">success</span>: <span class="ident">Ordering</span>,
-        <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+        current: <span class="self">Self</span>::Item,
+        new: <span class="self">Self</span>::Item,
+        success: Ordering,
+        failure: Ordering,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Item, <span class="self">Self</span>::Item&gt;;
 
-    <span class="doccomment">/// Performs a bitwise &quot;and&quot; on the currently-stored value and the argument</span>
-    <span class="doccomment">/// `value`, and stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_and`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_and`]: core::sync::atomic::AtomicUsize::fetch_and</span>
-    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
+    <span class="doccomment">/// Performs a bitwise &quot;and&quot; on the currently-stored value and the argument
+    /// `value`, and stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_and`].
+    ///
+    /// [`AtomicUsize::fetch_and`]: core::sync::atomic::AtomicUsize::fetch_and
+    </span><span class="kw">fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::BitOps;
 
-    <span class="doccomment">/// Performs a bitwise &quot;nand&quot; on the currently-stored value and the argument</span>
-    <span class="doccomment">/// `value`, and stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_nand`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_nand`]: core::sync::atomic::AtomicUsize::fetch_nand</span>
-    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
+    <span class="doccomment">/// Performs a bitwise &quot;nand&quot; on the currently-stored value and the argument
+    /// `value`, and stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_nand`].
+    ///
+    /// [`AtomicUsize::fetch_nand`]: core::sync::atomic::AtomicUsize::fetch_nand
+    </span><span class="kw">fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::BitOps;
 
-    <span class="doccomment">/// Performs a bitwise &quot;or&quot; on the currently-stored value and the argument</span>
-    <span class="doccomment">/// `value`, and stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_or`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_or`]: core::sync::atomic::AtomicUsize::fetch_or</span>
-    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
+    <span class="doccomment">/// Performs a bitwise &quot;or&quot; on the currently-stored value and the argument
+    /// `value`, and stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_or`].
+    ///
+    /// [`AtomicUsize::fetch_or`]: core::sync::atomic::AtomicUsize::fetch_or
+    </span><span class="kw">fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::BitOps;
 
-    <span class="doccomment">/// Performs a bitwise &quot;xor&quot; on the currently-stored value and the argument</span>
-    <span class="doccomment">/// `value`, and stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_xor`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_xor`]: core::sync::atomic::AtomicUsize::fetch_xor</span>
-    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::BitOps</span>;
+    <span class="doccomment">/// Performs a bitwise &quot;xor&quot; on the currently-stored value and the argument
+    /// `value`, and stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_xor`].
+    ///
+    /// [`AtomicUsize::fetch_xor`]: core::sync::atomic::AtomicUsize::fetch_xor
+    </span><span class="kw">fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::BitOps;
 
-    <span class="doccomment">/// Adds `value` to the currently-stored value, wrapping on overflow, and</span>
-    <span class="doccomment">/// stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_add`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_add`]: core::sync::atomic::AtomicUsize::fetch_add</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::NumericOps</span>;
+    <span class="doccomment">/// Adds `value` to the currently-stored value, wrapping on overflow, and
+    /// stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_add`].
+    ///
+    /// [`AtomicUsize::fetch_add`]: core::sync::atomic::AtomicUsize::fetch_add
+    </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::NumericOps;
 
-    <span class="doccomment">/// Subtracts `value` from the currently-stored value, wrapping on</span>
-    <span class="doccomment">/// underflow, and stores the result in `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previously-stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_sub`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_sub`]: core::sync::atomic::AtomicUsize::fetch_sub</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident"><span class="self">Self</span>::Item</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Item</span>: <span class="ident">marker::NumericOps</span>;
+    <span class="doccomment">/// Subtracts `value` from the currently-stored value, wrapping on
+    /// underflow, and stores the result in `self`.
+    ///
+    /// Returns the previously-stored value.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_sub`].
+    ///
+    /// [`AtomicUsize::fetch_sub`]: core::sync::atomic::AtomicUsize::fetch_sub
+    </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="self">Self</span>::Item, order: Ordering) -&gt; <span class="self">Self</span>::Item
+    <span class="kw">where
+        </span><span class="self">Self</span>::Item: marker::NumericOps;
 
-    <span class="doccomment">/// Fetches the value, and applies a function to it that returns an</span>
-    <span class="doccomment">/// optional new value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This may call the function multiple times if the value has been</span>
-    <span class="doccomment">/// changed from other threads in the meantime, as long as the function</span>
-    <span class="doccomment">/// returns `Some(_)`, but the function will have been applied only once to</span>
-    <span class="doccomment">/// the stored value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a `Result` of `Ok(previous_value)` if the function returned</span>
-    <span class="doccomment">/// `Some(_)`, else `Err(previous_value)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Ordering arguments are ignored by non-atomic types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also: [`AtomicUsize::fetch_update`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AtomicUsize::fetch_update`]: core::sync::atomic::AtomicUsize::fetch_update</span>
-    <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Fetches the value, and applies a function to it that returns an
+    /// optional new value.
+    ///
+    /// Note: This may call the function multiple times if the value has been
+    /// changed from other threads in the meantime, as long as the function
+    /// returns `Some(_)`, but the function will have been applied only once to
+    /// the stored value.
+    ///
+    /// Returns a `Result` of `Ok(previous_value)` if the function returned
+    /// `Some(_)`, else `Err(previous_value)`.
+    ///
+    /// Ordering arguments are ignored by non-atomic types.
+    ///
+    /// See also: [`AtomicUsize::fetch_update`].
+    ///
+    /// [`AtomicUsize::fetch_update`]: core::sync::atomic::AtomicUsize::fetch_update
+    </span><span class="kw">fn </span>fetch_update&lt;F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">set_order</span>: <span class="ident">Ordering</span>,
-        <span class="ident">fetch_order</span>: <span class="ident">Ordering</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span>, <span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+        set_order: Ordering,
+        fetch_order: Ordering,
+        f: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Item, <span class="self">Self</span>::Item&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="self">Self</span>::Item) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;;
 }
 
-<span class="doccomment">/// Marker traits used by [`Radium`].</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">marker</span> {
-    <span class="doccomment">/// Types supporting maybe-atomic bitwise operations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Types implementing this trait support the [`fetch_and`], [`fetch_nand`],</span>
-    <span class="doccomment">/// [`fetch_or`], and [`fetch_xor`] maybe-atomic operations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`fetch_and`]: crate::Radium::fetch_and</span>
-    <span class="doccomment">/// [`fetch_nand`]: crate::Radium::fetch_nand</span>
-    <span class="doccomment">/// [`fetch_or`]: crate::Radium::fetch_or</span>
-    <span class="doccomment">/// [`fetch_xor`]: crate::Radium::fetch_xor</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `bool` and all integer fundamental types implement this.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use core::sync::atomic::*;</span>
-    <span class="doccomment">/// # use radium::Radium;</span>
-    <span class="doccomment">/// let num: AtomicUsize = AtomicUsize::new(0);</span>
-    <span class="doccomment">/// Radium::fetch_or(&amp;num, 2, Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Pointers do not. This will cause a compiler error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,compile_fail</span>
-    <span class="doccomment">/// # use core::sync::atomic::*;</span>
-    <span class="doccomment">/// # use radium::Radium;</span>
-    <span class="doccomment">/// # use core::ptr;</span>
-    <span class="doccomment">/// let ptr: AtomicPtr&lt;usize&gt; = Default::default();</span>
-    <span class="doccomment">/// Radium::fetch_or(&amp;ptr, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitOps</span> {}
+<span class="doccomment">/// Marker traits used by [`Radium`].
+</span><span class="kw">pub mod </span>marker {
+    <span class="doccomment">/// Types supporting maybe-atomic bitwise operations.
+    ///
+    /// Types implementing this trait support the [`fetch_and`], [`fetch_nand`],
+    /// [`fetch_or`], and [`fetch_xor`] maybe-atomic operations.
+    ///
+    /// [`fetch_and`]: crate::Radium::fetch_and
+    /// [`fetch_nand`]: crate::Radium::fetch_nand
+    /// [`fetch_or`]: crate::Radium::fetch_or
+    /// [`fetch_xor`]: crate::Radium::fetch_xor
+    ///
+    /// `bool` and all integer fundamental types implement this.
+    ///
+    /// ```rust
+    /// # use core::sync::atomic::*;
+    /// # use radium::Radium;
+    /// let num: AtomicUsize = AtomicUsize::new(0);
+    /// Radium::fetch_or(&amp;num, 2, Ordering::Relaxed);
+    /// ```
+    ///
+    /// Pointers do not. This will cause a compiler error.
+    ///
+    /// ```rust,compile_fail
+    /// # use core::sync::atomic::*;
+    /// # use radium::Radium;
+    /// # use core::ptr;
+    /// let ptr: AtomicPtr&lt;usize&gt; = Default::default();
+    /// Radium::fetch_or(&amp;ptr, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="kw">pub trait </span>BitOps {}
 
-    <span class="doccomment">/// Types supporting maybe-atomic arithmetic operations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Types implementing this trait support the [`fetch_add`] and</span>
-    <span class="doccomment">/// [`fetch_sub`] maybe-atomic operations.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`fetch_add`]: crate::Radium::fetch_add</span>
-    <span class="doccomment">/// [`fetch_sub`]: crate::Radium::fetch_sub</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The integer types, such as `usize` and `i32`, implement this trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use core::sync::atomic::*;</span>
-    <span class="doccomment">/// # use radium::Radium;</span>
-    <span class="doccomment">/// let num: AtomicUsize = AtomicUsize::new(2);</span>
-    <span class="doccomment">/// Radium::fetch_add(&amp;num, 2, Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `bool` and pointers do not. This will cause a compiler error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,compile_fail</span>
-    <span class="doccomment">/// # use core::sync::atomic::*;</span>
-    <span class="doccomment">/// # use radium::Radium;</span>
-    <span class="doccomment">/// let bit: AtomicBool = AtomicBool::new(false);</span>
-    <span class="doccomment">/// Radium::fetch_add(&amp;bit, true, Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NumericOps</span>: <span class="ident">BitOps</span> {}
+    <span class="doccomment">/// Types supporting maybe-atomic arithmetic operations.
+    ///
+    /// Types implementing this trait support the [`fetch_add`] and
+    /// [`fetch_sub`] maybe-atomic operations.
+    ///
+    /// [`fetch_add`]: crate::Radium::fetch_add
+    /// [`fetch_sub`]: crate::Radium::fetch_sub
+    ///
+    /// The integer types, such as `usize` and `i32`, implement this trait.
+    ///
+    /// ```rust
+    /// # use core::sync::atomic::*;
+    /// # use radium::Radium;
+    /// let num: AtomicUsize = AtomicUsize::new(2);
+    /// Radium::fetch_add(&amp;num, 2, Ordering::Relaxed);
+    /// ```
+    ///
+    /// `bool` and pointers do not. This will cause a compiler error.
+    ///
+    /// ```rust,compile_fail
+    /// # use core::sync::atomic::*;
+    /// # use radium::Radium;
+    /// let bit: AtomicBool = AtomicBool::new(false);
+    /// Radium::fetch_add(&amp;bit, true, Ordering::Relaxed);
+    /// ```
+    </span><span class="kw">pub trait </span>NumericOps: BitOps {}
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">radium</span> {
-    <span class="comment">// Emit the universal `Radium` trait function bodies for atomic types.</span>
-    ( <span class="ident">atom</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">value</span>)
+<span class="macro">macro_rules! </span>radium {
+    <span class="comment">// Emit the universal `Radium` trait function bodies for atomic types.
+    </span>( atom <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>new(value: <span class="macro-nonterminal">$base</span>) -&gt; <span class="self">Self </span>{
+            <span class="self">Self</span>::new(value)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fence</span>(<span class="ident">order</span>: <span class="ident">Ordering</span>) {
-            <span class="ident">core::sync::atomic::fence</span>(<span class="ident">order</span>);
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fence(order: Ordering) {
+            core::sync::atomic::fence(order);
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">get_mut</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.get_mut()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">into_inner</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.into_inner()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">load</span>(<span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.load(order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) {
-            <span class="self">self</span>.<span class="ident">store</span>(<span class="ident">value</span>, <span class="ident">order</span>);
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>store(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) {
+            <span class="self">self</span>.store(value, order);
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">swap</span>(<span class="ident">value</span>, <span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.swap(value, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">compare_and_swap</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        #[allow(deprecated)]
+        </span><span class="kw">fn </span>compare_and_swap(<span class="kw-2">&amp;</span><span class="self">self</span>, current: <span class="macro-nonterminal">$base</span>, new: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.compare_and_swap(current, new, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">compare_exchange</span>(
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>compare_exchange(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">success</span>: <span class="ident">Ordering</span>,
-            <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">compare_exchange</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+            current: <span class="macro-nonterminal">$base</span>,
+            new: <span class="macro-nonterminal">$base</span>,
+            success: Ordering,
+            failure: Ordering,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt; {
+            <span class="self">self</span>.compare_exchange(current, new, success, failure)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">compare_exchange_weak</span>(
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>compare_exchange_weak(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">success</span>: <span class="ident">Ordering</span>,
-            <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">compare_exchange_weak</span>(<span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+            current: <span class="macro-nonterminal">$base</span>,
+            new: <span class="macro-nonterminal">$base</span>,
+            success: Ordering,
+            failure: Ordering,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt; {
+            <span class="self">self</span>.compare_exchange_weak(current, new, success, failure)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_update&lt;F&gt;(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            <span class="ident">set_order</span>: <span class="ident">Ordering</span>,
-            <span class="ident">fetch_order</span>: <span class="ident">Ordering</span>,
-            <span class="ident">f</span>: <span class="ident">F</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>,
+            set_order: Ordering,
+            fetch_order: Ordering,
+            f: F,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt;
+        <span class="kw">where
+            </span>F: FnMut(<span class="macro-nonterminal">$base</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$base</span>&gt;,
         {
-            <span class="self">self</span>.<span class="ident">fetch_update</span>(<span class="ident">set_order</span>, <span class="ident">fetch_order</span>, <span class="ident">f</span>)
+            <span class="self">self</span>.fetch_update(set_order, fetch_order, f)
         }
     };
 
-    <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.</span>
-    ( <span class="ident">atom_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="ident">value</span>, <span class="ident">order</span>)
+    <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.
+    </span>( atom_bit <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_and(value, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_nand</span>(<span class="ident">value</span>, <span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_nand(value, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">value</span>, <span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_or(value, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_xor</span>(<span class="ident">value</span>, <span class="ident">order</span>)
-        }
-    };
-
-    <span class="comment">// Emit the `Radium` trait function bodies for integral types.</span>
-    ( <span class="ident">atom_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_add</span>(<span class="ident">value</span>, <span class="ident">order</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">order</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">fetch_sub</span>(<span class="ident">value</span>, <span class="ident">order</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_xor(value, order)
         }
     };
 
-    <span class="comment">// Emit the universal `Radium` trait function bodies for `Cell&lt;_&gt;`.</span>
-    ( <span class="ident">cell</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Cell::new</span>(<span class="ident">value</span>)
+    <span class="comment">// Emit the `Radium` trait function bodies for integral types.
+    </span>( atom_int <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_add(value, order)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fence</span>(<span class="kw">_</span>: <span class="ident">Ordering</span>) {}
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, order: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.fetch_sub(value, order)
+        }
+    };
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">get_mut</span>()
+    <span class="comment">// Emit the universal `Radium` trait function bodies for `Cell&lt;_&gt;`.
+    </span>( cell <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>new(value: <span class="macro-nonterminal">$base</span>) -&gt; <span class="self">Self </span>{
+            Cell::new(value)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">into_inner</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fence(<span class="kw">_</span>: Ordering) {}
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.get_mut()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">get</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.into_inner()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) {
-            <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">value</span>);
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.get()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">value</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>store(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) {
+            <span class="self">self</span>.set(value);
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">compare_and_swap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="ident">current</span> {
-                <span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">new</span>)
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">get</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>swap(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(value)
+        }
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>compare_and_swap(<span class="kw-2">&amp;</span><span class="self">self</span>, current: <span class="macro-nonterminal">$base</span>, new: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="kw">if </span><span class="self">self</span>.get() == current {
+                <span class="self">self</span>.replace(new)
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.get()
             }
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">compare_exchange</span>(
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>compare_exchange(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="kw">_</span>: <span class="ident">Ordering</span>,
-            <span class="kw">_</span>: <span class="ident">Ordering</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get</span>() <span class="op">==</span> <span class="ident">current</span> {
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">new</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">get</span>())
+            current: <span class="macro-nonterminal">$base</span>,
+            new: <span class="macro-nonterminal">$base</span>,
+            <span class="kw">_</span>: Ordering,
+            <span class="kw">_</span>: Ordering,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt; {
+            <span class="kw">if </span><span class="self">self</span>.get() == current {
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.replace(new))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(<span class="self">self</span>.get())
             }
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">compare_exchange_weak</span>(
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>compare_exchange_weak(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
-            <span class="ident">current</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">new</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>,
-            <span class="ident">success</span>: <span class="ident">Ordering</span>,
-            <span class="ident">failure</span>: <span class="ident">Ordering</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="ident">Radium::compare_exchange</span>(<span class="self">self</span>, <span class="ident">current</span>, <span class="ident">new</span>, <span class="ident">success</span>, <span class="ident">failure</span>)
+            current: <span class="macro-nonterminal">$base</span>,
+            new: <span class="macro-nonterminal">$base</span>,
+            success: Ordering,
+            failure: Ordering,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt; {
+            Radium::compare_exchange(<span class="self">self</span>, current, new, success, failure)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_update</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span>,
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_update&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: Ordering, <span class="kw">_</span>: Ordering, <span class="kw-2">mut </span>f: F) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$base</span>, <span class="macro-nonterminal">$base</span>&gt;
+        <span class="kw">where
+            </span>F: FnMut(<span class="macro-nonterminal">$base</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$base</span>&gt;,
         {
-            <span class="kw">match</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">get</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">replace</span>(<span class="ident">x</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">get</span>()),
+            <span class="kw">match </span>f(<span class="self">self</span>.get()) {
+                <span class="prelude-val">Some</span>(x) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.replace(x)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>.get()),
             }
         }
     };
 
-    <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.</span>
-    ( <span class="ident">cell_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="ident">value</span>)
+    <span class="comment">// Emit the `Radium` trait function bodies for bit-wise types.
+    </span>( cell_bit <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(<span class="self">self</span>.get() &amp; value)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="op">!</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="ident">value</span>))
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(!(<span class="self">self</span>.get() &amp; value))
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">|</span> <span class="ident">value</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(<span class="self">self</span>.get() | value)
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>() <span class="op">^</span> <span class="ident">value</span>)
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(<span class="self">self</span>.get() ^ value)
         }
     };
 
-    <span class="comment">// Emit the `Radium` trait function bodies for integral types.</span>
-    ( <span class="ident">cell_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">wrapping_add</span>(<span class="ident">value</span>))
+    <span class="comment">// Emit the `Radium` trait function bodies for integral types.
+    </span>( cell_int <span class="macro-nonterminal">$base</span>:ty ) =&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(<span class="self">self</span>.get().wrapping_add(value))
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="kw">_</span>: <span class="ident">Ordering</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {
-            <span class="self">self</span>.<span class="ident">replace</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">wrapping_sub</span>(<span class="ident">value</span>))
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="macro-nonterminal">$base</span>, <span class="kw">_</span>: Ordering) -&gt; <span class="macro-nonterminal">$base </span>{
+            <span class="self">self</span>.replace(<span class="self">self</span>.get().wrapping_sub(value))
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">radium_int</span> {
-    ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">width</span>:<span class="ident">tt</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">ty</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">atom</span>:<span class="ident">ty</span> ; )<span class="op">*</span> ) =&gt; { $(
-        <span class="kw">impl</span> <span class="ident">marker::BitOps</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {}
-        <span class="kw">impl</span> <span class="ident">marker::NumericOps</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> {}
+<span class="macro">macro_rules! </span>radium_int {
+    ( $( <span class="macro-nonterminal">$width</span>:tt: <span class="macro-nonterminal">$base</span>:ty , <span class="macro-nonterminal">$atom</span>:ty ; )* ) =&gt; { $(
+        <span class="kw">impl </span>marker::BitOps <span class="kw">for </span><span class="macro-nonterminal">$base </span>{}
+        <span class="kw">impl </span>marker::NumericOps <span class="kw">for </span><span class="macro-nonterminal">$base </span>{}
 
-        <span class="macro">if_atomic!</span>(<span class="kw">if</span> <span class="ident">atomic</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">width</span>) {
-            <span class="kw">impl</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">atom</span> {
-                <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>;
+        <span class="macro">if_atomic!</span>(<span class="kw">if </span>atomic(<span class="macro-nonterminal">$width</span>) {
+            <span class="kw">impl </span>Radium <span class="kw">for </span><span class="macro-nonterminal">$atom </span>{
+                <span class="kw">type </span>Item = <span class="macro-nonterminal">$base</span>;
 
-                <span class="macro">radium!</span>(<span class="ident">atom</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
-                <span class="macro">radium!</span>(<span class="ident">atom_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
-                <span class="macro">radium!</span>(<span class="ident">atom_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
+                <span class="macro">radium!</span>(atom <span class="macro-nonterminal">$base</span>);
+                <span class="macro">radium!</span>(atom_bit <span class="macro-nonterminal">$base</span>);
+                <span class="macro">radium!</span>(atom_int <span class="macro-nonterminal">$base</span>);
             }
         });
 
-        <span class="kw">impl</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>;
+        <span class="kw">impl </span>Radium <span class="kw">for </span>Cell&lt;<span class="macro-nonterminal">$base</span>&gt; {
+            <span class="kw">type </span>Item = <span class="macro-nonterminal">$base</span>;
 
-            <span class="macro">radium!</span>(<span class="ident">cell</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
-            <span class="macro">radium!</span>(<span class="ident">cell_bit</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
-            <span class="macro">radium!</span>(<span class="ident">cell_int</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>);
+            <span class="macro">radium!</span>(cell <span class="macro-nonterminal">$base</span>);
+            <span class="macro">radium!</span>(cell_bit <span class="macro-nonterminal">$base</span>);
+            <span class="macro">radium!</span>(cell_int <span class="macro-nonterminal">$base</span>);
         }
-    )<span class="op">*</span> };
+    )* };
 }
 
-<span class="macro">radium_int!</span> {
-    <span class="number">8</span>: <span class="ident">i8</span>, <span class="ident">AtomicI8</span>;
-    <span class="number">8</span>: <span class="ident">u8</span>, <span class="ident">AtomicU8</span>;
-    <span class="number">16</span>: <span class="ident">i16</span>, <span class="ident">AtomicI16</span>;
-    <span class="number">16</span>: <span class="ident">u16</span>, <span class="ident">AtomicU16</span>;
-    <span class="number">32</span>: <span class="ident">i32</span>, <span class="ident">AtomicI32</span>;
-    <span class="number">32</span>: <span class="ident">u32</span>, <span class="ident">AtomicU32</span>;
-    <span class="number">64</span>: <span class="ident">i64</span>, <span class="ident">AtomicI64</span>;
-    <span class="number">64</span>: <span class="ident">u64</span>, <span class="ident">AtomicU64</span>;
-    <span class="ident">size</span>: <span class="ident">isize</span>, <span class="ident">AtomicIsize</span>;
-    <span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">AtomicUsize</span>;
+<span class="macro">radium_int! </span>{
+    <span class="number">8</span>: i8, AtomicI8;
+    <span class="number">8</span>: u8, AtomicU8;
+    <span class="number">16</span>: i16, AtomicI16;
+    <span class="number">16</span>: u16, AtomicU16;
+    <span class="number">32</span>: i32, AtomicI32;
+    <span class="number">32</span>: u32, AtomicU32;
+    <span class="number">64</span>: i64, AtomicI64;
+    <span class="number">64</span>: u64, AtomicU64;
+    size: isize, AtomicIsize;
+    size: usize, AtomicUsize;
 }
 
-<span class="kw">impl</span> <span class="ident">marker::BitOps</span> <span class="kw">for</span> <span class="ident">bool</span> {}
+<span class="kw">impl </span>marker::BitOps <span class="kw">for </span>bool {}
 
-<span class="macro">if_atomic!</span>(<span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">bool</span>) {
-    <span class="kw">impl</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="ident">AtomicBool</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="macro">if_atomic!</span>(<span class="kw">if </span>atomic(bool) {
+    <span class="kw">impl </span>Radium <span class="kw">for </span>AtomicBool {
+        <span class="kw">type </span>Item = bool;
 
-        <span class="macro">radium!</span>(<span class="ident">atom</span> <span class="ident">bool</span>);
-        <span class="macro">radium!</span>(<span class="ident">atom_bit</span> <span class="ident">bool</span>);
+        <span class="macro">radium!</span>(atom bool);
+        <span class="macro">radium!</span>(atom_bit bool);
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicBool::new(false);</span>
-        <span class="doccomment">/// Radium::fetch_add(&amp;atom, true, Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicBool::new(false);
+        /// Radium::fetch_add(&amp;atom, true, Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: bool, _order: Ordering) -&gt; bool {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicBool::new(false);</span>
-        <span class="doccomment">/// Radium::fetch_sub(&amp;atom, true, Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicBool::new(false);
+        /// Radium::fetch_sub(&amp;atom, true, Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: bool, _order: Ordering) -&gt; bool {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
     }
 });
 
-<span class="kw">impl</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
+<span class="kw">impl </span>Radium <span class="kw">for </span>Cell&lt;bool&gt; {
+    <span class="kw">type </span>Item = bool;
 
-    <span class="macro">radium!</span>(<span class="ident">cell</span> <span class="ident">bool</span>);
-    <span class="macro">radium!</span>(<span class="ident">cell_bit</span> <span class="ident">bool</span>);
+    <span class="macro">radium!</span>(cell bool);
+    <span class="macro">radium!</span>(cell_bit bool);
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;bool&gt;::new(false);</span>
-    <span class="doccomment">/// Radium::fetch_add(&amp;cell, true, Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;bool&gt;::new(false);
+    /// Radium::fetch_add(&amp;cell, true, Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: bool, _order: Ordering) -&gt; bool {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;bool&gt;::new(false);</span>
-    <span class="doccomment">/// Radium::fetch_sub(&amp;cell, true, Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="ident">bool</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;bool&gt;::new(false);
+    /// Radium::fetch_sub(&amp;cell, true, Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: bool, _order: Ordering) -&gt; bool {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }
 
-<span class="macro">if_atomic!</span>(<span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">ptr</span>) {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">T</span>;
+<span class="macro">if_atomic!</span>(<span class="kw">if </span>atomic(ptr) {
+    <span class="kw">impl</span>&lt;T&gt; Radium <span class="kw">for </span>AtomicPtr&lt;T&gt; {
+        <span class="kw">type </span>Item = <span class="kw-2">*mut </span>T;
 
-        <span class="macro">radium!</span>(<span class="ident">atom</span> <span class="kw-2">*mut</span> <span class="ident">T</span>);
+        <span class="macro">radium!</span>(atom <span class="kw-2">*mut </span>T);
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_and(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_and(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_nand(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_nand(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_or(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_or(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_xor(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_xor(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_add(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_add(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
 
-        <span class="doccomment">/// ```compile_fail</span>
-        <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-        <span class="doccomment">/// # use radium::*;</span>
-        <span class="doccomment">/// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());</span>
-        <span class="doccomment">/// Radium::fetch_sub(&amp;atom, ptr::null_mut(), Ordering::Relaxed);</span>
-        <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+        <span class="doccomment">/// ```compile_fail
+        /// # use std::{ptr, sync::atomic::*, cell::*};
+        /// # use radium::*;
+        /// let atom = AtomicPtr::&lt;u8&gt;::new(ptr::null_mut());
+        /// Radium::fetch_sub(&amp;atom, ptr::null_mut(), Ordering::Relaxed);
+        /// ```
+        </span><span class="attribute">#[doc(hidden)]
+        </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
             <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
         }
     }
 });
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Radium</span> <span class="kw">for</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; Radium <span class="kw">for </span>Cell&lt;<span class="kw-2">*mut </span>T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">*mut </span>T;
 
-    <span class="macro">radium!</span>(<span class="ident">cell</span> <span class="kw-2">*mut</span> <span class="ident">T</span>);
+    <span class="macro">radium!</span>(cell <span class="kw-2">*mut </span>T);
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_and(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_and</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_and(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_and(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_nand(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_nand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_nand(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_nand(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_or(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_or</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_or(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_or(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_xor(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_xor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_xor(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_xor(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_add(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_add(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_add(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 
-    <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use std::{ptr, sync::atomic::*, cell::*};</span>
-    <span class="doccomment">/// # use radium::*;</span>
-    <span class="doccomment">/// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());</span>
-    <span class="doccomment">/// Radium::fetch_sub(&amp;cell, ptr::null_mut(), Ordering::Relaxed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fetch_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_value</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>, <span class="ident">_order</span>: <span class="ident">Ordering</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
+    <span class="doccomment">/// ```compile_fail
+    /// # use std::{ptr, sync::atomic::*, cell::*};
+    /// # use radium::*;
+    /// let cell = Cell::&lt;*mut u8&gt;::new(ptr::null_mut());
+    /// Radium::fetch_sub(&amp;cell, ptr::null_mut(), Ordering::Relaxed);
+    /// ```
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>fetch_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, _value: <span class="kw-2">*mut </span>T, _order: Ordering) -&gt; <span class="kw-2">*mut </span>T {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This method statically cannot be called&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">core::cell::Cell</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>core::cell::Cell;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">absent_traits</span>() {
-        <span class="macro">static_assertions::assert_not_impl_any!</span>(<span class="ident">bool</span>: <span class="ident">marker::NumericOps</span>);
-        <span class="macro">static_assertions::assert_not_impl_any!</span>(<span class="kw-2">*mut</span> <span class="ident">u8</span>: <span class="ident">marker::BitOps</span>, <span class="ident">marker::NumericOps</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>absent_traits() {
+        <span class="macro">static_assertions::assert_not_impl_any!</span>(bool: marker::NumericOps);
+        <span class="macro">static_assertions::assert_not_impl_any!</span>(<span class="kw-2">*mut </span>u8: marker::BitOps, marker::NumericOps);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">present_traits</span>() {
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">bool</span>: <span class="ident">marker::BitOps</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">usize</span>: <span class="ident">marker::BitOps</span>, <span class="ident">marker::NumericOps</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>present_traits() {
+        <span class="macro">static_assertions::assert_impl_all!</span>(bool: marker::BitOps);
+        <span class="macro">static_assertions::assert_impl_all!</span>(usize: marker::BitOps, marker::NumericOps);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">always_cell</span>() {
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i8</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i16</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i64</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u64</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">isize</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">isize</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">*mut</span> ()<span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">*mut</span> ()<span class="op">&gt;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>always_cell() {
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;bool&gt;: Radium&lt;Item = bool&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;i8&gt;: Radium&lt;Item = i8&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;u8&gt;: Radium&lt;Item = u8&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;i16&gt;: Radium&lt;Item = i16&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;u16&gt;: Radium&lt;Item = u16&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;i32&gt;: Radium&lt;Item = i32&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;u32&gt;: Radium&lt;Item = u32&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;i64&gt;: Radium&lt;Item = i64&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;u64&gt;: Radium&lt;Item = u64&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;isize&gt;: Radium&lt;Item = isize&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;usize&gt;: Radium&lt;Item = usize&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(Cell&lt;<span class="kw-2">*mut </span>()&gt;: Radium&lt;Item = <span class="kw-2">*mut </span>()&gt;);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">always_alias</span>() {
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumBool</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumI8</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i8</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumU8</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumI16</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i16</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumU16</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumI32</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumU32</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumI64</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i64</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumU64</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u64</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumIsize</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">isize</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumUsize</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>);
-        <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">types::RadiumPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">*mut</span> ()<span class="op">&gt;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>always_alias() {
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumBool: Radium&lt;Item = bool&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumI8: Radium&lt;Item = i8&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumU8: Radium&lt;Item = u8&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumI16: Radium&lt;Item = i16&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumU16: Radium&lt;Item = u16&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumI32: Radium&lt;Item = i32&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumU32: Radium&lt;Item = u32&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumI64: Radium&lt;Item = i64&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumU64: Radium&lt;Item = u64&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumIsize: Radium&lt;Item = isize&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumUsize: Radium&lt;Item = usize&gt;);
+        <span class="macro">static_assertions::assert_impl_all!</span>(types::RadiumPtr&lt;()&gt;: Radium&lt;Item = <span class="kw-2">*mut </span>()&gt;);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">maybe_atom</span>() {
-        <span class="macro">if_atomic!</span> {
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">bool</span>) {
-                <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::<span class="kw-2">*</span>;
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicBool</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>maybe_atom() {
+        <span class="macro">if_atomic! </span>{
+            <span class="kw">if </span>atomic(bool) {
+                <span class="kw">use </span>core::sync::atomic::<span class="kw-2">*</span>;
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicBool: Radium&lt;Item = bool&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">8</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicI8</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i8</span><span class="op">&gt;</span>);
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicU8</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(<span class="number">8</span>) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicI8: Radium&lt;Item = i8&gt;);
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicU8: Radium&lt;Item = u8&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">16</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicI16</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i16</span><span class="op">&gt;</span>);
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicU16</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(<span class="number">16</span>) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicI16: Radium&lt;Item = i16&gt;);
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicU16: Radium&lt;Item = u16&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">32</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicI32</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i32</span><span class="op">&gt;</span>);
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicU32</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u32</span><span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(<span class="number">32</span>) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicI32: Radium&lt;Item = i32&gt;);
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicU32: Radium&lt;Item = u32&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">64</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicI64</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i64</span><span class="op">&gt;</span>);
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicU64</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u64</span><span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(<span class="number">64</span>) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicI64: Radium&lt;Item = i64&gt;);
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicU64: Radium&lt;Item = u64&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">size</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicIsize</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">isize</span><span class="op">&gt;</span>);
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicUsize</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(size) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicIsize: Radium&lt;Item = isize&gt;);
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicUsize: Radium&lt;Item = usize&gt;);
             }
-            <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">ptr</span>) {
-                <span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">*mut</span> ()<span class="op">&gt;</span>);
+            <span class="kw">if </span>atomic(ptr) {
+                <span class="macro">static_assertions::assert_impl_all!</span>(AtomicPtr&lt;()&gt;: Radium&lt;Item = <span class="kw-2">*mut </span>()&gt;);
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

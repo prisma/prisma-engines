@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/cockroach_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cockroach_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/cockroach_datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cockroach_datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -316,323 +316,323 @@
 <span id="316">316</span>
 <span id="317">317</span>
 <span id="318">318</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">native_types</span>;
-<span class="kw">mod</span> <span class="ident">validations</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>native_types;
+<span class="kw">mod </span>validations;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">native_types::CockroachType</span>;
+<span class="kw">pub use </span>native_types::CockroachType;
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CompletionItem</span>, <span class="ident">CompletionItemKind</span>, <span class="ident">CompletionList</span>};
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{
-        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">StringFilter</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>lsp_types::{CompletionItem, CompletionItemKind, CompletionList};
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, StringFilter,
     },
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">parser_database</span>::{
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{
         <span class="self">self</span>,
-        <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SchemaPosition</span>},
-        <span class="ident">coerce</span>,
-        <span class="ident">walkers::ModelWalker</span>,
-        <span class="ident">IndexAlgorithm</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
+        ast::{<span class="self">self</span>, SchemaPosition},
+        coerce,
+        walkers::ModelWalker,
+        IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
     },
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">const</span> <span class="ident">CONSTRAINT_SCOPES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span>];
+<span class="kw">const </span>CONSTRAINT_SCOPES: <span class="kw-2">&amp;</span>[ConstraintScope] = <span class="kw-2">&amp;</span>[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
-<span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ConnectorCapability::AdvancedJsonNullability</span>,
-    <span class="ident">ConnectorCapability::AnyId</span>,
-    <span class="ident">ConnectorCapability::AutoIncrement</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementAllowedOnNonId</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementMultipleAllowed</span>,
-    <span class="ident">ConnectorCapability::AutoIncrementNonIndexedAllowed</span>,
-    <span class="ident">ConnectorCapability::CompoundIds</span>,
-    <span class="ident">ConnectorCapability::CreateMany</span>,
-    <span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>,
-    <span class="ident">ConnectorCapability::CreateSkipDuplicates</span>,
-    <span class="ident">ConnectorCapability::Enums</span>,
-    <span class="ident">ConnectorCapability::InsensitiveFilters</span>,
-    <span class="ident">ConnectorCapability::Json</span>,
-    <span class="ident">ConnectorCapability::JsonFiltering</span>,
-    <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
-    <span class="ident">ConnectorCapability::NamedPrimaryKeys</span>,
-    <span class="ident">ConnectorCapability::NamedForeignKeys</span>,
-    <span class="ident">ConnectorCapability::SqlQueryRaw</span>,
-    <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
-    <span class="ident">ConnectorCapability::ScalarLists</span>,
-    <span class="ident">ConnectorCapability::UpdateableId</span>,
-    <span class="ident">ConnectorCapability::WritableAutoincField</span>,
-    <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
-    <span class="ident">ConnectorCapability::DecimalType</span>,
-    <span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>,
-    <span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>,
-    <span class="ident">ConnectorCapability::NativeUpsert</span>,
+<span class="kw">const </span>CAPABILITIES: <span class="kw-2">&amp;</span>[ConnectorCapability] = <span class="kw-2">&amp;</span>[
+    ConnectorCapability::AdvancedJsonNullability,
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::CreateManyWriteableAutoIncId,
+    ConnectorCapability::CreateSkipDuplicates,
+    ConnectorCapability::Enums,
+    ConnectorCapability::InsensitiveFilters,
+    ConnectorCapability::Json,
+    ConnectorCapability::JsonFiltering,
+    ConnectorCapability::JsonFilteringArrayPath,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::SqlQueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::ScalarLists,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::WritableAutoincField,
+    ConnectorCapability::ImplicitManyToManyRelation,
+    ConnectorCapability::DecimalType,
+    ConnectorCapability::OrderByNullsFirstLast,
+    ConnectorCapability::SupportsTxIsolationSerializable,
+    ConnectorCapability::NativeUpsert,
 ];
 
-<span class="kw">const</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>: <span class="kw-2">&amp;</span>[(<span class="ident">ScalarType</span>, <span class="ident">CockroachType</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    (<span class="ident">ScalarType::Int</span>, <span class="ident">CockroachType::Int4</span>),
-    (<span class="ident">ScalarType::BigInt</span>, <span class="ident">CockroachType::Int8</span>),
-    (<span class="ident">ScalarType::Float</span>, <span class="ident">CockroachType::Float8</span>),
-    (<span class="ident">ScalarType::Decimal</span>, <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>)))),
-    (<span class="ident">ScalarType::Boolean</span>, <span class="ident">CockroachType::Bool</span>),
-    (<span class="ident">ScalarType::String</span>, <span class="ident">CockroachType::String</span>(<span class="prelude-val">None</span>)),
-    (<span class="ident">ScalarType::DateTime</span>, <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="number">3</span>))),
-    (<span class="ident">ScalarType::Bytes</span>, <span class="ident">CockroachType::Bytes</span>),
-    (<span class="ident">ScalarType::Json</span>, <span class="ident">CockroachType::JsonB</span>),
+<span class="kw">const </span>SCALAR_TYPE_DEFAULTS: <span class="kw-2">&amp;</span>[(ScalarType, CockroachType)] = <span class="kw-2">&amp;</span>[
+    (ScalarType::Int, CockroachType::Int4),
+    (ScalarType::BigInt, CockroachType::Int8),
+    (ScalarType::Float, CockroachType::Float8),
+    (ScalarType::Decimal, CockroachType::Decimal(<span class="prelude-val">Some</span>((<span class="number">65</span>, <span class="number">30</span>)))),
+    (ScalarType::Boolean, CockroachType::Bool),
+    (ScalarType::String, CockroachType::String(<span class="prelude-val">None</span>)),
+    (ScalarType::DateTime, CockroachType::Timestamp(<span class="prelude-val">Some</span>(<span class="number">3</span>))),
+    (ScalarType::Bytes, CockroachType::Bytes),
+    (ScalarType::Json, CockroachType::JsonB),
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CockroachDatamodelConnector</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CockroachDatamodelConnector;
 
-<span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">CockroachDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;cockroachdb&quot;</span>
+<span class="kw">impl </span>Connector <span class="kw">for </span>CockroachDatamodelConnector {
+    <span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;cockroachdb&quot;
+    </span>}
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;CockroachDB&quot;
+    </span>}
+
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
+        CAPABILITIES
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;CockroachDB&quot;</span>
+    <span class="doccomment">/// The maximum length of postgres identifiers, in bytes.
+    ///
+    /// Reference: &lt;https://www.postgresql.org/docs/12/limits.html&gt;
+    </span><span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">63
+    </span>}
+
+    <span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        <span class="kw">use </span>ReferentialAction::<span class="kw-2">*</span>;
+
+        NoAction | Restrict | Cascade | SetNull | SetDefault
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
-        <span class="ident">CAPABILITIES</span>
-    }
+    <span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>CockroachType = native_type.downcast_ref();
 
-    <span class="doccomment">/// The maximum length of postgres identifiers, in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Reference: &lt;https://www.postgresql.org/docs/12/limits.html&gt;</span>
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">63</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
-
-        <span class="ident">NoAction</span> <span class="op">|</span> <span class="ident">Restrict</span> <span class="op">|</span> <span class="ident">Cascade</span> <span class="op">|</span> <span class="ident">SetNull</span> <span class="op">|</span> <span class="ident">SetDefault</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
-
-        <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="comment">// String</span>
-            <span class="ident">CockroachType::Char</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::CatalogSingleChar</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::String</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::VarBit</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::Uuid</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">CockroachType::Inet</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="comment">// Boolean</span>
-            <span class="ident">CockroachType::Bool</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
-            <span class="comment">// Int</span>
-            <span class="ident">CockroachType::Int2</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">CockroachType::Int4</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">CockroachType::Oid</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="comment">// BigInt</span>
-            <span class="ident">CockroachType::Int8</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
-            <span class="comment">// Float</span>
-            <span class="ident">CockroachType::Float4</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="ident">CockroachType::Float8</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="comment">// Decimal</span>
-            <span class="ident">CockroachType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::Decimal</span>,
-            <span class="comment">// DateTime</span>
-            <span class="ident">CockroachType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">CockroachType::Timestamptz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">CockroachType::Date</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">CockroachType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">CockroachType::Timetz</span>(<span class="kw">_</span>) =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="comment">// Json</span>
-            <span class="ident">CockroachType::JsonB</span> =&gt; <span class="ident">ScalarType::Json</span>,
-            <span class="comment">// Bytes</span>
-            <span class="ident">CockroachType::Bytes</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
+        <span class="kw">match </span>native_type {
+            <span class="comment">// String
+            </span>CockroachType::Char(<span class="kw">_</span>) =&gt; ScalarType::String,
+            CockroachType::CatalogSingleChar =&gt; ScalarType::String,
+            CockroachType::String(<span class="kw">_</span>) =&gt; ScalarType::String,
+            CockroachType::Bit(<span class="kw">_</span>) =&gt; ScalarType::String,
+            CockroachType::VarBit(<span class="kw">_</span>) =&gt; ScalarType::String,
+            CockroachType::Uuid =&gt; ScalarType::String,
+            CockroachType::Inet =&gt; ScalarType::String,
+            <span class="comment">// Boolean
+            </span>CockroachType::Bool =&gt; ScalarType::Boolean,
+            <span class="comment">// Int
+            </span>CockroachType::Int2 =&gt; ScalarType::Int,
+            CockroachType::Int4 =&gt; ScalarType::Int,
+            CockroachType::Oid =&gt; ScalarType::Int,
+            <span class="comment">// BigInt
+            </span>CockroachType::Int8 =&gt; ScalarType::BigInt,
+            <span class="comment">// Float
+            </span>CockroachType::Float4 =&gt; ScalarType::Float,
+            CockroachType::Float8 =&gt; ScalarType::Float,
+            <span class="comment">// Decimal
+            </span>CockroachType::Decimal(<span class="kw">_</span>) =&gt; ScalarType::Decimal,
+            <span class="comment">// DateTime
+            </span>CockroachType::Timestamp(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            CockroachType::Timestamptz(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            CockroachType::Date =&gt; ScalarType::DateTime,
+            CockroachType::Time(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            CockroachType::Timetz(<span class="kw">_</span>) =&gt; ScalarType::DateTime,
+            <span class="comment">// Json
+            </span>CockroachType::JsonB =&gt; ScalarType::Json,
+            <span class="comment">// Bytes
+            </span>CockroachType::Bytes =&gt; ScalarType::Bytes,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">SCALAR_TYPE_DEFAULTS</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">st</span> <span class="op">==</span> <span class="ident">scalar_type</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">native_type</span>)<span class="op">|</span> <span class="ident">native_type</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS&quot;</span>, <span class="ident">scalar_type</span>))
-            .<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+        <span class="kw">let </span>native_type = SCALAR_TYPE_DEFAULTS
+            .iter()
+            .find(|(st, <span class="kw">_</span>)| st == scalar_type)
+            .map(|(<span class="kw">_</span>, native_type)| native_type)
+            .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;Could not find scalar type {:?} in SCALAR_TYPE_DEFAULTS&quot;</span>, scalar_type))
+            .unwrap();
 
-        <span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span>(<span class="kw-2">*</span><span class="ident">native_type</span>)
+        NativeTypeInstance::new::&lt;CockroachType&gt;(<span class="kw-2">*</span>native_type)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+        native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool {
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>CockroachType = native_type.downcast_ref();
 
-        <span class="ident">SCALAR_TYPE_DEFAULTS</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">st</span>, <span class="ident">nt</span>)<span class="op">|</span> <span class="ident">scalar_type</span> <span class="op">==</span> <span class="ident">st</span> <span class="op">&amp;&amp;</span> <span class="ident">native_type</span> <span class="op">==</span> <span class="ident">nt</span>)
+        SCALAR_TYPE_DEFAULTS
+            .iter()
+            .any(|(st, nt)| scalar_type == st &amp;&amp; native_type == nt)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span>().<span class="ident">to_parts</span>()
+    <span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;) {
+        native_type.downcast_ref::&lt;CockroachType&gt;().to_parts()
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(
+    <span class="kw">fn </span>validate_native_type_arguments(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type_instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="ident">span</span>: <span class="ident">ast::Span</span>,
-        <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        native_type_instance: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        _scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+        span: ast::Span,
+        errors: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">native_type_instance</span>.<span class="ident">downcast_ref</span>();
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="ident">native_type_instance</span>);
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>CockroachType = native_type_instance.downcast_ref();
+        <span class="kw">let </span>error = <span class="self">self</span>.native_instance_error(native_type_instance);
 
-        <span class="kw">match</span> <span class="ident">native_type</span> {
-            <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>(<span class="ident">span</span>))
+        <span class="kw">match </span>native_type {
+            CockroachType::Decimal(<span class="prelude-val">Some</span>((precision, scale))) <span class="kw">if </span>scale &gt; precision =&gt; {
+                errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            <span class="ident">CockroachType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">prec</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">prec</span> <span class="op">&gt;</span> <span class="number">1000</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">prec</span> <span class="op">==</span> <span class="number">0</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(
+            CockroachType::Decimal(<span class="prelude-val">Some</span>((prec, <span class="kw">_</span>))) <span class="kw">if </span><span class="kw-2">*</span>prec &gt; <span class="number">1000 </span>|| <span class="kw-2">*</span>prec == <span class="number">0 </span>=&gt; {
+                errors.push_error(error.new_argument_m_out_of_range_error(
                     <span class="string">&quot;Precision must be positive with a maximum value of 1000.&quot;</span>,
-                    <span class="ident">span</span>,
+                    span,
                 ))
             }
-            <span class="ident">CockroachType::Bit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) <span class="op">|</span> <span class="ident">CockroachType::VarBit</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M must be a positive integer.&quot;</span>, <span class="ident">span</span>))
+            CockroachType::Bit(<span class="prelude-val">Some</span>(<span class="number">0</span>)) | CockroachType::VarBit(<span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; {
+                errors.push_error(error.new_argument_m_out_of_range_error(<span class="string">&quot;M must be a positive integer.&quot;</span>, span))
             }
-            <span class="ident">CockroachType::Timestamp</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
-            <span class="op">|</span> <span class="ident">CockroachType::Timestamptz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
-            <span class="op">|</span> <span class="ident">CockroachType::Time</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
-            <span class="op">|</span> <span class="ident">CockroachType::Timetz</span>(<span class="prelude-val">Some</span>(<span class="ident">p</span>))
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">p</span> <span class="op">&gt;</span> <span class="number">6</span> =&gt;
+            CockroachType::Timestamp(<span class="prelude-val">Some</span>(p))
+            | CockroachType::Timestamptz(<span class="prelude-val">Some</span>(p))
+            | CockroachType::Time(<span class="prelude-val">Some</span>(p))
+            | CockroachType::Timetz(<span class="prelude-val">Some</span>(p))
+                <span class="kw">if </span><span class="kw-2">*</span>p &gt; <span class="number">6 </span>=&gt;
             {
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 6.&quot;</span>, <span class="ident">span</span>))
+                errors.push_error(error.new_argument_m_out_of_range_error(<span class="string">&quot;M can range from 0 to 6.&quot;</span>, span))
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-        <span class="ident">validations::autoincrement_validations</span>(<span class="ident">model</span>, <span class="ident">diagnostics</span>);
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) {
+        validations::autoincrement_validations(model, diagnostics);
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="ident">validations::inverted_index_validations</span>(<span class="ident">index</span>, <span class="ident">diagnostics</span>);
+        <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+            validations::inverted_index_validations(index, diagnostics);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_scalar_field_unknown_default_functions</span>(
+    <span class="kw">fn </span>validate_scalar_field_unknown_default_functions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">parser_database::ParserDatabase</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        db: <span class="kw-2">&amp;</span>parser_database::ParserDatabase,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
-        <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_scalar_field_defaults_with_unknown_function</span>() {
-            <span class="kw">let</span> (<span class="ident">func_name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="ident">d</span>.<span class="ident">value</span>().<span class="ident">as_function</span>().<span class="ident">unwrap</span>();
-            <span class="kw">match</span> <span class="ident">func_name</span> {
-                <span class="string">&quot;sequence&quot;</span> =&gt; {
-                    <span class="ident">SequenceFunction::validate</span>(<span class="ident">args</span>, <span class="ident">diagnostics</span>);
+        <span class="kw">for </span>d <span class="kw">in </span>db.walk_scalar_field_defaults_with_unknown_function() {
+            <span class="kw">let </span>(func_name, args, span) = d.value().as_function().unwrap();
+            <span class="kw">match </span>func_name {
+                <span class="string">&quot;sequence&quot; </span>=&gt; {
+                    SequenceFunction::validate(args, diagnostics);
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_default_unknown_function</span>(<span class="ident">func_name</span>, <span class="ident">span</span>)),
+                <span class="kw">_ </span>=&gt; diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span)),
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
-        <span class="ident">CONSTRAINT_SCOPES</span>
+    <span class="kw">fn </span>constraint_violation_scopes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
-        <span class="ident">native_types::CONSTRUCTORS</span>
+    <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
+        native_types::CONSTRUCTORS
     }
 
-    <span class="kw">fn</span> <span class="ident">supported_index_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
-        <span class="ident">BitFlags::empty</span>() <span class="op">|</span> <span class="ident">IndexAlgorithm::BTree</span> <span class="op">|</span> <span class="ident">IndexAlgorithm::Gin</span>
+    <span class="kw">fn </span>supported_index_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;IndexAlgorithm&gt; {
+        BitFlags::empty() | IndexAlgorithm::BTree | IndexAlgorithm::Gin
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">ast::Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">CockroachType::from_parts</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">CockroachType</span><span class="op">&gt;</span>(<span class="ident">native_type</span>))
+        name: <span class="kw-2">&amp;</span>str,
+        args: <span class="kw-2">&amp;</span>[String],
+        span: ast::Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="kw">let </span>native_type = CockroachType::from_parts(name, args, span, diagnostics)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(NativeTypeInstance::new::&lt;CockroachType&gt;(native_type))
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type_name</span>: <span class="ident">String</span>, <span class="ident">native_type_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">native_type_name</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;uuid&quot;</span>) =&gt; <span class="string">&quot;Uuid&quot;</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">scalar_type_name</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>scalar_filter_name(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type_name: String, native_type_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="kw">match </span>native_type_name {
+            <span class="prelude-val">Some</span>(name) <span class="kw">if </span>name.eq_ignore_ascii_case(<span class="string">&quot;uuid&quot;</span>) =&gt; <span class="string">&quot;Uuid&quot;</span>.into(),
+            <span class="kw">_ </span>=&gt; scalar_type_name.into(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">string_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input_object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">StringFilter</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">input_object_name</span> {
-            <span class="string">&quot;Uuid&quot;</span> =&gt; <span class="ident">BitFlags::empty</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">BitFlags::all</span>(),
+    <span class="kw">fn </span>string_filters(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object_name: <span class="kw-2">&amp;</span>str) -&gt; BitFlags&lt;StringFilter&gt; {
+        <span class="kw">match </span>input_object_name {
+            <span class="string">&quot;Uuid&quot; </span>=&gt; BitFlags::empty(),
+            <span class="kw">_ </span>=&gt; BitFlags::all(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgres://&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;postgresql://&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `postgresql://` or `postgres://`.&quot;</span>.<span class="ident">to_owned</span>());
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span>!url.starts_with(<span class="string">&quot;postgres://&quot;</span>) &amp;&amp; !url.starts_with(<span class="string">&quot;postgresql://&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `postgresql://` or `postgres://`.&quot;</span>.to_owned());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">push_completions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>, <span class="ident">position</span>: <span class="ident">SchemaPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">completions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompletionList</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::SchemaPosition::Model</span>(
+    <span class="kw">fn </span>push_completions(<span class="kw-2">&amp;</span><span class="self">self</span>, _db: <span class="kw-2">&amp;</span>ParserDatabase, position: SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt;, completions: <span class="kw-2">&amp;mut </span>CompletionList) {
+        <span class="kw">if let </span>ast::SchemaPosition::Model(
             <span class="kw">_</span>,
-            <span class="ident">ast::ModelPosition::ModelAttribute</span>(<span class="string">&quot;index&quot;</span>, <span class="kw">_</span>, <span class="ident">ast::AttributePosition::Argument</span>(<span class="string">&quot;type&quot;</span>)),
-        ) <span class="op">=</span> <span class="ident">position</span>
+            ast::ModelPosition::ModelAttribute(<span class="string">&quot;index&quot;</span>, <span class="kw">_</span>, ast::AttributePosition::Argument(<span class="string">&quot;type&quot;</span>)),
+        ) = position
         {
-            <span class="kw">for</span> <span class="ident">index_type</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">supported_index_types</span>() {
-                <span class="ident">completions</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">CompletionItem</span> {
-                    <span class="ident">label</span>: <span class="ident">index_type</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CompletionItemKind::ENUM</span>),
-                    <span class="ident">detail</span>: <span class="prelude-val">Some</span>(<span class="ident">index_type</span>.<span class="ident">documentation</span>().<span class="ident">to_owned</span>()),
-                    ..<span class="ident">Default::default</span>()
+            <span class="kw">for </span>index_type <span class="kw">in </span><span class="self">self</span>.supported_index_types() {
+                completions.items.push(CompletionItem {
+                    label: index_type.to_string(),
+                    kind: <span class="prelude-val">Some</span>(CompletionItemKind::ENUM),
+                    detail: <span class="prelude-val">Some</span>(index_type.documentation().to_owned()),
+                    ..Default::default()
                 });
             }
         }
     }
 }
 
-<span class="doccomment">/// An `@default(sequence())` function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SequenceFunction</span> {
-    <span class="kw">pub</span> <span class="ident">r#virtual</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">cache</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">increment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">min_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">max_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An `@default(sequence())` function.
+</span><span class="attribute">#[derive(Default, Debug)]
+</span><span class="kw">pub struct </span>SequenceFunction {
+    <span class="kw">pub </span>r#virtual: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub </span>cache: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>increment: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>min_value: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>max_value: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>start: <span class="prelude-ty">Option</span>&lt;i64&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SequenceFunction</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_unchecked</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ast::ArgumentsList</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::validate</span>(<span class="ident">args</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics::default</span>())
+<span class="kw">impl </span>SequenceFunction {
+    <span class="kw">pub fn </span>build_unchecked(args: <span class="kw-2">&amp;</span>ast::ArgumentsList) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::validate(args, <span class="kw-2">&amp;mut </span>Diagnostics::default())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ast::ArgumentsList</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident">SequenceFunction::default</span>();
+    <span class="kw">pub fn </span>validate(args: <span class="kw-2">&amp;</span>ast::ArgumentsList, diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>this = SequenceFunction::default();
 
-        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">arguments</span> {
-            <span class="kw">match</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) {
-                <span class="prelude-val">Some</span>(<span class="string">&quot;virtual&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">r#virtual</span> <span class="op">=</span> <span class="ident">coerce::boolean</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">cache</span> <span class="op">=</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;increment&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">increment</span> <span class="op">=</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;minValue&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">min_value</span> <span class="op">=</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;maxValue&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">max_value</span> <span class="op">=</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="string">&quot;start&quot;</span>) =&gt; <span class="ident">this</span>.<span class="ident">start</span> <span class="op">=</span> <span class="ident">coerce::integer</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">diagnostics</span>),
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+        <span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;</span>args.arguments {
+            <span class="kw">match </span>arg.name.as_ref().map(|arg| arg.name.as_str()) {
+                <span class="prelude-val">Some</span>(<span class="string">&quot;virtual&quot;</span>) =&gt; this.r#virtual = coerce::boolean(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>) =&gt; this.cache = coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;increment&quot;</span>) =&gt; this.increment = coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;minValue&quot;</span>) =&gt; this.min_value = coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;maxValue&quot;</span>) =&gt; this.max_value = coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="string">&quot;start&quot;</span>) =&gt; this.start = coerce::integer(<span class="kw-2">&amp;</span>arg.value, diagnostics),
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) | <span class="prelude-val">None </span>=&gt; diagnostics.push_error(DatamodelError::new_static(
                     <span class="string">&quot;Unexpected argument in `sequence()` function call&quot;</span>,
-                    <span class="ident">arg</span>.<span class="ident">span</span>,
+                    arg.span,
                 )),
             }
         }
 
-        <span class="ident">this</span>
+        this
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

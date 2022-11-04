@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -829,836 +829,836 @@
 <span id="829">829</span>
 <span id="830">830</span>
 <span id="831">831</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A set of functions providing markup source code to HTML renderer, that make</span>
-<span class="doccomment">//! hyperlinks clickable.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A set of functions providing markup source code to HTML renderer, that make
+//! hyperlinks clickable.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::iterator::Hyperlink</span>;
-<span class="kw">use</span> <span class="ident">html_escape::encode_double_quoted_attribute</span>;
-<span class="kw">use</span> <span class="ident">html_escape::encode_safe</span>;
-<span class="kw">use</span> <span class="ident">html_escape::encode_text</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::iterator::Hyperlink;
+<span class="kw">use </span>html_escape::encode_double_quoted_attribute;
+<span class="kw">use </span>html_escape::encode_safe;
+<span class="kw">use </span>html_escape::encode_text;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::io::Write;
 
-<span class="kw">fn</span> <span class="ident">render</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">P</span>, <span class="ident">W</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">begin_doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">end_doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">verb_renderer</span>: <span class="ident">O</span>,
-    <span class="ident">link_renderer</span>: <span class="ident">P</span>,
-    <span class="ident">render_label</span>: <span class="ident">bool</span>,
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="ident">Fn</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">P</span>: <span class="ident">Fn</span>((<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, (<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">String</span>))) -&gt; <span class="ident">String</span>,
-    <span class="ident">W</span>: <span class="ident">Write</span>,
+<span class="kw">fn </span>render&lt;<span class="lifetime">&#39;a</span>, O, P, W&gt;(
+    input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    begin_doc: <span class="kw-2">&amp;</span>str,
+    end_doc: <span class="kw-2">&amp;</span>str,
+    verb_renderer: O,
+    link_renderer: P,
+    render_label: bool,
+    output: <span class="kw-2">&amp;mut </span>W,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt;
+<span class="kw">where
+    </span>O: Fn(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    P: Fn((Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, (String, String, String))) -&gt; String,
+    W: Write,
 {
-    <span class="comment">// As this will be overwritten inside the loop, the first value only counts</span>
-    <span class="comment">// when there are no hyperlinks in the input. In this case we print the</span>
-    <span class="comment">// input as a whole.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rest</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">input</span>);
+    <span class="comment">// As this will be overwritten inside the loop, the first value only counts
+    // when there are no hyperlinks in the input. In this case we print the
+    // input as a whole.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>rest = Cow::Borrowed(input);
 
-    <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">begin_doc</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-    <span class="kw">for</span> ((<span class="ident">skipped2</span>, <span class="ident">consumed2</span>, <span class="ident">remaining2</span>), (<span class="ident">text2</span>, <span class="ident">dest2</span>, <span class="ident">title2</span>)) <span class="kw">in</span>
-        <span class="ident">Hyperlink::new</span>(<span class="ident">input</span>, <span class="ident">render_label</span>)
+    output.write_all(begin_doc.as_bytes())<span class="question-mark">?</span>;
+    <span class="kw">for </span>((skipped2, consumed2, remaining2), (text2, dest2, title2)) <span class="kw">in
+        </span>Hyperlink::new(input, render_label)
     {
-        <span class="kw">let</span> <span class="ident">skipped</span> <span class="op">=</span> <span class="ident">encode_text</span>(<span class="ident">skipped2</span>);
-        <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="ident">encode_text</span>(<span class="ident">consumed2</span>);
-        <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">encode_text</span>(<span class="ident">remaining2</span>);
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">encode_safe</span>(<span class="kw-2">&amp;</span><span class="ident">text2</span>).<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">dest</span> <span class="op">=</span> <span class="ident">encode_double_quoted_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">dest2</span>).<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">title</span> <span class="op">=</span> <span class="ident">encode_double_quoted_attribute</span>(<span class="kw-2">&amp;</span><span class="ident">title2</span>).<span class="ident">to_string</span>();
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">verb_renderer</span>(<span class="ident">skipped</span>).<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">rendered_link</span> <span class="op">=</span> <span class="ident">link_renderer</span>((<span class="ident">consumed</span>, (<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>)));
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">rendered_link</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-        <span class="ident">rest</span> <span class="op">=</span> <span class="ident">remaining</span>;
+        <span class="kw">let </span>skipped = encode_text(skipped2);
+        <span class="kw">let </span>consumed = encode_text(consumed2);
+        <span class="kw">let </span>remaining = encode_text(remaining2);
+        <span class="kw">let </span>text = encode_safe(<span class="kw-2">&amp;</span>text2).to_string();
+        <span class="kw">let </span>dest = encode_double_quoted_attribute(<span class="kw-2">&amp;</span>dest2).to_string();
+        <span class="kw">let </span>title = encode_double_quoted_attribute(<span class="kw-2">&amp;</span>title2).to_string();
+        output.write_all(verb_renderer(skipped).as_bytes())<span class="question-mark">?</span>;
+        <span class="kw">let </span>rendered_link = link_renderer((consumed, (text, dest, title)));
+        output.write_all(rendered_link.as_bytes())<span class="question-mark">?</span>;
+        rest = remaining;
     }
-    <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">verb_renderer</span>(<span class="ident">rest</span>).<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-    <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="ident">end_doc</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
+    output.write_all(verb_renderer(rest).as_bytes())<span class="question-mark">?</span>;
+    output.write_all(end_doc.as_bytes())<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// # Source code viewer with link renderer</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Text to HTML renderer that prints the input text “as it is”, but</span>
-<span class="doccomment">/// renders links with markup. Links are clickable and only their</span>
-<span class="doccomment">/// _link text_ is shown (the part enclosed with `&lt;a&gt;` and `&lt;/a&gt;`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Markdown</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc</span>
-<span class="doccomment">/// abc[text1][label1]abc</span>
-<span class="doccomment">/// abc[text2](dest2 &quot;title2&quot;)abc</span>
-<span class="doccomment">/// [text3]: dest3 &quot;title3&quot;</span>
-<span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-<span class="doccomment">/// abc[text3]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]: dest3 &amp;quot;title3&amp;quot;&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[label1]: dest1 &amp;quot;title1&amp;quot;&lt;/a&gt;</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;text3&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">/// let res = text_links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]: dest3 &amp;quot;title3&amp;quot;&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[label1]: dest1 &amp;quot;title1&amp;quot;&lt;/a&gt;</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;text3&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## reStructuredText</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc `text1 &lt;label1_&gt;`_abc</span>
-<span class="doccomment">/// abc text2_ abc</span>
-<span class="doccomment">/// abc text3__ abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc text5__ abc</span>
-<span class="doccomment">/// .. _label1: dest1</span>
-<span class="doccomment">/// .. _text2: dest2</span>
-<span class="doccomment">/// .. __: dest3</span>
-<span class="doccomment">/// __ dest5</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5&lt;/a&gt; abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;.. _label1: dest1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;.. _text2: dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;.. __: dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;__ dest5&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;\</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5&lt;/a&gt; abc</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;.. _label1: dest1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;.. _text2: dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;.. __: dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;__ dest5&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Asciidoc</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc https://dest0[text0]abc</span>
-<span class="doccomment">/// abc link:https://dest1[text1]abc</span>
-<span class="doccomment">/// abc{label2}[text2]abc</span>
-<span class="doccomment">/// abc{label3}abc</span>
-<span class="doccomment">/// :label2: https://dest2</span>
-<span class="doccomment">/// :label3: https://dest3</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;:label2: https:&amp;#x2F;&amp;#x2F;dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;:label3: https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;:label2: https:&amp;#x2F;&amp;#x2F;dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;:label3: https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Wikitext</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[https://dest0 text0]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## HTML</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// HTML _inline links_ are sanitized and passed through.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;&lt;pre&gt;\</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc\</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_links2html</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">text_links2html_writer</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output</span>).<span class="ident">unwrap_or_default</span>();
-    <span class="comment">// We know this is safe, because only `str` have been written into `output`.</span>
-    <span class="comment">// So the following would be fine, but I want to keep this crate `unsafe`-free.</span>
-    <span class="comment">//    unsafe {String::from_utf8_unchecked(output)}</span>
-    <span class="ident">String::from_utf8</span>(<span class="ident">output</span>).<span class="ident">unwrap_or_default</span>()
+<span class="doccomment">/// # Source code viewer with link renderer
+///
+/// Text to HTML renderer that prints the input text “as it is”, but
+/// renders links with markup. Links are clickable and only their
+/// _link text_ is shown (the part enclosed with `&lt;a&gt;` and `&lt;/a&gt;`).
+///
+/// ## Markdown
+/// ```
+/// use parse_hyperlinks::renderer::text_links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc
+/// abc[text1][label1]abc
+/// abc[text2](dest2 &quot;title2&quot;)abc
+/// [text3]: dest3 &quot;title3&quot;
+/// [label1]: dest1 &quot;title1&quot;
+/// abc[text3]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc&lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;text0&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;abc
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]: dest3 &amp;quot;title3&amp;quot;&lt;/a&gt;
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[label1]: dest1 &amp;quot;title1&amp;quot;&lt;/a&gt;
+/// abc&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;text3&lt;/a&gt;abc
+/// &lt;/pre&gt;&quot;;
+/// let res = text_links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc&lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;text0&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc
+/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]: dest3 &amp;quot;title3&amp;quot;&lt;/a&gt;
+/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[label1]: dest1 &amp;quot;title1&amp;quot;&lt;/a&gt;
+/// abc&lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;text3&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+/// ## reStructuredText
+/// ```
+/// use parse_hyperlinks::renderer::text_links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc `text1 &lt;label1_&gt;`_abc
+/// abc text2_ abc
+/// abc text3__ abc
+/// abc text_label4_ abc
+/// abc text5__ abc
+/// .. _label1: dest1
+/// .. _text2: dest2
+/// .. __: dest3
+/// __ dest5
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc
+/// abc &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt; abc
+/// abc &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3&lt;/a&gt; abc
+/// abc text_label4_ abc
+/// abc &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5&lt;/a&gt; abc
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;.. _label1: dest1&lt;/a&gt;
+/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;.. _text2: dest2&lt;/a&gt;
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;.. __: dest3&lt;/a&gt;
+/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;__ dest5&lt;/a&gt;
+/// &lt;/pre&gt;\
+/// &quot;;
+///
+/// let res = text_links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;abc
+/// abc &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt; abc
+/// abc &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3&lt;/a&gt; abc
+/// abc text_label4_ abc
+/// abc &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5&lt;/a&gt; abc
+/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;.. _label1: dest1&lt;/a&gt;
+/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;.. _text2: dest2&lt;/a&gt;
+/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;.. __: dest3&lt;/a&gt;
+/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;__ dest5&lt;/a&gt;
+/// &lt;/pre&gt;
+///
+/// ## Asciidoc
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc https://dest0[text0]abc
+/// abc link:https://dest1[text1]abc
+/// abc{label2}[text2]abc
+/// abc{label3}abc
+/// :label2: https://dest2
+/// :label3: https://dest3
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;abc
+/// abc &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;abc
+/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;:label2: https:&amp;#x2F;&amp;#x2F;dest2&lt;/a&gt;
+/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;:label3: https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;abc
+/// abc &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;abc
+/// abc&lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;abc
+/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;:label2: https:&amp;#x2F;&amp;#x2F;dest2&lt;/a&gt;
+/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;:label3: https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;
+/// &lt;/pre&gt;
+///
+///
+/// ## Wikitext
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[https://dest0 text0]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc&lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;abc
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc&lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+///
+/// ## HTML
+///
+/// HTML _inline links_ are sanitized and passed through.
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc&quot;#;
+///
+/// let expected = &quot;&lt;pre&gt;\
+/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;abc\
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;
+/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>text_links2html(input: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
+    text_links2html_writer(input, <span class="kw-2">&amp;mut </span>output).unwrap_or_default();
+    <span class="comment">// We know this is safe, because only `str` have been written into `output`.
+    // So the following would be fine, but I want to keep this crate `unsafe`-free.
+    //    unsafe {String::from_utf8_unchecked(output)}
+    </span>String::from_utf8(output).unwrap_or_default()
 }
 
-<span class="doccomment">/// # Source code viewer with link renderer</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Same as `text_links2html()`, but it uses `Write` for output. This function</span>
-<span class="doccomment">/// allocates much less memory and is faster because it avoids copying.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Usage example:</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_links2html_writer;</span>
-<span class="doccomment">/// use std::io;</span>
-<span class="doccomment">/// use std::io::Read;</span>
-<span class="doccomment">/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {</span>
-<span class="doccomment">///     let mut stdin = String::new();</span>
-<span class="doccomment">///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     text_links2html_writer(&amp;stdin, &amp;mut io::stdout())?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_links2html_writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">S</span>,
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// # Source code viewer with link renderer
+///
+/// Same as `text_links2html()`, but it uses `Write` for output. This function
+/// allocates much less memory and is faster because it avoids copying.
+///
+/// Usage example:
+/// ```no_run
+/// use parse_hyperlinks::renderer::text_links2html_writer;
+/// use std::io;
+/// use std::io::Read;
+/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {
+///     let mut stdin = String::new();
+///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;
+///
+///     text_links2html_writer(&amp;stdin, &amp;mut io::stdout())?;
+///
+///     Ok(())
+/// }
+/// ```
+</span><span class="kw">pub fn </span>text_links2html_writer&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a </span>+ AsRef&lt;str&gt;, W: Write&gt;(
+    input: S,
+    output: <span class="kw-2">&amp;mut </span>W,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">let </span>input = input.as_ref();
 
-    <span class="kw">let</span> <span class="ident">verb_renderer</span> <span class="op">=</span> <span class="op">|</span><span class="ident">verb</span><span class="op">|</span> <span class="ident">verb</span>;
+    <span class="kw">let </span>verb_renderer = |verb| verb;
 
-    <span class="kw">let</span> <span class="ident">link_renderer</span> <span class="op">=</span> <span class="op">|</span>(<span class="kw">_</span>, (<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>)): (<span class="kw">_</span>, (<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">String</span>))<span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dest</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">title</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">text</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&lt;/a&gt;&quot;#</span>);
-        <span class="ident">s</span>
+    <span class="kw">let </span>link_renderer = |(<span class="kw">_</span>, (text, dest, title)): (<span class="kw">_</span>, (String, String, String))| {
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        s.push_str(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>dest);
+        s.push_str(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>title);
+        s.push_str(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>text);
+        s.push_str(<span class="string">r#&quot;&lt;/a&gt;&quot;#</span>);
+        s
     };
 
-    <span class="ident">render</span>(
-        <span class="ident">input</span>,
+    render(
+        input,
         <span class="string">&quot;&lt;pre&gt;&quot;</span>,
         <span class="string">&quot;&lt;/pre&gt;&quot;</span>,
-        <span class="ident">verb_renderer</span>,
-        <span class="ident">link_renderer</span>,
+        verb_renderer,
+        link_renderer,
         <span class="bool-val">true</span>,
-        <span class="ident">output</span>,
+        output,
     )
 }
 
-<span class="doccomment">/// # Markup source code viewer</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Markup source code viewer, that make hyperlinks</span>
-<span class="doccomment">/// clickable in your web-browser.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function prints the input text “as it is”, but</span>
-<span class="doccomment">/// renders links with markup. Links are clickable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Markdown</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc</span>
-<span class="doccomment">/// abc[text1][label1]abc</span>
-<span class="doccomment">/// abc[text2](dest2 &quot;title2&quot;)abc</span>
-<span class="doccomment">/// [text3]: dest3 &quot;title3&quot;</span>
-<span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-<span class="doccomment">/// abc[text3]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;[text0](dest0 \&quot;title0\&quot;)&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[text1][label1]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;[text2](dest2 \&quot;title2\&quot;)&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]: dest3 \&quot;title3\&quot;&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[label1]: dest1 \&quot;title1\&quot;&lt;/a&gt;</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_rawlinks2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;[text0](dest0 &quot;title0&quot;)&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[text1][label1]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;[text2](dest2 &quot;title2&quot;)&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]: dest3 &quot;title3&quot;&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[label1]: dest1 &quot;title1&quot;&lt;/a&gt;</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## reStructuredText</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;</span>
-<span class="doccomment">/// abc `text1 &lt;label1_&gt;`_abc</span>
-<span class="doccomment">/// abc text2_ abc</span>
-<span class="doccomment">/// abc text3__ abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc text5__ abc</span>
-<span class="doccomment">/// .. _label1: dest1</span>
-<span class="doccomment">/// .. _text2: dest2</span>
-<span class="doccomment">/// .. __: dest3</span>
-<span class="doccomment">/// __ dest5</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;`text1 &amp;lt;label1_&amp;gt;`_&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2_&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3__&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5__&lt;/a&gt; abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;.. _label1: dest1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;.. _text2: dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;.. __: dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;__ dest5&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_rawlinks2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text look likes in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;`text1 &amp;lt;label1_&amp;gt;`_&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2_&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3__&lt;/a&gt; abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5__&lt;/a&gt; abc</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;.. _label1: dest1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;.. _text2: dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;.. __: dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;__ dest5&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Asciidoc</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc https://dest0[text0]abc</span>
-<span class="doccomment">/// abc link:https://dest1[text1]abc</span>
-<span class="doccomment">/// abc{label2}[text2]abc</span>
-<span class="doccomment">/// abc{label3}abc</span>
-<span class="doccomment">/// :label2: https://dest2</span>
-<span class="doccomment">/// :label3: https://dest3</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;https://dest0[text0]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;link:https://dest1[text1]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;{label2}[text2]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;{label3}&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;:label2: https://dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;:label3: https://dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_rawlinks2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;https://dest0[text0]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;link:https://dest1[text1]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;{label2}[text2]&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;{label3}&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;:label2: https://dest2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;:label3: https://dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Wikitext</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[https://dest0 text0]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;[https://dest0 text0]&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_rawlinks2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;[https://dest0 text0]&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## HTML</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// HTML _inline links_ are sanitized and their link</span>
-<span class="doccomment">/// source code is shown as _link text_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;pre&gt;abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;\</span>
-<span class="doccomment">/// &amp;lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&amp;gt;text1&amp;lt;/a&amp;gt;\</span>
-<span class="doccomment">/// &lt;/a&gt;abc&lt;/pre&gt;&quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = text_rawlinks2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;&amp;lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&amp;gt;text1&amp;lt;/a&amp;gt;&lt;/a&gt;abc</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_rawlinks2html</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">text_rawlinks2html_writer</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output</span>).<span class="ident">unwrap_or_default</span>();
-    <span class="comment">// We know this is safe, because only `str` have been written into `output`.</span>
-    <span class="comment">// So the following would be fine, but I want to keep this crate `unsafe`-free.</span>
-    <span class="comment">//    unsafe {String::from_utf8_unchecked(output)}</span>
-    <span class="ident">String::from_utf8</span>(<span class="ident">output</span>).<span class="ident">unwrap_or_default</span>()
+<span class="doccomment">/// # Markup source code viewer
+///
+/// Markup source code viewer, that make hyperlinks
+/// clickable in your web-browser.
+///
+/// This function prints the input text “as it is”, but
+/// renders links with markup. Links are clickable.
+///
+/// ## Markdown
+/// ```
+/// use parse_hyperlinks::renderer::text_rawlinks2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc
+/// abc[text1][label1]abc
+/// abc[text2](dest2 &quot;title2&quot;)abc
+/// [text3]: dest3 &quot;title3&quot;
+/// [label1]: dest1 &quot;title1&quot;
+/// abc[text3]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc&lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;[text0](dest0 \&quot;title0\&quot;)&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[text1][label1]&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;[text2](dest2 \&quot;title2\&quot;)&lt;/a&gt;abc
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]: dest3 \&quot;title3\&quot;&lt;/a&gt;
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;[label1]: dest1 \&quot;title1\&quot;&lt;/a&gt;
+/// abc&lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;[text3]&lt;/a&gt;abc
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_rawlinks2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc&lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;[text0](dest0 &quot;title0&quot;)&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[text1][label1]&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;[text2](dest2 &quot;title2&quot;)&lt;/a&gt;abc
+/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]: dest3 &quot;title3&quot;&lt;/a&gt;
+/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;[label1]: dest1 &quot;title1&quot;&lt;/a&gt;
+/// abc&lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;[text3]&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+/// ## reStructuredText
+/// ```
+/// use parse_hyperlinks::renderer::text_rawlinks2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;
+/// abc `text1 &lt;label1_&gt;`_abc
+/// abc text2_ abc
+/// abc text3__ abc
+/// abc text_label4_ abc
+/// abc text5__ abc
+/// .. _label1: dest1
+/// .. _text2: dest2
+/// .. __: dest3
+/// __ dest5
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;
+/// abc &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;`text1 &amp;lt;label1_&amp;gt;`_&lt;/a&gt;abc
+/// abc &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2_&lt;/a&gt; abc
+/// abc &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3__&lt;/a&gt; abc
+/// abc text_label4_ abc
+/// abc &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5__&lt;/a&gt; abc
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;.. _label1: dest1&lt;/a&gt;
+/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;.. _text2: dest2&lt;/a&gt;
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;.. __: dest3&lt;/a&gt;
+/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;__ dest5&lt;/a&gt;
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_rawlinks2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text look likes in the browser:
+///
+/// &lt;pre&gt;
+/// abc &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;`text1 &amp;lt;label1_&amp;gt;`_&lt;/a&gt;abc
+/// abc &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2_&lt;/a&gt; abc
+/// abc &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3__&lt;/a&gt; abc
+/// abc text_label4_ abc
+/// abc &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5__&lt;/a&gt; abc
+/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;.. _label1: dest1&lt;/a&gt;
+/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;.. _text2: dest2&lt;/a&gt;
+/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;.. __: dest3&lt;/a&gt;
+/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;__ dest5&lt;/a&gt;
+/// &lt;/pre&gt;
+///
+/// ## Asciidoc
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_rawlinks2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc https://dest0[text0]abc
+/// abc link:https://dest1[text1]abc
+/// abc{label2}[text2]abc
+/// abc{label3}abc
+/// :label2: https://dest2
+/// :label3: https://dest3
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;https://dest0[text0]&lt;/a&gt;abc
+/// abc &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;link:https://dest1[text1]&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;{label2}[text2]&lt;/a&gt;abc
+/// abc&lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;{label3}&lt;/a&gt;abc
+/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;:label2: https://dest2&lt;/a&gt;
+/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;:label3: https://dest3&lt;/a&gt;
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_rawlinks2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;https://dest0[text0]&lt;/a&gt;abc
+/// abc &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;link:https://dest1[text1]&lt;/a&gt;abc
+/// abc&lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;{label2}[text2]&lt;/a&gt;abc
+/// abc&lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;{label3}&lt;/a&gt;abc
+/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;:label2: https://dest2&lt;/a&gt;
+/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;:label3: https://dest3&lt;/a&gt;
+/// &lt;/pre&gt;
+///
+///
+/// ## Wikitext
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_rawlinks2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[https://dest0 text0]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc&lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;[https://dest0 text0]&lt;/a&gt;abc
+/// &lt;/pre&gt;&quot;;
+///
+/// let res = text_rawlinks2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;abc&lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;[https://dest0 text0]&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+/// ## HTML
+///
+/// HTML _inline links_ are sanitized and their link
+/// source code is shown as _link text_.
+///
+/// ```
+/// use parse_hyperlinks::renderer::text_rawlinks2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc&quot;#;
+///
+/// let expected = &quot;\
+/// &lt;pre&gt;abc&lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;\
+/// &amp;lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&amp;gt;text1&amp;lt;/a&amp;gt;\
+/// &lt;/a&gt;abc&lt;/pre&gt;&quot;;
+///
+/// let res = text_rawlinks2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;pre&gt;
+/// abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;&amp;lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&amp;gt;text1&amp;lt;/a&amp;gt;&lt;/a&gt;abc
+/// &lt;/pre&gt;
+///
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>text_rawlinks2html(input: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
+    text_rawlinks2html_writer(input, <span class="kw-2">&amp;mut </span>output).unwrap_or_default();
+    <span class="comment">// We know this is safe, because only `str` have been written into `output`.
+    // So the following would be fine, but I want to keep this crate `unsafe`-free.
+    //    unsafe {String::from_utf8_unchecked(output)}
+    </span>String::from_utf8(output).unwrap_or_default()
 }
 
-<span class="doccomment">/// # Markup source code viewer</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Same as `text_rawlinks2html()`, but it uses `Write` for output. This function</span>
-<span class="doccomment">/// allocates much less memory and is faster because it avoids copying.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Usage example:</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::text_rawlinks2html_writer;</span>
-<span class="doccomment">/// use std::io;</span>
-<span class="doccomment">/// use std::io::Read;</span>
-<span class="doccomment">/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {</span>
-<span class="doccomment">///     let mut stdin = String::new();</span>
-<span class="doccomment">///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     text_rawlinks2html_writer(&amp;stdin, &amp;mut io::stdout())?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_rawlinks2html_writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">S</span>,
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// # Markup source code viewer
+///
+/// Same as `text_rawlinks2html()`, but it uses `Write` for output. This function
+/// allocates much less memory and is faster because it avoids copying.
+///
+/// Usage example:
+/// ```no_run
+/// use parse_hyperlinks::renderer::text_rawlinks2html_writer;
+/// use std::io;
+/// use std::io::Read;
+/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {
+///     let mut stdin = String::new();
+///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;
+///
+///     text_rawlinks2html_writer(&amp;stdin, &amp;mut io::stdout())?;
+///
+///     Ok(())
+/// }
+/// ```
+</span><span class="kw">pub fn </span>text_rawlinks2html_writer&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a </span>+ AsRef&lt;str&gt;, W: Write&gt;(
+    input: S,
+    output: <span class="kw-2">&amp;mut </span>W,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">let </span>input = input.as_ref();
 
-    <span class="kw">let</span> <span class="ident">verb_renderer</span> <span class="op">=</span> <span class="op">|</span><span class="ident">verb</span><span class="op">|</span> <span class="ident">verb</span>;
+    <span class="kw">let </span>verb_renderer = |verb| verb;
 
-    <span class="kw">let</span> <span class="ident">link_renderer</span> <span class="op">=</span> <span class="op">|</span>(<span class="ident">consumed</span>, (<span class="kw">_</span>, <span class="ident">dest</span>, <span class="ident">title</span>)): (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, (<span class="kw">_</span>, <span class="ident">String</span>, <span class="ident">String</span>))<span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dest</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">title</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">consumed</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&lt;/a&gt;&quot;#</span>);
-        <span class="ident">s</span>
+    <span class="kw">let </span>link_renderer = |(consumed, (<span class="kw">_</span>, dest, title)): (Cow&lt;str&gt;, (<span class="kw">_</span>, String, String))| {
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        s.push_str(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>dest);
+        s.push_str(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>title);
+        s.push_str(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>consumed);
+        s.push_str(<span class="string">r#&quot;&lt;/a&gt;&quot;#</span>);
+        s
     };
 
-    <span class="ident">render</span>(
-        <span class="ident">input</span>,
+    render(
+        input,
         <span class="string">&quot;&lt;pre&gt;&quot;</span>,
         <span class="string">&quot;&lt;/pre&gt;&quot;</span>,
-        <span class="ident">verb_renderer</span>,
-        <span class="ident">link_renderer</span>,
+        verb_renderer,
+        link_renderer,
         <span class="bool-val">true</span>,
-        <span class="ident">output</span>,
+        output,
     )
 }
 
-<span class="doccomment">/// # Hyperlink extractor</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Text to HTML renderer that prints only links with markup as</span>
-<span class="doccomment">/// a list, one per line. Links are clickable and only their</span>
-<span class="doccomment">/// _link text_ is shown (the part enclosed with `&lt;a&gt;` and `&lt;/a&gt;`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Markdown</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc</span>
-<span class="doccomment">/// abc[text1][label1]abc</span>
-<span class="doccomment">/// abc[text2](dest2 &quot;title2&quot;)abc</span>
-<span class="doccomment">/// [text3]: dest3 &quot;title3&quot;</span>
-<span class="doccomment">/// [label1]: dest1 &quot;title1&quot;</span>
-<span class="doccomment">/// abc[text3]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;text3&lt;/a&gt;</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">/// let res = links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;text3&lt;/a&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## reStructuredText</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;</span>
-<span class="doccomment">/// abc `text1 &lt;label1_&gt;`_abc</span>
-<span class="doccomment">/// abc text2_ abc</span>
-<span class="doccomment">/// abc text3__ abc</span>
-<span class="doccomment">/// abc text_label4_ abc</span>
-<span class="doccomment">/// abc text5__ abc</span>
-<span class="doccomment">/// .. _label1: dest1</span>
-<span class="doccomment">/// .. _text2: dest2</span>
-<span class="doccomment">/// .. __: dest3</span>
-<span class="doccomment">/// __ dest5</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5&lt;/a&gt;</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5&lt;/a&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Asciidoc</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc https://dest0[text0]abc</span>
-<span class="doccomment">/// abc link:https://dest1[text1]abc</span>
-<span class="doccomment">/// abc{label2}[text2]abc</span>
-<span class="doccomment">/// abc{label3}abc</span>
-<span class="doccomment">/// :label2: https://dest2</span>
-<span class="doccomment">/// :label3: https://dest3</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Wikitext</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc[https://dest0 text0]abc</span>
-<span class="doccomment">/// &quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## HTML</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// HTML _inline links_ are sanitized and listed, one per line.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc</span>
-<span class="doccomment">/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc&quot;#;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = &quot;\</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">/// &quot;;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let res = links2html(i);</span>
-<span class="doccomment">/// assert_eq!(res, expected);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ### Rendered text</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is how the rendered text looks like in the browser:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;</span>
-<span class="doccomment">/// &lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">links2html</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">links2html_writer</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output</span>).<span class="ident">unwrap_or_default</span>();
-    <span class="comment">// We know this is safe, because only `str` have been written into `output`.</span>
-    <span class="comment">// So the following would be fine, but I want to keep this crate `unsafe`-free.</span>
-    <span class="comment">//    unsafe {String::from_utf8_unchecked(output)}</span>
-    <span class="ident">String::from_utf8</span>(<span class="ident">output</span>).<span class="ident">unwrap_or_default</span>()
+<span class="doccomment">/// # Hyperlink extractor
+///
+/// Text to HTML renderer that prints only links with markup as
+/// a list, one per line. Links are clickable and only their
+/// _link text_ is shown (the part enclosed with `&lt;a&gt;` and `&lt;/a&gt;`).
+///
+/// ## Markdown
+/// ```
+/// use parse_hyperlinks::renderer::links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[text0](dest0 &quot;title0&quot;)abc
+/// abc[text1][label1]abc
+/// abc[text2](dest2 &quot;title2&quot;)abc
+/// [text3]: dest3 &quot;title3&quot;
+/// [label1]: dest1 &quot;title1&quot;
+/// abc[text3]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;a href=\&quot;dest0\&quot; title=\&quot;title0\&quot;&gt;text0&lt;/a&gt;
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;title3\&quot;&gt;text3&lt;/a&gt;
+/// &quot;;
+/// let res = links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;a href=&quot;dest0&quot; title=&quot;title0&quot;&gt;text0&lt;/a&gt;
+/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=&quot;dest3&quot; title=&quot;title3&quot;&gt;text3&lt;/a&gt;
+///
+///
+/// ## reStructuredText
+/// ```
+/// use parse_hyperlinks::renderer::links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;
+/// abc `text1 &lt;label1_&gt;`_abc
+/// abc text2_ abc
+/// abc text3__ abc
+/// abc text_label4_ abc
+/// abc text5__ abc
+/// .. _label1: dest1
+/// .. _text2: dest2
+/// .. __: dest3
+/// __ dest5
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=\&quot;dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=\&quot;dest3\&quot; title=\&quot;\&quot;&gt;text3&lt;/a&gt;
+/// &lt;a href=\&quot;dest5\&quot; title=\&quot;\&quot;&gt;text5&lt;/a&gt;
+/// &quot;;
+///
+/// let res = links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;a href=&quot;dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=&quot;dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=&quot;dest3&quot; title=&quot;&quot;&gt;text3&lt;/a&gt;
+/// &lt;a href=&quot;dest5&quot; title=&quot;&quot;&gt;text5&lt;/a&gt;
+///
+///
+/// ## Asciidoc
+///
+/// ```
+/// use parse_hyperlinks::renderer::links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc https://dest0[text0]abc
+/// abc link:https://dest1[text1]abc
+/// abc{label2}[text2]abc
+/// abc{label3}abc
+/// :label2: https://dest2
+/// :label3: https://dest3
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;
+/// &lt;a href=\&quot;https://dest1\&quot; title=\&quot;\&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=\&quot;https://dest2\&quot; title=\&quot;\&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=\&quot;https://dest3\&quot; title=\&quot;\&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;
+/// &quot;;
+///
+/// let res = links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;
+/// &lt;a href=&quot;https://dest1&quot; title=&quot;&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=&quot;https://dest2&quot; title=&quot;&quot;&gt;text2&lt;/a&gt;
+/// &lt;a href=&quot;https://dest3&quot; title=&quot;&quot;&gt;https:&amp;#x2F;&amp;#x2F;dest3&lt;/a&gt;
+///
+///
+/// ## Wikitext
+///
+/// ```
+/// use parse_hyperlinks::renderer::links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc[https://dest0 text0]abc
+/// &quot;#;
+///
+/// let expected = &quot;\
+/// &lt;a href=\&quot;https://dest0\&quot; title=\&quot;\&quot;&gt;text0&lt;/a&gt;
+/// &quot;;
+///
+/// let res = links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;a href=&quot;https://dest0&quot; title=&quot;&quot;&gt;text0&lt;/a&gt;
+///
+///
+/// ## HTML
+///
+/// HTML _inline links_ are sanitized and listed, one per line.
+///
+/// ```
+/// use parse_hyperlinks::renderer::links2html;
+/// use std::borrow::Cow;
+///
+/// let i = r#&quot;abc&lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
+/// abc&lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;abc&quot;#;
+///
+/// let expected = &quot;\
+/// &lt;a href=\&quot;dest1\&quot; title=\&quot;title1\&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=\&quot;dest2\&quot; title=\&quot;title2\&quot;&gt;text2&lt;/a&gt;
+/// &quot;;
+///
+/// let res = links2html(i);
+/// assert_eq!(res, expected);
+/// ```
+///
+/// ### Rendered text
+///
+/// This is how the rendered text looks like in the browser:
+///
+/// &lt;a href=&quot;dest1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;
+/// &lt;a href=&quot;dest2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;
+///
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>links2html(input: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
+    links2html_writer(input, <span class="kw-2">&amp;mut </span>output).unwrap_or_default();
+    <span class="comment">// We know this is safe, because only `str` have been written into `output`.
+    // So the following would be fine, but I want to keep this crate `unsafe`-free.
+    //    unsafe {String::from_utf8_unchecked(output)}
+    </span>String::from_utf8(output).unwrap_or_default()
 }
 
-<span class="doccomment">/// # Hyperlink extractor</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Same as `links2html()`, but it uses `Write` for output. This function</span>
-<span class="doccomment">/// allocates much less memory and is faster because it avoids copying.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Usage example:</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// use parse_hyperlinks::renderer::links2html_writer;</span>
-<span class="doccomment">/// use std::io;</span>
-<span class="doccomment">/// use std::io::Read;</span>
-<span class="doccomment">/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {</span>
-<span class="doccomment">///     let mut stdin = String::new();</span>
-<span class="doccomment">///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     links2html_writer(&amp;stdin, &amp;mut io::stdout())?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">links2html_writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="ident">S</span>,
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ref</span>();
+<span class="doccomment">/// # Hyperlink extractor
+///
+/// Same as `links2html()`, but it uses `Write` for output. This function
+/// allocates much less memory and is faster because it avoids copying.
+///
+/// Usage example:
+/// ```no_run
+/// use parse_hyperlinks::renderer::links2html_writer;
+/// use std::io;
+/// use std::io::Read;
+/// fn main() -&gt; Result&lt;(), ::std::io::Error&gt; {
+///     let mut stdin = String::new();
+///     Read::read_to_string(&amp;mut io::stdin(), &amp;mut stdin)?;
+///
+///     links2html_writer(&amp;stdin, &amp;mut io::stdout())?;
+///
+///     Ok(())
+/// }
+/// ```
+</span><span class="kw">pub fn </span>links2html_writer&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a </span>+ AsRef&lt;str&gt;, W: Write&gt;(
+    input: S,
+    output: <span class="kw-2">&amp;mut </span>W,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), io::Error&gt; {
+    <span class="kw">let </span>input = input.as_ref();
 
-    <span class="kw">let</span> <span class="ident">verb_renderer</span> <span class="op">=</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span>verb_renderer = |<span class="kw">_</span>| Cow::Borrowed(<span class="string">&quot;&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">link_renderer</span> <span class="op">=</span> <span class="op">|</span>(<span class="kw">_</span>, (<span class="ident">text</span>, <span class="ident">dest</span>, <span class="ident">title</span>)): (<span class="kw">_</span>, (<span class="ident">String</span>, <span class="ident">String</span>, <span class="ident">String</span>))<span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dest</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">title</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">text</span>);
-        <span class="ident">s</span>.<span class="ident">push_str</span>(<span class="string">&quot;&lt;/a&gt;\n&quot;</span>);
-        <span class="ident">s</span>
+    <span class="kw">let </span>link_renderer = |(<span class="kw">_</span>, (text, dest, title)): (<span class="kw">_</span>, (String, String, String))| {
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        s.push_str(<span class="string">r#&quot;&lt;a href=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>dest);
+        s.push_str(<span class="string">r#&quot;&quot; title=&quot;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>title);
+        s.push_str(<span class="string">r#&quot;&quot;&gt;&quot;#</span>);
+        s.push_str(<span class="kw-2">&amp;*</span>text);
+        s.push_str(<span class="string">&quot;&lt;/a&gt;\n&quot;</span>);
+        s
     };
 
-    <span class="ident">render</span>(<span class="ident">input</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="ident">verb_renderer</span>, <span class="ident">link_renderer</span>, <span class="bool-val">false</span>, <span class="ident">output</span>)
+    render(input, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, verb_renderer, link_renderer, <span class="bool-val">false</span>, output)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_text_links2html</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text1][label1]abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_text_links2html() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc[text1][label1]abc
 abc [text2](destination2 &quot;title2&quot;)
   [label3]: destination3 &quot;title3&quot;
   [label1]: destination1 &quot;title1&quot;
 abc[label3]abc[label4]abc
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;&lt;pre&gt;abc&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
+        <span class="kw">let </span>expected = <span class="string">r#&quot;&lt;pre&gt;abc&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;abc
 abc &lt;a href=&quot;destination2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;
   &lt;a href=&quot;destination3&quot; title=&quot;title3&quot;&gt;[label3]: destination3 &amp;quot;title3&amp;quot;&lt;/a&gt;
   &lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;[label1]: destination1 &amp;quot;title1&amp;quot;&lt;/a&gt;
 abc&lt;a href=&quot;destination3&quot; title=&quot;title3&quot;&gt;label3&lt;/a&gt;abc[label4]abc
 &lt;/pre&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
-        <span class="comment">//eprintln!(&quot;{}&quot;, res);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = text_links2html(i);
+        <span class="comment">//eprintln!(&quot;{}&quot;, res);
+        </span><span class="macro">assert_eq!</span>(res, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_text_links2html2</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_text_links2html2() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc
 abc
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;&lt;pre&gt;abc
+        <span class="kw">let </span>expected = <span class="string">r#&quot;&lt;pre&gt;abc
 abc
 &lt;/pre&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_links2html</span>(<span class="ident">i</span>);
-        <span class="comment">//eprintln!(&quot;{}&quot;, res);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = text_links2html(i);
+        <span class="comment">//eprintln!(&quot;{}&quot;, res);
+        </span><span class="macro">assert_eq!</span>(res, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_text_rawlinks2html</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text1][label1]abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_text_rawlinks2html() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc[text1][label1]abc
 abc [text2](destination2 &quot;title2&quot;)
   [label3]: destination3 &quot;title3&quot;
   [label1]: destination1 &quot;title1&quot;
 abc[label3]abc[label4]abc
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;&lt;pre&gt;abc&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;[text1][label1]&lt;/a&gt;abc
+        <span class="kw">let </span>expected = <span class="string">r#&quot;&lt;pre&gt;abc&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;[text1][label1]&lt;/a&gt;abc
 abc &lt;a href=&quot;destination2&quot; title=&quot;title2&quot;&gt;[text2](destination2 &quot;title2&quot;)&lt;/a&gt;
   &lt;a href=&quot;destination3&quot; title=&quot;title3&quot;&gt;[label3]: destination3 &quot;title3&quot;&lt;/a&gt;
   &lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;[label1]: destination1 &quot;title1&quot;&lt;/a&gt;
 abc&lt;a href=&quot;destination3&quot; title=&quot;title3&quot;&gt;[label3]&lt;/a&gt;abc[label4]abc
 &lt;/pre&gt;&quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">text_rawlinks2html</span>(<span class="ident">i</span>);
-        <span class="comment">//eprintln!(&quot;{}&quot;, res);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = text_rawlinks2html(i);
+        <span class="comment">//eprintln!(&quot;{}&quot;, res);
+        </span><span class="macro">assert_eq!</span>(res, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_links2html</span>() {
-        <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="string">r#&quot;abc[text1][label1]abc
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_links2html() {
+        <span class="kw">let </span>i = <span class="string">r#&quot;abc[text1][label1]abc
 abc [text2](destination2 &quot;title2&quot;)
   [label3]: destination3 &quot;title3&quot;
   [label1]: destination1 &quot;title1&quot;
 abc[label3]abc[label4]abc
 &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">r#&quot;&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;
+        <span class="kw">let </span>expected = <span class="string">r#&quot;&lt;a href=&quot;destination1&quot; title=&quot;title1&quot;&gt;text1&lt;/a&gt;
 &lt;a href=&quot;destination2&quot; title=&quot;title2&quot;&gt;text2&lt;/a&gt;
 &lt;a href=&quot;destination3&quot; title=&quot;title3&quot;&gt;label3&lt;/a&gt;
 &quot;#</span>;
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">links2html</span>(<span class="ident">i</span>);
-        <span class="comment">//eprintln!(&quot;{}&quot;, res);</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>res = links2html(i);
+        <span class="comment">//eprintln!(&quot;{}&quot;, res);
+        </span><span class="macro">assert_eq!</span>(res, expected);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

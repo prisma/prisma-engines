@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/signal/registry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/signal/registry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -277,284 +277,284 @@
 <span id="277">277</span>
 <span id="278">278</span>
 <span id="279">279</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unit_arg</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::unit_arg)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signal::os</span>::{<span class="ident">OsExtraData</span>, <span class="ident">OsStorage</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::signal::os::{OsExtraData, OsStorage};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::watch</span>;
+<span class="kw">use </span><span class="kw">crate</span>::sync::watch;
 
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>std::ops;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">EventId</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>EventId = usize;
 
-<span class="doccomment">/// State for a specific event, whether a notification is pending delivery,</span>
-<span class="doccomment">/// and what listeners are registered.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EventInfo</span> {
-    <span class="ident">pending</span>: <span class="ident">AtomicBool</span>,
-    <span class="ident">tx</span>: <span class="ident">watch::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+<span class="doccomment">/// State for a specific event, whether a notification is pending delivery,
+/// and what listeners are registered.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EventInfo {
+    pending: AtomicBool,
+    tx: watch::Sender&lt;()&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EventInfo</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">_rx</span>) <span class="op">=</span> <span class="ident">watch::channel</span>(());
+<span class="kw">impl </span>Default <span class="kw">for </span>EventInfo {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(tx, _rx) = watch::channel(());
 
-        <span class="self">Self</span> {
-            <span class="ident">pending</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">tx</span>,
+        <span class="self">Self </span>{
+            pending: AtomicBool::new(<span class="bool-val">false</span>),
+            tx,
         }
     }
 }
 
-<span class="doccomment">/// An interface for retrieving the `EventInfo` for a particular eventId.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Storage</span> {
-    <span class="doccomment">/// Gets the `EventInfo` for `id` if it exists.</span>
-    <span class="kw">fn</span> <span class="ident">event_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">EventId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EventInfo</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An interface for retrieving the `EventInfo` for a particular eventId.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Storage {
+    <span class="doccomment">/// Gets the `EventInfo` for `id` if it exists.
+    </span><span class="kw">fn </span>event_info(<span class="kw-2">&amp;</span><span class="self">self</span>, id: EventId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>EventInfo&gt;;
 
-    <span class="doccomment">/// Invokes `f` once for each defined `EventInfo` in this storage.</span>
-    <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EventInfo</span>);
+    <span class="doccomment">/// Invokes `f` once for each defined `EventInfo` in this storage.
+    </span><span class="kw">fn </span>for_each&lt;<span class="lifetime">&#39;a</span>, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, f: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EventInfo);
 }
 
-<span class="kw">impl</span> <span class="ident">Storage</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EventInfo</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">event_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">EventId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EventInfo</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">id</span>)
+<span class="kw">impl </span>Storage <span class="kw">for </span>Vec&lt;EventInfo&gt; {
+    <span class="kw">fn </span>event_info(<span class="kw-2">&amp;</span><span class="self">self</span>, id: EventId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>EventInfo&gt; {
+        <span class="self">self</span>.get(id)
     }
 
-    <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">EventInfo</span>),
+    <span class="kw">fn </span>for_each&lt;<span class="lifetime">&#39;a</span>, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, f: F)
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>EventInfo),
     {
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="ident">f</span>)
+        <span class="self">self</span>.iter().for_each(f)
     }
 }
 
-<span class="doccomment">/// An interface for initializing a type. Useful for situations where we cannot</span>
-<span class="doccomment">/// inject a configured instance in the constructor of another type.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Init</span> {
-    <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// An interface for initializing a type. Useful for situations where we cannot
+/// inject a configured instance in the constructor of another type.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Init {
+    <span class="kw">fn </span>init() -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Manages and distributes event notifications to any registered listeners.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Generic over the underlying storage to allow for domain specific</span>
-<span class="doccomment">/// optimizations (e.g. eventIds may or may not be contiguous).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">storage</span>: <span class="ident">S</span>,
+<span class="doccomment">/// Manages and distributes event notifications to any registered listeners.
+///
+/// Generic over the underlying storage to allow for domain specific
+/// optimizations (e.g. eventIds may or may not be contiguous).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Registry&lt;S&gt; {
+    storage: S,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">storage</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">storage</span> }
+<span class="kw">impl</span>&lt;S&gt; Registry&lt;S&gt; {
+    <span class="kw">fn </span>new(storage: S) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ storage }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Storage</span><span class="op">&gt;</span> <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Registers a new listener for `event_id`.</span>
-    <span class="kw">fn</span> <span class="ident">register_listener</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_id</span>: <span class="ident">EventId</span>) -&gt; <span class="ident">watch::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">storage</span>
-            .<span class="ident">event_info</span>(<span class="ident">event_id</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;invalid event_id: {}&quot;</span>, <span class="ident">event_id</span>))
-            .<span class="ident">tx</span>
-            .<span class="ident">subscribe</span>()
+<span class="kw">impl</span>&lt;S: Storage&gt; Registry&lt;S&gt; {
+    <span class="doccomment">/// Registers a new listener for `event_id`.
+    </span><span class="kw">fn </span>register_listener(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: EventId) -&gt; watch::Receiver&lt;()&gt; {
+        <span class="self">self</span>.storage
+            .event_info(event_id)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;invalid event_id: {}&quot;</span>, event_id))
+            .tx
+            .subscribe()
     }
 
-    <span class="doccomment">/// Marks `event_id` as having been delivered, without broadcasting it to</span>
-    <span class="doccomment">/// any listeners.</span>
-    <span class="kw">fn</span> <span class="ident">record_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_id</span>: <span class="ident">EventId</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event_info</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">event_info</span>(<span class="ident">event_id</span>) {
-            <span class="ident">event_info</span>.<span class="ident">pending</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>)
+    <span class="doccomment">/// Marks `event_id` as having been delivered, without broadcasting it to
+    /// any listeners.
+    </span><span class="kw">fn </span>record_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: EventId) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(event_info) = <span class="self">self</span>.storage.event_info(event_id) {
+            event_info.pending.store(<span class="bool-val">true</span>, Ordering::SeqCst)
         }
     }
 
-    <span class="doccomment">/// Broadcasts all previously recorded events to their respective listeners.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if an event was delivered to at least one listener.</span>
-    <span class="kw">fn</span> <span class="ident">broadcast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">did_notify</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">event_info</span><span class="op">|</span> {
-            <span class="comment">// Any signal of this kind arrived since we checked last?</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">event_info</span>.<span class="ident">pending</span>.<span class="ident">swap</span>(<span class="bool-val">false</span>, <span class="ident">Ordering::SeqCst</span>) {
+    <span class="doccomment">/// Broadcasts all previously recorded events to their respective listeners.
+    ///
+    /// Returns `true` if an event was delivered to at least one listener.
+    </span><span class="kw">fn </span>broadcast(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>did_notify = <span class="bool-val">false</span>;
+        <span class="self">self</span>.storage.for_each(|event_info| {
+            <span class="comment">// Any signal of this kind arrived since we checked last?
+            </span><span class="kw">if </span>!event_info.pending.swap(<span class="bool-val">false</span>, Ordering::SeqCst) {
                 <span class="kw">return</span>;
             }
 
-            <span class="comment">// Ignore errors if there are no listeners</span>
-            <span class="kw">if</span> <span class="ident">event_info</span>.<span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">is_ok</span>() {
-                <span class="ident">did_notify</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="comment">// Ignore errors if there are no listeners
+            </span><span class="kw">if </span>event_info.tx.send(()).is_ok() {
+                did_notify = <span class="bool-val">true</span>;
             }
         });
 
-        <span class="ident">did_notify</span>
+        did_notify
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Globals</span> {
-    <span class="ident">extra</span>: <span class="ident">OsExtraData</span>,
-    <span class="ident">registry</span>: <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">OsStorage</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Globals {
+    extra: OsExtraData,
+    registry: Registry&lt;OsStorage&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ops::Deref</span> <span class="kw">for</span> <span class="ident">Globals</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">OsExtraData</span>;
+<span class="kw">impl </span>ops::Deref <span class="kw">for </span>Globals {
+    <span class="kw">type </span>Target = OsExtraData;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extra</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Globals</span> {
-    <span class="doccomment">/// Registers a new listener for `event_id`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">register_listener</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_id</span>: <span class="ident">EventId</span>) -&gt; <span class="ident">watch::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="ident">event_id</span>)
-    }
-
-    <span class="doccomment">/// Marks `event_id` as having been delivered, without broadcasting it to</span>
-    <span class="doccomment">/// any listeners.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">record_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event_id</span>: <span class="ident">EventId</span>) {
-        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="ident">event_id</span>);
-    }
-
-    <span class="doccomment">/// Broadcasts all previously recorded events to their respective listeners.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if an event was delivered to at least one listener.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">broadcast</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">broadcast</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OsStorage</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">storage</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.extra
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">globals</span>() -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Globals</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">OsExtraData</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Init</span>,
-    <span class="ident">OsStorage</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Init</span>,
+<span class="kw">impl </span>Globals {
+    <span class="doccomment">/// Registers a new listener for `event_id`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>register_listener(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: EventId) -&gt; watch::Receiver&lt;()&gt; {
+        <span class="self">self</span>.registry.register_listener(event_id)
+    }
+
+    <span class="doccomment">/// Marks `event_id` as having been delivered, without broadcasting it to
+    /// any listeners.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>record_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event_id: EventId) {
+        <span class="self">self</span>.registry.record_event(event_id);
+    }
+
+    <span class="doccomment">/// Broadcasts all previously recorded events to their respective listeners.
+    ///
+    /// Returns `true` if an event was delivered to at least one listener.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>broadcast(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.registry.broadcast()
+    }
+
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>storage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OsStorage {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.registry.storage
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>globals() -&gt; Pin&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Globals&gt;
+<span class="kw">where
+    </span>OsExtraData: <span class="lifetime">&#39;static </span>+ Send + Sync + Init,
+    OsStorage: <span class="lifetime">&#39;static </span>+ Send + Sync + Init,
 {
-    <span class="kw">static</span> <span class="ident">GLOBALS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Globals</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">Box::pin</span>(<span class="ident">Globals</span> {
-            <span class="ident">extra</span>: <span class="ident">OsExtraData::init</span>(),
-            <span class="ident">registry</span>: <span class="ident">Registry::new</span>(<span class="ident">OsStorage::init</span>()),
+    <span class="kw">static </span>GLOBALS: Lazy&lt;Pin&lt;Box&lt;Globals&gt;&gt;&gt; = Lazy::new(|| {
+        Box::pin(Globals {
+            extra: OsExtraData::init(),
+            registry: Registry::new(OsStorage::init()),
         })
     });
 
-    <span class="ident">GLOBALS</span>.<span class="ident">as_ref</span>()
+    GLOBALS.as_ref()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">loom</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="self">self</span>, <span class="ident">Runtime</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{<span class="ident">oneshot</span>, <span class="ident">watch</span>};
+<span class="attribute">#[cfg(all(test, not(loom)))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::runtime::{<span class="self">self</span>, Runtime};
+    <span class="kw">use </span><span class="kw">crate</span>::sync::{oneshot, watch};
 
-    <span class="kw">use</span> <span class="ident">futures::future</span>;
+    <span class="kw">use </span>futures::future;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() {
-        <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">rt</span>();
-        <span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">Registry::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">EventInfo::default</span>(),
-                <span class="ident">EventInfo::default</span>(),
-                <span class="ident">EventInfo::default</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke() {
+        <span class="kw">let </span>rt = rt();
+        rt.block_on(<span class="kw">async move </span>{
+            <span class="kw">let </span>registry = Registry::new(<span class="macro">vec!</span>[
+                EventInfo::default(),
+                EventInfo::default(),
+                EventInfo::default(),
             ]);
 
-            <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">third</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">2</span>);
+            <span class="kw">let </span>first = registry.register_listener(<span class="number">0</span>);
+            <span class="kw">let </span>second = registry.register_listener(<span class="number">1</span>);
+            <span class="kw">let </span>third = registry.register_listener(<span class="number">2</span>);
 
-            <span class="kw">let</span> (<span class="ident">fire</span>, <span class="ident">wait</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
+            <span class="kw">let </span>(fire, wait) = oneshot::channel();
 
-            <span class="ident"><span class="kw">crate</span>::spawn</span>(<span class="kw">async</span> {
-                <span class="ident">wait</span>.<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;wait failed&quot;</span>);
+            <span class="kw">crate</span>::spawn(<span class="kw">async </span>{
+                wait.<span class="kw">await</span>.expect(<span class="string">&quot;wait failed&quot;</span>);
 
-                <span class="comment">// Record some events which should get coalesced</span>
-                <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-                <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-                <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">1</span>);
-                <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">1</span>);
-                <span class="ident">registry</span>.<span class="ident">broadcast</span>();
+                <span class="comment">// Record some events which should get coalesced
+                </span>registry.record_event(<span class="number">0</span>);
+                registry.record_event(<span class="number">0</span>);
+                registry.record_event(<span class="number">1</span>);
+                registry.record_event(<span class="number">1</span>);
+                registry.broadcast();
 
-                <span class="comment">// Yield so the previous broadcast can get received</span>
-                <span class="comment">//</span>
-                <span class="comment">// This yields many times since the block_on task is only polled every 61</span>
-                <span class="comment">// ticks.</span>
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-                    <span class="ident"><span class="kw">crate</span>::task::yield_now</span>().<span class="kw">await</span>;
+                <span class="comment">// Yield so the previous broadcast can get received
+                //
+                // This yields many times since the block_on task is only polled every 61
+                // ticks.
+                </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+                    <span class="kw">crate</span>::task::yield_now().<span class="kw">await</span>;
                 }
 
-                <span class="comment">// Send subsequent signal</span>
-                <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-                <span class="ident">registry</span>.<span class="ident">broadcast</span>();
+                <span class="comment">// Send subsequent signal
+                </span>registry.record_event(<span class="number">0</span>);
+                registry.broadcast();
 
-                <span class="ident">drop</span>(<span class="ident">registry</span>);
+                drop(registry);
             });
 
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">fire</span>.<span class="ident">send</span>(());
-            <span class="kw">let</span> <span class="ident">all</span> <span class="op">=</span> <span class="ident">future::join3</span>(<span class="ident">collect</span>(<span class="ident">first</span>), <span class="ident">collect</span>(<span class="ident">second</span>), <span class="ident">collect</span>(<span class="ident">third</span>));
+            <span class="kw">let _ </span>= fire.send(());
+            <span class="kw">let </span>all = future::join3(collect(first), collect(second), collect(third));
 
-            <span class="kw">let</span> (<span class="ident">first_results</span>, <span class="ident">second_results</span>, <span class="ident">third_results</span>) <span class="op">=</span> <span class="ident">all</span>.<span class="kw">await</span>;
-            <span class="macro">assert_eq!</span>(<span class="number">2</span>, <span class="ident">first_results</span>.<span class="ident">len</span>());
-            <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">second_results</span>.<span class="ident">len</span>());
-            <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">third_results</span>.<span class="ident">len</span>());
+            <span class="kw">let </span>(first_results, second_results, third_results) = all.<span class="kw">await</span>;
+            <span class="macro">assert_eq!</span>(<span class="number">2</span>, first_results.len());
+            <span class="macro">assert_eq!</span>(<span class="number">1</span>, second_results.len());
+            <span class="macro">assert_eq!</span>(<span class="number">0</span>, third_results.len());
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span> <span class="op">=</span> <span class="string">&quot;invalid event_id: 1&quot;</span>]</span>
-    <span class="kw">fn</span> <span class="ident">register_panics_on_invalid_input</span>() {
-        <span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">Registry::new</span>(<span class="macro">vec!</span>[<span class="ident">EventInfo::default</span>()]);
+    <span class="attribute">#[test]
+    #[should_panic = <span class="string">&quot;invalid event_id: 1&quot;</span>]
+    </span><span class="kw">fn </span>register_panics_on_invalid_input() {
+        <span class="kw">let </span>registry = Registry::new(<span class="macro">vec!</span>[EventInfo::default()]);
 
-        <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">1</span>);
+        registry.register_listener(<span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">record_invalid_event_does_nothing</span>() {
-        <span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">Registry::new</span>(<span class="macro">vec!</span>[<span class="ident">EventInfo::default</span>()]);
-        <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">1302</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>record_invalid_event_does_nothing() {
+        <span class="kw">let </span>registry = Registry::new(<span class="macro">vec!</span>[EventInfo::default()]);
+        registry.record_event(<span class="number">1302</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">broadcast_returns_if_at_least_one_event_fired</span>() {
-        <span class="kw">let</span> <span class="ident">registry</span> <span class="op">=</span> <span class="ident">Registry::new</span>(<span class="macro">vec!</span>[<span class="ident">EventInfo::default</span>(), <span class="ident">EventInfo::default</span>()]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>broadcast_returns_if_at_least_one_event_fired() {
+        <span class="kw">let </span>registry = Registry::new(<span class="macro">vec!</span>[EventInfo::default(), EventInfo::default()]);
 
-        <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">registry</span>.<span class="ident">broadcast</span>());
+        registry.record_event(<span class="number">0</span>);
+        <span class="macro">assert!</span>(!registry.broadcast());
 
-        <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">register_listener</span>(<span class="number">1</span>);
+        <span class="kw">let </span>first = registry.register_listener(<span class="number">0</span>);
+        <span class="kw">let </span>second = registry.register_listener(<span class="number">1</span>);
 
-        <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="ident">registry</span>.<span class="ident">broadcast</span>());
+        registry.record_event(<span class="number">0</span>);
+        <span class="macro">assert!</span>(registry.broadcast());
 
-        <span class="ident">drop</span>(<span class="ident">first</span>);
-        <span class="ident">registry</span>.<span class="ident">record_event</span>(<span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">registry</span>.<span class="ident">broadcast</span>());
+        drop(first);
+        registry.record_event(<span class="number">0</span>);
+        <span class="macro">assert!</span>(!registry.broadcast());
 
-        <span class="ident">drop</span>(<span class="ident">second</span>);
+        drop(second);
     }
 
-    <span class="kw">fn</span> <span class="ident">rt</span>() -&gt; <span class="ident">Runtime</span> {
-        <span class="ident">runtime::Builder::new_current_thread</span>()
-            .<span class="ident">enable_time</span>()
-            .<span class="ident">build</span>()
-            .<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>rt() -&gt; Runtime {
+        runtime::Builder::new_current_thread()
+            .enable_time()
+            .build()
+            .unwrap()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">collect</span>(<span class="kw-2">mut</span> <span class="ident">rx</span>: <span class="ident">watch::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">async fn </span>collect(<span class="kw-2">mut </span>rx: watch::Receiver&lt;()&gt;) -&gt; Vec&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="macro">vec!</span>[];
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">changed</span>().<span class="kw">await</span> {
-            <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">v</span>);
+        <span class="kw">while let </span><span class="prelude-val">Ok</span>(v) = rx.changed().<span class="kw">await </span>{
+            ret.push(v);
         }
 
-        <span class="ident">ret</span>
+        ret
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

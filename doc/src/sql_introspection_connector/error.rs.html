@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -221,228 +221,228 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>};
-<span class="kw">use</span> <span class="ident">quaint::error</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">QuaintError</span>, <span class="ident">ErrorKind</span> <span class="kw">as</span> <span class="ident">QuaintKind</span>};
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::introspection_engine::DatabaseSchemaInconsistent</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">common</span>, <span class="ident">quaint::render_quaint_error</span>, <span class="ident">query_engine::DatabaseConstraint</span>, <span class="ident">KnownError</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>introspection_connector::{ConnectorError, ErrorKind};
+<span class="kw">use </span>quaint::error::{Error <span class="kw">as </span>QuaintError, ErrorKind <span class="kw">as </span>QuaintKind};
+<span class="kw">use </span>thiserror::Error;
+<span class="kw">use </span>user_facing_errors::introspection_engine::DatabaseSchemaInconsistent;
+<span class="kw">use </span>user_facing_errors::{common, quaint::render_quaint_error, query_engine::DatabaseConstraint, KnownError};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SqlResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SqlError</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>SqlResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, SqlError&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SqlError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">Generic</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">anyhow::Error</span>),
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>SqlError {
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>Generic(<span class="attribute">#[source] </span>anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error connecting to the database {cause}&quot;</span>)]</span>
-    <span class="ident">ConnectionError</span> {
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Error connecting to the database {cause}&quot;</span>)]
+    </span>ConnectionError {
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error querying the database: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">QueryError</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">anyhow::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error querying the database: {}&quot;</span>, _0)]
+    </span>QueryError(<span class="attribute">#[source] </span>anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">CrossSchemaReference</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>CrossSchemaReference(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database &#39;{}&#39; does not exist&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseDoesNotExist</span> {
-        <span class="ident">db_name</span>: <span class="ident">String</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Database &#39;{}&#39; does not exist&quot;</span>, db_name)]
+    </span>DatabaseDoesNotExist {
+        db_name: String,
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseAccessDenied</span> {
-        <span class="ident">db_name</span>: <span class="ident">String</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, db_name)]
+    </span>DatabaseAccessDenied {
+        db_name: String,
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database &#39;{}&#39; already exists&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseAlreadyExists</span> {
-        <span class="ident">db_name</span>: <span class="ident">String</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Database &#39;{}&#39; already exists&quot;</span>, db_name)]
+    </span>DatabaseAlreadyExists {
+        db_name: String,
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, <span class="ident">user</span>)]</span>
-    <span class="ident">AuthenticationFailed</span> {
-        <span class="ident">user</span>: <span class="ident">String</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, user)]
+    </span>AuthenticationFailed {
+        user: String,
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">DatabaseUrlIsInvalid</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>DatabaseUrlIsInvalid(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Connect timed out&quot;</span>)]</span>
-    <span class="ident">ConnectTimeout</span>(<span class="attribute">#[<span class="ident">source</span>]</span> <span class="ident">QuaintKind</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Connect timed out&quot;</span>)]
+    </span>ConnectTimeout(<span class="attribute">#[source] </span>QuaintKind),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Operation timed out ({0})&quot;</span>)]</span>
-    <span class="ident">Timeout</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Operation timed out ({0})&quot;</span>)]
+    </span>Timeout(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error opening a TLS connection. {}&quot;</span>, <span class="ident">cause</span>)]</span>
-    <span class="ident">TlsError</span> {
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Error opening a TLS connection. {}&quot;</span>, cause)]
+    </span>TlsError {
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unique constraint violation&quot;</span>)]</span>
-    <span class="ident">UniqueConstraintViolation</span> {
-        <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">QuaintKind</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Unique constraint violation&quot;</span>)]
+    </span>UniqueConstraintViolation {
+        constraint: DatabaseConstraint,
+        <span class="attribute">#[source]
+        </span>cause: QuaintKind,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;An Error occurred because the schema was inconsistent: &#39;{}&#39;&quot;</span>, <span class="ident">explanation</span>)]</span>
-    <span class="ident">SchemaInconsistent</span> { <span class="ident">explanation</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;An Error occurred because the schema was inconsistent: &#39;{}&#39;&quot;</span>, explanation)]
+    </span>SchemaInconsistent { explanation: String },
 }
 
-<span class="kw">impl</span> <span class="ident">SqlError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>, <span class="ident">connection_info</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::ConnectionInfo</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlError::DatabaseDoesNotExist</span> { <span class="ident">db_name</span>, <span class="ident">cause</span> } =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::DatabaseDoesNotExist</span> { <span class="ident">db_name</span> },
+<span class="kw">impl </span>SqlError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_connector_error(<span class="self">self</span>, connection_info: <span class="kw-2">&amp;</span><span class="kw">super</span>::ConnectionInfo) -&gt; ConnectorError {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqlError::DatabaseDoesNotExist { db_name, cause } =&gt; ConnectorError {
+                user_facing_error: render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info),
+                kind: ErrorKind::DatabaseDoesNotExist { db_name },
             },
-            <span class="ident">SqlError::DatabaseAccessDenied</span> { <span class="ident">db_name</span>, <span class="ident">cause</span> } =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::DatabaseAccessDenied</span> { <span class="ident">database_name</span>: <span class="ident">db_name</span> },
+            SqlError::DatabaseAccessDenied { db_name, cause } =&gt; ConnectorError {
+                user_facing_error: render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info),
+                kind: ErrorKind::DatabaseAccessDenied { database_name: db_name },
             },
 
-            <span class="ident">SqlError::DatabaseAlreadyExists</span> { <span class="ident">db_name</span>, <span class="ident">cause</span> } =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::DatabaseAlreadyExists</span> { <span class="ident">db_name</span> },
+            SqlError::DatabaseAlreadyExists { db_name, cause } =&gt; ConnectorError {
+                user_facing_error: render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info),
+                kind: ErrorKind::DatabaseAlreadyExists { db_name },
             },
-            <span class="ident">SqlError::AuthenticationFailed</span> { <span class="ident">user</span>, <span class="ident">cause</span> } =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::AuthenticationFailed</span> { <span class="ident">user</span> },
+            SqlError::AuthenticationFailed { user, cause } =&gt; ConnectorError {
+                user_facing_error: render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info),
+                kind: ErrorKind::AuthenticationFailed { user },
             },
-            <span class="ident">SqlError::ConnectTimeout</span>(<span class="ident">cause</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>);
+            SqlError::ConnectTimeout(cause) =&gt; {
+                <span class="kw">let </span>user_facing_error = render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info);
 
-                <span class="ident">ConnectorError</span> {
-                    <span class="ident">user_facing_error</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::ConnectTimeout</span>,
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectTimeout,
                 }
             }
-            <span class="ident">SqlError::Timeout</span>(<span class="ident">message</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::Timeout</span>(<span class="ident">message</span>)),
-            <span class="ident">SqlError::TlsError</span> { <span class="ident">cause</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>);
+            SqlError::Timeout(message) =&gt; ConnectorError::from_kind(ErrorKind::Timeout(message)),
+            SqlError::TlsError { cause } =&gt; {
+                <span class="kw">let </span>user_facing_error = render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info);
 
-                <span class="ident">ConnectorError</span> {
-                    <span class="ident">user_facing_error</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::TlsError</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">cause</span>),
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::TlsError {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, cause),
                     },
                 }
             }
-            <span class="ident">SqlError::ConnectionError</span> { <span class="ident">cause</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>);
-                <span class="ident">ConnectorError</span> {
-                    <span class="ident">user_facing_error</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::ConnectionError</span> {
-                        <span class="ident">host</span>: <span class="ident">connection_info</span>.<span class="ident">host</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">cause</span>: <span class="ident">cause</span>.<span class="ident">into</span>(),
+            SqlError::ConnectionError { cause } =&gt; {
+                <span class="kw">let </span>user_facing_error = render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info);
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: cause.into(),
                     },
                 }
             }
-            <span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">cause</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="ident">render_quaint_error</span>(<span class="kw-2">&amp;</span><span class="ident">cause</span>, <span class="ident">connection_info</span>);
-                <span class="ident">ConnectorError</span> {
-                    <span class="ident">user_facing_error</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::ConnectionError</span> {
-                        <span class="ident">host</span>: <span class="ident">connection_info</span>.<span class="ident">host</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">cause</span>: <span class="ident">cause</span>.<span class="ident">into</span>(),
+            SqlError::UniqueConstraintViolation { cause, .. } =&gt; {
+                <span class="kw">let </span>user_facing_error = render_quaint_error(<span class="kw-2">&amp;</span>cause, connection_info);
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::ConnectionError {
+                        host: connection_info.host().to_owned(),
+                        cause: cause.into(),
                     },
                 }
             }
-            <span class="ident">SqlError::SchemaInconsistent</span> { <span class="ident">explanation</span> } =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">DatabaseSchemaInconsistent</span> {
-                    <span class="ident">explanation</span>: <span class="ident">explanation</span>.<span class="ident">to_owned</span>(),
+            SqlError::SchemaInconsistent { explanation } =&gt; ConnectorError {
+                user_facing_error: <span class="prelude-val">Some</span>(KnownError::new(DatabaseSchemaInconsistent {
+                    explanation: explanation.to_owned(),
                 })),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::DatabaseSchemaInconsistent</span> { <span class="ident">explanation</span> },
+                kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
             },
-            <span class="ident">SqlError::DatabaseUrlIsInvalid</span>(<span class="ident">reason</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">common::InvalidConnectionString</span> {
-                    <span class="ident">details</span>: <span class="ident">reason</span>.<span class="ident">clone</span>(),
+            SqlError::DatabaseUrlIsInvalid(reason) =&gt; {
+                <span class="kw">let </span>user_facing_error = <span class="prelude-val">Some</span>(KnownError::new(common::InvalidConnectionString {
+                    details: reason.clone(),
                 }));
 
-                <span class="ident">ConnectorError</span> {
-                    <span class="ident">user_facing_error</span>,
-                    <span class="ident">kind</span>: <span class="ident">ErrorKind::InvalidDatabaseUrl</span>(<span class="ident">reason</span>),
+                ConnectorError {
+                    user_facing_error,
+                    kind: ErrorKind::InvalidDatabaseUrl(reason),
                 }
             }
-            <span class="ident">SqlError::CrossSchemaReference</span>(<span class="ident">explanation</span>) =&gt; <span class="ident">ConnectorError</span> {
-                <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">DatabaseSchemaInconsistent</span> {
-                    <span class="ident">explanation</span>: <span class="ident">explanation</span>.<span class="ident">clone</span>(),
+            SqlError::CrossSchemaReference(explanation) =&gt; ConnectorError {
+                user_facing_error: <span class="prelude-val">Some</span>(KnownError::new(DatabaseSchemaInconsistent {
+                    explanation: explanation.clone(),
                 })),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::DatabaseSchemaInconsistent</span> { <span class="ident">explanation</span> },
+                kind: ErrorKind::DatabaseSchemaInconsistent { explanation },
             },
-            <span class="ident">error</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::QueryError</span>(<span class="ident">error</span>.<span class="ident">into</span>())),
+            error =&gt; ConnectorError::from_kind(ErrorKind::QueryError(error.into())),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QuaintKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kind</span>: <span class="ident">QuaintKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">kind</span> {
-            <span class="ident">QuaintKind::DatabaseDoesNotExist</span> { <span class="kw-2">ref</span> <span class="ident">db_name</span> } =&gt; <span class="ident"><span class="self">Self</span>::DatabaseDoesNotExist</span> {
-                <span class="ident">db_name</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">db_name</span>),
-                <span class="ident">cause</span>: <span class="ident">kind</span>,
+<span class="kw">impl </span>From&lt;QuaintKind&gt; <span class="kw">for </span>SqlError {
+    <span class="kw">fn </span>from(kind: QuaintKind) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>kind {
+            QuaintKind::DatabaseDoesNotExist { <span class="kw-2">ref </span>db_name } =&gt; <span class="self">Self</span>::DatabaseDoesNotExist {
+                db_name: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, db_name),
+                cause: kind,
             },
-            <span class="ident">QuaintKind::DatabaseAlreadyExists</span> { <span class="kw-2">ref</span> <span class="ident">db_name</span> } =&gt; <span class="ident"><span class="self">Self</span>::DatabaseAlreadyExists</span> {
-                <span class="ident">db_name</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">db_name</span>),
-                <span class="ident">cause</span>: <span class="ident">kind</span>,
+            QuaintKind::DatabaseAlreadyExists { <span class="kw-2">ref </span>db_name } =&gt; <span class="self">Self</span>::DatabaseAlreadyExists {
+                db_name: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, db_name),
+                cause: kind,
             },
-            <span class="ident">QuaintKind::DatabaseAccessDenied</span> { <span class="kw-2">ref</span> <span class="ident">db_name</span> } =&gt; <span class="ident"><span class="self">Self</span>::DatabaseAccessDenied</span> {
-                <span class="ident">db_name</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">db_name</span>),
-                <span class="ident">cause</span>: <span class="ident">kind</span>,
+            QuaintKind::DatabaseAccessDenied { <span class="kw-2">ref </span>db_name } =&gt; <span class="self">Self</span>::DatabaseAccessDenied {
+                db_name: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, db_name),
+                cause: kind,
             },
-            <span class="ident">QuaintKind::AuthenticationFailed</span> { <span class="kw-2">ref</span> <span class="ident">user</span> } =&gt; <span class="ident"><span class="self">Self</span>::AuthenticationFailed</span> {
-                <span class="ident">user</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">user</span>),
-                <span class="ident">cause</span>: <span class="ident">kind</span>,
+            QuaintKind::AuthenticationFailed { <span class="kw-2">ref </span>user } =&gt; <span class="self">Self</span>::AuthenticationFailed {
+                user: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, user),
+                cause: kind,
             },
-            <span class="ident">QuaintKind::DatabaseUrlIsInvalid</span>(<span class="ident">reason</span>) =&gt; <span class="ident"><span class="self">Self</span>::DatabaseUrlIsInvalid</span>(<span class="ident">reason</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::ConnectTimeout</span> =&gt; <span class="ident"><span class="self">Self</span>::ConnectTimeout</span>(<span class="ident">e</span>),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::SocketTimeout</span> =&gt; <span class="ident"><span class="self">Self</span>::Timeout</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)),
-            <span class="ident">e</span> @ <span class="ident">QuaintKind::PoolTimeout</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::Timeout</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>)),
-            <span class="ident">QuaintKind::ConnectionError</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::ConnectionError</span> { <span class="ident">cause</span>: <span class="ident">kind</span> },
-            <span class="ident">QuaintKind::TlsError</span> { .. } =&gt; <span class="ident"><span class="self">Self</span>::TlsError</span> { <span class="ident">cause</span>: <span class="ident">kind</span> },
-            <span class="ident">QuaintKind::UniqueConstraintViolation</span> { <span class="kw-2">ref</span> <span class="ident">constraint</span> } =&gt; <span class="ident"><span class="self">Self</span>::UniqueConstraintViolation</span> {
-                <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">into</span>(),
-                <span class="ident">cause</span>: <span class="ident">kind</span>,
+            QuaintKind::DatabaseUrlIsInvalid(reason) =&gt; <span class="self">Self</span>::DatabaseUrlIsInvalid(reason),
+            e @ QuaintKind::ConnectTimeout =&gt; <span class="self">Self</span>::ConnectTimeout(e),
+            e @ QuaintKind::SocketTimeout =&gt; <span class="self">Self</span>::Timeout(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e)),
+            e @ QuaintKind::PoolTimeout { .. } =&gt; <span class="self">Self</span>::Timeout(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e)),
+            QuaintKind::ConnectionError { .. } =&gt; <span class="self">Self</span>::ConnectionError { cause: kind },
+            QuaintKind::TlsError { .. } =&gt; <span class="self">Self</span>::TlsError { cause: kind },
+            QuaintKind::UniqueConstraintViolation { <span class="kw-2">ref </span>constraint } =&gt; <span class="self">Self</span>::UniqueConstraintViolation {
+                constraint: constraint.into(),
+                cause: kind,
             },
-            <span class="kw">_</span> =&gt; <span class="ident">SqlError::QueryError</span>(<span class="ident">kind</span>.<span class="ident">into</span>()),
+            <span class="kw">_ </span>=&gt; SqlError::QueryError(kind.into()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">QuaintError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">QuaintError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">QuaintKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;QuaintError&gt; <span class="kw">for </span>SqlError {
+    <span class="kw">fn </span>from(e: QuaintError) -&gt; <span class="self">Self </span>{
+        QuaintKind::from(e).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sql_schema_describer::DescriberError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">sql_schema_describer::DescriberError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">kind</span>() {
-            <span class="ident">sql_schema_describer::DescriberErrorKind::QuaintError</span>(..) =&gt; {
-                <span class="ident">SqlError::QueryError</span>(<span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>))
+<span class="kw">impl </span>From&lt;sql_schema_describer::DescriberError&gt; <span class="kw">for </span>SqlError {
+    <span class="kw">fn </span>from(error: sql_schema_describer::DescriberError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>error.kind() {
+            sql_schema_describer::DescriberErrorKind::QuaintError(..) =&gt; {
+                SqlError::QueryError(<span class="macro">anyhow::anyhow!</span>(<span class="string">&quot;{}&quot;</span>, error))
             }
-            <span class="ident">sql_schema_describer::DescriberErrorKind::CrossSchemaReference</span> { .. } =&gt; {
-                <span class="ident">SqlError::CrossSchemaReference</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>))
+            sql_schema_describer::DescriberErrorKind::CrossSchemaReference { .. } =&gt; {
+                SqlError::CrossSchemaReference(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, error))
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SqlError::Generic</span>(<span class="macro">anyhow::anyhow!</span>(<span class="ident">error</span>))
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>SqlError {
+    <span class="kw">fn </span>from(error: String) -&gt; <span class="self">Self </span>{
+        SqlError::Generic(<span class="macro">anyhow::anyhow!</span>(error))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

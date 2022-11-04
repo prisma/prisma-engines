@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/delegates.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>delegates.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/delegates.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>delegates.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -196,203 +196,203 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Delegate rpc calls</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Delegate rpc calls
 
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</span><span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calls</span>::{<span class="ident">Metadata</span>, <span class="ident">RemoteProcedure</span>, <span class="ident">RpcMethod</span>, <span class="ident">RpcNotification</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">Error</span>, <span class="ident">Params</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::BoxFuture</span>;
+<span class="kw">use </span><span class="kw">crate</span>::calls::{Metadata, RemoteProcedure, RpcMethod, RpcNotification};
+<span class="kw">use </span><span class="kw">crate</span>::types::{Error, Params, Value};
+<span class="kw">use </span><span class="kw">crate</span>::BoxFuture;
 
-<span class="kw">struct</span> <span class="ident">DelegateAsyncMethod</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">closure</span>: <span class="ident">F</span>,
+<span class="kw">struct </span>DelegateAsyncMethod&lt;T, F&gt; {
+	delegate: Arc&lt;T&gt;,
+	closure: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span>, <span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">RpcMethod</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DelegateAsyncMethod</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
-	<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>) -&gt; <span class="ident">I</span>,
-	<span class="ident">I</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, M, F, I&gt; RpcMethod&lt;M&gt; <span class="kw">for </span>DelegateAsyncMethod&lt;T, F&gt;
+<span class="kw">where
+	</span>M: Metadata,
+	F: Fn(<span class="kw-2">&amp;</span>T, Params) -&gt; I,
+	I: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Value, Error&gt;&gt; + Send + <span class="lifetime">&#39;static</span>,
+	T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	F: Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-	<span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">Params</span>, <span class="ident">_meta</span>: <span class="ident">M</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">closure</span>;
-		<span class="ident">Box::pin</span>(<span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delegate</span>, <span class="ident">params</span>))
+	<span class="kw">fn </span>call(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Params, _meta: M) -&gt; BoxFuture&lt;<span class="kw">crate</span>::Result&lt;Value&gt;&gt; {
+		<span class="kw">let </span>closure = <span class="kw-2">&amp;</span><span class="self">self</span>.closure;
+		Box::pin(closure(<span class="kw-2">&amp;</span><span class="self">self</span>.delegate, params))
 	}
 }
 
-<span class="kw">struct</span> <span class="ident">DelegateMethodWithMeta</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">closure</span>: <span class="ident">F</span>,
+<span class="kw">struct </span>DelegateMethodWithMeta&lt;T, F&gt; {
+	delegate: Arc&lt;T&gt;,
+	closure: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span>, <span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">RpcMethod</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DelegateMethodWithMeta</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
-	<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>, <span class="ident">M</span>) -&gt; <span class="ident">I</span>,
-	<span class="ident">I</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, M, F, I&gt; RpcMethod&lt;M&gt; <span class="kw">for </span>DelegateMethodWithMeta&lt;T, F&gt;
+<span class="kw">where
+	</span>M: Metadata,
+	F: Fn(<span class="kw-2">&amp;</span>T, Params, M) -&gt; I,
+	I: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Value, Error&gt;&gt; + Send + <span class="lifetime">&#39;static</span>,
+	T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	F: Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-	<span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">Params</span>, <span class="ident">meta</span>: <span class="ident">M</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">closure</span>;
-		<span class="ident">Box::pin</span>(<span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delegate</span>, <span class="ident">params</span>, <span class="ident">meta</span>))
+	<span class="kw">fn </span>call(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Params, meta: M) -&gt; BoxFuture&lt;<span class="kw">crate</span>::Result&lt;Value&gt;&gt; {
+		<span class="kw">let </span>closure = <span class="kw-2">&amp;</span><span class="self">self</span>.closure;
+		Box::pin(closure(<span class="kw-2">&amp;</span><span class="self">self</span>.delegate, params, meta))
 	}
 }
 
-<span class="kw">struct</span> <span class="ident">DelegateNotification</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">closure</span>: <span class="ident">F</span>,
+<span class="kw">struct </span>DelegateNotification&lt;T, F&gt; {
+	delegate: Arc&lt;T&gt;,
+	closure: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">RpcNotification</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DelegateNotification</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
-	<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, M, F&gt; RpcNotification&lt;M&gt; <span class="kw">for </span>DelegateNotification&lt;T, F&gt;
+<span class="kw">where
+	</span>M: Metadata,
+	F: Fn(<span class="kw-2">&amp;</span>T, Params) + <span class="lifetime">&#39;static</span>,
+	F: Send + Sync + <span class="lifetime">&#39;static</span>,
+	T: Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-	<span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">Params</span>, <span class="ident">_meta</span>: <span class="ident">M</span>) {
-		<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">closure</span>;
-		<span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delegate</span>, <span class="ident">params</span>)
+	<span class="kw">fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Params, _meta: M) {
+		<span class="kw">let </span>closure = <span class="kw-2">&amp;</span><span class="self">self</span>.closure;
+		closure(<span class="kw-2">&amp;</span><span class="self">self</span>.delegate, params)
 	}
 }
 
-<span class="kw">struct</span> <span class="ident">DelegateNotificationWithMeta</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-	<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">closure</span>: <span class="ident">F</span>,
+<span class="kw">struct </span>DelegateNotificationWithMeta&lt;T, F&gt; {
+	delegate: Arc&lt;T&gt;,
+	closure: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">RpcNotification</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DelegateNotificationWithMeta</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
-	<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>, <span class="ident">M</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, M, F&gt; RpcNotification&lt;M&gt; <span class="kw">for </span>DelegateNotificationWithMeta&lt;T, F&gt;
+<span class="kw">where
+	</span>M: Metadata,
+	F: Fn(<span class="kw-2">&amp;</span>T, Params, M) + <span class="lifetime">&#39;static</span>,
+	F: Send + Sync + <span class="lifetime">&#39;static</span>,
+	T: Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-	<span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">Params</span>, <span class="ident">meta</span>: <span class="ident">M</span>) {
-		<span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">closure</span>;
-		<span class="ident">closure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">delegate</span>, <span class="ident">params</span>, <span class="ident">meta</span>)
+	<span class="kw">fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, params: Params, meta: M) {
+		<span class="kw">let </span>closure = <span class="kw-2">&amp;</span><span class="self">self</span>.closure;
+		closure(<span class="kw-2">&amp;</span><span class="self">self</span>.delegate, params, meta)
 	}
 }
 
-<span class="doccomment">/// A set of RPC methods and notifications tied to single `delegate` struct.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IoDelegate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span> <span class="op">=</span> ()<span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
+<span class="doccomment">/// A set of RPC methods and notifications tied to single `delegate` struct.
+</span><span class="kw">pub struct </span>IoDelegate&lt;T, M = ()&gt;
+<span class="kw">where
+	</span>T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	M: Metadata,
 {
-	<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="ident">methods</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	delegate: Arc&lt;T&gt;,
+	methods: HashMap&lt;String, RemoteProcedure&lt;M&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">IoDelegate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
+<span class="kw">impl</span>&lt;T, M&gt; IoDelegate&lt;T, M&gt;
+<span class="kw">where
+	</span>T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	M: Metadata,
 {
-	<span class="doccomment">/// Creates new `IoDelegate`</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">delegate</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">IoDelegate</span> {
-			<span class="ident">delegate</span>,
-			<span class="ident">methods</span>: <span class="ident">HashMap::new</span>(),
+	<span class="doccomment">/// Creates new `IoDelegate`
+	</span><span class="kw">pub fn </span>new(delegate: Arc&lt;T&gt;) -&gt; <span class="self">Self </span>{
+		IoDelegate {
+			delegate,
+			methods: HashMap::new(),
 		}
 	}
 
-	<span class="doccomment">/// Adds an alias to existing method.</span>
-	<span class="doccomment">/// NOTE: Aliases are not transitive, i.e. you cannot create alias to an alias.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_alias</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(<span class="ident">from</span>.<span class="ident">into</span>(), <span class="ident">RemoteProcedure::Alias</span>(<span class="ident">to</span>.<span class="ident">into</span>()));
+	<span class="doccomment">/// Adds an alias to existing method.
+	/// NOTE: Aliases are not transitive, i.e. you cannot create alias to an alias.
+	</span><span class="kw">pub fn </span>add_alias(<span class="kw-2">&amp;mut </span><span class="self">self</span>, from: <span class="kw-2">&amp;</span>str, to: <span class="kw-2">&amp;</span>str) {
+		<span class="self">self</span>.methods.insert(from.into(), RemoteProcedure::Alias(to.into()));
 	}
 
-	<span class="doccomment">/// Adds async method to the delegate.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_method</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>) -&gt; <span class="ident">I</span>,
-		<span class="ident">I</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-		<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// Adds async method to the delegate.
+	</span><span class="kw">pub fn </span>add_method&lt;F, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, method: F)
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span>T, Params) -&gt; I,
+		I: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Value, Error&gt;&gt; + Send + <span class="lifetime">&#39;static</span>,
+		F: Send + Sync + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(
-			<span class="ident">name</span>.<span class="ident">into</span>(),
-			<span class="ident">RemoteProcedure::Method</span>(<span class="ident">Arc::new</span>(<span class="ident">DelegateAsyncMethod</span> {
-				<span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">clone</span>(),
-				<span class="ident">closure</span>: <span class="ident">method</span>,
+		<span class="self">self</span>.methods.insert(
+			name.into(),
+			RemoteProcedure::Method(Arc::new(DelegateAsyncMethod {
+				delegate: <span class="self">self</span>.delegate.clone(),
+				closure: method,
 			})),
 		);
 	}
 
-	<span class="doccomment">/// Adds async method with metadata to the delegate.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_method_with_meta</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">method</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>, <span class="ident">M</span>) -&gt; <span class="ident">I</span>,
-		<span class="ident">I</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-		<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// Adds async method with metadata to the delegate.
+	</span><span class="kw">pub fn </span>add_method_with_meta&lt;F, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, method: F)
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span>T, Params, M) -&gt; I,
+		I: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Value, Error&gt;&gt; + Send + <span class="lifetime">&#39;static</span>,
+		F: Send + Sync + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(
-			<span class="ident">name</span>.<span class="ident">into</span>(),
-			<span class="ident">RemoteProcedure::Method</span>(<span class="ident">Arc::new</span>(<span class="ident">DelegateMethodWithMeta</span> {
-				<span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">clone</span>(),
-				<span class="ident">closure</span>: <span class="ident">method</span>,
+		<span class="self">self</span>.methods.insert(
+			name.into(),
+			RemoteProcedure::Method(Arc::new(DelegateMethodWithMeta {
+				delegate: <span class="self">self</span>.delegate.clone(),
+				closure: method,
 			})),
 		);
 	}
 
-	<span class="doccomment">/// Adds notification to the delegate.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_notification</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">notification</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>),
-		<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// Adds notification to the delegate.
+	</span><span class="kw">pub fn </span>add_notification&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, notification: F)
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span>T, Params),
+		F: Send + Sync + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(
-			<span class="ident">name</span>.<span class="ident">into</span>(),
-			<span class="ident">RemoteProcedure::Notification</span>(<span class="ident">Arc::new</span>(<span class="ident">DelegateNotification</span> {
-				<span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">clone</span>(),
-				<span class="ident">closure</span>: <span class="ident">notification</span>,
+		<span class="self">self</span>.methods.insert(
+			name.into(),
+			RemoteProcedure::Notification(Arc::new(DelegateNotification {
+				delegate: <span class="self">self</span>.delegate.clone(),
+				closure: notification,
 			})),
 		);
 	}
 
-	<span class="doccomment">/// Adds notification with metadata to the delegate.</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_notification_with_meta</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">notification</span>: <span class="ident">F</span>)
-	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">Params</span>, <span class="ident">M</span>),
-		<span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+	<span class="doccomment">/// Adds notification with metadata to the delegate.
+	</span><span class="kw">pub fn </span>add_notification_with_meta&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, notification: F)
+	<span class="kw">where
+		</span>F: Fn(<span class="kw-2">&amp;</span>T, Params, M),
+		F: Send + Sync + <span class="lifetime">&#39;static</span>,
 	{
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">insert</span>(
-			<span class="ident">name</span>.<span class="ident">into</span>(),
-			<span class="ident">RemoteProcedure::Notification</span>(<span class="ident">Arc::new</span>(<span class="ident">DelegateNotificationWithMeta</span> {
-				<span class="ident">delegate</span>: <span class="self">self</span>.<span class="ident">delegate</span>.<span class="ident">clone</span>(),
-				<span class="ident">closure</span>: <span class="ident">notification</span>,
+		<span class="self">self</span>.methods.insert(
+			name.into(),
+			RemoteProcedure::Notification(Arc::new(DelegateNotificationWithMeta {
+				delegate: <span class="self">self</span>.delegate.clone(),
+				closure: notification,
 			})),
 		);
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::io::IoHandlerExtension</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IoDelegate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
+<span class="kw">impl</span>&lt;T, M&gt; <span class="kw">crate</span>::io::IoHandlerExtension&lt;M&gt; <span class="kw">for </span>IoDelegate&lt;T, M&gt;
+<span class="kw">where
+	</span>T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	M: Metadata,
 {
-	<span class="kw">fn</span> <span class="ident">augment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident"><span class="kw">crate</span>::Middleware</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">handler</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::MetaIoHandler</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-		<span class="ident">handler</span>.<span class="ident">extend_with</span>(<span class="self">self</span>.<span class="ident">methods</span>)
+	<span class="kw">fn </span>augment&lt;S: <span class="kw">crate</span>::Middleware&lt;M&gt;&gt;(<span class="self">self</span>, handler: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::MetaIoHandler&lt;M, S&gt;) {
+		handler.extend_with(<span class="self">self</span>.methods)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">IoDelegate</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-	<span class="ident">M</span>: <span class="ident">Metadata</span>,
+<span class="kw">impl</span>&lt;T, M&gt; IntoIterator <span class="kw">for </span>IoDelegate&lt;T, M&gt;
+<span class="kw">where
+	</span>T: Send + Sync + <span class="lifetime">&#39;static</span>,
+	M: Metadata,
 {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>);
-	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::collections::hash_map::IntoIter</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RemoteProcedure</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+	<span class="kw">type </span>Item = (String, RemoteProcedure&lt;M&gt;);
+	<span class="kw">type </span>IntoIter = std::collections::hash_map::IntoIter&lt;String, RemoteProcedure&lt;M&gt;&gt;;
 
-	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-		<span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">into_iter</span>()
+	<span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+		<span class="self">self</span>.methods.into_iter()
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

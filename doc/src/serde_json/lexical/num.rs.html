@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/num.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>num.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/num.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>num.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -438,15 +438,15 @@
 <span id="438">438</span>
 <span id="439">439</span>
 <span id="440">440</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="doccomment">//! Utilities for Rust numbers.</span>
+</span><span class="doccomment">//! Utilities for Rust numbers.
 
-<span class="kw">use</span> <span class="ident">core::ops</span>;
+</span><span class="kw">use </span>core::ops;
 
-<span class="doccomment">/// Precalculated values of radix**i for i in range [0, arr.len()-1].</span>
-<span class="doccomment">/// Each value can be **exactly** represented as that type.</span>
-<span class="kw">const</span> <span class="ident">F32_POW10</span>: [<span class="ident">f32</span>; <span class="number">11</span>] <span class="op">=</span> [
+<span class="doccomment">/// Precalculated values of radix**i for i in range [0, arr.len()-1].
+/// Each value can be **exactly** represented as that type.
+</span><span class="kw">const </span>F32_POW10: [f32; <span class="number">11</span>] = [
     <span class="number">1.0</span>,
     <span class="number">10.0</span>,
     <span class="number">100.0</span>,
@@ -460,9 +460,9 @@
     <span class="number">10000000000.0</span>,
 ];
 
-<span class="doccomment">/// Precalculated values of radix**i for i in range [0, arr.len()-1].</span>
-<span class="doccomment">/// Each value can be **exactly** represented as that type.</span>
-<span class="kw">const</span> <span class="ident">F64_POW10</span>: [<span class="ident">f64</span>; <span class="number">23</span>] <span class="op">=</span> [
+<span class="doccomment">/// Precalculated values of radix**i for i in range [0, arr.len()-1].
+/// Each value can be **exactly** represented as that type.
+</span><span class="kw">const </span>F64_POW10: [f64; <span class="number">23</span>] = [
     <span class="number">1.0</span>,
     <span class="number">10.0</span>,
     <span class="number">100.0</span>,
@@ -488,395 +488,395 @@
     <span class="number">10000000000000000000000.0</span>,
 ];
 
-<span class="doccomment">/// Type that can be converted to primitive with `as`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsPrimitive</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">PartialOrd</span> {
-    <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span>;
-    <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt; <span class="ident">u128</span>;
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span>;
-    <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span>;
+<span class="doccomment">/// Type that can be converted to primitive with `as`.
+</span><span class="kw">pub trait </span>AsPrimitive: Sized + Copy + PartialOrd {
+    <span class="kw">fn </span>as_u32(<span class="self">self</span>) -&gt; u32;
+    <span class="kw">fn </span>as_u64(<span class="self">self</span>) -&gt; u64;
+    <span class="kw">fn </span>as_u128(<span class="self">self</span>) -&gt; u128;
+    <span class="kw">fn </span>as_usize(<span class="self">self</span>) -&gt; usize;
+    <span class="kw">fn </span>as_f32(<span class="self">self</span>) -&gt; f32;
+    <span class="kw">fn </span>as_f64(<span class="self">self</span>) -&gt; f64;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">as_primitive_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>as_primitive_impl {
+    ($(<span class="macro-nonterminal">$ty</span>:ident)<span class="kw-2">*</span>) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">AsPrimitive</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_u32</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>
+            <span class="kw">impl </span>AsPrimitive <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_u32(<span class="self">self</span>) -&gt; u32 {
+                    <span class="self">self </span><span class="kw">as </span>u32
                 }
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_u64(<span class="self">self</span>) -&gt; u64 {
+                    <span class="self">self </span><span class="kw">as </span>u64
                 }
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="self">self</span>) -&gt; <span class="ident">u128</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">u128</span>
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_u128(<span class="self">self</span>) -&gt; u128 {
+                    <span class="self">self </span><span class="kw">as </span>u128
                 }
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span>
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_usize(<span class="self">self</span>) -&gt; usize {
+                    <span class="self">self </span><span class="kw">as </span>usize
                 }
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_f32</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">f32</span>
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_f32(<span class="self">self</span>) -&gt; f32 {
+                    <span class="self">self </span><span class="kw">as </span>f32
                 }
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">as_f64</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-                    <span class="self">self</span> <span class="kw">as</span> <span class="ident">f64</span>
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>as_f64(<span class="self">self</span>) -&gt; f64 {
+                    <span class="self">self </span><span class="kw">as </span>f64
                 }
             }
-        )<span class="op">*</span>
+        )*
     };
 }
 
-<span class="macro">as_primitive_impl!</span> { <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="macro">as_primitive_impl! </span>{ u32 u64 u128 usize f32 f64 }
 
-<span class="doccomment">/// An interface for casting between machine scalars.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsCast</span>: <span class="ident">AsPrimitive</span> {
-    <span class="doccomment">/// Creates a number from another value that can be converted into</span>
-    <span class="doccomment">/// a primitive via the `AsPrimitive` trait.</span>
-    <span class="kw">fn</span> <span class="ident">as_cast</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AsPrimitive</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// An interface for casting between machine scalars.
+</span><span class="kw">pub trait </span>AsCast: AsPrimitive {
+    <span class="doccomment">/// Creates a number from another value that can be converted into
+    /// a primitive via the `AsPrimitive` trait.
+    </span><span class="kw">fn </span>as_cast&lt;N: AsPrimitive&gt;(n: N) -&gt; <span class="self">Self</span>;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">as_cast_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">AsCast</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">as_cast</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AsPrimitive</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">n</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>()
+<span class="macro">macro_rules! </span>as_cast_impl {
+    (<span class="macro-nonterminal">$ty</span>:ident, <span class="macro-nonterminal">$method</span>:ident) =&gt; {
+        <span class="kw">impl </span>AsCast <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>as_cast&lt;N: AsPrimitive&gt;(n: N) -&gt; <span class="self">Self </span>{
+                n.<span class="macro-nonterminal">$method</span>()
             }
         }
     };
 }
 
-<span class="macro">as_cast_impl!</span>(<span class="ident">u32</span>, <span class="ident">as_u32</span>);
-<span class="macro">as_cast_impl!</span>(<span class="ident">u64</span>, <span class="ident">as_u64</span>);
-<span class="macro">as_cast_impl!</span>(<span class="ident">u128</span>, <span class="ident">as_u128</span>);
-<span class="macro">as_cast_impl!</span>(<span class="ident">usize</span>, <span class="ident">as_usize</span>);
-<span class="macro">as_cast_impl!</span>(<span class="ident">f32</span>, <span class="ident">as_f32</span>);
-<span class="macro">as_cast_impl!</span>(<span class="ident">f64</span>, <span class="ident">as_f64</span>);
+<span class="macro">as_cast_impl!</span>(u32, as_u32);
+<span class="macro">as_cast_impl!</span>(u64, as_u64);
+<span class="macro">as_cast_impl!</span>(u128, as_u128);
+<span class="macro">as_cast_impl!</span>(usize, as_usize);
+<span class="macro">as_cast_impl!</span>(f32, as_f32);
+<span class="macro">as_cast_impl!</span>(f64, as_f64);
 
-<span class="doccomment">/// Numerical type trait.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Number</span>: <span class="ident">AsCast</span> <span class="op">+</span> <span class="ident">ops::Add</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span> {}
+<span class="doccomment">/// Numerical type trait.
+</span><span class="kw">pub trait </span>Number: AsCast + ops::Add&lt;Output = <span class="self">Self</span>&gt; {}
 
-<span class="macro">macro_rules!</span> <span class="ident">number_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>number_impl {
+    ($(<span class="macro-nonterminal">$ty</span>:ident)<span class="kw-2">*</span>) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">Number</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {}
-        )<span class="op">*</span>
+            <span class="kw">impl </span>Number <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{}
+        )*
     };
 }
 
-<span class="macro">number_impl!</span> { <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="macro">number_impl! </span>{ u32 u64 u128 usize f32 f64 }
 
-<span class="doccomment">/// Defines a trait that supports integral operations.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Integer</span>: <span class="ident">Number</span> <span class="op">+</span> <span class="ident">ops::BitAnd</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">ops::Shr</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span>;
+<span class="doccomment">/// Defines a trait that supports integral operations.
+</span><span class="kw">pub trait </span>Integer: Number + ops::BitAnd&lt;Output = <span class="self">Self</span>&gt; + ops::Shr&lt;i32, Output = <span class="self">Self</span>&gt; {
+    <span class="kw">const </span>ZERO: <span class="self">Self</span>;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">integer_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>integer_impl {
+    ($(<span class="macro-nonterminal">$ty</span>:tt)<span class="kw-2">*</span>) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">Integer</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-                <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="kw">impl </span>Integer <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{
+                <span class="kw">const </span>ZERO: <span class="self">Self </span>= <span class="number">0</span>;
             }
-        )<span class="op">*</span>
+        )*
     };
 }
 
-<span class="macro">integer_impl!</span> { <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> }
+<span class="macro">integer_impl! </span>{ u32 u64 u128 usize }
 
-<span class="doccomment">/// Type trait for the mantissa type.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Mantissa</span>: <span class="ident">Integer</span> {
-    <span class="doccomment">/// Mask to extract the high bits from the integer.</span>
-    <span class="kw">const</span> <span class="ident">HIMASK</span>: <span class="self">Self</span>;
-    <span class="doccomment">/// Mask to extract the low bits from the integer.</span>
-    <span class="kw">const</span> <span class="ident">LOMASK</span>: <span class="self">Self</span>;
-    <span class="doccomment">/// Full size of the integer, in bits.</span>
-    <span class="kw">const</span> <span class="ident">FULL</span>: <span class="ident">i32</span>;
-    <span class="doccomment">/// Half size of the integer, in bits.</span>
-    <span class="kw">const</span> <span class="ident">HALF</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::FULL</span> <span class="op">/</span> <span class="number">2</span>;
+<span class="doccomment">/// Type trait for the mantissa type.
+</span><span class="kw">pub trait </span>Mantissa: Integer {
+    <span class="doccomment">/// Mask to extract the high bits from the integer.
+    </span><span class="kw">const </span>HIMASK: <span class="self">Self</span>;
+    <span class="doccomment">/// Mask to extract the low bits from the integer.
+    </span><span class="kw">const </span>LOMASK: <span class="self">Self</span>;
+    <span class="doccomment">/// Full size of the integer, in bits.
+    </span><span class="kw">const </span>FULL: i32;
+    <span class="doccomment">/// Half size of the integer, in bits.
+    </span><span class="kw">const </span>HALF: i32 = <span class="self">Self</span>::FULL / <span class="number">2</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">Mantissa</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">const</span> <span class="ident">HIMASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0xFFFFFFFF00000000</span>;
-    <span class="kw">const</span> <span class="ident">LOMASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x00000000FFFFFFFF</span>;
-    <span class="kw">const</span> <span class="ident">FULL</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">64</span>;
+<span class="kw">impl </span>Mantissa <span class="kw">for </span>u64 {
+    <span class="kw">const </span>HIMASK: u64 = <span class="number">0xFFFFFFFF00000000</span>;
+    <span class="kw">const </span>LOMASK: u64 = <span class="number">0x00000000FFFFFFFF</span>;
+    <span class="kw">const </span>FULL: i32 = <span class="number">64</span>;
 }
 
-<span class="doccomment">/// Get exact exponent limit for radix.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Float</span>: <span class="ident">Number</span> {
-    <span class="doccomment">/// Unsigned type of the same size.</span>
-    <span class="kw">type</span> <span class="ident">Unsigned</span>: <span class="ident">Integer</span>;
+<span class="doccomment">/// Get exact exponent limit for radix.
+</span><span class="kw">pub trait </span>Float: Number {
+    <span class="doccomment">/// Unsigned type of the same size.
+    </span><span class="kw">type </span>Unsigned: Integer;
 
-    <span class="doccomment">/// Literal zero.</span>
-    <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="self">Self</span>;
-    <span class="doccomment">/// Maximum number of digits that can contribute in the mantissa.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We can exactly represent a float in radix `b` from radix 2 if</span>
-    <span class="doccomment">/// `b` is divisible by 2. This function calculates the exact number of</span>
-    <span class="doccomment">/// digits required to exactly represent that float.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// According to the &quot;Handbook of Floating Point Arithmetic&quot;,</span>
-    <span class="doccomment">/// for IEEE754, with emin being the min exponent, p2 being the</span>
-    <span class="doccomment">/// precision, and b being the radix, the number of digits follows as:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `−emin + p2 + ⌊(emin + 1) log(2, b) − log(1 − 2^(−p2), b)⌋`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For f32, this follows as:</span>
-    <span class="doccomment">///     emin = -126</span>
-    <span class="doccomment">///     p2 = 24</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For f64, this follows as:</span>
-    <span class="doccomment">///     emin = -1022</span>
-    <span class="doccomment">///     p2 = 53</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In Python:</span>
-    <span class="doccomment">///     `-emin + p2 + math.floor((emin+1)*math.log(2, b) - math.log(1-2**(-p2), b))`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This was used to calculate the maximum number of digits for [2, 36].</span>
-    <span class="kw">const</span> <span class="ident">MAX_DIGITS</span>: <span class="ident">usize</span>;
+    <span class="doccomment">/// Literal zero.
+    </span><span class="kw">const </span>ZERO: <span class="self">Self</span>;
+    <span class="doccomment">/// Maximum number of digits that can contribute in the mantissa.
+    ///
+    /// We can exactly represent a float in radix `b` from radix 2 if
+    /// `b` is divisible by 2. This function calculates the exact number of
+    /// digits required to exactly represent that float.
+    ///
+    /// According to the &quot;Handbook of Floating Point Arithmetic&quot;,
+    /// for IEEE754, with emin being the min exponent, p2 being the
+    /// precision, and b being the radix, the number of digits follows as:
+    ///
+    /// `−emin + p2 + ⌊(emin + 1) log(2, b) − log(1 − 2^(−p2), b)⌋`
+    ///
+    /// For f32, this follows as:
+    ///     emin = -126
+    ///     p2 = 24
+    ///
+    /// For f64, this follows as:
+    ///     emin = -1022
+    ///     p2 = 53
+    ///
+    /// In Python:
+    ///     `-emin + p2 + math.floor((emin+1)*math.log(2, b) - math.log(1-2**(-p2), b))`
+    ///
+    /// This was used to calculate the maximum number of digits for [2, 36].
+    </span><span class="kw">const </span>MAX_DIGITS: usize;
 
-    <span class="comment">// MASKS</span>
+    <span class="comment">// MASKS
 
-    <span class="doccomment">/// Bitmask for the sign bit.</span>
-    <span class="kw">const</span> <span class="ident">SIGN_MASK</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="doccomment">/// Bitmask for the exponent, including the hidden bit.</span>
-    <span class="kw">const</span> <span class="ident">EXPONENT_MASK</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="doccomment">/// Bitmask for the hidden bit in exponent, which is an implicit 1 in the fraction.</span>
-    <span class="kw">const</span> <span class="ident">HIDDEN_BIT_MASK</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="doccomment">/// Bitmask for the mantissa (fraction), excluding the hidden bit.</span>
-    <span class="kw">const</span> <span class="ident">MANTISSA_MASK</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
+    </span><span class="doccomment">/// Bitmask for the sign bit.
+    </span><span class="kw">const </span>SIGN_MASK: <span class="self">Self</span>::Unsigned;
+    <span class="doccomment">/// Bitmask for the exponent, including the hidden bit.
+    </span><span class="kw">const </span>EXPONENT_MASK: <span class="self">Self</span>::Unsigned;
+    <span class="doccomment">/// Bitmask for the hidden bit in exponent, which is an implicit 1 in the fraction.
+    </span><span class="kw">const </span>HIDDEN_BIT_MASK: <span class="self">Self</span>::Unsigned;
+    <span class="doccomment">/// Bitmask for the mantissa (fraction), excluding the hidden bit.
+    </span><span class="kw">const </span>MANTISSA_MASK: <span class="self">Self</span>::Unsigned;
 
-    <span class="comment">// PROPERTIES</span>
+    <span class="comment">// PROPERTIES
 
-    <span class="doccomment">/// Positive infinity as bits.</span>
-    <span class="kw">const</span> <span class="ident">INFINITY_BITS</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="doccomment">/// Positive infinity as bits.</span>
-    <span class="kw">const</span> <span class="ident">NEGATIVE_INFINITY_BITS</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="doccomment">/// Size of the significand (mantissa) without hidden bit.</span>
-    <span class="kw">const</span> <span class="ident">MANTISSA_SIZE</span>: <span class="ident">i32</span>;
-    <span class="doccomment">/// Bias of the exponet</span>
-    <span class="kw">const</span> <span class="ident">EXPONENT_BIAS</span>: <span class="ident">i32</span>;
-    <span class="doccomment">/// Exponent portion of a denormal float.</span>
-    <span class="kw">const</span> <span class="ident">DENORMAL_EXPONENT</span>: <span class="ident">i32</span>;
-    <span class="doccomment">/// Maximum exponent value in float.</span>
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT</span>: <span class="ident">i32</span>;
+    </span><span class="doccomment">/// Positive infinity as bits.
+    </span><span class="kw">const </span>INFINITY_BITS: <span class="self">Self</span>::Unsigned;
+    <span class="doccomment">/// Positive infinity as bits.
+    </span><span class="kw">const </span>NEGATIVE_INFINITY_BITS: <span class="self">Self</span>::Unsigned;
+    <span class="doccomment">/// Size of the significand (mantissa) without hidden bit.
+    </span><span class="kw">const </span>MANTISSA_SIZE: i32;
+    <span class="doccomment">/// Bias of the exponet
+    </span><span class="kw">const </span>EXPONENT_BIAS: i32;
+    <span class="doccomment">/// Exponent portion of a denormal float.
+    </span><span class="kw">const </span>DENORMAL_EXPONENT: i32;
+    <span class="doccomment">/// Maximum exponent value in float.
+    </span><span class="kw">const </span>MAX_EXPONENT: i32;
 
-    <span class="comment">// ROUNDING</span>
+    <span class="comment">// ROUNDING
 
-    <span class="doccomment">/// Default number of bits to shift (or 64 - mantissa size - 1).</span>
-    <span class="kw">const</span> <span class="ident">DEFAULT_SHIFT</span>: <span class="ident">i32</span>;
-    <span class="doccomment">/// Mask to determine if a full-carry occurred (1 in bit above hidden bit).</span>
-    <span class="kw">const</span> <span class="ident">CARRY_MASK</span>: <span class="ident">u64</span>;
+    </span><span class="doccomment">/// Default number of bits to shift (or 64 - mantissa size - 1).
+    </span><span class="kw">const </span>DEFAULT_SHIFT: i32;
+    <span class="doccomment">/// Mask to determine if a full-carry occurred (1 in bit above hidden bit).
+    </span><span class="kw">const </span>CARRY_MASK: u64;
 
-    <span class="doccomment">/// Get min and max exponent limits (exact) from radix.</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>() -&gt; (<span class="ident">i32</span>, <span class="ident">i32</span>);
+    <span class="doccomment">/// Get min and max exponent limits (exact) from radix.
+    </span><span class="kw">fn </span>exponent_limit() -&gt; (i32, i32);
 
-    <span class="doccomment">/// Get the number of digits that can be shifted from exponent to mantissa.</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>() -&gt; <span class="ident">i32</span>;
+    <span class="doccomment">/// Get the number of digits that can be shifted from exponent to mantissa.
+    </span><span class="kw">fn </span>mantissa_limit() -&gt; i32;
 
-    <span class="comment">// Re-exported methods from std.</span>
-    <span class="kw">fn</span> <span class="ident">pow10</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">from_bits</span>(<span class="ident">u</span>: <span class="ident"><span class="self">Self</span>::Unsigned</span>) -&gt; <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">to_bits</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unsigned</span>;
-    <span class="kw">fn</span> <span class="ident">is_sign_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">is_sign_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="comment">// Re-exported methods from std.
+    </span><span class="kw">fn </span>pow10(<span class="self">self</span>, n: i32) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>from_bits(u: <span class="self">Self</span>::Unsigned) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>to_bits(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Unsigned;
+    <span class="kw">fn </span>is_sign_positive(<span class="self">self</span>) -&gt; bool;
+    <span class="kw">fn </span>is_sign_negative(<span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Returns true if the float is a denormal.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_denormal</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">to_bits</span>() <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::EXPONENT_MASK</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::Unsigned::ZERO</span>
+    <span class="doccomment">/// Returns true if the float is a denormal.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_denormal(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.to_bits() &amp; <span class="self">Self</span>::EXPONENT_MASK == <span class="self">Self</span>::Unsigned::ZERO
     }
 
-    <span class="doccomment">/// Returns true if the float is a NaN or Infinite.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_special</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">to_bits</span>() <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::EXPONENT_MASK</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::EXPONENT_MASK</span>
+    <span class="doccomment">/// Returns true if the float is a NaN or Infinite.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_special(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.to_bits() &amp; <span class="self">Self</span>::EXPONENT_MASK == <span class="self">Self</span>::EXPONENT_MASK
     }
 
-    <span class="doccomment">/// Returns true if the float is infinite.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_inf</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_special</span>() <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">to_bits</span>() <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::MANTISSA_MASK</span>) <span class="op">==</span> <span class="ident"><span class="self">Self</span>::Unsigned::ZERO</span>
+    <span class="doccomment">/// Returns true if the float is infinite.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_inf(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_special() &amp;&amp; (<span class="self">self</span>.to_bits() &amp; <span class="self">Self</span>::MANTISSA_MASK) == <span class="self">Self</span>::Unsigned::ZERO
     }
 
-    <span class="doccomment">/// Get exponent component from the float.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_denormal</span>() {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::DENORMAL_EXPONENT</span>;
+    <span class="doccomment">/// Get exponent component from the float.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>exponent(<span class="self">self</span>) -&gt; i32 {
+        <span class="kw">if </span><span class="self">self</span>.is_denormal() {
+            <span class="kw">return </span><span class="self">Self</span>::DENORMAL_EXPONENT;
         }
 
-        <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_bits</span>();
-        <span class="kw">let</span> <span class="ident">biased_e</span> <span class="op">=</span> ((<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::EXPONENT_MASK</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::MANTISSA_SIZE</span>).<span class="ident">as_u32</span>();
-        <span class="ident">biased_e</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>
+        <span class="kw">let </span>bits = <span class="self">self</span>.to_bits();
+        <span class="kw">let </span>biased_e = ((bits &amp; <span class="self">Self</span>::EXPONENT_MASK) &gt;&gt; <span class="self">Self</span>::MANTISSA_SIZE).as_u32();
+        biased_e <span class="kw">as </span>i32 - <span class="self">Self</span>::EXPONENT_BIAS
     }
 
-    <span class="doccomment">/// Get mantissa (significand) component from float.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Unsigned</span> {
-        <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_bits</span>();
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::MANTISSA_MASK</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_denormal</span>() {
-            <span class="ident">s</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::HIDDEN_BIT_MASK</span>
-        } <span class="kw">else</span> {
-            <span class="ident">s</span>
+    <span class="doccomment">/// Get mantissa (significand) component from float.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mantissa(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Unsigned {
+        <span class="kw">let </span>bits = <span class="self">self</span>.to_bits();
+        <span class="kw">let </span>s = bits &amp; <span class="self">Self</span>::MANTISSA_MASK;
+        <span class="kw">if </span>!<span class="self">self</span>.is_denormal() {
+            s + <span class="self">Self</span>::HIDDEN_BIT_MASK
+        } <span class="kw">else </span>{
+            s
         }
     }
 
-    <span class="doccomment">/// Get next greater float for a positive float.</span>
-    <span class="doccomment">/// Value must be &gt;= 0.0 and &lt; INFINITY.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next_positive</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_sign_positive</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_inf</span>());
-        <span class="ident"><span class="self">Self</span>::from_bits</span>(<span class="self">self</span>.<span class="ident">to_bits</span>() <span class="op">+</span> <span class="ident"><span class="self">Self</span>::Unsigned::as_cast</span>(<span class="number">1u32</span>))
+    <span class="doccomment">/// Get next greater float for a positive float.
+    /// Value must be &gt;= 0.0 and &lt; INFINITY.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next_positive(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_sign_positive() &amp;&amp; !<span class="self">self</span>.is_inf());
+        <span class="self">Self</span>::from_bits(<span class="self">self</span>.to_bits() + <span class="self">Self</span>::Unsigned::as_cast(<span class="number">1u32</span>))
     }
 
-    <span class="doccomment">/// Round a positive number to even.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">round_positive_even</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mantissa</span>() <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::Unsigned::as_cast</span>(<span class="number">1u32</span>) <span class="op">==</span> <span class="ident"><span class="self">Self</span>::Unsigned::as_cast</span>(<span class="number">1u32</span>) {
-            <span class="self">self</span>.<span class="ident">next_positive</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>
-        }
+    <span class="doccomment">/// Round a positive number to even.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>round_positive_even(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.mantissa() &amp; <span class="self">Self</span>::Unsigned::as_cast(<span class="number">1u32</span>) == <span class="self">Self</span>::Unsigned::as_cast(<span class="number">1u32</span>) {
+            <span class="self">self</span>.next_positive()
+        } <span class="kw">else </span>{
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Float</span> <span class="kw">for</span> <span class="ident">f32</span> {
-    <span class="kw">type</span> <span class="ident">Unsigned</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">impl </span>Float <span class="kw">for </span>f32 {
+    <span class="kw">type </span>Unsigned = u32;
 
-    <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">0.0</span>;
-    <span class="kw">const</span> <span class="ident">MAX_DIGITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">114</span>;
-    <span class="kw">const</span> <span class="ident">SIGN_MASK</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x80000000</span>;
-    <span class="kw">const</span> <span class="ident">EXPONENT_MASK</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x7F800000</span>;
-    <span class="kw">const</span> <span class="ident">HIDDEN_BIT_MASK</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x00800000</span>;
-    <span class="kw">const</span> <span class="ident">MANTISSA_MASK</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x007FFFFF</span>;
-    <span class="kw">const</span> <span class="ident">INFINITY_BITS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0x7F800000</span>;
-    <span class="kw">const</span> <span class="ident">NEGATIVE_INFINITY_BITS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::INFINITY_BITS</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::SIGN_MASK</span>;
-    <span class="kw">const</span> <span class="ident">MANTISSA_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">23</span>;
-    <span class="kw">const</span> <span class="ident">EXPONENT_BIAS</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">127</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::MANTISSA_SIZE</span>;
-    <span class="kw">const</span> <span class="ident">DENORMAL_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0xFF</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>;
-    <span class="kw">const</span> <span class="ident">DEFAULT_SHIFT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">u64::FULL</span> <span class="op">-</span> <span class="ident">f32::MANTISSA_SIZE</span> <span class="op">-</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">CARRY_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x1000000</span>;
+    <span class="kw">const </span>ZERO: f32 = <span class="number">0.0</span>;
+    <span class="kw">const </span>MAX_DIGITS: usize = <span class="number">114</span>;
+    <span class="kw">const </span>SIGN_MASK: u32 = <span class="number">0x80000000</span>;
+    <span class="kw">const </span>EXPONENT_MASK: u32 = <span class="number">0x7F800000</span>;
+    <span class="kw">const </span>HIDDEN_BIT_MASK: u32 = <span class="number">0x00800000</span>;
+    <span class="kw">const </span>MANTISSA_MASK: u32 = <span class="number">0x007FFFFF</span>;
+    <span class="kw">const </span>INFINITY_BITS: u32 = <span class="number">0x7F800000</span>;
+    <span class="kw">const </span>NEGATIVE_INFINITY_BITS: u32 = <span class="self">Self</span>::INFINITY_BITS | <span class="self">Self</span>::SIGN_MASK;
+    <span class="kw">const </span>MANTISSA_SIZE: i32 = <span class="number">23</span>;
+    <span class="kw">const </span>EXPONENT_BIAS: i32 = <span class="number">127 </span>+ <span class="self">Self</span>::MANTISSA_SIZE;
+    <span class="kw">const </span>DENORMAL_EXPONENT: i32 = <span class="number">1 </span>- <span class="self">Self</span>::EXPONENT_BIAS;
+    <span class="kw">const </span>MAX_EXPONENT: i32 = <span class="number">0xFF </span>- <span class="self">Self</span>::EXPONENT_BIAS;
+    <span class="kw">const </span>DEFAULT_SHIFT: i32 = u64::FULL - f32::MANTISSA_SIZE - <span class="number">1</span>;
+    <span class="kw">const </span>CARRY_MASK: u64 = <span class="number">0x1000000</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>() -&gt; (<span class="ident">i32</span>, <span class="ident">i32</span>) {
-        (<span class="op">-</span><span class="number">10</span>, <span class="number">10</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>exponent_limit() -&gt; (i32, i32) {
+        (-<span class="number">10</span>, <span class="number">10</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>() -&gt; <span class="ident">i32</span> {
-        <span class="number">7</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mantissa_limit() -&gt; i32 {
+        <span class="number">7
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pow10</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="ident">f32</span> {
-        <span class="comment">// Check the exponent is within bounds in debug builds.</span>
-        <span class="macro">debug_assert!</span>({
-            <span class="kw">let</span> (<span class="ident">min</span>, <span class="ident">max</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::exponent_limit</span>();
-            <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">min</span> <span class="op">&amp;&amp;</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>pow10(<span class="self">self</span>, n: i32) -&gt; f32 {
+        <span class="comment">// Check the exponent is within bounds in debug builds.
+        </span><span class="macro">debug_assert!</span>({
+            <span class="kw">let </span>(min, max) = <span class="self">Self</span>::exponent_limit();
+            n &gt;= min &amp;&amp; n &lt;= max
         });
 
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="self">self</span> <span class="op">*</span> <span class="ident">F32_POW10</span>[<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>]
-        } <span class="kw">else</span> {
-            <span class="self">self</span> <span class="op">/</span> <span class="ident">F32_POW10</span>[<span class="op">-</span><span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>]
+        <span class="kw">if </span>n &gt; <span class="number">0 </span>{
+            <span class="self">self </span>* F32_POW10[n <span class="kw">as </span>usize]
+        } <span class="kw">else </span>{
+            <span class="self">self </span>/ F32_POW10[-n <span class="kw">as </span>usize]
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_bits</span>(<span class="ident">u</span>: <span class="ident">u32</span>) -&gt; <span class="ident">f32</span> {
-        <span class="ident">f32::from_bits</span>(<span class="ident">u</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_bits(u: u32) -&gt; f32 {
+        f32::from_bits(u)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_bits</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="ident">f32::to_bits</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_bits(<span class="self">self</span>) -&gt; u32 {
+        f32::to_bits(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_sign_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">f32::is_sign_positive</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_sign_positive(<span class="self">self</span>) -&gt; bool {
+        f32::is_sign_positive(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_sign_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">f32::is_sign_negative</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_sign_negative(<span class="self">self</span>) -&gt; bool {
+        f32::is_sign_negative(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Float</span> <span class="kw">for</span> <span class="ident">f64</span> {
-    <span class="kw">type</span> <span class="ident">Unsigned</span> <span class="op">=</span> <span class="ident">u64</span>;
+<span class="kw">impl </span>Float <span class="kw">for </span>f64 {
+    <span class="kw">type </span>Unsigned = u64;
 
-    <span class="kw">const</span> <span class="ident">ZERO</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">0.0</span>;
-    <span class="kw">const</span> <span class="ident">MAX_DIGITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">769</span>;
-    <span class="kw">const</span> <span class="ident">SIGN_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x8000000000000000</span>;
-    <span class="kw">const</span> <span class="ident">EXPONENT_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x7FF0000000000000</span>;
-    <span class="kw">const</span> <span class="ident">HIDDEN_BIT_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x0010000000000000</span>;
-    <span class="kw">const</span> <span class="ident">MANTISSA_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x000FFFFFFFFFFFFF</span>;
-    <span class="kw">const</span> <span class="ident">INFINITY_BITS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x7FF0000000000000</span>;
-    <span class="kw">const</span> <span class="ident">NEGATIVE_INFINITY_BITS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::INFINITY_BITS</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::SIGN_MASK</span>;
-    <span class="kw">const</span> <span class="ident">MANTISSA_SIZE</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">52</span>;
-    <span class="kw">const</span> <span class="ident">EXPONENT_BIAS</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">1023</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::MANTISSA_SIZE</span>;
-    <span class="kw">const</span> <span class="ident">DENORMAL_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>;
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0x7FF</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::EXPONENT_BIAS</span>;
-    <span class="kw">const</span> <span class="ident">DEFAULT_SHIFT</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">u64::FULL</span> <span class="op">-</span> <span class="ident">f64::MANTISSA_SIZE</span> <span class="op">-</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">CARRY_MASK</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0x20000000000000</span>;
+    <span class="kw">const </span>ZERO: f64 = <span class="number">0.0</span>;
+    <span class="kw">const </span>MAX_DIGITS: usize = <span class="number">769</span>;
+    <span class="kw">const </span>SIGN_MASK: u64 = <span class="number">0x8000000000000000</span>;
+    <span class="kw">const </span>EXPONENT_MASK: u64 = <span class="number">0x7FF0000000000000</span>;
+    <span class="kw">const </span>HIDDEN_BIT_MASK: u64 = <span class="number">0x0010000000000000</span>;
+    <span class="kw">const </span>MANTISSA_MASK: u64 = <span class="number">0x000FFFFFFFFFFFFF</span>;
+    <span class="kw">const </span>INFINITY_BITS: u64 = <span class="number">0x7FF0000000000000</span>;
+    <span class="kw">const </span>NEGATIVE_INFINITY_BITS: u64 = <span class="self">Self</span>::INFINITY_BITS | <span class="self">Self</span>::SIGN_MASK;
+    <span class="kw">const </span>MANTISSA_SIZE: i32 = <span class="number">52</span>;
+    <span class="kw">const </span>EXPONENT_BIAS: i32 = <span class="number">1023 </span>+ <span class="self">Self</span>::MANTISSA_SIZE;
+    <span class="kw">const </span>DENORMAL_EXPONENT: i32 = <span class="number">1 </span>- <span class="self">Self</span>::EXPONENT_BIAS;
+    <span class="kw">const </span>MAX_EXPONENT: i32 = <span class="number">0x7FF </span>- <span class="self">Self</span>::EXPONENT_BIAS;
+    <span class="kw">const </span>DEFAULT_SHIFT: i32 = u64::FULL - f64::MANTISSA_SIZE - <span class="number">1</span>;
+    <span class="kw">const </span>CARRY_MASK: u64 = <span class="number">0x20000000000000</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exponent_limit</span>() -&gt; (<span class="ident">i32</span>, <span class="ident">i32</span>) {
-        (<span class="op">-</span><span class="number">22</span>, <span class="number">22</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>exponent_limit() -&gt; (i32, i32) {
+        (-<span class="number">22</span>, <span class="number">22</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mantissa_limit</span>() -&gt; <span class="ident">i32</span> {
-        <span class="number">15</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mantissa_limit() -&gt; i32 {
+        <span class="number">15
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pow10</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i32</span>) -&gt; <span class="ident">f64</span> {
-        <span class="comment">// Check the exponent is within bounds in debug builds.</span>
-        <span class="macro">debug_assert!</span>({
-            <span class="kw">let</span> (<span class="ident">min</span>, <span class="ident">max</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::exponent_limit</span>();
-            <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">min</span> <span class="op">&amp;&amp;</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>pow10(<span class="self">self</span>, n: i32) -&gt; f64 {
+        <span class="comment">// Check the exponent is within bounds in debug builds.
+        </span><span class="macro">debug_assert!</span>({
+            <span class="kw">let </span>(min, max) = <span class="self">Self</span>::exponent_limit();
+            n &gt;= min &amp;&amp; n &lt;= max
         });
 
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="self">self</span> <span class="op">*</span> <span class="ident">F64_POW10</span>[<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>]
-        } <span class="kw">else</span> {
-            <span class="self">self</span> <span class="op">/</span> <span class="ident">F64_POW10</span>[<span class="op">-</span><span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>]
+        <span class="kw">if </span>n &gt; <span class="number">0 </span>{
+            <span class="self">self </span>* F64_POW10[n <span class="kw">as </span>usize]
+        } <span class="kw">else </span>{
+            <span class="self">self </span>/ F64_POW10[-n <span class="kw">as </span>usize]
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_bits</span>(<span class="ident">u</span>: <span class="ident">u64</span>) -&gt; <span class="ident">f64</span> {
-        <span class="ident">f64::from_bits</span>(<span class="ident">u</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_bits(u: u64) -&gt; f64 {
+        f64::from_bits(u)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_bits</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">f64::to_bits</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_bits(<span class="self">self</span>) -&gt; u64 {
+        f64::to_bits(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_sign_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">f64::is_sign_positive</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_sign_positive(<span class="self">self</span>) -&gt; bool {
+        f64::is_sign_positive(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_sign_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">f64::is_sign_negative</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_sign_negative(<span class="self">self</span>) -&gt; bool {
+        f64::is_sign_negative(<span class="self">self</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

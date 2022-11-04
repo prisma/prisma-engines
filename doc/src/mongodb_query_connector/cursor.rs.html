@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/cursor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/cursor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cursor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -209,216 +209,216 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">orderby::OrderByData</span>, <span class="ident">IntoBson</span>};
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">SelectionResult</span>, <span class="ident">SortOrder</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{orderby::OrderByData, IntoBson};
+<span class="kw">use </span>mongodb::bson::{doc, Document};
+<span class="kw">use </span>prisma_models::{OrderBy, SelectionResult, SortOrder};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorData</span> {
-    <span class="doccomment">/// A mongo filter document containing cursor-related conditions.</span>
-    <span class="doccomment">/// These are applied after sort operations but before skip or takes.</span>
-    <span class="kw">pub</span> <span class="ident">cursor_filter</span>: <span class="ident">Document</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorData {
+    <span class="doccomment">/// A mongo filter document containing cursor-related conditions.
+    /// These are applied after sort operations but before skip or takes.
+    </span><span class="kw">pub </span>cursor_filter: Document,
 
-    <span class="doccomment">/// A document to make the `let` binding of the outer (cursor) document work.</span>
-    <span class="kw">pub</span> <span class="ident">bindings</span>: <span class="ident">Document</span>,
+    <span class="doccomment">/// A document to make the `let` binding of the outer (cursor) document work.
+    </span><span class="kw">pub </span>bindings: Document,
 
-    <span class="doccomment">/// The actual conditions used to filter down records based on the cursor.</span>
-    <span class="kw">pub</span> <span class="ident">cursor_condition</span>: <span class="ident">Document</span>,
+    <span class="doccomment">/// The actual conditions used to filter down records based on the cursor.
+    </span><span class="kw">pub </span>cursor_condition: Document,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorBuilder</span> {
-    <span class="doccomment">/// The field-value combination the cursor .</span>
-    <span class="ident">cursor</span>: <span class="ident">SelectionResult</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorBuilder {
+    <span class="doccomment">/// The field-value combination the cursor .
+    </span>cursor: SelectionResult,
 
-    <span class="doccomment">/// Ordering to use. Influences how cursor conditions are build.</span>
-    <span class="doccomment">/// Relies on the `OrderByBuilder` to compute the joins and prepare</span>
-    <span class="doccomment">/// the documents for cursor conditions so this builder can focus on</span>
-    <span class="doccomment">/// conditionals only.</span>
-    <span class="ident">order_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByData</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Ordering to use. Influences how cursor conditions are build.
+    /// Relies on the `OrderByBuilder` to compute the joins and prepare
+    /// the documents for cursor conditions so this builder can focus on
+    /// conditionals only.
+    </span>order_data: Vec&lt;OrderByData&gt;,
 
-    <span class="doccomment">/// Order needs reversal</span>
-    <span class="ident">reverse</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Order needs reversal
+    </span>reverse: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">CursorBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">SelectionResult</span>, <span class="ident">order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">OrderByData::from_list</span>(<span class="ident">order</span>);
+<span class="kw">impl </span>CursorBuilder {
+    <span class="kw">pub fn </span>new(cursor: SelectionResult, order: Vec&lt;OrderBy&gt;, reverse: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>order_data = OrderByData::from_list(order);
 
-        <span class="self">Self</span> {
-            <span class="ident">cursor</span>,
-            <span class="ident">order_data</span>,
-            <span class="ident">reverse</span>,
+        <span class="self">Self </span>{
+            cursor,
+            order_data,
+            reverse,
         }
     }
 
-    <span class="doccomment">/// Returns a filter document for the cursor and a filter document for the cursor condition.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">CursorData</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>;
+    <span class="doccomment">/// Returns a filter document for the cursor and a filter document for the cursor condition.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;CursorData&gt; {
+        <span class="kw">let </span>cursor = <span class="self">self</span>.cursor;
 
-        <span class="comment">// First, we need to pin the record specified by the cursor to find the order by values for the comparator.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor_filters</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="comment">// First, we need to pin the record specified by the cursor to find the order by values for the comparator.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>cursor_filters = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">cursor</span> {
-            <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">field</span>, <span class="ident">value</span>).<span class="ident">into_bson</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>());
+        <span class="kw">for </span>(field, value) <span class="kw">in </span>cursor {
+            <span class="kw">let </span>bson = (<span class="kw-2">&amp;</span>field, value).into_bson()<span class="question-mark">?</span>;
+            <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, field.db_name());
 
-            <span class="ident">cursor_filters</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="ident">field_name</span>, <span class="ident">bson</span>]});
+            cursor_filters.push(<span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [field_name, bson]});
         }
 
-        <span class="kw">let</span> <span class="ident">cursor_filter</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;$and&quot;</span>: <span class="ident">cursor_filters</span> };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bindings</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+        <span class="kw">let </span>cursor_filter = <span class="macro">doc! </span>{ <span class="string">&quot;$and&quot;</span>: cursor_filters };
+        <span class="kw">let </span><span class="kw-2">mut </span>bindings = Document::new();
 
-        <span class="kw">for</span> <span class="ident">order_data</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">order_data</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> (<span class="ident">left_bind_field_name</span>, <span class="ident">right_binding_field_name</span>) <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">binding_names</span>();
+        <span class="kw">for </span>order_data <span class="kw">in </span><span class="self">self</span>.order_data.iter() {
+            <span class="kw">let </span>(left_bind_field_name, right_binding_field_name) = order_data.binding_names();
 
-            <span class="comment">// For: `&quot;let&quot;: { fieldName: &quot;$fieldName&quot; }` bindings for the outer pipeline.</span>
-            <span class="ident">bindings</span>.<span class="ident">insert</span>(<span class="ident">left_bind_field_name</span>, <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">right_binding_field_name</span>));
+            <span class="comment">// For: `&quot;let&quot;: { fieldName: &quot;$fieldName&quot; }` bindings for the outer pipeline.
+            </span>bindings.insert(left_bind_field_name, <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, right_binding_field_name));
         }
 
-        <span class="kw">let</span> <span class="ident">cursor_condition</span> <span class="op">=</span> <span class="ident">cursor_conditions</span>(<span class="self">self</span>.<span class="ident">order_data</span>, <span class="self">self</span>.<span class="ident">reverse</span>);
+        <span class="kw">let </span>cursor_condition = cursor_conditions(<span class="self">self</span>.order_data, <span class="self">self</span>.reverse);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">CursorData</span> {
-            <span class="ident">cursor_filter</span>,
-            <span class="ident">bindings</span>,
-            <span class="ident">cursor_condition</span>,
+        <span class="prelude-val">Ok</span>(CursorData {
+            cursor_filter,
+            bindings,
+            cursor_condition,
         })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cursor_conditions</span>(<span class="kw-2">mut</span> <span class="ident">order_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByData</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
-    <span class="comment">// let mut conditions = vec![];</span>
-    <span class="kw">let</span> <span class="ident">num_orderings</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">len</span>();
+<span class="kw">fn </span>cursor_conditions(<span class="kw-2">mut </span>order_data: Vec&lt;OrderByData&gt;, reverse: bool) -&gt; Document {
+    <span class="comment">// let mut conditions = vec![];
+    </span><span class="kw">let </span>num_orderings = order_data.len();
 
-    <span class="kw">if</span> <span class="ident">num_orderings</span> <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="ident">map_orderby_condition</span>(<span class="kw-2">&amp;</span><span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">or_conditions</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">if </span>num_orderings == <span class="number">1 </span>{
+        <span class="kw">let </span>order_data = order_data.pop().unwrap();
+        map_orderby_condition(<span class="kw-2">&amp;</span>order_data, reverse, <span class="bool-val">true</span>)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>or_conditions = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_orderings</span> {
-            <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">split_at</span>(<span class="ident">num_orderings</span> <span class="op">-</span> <span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">and_conditions</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">head</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
+        <span class="kw">for </span>n <span class="kw">in </span><span class="number">0</span>..num_orderings {
+            <span class="kw">let </span>(head, tail) = order_data.split_at(num_orderings - n - <span class="number">1</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>and_conditions = Vec::with_capacity(head.len() + <span class="number">1</span>);
 
-            <span class="kw">for</span> <span class="ident">order_data</span> <span class="kw">in</span> <span class="ident">head</span> {
-                <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_equality_condition</span>(<span class="ident">order_data</span>));
+            <span class="kw">for </span>order_data <span class="kw">in </span>head {
+                and_conditions.push(map_equality_condition(order_data));
             }
 
-            <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let </span>order_data = tail.first().unwrap();
 
-            <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">num_orderings</span> <span class="op">-</span> <span class="number">1</span> {
-                <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">true</span>));
-            } <span class="kw">else</span> {
-                <span class="ident">and_conditions</span>.<span class="ident">push</span>(<span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>, <span class="ident">reverse</span>, <span class="bool-val">false</span>));
+            <span class="kw">if </span>head.len() == num_orderings - <span class="number">1 </span>{
+                and_conditions.push(map_orderby_condition(order_data, reverse, <span class="bool-val">true</span>));
+            } <span class="kw">else </span>{
+                and_conditions.push(map_orderby_condition(order_data, reverse, <span class="bool-val">false</span>));
             }
 
-            <span class="ident">or_conditions</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$and&quot;</span>: <span class="ident">and_conditions</span> });
+            or_conditions.push(<span class="macro">doc! </span>{ <span class="string">&quot;$and&quot;</span>: and_conditions });
         }
 
-        <span class="macro">doc!</span> { <span class="string">&quot;$or&quot;</span>: <span class="ident">or_conditions</span> }
+        <span class="macro">doc! </span>{ <span class="string">&quot;$or&quot;</span>: or_conditions }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">map_orderby_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>, <span class="ident">include_eq</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Document</span> {
-    <span class="kw">let</span> <span class="ident">bound_order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">unbound_order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">false</span>);
+<span class="kw">fn </span>map_orderby_condition(order_data: <span class="kw-2">&amp;</span>OrderByData, reverse: bool, include_eq: bool) -&gt; Document {
+    <span class="kw">let </span>bound_order_field_reference = order_data.full_reference_path(<span class="bool-val">true</span>);
+    <span class="kw">let </span>unbound_order_field_reference = order_data.full_reference_path(<span class="bool-val">false</span>);
 
-    <span class="kw">let</span> <span class="ident">order_doc</span>: <span class="ident">Document</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">order_data</span>.<span class="ident">sort_order</span>() {
-        <span class="comment">// If it&#39;s ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).</span>
-        <span class="ident">SortOrder::Ascending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
-            } <span class="kw">else</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
+    <span class="kw">let </span>order_doc: Document = <span class="kw">match </span>order_data.sort_order() {
+        <span class="comment">// If it&#39;s ASC but we want to take from the back, the ORDER BY will be DESC, meaning that comparisons done need to be lt(e).
+        </span>SortOrder::Ascending <span class="kw">if </span>reverse =&gt; {
+            <span class="kw">if </span>include_eq {
+                <span class="macro">doc! </span>{ <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
+            } <span class="kw">else </span>{
+                <span class="macro">doc! </span>{ <span class="string">&quot;$lt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
             }
         }
 
-        <span class="comment">// If it&#39;s DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).</span>
-        <span class="ident">SortOrder::Descending</span> <span class="kw">if</span> <span class="ident">reverse</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
-            } <span class="kw">else</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
+        <span class="comment">// If it&#39;s DESC but we want to take from the back, the ORDER BY will be ASC, meaning that comparisons done need to be gt(e).
+        </span>SortOrder::Descending <span class="kw">if </span>reverse =&gt; {
+            <span class="kw">if </span>include_eq {
+                <span class="macro">doc! </span>{ <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
+            } <span class="kw">else </span>{
+                <span class="macro">doc! </span>{ <span class="string">&quot;$gt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
             }
         }
 
-        <span class="ident">SortOrder::Ascending</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
-            } <span class="kw">else</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$gt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
+        SortOrder::Ascending =&gt; {
+            <span class="kw">if </span>include_eq {
+                <span class="macro">doc! </span>{ <span class="string">&quot;$gte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
+            } <span class="kw">else </span>{
+                <span class="macro">doc! </span>{ <span class="string">&quot;$gt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
             }
         }
 
-        <span class="ident">SortOrder::Descending</span> =&gt; {
-            <span class="kw">if</span> <span class="ident">include_eq</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
-            } <span class="kw">else</span> {
-                <span class="macro">doc!</span> { <span class="string">&quot;$lt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">unbound_order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bound_order_field_reference</span>)] }
+        SortOrder::Descending =&gt; {
+            <span class="kw">if </span>include_eq {
+                <span class="macro">doc! </span>{ <span class="string">&quot;$lte&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
+            } <span class="kw">else </span>{
+                <span class="macro">doc! </span>{ <span class="string">&quot;$lt&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>unbound_order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>bound_order_field_reference)] }
             }
         }
     };
 
-    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a</span>
-    <span class="comment">// statement over their order relative to the cursor.</span>
-    <span class="comment">// let order_doc = if !order_by.field.is_required {</span>
+    <span class="comment">// If we have null values in the ordering or comparison row, those are automatically included because we can&#39;t make a
+    // statement over their order relative to the cursor.
+    // let order_doc = if !order_by.field.is_required {
 
-    <span class="comment">//     // order_expr</span>
-    <span class="comment">//     //     .or(cloned_order_column.is_null())</span>
-    <span class="comment">//     //     .or(cloned_cmp_column.is_null())</span>
-    <span class="comment">//     //     .into()</span>
-    <span class="comment">// } else {</span>
-    <span class="comment">//     order_expr</span>
-    <span class="comment">// };</span>
+    //     // order_expr
+    //     //     .or(cloned_order_column.is_null())
+    //     //     .or(cloned_cmp_column.is_null())
+    //     //     .into()
+    // } else {
+    //     order_expr
+    // };
 
-    <span class="comment">// Add OR statements for the foreign key fields too if they are nullable</span>
-    <span class="comment">// let order_expr = if let Some(fks) = &amp;order_definition.fks {</span>
-    <span class="comment">//     fks.iter()</span>
-    <span class="comment">//         .filter(|(fk, _)| !fk.is_required)</span>
-    <span class="comment">//         .fold(order_expr, |acc, (fk, alias)| {</span>
-    <span class="comment">//             let col = if let Some(alias) = alias {</span>
-    <span class="comment">//                 Column::from((alias.to_owned(), fk.db_name().to_owned()))</span>
-    <span class="comment">//             } else {</span>
-    <span class="comment">//                 fk.as_column()</span>
-    <span class="comment">//             }</span>
-    <span class="comment">//             .is_null();</span>
+    // Add OR statements for the foreign key fields too if they are nullable
+    // let order_expr = if let Some(fks) = &amp;order_definition.fks {
+    //     fks.iter()
+    //         .filter(|(fk, _)| !fk.is_required)
+    //         .fold(order_expr, |acc, (fk, alias)| {
+    //             let col = if let Some(alias) = alias {
+    //                 Column::from((alias.to_owned(), fk.db_name().to_owned()))
+    //             } else {
+    //                 fk.as_column()
+    //             }
+    //             .is_null();
 
-    <span class="comment">//             acc.or(col).into()</span>
-    <span class="comment">//         })</span>
-    <span class="comment">// } else {</span>
-    <span class="comment">//     order_expr</span>
-    <span class="comment">// };</span>
+    //             acc.or(col).into()
+    //         })
+    // } else {
+    //     order_expr
+    // };
 
-    <span class="comment">// order_expr</span>
+    // order_expr
 
-    <span class="ident">order_doc</span>
+    </span>order_doc
 }
 
-<span class="kw">fn</span> <span class="ident">map_equality_condition</span>(<span class="ident">order_data</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByData</span>) -&gt; <span class="ident">Document</span> {
-    <span class="kw">let</span> <span class="ident">order_field_reference</span> <span class="op">=</span> <span class="ident">order_data</span>.<span class="ident">full_reference_path</span>(<span class="bool-val">true</span>);
+<span class="kw">fn </span>map_equality_condition(order_data: <span class="kw-2">&amp;</span>OrderByData) -&gt; Document {
+    <span class="kw">let </span>order_field_reference = order_data.full_reference_path(<span class="bool-val">true</span>);
 
-    <span class="comment">// // If we have null values in the ordering or comparison row, those are automatically</span>
-    <span class="comment">// // included because we can&#39;t make a statement over their order relative to the cursor.</span>
-    <span class="comment">// if !field.is_required {</span>
-    <span class="comment">//     order_column</span>
-    <span class="comment">//         .clone()</span>
-    <span class="comment">//         .equals(cmp_column.clone())</span>
-    <span class="comment">//         .or(cmp_column.is_null())</span>
-    <span class="comment">//         .or(order_column.is_null())</span>
-    <span class="comment">//         .into()</span>
+    <span class="comment">// // If we have null values in the ordering or comparison row, those are automatically
+    // // included because we can&#39;t make a statement over their order relative to the cursor.
+    // if !field.is_required {
+    //     order_column
+    //         .clone()
+    //         .equals(cmp_column.clone())
+    //         .or(cmp_column.is_null())
+    //         .or(order_column.is_null())
+    //         .into()
 
-    <span class="comment">//     doc! {</span>
-    <span class="comment">//         &quot;$or&quot;: [</span>
-    <span class="comment">//             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }},</span>
-    <span class="comment">//             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }},</span>
-    <span class="comment">//             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }}</span>
-    <span class="comment">//         ]</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// } else {</span>
+    //     doc! {
+    //         &quot;$or&quot;: [
+    //             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }},
+    //             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }},
+    //             { &quot;$expr&quot;: { &quot;$eq&quot;: [format!(&quot;${}&quot;, &amp;order_field_reference), format!(&quot;$${}&quot;, &amp;order_field_reference)] }}
+    //         ]
+    //     }
+    // } else {
 
-    <span class="comment">// Todo: Verify this actually does everything we want already.</span>
-    <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">order_field_reference</span>), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">order_field_reference</span>)] }
-    <span class="comment">// }</span>
-}
+    // Todo: Verify this actually does everything we want already.
+    </span><span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [<span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>order_field_reference), <span class="macro">format!</span>(<span class="string">&quot;$${}&quot;</span>, <span class="kw-2">&amp;</span>order_field_reference)] }
+    <span class="comment">// }
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

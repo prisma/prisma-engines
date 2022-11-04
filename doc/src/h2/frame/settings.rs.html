@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/frame/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/frame/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -389,396 +389,396 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>::{<span class="ident">util</span>, <span class="ident">Error</span>, <span class="ident">Frame</span>, <span class="ident">FrameSize</span>, <span class="ident">Head</span>, <span class="ident">Kind</span>, <span class="ident">StreamId</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
+<span class="kw">use </span><span class="kw">crate</span>::frame::{util, Error, Frame, FrameSize, Head, Kind, StreamId};
+<span class="kw">use </span>bytes::{BufMut, BytesMut};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Settings</span> {
-    <span class="ident">flags</span>: <span class="ident">SettingsFlags</span>,
-    <span class="comment">// Fields</span>
-    <span class="ident">header_table_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">enable_push</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">max_concurrent_streams</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">initial_window_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">max_frame_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">max_header_list_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">enable_connect_protocol</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Default, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Settings {
+    flags: SettingsFlags,
+    <span class="comment">// Fields
+    </span>header_table_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    enable_push: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    max_concurrent_streams: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    initial_window_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    max_frame_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    max_header_list_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    enable_connect_protocol: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="doccomment">/// An enum that lists all valid settings that can be sent in a SETTINGS</span>
-<span class="doccomment">/// frame.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each setting has a value that is a 32 bit unsigned integer (6.5.1.).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Setting</span> {
-    <span class="ident">HeaderTableSize</span>(<span class="ident">u32</span>),
-    <span class="ident">EnablePush</span>(<span class="ident">u32</span>),
-    <span class="ident">MaxConcurrentStreams</span>(<span class="ident">u32</span>),
-    <span class="ident">InitialWindowSize</span>(<span class="ident">u32</span>),
-    <span class="ident">MaxFrameSize</span>(<span class="ident">u32</span>),
-    <span class="ident">MaxHeaderListSize</span>(<span class="ident">u32</span>),
-    <span class="ident">EnableConnectProtocol</span>(<span class="ident">u32</span>),
+<span class="doccomment">/// An enum that lists all valid settings that can be sent in a SETTINGS
+/// frame.
+///
+/// Each setting has a value that is a 32 bit unsigned integer (6.5.1.).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Setting {
+    HeaderTableSize(u32),
+    EnablePush(u32),
+    MaxConcurrentStreams(u32),
+    InitialWindowSize(u32),
+    MaxFrameSize(u32),
+    MaxHeaderListSize(u32),
+    EnableConnectProtocol(u32),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SettingsFlags</span>(<span class="ident">u8</span>);
+<span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, Default)]
+</span><span class="kw">pub struct </span>SettingsFlags(u8);
 
-<span class="kw">const</span> <span class="ident">ACK</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x1</span>;
-<span class="kw">const</span> <span class="ident">ALL</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">ACK</span>;
+<span class="kw">const </span>ACK: u8 = <span class="number">0x1</span>;
+<span class="kw">const </span>ALL: u8 = ACK;
 
-<span class="doccomment">/// The default value of SETTINGS_HEADER_TABLE_SIZE</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_SETTINGS_HEADER_TABLE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4_096</span>;
+<span class="doccomment">/// The default value of SETTINGS_HEADER_TABLE_SIZE
+</span><span class="kw">pub const </span>DEFAULT_SETTINGS_HEADER_TABLE_SIZE: usize = <span class="number">4_096</span>;
 
-<span class="doccomment">/// The default value of SETTINGS_INITIAL_WINDOW_SIZE</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_INITIAL_WINDOW_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">65_535</span>;
+<span class="doccomment">/// The default value of SETTINGS_INITIAL_WINDOW_SIZE
+</span><span class="kw">pub const </span>DEFAULT_INITIAL_WINDOW_SIZE: u32 = <span class="number">65_535</span>;
 
-<span class="doccomment">/// The default value of MAX_FRAME_SIZE</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>: <span class="ident">FrameSize</span> <span class="op">=</span> <span class="number">16_384</span>;
+<span class="doccomment">/// The default value of MAX_FRAME_SIZE
+</span><span class="kw">pub const </span>DEFAULT_MAX_FRAME_SIZE: FrameSize = <span class="number">16_384</span>;
 
-<span class="doccomment">/// INITIAL_WINDOW_SIZE upper bound</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_INITIAL_WINDOW_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>) <span class="op">-</span> <span class="number">1</span>;
+<span class="doccomment">/// INITIAL_WINDOW_SIZE upper bound
+</span><span class="kw">pub const </span>MAX_INITIAL_WINDOW_SIZE: usize = (<span class="number">1 </span>&lt;&lt; <span class="number">31</span>) - <span class="number">1</span>;
 
-<span class="doccomment">/// MAX_FRAME_SIZE upper bound</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_MAX_FRAME_SIZE</span>: <span class="ident">FrameSize</span> <span class="op">=</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">1</span>;
+<span class="doccomment">/// MAX_FRAME_SIZE upper bound
+</span><span class="kw">pub const </span>MAX_MAX_FRAME_SIZE: FrameSize = (<span class="number">1 </span>&lt;&lt; <span class="number">24</span>) - <span class="number">1</span>;
 
-<span class="comment">// ===== impl Settings =====</span>
+<span class="comment">// ===== impl Settings =====
 
-<span class="kw">impl</span> <span class="ident">Settings</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ack</span>() -&gt; <span class="ident">Settings</span> {
-        <span class="ident">Settings</span> {
-            <span class="ident">flags</span>: <span class="ident">SettingsFlags::ack</span>(),
-            ..<span class="ident">Settings::default</span>()
+</span><span class="kw">impl </span>Settings {
+    <span class="kw">pub fn </span>ack() -&gt; Settings {
+        Settings {
+            flags: SettingsFlags::ack(),
+            ..Settings::default()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">is_ack</span>()
+    <span class="kw">pub fn </span>is_ack(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.flags.is_ack()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_window_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">initial_window_size</span>
+    <span class="kw">pub fn </span>initial_window_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.initial_window_size
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_initial_window_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">initial_window_size</span> <span class="op">=</span> <span class="ident">size</span>;
+    <span class="kw">pub fn </span>set_initial_window_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+        <span class="self">self</span>.initial_window_size = size;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_concurrent_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">max_concurrent_streams</span>
+    <span class="kw">pub fn </span>max_concurrent_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.max_concurrent_streams
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_concurrent_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">max_concurrent_streams</span> <span class="op">=</span> <span class="ident">max</span>;
+    <span class="kw">pub fn </span>set_max_concurrent_streams(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+        <span class="self">self</span>.max_concurrent_streams = max;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_frame_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">max_frame_size</span>
+    <span class="kw">pub fn </span>max_frame_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.max_frame_size
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">size</span> {
-            <span class="macro">assert!</span>(<span class="ident">DEFAULT_MAX_FRAME_SIZE</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">val</span> <span class="op">&amp;&amp;</span> <span class="ident">val</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_MAX_FRAME_SIZE</span>);
+    <span class="kw">pub fn </span>set_max_frame_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = size {
+            <span class="macro">assert!</span>(DEFAULT_MAX_FRAME_SIZE &lt;= val &amp;&amp; val &lt;= MAX_MAX_FRAME_SIZE);
         }
-        <span class="self">self</span>.<span class="ident">max_frame_size</span> <span class="op">=</span> <span class="ident">size</span>;
+        <span class="self">self</span>.max_frame_size = size;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_header_list_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">max_header_list_size</span>
+    <span class="kw">pub fn </span>max_header_list_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.max_header_list_size
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_header_list_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">max_header_list_size</span> <span class="op">=</span> <span class="ident">size</span>;
+    <span class="kw">pub fn </span>set_max_header_list_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+        <span class="self">self</span>.max_header_list_size = size;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_push_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enable_push</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+    <span class="kw">pub fn </span>is_push_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.enable_push.map(|val| val != <span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_enable_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enable</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">enable_push</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">enable</span> <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="kw">pub fn </span>set_enable_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enable: bool) {
+        <span class="self">self</span>.enable_push = <span class="prelude-val">Some</span>(enable <span class="kw">as </span>u32);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_extended_connect_protocol_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">enable_connect_protocol</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+    <span class="kw">pub fn </span>is_extended_connect_protocol_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.enable_connect_protocol.map(|val| val != <span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_enable_connect_protocol</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">enable_connect_protocol</span> <span class="op">=</span> <span class="ident">val</span>;
+    <span class="kw">pub fn </span>set_enable_connect_protocol(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="prelude-ty">Option</span>&lt;u32&gt;) {
+        <span class="self">self</span>.enable_connect_protocol = val;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_table_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">header_table_size</span>
+    <span class="kw">pub fn </span>header_table_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.header_table_size
     }
 
     <span class="comment">/*
     pub fn set_header_table_size(&amp;mut self, size: Option&lt;u32&gt;) {
         self.header_table_size = size;
     }
-    */</span>
+    */
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">head</span>: <span class="ident">Head</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Settings</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Setting</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">pub fn </span>load(head: Head, payload: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Settings, Error&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Setting::<span class="kw-2">*</span>;
 
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">head</span>.<span class="ident">kind</span>(), <span class="ident"><span class="kw">crate</span>::frame::Kind::Settings</span>);
+        <span class="macro">debug_assert_eq!</span>(head.kind(), <span class="kw">crate</span>::frame::Kind::Settings);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">head</span>.<span class="ident">stream_id</span>().<span class="ident">is_zero</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidStreamId</span>);
+        <span class="kw">if </span>!head.stream_id().is_zero() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidStreamId);
         }
 
-        <span class="comment">// Load the flag</span>
-        <span class="kw">let</span> <span class="ident">flag</span> <span class="op">=</span> <span class="ident">SettingsFlags::load</span>(<span class="ident">head</span>.<span class="ident">flag</span>());
+        <span class="comment">// Load the flag
+        </span><span class="kw">let </span>flag = SettingsFlags::load(head.flag());
 
-        <span class="kw">if</span> <span class="ident">flag</span>.<span class="ident">is_ack</span>() {
-            <span class="comment">// Ensure that the payload is empty</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">payload</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidPayloadLength</span>);
+        <span class="kw">if </span>flag.is_ack() {
+            <span class="comment">// Ensure that the payload is empty
+            </span><span class="kw">if </span>!payload.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidPayloadLength);
             }
 
-            <span class="comment">// Return the ACK frame</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Settings::ack</span>());
+            <span class="comment">// Return the ACK frame
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(Settings::ack());
         }
 
-        <span class="comment">// Ensure the payload length is correct, each setting is 6 bytes long.</span>
-        <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">6</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="macro">tracing::debug!</span>(<span class="string">&quot;invalid settings payload length; len={:?}&quot;</span>, <span class="ident">payload</span>.<span class="ident">len</span>());
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidPayloadAckSettings</span>);
+        <span class="comment">// Ensure the payload length is correct, each setting is 6 bytes long.
+        </span><span class="kw">if </span>payload.len() % <span class="number">6 </span>!= <span class="number">0 </span>{
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;invalid settings payload length; len={:?}&quot;</span>, payload.len());
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidPayloadAckSettings);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings::default</span>();
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">settings</span>.<span class="ident">flags</span>.<span class="ident">is_ack</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>settings = Settings::default();
+        <span class="macro">debug_assert!</span>(!settings.flags.is_ack());
 
-        <span class="kw">for</span> <span class="ident">raw</span> <span class="kw">in</span> <span class="ident">payload</span>.<span class="ident">chunks</span>(<span class="number">6</span>) {
-            <span class="kw">match</span> <span class="ident">Setting::load</span>(<span class="ident">raw</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">HeaderTableSize</span>(<span class="ident">val</span>)) =&gt; {
-                    <span class="ident">settings</span>.<span class="ident">header_table_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+        <span class="kw">for </span>raw <span class="kw">in </span>payload.chunks(<span class="number">6</span>) {
+            <span class="kw">match </span>Setting::load(raw) {
+                <span class="prelude-val">Some</span>(HeaderTableSize(val)) =&gt; {
+                    settings.header_table_size = <span class="prelude-val">Some</span>(val);
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">EnablePush</span>(<span class="ident">val</span>)) =&gt; <span class="kw">match</span> <span class="ident">val</span> {
-                    <span class="number">0</span> <span class="op">|</span> <span class="number">1</span> =&gt; {
-                        <span class="ident">settings</span>.<span class="ident">enable_push</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(EnablePush(val)) =&gt; <span class="kw">match </span>val {
+                    <span class="number">0 </span>| <span class="number">1 </span>=&gt; {
+                        settings.enable_push = <span class="prelude-val">Some</span>(val);
                     }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSettingValue</span>);
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSettingValue);
                     }
                 },
-                <span class="prelude-val">Some</span>(<span class="ident">MaxConcurrentStreams</span>(<span class="ident">val</span>)) =&gt; {
-                    <span class="ident">settings</span>.<span class="ident">max_concurrent_streams</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(MaxConcurrentStreams(val)) =&gt; {
+                    settings.max_concurrent_streams = <span class="prelude-val">Some</span>(val);
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">InitialWindowSize</span>(<span class="ident">val</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">val</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">MAX_INITIAL_WINDOW_SIZE</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSettingValue</span>);
-                    } <span class="kw">else</span> {
-                        <span class="ident">settings</span>.<span class="ident">initial_window_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(InitialWindowSize(val)) =&gt; {
+                    <span class="kw">if </span>val <span class="kw">as </span>usize &gt; MAX_INITIAL_WINDOW_SIZE {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSettingValue);
+                    } <span class="kw">else </span>{
+                        settings.initial_window_size = <span class="prelude-val">Some</span>(val);
                     }
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">MaxFrameSize</span>(<span class="ident">val</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="ident">DEFAULT_MAX_FRAME_SIZE</span> <span class="op">|</span><span class="op">|</span> <span class="ident">val</span> <span class="op">&gt;</span> <span class="ident">MAX_MAX_FRAME_SIZE</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSettingValue</span>);
-                    } <span class="kw">else</span> {
-                        <span class="ident">settings</span>.<span class="ident">max_frame_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(MaxFrameSize(val)) =&gt; {
+                    <span class="kw">if </span>val &lt; DEFAULT_MAX_FRAME_SIZE || val &gt; MAX_MAX_FRAME_SIZE {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSettingValue);
+                    } <span class="kw">else </span>{
+                        settings.max_frame_size = <span class="prelude-val">Some</span>(val);
                     }
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">MaxHeaderListSize</span>(<span class="ident">val</span>)) =&gt; {
-                    <span class="ident">settings</span>.<span class="ident">max_header_list_size</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(MaxHeaderListSize(val)) =&gt; {
+                    settings.max_header_list_size = <span class="prelude-val">Some</span>(val);
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">EnableConnectProtocol</span>(<span class="ident">val</span>)) =&gt; <span class="kw">match</span> <span class="ident">val</span> {
-                    <span class="number">0</span> <span class="op">|</span> <span class="number">1</span> =&gt; {
-                        <span class="ident">settings</span>.<span class="ident">enable_connect_protocol</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
+                <span class="prelude-val">Some</span>(EnableConnectProtocol(val)) =&gt; <span class="kw">match </span>val {
+                    <span class="number">0 </span>| <span class="number">1 </span>=&gt; {
+                        settings.enable_connect_protocol = <span class="prelude-val">Some</span>(val);
                     }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSettingValue</span>);
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidSettingValue);
                     }
                 },
-                <span class="prelude-val">None</span> =&gt; {}
+                <span class="prelude-val">None </span>=&gt; {}
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">settings</span>)
+        <span class="prelude-val">Ok</span>(settings)
     }
 
-    <span class="kw">fn</span> <span class="ident">payload_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">6</span>);
-        <span class="ident">len</span>
+    <span class="kw">fn </span>payload_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="number">0</span>;
+        <span class="self">self</span>.for_each(|<span class="kw">_</span>| len += <span class="number">6</span>);
+        len
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
-        <span class="comment">// Create &amp; encode an appropriate frame head</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">Head::new</span>(<span class="ident">Kind::Settings</span>, <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">into</span>(), <span class="ident">StreamId::zero</span>());
-        <span class="kw">let</span> <span class="ident">payload_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">payload_len</span>();
+    <span class="kw">pub fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) {
+        <span class="comment">// Create &amp; encode an appropriate frame head
+        </span><span class="kw">let </span>head = Head::new(Kind::Settings, <span class="self">self</span>.flags.into(), StreamId::zero());
+        <span class="kw">let </span>payload_len = <span class="self">self</span>.payload_len();
 
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;encoding SETTINGS; len={}&quot;</span>, <span class="ident">payload_len</span>);
+        <span class="macro">tracing::trace!</span>(<span class="string">&quot;encoding SETTINGS; len={}&quot;</span>, payload_len);
 
-        <span class="ident">head</span>.<span class="ident">encode</span>(<span class="ident">payload_len</span>, <span class="ident">dst</span>);
+        head.encode(payload_len, dst);
 
-        <span class="comment">// Encode the settings</span>
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">setting</span><span class="op">|</span> {
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;encoding setting; val={:?}&quot;</span>, <span class="ident">setting</span>);
-            <span class="ident">setting</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)
+        <span class="comment">// Encode the settings
+        </span><span class="self">self</span>.for_each(|setting| {
+            <span class="macro">tracing::trace!</span>(<span class="string">&quot;encoding setting; val={:?}&quot;</span>, setting);
+            setting.encode(dst)
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Setting</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Setting</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>for_each&lt;F: FnMut(Setting)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>f: F) {
+        <span class="kw">use </span><span class="self">self</span>::Setting::<span class="kw-2">*</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">header_table_size</span> {
-            <span class="ident">f</span>(<span class="ident">HeaderTableSize</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.header_table_size {
+            f(HeaderTableSize(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enable_push</span> {
-            <span class="ident">f</span>(<span class="ident">EnablePush</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.enable_push {
+            f(EnablePush(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_concurrent_streams</span> {
-            <span class="ident">f</span>(<span class="ident">MaxConcurrentStreams</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.max_concurrent_streams {
+            f(MaxConcurrentStreams(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">initial_window_size</span> {
-            <span class="ident">f</span>(<span class="ident">InitialWindowSize</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.initial_window_size {
+            f(InitialWindowSize(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_frame_size</span> {
-            <span class="ident">f</span>(<span class="ident">MaxFrameSize</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.max_frame_size {
+            f(MaxFrameSize(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_header_list_size</span> {
-            <span class="ident">f</span>(<span class="ident">MaxHeaderListSize</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.max_header_list_size {
+            f(MaxHeaderListSize(v));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">enable_connect_protocol</span> {
-            <span class="ident">f</span>(<span class="ident">EnableConnectProtocol</span>(<span class="ident">v</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = <span class="self">self</span>.enable_connect_protocol {
+            f(EnableConnectProtocol(v));
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Settings</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">Settings</span>) -&gt; <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Frame::Settings</span>(<span class="ident">src</span>)
+<span class="kw">impl</span>&lt;T&gt; From&lt;Settings&gt; <span class="kw">for </span>Frame&lt;T&gt; {
+    <span class="kw">fn </span>from(src: Settings) -&gt; Frame&lt;T&gt; {
+        Frame::Settings(src)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Settings</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Settings&quot;</span>);
-        <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;flags&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Settings {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = f.debug_struct(<span class="string">&quot;Settings&quot;</span>);
+        builder.field(<span class="string">&quot;flags&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.flags);
 
-        <span class="self">self</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">setting</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">setting</span> {
-            <span class="ident">Setting::EnablePush</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;enable_push&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+        <span class="self">self</span>.for_each(|setting| <span class="kw">match </span>setting {
+            Setting::EnablePush(v) =&gt; {
+                builder.field(<span class="string">&quot;enable_push&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::HeaderTableSize</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;header_table_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::HeaderTableSize(v) =&gt; {
+                builder.field(<span class="string">&quot;header_table_size&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::InitialWindowSize</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;initial_window_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::InitialWindowSize(v) =&gt; {
+                builder.field(<span class="string">&quot;initial_window_size&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::MaxConcurrentStreams</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;max_concurrent_streams&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::MaxConcurrentStreams(v) =&gt; {
+                builder.field(<span class="string">&quot;max_concurrent_streams&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::MaxFrameSize</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;max_frame_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::MaxFrameSize(v) =&gt; {
+                builder.field(<span class="string">&quot;max_frame_size&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::MaxHeaderListSize</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;max_header_list_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::MaxHeaderListSize(v) =&gt; {
+                builder.field(<span class="string">&quot;max_header_list_size&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
-            <span class="ident">Setting::EnableConnectProtocol</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">builder</span>.<span class="ident">field</span>(<span class="string">&quot;enable_connect_protocol&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+            Setting::EnableConnectProtocol(v) =&gt; {
+                builder.field(<span class="string">&quot;enable_connect_protocol&quot;</span>, <span class="kw-2">&amp;</span>v);
             }
         });
 
-        <span class="ident">builder</span>.<span class="ident">finish</span>()
+        builder.finish()
     }
 }
 
-<span class="comment">// ===== impl Setting =====</span>
+<span class="comment">// ===== impl Setting =====
 
-<span class="kw">impl</span> <span class="ident">Setting</span> {
-    <span class="doccomment">/// Creates a new `Setting` with the correct variant corresponding to the</span>
-    <span class="doccomment">/// given setting id, based on the settings IDs defined in section</span>
-    <span class="doccomment">/// 6.5.2.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_id</span>(<span class="ident">id</span>: <span class="ident">u16</span>, <span class="ident">val</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Setting</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Setting</span>::<span class="kw-2">*</span>;
+</span><span class="kw">impl </span>Setting {
+    <span class="doccomment">/// Creates a new `Setting` with the correct variant corresponding to the
+    /// given setting id, based on the settings IDs defined in section
+    /// 6.5.2.
+    </span><span class="kw">pub fn </span>from_id(id: u16, val: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Setting&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Setting::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">HeaderTableSize</span>(<span class="ident">val</span>)),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">EnablePush</span>(<span class="ident">val</span>)),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MaxConcurrentStreams</span>(<span class="ident">val</span>)),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">InitialWindowSize</span>(<span class="ident">val</span>)),
-            <span class="number">5</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MaxFrameSize</span>(<span class="ident">val</span>)),
-            <span class="number">6</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">MaxHeaderListSize</span>(<span class="ident">val</span>)),
-            <span class="number">8</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">EnableConnectProtocol</span>(<span class="ident">val</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">match </span>id {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Some</span>(HeaderTableSize(val)),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Some</span>(EnablePush(val)),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Some</span>(MaxConcurrentStreams(val)),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Some</span>(InitialWindowSize(val)),
+            <span class="number">5 </span>=&gt; <span class="prelude-val">Some</span>(MaxFrameSize(val)),
+            <span class="number">6 </span>=&gt; <span class="prelude-val">Some</span>(MaxHeaderListSize(val)),
+            <span class="number">8 </span>=&gt; <span class="prelude-val">Some</span>(EnableConnectProtocol(val)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates a new `Setting` by parsing the given buffer of 6 bytes, which</span>
-    <span class="doccomment">/// contains the raw byte representation of the setting, according to the</span>
-    <span class="doccomment">/// &quot;SETTINGS format&quot; defined in section 6.5.1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `raw` parameter should have length at least 6 bytes, since the</span>
-    <span class="doccomment">/// length of the raw setting is exactly 6 bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If given a buffer shorter than 6 bytes, the function will panic.</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Setting</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="ident">u16::from</span>(<span class="ident">raw</span>[<span class="number">0</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">u16::from</span>(<span class="ident">raw</span>[<span class="number">1</span>]);
-        <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="macro">unpack_octets_4!</span>(<span class="ident">raw</span>, <span class="number">2</span>, <span class="ident">u32</span>);
+    <span class="doccomment">/// Creates a new `Setting` by parsing the given buffer of 6 bytes, which
+    /// contains the raw byte representation of the setting, according to the
+    /// &quot;SETTINGS format&quot; defined in section 6.5.1.
+    ///
+    /// The `raw` parameter should have length at least 6 bytes, since the
+    /// length of the raw setting is exactly 6 bytes.
+    ///
+    /// # Panics
+    ///
+    /// If given a buffer shorter than 6 bytes, the function will panic.
+    </span><span class="kw">fn </span>load(raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Setting&gt; {
+        <span class="kw">let </span>id: u16 = (u16::from(raw[<span class="number">0</span>]) &lt;&lt; <span class="number">8</span>) | u16::from(raw[<span class="number">1</span>]);
+        <span class="kw">let </span>val: u32 = <span class="macro">unpack_octets_4!</span>(raw, <span class="number">2</span>, u32);
 
-        <span class="ident">Setting::from_id</span>(<span class="ident">id</span>, <span class="ident">val</span>)
+        Setting::from_id(id, val)
     }
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Setting</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) {
+        <span class="kw">use </span><span class="self">self</span>::Setting::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> (<span class="ident">kind</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">HeaderTableSize</span>(<span class="ident">v</span>) =&gt; (<span class="number">1</span>, <span class="ident">v</span>),
-            <span class="ident">EnablePush</span>(<span class="ident">v</span>) =&gt; (<span class="number">2</span>, <span class="ident">v</span>),
-            <span class="ident">MaxConcurrentStreams</span>(<span class="ident">v</span>) =&gt; (<span class="number">3</span>, <span class="ident">v</span>),
-            <span class="ident">InitialWindowSize</span>(<span class="ident">v</span>) =&gt; (<span class="number">4</span>, <span class="ident">v</span>),
-            <span class="ident">MaxFrameSize</span>(<span class="ident">v</span>) =&gt; (<span class="number">5</span>, <span class="ident">v</span>),
-            <span class="ident">MaxHeaderListSize</span>(<span class="ident">v</span>) =&gt; (<span class="number">6</span>, <span class="ident">v</span>),
-            <span class="ident">EnableConnectProtocol</span>(<span class="ident">v</span>) =&gt; (<span class="number">8</span>, <span class="ident">v</span>),
+        <span class="kw">let </span>(kind, val) = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            HeaderTableSize(v) =&gt; (<span class="number">1</span>, v),
+            EnablePush(v) =&gt; (<span class="number">2</span>, v),
+            MaxConcurrentStreams(v) =&gt; (<span class="number">3</span>, v),
+            InitialWindowSize(v) =&gt; (<span class="number">4</span>, v),
+            MaxFrameSize(v) =&gt; (<span class="number">5</span>, v),
+            MaxHeaderListSize(v) =&gt; (<span class="number">6</span>, v),
+            EnableConnectProtocol(v) =&gt; (<span class="number">8</span>, v),
         };
 
-        <span class="ident">dst</span>.<span class="ident">put_u16</span>(<span class="ident">kind</span>);
-        <span class="ident">dst</span>.<span class="ident">put_u32</span>(<span class="ident">val</span>);
+        dst.put_u16(kind);
+        dst.put_u32(val);
     }
 }
 
-<span class="comment">// ===== impl SettingsFlags =====</span>
+<span class="comment">// ===== impl SettingsFlags =====
 
-<span class="kw">impl</span> <span class="ident">SettingsFlags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">SettingsFlags</span> {
-        <span class="ident">SettingsFlags</span>(<span class="number">0</span>)
+</span><span class="kw">impl </span>SettingsFlags {
+    <span class="kw">pub fn </span>empty() -&gt; SettingsFlags {
+        SettingsFlags(<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">bits</span>: <span class="ident">u8</span>) -&gt; <span class="ident">SettingsFlags</span> {
-        <span class="ident">SettingsFlags</span>(<span class="ident">bits</span> <span class="op">&amp;</span> <span class="ident">ALL</span>)
+    <span class="kw">pub fn </span>load(bits: u8) -&gt; SettingsFlags {
+        SettingsFlags(bits &amp; ALL)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ack</span>() -&gt; <span class="ident">SettingsFlags</span> {
-        <span class="ident">SettingsFlags</span>(<span class="ident">ACK</span>)
+    <span class="kw">pub fn </span>ack() -&gt; SettingsFlags {
+        SettingsFlags(ACK)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">ACK</span> <span class="op">==</span> <span class="ident">ACK</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SettingsFlags</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">SettingsFlags</span>) -&gt; <span class="ident">u8</span> {
-        <span class="ident">src</span>.<span class="number">0</span>
+    <span class="kw">pub fn </span>is_ack(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0 </span>&amp; ACK == ACK
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SettingsFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">util::debug_flags</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>)
-            .<span class="ident">flag_if</span>(<span class="self">self</span>.<span class="ident">is_ack</span>(), <span class="string">&quot;ACK&quot;</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>From&lt;SettingsFlags&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(src: SettingsFlags) -&gt; u8 {
+        src.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SettingsFlags {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        util::debug_flags(f, <span class="self">self</span>.<span class="number">0</span>)
+            .flag_if(<span class="self">self</span>.is_ack(), <span class="string">&quot;ACK&quot;</span>)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

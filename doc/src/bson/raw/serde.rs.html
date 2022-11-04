@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/serde.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/serde.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -524,531 +524,531 @@
 <span id="524">524</span>
 <span id="525">525</span>
 <span id="526">526</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Debug</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::Visitor</span>, <span class="ident">Deserialize</span>};
-<span class="kw">use</span> <span class="ident">serde_bytes::ByteBuf</span>;
+<span class="kw">use </span>serde::{de::Visitor, Deserialize};
+<span class="kw">use </span>serde_bytes::ByteBuf;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">de::convert_unsigned_to_signed_raw</span>,
-    <span class="ident">extjson</span>,
-    <span class="ident">oid::ObjectId</span>,
-    <span class="ident">raw</span>::{<span class="ident">RawJavaScriptCodeWithScope</span>, <span class="ident">RAW_ARRAY_NEWTYPE</span>, <span class="ident">RAW_DOCUMENT_NEWTYPE</span>},
-    <span class="ident">spec::BinarySubtype</span>,
-    <span class="ident">Binary</span>,
-    <span class="ident">DateTime</span>,
-    <span class="ident">DbPointer</span>,
-    <span class="ident">Decimal128</span>,
-    <span class="ident">RawArray</span>,
-    <span class="ident">RawArrayBuf</span>,
-    <span class="ident">RawBinaryRef</span>,
-    <span class="ident">RawBsonRef</span>,
-    <span class="ident">RawDbPointerRef</span>,
-    <span class="ident">RawDocument</span>,
-    <span class="ident">RawDocumentBuf</span>,
-    <span class="ident">RawJavaScriptCodeWithScopeRef</span>,
-    <span class="ident">RawRegexRef</span>,
-    <span class="ident">Regex</span>,
-    <span class="ident">Timestamp</span>,
+<span class="kw">use crate</span>::{
+    de::convert_unsigned_to_signed_raw,
+    extjson,
+    oid::ObjectId,
+    raw::{RawJavaScriptCodeWithScope, RAW_ARRAY_NEWTYPE, RAW_DOCUMENT_NEWTYPE},
+    spec::BinarySubtype,
+    Binary,
+    DateTime,
+    DbPointer,
+    Decimal128,
+    RawArray,
+    RawArrayBuf,
+    RawBinaryRef,
+    RawBsonRef,
+    RawDbPointerRef,
+    RawDocument,
+    RawDocumentBuf,
+    RawJavaScriptCodeWithScopeRef,
+    RawRegexRef,
+    Regex,
+    Timestamp,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">bson::RawBson</span>, <span class="ident">RAW_BSON_NEWTYPE</span>};
+<span class="kw">use super</span>::{bson::RawBson, RAW_BSON_NEWTYPE};
 
-<span class="doccomment">/// A raw BSON value that may either be borrowed or owned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used to consolidate the `Serialize` and `Deserialize` implementations for</span>
-<span class="doccomment">/// `RawBson` and `OwnedRawBson`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Owned</span>(<span class="ident">RawBson</span>),
-    <span class="ident">Borrowed</span>(<span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A raw BSON value that may either be borrowed or owned.
+///
+/// This is used to consolidate the `Serialize` and `Deserialize` implementations for
+/// `RawBson` and `OwnedRawBson`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Owned(RawBson),
+    Borrowed(RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_newtype_struct</span>(<span class="ident">RAW_BSON_NEWTYPE</span>, <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>)
+        deserializer.deserialize_newtype_struct(RAW_BSON_NEWTYPE, OwnedOrBorrowedRawBsonVisitor)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Owned(o) =&gt; o.fmt(f),
+            <span class="self">Self</span>::Borrowed(b) =&gt; b.fmt(f),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">b</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(b: RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        OwnedOrBorrowedRawBson::Borrowed(b)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">b</span>: <span class="ident">RawBson</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">b</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;RawBson&gt; <span class="kw">for </span>OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(b: RawBson) -&gt; <span class="self">Self </span>{
+        OwnedOrBorrowedRawBson::Owned(b)
     }
 }
 
-<span class="doccomment">/// Wrapper around a `Cow&lt;str&gt;` to enable borrowed deserialization.</span>
-<span class="doccomment">/// The default `Deserialize` impl for `Cow` always uses the owned version.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CowStr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Wrapper around a `Cow&lt;str&gt;` to enable borrowed deserialization.
+/// The default `Deserialize` impl for `Cow` always uses the owned version.
+</span><span class="attribute">#[derive(Debug, Deserialize)]
+</span><span class="kw">struct </span>CowStr&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="attribute">#[serde(borrow)] </span>Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;);
 
-<span class="doccomment">/// Wrapper type that can deserialize either an owned or a borrowed raw BSON document.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OwnedOrBorrowedRawDocument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Owned</span>(<span class="ident">RawDocumentBuf</span>),
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span>),
+<span class="doccomment">/// Wrapper type that can deserialize either an owned or a borrowed raw BSON document.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>OwnedOrBorrowedRawDocument&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Owned(RawDocumentBuf),
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OwnedOrBorrowedRawDocument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">RawDocumentBuf</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
-            <span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OwnedOrBorrowedRawDocument&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; RawDocumentBuf {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Owned(o) =&gt; o,
+            <span class="self">Self</span>::Borrowed(b) =&gt; b.to_owned(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawDocument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OwnedOrBorrowedRawDocument&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">deserializer</span>
-            .<span class="ident">deserialize_newtype_struct</span>(<span class="ident">RAW_DOCUMENT_NEWTYPE</span>, <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">RawBsonRef::Document</span>(<span class="ident">d</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">d</span>)),
-            <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">RawBson::Document</span>(<span class="ident">d</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">d</span>)),
+        <span class="kw">match </span>deserializer
+            .deserialize_newtype_struct(RAW_DOCUMENT_NEWTYPE, OwnedOrBorrowedRawBsonVisitor)<span class="question-mark">?
+        </span>{
+            OwnedOrBorrowedRawBson::Borrowed(RawBsonRef::Document(d)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Borrowed(d)),
+            OwnedOrBorrowedRawBson::Owned(RawBson::Document(d)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Owned(d)),
 
-            <span class="comment">// For non-BSON formats, RawDocument gets serialized as bytes, so we need to deserialize</span>
-            <span class="comment">// from them here too. For BSON, the deserializier will return an error if it</span>
-            <span class="comment">// sees the RAW_DOCUMENT_NEWTYPE but the next type isn&#39;t a document.</span>
-            <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">RawBsonRef::Binary</span>(<span class="ident">b</span>))
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::Generic</span> =&gt;
+            <span class="comment">// For non-BSON formats, RawDocument gets serialized as bytes, so we need to deserialize
+            // from them here too. For BSON, the deserializier will return an error if it
+            // sees the RAW_DOCUMENT_NEWTYPE but the next type isn&#39;t a document.
+            </span>OwnedOrBorrowedRawBson::Borrowed(RawBsonRef::Binary(b))
+                <span class="kw">if </span>b.subtype == BinarySubtype::Generic =&gt;
             {
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Borrowed</span>(
-                    <span class="ident">RawDocument::from_bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Borrowed(
+                    RawDocument::from_bytes(b.bytes).map_err(serde::de::Error::custom)<span class="question-mark">?</span>,
                 ))
             }
-            <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">RawBson::Binary</span>(<span class="ident">b</span>))
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::Generic</span> =&gt;
+            OwnedOrBorrowedRawBson::Owned(RawBson::Binary(b))
+                <span class="kw">if </span>b.subtype == BinarySubtype::Generic =&gt;
             {
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Owned</span>(
-                    <span class="ident">RawDocumentBuf::from_bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Owned(
+                    RawDocumentBuf::from_bytes(b.bytes).map_err(serde::de::Error::custom)<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="ident">o</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="macro">format!</span>(
+            o =&gt; <span class="prelude-val">Err</span>(serde::de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;expected raw document, instead got {:?}&quot;</span>,
-                <span class="ident">o</span>
+                o
             ))),
         }
     }
 }
 
-<span class="doccomment">/// Wrapper type that can deserialize either an owned or a borrowed raw BSON array.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">OwnedOrBorrowedRawArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Owned</span>(<span class="ident">RawArrayBuf</span>),
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span>),
+<span class="doccomment">/// Wrapper type that can deserialize either an owned or a borrowed raw BSON array.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>OwnedOrBorrowedRawArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Owned(RawArrayBuf),
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawArray),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OwnedOrBorrowedRawArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">RawArrayBuf</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
-            <span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OwnedOrBorrowedRawArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_owned(<span class="self">self</span>) -&gt; RawArrayBuf {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Owned(o) =&gt; o,
+            <span class="self">Self</span>::Borrowed(b) =&gt; b.to_owned(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OwnedOrBorrowedRawArray&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">deserializer</span>
-            .<span class="ident">deserialize_newtype_struct</span>(<span class="ident">RAW_ARRAY_NEWTYPE</span>, <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">RawBsonRef::Array</span>(<span class="ident">d</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">d</span>)),
-            <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">RawBson::Array</span>(<span class="ident">d</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">d</span>)),
+        <span class="kw">match </span>deserializer
+            .deserialize_newtype_struct(RAW_ARRAY_NEWTYPE, OwnedOrBorrowedRawBsonVisitor)<span class="question-mark">?
+        </span>{
+            OwnedOrBorrowedRawBson::Borrowed(RawBsonRef::Array(d)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Borrowed(d)),
+            OwnedOrBorrowedRawBson::Owned(RawBson::Array(d)) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Owned(d)),
 
-            <span class="comment">// For non-BSON formats, RawArray gets serialized as bytes, so we need to deserialize</span>
-            <span class="comment">// from them here too. For BSON, the deserializier will return an error if it</span>
-            <span class="comment">// sees the RAW_DOCUMENT_NEWTYPE but the next type isn&#39;t a document.</span>
-            <span class="ident">OwnedOrBorrowedRawBson::Borrowed</span>(<span class="ident">RawBsonRef::Binary</span>(<span class="ident">b</span>))
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::Generic</span> =&gt;
+            <span class="comment">// For non-BSON formats, RawArray gets serialized as bytes, so we need to deserialize
+            // from them here too. For BSON, the deserializier will return an error if it
+            // sees the RAW_DOCUMENT_NEWTYPE but the next type isn&#39;t a document.
+            </span>OwnedOrBorrowedRawBson::Borrowed(RawBsonRef::Binary(b))
+                <span class="kw">if </span>b.subtype == BinarySubtype::Generic =&gt;
             {
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">RawArray::from_doc</span>(<span class="ident">doc</span>)))
+                <span class="kw">let </span>doc = RawDocument::from_bytes(b.bytes).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Borrowed(RawArray::from_doc(doc)))
             }
-            <span class="ident">OwnedOrBorrowedRawBson::Owned</span>(<span class="ident">RawBson::Binary</span>(<span class="ident">b</span>))
-                <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::Generic</span> =&gt;
+            OwnedOrBorrowedRawBson::Owned(RawBson::Binary(b))
+                <span class="kw">if </span>b.subtype == BinarySubtype::Generic =&gt;
             {
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocumentBuf::from_bytes</span>(<span class="ident">b</span>.<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">RawArrayBuf::from_raw_document_buf</span>(<span class="ident">doc</span>)))
+                <span class="kw">let </span>doc = RawDocumentBuf::from_bytes(b.bytes).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Owned(RawArrayBuf::from_raw_document_buf(doc)))
             }
 
-            <span class="ident">o</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="macro">format!</span>(
+            o =&gt; <span class="prelude-val">Err</span>(serde::de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;expected raw array, instead got {:?}&quot;</span>,
-                <span class="ident">o</span>
+                o
             ))),
         }
     }
 }
 
-<span class="doccomment">/// A visitor used to deserialize types backed by raw BSON.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OwnedOrBorrowedRawBsonVisitor</span>;
+<span class="doccomment">/// A visitor used to deserialize types backed by raw BSON.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OwnedOrBorrowedRawBsonVisitor;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedOrBorrowedRawBsonVisitor</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OwnedOrBorrowedRawBsonVisitor {
+    <span class="kw">type </span>Value = OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;de</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a raw BSON value&quot;</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;a raw BSON value&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_borrowed_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_borrowed_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>str) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::String</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::String(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBson::String</span>(<span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBson::String(v.to_string()).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_string</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_string&lt;E&gt;(<span class="self">self</span>, v: String) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBson::String</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBson::String(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_borrowed_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_borrowed_bytes&lt;E&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8]) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Binary</span>(<span class="ident">RawBinaryRef</span> {
-            <span class="ident">bytes</span>,
-            <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
+        <span class="prelude-val">Ok</span>(RawBsonRef::Binary(RawBinaryRef {
+            bytes,
+            subtype: BinarySubtype::Generic,
         })
-        .<span class="ident">into</span>())
+        .into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i8</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i8</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_i8&lt;E&gt;(<span class="self">self</span>, v: i8) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Int32</span>(<span class="ident">v</span>.<span class="ident">into</span>()).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Int32(v.into()).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i16</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_i16&lt;E&gt;(<span class="self">self</span>, v: i16) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Int32</span>(<span class="ident">v</span>.<span class="ident">into</span>()).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Int32(v.into()).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i32</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_i32&lt;E&gt;(<span class="self">self</span>, v: i32) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Int32</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Int32(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_i64&lt;E&gt;(<span class="self">self</span>, v: i64) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Int64</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Int64(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u8</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_u8&lt;E&gt;(<span class="self">self</span>, value: u8) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">convert_unsigned_to_signed_raw</span>(<span class="ident">value</span>.<span class="ident">into</span>())<span class="question-mark">?</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(convert_unsigned_to_signed_raw(value.into())<span class="question-mark">?</span>.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u16</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_u16&lt;E&gt;(<span class="self">self</span>, value: u16) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">convert_unsigned_to_signed_raw</span>(<span class="ident">value</span>.<span class="ident">into</span>())<span class="question-mark">?</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(convert_unsigned_to_signed_raw(value.into())<span class="question-mark">?</span>.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u32</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_u32&lt;E&gt;(<span class="self">self</span>, value: u32) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">convert_unsigned_to_signed_raw</span>(<span class="ident">value</span>.<span class="ident">into</span>())<span class="question-mark">?</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(convert_unsigned_to_signed_raw(value.into())<span class="question-mark">?</span>.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_u64&lt;E&gt;(<span class="self">self</span>, value: u64) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">convert_unsigned_to_signed_raw</span>(<span class="ident">value</span>)<span class="question-mark">?</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(convert_unsigned_to_signed_raw(value)<span class="question-mark">?</span>.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_bool</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_bool&lt;E&gt;(<span class="self">self</span>, v: bool) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Boolean</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Boolean(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_f64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_f64&lt;E&gt;(<span class="self">self</span>, v: f64) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Double</span>(<span class="ident">v</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Double(v).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_none&lt;E&gt;(<span class="self">self</span>) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Null</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Null.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_unit</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_unit&lt;E&gt;(<span class="self">self</span>) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Null</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBsonRef::Null.into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_newtype_struct</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_newtype_struct&lt;D&gt;(<span class="self">self</span>, deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="self">self</span>)
+        deserializer.deserialize_any(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_byte_buf</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_byte_buf&lt;E&gt;(<span class="self">self</span>, v: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Binary</span>(<span class="ident">Binary</span> {
-            <span class="ident">bytes</span>: <span class="ident">v</span>,
-            <span class="ident">subtype</span>: <span class="ident">BinarySubtype::Generic</span>,
+        <span class="prelude-val">Ok</span>(RawBson::Binary(Binary {
+            bytes: v,
+            subtype: BinarySubtype::Generic,
         })
-        .<span class="ident">into</span>())
+        .into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">seq</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">serde::de::SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_seq&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>seq: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+    <span class="kw">where
+        </span>A: serde::de::SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">array</span> <span class="op">=</span> <span class="ident">RawArrayBuf::new</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">seq</span>.<span class="ident">next_element</span>::<span class="op">&lt;</span><span class="ident">RawBson</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="ident">array</span>.<span class="ident">push</span>(<span class="ident">v</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>array = RawArrayBuf::new();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(v) = seq.next_element::&lt;RawBson&gt;()<span class="question-mark">? </span>{
+            array.push(v);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Array</span>(<span class="ident">array</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(RawBson::Array(array).into())
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, <span class="kw-2">mut </span>map: A) -&gt; std::result::Result&lt;<span class="self">Self</span>::Value, A::Error&gt;
+    <span class="kw">where
+        </span>A: serde::de::MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="doccomment">/// Helper function used to build up the rest of a document once we determine that</span>
-        <span class="doccomment">/// the map being visited isn&#39;t the serde data model version of a BSON type and is</span>
-        <span class="doccomment">/// in fact a regular map.</span>
-        <span class="kw">fn</span> <span class="ident">build_doc</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">A</span><span class="op">&gt;</span>(
-            <span class="ident">first_key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-            <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">A</span>,
-        ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">OwnedOrBorrowedRawBson</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">A</span>: <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Helper function used to build up the rest of a document once we determine that
+        /// the map being visited isn&#39;t the serde data model version of a BSON type and is
+        /// in fact a regular map.
+        </span><span class="kw">fn </span>build_doc&lt;<span class="lifetime">&#39;de</span>, A&gt;(
+            first_key: <span class="kw-2">&amp;</span>str,
+            <span class="kw-2">mut </span>map: A,
+        ) -&gt; std::result::Result&lt;OwnedOrBorrowedRawBson&lt;<span class="lifetime">&#39;de</span>&gt;, A::Error&gt;
+        <span class="kw">where
+            </span>A: serde::de::MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocumentBuf::new</span>();
-            <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">RawBson</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-            <span class="ident">doc</span>.<span class="ident">append</span>(<span class="ident">first_key</span>, <span class="ident">v</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>doc = RawDocumentBuf::new();
+            <span class="kw">let </span>v: RawBson = map.next_value()<span class="question-mark">?</span>;
+            doc.append(first_key, v);
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">k</span>, <span class="ident">v</span>)) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_entry</span>::<span class="op">&lt;</span><span class="ident">CowStr</span>, <span class="ident">RawBson</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-                <span class="ident">doc</span>.<span class="ident">append</span>(<span class="ident">k</span>.<span class="number">0</span>, <span class="ident">v</span>);
+            <span class="kw">while let </span><span class="prelude-val">Some</span>((k, v)) = map.next_entry::&lt;CowStr, RawBson&gt;()<span class="question-mark">? </span>{
+                doc.append(k.<span class="number">0</span>, v);
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Document</span>(<span class="ident">doc</span>).<span class="ident">into</span>())
+            <span class="prelude-val">Ok</span>(RawBson::Document(doc).into())
         }
 
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">CowStr</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">k</span>) =&gt; <span class="ident">k</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Document</span>(<span class="ident">RawDocumentBuf::new</span>()).<span class="ident">into</span>()),
+        <span class="kw">let </span>k = <span class="kw">match </span>map.next_key::&lt;CowStr&gt;()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(k) =&gt; k,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(RawBson::Document(RawDocumentBuf::new()).into()),
         };
 
-        <span class="kw">match</span> <span class="ident">k</span>.<span class="number">0</span>.<span class="ident">as_ref</span>() {
-            <span class="string">&quot;$oid&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">oid</span>: <span class="ident">ObjectId</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::ObjectId</span>(<span class="ident">oid</span>).<span class="ident">into</span>())
+        <span class="kw">match </span>k.<span class="number">0</span>.as_ref() {
+            <span class="string">&quot;$oid&quot; </span>=&gt; {
+                <span class="kw">let </span>oid: ObjectId = map.next_value()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::ObjectId(oid).into())
             }
-            <span class="string">&quot;$symbol&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">CowStr</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">s</span>.<span class="number">0</span> {
-                    <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Symbol</span>(<span class="ident">s</span>).<span class="ident">into</span>()),
-                    <span class="ident">Cow::Owned</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Symbol</span>(<span class="ident">s</span>).<span class="ident">into</span>()),
+            <span class="string">&quot;$symbol&quot; </span>=&gt; {
+                <span class="kw">let </span>s: CowStr = map.next_value()<span class="question-mark">?</span>;
+                <span class="kw">match </span>s.<span class="number">0 </span>{
+                    Cow::Borrowed(s) =&gt; <span class="prelude-val">Ok</span>(RawBsonRef::Symbol(s).into()),
+                    Cow::Owned(s) =&gt; <span class="prelude-val">Ok</span>(RawBson::Symbol(s).into()),
                 }
             }
-            <span class="string">&quot;$numberDecimalBytes&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">ByteBuf</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(
-                    <span class="ident">RawBsonRef::Decimal128</span>(<span class="ident">Decimal128::deserialize_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>)<span class="question-mark">?</span>).<span class="ident">into</span>(),
+            <span class="string">&quot;$numberDecimalBytes&quot; </span>=&gt; {
+                <span class="kw">let </span>bytes = map.next_value::&lt;ByteBuf&gt;()<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(
+                    RawBsonRef::Decimal128(Decimal128::deserialize_from_slice(<span class="kw-2">&amp;</span>bytes)<span class="question-mark">?</span>).into(),
                 );
             }
-            <span class="string">&quot;$regularExpression&quot;</span> =&gt; {
-                <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-                <span class="kw">struct</span> <span class="ident">BorrowedRegexBody</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>
-                    <span class="ident">pattern</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+            <span class="string">&quot;$regularExpression&quot; </span>=&gt; {
+                <span class="attribute">#[derive(Debug, Deserialize)]
+                </span><span class="kw">struct </span>BorrowedRegexBody&lt;<span class="lifetime">&#39;a</span>&gt; {
+                    <span class="attribute">#[serde(borrow)]
+                    </span>pattern: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
 
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>
-                    <span class="ident">options</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+                    <span class="attribute">#[serde(borrow)]
+                    </span>options: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
                 }
-                <span class="kw">let</span> <span class="ident">body</span>: <span class="ident">BorrowedRegexBody</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
+                <span class="kw">let </span>body: BorrowedRegexBody = map.next_value()<span class="question-mark">?</span>;
 
-                <span class="kw">match</span> (<span class="ident">body</span>.<span class="ident">pattern</span>, <span class="ident">body</span>.<span class="ident">options</span>) {
-                    (<span class="ident">Cow::Borrowed</span>(<span class="ident">p</span>), <span class="ident">Cow::Borrowed</span>(<span class="ident">o</span>)) =&gt; {
-                        <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::RegularExpression</span>(<span class="ident">RawRegexRef</span> {
-                            <span class="ident">pattern</span>: <span class="ident">p</span>,
-                            <span class="ident">options</span>: <span class="ident">o</span>,
+                <span class="kw">match </span>(body.pattern, body.options) {
+                    (Cow::Borrowed(p), Cow::Borrowed(o)) =&gt; {
+                        <span class="prelude-val">Ok</span>(RawBsonRef::RegularExpression(RawRegexRef {
+                            pattern: p,
+                            options: o,
                         })
-                        .<span class="ident">into</span>())
+                        .into())
                     }
-                    (<span class="ident">p</span>, <span class="ident">o</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RawBson::RegularExpression</span>(<span class="ident">Regex</span> {
-                        <span class="ident">pattern</span>: <span class="ident">p</span>.<span class="ident">into_owned</span>(),
-                        <span class="ident">options</span>: <span class="ident">o</span>.<span class="ident">into_owned</span>(),
+                    (p, o) =&gt; <span class="prelude-val">Ok</span>(RawBson::RegularExpression(Regex {
+                        pattern: p.into_owned(),
+                        options: o.into_owned(),
                     })
-                    .<span class="ident">into</span>()),
+                    .into()),
                 }
             }
-            <span class="string">&quot;$undefined&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Undefined</span>.<span class="ident">into</span>())
+            <span class="string">&quot;$undefined&quot; </span>=&gt; {
+                <span class="kw">let _</span>: bool = map.next_value()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::Undefined.into())
             }
-            <span class="string">&quot;$binary&quot;</span> =&gt; {
-                <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-                <span class="kw">struct</span> <span class="ident">BorrowedBinaryBody</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>
-                    <span class="ident">bytes</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>,
+            <span class="string">&quot;$binary&quot; </span>=&gt; {
+                <span class="attribute">#[derive(Debug, Deserialize)]
+                </span><span class="kw">struct </span>BorrowedBinaryBody&lt;<span class="lifetime">&#39;a</span>&gt; {
+                    <span class="attribute">#[serde(borrow)]
+                    </span>bytes: Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;,
 
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;subType&quot;</span>)]</span>
-                    <span class="ident">subtype</span>: <span class="ident">u8</span>,
+                    <span class="attribute">#[serde(rename = <span class="string">&quot;subType&quot;</span>)]
+                    </span>subtype: u8,
                 }
 
-                <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">BorrowedBinaryBody</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let </span>v = map.next_value::&lt;BorrowedBinaryBody&gt;()<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">v</span>.<span class="ident">bytes</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Binary</span>(<span class="ident">RawBinaryRef</span> {
-                        <span class="ident">bytes</span>,
-                        <span class="ident">subtype</span>: <span class="ident">v</span>.<span class="ident">subtype</span>.<span class="ident">into</span>(),
+                <span class="kw">if let </span>Cow::Borrowed(bytes) = v.bytes {
+                    <span class="prelude-val">Ok</span>(RawBsonRef::Binary(RawBinaryRef {
+                        bytes,
+                        subtype: v.subtype.into(),
                     })
-                    .<span class="ident">into</span>())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBson::Binary</span>(<span class="ident">Binary</span> {
-                        <span class="ident">bytes</span>: <span class="ident">v</span>.<span class="ident">bytes</span>.<span class="ident">into_owned</span>(),
-                        <span class="ident">subtype</span>: <span class="ident">v</span>.<span class="ident">subtype</span>.<span class="ident">into</span>(),
+                    .into())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(RawBson::Binary(Binary {
+                        bytes: v.bytes.into_owned(),
+                        subtype: v.subtype.into(),
                     })
-                    .<span class="ident">into</span>())
+                    .into())
                 }
             }
-            <span class="string">&quot;$date&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::DateTime</span>(<span class="ident">DateTime::from_millis</span>(<span class="ident">v</span>)).<span class="ident">into</span>())
+            <span class="string">&quot;$date&quot; </span>=&gt; {
+                <span class="kw">let </span>v = map.next_value::&lt;i64&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::DateTime(DateTime::from_millis(v)).into())
             }
-            <span class="string">&quot;$timestamp&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">extjson::models::TimestampBody</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Timestamp</span>(<span class="ident">Timestamp</span> {
-                    <span class="ident">time</span>: <span class="ident">v</span>.<span class="ident">t</span>,
-                    <span class="ident">increment</span>: <span class="ident">v</span>.<span class="ident">i</span>,
+            <span class="string">&quot;$timestamp&quot; </span>=&gt; {
+                <span class="kw">let </span>v = map.next_value::&lt;extjson::models::TimestampBody&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::Timestamp(Timestamp {
+                    time: v.t,
+                    increment: v.i,
                 })
-                .<span class="ident">into</span>())
+                .into())
             }
-            <span class="string">&quot;$minKey&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::MinKey</span>.<span class="ident">into</span>())
+            <span class="string">&quot;$minKey&quot; </span>=&gt; {
+                <span class="kw">let _ </span>= map.next_value::&lt;i32&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::MinKey.into())
             }
-            <span class="string">&quot;$maxKey&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::MaxKey</span>.<span class="ident">into</span>())
+            <span class="string">&quot;$maxKey&quot; </span>=&gt; {
+                <span class="kw">let _ </span>= map.next_value::&lt;i32&gt;()<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::MaxKey.into())
             }
-            <span class="string">&quot;$code&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">CowStr</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">CowStr</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-                    <span class="kw">if</span> <span class="ident">key</span>.<span class="number">0</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="string">&quot;$scope&quot;</span> {
-                        <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">OwnedOrBorrowedRawDocument</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                        <span class="kw">match</span> (<span class="ident">code</span>.<span class="number">0</span>, <span class="ident">scope</span>) {
-                            (<span class="ident">Cow::Borrowed</span>(<span class="ident">code</span>), <span class="ident">OwnedOrBorrowedRawDocument::Borrowed</span>(<span class="ident">scope</span>)) =&gt; {
-                                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::JavaScriptCodeWithScope</span>(
-                                    <span class="ident">RawJavaScriptCodeWithScopeRef</span> { <span class="ident">code</span>, <span class="ident">scope</span> },
+            <span class="string">&quot;$code&quot; </span>=&gt; {
+                <span class="kw">let </span>code = map.next_value::&lt;CowStr&gt;()<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(key) = map.next_key::&lt;CowStr&gt;()<span class="question-mark">? </span>{
+                    <span class="kw">if </span>key.<span class="number">0</span>.as_ref() == <span class="string">&quot;$scope&quot; </span>{
+                        <span class="kw">let </span>scope = map.next_value::&lt;OwnedOrBorrowedRawDocument&gt;()<span class="question-mark">?</span>;
+                        <span class="kw">match </span>(code.<span class="number">0</span>, scope) {
+                            (Cow::Borrowed(code), OwnedOrBorrowedRawDocument::Borrowed(scope)) =&gt; {
+                                <span class="prelude-val">Ok</span>(RawBsonRef::JavaScriptCodeWithScope(
+                                    RawJavaScriptCodeWithScopeRef { code, scope },
                                 )
-                                .<span class="ident">into</span>())
+                                .into())
                             }
-                            (<span class="ident">code</span>, <span class="ident">scope</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RawBson::JavaScriptCodeWithScope</span>(
-                                <span class="ident">RawJavaScriptCodeWithScope</span> {
-                                    <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">into_owned</span>(),
-                                    <span class="ident">scope</span>: <span class="ident">scope</span>.<span class="ident">into_owned</span>(),
+                            (code, scope) =&gt; <span class="prelude-val">Ok</span>(RawBson::JavaScriptCodeWithScope(
+                                RawJavaScriptCodeWithScope {
+                                    code: code.into_owned(),
+                                    scope: scope.into_owned(),
                                 },
                             )
-                            .<span class="ident">into</span>()),
+                            .into()),
                         }
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::unknown_field</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;$scope&quot;</span>]))
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">Err</span>(serde::de::Error::unknown_field(<span class="kw-2">&amp;</span>key.<span class="number">0</span>, <span class="kw-2">&amp;</span>[<span class="string">&quot;$scope&quot;</span>]))
                     }
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">code</span>) <span class="op">=</span> <span class="ident">code</span>.<span class="number">0</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::JavaScriptCode</span>(<span class="ident">code</span>).<span class="ident">into</span>())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBson::JavaScriptCode</span>(<span class="ident">code</span>.<span class="number">0</span>.<span class="ident">into_owned</span>()).<span class="ident">into</span>())
+                } <span class="kw">else if let </span>Cow::Borrowed(code) = code.<span class="number">0 </span>{
+                    <span class="prelude-val">Ok</span>(RawBsonRef::JavaScriptCode(code).into())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(RawBson::JavaScriptCode(code.<span class="number">0</span>.into_owned()).into())
                 }
             }
-            <span class="string">&quot;$dbPointer&quot;</span> =&gt; {
-                <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-                <span class="kw">struct</span> <span class="ident">BorrowedDbPointerBody</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$ref&quot;</span>)]</span>
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">borrow</span>)]</span>
-                    <span class="ident">ns</span>: <span class="ident">CowStr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+            <span class="string">&quot;$dbPointer&quot; </span>=&gt; {
+                <span class="attribute">#[derive(Deserialize)]
+                </span><span class="kw">struct </span>BorrowedDbPointerBody&lt;<span class="lifetime">&#39;a</span>&gt; {
+                    <span class="attribute">#[serde(rename = <span class="string">&quot;$ref&quot;</span>)]
+                    #[serde(borrow)]
+                    </span>ns: CowStr&lt;<span class="lifetime">&#39;a</span>&gt;,
 
-                    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$id&quot;</span>)]</span>
-                    <span class="ident">id</span>: <span class="ident">ObjectId</span>,
+                    <span class="attribute">#[serde(rename = <span class="string">&quot;$id&quot;</span>)]
+                    </span>id: ObjectId,
                 }
 
-                <span class="kw">let</span> <span class="ident">body</span>: <span class="ident">BorrowedDbPointerBody</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">ns</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">ns</span>.<span class="number">0</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::DbPointer</span>(<span class="ident">RawDbPointerRef</span> {
-                        <span class="ident">namespace</span>: <span class="ident">ns</span>,
-                        <span class="ident">id</span>: <span class="ident">body</span>.<span class="ident">id</span>,
+                <span class="kw">let </span>body: BorrowedDbPointerBody = map.next_value()<span class="question-mark">?</span>;
+                <span class="kw">if let </span>Cow::Borrowed(ns) = body.ns.<span class="number">0 </span>{
+                    <span class="prelude-val">Ok</span>(RawBsonRef::DbPointer(RawDbPointerRef {
+                        namespace: ns,
+                        id: body.id,
                     })
-                    .<span class="ident">into</span>())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">RawBson::DbPointer</span>(<span class="ident">DbPointer</span> {
-                        <span class="ident">namespace</span>: <span class="ident">body</span>.<span class="ident">ns</span>.<span class="number">0</span>.<span class="ident">into_owned</span>(),
-                        <span class="ident">id</span>: <span class="ident">body</span>.<span class="ident">id</span>,
+                    .into())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(RawBson::DbPointer(DbPointer {
+                        namespace: body.ns.<span class="number">0</span>.into_owned(),
+                        id: body.id,
                     })
-                    .<span class="ident">into</span>())
+                    .into())
                 }
             }
-            <span class="ident">RAW_DOCUMENT_NEWTYPE</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="ident">bson</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Document</span>(<span class="ident">doc</span>).<span class="ident">into</span>())
+            RAW_DOCUMENT_NEWTYPE =&gt; {
+                <span class="kw">let </span>bson = map.next_value::&lt;<span class="kw-2">&amp;</span>[u8]&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>doc = RawDocument::from_bytes(bson).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::Document(doc).into())
             }
-            <span class="ident">RAW_ARRAY_NEWTYPE</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="ident">bson</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">RawBsonRef::Array</span>(<span class="ident">RawArray::from_doc</span>(<span class="ident">doc</span>)).<span class="ident">into</span>())
+            RAW_ARRAY_NEWTYPE =&gt; {
+                <span class="kw">let </span>bson = map.next_value::&lt;<span class="kw-2">&amp;</span>[u8]&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>doc = RawDocument::from_bytes(bson).map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(RawBsonRef::Array(RawArray::from_doc(doc)).into())
             }
-            <span class="ident">k</span> =&gt; <span class="ident">build_doc</span>(<span class="ident">k</span>, <span class="ident">map</span>),
+            k =&gt; build_doc(k, map),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-ddl/src/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_ddl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-ddl/src/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_ddl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_ddl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -276,222 +276,222 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">Indented</span>, <span class="ident">IteratorJoin</span>, <span class="ident">SQL_INDENTATION</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Display</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::common::{Indented, IteratorJoin, SQL_INDENTATION};
+<span class="kw">use </span>std::{borrow::Cow, fmt::Display};
 
-<span class="kw">struct</span> <span class="ident">SqliteIdentifier</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+<span class="kw">struct </span>SqliteIdentifier&lt;T&gt;(T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Display</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">SqliteIdentifier</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;T: Display&gt; Display <span class="kw">for </span>SqliteIdentifier&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;\&quot;{}\&quot;&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateTable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">Display</span>,
-    <span class="kw">pub</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">foreign_keys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>CreateTable&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>Display,
+    <span class="kw">pub </span>columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub </span>primary_key: <span class="prelude-ty">Option</span>&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;,
+    <span class="kw">pub </span>foreign_keys: Vec&lt;ForeignKey&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateTable</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;CREATE TABLE {} (&quot;</span>, <span class="self">self</span>.<span class="ident">table_name</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>CreateTable&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter) -&gt; std::fmt::Result {
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;CREATE TABLE {} (&quot;</span>, <span class="self">self</span>.table_name)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Indented</span>).<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.columns.iter().map(Indented).join(<span class="string">&quot;,\n&quot;</span>, f)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">primary_key</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;,\n\n&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">SQL_INDENTATION</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;PRIMARY KEY (&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">primary_key</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">SqliteIdentifier</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(primary_key) = <span class="kw-2">&amp;</span><span class="self">self</span>.primary_key {
+            f.write_str(<span class="string">&quot;,\n\n&quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(SQL_INDENTATION)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">&quot;PRIMARY KEY (&quot;</span>)<span class="question-mark">?</span>;
+            primary_key.iter().map(SqliteIdentifier).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
+            f.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">foreign_key</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">foreign_keys</span> {
+        <span class="kw">for </span>foreign_key <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.foreign_keys {
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;,\n{indentation}{fk}&quot;</span>,
-                <span class="ident">indentation</span> <span class="op">=</span> <span class="ident">SQL_INDENTATION</span>,
-                <span class="ident">fk</span> <span class="op">=</span> <span class="ident">foreign_key</span>
+                indentation = SQL_INDENTATION,
+                fk = foreign_key
             )<span class="question-mark">?</span>;
         }
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n)&quot;</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;\n)&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">constrains</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">references</span>: (<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="kw">pub</span> <span class="ident">constraint_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ForeignKeyAction</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ForeignKeyAction</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>ForeignKey&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>constrains: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>references: (Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;),
+    <span class="kw">pub </span>constraint_name: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>on_delete: <span class="prelude-ty">Option</span>&lt;ForeignKeyAction&gt;,
+    <span class="kw">pub </span>on_update: <span class="prelude-ty">Option</span>&lt;ForeignKeyAction&gt;,
 }
 
-<span class="doccomment">/// Foreign key action types (for ON DELETE|ON UPDATE).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ForeignKeyAction</span> {
-    <span class="doccomment">/// Produce an error indicating that the deletion or update would create a foreign key</span>
-    <span class="doccomment">/// constraint violation. If the constraint is deferred, this error will be produced at</span>
-    <span class="doccomment">/// constraint check time if there still exist any referencing rows. This is the default action.</span>
-    <span class="ident">NoAction</span>,
-    <span class="doccomment">/// Produce an error indicating that the deletion or update would create a foreign key</span>
-    <span class="doccomment">/// constraint violation. This is the same as NO ACTION except that the check is not deferrable.</span>
-    <span class="ident">Restrict</span>,
-    <span class="doccomment">/// Delete any rows referencing the deleted row, or update the values of the referencing</span>
-    <span class="doccomment">/// column(s) to the new values of the referenced columns, respectively.</span>
-    <span class="ident">Cascade</span>,
-    <span class="doccomment">/// Set the referencing column(s) to null.</span>
-    <span class="ident">SetNull</span>,
-    <span class="doccomment">/// Set the referencing column(s) to their default values. (There must be a row in the</span>
-    <span class="doccomment">/// referenced table matching the default values, if they are not null, or the operation</span>
-    <span class="doccomment">/// will fail).</span>
-    <span class="ident">SetDefault</span>,
+<span class="doccomment">/// Foreign key action types (for ON DELETE|ON UPDATE).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ForeignKeyAction {
+    <span class="doccomment">/// Produce an error indicating that the deletion or update would create a foreign key
+    /// constraint violation. If the constraint is deferred, this error will be produced at
+    /// constraint check time if there still exist any referencing rows. This is the default action.
+    </span>NoAction,
+    <span class="doccomment">/// Produce an error indicating that the deletion or update would create a foreign key
+    /// constraint violation. This is the same as NO ACTION except that the check is not deferrable.
+    </span>Restrict,
+    <span class="doccomment">/// Delete any rows referencing the deleted row, or update the values of the referencing
+    /// column(s) to the new values of the referenced columns, respectively.
+    </span>Cascade,
+    <span class="doccomment">/// Set the referencing column(s) to null.
+    </span>SetNull,
+    <span class="doccomment">/// Set the referencing column(s) to their default values. (There must be a row in the
+    /// referenced table matching the default values, if they are not null, or the operation
+    /// will fail).
+    </span>SetDefault,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKeyAction</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">action_s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="string">&quot;NO ACTION&quot;</span>,
-            <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="string">&quot;RESTRICT&quot;</span>,
-            <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="string">&quot;CASCADE&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="string">&quot;SET NULL&quot;</span>,
-            <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="string">&quot;SET DEFAULT&quot;</span>,
+<span class="kw">impl </span>Display <span class="kw">for </span>ForeignKeyAction {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>action_s = <span class="kw">match </span><span class="self">self </span>{
+            ForeignKeyAction::NoAction =&gt; <span class="string">&quot;NO ACTION&quot;</span>,
+            ForeignKeyAction::Restrict =&gt; <span class="string">&quot;RESTRICT&quot;</span>,
+            ForeignKeyAction::Cascade =&gt; <span class="string">&quot;CASCADE&quot;</span>,
+            ForeignKeyAction::SetNull =&gt; <span class="string">&quot;SET NULL&quot;</span>,
+            ForeignKeyAction::SetDefault =&gt; <span class="string">&quot;SET DEFAULT&quot;</span>,
         };
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">action_s</span>)
+        f.write_str(action_s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ForeignKey</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constraint_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">constraint_name</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;CONSTRAINT \&quot;{}\&quot; &quot;</span>, <span class="ident">constraint_name</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>ForeignKey&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(constraint_name) = <span class="kw-2">&amp;</span><span class="self">self</span>.constraint_name {
+            <span class="macro">write!</span>(f, <span class="string">&quot;CONSTRAINT \&quot;{}\&quot; &quot;</span>, constraint_name)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FOREIGN KEY (&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;FOREIGN KEY (&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">constrains</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">SqliteIdentifier</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.constrains.iter().map(SqliteIdentifier).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;) REFERENCES \&quot;{referenced_table}\&quot; (&quot;</span>,
-            <span class="ident">referenced_table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">references</span>.<span class="number">0</span>,
+            referenced_table = <span class="self">self</span>.references.<span class="number">0</span>,
         )<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">references</span>.<span class="number">1</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">SqliteIdentifier</span>).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.references.<span class="number">1</span>.iter().map(SqliteIdentifier).join(<span class="string">&quot;, &quot;</span>, f)<span class="question-mark">?</span>;
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">on_delete</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; ON DELETE &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">action</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw-2">&amp;</span><span class="self">self</span>.on_delete {
+            f.write_str(<span class="string">&quot; ON DELETE &quot;</span>)<span class="question-mark">?</span>;
+            action.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">on_update</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; ON UPDATE &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">action</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw-2">&amp;</span><span class="self">self</span>.on_update {
+            f.write_str(<span class="string">&quot; ON UPDATE &quot;</span>)<span class="question-mark">?</span>;
+            action.fmt(f)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">r#type</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">not_null</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">primary_key</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether to render AUTOINCREMENT on the primary key.</span>
-    <span class="kw">pub</span> <span class="ident">autoincrement</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    <span class="kw">pub </span>r#type: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
+    <span class="kw">pub </span>not_null: bool,
+    <span class="kw">pub </span>primary_key: bool,
+    <span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="doccomment">/// Whether to render AUTOINCREMENT on the primary key.
+    </span><span class="kw">pub </span>autoincrement: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+<span class="kw">impl </span>Display <span class="kw">for </span>Column&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;\&quot;{name}\&quot; {tpe}{not_null}{primary_key}{autoincrement}&quot;</span>,
-            <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>,
-            <span class="ident">tpe</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r#type</span>,
-            <span class="ident">not_null</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">not_null</span> { <span class="string">&quot; NOT NULL&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-            <span class="ident">primary_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">primary_key</span> { <span class="string">&quot; PRIMARY KEY&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-            <span class="ident">autoincrement</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">autoincrement</span> { <span class="string">&quot; AUTOINCREMENT&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
+            name = <span class="self">self</span>.name,
+            tpe = <span class="self">self</span>.r#type,
+            not_null = <span class="kw">if </span><span class="self">self</span>.not_null { <span class="string">&quot; NOT NULL&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+            primary_key = <span class="kw">if </span><span class="self">self</span>.primary_key { <span class="string">&quot; PRIMARY KEY&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+            autoincrement = <span class="kw">if </span><span class="self">self</span>.autoincrement { <span class="string">&quot; AUTOINCREMENT&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
         )<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">default</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; DEFAULT &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">default</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = <span class="kw-2">&amp;</span><span class="self">self</span>.default {
+            f.write_str(<span class="string">&quot; DEFAULT &quot;</span>)<span class="question-mark">?</span>;
+            f.write_str(default)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">indoc::indoc</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>indoc::indoc;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">basic_create_table</span>() {
-        <span class="kw">let</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="ident">CreateTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">SqliteIdentifier</span>(<span class="string">&quot;Cat&quot;</span>),
-            <span class="ident">columns</span>: <span class="macro">vec!</span>[
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;integer&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">primary_key</span>: <span class="bool-val">true</span>,
-                    <span class="ident">autoincrement</span>: <span class="bool-val">true</span>,
-                    ..<span class="ident">Default::default</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>basic_create_table() {
+        <span class="kw">let </span>create_table = CreateTable {
+            table_name: <span class="kw-2">&amp;</span>SqliteIdentifier(<span class="string">&quot;Cat&quot;</span>),
+            columns: <span class="macro">vec!</span>[
+                Column {
+                    name: <span class="string">&quot;id&quot;</span>.into(),
+                    r#type: <span class="string">&quot;integer&quot;</span>.into(),
+                    primary_key: <span class="bool-val">true</span>,
+                    autoincrement: <span class="bool-val">true</span>,
+                    ..Default::default()
                 },
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;uuid&quot;</span>.<span class="ident">into</span>(),
-                    ..<span class="ident">Default::default</span>()
+                Column {
+                    name: <span class="string">&quot;boxId&quot;</span>.into(),
+                    r#type: <span class="string">&quot;uuid&quot;</span>.into(),
+                    ..Default::default()
                 },
             ],
-            <span class="ident">primary_key</span>: <span class="prelude-val">None</span>,
-            <span class="ident">foreign_keys</span>: <span class="ident">Vec::new</span>(),
+            primary_key: <span class="prelude-val">None</span>,
+            foreign_keys: Vec::new(),
         };
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">indoc::indoc!</span>(
+        <span class="kw">let </span>expected = <span class="macro">indoc::indoc!</span>(
             <span class="string">r#&quot;
             CREATE TABLE &quot;Cat&quot; (
                 &quot;id&quot; integer PRIMARY KEY AUTOINCREMENT,
                 &quot;boxId&quot; uuid
             )
-            &quot;#</span>
-        );
+            &quot;#
+        </span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">create_table</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\n&#39;</span>))
+        <span class="macro">assert_eq!</span>(create_table.to_string(), expected.trim_matches(<span class="string">&#39;\n&#39;</span>))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_table_with_primary_key</span>() {
-        <span class="kw">let</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="ident">CreateTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">SqliteIdentifier</span>(<span class="string">&quot;Cat&quot;</span>),
-            <span class="ident">columns</span>: <span class="macro">vec!</span>[
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;integer&quot;</span>.<span class="ident">into</span>(),
-                    ..<span class="ident">Default::default</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_table_with_primary_key() {
+        <span class="kw">let </span>create_table = CreateTable {
+            table_name: <span class="kw-2">&amp;</span>SqliteIdentifier(<span class="string">&quot;Cat&quot;</span>),
+            columns: <span class="macro">vec!</span>[
+                Column {
+                    name: <span class="string">&quot;id&quot;</span>.into(),
+                    r#type: <span class="string">&quot;integer&quot;</span>.into(),
+                    ..Default::default()
                 },
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;uuid&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">default</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;&#39;maybe_a_uuid_idk&#39;&quot;</span>.<span class="ident">into</span>()),
-                    ..<span class="ident">Default::default</span>()
+                Column {
+                    name: <span class="string">&quot;boxId&quot;</span>.into(),
+                    r#type: <span class="string">&quot;uuid&quot;</span>.into(),
+                    default: <span class="prelude-val">Some</span>(<span class="string">&quot;&#39;maybe_a_uuid_idk&#39;&quot;</span>.into()),
+                    ..Default::default()
                 },
             ],
-            <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>()]),
-            <span class="ident">foreign_keys</span>: <span class="ident">Vec::new</span>(),
+            primary_key: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.into(), <span class="string">&quot;boxId&quot;</span>.into()]),
+            foreign_keys: Vec::new(),
         };
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">indoc!</span>(
+        <span class="kw">let </span>expected = <span class="macro">indoc!</span>(
             <span class="string">r#&quot;
             CREATE TABLE &quot;Cat&quot; (
                 &quot;id&quot; integer,
@@ -499,46 +499,46 @@
 
                 PRIMARY KEY (&quot;id&quot;, &quot;boxId&quot;)
             )
-            &quot;#</span>
-        );
+            &quot;#
+        </span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">create_table</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\n&#39;</span>))
+        <span class="macro">assert_eq!</span>(create_table.to_string(), expected.trim_matches(<span class="string">&#39;\n&#39;</span>))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_table_with_primary_key_and_foreign_keys</span>() {
-        <span class="kw">let</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="ident">CreateTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">SqliteIdentifier</span>(<span class="string">&quot;Cat&quot;</span>),
-            <span class="ident">columns</span>: <span class="macro">vec!</span>[
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;integer&quot;</span>.<span class="ident">into</span>(),
-                    ..<span class="ident">Default::default</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_table_with_primary_key_and_foreign_keys() {
+        <span class="kw">let </span>create_table = CreateTable {
+            table_name: <span class="kw-2">&amp;</span>SqliteIdentifier(<span class="string">&quot;Cat&quot;</span>),
+            columns: <span class="macro">vec!</span>[
+                Column {
+                    name: <span class="string">&quot;id&quot;</span>.into(),
+                    r#type: <span class="string">&quot;integer&quot;</span>.into(),
+                    ..Default::default()
                 },
-                <span class="ident">Column</span> {
-                    <span class="ident">name</span>: <span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">r#type</span>: <span class="string">&quot;uuid&quot;</span>.<span class="ident">into</span>(),
-                    <span class="ident">default</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;&#39;maybe_a_uuid_idk&#39;&quot;</span>.<span class="ident">into</span>()),
-                    ..<span class="ident">Default::default</span>()
+                Column {
+                    name: <span class="string">&quot;boxId&quot;</span>.into(),
+                    r#type: <span class="string">&quot;uuid&quot;</span>.into(),
+                    default: <span class="prelude-val">Some</span>(<span class="string">&quot;&#39;maybe_a_uuid_idk&#39;&quot;</span>.into()),
+                    ..Default::default()
                 },
             ],
-            <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>()]),
-            <span class="ident">foreign_keys</span>: <span class="macro">vec!</span>[
-                <span class="ident">ForeignKey</span> {
-                    <span class="ident">constrains</span>: <span class="macro">vec!</span>[<span class="string">&quot;boxId&quot;</span>.<span class="ident">into</span>()],
-                    <span class="ident">references</span>: (<span class="string">&quot;Box&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;material&quot;</span>.<span class="ident">into</span>()]),
-                    ..<span class="ident">Default::default</span>()
+            primary_key: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.into(), <span class="string">&quot;boxId&quot;</span>.into()]),
+            foreign_keys: <span class="macro">vec!</span>[
+                ForeignKey {
+                    constrains: <span class="macro">vec!</span>[<span class="string">&quot;boxId&quot;</span>.into()],
+                    references: (<span class="string">&quot;Box&quot;</span>.into(), <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.into(), <span class="string">&quot;material&quot;</span>.into()]),
+                    ..Default::default()
                 },
-                <span class="ident">ForeignKey</span> {
-                    <span class="ident">constrains</span>: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">into</span>()],
-                    <span class="ident">references</span>: (<span class="string">&quot;meow&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.<span class="ident">into</span>()]),
-                    <span class="ident">constraint_name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;meowConstraint&quot;</span>.<span class="ident">into</span>()),
-                    ..<span class="ident">Default::default</span>()
+                ForeignKey {
+                    constrains: <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.into()],
+                    references: (<span class="string">&quot;meow&quot;</span>.into(), <span class="macro">vec!</span>[<span class="string">&quot;id&quot;</span>.into()]),
+                    constraint_name: <span class="prelude-val">Some</span>(<span class="string">&quot;meowConstraint&quot;</span>.into()),
+                    ..Default::default()
                 },
             ],
         };
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">indoc!</span>(
+        <span class="kw">let </span>expected = <span class="macro">indoc!</span>(
             <span class="string">r#&quot;
             CREATE TABLE &quot;Cat&quot; (
                 &quot;id&quot; integer,
@@ -548,11 +548,11 @@
                 FOREIGN KEY (&quot;boxId&quot;) REFERENCES &quot;Box&quot; (&quot;id&quot;, &quot;material&quot;),
                 CONSTRAINT &quot;meowConstraint&quot; FOREIGN KEY (&quot;id&quot;) REFERENCES &quot;meow&quot; (&quot;id&quot;)
             )
-            &quot;#</span>
-        );
+            &quot;#
+        </span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">create_table</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\n&#39;</span>))
+        <span class="macro">assert_eq!</span>(create_table.to_string(), expected.trim_matches(<span class="string">&#39;\n&#39;</span>))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_ddl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_ddl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

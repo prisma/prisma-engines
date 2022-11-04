@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/code_actions/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_fmt/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `prisma-fmt/src/code_actions/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_fmt/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_fmt/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -221,228 +221,228 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">lsp_types</span>::{<span class="ident">CodeAction</span>, <span class="ident">CodeActionKind</span>, <span class="ident">CodeActionOrCommand</span>, <span class="ident">CodeActionParams</span>, <span class="ident">Range</span>, <span class="ident">TextEdit</span>, <span class="ident">WorkspaceEdit</span>};
-<span class="kw">use</span> <span class="ident">psl::parser_database</span>::{
-    <span class="ident">ast::WithSpan</span>,
-    <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>lsp_types::{CodeAction, CodeActionKind, CodeActionOrCommand, CodeActionParams, Range, TextEdit, WorkspaceEdit};
+<span class="kw">use </span>psl::parser_database::{
+    ast::WithSpan,
+    walkers::{CompleteInlineRelationWalker, ModelWalker, ScalarFieldWalker},
 };
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="doccomment">/// If the referencing side of the one-to-one relation does not point</span>
-<span class="doccomment">/// to a unique constraint, the action adds the attribute.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If referencing a single field:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// model A {</span>
-<span class="doccomment">///   id    Int @id</span>
-<span class="doccomment">///   field Int @unique</span>
-<span class="doccomment">///   b     B   @relation(&quot;foo&quot;)</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// model B {</span>
-<span class="doccomment">///   id  Int  @id</span>
-<span class="doccomment">///   aId Int? // &lt;- suggest @unique here</span>
-<span class="doccomment">///   a   A    @relation(&quot;foo&quot;, fields: [aId], references: [field])</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the referencing multiple fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// model A {</span>
-<span class="doccomment">///   id     Int @id</span>
-<span class="doccomment">///   field1 Int</span>
-<span class="doccomment">///   field2 Int</span>
-<span class="doccomment">///   b      B   @relation(&quot;foo&quot;)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   // &lt;- suggest @@unique([field1, field2]) here</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// model B {</span>
-<span class="doccomment">///   id   Int  @id</span>
-<span class="doccomment">///   aId1 Int?</span>
-<span class="doccomment">///   aId2 Int?</span>
-<span class="doccomment">///   a    A    @relation(&quot;foo&quot;, fields: [aId1, aId2], references: [field1, field2])</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   @@unique([aId1, aId2])</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_referencing_side_unique</span>(
-    <span class="ident">actions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span>,
-    <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">CodeActionParams</span>,
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">relation</span>: <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// If the referencing side of the one-to-one relation does not point
+/// to a unique constraint, the action adds the attribute.
+///
+/// If referencing a single field:
+///
+/// ```ignore
+/// model A {
+///   id    Int @id
+///   field Int @unique
+///   b     B   @relation(&quot;foo&quot;)
+/// }
+///
+/// model B {
+///   id  Int  @id
+///   aId Int? // &lt;- suggest @unique here
+///   a   A    @relation(&quot;foo&quot;, fields: [aId], references: [field])
+/// }
+/// ```
+///
+/// If the referencing multiple fields:
+///
+/// ```ignore
+/// model A {
+///   id     Int @id
+///   field1 Int
+///   field2 Int
+///   b      B   @relation(&quot;foo&quot;)
+///
+///   // &lt;- suggest @@unique([field1, field2]) here
+/// }
+///
+/// model B {
+///   id   Int  @id
+///   aId1 Int?
+///   aId2 Int?
+///   a    A    @relation(&quot;foo&quot;, fields: [aId1, aId2], references: [field1, field2])
+///
+///   @@unique([aId1, aId2])
+/// }
+/// ```
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>add_referencing_side_unique(
+    actions: <span class="kw-2">&amp;mut </span>Vec&lt;CodeActionOrCommand&gt;,
+    params: <span class="kw-2">&amp;</span>CodeActionParams,
+    schema: <span class="kw-2">&amp;</span>str,
+    relation: CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="ident">relation</span>
-        .<span class="ident">referencing_model</span>()
-        .<span class="ident">unique_criterias</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">crit</span><span class="op">|</span> <span class="ident">crit</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referencing_fields</span>()))
+    <span class="kw">if </span>relation
+        .referencing_model()
+        .unique_criterias()
+        .any(|crit| crit.contains_exactly_fields(relation.referencing_fields()))
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">referencing_fields</span>().<span class="ident">len</span>(), <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">len</span>()) {
+    <span class="kw">match </span>(relation.referencing_fields().len(), relation.referenced_fields().len()) {
         (<span class="number">0</span>, <span class="number">0</span>) =&gt; <span class="kw">return</span>,
-        (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span> =&gt; <span class="kw">return</span>,
-        <span class="kw">_</span> =&gt; (),
+        (a, b) <span class="kw">if </span>a != b =&gt; <span class="kw">return</span>,
+        <span class="kw">_ </span>=&gt; (),
     }
 
-    <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">create_missing_unique</span>(<span class="ident">schema</span>, <span class="ident">relation</span>.<span class="ident">referencing_model</span>(), <span class="ident">relation</span>.<span class="ident">referencing_fields</span>());
+    <span class="kw">let </span>text = create_missing_unique(schema, relation.referencing_model(), relation.referencing_fields());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="ident">changes</span>.<span class="ident">insert</span>(<span class="ident">params</span>.<span class="ident">text_document</span>.<span class="ident">uri</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">text</span>]);
+    <span class="kw">let </span><span class="kw-2">mut </span>changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), <span class="macro">vec!</span>[text]);
 
-    <span class="kw">let</span> <span class="ident">edit</span> <span class="op">=</span> <span class="ident">WorkspaceEdit</span> {
-        <span class="ident">changes</span>: <span class="prelude-val">Some</span>(<span class="ident">changes</span>),
-        ..<span class="ident">Default::default</span>()
+    <span class="kw">let </span>edit = WorkspaceEdit {
+        changes: <span class="prelude-val">Some</span>(changes),
+        ..Default::default()
     };
 
-    <span class="comment">// The returned diagnostics are the ones we promise to fix with</span>
-    <span class="comment">// the code action.</span>
-    <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::diagnostics_for_span</span>(
-        <span class="ident">schema</span>,
-        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">context</span>.<span class="ident">diagnostics</span>,
-        <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    <span class="comment">// The returned diagnostics are the ones we promise to fix with
+    // the code action.
+    </span><span class="kw">let </span>diagnostics = <span class="kw">super</span>::diagnostics_for_span(
+        schema,
+        <span class="kw-2">&amp;</span>params.context.diagnostics,
+        relation.referencing_field().ast_field().span(),
     );
 
-    <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">CodeAction</span> {
-        <span class="ident">title</span>: <span class="ident">String::from</span>(<span class="string">&quot;Make referencing fields unique&quot;</span>),
-        <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CodeActionKind::QUICKFIX</span>),
-        <span class="ident">edit</span>: <span class="prelude-val">Some</span>(<span class="ident">edit</span>),
-        <span class="ident">diagnostics</span>,
-        ..<span class="ident">Default::default</span>()
+    <span class="kw">let </span>action = CodeAction {
+        title: String::from(<span class="string">&quot;Make referencing fields unique&quot;</span>),
+        kind: <span class="prelude-val">Some</span>(CodeActionKind::QUICKFIX),
+        edit: <span class="prelude-val">Some</span>(edit),
+        diagnostics,
+        ..Default::default()
     };
 
-    <span class="ident">actions</span>.<span class="ident">push</span>(<span class="ident">CodeActionOrCommand::CodeAction</span>(<span class="ident">action</span>));
+    actions.push(CodeActionOrCommand::CodeAction(action));
 }
 
-<span class="doccomment">/// If the referenced side of the relation does not point to a unique</span>
-<span class="doccomment">/// constraint, the action adds the attribute.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If referencing a single field:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// model A {</span>
-<span class="doccomment">///   id    Int @id</span>
-<span class="doccomment">///   field Int // &lt;- suggests @unique here</span>
-<span class="doccomment">///   bs    B[]</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// model B {</span>
-<span class="doccomment">///   id  Int @id</span>
-<span class="doccomment">///   aId Int</span>
-<span class="doccomment">///   a   A   @relation(fields: [aId], references: [field])</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the referencing multiple fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// model A {</span>
-<span class="doccomment">///   id     Int @id</span>
-<span class="doccomment">///   field1 Int</span>
-<span class="doccomment">///   field2 Int</span>
-<span class="doccomment">///   bs     B[]</span>
-<span class="doccomment">///   // &lt;- suggest @@unique([field1, field2]) here</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// model B {</span>
-<span class="doccomment">///   id   Int @id</span>
-<span class="doccomment">///   aId1 Int</span>
-<span class="doccomment">///   aId2 Int</span>
-<span class="doccomment">///   a    A   @relation(fields: [aId1, aId2], references: [field1, field2])</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_referenced_side_unique</span>(
-    <span class="ident">actions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span>,
-    <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">CodeActionParams</span>,
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">relation</span>: <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// If the referenced side of the relation does not point to a unique
+/// constraint, the action adds the attribute.
+///
+/// If referencing a single field:
+///
+/// ```ignore
+/// model A {
+///   id    Int @id
+///   field Int // &lt;- suggests @unique here
+///   bs    B[]
+/// }
+///
+/// model B {
+///   id  Int @id
+///   aId Int
+///   a   A   @relation(fields: [aId], references: [field])
+/// }
+/// ```
+///
+/// If the referencing multiple fields:
+///
+/// ```ignore
+/// model A {
+///   id     Int @id
+///   field1 Int
+///   field2 Int
+///   bs     B[]
+///   // &lt;- suggest @@unique([field1, field2]) here
+/// }
+///
+/// model B {
+///   id   Int @id
+///   aId1 Int
+///   aId2 Int
+///   a    A   @relation(fields: [aId1, aId2], references: [field1, field2])
+/// }
+/// ```
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>add_referenced_side_unique(
+    actions: <span class="kw-2">&amp;mut </span>Vec&lt;CodeActionOrCommand&gt;,
+    params: <span class="kw-2">&amp;</span>CodeActionParams,
+    schema: <span class="kw-2">&amp;</span>str,
+    relation: CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="ident">relation</span>
-        .<span class="ident">referenced_model</span>()
-        .<span class="ident">unique_criterias</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">crit</span><span class="op">|</span> <span class="ident">crit</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">relation</span>.<span class="ident">referenced_fields</span>()))
+    <span class="kw">if </span>relation
+        .referenced_model()
+        .unique_criterias()
+        .any(|crit| crit.contains_exactly_fields(relation.referenced_fields()))
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">referencing_fields</span>().<span class="ident">len</span>(), <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">len</span>()) {
+    <span class="kw">match </span>(relation.referencing_fields().len(), relation.referenced_fields().len()) {
         (<span class="number">0</span>, <span class="number">0</span>) =&gt; <span class="kw">return</span>,
-        (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span> =&gt; <span class="kw">return</span>,
-        <span class="kw">_</span> =&gt; (),
+        (a, b) <span class="kw">if </span>a != b =&gt; <span class="kw">return</span>,
+        <span class="kw">_ </span>=&gt; (),
     }
 
-    <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="ident">create_missing_unique</span>(<span class="ident">schema</span>, <span class="ident">relation</span>.<span class="ident">referenced_model</span>(), <span class="ident">relation</span>.<span class="ident">referenced_fields</span>());
+    <span class="kw">let </span>text = create_missing_unique(schema, relation.referenced_model(), relation.referenced_fields());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="ident">changes</span>.<span class="ident">insert</span>(<span class="ident">params</span>.<span class="ident">text_document</span>.<span class="ident">uri</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">text</span>]);
+    <span class="kw">let </span><span class="kw-2">mut </span>changes = HashMap::new();
+    changes.insert(params.text_document.uri.clone(), <span class="macro">vec!</span>[text]);
 
-    <span class="kw">let</span> <span class="ident">edit</span> <span class="op">=</span> <span class="ident">WorkspaceEdit</span> {
-        <span class="ident">changes</span>: <span class="prelude-val">Some</span>(<span class="ident">changes</span>),
-        ..<span class="ident">Default::default</span>()
+    <span class="kw">let </span>edit = WorkspaceEdit {
+        changes: <span class="prelude-val">Some</span>(changes),
+        ..Default::default()
     };
 
-    <span class="comment">// The returned diagnostics are the ones we promise to fix with</span>
-    <span class="comment">// the code action.</span>
-    <span class="kw">let</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::diagnostics_for_span</span>(
-        <span class="ident">schema</span>,
-        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">context</span>.<span class="ident">diagnostics</span>,
-        <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    <span class="comment">// The returned diagnostics are the ones we promise to fix with
+    // the code action.
+    </span><span class="kw">let </span>diagnostics = <span class="kw">super</span>::diagnostics_for_span(
+        schema,
+        <span class="kw-2">&amp;</span>params.context.diagnostics,
+        relation.referencing_field().ast_field().span(),
     );
 
-    <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">CodeAction</span> {
-        <span class="ident">title</span>: <span class="ident">String::from</span>(<span class="string">&quot;Make referenced field(s) unique&quot;</span>),
-        <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CodeActionKind::QUICKFIX</span>),
-        <span class="ident">edit</span>: <span class="prelude-val">Some</span>(<span class="ident">edit</span>),
-        <span class="ident">diagnostics</span>,
-        ..<span class="ident">Default::default</span>()
+    <span class="kw">let </span>action = CodeAction {
+        title: String::from(<span class="string">&quot;Make referenced field(s) unique&quot;</span>),
+        kind: <span class="prelude-val">Some</span>(CodeActionKind::QUICKFIX),
+        edit: <span class="prelude-val">Some</span>(edit),
+        diagnostics,
+        ..Default::default()
     };
 
-    <span class="ident">actions</span>.<span class="ident">push</span>(<span class="ident">CodeActionOrCommand::CodeAction</span>(<span class="ident">action</span>));
+    actions.push(CodeActionOrCommand::CodeAction(action));
 }
 
-<span class="kw">fn</span> <span class="ident">create_missing_unique</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-) -&gt; <span class="ident">TextEdit</span> {
-    <span class="kw">let</span> (<span class="ident">new_text</span>, <span class="ident">range</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">let</span> <span class="ident">new_text</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot; @unique&quot;</span>);
+<span class="kw">fn </span>create_missing_unique&lt;<span class="lifetime">&#39;a</span>&gt;(
+    schema: <span class="kw-2">&amp;</span>str,
+    model: ModelWalker&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw-2">mut </span>fields: <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;a</span>,
+) -&gt; TextEdit {
+    <span class="kw">let </span>(new_text, range) = <span class="kw">if </span>fields.len() == <span class="number">1 </span>{
+        <span class="kw">let </span>new_text = String::from(<span class="string">&quot; @unique&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::position_after_span</span>(<span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(), <span class="ident">schema</span>);
+        <span class="kw">let </span>field = fields.next().unwrap();
+        <span class="kw">let </span>position = <span class="kw">crate</span>::position_after_span(field.ast_field().span(), schema);
 
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">Range</span> {
-            <span class="ident">start</span>: <span class="ident">position</span>,
-            <span class="ident">end</span>: <span class="ident">position</span>,
+        <span class="kw">let </span>range = Range {
+            start: position,
+            end: position,
         };
 
-        (<span class="ident">new_text</span>, <span class="ident">range</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+        (new_text, range)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>fields = fields.map(|f| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">indentation</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">indentation</span>();
-        <span class="kw">let</span> <span class="ident">newline</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">newline</span>();
+        <span class="kw">let </span>indentation = model.indentation();
+        <span class="kw">let </span>newline = model.newline();
 
-        <span class="kw">let</span> <span class="ident">separator</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">attributes</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">newline</span>.<span class="ident">as_ref</span>()
-        } <span class="kw">else</span> {
-            <span class="string">&quot;&quot;</span>
-        };
+        <span class="kw">let </span>separator = <span class="kw">if </span>model.ast_model().attributes.is_empty() {
+            newline.as_ref()
+        } <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>};
 
-        <span class="kw">let</span> <span class="ident">new_text</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{separator}{indentation}@@unique([{fields}]){newline}}}&quot;</span>);
+        <span class="kw">let </span>new_text = <span class="macro">format!</span>(<span class="string">&quot;{separator}{indentation}@@unique([{fields}]){newline}}}&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::offset_to_position</span>(<span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>().<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">schema</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::offset_to_position</span>(<span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>().<span class="ident">end</span>, <span class="ident">schema</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>start = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end - <span class="number">1</span>, schema).unwrap();
+        <span class="kw">let </span>end = <span class="kw">crate</span>::offset_to_position(model.ast_model().span().end, schema).unwrap();
 
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">Range</span> { <span class="ident">start</span>, <span class="ident">end</span> };
+        <span class="kw">let </span>range = Range { start, end };
 
-        (<span class="ident">new_text</span>, <span class="ident">range</span>)
+        (new_text, range)
     };
 
-    <span class="ident">TextEdit</span> { <span class="ident">range</span>, <span class="ident">new_text</span> }
+    TextEdit { range, new_text }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_fmt" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

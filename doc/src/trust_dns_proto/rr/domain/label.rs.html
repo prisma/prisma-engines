@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/domain/label.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>label.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/domain/label.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>label.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -501,508 +501,508 @@
 <span id="501">501</span>
 <span id="502">502</span>
 <span id="503">503</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Labels are used as the internal components of a Name.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A label is stored internally as ascii, where all unicode characters are converted to punycode internally.</span>
+</span><span class="doccomment">//! Labels are used as the internal components of a Name.
+//!
+//! A label is stored internally as ascii, where all unicode characters are converted to punycode internally.
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::useless_attribute</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ascii::AsciiExt</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">std::cmp</span>::{<span class="ident">Ordering</span>, <span class="ident">PartialEq</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="ident">Write</span>};
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">tinyvec::TinyVec</span>;
+</span><span class="attribute">#[allow(clippy::useless_attribute)]
+#[allow(unused)]
+#[allow(deprecated)]
+</span><span class="kw">use </span>std::ascii::AsciiExt;
+<span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>std::cmp::{Ordering, PartialEq};
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug, Display, Formatter, Write};
+<span class="kw">use </span>std::hash::{Hash, Hasher};
+<span class="kw">use </span>tinyvec::TinyVec;
 
-<span class="kw">use</span> <span class="ident">idna</span>;
-<span class="kw">use</span> <span class="ident">log::debug</span>;
+<span class="kw">use </span>idna;
+<span class="kw">use </span>log::debug;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
 
-<span class="kw">const</span> <span class="ident">WILDCARD</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;*&quot;</span>;
-<span class="kw">const</span> <span class="ident">IDNA_PREFIX</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;xn--&quot;</span>;
+<span class="kw">const </span>WILDCARD: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;*&quot;</span>;
+<span class="kw">const </span>IDNA_PREFIX: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;xn--&quot;</span>;
 
-<span class="doccomment">/// Labels are always stored as ASCII, unicode characters must be encoded with punycode</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Label</span>(<span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">24</span>]<span class="op">&gt;</span>);
+<span class="doccomment">/// Labels are always stored as ASCII, unicode characters must be encoded with punycode
+</span><span class="attribute">#[derive(Clone, Eq)]
+</span><span class="kw">pub struct </span>Label(TinyVec&lt;[u8; <span class="number">24</span>]&gt;);
 
-<span class="kw">impl</span> <span class="ident">Label</span> {
-    <span class="doccomment">/// These must only be ASCII, with unicode encoded to PunyCode, or other such transformation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This uses the bytes as raw ascii values, with nothing escaped on the wire.</span>
-    <span class="doccomment">/// Generally users should use `from_str` or `from_ascii`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_raw_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">63</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Label exceeds maximum length 63: {}&quot;</span>, <span class="ident">bytes</span>.<span class="ident">len</span>()).<span class="ident">into</span>());
+<span class="kw">impl </span>Label {
+    <span class="doccomment">/// These must only be ASCII, with unicode encoded to PunyCode, or other such transformation.
+    ///
+    /// This uses the bytes as raw ascii values, with nothing escaped on the wire.
+    /// Generally users should use `from_str` or `from_ascii`
+    </span><span class="kw">pub fn </span>from_raw_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>bytes.len() &gt; <span class="number">63 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Label exceeds maximum length 63: {}&quot;</span>, bytes.len()).into());
         };
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">TinyVec::from</span>(<span class="ident">bytes</span>)))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(TinyVec::from(bytes)))
     }
 
-    <span class="doccomment">/// Translates this string into IDNA safe name, encoding to punycode as necessary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_utf8</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">WILDCARD</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::wildcard</span>());
+    <span class="doccomment">/// Translates this string into IDNA safe name, encoding to punycode as necessary.
+    </span><span class="kw">pub fn </span>from_utf8(s: <span class="kw-2">&amp;</span>str) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>s.as_bytes() == WILDCARD {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::wildcard());
         }
 
-        <span class="comment">// special case for SRV type records</span>
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>) {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::from_ascii</span>(<span class="ident">s</span>);
+        <span class="comment">// special case for SRV type records
+        </span><span class="kw">if </span>s.starts_with(<span class="string">&#39;_&#39;</span>) {
+            <span class="kw">return </span><span class="self">Self</span>::from_ascii(s);
         }
 
-        <span class="kw">match</span> <span class="ident">idna::Config::default</span>()
-            .<span class="ident">use_std3_ascii_rules</span>(<span class="bool-val">true</span>)
-            .<span class="ident">transitional_processing</span>(<span class="bool-val">true</span>)
-            .<span class="ident">verify_dns_length</span>(<span class="bool-val">true</span>)
-            .<span class="ident">to_ascii</span>(<span class="ident">s</span>)
+        <span class="kw">match </span>idna::Config::default()
+            .use_std3_ascii_rules(<span class="bool-val">true</span>)
+            .transitional_processing(<span class="bool-val">true</span>)
+            .verify_dns_length(<span class="bool-val">true</span>)
+            .to_ascii(s)
         {
-            <span class="prelude-val">Ok</span>(<span class="ident">puny</span>) =&gt; <span class="ident"><span class="self">Self</span>::from_ascii</span>(<span class="kw-2">&amp;</span><span class="ident">puny</span>),
-            <span class="ident">e</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Label contains invalid characters: {:?}&quot;</span>, <span class="ident">e</span>).<span class="ident">into</span>()),
+            <span class="prelude-val">Ok</span>(puny) =&gt; <span class="self">Self</span>::from_ascii(<span class="kw-2">&amp;</span>puny),
+            e =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Label contains invalid characters: {:?}&quot;</span>, e).into()),
         }
     }
 
-    <span class="doccomment">/// Takes the ascii string and returns a new label.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return an Error if the label is not an ascii string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ascii</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">WILDCARD</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::wildcard</span>());
+    <span class="doccomment">/// Takes the ascii string and returns a new label.
+    ///
+    /// This will return an Error if the label is not an ascii string
+    </span><span class="kw">pub fn </span>from_ascii(s: <span class="kw-2">&amp;</span>str) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>s.as_bytes() == WILDCARD {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::wildcard());
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">is_ascii</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">take</span>(<span class="number">1</span>).<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">is_safe_ascii</span>(<span class="ident">c</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>))
-            <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">1</span>).<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">is_safe_ascii</span>(<span class="ident">c</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
+        <span class="kw">if </span>!s.is_empty()
+            &amp;&amp; s.is_ascii()
+            &amp;&amp; s.chars().take(<span class="number">1</span>).all(|c| is_safe_ascii(c, <span class="bool-val">true</span>, <span class="bool-val">false</span>))
+            &amp;&amp; s.chars().skip(<span class="number">1</span>).all(|c| is_safe_ascii(c, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
         {
-            <span class="ident"><span class="self">Self</span>::from_raw_bytes</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Malformed label: {}&quot;</span>, <span class="ident">s</span>).<span class="ident">into</span>())
+            <span class="self">Self</span>::from_raw_bytes(s.as_bytes())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;Malformed label: {}&quot;</span>, s).into())
         }
     }
 
-    <span class="doccomment">/// Returns a new Label of the Wildcard, i.e. &quot;*&quot;</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wildcard</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">TinyVec::from</span>(<span class="ident">WILDCARD</span>))
+    <span class="doccomment">/// Returns a new Label of the Wildcard, i.e. &quot;*&quot;
+    </span><span class="kw">pub fn </span>wildcard() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(TinyVec::from(WILDCARD))
     }
 
-    <span class="doccomment">/// Converts this label to lowercase</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// TODO: replace case conversion when (ascii_ctype #39658) stabilizes</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">idx</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="self">self</span>
-            .<span class="number">0</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>())
+    <span class="doccomment">/// Converts this label to lowercase
+    </span><span class="kw">pub fn </span>to_lowercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="comment">// TODO: replace case conversion when (ascii_ctype #39658) stabilizes
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((idx, <span class="kw">_</span>)) = <span class="self">self
+            </span>.<span class="number">0
+            </span>.iter()
+            .enumerate()
+            .find(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)| <span class="kw-2">*</span>c != c.to_ascii_lowercase())
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lower_label</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_vec</span>();
-            <span class="ident">lower_label</span>[<span class="ident">idx</span>..].<span class="ident">make_ascii_lowercase</span>();
-            <span class="self">Self</span>(<span class="ident">TinyVec::from</span>(<span class="ident">lower_label</span>.<span class="ident">as_slice</span>()))
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">clone</span>()
+            <span class="kw">let </span><span class="kw-2">mut </span>lower_label: Vec&lt;u8&gt; = <span class="self">self</span>.<span class="number">0</span>.to_vec();
+            lower_label[idx..].make_ascii_lowercase();
+            <span class="self">Self</span>(TinyVec::from(lower_label.as_slice()))
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.clone()
         }
     }
 
-    <span class="doccomment">/// Returns true if this label is the wildcard, &#39;*&#39;, label</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_wildcard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">WILDCARD</span>
+    <span class="doccomment">/// Returns true if this label is the wildcard, &#39;*&#39;, label
+    </span><span class="kw">pub fn </span>is_wildcard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_bytes() == WILDCARD
     }
 
-    <span class="doccomment">/// Returns the lenght in bytes of this label</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the lenght in bytes of this label
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.len()
     }
 
-    <span class="doccomment">/// True if the label contains no characters</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// True if the label contains no characters
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.is_empty()
     }
 
-    <span class="doccomment">/// Returns the raw bytes of the label, this is good for writing to the wire.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`Display`] for presentation version (unescaped from punycode, etc)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the raw bytes of the label, this is good for writing to the wire.
+    ///
+    /// See [`Display`] for presentation version (unescaped from punycode, etc)
+    </span><span class="kw">pub fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Performs the equivalence operation disregarding case
+    </span><span class="kw">pub fn </span>eq_ignore_ascii_case(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>other.<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Performs the equivalence operation disregarding case</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>)
-    }
+    <span class="doccomment">/// compares with the other label, ignoring case
+    </span><span class="kw">pub fn </span>cmp_with_f&lt;F: LabelCmp&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span>s = <span class="self">self</span>.<span class="number">0</span>.iter();
+        <span class="kw">let </span>o = other.<span class="number">0</span>.iter();
 
-    <span class="doccomment">/// compares with the other label, ignoring case</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cmp_with_f</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LabelCmp</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>();
-        <span class="kw">let</span> <span class="ident">o</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>.<span class="ident">iter</span>();
-
-        <span class="kw">for</span> (<span class="ident">s</span>, <span class="ident">o</span>) <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">zip</span>(<span class="ident">o</span>) {
-            <span class="kw">match</span> <span class="ident">F::cmp_u8</span>(<span class="kw-2">*</span><span class="ident">s</span>, <span class="kw-2">*</span><span class="ident">o</span>) {
-                <span class="ident">Ordering::Equal</span> =&gt; <span class="kw">continue</span>,
-                <span class="ident">not_eq</span> =&gt; <span class="kw">return</span> <span class="ident">not_eq</span>,
+        <span class="kw">for </span>(s, o) <span class="kw">in </span>s.zip(o) {
+            <span class="kw">match </span>F::cmp_u8(<span class="kw-2">*</span>s, <span class="kw-2">*</span>o) {
+                Ordering::Equal =&gt; <span class="kw">continue</span>,
+                not_eq =&gt; <span class="kw">return </span>not_eq,
             }
         }
 
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>.<span class="ident">len</span>())
+        <span class="self">self</span>.<span class="number">0</span>.len().cmp(<span class="kw-2">&amp;</span>other.<span class="number">0</span>.len())
     }
 
-    <span class="doccomment">/// Performs the conversion to utf8 from IDNA as necessary, see `fmt` for more details</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_utf8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+    <span class="doccomment">/// Performs the conversion to utf8 from IDNA as necessary, see `fmt` for more details
+    </span><span class="kw">pub fn </span>to_utf8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Converts this label to safe ascii, escaping characters as necessary</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this is an IDNA, punycode, label, then the xn-- prefix will be maintained as ascii</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ascii</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>());
+    <span class="doccomment">/// Converts this label to safe ascii, escaping characters as necessary
+    ///
+    /// If this is an IDNA, punycode, label, then the xn-- prefix will be maintained as ascii
+    </span><span class="kw">pub fn </span>to_ascii(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>ascii = String::with_capacity(<span class="self">self</span>.as_bytes().len());
 
-        <span class="self">self</span>.<span class="ident">write_ascii</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ascii</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;should never fail to write a new string&quot;</span>);
-        <span class="ident">ascii</span>
+        <span class="self">self</span>.write_ascii(<span class="kw-2">&amp;mut </span>ascii)
+            .expect(<span class="string">&quot;should never fail to write a new string&quot;</span>);
+        ascii
     }
 
-    <span class="doccomment">/// Writes this label to safe ascii, escaping characters as necessary</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_ascii</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="comment">// We can&#39;t guarantee that the same input will always translate to the same output</span>
-        <span class="kw">fn</span> <span class="ident">escape_non_ascii</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(
-            <span class="ident">byte</span>: <span class="ident">u8</span>,
-            <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-            <span class="ident">is_first</span>: <span class="ident">bool</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">to_triple_escape</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ch</span>: <span class="ident">u8</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;\\{:03o}&quot;</span>, <span class="ident">ch</span>);
-            <span class="kw">let</span> <span class="ident">to_single_escape</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ch</span>: <span class="ident">char</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;\\{}&quot;</span>, <span class="ident">ch</span>);
+    <span class="doccomment">/// Writes this label to safe ascii, escaping characters as necessary
+    </span><span class="kw">pub fn </span>write_ascii&lt;W: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="comment">// We can&#39;t guarantee that the same input will always translate to the same output
+        </span><span class="kw">fn </span>escape_non_ascii&lt;W: Write&gt;(
+            byte: u8,
+            f: <span class="kw-2">&amp;mut </span>W,
+            is_first: bool,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+            <span class="kw">let </span>to_triple_escape = |ch: u8| <span class="macro">format!</span>(<span class="string">&quot;\\{:03o}&quot;</span>, ch);
+            <span class="kw">let </span>to_single_escape = |ch: char| <span class="macro">format!</span>(<span class="string">&quot;\\{}&quot;</span>, ch);
 
-            <span class="kw">match</span> <span class="ident">char::from</span>(<span class="ident">byte</span>) {
-                <span class="ident">c</span> <span class="kw">if</span> <span class="ident">is_safe_ascii</span>(<span class="ident">c</span>, <span class="ident">is_first</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_char</span>(<span class="ident">c</span>)<span class="question-mark">?</span>,
-                <span class="comment">// it&#39;s not a control and is printable as well as inside the standard ascii range</span>
-                <span class="ident">c</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&gt;</span> <span class="string">b&#39;\x20&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span> <span class="string">b&#39;\x7f&#39;</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">to_single_escape</span>(<span class="ident">c</span>))<span class="question-mark">?</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">to_triple_escape</span>(<span class="ident">byte</span>))<span class="question-mark">?</span>,
+            <span class="kw">match </span>char::from(byte) {
+                c <span class="kw">if </span>is_safe_ascii(c, is_first, <span class="bool-val">true</span>) =&gt; f.write_char(c)<span class="question-mark">?</span>,
+                <span class="comment">// it&#39;s not a control and is printable as well as inside the standard ascii range
+                </span>c <span class="kw">if </span>byte &gt; <span class="string">b&#39;\x20&#39; </span>&amp;&amp; byte &lt; <span class="string">b&#39;\x7f&#39; </span>=&gt; f.write_str(<span class="kw-2">&amp;</span>to_single_escape(c))<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; f.write_str(<span class="kw-2">&amp;</span>to_triple_escape(byte))<span class="question-mark">?</span>,
             }
 
             <span class="prelude-val">Ok</span>(())
         }
 
-        <span class="comment">// traditional ascii case...</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ch</span>) <span class="op">=</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-            <span class="ident">escape_non_ascii</span>(<span class="kw-2">*</span><span class="ident">ch</span>, <span class="ident">f</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+        <span class="comment">// traditional ascii case...
+        </span><span class="kw">let </span><span class="kw-2">mut </span>chars = <span class="self">self</span>.as_bytes().iter();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ch) = chars.next() {
+            escape_non_ascii(<span class="kw-2">*</span>ch, f, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">chars</span> {
-            <span class="ident">escape_non_ascii</span>(<span class="kw-2">*</span><span class="ident">ch</span>, <span class="ident">f</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>ch <span class="kw">in </span>chars {
+            escape_non_ascii(<span class="kw-2">*</span>ch, f, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>()
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Label {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.as_bytes()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>Borrow&lt;[u8]&gt; <span class="kw">for </span>Label {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">fn </span>is_safe_ascii(c: char, is_first: bool, for_encoding: bool) -&gt; bool {
+    <span class="kw">match </span>c {
+        c <span class="kw">if </span>!c.is_ascii() =&gt; <span class="bool-val">false</span>,
+        c <span class="kw">if </span>c.is_alphanumeric() =&gt; <span class="bool-val">true</span>,
+        <span class="string">&#39;-&#39; </span><span class="kw">if </span>!is_first =&gt; <span class="bool-val">true</span>,     <span class="comment">// dash is allowed
+        </span><span class="string">&#39;_&#39; </span>=&gt; <span class="bool-val">true</span>,                  <span class="comment">// SRV like labels
+        </span><span class="string">&#39;*&#39; </span><span class="kw">if </span>is_first =&gt; <span class="bool-val">true</span>,      <span class="comment">// wildcard
+        </span><span class="string">&#39;.&#39; </span><span class="kw">if </span>!for_encoding =&gt; <span class="bool-val">true</span>, <span class="comment">// needed to allow dots, for things like email addresses
+        </span><span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">is_safe_ascii</span>(<span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">is_first</span>: <span class="ident">bool</span>, <span class="ident">for_encoding</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="ident">c</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_ascii</span>() =&gt; <span class="bool-val">false</span>,
-        <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_alphanumeric</span>() =&gt; <span class="bool-val">true</span>,
-        <span class="string">&#39;-&#39;</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_first</span> =&gt; <span class="bool-val">true</span>,     <span class="comment">// dash is allowed</span>
-        <span class="string">&#39;_&#39;</span> =&gt; <span class="bool-val">true</span>,                  <span class="comment">// SRV like labels</span>
-        <span class="string">&#39;*&#39;</span> <span class="kw">if</span> <span class="ident">is_first</span> =&gt; <span class="bool-val">true</span>,      <span class="comment">// wildcard</span>
-        <span class="string">&#39;.&#39;</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">for_encoding</span> =&gt; <span class="bool-val">true</span>, <span class="comment">// needed to allow dots, for things like email addresses</span>
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-    }
-}
+<span class="kw">impl </span>Display <span class="kw">for </span>Label {
+    <span class="doccomment">/// outputs characters in a safe string manner.
+    ///
+    /// if the string is punycode, i.e. starts with `xn--`, otherwise it translates to a safe ascii string
+    ///   escaping characters as necessary.
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.as_bytes().starts_with(IDNA_PREFIX) {
+            <span class="comment">// this should never be outside the ascii codes...
+            </span><span class="kw">let </span>label = String::from_utf8_lossy(<span class="self">self</span>.borrow());
+            <span class="kw">let </span>(label, e) = idna::Config::default()
+                .use_std3_ascii_rules(<span class="bool-val">false</span>)
+                .transitional_processing(<span class="bool-val">false</span>)
+                .verify_dns_length(<span class="bool-val">false</span>)
+                .to_unicode(<span class="kw-2">&amp;</span>label);
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="doccomment">/// outputs characters in a safe string manner.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if the string is punycode, i.e. starts with `xn--`, otherwise it translates to a safe ascii string</span>
-    <span class="doccomment">///   escaping characters as necessary.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">starts_with</span>(<span class="ident">IDNA_PREFIX</span>) {
-            <span class="comment">// this should never be outside the ascii codes...</span>
-            <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">borrow</span>());
-            <span class="kw">let</span> (<span class="ident">label</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">idna::Config::default</span>()
-                .<span class="ident">use_std3_ascii_rules</span>(<span class="bool-val">false</span>)
-                .<span class="ident">transitional_processing</span>(<span class="bool-val">false</span>)
-                .<span class="ident">verify_dns_length</span>(<span class="bool-val">false</span>)
-                .<span class="ident">to_unicode</span>(<span class="kw-2">&amp;</span><span class="ident">label</span>);
-
-            <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_ok</span>() {
-                <span class="kw">return</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">label</span>);
-            } <span class="kw">else</span> {
+            <span class="kw">if </span>e.is_ok() {
+                <span class="kw">return </span>f.write_str(<span class="kw-2">&amp;</span>label);
+            } <span class="kw">else </span>{
                 <span class="macro">debug!</span>(
                     <span class="string">&quot;xn-- prefixed string did not translate via IDNA properly: {:?}&quot;</span>,
-                    <span class="ident">e</span>
+                    e
                 )
             }
         }
 
-        <span class="comment">// it wasn&#39;t known to be utf8</span>
-        <span class="self">self</span>.<span class="ident">write_ascii</span>(<span class="ident">f</span>)
+        <span class="comment">// it wasn&#39;t known to be utf8
+        </span><span class="self">self</span>.write_ascii(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">borrow</span>());
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="ident">label</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>Label {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">let </span>label = String::from_utf8_lossy(<span class="self">self</span>.borrow());
+        f.write_str(<span class="kw-2">&amp;</span>label)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">other</span>)
+<span class="kw">impl </span>PartialEq&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>Label {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.eq_ignore_ascii_case(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialOrd&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>Label {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseInsensitive</span><span class="op">&gt;</span>(<span class="ident">other</span>)
+<span class="kw">impl </span>Ord <span class="kw">for </span>Label {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="self">self</span>.cmp_with_f::&lt;CaseInsensitive&gt;(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-    <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">Hasher</span>,
+<span class="kw">impl </span>Hash <span class="kw">for </span>Label {
+    <span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
+    <span class="kw">where
+        </span>H: Hasher,
     {
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">borrow</span>() <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-            <span class="ident">state</span>.<span class="ident">write_u8</span>(<span class="ident">b</span>.<span class="ident">to_ascii_lowercase</span>());
+        <span class="kw">for </span>b <span class="kw">in </span><span class="self">self</span>.borrow() <span class="kw">as </span><span class="kw-2">&amp;</span>[u8] {
+            state.write_u8(b.to_ascii_lowercase());
         }
     }
 }
 
-<span class="doccomment">/// Label comparison trait for case sensitive or insensitive comparisons</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LabelCmp</span> {
-    <span class="doccomment">/// this should mimic the cmp method from [`PartialOrd`]</span>
-    <span class="kw">fn</span> <span class="ident">cmp_u8</span>(<span class="ident">l</span>: <span class="ident">u8</span>, <span class="ident">r</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Ordering</span>;
+<span class="doccomment">/// Label comparison trait for case sensitive or insensitive comparisons
+</span><span class="kw">pub trait </span>LabelCmp {
+    <span class="doccomment">/// this should mimic the cmp method from [`PartialOrd`]
+    </span><span class="kw">fn </span>cmp_u8(l: u8, r: u8) -&gt; Ordering;
 }
 
-<span class="doccomment">/// For case sensitive comparisons</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">CaseSensitive</span>;
+<span class="doccomment">/// For case sensitive comparisons
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>CaseSensitive;
 
-<span class="kw">impl</span> <span class="ident">LabelCmp</span> <span class="kw">for</span> <span class="ident">CaseSensitive</span> {
-    <span class="kw">fn</span> <span class="ident">cmp_u8</span>(<span class="ident">l</span>: <span class="ident">u8</span>, <span class="ident">r</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="ident">l</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>)
+<span class="kw">impl </span>LabelCmp <span class="kw">for </span>CaseSensitive {
+    <span class="kw">fn </span>cmp_u8(l: u8, r: u8) -&gt; Ordering {
+        l.cmp(<span class="kw-2">&amp;</span>r)
     }
 }
 
-<span class="doccomment">/// For case insensitive comparisons</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">CaseInsensitive</span>;
+<span class="doccomment">/// For case insensitive comparisons
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>CaseInsensitive;
 
-<span class="kw">impl</span> <span class="ident">LabelCmp</span> <span class="kw">for</span> <span class="ident">CaseInsensitive</span> {
-    <span class="kw">fn</span> <span class="ident">cmp_u8</span>(<span class="ident">l</span>: <span class="ident">u8</span>, <span class="ident">r</span>: <span class="ident">u8</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="ident">l</span>.<span class="ident">to_ascii_lowercase</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">to_ascii_lowercase</span>())
+<span class="kw">impl </span>LabelCmp <span class="kw">for </span>CaseInsensitive {
+    <span class="kw">fn </span>cmp_u8(l: u8, r: u8) -&gt; Ordering {
+        l.to_ascii_lowercase().cmp(<span class="kw-2">&amp;</span>r.to_ascii_lowercase())
     }
 }
 
-<span class="doccomment">/// Conversion into a Label</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoLabel</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// Convert this into Label</span>
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Conversion into a Label
+</span><span class="kw">pub trait </span>IntoLabel: Sized {
+    <span class="doccomment">/// Convert this into Label
+    </span><span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoLabel <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Label {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.clone())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="ident">Label</span> {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>IntoLabel <span class="kw">for </span>Label {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="ident">Label::from_utf8</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoLabel <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
+        Label::from_utf8(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="ident">Label::from_utf8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
+<span class="kw">impl </span>IntoLabel <span class="kw">for </span>String {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
+        Label::from_utf8(<span class="kw-2">&amp;</span><span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="ident">Label::from_raw_bytes</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoLabel <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
+        Label::from_raw_bytes(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoLabel</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_label</span>(<span class="self">self</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>)
+<span class="kw">impl </span>IntoLabel <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>into_label(<span class="self">self</span>) -&gt; ProtoResult&lt;Label&gt; {
+        Label::from_raw_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encoding</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encoding() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_utf8</span>(<span class="string">&quot;abc&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;abc&quot;</span>).<span class="ident">unwrap</span>()
+            Label::from_utf8(<span class="string">&quot;abc&quot;</span>).unwrap(),
+            Label::from_raw_bytes(<span class="string">b&quot;abc&quot;</span>).unwrap()
         );
-        <span class="comment">// case insensitive, this works...</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_utf8</span>(<span class="string">&quot;ABC&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;ABC&quot;</span>).<span class="ident">unwrap</span>()
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_utf8</span>(<span class="string">&quot;🦀&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;xn--zs9h&quot;</span>).<span class="ident">unwrap</span>()
+        <span class="comment">// case insensitive, this works...
+        </span><span class="macro">assert_eq!</span>(
+            Label::from_utf8(<span class="string">&quot;ABC&quot;</span>).unwrap(),
+            Label::from_raw_bytes(<span class="string">b&quot;ABC&quot;</span>).unwrap()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_utf8</span>(<span class="string">&quot;rust-🦀-icon&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;xn--rust--icon-9447i&quot;</span>).<span class="ident">unwrap</span>()
+            Label::from_utf8(<span class="string">&quot;🦀&quot;</span>).unwrap(),
+            Label::from_raw_bytes(<span class="string">b&quot;xn--zs9h&quot;</span>).unwrap()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;ben.fry&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;ben.fry&quot;</span>).<span class="ident">unwrap</span>()
+            Label::from_utf8(<span class="string">&quot;rust-🦀-icon&quot;</span>).unwrap(),
+            Label::from_raw_bytes(<span class="string">b&quot;xn--rust--icon-9447i&quot;</span>).unwrap()
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">Label::from_utf8</span>(<span class="string">&quot;🦀&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_utf8</span>(), <span class="string">&quot;🦀&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Label::from_utf8</span>(<span class="string">&quot;🦀&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_ascii</span>(), <span class="string">&quot;xn--zs9h&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;ben.fry&quot;</span>).unwrap(),
+            Label::from_raw_bytes(<span class="string">b&quot;ben.fry&quot;</span>).unwrap()
+        );
+        <span class="macro">assert_eq!</span>(Label::from_utf8(<span class="string">&quot;🦀&quot;</span>).unwrap().to_utf8(), <span class="string">&quot;🦀&quot;</span>);
+        <span class="macro">assert_eq!</span>(Label::from_utf8(<span class="string">&quot;🦀&quot;</span>).unwrap().to_ascii(), <span class="string">&quot;xn--zs9h&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoding</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;abc&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;abc&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoding() {
+        <span class="macro">assert_eq!</span>(Label::from_raw_bytes(<span class="string">b&quot;abc&quot;</span>).unwrap().to_string(), <span class="string">&quot;abc&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;xn--zs9h&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;🦀&quot;</span>
+            Label::from_raw_bytes(<span class="string">b&quot;xn--zs9h&quot;</span>).unwrap().to_string(),
+            <span class="string">&quot;🦀&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            Label::from_raw_bytes(<span class="string">b&quot;xn--rust--icon-9447i&quot;</span>)
+                .unwrap()
+                .to_string(),
+            <span class="string">&quot;rust-🦀-icon&quot;
+        </span>);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_lowercase() {
+        <span class="macro">assert_ne!</span>(Label::from_ascii(<span class="string">&quot;ABC&quot;</span>).unwrap().to_string(), <span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_ne!</span>(Label::from_ascii(<span class="string">&quot;abcDEF&quot;</span>).unwrap().to_string(), <span class="string">&quot;abcdef&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;ABC&quot;</span>).unwrap().to_lowercase().to_string(),
+            <span class="string">&quot;abc&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;abcDEF&quot;</span>)
+                .unwrap()
+                .to_lowercase()
+                .to_string(),
+            <span class="string">&quot;abcdef&quot;
+        </span>);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_cmp_f() {
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;ABC&quot;</span>)
+                .unwrap()
+                .cmp_with_f::&lt;CaseInsensitive&gt;(<span class="kw-2">&amp;</span>Label::from_ascii(<span class="string">&quot;abc&quot;</span>).unwrap()),
+            Ordering::Equal
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;xn--rust--icon-9447i&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">to_string</span>(),
-            <span class="string">&quot;rust-🦀-icon&quot;</span>
+            Label::from_ascii(<span class="string">&quot;abcDEF&quot;</span>)
+                .unwrap()
+                .cmp_with_f::&lt;CaseInsensitive&gt;(<span class="kw-2">&amp;</span>Label::from_ascii(<span class="string">&quot;abcdef&quot;</span>).unwrap()),
+            Ordering::Equal
+        );
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;ABC&quot;</span>)
+                .unwrap()
+                .cmp_with_f::&lt;CaseSensitive&gt;(<span class="kw-2">&amp;</span>Label::from_ascii(<span class="string">&quot;abc&quot;</span>).unwrap()),
+            Ordering::Less
+        );
+        <span class="macro">assert_eq!</span>(
+            Label::from_ascii(<span class="string">&quot;abcDEF&quot;</span>)
+                .unwrap()
+                .cmp_with_f::&lt;CaseSensitive&gt;(<span class="kw-2">&amp;</span>Label::from_ascii(<span class="string">&quot;abcdef&quot;</span>).unwrap()),
+            Ordering::Less
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_lowercase</span>() {
-        <span class="macro">assert_ne!</span>(<span class="ident">Label::from_ascii</span>(<span class="string">&quot;ABC&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_ne!</span>(<span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcDEF&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(), <span class="string">&quot;abcdef&quot;</span>);
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;ABC&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_lowercase</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;abc&quot;</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcDEF&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">to_lowercase</span>()
-                .<span class="ident">to_string</span>(),
-            <span class="string">&quot;abcdef&quot;</span>
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_cmp_f</span>() {
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;ABC&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseInsensitive</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">Label::from_ascii</span>(<span class="string">&quot;abc&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">Ordering::Equal</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcDEF&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseInsensitive</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcdef&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">Ordering::Equal</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;ABC&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseSensitive</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">Label::from_ascii</span>(<span class="string">&quot;abc&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">Ordering::Less</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcDEF&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">cmp_with_f</span>::<span class="op">&lt;</span><span class="ident">CaseSensitive</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">Label::from_ascii</span>(<span class="string">&quot;abcdef&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">Ordering::Less</span>
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_partial_cmp</span>() {
-        <span class="kw">let</span> <span class="ident">comparisons</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Label</span>, <span class="ident">Label</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_partial_cmp() {
+        <span class="kw">let </span>comparisons: Vec&lt;(Label, Label)&gt; = <span class="macro">vec!</span>[
             (
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;yljkjljk&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;Z&quot;</span>).<span class="ident">unwrap</span>(),
+                Label::from_raw_bytes(<span class="string">b&quot;yljkjljk&quot;</span>).unwrap(),
+                Label::from_raw_bytes(<span class="string">b&quot;Z&quot;</span>).unwrap(),
             ),
             (
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;Z&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;zABC&quot;</span>).<span class="ident">unwrap</span>(),
+                Label::from_raw_bytes(<span class="string">b&quot;Z&quot;</span>).unwrap(),
+                Label::from_raw_bytes(<span class="string">b&quot;zABC&quot;</span>).unwrap(),
             ),
             (
-                <span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">1</span>]).<span class="ident">unwrap</span>(),
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;*&quot;</span>).<span class="ident">unwrap</span>(),
+                Label::from_raw_bytes(<span class="kw-2">&amp;</span>[<span class="number">1</span>]).unwrap(),
+                Label::from_raw_bytes(<span class="string">b&quot;*&quot;</span>).unwrap(),
             ),
             (
-                <span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;*&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">200</span>]).<span class="ident">unwrap</span>(),
+                Label::from_raw_bytes(<span class="string">b&quot;*&quot;</span>).unwrap(),
+                Label::from_raw_bytes(<span class="kw-2">&amp;</span>[<span class="number">200</span>]).unwrap(),
             ),
         ];
 
-        <span class="kw">for</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="kw">in</span> <span class="ident">comparisons</span> {
-            <span class="macro">println!</span>(<span class="string">&quot;left: {}, right: {}&quot;</span>, <span class="ident">left</span>, <span class="ident">right</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">left</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>), <span class="ident">Ordering::Less</span>);
+        <span class="kw">for </span>(left, right) <span class="kw">in </span>comparisons {
+            <span class="macro">println!</span>(<span class="string">&quot;left: {}, right: {}&quot;</span>, left, right);
+            <span class="macro">assert_eq!</span>(left.cmp(<span class="kw-2">&amp;</span>right), Ordering::Less);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_wildcard</span>() {
-        <span class="macro">assert!</span>(<span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;*&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">is_wildcard</span>());
-        <span class="macro">assert!</span>(<span class="ident">Label::from_ascii</span>(<span class="string">&quot;*&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">is_wildcard</span>());
-        <span class="macro">assert!</span>(<span class="ident">Label::from_utf8</span>(<span class="string">&quot;*&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">is_wildcard</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Label::from_raw_bytes</span>(<span class="string">b&quot;abc&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">is_wildcard</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_is_wildcard() {
+        <span class="macro">assert!</span>(Label::from_raw_bytes(<span class="string">b&quot;*&quot;</span>).unwrap().is_wildcard());
+        <span class="macro">assert!</span>(Label::from_ascii(<span class="string">&quot;*&quot;</span>).unwrap().is_wildcard());
+        <span class="macro">assert!</span>(Label::from_utf8(<span class="string">&quot;*&quot;</span>).unwrap().is_wildcard());
+        <span class="macro">assert!</span>(!Label::from_raw_bytes(<span class="string">b&quot;abc&quot;</span>).unwrap().is_wildcard());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ascii_escape</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ascii_escape() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0o200</span>]).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;\\200&quot;</span>
-        );
+            Label::from_raw_bytes(<span class="kw-2">&amp;</span>[<span class="number">0o200</span>]).unwrap().to_string(),
+            <span class="string">&quot;\\200&quot;
+        </span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0o001</span>]).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;\\001&quot;</span>
-        );
-        <span class="macro">assert_eq!</span>(<span class="ident">Label::from_ascii</span>(<span class="string">&quot;.&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_ascii</span>(), <span class="string">&quot;\\.&quot;</span>);
+            Label::from_raw_bytes(<span class="kw-2">&amp;</span>[<span class="number">0o001</span>]).unwrap().to_string(),
+            <span class="string">&quot;\\001&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(Label::from_ascii(<span class="string">&quot;.&quot;</span>).unwrap().to_ascii(), <span class="string">&quot;\\.&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Label::from_ascii</span>(<span class="string">&quot;ben.fry&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">to_string</span>(),
-            <span class="string">&quot;ben\\.fry&quot;</span>
-        );
-        <span class="macro">assert_eq!</span>(<span class="ident">Label::from_raw_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0o200</span>]).<span class="ident">unwrap</span>().<span class="ident">to_ascii</span>(), <span class="string">&quot;\\200&quot;</span>);
+            Label::from_ascii(<span class="string">&quot;ben.fry&quot;</span>).unwrap().to_string(),
+            <span class="string">&quot;ben\\.fry&quot;
+        </span>);
+        <span class="macro">assert_eq!</span>(Label::from_raw_bytes(<span class="kw-2">&amp;</span>[<span class="number">0o200</span>]).unwrap().to_ascii(), <span class="string">&quot;\\200&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

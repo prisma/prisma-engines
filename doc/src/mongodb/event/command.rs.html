@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/command.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>command.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -144,151 +144,151 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality to monitor the commands and responses that a `Client`</span>
-<span class="doccomment">//! sends and receives from the server.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality to monitor the commands and responses that a `Client`
+//! sends and receives from the server.
 
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</span><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util::serialize_error_as_string</span>,
-    <span class="ident">error::Error</span>,
+<span class="kw">use crate</span>::{
+    bson::{oid::ObjectId, Document},
+    bson_util::serialize_error_as_string,
+    error::Error,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cmap::ConnectionInfo</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::cmap::ConnectionInfo;
 
-<span class="doccomment">/// An event that triggers when a database command is initiated.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandStartedEvent</span> {
-    <span class="doccomment">/// The command being run.</span>
-    <span class="kw">pub</span> <span class="ident">command</span>: <span class="ident">Document</span>,
+<span class="doccomment">/// An event that triggers when a database command is initiated.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandStartedEvent {
+    <span class="doccomment">/// The command being run.
+    </span><span class="kw">pub </span>command: Document,
 
-    <span class="doccomment">/// The name of the database the command is being run against.</span>
-    <span class="kw">pub</span> <span class="ident">db</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The name of the database the command is being run against.
+    </span><span class="kw">pub </span>db: String,
 
-    <span class="doccomment">/// The type of command being run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
-    <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The type of command being run, e.g. &quot;find&quot; or &quot;hello&quot;.
+    </span><span class="kw">pub </span>command_name: String,
 
-    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the</span>
-    <span class="doccomment">/// corresponding event triggered by the completion of this command (i.e. either</span>
-    <span class="doccomment">/// [`CommandSucceededEvent`](struct.CommandSucceededEvent.html) or</span>
-    <span class="doccomment">/// [`CommandFailedEvent`](struct.CommandFailedEvent.html)).</span>
-    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the
+    /// corresponding event triggered by the completion of this command (i.e. either
+    /// [`CommandSucceededEvent`](struct.CommandSucceededEvent.html) or
+    /// [`CommandFailedEvent`](struct.CommandFailedEvent.html)).
+    </span><span class="kw">pub </span>request_id: i32,
 
-    <span class="doccomment">/// Information about the connect the command will be run on.</span>
-    <span class="kw">pub</span> <span class="ident">connection</span>: <span class="ident">ConnectionInfo</span>,
+    <span class="doccomment">/// Information about the connect the command will be run on.
+    </span><span class="kw">pub </span>connection: ConnectionInfo,
 
-    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.</span>
-    <span class="kw">pub</span> <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.
+    </span><span class="kw">pub </span>service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 }
 
-<span class="doccomment">/// An event that triggers when a database command completes without an error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandSucceededEvent</span> {
-    <span class="doccomment">/// The total execution time of the command (including the network round-trip).</span>
-    <span class="kw">pub</span> <span class="ident">duration</span>: <span class="ident">Duration</span>,
+<span class="doccomment">/// An event that triggers when a database command completes without an error.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandSucceededEvent {
+    <span class="doccomment">/// The total execution time of the command (including the network round-trip).
+    </span><span class="kw">pub </span>duration: Duration,
 
-    <span class="doccomment">/// The server&#39;s reply to the command.</span>
-    <span class="kw">pub</span> <span class="ident">reply</span>: <span class="ident">Document</span>,
+    <span class="doccomment">/// The server&#39;s reply to the command.
+    </span><span class="kw">pub </span>reply: Document,
 
-    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
-    <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.
+    </span><span class="kw">pub </span>command_name: String,
 
-    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the</span>
-    <span class="doccomment">/// corresponding [`CommandStartedEvent`](struct.CommandStartedEvent.html) that triggered</span>
-    <span class="doccomment">/// earlier.</span>
-    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the
+    /// corresponding [`CommandStartedEvent`](struct.CommandStartedEvent.html) that triggered
+    /// earlier.
+    </span><span class="kw">pub </span>request_id: i32,
 
-    <span class="doccomment">/// Information about the connect the command will be run on.</span>
-    <span class="kw">pub</span> <span class="ident">connection</span>: <span class="ident">ConnectionInfo</span>,
+    <span class="doccomment">/// Information about the connect the command will be run on.
+    </span><span class="kw">pub </span>connection: ConnectionInfo,
 
-    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.</span>
-    <span class="kw">pub</span> <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.
+    </span><span class="kw">pub </span>service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 }
 
-<span class="doccomment">/// An event that triggers when a command failed to complete successfully.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandFailedEvent</span> {
-    <span class="doccomment">/// The total execution time of the command (including the network round-trip).</span>
-    <span class="kw">pub</span> <span class="ident">duration</span>: <span class="ident">Duration</span>,
+<span class="doccomment">/// An event that triggers when a command failed to complete successfully.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CommandFailedEvent {
+    <span class="doccomment">/// The total execution time of the command (including the network round-trip).
+    </span><span class="kw">pub </span>duration: Duration,
 
-    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.</span>
-    <span class="kw">pub</span> <span class="ident">command_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The type of command that was run, e.g. &quot;find&quot; or &quot;hello&quot;.
+    </span><span class="kw">pub </span>command_name: String,
 
-    <span class="doccomment">/// The error that the driver returned due to the event failing.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_error_as_string&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">failure</span>: <span class="ident">Error</span>,
+    <span class="doccomment">/// The error that the driver returned due to the event failing.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;serialize_error_as_string&quot;</span>)]
+    </span><span class="kw">pub </span>failure: Error,
 
-    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the</span>
-    <span class="doccomment">/// corresponding [`CommandStartedEvent`](struct.CommandStartedEvent.html) that triggered</span>
-    <span class="doccomment">/// earlier.</span>
-    <span class="kw">pub</span> <span class="ident">request_id</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// The driver-generated identifier for the request. Applications can use this to identify the
+    /// corresponding [`CommandStartedEvent`](struct.CommandStartedEvent.html) that triggered
+    /// earlier.
+    </span><span class="kw">pub </span>request_id: i32,
 
-    <span class="doccomment">/// Information about the connect the command will be run on.</span>
-    <span class="kw">pub</span> <span class="ident">connection</span>: <span class="ident">ConnectionInfo</span>,
+    <span class="doccomment">/// Information about the connect the command will be run on.
+    </span><span class="kw">pub </span>connection: ConnectionInfo,
 
-    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.</span>
-    <span class="kw">pub</span> <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the client connection is to a load balancer, the id of the selected backend.
+    </span><span class="kw">pub </span>service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 }
 
-<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each command event sent</span>
-<span class="doccomment">/// by the driver.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # use mongodb::{</span>
-<span class="doccomment">/// #     error::Result,</span>
-<span class="doccomment">/// #     event::command::{</span>
-<span class="doccomment">/// #         CommandEventHandler,</span>
-<span class="doccomment">/// #         CommandFailedEvent</span>
-<span class="doccomment">/// #     },</span>
-<span class="doccomment">/// #     options::ClientOptions,</span>
-<span class="doccomment">/// # };</span>
-<span class="doccomment">/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]</span>
-<span class="doccomment">/// # use mongodb::sync::Client;</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use mongodb::Client;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// struct FailedCommandLogger;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl CommandEventHandler for FailedCommandLogger {</span>
-<span class="doccomment">///     fn handle_command_failed_event(&amp;self, event: CommandFailedEvent) {</span>
-<span class="doccomment">///         eprintln!(&quot;Failed command: {:?}&quot;, event);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// let handler: Arc&lt;dyn CommandEventHandler&gt; = Arc::new(FailedCommandLogger);</span>
-<span class="doccomment">/// let options = ClientOptions::builder()</span>
-<span class="doccomment">///                   .command_event_handler(handler)</span>
-<span class="doccomment">///                   .build();</span>
-<span class="doccomment">/// let client = Client::with_options(options)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Do things with the client, and failed command events will be logged to stderr.</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CommandEventHandler</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a database command is initiated.</span>
-    <span class="kw">fn</span> <span class="ident">handle_command_started_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">CommandStartedEvent</span>) {}
+<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each command event sent
+/// by the driver.
+///
+/// ```rust
+/// # use std::sync::Arc;
+/// #
+/// # use mongodb::{
+/// #     error::Result,
+/// #     event::command::{
+/// #         CommandEventHandler,
+/// #         CommandFailedEvent
+/// #     },
+/// #     options::ClientOptions,
+/// # };
+/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]
+/// # use mongodb::sync::Client;
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use mongodb::Client;
+/// #
+/// struct FailedCommandLogger;
+///
+/// impl CommandEventHandler for FailedCommandLogger {
+///     fn handle_command_failed_event(&amp;self, event: CommandFailedEvent) {
+///         eprintln!(&quot;Failed command: {:?}&quot;, event);
+///     }
+/// }
+///
+/// # fn do_stuff() -&gt; Result&lt;()&gt; {
+/// let handler: Arc&lt;dyn CommandEventHandler&gt; = Arc::new(FailedCommandLogger);
+/// let options = ClientOptions::builder()
+///                   .command_event_handler(handler)
+///                   .build();
+/// let client = Client::with_options(options)?;
+///
+/// // Do things with the client, and failed command events will be logged to stderr.
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="kw">pub trait </span>CommandEventHandler: Send + Sync {
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a database command is initiated.
+    </span><span class="kw">fn </span>handle_command_started_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: CommandStartedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a database command successfully completes.</span>
-    <span class="kw">fn</span> <span class="ident">handle_command_succeeded_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">CommandSucceededEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a database command successfully completes.
+    </span><span class="kw">fn </span>handle_command_succeeded_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: CommandSucceededEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a database command fails to complete successfully.</span>
-    <span class="kw">fn</span> <span class="ident">handle_command_failed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">CommandFailedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a database command fails to complete successfully.
+    </span><span class="kw">fn </span>handle_command_failed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: CommandFailedEvent) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/mssql_renderer/alter_table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>alter_table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/mssql_renderer/alter_table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>alter_table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -285,252 +285,252 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::render_default</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">flavour::MssqlFlavour</span>,
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_migration::AlterColumn</span>,
-    <span class="ident">sql_migration::TableChange</span>,
-    <span class="ident">sql_renderer</span>::{
-        <span class="ident">common</span>::{<span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>},
-        <span class="ident">SqlRenderer</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::render_default;
+<span class="kw">use crate</span>::{
+    flavour::MssqlFlavour,
+    pair::Pair,
+    sql_migration::AlterColumn,
+    sql_migration::TableChange,
+    sql_renderer::{
+        common::{IteratorJoin, Quoted},
+        SqlRenderer,
     },
-    <span class="ident">sql_schema_differ::ColumnChanges</span>,
+    sql_schema_differ::ColumnChanges,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">mssql::MssqlSchemaExt</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ColumnId</span>, <span class="ident">DefaultValue</span>,
+<span class="kw">use </span>sql_schema_describer::{
+    mssql::MssqlSchemaExt,
+    walkers::{ColumnWalker, TableWalker},
+    ColumnId, DefaultValue,
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::collections::BTreeSet;
 
-<span class="doccomment">/// Creates a set of `ALTER TABLE` statements in a correct execution order.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_statements</span>(
-    <span class="ident">renderer</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlFlavour</span>,
-    <span class="ident">tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">changes</span>: <span class="kw-2">&amp;</span>[<span class="ident">TableChange</span>],
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">constructor</span> <span class="op">=</span> <span class="ident">AlterTableConstructor</span> {
-        <span class="ident">renderer</span>,
-        <span class="ident">tables</span>,
-        <span class="ident">changes</span>,
-        <span class="ident">drop_constraints</span>: <span class="ident">BTreeSet::new</span>(),
-        <span class="ident">add_constraints</span>: <span class="ident">BTreeSet::new</span>(),
-        <span class="ident">rename_primary_key</span>: <span class="bool-val">false</span>,
-        <span class="ident">add_columns</span>: <span class="ident">Vec::new</span>(),
-        <span class="ident">drop_columns</span>: <span class="ident">Vec::new</span>(),
-        <span class="ident">column_mods</span>: <span class="ident">Vec::new</span>(),
+<span class="doccomment">/// Creates a set of `ALTER TABLE` statements in a correct execution order.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_statements(
+    renderer: <span class="kw-2">&amp;</span>MssqlFlavour,
+    tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+    changes: <span class="kw-2">&amp;</span>[TableChange],
+) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span>constructor = AlterTableConstructor {
+        renderer,
+        tables,
+        changes,
+        drop_constraints: BTreeSet::new(),
+        add_constraints: BTreeSet::new(),
+        rename_primary_key: <span class="bool-val">false</span>,
+        add_columns: Vec::new(),
+        drop_columns: Vec::new(),
+        column_mods: Vec::new(),
     };
 
-    <span class="ident">constructor</span>.<span class="ident">into_statements</span>()
+    constructor.into_statements()
 }
 
-<span class="kw">struct</span> <span class="ident">AlterTableConstructor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">renderer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MssqlFlavour</span>,
-    <span class="ident">tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">TableChange</span>],
-    <span class="ident">drop_constraints</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">add_constraints</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">rename_primary_key</span>: <span class="ident">bool</span>,
-    <span class="ident">add_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">drop_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">column_mods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>AlterTableConstructor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    renderer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MssqlFlavour,
+    tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    changes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[TableChange],
+    drop_constraints: BTreeSet&lt;String&gt;,
+    add_constraints: BTreeSet&lt;String&gt;,
+    rename_primary_key: bool,
+    add_columns: Vec&lt;String&gt;,
+    drop_columns: Vec&lt;String&gt;,
+    column_mods: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AlterTableConstructor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_statements</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">changes</span> {
-            <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">TableChange::DropPrimaryKey</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">drop_primary_key</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AlterTableConstructor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>into_statements(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="kw">for </span>change <span class="kw">in </span><span class="self">self</span>.changes {
+            <span class="kw">match </span>change {
+                TableChange::DropPrimaryKey =&gt; {
+                    <span class="self">self</span>.drop_primary_key();
                 }
-                <span class="ident">TableChange::RenamePrimaryKey</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">rename_primary_key</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                TableChange::RenamePrimaryKey =&gt; {
+                    <span class="self">self</span>.rename_primary_key = <span class="bool-val">true</span>;
                 }
-                <span class="ident">TableChange::AddPrimaryKey</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">add_primary_key</span>();
+                TableChange::AddPrimaryKey =&gt; {
+                    <span class="self">self</span>.add_primary_key();
                 }
-                <span class="ident">TableChange::AddColumn</span> {
-                    <span class="ident">column_id</span>,
-                    <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: <span class="kw">_</span>,
                 } =&gt; {
-                    <span class="self">self</span>.<span class="ident">add_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
+                    <span class="self">self</span>.add_column(<span class="kw-2">*</span>column_id);
                 }
-                <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } =&gt; {
-                    <span class="self">self</span>.<span class="ident">drop_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
+                TableChange::DropColumn { column_id } =&gt; {
+                    <span class="self">self</span>.drop_column(<span class="kw-2">*</span>column_id);
                 }
-                <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, .. } =&gt; {
-                    <span class="self">self</span>.<span class="ident">drop_and_recreate_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
+                TableChange::DropAndRecreateColumn { column_id, .. } =&gt; {
+                    <span class="self">self</span>.drop_and_recreate_column(<span class="kw-2">*</span>column_id);
                 }
-                <span class="ident">TableChange::AlterColumn</span>(<span class="ident">AlterColumn</span> {
-                    <span class="ident">column_id</span>,
-                    <span class="ident">changes</span>,
-                    <span class="ident">type_change</span>: <span class="kw">_</span>,
+                TableChange::AlterColumn(AlterColumn {
+                    column_id,
+                    changes,
+                    type_change: <span class="kw">_</span>,
                 }) =&gt; {
-                    <span class="self">self</span>.<span class="ident">alter_column</span>(<span class="kw-2">*</span><span class="ident">column_id</span>, <span class="ident">changes</span>);
+                    <span class="self">self</span>.alter_column(<span class="kw-2">*</span>column_id, changes);
                 }
             };
         }
 
-        <span class="comment">// Order matters</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">statements</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="comment">// Order matters
+        </span><span class="kw">let </span><span class="kw-2">mut </span>statements = Vec::new();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">drop_constraints</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span>!<span class="self">self</span>.drop_constraints.is_empty() {
+            statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} DROP CONSTRAINT {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote_with_schema</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">drop_constraints</span>.<span class="ident">iter</span>().<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>),
+                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.drop_constraints.iter().join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rename_primary_key</span> {
-            <span class="kw">let</span> <span class="ident">with_schema</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">if </span><span class="self">self</span>.rename_primary_key {
+            <span class="kw">let </span>with_schema = <span class="macro">format!</span>(
                 <span class="string">&quot;{}.{}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">schema_name</span>(),
-                <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()
+                <span class="self">self</span>.renderer.schema_name(),
+                <span class="self">self</span>.tables.previous.primary_key().unwrap().name()
             );
 
-            <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+            statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;EXEC SP_RENAME N{}, N{}&quot;</span>,
-                <span class="ident">Quoted::mssql_string</span>(<span class="ident">with_schema</span>),
-                <span class="ident">Quoted::mssql_string</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>()),
+                Quoted::mssql_string(with_schema),
+                Quoted::mssql_string(<span class="self">self</span>.tables.next.primary_key().unwrap().name()),
             ));
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">column_mods</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">statements</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">column_mods</span>)
+        <span class="kw">if </span>!<span class="self">self</span>.column_mods.is_empty() {
+            statements.extend(<span class="self">self</span>.column_mods)
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">drop_columns</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span>!<span class="self">self</span>.drop_columns.is_empty() {
+            statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} DROP COLUMN {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote_with_schema</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">drop_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>),
+                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.drop_columns.join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span>!<span class="self">self</span>.add_constraints.is_empty() {
+            statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} ADD {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote_with_schema</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">iter</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.add_constraints.iter().join(<span class="string">&quot;, &quot;</span>)
             ));
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">add_columns</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">statements</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span>!<span class="self">self</span>.add_columns.is_empty() {
+            statements.push(<span class="macro">format!</span>(
                 <span class="string">&quot;ALTER TABLE {} ADD {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote_with_schema</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                <span class="self">self</span>.<span class="ident">add_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,\n&quot;</span>),
+                <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                <span class="self">self</span>.add_columns.join(<span class="string">&quot;,\n&quot;</span>),
             ));
         }
 
-        <span class="ident">statements</span>
+        statements
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_primary_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">tables</span>
-            .<span class="ident">previous</span>
-            .<span class="ident">primary_key</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>())
-            .<span class="ident">expect</span>(<span class="string">&quot;Missing constraint name in DropPrimaryKey on MSSQL&quot;</span>);
+    <span class="kw">fn </span>drop_primary_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>constraint_name = <span class="self">self
+            </span>.tables
+            .previous
+            .primary_key()
+            .map(|pk| pk.name())
+            .expect(<span class="string">&quot;Missing constraint name in DropPrimaryKey on MSSQL&quot;</span>);
 
-        <span class="self">self</span>.<span class="ident">drop_constraints</span>
-            .<span class="ident">insert</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="ident">constraint_name</span>)));
+        <span class="self">self</span>.drop_constraints
+            .insert(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.renderer.quote(constraint_name)));
     }
 
-    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">mssql_schema_ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="kw">let</span> <span class="ident">next_pk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key</span>().<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>add_primary_key(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>mssql_schema_ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = <span class="self">self</span>.tables.next.schema.downcast_connector_data();
+        <span class="kw">let </span>next_pk = <span class="self">self</span>.tables.next.primary_key().unwrap();
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">primary_key_columns</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quoted_columns</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span>columns = <span class="self">self</span>.tables.next.primary_key_columns().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>quoted_columns = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">columns</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">Quoted::mssql_ident</span>(<span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()).<span class="ident">to_string</span>();
+        <span class="kw">for </span>column <span class="kw">in </span>columns {
+            <span class="kw">let </span><span class="kw-2">mut </span>rendered = Quoted::mssql_ident(column.as_column().name()).to_string();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">column</span>.<span class="ident">sort_order</span>() {
-                <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-                <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = column.sort_order() {
+                rendered.push(<span class="string">&#39; &#39;</span>);
+                rendered.push_str(sort_order.as_ref());
             }
 
-            <span class="ident">quoted_columns</span>.<span class="ident">push</span>(<span class="ident">rendered</span>);
+            quoted_columns.push(rendered);
         }
 
-        <span class="kw">let</span> <span class="ident">clustering</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mssql_schema_ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">next_pk</span>.<span class="ident">id</span>) {
-            <span class="string">&quot; CLUSTERED&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot; NONCLUSTERED&quot;</span>
-        };
+        <span class="kw">let </span>clustering = <span class="kw">if </span>mssql_schema_ext.index_is_clustered(next_pk.id) {
+            <span class="string">&quot; CLUSTERED&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot; NONCLUSTERED&quot;
+        </span>};
 
-        <span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(
+        <span class="self">self</span>.add_constraints.insert(<span class="macro">format!</span>(
             <span class="string">&quot;CONSTRAINT {} PRIMARY KEY{} ({})&quot;</span>,
-            <span class="ident">next_pk</span>.<span class="ident">name</span>(),
-            <span class="ident">clustering</span>,
-            <span class="ident">quoted_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
+            next_pk.name(),
+            clustering,
+            quoted_columns.join(<span class="string">&quot;,&quot;</span>),
         ));
     }
 
-    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column_id</span>: <span class="ident">ColumnId</span>) {
-        <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>);
-        <span class="self">self</span>.<span class="ident">add_columns</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">render_column</span>(<span class="ident">column</span>));
+    <span class="kw">fn </span>add_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column_id: ColumnId) {
+        <span class="kw">let </span>column = <span class="self">self</span>.tables.next.schema.walk(column_id);
+        <span class="self">self</span>.add_columns.push(<span class="self">self</span>.renderer.render_column(column));
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column_id</span>: <span class="ident">ColumnId</span>) {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>).<span class="ident">name</span>());
+    <span class="kw">fn </span>drop_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, column_id: ColumnId) {
+        <span class="kw">let </span>name = <span class="self">self</span>.renderer.quote(<span class="self">self</span>.tables.previous.walk(column_id).name());
 
-        <span class="self">self</span>.<span class="ident">drop_columns</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>));
+        <span class="self">self</span>.drop_columns.push(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, name));
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_and_recreate_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">walk</span>(<span class="ident">columns</span>);
+    <span class="kw">fn </span>drop_and_recreate_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, columns: Pair&lt;ColumnId&gt;) {
+        <span class="kw">let </span>columns = <span class="self">self</span>.tables.walk(columns);
 
-        <span class="self">self</span>.<span class="ident">drop_columns</span>
-            .<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>())));
+        <span class="self">self</span>.drop_columns
+            .push(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.renderer.quote(columns.previous.name())));
 
-        <span class="self">self</span>.<span class="ident">add_columns</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">render_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>));
+        <span class="self">self</span>.add_columns.push(<span class="self">self</span>.renderer.render_column(columns.next));
     }
 
-    <span class="kw">fn</span> <span class="ident">alter_column</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) {
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">walk</span>(<span class="ident">columns</span>);
-        <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="ident">expand_alter_column</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">changes</span>);
+    <span class="kw">fn </span>alter_column(<span class="kw-2">&amp;mut </span><span class="self">self</span>, columns: Pair&lt;ColumnId&gt;, changes: <span class="kw-2">&amp;</span>ColumnChanges) {
+        <span class="kw">let </span>columns = <span class="self">self</span>.tables.walk(columns);
+        <span class="kw">let </span>expanded = expand_alter_column(<span class="kw-2">&amp;</span>columns, changes);
 
-        <span class="kw">for</span> <span class="ident">alter</span> <span class="kw">in</span> <span class="ident">expanded</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">match</span> <span class="ident">alter</span> {
-                <span class="ident">MsSqlAlterColumn::DropDefault</span> { <span class="ident">constraint_name</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">escaped</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="kw-2">&amp;</span><span class="ident">constraint_name</span>));
-                    <span class="self">self</span>.<span class="ident">drop_constraints</span>.<span class="ident">insert</span>(<span class="ident">escaped</span>);
+        <span class="kw">for </span>alter <span class="kw">in </span>expanded.into_iter() {
+            <span class="kw">match </span>alter {
+                MsSqlAlterColumn::DropDefault { constraint_name } =&gt; {
+                    <span class="kw">let </span>escaped = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.renderer.quote(<span class="kw-2">&amp;</span>constraint_name));
+                    <span class="self">self</span>.drop_constraints.insert(escaped);
                 }
-                <span class="ident">MsSqlAlterColumn::SetDefault</span>(<span class="ident">default</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">default</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">old_default</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DF__{}__{}&quot;</span>, <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">name</span>(), <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">name</span>());
-                        <span class="ident">Cow::from</span>(<span class="ident">old_default</span>)
+                MsSqlAlterColumn::SetDefault(default) =&gt; {
+                    <span class="kw">let </span>constraint_name = default.constraint_name().map(Cow::from).unwrap_or_else(|| {
+                        <span class="kw">let </span>old_default = <span class="macro">format!</span>(<span class="string">&quot;DF__{}__{}&quot;</span>, <span class="self">self</span>.tables.next.name(), columns.next.name());
+                        Cow::from(old_default)
                     });
 
-                    <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">render_default</span>(<span class="kw-2">&amp;</span><span class="ident">default</span>);
+                    <span class="kw">let </span>default = render_default(<span class="kw-2">&amp;</span>default);
 
-                    <span class="self">self</span>.<span class="ident">add_constraints</span>.<span class="ident">insert</span>(<span class="macro">format!</span>(
+                    <span class="self">self</span>.add_constraints.insert(<span class="macro">format!</span>(
                         <span class="string">&quot;CONSTRAINT [{constraint}] DEFAULT {default} FOR [{column}]&quot;</span>,
-                        <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">constraint_name</span>,
-                        <span class="ident">column</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">name</span>(),
-                        <span class="ident">default</span> <span class="op">=</span> <span class="ident">default</span>,
+                        constraint = constraint_name,
+                        column = columns.next.name(),
+                        default = default,
                     ));
                 }
-                <span class="ident">MsSqlAlterColumn::Modify</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">nullability</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() {
-                        <span class="string">&quot;NOT NULL&quot;</span>
-                    } <span class="kw">else</span> {
-                        <span class="string">&quot;NULL&quot;</span>
-                    };
+                MsSqlAlterColumn::Modify =&gt; {
+                    <span class="kw">let </span>nullability = <span class="kw">if </span>columns.next.arity().is_required() {
+                        <span class="string">&quot;NOT NULL&quot;
+                    </span>} <span class="kw">else </span>{
+                        <span class="string">&quot;NULL&quot;
+                    </span>};
 
-                    <span class="self">self</span>.<span class="ident">column_mods</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+                    <span class="self">self</span>.column_mods.push(<span class="macro">format!</span>(
                         <span class="string">&quot;ALTER TABLE {table} ALTER COLUMN {column_name} {column_type} {nullability}&quot;</span>,
-                        <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote_with_schema</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-                        <span class="ident">column_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">renderer</span>.<span class="ident">quote</span>(<span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">name</span>()),
-                        <span class="ident">column_type</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>),
-                        <span class="ident">nullability</span> <span class="op">=</span> <span class="ident">nullability</span>,
+                        table = <span class="self">self</span>.renderer.quote_with_schema(<span class="self">self</span>.tables.previous.name()),
+                        column_name = <span class="self">self</span>.renderer.quote(columns.next.name()),
+                        column_type = <span class="kw">super</span>::render_column_type(columns.next),
+                        nullability = nullability,
                     ));
                 }
             }
@@ -538,39 +538,39 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">MsSqlAlterColumn</span> {
-    <span class="ident">DropDefault</span> { <span class="ident">constraint_name</span>: <span class="ident">String</span> },
-    <span class="ident">SetDefault</span>(<span class="ident">DefaultValue</span>),
-    <span class="ident">Modify</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>MsSqlAlterColumn {
+    DropDefault { constraint_name: String },
+    SetDefault(DefaultValue),
+    Modify,
 }
 
-<span class="kw">fn</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">column_changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MsSqlAlterColumn</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">fn </span>expand_alter_column(columns: <span class="kw-2">&amp;</span>Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, column_changes: <span class="kw-2">&amp;</span>ColumnChanges) -&gt; Vec&lt;MsSqlAlterColumn&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>changes = Vec::new();
 
-    <span class="comment">// Default value changes require us to re-create the constraint, which we</span>
-    <span class="comment">// must do before modifying the column.</span>
-    <span class="kw">if</span> <span class="ident">column_changes</span>.<span class="ident">default_changed</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">default</span>) <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">default</span>() {
-            <span class="kw">let</span> <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">default</span>.<span class="ident">constraint_name</span>();
+    <span class="comment">// Default value changes require us to re-create the constraint, which we
+    // must do before modifying the column.
+    </span><span class="kw">if </span>column_changes.default_changed() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(default) = columns.previous.default() {
+            <span class="kw">let </span>constraint_name = default.constraint_name();
 
-            <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">MsSqlAlterColumn::DropDefault</span> {
-                <span class="ident">constraint_name</span>: <span class="ident">constraint_name</span>.<span class="ident">unwrap</span>().<span class="ident">into</span>(),
+            changes.push(MsSqlAlterColumn::DropDefault {
+                constraint_name: constraint_name.unwrap().into(),
             });
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">column_changes</span>.<span class="ident">only_default_changed</span>() {
-            <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">MsSqlAlterColumn::Modify</span>);
+        <span class="kw">if </span>!column_changes.only_default_changed() {
+            changes.push(MsSqlAlterColumn::Modify);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next_default</span>) <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>() {
-            <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">MsSqlAlterColumn::SetDefault</span>(<span class="ident">next_default</span>.<span class="ident">clone</span>()));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(next_default) = columns.next.default() {
+            changes.push(MsSqlAlterColumn::SetDefault(next_default.clone()));
         }
-    } <span class="kw">else</span> {
-        <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">MsSqlAlterColumn::Modify</span>);
+    } <span class="kw">else </span>{
+        changes.push(MsSqlAlterColumn::Modify);
     }
 
-    <span class="ident">changes</span>
+    changes
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

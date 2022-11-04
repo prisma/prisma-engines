@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/curve.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>curve.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/curve.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>curve.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -81,88 +81,88 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ec</span>, <span class="ident">error</span>, <span class="ident">rand</span>};
+</span><span class="kw">use crate</span>::{ec, error, rand};
 
-<span class="doccomment">/// A key agreement algorithm.</span>
-<span class="macro">macro_rules!</span> <span class="ident">suite_b_curve</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">NAME</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bits</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">expr</span>,
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">check_private_key_bytes</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">generate_private_key</span>:<span class="ident">ident</span>,
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">public_from_private</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="doccomment">/// Public keys are encoding in uncompressed form using the</span>
-        <span class="doccomment">/// Octet-String-to-Elliptic-Curve-Point algorithm in</span>
-        <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0]. Public keys are</span>
-        <span class="doccomment">/// validated during key agreement according to</span>
-        <span class="doccomment">/// [NIST Special Publication 800-56A, revision 2] and Appendix B.3 of</span>
-        <span class="doccomment">/// the NSA&#39;s [Suite B Implementer&#39;s Guide to NIST SP 800-56A].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:</span>
-        <span class="doccomment">///     http://www.secg.org/sec1-v2.pdf</span>
-        <span class="doccomment">/// [NIST Special Publication 800-56A, revision 2]:</span>
-        <span class="doccomment">///     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf</span>
-        <span class="doccomment">/// [Suite B Implementer&#39;s Guide to NIST SP 800-56A]:</span>
-        <span class="doccomment">///     https://github.com/briansmith/ring/blob/main/doc/ecdh.pdf</span>
-        <span class="kw">pub</span> <span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">NAME</span>: <span class="ident">ec::Curve</span> <span class="op">=</span> <span class="ident">ec::Curve</span> {
-            <span class="ident">public_key_len</span>: <span class="number">1</span> <span class="op">+</span> (<span class="number">2</span> <span class="op">*</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bits</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>)),
-            <span class="ident">elem_scalar_seed_len</span>: (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bits</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>,
-            <span class="ident">id</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>,
-            <span class="ident">check_private_key_bytes</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">check_private_key_bytes</span>,
-            <span class="ident">generate_private_key</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">generate_private_key</span>,
-            <span class="ident">public_from_private</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">public_from_private</span>,
+<span class="doccomment">/// A key agreement algorithm.
+</span><span class="macro">macro_rules! </span>suite_b_curve {
+    ( <span class="macro-nonterminal">$NAME</span>:ident, <span class="macro-nonterminal">$bits</span>:expr, <span class="macro-nonterminal">$private_key_ops</span>:expr, <span class="macro-nonterminal">$id</span>:expr,
+      <span class="macro-nonterminal">$check_private_key_bytes</span>:ident, <span class="macro-nonterminal">$generate_private_key</span>:ident,
+      <span class="macro-nonterminal">$public_from_private</span>:ident) =&gt; {
+        <span class="doccomment">/// Public keys are encoding in uncompressed form using the
+        /// Octet-String-to-Elliptic-Curve-Point algorithm in
+        /// [SEC 1: Elliptic Curve Cryptography, Version 2.0]. Public keys are
+        /// validated during key agreement according to
+        /// [NIST Special Publication 800-56A, revision 2] and Appendix B.3 of
+        /// the NSA&#39;s [Suite B Implementer&#39;s Guide to NIST SP 800-56A].
+        ///
+        /// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:
+        ///     http://www.secg.org/sec1-v2.pdf
+        /// [NIST Special Publication 800-56A, revision 2]:
+        ///     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf
+        /// [Suite B Implementer&#39;s Guide to NIST SP 800-56A]:
+        ///     https://github.com/briansmith/ring/blob/main/doc/ecdh.pdf
+        </span><span class="kw">pub static </span><span class="macro-nonterminal">$NAME</span>: ec::Curve = ec::Curve {
+            public_key_len: <span class="number">1 </span>+ (<span class="number">2 </span>* ((<span class="macro-nonterminal">$bits </span>+ <span class="number">7</span>) / <span class="number">8</span>)),
+            elem_scalar_seed_len: (<span class="macro-nonterminal">$bits </span>+ <span class="number">7</span>) / <span class="number">8</span>,
+            id: <span class="macro-nonterminal">$id</span>,
+            check_private_key_bytes: <span class="macro-nonterminal">$check_private_key_bytes</span>,
+            generate_private_key: <span class="macro-nonterminal">$generate_private_key</span>,
+            public_from_private: <span class="macro-nonterminal">$public_from_private</span>,
         };
 
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">check_private_key_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">bytes</span>.<span class="ident">len</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bits</span> <span class="op">/</span> <span class="number">8</span>);
-            <span class="ident">ec::suite_b::private_key::check_scalar_big_endian_bytes</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>, <span class="ident">bytes</span>)
+        <span class="kw">fn </span><span class="macro-nonterminal">$check_private_key_bytes</span>(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            <span class="macro">debug_assert_eq!</span>(bytes.len(), <span class="macro-nonterminal">$bits </span>/ <span class="number">8</span>);
+            ec::suite_b::private_key::check_scalar_big_endian_bytes(<span class="macro-nonterminal">$private_key_ops</span>, bytes)
         }
 
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">generate_private_key</span>(
-            <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-            <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="ident">ec::suite_b::private_key::generate_private_scalar_bytes</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>, <span class="ident">rng</span>, <span class="ident">out</span>)
+        <span class="kw">fn </span><span class="macro-nonterminal">$generate_private_key</span>(
+            rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+            out: <span class="kw-2">&amp;mut </span>[u8],
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            ec::suite_b::private_key::generate_private_scalar_bytes(<span class="macro-nonterminal">$private_key_ops</span>, rng, out)
         }
 
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">public_from_private</span>(
-            <span class="ident">public_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-            <span class="ident">private_key</span>: <span class="kw-2">&amp;</span><span class="ident">ec::Seed</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-            <span class="ident">ec::suite_b::private_key::public_from_private</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">private_key_ops</span>, <span class="ident">public_out</span>, <span class="ident">private_key</span>)
+        <span class="kw">fn </span><span class="macro-nonterminal">$public_from_private</span>(
+            public_out: <span class="kw-2">&amp;mut </span>[u8],
+            private_key: <span class="kw-2">&amp;</span>ec::Seed,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+            ec::suite_b::private_key::public_from_private(<span class="macro-nonterminal">$private_key_ops</span>, public_out, private_key)
         }
     };
 }
 
 <span class="macro">suite_b_curve!</span>(
-    <span class="ident">P256</span>,
+    P256,
     <span class="number">256</span>,
-    <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::ops::p256::PRIVATE_KEY_OPS</span>,
-    <span class="ident">ec::CurveID::P256</span>,
-    <span class="ident">p256_check_private_key_bytes</span>,
-    <span class="ident">p256_generate_private_key</span>,
-    <span class="ident">p256_public_from_private</span>
+    <span class="kw-2">&amp;</span>ec::suite_b::ops::p256::PRIVATE_KEY_OPS,
+    ec::CurveID::P256,
+    p256_check_private_key_bytes,
+    p256_generate_private_key,
+    p256_public_from_private
 );
 
 <span class="macro">suite_b_curve!</span>(
-    <span class="ident">P384</span>,
+    P384,
     <span class="number">384</span>,
-    <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::ops::p384::PRIVATE_KEY_OPS</span>,
-    <span class="ident">ec::CurveID::P384</span>,
-    <span class="ident">p384_check_private_key_bytes</span>,
-    <span class="ident">p384_generate_private_key</span>,
-    <span class="ident">p384_public_from_private</span>
+    <span class="kw-2">&amp;</span>ec::suite_b::ops::p384::PRIVATE_KEY_OPS,
+    ec::CurveID::P384,
+    p384_check_private_key_bytes,
+    p384_generate_private_key,
+    p384_public_from_private
 );
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

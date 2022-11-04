@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h2/server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h2/server.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>server.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -546,553 +546,553 @@
 <span id="546">546</span>
 <span id="547">547</span>
 <span id="548">548</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error::Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
-<span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::error::Error <span class="kw">as </span>StdError;
+<span class="kw">use </span>std::marker::Unpin;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">h2::server</span>::{<span class="ident">Connection</span>, <span class="ident">Handshake</span>, <span class="ident">SendResponse</span>};
-<span class="kw">use</span> <span class="ident">h2</span>::{<span class="ident">Reason</span>, <span class="ident">RecvStream</span>};
-<span class="kw">use</span> <span class="ident">http</span>::{<span class="ident">Method</span>, <span class="ident">Request</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
+<span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>h2::server::{Connection, Handshake, SendResponse};
+<span class="kw">use </span>h2::{Reason, RecvStream};
+<span class="kw">use </span>http::{Method, Request};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tracing::{debug, trace, warn};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ping</span>, <span class="ident">PipeToSendStream</span>, <span class="ident">SendBuf</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::body::HttpBody</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::exec::ConnStreamExec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">date</span>, <span class="ident">task</span>, <span class="ident">Future</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ext::Protocol</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::headers</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::h2::ping::Recorder</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::h2</span>::{<span class="ident">H2Upgraded</span>, <span class="ident">UpgradedSendStream</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::Dispatched</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::service::HttpService</span>;
+<span class="kw">use super</span>::{ping, PipeToSendStream, SendBuf};
+<span class="kw">use </span><span class="kw">crate</span>::body::HttpBody;
+<span class="kw">use </span><span class="kw">crate</span>::common::exec::ConnStreamExec;
+<span class="kw">use </span><span class="kw">crate</span>::common::{date, task, Future, Pin, Poll};
+<span class="kw">use </span><span class="kw">crate</span>::ext::Protocol;
+<span class="kw">use </span><span class="kw">crate</span>::headers;
+<span class="kw">use </span><span class="kw">crate</span>::proto::h2::ping::Recorder;
+<span class="kw">use </span><span class="kw">crate</span>::proto::h2::{H2Upgraded, UpgradedSendStream};
+<span class="kw">use </span><span class="kw">crate</span>::proto::Dispatched;
+<span class="kw">use </span><span class="kw">crate</span>::service::HttpService;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::upgrade</span>::{<span class="ident">OnUpgrade</span>, <span class="ident">Pending</span>, <span class="ident">Upgraded</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Body</span>, <span class="ident">Response</span>};
+<span class="kw">use </span><span class="kw">crate</span>::upgrade::{OnUpgrade, Pending, Upgraded};
+<span class="kw">use crate</span>::{Body, Response};
 
-<span class="comment">// Our defaults are chosen for the &quot;majority&quot; case, which usually are not</span>
-<span class="comment">// resource constrained, and so the spec default of 64kb can be too limiting</span>
-<span class="comment">// for performance.</span>
-<span class="comment">//</span>
-<span class="comment">// At the same time, a server more often has multiple clients connected, and</span>
-<span class="comment">// so is more likely to use more resources than a client would.</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_CONN_WINDOW</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>; <span class="comment">// 1mb</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_STREAM_WINDOW</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>; <span class="comment">// 1mb</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">16</span>; <span class="comment">// 16kb</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_MAX_SEND_BUF_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">400</span>; <span class="comment">// 400kb</span>
-<span class="comment">// 16 MB &quot;sane default&quot; taken from golang http2</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">16</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
+<span class="comment">// Our defaults are chosen for the &quot;majority&quot; case, which usually are not
+// resource constrained, and so the spec default of 64kb can be too limiting
+// for performance.
+//
+// At the same time, a server more often has multiple clients connected, and
+// so is more likely to use more resources than a client would.
+</span><span class="kw">const </span>DEFAULT_CONN_WINDOW: u32 = <span class="number">1024 </span>* <span class="number">1024</span>; <span class="comment">// 1mb
+</span><span class="kw">const </span>DEFAULT_STREAM_WINDOW: u32 = <span class="number">1024 </span>* <span class="number">1024</span>; <span class="comment">// 1mb
+</span><span class="kw">const </span>DEFAULT_MAX_FRAME_SIZE: u32 = <span class="number">1024 </span>* <span class="number">16</span>; <span class="comment">// 16kb
+</span><span class="kw">const </span>DEFAULT_MAX_SEND_BUF_SIZE: usize = <span class="number">1024 </span>* <span class="number">400</span>; <span class="comment">// 400kb
+// 16 MB &quot;sane default&quot; taken from golang http2
+</span><span class="kw">const </span>DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE: u32 = <span class="number">16 </span>&lt;&lt; <span class="number">20</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">adaptive_window</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_conn_window_size</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_stream_window_size</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_frame_size</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">enable_connect_protocol</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_concurrent_streams</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keep_alive_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keep_alive_timeout</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_send_buffer_size</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_header_list_size</span>: <span class="ident">u32</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Config {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) adaptive_window: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) initial_conn_window_size: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) initial_stream_window_size: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_frame_size: u32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) enable_connect_protocol: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_concurrent_streams: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) keep_alive_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) keep_alive_timeout: Duration,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_send_buffer_size: usize,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_header_list_size: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Config</span> {
-        <span class="ident">Config</span> {
-            <span class="ident">adaptive_window</span>: <span class="bool-val">false</span>,
-            <span class="ident">initial_conn_window_size</span>: <span class="ident">DEFAULT_CONN_WINDOW</span>,
-            <span class="ident">initial_stream_window_size</span>: <span class="ident">DEFAULT_STREAM_WINDOW</span>,
-            <span class="ident">max_frame_size</span>: <span class="ident">DEFAULT_MAX_FRAME_SIZE</span>,
-            <span class="ident">enable_connect_protocol</span>: <span class="bool-val">false</span>,
-            <span class="ident">max_concurrent_streams</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">keep_alive_interval</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">keep_alive_timeout</span>: <span class="ident">Duration::from_secs</span>(<span class="number">20</span>),
-            <span class="ident">max_send_buffer_size</span>: <span class="ident">DEFAULT_MAX_SEND_BUF_SIZE</span>,
-            <span class="ident">max_header_list_size</span>: <span class="ident">DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Config {
+    <span class="kw">fn </span>default() -&gt; Config {
+        Config {
+            adaptive_window: <span class="bool-val">false</span>,
+            initial_conn_window_size: DEFAULT_CONN_WINDOW,
+            initial_stream_window_size: DEFAULT_STREAM_WINDOW,
+            max_frame_size: DEFAULT_MAX_FRAME_SIZE,
+            enable_connect_protocol: <span class="bool-val">false</span>,
+            max_concurrent_streams: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>keep_alive_interval: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>keep_alive_timeout: Duration::from_secs(<span class="number">20</span>),
+            max_send_buffer_size: DEFAULT_MAX_SEND_BUF_SIZE,
+            max_header_list_size: DEFAULT_SETTINGS_MAX_HEADER_LIST_SIZE,
         }
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>,
-        <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="macro">pin_project! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Server&lt;T, S, B, E&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body&gt;,
+        B: HttpBody,
     {
-        <span class="ident">exec</span>: <span class="ident">E</span>,
-        <span class="ident">service</span>: <span class="ident">S</span>,
-        <span class="ident">state</span>: <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+        exec: E,
+        service: S,
+        state: State&lt;T, B&gt;,
     }
 }
 
-<span class="kw">enum</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="kw">enum </span>State&lt;T, B&gt;
+<span class="kw">where
+    </span>B: HttpBody,
 {
-    <span class="ident">Handshaking</span> {
-        <span class="ident">ping_config</span>: <span class="ident">ping::Config</span>,
-        <span class="ident">hs</span>: <span class="ident">Handshake</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    Handshaking {
+        ping_config: ping::Config,
+        hs: Handshake&lt;T, SendBuf&lt;B::Data&gt;&gt;,
     },
-    <span class="ident">Serving</span>(<span class="ident">Serving</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>),
-    <span class="ident">Closed</span>,
+    Serving(Serving&lt;T, B&gt;),
+    Closed,
 }
 
-<span class="kw">struct</span> <span class="ident">Serving</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="kw">struct </span>Serving&lt;T, B&gt;
+<span class="kw">where
+    </span>B: HttpBody,
 {
-    <span class="ident">ping</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ping::Recorder</span>, <span class="ident">ping::Ponger</span>)<span class="op">&gt;</span>,
-    <span class="ident">conn</span>: <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">closing</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+    ping: <span class="prelude-ty">Option</span>&lt;(ping::Recorder, ping::Ponger)&gt;,
+    conn: Connection&lt;T, SendBuf&lt;B::Data&gt;&gt;,
+    closing: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::Error&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, S, B, E&gt; Server&lt;T, S, B, E&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    S: HttpService&lt;Body, ResBody = B&gt;,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
+    E: ConnStreamExec&lt;S::Future, B&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">io</span>: <span class="ident">T</span>, <span class="ident">service</span>: <span class="ident">S</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>, <span class="ident">exec</span>: <span class="ident">E</span>) -&gt; <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">h2::server::Builder::default</span>();
-        <span class="ident">builder</span>
-            .<span class="ident">initial_window_size</span>(<span class="ident">config</span>.<span class="ident">initial_stream_window_size</span>)
-            .<span class="ident">initial_connection_window_size</span>(<span class="ident">config</span>.<span class="ident">initial_conn_window_size</span>)
-            .<span class="ident">max_frame_size</span>(<span class="ident">config</span>.<span class="ident">max_frame_size</span>)
-            .<span class="ident">max_header_list_size</span>(<span class="ident">config</span>.<span class="ident">max_header_list_size</span>)
-            .<span class="ident">max_send_buffer_size</span>(<span class="ident">config</span>.<span class="ident">max_send_buffer_size</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">max_concurrent_streams</span> {
-            <span class="ident">builder</span>.<span class="ident">max_concurrent_streams</span>(<span class="ident">max</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(io: T, service: S, config: <span class="kw-2">&amp;</span>Config, exec: E) -&gt; Server&lt;T, S, B, E&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = h2::server::Builder::default();
+        builder
+            .initial_window_size(config.initial_stream_window_size)
+            .initial_connection_window_size(config.initial_conn_window_size)
+            .max_frame_size(config.max_frame_size)
+            .max_header_list_size(config.max_header_list_size)
+            .max_send_buffer_size(config.max_send_buffer_size);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = config.max_concurrent_streams {
+            builder.max_concurrent_streams(max);
         }
-        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">enable_connect_protocol</span> {
-            <span class="ident">builder</span>.<span class="ident">enable_connect_protocol</span>();
+        <span class="kw">if </span>config.enable_connect_protocol {
+            builder.enable_connect_protocol();
         }
-        <span class="kw">let</span> <span class="ident">handshake</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">handshake</span>(<span class="ident">io</span>);
+        <span class="kw">let </span>handshake = builder.handshake(io);
 
-        <span class="kw">let</span> <span class="ident">bdp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">adaptive_window</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">config</span>.<span class="ident">initial_stream_window_size</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+        <span class="kw">let </span>bdp = <span class="kw">if </span>config.adaptive_window {
+            <span class="prelude-val">Some</span>(config.initial_stream_window_size)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+
+        <span class="kw">let </span>ping_config = ping::Config {
+            bdp_initial_window: bdp,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>keep_alive_interval: config.keep_alive_interval,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>keep_alive_timeout: config.keep_alive_timeout,
+            <span class="comment">// If keep-alive is enabled for servers, always enabled while
+            // idle, so it can more aggressively close dead connections.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>keep_alive_while_idle: <span class="bool-val">true</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">ping_config</span> <span class="op">=</span> <span class="ident">ping::Config</span> {
-            <span class="ident">bdp_initial_window</span>: <span class="ident">bdp</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">keep_alive_interval</span>: <span class="ident">config</span>.<span class="ident">keep_alive_interval</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">keep_alive_timeout</span>: <span class="ident">config</span>.<span class="ident">keep_alive_timeout</span>,
-            <span class="comment">// If keep-alive is enabled for servers, always enabled while</span>
-            <span class="comment">// idle, so it can more aggressively close dead connections.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">keep_alive_while_idle</span>: <span class="bool-val">true</span>,
-        };
-
-        <span class="ident">Server</span> {
-            <span class="ident">exec</span>,
-            <span class="ident">state</span>: <span class="ident">State::Handshaking</span> {
-                <span class="ident">ping_config</span>,
-                <span class="ident">hs</span>: <span class="ident">handshake</span>,
+        Server {
+            exec,
+            state: State::Handshaking {
+                ping_config,
+                hs: handshake,
             },
-            <span class="ident">service</span>,
+            service,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">graceful_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>graceful_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">trace!</span>(<span class="string">&quot;graceful_shutdown&quot;</span>);
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident">State::Handshaking</span> { .. } =&gt; {
-                <span class="comment">// fall-through, to replace state with Closed</span>
-            }
-            <span class="ident">State::Serving</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">srv</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">srv</span>.<span class="ident">closing</span>.<span class="ident">is_none</span>() {
-                    <span class="ident">srv</span>.<span class="ident">conn</span>.<span class="ident">graceful_shutdown</span>();
+        <span class="kw">match </span><span class="self">self</span>.state {
+            State::Handshaking { .. } =&gt; {
+                <span class="comment">// fall-through, to replace state with Closed
+            </span>}
+            State::Serving(<span class="kw-2">ref mut </span>srv) =&gt; {
+                <span class="kw">if </span>srv.closing.is_none() {
+                    srv.conn.graceful_shutdown();
                 }
                 <span class="kw">return</span>;
             }
-            <span class="ident">State::Closed</span> =&gt; {
+            State::Closed =&gt; {
                 <span class="kw">return</span>;
             }
         }
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Closed</span>;
+        <span class="self">self</span>.state = State::Closed;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Server</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, S, B, E&gt; Future <span class="kw">for </span>Server&lt;T, S, B, E&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    S: HttpService&lt;Body, ResBody = B&gt;,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
+    E: ConnStreamExec&lt;S::Future, B&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Dispatched</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="kw">crate</span>::Result&lt;Dispatched&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">me</span>.<span class="ident">state</span> {
-                <span class="ident">State::Handshaking</span> {
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">hs</span>,
-                    <span class="kw-2">ref</span> <span class="ident">ping_config</span>,
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>me = <span class="kw-2">&amp;mut *</span><span class="self">self</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>next = <span class="kw">match </span>me.state {
+                State::Handshaking {
+                    <span class="kw-2">ref mut </span>hs,
+                    <span class="kw-2">ref </span>ping_config,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">hs</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">ping</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ping_config</span>.<span class="ident">is_enabled</span>() {
-                        <span class="kw">let</span> <span class="ident">pp</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">ping_pong</span>().<span class="ident">expect</span>(<span class="string">&quot;conn.ping_pong&quot;</span>);
-                        <span class="prelude-val">Some</span>(<span class="ident">ping::channel</span>(<span class="ident">pp</span>, <span class="ident">ping_config</span>.<span class="ident">clone</span>()))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    };
-                    <span class="ident">State::Serving</span>(<span class="ident">Serving</span> {
-                        <span class="ident">ping</span>,
-                        <span class="ident">conn</span>,
-                        <span class="ident">closing</span>: <span class="prelude-val">None</span>,
+                    <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="macro">ready!</span>(Pin::new(hs).poll(cx).map_err(<span class="kw">crate</span>::Error::new_h2))<span class="question-mark">?</span>;
+                    <span class="kw">let </span>ping = <span class="kw">if </span>ping_config.is_enabled() {
+                        <span class="kw">let </span>pp = conn.ping_pong().expect(<span class="string">&quot;conn.ping_pong&quot;</span>);
+                        <span class="prelude-val">Some</span>(ping::channel(pp, ping_config.clone()))
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>};
+                    State::Serving(Serving {
+                        ping,
+                        conn,
+                        closing: <span class="prelude-val">None</span>,
                     })
                 }
-                <span class="ident">State::Serving</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">srv</span>) =&gt; {
-                    <span class="macro">ready!</span>(<span class="ident">srv</span>.<span class="ident">poll_server</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">me</span>.<span class="ident">service</span>, <span class="kw-2">&amp;mut</span> <span class="ident">me</span>.<span class="ident">exec</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">Dispatched::Shutdown</span>));
+                State::Serving(<span class="kw-2">ref mut </span>srv) =&gt; {
+                    <span class="macro">ready!</span>(srv.poll_server(cx, <span class="kw-2">&amp;mut </span>me.service, <span class="kw-2">&amp;mut </span>me.exec))<span class="question-mark">?</span>;
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(Dispatched::Shutdown));
                 }
-                <span class="ident">State::Closed</span> =&gt; {
-                    <span class="comment">// graceful_shutdown was called before handshaking finished,</span>
-                    <span class="comment">// nothing to do here...</span>
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">Dispatched::Shutdown</span>));
+                State::Closed =&gt; {
+                    <span class="comment">// graceful_shutdown was called before handshaking finished,
+                    // nothing to do here...
+                    </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(Dispatched::Shutdown));
                 }
             };
-            <span class="ident">me</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">next</span>;
+            me.state = next;
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Serving</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, B&gt; Serving&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    B: HttpBody + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">poll_server</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">service</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>,
-        <span class="ident">exec</span>: <span class="kw-2">&amp;mut</span> <span class="ident">E</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">HttpService</span><span class="op">&lt;</span><span class="ident">Body</span>, <span class="ident">ResBody</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">S::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">E</span>: <span class="ident">ConnStreamExec</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>poll_server&lt;S, E&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        service: <span class="kw-2">&amp;mut </span>S,
+        exec: <span class="kw-2">&amp;mut </span>E,
+    ) -&gt; Poll&lt;<span class="kw">crate</span>::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>S: HttpService&lt;Body, ResBody = B&gt;,
+        S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+        E: ConnStreamExec&lt;S::Future, B&gt;,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">closing</span>.<span class="ident">is_none</span>() {
-            <span class="kw">loop</span> {
-                <span class="self">self</span>.<span class="ident">poll_ping</span>(<span class="ident">cx</span>);
+        <span class="kw">if </span><span class="self">self</span>.closing.is_none() {
+            <span class="kw">loop </span>{
+                <span class="self">self</span>.poll_ping(cx);
 
-                <span class="comment">// Check that the service is ready to accept a new request.</span>
-                <span class="comment">//</span>
-                <span class="comment">// - If not, just drive the connection some.</span>
-                <span class="comment">// - If ready, try to accept a new request from the connection.</span>
-                <span class="kw">match</span> <span class="ident">service</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; (),
-                    <span class="ident">Poll::Pending</span> =&gt; {
-                        <span class="comment">// use `poll_closed` instead of `poll_accept`,</span>
-                        <span class="comment">// in order to avoid accepting a request.</span>
-                        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_closed</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>))<span class="question-mark">?</span>;
+                <span class="comment">// Check that the service is ready to accept a new request.
+                //
+                // - If not, just drive the connection some.
+                // - If ready, try to accept a new request from the connection.
+                </span><span class="kw">match </span>service.poll_ready(cx) {
+                    Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; (),
+                    Poll::Pending =&gt; {
+                        <span class="comment">// use `poll_closed` instead of `poll_accept`,
+                        // in order to avoid accepting a request.
+                        </span><span class="macro">ready!</span>(<span class="self">self</span>.conn.poll_closed(cx).map_err(<span class="kw">crate</span>::Error::new_h2))<span class="question-mark">?</span>;
                         <span class="macro">trace!</span>(<span class="string">&quot;incoming connection complete&quot;</span>);
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                     }
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error::new_user_service</span>(<span class="ident">err</span>);
-                        <span class="macro">debug!</span>(<span class="string">&quot;service closed: {}&quot;</span>, <span class="ident">err</span>);
+                    Poll::Ready(<span class="prelude-val">Err</span>(err)) =&gt; {
+                        <span class="kw">let </span>err = <span class="kw">crate</span>::Error::new_user_service(err);
+                        <span class="macro">debug!</span>(<span class="string">&quot;service closed: {}&quot;</span>, err);
 
-                        <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">h2_reason</span>();
-                        <span class="kw">if</span> <span class="ident">reason</span> <span class="op">==</span> <span class="ident">Reason::NO_ERROR</span> {
-                            <span class="comment">// NO_ERROR is only used for graceful shutdowns...</span>
-                            <span class="macro">trace!</span>(<span class="string">&quot;interpreting NO_ERROR user error as graceful_shutdown&quot;</span>);
-                            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">graceful_shutdown</span>();
-                        } <span class="kw">else</span> {
-                            <span class="macro">trace!</span>(<span class="string">&quot;abruptly shutting down with {:?}&quot;</span>, <span class="ident">reason</span>);
-                            <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">abrupt_shutdown</span>(<span class="ident">reason</span>);
+                        <span class="kw">let </span>reason = err.h2_reason();
+                        <span class="kw">if </span>reason == Reason::NO_ERROR {
+                            <span class="comment">// NO_ERROR is only used for graceful shutdowns...
+                            </span><span class="macro">trace!</span>(<span class="string">&quot;interpreting NO_ERROR user error as graceful_shutdown&quot;</span>);
+                            <span class="self">self</span>.conn.graceful_shutdown();
+                        } <span class="kw">else </span>{
+                            <span class="macro">trace!</span>(<span class="string">&quot;abruptly shutting down with {:?}&quot;</span>, reason);
+                            <span class="self">self</span>.conn.abrupt_shutdown(reason);
                         }
-                        <span class="self">self</span>.<span class="ident">closing</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
+                        <span class="self">self</span>.closing = <span class="prelude-val">Some</span>(err);
                         <span class="kw">break</span>;
                     }
                 }
 
-                <span class="comment">// When the service is ready, accepts an incoming request.</span>
-                <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_accept</span>(<span class="ident">cx</span>)) {
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">req</span>, <span class="kw-2">mut</span> <span class="ident">respond</span>))) =&gt; {
+                <span class="comment">// When the service is ready, accepts an incoming request.
+                </span><span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.conn.poll_accept(cx)) {
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((req, <span class="kw-2">mut </span>respond))) =&gt; {
                         <span class="macro">trace!</span>(<span class="string">&quot;incoming request&quot;</span>);
-                        <span class="kw">let</span> <span class="ident">content_length</span> <span class="op">=</span> <span class="ident">headers::content_length_parse_all</span>(<span class="ident">req</span>.<span class="ident">headers</span>());
-                        <span class="kw">let</span> <span class="ident">ping</span> <span class="op">=</span> <span class="self">self</span>
-                            .<span class="ident">ping</span>
-                            .<span class="ident">as_ref</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ping</span><span class="op">|</span> <span class="ident">ping</span>.<span class="number">0</span>.<span class="ident">clone</span>())
-                            .<span class="ident">unwrap_or_else</span>(<span class="ident">ping::disabled</span>);
+                        <span class="kw">let </span>content_length = headers::content_length_parse_all(req.headers());
+                        <span class="kw">let </span>ping = <span class="self">self
+                            </span>.ping
+                            .as_ref()
+                            .map(|ping| ping.<span class="number">0</span>.clone())
+                            .unwrap_or_else(ping::disabled);
 
-                        <span class="comment">// Record the headers received</span>
-                        <span class="ident">ping</span>.<span class="ident">record_non_data</span>();
+                        <span class="comment">// Record the headers received
+                        </span>ping.record_non_data();
 
-                        <span class="kw">let</span> <span class="ident">is_connect</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">method</span>() <span class="op">==</span> <span class="ident">Method::CONNECT</span>;
-                        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">parts</span>, <span class="ident">stream</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_parts</span>();
-                        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">req</span>, <span class="ident">connect_parts</span>) <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_connect</span> {
+                        <span class="kw">let </span>is_connect = req.method() == Method::CONNECT;
+                        <span class="kw">let </span>(<span class="kw-2">mut </span>parts, stream) = req.into_parts();
+                        <span class="kw">let </span>(<span class="kw-2">mut </span>req, connect_parts) = <span class="kw">if </span>!is_connect {
                             (
-                                <span class="ident">Request::from_parts</span>(
-                                    <span class="ident">parts</span>,
-                                    <span class="ident"><span class="kw">crate</span>::Body::h2</span>(<span class="ident">stream</span>, <span class="ident">content_length</span>.<span class="ident">into</span>(), <span class="ident">ping</span>),
+                                Request::from_parts(
+                                    parts,
+                                    <span class="kw">crate</span>::Body::h2(stream, content_length.into(), ping),
                                 ),
                                 <span class="prelude-val">None</span>,
                             )
-                        } <span class="kw">else</span> {
-                            <span class="kw">if</span> <span class="ident">content_length</span>.<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) {
+                        } <span class="kw">else </span>{
+                            <span class="kw">if </span>content_length.map_or(<span class="bool-val">false</span>, |len| len != <span class="number">0</span>) {
                                 <span class="macro">warn!</span>(<span class="string">&quot;h2 connect request with non-zero body not supported&quot;</span>);
-                                <span class="ident">respond</span>.<span class="ident">send_reset</span>(<span class="ident">h2::Reason::INTERNAL_ERROR</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                                respond.send_reset(h2::Reason::INTERNAL_ERROR);
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                             }
-                            <span class="kw">let</span> (<span class="ident">pending</span>, <span class="ident">upgrade</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::upgrade::pending</span>();
-                            <span class="macro">debug_assert!</span>(<span class="ident">parts</span>.<span class="ident">extensions</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">OnUpgrade</span><span class="op">&gt;</span>().<span class="ident">is_none</span>());
-                            <span class="ident">parts</span>.<span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident">upgrade</span>);
+                            <span class="kw">let </span>(pending, upgrade) = <span class="kw">crate</span>::upgrade::pending();
+                            <span class="macro">debug_assert!</span>(parts.extensions.get::&lt;OnUpgrade&gt;().is_none());
+                            parts.extensions.insert(upgrade);
                             (
-                                <span class="ident">Request::from_parts</span>(<span class="ident">parts</span>, <span class="ident"><span class="kw">crate</span>::Body::empty</span>()),
-                                <span class="prelude-val">Some</span>(<span class="ident">ConnectParts</span> {
-                                    <span class="ident">pending</span>,
-                                    <span class="ident">ping</span>,
-                                    <span class="ident">recv_stream</span>: <span class="ident">stream</span>,
+                                Request::from_parts(parts, <span class="kw">crate</span>::Body::empty()),
+                                <span class="prelude-val">Some</span>(ConnectParts {
+                                    pending,
+                                    ping,
+                                    recv_stream: stream,
                                 }),
                             )
                         };
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">protocol</span>) <span class="op">=</span> <span class="ident">req</span>.<span class="ident">extensions_mut</span>().<span class="ident">remove</span>::<span class="op">&lt;</span><span class="ident">h2::ext::Protocol</span><span class="op">&gt;</span>() {
-                            <span class="ident">req</span>.<span class="ident">extensions_mut</span>().<span class="ident">insert</span>(<span class="ident">Protocol::from_inner</span>(<span class="ident">protocol</span>));
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(protocol) = req.extensions_mut().remove::&lt;h2::ext::Protocol&gt;() {
+                            req.extensions_mut().insert(Protocol::from_inner(protocol));
                         }
 
-                        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">H2Stream::new</span>(<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>), <span class="ident">connect_parts</span>, <span class="ident">respond</span>);
-                        <span class="ident">exec</span>.<span class="ident">execute_h2stream</span>(<span class="ident">fut</span>);
+                        <span class="kw">let </span>fut = H2Stream::new(service.call(req), connect_parts, respond);
+                        exec.execute_h2stream(fut);
                     }
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>(<span class="ident">e</span>)));
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; {
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_h2(e)));
                     }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="comment">// no more incoming streams...</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw-2">ref</span> <span class="ident">ping</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ping</span> {
-                            <span class="ident">ping</span>.<span class="ident">ensure_not_timed_out</span>()<span class="question-mark">?</span>;
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="comment">// no more incoming streams...
+                        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw-2">ref </span>ping, <span class="kw">_</span>)) = <span class="self">self</span>.ping {
+                            ping.ensure_not_timed_out()<span class="question-mark">?</span>;
                         }
 
                         <span class="macro">trace!</span>(<span class="string">&quot;incoming connection complete&quot;</span>);
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                     }
                 }
             }
         }
 
         <span class="macro">debug_assert!</span>(
-            <span class="self">self</span>.<span class="ident">closing</span>.<span class="ident">is_some</span>(),
-            <span class="string">&quot;poll_server broke loop without closing&quot;</span>
-        );
+            <span class="self">self</span>.closing.is_some(),
+            <span class="string">&quot;poll_server broke loop without closing&quot;
+        </span>);
 
-        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_closed</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>))<span class="question-mark">?</span>;
+        <span class="macro">ready!</span>(<span class="self">self</span>.conn.poll_closed(cx).map_err(<span class="kw">crate</span>::Error::new_h2))<span class="question-mark">?</span>;
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">closing</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;polled after error&quot;</span>)))
+        Poll::Ready(<span class="prelude-val">Err</span>(<span class="self">self</span>.closing.take().expect(<span class="string">&quot;polled after error&quot;</span>)))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_ping</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">estimator</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ping</span> {
-            <span class="kw">match</span> <span class="ident">estimator</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="ident">ping::Ponged::SizeUpdate</span>(<span class="ident">wnd</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">set_target_window_size</span>(<span class="ident">wnd</span>);
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">set_initial_window_size</span>(<span class="ident">wnd</span>);
+    <span class="kw">fn </span>poll_ping(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw-2">ref mut </span>estimator)) = <span class="self">self</span>.ping {
+            <span class="kw">match </span>estimator.poll(cx) {
+                Poll::Ready(ping::Ponged::SizeUpdate(wnd)) =&gt; {
+                    <span class="self">self</span>.conn.set_target_window_size(wnd);
+                    <span class="kw">let _ </span>= <span class="self">self</span>.conn.set_initial_window_size(wnd);
                 }
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-                <span class="ident">Poll::Ready</span>(<span class="ident">ping::Ponged::KeepAliveTimedOut</span>) =&gt; {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+                </span>Poll::Ready(ping::Ponged::KeepAliveTimedOut) =&gt; {
                     <span class="macro">debug!</span>(<span class="string">&quot;keep-alive timed out, closing connection&quot;</span>);
-                    <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">abrupt_shutdown</span>(<span class="ident">h2::Reason::NO_ERROR</span>);
+                    <span class="self">self</span>.conn.abrupt_shutdown(h2::Reason::NO_ERROR);
                 }
-                <span class="ident">Poll::Pending</span> =&gt; {}
+                Poll::Pending =&gt; {}
             }
         }
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H2Stream</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="macro">pin_project! </span>{
+    <span class="attribute">#[allow(missing_debug_implementations)]
+    </span><span class="kw">pub struct </span>H2Stream&lt;F, B&gt;
+    <span class="kw">where
+        </span>B: HttpBody,
     {
-        <span class="ident">reply</span>: <span class="ident">SendResponse</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">state</span>: <span class="ident">H2StreamState</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>,
+        reply: SendResponse&lt;SendBuf&lt;B::Data&gt;&gt;,
+        <span class="attribute">#[pin]
+        </span>state: H2StreamState&lt;F, B&gt;,
     }
 }
 
-<span class="macro">pin_project!</span> {
-    <span class="attribute">#[<span class="ident">project</span> <span class="op">=</span> <span class="ident">H2StreamStateProj</span>]</span>
-    <span class="kw">enum</span> <span class="ident">H2StreamState</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="macro">pin_project! </span>{
+    <span class="attribute">#[project = H2StreamStateProj]
+    </span><span class="kw">enum </span>H2StreamState&lt;F, B&gt;
+    <span class="kw">where
+        </span>B: HttpBody,
     {
-        <span class="ident">Service</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">fut</span>: <span class="ident">F</span>,
-            <span class="ident">connect_parts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectParts</span><span class="op">&gt;</span>,
+        Service {
+            <span class="attribute">#[pin]
+            </span>fut: F,
+            connect_parts: <span class="prelude-ty">Option</span>&lt;ConnectParts&gt;,
         },
-        <span class="ident">Body</span> {
-            <span class="attribute">#[<span class="ident">pin</span>]</span>
-            <span class="ident">pipe</span>: <span class="ident">PipeToSendStream</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+        Body {
+            <span class="attribute">#[pin]
+            </span>pipe: PipeToSendStream&lt;B&gt;,
         },
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ConnectParts</span> {
-    <span class="ident">pending</span>: <span class="ident">Pending</span>,
-    <span class="ident">ping</span>: <span class="ident">Recorder</span>,
-    <span class="ident">recv_stream</span>: <span class="ident">RecvStream</span>,
+<span class="kw">struct </span>ConnectParts {
+    pending: Pending,
+    ping: Recorder,
+    recv_stream: RecvStream,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">H2Stream</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">HttpBody</span>,
+<span class="kw">impl</span>&lt;F, B&gt; H2Stream&lt;F, B&gt;
+<span class="kw">where
+    </span>B: HttpBody,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">fut</span>: <span class="ident">F</span>,
-        <span class="ident">connect_parts</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectParts</span><span class="op">&gt;</span>,
-        <span class="ident">respond</span>: <span class="ident">SendResponse</span><span class="op">&lt;</span><span class="ident">SendBuf</span><span class="op">&lt;</span><span class="ident">B::Data</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">H2Stream</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="ident">H2Stream</span> {
-            <span class="ident">reply</span>: <span class="ident">respond</span>,
-            <span class="ident">state</span>: <span class="ident">H2StreamState::Service</span> { <span class="ident">fut</span>, <span class="ident">connect_parts</span> },
+    <span class="kw">fn </span>new(
+        fut: F,
+        connect_parts: <span class="prelude-ty">Option</span>&lt;ConnectParts&gt;,
+        respond: SendResponse&lt;SendBuf&lt;B::Data&gt;&gt;,
+    ) -&gt; H2Stream&lt;F, B&gt; {
+        H2Stream {
+            reply: respond,
+            state: H2StreamState::Service { fut, connect_parts },
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">reply</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">eos</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>.<span class="ident">reply</span>.<span class="ident">send_response</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">eos</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">tx</span>) =&gt; <span class="ident">tx</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="macro">debug!</span>(<span class="string">&quot;send response error: {}&quot;</span>, <span class="ident">e</span>);
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">me</span>.<span class="ident">reply</span>.<span class="ident">send_reset</span>(<span class="ident">Reason::INTERNAL_ERROR</span>);
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>(<span class="ident">e</span>)));
+<span class="macro">macro_rules! </span>reply {
+    (<span class="macro-nonterminal">$me</span>:expr, <span class="macro-nonterminal">$res</span>:expr, <span class="macro-nonterminal">$eos</span>:expr) =&gt; {{
+        <span class="kw">match </span><span class="macro-nonterminal">$me</span>.reply.send_response(<span class="macro-nonterminal">$res</span>, <span class="macro-nonterminal">$eos</span>) {
+            <span class="prelude-val">Ok</span>(tx) =&gt; tx,
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;send response error: {}&quot;</span>, e);
+                <span class="macro-nonterminal">$me</span>.reply.send_reset(Reason::INTERNAL_ERROR);
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_h2(e)));
             }
         }
     }};
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">H2Stream</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span>,
-    <span class="ident">B::Data</span>: <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, B, E&gt; H2Stream&lt;F, B&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response&lt;B&gt;, E&gt;&gt;,
+    B: HttpBody,
+    B::Data: <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    E: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">poll2</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">me</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>() {
-                <span class="ident">H2StreamStateProj::Service</span> {
-                    <span class="ident">fut</span>: <span class="ident">h</span>,
-                    <span class="ident">connect_parts</span>,
+    <span class="kw">fn </span>poll2(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="kw">crate</span>::Result&lt;()&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>me = <span class="self">self</span>.project();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>next = <span class="kw">match </span>me.state.as_mut().project() {
+                H2StreamStateProj::Service {
+                    fut: h,
+                    connect_parts,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">h</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">r</span>)) =&gt; <span class="ident">r</span>,
-                        <span class="ident">Poll::Pending</span> =&gt; {
-                            <span class="comment">// Response is not yet ready, so we want to check if the client has sent a</span>
-                            <span class="comment">// RST_STREAM frame which would cancel the current request.</span>
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">reason</span>) <span class="op">=</span>
-                                <span class="ident">me</span>.<span class="ident">reply</span>.<span class="ident">poll_reset</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>)<span class="question-mark">?</span>
-                            {
-                                <span class="macro">debug!</span>(<span class="string">&quot;stream received RST_STREAM: {:?}&quot;</span>, <span class="ident">reason</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_h2</span>(<span class="ident">reason</span>.<span class="ident">into</span>())));
+                    <span class="kw">let </span>res = <span class="kw">match </span>h.poll(cx) {
+                        Poll::Ready(<span class="prelude-val">Ok</span>(r)) =&gt; r,
+                        Poll::Pending =&gt; {
+                            <span class="comment">// Response is not yet ready, so we want to check if the client has sent a
+                            // RST_STREAM frame which would cancel the current request.
+                            </span><span class="kw">if let </span>Poll::Ready(reason) =
+                                me.reply.poll_reset(cx).map_err(<span class="kw">crate</span>::Error::new_h2)<span class="question-mark">?
+                            </span>{
+                                <span class="macro">debug!</span>(<span class="string">&quot;stream received RST_STREAM: {:?}&quot;</span>, reason);
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_h2(reason.into())));
                             }
-                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                            <span class="kw">return </span>Poll::Pending;
                         }
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error::new_user_service</span>(<span class="ident">e</span>);
-                            <span class="macro">warn!</span>(<span class="string">&quot;http2 service errored: {}&quot;</span>, <span class="ident">err</span>);
-                            <span class="ident">me</span>.<span class="ident">reply</span>.<span class="ident">send_reset</span>(<span class="ident">err</span>.<span class="ident">h2_reason</span>());
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+                        Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; {
+                            <span class="kw">let </span>err = <span class="kw">crate</span>::Error::new_user_service(e);
+                            <span class="macro">warn!</span>(<span class="string">&quot;http2 service errored: {}&quot;</span>, err);
+                            me.reply.send_reset(err.h2_reason());
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(err));
                         }
                     };
 
-                    <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">into_parts</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">::http::Response::from_parts</span>(<span class="ident">head</span>, ());
-                    <span class="ident"><span class="kw">super</span>::strip_connection_headers</span>(<span class="ident">res</span>.<span class="ident">headers_mut</span>(), <span class="bool-val">false</span>);
+                    <span class="kw">let </span>(head, body) = res.into_parts();
+                    <span class="kw">let </span><span class="kw-2">mut </span>res = ::http::Response::from_parts(head, ());
+                    <span class="kw">super</span>::strip_connection_headers(res.headers_mut(), <span class="bool-val">false</span>);
 
-                    <span class="comment">// set Date header if it isn&#39;t already set...</span>
-                    <span class="ident">res</span>.<span class="ident">headers_mut</span>()
-                        .<span class="ident">entry</span>(<span class="ident">::http::header::DATE</span>)
-                        .<span class="ident">or_insert_with</span>(<span class="ident">date::update_and_header_value</span>);
+                    <span class="comment">// set Date header if it isn&#39;t already set...
+                    </span>res.headers_mut()
+                        .entry(::http::header::DATE)
+                        .or_insert_with(date::update_and_header_value);
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connect_parts</span>) <span class="op">=</span> <span class="ident">connect_parts</span>.<span class="ident">take</span>() {
-                        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
-                            <span class="kw">if</span> <span class="ident">headers::content_length_parse_all</span>(<span class="ident">res</span>.<span class="ident">headers</span>())
-                                .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(connect_parts) = connect_parts.take() {
+                        <span class="kw">if </span>res.status().is_success() {
+                            <span class="kw">if </span>headers::content_length_parse_all(res.headers())
+                                .map_or(<span class="bool-val">false</span>, |len| len != <span class="number">0</span>)
                             {
                                 <span class="macro">warn!</span>(<span class="string">&quot;h2 successful response to CONNECT request with body not supported&quot;</span>);
-                                <span class="ident">me</span>.<span class="ident">reply</span>.<span class="ident">send_reset</span>(<span class="ident">h2::Reason::INTERNAL_ERROR</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_user_header</span>()));
+                                me.reply.send_reset(h2::Reason::INTERNAL_ERROR);
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_user_header()));
                             }
-                            <span class="kw">let</span> <span class="ident">send_stream</span> <span class="op">=</span> <span class="macro">reply!</span>(<span class="ident">me</span>, <span class="ident">res</span>, <span class="bool-val">false</span>);
-                            <span class="ident">connect_parts</span>.<span class="ident">pending</span>.<span class="ident">fulfill</span>(<span class="ident">Upgraded::new</span>(
-                                <span class="ident">H2Upgraded</span> {
-                                    <span class="ident">ping</span>: <span class="ident">connect_parts</span>.<span class="ident">ping</span>,
-                                    <span class="ident">recv_stream</span>: <span class="ident">connect_parts</span>.<span class="ident">recv_stream</span>,
-                                    <span class="ident">send_stream</span>: <span class="kw">unsafe</span> { <span class="ident">UpgradedSendStream::new</span>(<span class="ident">send_stream</span>) },
-                                    <span class="ident">buf</span>: <span class="ident">Bytes::new</span>(),
+                            <span class="kw">let </span>send_stream = <span class="macro">reply!</span>(me, res, <span class="bool-val">false</span>);
+                            connect_parts.pending.fulfill(Upgraded::new(
+                                H2Upgraded {
+                                    ping: connect_parts.ping,
+                                    recv_stream: connect_parts.recv_stream,
+                                    send_stream: <span class="kw">unsafe </span>{ UpgradedSendStream::new(send_stream) },
+                                    buf: Bytes::new(),
                                 },
-                                <span class="ident">Bytes::new</span>(),
+                                Bytes::new(),
                             ));
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                         }
                     }
 
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">body</span>.<span class="ident">is_end_stream</span>() {
-                        <span class="comment">// automatically set Content-Length from body...</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">exact</span>() {
-                            <span class="ident">headers::set_content_length_if_missing</span>(<span class="ident">res</span>.<span class="ident">headers_mut</span>(), <span class="ident">len</span>);
+                    <span class="kw">if </span>!body.is_end_stream() {
+                        <span class="comment">// automatically set Content-Length from body...
+                        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(len) = body.size_hint().exact() {
+                            headers::set_content_length_if_missing(res.headers_mut(), len);
                         }
 
-                        <span class="kw">let</span> <span class="ident">body_tx</span> <span class="op">=</span> <span class="macro">reply!</span>(<span class="ident">me</span>, <span class="ident">res</span>, <span class="bool-val">false</span>);
-                        <span class="ident">H2StreamState::Body</span> {
-                            <span class="ident">pipe</span>: <span class="ident">PipeToSendStream::new</span>(<span class="ident">body</span>, <span class="ident">body_tx</span>),
+                        <span class="kw">let </span>body_tx = <span class="macro">reply!</span>(me, res, <span class="bool-val">false</span>);
+                        H2StreamState::Body {
+                            pipe: PipeToSendStream::new(body, body_tx),
                         }
-                    } <span class="kw">else</span> {
-                        <span class="macro">reply!</span>(<span class="ident">me</span>, <span class="ident">res</span>, <span class="bool-val">true</span>);
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                    } <span class="kw">else </span>{
+                        <span class="macro">reply!</span>(me, res, <span class="bool-val">true</span>);
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                     }
                 }
-                <span class="ident">H2StreamStateProj::Body</span> { <span class="ident">pipe</span> } =&gt; {
-                    <span class="kw">return</span> <span class="ident">pipe</span>.<span class="ident">poll</span>(<span class="ident">cx</span>);
+                H2StreamStateProj::Body { pipe } =&gt; {
+                    <span class="kw">return </span>pipe.poll(cx);
                 }
             };
-            <span class="ident">me</span>.<span class="ident">state</span>.<span class="ident">set</span>(<span class="ident">next</span>);
+            me.state.set(next);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">H2Stream</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">HttpBody</span>,
-    <span class="ident">B::Data</span>: <span class="lifetime">&#39;static</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, B, E&gt; Future <span class="kw">for </span>H2Stream&lt;F, B&gt;
+<span class="kw">where
+    </span>F: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Response&lt;B&gt;, E&gt;&gt;,
+    B: HttpBody,
+    B::Data: <span class="lifetime">&#39;static</span>,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
+    E: Into&lt;Box&lt;<span class="kw">dyn </span>StdError + Send + Sync&gt;&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">poll2</span>(<span class="ident">cx</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">res</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;stream error: {}&quot;</span>, <span class="ident">e</span>);
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="self">self</span>.poll2(cx).map(|res| {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = res {
+                <span class="macro">debug!</span>(<span class="string">&quot;stream error: {}&quot;</span>, e);
             }
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

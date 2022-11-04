@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -95,102 +95,102 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CompositeTypeFieldWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ScalarType</span>;
-<span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{CompositeTypeFieldWalker, ModelWalker, RelationFieldWalker, ScalarFieldWalker};
+<span class="kw">use </span><span class="kw">crate</span>::ScalarType;
+<span class="kw">use </span>schema_ast::ast;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InnerWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
-    <span class="ident">Relation</span>(<span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">enum </span>InnerWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    Scalar(ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+    Relation(RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
 }
 
-<span class="doccomment">/// A model field, scalar or relation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">InnerWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A model field, scalar or relation.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    inner: InnerWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The field name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerWalker::Scalar</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">name</span>(),
-            <span class="ident">InnerWalker::Relation</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">name</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The field name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerWalker::Scalar(f) =&gt; f.name(),
+            InnerWalker::Relation(f) =&gt; f.name(),
         }
     }
 
-    <span class="doccomment">/// The model name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerWalker::Scalar</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">model</span>(),
-            <span class="ident">InnerWalker::Relation</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">model</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">w</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">InnerWalker::Scalar</span>(<span class="ident">w</span>),
+    <span class="doccomment">/// The model name.
+    </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerWalker::Scalar(f) =&gt; f.model(),
+            InnerWalker::Relation(f) =&gt; f.model(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">w</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">InnerWalker::Relation</span>(<span class="ident">w</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(w: ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: InnerWalker::Scalar(w),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InnerTypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">w</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">InnerTypedFieldWalker::Scalar</span>(<span class="ident">w</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>FieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(w: RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: InnerWalker::Relation(w),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">w</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">InnerTypedFieldWalker::Composite</span>(<span class="ident">w</span>),
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">enum </span>InnerTypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    Scalar(ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+    Composite(CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>TypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(w: ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: InnerTypedFieldWalker::Scalar(w),
         }
     }
 }
 
-<span class="doccomment">/// A model or composite type field of a scalar type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">InnerTypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>TypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>from(w: CompositeTypeFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: InnerTypedFieldWalker::Composite(w),
+        }
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">TypedFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerTypedFieldWalker::Scalar</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">scalar_type</span>(),
-            <span class="ident">InnerTypedFieldWalker::Composite</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">scalar_type</span>(),
+<span class="doccomment">/// A model or composite type field of a scalar type.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>TypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    inner: InnerTypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; TypedFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).
+    </span><span class="kw">pub fn </span>scalar_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerTypedFieldWalker::Scalar(field) =&gt; field.scalar_type(),
+            InnerTypedFieldWalker::Composite(field) =&gt; field.scalar_type(),
         }
     }
 
-    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">ast::Span</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">InnerTypedFieldWalker::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">raw_native_type</span>(),
-            <span class="ident">InnerTypedFieldWalker::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">raw_native_type</span>(),
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)
+    </span><span class="kw">pub fn </span>raw_native_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[String], ast::Span)&gt; {
+        <span class="kw">match </span><span class="self">self</span>.inner {
+            InnerTypedFieldWalker::Scalar(sf) =&gt; sf.raw_native_type(),
+            InnerTypedFieldWalker::Composite(cf) =&gt; cf.raw_native_type(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

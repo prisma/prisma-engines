@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -631,638 +631,638 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! ISO 8601 calendar date with time zone.</span>
+</span><span class="doccomment">//! ISO 8601 calendar date with time zone.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident">core::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">AddAssign</span>, <span class="ident">Sub</span>, <span class="ident">SubAssign</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">hash</span>};
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span>core::borrow::Borrow;
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::ops::{Add, AddAssign, Sub, SubAssign};
+<span class="kw">use </span>core::{fmt, hash};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rkyv</span>::{<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rkyv&quot;</span>)]
+</span><span class="kw">use </span>rkyv::{Archive, Deserialize, Serialize};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format::Locale</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format</span>::{<span class="ident">DelayedFormat</span>, <span class="ident">Item</span>, <span class="ident">StrftimeItems</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::naive</span>::{<span class="ident">IsoWeek</span>, <span class="ident">NaiveDate</span>, <span class="ident">NaiveTime</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset</span>::{<span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oldtime::Duration</span> <span class="kw">as</span> <span class="ident">OldDuration</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Datelike</span>, <span class="ident">Weekday</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::format::Locale;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span><span class="kw">crate</span>::format::{DelayedFormat, Item, StrftimeItems};
+<span class="kw">use </span><span class="kw">crate</span>::naive::{IsoWeek, NaiveDate, NaiveTime};
+<span class="kw">use </span><span class="kw">crate</span>::offset::{TimeZone, Utc};
+<span class="kw">use </span><span class="kw">crate</span>::oldtime::Duration <span class="kw">as </span>OldDuration;
+<span class="kw">use </span><span class="kw">crate</span>::DateTime;
+<span class="kw">use crate</span>::{Datelike, Weekday};
 
-<span class="doccomment">/// ISO 8601 calendar date with time zone.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You almost certainly want to be using a [`NaiveDate`] instead of this type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type primarily exists to aid in the construction of DateTimes that</span>
-<span class="doccomment">/// have a timezone by way of the [`TimeZone`] datelike constructors (e.g.</span>
-<span class="doccomment">/// [`TimeZone::ymd`]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type should be considered ambiguous at best, due to the inherent lack</span>
-<span class="doccomment">/// of precision required for the time zone resolution.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There are some guarantees on the usage of `Date&lt;Tz&gt;`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - If properly constructed via [`TimeZone::ymd`] and others without an error,</span>
-<span class="doccomment">///   the corresponding local date should exist for at least a moment.</span>
-<span class="doccomment">///   (It may still have a gap from the offset changes.)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The `TimeZone` is free to assign *any* [`Offset`](crate::offset::Offset) to the</span>
-<span class="doccomment">///   local date, as long as that offset did occur in given day.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   For example, if `2015-03-08T01:59-08:00` is followed by `2015-03-08T03:00-07:00`,</span>
-<span class="doccomment">///   it may produce either `2015-03-08-08:00` or `2015-03-08-07:00`</span>
-<span class="doccomment">///   but *not* `2015-03-08+00:00` and others.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Once constructed as a full `DateTime`, [`DateTime::date`] and other associated</span>
-<span class="doccomment">///   methods should return those for the original `Date`. For example, if `dt =</span>
-<span class="doccomment">///   tz.ymd(y,m,d).hms(h,n,s)` were valid, `dt.date() == tz.ymd(y,m,d)`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The date is timezone-agnostic up to one day (i.e. practically always),</span>
-<span class="doccomment">///   so the local date and UTC date should be equal for most cases</span>
-<span class="doccomment">///   even though the raw calculation between `NaiveDate` and `Duration` may not.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>, <span class="ident">derive</span>(<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> {
-    <span class="ident">date</span>: <span class="ident">NaiveDate</span>,
-    <span class="ident">offset</span>: <span class="ident">Tz::Offset</span>,
+<span class="doccomment">/// ISO 8601 calendar date with time zone.
+///
+/// You almost certainly want to be using a [`NaiveDate`] instead of this type.
+///
+/// This type primarily exists to aid in the construction of DateTimes that
+/// have a timezone by way of the [`TimeZone`] datelike constructors (e.g.
+/// [`TimeZone::ymd`]).
+///
+/// This type should be considered ambiguous at best, due to the inherent lack
+/// of precision required for the time zone resolution.
+///
+/// There are some guarantees on the usage of `Date&lt;Tz&gt;`:
+///
+/// - If properly constructed via [`TimeZone::ymd`] and others without an error,
+///   the corresponding local date should exist for at least a moment.
+///   (It may still have a gap from the offset changes.)
+///
+/// - The `TimeZone` is free to assign *any* [`Offset`](crate::offset::Offset) to the
+///   local date, as long as that offset did occur in given day.
+///
+///   For example, if `2015-03-08T01:59-08:00` is followed by `2015-03-08T03:00-07:00`,
+///   it may produce either `2015-03-08-08:00` or `2015-03-08-07:00`
+///   but *not* `2015-03-08+00:00` and others.
+///
+/// - Once constructed as a full `DateTime`, [`DateTime::date`] and other associated
+///   methods should return those for the original `Date`. For example, if `dt =
+///   tz.ymd(y,m,d).hms(h,n,s)` were valid, `dt.date() == tz.ymd(y,m,d)`.
+///
+/// - The date is timezone-agnostic up to one day (i.e. practically always),
+///   so the local date and UTC date should be equal for most cases
+///   even though the raw calculation between `NaiveDate` and `Duration` may not.
+</span><span class="attribute">#[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;rkyv&quot;</span>, derive(Archive, Deserialize, Serialize))]
+</span><span class="kw">pub struct </span>Date&lt;Tz: TimeZone&gt; {
+    date: NaiveDate,
+    offset: Tz::Offset,
 }
 
-<span class="doccomment">/// The minimum possible `Date`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.4.20&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use Date::MIN_UTC instead&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_DATE</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Date</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::MIN_UTC</span>;
-<span class="doccomment">/// The maximum possible `Date`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.4.20&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use Date::MAX_UTC instead&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_DATE</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Date</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::MAX_UTC</span>;
+<span class="doccomment">/// The minimum possible `Date`.
+</span><span class="attribute">#[allow(deprecated)]
+#[deprecated(since = <span class="string">&quot;0.4.20&quot;</span>, note = <span class="string">&quot;Use Date::MIN_UTC instead&quot;</span>)]
+</span><span class="kw">pub const </span>MIN_DATE: Date&lt;Utc&gt; = Date::&lt;Utc&gt;::MIN_UTC;
+<span class="doccomment">/// The maximum possible `Date`.
+</span><span class="attribute">#[allow(deprecated)]
+#[deprecated(since = <span class="string">&quot;0.4.20&quot;</span>, note = <span class="string">&quot;Use Date::MAX_UTC instead&quot;</span>)]
+</span><span class="kw">pub const </span>MAX_DATE: Date&lt;Utc&gt; = Date::&lt;Utc&gt;::MAX_UTC;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Makes a new `Date` with given *UTC* date and offset.</span>
-    <span class="doccomment">/// The local date should be constructed via the `TimeZone` trait.</span>
-    <span class="comment">//</span>
-    <span class="comment">// note: this constructor is purposely not named to `new` to discourage the direct usage.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_utc</span>(<span class="ident">date</span>: <span class="ident">NaiveDate</span>, <span class="ident">offset</span>: <span class="ident">Tz::Offset</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="ident">Date</span> { <span class="ident">date</span>, <span class="ident">offset</span> }
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Date&lt;Tz&gt; {
+    <span class="doccomment">/// Makes a new `Date` with given *UTC* date and offset.
+    /// The local date should be constructed via the `TimeZone` trait.
+    </span><span class="comment">//
+    // note: this constructor is purposely not named to `new` to discourage the direct usage.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_utc(date: NaiveDate, offset: Tz::Offset) -&gt; Date&lt;Tz&gt; {
+        Date { date, offset }
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date and given `NaiveTime`.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on invalid datetime.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">time</span>: <span class="ident">NaiveTime</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">localdt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">and_time</span>(<span class="ident">time</span>);
-        <span class="self">self</span>.<span class="ident">timezone</span>().<span class="ident">from_local_datetime</span>(<span class="kw-2">&amp;</span><span class="ident">localdt</span>).<span class="ident">single</span>()
+    <span class="doccomment">/// Makes a new `DateTime` from the current date and given `NaiveTime`.
+    /// The offset in the current date is preserved.
+    ///
+    /// Panics on invalid datetime.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_time(<span class="kw-2">&amp;</span><span class="self">self</span>, time: NaiveTime) -&gt; <span class="prelude-ty">Option</span>&lt;DateTime&lt;Tz&gt;&gt; {
+        <span class="kw">let </span>localdt = <span class="self">self</span>.naive_local().and_time(time);
+        <span class="self">self</span>.timezone().from_local_datetime(<span class="kw-2">&amp;</span>localdt).single()
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute and second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on invalid hour, minute and/or second.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>, <span class="ident">min</span>: <span class="ident">u32</span>, <span class="ident">sec</span>: <span class="ident">u32</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">and_hms_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid time&quot;</span>)
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute and second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Panics on invalid hour, minute and/or second.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32) -&gt; DateTime&lt;Tz&gt; {
+        <span class="self">self</span>.and_hms_opt(hour, min, sec).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute and second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on invalid hour, minute and/or second.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>, <span class="ident">min</span>: <span class="ident">u32</span>, <span class="ident">sec</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">NaiveTime::from_hms_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">and_time</span>(<span class="ident">time</span>))
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute and second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Returns `None` on invalid hour, minute and/or second.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_opt(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32) -&gt; <span class="prelude-ty">Option</span>&lt;DateTime&lt;Tz&gt;&gt; {
+        NaiveTime::from_hms_opt(hour, min, sec).and_then(|time| <span class="self">self</span>.and_time(time))
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and millisecond.</span>
-    <span class="doccomment">/// The millisecond part can exceed 1,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on invalid hour, minute, second and/or millisecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_milli</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>, <span class="ident">min</span>: <span class="ident">u32</span>, <span class="ident">sec</span>: <span class="ident">u32</span>, <span class="ident">milli</span>: <span class="ident">u32</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">and_hms_milli_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">milli</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid time&quot;</span>)
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and millisecond.
+    /// The millisecond part can exceed 1,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Panics on invalid hour, minute, second and/or millisecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_milli(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, milli: u32) -&gt; DateTime&lt;Tz&gt; {
+        <span class="self">self</span>.and_hms_milli_opt(hour, min, sec, milli).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and millisecond.</span>
-    <span class="doccomment">/// The millisecond part can exceed 1,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on invalid hour, minute, second and/or millisecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_milli_opt</span>(
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and millisecond.
+    /// The millisecond part can exceed 1,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Returns `None` on invalid hour, minute, second and/or millisecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_milli_opt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u32</span>,
-        <span class="ident">min</span>: <span class="ident">u32</span>,
-        <span class="ident">sec</span>: <span class="ident">u32</span>,
-        <span class="ident">milli</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">NaiveTime::from_hms_milli_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">milli</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">and_time</span>(<span class="ident">time</span>))
+        hour: u32,
+        min: u32,
+        sec: u32,
+        milli: u32,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;DateTime&lt;Tz&gt;&gt; {
+        NaiveTime::from_hms_milli_opt(hour, min, sec, milli).and_then(|time| <span class="self">self</span>.and_time(time))
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and microsecond.</span>
-    <span class="doccomment">/// The microsecond part can exceed 1,000,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on invalid hour, minute, second and/or microsecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_micro</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>, <span class="ident">min</span>: <span class="ident">u32</span>, <span class="ident">sec</span>: <span class="ident">u32</span>, <span class="ident">micro</span>: <span class="ident">u32</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">and_hms_micro_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">micro</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid time&quot;</span>)
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and microsecond.
+    /// The microsecond part can exceed 1,000,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Panics on invalid hour, minute, second and/or microsecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_micro(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, micro: u32) -&gt; DateTime&lt;Tz&gt; {
+        <span class="self">self</span>.and_hms_micro_opt(hour, min, sec, micro).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and microsecond.</span>
-    <span class="doccomment">/// The microsecond part can exceed 1,000,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on invalid hour, minute, second and/or microsecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_micro_opt</span>(
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and microsecond.
+    /// The microsecond part can exceed 1,000,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Returns `None` on invalid hour, minute, second and/or microsecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_micro_opt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u32</span>,
-        <span class="ident">min</span>: <span class="ident">u32</span>,
-        <span class="ident">sec</span>: <span class="ident">u32</span>,
-        <span class="ident">micro</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">NaiveTime::from_hms_micro_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">micro</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">and_time</span>(<span class="ident">time</span>))
+        hour: u32,
+        min: u32,
+        sec: u32,
+        micro: u32,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;DateTime&lt;Tz&gt;&gt; {
+        NaiveTime::from_hms_micro_opt(hour, min, sec, micro).and_then(|time| <span class="self">self</span>.and_time(time))
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and nanosecond.</span>
-    <span class="doccomment">/// The nanosecond part can exceed 1,000,000,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on invalid hour, minute, second and/or nanosecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_nano</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>, <span class="ident">min</span>: <span class="ident">u32</span>, <span class="ident">sec</span>: <span class="ident">u32</span>, <span class="ident">nano</span>: <span class="ident">u32</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">and_hms_nano_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">nano</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid time&quot;</span>)
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and nanosecond.
+    /// The nanosecond part can exceed 1,000,000,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Panics on invalid hour, minute, second and/or nanosecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_nano(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32, min: u32, sec: u32, nano: u32) -&gt; DateTime&lt;Tz&gt; {
+        <span class="self">self</span>.and_hms_nano_opt(hour, min, sec, nano).expect(<span class="string">&quot;invalid time&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and nanosecond.</span>
-    <span class="doccomment">/// The nanosecond part can exceed 1,000,000,000 in order to represent the leap second.</span>
-    <span class="doccomment">/// The offset in the current date is preserved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on invalid hour, minute, second and/or nanosecond.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_hms_nano_opt</span>(
+    <span class="doccomment">/// Makes a new `DateTime` from the current date, hour, minute, second and nanosecond.
+    /// The nanosecond part can exceed 1,000,000,000 in order to represent the leap second.
+    /// The offset in the current date is preserved.
+    ///
+    /// Returns `None` on invalid hour, minute, second and/or nanosecond.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_hms_nano_opt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u32</span>,
-        <span class="ident">min</span>: <span class="ident">u32</span>,
-        <span class="ident">sec</span>: <span class="ident">u32</span>,
-        <span class="ident">nano</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">NaiveTime::from_hms_nano_opt</span>(<span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>, <span class="ident">nano</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">time</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">and_time</span>(<span class="ident">time</span>))
+        hour: u32,
+        min: u32,
+        sec: u32,
+        nano: u32,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;DateTime&lt;Tz&gt;&gt; {
+        NaiveTime::from_hms_nano_opt(hour, min, sec, nano).and_then(|time| <span class="self">self</span>.and_time(time))
     }
 
-    <span class="doccomment">/// Makes a new `Date` for the next date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics when `self` is the last representable date.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">succ</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">succ_opt</span>().<span class="ident">expect</span>(<span class="string">&quot;out of bound&quot;</span>)
+    <span class="doccomment">/// Makes a new `Date` for the next date.
+    ///
+    /// Panics when `self` is the last representable date.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>succ(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Date&lt;Tz&gt; {
+        <span class="self">self</span>.succ_opt().expect(<span class="string">&quot;out of bound&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `Date` for the next date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when `self` is the last representable date.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">succ_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">succ_opt</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">Date::from_utc</span>(<span class="ident">date</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">clone</span>()))
+    <span class="doccomment">/// Makes a new `Date` for the next date.
+    ///
+    /// Returns `None` when `self` is the last representable date.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>succ_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        <span class="self">self</span>.date.succ_opt().map(|date| Date::from_utc(date, <span class="self">self</span>.offset.clone()))
     }
 
-    <span class="doccomment">/// Makes a new `Date` for the prior date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics when `self` is the first representable date.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pred</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pred_opt</span>().<span class="ident">expect</span>(<span class="string">&quot;out of bound&quot;</span>)
+    <span class="doccomment">/// Makes a new `Date` for the prior date.
+    ///
+    /// Panics when `self` is the first representable date.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>pred(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Date&lt;Tz&gt; {
+        <span class="self">self</span>.pred_opt().expect(<span class="string">&quot;out of bound&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `Date` for the prior date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when `self` is the first representable date.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pred_opt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">pred_opt</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">Date::from_utc</span>(<span class="ident">date</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">clone</span>()))
+    <span class="doccomment">/// Makes a new `Date` for the prior date.
+    ///
+    /// Returns `None` when `self` is the first representable date.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>pred_opt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        <span class="self">self</span>.date.pred_opt().map(|date| Date::from_utc(date, <span class="self">self</span>.offset.clone()))
     }
 
-    <span class="doccomment">/// Retrieves an associated offset from UTC.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Tz::Offset</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">offset</span>
+    <span class="doccomment">/// Retrieves an associated offset from UTC.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Tz::Offset {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.offset
     }
 
-    <span class="doccomment">/// Retrieves an associated time zone.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timezone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Tz</span> {
-        <span class="ident">TimeZone::from_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">offset</span>)
+    <span class="doccomment">/// Retrieves an associated time zone.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>timezone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Tz {
+        TimeZone::from_offset(<span class="kw-2">&amp;</span><span class="self">self</span>.offset)
     }
 
-    <span class="doccomment">/// Changes the associated time zone.</span>
-    <span class="doccomment">/// This does not change the actual `Date` (but will change the string representation).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_timezone</span><span class="op">&lt;</span><span class="ident">Tz2</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tz</span>: <span class="kw-2">&amp;</span><span class="ident">Tz2</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz2</span><span class="op">&gt;</span> {
-        <span class="ident">tz</span>.<span class="ident">from_utc_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">date</span>)
+    <span class="doccomment">/// Changes the associated time zone.
+    /// This does not change the actual `Date` (but will change the string representation).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>with_timezone&lt;Tz2: TimeZone&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, tz: <span class="kw-2">&amp;</span>Tz2) -&gt; Date&lt;Tz2&gt; {
+        tz.from_utc_date(<span class="kw-2">&amp;</span><span class="self">self</span>.date)
     }
 
-    <span class="doccomment">/// Adds given `Duration` to the current date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when it will result in overflow.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_add_signed</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="macro">try_opt!</span>(<span class="self">self</span>.<span class="ident">date</span>.<span class="ident">checked_add_signed</span>(<span class="ident">rhs</span>));
-        <span class="prelude-val">Some</span>(<span class="ident">Date</span> { <span class="ident">date</span>, <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span> })
+    <span class="doccomment">/// Adds given `Duration` to the current date.
+    ///
+    /// Returns `None` when it will result in overflow.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>checked_add_signed(<span class="self">self</span>, rhs: OldDuration) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        <span class="kw">let </span>date = <span class="macro">try_opt!</span>(<span class="self">self</span>.date.checked_add_signed(rhs));
+        <span class="prelude-val">Some</span>(Date { date, offset: <span class="self">self</span>.offset })
     }
 
-    <span class="doccomment">/// Subtracts given `Duration` from the current date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when it will result in overflow.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_sub_signed</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="macro">try_opt!</span>(<span class="self">self</span>.<span class="ident">date</span>.<span class="ident">checked_sub_signed</span>(<span class="ident">rhs</span>));
-        <span class="prelude-val">Some</span>(<span class="ident">Date</span> { <span class="ident">date</span>, <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span> })
+    <span class="doccomment">/// Subtracts given `Duration` from the current date.
+    ///
+    /// Returns `None` when it will result in overflow.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>checked_sub_signed(<span class="self">self</span>, rhs: OldDuration) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        <span class="kw">let </span>date = <span class="macro">try_opt!</span>(<span class="self">self</span>.date.checked_sub_signed(rhs));
+        <span class="prelude-val">Some</span>(Date { date, offset: <span class="self">self</span>.offset })
     }
 
-    <span class="doccomment">/// Subtracts another `Date` from the current date.</span>
-    <span class="doccomment">/// Returns a `Duration` of integral numbers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does not overflow or underflow at all,</span>
-    <span class="doccomment">/// as all possible output fits in the range of `Duration`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_duration_since</span><span class="op">&lt;</span><span class="ident">Tz2</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz2</span><span class="op">&gt;</span>) -&gt; <span class="ident">OldDuration</span> {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">signed_duration_since</span>(<span class="ident">rhs</span>.<span class="ident">date</span>)
+    <span class="doccomment">/// Subtracts another `Date` from the current date.
+    /// Returns a `Duration` of integral numbers.
+    ///
+    /// This does not overflow or underflow at all,
+    /// as all possible output fits in the range of `Duration`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>signed_duration_since&lt;Tz2: TimeZone&gt;(<span class="self">self</span>, rhs: Date&lt;Tz2&gt;) -&gt; OldDuration {
+        <span class="self">self</span>.date.signed_duration_since(rhs.date)
     }
 
-    <span class="doccomment">/// Returns a view to the naive UTC date.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">naive_utc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NaiveDate</span> {
-        <span class="self">self</span>.<span class="ident">date</span>
+    <span class="doccomment">/// Returns a view to the naive UTC date.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>naive_utc(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NaiveDate {
+        <span class="self">self</span>.date
     }
 
-    <span class="doccomment">/// Returns a view to the naive local date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is technically the same as [`naive_utc`](#method.naive_utc)</span>
-    <span class="doccomment">/// because the offset is restricted to never exceed one day,</span>
-    <span class="doccomment">/// but provided for the consistency.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">naive_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NaiveDate</span> {
-        <span class="self">self</span>.<span class="ident">date</span>
+    <span class="doccomment">/// Returns a view to the naive local date.
+    ///
+    /// This is technically the same as [`naive_utc`](#method.naive_utc)
+    /// because the offset is restricted to never exceed one day,
+    /// but provided for the consistency.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>naive_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NaiveDate {
+        <span class="self">self</span>.date
     }
 
-    <span class="doccomment">/// Returns the number of whole years from the given `base` until `self`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">years_since</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">years</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">year</span>() <span class="op">-</span> <span class="ident">base</span>.<span class="ident">year</span>();
-        <span class="kw">if</span> (<span class="self">self</span>.<span class="ident">month</span>(), <span class="self">self</span>.<span class="ident">day</span>()) <span class="op">&lt;</span> (<span class="ident">base</span>.<span class="ident">month</span>(), <span class="ident">base</span>.<span class="ident">day</span>()) {
-            <span class="ident">years</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Returns the number of whole years from the given `base` until `self`.
+    </span><span class="kw">pub fn </span>years_since(<span class="kw-2">&amp;</span><span class="self">self</span>, base: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>years = <span class="self">self</span>.year() - base.year();
+        <span class="kw">if </span>(<span class="self">self</span>.month(), <span class="self">self</span>.day()) &lt; (base.month(), base.day()) {
+            years -= <span class="number">1</span>;
         }
 
-        <span class="kw">match</span> <span class="ident">years</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="bool-val">true</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">years</span> <span class="kw">as</span> <span class="ident">u32</span>),
-            <span class="bool-val">false</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">match </span>years &gt;= <span class="number">0 </span>{
+            <span class="bool-val">true </span>=&gt; <span class="prelude-val">Some</span>(years <span class="kw">as </span>u32),
+            <span class="bool-val">false </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The minimum possible `Date`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_UTC</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Date</span> { <span class="ident">date</span>: <span class="ident">NaiveDate::MIN</span>, <span class="ident">offset</span>: <span class="ident">Utc</span> };
-    <span class="doccomment">/// The maximum possible `Date`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_UTC</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Date</span> { <span class="ident">date</span>: <span class="ident">NaiveDate::MAX</span>, <span class="ident">offset</span>: <span class="ident">Utc</span> };
+    <span class="doccomment">/// The minimum possible `Date`.
+    </span><span class="kw">pub const </span>MIN_UTC: Date&lt;Utc&gt; = Date { date: NaiveDate::MIN, offset: Utc };
+    <span class="doccomment">/// The maximum possible `Date`.
+    </span><span class="kw">pub const </span>MAX_UTC: Date&lt;Utc&gt; = Date { date: NaiveDate::MAX, offset: Utc };
 }
 
-<span class="doccomment">/// Maps the local date to other date with given conversion function.</span>
-<span class="kw">fn</span> <span class="ident">map_local</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">NaiveDate</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Maps the local date to other date with given conversion function.
+</span><span class="kw">fn </span>map_local&lt;Tz: TimeZone, F&gt;(d: <span class="kw-2">&amp;</span>Date&lt;Tz&gt;, <span class="kw-2">mut </span>f: F) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt;
+<span class="kw">where
+    </span>F: FnMut(NaiveDate) -&gt; <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;,
 {
-    <span class="ident">f</span>(<span class="ident">d</span>.<span class="ident">naive_local</span>()).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">timezone</span>().<span class="ident">from_local_date</span>(<span class="kw-2">&amp;</span><span class="ident">date</span>).<span class="ident">single</span>())
+    f(d.naive_local()).and_then(|date| d.timezone().from_local_date(<span class="kw-2">&amp;</span>date).single())
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tz::Offset</span>: <span class="ident">fmt::Display</span>,
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Date&lt;Tz&gt;
+<span class="kw">where
+    </span>Tz::Offset: fmt::Display,
 {
-    <span class="doccomment">/// Formats the date with the specified formatting items.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_with_items</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-        <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Formats the date with the specified formatting items.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    #[inline]
+    </span><span class="kw">pub fn </span>format_with_items&lt;<span class="lifetime">&#39;a</span>, I, B&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, items: I) -&gt; DelayedFormat&lt;I&gt;
+    <span class="kw">where
+        </span>I: Iterator&lt;Item = B&gt; + Clone,
+        B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">DelayedFormat::new_with_offset</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">naive_local</span>()), <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">offset</span>, <span class="ident">items</span>)
+        DelayedFormat::new_with_offset(<span class="prelude-val">Some</span>(<span class="self">self</span>.naive_local()), <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.offset, items)
     }
 
-    <span class="doccomment">/// Formats the date with the specified format string.</span>
-    <span class="doccomment">/// See the [`crate::format::strftime`] module</span>
-    <span class="doccomment">/// on the supported escape sequences.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use chrono::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let date_time: Date&lt;Utc&gt; = Utc.ymd(2017, 04, 02);</span>
-    <span class="doccomment">/// let formatted = format!(&quot;{}&quot;, date_time.format(&quot;%d/%m/%Y&quot;));</span>
-    <span class="doccomment">/// assert_eq!(formatted, &quot;02/04/2017&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">format_with_items</span>(<span class="ident">StrftimeItems::new</span>(<span class="ident">fmt</span>))
+    <span class="doccomment">/// Formats the date with the specified format string.
+    /// See the [`crate::format::strftime`] module
+    /// on the supported escape sequences.
+    ///
+    /// # Example
+    /// ```rust
+    /// use chrono::prelude::*;
+    ///
+    /// let date_time: Date&lt;Utc&gt; = Utc.ymd(2017, 04, 02);
+    /// let formatted = format!(&quot;{}&quot;, date_time.format(&quot;%d/%m/%Y&quot;));
+    /// assert_eq!(formatted, &quot;02/04/2017&quot;);
+    /// ```
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    #[inline]
+    </span><span class="kw">pub fn </span>format&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; DelayedFormat&lt;StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.format_with_items(StrftimeItems::new(fmt))
     }
 
-    <span class="doccomment">/// Formats the date with the specified formatting items and locale.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_localized_with_items</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">B</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Formats the date with the specified formatting items and locale.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>format_localized_with_items&lt;<span class="lifetime">&#39;a</span>, I, B&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">items</span>: <span class="ident">I</span>,
-        <span class="ident">locale</span>: <span class="ident">Locale</span>,
-    ) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-        <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        items: I,
+        locale: Locale,
+    ) -&gt; DelayedFormat&lt;I&gt;
+    <span class="kw">where
+        </span>I: Iterator&lt;Item = B&gt; + Clone,
+        B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">DelayedFormat::new_with_offset_and_locale</span>(
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">naive_local</span>()),
+        DelayedFormat::new_with_offset_and_locale(
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.naive_local()),
             <span class="prelude-val">None</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">offset</span>,
-            <span class="ident">items</span>,
-            <span class="ident">locale</span>,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.offset,
+            items,
+            locale,
         )
     }
 
-    <span class="doccomment">/// Formats the date with the specified format string and locale.</span>
-    <span class="doccomment">/// See the [`::format::strftime`] module</span>
-    <span class="doccomment">/// on the supported escape sequences.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_localized</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Formats the date with the specified format string and locale.
+    /// See the [`::format::strftime`] module
+    /// on the supported escape sequences.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>format_localized&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">locale</span>: <span class="ident">Locale</span>,
-    ) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">StrftimeItems</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">format_localized_with_items</span>(<span class="ident">StrftimeItems::new_with_locale</span>(<span class="ident">fmt</span>, <span class="ident">locale</span>), <span class="ident">locale</span>)
+        fmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        locale: Locale,
+    ) -&gt; DelayedFormat&lt;StrftimeItems&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.format_localized_with_items(StrftimeItems::new_with_locale(fmt, locale), locale)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Datelike</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">year</span>()
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Datelike <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.naive_local().year()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">month</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">month</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().month()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">month0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">month0</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>month0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().month0()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">day</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">day</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().day()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">day0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">day0</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>day0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().day0()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">ordinal</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().ordinal()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ordinal0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">ordinal0</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ordinal0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.naive_local().ordinal0()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">weekday</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Weekday</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">weekday</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>weekday(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Weekday {
+        <span class="self">self</span>.naive_local().weekday()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">iso_week</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IsoWeek</span> {
-        <span class="self">self</span>.<span class="ident">naive_local</span>().<span class="ident">iso_week</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_year</span>(<span class="ident">year</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>iso_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IsoWeek {
+        <span class="self">self</span>.naive_local().iso_week()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_month</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">month</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_month</span>(<span class="ident">month</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_year(<span class="kw-2">&amp;</span><span class="self">self</span>, year: i32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_year(year))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_month0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">month0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_month0</span>(<span class="ident">month0</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_month(<span class="kw-2">&amp;</span><span class="self">self</span>, month: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_month(month))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_day</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">day</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_day</span>(<span class="ident">day</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_month0(<span class="kw-2">&amp;</span><span class="self">self</span>, month0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_month0(month0))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_day0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">day0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_day0</span>(<span class="ident">day0</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_day(<span class="kw-2">&amp;</span><span class="self">self</span>, day: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_day(day))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_ordinal</span>(<span class="ident">ordinal</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_day0(<span class="kw-2">&amp;</span><span class="self">self</span>, day0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_day0(day0))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_ordinal0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">map_local</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">date</span><span class="op">|</span> <span class="ident">date</span>.<span class="ident">with_ordinal0</span>(<span class="ident">ordinal0</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_ordinal(ordinal))
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>with_ordinal0(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;Date&lt;Tz&gt;&gt; {
+        map_local(<span class="self">self</span>, |date| date.with_ordinal0(ordinal0))
     }
 }
 
-<span class="comment">// we need them as automatic impls cannot handle associated types</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="op">&lt;</span><span class="ident">Tz</span> <span class="kw">as</span> <span class="ident">TimeZone</span><span class="op">&gt;</span><span class="ident">::Offset</span>: <span class="ident">Copy</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="op">&lt;</span><span class="ident">Tz</span> <span class="kw">as</span> <span class="ident">TimeZone</span><span class="op">&gt;</span><span class="ident">::Offset</span>: <span class="ident">Send</span> {}
+<span class="comment">// we need them as automatic impls cannot handle associated types
+</span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; Copy <span class="kw">for </span>Date&lt;Tz&gt; <span class="kw">where </span>&lt;Tz <span class="kw">as </span>TimeZone&gt;::Offset: Copy {}
+<span class="kw">unsafe impl</span>&lt;Tz: TimeZone&gt; Send <span class="kw">for </span>Date&lt;Tz&gt; <span class="kw">where </span>&lt;Tz <span class="kw">as </span>TimeZone&gt;::Offset: Send {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span>, <span class="ident">Tz2</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">date</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">date</span>
+<span class="kw">impl</span>&lt;Tz: TimeZone, Tz2: TimeZone&gt; PartialEq&lt;Date&lt;Tz2&gt;&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Date&lt;Tz2&gt;) -&gt; bool {
+        <span class="self">self</span>.date == other.date
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Eq <span class="kw">for </span>Date&lt;Tz&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">date</span>)
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; PartialOrd <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Date&lt;Tz&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="self">self</span>.date.partial_cmp(<span class="kw-2">&amp;</span>other.date)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">date</span>)
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Ord <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Date&lt;Tz&gt;) -&gt; Ordering {
+        <span class="self">self</span>.date.cmp(<span class="kw-2">&amp;</span>other.date)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">hash</span>(<span class="ident">state</span>)
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; hash::Hash <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">fn </span>hash&lt;H: hash::Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="self">self</span>.date.hash(state)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">OldDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Add&lt;OldDuration&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">type </span>Output = Date&lt;Tz&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_add_signed</span>(<span class="ident">rhs</span>).<span class="ident">expect</span>(<span class="string">&quot;`Date + Duration` overflowed&quot;</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: OldDuration) -&gt; Date&lt;Tz&gt; {
+        <span class="self">self</span>.checked_add_signed(rhs).expect(<span class="string">&quot;`Date + Duration` overflowed&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">AddAssign</span><span class="op">&lt;</span><span class="ident">OldDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) {
-        <span class="self">self</span>.<span class="ident">date</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">checked_add_signed</span>(<span class="ident">rhs</span>).<span class="ident">expect</span>(<span class="string">&quot;`Date + Duration` overflowed&quot;</span>);
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; AddAssign&lt;OldDuration&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: OldDuration) {
+        <span class="self">self</span>.date = <span class="self">self</span>.date.checked_add_signed(rhs).expect(<span class="string">&quot;`Date + Duration` overflowed&quot;</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">OldDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Sub&lt;OldDuration&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">type </span>Output = Date&lt;Tz&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) -&gt; <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_sub_signed</span>(<span class="ident">rhs</span>).<span class="ident">expect</span>(<span class="string">&quot;`Date - Duration` overflowed&quot;</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: OldDuration) -&gt; Date&lt;Tz&gt; {
+        <span class="self">self</span>.checked_sub_signed(rhs).expect(<span class="string">&quot;`Date - Duration` overflowed&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">OldDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">OldDuration</span>) {
-        <span class="self">self</span>.<span class="ident">date</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">checked_sub_signed</span>(<span class="ident">rhs</span>).<span class="ident">expect</span>(<span class="string">&quot;`Date - Duration` overflowed&quot;</span>);
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; SubAssign&lt;OldDuration&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: OldDuration) {
+        <span class="self">self</span>.date = <span class="self">self</span>.date.checked_sub_signed(rhs).expect(<span class="string">&quot;`Date - Duration` overflowed&quot;</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">OldDuration</span>;
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Sub&lt;Date&lt;Tz&gt;&gt; <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">type </span>Output = OldDuration;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>) -&gt; <span class="ident">OldDuration</span> {
-        <span class="self">self</span>.<span class="ident">signed_duration_since</span>(<span class="ident">rhs</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: Date&lt;Tz&gt;) -&gt; OldDuration {
+        <span class="self">self</span>.signed_duration_since(rhs)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}{:?}&quot;</span>, <span class="self">self</span>.<span class="ident">naive_local</span>(), <span class="self">self</span>.<span class="ident">offset</span>)
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; fmt::Debug <span class="kw">for </span>Date&lt;Tz&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{:?}{:?}&quot;</span>, <span class="self">self</span>.naive_local(), <span class="self">self</span>.offset)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Date</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tz::Offset</span>: <span class="ident">fmt::Display</span>,
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; fmt::Display <span class="kw">for </span>Date&lt;Tz&gt;
+<span class="kw">where
+    </span>Tz::Offset: fmt::Display,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">naive_local</span>(), <span class="self">self</span>.<span class="ident">offset</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.naive_local(), <span class="self">self</span>.offset)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Date</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Date;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oldtime::Duration</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FixedOffset</span>, <span class="ident">NaiveDate</span>, <span class="ident">Utc</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::oldtime::Duration;
+    <span class="kw">use crate</span>::{FixedOffset, NaiveDate, Utc};
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;clock&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset</span>::{<span class="ident">Local</span>, <span class="ident">TimeZone</span>};
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;clock&quot;</span>)]
+    </span><span class="kw">use </span><span class="kw">crate</span>::offset::{Local, TimeZone};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;clock&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_years_elapsed</span>() {
-        <span class="kw">const</span> <span class="ident">WEEKS_PER_YEAR</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="number">52.1775</span>;
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;clock&quot;</span>)]
+    </span><span class="kw">fn </span>test_years_elapsed() {
+        <span class="kw">const </span>WEEKS_PER_YEAR: f32 = <span class="number">52.1775</span>;
 
-        <span class="comment">// This is always at least one year because 1 year = 52.1775 weeks.</span>
-        <span class="kw">let</span> <span class="ident">one_year_ago</span> <span class="op">=</span> <span class="ident">Utc::today</span>() <span class="op">-</span> <span class="ident">Duration::weeks</span>((<span class="ident">WEEKS_PER_YEAR</span> <span class="op">*</span> <span class="number">1.5</span>).<span class="ident">ceil</span>() <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="comment">// A bit more than 2 years.</span>
-        <span class="kw">let</span> <span class="ident">two_year_ago</span> <span class="op">=</span> <span class="ident">Utc::today</span>() <span class="op">-</span> <span class="ident">Duration::weeks</span>((<span class="ident">WEEKS_PER_YEAR</span> <span class="op">*</span> <span class="number">2.5</span>).<span class="ident">ceil</span>() <span class="kw">as</span> <span class="ident">i64</span>);
+        <span class="comment">// This is always at least one year because 1 year = 52.1775 weeks.
+        </span><span class="kw">let </span>one_year_ago = Utc::today() - Duration::weeks((WEEKS_PER_YEAR * <span class="number">1.5</span>).ceil() <span class="kw">as </span>i64);
+        <span class="comment">// A bit more than 2 years.
+        </span><span class="kw">let </span>two_year_ago = Utc::today() - Duration::weeks((WEEKS_PER_YEAR * <span class="number">2.5</span>).ceil() <span class="kw">as </span>i64);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Utc::today</span>().<span class="ident">years_since</span>(<span class="ident">one_year_ago</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Utc::today</span>().<span class="ident">years_since</span>(<span class="ident">two_year_ago</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(Utc::today().years_since(one_year_ago), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(Utc::today().years_since(two_year_ago), <span class="prelude-val">Some</span>(<span class="number">2</span>));
 
-        <span class="comment">// If the given DateTime is later than now, the function will always return 0.</span>
-        <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">Utc::today</span>() <span class="op">+</span> <span class="ident">Duration::weeks</span>(<span class="number">12</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Utc::today</span>().<span class="ident">years_since</span>(<span class="ident">future</span>), <span class="prelude-val">None</span>);
+        <span class="comment">// If the given DateTime is later than now, the function will always return 0.
+        </span><span class="kw">let </span>future = Utc::today() + Duration::weeks(<span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(Utc::today().years_since(future), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_add_assign</span>() {
-        <span class="kw">let</span> <span class="ident">naivedate</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Date</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_utc</span>(<span class="ident">naivedate</span>, <span class="ident">Utc</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">date_add</span> <span class="op">=</span> <span class="ident">date</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_add_assign() {
+        <span class="kw">let </span>naivedate = NaiveDate::from_ymd(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
+        <span class="kw">let </span>date = Date::&lt;Utc&gt;::from_utc(naivedate, Utc);
+        <span class="kw">let </span><span class="kw-2">mut </span>date_add = date;
 
-        <span class="ident">date_add</span> <span class="op">+</span><span class="op">=</span> <span class="ident">Duration::days</span>(<span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">date_add</span>, <span class="ident">date</span> <span class="op">+</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        date_add += Duration::days(<span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(date_add, date + Duration::days(<span class="number">5</span>));
 
-        <span class="kw">let</span> <span class="ident">timezone</span> <span class="op">=</span> <span class="ident">FixedOffset::east</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
-        <span class="kw">let</span> <span class="ident">date_add</span> <span class="op">=</span> <span class="ident">date_add</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
+        <span class="kw">let </span>timezone = FixedOffset::east(<span class="number">60 </span>* <span class="number">60</span>);
+        <span class="kw">let </span>date = date.with_timezone(<span class="kw-2">&amp;</span>timezone);
+        <span class="kw">let </span>date_add = date_add.with_timezone(<span class="kw-2">&amp;</span>timezone);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">date_add</span>, <span class="ident">date</span> <span class="op">+</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(date_add, date + Duration::days(<span class="number">5</span>));
 
-        <span class="kw">let</span> <span class="ident">timezone</span> <span class="op">=</span> <span class="ident">FixedOffset::west</span>(<span class="number">2</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
-        <span class="kw">let</span> <span class="ident">date_add</span> <span class="op">=</span> <span class="ident">date_add</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
+        <span class="kw">let </span>timezone = FixedOffset::west(<span class="number">2 </span>* <span class="number">60 </span>* <span class="number">60</span>);
+        <span class="kw">let </span>date = date.with_timezone(<span class="kw-2">&amp;</span>timezone);
+        <span class="kw">let </span>date_add = date_add.with_timezone(<span class="kw-2">&amp;</span>timezone);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">date_add</span>, <span class="ident">date</span> <span class="op">+</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(date_add, date + Duration::days(<span class="number">5</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;clock&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_add_assign_local</span>() {
-        <span class="kw">let</span> <span class="ident">naivedate</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;clock&quot;</span>)]
+    </span><span class="kw">fn </span>test_date_add_assign_local() {
+        <span class="kw">let </span>naivedate = NaiveDate::from_ymd(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Local</span>.<span class="ident">from_utc_date</span>(<span class="kw-2">&amp;</span><span class="ident">naivedate</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">date_add</span> <span class="op">=</span> <span class="ident">date</span>;
+        <span class="kw">let </span>date = Local.from_utc_date(<span class="kw-2">&amp;</span>naivedate);
+        <span class="kw">let </span><span class="kw-2">mut </span>date_add = date;
 
-        <span class="ident">date_add</span> <span class="op">+</span><span class="op">=</span> <span class="ident">Duration::days</span>(<span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">date_add</span>, <span class="ident">date</span> <span class="op">+</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        date_add += Duration::days(<span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(date_add, date + Duration::days(<span class="number">5</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_sub_assign</span>() {
-        <span class="kw">let</span> <span class="ident">naivedate</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Date</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_utc</span>(<span class="ident">naivedate</span>, <span class="ident">Utc</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">date_sub</span> <span class="op">=</span> <span class="ident">date</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_sub_assign() {
+        <span class="kw">let </span>naivedate = NaiveDate::from_ymd(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
+        <span class="kw">let </span>date = Date::&lt;Utc&gt;::from_utc(naivedate, Utc);
+        <span class="kw">let </span><span class="kw-2">mut </span>date_sub = date;
 
-        <span class="ident">date_sub</span> <span class="op">-</span><span class="op">=</span> <span class="ident">Duration::days</span>(<span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">date_sub</span>, <span class="ident">date</span> <span class="op">-</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        date_sub -= Duration::days(<span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(date_sub, date - Duration::days(<span class="number">5</span>));
 
-        <span class="kw">let</span> <span class="ident">timezone</span> <span class="op">=</span> <span class="ident">FixedOffset::east</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
-        <span class="kw">let</span> <span class="ident">date_sub</span> <span class="op">=</span> <span class="ident">date_sub</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
+        <span class="kw">let </span>timezone = FixedOffset::east(<span class="number">60 </span>* <span class="number">60</span>);
+        <span class="kw">let </span>date = date.with_timezone(<span class="kw-2">&amp;</span>timezone);
+        <span class="kw">let </span>date_sub = date_sub.with_timezone(<span class="kw-2">&amp;</span>timezone);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">date_sub</span>, <span class="ident">date</span> <span class="op">-</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(date_sub, date - Duration::days(<span class="number">5</span>));
 
-        <span class="kw">let</span> <span class="ident">timezone</span> <span class="op">=</span> <span class="ident">FixedOffset::west</span>(<span class="number">2</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
-        <span class="kw">let</span> <span class="ident">date_sub</span> <span class="op">=</span> <span class="ident">date_sub</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">timezone</span>);
+        <span class="kw">let </span>timezone = FixedOffset::west(<span class="number">2 </span>* <span class="number">60 </span>* <span class="number">60</span>);
+        <span class="kw">let </span>date = date.with_timezone(<span class="kw-2">&amp;</span>timezone);
+        <span class="kw">let </span>date_sub = date_sub.with_timezone(<span class="kw-2">&amp;</span>timezone);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">date_sub</span>, <span class="ident">date</span> <span class="op">-</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(date_sub, date - Duration::days(<span class="number">5</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;clock&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_sub_assign_local</span>() {
-        <span class="kw">let</span> <span class="ident">naivedate</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;clock&quot;</span>)]
+    </span><span class="kw">fn </span>test_date_sub_assign_local() {
+        <span class="kw">let </span>naivedate = NaiveDate::from_ymd(<span class="number">2000</span>, <span class="number">1</span>, <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">Local</span>.<span class="ident">from_utc_date</span>(<span class="kw-2">&amp;</span><span class="ident">naivedate</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">date_sub</span> <span class="op">=</span> <span class="ident">date</span>;
+        <span class="kw">let </span>date = Local.from_utc_date(<span class="kw-2">&amp;</span>naivedate);
+        <span class="kw">let </span><span class="kw-2">mut </span>date_sub = date;
 
-        <span class="ident">date_sub</span> <span class="op">-</span><span class="op">=</span> <span class="ident">Duration::days</span>(<span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">date_sub</span>, <span class="ident">date</span> <span class="op">-</span> <span class="ident">Duration::days</span>(<span class="number">5</span>));
+        date_sub -= Duration::days(<span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(date_sub, date - Duration::days(<span class="number">5</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

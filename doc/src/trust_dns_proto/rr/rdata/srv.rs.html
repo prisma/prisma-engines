@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/srv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>srv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/srv.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>srv.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -300,279 +300,279 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! service records for identify port mapping for specific services on a host</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="doccomment">//! service records for identify port mapping for specific services on a host
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 2782, DNS SRV RR, February 2000](https://tools.ietf.org/html/rfc2782)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// Introductory example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  If a SRV-cognizant LDAP client wants to discover a LDAP server that</span>
-<span class="doccomment">///  supports TCP protocol and provides LDAP service for the domain</span>
-<span class="doccomment">///  example.com., it does a lookup of</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// _ldap._tcp.example.com</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  as described in [ARM].  The example zone file near the end of this</span>
-<span class="doccomment">///  memo contains answering RRs for an SRV query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Note: LDAP is chosen as an example for illustrative purposes only,</span>
-<span class="doccomment">///  and the LDAP examples used in this document should not be considered</span>
-<span class="doccomment">///  a definitive statement on the recommended way for LDAP to use SRV</span>
-<span class="doccomment">///  records. As described in the earlier applicability section, consult</span>
-<span class="doccomment">///  the appropriate LDAP documents for the recommended procedures.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The format of the SRV RR</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Here is the format of the SRV RR, whose DNS type code is 33:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// _Service._Proto.Name TTL Class SRV Priority Weight Port Target</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// (There is an example near the end of this document.)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Service</span>
-<span class="doccomment">/// The symbolic name of the desired service, as defined in Assigned</span>
-<span class="doccomment">/// Numbers [STD 2] or locally.  An underscore (_) is prepended to</span>
-<span class="doccomment">/// the service identifier to avoid collisions with DNS labels that</span>
-<span class="doccomment">/// occur in nature.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Some widely used services, notably POP, don&#39;t have a single</span>
-<span class="doccomment">/// universal name.  If Assigned Numbers names the service</span>
-<span class="doccomment">/// indicated, that name is the only name which is legal for SRV</span>
-<span class="doccomment">/// lookups.  The Service is case insensitive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Proto</span>
-<span class="doccomment">/// The symbolic name of the desired protocol, with an underscore</span>
-<span class="doccomment">/// (_) prepended to prevent collisions with DNS labels that occur</span>
-<span class="doccomment">/// in nature.  _TCP and _UDP are at present the most useful values</span>
-<span class="doccomment">/// for this field, though any name defined by Assigned Numbers or</span>
-<span class="doccomment">/// locally may be used (as for Service).  The Proto is case</span>
-<span class="doccomment">/// insensitive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Name</span>
-<span class="doccomment">/// The domain this RR refers to.  The SRV RR is unique in that the</span>
-<span class="doccomment">/// name one searches for is not this name; the example near the end</span>
-<span class="doccomment">/// shows this clearly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  TTL</span>
-<span class="doccomment">/// Standard DNS meaning [RFC 1035].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Class</span>
-<span class="doccomment">/// Standard DNS meaning [RFC 1035].   SRV records occur in the IN</span>
-<span class="doccomment">/// Class.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SRV</span> {
-    <span class="ident">priority</span>: <span class="ident">u16</span>,
-    <span class="ident">weight</span>: <span class="ident">u16</span>,
-    <span class="ident">port</span>: <span class="ident">u16</span>,
-    <span class="ident">target</span>: <span class="ident">Name</span>,
+<span class="doccomment">/// [RFC 2782, DNS SRV RR, February 2000](https://tools.ietf.org/html/rfc2782)
+///
+/// ```text
+/// Introductory example
+///
+///  If a SRV-cognizant LDAP client wants to discover a LDAP server that
+///  supports TCP protocol and provides LDAP service for the domain
+///  example.com., it does a lookup of
+///
+/// _ldap._tcp.example.com
+///
+///  as described in [ARM].  The example zone file near the end of this
+///  memo contains answering RRs for an SRV query.
+///
+///  Note: LDAP is chosen as an example for illustrative purposes only,
+///  and the LDAP examples used in this document should not be considered
+///  a definitive statement on the recommended way for LDAP to use SRV
+///  records. As described in the earlier applicability section, consult
+///  the appropriate LDAP documents for the recommended procedures.
+///
+/// The format of the SRV RR
+///
+///  Here is the format of the SRV RR, whose DNS type code is 33:
+///
+/// _Service._Proto.Name TTL Class SRV Priority Weight Port Target
+///
+/// (There is an example near the end of this document.)
+///
+///  Service
+/// The symbolic name of the desired service, as defined in Assigned
+/// Numbers [STD 2] or locally.  An underscore (_) is prepended to
+/// the service identifier to avoid collisions with DNS labels that
+/// occur in nature.
+///
+/// Some widely used services, notably POP, don&#39;t have a single
+/// universal name.  If Assigned Numbers names the service
+/// indicated, that name is the only name which is legal for SRV
+/// lookups.  The Service is case insensitive.
+///
+///  Proto
+/// The symbolic name of the desired protocol, with an underscore
+/// (_) prepended to prevent collisions with DNS labels that occur
+/// in nature.  _TCP and _UDP are at present the most useful values
+/// for this field, though any name defined by Assigned Numbers or
+/// locally may be used (as for Service).  The Proto is case
+/// insensitive.
+///
+///  Name
+/// The domain this RR refers to.  The SRV RR is unique in that the
+/// name one searches for is not this name; the example near the end
+/// shows this clearly.
+///
+///  TTL
+/// Standard DNS meaning [RFC 1035].
+///
+///  Class
+/// Standard DNS meaning [RFC 1035].   SRV records occur in the IN
+/// Class.
+///
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>SRV {
+    priority: u16,
+    weight: u16,
+    port: u16,
+    target: Name,
 }
 
-<span class="kw">impl</span> <span class="ident">SRV</span> {
-    <span class="doccomment">/// Creates a new SRV record data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `priority` - lower values have a higher priority and clients will attempt to use these</span>
-    <span class="doccomment">///                first.</span>
-    <span class="doccomment">/// * `weight` - for servers with the same priority, higher weights will be chosen more often.</span>
-    <span class="doccomment">/// * `port` - the socket port number on which the service is listening.</span>
-    <span class="doccomment">/// * `target` - like CNAME, this is the target domain name to which the service is associated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Return value</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The newly constructed SRV record data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">priority</span>: <span class="ident">u16</span>, <span class="ident">weight</span>: <span class="ident">u16</span>, <span class="ident">port</span>: <span class="ident">u16</span>, <span class="ident">target</span>: <span class="ident">Name</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">priority</span>,
-            <span class="ident">weight</span>,
-            <span class="ident">port</span>,
-            <span class="ident">target</span>,
+<span class="kw">impl </span>SRV {
+    <span class="doccomment">/// Creates a new SRV record data.
+    ///
+    /// # Arguments
+    ///
+    /// * `priority` - lower values have a higher priority and clients will attempt to use these
+    ///                first.
+    /// * `weight` - for servers with the same priority, higher weights will be chosen more often.
+    /// * `port` - the socket port number on which the service is listening.
+    /// * `target` - like CNAME, this is the target domain name to which the service is associated.
+    ///
+    /// # Return value
+    ///
+    /// The newly constructed SRV record data.
+    </span><span class="kw">pub fn </span>new(priority: u16, weight: u16, port: u16, target: Name) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            priority,
+            weight,
+            port,
+            target,
         }
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///  Priority</span>
-    <span class="doccomment">/// The priority of this target host.  A client MUST attempt to</span>
-    <span class="doccomment">/// contact the target host with the lowest-numbered priority it can</span>
-    <span class="doccomment">/// reach; target hosts with the same priority SHOULD be tried in an</span>
-    <span class="doccomment">/// order defined by the weight field.  The range is 0-65535.  This</span>
-    <span class="doccomment">/// is a 16 bit unsigned integer in network byte order.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">priority</span>
+    <span class="doccomment">/// ```text
+    ///  Priority
+    /// The priority of this target host.  A client MUST attempt to
+    /// contact the target host with the lowest-numbered priority it can
+    /// reach; target hosts with the same priority SHOULD be tried in an
+    /// order defined by the weight field.  The range is 0-65535.  This
+    /// is a 16 bit unsigned integer in network byte order.
+    /// ```
+    </span><span class="kw">pub fn </span>priority(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.priority
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///  Weight</span>
-    <span class="doccomment">/// A server selection mechanism.  The weight field specifies a</span>
-    <span class="doccomment">/// relative weight for entries with the same priority. Larger</span>
-    <span class="doccomment">/// weights SHOULD be given a proportionately higher probability of</span>
-    <span class="doccomment">/// being selected. The range of this number is 0-65535.  This is a</span>
-    <span class="doccomment">/// 16 bit unsigned integer in network byte order.  Domain</span>
-    <span class="doccomment">/// administrators SHOULD use Weight 0 when there isn&#39;t any server</span>
-    <span class="doccomment">/// selection to do, to make the RR easier to read for humans (less</span>
-    <span class="doccomment">/// noisy).  In the presence of records containing weights greater</span>
-    <span class="doccomment">/// than 0, records with weight 0 should have a very small chance of</span>
-    <span class="doccomment">/// being selected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the absence of a protocol whose specification calls for the</span>
-    <span class="doccomment">/// use of other weighting information, a client arranges the SRV</span>
-    <span class="doccomment">/// RRs of the same Priority in the order in which target hosts,</span>
-    <span class="doccomment">/// specified by the SRV RRs, will be contacted. The following</span>
-    <span class="doccomment">/// algorithm SHOULD be used to order the SRV RRs of the same</span>
-    <span class="doccomment">/// priority:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To select a target to be contacted next, arrange all SRV RRs</span>
-    <span class="doccomment">/// (that have not been ordered yet) in any order, except that all</span>
-    <span class="doccomment">/// those with weight 0 are placed at the beginning of the list.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Compute the sum of the weights of those RRs, and with each RR</span>
-    <span class="doccomment">/// associate the running sum in the selected order. Then choose a</span>
-    <span class="doccomment">/// uniform random number between 0 and the sum computed</span>
-    <span class="doccomment">/// (inclusive), and select the RR whose running sum value is the</span>
-    <span class="doccomment">/// first in the selected order which is greater than or equal to</span>
-    <span class="doccomment">/// the random number selected. The target host specified in the</span>
-    <span class="doccomment">/// selected SRV RR is the next one to be contacted by the client.</span>
-    <span class="doccomment">/// Remove this SRV RR from the set of the unordered SRV RRs and</span>
-    <span class="doccomment">/// apply the described algorithm to the unordered SRV RRs to select</span>
-    <span class="doccomment">/// the next target host.  Continue the ordering process until there</span>
-    <span class="doccomment">/// are no unordered SRV RRs.  This process is repeated for each</span>
-    <span class="doccomment">/// Priority.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">weight</span>
+    <span class="doccomment">/// ```text
+    ///  Weight
+    /// A server selection mechanism.  The weight field specifies a
+    /// relative weight for entries with the same priority. Larger
+    /// weights SHOULD be given a proportionately higher probability of
+    /// being selected. The range of this number is 0-65535.  This is a
+    /// 16 bit unsigned integer in network byte order.  Domain
+    /// administrators SHOULD use Weight 0 when there isn&#39;t any server
+    /// selection to do, to make the RR easier to read for humans (less
+    /// noisy).  In the presence of records containing weights greater
+    /// than 0, records with weight 0 should have a very small chance of
+    /// being selected.
+    ///
+    /// In the absence of a protocol whose specification calls for the
+    /// use of other weighting information, a client arranges the SRV
+    /// RRs of the same Priority in the order in which target hosts,
+    /// specified by the SRV RRs, will be contacted. The following
+    /// algorithm SHOULD be used to order the SRV RRs of the same
+    /// priority:
+    ///
+    /// To select a target to be contacted next, arrange all SRV RRs
+    /// (that have not been ordered yet) in any order, except that all
+    /// those with weight 0 are placed at the beginning of the list.
+    ///
+    /// Compute the sum of the weights of those RRs, and with each RR
+    /// associate the running sum in the selected order. Then choose a
+    /// uniform random number between 0 and the sum computed
+    /// (inclusive), and select the RR whose running sum value is the
+    /// first in the selected order which is greater than or equal to
+    /// the random number selected. The target host specified in the
+    /// selected SRV RR is the next one to be contacted by the client.
+    /// Remove this SRV RR from the set of the unordered SRV RRs and
+    /// apply the described algorithm to the unordered SRV RRs to select
+    /// the next target host.  Continue the ordering process until there
+    /// are no unordered SRV RRs.  This process is repeated for each
+    /// Priority.
+    /// ```
+    </span><span class="kw">pub fn </span>weight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.weight
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///  Port</span>
-    <span class="doccomment">/// The port on this target host of this service.  The range is 0-</span>
-    <span class="doccomment">/// 65535.  This is a 16 bit unsigned integer in network byte order.</span>
-    <span class="doccomment">/// This is often as specified in Assigned Numbers but need not be.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">port</span>
+    <span class="doccomment">/// ```text
+    ///  Port
+    /// The port on this target host of this service.  The range is 0-
+    /// 65535.  This is a 16 bit unsigned integer in network byte order.
+    /// This is often as specified in Assigned Numbers but need not be.
+    ///
+    /// ```
+    </span><span class="kw">pub fn </span>port(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.port
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///  Target</span>
-    <span class="doccomment">/// The domain name of the target host.  There MUST be one or more</span>
-    <span class="doccomment">/// address records for this name, the name MUST NOT be an alias (in</span>
-    <span class="doccomment">/// the sense of RFC 1034 or RFC 2181).  Implementors are urged, but</span>
-    <span class="doccomment">/// not required, to return the address record(s) in the Additional</span>
-    <span class="doccomment">/// Data section.  Unless and until permitted by future standards</span>
-    <span class="doccomment">/// action, name compression is not to be used for this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A Target of &quot;.&quot; means that the service is decidedly not</span>
-    <span class="doccomment">/// available at this domain.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span>
+    <span class="doccomment">/// ```text
+    ///  Target
+    /// The domain name of the target host.  There MUST be one or more
+    /// address records for this name, the name MUST NOT be an alias (in
+    /// the sense of RFC 1034 or RFC 2181).  Implementors are urged, but
+    /// not required, to return the address record(s) in the Additional
+    /// Data section.  Unless and until permitted by future standards
+    /// action, name compression is not to be used for this field.
+    ///
+    /// A Target of &quot;.&quot; means that the service is decidedly not
+    /// available at this domain.
+    /// ```
+    </span><span class="kw">pub fn </span>target(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.target
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">SRV</span><span class="op">&gt;</span> {
-    <span class="comment">// SRV { priority: u16, weight: u16, port: u16, target: Name, },</span>
-    <span class="prelude-val">Ok</span>(<span class="ident">SRV::new</span>(
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>,
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;SRV&gt; {
+    <span class="comment">// SRV { priority: u16, weight: u16, port: u16, target: Name, },
+    </span><span class="prelude-val">Ok</span>(SRV::new(
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        Name::read(decoder)<span class="question-mark">?</span>,
     ))
 }
 
-<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is accurate for all currently known name records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 6.2.  Canonical RR Form</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For the purposes of DNS security, the canonical form of an RR is the</span>
-<span class="doccomment">///    wire format of the RR where:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    ...</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,</span>
-<span class="doccomment">///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,</span>
-<span class="doccomment">///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase</span>
-<span class="doccomment">///        US-ASCII letters in the DNS names contained within the RDATA are replaced</span>
-<span class="doccomment">///        by the corresponding lowercase US-ASCII letters;</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">srv</span>: <span class="kw-2">&amp;</span><span class="ident">SRV</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
+<span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005
+///
+/// This is accurate for all currently known name records.
+///
+/// ```text
+/// 6.2.  Canonical RR Form
+///
+///    For the purposes of DNS security, the canonical form of an RR is the
+///    wire format of the RR where:
+///
+///    ...
+///
+///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,
+///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,
+///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase
+///        US-ASCII letters in the DNS names contained within the RDATA are replaced
+///        by the corresponding lowercase US-ASCII letters;
+/// ```
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, srv: <span class="kw-2">&amp;</span>SRV) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">let </span>is_canonical_names = encoder.is_canonical_names();
 
-    <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">srv</span>.<span class="ident">priority</span>())<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">srv</span>.<span class="ident">weight</span>())<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">srv</span>.<span class="ident">port</span>())<span class="question-mark">?</span>;
-    <span class="ident">srv</span>.<span class="ident">target</span>()
-        .<span class="ident">emit_with_lowercase</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)<span class="question-mark">?</span>;
+    encoder.emit_u16(srv.priority())<span class="question-mark">?</span>;
+    encoder.emit_u16(srv.weight())<span class="question-mark">?</span>;
+    encoder.emit_u16(srv.port())<span class="question-mark">?</span>;
+    srv.target()
+        .emit_with_lowercase(encoder, is_canonical_names)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// [RFC 2782, DNS SRV RR, February 2000](https://tools.ietf.org/html/rfc2782)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// The format of the SRV RR</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Here is the format of the SRV RR, whose DNS type code is 33:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   _Service._Proto.Name TTL Class SRV Priority Weight Port Target</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   (There is an example near the end of this document.)</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SRV</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="doccomment">/// [RFC 2782, DNS SRV RR, February 2000](https://tools.ietf.org/html/rfc2782)
+///
+/// ```text
+/// The format of the SRV RR
+///
+///   Here is the format of the SRV RR, whose DNS type code is 33:
+///
+///   _Service._Proto.Name TTL Class SRV Priority Weight Port Target
+///
+///   (There is an example near the end of this document.)
+/// ```
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>SRV {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{priority} {weight} {port} {target}&quot;</span>,
-            <span class="ident">priority</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">priority</span>,
-            <span class="ident">weight</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">weight</span>,
-            <span class="ident">port</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">port</span>,
-            <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span>,
+            priority = <span class="self">self</span>.priority,
+            weight = <span class="self">self</span>.weight,
+            port = <span class="self">self</span>.port,
+            target = <span class="self">self</span>.target,
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">use </span>std::str::FromStr;
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">SRV::new</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="ident">Name::from_str</span>(<span class="string">&quot;_dns._tcp.example.com&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let </span>rdata = SRV::new(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, Name::from_str(<span class="string">&quot;_dns._tcp.example.com&quot;</span>).unwrap());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
 
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

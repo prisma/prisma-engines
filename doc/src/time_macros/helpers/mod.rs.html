@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/helpers/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/helpers/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -134,141 +134,141 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">string</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>string;
 
-<span class="kw">use</span> <span class="ident">std::iter::Peekable</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="kw">use </span>std::iter::Peekable;
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">token_stream</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
+<span class="kw">use </span>proc_macro::{token_stream, Span, TokenStream, TokenTree};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_string_literal</span>(<span class="ident">tokens</span>: <span class="ident">TokenStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Span</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">tokens</span>.<span class="ident">into_iter</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_string_literal(tokens: TokenStream) -&gt; <span class="prelude-ty">Result</span>&lt;(Span, Vec&lt;u8&gt;), Error&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = tokens.into_iter();
 
-    <span class="kw">match</span> (<span class="ident">tokens</span>.<span class="ident">next</span>(), <span class="ident">tokens</span>.<span class="ident">next</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">literal</span>)), <span class="prelude-val">None</span>) =&gt; <span class="ident">string::parse</span>(<span class="kw-2">&amp;</span><span class="ident">literal</span>),
-        (<span class="prelude-val">Some</span>(<span class="ident">tree</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedString</span> {
-            <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">tree</span>.<span class="ident">span</span>()),
-            <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">tree</span>.<span class="ident">span</span>()),
+    <span class="kw">match </span>(tokens.next(), tokens.next()) {
+        (<span class="prelude-val">Some</span>(TokenTree::Literal(literal)), <span class="prelude-val">None</span>) =&gt; string::parse(<span class="kw-2">&amp;</span>literal),
+        (<span class="prelude-val">Some</span>(tree), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(Error::ExpectedString {
+            span_start: <span class="prelude-val">Some</span>(tree.span()),
+            span_end: <span class="prelude-val">Some</span>(tree.span()),
         }),
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">tree</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedToken</span> { <span class="ident">tree</span> }),
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedString</span> {
-            <span class="ident">span_start</span>: <span class="prelude-val">None</span>,
-            <span class="ident">span_end</span>: <span class="prelude-val">None</span>,
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(tree)) =&gt; <span class="prelude-val">Err</span>(Error::UnexpectedToken { tree }),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(Error::ExpectedString {
+            span_start: <span class="prelude-val">None</span>,
+            span_end: <span class="prelude-val">None</span>,
         }),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">consume_number</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(
-    <span class="ident">component_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="ident">chars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Span</span>, <span class="ident">T</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">span</span>, <span class="ident">digits</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">literal</span>)) =&gt; (<span class="ident">literal</span>.<span class="ident">span</span>(), <span class="ident">literal</span>.<span class="ident">to_string</span>()),
-        <span class="prelude-val">Some</span>(<span class="ident">tree</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedToken</span> { <span class="ident">tree</span> }),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEndOfInput</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>consume_number&lt;T: FromStr&gt;(
+    component_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    chars: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(Span, T), Error&gt; {
+    <span class="kw">let </span>(span, digits) = <span class="kw">match </span>chars.next() {
+        <span class="prelude-val">Some</span>(TokenTree::Literal(literal)) =&gt; (literal.span(), literal.to_string()),
+        <span class="prelude-val">Some</span>(tree) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnexpectedToken { tree }),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::UnexpectedEndOfInput),
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">digits</span>.<span class="ident">replace</span>(<span class="string">&#39;_&#39;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">parse</span>() {
-        <span class="prelude-val">Ok</span>((<span class="ident">span</span>, <span class="ident">value</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-            <span class="ident">name</span>: <span class="ident">component_name</span>,
-            <span class="ident">value</span>: <span class="ident">digits</span>,
-            <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">span</span>),
-            <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">span</span>),
+    <span class="kw">if let </span><span class="prelude-val">Ok</span>(value) = digits.replace(<span class="string">&#39;_&#39;</span>, <span class="string">&quot;&quot;</span>).parse() {
+        <span class="prelude-val">Ok</span>((span, value))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Error::InvalidComponent {
+            name: component_name,
+            value: digits,
+            span_start: <span class="prelude-val">Some</span>(span),
+            span_end: <span class="prelude-val">Some</span>(span),
         })
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">consume_any_ident</span>(
-    <span class="ident">idents</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">chars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Span</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">peek</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Ident</span>(<span class="ident">char</span>)) <span class="kw">if</span> <span class="ident">idents</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">char</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>()) =&gt; {
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="ident">char</span>.<span class="ident">span</span>());
-            <span class="ident">drop</span>(<span class="ident">chars</span>.<span class="ident">next</span>());
-            <span class="ident">ret</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>consume_any_ident(
+    idents: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    chars: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Span, Error&gt; {
+    <span class="kw">match </span>chars.peek() {
+        <span class="prelude-val">Some</span>(TokenTree::Ident(char)) <span class="kw">if </span>idents.contains(<span class="kw-2">&amp;</span>char.to_string().as_str()) =&gt; {
+            <span class="kw">let </span>ret = <span class="prelude-val">Ok</span>(char.span());
+            drop(chars.next());
+            ret
         }
-        <span class="prelude-val">Some</span>(<span class="ident">tree</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedToken</span> { <span class="ident">tree</span>: <span class="ident">tree</span>.<span class="ident">clone</span>() }),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEndOfInput</span>),
+        <span class="prelude-val">Some</span>(tree) =&gt; <span class="prelude-val">Err</span>(Error::UnexpectedToken { tree: tree.clone() }),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::UnexpectedEndOfInput),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">consume_punct</span>(
-    <span class="ident">c</span>: <span class="ident">char</span>,
-    <span class="ident">chars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Span</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">peek</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Punct</span>(<span class="ident">punct</span>)) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">punct</span> <span class="op">==</span> <span class="ident">c</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="ident">punct</span>.<span class="ident">span</span>());
-            <span class="ident">drop</span>(<span class="ident">chars</span>.<span class="ident">next</span>());
-            <span class="ident">ret</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>consume_punct(
+    c: char,
+    chars: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Span, Error&gt; {
+    <span class="kw">match </span>chars.peek() {
+        <span class="prelude-val">Some</span>(TokenTree::Punct(punct)) <span class="kw">if </span><span class="kw-2">*</span>punct == c =&gt; {
+            <span class="kw">let </span>ret = <span class="prelude-val">Ok</span>(punct.span());
+            drop(chars.next());
+            ret
         }
-        <span class="prelude-val">Some</span>(<span class="ident">tree</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedToken</span> { <span class="ident">tree</span>: <span class="ident">tree</span>.<span class="ident">clone</span>() }),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEndOfInput</span>),
+        <span class="prelude-val">Some</span>(tree) =&gt; <span class="prelude-val">Err</span>(Error::UnexpectedToken { tree: tree.clone() }),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::UnexpectedEndOfInput),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">year</span> <span class="op">%</span> <span class="number">4</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> ((<span class="ident">year</span> <span class="op">%</span> <span class="number">100</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">year</span> <span class="op">%</span> <span class="number">400</span> <span class="op">==</span> <span class="number">0</span>))
+<span class="kw">fn </span>is_leap_year(year: i32) -&gt; bool {
+    (year % <span class="number">4 </span>== <span class="number">0</span>) &amp;&amp; ((year % <span class="number">100 </span>!= <span class="number">0</span>) || (year % <span class="number">400 </span>== <span class="number">0</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">jan_weekday</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">ordinal</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u8</span> {
-    <span class="macro">macro_rules!</span> <span class="ident">div_floor</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) =&gt; {{
-            <span class="kw">let</span> (<span class="ident">_quotient</span>, <span class="ident">_remainder</span>) <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">%</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>);
-            <span class="kw">if</span> (<span class="ident">_remainder</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">&lt;</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">_remainder</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">&gt;</span> <span class="number">0</span>) {
-                <span class="ident">_quotient</span> <span class="op">-</span> <span class="number">1</span>
-            } <span class="kw">else</span> {
-                <span class="ident">_quotient</span>
+<span class="kw">fn </span>jan_weekday(year: i32, ordinal: i32) -&gt; u8 {
+    <span class="macro">macro_rules! </span>div_floor {
+        (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$b</span>:expr) =&gt; {{
+            <span class="kw">let </span>(_quotient, _remainder) = (<span class="macro-nonterminal">$a </span>/ <span class="macro-nonterminal">$b</span>, <span class="macro-nonterminal">$a </span>% <span class="macro-nonterminal">$b</span>);
+            <span class="kw">if </span>(_remainder &gt; <span class="number">0 </span>&amp;&amp; <span class="macro-nonterminal">$b </span>&lt; <span class="number">0</span>) || (_remainder &lt; <span class="number">0 </span>&amp;&amp; <span class="macro-nonterminal">$b </span>&gt; <span class="number">0</span>) {
+                _quotient - <span class="number">1
+            </span>} <span class="kw">else </span>{
+                _quotient
             }
         }};
     }
 
-    <span class="kw">let</span> <span class="ident">adj_year</span> <span class="op">=</span> <span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>;
-    ((<span class="ident">ordinal</span> <span class="op">+</span> <span class="ident">adj_year</span> <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">4</span>) <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">100</span>)
-        <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">400</span>)
-        <span class="op">+</span> <span class="number">6</span>)
-    .<span class="ident">rem_euclid</span>(<span class="number">7</span>)) <span class="kw">as</span> <span class="kw">_</span>
+    <span class="kw">let </span>adj_year = year - <span class="number">1</span>;
+    ((ordinal + adj_year + <span class="macro">div_floor!</span>(adj_year, <span class="number">4</span>) - <span class="macro">div_floor!</span>(adj_year, <span class="number">100</span>)
+        + <span class="macro">div_floor!</span>(adj_year, <span class="number">400</span>)
+        + <span class="number">6</span>)
+    .rem_euclid(<span class="number">7</span>)) <span class="kw">as _
+</span>}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>days_in_year(year: i32) -&gt; u16 {
+    <span class="number">365 </span>+ is_leap_year(year) <span class="kw">as </span>u16
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u16</span> {
-    <span class="number">365</span> <span class="op">+</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>) <span class="kw">as</span> <span class="ident">u16</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>days_in_year_month(year: i32, month: u8) -&gt; u8 {
+    [<span class="number">31</span>, <span class="number">28</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>][month <span class="kw">as </span>usize - <span class="number">1</span>]
+        + (month == <span class="number">2 </span>&amp;&amp; is_leap_year(year)) <span class="kw">as </span>u8
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">days_in_year_month</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">month</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span> {
-    [<span class="number">31</span>, <span class="number">28</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>][<span class="ident">month</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]
-        <span class="op">+</span> (<span class="ident">month</span> <span class="op">==</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>)) <span class="kw">as</span> <span class="ident">u8</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>weeks_in_year(year: i32) -&gt; u8 {
+    <span class="number">52 </span>+ (jan_weekday(year, <span class="number">1</span>) + is_leap_year(year) <span class="kw">as </span>u8 == <span class="number">3</span>) <span class="kw">as </span>u8
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">weeks_in_year</span>(<span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="ident">u8</span> {
-    <span class="number">52</span> <span class="op">+</span> (<span class="ident">jan_weekday</span>(<span class="ident">year</span>, <span class="number">1</span>) <span class="op">+</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">==</span> <span class="number">3</span>) <span class="kw">as</span> <span class="ident">u8</span>
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ywd_to_yo(year: i32, week: u8, iso_weekday_number: u8) -&gt; (i32, u16) {
+    <span class="kw">let </span>(ordinal, overflow) = (u16::from(week) * <span class="number">7 </span>+ u16::from(iso_weekday_number))
+        .overflowing_sub(u16::from(jan_weekday(year, <span class="number">4</span>)) + <span class="number">4</span>);
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ywd_to_yo</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">week</span>: <span class="ident">u8</span>, <span class="ident">iso_weekday_number</span>: <span class="ident">u8</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u16</span>) {
-    <span class="kw">let</span> (<span class="ident">ordinal</span>, <span class="ident">overflow</span>) <span class="op">=</span> (<span class="ident">u16::from</span>(<span class="ident">week</span>) <span class="op">*</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">u16::from</span>(<span class="ident">iso_weekday_number</span>))
-        .<span class="ident">overflowing_sub</span>(<span class="ident">u16::from</span>(<span class="ident">jan_weekday</span>(<span class="ident">year</span>, <span class="number">4</span>)) <span class="op">+</span> <span class="number">4</span>);
-
-    <span class="kw">if</span> <span class="ident">overflow</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ordinal</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> (<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>, (<span class="ident">ordinal</span>.<span class="ident">wrapping_add</span>(<span class="ident">days_in_year</span>(<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>))));
+    <span class="kw">if </span>overflow || ordinal == <span class="number">0 </span>{
+        <span class="kw">return </span>(year - <span class="number">1</span>, (ordinal.wrapping_add(days_in_year(year - <span class="number">1</span>))));
     }
 
-    <span class="kw">let</span> <span class="ident">days_in_cur_year</span> <span class="op">=</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>);
-    <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days_in_cur_year</span> {
-        (<span class="ident">year</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days_in_cur_year</span>)
-    } <span class="kw">else</span> {
-        (<span class="ident">year</span>, <span class="ident">ordinal</span>)
+    <span class="kw">let </span>days_in_cur_year = days_in_year(year);
+    <span class="kw">if </span>ordinal &gt; days_in_cur_year {
+        (year + <span class="number">1</span>, ordinal - days_in_cur_year)
+    } <span class="kw">else </span>{
+        (year, ordinal)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ymd_to_yo</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">month</span>: <span class="ident">u8</span>, <span class="ident">day</span>: <span class="ident">u8</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u16</span>) {
-    <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">31</span>, <span class="number">59</span>, <span class="number">90</span>, <span class="number">120</span>, <span class="number">151</span>, <span class="number">181</span>, <span class="number">212</span>, <span class="number">243</span>, <span class="number">273</span>, <span class="number">304</span>, <span class="number">334</span>][<span class="ident">month</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]
-        <span class="op">+</span> (<span class="ident">month</span> <span class="op">&gt;</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>)) <span class="kw">as</span> <span class="ident">u16</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ymd_to_yo(year: i32, month: u8, day: u8) -&gt; (i32, u16) {
+    <span class="kw">let </span>ordinal = [<span class="number">0</span>, <span class="number">31</span>, <span class="number">59</span>, <span class="number">90</span>, <span class="number">120</span>, <span class="number">151</span>, <span class="number">181</span>, <span class="number">212</span>, <span class="number">243</span>, <span class="number">273</span>, <span class="number">304</span>, <span class="number">334</span>][month <span class="kw">as </span>usize - <span class="number">1</span>]
+        + (month &gt; <span class="number">2 </span>&amp;&amp; is_leap_year(year)) <span class="kw">as </span>u16;
 
-    (<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="op">+</span> <span class="ident">u16::from</span>(<span class="ident">day</span>))
+    (year, ordinal + u16::from(day))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty_assertions-0.6.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_assertions/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pretty_assertions/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pretty_assertions/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty_assertions-0.6.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_assertions/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pretty_assertions/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pretty_assertions/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -192,168 +192,168 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # Pretty Assertions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When writing tests in Rust, you&#39;ll probably use `assert_eq!(a, b)` _a lot_.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If such a test fails, it will present all the details of `a` and `b`.</span>
-<span class="doccomment">//! But you have to spot the differences yourself, which is not always straightforward,</span>
-<span class="doccomment">//! like here:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ![standard assertion](https://raw.githubusercontent.com/colin-kiegel/rust-pretty-assertions/1a7feb17e1dfbeabfac91b0d5a9cb78dfb1bc065/examples/standard_assertion.png)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Wouldn&#39;t that task be _much_ easier with a colorful diff?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ![pretty assertion](https://raw.githubusercontent.com/colin-kiegel/rust-pretty-assertions/1a7feb17e1dfbeabfac91b0d5a9cb78dfb1bc065/examples/pretty_assertion.png)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Yep — and you only need **one line of code** to make it happen:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! use pretty_assertions::{assert_eq, assert_ne};</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;details&gt;</span>
-<span class="doccomment">//! &lt;summary&gt;Show the example behind the screenshots above.&lt;/summary&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! // 1. add the `pretty_assertions` dependency to `Cargo.toml`.</span>
-<span class="doccomment">//! // 2. insert this line at the top of each module, as needed</span>
-<span class="doccomment">//! use pretty_assertions::{assert_eq, assert_ne};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     #[derive(Debug, PartialEq)]</span>
-<span class="doccomment">//!     struct Foo {</span>
-<span class="doccomment">//!         lorem: &amp;&#39;static str,</span>
-<span class="doccomment">//!         ipsum: u32,</span>
-<span class="doccomment">//!         dolor: Result&lt;String, String&gt;,</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let x = Some(Foo { lorem: &quot;Hello World!&quot;, ipsum: 42, dolor: Ok(&quot;hey&quot;.to_string())});</span>
-<span class="doccomment">//!     let y = Some(Foo { lorem: &quot;Hello Wrold!&quot;, ipsum: 42, dolor: Ok(&quot;hey ho!&quot;.to_string())});</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     assert_eq!(x, y);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! &lt;/details&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Tip</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Specify it as [`[dev-dependencies]`](http://doc.crates.io/specifying-dependencies.html#development-dependencies)</span>
-<span class="doccomment">//! and it will only be used for compiling tests, examples, and benchmarks.</span>
-<span class="doccomment">//! This way the compile time of `cargo build` won&#39;t be affected!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Also add `#[cfg(test)]` to your `use` statements, like this:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust,ignore</span>
-<span class="doccomment">//! #[cfg(test)]</span>
-<span class="doccomment">//! use pretty_assertions::{assert_eq, assert_ne};</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Note</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * Since `Rust 2018` edition, you need to declare</span>
-<span class="doccomment">//!   `use pretty_assertions::{assert_eq, assert_ne};` per module.</span>
-<span class="doccomment">//!   Before you would write `#[macro_use] extern crate pretty_assertions;`.</span>
-<span class="doccomment">//! * The replacement is only effective in your own crate, not in other libraries</span>
-<span class="doccomment">//!   you include.</span>
-<span class="doccomment">//! * `assert_ne` is also switched to multi-line presentation, but does _not_ show</span>
-<span class="doccomment">//!   a diff.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # Pretty Assertions
+//!
+//! When writing tests in Rust, you&#39;ll probably use `assert_eq!(a, b)` _a lot_.
+//!
+//! If such a test fails, it will present all the details of `a` and `b`.
+//! But you have to spot the differences yourself, which is not always straightforward,
+//! like here:
+//!
+//! ![standard assertion](https://raw.githubusercontent.com/colin-kiegel/rust-pretty-assertions/1a7feb17e1dfbeabfac91b0d5a9cb78dfb1bc065/examples/standard_assertion.png)
+//!
+//! Wouldn&#39;t that task be _much_ easier with a colorful diff?
+//!
+//! ![pretty assertion](https://raw.githubusercontent.com/colin-kiegel/rust-pretty-assertions/1a7feb17e1dfbeabfac91b0d5a9cb78dfb1bc065/examples/pretty_assertion.png)
+//!
+//! Yep — and you only need **one line of code** to make it happen:
+//!
+//! ```rust,ignore
+//! use pretty_assertions::{assert_eq, assert_ne};
+//! ```
+//!
+//! &lt;details&gt;
+//! &lt;summary&gt;Show the example behind the screenshots above.&lt;/summary&gt;
+//!
+//! ```rust,ignore
+//! // 1. add the `pretty_assertions` dependency to `Cargo.toml`.
+//! // 2. insert this line at the top of each module, as needed
+//! use pretty_assertions::{assert_eq, assert_ne};
+//!
+//! fn main() {
+//!     #[derive(Debug, PartialEq)]
+//!     struct Foo {
+//!         lorem: &amp;&#39;static str,
+//!         ipsum: u32,
+//!         dolor: Result&lt;String, String&gt;,
+//!     }
+//!
+//!     let x = Some(Foo { lorem: &quot;Hello World!&quot;, ipsum: 42, dolor: Ok(&quot;hey&quot;.to_string())});
+//!     let y = Some(Foo { lorem: &quot;Hello Wrold!&quot;, ipsum: 42, dolor: Ok(&quot;hey ho!&quot;.to_string())});
+//!
+//!     assert_eq!(x, y);
+//! }
+//! ```
+//! &lt;/details&gt;
+//!
+//! ## Tip
+//!
+//! Specify it as [`[dev-dependencies]`](http://doc.crates.io/specifying-dependencies.html#development-dependencies)
+//! and it will only be used for compiling tests, examples, and benchmarks.
+//! This way the compile time of `cargo build` won&#39;t be affected!
+//!
+//! Also add `#[cfg(test)]` to your `use` statements, like this:
+//!
+//! ```rust,ignore
+//! #[cfg(test)]
+//! use pretty_assertions::{assert_eq, assert_ne};
+//! ```
+//!
+//! ## Note
+//!
+//! * Since `Rust 2018` edition, you need to declare
+//!   `use pretty_assertions::{assert_eq, assert_ne};` per module.
+//!   Before you would write `#[macro_use] extern crate pretty_assertions;`.
+//! * The replacement is only effective in your own crate, not in other libraries
+//!   you include.
+//! * `assert_ne` is also switched to multi-line presentation, but does _not_ show
+//!   a diff.
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ansi_term</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">difference</span>;
+</span><span class="kw">extern crate </span>ansi_term;
+<span class="kw">extern crate </span>difference;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ctor</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">output_vt100</span>;
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">extern crate </span>ctor;
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">extern crate </span>output_vt100;
 
-<span class="kw">mod</span> <span class="ident">format_changeset</span>;
+<span class="kw">mod </span>format_changeset;
 
-<span class="kw">use</span> <span class="ident">difference::Changeset</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>};
+<span class="kw">use </span>difference::Changeset;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug, Display};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_changeset::format_changeset</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ansi_term::Style</span>;
+<span class="kw">use </span><span class="kw">crate</span>::format_changeset::format_changeset;
+<span class="kw">pub use </span>ansi_term::Style;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">use</span> <span class="ident">ctor</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="attribute">#[<span class="ident">ctor</span>]</span>
-<span class="kw">fn</span> <span class="ident">init</span>() {
-    <span class="ident">output_vt100::try_init</span>().<span class="ident">ok</span>(); <span class="comment">// Do not panic on fail</span>
-}
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">use </span>ctor::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(windows)]
+#[ctor]
+</span><span class="kw">fn </span>init() {
+    output_vt100::try_init().ok(); <span class="comment">// Do not panic on fail
+</span>}
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Comparison</span>(<span class="ident">Changeset</span>);
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub struct </span>Comparison(Changeset);
 
-<span class="kw">impl</span> <span class="ident">Comparison</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">TLeft</span>: <span class="ident">Debug</span>, <span class="ident">TRight</span>: <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">left</span>: <span class="kw-2">&amp;</span><span class="ident">TLeft</span>, <span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">TRight</span>) -&gt; <span class="ident">Comparison</span> {
-        <span class="kw">let</span> <span class="ident">left_dbg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="kw-2">*</span><span class="ident">left</span>);
-        <span class="kw">let</span> <span class="ident">right_dbg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="kw-2">*</span><span class="ident">right</span>);
-        <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="kw-2">&amp;</span><span class="ident">left_dbg</span>, <span class="kw-2">&amp;</span><span class="ident">right_dbg</span>, <span class="string">&quot;\n&quot;</span>);
+<span class="kw">impl </span>Comparison {
+    <span class="kw">pub fn </span>new&lt;TLeft: Debug, TRight: Debug&gt;(left: <span class="kw-2">&amp;</span>TLeft, right: <span class="kw-2">&amp;</span>TRight) -&gt; Comparison {
+        <span class="kw">let </span>left_dbg = <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="kw-2">*</span>left);
+        <span class="kw">let </span>right_dbg = <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="kw-2">*</span>right);
+        <span class="kw">let </span>changeset = Changeset::new(<span class="kw-2">&amp;</span>left_dbg, <span class="kw-2">&amp;</span>right_dbg, <span class="string">&quot;\n&quot;</span>);
 
-        <span class="ident">Comparison</span>(<span class="ident">changeset</span>)
+        Comparison(changeset)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Comparison</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">format_changeset</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>Comparison {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        format_changeset(f, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_eq</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>,) =&gt; ({
-        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>)
+<span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_eq {
+    (<span class="macro-nonterminal">$left</span>:expr , <span class="macro-nonterminal">$right</span>:expr,) =&gt; ({
+        <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$left</span>, <span class="macro-nonterminal">$right</span>)
     });
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>) =&gt; ({
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>)) {
-            (<span class="ident">left_val</span>, <span class="ident">right_val</span>) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">*</span><span class="ident">left_val</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">right_val</span>) {
+    (<span class="macro-nonterminal">$left</span>:expr , <span class="macro-nonterminal">$right</span>:expr) =&gt; ({
+        <span class="kw">match </span>(<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$right</span>)) {
+            (left_val, right_val) =&gt; {
+                <span class="kw">if </span>!(<span class="kw-2">*</span>left_val == <span class="kw-2">*</span>right_val) {
                     <span class="macro">panic!</span>(<span class="string">&quot;assertion failed: `(left == right)`\
                           \n\
                           \n{}\
                           \n&quot;</span>,
-                           <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Comparison::new</span>(<span class="ident">left_val</span>, <span class="ident">right_val</span>))
+                           <span class="macro-nonterminal">$crate::Comparison::new</span>(left_val, right_val))
                 }
             }
         }
     });
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; ({
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>)) {
-            (<span class="ident">left_val</span>, <span class="ident">right_val</span>) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">*</span><span class="ident">left_val</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">right_val</span>) {
+    (<span class="macro-nonterminal">$left</span>:expr , <span class="macro-nonterminal">$right</span>:expr, $(<span class="macro-nonterminal">$arg</span>:tt)<span class="kw-2">*</span>) =&gt; ({
+        <span class="kw">match </span>(<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$right</span>)) {
+            (left_val, right_val) =&gt; {
+                <span class="kw">if </span>!(<span class="kw-2">*</span>left_val == <span class="kw-2">*</span>right_val) {
                     <span class="macro">panic!</span>(<span class="string">&quot;assertion failed: `(left == right)`: {}\
                           \n\
                           \n{}\
                           \n&quot;</span>,
-                           <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>),
-                           <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Comparison::new</span>(<span class="ident">left_val</span>, <span class="ident">right_val</span>))
+                           <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$arg</span>)<span class="kw-2">*</span>),
+                           <span class="macro-nonterminal">$crate::Comparison::new</span>(left_val, right_val))
                 }
             }
         }
     });
 }
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_ne</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>) =&gt; ({
-        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
+<span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_ne {
+    (<span class="macro-nonterminal">$left</span>:expr, <span class="macro-nonterminal">$right</span>:expr) =&gt; ({
+        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$left</span>, <span class="macro-nonterminal">$right</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
     });
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>,) =&gt; ({
-        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
+    (<span class="macro-nonterminal">$left</span>:expr, <span class="macro-nonterminal">$right</span>:expr,) =&gt; ({
+        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$left</span>, <span class="macro-nonterminal">$right</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);
     });
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) =&gt; ({
-        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>, <span class="string">&quot;: &quot;</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="op">+</span>);
+    (<span class="macro-nonterminal">$left</span>:expr, <span class="macro-nonterminal">$right</span>:expr, $(<span class="macro-nonterminal">$arg</span>:tt)+) =&gt; ({
+        <span class="macro">assert_ne!</span>(@ <span class="macro-nonterminal">$left</span>, <span class="macro-nonterminal">$right</span>, <span class="string">&quot;: &quot;</span>, $(<span class="macro-nonterminal">$arg</span>)+);
     });
-    (@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">maybe_semicolon</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="op">+</span>) =&gt; ({
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>)) {
-            (<span class="ident">left_val</span>, <span class="ident">right_val</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">left_val</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">right_val</span> {
-                  <span class="kw">let</span> <span class="ident">left_dbg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">*</span><span class="ident">left_val</span>);
-                  <span class="kw">let</span> <span class="ident">right_dbg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">*</span><span class="ident">right_val</span>);
-                  <span class="kw">if</span> <span class="ident">left_dbg</span> <span class="op">!</span><span class="op">=</span> <span class="ident">right_dbg</span> {
+    (@ <span class="macro-nonterminal">$left</span>:expr, <span class="macro-nonterminal">$right</span>:expr, <span class="macro-nonterminal">$maybe_semicolon</span>:expr, $(<span class="macro-nonterminal">$arg</span>:tt)+) =&gt; ({
+        <span class="kw">match </span>(<span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$left</span>), <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$right</span>)) {
+            (left_val, right_val) =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>left_val == <span class="kw-2">*</span>right_val {
+                  <span class="kw">let </span>left_dbg = <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">*</span>left_val);
+                  <span class="kw">let </span>right_dbg = <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">*</span>right_val);
+                  <span class="kw">if </span>left_dbg != right_dbg {
 
                       <span class="macro">panic!</span>(<span class="string">&quot;assertion failed: `(left != right)`{}{}\
                             \n\
@@ -362,13 +362,13 @@
                               are partially equivalent, even if the `Debug` outputs differ.\
                             \n\
                             \n&quot;</span>,
-                             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">maybe_semicolon</span>,
-                             <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="op">+</span>),
-                             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Comparison::new</span>(<span class="ident">left_val</span>, <span class="ident">right_val</span>),
-                             <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Style::new</span>()
-                                 .<span class="ident">bold</span>()
-                                 .<span class="ident">underline</span>()
-                                 .<span class="ident">paint</span>(<span class="string">&quot;Note&quot;</span>))
+                             <span class="macro-nonterminal">$maybe_semicolon</span>,
+                             <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$arg</span>)+),
+                             <span class="macro-nonterminal">$crate::Comparison::new</span>(left_val, right_val),
+                             <span class="macro-nonterminal">$crate::Style::new</span>()
+                                 .bold()
+                                 .underline()
+                                 .paint(<span class="string">&quot;Note&quot;</span>))
                   }
 
                   <span class="macro">panic!</span>(<span class="string">&quot;assertion failed: `(left != right)`{}{}\
@@ -377,14 +377,14 @@
                         \n{:#?}\
                         \n\
                         \n&quot;</span>,
-                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">maybe_semicolon</span>,
-                         <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="op">+</span>),
-                         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Style::new</span>().<span class="ident">bold</span>().<span class="ident">paint</span>(<span class="string">&quot;Both sides&quot;</span>),
-                         <span class="ident">left_val</span>)
+                         <span class="macro-nonterminal">$maybe_semicolon</span>,
+                         <span class="macro">format_args!</span>($(<span class="macro-nonterminal">$arg</span>)+),
+                         <span class="macro-nonterminal">$crate::Style::new</span>().bold().paint(<span class="string">&quot;Both sides&quot;</span>),
+                         left_val)
                 }
             }
         }
     });
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_assertions" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

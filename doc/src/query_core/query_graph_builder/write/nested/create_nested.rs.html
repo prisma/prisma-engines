@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/create_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/create_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -491,202 +491,202 @@
 <span id="491">491</span>
 <span id="492">492</span>
 <span id="493">493</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">write::write_args_parser::WriteArgsParser</span>,
-    <span class="ident">ParsedInputList</span>, <span class="ident">ParsedInputValue</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    write::write_args_parser::WriteArgsParser,
+    ParsedInputList, ParsedInputValue,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Filter</span>, <span class="ident">IntoFilter</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>};
-<span class="kw">use</span> <span class="ident">schema_builder::constants::args</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>connector::{Filter, IntoFilter};
+<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>schema_builder::constants::args;
+<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
 
-<span class="doccomment">/// Handles nested create one cases.</span>
-<span class="doccomment">/// The resulting graph can take multiple forms, based on the relation type to the parent model.</span>
-<span class="doccomment">/// Information on the graph shapes can be found on the individual handlers.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_create</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">child_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>();
+<span class="doccomment">/// Handles nested create one cases.
+/// The resulting graph can take multiple forms, based on the relation type to the parent model.
+/// Information on the graph shapes can be found on the individual handlers.
+</span><span class="kw">pub fn </span>nested_create(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>relation = parent_relation_field.relation();
 
-    <span class="comment">// Build all create nodes upfront.</span>
-    <span class="kw">let</span> <span class="ident">creates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">utils::coerce_vec</span>(<span class="ident">value</span>)
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">create::create_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Arc::clone</span>(<span class="ident">child_model</span>), <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    <span class="comment">// Build all create nodes upfront.
+    </span><span class="kw">let </span>creates: Vec&lt;NodeRef&gt; = utils::coerce_vec(value)
+        .into_iter()
+        .map(|value| create::create_record_node(graph, connector_ctx, Arc::clone(child_model), value.try_into()<span class="question-mark">?</span>))
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;NodeRef&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
-        <span class="ident">handle_many_to_many</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">creates</span>)<span class="question-mark">?</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_many</span>() {
-        <span class="ident">handle_one_to_many</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">creates</span>)<span class="question-mark">?</span>;
-    } <span class="kw">else</span> {
-        <span class="ident">handle_one_to_one</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">creates</span>)<span class="question-mark">?</span>;
+    <span class="kw">if </span>relation.is_many_to_many() {
+        handle_many_to_many(graph, parent_node, parent_relation_field, creates)<span class="question-mark">?</span>;
+    } <span class="kw">else if </span>relation.is_one_to_many() {
+        handle_one_to_many(graph, parent_node, parent_relation_field, creates)<span class="question-mark">?</span>;
+    } <span class="kw">else </span>{
+        handle_one_to_one(graph, parent_node, parent_relation_field, creates)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Handles a many-to-many nested create.</span>
-<span class="doccomment">/// This is the least complicated case, as it doesn&#39;t involve</span>
-<span class="doccomment">/// checking for relation violations or updating inlined relations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example for 2 children being created:</span>
-<span class="doccomment">///```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ┌──    Parent   │──────────┬────────┐─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─           │        │</span>
-<span class="doccomment">/// │         │                │        │        │</span>
-<span class="doccomment">/// │         ▼                ▼        │        ▼</span>
-<span class="doccomment">/// │  ┌────────────┐   ┌────────────┐  │  ┌ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │  │Create Child│   │Create Child│  │     Result  │</span>
-<span class="doccomment">/// │  └────────────┘   └────────────┘  │  └ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │         │                │        │</span>
-<span class="doccomment">/// │         ▼                ▼        │</span>
-<span class="doccomment">/// │  ┌────────────┐   ┌────────────┐  │</span>
-<span class="doccomment">/// └─▶│  Connect   │   │  Connect   │◀─┘</span>
-<span class="doccomment">///    └────────────┘   └────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">handle_many_to_many</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">create_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// Todo optimize with createMany</span>
-    <span class="kw">for</span> <span class="ident">create_node</span> <span class="kw">in</span> <span class="ident">create_nodes</span> {
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">create_node</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
-        <span class="ident">connect::connect_records_node</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">create_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Handles a many-to-many nested create.
+/// This is the least complicated case, as it doesn&#39;t involve
+/// checking for relation violations or updating inlined relations.
+///
+/// Example for 2 children being created:
+///```text
+///    ┌ ─ ─ ─ ─ ─ ─
+/// ┌──    Parent   │──────────┬────────┐─ ─ ─ ─ ┐
+/// │  └ ─ ─ ─ ─ ─ ─           │        │
+/// │         │                │        │        │
+/// │         ▼                ▼        │        ▼
+/// │  ┌────────────┐   ┌────────────┐  │  ┌ ─ ─ ─ ─ ─
+/// │  │Create Child│   │Create Child│  │     Result  │
+/// │  └────────────┘   └────────────┘  │  └ ─ ─ ─ ─ ─
+/// │         │                │        │
+/// │         ▼                ▼        │
+/// │  ┌────────────┐   ┌────────────┐  │
+/// └─▶│  Connect   │   │  Connect   │◀─┘
+///    └────────────┘   └────────────┘
+/// ```
+</span><span class="kw">fn </span>handle_many_to_many(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    create_nodes: Vec&lt;NodeRef&gt;,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="comment">// Todo optimize with createMany
+    </span><span class="kw">for </span>create_node <span class="kw">in </span>create_nodes {
+        graph.create_edge(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>create_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
+        connect::connect_records_node(graph, <span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>create_node, <span class="kw-2">&amp;</span>parent_relation_field, <span class="number">1</span>)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Handles a one-to-many nested create.</span>
-<span class="doccomment">/// There are two main cases: Either the relation side is inlined on the parent or the child.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Concerning `create_nodes` parameter:</span>
-<span class="doccomment">/// - If the relation side is inlined on the parent, `create_nodes` can only be of length 1,</span>
-<span class="doccomment">///   because there can only be one possible child being created in that direction in the API.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - If the relation side is inlined on the child, `create_nodes` can be of any size greater or equal 1.</span>
-<span class="doccomment">///   Opposite to the above reasoning, an indefinite amount of children can be created.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Inlined on the parent</span>
-<span class="doccomment">/// We need to create a graph that has a create node for the child first and then the parent operation</span>
-<span class="doccomment">/// to have the child ID ready if needed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example finalized graph:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// ┌────────────────┐</span>
-<span class="doccomment">/// │  Child Create  │</span>
-<span class="doccomment">/// └────────────────┘</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          ▼</span>
-<span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///       Parent     │</span>
-<span class="doccomment">/// └ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          │</span>
-<span class="doccomment">///          ▼</span>
-<span class="doccomment">/// ┌ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///       Result     │</span>
-<span class="doccomment">/// └ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Inlined on the child</span>
-<span class="doccomment">/// We can have the parent operation first, then do the child create(s) and</span>
-<span class="doccomment">/// insert the parent ID into the inline relation field.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example graph for 2 children:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///                 ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///        ┌────────    Parent   │─ ─ ─ ─ ─</span>
-<span class="doccomment">///        │        └ ─ ─ ─ ─ ─ ─          │</span>
-<span class="doccomment">///        │               │</span>
-<span class="doccomment">///        │               │               │</span>
-<span class="doccomment">///        │               │</span>
-<span class="doccomment">///        ▼               ▼               ▼</span>
-<span class="doccomment">/// ┌────────────┐  ┌────────────┐  ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │Create Child│  │Create Child│      Result   │</span>
-<span class="doccomment">/// └────────────┘  └────────────┘  └ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">handle_one_to_many</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">create_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        <span class="kw">let</span> <span class="ident">child_node</span> <span class="op">=</span> <span class="ident">create_nodes</span>
-            .<span class="ident">pop</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;[Query Graph] Expected one nested create node on a 1:m relation with inline IDs on the parent.&quot;</span>);
+<span class="doccomment">/// Handles a one-to-many nested create.
+/// There are two main cases: Either the relation side is inlined on the parent or the child.
+///
+/// Concerning `create_nodes` parameter:
+/// - If the relation side is inlined on the parent, `create_nodes` can only be of length 1,
+///   because there can only be one possible child being created in that direction in the API.
+///
+/// - If the relation side is inlined on the child, `create_nodes` can be of any size greater or equal 1.
+///   Opposite to the above reasoning, an indefinite amount of children can be created.
+///
+/// ## Inlined on the parent
+/// We need to create a graph that has a create node for the child first and then the parent operation
+/// to have the child ID ready if needed.
+///
+/// Example finalized graph:
+/// ```text
+/// ┌────────────────┐
+/// │  Child Create  │
+/// └────────────────┘
+///          │
+///          │
+///          │
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─
+///       Parent     │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─
+///          │
+///          │
+///          │
+///          ▼
+/// ┌ ─ ─ ─ ─ ─ ─ ─ ─
+///       Result     │
+/// └ ─ ─ ─ ─ ─ ─ ─ ─
+/// ```
+///
+/// ## Inlined on the child
+/// We can have the parent operation first, then do the child create(s) and
+/// insert the parent ID into the inline relation field.
+///
+/// Example graph for 2 children:
+/// ```text
+///                 ┌ ─ ─ ─ ─ ─ ─
+///        ┌────────    Parent   │─ ─ ─ ─ ─
+///        │        └ ─ ─ ─ ─ ─ ─          │
+///        │               │
+///        │               │               │
+///        │               │
+///        ▼               ▼               ▼
+/// ┌────────────┐  ┌────────────┐  ┌ ─ ─ ─ ─ ─ ─
+/// │Create Child│  │Create Child│      Result   │
+/// └────────────┘  └────────────┘  └ ─ ─ ─ ─ ─ ─
+/// ```
+</span><span class="kw">fn </span>handle_one_to_many(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    <span class="kw-2">mut </span>create_nodes: Vec&lt;NodeRef&gt;,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">if </span>parent_relation_field.is_inlined_on_enclosing_model() {
+        <span class="kw">let </span>child_node = create_nodes
+            .pop()
+            .expect(<span class="string">&quot;[Query Graph] Expected one nested create node on a 1:m relation with inline IDs on the parent.&quot;</span>);
 
-        <span class="comment">// We need to swap the create node and the parent because the inlining is done in the parent.</span>
-        <span class="ident">graph</span>.<span class="ident">mark_nodes</span>(<span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">child_node</span>);
+        <span class="comment">// We need to swap the create node and the parent because the inlining is done in the parent.
+        </span>graph.mark_nodes(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>child_node);
 
-        <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-        <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+        <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
+        <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
 
-        <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+        <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
+        <span class="kw">let </span>child_model_name = parent_relation_field.related_model().name.clone();
 
-        <span class="comment">// We extract the child linking fields in the edge, because after the swap, the child is the new parent.</span>
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-            <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">child_node</span>,
-            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">child_link</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">parent_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_links</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+        <span class="comment">// We extract the child linking fields in the edge, because after the swap, the child is the new parent.
+        </span>graph.create_edge(
+            <span class="kw-2">&amp;</span>parent_node,
+            <span class="kw-2">&amp;</span>child_node,
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>parent_node, <span class="kw-2">mut </span>child_links| {
+                <span class="kw">let </span>child_link = <span class="kw">match </span>child_links.pop() {
+                    <span class="prelude-val">Some</span>(link) =&gt; <span class="prelude-val">Ok</span>(link),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                         <span class="string">&quot;No &#39;{}&#39; record (needed to inline the relation on &#39;{}&#39; record) was found for a nested create on one-to-many relation &#39;{}&#39;.&quot;</span>,
-                        <span class="ident">child_model_name</span>, <span class="ident">parent_model_name</span>, <span class="ident">relation_name</span>
+                        child_model_name, parent_model_name, relation_name
                     ))),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">parent_node</span> {
-                    <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">parent_link</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
+                <span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq)) = parent_node {
+                    wq.inject_result_into_args(parent_link.assimilate(child_link)<span class="question-mark">?</span>);
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">parent_node</span>)
+                <span class="prelude-val">Ok</span>(parent_node)
             })),
         )<span class="question-mark">?</span>;
-    } <span class="kw">else</span> {
-        <span class="kw">for</span> <span class="ident">create_node</span> <span class="kw">in</span> <span class="ident">create_nodes</span> {
-            <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-            <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+    } <span class="kw">else </span>{
+        <span class="kw">for </span>create_node <span class="kw">in </span>create_nodes {
+            <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
+            <span class="kw">let </span>child_link = parent_relation_field.related_field().linking_fields();
 
-            <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
+            <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+            <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
+            <span class="kw">let </span>child_model_name = parent_relation_field.related_model().name.clone();
 
-            <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-                <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-                <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-                <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">parent_link</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">create_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_links</span>.<span class="ident">pop</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+            graph.create_edge(
+                <span class="kw-2">&amp;</span>parent_node,
+                <span class="kw-2">&amp;</span>create_node,
+                QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>create_node, <span class="kw-2">mut </span>parent_links| {
+                    <span class="kw">let </span>parent_link = <span class="kw">match </span>parent_links.pop() {
+                        <span class="prelude-val">Some</span>(link) =&gt; <span class="prelude-val">Ok</span>(link),
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                             <span class="string">&quot;No &#39;{}&#39; record (needed to inline the relation on &#39;{}&#39; record) was found for a nested create on one-to-many relation &#39;{}&#39;.&quot;</span>,
-                            <span class="ident">parent_model_name</span>, <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
+                            parent_model_name, child_model_name, relation_name
                         ))),
                     }<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">create_node</span> {
-                        <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">child_link</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>);
+                    <span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq)) = create_node {
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)<span class="question-mark">?</span>);
                     }
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">create_node</span>)
+                    <span class="prelude-val">Ok</span>(create_node)
                 })))<span class="question-mark">?</span>;
         }
     };
@@ -694,219 +694,219 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Handles a one-to-one nested create.</span>
-<span class="doccomment">/// Most complex case as there are edge cases where we need to make sure</span>
-<span class="doccomment">/// that we don&#39;t violate relation requirements.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The full graph that can be created by this handler depends on the inline relation side.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the relation is inlined in the child:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///                 ┌────────────────┐</span>
-<span class="doccomment">///        ┌────────│     Parent     │─────────┐</span>
-<span class="doccomment">///        │        └────────────────┘         │</span>
-<span class="doccomment">///        │                 │                 │</span>
-<span class="doccomment">///        │                 │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">///        │                 │                 ▼</span>
-<span class="doccomment">///        │                 │  │ ┌────────────────────────┐                            │</span>
-<span class="doccomment">///        │                 │    │     Read ex. child     │──┐</span>
-<span class="doccomment">///        │                 │  │ └────────────────────────┘  │                         │</span>
-<span class="doccomment">///        │                 │                 │              │</span>
-<span class="doccomment">///        │                 │  │              ▼              │(Fail on c &gt; 0 if child  │</span>
-<span class="doccomment">///        │                 │    ┌────────────────────────┐  │     side required)</span>
-<span class="doccomment">///        │                 │  │ │ If c &gt; 0 &amp;&amp; c. inlined │  │                         │</span>
-<span class="doccomment">///        │                 │    └────────────────────────┘  │</span>
-<span class="doccomment">///        │                 │  │              │              │                         │</span>
-<span class="doccomment">///        │                 │                 ▼              │</span>
-<span class="doccomment">///        │                 │  │ ┌────────────────────────┐  │                         │</span>
-<span class="doccomment">///        │                 │    │    Update ex. child    │◀─┘</span>
-<span class="doccomment">///        │                 │  │ └────────────────────────┘                            │</span>
-<span class="doccomment">///        │                 │</span>
-<span class="doccomment">///        │                 │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">///        ▼                 ▼</span>
-<span class="doccomment">/// ┌────────────┐  ┌────────────────┐</span>
-<span class="doccomment">/// │   Result   │  │  Child Create  │</span>
-<span class="doccomment">/// └────────────┘  └────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the relation is inlined in the parent:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌────────────────┐</span>
-<span class="doccomment">/// ┌──│  Child Create  │</span>
-<span class="doccomment">/// │  └────────────────┘</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           ▼</span>
-<span class="doccomment">/// │  ┌────────────────┐</span>
-<span class="doccomment">/// ├──│     Parent     │─────────┐</span>
-<span class="doccomment">/// │  └────────────────┘         │</span>
-<span class="doccomment">/// │           │                 │</span>
-<span class="doccomment">/// │           │                 │</span>
-<span class="doccomment">/// │           │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// │           │                 ▼</span>
-<span class="doccomment">/// │           │  │ ┌────────────────────────┐                            │</span>
-<span class="doccomment">/// │           │    │     Read ex. child     │──┐</span>
-<span class="doccomment">/// │           │  │ └────────────────────────┘  │                         │</span>
-<span class="doccomment">/// │           │                 │              │</span>
-<span class="doccomment">/// │           │  │              ▼              │(Fail on c &gt; 0 if child  │</span>
-<span class="doccomment">/// │           │    ┌────────────────────────┐  │     side required)</span>
-<span class="doccomment">/// │           │  │ │ If c &gt; 0 &amp;&amp; c. inlined │  │                         │</span>
-<span class="doccomment">/// │           │    └────────────────────────┘  │</span>
-<span class="doccomment">/// │           │  │              │              │                         │</span>
-<span class="doccomment">/// │           │                 ▼              │</span>
-<span class="doccomment">/// │           │  │ ┌────────────────────────┐  │                         │</span>
-<span class="doccomment">/// │           │    │    Update ex. child    │◀─┘</span>
-<span class="doccomment">/// │           │  │ └────────────────────────┘                            │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │           ▼</span>
-<span class="doccomment">/// │    ┌────────────┐</span>
-<span class="doccomment">/// │    │   Result   │</span>
-<span class="doccomment">/// │    └────────────┘</span>
-<span class="doccomment">/// │    ┌────────────┐</span>
-<span class="doccomment">/// └───▶│   Update   │ (if non-create)</span>
-<span class="doccomment">///      └────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Important: We cannot inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause</span>
-<span class="doccomment">/// the following issue (example):</span>
-<span class="doccomment">/// - Parent is an update, doesn&#39;t have a connected child on relation x.</span>
-<span class="doccomment">/// - Parent gets injected with a child on x, because that&#39;s what the nested create is supposed to do.</span>
-<span class="doccomment">/// - The update runs, the relation is updated.</span>
-<span class="doccomment">/// - Now the check runs, because it&#39;s dependent on the parent&#39;s ID... but the check finds an existing child and fails...</span>
-<span class="doccomment">/// ... because we just updated the relation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For these reasons, we need to have an extra update at the end if it&#39;s inlined on the parent and a non-create.</span>
-<span class="kw">fn</span> <span class="ident">handle_one_to_one</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">create_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent_is_create</span> <span class="op">=</span> <span class="ident">utils::node_is_create</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>);
-    <span class="kw">let</span> <span class="ident">child_relation_field</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>();
-    <span class="kw">let</span> <span class="ident">parent_side_required</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_required</span>();
-    <span class="kw">let</span> <span class="ident">child_side_required</span> <span class="op">=</span> <span class="ident">child_relation_field</span>.<span class="ident">is_required</span>();
-    <span class="kw">let</span> <span class="ident">relation_inlined_parent</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation_is_inlined_in_parent</span>();
+<span class="doccomment">/// Handles a one-to-one nested create.
+/// Most complex case as there are edge cases where we need to make sure
+/// that we don&#39;t violate relation requirements.
+///
+/// The full graph that can be created by this handler depends on the inline relation side.
+///
+/// If the relation is inlined in the child:
+/// ```text
+///                 ┌────────────────┐
+///        ┌────────│     Parent     │─────────┐
+///        │        └────────────────┘         │
+///        │                 │                 │
+///        │                 │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+///        │                 │                 ▼
+///        │                 │  │ ┌────────────────────────┐                            │
+///        │                 │    │     Read ex. child     │──┐
+///        │                 │  │ └────────────────────────┘  │                         │
+///        │                 │                 │              │
+///        │                 │  │              ▼              │(Fail on c &gt; 0 if child  │
+///        │                 │    ┌────────────────────────┐  │     side required)
+///        │                 │  │ │ If c &gt; 0 &amp;&amp; c. inlined │  │                         │
+///        │                 │    └────────────────────────┘  │
+///        │                 │  │              │              │                         │
+///        │                 │                 ▼              │
+///        │                 │  │ ┌────────────────────────┐  │                         │
+///        │                 │    │    Update ex. child    │◀─┘
+///        │                 │  │ └────────────────────────┘                            │
+///        │                 │
+///        │                 │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+///        ▼                 ▼
+/// ┌────────────┐  ┌────────────────┐
+/// │   Result   │  │  Child Create  │
+/// └────────────┘  └────────────────┘
+/// ```
+///
+/// If the relation is inlined in the parent:
+/// ```text
+///    ┌────────────────┐
+/// ┌──│  Child Create  │
+/// │  └────────────────┘
+/// │           │
+/// │           ▼
+/// │  ┌────────────────┐
+/// ├──│     Parent     │─────────┐
+/// │  └────────────────┘         │
+/// │           │                 │
+/// │           │                 │
+/// │           │  ┌ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// │           │                 ▼
+/// │           │  │ ┌────────────────────────┐                            │
+/// │           │    │     Read ex. child     │──┐
+/// │           │  │ └────────────────────────┘  │                         │
+/// │           │                 │              │
+/// │           │  │              ▼              │(Fail on c &gt; 0 if child  │
+/// │           │    ┌────────────────────────┐  │     side required)
+/// │           │  │ │ If c &gt; 0 &amp;&amp; c. inlined │  │                         │
+/// │           │    └────────────────────────┘  │
+/// │           │  │              │              │                         │
+/// │           │                 ▼              │
+/// │           │  │ ┌────────────────────────┐  │                         │
+/// │           │    │    Update ex. child    │◀─┘
+/// │           │  │ └────────────────────────┘                            │
+/// │           │
+/// │           │  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │           ▼
+/// │    ┌────────────┐
+/// │    │   Result   │
+/// │    └────────────┘
+/// │    ┌────────────┐
+/// └───▶│   Update   │ (if non-create)
+///      └────────────┘
+/// ```
+///
+/// Important: We cannot inject from `Child Create` to `Parent` if `Parent` is a non-create, as it would cause
+/// the following issue (example):
+/// - Parent is an update, doesn&#39;t have a connected child on relation x.
+/// - Parent gets injected with a child on x, because that&#39;s what the nested create is supposed to do.
+/// - The update runs, the relation is updated.
+/// - Now the check runs, because it&#39;s dependent on the parent&#39;s ID... but the check finds an existing child and fails...
+/// ... because we just updated the relation.
+///
+/// For these reasons, we need to have an extra update at the end if it&#39;s inlined on the parent and a non-create.
+</span><span class="kw">fn </span>handle_one_to_one(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    <span class="kw-2">mut </span>create_nodes: Vec&lt;NodeRef&gt;,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>parent_is_create = utils::node_is_create(graph, <span class="kw-2">&amp;</span>parent_node);
+    <span class="kw">let </span>child_relation_field = parent_relation_field.related_field();
+    <span class="kw">let </span>parent_side_required = parent_relation_field.is_required();
+    <span class="kw">let </span>child_side_required = child_relation_field.is_required();
+    <span class="kw">let </span>relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
 
-    <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-    <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="ident">child_relation_field</span>.<span class="ident">linking_fields</span>();
+    <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
+    <span class="kw">let </span>child_link = child_relation_field.linking_fields();
 
-    <span class="comment">// Build-time check</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">parent_is_create</span> <span class="op">&amp;&amp;</span> (<span class="ident">parent_side_required</span> <span class="op">&amp;&amp;</span> <span class="ident">child_side_required</span>) {
-        <span class="comment">// Both sides are required, which means that we know that there already has to be a parent connected a child (it must exist).</span>
-        <span class="comment">// Creating a new child for the parent would disconnect the other child, violating the required side of the existing child.</span>
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>(
-            (<span class="ident">parent_relation_field</span>).<span class="ident">into</span>(),
+    <span class="comment">// Build-time check
+    </span><span class="kw">if </span>!parent_is_create &amp;&amp; (parent_side_required &amp;&amp; child_side_required) {
+        <span class="comment">// Both sides are required, which means that we know that there already has to be a parent connected a child (it must exist).
+        // Creating a new child for the parent would disconnect the other child, violating the required side of the existing child.
+        </span><span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation(
+            (parent_relation_field).into(),
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create_nodes</span>
-        .<span class="ident">pop</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;[Query Graph] Expected only one nested create node on a 1:m relation with inline IDs on the parent.&quot;</span>);
+    <span class="kw">let </span>create_node = create_nodes
+        .pop()
+        .expect(<span class="string">&quot;[Query Graph] Expected only one nested create node on a 1:m relation with inline IDs on the parent.&quot;</span>);
 
-    <span class="comment">// If the parent node is not a create, we need to do additional checks and potentially disconnect an already existing child,</span>
-    <span class="comment">// because we know that the parent node has to exist already.</span>
-    <span class="comment">// If the parent is a create, we can be sure that there&#39;s no existing relation to anything, and we don&#39;t need checks,</span>
-    <span class="comment">// especially because we are in a nested create scenario - the child also can&#39;t exist yet, so no checks are needed for an</span>
-    <span class="comment">// existing parent, either.</span>
-    <span class="comment">// For the above reasons, the checks always live on `parent_node`.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">parent_is_create</span> {
-        <span class="ident">utils::insert_existing_1to1_related_model_checks</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>)<span class="question-mark">?</span>;
+    <span class="comment">// If the parent node is not a create, we need to do additional checks and potentially disconnect an already existing child,
+    // because we know that the parent node has to exist already.
+    // If the parent is a create, we can be sure that there&#39;s no existing relation to anything, and we don&#39;t need checks,
+    // especially because we are in a nested create scenario - the child also can&#39;t exist yet, so no checks are needed for an
+    // existing parent, either.
+    // For the above reasons, the checks always live on `parent_node`.
+    </span><span class="kw">if </span>!parent_is_create {
+        utils::insert_existing_1to1_related_model_checks(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field)<span class="question-mark">?</span>;
     }
 
-    <span class="comment">// If the relation is inlined on the parent, we swap the create and the parent to have the child ID for inlining.</span>
-    <span class="comment">// Swapping changes the extraction model identifier as well.</span>
-    <span class="kw">let</span> ((<span class="ident">extractor_model</span>, <span class="ident">extractor</span>), (<span class="ident">assimilator_model</span>, <span class="ident">assimilator</span>)) <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_inlined_parent</span> {
-        <span class="comment">// We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.</span>
-        <span class="ident">graph</span>.<span class="ident">mark_nodes</span>(<span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">create_node</span>);
+    <span class="comment">// If the relation is inlined on the parent, we swap the create and the parent to have the child ID for inlining.
+    // Swapping changes the extraction model identifier as well.
+    </span><span class="kw">let </span>((extractor_model, extractor), (assimilator_model, assimilator)) = <span class="kw">if </span>relation_inlined_parent {
+        <span class="comment">// We need to swap the read node and the parent because the inlining is done in the parent, and we need to fetch the ID first.
+        </span>graph.mark_nodes(<span class="kw-2">&amp;</span>parent_node, <span class="kw-2">&amp;</span>create_node);
         (
-            (<span class="ident">child_relation_field</span>.<span class="ident">model</span>(), <span class="ident">child_link</span>.<span class="ident">clone</span>()),
-            (<span class="ident">parent_relation_field</span>.<span class="ident">model</span>(), <span class="ident">parent_link</span>),
+            (child_relation_field.model(), child_link.clone()),
+            (parent_relation_field.model(), parent_link),
         )
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         (
-            (<span class="ident">parent_relation_field</span>.<span class="ident">model</span>(), <span class="ident">parent_link</span>),
-            (<span class="ident">child_relation_field</span>.<span class="ident">model</span>(), <span class="ident">child_link</span>.<span class="ident">clone</span>()),
+            (parent_relation_field.model(), parent_link),
+            (child_relation_field.model(), child_link.clone()),
         )
     };
 
-    <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">extractor_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">assimilator_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+    <span class="kw">let </span>parent_model_name = extractor_model.name.clone();
+    <span class="kw">let </span>child_model_name = assimilator_model.name.clone();
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">extractor</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">child_node</span>, <span class="kw-2">mut</span> <span class="ident">links</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">links</span>.<span class="ident">pop</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>parent_node,
+        <span class="kw-2">&amp;</span>create_node,
+        QueryGraphDependency::ProjectedDataDependency(extractor, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>child_node, <span class="kw-2">mut </span>links| {
+            <span class="kw">let </span>link = <span class="kw">match </span>links.pop() {
+                <span class="prelude-val">Some</span>(link) =&gt; <span class="prelude-val">Ok</span>(link),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                     <span class="string">&quot;No &#39;{}&#39; record (needed to inline the relation with create on &#39;{}&#39; record) was found for a nested create on one-to-one relation &#39;{}&#39;.&quot;</span>,
-                    <span class="ident">parent_model_name</span>, <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
+                    parent_model_name, child_model_name, relation_name
                 ))),
             }<span class="question-mark">?</span>;
 
-            <span class="comment">// We ONLY inject for creates here. Check end of doc comment for explanation.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">q</span> @ <span class="ident">WriteQuery::CreateRecord</span>(<span class="kw">_</span>))) <span class="op">=</span> <span class="ident">child_node</span> {
-                <span class="ident">q</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">assimilator</span>.<span class="ident">assimilate</span>(<span class="ident">link</span>)<span class="question-mark">?</span>);
+            <span class="comment">// We ONLY inject for creates here. Check end of doc comment for explanation.
+            </span><span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>q @ WriteQuery::CreateRecord(<span class="kw">_</span>))) = child_node {
+                q.inject_result_into_args(assimilator.assimilate(link)<span class="question-mark">?</span>);
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">child_node</span>)
+            <span class="prelude-val">Ok</span>(child_node)
         })),
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// Relation is inlined on the Parent and a non-create.</span>
-    <span class="comment">// Create an update node for Parent to set the connection to the child.</span>
-    <span class="comment">// For explanation see end of doc comment.</span>
-    <span class="kw">if</span> <span class="ident">relation_inlined_parent</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">parent_is_create</span> {
-        <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>();
-        <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">parent_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">utils::update_records_node_placeholder</span>(<span class="ident">graph</span>, <span class="ident">Filter::empty</span>(), <span class="ident">parent_model</span>);
-        <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
+    <span class="comment">// Relation is inlined on the Parent and a non-create.
+    // Create an update node for Parent to set the connection to the child.
+    // For explanation see end of doc comment.
+    </span><span class="kw">if </span>relation_inlined_parent &amp;&amp; !parent_is_create {
+        <span class="kw">let </span>parent_model = parent_relation_field.model();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+        <span class="kw">let </span>parent_model_name = parent_model.name.clone();
+        <span class="kw">let </span>child_model_name = parent_relation_field.related_model().name.clone();
+        <span class="kw">let </span>update_node = utils::update_records_node_placeholder(graph, Filter::empty(), parent_model);
+        <span class="kw">let </span>parent_link = parent_relation_field.linking_fields();
 
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-            <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">child_link</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_links</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>create_node,
+            <span class="kw-2">&amp;</span>update_node,
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_node, <span class="kw-2">mut </span>child_links| {
+                <span class="kw">let </span>child_link = <span class="kw">match </span>child_links.pop() {
+                    <span class="prelude-val">Some</span>(link) =&gt; <span class="prelude-val">Ok</span>(link),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                         <span class="string">&quot;No &#39;{}&#39; record (needed to inline the relation with an update on &#39;{}&#39; record) was found for a nested create on one-to-one relation &#39;{}&#39;.&quot;</span>,
-                        <span class="ident">child_model_name</span>, <span class="ident">parent_model_name</span>, <span class="ident">relation_name</span>
+                        child_model_name, parent_model_name, relation_name
                     ))),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_node</span> {
-                    <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">parent_link</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
+                <span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq)) = update_node {
+                    wq.inject_result_into_args(parent_link.assimilate(child_link)<span class="question-mark">?</span>);
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                <span class="prelude-val">Ok</span>(update_node)
             })),
          )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">parent_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-        <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>parent_model_identifier = parent_relation_field.model().primary_identifier();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+        <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
 
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-            <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">parent_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>parent_node,
+            <span class="kw-2">&amp;</span>update_node,
+            QueryGraphDependency::ProjectedDataDependency(parent_model_identifier, Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_node, <span class="kw-2">mut </span>parent_ids| {
+                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                         <span class="string">&quot;No &#39;{}&#39; record (needed to update the relation on &#39;{}&#39; record) was found for a nested create on one-to-one relation &#39;{}&#39;.&quot;</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">parent_model_name</span>, <span class="ident">parent_model_name</span>, <span class="ident">relation_name</span>
+                        <span class="kw-2">&amp;</span>parent_model_name, parent_model_name, relation_name
                     ))),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_node</span> {
-                    <span class="ident">wq</span>.<span class="ident">add_filter</span>(<span class="ident">parent_id</span>.<span class="ident">filter</span>());
+                <span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq)) = update_node {
+                    wq.add_filter(parent_id.filter());
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                <span class="prelude-val">Ok</span>(update_node)
             })),
          )<span class="question-mark">?</span>;
     }
@@ -914,70 +914,70 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_create_many</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">child_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// Nested input is an object of { data: [...], skipDuplicates: bool }</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="kw">pub fn </span>nested_create_many(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="comment">// Nested input is an object of { data: [...], skipDuplicates: bool }
+    </span><span class="kw">let </span><span class="kw-2">mut </span>obj: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">data_list</span>: <span class="ident">ParsedInputList</span> <span class="op">=</span> <span class="ident">obj</span>.<span class="ident">remove</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">skip_duplicates</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">obj</span>.<span class="ident">remove</span>(<span class="ident">args::SKIP_DUPLICATES</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">let </span>data_list: ParsedInputList = obj.remove(args::DATA).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>skip_duplicates: bool = <span class="kw">match </span>obj.remove(args::SKIP_DUPLICATES) {
+        <span class="prelude-val">Some</span>(val) =&gt; val.try_into()<span class="question-mark">?</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">data_list</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">data_value</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">data_map</span> <span class="op">=</span> <span class="ident">data_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_model</span>, <span class="ident">data_map</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
+    <span class="kw">let </span>args = data_list
+        .into_iter()
+        .map(|data_value| {
+            <span class="kw">let </span>data_map = data_value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>args = WriteArgsParser::from(<span class="kw-2">&amp;</span>child_model, data_map)<span class="question-mark">?</span>.args;
 
-            <span class="ident">args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">child_model</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">args</span>)
+            args.add_datetimes(<span class="kw-2">&amp;</span>child_model);
+            <span class="prelude-val">Ok</span>(args)
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">CreateManyRecords</span> {
-        <span class="ident">model</span>: <span class="ident">Arc::clone</span>(<span class="ident">child_model</span>),
-        <span class="ident">args</span>,
-        <span class="ident">skip_duplicates</span>,
+    <span class="kw">let </span>query = CreateManyRecords {
+        model: Arc::clone(child_model),
+        args,
+        skip_duplicates,
     };
 
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::CreateManyRecords</span>(<span class="ident">query</span>)));
+    <span class="kw">let </span>create_node = graph.create_node(Query::Write(WriteQuery::CreateManyRecords(query)));
 
-    <span class="comment">// We know that the id must be inlined on the child, so we need the parent link to inline it.</span>
-    <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-    <span class="kw">let</span> <span class="ident">child_linking_fields</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+    <span class="comment">// We know that the id must be inlined on the child, so we need the parent link to inline it.
+    </span><span class="kw">let </span>linking_fields = parent_relation_field.linking_fields();
+    <span class="kw">let </span>child_linking_fields = parent_relation_field.related_field().linking_fields();
 
-    <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">parent_model_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">child_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+    <span class="kw">let </span>parent_model_name = parent_relation_field.model().name.clone();
+    <span class="kw">let </span>child_model_name = child_model.name.clone();
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">linking_fields</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">create_many_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
-                <span class="comment">// There can only be one parent.</span>
-                <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_links</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">p</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>parent_node,
+        <span class="kw-2">&amp;</span>create_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            linking_fields,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>create_many_node, <span class="kw-2">mut </span>parent_links| {
+                <span class="comment">// There can only be one parent.
+                </span><span class="kw">let </span>parent_link = <span class="kw">match </span>parent_links.pop() {
+                    <span class="prelude-val">Some</span>(p) =&gt; <span class="prelude-val">Ok</span>(p),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                         <span class="string">&quot;No &#39;{}&#39; record (needed to inline the relation on &#39;{}&#39; record) was found for a nested createMany on relation &#39;{}&#39;.&quot;</span>,
-                        <span class="ident">parent_model_name</span>, <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
+                        parent_model_name, child_model_name, relation_name
                     ))),
                 }<span class="question-mark">?</span>;
 
-                <span class="comment">// Inject the parent id into all nested records.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::CreateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cmr</span>))) <span class="op">=</span> <span class="ident">create_many_node</span> {
-                    <span class="ident">cmr</span>.<span class="ident">inject_result_into_all</span>(<span class="ident">child_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>);
+                <span class="comment">// Inject the parent id into all nested records.
+                </span><span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::CreateManyRecords(<span class="kw-2">ref mut </span>cmr))) = create_many_node {
+                    cmr.inject_result_into_all(child_linking_fields.assimilate(parent_link)<span class="question-mark">?</span>);
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">create_many_node</span>)
+                <span class="prelude-val">Ok</span>(create_many_node)
             }),
         ),
     )<span class="question-mark">?</span>;
@@ -985,4 +985,4 @@
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../barrel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../barrel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -210,217 +210,217 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Powerful schema migration builder, that let&#39;s you write your SQL</span>
-<span class="doccomment">//! migrations in Rust.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `barrel` makes writing migrations for different databases as easy</span>
-<span class="doccomment">//! as possible.  It provides you with a common API over SQL, with</span>
-<span class="doccomment">//! certain features only provided for database specific</span>
-<span class="doccomment">//! implementations.  This way you can focus on your Rust code, and</span>
-<span class="doccomment">//! stop worrying about SQL.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `barrel` has three primary models: the</span>
-<span class="doccomment">//! [Migration](migration/struct.Migration.html) which represents all</span>
-<span class="doccomment">//! changes and changes made on a database level, the</span>
-<span class="doccomment">//! [Table](table/struct.Table.html) and the</span>
-<span class="doccomment">//! [Type](types/struct.Type.html).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When creating or altering tables a lambda which exposes `&amp;mut</span>
-<span class="doccomment">//! Table` is provided for initialisation. Adding columns is then as</span>
-<span class="doccomment">//! easy as calling `add_column(...)` on the table.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Each column is statically typed and some types require some</span>
-<span class="doccomment">//! metadata in order to compile the migration (for example</span>
-<span class="doccomment">//! `Varchar(255)`). You can also provide default types and override</span>
-<span class="doccomment">//! encodings, nullability or uniqueness of columns.  Some checks are</span>
-<span class="doccomment">//! performed at compile-time however most things (including) correct</span>
-<span class="doccomment">//! default values) are only checked at runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! **Note** Since version `0.3.0` it is required to provide a</span>
-<span class="doccomment">//! database backend in order to compile `barrel`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following code is a simple example of how to get going with</span>
-<span class="doccomment">//! `barrel`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use barrel::{types, Migration};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let mut m = Migration::new();</span>
-<span class="doccomment">//!     m.create_table(&quot;users&quot;, |t| {</span>
-<span class="doccomment">//!         t.add_column(&quot;name&quot;, types::varchar(255));</span>
-<span class="doccomment">//!         t.add_column(&quot;age&quot;, types::integer());</span>
-<span class="doccomment">//!         t.add_column(&quot;owns_plushy_sharks&quot;, types::boolean());</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `barrel` also supports more advanced types, such as `foreign(...)`</span>
-<span class="doccomment">//! and `array(...)` however currently doesn&#39;t support nested Array</span>
-<span class="doccomment">//! types on foreign keys (such as `array(array(foreign(...)))`). Each</span>
-<span class="doccomment">//! column addition returns a Column object which can then be used to</span>
-<span class="doccomment">//! provide further configuration.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To generate SQL strings you have two options. If you just want to</span>
-<span class="doccomment">//! run the migration yourself simply run `Migration::exec()` where</span>
-<span class="doccomment">//! you provide a generic `SqlGenerator` type according to your</span>
-<span class="doccomment">//! database backend</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;pg&quot;)]</span>
-<span class="doccomment">//! # use barrel::backend::Pg;</span>
-<span class="doccomment">//! # use barrel::Migration;</span>
-<span class="doccomment">//! # let mut m = Migration::new();</span>
-<span class="doccomment">//! // Example for pgsql</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;pg&quot;)]</span>
-<span class="doccomment">//! m.make::&lt;Pg&gt;();</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Alternatively, if you&#39;re a library developer and you want to more</span>
-<span class="doccomment">//! easily embed `barrel` into your library you can simply implement</span>
-<span class="doccomment">//! the `DatabaseExecutor` trait for a type of yours that knows how to</span>
-<span class="doccomment">//! execute SQL.  Running a migration with `barrel` is then super</span>
-<span class="doccomment">//! easy.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use barrel::connectors::SqlRunner;</span>
-<span class="doccomment">//! # use barrel::Migration;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;pg&quot;)]</span>
-<span class="doccomment">//! # use barrel::backend::Pg;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! struct MyRunner;</span>
-<span class="doccomment">//! impl SqlRunner for MyRunner {</span>
-<span class="doccomment">//!     fn execute&lt;S: Into&lt;String&gt;&gt;(&amp;mut self, sql: S) {</span>
-<span class="doccomment">//!         # let s: String = sql.into();</span>
-<span class="doccomment">//!         // ...</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # let mut m = Migration::new();</span>
-<span class="doccomment">//! # let mut executor = MyRunner;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;pg&quot;)]</span>
-<span class="doccomment">//! m.execute::&lt;Pg, _&gt;(&amp;mut executor);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In this case `executor` is your provided type which implements the</span>
-<span class="doccomment">//! required trait. You can read more about this in the</span>
-<span class="doccomment">//! [connectors](connectors/index.html) module docs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you find database-specific features or documentation lacking,</span>
-<span class="doccomment">//! don&#39;t hesitate to open an issue/PR about it.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Powerful schema migration builder, that let&#39;s you write your SQL
+//! migrations in Rust.
+//!
+//! `barrel` makes writing migrations for different databases as easy
+//! as possible.  It provides you with a common API over SQL, with
+//! certain features only provided for database specific
+//! implementations.  This way you can focus on your Rust code, and
+//! stop worrying about SQL.
+//!
+//! `barrel` has three primary models: the
+//! [Migration](migration/struct.Migration.html) which represents all
+//! changes and changes made on a database level, the
+//! [Table](table/struct.Table.html) and the
+//! [Type](types/struct.Type.html).
+//!
+//! When creating or altering tables a lambda which exposes `&amp;mut
+//! Table` is provided for initialisation. Adding columns is then as
+//! easy as calling `add_column(...)` on the table.
+//!
+//! Each column is statically typed and some types require some
+//! metadata in order to compile the migration (for example
+//! `Varchar(255)`). You can also provide default types and override
+//! encodings, nullability or uniqueness of columns.  Some checks are
+//! performed at compile-time however most things (including) correct
+//! default values) are only checked at runtime.
+//!
+//! **Note** Since version `0.3.0` it is required to provide a
+//! database backend in order to compile `barrel`.
+//!
+//! The following code is a simple example of how to get going with
+//! `barrel`
+//!
+//! ```rust
+//! use barrel::{types, Migration};
+//!
+//! fn main() {
+//!     let mut m = Migration::new();
+//!     m.create_table(&quot;users&quot;, |t| {
+//!         t.add_column(&quot;name&quot;, types::varchar(255));
+//!         t.add_column(&quot;age&quot;, types::integer());
+//!         t.add_column(&quot;owns_plushy_sharks&quot;, types::boolean());
+//!     });
+//! }
+//! ```
+//!
+//! `barrel` also supports more advanced types, such as `foreign(...)`
+//! and `array(...)` however currently doesn&#39;t support nested Array
+//! types on foreign keys (such as `array(array(foreign(...)))`). Each
+//! column addition returns a Column object which can then be used to
+//! provide further configuration.
+//!
+//! To generate SQL strings you have two options. If you just want to
+//! run the migration yourself simply run `Migration::exec()` where
+//! you provide a generic `SqlGenerator` type according to your
+//! database backend
+//!
+//! ```rust
+//! # #[cfg(feature = &quot;pg&quot;)]
+//! # use barrel::backend::Pg;
+//! # use barrel::Migration;
+//! # let mut m = Migration::new();
+//! // Example for pgsql
+//! # #[cfg(feature = &quot;pg&quot;)]
+//! m.make::&lt;Pg&gt;();
+//! ```
+//!
+//! Alternatively, if you&#39;re a library developer and you want to more
+//! easily embed `barrel` into your library you can simply implement
+//! the `DatabaseExecutor` trait for a type of yours that knows how to
+//! execute SQL.  Running a migration with `barrel` is then super
+//! easy.
+//!
+//! ```rust
+//! use barrel::connectors::SqlRunner;
+//! # use barrel::Migration;
+//! # #[cfg(feature = &quot;pg&quot;)]
+//! # use barrel::backend::Pg;
+//!
+//! struct MyRunner;
+//! impl SqlRunner for MyRunner {
+//!     fn execute&lt;S: Into&lt;String&gt;&gt;(&amp;mut self, sql: S) {
+//!         # let s: String = sql.into();
+//!         // ...
+//!     }
+//! }
+//!
+//! # let mut m = Migration::new();
+//! # let mut executor = MyRunner;
+//! # #[cfg(feature = &quot;pg&quot;)]
+//! m.execute::&lt;Pg, _&gt;(&amp;mut executor);
+//! ```
+//!
+//! In this case `executor` is your provided type which implements the
+//! required trait. You can read more about this in the
+//! [connectors](connectors/index.html) module docs.
+//!
+//! If you find database-specific features or documentation lacking,
+//! don&#39;t hesitate to open an issue/PR about it.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;diesel&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">integrations</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;diesel&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">integrations</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;diesel&quot;</span>)]
+</span><span class="kw">pub mod </span>integrations;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;diesel&quot;</span>)]
+</span><span class="kw">pub use </span>integrations::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">backend</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connectors</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">functions</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">migration</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">table</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
+<span class="kw">pub mod </span>backend;
+<span class="kw">pub mod </span>connectors;
+<span class="kw">pub mod </span>functions;
+<span class="kw">pub mod </span>migration;
+<span class="kw">pub mod </span>table;
+<span class="kw">pub mod </span>types;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">backend::SqlVariant</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration::Migration</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">table</span>::{<span class="ident">Table</span>, <span class="ident">TableMeta</span>};
+<span class="kw">pub use </span>backend::SqlVariant;
+<span class="kw">pub use </span>migration::Migration;
+<span class="kw">pub use </span>table::{Table, TableMeta};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+<span class="kw">use </span>std::rc::Rc;
 
-<span class="doccomment">/// An enum set that represents a single change on a table</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TableChange</span> {
-    <span class="doccomment">/// Add a column of a name and type</span>
-    <span class="ident">AddColumn</span>(<span class="ident">String</span>, <span class="ident">types::Type</span>),
+<span class="doccomment">/// An enum set that represents a single change on a table
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>TableChange {
+    <span class="doccomment">/// Add a column of a name and type
+    </span>AddColumn(String, types::Type),
 
-    <span class="doccomment">/// Change an existing column</span>
-    <span class="ident">ChangeColumn</span>(<span class="ident">String</span>, <span class="ident">types::Type</span>, <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">types::Type</span>)<span class="op">&gt;</span>),
+    <span class="doccomment">/// Change an existing column
+    </span>ChangeColumn(String, types::Type, Rc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>types::Type)&gt;),
 
-    <span class="doccomment">/// Simply rename a column</span>
-    <span class="ident">RenameColumn</span>(<span class="ident">String</span>, <span class="ident">String</span>),
+    <span class="doccomment">/// Simply rename a column
+    </span>RenameColumn(String, String),
 
-    <span class="doccomment">/// Remove a column</span>
-    <span class="ident">DropColumn</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Remove a column
+    </span>DropColumn(String),
 
-    <span class="doccomment">/// Add some custom SQL if all else fails</span>
-    <span class="ident">CustomLine</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Add some custom SQL if all else fails
+    </span>CustomLine(String),
 }
 
-<span class="doccomment">/// An enum set that represents a single change on a database</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DatabaseChange</span> {
-    <span class="doccomment">/// Create a new table</span>
-    <span class="ident">CreateTable</span>(<span class="ident">Table</span>, <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Table</span>)<span class="op">&gt;</span>),
+<span class="doccomment">/// An enum set that represents a single change on a database
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>DatabaseChange {
+    <span class="doccomment">/// Create a new table
+    </span>CreateTable(Table, Rc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>Table)&gt;),
 
-    <span class="doccomment">/// Create a new table *only* if it doesn&#39;t exist yet</span>
-    <span class="ident">CreateTableIfNotExists</span>(<span class="ident">Table</span>, <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Table</span>)<span class="op">&gt;</span>),
+    <span class="doccomment">/// Create a new table *only* if it doesn&#39;t exist yet
+    </span>CreateTableIfNotExists(Table, Rc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>Table)&gt;),
 
-    <span class="doccomment">/// Change fields on an existing table</span>
-    <span class="ident">ChangeTable</span>(<span class="ident">Table</span>, <span class="ident">Rc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Table</span>)<span class="op">&gt;</span>),
+    <span class="doccomment">/// Change fields on an existing table
+    </span>ChangeTable(Table, Rc&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>Table)&gt;),
 
-    <span class="doccomment">/// Rename a table</span>
-    <span class="ident">RenameTable</span>(<span class="ident">String</span>, <span class="ident">String</span>),
+    <span class="doccomment">/// Rename a table
+    </span>RenameTable(String, String),
 
-    <span class="doccomment">/// Drop an existing table</span>
-    <span class="ident">DropTable</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Drop an existing table
+    </span>DropTable(String),
 
-    <span class="doccomment">/// Only drop a table if it exists</span>
-    <span class="ident">DropTableIfExists</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Only drop a table if it exists
+    </span>DropTableIfExists(String),
 
-    <span class="doccomment">/// Add some custom SQL if all else fails</span>
-    <span class="ident">CustomLine</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Add some custom SQL if all else fails
+    </span>CustomLine(String),
 }
 
-<span class="doccomment">/// An enum set that represents operations done with and on indices</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexChange</span> {
-    <span class="doccomment">/// Add a multi-column index</span>
-    <span class="ident">AddIndex</span> {
-        <span class="ident">index</span>: <span class="ident">String</span>,
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">columns</span>: <span class="ident">types::Type</span>, <span class="comment">// Should always be a `Index` type</span>
+<span class="doccomment">/// An enum set that represents operations done with and on indices
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>IndexChange {
+    <span class="doccomment">/// Add a multi-column index
+    </span>AddIndex {
+        index: String,
+        table: String,
+        columns: types::Type, <span class="comment">// Should always be a `Index` type
+    </span>},
+
+    AddPartialIndex {
+        index: String,
+        table: String,
+        columns: types::Type, <span class="comment">// Should always be a `Index` type
+        </span>conditions: String,
     },
 
-    <span class="ident">AddPartialIndex</span> {
-        <span class="ident">index</span>: <span class="ident">String</span>,
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">columns</span>: <span class="ident">types::Type</span>, <span class="comment">// Should always be a `Index` type</span>
-        <span class="ident">conditions</span>: <span class="ident">String</span>,
-    },
-
-    <span class="doccomment">/// Remove a multi-column index</span>
-    <span class="ident">RemoveIndex</span>(<span class="ident">String</span>, <span class="ident">String</span>),
+    <span class="doccomment">/// Remove a multi-column index
+    </span>RemoveIndex(String, String),
 }
 
-<span class="doccomment">/// An enum set that represents operations done with and on constraints</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConstraintChange</span> {
-    <span class="doccomment">/// Add a new constraint</span>
-    <span class="ident">AddConstraint</span> {
-        <span class="ident">index</span>: <span class="ident">String</span>,
-        <span class="ident">columns</span>: <span class="ident">types::Type</span>, <span class="comment">// Should always be a `Constraint` type</span>
-    },
+<span class="doccomment">/// An enum set that represents operations done with and on constraints
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>ConstraintChange {
+    <span class="doccomment">/// Add a new constraint
+    </span>AddConstraint {
+        index: String,
+        columns: types::Type, <span class="comment">// Should always be a `Constraint` type
+    </span>},
 }
 
-<span class="doccomment">/// An enum set that represents operations done with and on foreign keys</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ForeignKeyChange</span> {
-    <span class="doccomment">/// Add a foreign key</span>
-    <span class="ident">AddForeignKey</span> {
-        <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">relation_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An enum set that represents operations done with and on foreign keys
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>ForeignKeyChange {
+    <span class="doccomment">/// Add a foreign key
+    </span>AddForeignKey {
+        columns: Vec&lt;String&gt;,
+        table: String,
+        relation_columns: Vec&lt;String&gt;,
     },
 }
 
-<span class="doccomment">/// An enum set that represents operations done to the primary key</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PrimaryKeyChange</span> {
-    <span class="doccomment">/// Adds a primary key to the table</span>
-    <span class="ident">AddPrimaryKey</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
+<span class="doccomment">/// An enum set that represents operations done to the primary key
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>PrimaryKeyChange {
+    <span class="doccomment">/// Adds a primary key to the table
+    </span>AddPrimaryKey(Vec&lt;String&gt;),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

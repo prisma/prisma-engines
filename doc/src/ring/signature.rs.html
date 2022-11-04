@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/signature.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signature.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/signature.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signature.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -404,411 +404,411 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Public key signatures: signing and verification.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Use the `verify` function to verify signatures, passing a reference to the</span>
-<span class="doccomment">//! algorithm that identifies the algorithm. See the documentation for `verify`</span>
-<span class="doccomment">//! for examples.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For signature verification, this API treats each combination of parameters</span>
-<span class="doccomment">//! as a separate algorithm. For example, instead of having a single &quot;RSA&quot;</span>
-<span class="doccomment">//! algorithm with a verification function that takes a bunch of parameters,</span>
-<span class="doccomment">//! there are `RSA_PKCS1_2048_8192_SHA256`, `RSA_PKCS1_2048_8192_SHA384`, etc.,</span>
-<span class="doccomment">//! which encode sets of parameter choices into objects. This is designed to</span>
-<span class="doccomment">//! reduce the risks of algorithm agility and to provide consistency with ECDSA</span>
-<span class="doccomment">//! and EdDSA.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Currently this module does not support digesting the message to be signed</span>
-<span class="doccomment">//! separately from the public key operation, as it is currently being</span>
-<span class="doccomment">//! optimized for Ed25519 and for the implementation of protocols that do not</span>
-<span class="doccomment">//! requiring signing large messages. An interface for efficiently supporting</span>
-<span class="doccomment">//! larger messages may be added later.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Algorithm Details</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## `ECDSA_*_ASN1` Details: ASN.1-encoded ECDSA Signatures</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The signature is a ASN.1 DER-encoded `Ecdsa-Sig-Value` as described in</span>
-<span class="doccomment">//! [RFC 3279 Section 2.2.3]. This is the form of ECDSA signature used in</span>
-<span class="doccomment">//! X.509-related structures and in TLS&#39;s `ServerKeyExchange` messages.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The public key is encoding in uncompressed form using the</span>
-<span class="doccomment">//! Octet-String-to-Elliptic-Curve-Point algorithm in</span>
-<span class="doccomment">//! [SEC 1: Elliptic Curve Cryptography, Version 2.0].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! During verification, the public key is validated using the ECC Partial</span>
-<span class="doccomment">//! Public-Key Validation Routine from Section 5.6.2.3.3 of</span>
-<span class="doccomment">//! [NIST Special Publication 800-56A, revision 2] and Appendix A.3 of the</span>
-<span class="doccomment">//! NSA&#39;s [Suite B implementer&#39;s guide to FIPS 186-3]. Note that, as explained</span>
-<span class="doccomment">//! in the NSA guide, ECC Partial Public-Key Validation is equivalent to ECC</span>
-<span class="doccomment">//! Full Public-Key Validation for prime-order curves like this one.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## `ECDSA_*_FIXED` Details: Fixed-length (PKCS#11-style) ECDSA Signatures</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The signature is *r*||*s*, where || denotes concatenation, and where both</span>
-<span class="doccomment">//! *r* and *s* are both big-endian-encoded values that are left-padded to the</span>
-<span class="doccomment">//! maximum length. A P-256 signature will be 64 bytes long (two 32-byte</span>
-<span class="doccomment">//! components) and a P-384 signature will be 96 bytes long (two 48-byte</span>
-<span class="doccomment">//! components). This is the form of ECDSA signature used PKCS#11 and DNSSEC.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The public key is encoding in uncompressed form using the</span>
-<span class="doccomment">//! Octet-String-to-Elliptic-Curve-Point algorithm in</span>
-<span class="doccomment">//! [SEC 1: Elliptic Curve Cryptography, Version 2.0].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! During verification, the public key is validated using the ECC Partial</span>
-<span class="doccomment">//! Public-Key Validation Routine from Section 5.6.2.3.3 of</span>
-<span class="doccomment">//! [NIST Special Publication 800-56A, revision 2] and Appendix A.3 of the</span>
-<span class="doccomment">//! NSA&#39;s [Suite B implementer&#39;s guide to FIPS 186-3]. Note that, as explained</span>
-<span class="doccomment">//! in the NSA guide, ECC Partial Public-Key Validation is equivalent to ECC</span>
-<span class="doccomment">//! Full Public-Key Validation for prime-order curves like this one.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## `RSA_PKCS1_*` Details: RSA PKCS#1 1.5 Signatures</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The signature is an RSASSA-PKCS1-v1_5 signature as described in</span>
-<span class="doccomment">//! [RFC 3447 Section 8.2].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The public key is encoded as an ASN.1 `RSAPublicKey` as described in</span>
-<span class="doccomment">//! [RFC 3447 Appendix-A.1.1]. The public key modulus length, rounded *up* to</span>
-<span class="doccomment">//! the nearest (larger) multiple of 8 bits, must be in the range given in the</span>
-<span class="doccomment">//! name of the algorithm. The public exponent must be an odd integer of 2-33</span>
-<span class="doccomment">//! bits, inclusive.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## `RSA_PSS_*` Details: RSA PSS Signatures</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The signature is an RSASSA-PSS signature as described in</span>
-<span class="doccomment">//! [RFC 3447 Section 8.1].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The public key is encoded as an ASN.1 `RSAPublicKey` as described in</span>
-<span class="doccomment">//! [RFC 3447 Appendix-A.1.1]. The public key modulus length, rounded *up* to</span>
-<span class="doccomment">//! the nearest (larger) multiple of 8 bits, must be in the range given in the</span>
-<span class="doccomment">//! name of the algorithm. The public exponent must be an odd integer of 2-33</span>
-<span class="doccomment">//! bits, inclusive.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! During verification, signatures will only be accepted if the MGF1 digest</span>
-<span class="doccomment">//! algorithm is the same as the message digest algorithm and if the salt</span>
-<span class="doccomment">//! length is the same length as the message digest. This matches the</span>
-<span class="doccomment">//! requirements in TLS 1.3 and other recent specifications.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! During signing, the message digest algorithm will be used as the MGF1</span>
-<span class="doccomment">//! digest algorithm. The salt will be the same length as the message digest.</span>
-<span class="doccomment">//! This matches the requirements in TLS 1.3 and other recent specifications.</span>
-<span class="doccomment">//! Additionally, the entire salt is randomly generated separately for each</span>
-<span class="doccomment">//! signature using the secure random number generator passed to `sign()`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [SEC 1: Elliptic Curve Cryptography, Version 2.0]:</span>
-<span class="doccomment">//!     http://www.secg.org/sec1-v2.pdf</span>
-<span class="doccomment">//! [NIST Special Publication 800-56A, revision 2]:</span>
-<span class="doccomment">//!     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf</span>
-<span class="doccomment">//! [Suite B implementer&#39;s guide to FIPS 186-3]:</span>
-<span class="doccomment">//!     https://github.com/briansmith/ring/blob/main/doc/ecdsa.pdf</span>
-<span class="doccomment">//! [RFC 3279 Section 2.2.3]:</span>
-<span class="doccomment">//!     https://tools.ietf.org/html/rfc3279#section-2.2.3</span>
-<span class="doccomment">//! [RFC 3447 Section 8.2]:</span>
-<span class="doccomment">//!     https://tools.ietf.org/html/rfc3447#section-7.2</span>
-<span class="doccomment">//! [RFC 3447 Section 8.1]:</span>
-<span class="doccomment">//!     https://tools.ietf.org/html/rfc3447#section-8.1</span>
-<span class="doccomment">//! [RFC 3447 Appendix-A.1.1]:</span>
-<span class="doccomment">//!     https://tools.ietf.org/html/rfc3447#appendix-A.1.1</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Signing and verifying with Ed25519</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{</span>
-<span class="doccomment">//!     rand,</span>
-<span class="doccomment">//!     signature::{self, KeyPair},</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() -&gt; Result&lt;(), ring::error::Unspecified&gt; {</span>
-<span class="doccomment">//! // Generate a key pair in PKCS#8 (v2) format.</span>
-<span class="doccomment">//! let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">//! let pkcs8_bytes = signature::Ed25519KeyPair::generate_pkcs8(&amp;rng)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Normally the application would store the PKCS#8 file persistently. Later</span>
-<span class="doccomment">//! // it would read the PKCS#8 file from persistent storage to use it.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let key_pair = signature::Ed25519KeyPair::from_pkcs8(pkcs8_bytes.as_ref())?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Sign the message &quot;hello, world&quot;.</span>
-<span class="doccomment">//! const MESSAGE: &amp;[u8] = b&quot;hello, world&quot;;</span>
-<span class="doccomment">//! let sig = key_pair.sign(MESSAGE);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Normally an application would extract the bytes of the signature and</span>
-<span class="doccomment">//! // send them in a protocol message to the peer(s). Here we just get the</span>
-<span class="doccomment">//! // public key key directly from the key pair.</span>
-<span class="doccomment">//! let peer_public_key_bytes = key_pair.public_key().as_ref();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Verify the signature of the message using the public key. Normally the</span>
-<span class="doccomment">//! // verifier of the message would parse the inputs to this code out of the</span>
-<span class="doccomment">//! // protocol message(s) sent by the signer.</span>
-<span class="doccomment">//! let peer_public_key =</span>
-<span class="doccomment">//!     signature::UnparsedPublicKey::new(&amp;signature::ED25519, peer_public_key_bytes);</span>
-<span class="doccomment">//! peer_public_key.verify(MESSAGE, sig.as_ref())?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Signing and verifying with RSA (PKCS#1 1.5 padding)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! By default OpenSSL writes RSA public keys in SubjectPublicKeyInfo format,</span>
-<span class="doccomment">//! not RSAPublicKey format, and Base64-encodes them (“PEM” format).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To convert the PEM SubjectPublicKeyInfo format (“BEGIN PUBLIC KEY”) to the</span>
-<span class="doccomment">//! binary RSAPublicKey format needed by `verify()`, use:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```sh</span>
-<span class="doccomment">//! openssl rsa -pubin \</span>
-<span class="doccomment">//!             -in public_key.pem \</span>
-<span class="doccomment">//!             -inform PEM \</span>
-<span class="doccomment">//!             -RSAPublicKey_out \</span>
-<span class="doccomment">//!             -outform DER \</span>
-<span class="doccomment">//!             -out public_key.der</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To extract the RSAPublicKey-formatted public key from an ASN.1 (binary)</span>
-<span class="doccomment">//! DER-encoded RSAPrivateKey format private key file, use:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```sh</span>
-<span class="doccomment">//! openssl rsa -in private_key.der \</span>
-<span class="doccomment">//!             -inform DER \</span>
-<span class="doccomment">//!             -RSAPublicKey_out \</span>
-<span class="doccomment">//!             -outform DER \</span>
-<span class="doccomment">//!             -out public_key.der</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{rand, signature};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;std&quot;)]</span>
-<span class="doccomment">//! fn sign_and_verify_rsa(private_key_path: &amp;std::path::Path,</span>
-<span class="doccomment">//!                        public_key_path: &amp;std::path::Path)</span>
-<span class="doccomment">//!                        -&gt; Result&lt;(), MyError&gt; {</span>
-<span class="doccomment">//! // Create an `RsaKeyPair` from the DER-encoded bytes. This example uses</span>
-<span class="doccomment">//! // a 2048-bit key, but larger keys are also supported.</span>
-<span class="doccomment">//! let private_key_der = read_file(private_key_path)?;</span>
-<span class="doccomment">//! let key_pair = signature::RsaKeyPair::from_der(&amp;private_key_der)</span>
-<span class="doccomment">//!     .map_err(|_| MyError::BadPrivateKey)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Sign the message &quot;hello, world&quot;, using PKCS#1 v1.5 padding and the</span>
-<span class="doccomment">//! // SHA256 digest algorithm.</span>
-<span class="doccomment">//! const MESSAGE: &amp;&#39;static [u8] = b&quot;hello, world&quot;;</span>
-<span class="doccomment">//! let rng = rand::SystemRandom::new();</span>
-<span class="doccomment">//! let mut signature = vec![0; key_pair.public_modulus_len()];</span>
-<span class="doccomment">//! key_pair.sign(&amp;signature::RSA_PKCS1_SHA256, &amp;rng, MESSAGE, &amp;mut signature)</span>
-<span class="doccomment">//!     .map_err(|_| MyError::OOM)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Verify the signature.</span>
-<span class="doccomment">//! let public_key =</span>
-<span class="doccomment">//!     signature::UnparsedPublicKey::new(&amp;signature::RSA_PKCS1_2048_8192_SHA256,</span>
-<span class="doccomment">//!                                       read_file(public_key_path)?);</span>
-<span class="doccomment">//! public_key.verify(MESSAGE, &amp;signature)</span>
-<span class="doccomment">//!     .map_err(|_| MyError::BadSignature)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug)]</span>
-<span class="doccomment">//! enum MyError {</span>
-<span class="doccomment">//! #  #[cfg(feature = &quot;std&quot;)]</span>
-<span class="doccomment">//!    IO(std::io::Error),</span>
-<span class="doccomment">//!    BadPrivateKey,</span>
-<span class="doccomment">//!    OOM,</span>
-<span class="doccomment">//!    BadSignature,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;std&quot;)]</span>
-<span class="doccomment">//! fn read_file(path: &amp;std::path::Path) -&gt; Result&lt;Vec&lt;u8&gt;, MyError&gt; {</span>
-<span class="doccomment">//!     use std::io::Read;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let mut file = std::fs::File::open(path).map_err(|e| MyError::IO(e))?;</span>
-<span class="doccomment">//!     let mut contents: Vec&lt;u8&gt; = Vec::new();</span>
-<span class="doccomment">//!     file.read_to_end(&amp;mut contents).map_err(|e| MyError::IO(e))?;</span>
-<span class="doccomment">//!     Ok(contents)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(not(feature = &quot;std&quot;))]</span>
-<span class="doccomment">//! # fn sign_and_verify_rsa(_private_key_path: &amp;std::path::Path,</span>
-<span class="doccomment">//! #                        _public_key_path: &amp;std::path::Path)</span>
-<span class="doccomment">//! #                        -&gt; Result&lt;(), ()&gt; {</span>
-<span class="doccomment">//! #     Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! #     let private_key_path =</span>
-<span class="doccomment">//! #         std::path::Path::new(&quot;src/rsa/signature_rsa_example_private_key.der&quot;);</span>
-<span class="doccomment">//! #     let public_key_path =</span>
-<span class="doccomment">//! #         std::path::Path::new(&quot;src/rsa/signature_rsa_example_public_key.der&quot;);</span>
-<span class="doccomment">//! #     sign_and_verify_rsa(&amp;private_key_path, &amp;public_key_path).unwrap()</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! Public key signatures: signing and verification.
+//!
+//! Use the `verify` function to verify signatures, passing a reference to the
+//! algorithm that identifies the algorithm. See the documentation for `verify`
+//! for examples.
+//!
+//! For signature verification, this API treats each combination of parameters
+//! as a separate algorithm. For example, instead of having a single &quot;RSA&quot;
+//! algorithm with a verification function that takes a bunch of parameters,
+//! there are `RSA_PKCS1_2048_8192_SHA256`, `RSA_PKCS1_2048_8192_SHA384`, etc.,
+//! which encode sets of parameter choices into objects. This is designed to
+//! reduce the risks of algorithm agility and to provide consistency with ECDSA
+//! and EdDSA.
+//!
+//! Currently this module does not support digesting the message to be signed
+//! separately from the public key operation, as it is currently being
+//! optimized for Ed25519 and for the implementation of protocols that do not
+//! requiring signing large messages. An interface for efficiently supporting
+//! larger messages may be added later.
+//!
+//!
+//! # Algorithm Details
+//!
+//! ## `ECDSA_*_ASN1` Details: ASN.1-encoded ECDSA Signatures
+//!
+//! The signature is a ASN.1 DER-encoded `Ecdsa-Sig-Value` as described in
+//! [RFC 3279 Section 2.2.3]. This is the form of ECDSA signature used in
+//! X.509-related structures and in TLS&#39;s `ServerKeyExchange` messages.
+//!
+//! The public key is encoding in uncompressed form using the
+//! Octet-String-to-Elliptic-Curve-Point algorithm in
+//! [SEC 1: Elliptic Curve Cryptography, Version 2.0].
+//!
+//! During verification, the public key is validated using the ECC Partial
+//! Public-Key Validation Routine from Section 5.6.2.3.3 of
+//! [NIST Special Publication 800-56A, revision 2] and Appendix A.3 of the
+//! NSA&#39;s [Suite B implementer&#39;s guide to FIPS 186-3]. Note that, as explained
+//! in the NSA guide, ECC Partial Public-Key Validation is equivalent to ECC
+//! Full Public-Key Validation for prime-order curves like this one.
+//!
+//! ## `ECDSA_*_FIXED` Details: Fixed-length (PKCS#11-style) ECDSA Signatures
+//!
+//! The signature is *r*||*s*, where || denotes concatenation, and where both
+//! *r* and *s* are both big-endian-encoded values that are left-padded to the
+//! maximum length. A P-256 signature will be 64 bytes long (two 32-byte
+//! components) and a P-384 signature will be 96 bytes long (two 48-byte
+//! components). This is the form of ECDSA signature used PKCS#11 and DNSSEC.
+//!
+//! The public key is encoding in uncompressed form using the
+//! Octet-String-to-Elliptic-Curve-Point algorithm in
+//! [SEC 1: Elliptic Curve Cryptography, Version 2.0].
+//!
+//! During verification, the public key is validated using the ECC Partial
+//! Public-Key Validation Routine from Section 5.6.2.3.3 of
+//! [NIST Special Publication 800-56A, revision 2] and Appendix A.3 of the
+//! NSA&#39;s [Suite B implementer&#39;s guide to FIPS 186-3]. Note that, as explained
+//! in the NSA guide, ECC Partial Public-Key Validation is equivalent to ECC
+//! Full Public-Key Validation for prime-order curves like this one.
+//!
+//! ## `RSA_PKCS1_*` Details: RSA PKCS#1 1.5 Signatures
+//!
+//! The signature is an RSASSA-PKCS1-v1_5 signature as described in
+//! [RFC 3447 Section 8.2].
+//!
+//! The public key is encoded as an ASN.1 `RSAPublicKey` as described in
+//! [RFC 3447 Appendix-A.1.1]. The public key modulus length, rounded *up* to
+//! the nearest (larger) multiple of 8 bits, must be in the range given in the
+//! name of the algorithm. The public exponent must be an odd integer of 2-33
+//! bits, inclusive.
+//!
+//!
+//! ## `RSA_PSS_*` Details: RSA PSS Signatures
+//!
+//! The signature is an RSASSA-PSS signature as described in
+//! [RFC 3447 Section 8.1].
+//!
+//! The public key is encoded as an ASN.1 `RSAPublicKey` as described in
+//! [RFC 3447 Appendix-A.1.1]. The public key modulus length, rounded *up* to
+//! the nearest (larger) multiple of 8 bits, must be in the range given in the
+//! name of the algorithm. The public exponent must be an odd integer of 2-33
+//! bits, inclusive.
+//!
+//! During verification, signatures will only be accepted if the MGF1 digest
+//! algorithm is the same as the message digest algorithm and if the salt
+//! length is the same length as the message digest. This matches the
+//! requirements in TLS 1.3 and other recent specifications.
+//!
+//! During signing, the message digest algorithm will be used as the MGF1
+//! digest algorithm. The salt will be the same length as the message digest.
+//! This matches the requirements in TLS 1.3 and other recent specifications.
+//! Additionally, the entire salt is randomly generated separately for each
+//! signature using the secure random number generator passed to `sign()`.
+//!
+//!
+//! [SEC 1: Elliptic Curve Cryptography, Version 2.0]:
+//!     http://www.secg.org/sec1-v2.pdf
+//! [NIST Special Publication 800-56A, revision 2]:
+//!     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-56Ar2.pdf
+//! [Suite B implementer&#39;s guide to FIPS 186-3]:
+//!     https://github.com/briansmith/ring/blob/main/doc/ecdsa.pdf
+//! [RFC 3279 Section 2.2.3]:
+//!     https://tools.ietf.org/html/rfc3279#section-2.2.3
+//! [RFC 3447 Section 8.2]:
+//!     https://tools.ietf.org/html/rfc3447#section-7.2
+//! [RFC 3447 Section 8.1]:
+//!     https://tools.ietf.org/html/rfc3447#section-8.1
+//! [RFC 3447 Appendix-A.1.1]:
+//!     https://tools.ietf.org/html/rfc3447#appendix-A.1.1
+//!
+//!
+//! # Examples
+//!
+//! ## Signing and verifying with Ed25519
+//!
+//! ```
+//! use ring::{
+//!     rand,
+//!     signature::{self, KeyPair},
+//! };
+//!
+//! # fn main() -&gt; Result&lt;(), ring::error::Unspecified&gt; {
+//! // Generate a key pair in PKCS#8 (v2) format.
+//! let rng = rand::SystemRandom::new();
+//! let pkcs8_bytes = signature::Ed25519KeyPair::generate_pkcs8(&amp;rng)?;
+//!
+//! // Normally the application would store the PKCS#8 file persistently. Later
+//! // it would read the PKCS#8 file from persistent storage to use it.
+//!
+//! let key_pair = signature::Ed25519KeyPair::from_pkcs8(pkcs8_bytes.as_ref())?;
+//!
+//! // Sign the message &quot;hello, world&quot;.
+//! const MESSAGE: &amp;[u8] = b&quot;hello, world&quot;;
+//! let sig = key_pair.sign(MESSAGE);
+//!
+//! // Normally an application would extract the bytes of the signature and
+//! // send them in a protocol message to the peer(s). Here we just get the
+//! // public key key directly from the key pair.
+//! let peer_public_key_bytes = key_pair.public_key().as_ref();
+//!
+//! // Verify the signature of the message using the public key. Normally the
+//! // verifier of the message would parse the inputs to this code out of the
+//! // protocol message(s) sent by the signer.
+//! let peer_public_key =
+//!     signature::UnparsedPublicKey::new(&amp;signature::ED25519, peer_public_key_bytes);
+//! peer_public_key.verify(MESSAGE, sig.as_ref())?;
+//!
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Signing and verifying with RSA (PKCS#1 1.5 padding)
+//!
+//! By default OpenSSL writes RSA public keys in SubjectPublicKeyInfo format,
+//! not RSAPublicKey format, and Base64-encodes them (“PEM” format).
+//!
+//! To convert the PEM SubjectPublicKeyInfo format (“BEGIN PUBLIC KEY”) to the
+//! binary RSAPublicKey format needed by `verify()`, use:
+//!
+//! ```sh
+//! openssl rsa -pubin \
+//!             -in public_key.pem \
+//!             -inform PEM \
+//!             -RSAPublicKey_out \
+//!             -outform DER \
+//!             -out public_key.der
+//! ```
+//!
+//! To extract the RSAPublicKey-formatted public key from an ASN.1 (binary)
+//! DER-encoded RSAPrivateKey format private key file, use:
+//!
+//! ```sh
+//! openssl rsa -in private_key.der \
+//!             -inform DER \
+//!             -RSAPublicKey_out \
+//!             -outform DER \
+//!             -out public_key.der
+//! ```
+//!
+//! ```
+//! use ring::{rand, signature};
+//!
+//! # #[cfg(feature = &quot;std&quot;)]
+//! fn sign_and_verify_rsa(private_key_path: &amp;std::path::Path,
+//!                        public_key_path: &amp;std::path::Path)
+//!                        -&gt; Result&lt;(), MyError&gt; {
+//! // Create an `RsaKeyPair` from the DER-encoded bytes. This example uses
+//! // a 2048-bit key, but larger keys are also supported.
+//! let private_key_der = read_file(private_key_path)?;
+//! let key_pair = signature::RsaKeyPair::from_der(&amp;private_key_der)
+//!     .map_err(|_| MyError::BadPrivateKey)?;
+//!
+//! // Sign the message &quot;hello, world&quot;, using PKCS#1 v1.5 padding and the
+//! // SHA256 digest algorithm.
+//! const MESSAGE: &amp;&#39;static [u8] = b&quot;hello, world&quot;;
+//! let rng = rand::SystemRandom::new();
+//! let mut signature = vec![0; key_pair.public_modulus_len()];
+//! key_pair.sign(&amp;signature::RSA_PKCS1_SHA256, &amp;rng, MESSAGE, &amp;mut signature)
+//!     .map_err(|_| MyError::OOM)?;
+//!
+//! // Verify the signature.
+//! let public_key =
+//!     signature::UnparsedPublicKey::new(&amp;signature::RSA_PKCS1_2048_8192_SHA256,
+//!                                       read_file(public_key_path)?);
+//! public_key.verify(MESSAGE, &amp;signature)
+//!     .map_err(|_| MyError::BadSignature)
+//! }
+//!
+//! #[derive(Debug)]
+//! enum MyError {
+//! #  #[cfg(feature = &quot;std&quot;)]
+//!    IO(std::io::Error),
+//!    BadPrivateKey,
+//!    OOM,
+//!    BadSignature,
+//! }
+//!
+//! # #[cfg(feature = &quot;std&quot;)]
+//! fn read_file(path: &amp;std::path::Path) -&gt; Result&lt;Vec&lt;u8&gt;, MyError&gt; {
+//!     use std::io::Read;
+//!
+//!     let mut file = std::fs::File::open(path).map_err(|e| MyError::IO(e))?;
+//!     let mut contents: Vec&lt;u8&gt; = Vec::new();
+//!     file.read_to_end(&amp;mut contents).map_err(|e| MyError::IO(e))?;
+//!     Ok(contents)
+//! }
+//! #
+//! # #[cfg(not(feature = &quot;std&quot;))]
+//! # fn sign_and_verify_rsa(_private_key_path: &amp;std::path::Path,
+//! #                        _public_key_path: &amp;std::path::Path)
+//! #                        -&gt; Result&lt;(), ()&gt; {
+//! #     Ok(())
+//! # }
+//! #
+//! # fn main() {
+//! #     let private_key_path =
+//! #         std::path::Path::new(&quot;src/rsa/signature_rsa_example_private_key.der&quot;);
+//! #     let public_key_path =
+//! #         std::path::Path::new(&quot;src/rsa/signature_rsa_example_public_key.der&quot;);
+//! #     sign_and_verify_rsa(&amp;private_key_path, &amp;public_key_path).unwrap()
+//! # }
+//! ```
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cpu</span>, <span class="ident">ec</span>, <span class="ident">error</span>, <span class="ident">sealed</span>};
+</span><span class="kw">use crate</span>::{cpu, ec, error, sealed};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ec</span>::{
-    <span class="ident">curve25519::ed25519</span>::{
-        <span class="ident">signing::Ed25519KeyPair</span>,
-        <span class="ident">verification</span>::{<span class="ident">EdDSAParameters</span>, <span class="ident">ED25519</span>},
-        <span class="ident">ED25519_PUBLIC_KEY_LEN</span>,
+<span class="kw">pub use </span><span class="kw">crate</span>::ec::{
+    curve25519::ed25519::{
+        signing::Ed25519KeyPair,
+        verification::{EdDSAParameters, ED25519},
+        ED25519_PUBLIC_KEY_LEN,
     },
-    <span class="ident">suite_b::ecdsa</span>::{
-        <span class="ident">signing</span>::{
-            <span class="ident">EcdsaKeyPair</span>, <span class="ident">EcdsaSigningAlgorithm</span>, <span class="ident">ECDSA_P256_SHA256_ASN1_SIGNING</span>,
-            <span class="ident">ECDSA_P256_SHA256_FIXED_SIGNING</span>, <span class="ident">ECDSA_P384_SHA384_ASN1_SIGNING</span>,
-            <span class="ident">ECDSA_P384_SHA384_FIXED_SIGNING</span>,
+    suite_b::ecdsa::{
+        signing::{
+            EcdsaKeyPair, EcdsaSigningAlgorithm, ECDSA_P256_SHA256_ASN1_SIGNING,
+            ECDSA_P256_SHA256_FIXED_SIGNING, ECDSA_P384_SHA384_ASN1_SIGNING,
+            ECDSA_P384_SHA384_FIXED_SIGNING,
         },
-        <span class="ident">verification</span>::{
-            <span class="ident">EcdsaVerificationAlgorithm</span>, <span class="ident">ECDSA_P256_SHA256_ASN1</span>, <span class="ident">ECDSA_P256_SHA256_FIXED</span>,
-            <span class="ident">ECDSA_P256_SHA384_ASN1</span>, <span class="ident">ECDSA_P384_SHA256_ASN1</span>, <span class="ident">ECDSA_P384_SHA384_ASN1</span>,
-            <span class="ident">ECDSA_P384_SHA384_FIXED</span>,
+        verification::{
+            EcdsaVerificationAlgorithm, ECDSA_P256_SHA256_ASN1, ECDSA_P256_SHA256_FIXED,
+            ECDSA_P256_SHA384_ASN1, ECDSA_P384_SHA256_ASN1, ECDSA_P384_SHA384_ASN1,
+            ECDSA_P384_SHA384_FIXED,
         },
     },
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rsa</span>::{
-    <span class="ident">signing::RsaKeyPair</span>,
-    <span class="ident">signing::RsaSubjectPublicKey</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::rsa::{
+    signing::RsaKeyPair,
+    signing::RsaSubjectPublicKey,
 
-    <span class="ident">verification</span>::{
-        <span class="ident">RsaPublicKeyComponents</span>, <span class="ident">RSA_PKCS1_1024_8192_SHA1_FOR_LEGACY_USE_ONLY</span>,
-        <span class="ident">RSA_PKCS1_1024_8192_SHA256_FOR_LEGACY_USE_ONLY</span>,
-        <span class="ident">RSA_PKCS1_1024_8192_SHA512_FOR_LEGACY_USE_ONLY</span>,
-        <span class="ident">RSA_PKCS1_2048_8192_SHA1_FOR_LEGACY_USE_ONLY</span>, <span class="ident">RSA_PKCS1_2048_8192_SHA256</span>,
-        <span class="ident">RSA_PKCS1_2048_8192_SHA384</span>, <span class="ident">RSA_PKCS1_2048_8192_SHA512</span>, <span class="ident">RSA_PKCS1_3072_8192_SHA384</span>,
-        <span class="ident">RSA_PSS_2048_8192_SHA256</span>, <span class="ident">RSA_PSS_2048_8192_SHA384</span>, <span class="ident">RSA_PSS_2048_8192_SHA512</span>,
+    verification::{
+        RsaPublicKeyComponents, RSA_PKCS1_1024_8192_SHA1_FOR_LEGACY_USE_ONLY,
+        RSA_PKCS1_1024_8192_SHA256_FOR_LEGACY_USE_ONLY,
+        RSA_PKCS1_1024_8192_SHA512_FOR_LEGACY_USE_ONLY,
+        RSA_PKCS1_2048_8192_SHA1_FOR_LEGACY_USE_ONLY, RSA_PKCS1_2048_8192_SHA256,
+        RSA_PKCS1_2048_8192_SHA384, RSA_PKCS1_2048_8192_SHA512, RSA_PKCS1_3072_8192_SHA384,
+        RSA_PSS_2048_8192_SHA256, RSA_PSS_2048_8192_SHA384, RSA_PSS_2048_8192_SHA512,
     },
 
-    <span class="ident">RsaEncoding</span>,
-    <span class="ident">RsaParameters</span>,
+    RsaEncoding,
+    RsaParameters,
 
-    <span class="comment">// `RSA_PKCS1_SHA1` is intentionally not exposed. At a minimum, we&#39;d need</span>
-    <span class="comment">// to create test vectors for signing with it, which we don&#39;t currently</span>
-    <span class="comment">// have. But, it&#39;s a bad idea to use SHA-1 anyway, so perhaps we just won&#39;t</span>
-    <span class="comment">// ever expose it.</span>
-    <span class="ident">RSA_PKCS1_SHA256</span>,
-    <span class="ident">RSA_PKCS1_SHA384</span>,
-    <span class="ident">RSA_PKCS1_SHA512</span>,
+    <span class="comment">// `RSA_PKCS1_SHA1` is intentionally not exposed. At a minimum, we&#39;d need
+    // to create test vectors for signing with it, which we don&#39;t currently
+    // have. But, it&#39;s a bad idea to use SHA-1 anyway, so perhaps we just won&#39;t
+    // ever expose it.
+    </span>RSA_PKCS1_SHA256,
+    RSA_PKCS1_SHA384,
+    RSA_PKCS1_SHA512,
 
-    <span class="ident">RSA_PSS_SHA256</span>,
-    <span class="ident">RSA_PSS_SHA384</span>,
-    <span class="ident">RSA_PSS_SHA512</span>,
+    RSA_PSS_SHA256,
+    RSA_PSS_SHA384,
+    RSA_PSS_SHA512,
 };
 
-<span class="doccomment">/// A public key signature returned from a signing operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Signature</span> {
-    <span class="ident">value</span>: [<span class="ident">u8</span>; <span class="ident">MAX_LEN</span>],
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A public key signature returned from a signing operation.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Signature {
+    value: [u8; MAX_LEN],
+    len: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Signature</span> {
-    <span class="comment">// Panics if `value` is too long.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fill</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="ident">MAX_LEN</span>]) -&gt; <span class="ident">usize</span>,
+<span class="kw">impl </span>Signature {
+    <span class="comment">// Panics if `value` is too long.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new&lt;F&gt;(fill: F) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>[u8; MAX_LEN]) -&gt; usize,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">value</span>: [<span class="number">0</span>; <span class="ident">MAX_LEN</span>],
-            <span class="ident">len</span>: <span class="number">0</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="self">Self </span>{
+            value: [<span class="number">0</span>; MAX_LEN],
+            len: <span class="number">0</span>,
         };
-        <span class="ident">r</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>.<span class="ident">value</span>);
-        <span class="ident">r</span>
+        r.len = fill(<span class="kw-2">&amp;mut </span>r.value);
+        r
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Signature</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Signature {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.value[..<span class="self">self</span>.len]
     }
 }
 
-<span class="doccomment">/// Key pairs for signing messages (private key and public key).</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KeyPair</span>: <span class="ident">core::fmt::Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// The type of the public key.</span>
-    <span class="kw">type</span> <span class="ident">PublicKey</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">core::fmt::Debug</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Sync</span>;
+<span class="doccomment">/// Key pairs for signing messages (private key and public key).
+</span><span class="kw">pub trait </span>KeyPair: core::fmt::Debug + Send + Sized + Sync {
+    <span class="doccomment">/// The type of the public key.
+    </span><span class="kw">type </span>PublicKey: AsRef&lt;[u8]&gt; + core::fmt::Debug + Clone + Send + Sized + Sync;
 
-    <span class="doccomment">/// The public key for the key pair.</span>
-    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span>;
+    <span class="doccomment">/// The public key for the key pair.
+    </span><span class="kw">fn </span>public_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::PublicKey;
 }
 
-<span class="doccomment">/// The longest signature is an ASN.1 P-384 signature where *r* and *s* are of</span>
-<span class="doccomment">/// maximum length with the leading high bit set on each. Then each component</span>
-<span class="doccomment">/// will have a tag, a one-byte length, and a one-byte “I&#39;m not negative”</span>
-<span class="doccomment">/// prefix, and the outer sequence will have a two-byte length.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span><span class="comment">/*tag:SEQUENCE*/</span> <span class="op">+</span> <span class="number">2</span><span class="comment">/*len*/</span> <span class="op">+</span>
-    (<span class="number">2</span> <span class="op">*</span> (<span class="number">1</span><span class="comment">/*tag:INTEGER*/</span> <span class="op">+</span> <span class="number">1</span><span class="comment">/*len*/</span> <span class="op">+</span> <span class="number">1</span><span class="comment">/*zero*/</span> <span class="op">+</span> <span class="ident">ec::SCALAR_MAX_BYTES</span>));
+<span class="doccomment">/// The longest signature is an ASN.1 P-384 signature where *r* and *s* are of
+/// maximum length with the leading high bit set on each. Then each component
+/// will have a tag, a one-byte length, and a one-byte “I&#39;m not negative”
+/// prefix, and the outer sequence will have a two-byte length.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_LEN: usize = <span class="number">1</span><span class="comment">/*tag:SEQUENCE*/ </span>+ <span class="number">2</span><span class="comment">/*len*/ </span>+
+    (<span class="number">2 </span>* (<span class="number">1</span><span class="comment">/*tag:INTEGER*/ </span>+ <span class="number">1</span><span class="comment">/*len*/ </span>+ <span class="number">1</span><span class="comment">/*zero*/ </span>+ ec::SCALAR_MAX_BYTES));
 
-<span class="doccomment">/// A signature verification algorithm.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VerificationAlgorithm</span>: <span class="ident">core::fmt::Debug</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">sealed::Sealed</span> {
-    <span class="doccomment">/// Verify the signature `signature` of message `msg` with the public key</span>
-    <span class="doccomment">/// `public_key`.</span>
-    <span class="kw">fn</span> <span class="ident">verify</span>(
+<span class="doccomment">/// A signature verification algorithm.
+</span><span class="kw">pub trait </span>VerificationAlgorithm: core::fmt::Debug + Sync + sealed::Sealed {
+    <span class="doccomment">/// Verify the signature `signature` of message `msg` with the public key
+    /// `public_key`.
+    </span><span class="kw">fn </span>verify(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">public_key</span>: <span class="ident">untrusted::Input</span>,
-        <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
-        <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
+        public_key: untrusted::Input,
+        msg: untrusted::Input,
+        signature: untrusted::Input,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;;
 }
 
-<span class="doccomment">/// An unparsed, possibly malformed, public key for signature verification.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnparsedPublicKey</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">VerificationAlgorithm</span>,
-    <span class="ident">bytes</span>: <span class="ident">B</span>,
+<span class="doccomment">/// An unparsed, possibly malformed, public key for signature verification.
+</span><span class="kw">pub struct </span>UnparsedPublicKey&lt;B: AsRef&lt;[u8]&gt;&gt; {
+    algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>VerificationAlgorithm,
+    bytes: B,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">UnparsedPublicKey</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;B: Copy&gt; Copy <span class="kw">for </span>UnparsedPublicKey&lt;B&gt; <span class="kw">where </span>B: AsRef&lt;[u8]&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">UnparsedPublicKey</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;B: Clone&gt; Clone <span class="kw">for </span>UnparsedPublicKey&lt;B&gt;
+<span class="kw">where
+    </span>B: AsRef&lt;[u8]&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">algorithm</span>: <span class="self">self</span>.<span class="ident">algorithm</span>,
-            <span class="ident">bytes</span>: <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            algorithm: <span class="self">self</span>.algorithm,
+            bytes: <span class="self">self</span>.bytes.clone(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">UnparsedPublicKey</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new `UnparsedPublicKey`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// No validation of `bytes` is done until `verify()` is called.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">VerificationAlgorithm</span>, <span class="ident">bytes</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">algorithm</span>, <span class="ident">bytes</span> }
+<span class="kw">impl</span>&lt;B: AsRef&lt;[u8]&gt;&gt; UnparsedPublicKey&lt;B&gt; {
+    <span class="doccomment">/// Construct a new `UnparsedPublicKey`.
+    ///
+    /// No validation of `bytes` is done until `verify()` is called.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>VerificationAlgorithm, bytes: B) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ algorithm, bytes }
     }
 
-    <span class="doccomment">/// Parses the public key and verifies `signature` is a valid signature of</span>
-    <span class="doccomment">/// `message` using it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the [crate::signature] module-level documentation for examples.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">cpu::features</span>();
-        <span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">verify</span>(
-            <span class="ident">untrusted::Input::from</span>(<span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">untrusted::Input::from</span>(<span class="ident">message</span>),
-            <span class="ident">untrusted::Input::from</span>(<span class="ident">signature</span>),
+    <span class="doccomment">/// Parses the public key and verifies `signature` is a valid signature of
+    /// `message` using it.
+    ///
+    /// See the [crate::signature] module-level documentation for examples.
+    </span><span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8], signature: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="kw">let _ </span>= cpu::features();
+        <span class="self">self</span>.algorithm.verify(
+            untrusted::Input::from(<span class="self">self</span>.bytes.as_ref()),
+            untrusted::Input::from(message),
+            untrusted::Input::from(signature),
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

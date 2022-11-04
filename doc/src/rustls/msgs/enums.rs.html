@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/enums.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/enums.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enums.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -798,805 +798,805 @@
 <span id="798">798</span>
 <span id="799">799</span>
 <span id="800">800</span>
-</pre><pre class="rust"><code><span class="doccomment">/// This file is autogenerated.  See https://github.com/ctz/tls-hacking/</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>::{<span class="ident">Codec</span>, <span class="ident">Reader</span>};
+</pre><pre class="rust"><code><span class="doccomment">/// This file is autogenerated.  See https://github.com/ctz/tls-hacking/
+</span><span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ProtocolVersion` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">ProtocolVersion</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">SSLv2</span> =&gt; <span class="number">0x0200</span>,
-        <span class="ident">SSLv3</span> =&gt; <span class="number">0x0300</span>,
-        <span class="ident">TLSv1_0</span> =&gt; <span class="number">0x0301</span>,
-        <span class="ident">TLSv1_1</span> =&gt; <span class="number">0x0302</span>,
-        <span class="ident">TLSv1_2</span> =&gt; <span class="number">0x0303</span>,
-        <span class="ident">TLSv1_3</span> =&gt; <span class="number">0x0304</span>,
-        <span class="ident">DTLSv1_0</span> =&gt; <span class="number">0xFEFF</span>,
-        <span class="ident">DTLSv1_2</span> =&gt; <span class="number">0xFEFD</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ProtocolVersion` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: ProtocolVersion;
+    EnumVal{
+        SSLv2 =&gt; <span class="number">0x0200</span>,
+        SSLv3 =&gt; <span class="number">0x0300</span>,
+        TLSv1_0 =&gt; <span class="number">0x0301</span>,
+        TLSv1_1 =&gt; <span class="number">0x0302</span>,
+        TLSv1_2 =&gt; <span class="number">0x0303</span>,
+        TLSv1_3 =&gt; <span class="number">0x0304</span>,
+        DTLSv1_0 =&gt; <span class="number">0xFEFF</span>,
+        DTLSv1_2 =&gt; <span class="number">0xFEFD
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `HashAlgorithm` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">HashAlgorithm</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">NONE</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">MD5</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">SHA1</span> =&gt; <span class="number">0x02</span>,
-        <span class="ident">SHA224</span> =&gt; <span class="number">0x03</span>,
-        <span class="ident">SHA256</span> =&gt; <span class="number">0x04</span>,
-        <span class="ident">SHA384</span> =&gt; <span class="number">0x05</span>,
-        <span class="ident">SHA512</span> =&gt; <span class="number">0x06</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `HashAlgorithm` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: HashAlgorithm;
+    EnumVal{
+        NONE =&gt; <span class="number">0x00</span>,
+        MD5 =&gt; <span class="number">0x01</span>,
+        SHA1 =&gt; <span class="number">0x02</span>,
+        SHA224 =&gt; <span class="number">0x03</span>,
+        SHA256 =&gt; <span class="number">0x04</span>,
+        SHA384 =&gt; <span class="number">0x05</span>,
+        SHA512 =&gt; <span class="number">0x06
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `SignatureAlgorithm` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">SignatureAlgorithm</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">Anonymous</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">RSA</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">DSA</span> =&gt; <span class="number">0x02</span>,
-        <span class="ident">ECDSA</span> =&gt; <span class="number">0x03</span>,
-        <span class="ident">ED25519</span> =&gt; <span class="number">0x07</span>,
-        <span class="ident">ED448</span> =&gt; <span class="number">0x08</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `SignatureAlgorithm` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: SignatureAlgorithm;
+    EnumVal{
+        Anonymous =&gt; <span class="number">0x00</span>,
+        RSA =&gt; <span class="number">0x01</span>,
+        DSA =&gt; <span class="number">0x02</span>,
+        ECDSA =&gt; <span class="number">0x03</span>,
+        ED25519 =&gt; <span class="number">0x07</span>,
+        ED448 =&gt; <span class="number">0x08
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ClientCertificateType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">ClientCertificateType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">RSASign</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">DSSSign</span> =&gt; <span class="number">0x02</span>,
-        <span class="ident">RSAFixedDH</span> =&gt; <span class="number">0x03</span>,
-        <span class="ident">DSSFixedDH</span> =&gt; <span class="number">0x04</span>,
-        <span class="ident">RSAEphemeralDH</span> =&gt; <span class="number">0x05</span>,
-        <span class="ident">DSSEphemeralDH</span> =&gt; <span class="number">0x06</span>,
-        <span class="ident">FortezzaDMS</span> =&gt; <span class="number">0x14</span>,
-        <span class="ident">ECDSASign</span> =&gt; <span class="number">0x40</span>,
-        <span class="ident">RSAFixedECDH</span> =&gt; <span class="number">0x41</span>,
-        <span class="ident">ECDSAFixedECDH</span> =&gt; <span class="number">0x42</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ClientCertificateType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: ClientCertificateType;
+    EnumVal{
+        RSASign =&gt; <span class="number">0x01</span>,
+        DSSSign =&gt; <span class="number">0x02</span>,
+        RSAFixedDH =&gt; <span class="number">0x03</span>,
+        DSSFixedDH =&gt; <span class="number">0x04</span>,
+        RSAEphemeralDH =&gt; <span class="number">0x05</span>,
+        DSSEphemeralDH =&gt; <span class="number">0x06</span>,
+        FortezzaDMS =&gt; <span class="number">0x14</span>,
+        ECDSASign =&gt; <span class="number">0x40</span>,
+        RSAFixedECDH =&gt; <span class="number">0x41</span>,
+        ECDSAFixedECDH =&gt; <span class="number">0x42
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `Compression` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">Compression</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">Null</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">Deflate</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">LSZ</span> =&gt; <span class="number">0x40</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `Compression` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: Compression;
+    EnumVal{
+        Null =&gt; <span class="number">0x00</span>,
+        Deflate =&gt; <span class="number">0x01</span>,
+        LSZ =&gt; <span class="number">0x40
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ContentType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">ContentType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">ChangeCipherSpec</span> =&gt; <span class="number">0x14</span>,
-        <span class="ident">Alert</span> =&gt; <span class="number">0x15</span>,
-        <span class="ident">Handshake</span> =&gt; <span class="number">0x16</span>,
-        <span class="ident">ApplicationData</span> =&gt; <span class="number">0x17</span>,
-        <span class="ident">Heartbeat</span> =&gt; <span class="number">0x18</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ContentType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: ContentType;
+    EnumVal{
+        ChangeCipherSpec =&gt; <span class="number">0x14</span>,
+        Alert =&gt; <span class="number">0x15</span>,
+        Handshake =&gt; <span class="number">0x16</span>,
+        ApplicationData =&gt; <span class="number">0x17</span>,
+        Heartbeat =&gt; <span class="number">0x18
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `HandshakeType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">HandshakeType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">HelloRequest</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">ClientHello</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">ServerHello</span> =&gt; <span class="number">0x02</span>,
-        <span class="ident">HelloVerifyRequest</span> =&gt; <span class="number">0x03</span>,
-        <span class="ident">NewSessionTicket</span> =&gt; <span class="number">0x04</span>,
-        <span class="ident">EndOfEarlyData</span> =&gt; <span class="number">0x05</span>,
-        <span class="ident">HelloRetryRequest</span> =&gt; <span class="number">0x06</span>,
-        <span class="ident">EncryptedExtensions</span> =&gt; <span class="number">0x08</span>,
-        <span class="ident">Certificate</span> =&gt; <span class="number">0x0b</span>,
-        <span class="ident">ServerKeyExchange</span> =&gt; <span class="number">0x0c</span>,
-        <span class="ident">CertificateRequest</span> =&gt; <span class="number">0x0d</span>,
-        <span class="ident">ServerHelloDone</span> =&gt; <span class="number">0x0e</span>,
-        <span class="ident">CertificateVerify</span> =&gt; <span class="number">0x0f</span>,
-        <span class="ident">ClientKeyExchange</span> =&gt; <span class="number">0x10</span>,
-        <span class="ident">Finished</span> =&gt; <span class="number">0x14</span>,
-        <span class="ident">CertificateURL</span> =&gt; <span class="number">0x15</span>,
-        <span class="ident">CertificateStatus</span> =&gt; <span class="number">0x16</span>,
-        <span class="ident">KeyUpdate</span> =&gt; <span class="number">0x18</span>,
-        <span class="ident">MessageHash</span> =&gt; <span class="number">0xfe</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `HandshakeType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: HandshakeType;
+    EnumVal{
+        HelloRequest =&gt; <span class="number">0x00</span>,
+        ClientHello =&gt; <span class="number">0x01</span>,
+        ServerHello =&gt; <span class="number">0x02</span>,
+        HelloVerifyRequest =&gt; <span class="number">0x03</span>,
+        NewSessionTicket =&gt; <span class="number">0x04</span>,
+        EndOfEarlyData =&gt; <span class="number">0x05</span>,
+        HelloRetryRequest =&gt; <span class="number">0x06</span>,
+        EncryptedExtensions =&gt; <span class="number">0x08</span>,
+        Certificate =&gt; <span class="number">0x0b</span>,
+        ServerKeyExchange =&gt; <span class="number">0x0c</span>,
+        CertificateRequest =&gt; <span class="number">0x0d</span>,
+        ServerHelloDone =&gt; <span class="number">0x0e</span>,
+        CertificateVerify =&gt; <span class="number">0x0f</span>,
+        ClientKeyExchange =&gt; <span class="number">0x10</span>,
+        Finished =&gt; <span class="number">0x14</span>,
+        CertificateURL =&gt; <span class="number">0x15</span>,
+        CertificateStatus =&gt; <span class="number">0x16</span>,
+        KeyUpdate =&gt; <span class="number">0x18</span>,
+        MessageHash =&gt; <span class="number">0xfe
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `AlertLevel` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">AlertLevel</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">Warning</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">Fatal</span> =&gt; <span class="number">0x02</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `AlertLevel` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: AlertLevel;
+    EnumVal{
+        Warning =&gt; <span class="number">0x01</span>,
+        Fatal =&gt; <span class="number">0x02
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `AlertDescription` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">AlertDescription</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">CloseNotify</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">UnexpectedMessage</span> =&gt; <span class="number">0x0a</span>,
-        <span class="ident">BadRecordMac</span> =&gt; <span class="number">0x14</span>,
-        <span class="ident">DecryptionFailed</span> =&gt; <span class="number">0x15</span>,
-        <span class="ident">RecordOverflow</span> =&gt; <span class="number">0x16</span>,
-        <span class="ident">DecompressionFailure</span> =&gt; <span class="number">0x1e</span>,
-        <span class="ident">HandshakeFailure</span> =&gt; <span class="number">0x28</span>,
-        <span class="ident">NoCertificate</span> =&gt; <span class="number">0x29</span>,
-        <span class="ident">BadCertificate</span> =&gt; <span class="number">0x2a</span>,
-        <span class="ident">UnsupportedCertificate</span> =&gt; <span class="number">0x2b</span>,
-        <span class="ident">CertificateRevoked</span> =&gt; <span class="number">0x2c</span>,
-        <span class="ident">CertificateExpired</span> =&gt; <span class="number">0x2d</span>,
-        <span class="ident">CertificateUnknown</span> =&gt; <span class="number">0x2e</span>,
-        <span class="ident">IllegalParameter</span> =&gt; <span class="number">0x2f</span>,
-        <span class="ident">UnknownCA</span> =&gt; <span class="number">0x30</span>,
-        <span class="ident">AccessDenied</span> =&gt; <span class="number">0x31</span>,
-        <span class="ident">DecodeError</span> =&gt; <span class="number">0x32</span>,
-        <span class="ident">DecryptError</span> =&gt; <span class="number">0x33</span>,
-        <span class="ident">ExportRestriction</span> =&gt; <span class="number">0x3c</span>,
-        <span class="ident">ProtocolVersion</span> =&gt; <span class="number">0x46</span>,
-        <span class="ident">InsufficientSecurity</span> =&gt; <span class="number">0x47</span>,
-        <span class="ident">InternalError</span> =&gt; <span class="number">0x50</span>,
-        <span class="ident">InappropriateFallback</span> =&gt; <span class="number">0x56</span>,
-        <span class="ident">UserCanceled</span> =&gt; <span class="number">0x5a</span>,
-        <span class="ident">NoRenegotiation</span> =&gt; <span class="number">0x64</span>,
-        <span class="ident">MissingExtension</span> =&gt; <span class="number">0x6d</span>,
-        <span class="ident">UnsupportedExtension</span> =&gt; <span class="number">0x6e</span>,
-        <span class="ident">CertificateUnobtainable</span> =&gt; <span class="number">0x6f</span>,
-        <span class="ident">UnrecognisedName</span> =&gt; <span class="number">0x70</span>,
-        <span class="ident">BadCertificateStatusResponse</span> =&gt; <span class="number">0x71</span>,
-        <span class="ident">BadCertificateHashValue</span> =&gt; <span class="number">0x72</span>,
-        <span class="ident">UnknownPSKIdentity</span> =&gt; <span class="number">0x73</span>,
-        <span class="ident">CertificateRequired</span> =&gt; <span class="number">0x74</span>,
-        <span class="ident">NoApplicationProtocol</span> =&gt; <span class="number">0x78</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `AlertDescription` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: AlertDescription;
+    EnumVal{
+        CloseNotify =&gt; <span class="number">0x00</span>,
+        UnexpectedMessage =&gt; <span class="number">0x0a</span>,
+        BadRecordMac =&gt; <span class="number">0x14</span>,
+        DecryptionFailed =&gt; <span class="number">0x15</span>,
+        RecordOverflow =&gt; <span class="number">0x16</span>,
+        DecompressionFailure =&gt; <span class="number">0x1e</span>,
+        HandshakeFailure =&gt; <span class="number">0x28</span>,
+        NoCertificate =&gt; <span class="number">0x29</span>,
+        BadCertificate =&gt; <span class="number">0x2a</span>,
+        UnsupportedCertificate =&gt; <span class="number">0x2b</span>,
+        CertificateRevoked =&gt; <span class="number">0x2c</span>,
+        CertificateExpired =&gt; <span class="number">0x2d</span>,
+        CertificateUnknown =&gt; <span class="number">0x2e</span>,
+        IllegalParameter =&gt; <span class="number">0x2f</span>,
+        UnknownCA =&gt; <span class="number">0x30</span>,
+        AccessDenied =&gt; <span class="number">0x31</span>,
+        DecodeError =&gt; <span class="number">0x32</span>,
+        DecryptError =&gt; <span class="number">0x33</span>,
+        ExportRestriction =&gt; <span class="number">0x3c</span>,
+        ProtocolVersion =&gt; <span class="number">0x46</span>,
+        InsufficientSecurity =&gt; <span class="number">0x47</span>,
+        InternalError =&gt; <span class="number">0x50</span>,
+        InappropriateFallback =&gt; <span class="number">0x56</span>,
+        UserCanceled =&gt; <span class="number">0x5a</span>,
+        NoRenegotiation =&gt; <span class="number">0x64</span>,
+        MissingExtension =&gt; <span class="number">0x6d</span>,
+        UnsupportedExtension =&gt; <span class="number">0x6e</span>,
+        CertificateUnobtainable =&gt; <span class="number">0x6f</span>,
+        UnrecognisedName =&gt; <span class="number">0x70</span>,
+        BadCertificateStatusResponse =&gt; <span class="number">0x71</span>,
+        BadCertificateHashValue =&gt; <span class="number">0x72</span>,
+        UnknownPSKIdentity =&gt; <span class="number">0x73</span>,
+        CertificateRequired =&gt; <span class="number">0x74</span>,
+        NoApplicationProtocol =&gt; <span class="number">0x78
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `HeartbeatMessageType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">HeartbeatMessageType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">Request</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">Response</span> =&gt; <span class="number">0x02</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `HeartbeatMessageType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: HeartbeatMessageType;
+    EnumVal{
+        Request =&gt; <span class="number">0x01</span>,
+        Response =&gt; <span class="number">0x02
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ExtensionType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">ExtensionType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">ServerName</span> =&gt; <span class="number">0x0000</span>,
-        <span class="ident">MaxFragmentLength</span> =&gt; <span class="number">0x0001</span>,
-        <span class="ident">ClientCertificateUrl</span> =&gt; <span class="number">0x0002</span>,
-        <span class="ident">TrustedCAKeys</span> =&gt; <span class="number">0x0003</span>,
-        <span class="ident">TruncatedHMAC</span> =&gt; <span class="number">0x0004</span>,
-        <span class="ident">StatusRequest</span> =&gt; <span class="number">0x0005</span>,
-        <span class="ident">UserMapping</span> =&gt; <span class="number">0x0006</span>,
-        <span class="ident">ClientAuthz</span> =&gt; <span class="number">0x0007</span>,
-        <span class="ident">ServerAuthz</span> =&gt; <span class="number">0x0008</span>,
-        <span class="ident">CertificateType</span> =&gt; <span class="number">0x0009</span>,
-        <span class="ident">EllipticCurves</span> =&gt; <span class="number">0x000a</span>,
-        <span class="ident">ECPointFormats</span> =&gt; <span class="number">0x000b</span>,
-        <span class="ident">SRP</span> =&gt; <span class="number">0x000c</span>,
-        <span class="ident">SignatureAlgorithms</span> =&gt; <span class="number">0x000d</span>,
-        <span class="ident">UseSRTP</span> =&gt; <span class="number">0x000e</span>,
-        <span class="ident">Heartbeat</span> =&gt; <span class="number">0x000f</span>,
-        <span class="ident">ALProtocolNegotiation</span> =&gt; <span class="number">0x0010</span>,
-        <span class="ident">SCT</span> =&gt; <span class="number">0x0012</span>,
-        <span class="ident">Padding</span> =&gt; <span class="number">0x0015</span>,
-        <span class="ident">ExtendedMasterSecret</span> =&gt; <span class="number">0x0017</span>,
-        <span class="ident">SessionTicket</span> =&gt; <span class="number">0x0023</span>,
-        <span class="ident">PreSharedKey</span> =&gt; <span class="number">0x0029</span>,
-        <span class="ident">EarlyData</span> =&gt; <span class="number">0x002a</span>,
-        <span class="ident">SupportedVersions</span> =&gt; <span class="number">0x002b</span>,
-        <span class="ident">Cookie</span> =&gt; <span class="number">0x002c</span>,
-        <span class="ident">PSKKeyExchangeModes</span> =&gt; <span class="number">0x002d</span>,
-        <span class="ident">TicketEarlyDataInfo</span> =&gt; <span class="number">0x002e</span>,
-        <span class="ident">CertificateAuthorities</span> =&gt; <span class="number">0x002f</span>,
-        <span class="ident">OIDFilters</span> =&gt; <span class="number">0x0030</span>,
-        <span class="ident">PostHandshakeAuth</span> =&gt; <span class="number">0x0031</span>,
-        <span class="ident">SignatureAlgorithmsCert</span> =&gt; <span class="number">0x0032</span>,
-        <span class="ident">KeyShare</span> =&gt; <span class="number">0x0033</span>,
-        <span class="ident">TransportParameters</span> =&gt; <span class="number">0x0039</span>,
-        <span class="ident">NextProtocolNegotiation</span> =&gt; <span class="number">0x3374</span>,
-        <span class="ident">ChannelId</span> =&gt; <span class="number">0x754f</span>,
-        <span class="ident">RenegotiationInfo</span> =&gt; <span class="number">0xff01</span>,
-        <span class="ident">TransportParametersDraft</span> =&gt; <span class="number">0xffa5</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ExtensionType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: ExtensionType;
+    EnumVal{
+        ServerName =&gt; <span class="number">0x0000</span>,
+        MaxFragmentLength =&gt; <span class="number">0x0001</span>,
+        ClientCertificateUrl =&gt; <span class="number">0x0002</span>,
+        TrustedCAKeys =&gt; <span class="number">0x0003</span>,
+        TruncatedHMAC =&gt; <span class="number">0x0004</span>,
+        StatusRequest =&gt; <span class="number">0x0005</span>,
+        UserMapping =&gt; <span class="number">0x0006</span>,
+        ClientAuthz =&gt; <span class="number">0x0007</span>,
+        ServerAuthz =&gt; <span class="number">0x0008</span>,
+        CertificateType =&gt; <span class="number">0x0009</span>,
+        EllipticCurves =&gt; <span class="number">0x000a</span>,
+        ECPointFormats =&gt; <span class="number">0x000b</span>,
+        SRP =&gt; <span class="number">0x000c</span>,
+        SignatureAlgorithms =&gt; <span class="number">0x000d</span>,
+        UseSRTP =&gt; <span class="number">0x000e</span>,
+        Heartbeat =&gt; <span class="number">0x000f</span>,
+        ALProtocolNegotiation =&gt; <span class="number">0x0010</span>,
+        SCT =&gt; <span class="number">0x0012</span>,
+        Padding =&gt; <span class="number">0x0015</span>,
+        ExtendedMasterSecret =&gt; <span class="number">0x0017</span>,
+        SessionTicket =&gt; <span class="number">0x0023</span>,
+        PreSharedKey =&gt; <span class="number">0x0029</span>,
+        EarlyData =&gt; <span class="number">0x002a</span>,
+        SupportedVersions =&gt; <span class="number">0x002b</span>,
+        Cookie =&gt; <span class="number">0x002c</span>,
+        PSKKeyExchangeModes =&gt; <span class="number">0x002d</span>,
+        TicketEarlyDataInfo =&gt; <span class="number">0x002e</span>,
+        CertificateAuthorities =&gt; <span class="number">0x002f</span>,
+        OIDFilters =&gt; <span class="number">0x0030</span>,
+        PostHandshakeAuth =&gt; <span class="number">0x0031</span>,
+        SignatureAlgorithmsCert =&gt; <span class="number">0x0032</span>,
+        KeyShare =&gt; <span class="number">0x0033</span>,
+        TransportParameters =&gt; <span class="number">0x0039</span>,
+        NextProtocolNegotiation =&gt; <span class="number">0x3374</span>,
+        ChannelId =&gt; <span class="number">0x754f</span>,
+        RenegotiationInfo =&gt; <span class="number">0xff01</span>,
+        TransportParametersDraft =&gt; <span class="number">0xffa5
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ServerNameType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">ServerNameType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">HostName</span> =&gt; <span class="number">0x00</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ServerNameType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: ServerNameType;
+    EnumVal{
+        HostName =&gt; <span class="number">0x00
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `NamedCurve` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">NamedCurve</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">sect163k1</span> =&gt; <span class="number">0x0001</span>,
-        <span class="ident">sect163r1</span> =&gt; <span class="number">0x0002</span>,
-        <span class="ident">sect163r2</span> =&gt; <span class="number">0x0003</span>,
-        <span class="ident">sect193r1</span> =&gt; <span class="number">0x0004</span>,
-        <span class="ident">sect193r2</span> =&gt; <span class="number">0x0005</span>,
-        <span class="ident">sect233k1</span> =&gt; <span class="number">0x0006</span>,
-        <span class="ident">sect233r1</span> =&gt; <span class="number">0x0007</span>,
-        <span class="ident">sect239k1</span> =&gt; <span class="number">0x0008</span>,
-        <span class="ident">sect283k1</span> =&gt; <span class="number">0x0009</span>,
-        <span class="ident">sect283r1</span> =&gt; <span class="number">0x000a</span>,
-        <span class="ident">sect409k1</span> =&gt; <span class="number">0x000b</span>,
-        <span class="ident">sect409r1</span> =&gt; <span class="number">0x000c</span>,
-        <span class="ident">sect571k1</span> =&gt; <span class="number">0x000d</span>,
-        <span class="ident">sect571r1</span> =&gt; <span class="number">0x000e</span>,
-        <span class="ident">secp160k1</span> =&gt; <span class="number">0x000f</span>,
-        <span class="ident">secp160r1</span> =&gt; <span class="number">0x0010</span>,
-        <span class="ident">secp160r2</span> =&gt; <span class="number">0x0011</span>,
-        <span class="ident">secp192k1</span> =&gt; <span class="number">0x0012</span>,
-        <span class="ident">secp192r1</span> =&gt; <span class="number">0x0013</span>,
-        <span class="ident">secp224k1</span> =&gt; <span class="number">0x0014</span>,
-        <span class="ident">secp224r1</span> =&gt; <span class="number">0x0015</span>,
-        <span class="ident">secp256k1</span> =&gt; <span class="number">0x0016</span>,
-        <span class="ident">secp256r1</span> =&gt; <span class="number">0x0017</span>,
-        <span class="ident">secp384r1</span> =&gt; <span class="number">0x0018</span>,
-        <span class="ident">secp521r1</span> =&gt; <span class="number">0x0019</span>,
-        <span class="ident">brainpoolp256r1</span> =&gt; <span class="number">0x001a</span>,
-        <span class="ident">brainpoolp384r1</span> =&gt; <span class="number">0x001b</span>,
-        <span class="ident">brainpoolp512r1</span> =&gt; <span class="number">0x001c</span>,
-        <span class="ident">X25519</span> =&gt; <span class="number">0x001d</span>,
-        <span class="ident">X448</span> =&gt; <span class="number">0x001e</span>,
-        <span class="ident">arbitrary_explicit_prime_curves</span> =&gt; <span class="number">0xff01</span>,
-        <span class="ident">arbitrary_explicit_char2_curves</span> =&gt; <span class="number">0xff02</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `NamedCurve` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: NamedCurve;
+    EnumVal{
+        sect163k1 =&gt; <span class="number">0x0001</span>,
+        sect163r1 =&gt; <span class="number">0x0002</span>,
+        sect163r2 =&gt; <span class="number">0x0003</span>,
+        sect193r1 =&gt; <span class="number">0x0004</span>,
+        sect193r2 =&gt; <span class="number">0x0005</span>,
+        sect233k1 =&gt; <span class="number">0x0006</span>,
+        sect233r1 =&gt; <span class="number">0x0007</span>,
+        sect239k1 =&gt; <span class="number">0x0008</span>,
+        sect283k1 =&gt; <span class="number">0x0009</span>,
+        sect283r1 =&gt; <span class="number">0x000a</span>,
+        sect409k1 =&gt; <span class="number">0x000b</span>,
+        sect409r1 =&gt; <span class="number">0x000c</span>,
+        sect571k1 =&gt; <span class="number">0x000d</span>,
+        sect571r1 =&gt; <span class="number">0x000e</span>,
+        secp160k1 =&gt; <span class="number">0x000f</span>,
+        secp160r1 =&gt; <span class="number">0x0010</span>,
+        secp160r2 =&gt; <span class="number">0x0011</span>,
+        secp192k1 =&gt; <span class="number">0x0012</span>,
+        secp192r1 =&gt; <span class="number">0x0013</span>,
+        secp224k1 =&gt; <span class="number">0x0014</span>,
+        secp224r1 =&gt; <span class="number">0x0015</span>,
+        secp256k1 =&gt; <span class="number">0x0016</span>,
+        secp256r1 =&gt; <span class="number">0x0017</span>,
+        secp384r1 =&gt; <span class="number">0x0018</span>,
+        secp521r1 =&gt; <span class="number">0x0019</span>,
+        brainpoolp256r1 =&gt; <span class="number">0x001a</span>,
+        brainpoolp384r1 =&gt; <span class="number">0x001b</span>,
+        brainpoolp512r1 =&gt; <span class="number">0x001c</span>,
+        X25519 =&gt; <span class="number">0x001d</span>,
+        X448 =&gt; <span class="number">0x001e</span>,
+        arbitrary_explicit_prime_curves =&gt; <span class="number">0xff01</span>,
+        arbitrary_explicit_char2_curves =&gt; <span class="number">0xff02
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `NamedGroup` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">NamedGroup</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">secp256r1</span> =&gt; <span class="number">0x0017</span>,
-        <span class="ident">secp384r1</span> =&gt; <span class="number">0x0018</span>,
-        <span class="ident">secp521r1</span> =&gt; <span class="number">0x0019</span>,
-        <span class="ident">X25519</span> =&gt; <span class="number">0x001d</span>,
-        <span class="ident">X448</span> =&gt; <span class="number">0x001e</span>,
-        <span class="ident">FFDHE2048</span> =&gt; <span class="number">0x0100</span>,
-        <span class="ident">FFDHE3072</span> =&gt; <span class="number">0x0101</span>,
-        <span class="ident">FFDHE4096</span> =&gt; <span class="number">0x0102</span>,
-        <span class="ident">FFDHE6144</span> =&gt; <span class="number">0x0103</span>,
-        <span class="ident">FFDHE8192</span> =&gt; <span class="number">0x0104</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `NamedGroup` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: NamedGroup;
+    EnumVal{
+        secp256r1 =&gt; <span class="number">0x0017</span>,
+        secp384r1 =&gt; <span class="number">0x0018</span>,
+        secp521r1 =&gt; <span class="number">0x0019</span>,
+        X25519 =&gt; <span class="number">0x001d</span>,
+        X448 =&gt; <span class="number">0x001e</span>,
+        FFDHE2048 =&gt; <span class="number">0x0100</span>,
+        FFDHE3072 =&gt; <span class="number">0x0101</span>,
+        FFDHE4096 =&gt; <span class="number">0x0102</span>,
+        FFDHE6144 =&gt; <span class="number">0x0103</span>,
+        FFDHE8192 =&gt; <span class="number">0x0104
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `CipherSuite` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">CipherSuite</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">TLS_NULL_WITH_NULL_NULL</span> =&gt; <span class="number">0x0000</span>,
-        <span class="ident">TLS_RSA_WITH_NULL_MD5</span> =&gt; <span class="number">0x0001</span>,
-        <span class="ident">TLS_RSA_WITH_NULL_SHA</span> =&gt; <span class="number">0x0002</span>,
-        <span class="ident">TLS_RSA_EXPORT_WITH_RC4_40_MD5</span> =&gt; <span class="number">0x0003</span>,
-        <span class="ident">TLS_RSA_WITH_RC4_128_MD5</span> =&gt; <span class="number">0x0004</span>,
-        <span class="ident">TLS_RSA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x0005</span>,
-        <span class="ident">TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5</span> =&gt; <span class="number">0x0006</span>,
-        <span class="ident">TLS_RSA_WITH_IDEA_CBC_SHA</span> =&gt; <span class="number">0x0007</span>,
-        <span class="ident">TLS_RSA_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x0008</span>,
-        <span class="ident">TLS_RSA_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x0009</span>,
-        <span class="ident">TLS_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x000a</span>,
-        <span class="ident">TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x000b</span>,
-        <span class="ident">TLS_DH_DSS_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x000c</span>,
-        <span class="ident">TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x000d</span>,
-        <span class="ident">TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x000e</span>,
-        <span class="ident">TLS_DH_RSA_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x000f</span>,
-        <span class="ident">TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x0010</span>,
-        <span class="ident">TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x0011</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x0012</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x0013</span>,
-        <span class="ident">TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x0014</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x0015</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x0016</span>,
-        <span class="ident">TLS_DH_anon_EXPORT_WITH_RC4_40_MD5</span> =&gt; <span class="number">0x0017</span>,
-        <span class="ident">TLS_DH_anon_WITH_RC4_128_MD5</span> =&gt; <span class="number">0x0018</span>,
-        <span class="ident">TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA</span> =&gt; <span class="number">0x0019</span>,
-        <span class="ident">TLS_DH_anon_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x001a</span>,
-        <span class="ident">TLS_DH_anon_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x001b</span>,
-        <span class="ident">SSL_FORTEZZA_KEA_WITH_NULL_SHA</span> =&gt; <span class="number">0x001c</span>,
-        <span class="ident">SSL_FORTEZZA_KEA_WITH_FORTEZZA_CBC_SHA</span> =&gt; <span class="number">0x001d</span>,
-        <span class="ident">TLS_KRB5_WITH_DES_CBC_SHA_or_SSL_FORTEZZA_KEA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x001e</span>,
-        <span class="ident">TLS_KRB5_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x001f</span>,
-        <span class="ident">TLS_KRB5_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x0020</span>,
-        <span class="ident">TLS_KRB5_WITH_IDEA_CBC_SHA</span> =&gt; <span class="number">0x0021</span>,
-        <span class="ident">TLS_KRB5_WITH_DES_CBC_MD5</span> =&gt; <span class="number">0x0022</span>,
-        <span class="ident">TLS_KRB5_WITH_3DES_EDE_CBC_MD5</span> =&gt; <span class="number">0x0023</span>,
-        <span class="ident">TLS_KRB5_WITH_RC4_128_MD5</span> =&gt; <span class="number">0x0024</span>,
-        <span class="ident">TLS_KRB5_WITH_IDEA_CBC_MD5</span> =&gt; <span class="number">0x0025</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA</span> =&gt; <span class="number">0x0026</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_RC2_CBC_40_SHA</span> =&gt; <span class="number">0x0027</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_RC4_40_SHA</span> =&gt; <span class="number">0x0028</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5</span> =&gt; <span class="number">0x0029</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_RC2_CBC_40_MD5</span> =&gt; <span class="number">0x002a</span>,
-        <span class="ident">TLS_KRB5_EXPORT_WITH_RC4_40_MD5</span> =&gt; <span class="number">0x002b</span>,
-        <span class="ident">TLS_PSK_WITH_NULL_SHA</span> =&gt; <span class="number">0x002c</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_NULL_SHA</span> =&gt; <span class="number">0x002d</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_NULL_SHA</span> =&gt; <span class="number">0x002e</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x002f</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0030</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0031</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0032</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0033</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0034</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0035</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0036</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0037</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0038</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0039</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x003a</span>,
-        <span class="ident">TLS_RSA_WITH_NULL_SHA256</span> =&gt; <span class="number">0x003b</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x003c</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x003d</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x003e</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x003f</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x0040</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0041</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0042</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0043</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0044</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0045</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA</span> =&gt; <span class="number">0x0046</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_NULL_SHA_draft</span> =&gt; <span class="number">0x0047</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_RC4_128_SHA_draft</span> =&gt; <span class="number">0x0048</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_DES_CBC_SHA_draft</span> =&gt; <span class="number">0x0049</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA_draft</span> =&gt; <span class="number">0x004a</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA_draft</span> =&gt; <span class="number">0x004b</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA_draft</span> =&gt; <span class="number">0x004c</span>,
-        <span class="ident">TLS_ECDH_ECNRA_WITH_DES_CBC_SHA_draft</span> =&gt; <span class="number">0x004d</span>,
-        <span class="ident">TLS_ECDH_ECNRA_WITH_3DES_EDE_CBC_SHA_draft</span> =&gt; <span class="number">0x004e</span>,
-        <span class="ident">TLS_ECMQV_ECDSA_NULL_SHA_draft</span> =&gt; <span class="number">0x004f</span>,
-        <span class="ident">TLS_ECMQV_ECDSA_WITH_RC4_128_SHA_draft</span> =&gt; <span class="number">0x0050</span>,
-        <span class="ident">TLS_ECMQV_ECDSA_WITH_DES_CBC_SHA_draft</span> =&gt; <span class="number">0x0051</span>,
-        <span class="ident">TLS_ECMQV_ECDSA_WITH_3DES_EDE_CBC_SHA_draft</span> =&gt; <span class="number">0x0052</span>,
-        <span class="ident">TLS_ECMQV_ECNRA_NULL_SHA_draft</span> =&gt; <span class="number">0x0053</span>,
-        <span class="ident">TLS_ECMQV_ECNRA_WITH_RC4_128_SHA_draft</span> =&gt; <span class="number">0x0054</span>,
-        <span class="ident">TLS_ECMQV_ECNRA_WITH_DES_CBC_SHA_draft</span> =&gt; <span class="number">0x0055</span>,
-        <span class="ident">TLS_ECMQV_ECNRA_WITH_3DES_EDE_CBC_SHA_draft</span> =&gt; <span class="number">0x0056</span>,
-        <span class="ident">TLS_ECDH_anon_NULL_WITH_SHA_draft</span> =&gt; <span class="number">0x0057</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_RC4_128_SHA_draft</span> =&gt; <span class="number">0x0058</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_DES_CBC_SHA_draft</span> =&gt; <span class="number">0x0059</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA_draft</span> =&gt; <span class="number">0x005a</span>,
-        <span class="ident">TLS_ECDH_anon_EXPORT_WITH_DES40_CBC_SHA_draft</span> =&gt; <span class="number">0x005b</span>,
-        <span class="ident">TLS_ECDH_anon_EXPORT_WITH_RC4_40_SHA_draft</span> =&gt; <span class="number">0x005c</span>,
-        <span class="ident">TLS_RSA_EXPORT1024_WITH_RC4_56_MD5</span> =&gt; <span class="number">0x0060</span>,
-        <span class="ident">TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5</span> =&gt; <span class="number">0x0061</span>,
-        <span class="ident">TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x0062</span>,
-        <span class="ident">TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0x0063</span>,
-        <span class="ident">TLS_RSA_EXPORT1024_WITH_RC4_56_SHA</span> =&gt; <span class="number">0x0064</span>,
-        <span class="ident">TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA</span> =&gt; <span class="number">0x0065</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x0066</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x0067</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x0068</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x0069</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x006a</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x006b</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x006c</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_256_CBC_SHA256</span> =&gt; <span class="number">0x006d</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_3DES_EDE_CBC_RMD</span> =&gt; <span class="number">0x0072</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_128_CBC_RMD</span> =&gt; <span class="number">0x0073</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_256_CBC_RMD</span> =&gt; <span class="number">0x0074</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_3DES_EDE_CBC_RMD</span> =&gt; <span class="number">0x0077</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_CBC_RMD</span> =&gt; <span class="number">0x0078</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_CBC_RMD</span> =&gt; <span class="number">0x0079</span>,
-        <span class="ident">TLS_RSA_WITH_3DES_EDE_CBC_RMD</span> =&gt; <span class="number">0x007c</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_CBC_RMD</span> =&gt; <span class="number">0x007d</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_CBC_RMD</span> =&gt; <span class="number">0x007e</span>,
-        <span class="ident">TLS_GOSTR341094_WITH_28147_CNT_IMIT</span> =&gt; <span class="number">0x0080</span>,
-        <span class="ident">TLS_GOSTR341001_WITH_28147_CNT_IMIT</span> =&gt; <span class="number">0x0081</span>,
-        <span class="ident">TLS_GOSTR341094_WITH_NULL_GOSTR3411</span> =&gt; <span class="number">0x0082</span>,
-        <span class="ident">TLS_GOSTR341001_WITH_NULL_GOSTR3411</span> =&gt; <span class="number">0x0083</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0084</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0085</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0086</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0087</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0088</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA</span> =&gt; <span class="number">0x0089</span>,
-        <span class="ident">TLS_PSK_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x008a</span>,
-        <span class="ident">TLS_PSK_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x008b</span>,
-        <span class="ident">TLS_PSK_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x008c</span>,
-        <span class="ident">TLS_PSK_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x008d</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x008e</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x008f</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0090</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0091</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_RC4_128_SHA</span> =&gt; <span class="number">0x0092</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0x0093</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0x0094</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0x0095</span>,
-        <span class="ident">TLS_RSA_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x0096</span>,
-        <span class="ident">TLS_DH_DSS_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x0097</span>,
-        <span class="ident">TLS_DH_RSA_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x0098</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x0099</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x009a</span>,
-        <span class="ident">TLS_DH_anon_WITH_SEED_CBC_SHA</span> =&gt; <span class="number">0x009b</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x009c</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x009d</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x009e</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x009f</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00a0</span>,
-        <span class="ident">TLS_DH_RSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00a1</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00a2</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00a3</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00a4</span>,
-        <span class="ident">TLS_DH_DSS_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00a5</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00a6</span>,
-        <span class="ident">TLS_DH_anon_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00a7</span>,
-        <span class="ident">TLS_PSK_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00a8</span>,
-        <span class="ident">TLS_PSK_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00a9</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00aa</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00ab</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x00ac</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x00ad</span>,
-        <span class="ident">TLS_PSK_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x00ae</span>,
-        <span class="ident">TLS_PSK_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0x00af</span>,
-        <span class="ident">TLS_PSK_WITH_NULL_SHA256</span> =&gt; <span class="number">0x00b0</span>,
-        <span class="ident">TLS_PSK_WITH_NULL_SHA384</span> =&gt; <span class="number">0x00b1</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x00b2</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0x00b3</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_NULL_SHA256</span> =&gt; <span class="number">0x00b4</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_NULL_SHA384</span> =&gt; <span class="number">0x00b5</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0x00b6</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0x00b7</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_NULL_SHA256</span> =&gt; <span class="number">0x00b8</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_NULL_SHA384</span> =&gt; <span class="number">0x00b9</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00ba</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00bb</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00bc</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00bd</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00be</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0x00bf</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c0</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c1</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c2</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c3</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c4</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256</span> =&gt; <span class="number">0x00c5</span>,
-        <span class="ident">TLS_EMPTY_RENEGOTIATION_INFO_SCSV</span> =&gt; <span class="number">0x00ff</span>,
-        <span class="ident">TLS13_AES_128_GCM_SHA256</span> =&gt; <span class="number">0x1301</span>,
-        <span class="ident">TLS13_AES_256_GCM_SHA384</span> =&gt; <span class="number">0x1302</span>,
-        <span class="ident">TLS13_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0x1303</span>,
-        <span class="ident">TLS13_AES_128_CCM_SHA256</span> =&gt; <span class="number">0x1304</span>,
-        <span class="ident">TLS13_AES_128_CCM_8_SHA256</span> =&gt; <span class="number">0x1305</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_NULL_SHA</span> =&gt; <span class="number">0xc001</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc002</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc003</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc004</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc005</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_NULL_SHA</span> =&gt; <span class="number">0xc006</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc007</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc008</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc009</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc00a</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_NULL_SHA</span> =&gt; <span class="number">0xc00b</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc00c</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc00d</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc00e</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc00f</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_NULL_SHA</span> =&gt; <span class="number">0xc010</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc011</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc012</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc013</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc014</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_NULL_SHA</span> =&gt; <span class="number">0xc015</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc016</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc017</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc018</span>,
-        <span class="ident">TLS_ECDH_anon_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc019</span>,
-        <span class="ident">TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc01a</span>,
-        <span class="ident">TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc01b</span>,
-        <span class="ident">TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc01c</span>,
-        <span class="ident">TLS_SRP_SHA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc01d</span>,
-        <span class="ident">TLS_SRP_SHA_RSA_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc01e</span>,
-        <span class="ident">TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc01f</span>,
-        <span class="ident">TLS_SRP_SHA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc020</span>,
-        <span class="ident">TLS_SRP_SHA_RSA_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc021</span>,
-        <span class="ident">TLS_SRP_SHA_DSS_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc022</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0xc023</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0xc024</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0xc025</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0xc026</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0xc027</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0xc028</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0xc029</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0xc02a</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0xc02b</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0xc02c</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0xc02d</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0xc02e</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0xc02f</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0xc030</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256</span> =&gt; <span class="number">0xc031</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384</span> =&gt; <span class="number">0xc032</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_RC4_128_SHA</span> =&gt; <span class="number">0xc033</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xc034</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA</span> =&gt; <span class="number">0xc035</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA</span> =&gt; <span class="number">0xc036</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256</span> =&gt; <span class="number">0xc037</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384</span> =&gt; <span class="number">0xc038</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_NULL_SHA</span> =&gt; <span class="number">0xc039</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_NULL_SHA256</span> =&gt; <span class="number">0xc03a</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_NULL_SHA384</span> =&gt; <span class="number">0xc03b</span>,
-        <span class="ident">TLS_RSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc03c</span>,
-        <span class="ident">TLS_RSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc03d</span>,
-        <span class="ident">TLS_DH_DSS_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc03e</span>,
-        <span class="ident">TLS_DH_DSS_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc03f</span>,
-        <span class="ident">TLS_DH_RSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc040</span>,
-        <span class="ident">TLS_DH_RSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc041</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc042</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc043</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc044</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc045</span>,
-        <span class="ident">TLS_DH_anon_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc046</span>,
-        <span class="ident">TLS_DH_anon_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc047</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc048</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc049</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc04a</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc04b</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc04c</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc04d</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc04e</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc04f</span>,
-        <span class="ident">TLS_RSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc050</span>,
-        <span class="ident">TLS_RSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc051</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc052</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc053</span>,
-        <span class="ident">TLS_DH_RSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc054</span>,
-        <span class="ident">TLS_DH_RSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc055</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc056</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc057</span>,
-        <span class="ident">TLS_DH_DSS_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc058</span>,
-        <span class="ident">TLS_DH_DSS_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc059</span>,
-        <span class="ident">TLS_DH_anon_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc05a</span>,
-        <span class="ident">TLS_DH_anon_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc05b</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc05c</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc05d</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc05e</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc05f</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc060</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc061</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc062</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc063</span>,
-        <span class="ident">TLS_PSK_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc064</span>,
-        <span class="ident">TLS_PSK_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc065</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc066</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc067</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc068</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc069</span>,
-        <span class="ident">TLS_PSK_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc06a</span>,
-        <span class="ident">TLS_PSK_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc06b</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc06c</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc06d</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc06e</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc06f</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_ARIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc070</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_ARIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc071</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc072</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc073</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc074</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc075</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc076</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc077</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc078</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc079</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc07a</span>,
-        <span class="ident">TLS_RSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc07b</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc07c</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc07d</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc07e</span>,
-        <span class="ident">TLS_DH_RSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc07f</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc080</span>,
-        <span class="ident">TLS_DHE_DSS_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc081</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc082</span>,
-        <span class="ident">TLS_DH_DSS_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc083</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc084</span>,
-        <span class="ident">TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc085</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc086</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc087</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc088</span>,
-        <span class="ident">TLS_ECDH_ECDSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc089</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc08a</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc08b</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc08c</span>,
-        <span class="ident">TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc08d</span>,
-        <span class="ident">TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc08e</span>,
-        <span class="ident">TLS_PSK_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc08f</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc090</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc091</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256</span> =&gt; <span class="number">0xc092</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_CAMELLIA_256_GCM_SHA384</span> =&gt; <span class="number">0xc093</span>,
-        <span class="ident">TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc094</span>,
-        <span class="ident">TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc095</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc096</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc097</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc098</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc099</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256</span> =&gt; <span class="number">0xc09a</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384</span> =&gt; <span class="number">0xc09b</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_CCM</span> =&gt; <span class="number">0xc09c</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_CCM</span> =&gt; <span class="number">0xc09d</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_CCM</span> =&gt; <span class="number">0xc09e</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_CCM</span> =&gt; <span class="number">0xc09f</span>,
-        <span class="ident">TLS_RSA_WITH_AES_128_CCM_8</span> =&gt; <span class="number">0xc0a0</span>,
-        <span class="ident">TLS_RSA_WITH_AES_256_CCM_8</span> =&gt; <span class="number">0xc0a1</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_128_CCM_8</span> =&gt; <span class="number">0xc0a2</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_AES_256_CCM_8</span> =&gt; <span class="number">0xc0a3</span>,
-        <span class="ident">TLS_PSK_WITH_AES_128_CCM</span> =&gt; <span class="number">0xc0a4</span>,
-        <span class="ident">TLS_PSK_WITH_AES_256_CCM</span> =&gt; <span class="number">0xc0a5</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_128_CCM</span> =&gt; <span class="number">0xc0a6</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_AES_256_CCM</span> =&gt; <span class="number">0xc0a7</span>,
-        <span class="ident">TLS_PSK_WITH_AES_128_CCM_8</span> =&gt; <span class="number">0xc0a8</span>,
-        <span class="ident">TLS_PSK_WITH_AES_256_CCM_8</span> =&gt; <span class="number">0xc0a9</span>,
-        <span class="ident">TLS_PSK_DHE_WITH_AES_128_CCM_8</span> =&gt; <span class="number">0xc0aa</span>,
-        <span class="ident">TLS_PSK_DHE_WITH_AES_256_CCM_8</span> =&gt; <span class="number">0xc0ab</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_CCM</span> =&gt; <span class="number">0xc0ac</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_CCM</span> =&gt; <span class="number">0xc0ad</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8</span> =&gt; <span class="number">0xc0ae</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8</span> =&gt; <span class="number">0xc0af</span>,
-        <span class="ident">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xcca8</span>,
-        <span class="ident">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xcca9</span>,
-        <span class="ident">TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xccaa</span>,
-        <span class="ident">TLS_PSK_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xccab</span>,
-        <span class="ident">TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xccac</span>,
-        <span class="ident">TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xccad</span>,
-        <span class="ident">TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256</span> =&gt; <span class="number">0xccae</span>,
-        <span class="ident">SSL_RSA_FIPS_WITH_DES_CBC_SHA</span> =&gt; <span class="number">0xfefe</span>,
-        <span class="ident">SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA</span> =&gt; <span class="number">0xfeff</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `CipherSuite` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: CipherSuite;
+    EnumVal{
+        TLS_NULL_WITH_NULL_NULL =&gt; <span class="number">0x0000</span>,
+        TLS_RSA_WITH_NULL_MD5 =&gt; <span class="number">0x0001</span>,
+        TLS_RSA_WITH_NULL_SHA =&gt; <span class="number">0x0002</span>,
+        TLS_RSA_EXPORT_WITH_RC4_40_MD5 =&gt; <span class="number">0x0003</span>,
+        TLS_RSA_WITH_RC4_128_MD5 =&gt; <span class="number">0x0004</span>,
+        TLS_RSA_WITH_RC4_128_SHA =&gt; <span class="number">0x0005</span>,
+        TLS_RSA_EXPORT_WITH_RC2_CBC_40_MD5 =&gt; <span class="number">0x0006</span>,
+        TLS_RSA_WITH_IDEA_CBC_SHA =&gt; <span class="number">0x0007</span>,
+        TLS_RSA_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x0008</span>,
+        TLS_RSA_WITH_DES_CBC_SHA =&gt; <span class="number">0x0009</span>,
+        TLS_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x000a</span>,
+        TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x000b</span>,
+        TLS_DH_DSS_WITH_DES_CBC_SHA =&gt; <span class="number">0x000c</span>,
+        TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x000d</span>,
+        TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x000e</span>,
+        TLS_DH_RSA_WITH_DES_CBC_SHA =&gt; <span class="number">0x000f</span>,
+        TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x0010</span>,
+        TLS_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x0011</span>,
+        TLS_DHE_DSS_WITH_DES_CBC_SHA =&gt; <span class="number">0x0012</span>,
+        TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x0013</span>,
+        TLS_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x0014</span>,
+        TLS_DHE_RSA_WITH_DES_CBC_SHA =&gt; <span class="number">0x0015</span>,
+        TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x0016</span>,
+        TLS_DH_anon_EXPORT_WITH_RC4_40_MD5 =&gt; <span class="number">0x0017</span>,
+        TLS_DH_anon_WITH_RC4_128_MD5 =&gt; <span class="number">0x0018</span>,
+        TLS_DH_anon_EXPORT_WITH_DES40_CBC_SHA =&gt; <span class="number">0x0019</span>,
+        TLS_DH_anon_WITH_DES_CBC_SHA =&gt; <span class="number">0x001a</span>,
+        TLS_DH_anon_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x001b</span>,
+        SSL_FORTEZZA_KEA_WITH_NULL_SHA =&gt; <span class="number">0x001c</span>,
+        SSL_FORTEZZA_KEA_WITH_FORTEZZA_CBC_SHA =&gt; <span class="number">0x001d</span>,
+        TLS_KRB5_WITH_DES_CBC_SHA_or_SSL_FORTEZZA_KEA_WITH_RC4_128_SHA =&gt; <span class="number">0x001e</span>,
+        TLS_KRB5_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x001f</span>,
+        TLS_KRB5_WITH_RC4_128_SHA =&gt; <span class="number">0x0020</span>,
+        TLS_KRB5_WITH_IDEA_CBC_SHA =&gt; <span class="number">0x0021</span>,
+        TLS_KRB5_WITH_DES_CBC_MD5 =&gt; <span class="number">0x0022</span>,
+        TLS_KRB5_WITH_3DES_EDE_CBC_MD5 =&gt; <span class="number">0x0023</span>,
+        TLS_KRB5_WITH_RC4_128_MD5 =&gt; <span class="number">0x0024</span>,
+        TLS_KRB5_WITH_IDEA_CBC_MD5 =&gt; <span class="number">0x0025</span>,
+        TLS_KRB5_EXPORT_WITH_DES_CBC_40_SHA =&gt; <span class="number">0x0026</span>,
+        TLS_KRB5_EXPORT_WITH_RC2_CBC_40_SHA =&gt; <span class="number">0x0027</span>,
+        TLS_KRB5_EXPORT_WITH_RC4_40_SHA =&gt; <span class="number">0x0028</span>,
+        TLS_KRB5_EXPORT_WITH_DES_CBC_40_MD5 =&gt; <span class="number">0x0029</span>,
+        TLS_KRB5_EXPORT_WITH_RC2_CBC_40_MD5 =&gt; <span class="number">0x002a</span>,
+        TLS_KRB5_EXPORT_WITH_RC4_40_MD5 =&gt; <span class="number">0x002b</span>,
+        TLS_PSK_WITH_NULL_SHA =&gt; <span class="number">0x002c</span>,
+        TLS_DHE_PSK_WITH_NULL_SHA =&gt; <span class="number">0x002d</span>,
+        TLS_RSA_PSK_WITH_NULL_SHA =&gt; <span class="number">0x002e</span>,
+        TLS_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x002f</span>,
+        TLS_DH_DSS_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0030</span>,
+        TLS_DH_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0031</span>,
+        TLS_DHE_DSS_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0032</span>,
+        TLS_DHE_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0033</span>,
+        TLS_DH_anon_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0034</span>,
+        TLS_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0035</span>,
+        TLS_DH_DSS_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0036</span>,
+        TLS_DH_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0037</span>,
+        TLS_DHE_DSS_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0038</span>,
+        TLS_DHE_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0039</span>,
+        TLS_DH_anon_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x003a</span>,
+        TLS_RSA_WITH_NULL_SHA256 =&gt; <span class="number">0x003b</span>,
+        TLS_RSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x003c</span>,
+        TLS_RSA_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x003d</span>,
+        TLS_DH_DSS_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x003e</span>,
+        TLS_DH_RSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x003f</span>,
+        TLS_DHE_DSS_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x0040</span>,
+        TLS_RSA_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0041</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0042</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0043</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0044</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0045</span>,
+        TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA =&gt; <span class="number">0x0046</span>,
+        TLS_ECDH_ECDSA_WITH_NULL_SHA_draft =&gt; <span class="number">0x0047</span>,
+        TLS_ECDH_ECDSA_WITH_RC4_128_SHA_draft =&gt; <span class="number">0x0048</span>,
+        TLS_ECDH_ECDSA_WITH_DES_CBC_SHA_draft =&gt; <span class="number">0x0049</span>,
+        TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA_draft =&gt; <span class="number">0x004a</span>,
+        TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA_draft =&gt; <span class="number">0x004b</span>,
+        TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA_draft =&gt; <span class="number">0x004c</span>,
+        TLS_ECDH_ECNRA_WITH_DES_CBC_SHA_draft =&gt; <span class="number">0x004d</span>,
+        TLS_ECDH_ECNRA_WITH_3DES_EDE_CBC_SHA_draft =&gt; <span class="number">0x004e</span>,
+        TLS_ECMQV_ECDSA_NULL_SHA_draft =&gt; <span class="number">0x004f</span>,
+        TLS_ECMQV_ECDSA_WITH_RC4_128_SHA_draft =&gt; <span class="number">0x0050</span>,
+        TLS_ECMQV_ECDSA_WITH_DES_CBC_SHA_draft =&gt; <span class="number">0x0051</span>,
+        TLS_ECMQV_ECDSA_WITH_3DES_EDE_CBC_SHA_draft =&gt; <span class="number">0x0052</span>,
+        TLS_ECMQV_ECNRA_NULL_SHA_draft =&gt; <span class="number">0x0053</span>,
+        TLS_ECMQV_ECNRA_WITH_RC4_128_SHA_draft =&gt; <span class="number">0x0054</span>,
+        TLS_ECMQV_ECNRA_WITH_DES_CBC_SHA_draft =&gt; <span class="number">0x0055</span>,
+        TLS_ECMQV_ECNRA_WITH_3DES_EDE_CBC_SHA_draft =&gt; <span class="number">0x0056</span>,
+        TLS_ECDH_anon_NULL_WITH_SHA_draft =&gt; <span class="number">0x0057</span>,
+        TLS_ECDH_anon_WITH_RC4_128_SHA_draft =&gt; <span class="number">0x0058</span>,
+        TLS_ECDH_anon_WITH_DES_CBC_SHA_draft =&gt; <span class="number">0x0059</span>,
+        TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA_draft =&gt; <span class="number">0x005a</span>,
+        TLS_ECDH_anon_EXPORT_WITH_DES40_CBC_SHA_draft =&gt; <span class="number">0x005b</span>,
+        TLS_ECDH_anon_EXPORT_WITH_RC4_40_SHA_draft =&gt; <span class="number">0x005c</span>,
+        TLS_RSA_EXPORT1024_WITH_RC4_56_MD5 =&gt; <span class="number">0x0060</span>,
+        TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5 =&gt; <span class="number">0x0061</span>,
+        TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA =&gt; <span class="number">0x0062</span>,
+        TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA =&gt; <span class="number">0x0063</span>,
+        TLS_RSA_EXPORT1024_WITH_RC4_56_SHA =&gt; <span class="number">0x0064</span>,
+        TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA =&gt; <span class="number">0x0065</span>,
+        TLS_DHE_DSS_WITH_RC4_128_SHA =&gt; <span class="number">0x0066</span>,
+        TLS_DHE_RSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x0067</span>,
+        TLS_DH_DSS_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x0068</span>,
+        TLS_DH_RSA_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x0069</span>,
+        TLS_DHE_DSS_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x006a</span>,
+        TLS_DHE_RSA_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x006b</span>,
+        TLS_DH_anon_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x006c</span>,
+        TLS_DH_anon_WITH_AES_256_CBC_SHA256 =&gt; <span class="number">0x006d</span>,
+        TLS_DHE_DSS_WITH_3DES_EDE_CBC_RMD =&gt; <span class="number">0x0072</span>,
+        TLS_DHE_DSS_WITH_AES_128_CBC_RMD =&gt; <span class="number">0x0073</span>,
+        TLS_DHE_DSS_WITH_AES_256_CBC_RMD =&gt; <span class="number">0x0074</span>,
+        TLS_DHE_RSA_WITH_3DES_EDE_CBC_RMD =&gt; <span class="number">0x0077</span>,
+        TLS_DHE_RSA_WITH_AES_128_CBC_RMD =&gt; <span class="number">0x0078</span>,
+        TLS_DHE_RSA_WITH_AES_256_CBC_RMD =&gt; <span class="number">0x0079</span>,
+        TLS_RSA_WITH_3DES_EDE_CBC_RMD =&gt; <span class="number">0x007c</span>,
+        TLS_RSA_WITH_AES_128_CBC_RMD =&gt; <span class="number">0x007d</span>,
+        TLS_RSA_WITH_AES_256_CBC_RMD =&gt; <span class="number">0x007e</span>,
+        TLS_GOSTR341094_WITH_28147_CNT_IMIT =&gt; <span class="number">0x0080</span>,
+        TLS_GOSTR341001_WITH_28147_CNT_IMIT =&gt; <span class="number">0x0081</span>,
+        TLS_GOSTR341094_WITH_NULL_GOSTR3411 =&gt; <span class="number">0x0082</span>,
+        TLS_GOSTR341001_WITH_NULL_GOSTR3411 =&gt; <span class="number">0x0083</span>,
+        TLS_RSA_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0084</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0085</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0086</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0087</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0088</span>,
+        TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA =&gt; <span class="number">0x0089</span>,
+        TLS_PSK_WITH_RC4_128_SHA =&gt; <span class="number">0x008a</span>,
+        TLS_PSK_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x008b</span>,
+        TLS_PSK_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x008c</span>,
+        TLS_PSK_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x008d</span>,
+        TLS_DHE_PSK_WITH_RC4_128_SHA =&gt; <span class="number">0x008e</span>,
+        TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x008f</span>,
+        TLS_DHE_PSK_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0090</span>,
+        TLS_DHE_PSK_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0091</span>,
+        TLS_RSA_PSK_WITH_RC4_128_SHA =&gt; <span class="number">0x0092</span>,
+        TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0x0093</span>,
+        TLS_RSA_PSK_WITH_AES_128_CBC_SHA =&gt; <span class="number">0x0094</span>,
+        TLS_RSA_PSK_WITH_AES_256_CBC_SHA =&gt; <span class="number">0x0095</span>,
+        TLS_RSA_WITH_SEED_CBC_SHA =&gt; <span class="number">0x0096</span>,
+        TLS_DH_DSS_WITH_SEED_CBC_SHA =&gt; <span class="number">0x0097</span>,
+        TLS_DH_RSA_WITH_SEED_CBC_SHA =&gt; <span class="number">0x0098</span>,
+        TLS_DHE_DSS_WITH_SEED_CBC_SHA =&gt; <span class="number">0x0099</span>,
+        TLS_DHE_RSA_WITH_SEED_CBC_SHA =&gt; <span class="number">0x009a</span>,
+        TLS_DH_anon_WITH_SEED_CBC_SHA =&gt; <span class="number">0x009b</span>,
+        TLS_RSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x009c</span>,
+        TLS_RSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x009d</span>,
+        TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x009e</span>,
+        TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x009f</span>,
+        TLS_DH_RSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00a0</span>,
+        TLS_DH_RSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00a1</span>,
+        TLS_DHE_DSS_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00a2</span>,
+        TLS_DHE_DSS_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00a3</span>,
+        TLS_DH_DSS_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00a4</span>,
+        TLS_DH_DSS_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00a5</span>,
+        TLS_DH_anon_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00a6</span>,
+        TLS_DH_anon_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00a7</span>,
+        TLS_PSK_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00a8</span>,
+        TLS_PSK_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00a9</span>,
+        TLS_DHE_PSK_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00aa</span>,
+        TLS_DHE_PSK_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00ab</span>,
+        TLS_RSA_PSK_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0x00ac</span>,
+        TLS_RSA_PSK_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0x00ad</span>,
+        TLS_PSK_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x00ae</span>,
+        TLS_PSK_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0x00af</span>,
+        TLS_PSK_WITH_NULL_SHA256 =&gt; <span class="number">0x00b0</span>,
+        TLS_PSK_WITH_NULL_SHA384 =&gt; <span class="number">0x00b1</span>,
+        TLS_DHE_PSK_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x00b2</span>,
+        TLS_DHE_PSK_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0x00b3</span>,
+        TLS_DHE_PSK_WITH_NULL_SHA256 =&gt; <span class="number">0x00b4</span>,
+        TLS_DHE_PSK_WITH_NULL_SHA384 =&gt; <span class="number">0x00b5</span>,
+        TLS_RSA_PSK_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0x00b6</span>,
+        TLS_RSA_PSK_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0x00b7</span>,
+        TLS_RSA_PSK_WITH_NULL_SHA256 =&gt; <span class="number">0x00b8</span>,
+        TLS_RSA_PSK_WITH_NULL_SHA384 =&gt; <span class="number">0x00b9</span>,
+        TLS_RSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00ba</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00bb</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00bc</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00bd</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00be</span>,
+        TLS_DH_anon_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0x00bf</span>,
+        TLS_RSA_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c0</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c1</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c2</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c3</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c4</span>,
+        TLS_DH_anon_WITH_CAMELLIA_256_CBC_SHA256 =&gt; <span class="number">0x00c5</span>,
+        TLS_EMPTY_RENEGOTIATION_INFO_SCSV =&gt; <span class="number">0x00ff</span>,
+        TLS13_AES_128_GCM_SHA256 =&gt; <span class="number">0x1301</span>,
+        TLS13_AES_256_GCM_SHA384 =&gt; <span class="number">0x1302</span>,
+        TLS13_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0x1303</span>,
+        TLS13_AES_128_CCM_SHA256 =&gt; <span class="number">0x1304</span>,
+        TLS13_AES_128_CCM_8_SHA256 =&gt; <span class="number">0x1305</span>,
+        TLS_ECDH_ECDSA_WITH_NULL_SHA =&gt; <span class="number">0xc001</span>,
+        TLS_ECDH_ECDSA_WITH_RC4_128_SHA =&gt; <span class="number">0xc002</span>,
+        TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc003</span>,
+        TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc004</span>,
+        TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc005</span>,
+        TLS_ECDHE_ECDSA_WITH_NULL_SHA =&gt; <span class="number">0xc006</span>,
+        TLS_ECDHE_ECDSA_WITH_RC4_128_SHA =&gt; <span class="number">0xc007</span>,
+        TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc008</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc009</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc00a</span>,
+        TLS_ECDH_RSA_WITH_NULL_SHA =&gt; <span class="number">0xc00b</span>,
+        TLS_ECDH_RSA_WITH_RC4_128_SHA =&gt; <span class="number">0xc00c</span>,
+        TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc00d</span>,
+        TLS_ECDH_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc00e</span>,
+        TLS_ECDH_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc00f</span>,
+        TLS_ECDHE_RSA_WITH_NULL_SHA =&gt; <span class="number">0xc010</span>,
+        TLS_ECDHE_RSA_WITH_RC4_128_SHA =&gt; <span class="number">0xc011</span>,
+        TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc012</span>,
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc013</span>,
+        TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc014</span>,
+        TLS_ECDH_anon_WITH_NULL_SHA =&gt; <span class="number">0xc015</span>,
+        TLS_ECDH_anon_WITH_RC4_128_SHA =&gt; <span class="number">0xc016</span>,
+        TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc017</span>,
+        TLS_ECDH_anon_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc018</span>,
+        TLS_ECDH_anon_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc019</span>,
+        TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc01a</span>,
+        TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc01b</span>,
+        TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc01c</span>,
+        TLS_SRP_SHA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc01d</span>,
+        TLS_SRP_SHA_RSA_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc01e</span>,
+        TLS_SRP_SHA_DSS_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc01f</span>,
+        TLS_SRP_SHA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc020</span>,
+        TLS_SRP_SHA_RSA_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc021</span>,
+        TLS_SRP_SHA_DSS_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc022</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0xc023</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0xc024</span>,
+        TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0xc025</span>,
+        TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0xc026</span>,
+        TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0xc027</span>,
+        TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0xc028</span>,
+        TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0xc029</span>,
+        TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0xc02a</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0xc02b</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0xc02c</span>,
+        TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0xc02d</span>,
+        TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0xc02e</span>,
+        TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0xc02f</span>,
+        TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0xc030</span>,
+        TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256 =&gt; <span class="number">0xc031</span>,
+        TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384 =&gt; <span class="number">0xc032</span>,
+        TLS_ECDHE_PSK_WITH_RC4_128_SHA =&gt; <span class="number">0xc033</span>,
+        TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xc034</span>,
+        TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA =&gt; <span class="number">0xc035</span>,
+        TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA =&gt; <span class="number">0xc036</span>,
+        TLS_ECDHE_PSK_WITH_AES_128_CBC_SHA256 =&gt; <span class="number">0xc037</span>,
+        TLS_ECDHE_PSK_WITH_AES_256_CBC_SHA384 =&gt; <span class="number">0xc038</span>,
+        TLS_ECDHE_PSK_WITH_NULL_SHA =&gt; <span class="number">0xc039</span>,
+        TLS_ECDHE_PSK_WITH_NULL_SHA256 =&gt; <span class="number">0xc03a</span>,
+        TLS_ECDHE_PSK_WITH_NULL_SHA384 =&gt; <span class="number">0xc03b</span>,
+        TLS_RSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc03c</span>,
+        TLS_RSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc03d</span>,
+        TLS_DH_DSS_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc03e</span>,
+        TLS_DH_DSS_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc03f</span>,
+        TLS_DH_RSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc040</span>,
+        TLS_DH_RSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc041</span>,
+        TLS_DHE_DSS_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc042</span>,
+        TLS_DHE_DSS_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc043</span>,
+        TLS_DHE_RSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc044</span>,
+        TLS_DHE_RSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc045</span>,
+        TLS_DH_anon_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc046</span>,
+        TLS_DH_anon_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc047</span>,
+        TLS_ECDHE_ECDSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc048</span>,
+        TLS_ECDHE_ECDSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc049</span>,
+        TLS_ECDH_ECDSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc04a</span>,
+        TLS_ECDH_ECDSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc04b</span>,
+        TLS_ECDHE_RSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc04c</span>,
+        TLS_ECDHE_RSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc04d</span>,
+        TLS_ECDH_RSA_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc04e</span>,
+        TLS_ECDH_RSA_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc04f</span>,
+        TLS_RSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc050</span>,
+        TLS_RSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc051</span>,
+        TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc052</span>,
+        TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc053</span>,
+        TLS_DH_RSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc054</span>,
+        TLS_DH_RSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc055</span>,
+        TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc056</span>,
+        TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc057</span>,
+        TLS_DH_DSS_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc058</span>,
+        TLS_DH_DSS_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc059</span>,
+        TLS_DH_anon_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc05a</span>,
+        TLS_DH_anon_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc05b</span>,
+        TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc05c</span>,
+        TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc05d</span>,
+        TLS_ECDH_ECDSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc05e</span>,
+        TLS_ECDH_ECDSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc05f</span>,
+        TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc060</span>,
+        TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc061</span>,
+        TLS_ECDH_RSA_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc062</span>,
+        TLS_ECDH_RSA_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc063</span>,
+        TLS_PSK_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc064</span>,
+        TLS_PSK_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc065</span>,
+        TLS_DHE_PSK_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc066</span>,
+        TLS_DHE_PSK_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc067</span>,
+        TLS_RSA_PSK_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc068</span>,
+        TLS_RSA_PSK_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc069</span>,
+        TLS_PSK_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc06a</span>,
+        TLS_PSK_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc06b</span>,
+        TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc06c</span>,
+        TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc06d</span>,
+        TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256 =&gt; <span class="number">0xc06e</span>,
+        TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384 =&gt; <span class="number">0xc06f</span>,
+        TLS_ECDHE_PSK_WITH_ARIA_128_CBC_SHA256 =&gt; <span class="number">0xc070</span>,
+        TLS_ECDHE_PSK_WITH_ARIA_256_CBC_SHA384 =&gt; <span class="number">0xc071</span>,
+        TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc072</span>,
+        TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc073</span>,
+        TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc074</span>,
+        TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc075</span>,
+        TLS_ECDHE_RSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc076</span>,
+        TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc077</span>,
+        TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc078</span>,
+        TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc079</span>,
+        TLS_RSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc07a</span>,
+        TLS_RSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc07b</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc07c</span>,
+        TLS_DHE_RSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc07d</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc07e</span>,
+        TLS_DH_RSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc07f</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc080</span>,
+        TLS_DHE_DSS_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc081</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc082</span>,
+        TLS_DH_DSS_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc083</span>,
+        TLS_DH_anon_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc084</span>,
+        TLS_DH_anon_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc085</span>,
+        TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc086</span>,
+        TLS_ECDHE_ECDSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc087</span>,
+        TLS_ECDH_ECDSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc088</span>,
+        TLS_ECDH_ECDSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc089</span>,
+        TLS_ECDHE_RSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc08a</span>,
+        TLS_ECDHE_RSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc08b</span>,
+        TLS_ECDH_RSA_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc08c</span>,
+        TLS_ECDH_RSA_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc08d</span>,
+        TLS_PSK_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc08e</span>,
+        TLS_PSK_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc08f</span>,
+        TLS_DHE_PSK_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc090</span>,
+        TLS_DHE_PSK_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc091</span>,
+        TLS_RSA_PSK_WITH_CAMELLIA_128_GCM_SHA256 =&gt; <span class="number">0xc092</span>,
+        TLS_RSA_PSK_WITH_CAMELLIA_256_GCM_SHA384 =&gt; <span class="number">0xc093</span>,
+        TLS_PSK_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc094</span>,
+        TLS_PSK_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc095</span>,
+        TLS_DHE_PSK_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc096</span>,
+        TLS_DHE_PSK_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc097</span>,
+        TLS_RSA_PSK_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc098</span>,
+        TLS_RSA_PSK_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc099</span>,
+        TLS_ECDHE_PSK_WITH_CAMELLIA_128_CBC_SHA256 =&gt; <span class="number">0xc09a</span>,
+        TLS_ECDHE_PSK_WITH_CAMELLIA_256_CBC_SHA384 =&gt; <span class="number">0xc09b</span>,
+        TLS_RSA_WITH_AES_128_CCM =&gt; <span class="number">0xc09c</span>,
+        TLS_RSA_WITH_AES_256_CCM =&gt; <span class="number">0xc09d</span>,
+        TLS_DHE_RSA_WITH_AES_128_CCM =&gt; <span class="number">0xc09e</span>,
+        TLS_DHE_RSA_WITH_AES_256_CCM =&gt; <span class="number">0xc09f</span>,
+        TLS_RSA_WITH_AES_128_CCM_8 =&gt; <span class="number">0xc0a0</span>,
+        TLS_RSA_WITH_AES_256_CCM_8 =&gt; <span class="number">0xc0a1</span>,
+        TLS_DHE_RSA_WITH_AES_128_CCM_8 =&gt; <span class="number">0xc0a2</span>,
+        TLS_DHE_RSA_WITH_AES_256_CCM_8 =&gt; <span class="number">0xc0a3</span>,
+        TLS_PSK_WITH_AES_128_CCM =&gt; <span class="number">0xc0a4</span>,
+        TLS_PSK_WITH_AES_256_CCM =&gt; <span class="number">0xc0a5</span>,
+        TLS_DHE_PSK_WITH_AES_128_CCM =&gt; <span class="number">0xc0a6</span>,
+        TLS_DHE_PSK_WITH_AES_256_CCM =&gt; <span class="number">0xc0a7</span>,
+        TLS_PSK_WITH_AES_128_CCM_8 =&gt; <span class="number">0xc0a8</span>,
+        TLS_PSK_WITH_AES_256_CCM_8 =&gt; <span class="number">0xc0a9</span>,
+        TLS_PSK_DHE_WITH_AES_128_CCM_8 =&gt; <span class="number">0xc0aa</span>,
+        TLS_PSK_DHE_WITH_AES_256_CCM_8 =&gt; <span class="number">0xc0ab</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_128_CCM =&gt; <span class="number">0xc0ac</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_256_CCM =&gt; <span class="number">0xc0ad</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 =&gt; <span class="number">0xc0ae</span>,
+        TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8 =&gt; <span class="number">0xc0af</span>,
+        TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xcca8</span>,
+        TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xcca9</span>,
+        TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xccaa</span>,
+        TLS_PSK_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xccab</span>,
+        TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xccac</span>,
+        TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xccad</span>,
+        TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256 =&gt; <span class="number">0xccae</span>,
+        SSL_RSA_FIPS_WITH_DES_CBC_SHA =&gt; <span class="number">0xfefe</span>,
+        SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA =&gt; <span class="number">0xfeff
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ECPointFormat` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">ECPointFormat</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">Uncompressed</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">ANSIX962CompressedPrime</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">ANSIX962CompressedChar2</span> =&gt; <span class="number">0x02</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ECPointFormat` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: ECPointFormat;
+    EnumVal{
+        Uncompressed =&gt; <span class="number">0x00</span>,
+        ANSIX962CompressedPrime =&gt; <span class="number">0x01</span>,
+        ANSIX962CompressedChar2 =&gt; <span class="number">0x02
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `HeartbeatMode` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">HeartbeatMode</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">PeerAllowedToSend</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">PeerNotAllowedToSend</span> =&gt; <span class="number">0x02</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `HeartbeatMode` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: HeartbeatMode;
+    EnumVal{
+        PeerAllowedToSend =&gt; <span class="number">0x01</span>,
+        PeerNotAllowedToSend =&gt; <span class="number">0x02
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `ECCurveType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">ECCurveType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">ExplicitPrime</span> =&gt; <span class="number">0x01</span>,
-        <span class="ident">ExplicitChar2</span> =&gt; <span class="number">0x02</span>,
-        <span class="ident">NamedCurve</span> =&gt; <span class="number">0x03</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `ECCurveType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: ECCurveType;
+    EnumVal{
+        ExplicitPrime =&gt; <span class="number">0x01</span>,
+        ExplicitChar2 =&gt; <span class="number">0x02</span>,
+        NamedCurve =&gt; <span class="number">0x03
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `SignatureScheme` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U16</span>
-    <span class="ident">EnumName</span>: <span class="ident">SignatureScheme</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">RSA_PKCS1_SHA1</span> =&gt; <span class="number">0x0201</span>,
-        <span class="ident">ECDSA_SHA1_Legacy</span> =&gt; <span class="number">0x0203</span>,
-        <span class="ident">RSA_PKCS1_SHA256</span> =&gt; <span class="number">0x0401</span>,
-        <span class="ident">ECDSA_NISTP256_SHA256</span> =&gt; <span class="number">0x0403</span>,
-        <span class="ident">RSA_PKCS1_SHA384</span> =&gt; <span class="number">0x0501</span>,
-        <span class="ident">ECDSA_NISTP384_SHA384</span> =&gt; <span class="number">0x0503</span>,
-        <span class="ident">RSA_PKCS1_SHA512</span> =&gt; <span class="number">0x0601</span>,
-        <span class="ident">ECDSA_NISTP521_SHA512</span> =&gt; <span class="number">0x0603</span>,
-        <span class="ident">RSA_PSS_SHA256</span> =&gt; <span class="number">0x0804</span>,
-        <span class="ident">RSA_PSS_SHA384</span> =&gt; <span class="number">0x0805</span>,
-        <span class="ident">RSA_PSS_SHA512</span> =&gt; <span class="number">0x0806</span>,
-        <span class="ident">ED25519</span> =&gt; <span class="number">0x0807</span>,
-        <span class="ident">ED448</span> =&gt; <span class="number">0x0808</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `SignatureScheme` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U16
+    EnumName: SignatureScheme;
+    EnumVal{
+        RSA_PKCS1_SHA1 =&gt; <span class="number">0x0201</span>,
+        ECDSA_SHA1_Legacy =&gt; <span class="number">0x0203</span>,
+        RSA_PKCS1_SHA256 =&gt; <span class="number">0x0401</span>,
+        ECDSA_NISTP256_SHA256 =&gt; <span class="number">0x0403</span>,
+        RSA_PKCS1_SHA384 =&gt; <span class="number">0x0501</span>,
+        ECDSA_NISTP384_SHA384 =&gt; <span class="number">0x0503</span>,
+        RSA_PKCS1_SHA512 =&gt; <span class="number">0x0601</span>,
+        ECDSA_NISTP521_SHA512 =&gt; <span class="number">0x0603</span>,
+        RSA_PSS_SHA256 =&gt; <span class="number">0x0804</span>,
+        RSA_PSS_SHA384 =&gt; <span class="number">0x0805</span>,
+        RSA_PSS_SHA512 =&gt; <span class="number">0x0806</span>,
+        ED25519 =&gt; <span class="number">0x0807</span>,
+        ED448 =&gt; <span class="number">0x0808
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `PSKKeyExchangeMode` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">PSKKeyExchangeMode</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">PSK_KE</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">PSK_DHE_KE</span> =&gt; <span class="number">0x01</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `PSKKeyExchangeMode` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: PSKKeyExchangeMode;
+    EnumVal{
+        PSK_KE =&gt; <span class="number">0x00</span>,
+        PSK_DHE_KE =&gt; <span class="number">0x01
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `KeyUpdateRequest` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">KeyUpdateRequest</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">UpdateNotRequested</span> =&gt; <span class="number">0x00</span>,
-        <span class="ident">UpdateRequested</span> =&gt; <span class="number">0x01</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `KeyUpdateRequest` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: KeyUpdateRequest;
+    EnumVal{
+        UpdateNotRequested =&gt; <span class="number">0x00</span>,
+        UpdateRequested =&gt; <span class="number">0x01
+    </span>}
 }
 
-<span class="macro">enum_builder!</span> {
-    <span class="doccomment">/// The `CertificateStatusType` TLS protocol enum.  Values in this enum are taken</span>
-    <span class="doccomment">/// from the various RFCs covering TLS, and are listed by IANA.</span>
-    <span class="doccomment">/// The `Unknown` item is used when processing unrecognised ordinals.</span>
-    @<span class="ident">U8</span>
-    <span class="ident">EnumName</span>: <span class="ident">CertificateStatusType</span>;
-    <span class="ident">EnumVal</span>{
-        <span class="ident">OCSP</span> =&gt; <span class="number">0x01</span>
-    }
+<span class="macro">enum_builder! </span>{
+    <span class="doccomment">/// The `CertificateStatusType` TLS protocol enum.  Values in this enum are taken
+    /// from the various RFCs covering TLS, and are listed by IANA.
+    /// The `Unknown` item is used when processing unrecognised ordinals.
+    </span>@U8
+    EnumName: CertificateStatusType;
+    EnumVal{
+        OCSP =&gt; <span class="number">0x01
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

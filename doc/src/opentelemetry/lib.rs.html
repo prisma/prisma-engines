@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -270,275 +270,275 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
-</pre><pre class="rust"><code><span class="doccomment">//! OpenTelemetry provides a single set of APIs, libraries, agents, and collector</span>
-<span class="doccomment">//! services to capture distributed traces and metrics from your application. You</span>
-<span class="doccomment">//! can analyze them using [Prometheus], [Jaeger], and other observability tools.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.46+][msrv]*</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [Prometheus]: https://prometheus.io</span>
-<span class="doccomment">//! [Jaeger]: https://www.jaegertracing.io</span>
-<span class="doccomment">//! [msrv]: #supported-rust-versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, sdk::export::trace::stdout, trace::Tracer};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     // Create a new trace pipeline that prints to stdout</span>
-<span class="doccomment">//!     let tracer = stdout::new_pipeline().install_simple();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced app logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Shutdown trace pipeline</span>
-<span class="doccomment">//!     global::shutdown_tracer_provider();</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [examples] directory for different integration patterns.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [examples]: https://github.com/open-telemetry/opentelemetry-rust/tree/main/examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Traces</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`trace`] module includes types for tracking the progression of a single</span>
-<span class="doccomment">//! request while it is handled by services that make up an application. A trace</span>
-<span class="doccomment">//! is a tree of [`Span`]s which are objects that represent the work being done</span>
-<span class="doccomment">//! by individual services or components involved in a request as it flows</span>
-<span class="doccomment">//! through a system.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Creating and exporting spans</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, trace::{Span, Tracer}, KeyValue};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // get a tracer from a provider</span>
-<span class="doccomment">//! let tracer = global::tracer(&quot;my_service&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // start a new span</span>
-<span class="doccomment">//! let mut span = tracer.start(&quot;my_span&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // set some attributes</span>
-<span class="doccomment">//! span.set_attribute(KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // perform some more work...</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // end or drop the span to export</span>
-<span class="doccomment">//! span.end();</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [`trace`] module docs for more information on creating and managing</span>
-<span class="doccomment">//! spans.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Span`]: crate::trace::Span</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Metrics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note: the metrics specification is **still in progress** and **subject to major</span>
-<span class="doccomment">//! changes**.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`metrics`] module includes types for recording measurements about a</span>
-<span class="doccomment">//! service at runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Creating instruments and recording measurements</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;metrics&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, KeyValue};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // get a meter from a provider</span>
-<span class="doccomment">//! let meter = global::meter(&quot;my_service&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // create an instrument</span>
-<span class="doccomment">//! let counter = meter.u64_counter(&quot;my_counter&quot;).init();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // record a measurement</span>
-<span class="doccomment">//! counter.add(1, &amp;[KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;)]);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [`metrics`] module docs for more information on creating and</span>
-<span class="doccomment">//! managing instruments.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Crate Feature Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following core crate feature flags are available:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `trace`: Includes the trace API and SDK (enabled by default).</span>
-<span class="doccomment">//! * `metrics`: Includes the unstable metrics API and SDK.</span>
-<span class="doccomment">//! * `serialize`: Adds [serde] serializers for common types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Support for recording and exporting telemetry asynchronously can be added</span>
-<span class="doccomment">//! via the following flags:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `rt-tokio`: Spawn telemetry tasks using [tokio]&#39;s multi-thread runtime.</span>
-<span class="doccomment">//! * `rt-tokio-current-thread`: Spawn telemetry tasks on a separate runtime so that the main runtime won&#39;t be blocked.</span>
-<span class="doccomment">//! * `rt-async-std`: Spawn telemetry tasks using [async-std]&#39;s runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [tokio]: https://crates.io/crates/tokio</span>
-<span class="doccomment">//! [async-std]: https://crates.io/crates/async-std</span>
-<span class="doccomment">//! [serde]: https://crates.io/crates/serde</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Related Crates</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In addition to `opentelemetry`, the [`open-telemetry/opentelemetry-rust`]</span>
-<span class="doccomment">//! repository contains several additional crates designed to be used with the</span>
-<span class="doccomment">//! `opentelemetry` ecosystem. This includes a collection of trace</span>
-<span class="doccomment">//! `SpanExporter` and metrics pull and push controller implementations, as well</span>
-<span class="doccomment">//! as utility and adapter crates to assist in propagating state and</span>
-<span class="doccomment">//! instrumenting applications.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In particular, the following crates are likely to be of interest:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`opentelemetry-http`] provides an interface for injecting and extracting</span>
-<span class="doccomment">//!   trace information from [`http`] headers.</span>
-<span class="doccomment">//! - [`opentelemetry-jaeger`] provides a pipeline and exporter for sending</span>
-<span class="doccomment">//!   trace information to [`Jaeger`].</span>
-<span class="doccomment">//! - [`opentelemetry-otlp`] exporter for sending trace and metric data in the</span>
-<span class="doccomment">//!   OTLP format to the OpenTelemetry collector.</span>
-<span class="doccomment">//! - [`opentelemetry-prometheus`] provides a pipeline and exporter for sending</span>
-<span class="doccomment">//!   metrics information to [`Prometheus`].</span>
-<span class="doccomment">//! - [`opentelemetry-zipkin`] provides a pipeline and exporter for sending</span>
-<span class="doccomment">//!   trace information to [`Zipkin`].</span>
-<span class="doccomment">//! - [`opentelemetry-datadog`] provides additional exporters to [`Datadog`].</span>
-<span class="doccomment">//! - [`opentelemetry-aws`] provides unofficial propagators for AWS X-ray.</span>
-<span class="doccomment">//! - [`opentelemetry-contrib`] provides additional exporters and propagators that are</span>
-<span class="doccomment">//!   experimental.</span>
-<span class="doccomment">//! - [`opentelemetry-semantic-conventions`] provides standard names and</span>
-<span class="doccomment">//!   semantic otel conventions.</span>
-<span class="doccomment">//! - [`opentelemetry-stackdriver`] provides an exporter for Google&#39;s [Cloud Trace]</span>
-<span class="doccomment">//!   (which used to be called StackDriver).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, there are also several third-party crates which are not</span>
-<span class="doccomment">//! maintained by the `opentelemetry` project. These include:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`tracing-opentelemetry`] provides integration for applications</span>
-<span class="doccomment">//!   instrumented using the [`tracing`] API and ecosystem.</span>
-<span class="doccomment">//! - [`actix-web-opentelemetry`] provides integration for the [`actix-web`] web</span>
-<span class="doccomment">//!   server and ecosystem.</span>
-<span class="doccomment">//! - [`opentelemetry-application-insights`] provides an unofficial [Azure</span>
-<span class="doccomment">//!   Application Insights] exporter.</span>
-<span class="doccomment">//! - [`opentelemetry-tide`] provides integration for the [`Tide`] web server</span>
-<span class="doccomment">//!   and ecosystem.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If you&#39;re the maintainer of an `opentelemetry` ecosystem crate not listed</span>
-<span class="doccomment">//! above, please let us know! We&#39;d love to add your project to the list!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`open-telemetry/opentelemetry-rust`]: https://github.com/open-telemetry/opentelemetry-rust</span>
-<span class="doccomment">//! [`opentelemetry-jaeger`]: https://crates.io/crates/opentelemetry-jaeger</span>
-<span class="doccomment">//! [`Jaeger`]: https://www.jaegertracing.io</span>
-<span class="doccomment">//! [`opentelemetry-otlp`]: https://crates.io/crates/opentelemetry-otlp</span>
-<span class="doccomment">//! [`opentelemetry-http`]: https://crates.io/crates/opentelemetry-http</span>
-<span class="doccomment">//! [`opentelemetry-prometheus`]: https://crates.io/crates/opentelemetry-prometheus</span>
-<span class="doccomment">//! [`opentelemetry-aws`]: https://crates.io/crates/opentelemetry-aws</span>
-<span class="doccomment">//! [`Prometheus`]: https://prometheus.io</span>
-<span class="doccomment">//! [`opentelemetry-zipkin`]: https://crates.io/crates/opentelemetry-zipkin</span>
-<span class="doccomment">//! [`http`]: https://crates.io/crates/http</span>
-<span class="doccomment">//! [`Zipkin`]: https://zipkin.io</span>
-<span class="doccomment">//! [`opentelemetry-contrib`]: https://crates.io/crates/opentelemetry-contrib</span>
-<span class="doccomment">//! [`opentelemetry-datadog`]: https://crates.io/crates/opentelemetry-datadog</span>
-<span class="doccomment">//! [`Datadog`]: https://www.datadoghq.com</span>
-<span class="doccomment">//! [`opentelemetry-semantic-conventions`]: https://crates.io/crates/opentelemetry-semantic-conventions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tracing-opentelemetry`]: https://crates.io/crates/tracing-opentelemetry</span>
-<span class="doccomment">//! [`tracing`]: https://crates.io/crates/tracing</span>
-<span class="doccomment">//! [`actix-web-opentelemetry`]: https://crates.io/crates/actix-web-opentelemetry</span>
-<span class="doccomment">//! [`actix-web`]: https://crates.io/crates/actix-web</span>
-<span class="doccomment">//! [`opentelemetry-application-insights`]: https://crates.io/crates/opentelemetry-application-insights</span>
-<span class="doccomment">//! [Azure Application Insights]: https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview</span>
-<span class="doccomment">//! [`opentelemetry-tide`]: https://crates.io/crates/opentelemetry-tide</span>
-<span class="doccomment">//! [`Tide`]: https://crates.io/crates/tide</span>
-<span class="doccomment">//! [`opentelemetry-stackdriver`]: https://crates.io/crates/opentelemetry-stackdriver</span>
-<span class="doccomment">//! [Cloud Trace]: https://cloud.google.com/trace/</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Supported Rust Versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! OpenTelemetry is built against the latest stable release. The minimum</span>
-<span class="doccomment">//! supported version is 1.46. The current OpenTelemetry version is not</span>
-<span class="doccomment">//! guaranteed to build on Rust versions earlier than the minimum supported</span>
-<span class="doccomment">//! version.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The current stable Rust compiler and the three most recent minor versions</span>
-<span class="doccomment">//! before it will always be supported. For example, if the current stable</span>
-<span class="doccomment">//! compiler version is 1.49, the minimum supported version will not be</span>
-<span class="doccomment">//! increased past 1.46, three minor versions prior. Increasing the minimum</span>
-<span class="doccomment">//! supported compiler version is not considered a semver breaking change as</span>
-<span class="doccomment">//! long as doing so complies with this policy.</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">future_incompatible</span>,
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">nonstandard_style</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">unused</span>
-)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_doctest_main</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! OpenTelemetry provides a single set of APIs, libraries, agents, and collector
+//! services to capture distributed traces and metrics from your application. You
+//! can analyze them using [Prometheus], [Jaeger], and other observability tools.
+//!
+//! *Compiler support: [requires `rustc` 1.46+][msrv]*
+//!
+//! [Prometheus]: https://prometheus.io
+//! [Jaeger]: https://www.jaegertracing.io
+//! [msrv]: #supported-rust-versions
+//!
+//! # Getting Started
+//!
+//! ```no_run
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, sdk::export::trace::stdout, trace::Tracer};
+//!
+//! fn main() {
+//!     // Create a new trace pipeline that prints to stdout
+//!     let tracer = stdout::new_pipeline().install_simple();
+//!
+//!     tracer.in_span(&quot;doing_work&quot;, |cx| {
+//!         // Traced app logic here...
+//!     });
+//!
+//!     // Shutdown trace pipeline
+//!     global::shutdown_tracer_provider();
+//! }
+//! # }
+//! ```
+//!
+//! See the [examples] directory for different integration patterns.
+//!
+//! [examples]: https://github.com/open-telemetry/opentelemetry-rust/tree/main/examples
+//!
+//! # Traces
+//!
+//! The [`trace`] module includes types for tracking the progression of a single
+//! request while it is handled by services that make up an application. A trace
+//! is a tree of [`Span`]s which are objects that represent the work being done
+//! by individual services or components involved in a request as it flows
+//! through a system.
+//!
+//! ### Creating and exporting spans
+//!
+//! ```
+//! # #[cfg(feature = &quot;trace&quot;)]
+//! # {
+//! use opentelemetry::{global, trace::{Span, Tracer}, KeyValue};
+//!
+//! // get a tracer from a provider
+//! let tracer = global::tracer(&quot;my_service&quot;);
+//!
+//! // start a new span
+//! let mut span = tracer.start(&quot;my_span&quot;);
+//!
+//! // set some attributes
+//! span.set_attribute(KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;));
+//!
+//! // perform some more work...
+//!
+//! // end or drop the span to export
+//! span.end();
+//! # }
+//! ```
+//!
+//! See the [`trace`] module docs for more information on creating and managing
+//! spans.
+//!
+//! [`Span`]: crate::trace::Span
+//!
+//! # Metrics
+//!
+//! Note: the metrics specification is **still in progress** and **subject to major
+//! changes**.
+//!
+//! The [`metrics`] module includes types for recording measurements about a
+//! service at runtime.
+//!
+//! ### Creating instruments and recording measurements
+//!
+//! ```
+//! # #[cfg(feature = &quot;metrics&quot;)]
+//! # {
+//! use opentelemetry::{global, KeyValue};
+//!
+//! // get a meter from a provider
+//! let meter = global::meter(&quot;my_service&quot;);
+//!
+//! // create an instrument
+//! let counter = meter.u64_counter(&quot;my_counter&quot;).init();
+//!
+//! // record a measurement
+//! counter.add(1, &amp;[KeyValue::new(&quot;http.client_ip&quot;, &quot;83.164.160.102&quot;)]);
+//! # }
+//! ```
+//!
+//! See the [`metrics`] module docs for more information on creating and
+//! managing instruments.
+//!
+//! ## Crate Feature Flags
+//!
+//! The following core crate feature flags are available:
+//!
+//! * `trace`: Includes the trace API and SDK (enabled by default).
+//! * `metrics`: Includes the unstable metrics API and SDK.
+//! * `serialize`: Adds [serde] serializers for common types.
+//!
+//! Support for recording and exporting telemetry asynchronously can be added
+//! via the following flags:
+//!
+//! * `rt-tokio`: Spawn telemetry tasks using [tokio]&#39;s multi-thread runtime.
+//! * `rt-tokio-current-thread`: Spawn telemetry tasks on a separate runtime so that the main runtime won&#39;t be blocked.
+//! * `rt-async-std`: Spawn telemetry tasks using [async-std]&#39;s runtime.
+//!
+//! [tokio]: https://crates.io/crates/tokio
+//! [async-std]: https://crates.io/crates/async-std
+//! [serde]: https://crates.io/crates/serde
+//!
+//! ## Related Crates
+//!
+//! In addition to `opentelemetry`, the [`open-telemetry/opentelemetry-rust`]
+//! repository contains several additional crates designed to be used with the
+//! `opentelemetry` ecosystem. This includes a collection of trace
+//! `SpanExporter` and metrics pull and push controller implementations, as well
+//! as utility and adapter crates to assist in propagating state and
+//! instrumenting applications.
+//!
+//! In particular, the following crates are likely to be of interest:
+//!
+//! - [`opentelemetry-http`] provides an interface for injecting and extracting
+//!   trace information from [`http`] headers.
+//! - [`opentelemetry-jaeger`] provides a pipeline and exporter for sending
+//!   trace information to [`Jaeger`].
+//! - [`opentelemetry-otlp`] exporter for sending trace and metric data in the
+//!   OTLP format to the OpenTelemetry collector.
+//! - [`opentelemetry-prometheus`] provides a pipeline and exporter for sending
+//!   metrics information to [`Prometheus`].
+//! - [`opentelemetry-zipkin`] provides a pipeline and exporter for sending
+//!   trace information to [`Zipkin`].
+//! - [`opentelemetry-datadog`] provides additional exporters to [`Datadog`].
+//! - [`opentelemetry-aws`] provides unofficial propagators for AWS X-ray.
+//! - [`opentelemetry-contrib`] provides additional exporters and propagators that are
+//!   experimental.
+//! - [`opentelemetry-semantic-conventions`] provides standard names and
+//!   semantic otel conventions.
+//! - [`opentelemetry-stackdriver`] provides an exporter for Google&#39;s [Cloud Trace]
+//!   (which used to be called StackDriver).
+//!
+//! Additionally, there are also several third-party crates which are not
+//! maintained by the `opentelemetry` project. These include:
+//!
+//! - [`tracing-opentelemetry`] provides integration for applications
+//!   instrumented using the [`tracing`] API and ecosystem.
+//! - [`actix-web-opentelemetry`] provides integration for the [`actix-web`] web
+//!   server and ecosystem.
+//! - [`opentelemetry-application-insights`] provides an unofficial [Azure
+//!   Application Insights] exporter.
+//! - [`opentelemetry-tide`] provides integration for the [`Tide`] web server
+//!   and ecosystem.
+//!
+//! If you&#39;re the maintainer of an `opentelemetry` ecosystem crate not listed
+//! above, please let us know! We&#39;d love to add your project to the list!
+//!
+//! [`open-telemetry/opentelemetry-rust`]: https://github.com/open-telemetry/opentelemetry-rust
+//! [`opentelemetry-jaeger`]: https://crates.io/crates/opentelemetry-jaeger
+//! [`Jaeger`]: https://www.jaegertracing.io
+//! [`opentelemetry-otlp`]: https://crates.io/crates/opentelemetry-otlp
+//! [`opentelemetry-http`]: https://crates.io/crates/opentelemetry-http
+//! [`opentelemetry-prometheus`]: https://crates.io/crates/opentelemetry-prometheus
+//! [`opentelemetry-aws`]: https://crates.io/crates/opentelemetry-aws
+//! [`Prometheus`]: https://prometheus.io
+//! [`opentelemetry-zipkin`]: https://crates.io/crates/opentelemetry-zipkin
+//! [`http`]: https://crates.io/crates/http
+//! [`Zipkin`]: https://zipkin.io
+//! [`opentelemetry-contrib`]: https://crates.io/crates/opentelemetry-contrib
+//! [`opentelemetry-datadog`]: https://crates.io/crates/opentelemetry-datadog
+//! [`Datadog`]: https://www.datadoghq.com
+//! [`opentelemetry-semantic-conventions`]: https://crates.io/crates/opentelemetry-semantic-conventions
+//!
+//! [`tracing-opentelemetry`]: https://crates.io/crates/tracing-opentelemetry
+//! [`tracing`]: https://crates.io/crates/tracing
+//! [`actix-web-opentelemetry`]: https://crates.io/crates/actix-web-opentelemetry
+//! [`actix-web`]: https://crates.io/crates/actix-web
+//! [`opentelemetry-application-insights`]: https://crates.io/crates/opentelemetry-application-insights
+//! [Azure Application Insights]: https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview
+//! [`opentelemetry-tide`]: https://crates.io/crates/opentelemetry-tide
+//! [`Tide`]: https://crates.io/crates/tide
+//! [`opentelemetry-stackdriver`]: https://crates.io/crates/opentelemetry-stackdriver
+//! [Cloud Trace]: https://cloud.google.com/trace/
+//!
+//! ## Supported Rust Versions
+//!
+//! OpenTelemetry is built against the latest stable release. The minimum
+//! supported version is 1.46. The current OpenTelemetry version is not
+//! guaranteed to build on Rust versions earlier than the minimum supported
+//! version.
+//!
+//! The current stable Rust compiler and the three most recent minor versions
+//! before it will always be supported. For example, if the current stable
+//! compiler version is 1.49, the minimum supported version will not be
+//! increased past 1.46, three minor versions prior. Increasing the minimum
+//! supported compiler version is not considered a semver breaking change as
+//! long as doing so complies with this policy.
+</span><span class="attribute">#![warn(
+    future_incompatible,
+    missing_debug_implementations,
+    missing_docs,
+    nonstandard_style,
+    rust_2018_idioms,
+    unreachable_pub,
+    unused
+)]
+#![allow(clippy::needless_doctest_main)]
+#![cfg_attr(docsrs, feature(doc_cfg), deny(rustdoc::broken_intra_doc_links))]
+#![doc(
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg&quot;
+</span>)]
+#![cfg_attr(test, deny(warnings))]
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">global</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sdk</span>;
+</span><span class="kw">pub mod </span>global;
+<span class="kw">pub mod </span>sdk;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">testing</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;testing&quot;</span>)]
+#[doc(hidden)]
+</span><span class="kw">pub mod </span>testing;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">baggage</span>;
+<span class="kw">pub mod </span>baggage;
 
-<span class="kw">mod</span> <span class="ident">context</span>;
+<span class="kw">mod </span>context;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">context</span>::{<span class="ident">Context</span>, <span class="ident">ContextGuard</span>};
+<span class="kw">pub use </span>context::{Context, ContextGuard};
 
-<span class="kw">mod</span> <span class="ident">common</span>;
+<span class="kw">mod </span>common;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">Array</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>, <span class="ident">Value</span>};
+<span class="kw">pub use </span>common::{Array, Key, KeyValue, Value};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtime</span>;
+<span class="kw">pub mod </span>runtime;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub mod </span>util;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">attributes</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;metrics&quot;</span>)))]
+</span><span class="kw">pub mod </span>attributes;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">metrics</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;metrics&quot;</span>)))]
+</span><span class="kw">pub mod </span>metrics;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">propagation</span>;
+<span class="kw">pub mod </span>propagation;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">trace</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;trace&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;trace&quot;</span>)))]
+</span><span class="kw">pub mod </span>trace;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">time</span> {
-    <span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;metrics&quot;</span>, feature = <span class="string">&quot;trace&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>time {
+    <span class="kw">use </span>std::time::SystemTime;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">SystemTime</span> {
-        <span class="ident">SystemTime::now</span>()
+    <span class="attribute">#[cfg(not(target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>now() -&gt; SystemTime {
+        SystemTime::now()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">SystemTime</span> {
-        <span class="ident">SystemTime::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_millis</span>(<span class="ident">js_sys::Date::now</span>() <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;wasm32&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>now() -&gt; SystemTime {
+        SystemTime::UNIX_EPOCH + std::time::Duration::from_millis(js_sys::Date::now() <span class="kw">as </span>u64)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

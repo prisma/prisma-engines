@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/multi_thread/park.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>park.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tokio/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/scheduler/multi_thread/park.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>park.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tokio/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -255,262 +255,262 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parks the runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A combination of the various resource driver park handles.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parks the runtime.
+//!
+//! A combination of the various resource driver park handles.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic::AtomicUsize</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Condvar</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::thread</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park</span>::{<span class="ident">Park</span>, <span class="ident">Unpark</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::driver::Driver</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::TryLock</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::AtomicUsize;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::{Arc, Condvar, Mutex};
+<span class="kw">use </span><span class="kw">crate</span>::loom::thread;
+<span class="kw">use </span><span class="kw">crate</span>::park::{Park, Unpark};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::driver::Driver;
+<span class="kw">use </span><span class="kw">crate</span>::util::TryLock;
 
-<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::SeqCst</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::sync::atomic::Ordering::SeqCst;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Parker</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Parker {
+    inner: Arc&lt;Inner&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Unparker</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Unparker {
+    inner: Arc&lt;Inner&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">Inner</span> {
-    <span class="doccomment">/// Avoids entering the park if possible</span>
-    <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
+<span class="kw">struct </span>Inner {
+    <span class="doccomment">/// Avoids entering the park if possible
+    </span>state: AtomicUsize,
 
-    <span class="doccomment">/// Used to coordinate access to the driver / condvar</span>
-    <span class="ident">mutex</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="doccomment">/// Used to coordinate access to the driver / condvar
+    </span>mutex: Mutex&lt;()&gt;,
 
-    <span class="doccomment">/// Condvar to block on if the driver is unavailable.</span>
-    <span class="ident">condvar</span>: <span class="ident">Condvar</span>,
+    <span class="doccomment">/// Condvar to block on if the driver is unavailable.
+    </span>condvar: Condvar,
 
-    <span class="doccomment">/// Resource (I/O, time, ...) driver</span>
-    <span class="ident">shared</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Shared</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Resource (I/O, time, ...) driver
+    </span>shared: Arc&lt;Shared&gt;,
 }
 
-<span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">const</span> <span class="ident">PARKED_CONDVAR</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">PARKED_DRIVER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">NOTIFIED</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+<span class="kw">const </span>EMPTY: usize = <span class="number">0</span>;
+<span class="kw">const </span>PARKED_CONDVAR: usize = <span class="number">1</span>;
+<span class="kw">const </span>PARKED_DRIVER: usize = <span class="number">2</span>;
+<span class="kw">const </span>NOTIFIED: usize = <span class="number">3</span>;
 
-<span class="doccomment">/// Shared across multiple Parker handles</span>
-<span class="kw">struct</span> <span class="ident">Shared</span> {
-    <span class="doccomment">/// Shared driver. Only one thread at a time can use this</span>
-    <span class="ident">driver</span>: <span class="ident">TryLock</span><span class="op">&lt;</span><span class="ident">Driver</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Shared across multiple Parker handles
+</span><span class="kw">struct </span>Shared {
+    <span class="doccomment">/// Shared driver. Only one thread at a time can use this
+    </span>driver: TryLock&lt;Driver&gt;,
 
-    <span class="doccomment">/// Unpark handle</span>
-    <span class="ident">handle</span>: <span class="op">&lt;</span><span class="ident">Driver</span> <span class="kw">as</span> <span class="ident">Park</span><span class="op">&gt;</span><span class="ident">::Unpark</span>,
+    <span class="doccomment">/// Unpark handle
+    </span>handle: &lt;Driver <span class="kw">as </span>Park&gt;::Unpark,
 }
 
-<span class="kw">impl</span> <span class="ident">Parker</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">driver</span>: <span class="ident">Driver</span>) -&gt; <span class="ident">Parker</span> {
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">unpark</span>();
+<span class="kw">impl </span>Parker {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(driver: Driver) -&gt; Parker {
+        <span class="kw">let </span>handle = driver.unpark();
 
-        <span class="ident">Parker</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
-                <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">EMPTY</span>),
-                <span class="ident">mutex</span>: <span class="ident">Mutex::new</span>(()),
-                <span class="ident">condvar</span>: <span class="ident">Condvar::new</span>(),
-                <span class="ident">shared</span>: <span class="ident">Arc::new</span>(<span class="ident">Shared</span> {
-                    <span class="ident">driver</span>: <span class="ident">TryLock::new</span>(<span class="ident">driver</span>),
-                    <span class="ident">handle</span>,
+        Parker {
+            inner: Arc::new(Inner {
+                state: AtomicUsize::new(EMPTY),
+                mutex: Mutex::new(()),
+                condvar: Condvar::new(),
+                shared: Arc::new(Shared {
+                    driver: TryLock::new(driver),
+                    handle,
                 }),
             }),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Parker</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Parker</span> {
-        <span class="ident">Parker</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
-                <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">EMPTY</span>),
-                <span class="ident">mutex</span>: <span class="ident">Mutex::new</span>(()),
-                <span class="ident">condvar</span>: <span class="ident">Condvar::new</span>(),
-                <span class="ident">shared</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shared</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>Clone <span class="kw">for </span>Parker {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Parker {
+        Parker {
+            inner: Arc::new(Inner {
+                state: AtomicUsize::new(EMPTY),
+                mutex: Mutex::new(()),
+                condvar: Condvar::new(),
+                shared: <span class="self">self</span>.inner.shared.clone(),
             }),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Park</span> <span class="kw">for</span> <span class="ident">Parker</span> {
-    <span class="kw">type</span> <span class="ident">Unpark</span> <span class="op">=</span> <span class="ident">Unparker</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+<span class="kw">impl </span>Park <span class="kw">for </span>Parker {
+    <span class="kw">type </span>Unpark = Unparker;
+    <span class="kw">type </span>Error = ();
 
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Unparker</span> {
-        <span class="ident">Unparker</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Unparker {
+        Unparker {
+            inner: <span class="self">self</span>.inner.clone(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">park</span>();
+    <span class="kw">fn </span>park(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="self">self</span>.inner.park();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">park_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="comment">// Only parking with zero is supported...</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">duration</span>, <span class="ident">Duration::from_millis</span>(<span class="number">0</span>));
+    <span class="kw">fn </span>park_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        <span class="comment">// Only parking with zero is supported...
+        </span><span class="macro">assert_eq!</span>(duration, Duration::from_millis(<span class="number">0</span>));
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">driver</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shared</span>.<span class="ident">driver</span>.<span class="ident">try_lock</span>() {
-            <span class="ident">driver</span>.<span class="ident">park_timeout</span>(<span class="ident">duration</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-        } <span class="kw">else</span> {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>driver) = <span class="self">self</span>.inner.shared.driver.try_lock() {
+            driver.park_timeout(duration).map_err(|<span class="kw">_</span>| ())
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">shutdown</span>();
+    <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.shutdown();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Unpark</span> <span class="kw">for</span> <span class="ident">Unparker</span> {
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">unpark</span>();
+<span class="kw">impl </span>Unpark <span class="kw">for </span>Unparker {
+    <span class="kw">fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.unpark();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Inner</span> {
-    <span class="doccomment">/// Parks the current thread for at most `dur`.</span>
-    <span class="kw">fn</span> <span class="ident">park</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-            <span class="comment">// If we were previously notified then we consume this notification and</span>
-            <span class="comment">// return quickly.</span>
-            <span class="kw">if</span> <span class="self">self</span>
-                .<span class="ident">state</span>
-                .<span class="ident">compare_exchange</span>(<span class="ident">NOTIFIED</span>, <span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
-                .<span class="ident">is_ok</span>()
+<span class="kw">impl </span>Inner {
+    <span class="doccomment">/// Parks the current thread for at most `dur`.
+    </span><span class="kw">fn </span>park(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">3 </span>{
+            <span class="comment">// If we were previously notified then we consume this notification and
+            // return quickly.
+            </span><span class="kw">if </span><span class="self">self
+                </span>.state
+                .compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst)
+                .is_ok()
             {
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">thread::yield_now</span>();
+            thread::yield_now();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">driver</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">driver</span>.<span class="ident">try_lock</span>() {
-            <span class="self">self</span>.<span class="ident">park_driver</span>(<span class="kw-2">&amp;mut</span> <span class="ident">driver</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">park_condvar</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>driver) = <span class="self">self</span>.shared.driver.try_lock() {
+            <span class="self">self</span>.park_driver(<span class="kw-2">&amp;mut </span>driver);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.park_condvar();
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">park_condvar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// Otherwise we need to coordinate going to sleep</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mutex</span>.<span class="ident">lock</span>();
+    <span class="kw">fn </span>park_condvar(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="comment">// Otherwise we need to coordinate going to sleep
+        </span><span class="kw">let </span><span class="kw-2">mut </span>m = <span class="self">self</span>.mutex.lock();
 
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">state</span>
-            .<span class="ident">compare_exchange</span>(<span class="ident">EMPTY</span>, <span class="ident">PARKED_CONDVAR</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
+        <span class="kw">match </span><span class="self">self
+            </span>.state
+            .compare_exchange(EMPTY, PARKED_CONDVAR, SeqCst, SeqCst)
         {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) =&gt; {
-                <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.</span>
-                <span class="comment">// This is because `unpark` may have been called again since we read</span>
-                <span class="comment">// `NOTIFIED` in the `compare_exchange` above. We must perform an</span>
-                <span class="comment">// acquire operation that synchronizes with that `unpark` to observe</span>
-                <span class="comment">// any writes it made before the call to unpark. To do that we must</span>
-                <span class="comment">// read from the write it made to `state`.</span>
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>);
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">old</span>, <span class="ident">NOTIFIED</span>, <span class="string">&quot;park state changed unexpectedly&quot;</span>);
+            <span class="prelude-val">Err</span>(NOTIFIED) =&gt; {
+                <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.
+                // This is because `unpark` may have been called again since we read
+                // `NOTIFIED` in the `compare_exchange` above. We must perform an
+                // acquire operation that synchronizes with that `unpark` to observe
+                // any writes it made before the call to unpark. To do that we must
+                // read from the write it made to `state`.
+                </span><span class="kw">let </span>old = <span class="self">self</span>.state.swap(EMPTY, SeqCst);
+                <span class="macro">debug_assert_eq!</span>(old, NOTIFIED, <span class="string">&quot;park state changed unexpectedly&quot;</span>);
 
                 <span class="kw">return</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
+            <span class="prelude-val">Err</span>(actual) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, actual),
         }
 
-        <span class="kw">loop</span> {
-            <span class="ident">m</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">condvar</span>.<span class="ident">wait</span>(<span class="ident">m</span>).<span class="ident">unwrap</span>();
+        <span class="kw">loop </span>{
+            m = <span class="self">self</span>.condvar.wait(m).unwrap();
 
-            <span class="kw">if</span> <span class="self">self</span>
-                .<span class="ident">state</span>
-                .<span class="ident">compare_exchange</span>(<span class="ident">NOTIFIED</span>, <span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
-                .<span class="ident">is_ok</span>()
+            <span class="kw">if </span><span class="self">self
+                </span>.state
+                .compare_exchange(NOTIFIED, EMPTY, SeqCst, SeqCst)
+                .is_ok()
             {
-                <span class="comment">// got a notification</span>
-                <span class="kw">return</span>;
+                <span class="comment">// got a notification
+                </span><span class="kw">return</span>;
             }
 
-            <span class="comment">// spurious wakeup, go back to sleep</span>
-        }
+            <span class="comment">// spurious wakeup, go back to sleep
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">park_driver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">driver</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Driver</span>) {
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">state</span>
-            .<span class="ident">compare_exchange</span>(<span class="ident">EMPTY</span>, <span class="ident">PARKED_DRIVER</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
+    <span class="kw">fn </span>park_driver(<span class="kw-2">&amp;</span><span class="self">self</span>, driver: <span class="kw-2">&amp;mut </span>Driver) {
+        <span class="kw">match </span><span class="self">self
+            </span>.state
+            .compare_exchange(EMPTY, PARKED_DRIVER, SeqCst, SeqCst)
         {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="prelude-val">Err</span>(<span class="ident">NOTIFIED</span>) =&gt; {
-                <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.</span>
-                <span class="comment">// This is because `unpark` may have been called again since we read</span>
-                <span class="comment">// `NOTIFIED` in the `compare_exchange` above. We must perform an</span>
-                <span class="comment">// acquire operation that synchronizes with that `unpark` to observe</span>
-                <span class="comment">// any writes it made before the call to unpark. To do that we must</span>
-                <span class="comment">// read from the write it made to `state`.</span>
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>);
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">old</span>, <span class="ident">NOTIFIED</span>, <span class="string">&quot;park state changed unexpectedly&quot;</span>);
+            <span class="prelude-val">Err</span>(NOTIFIED) =&gt; {
+                <span class="comment">// We must read here, even though we know it will be `NOTIFIED`.
+                // This is because `unpark` may have been called again since we read
+                // `NOTIFIED` in the `compare_exchange` above. We must perform an
+                // acquire operation that synchronizes with that `unpark` to observe
+                // any writes it made before the call to unpark. To do that we must
+                // read from the write it made to `state`.
+                </span><span class="kw">let </span>old = <span class="self">self</span>.state.swap(EMPTY, SeqCst);
+                <span class="macro">debug_assert_eq!</span>(old, NOTIFIED, <span class="string">&quot;park state changed unexpectedly&quot;</span>);
 
                 <span class="kw">return</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, <span class="ident">actual</span>),
+            <span class="prelude-val">Err</span>(actual) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park state; actual = {}&quot;</span>, actual),
         }
 
-        <span class="comment">// TODO: don&#39;t unwrap</span>
-        <span class="ident">driver</span>.<span class="ident">park</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// TODO: don&#39;t unwrap
+        </span>driver.park().unwrap();
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">EMPTY</span>, <span class="ident">SeqCst</span>) {
-            <span class="ident">NOTIFIED</span> =&gt; {}      <span class="comment">// got a notification, hurray!</span>
-            <span class="ident">PARKED_DRIVER</span> =&gt; {} <span class="comment">// no notification, alas</span>
-            <span class="ident">n</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park_timeout state: {}&quot;</span>, <span class="ident">n</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// To ensure the unparked thread will observe any writes we made before</span>
-        <span class="comment">// this call, we must perform a release operation that `park` can</span>
-        <span class="comment">// synchronize with. To do that we must write `NOTIFIED` even if `state`</span>
-        <span class="comment">// is already `NOTIFIED`. That is why this must be a swap rather than a</span>
-        <span class="comment">// compare-and-swap that returns if it reads `NOTIFIED` on failure.</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">NOTIFIED</span>, <span class="ident">SeqCst</span>) {
-            <span class="ident">EMPTY</span> =&gt; {}    <span class="comment">// no one was waiting</span>
-            <span class="ident">NOTIFIED</span> =&gt; {} <span class="comment">// already unparked</span>
-            <span class="ident">PARKED_CONDVAR</span> =&gt; <span class="self">self</span>.<span class="ident">unpark_condvar</span>(),
-            <span class="ident">PARKED_DRIVER</span> =&gt; <span class="self">self</span>.<span class="ident">unpark_driver</span>(),
-            <span class="ident">actual</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent state in unpark; actual = {}&quot;</span>, <span class="ident">actual</span>),
+        <span class="kw">match </span><span class="self">self</span>.state.swap(EMPTY, SeqCst) {
+            NOTIFIED =&gt; {}      <span class="comment">// got a notification, hurray!
+            </span>PARKED_DRIVER =&gt; {} <span class="comment">// no notification, alas
+            </span>n =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent park_timeout state: {}&quot;</span>, n),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">unpark_condvar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// There is a period between when the parked thread sets `state` to</span>
-        <span class="comment">// `PARKED` (or last checked `state` in the case of a spurious wake</span>
-        <span class="comment">// up) and when it actually waits on `cvar`. If we were to notify</span>
-        <span class="comment">// during this period it would be ignored and then when the parked</span>
-        <span class="comment">// thread went to sleep it would never wake up. Fortunately, it has</span>
-        <span class="comment">// `lock` locked at this stage so we can acquire `lock` to wait until</span>
-        <span class="comment">// it is ready to receive the notification.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Releasing `lock` before the call to `notify_one` means that when the</span>
-        <span class="comment">// parked thread wakes it doesn&#39;t get woken only to have to wait for us</span>
-        <span class="comment">// to release `lock`.</span>
-        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">mutex</span>.<span class="ident">lock</span>());
-
-        <span class="self">self</span>.<span class="ident">condvar</span>.<span class="ident">notify_one</span>()
+    <span class="kw">fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="comment">// To ensure the unparked thread will observe any writes we made before
+        // this call, we must perform a release operation that `park` can
+        // synchronize with. To do that we must write `NOTIFIED` even if `state`
+        // is already `NOTIFIED`. That is why this must be a swap rather than a
+        // compare-and-swap that returns if it reads `NOTIFIED` on failure.
+        </span><span class="kw">match </span><span class="self">self</span>.state.swap(NOTIFIED, SeqCst) {
+            EMPTY =&gt; {}    <span class="comment">// no one was waiting
+            </span>NOTIFIED =&gt; {} <span class="comment">// already unparked
+            </span>PARKED_CONDVAR =&gt; <span class="self">self</span>.unpark_condvar(),
+            PARKED_DRIVER =&gt; <span class="self">self</span>.unpark_driver(),
+            actual =&gt; <span class="macro">panic!</span>(<span class="string">&quot;inconsistent state in unpark; actual = {}&quot;</span>, actual),
+        }
     }
 
-    <span class="kw">fn</span> <span class="ident">unpark_driver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">handle</span>.<span class="ident">unpark</span>();
+    <span class="kw">fn </span>unpark_condvar(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="comment">// There is a period between when the parked thread sets `state` to
+        // `PARKED` (or last checked `state` in the case of a spurious wake
+        // up) and when it actually waits on `cvar`. If we were to notify
+        // during this period it would be ignored and then when the parked
+        // thread went to sleep it would never wake up. Fortunately, it has
+        // `lock` locked at this stage so we can acquire `lock` to wait until
+        // it is ready to receive the notification.
+        //
+        // Releasing `lock` before the call to `notify_one` means that when the
+        // parked thread wakes it doesn&#39;t get woken only to have to wait for us
+        // to release `lock`.
+        </span>drop(<span class="self">self</span>.mutex.lock());
+
+        <span class="self">self</span>.condvar.notify_one()
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">driver</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">driver</span>.<span class="ident">try_lock</span>() {
-            <span class="ident">driver</span>.<span class="ident">shutdown</span>();
+    <span class="kw">fn </span>unpark_driver(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.shared.handle.unpark();
+    }
+
+    <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>driver) = <span class="self">self</span>.shared.driver.try_lock() {
+            driver.shutdown();
         }
 
-        <span class="self">self</span>.<span class="ident">condvar</span>.<span class="ident">notify_all</span>();
+        <span class="self">self</span>.condvar.notify_all();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/backtrace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backtrace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/backtrace.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backtrace.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_error/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -320,325 +320,325 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer::WithContext</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">Metadata</span>, <span class="ident">Span</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::layer::WithContext;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>tracing::{Metadata, Span};
 
-<span class="doccomment">/// A captured trace of [`tracing`] spans.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type can be thought of as a relative of</span>
-<span class="doccomment">/// [`std::backtrace::Backtrace`][`Backtrace`].</span>
-<span class="doccomment">/// However, rather than capturing the current call stack when it is</span>
-<span class="doccomment">/// constructed, a `SpanTrace` instead captures the current [span] and its</span>
-<span class="doccomment">/// [parents].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In many cases, span traces may be as useful as stack backtraces useful in</span>
-<span class="doccomment">/// pinpointing where an error occurred and why, if not moreso:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * A span trace captures only the user-defined, human-readable `tracing`</span>
-<span class="doccomment">///   spans, rather than _every_ frame in the call stack, often cutting out a</span>
-<span class="doccomment">///   lot of noise.</span>
-<span class="doccomment">/// * Span traces include the [fields] recorded by each span in the trace, as</span>
-<span class="doccomment">///   well as their names and source code location, so different invocations of</span>
-<span class="doccomment">///   a function can be distinguished,</span>
-<span class="doccomment">/// * In asynchronous code, backtraces for errors that occur in [futures] often</span>
-<span class="doccomment">///   consist not of the stack frames that _spawned_ a future, but the stack</span>
-<span class="doccomment">///   frames of the executor that is responsible for running that future. This</span>
-<span class="doccomment">///   means that if an `async fn` calls another `async fn` which generates an</span>
-<span class="doccomment">///   error, the calling async function will not appear in the stack trace (and</span>
-<span class="doccomment">///   often, the callee won&#39;t either!). On the other hand, when the</span>
-<span class="doccomment">///   [`tracing-futures`] crate is used to instrument async code, the span trace</span>
-<span class="doccomment">///   will represent the logical application context a future was running in,</span>
-<span class="doccomment">///   rather than the stack trace of the executor that was polling a future when</span>
-<span class="doccomment">///   an error occurred.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Finally, unlike stack [`Backtrace`]s, capturing a `SpanTrace` is fairly</span>
-<span class="doccomment">/// lightweight, and the resulting struct is not large. The `SpanTrace` struct</span>
-<span class="doccomment">/// is formatted lazily; instead, it simply stores a copy of the current span,</span>
-<span class="doccomment">/// and allows visiting the spans in that span&#39;s trace tree by calling the</span>
-<span class="doccomment">/// [`with_spans` method][`with_spans`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Formatting</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `SpanTrace` type implements `fmt::Display`, formatting the span trace</span>
-<span class="doccomment">/// similarly to how Rust formats panics. For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    0: custom_error::do_another_thing</span>
-<span class="doccomment">///         with answer=42 will_succeed=false</span>
-<span class="doccomment">///           at examples/examples/custom_error.rs:42</span>
-<span class="doccomment">///    1: custom_error::do_something</span>
-<span class="doccomment">///         with foo=&quot;hello world&quot;</span>
-<span class="doccomment">///           at examples/examples/custom_error.rs:37</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Additionally, if custom formatting is desired, the [`with_spans`] method can</span>
-<span class="doccomment">/// be used to visit each span in the trace, formatting them in order.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`tracing`]: https://docs.rs/tracing</span>
-<span class="doccomment">/// [`Backtrace`]: https://doc.rust-lang.org/std/backtrace/struct.Backtrace.html</span>
-<span class="doccomment">/// [span]: https://docs.rs/tracing/latest/tracing/span/index.html</span>
-<span class="doccomment">/// [parents]: https://docs.rs/tracing/latest/tracing/span/index.html#span-relationships</span>
-<span class="doccomment">/// [fields]: https://docs.rs/tracing/latest/tracing/field/index.html</span>
-<span class="doccomment">/// [futures]: https://doc.rust-lang.org/std/future/trait.Future.html</span>
-<span class="doccomment">/// [`tracing-futures`]: https://docs.rs/tracing-futures/</span>
-<span class="doccomment">/// [`with_spans`]: #method.with_spans</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanTrace</span> {
-    <span class="ident">span</span>: <span class="ident">Span</span>,
+<span class="doccomment">/// A captured trace of [`tracing`] spans.
+///
+/// This type can be thought of as a relative of
+/// [`std::backtrace::Backtrace`][`Backtrace`].
+/// However, rather than capturing the current call stack when it is
+/// constructed, a `SpanTrace` instead captures the current [span] and its
+/// [parents].
+///
+/// In many cases, span traces may be as useful as stack backtraces useful in
+/// pinpointing where an error occurred and why, if not moreso:
+///
+/// * A span trace captures only the user-defined, human-readable `tracing`
+///   spans, rather than _every_ frame in the call stack, often cutting out a
+///   lot of noise.
+/// * Span traces include the [fields] recorded by each span in the trace, as
+///   well as their names and source code location, so different invocations of
+///   a function can be distinguished,
+/// * In asynchronous code, backtraces for errors that occur in [futures] often
+///   consist not of the stack frames that _spawned_ a future, but the stack
+///   frames of the executor that is responsible for running that future. This
+///   means that if an `async fn` calls another `async fn` which generates an
+///   error, the calling async function will not appear in the stack trace (and
+///   often, the callee won&#39;t either!). On the other hand, when the
+///   [`tracing-futures`] crate is used to instrument async code, the span trace
+///   will represent the logical application context a future was running in,
+///   rather than the stack trace of the executor that was polling a future when
+///   an error occurred.
+///
+/// Finally, unlike stack [`Backtrace`]s, capturing a `SpanTrace` is fairly
+/// lightweight, and the resulting struct is not large. The `SpanTrace` struct
+/// is formatted lazily; instead, it simply stores a copy of the current span,
+/// and allows visiting the spans in that span&#39;s trace tree by calling the
+/// [`with_spans` method][`with_spans`].
+///
+/// # Formatting
+///
+/// The `SpanTrace` type implements `fmt::Display`, formatting the span trace
+/// similarly to how Rust formats panics. For example:
+///
+/// ```text
+///    0: custom_error::do_another_thing
+///         with answer=42 will_succeed=false
+///           at examples/examples/custom_error.rs:42
+///    1: custom_error::do_something
+///         with foo=&quot;hello world&quot;
+///           at examples/examples/custom_error.rs:37
+/// ```
+///
+/// Additionally, if custom formatting is desired, the [`with_spans`] method can
+/// be used to visit each span in the trace, formatting them in order.
+///
+/// [`tracing`]: https://docs.rs/tracing
+/// [`Backtrace`]: https://doc.rust-lang.org/std/backtrace/struct.Backtrace.html
+/// [span]: https://docs.rs/tracing/latest/tracing/span/index.html
+/// [parents]: https://docs.rs/tracing/latest/tracing/span/index.html#span-relationships
+/// [fields]: https://docs.rs/tracing/latest/tracing/field/index.html
+/// [futures]: https://doc.rust-lang.org/std/future/trait.Future.html
+/// [`tracing-futures`]: https://docs.rs/tracing-futures/
+/// [`with_spans`]: #method.with_spans
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>SpanTrace {
+    span: Span,
 }
 
-<span class="comment">// === impl SpanTrace ===</span>
+<span class="comment">// === impl SpanTrace ===
 
-<span class="kw">impl</span> <span class="ident">SpanTrace</span> {
-    <span class="doccomment">/// Create a new span trace with the given span as the innermost span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanTrace</span> { <span class="ident">span</span> }
+</span><span class="kw">impl </span>SpanTrace {
+    <span class="doccomment">/// Create a new span trace with the given span as the innermost span.
+    </span><span class="kw">pub fn </span>new(span: Span) -&gt; <span class="self">Self </span>{
+        SpanTrace { span }
     }
 
-    <span class="doccomment">/// Capture the current span trace.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_error::SpanTrace;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pub struct MyError {</span>
-    <span class="doccomment">///     span_trace: SpanTrace,</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn some_error_condition() -&gt; bool { true }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[tracing::instrument]</span>
-    <span class="doccomment">/// pub fn my_function(arg: &amp;str) -&gt; Result&lt;(), MyError&gt; {</span>
-    <span class="doccomment">///     if some_error_condition() {</span>
-    <span class="doccomment">///         return Err(MyError {</span>
-    <span class="doccomment">///             span_trace: SpanTrace::capture(),</span>
-    <span class="doccomment">///             // ...</span>
-    <span class="doccomment">///         });</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// #   Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capture</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanTrace::new</span>(<span class="ident">Span::current</span>())
+    <span class="doccomment">/// Capture the current span trace.
+    ///
+    /// # Examples
+    /// ```rust
+    /// use tracing_error::SpanTrace;
+    ///
+    /// pub struct MyError {
+    ///     span_trace: SpanTrace,
+    ///     // ...
+    /// }
+    ///
+    /// # fn some_error_condition() -&gt; bool { true }
+    ///
+    /// #[tracing::instrument]
+    /// pub fn my_function(arg: &amp;str) -&gt; Result&lt;(), MyError&gt; {
+    ///     if some_error_condition() {
+    ///         return Err(MyError {
+    ///             span_trace: SpanTrace::capture(),
+    ///             // ...
+    ///         });
+    ///     }
+    ///
+    ///     // ...
+    /// #   Ok(())
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>capture() -&gt; <span class="self">Self </span>{
+        SpanTrace::new(Span::current())
     }
 
-    <span class="doccomment">/// Apply a function to all captured spans in the trace until it returns</span>
-    <span class="doccomment">/// `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will call the provided function with a reference to the</span>
-    <span class="doccomment">/// [`Metadata`] and a formatted representation of the [fields] of each span</span>
-    <span class="doccomment">/// captured in the trace, starting with the span that was current when the</span>
-    <span class="doccomment">/// trace was captured. The function may return `true` or `false` to</span>
-    <span class="doccomment">/// indicate whether to continue iterating over spans; if it returns</span>
-    <span class="doccomment">/// `false`, no additional spans will be visited.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [fields]: https://docs.rs/tracing/latest/tracing/field/index.html</span>
-    <span class="doccomment">/// [`Metadata`]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_spans</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">span</span>.<span class="ident">with_subscriber</span>(<span class="op">|</span>(<span class="ident">id</span>, <span class="ident">s</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">getcx</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>() {
-                <span class="ident">getcx</span>.<span class="ident">with_context</span>(<span class="ident">s</span>, <span class="ident">id</span>, <span class="ident">f</span>);
+    <span class="doccomment">/// Apply a function to all captured spans in the trace until it returns
+    /// `false`.
+    ///
+    /// This will call the provided function with a reference to the
+    /// [`Metadata`] and a formatted representation of the [fields] of each span
+    /// captured in the trace, starting with the span that was current when the
+    /// trace was captured. The function may return `true` or `false` to
+    /// indicate whether to continue iterating over spans; if it returns
+    /// `false`, no additional spans will be visited.
+    ///
+    /// [fields]: https://docs.rs/tracing/latest/tracing/field/index.html
+    /// [`Metadata`]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html
+    </span><span class="kw">pub fn </span>with_spans(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;, <span class="kw-2">&amp;</span>str) -&gt; bool) {
+        <span class="self">self</span>.span.with_subscriber(|(id, s)| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(getcx) = s.downcast_ref::&lt;WithContext&gt;() {
+                getcx.with_context(s, id, f);
             }
         });
     }
 
-    <span class="doccomment">/// Returns the status of this `SpanTrace`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The status indicates one of the following:</span>
-    <span class="doccomment">/// * the current subscriber does not support capturing `SpanTrace`s</span>
-    <span class="doccomment">/// * there was no current span, so a trace was not captured</span>
-    <span class="doccomment">/// * a span trace was successfully captured</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanTraceStatus</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">span</span>.<span class="ident">is_none</span>() {
-            <span class="ident">SpanTraceStatusInner::Empty</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="self">self</span>.<span class="ident">span</span>.<span class="ident">with_subscriber</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">s</span>)<span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">WithContext</span><span class="op">&gt;</span>().<span class="ident">is_some</span>() {
-                    <span class="ident">status</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SpanTraceStatusInner::Captured</span>);
+    <span class="doccomment">/// Returns the status of this `SpanTrace`.
+    ///
+    /// The status indicates one of the following:
+    /// * the current subscriber does not support capturing `SpanTrace`s
+    /// * there was no current span, so a trace was not captured
+    /// * a span trace was successfully captured
+    </span><span class="kw">pub fn </span>status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SpanTraceStatus {
+        <span class="kw">let </span>inner = <span class="kw">if </span><span class="self">self</span>.span.is_none() {
+            SpanTraceStatusInner::Empty
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>status = <span class="prelude-val">None</span>;
+            <span class="self">self</span>.span.with_subscriber(|(<span class="kw">_</span>, s)| {
+                <span class="kw">if </span>s.downcast_ref::&lt;WithContext&gt;().is_some() {
+                    status = <span class="prelude-val">Some</span>(SpanTraceStatusInner::Captured);
                 }
             });
 
-            <span class="ident">status</span>.<span class="ident">unwrap_or</span>(<span class="ident">SpanTraceStatusInner::Unsupported</span>)
+            status.unwrap_or(SpanTraceStatusInner::Unsupported)
         };
 
-        <span class="ident">SpanTraceStatus</span>(<span class="ident">inner</span>)
+        SpanTraceStatus(inner)
     }
 }
 
-<span class="doccomment">/// The current status of a SpanTrace, indicating whether it was captured or</span>
-<span class="doccomment">/// whether it is empty for some other reason.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanTraceStatus</span>(<span class="ident">SpanTraceStatusInner</span>);
+<span class="doccomment">/// The current status of a SpanTrace, indicating whether it was captured or
+/// whether it is empty for some other reason.
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>SpanTraceStatus(SpanTraceStatusInner);
 
-<span class="kw">impl</span> <span class="ident">SpanTraceStatus</span> {
-    <span class="doccomment">/// Formatting a SpanTrace is not supported, likely because there is no</span>
-    <span class="doccomment">/// ErrorLayer or the ErrorLayer is from a different version of</span>
-    <span class="doccomment">/// tracing_error</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UNSUPPORTED</span>: <span class="ident">SpanTraceStatus</span> <span class="op">=</span> <span class="ident">SpanTraceStatus</span>(<span class="ident">SpanTraceStatusInner::Unsupported</span>);
+<span class="kw">impl </span>SpanTraceStatus {
+    <span class="doccomment">/// Formatting a SpanTrace is not supported, likely because there is no
+    /// ErrorLayer or the ErrorLayer is from a different version of
+    /// tracing_error
+    </span><span class="kw">pub const </span>UNSUPPORTED: SpanTraceStatus = SpanTraceStatus(SpanTraceStatusInner::Unsupported);
 
-    <span class="doccomment">/// The SpanTrace is empty, likely because it was captured outside of any</span>
-    <span class="doccomment">/// `span`s</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="ident">SpanTraceStatus</span> <span class="op">=</span> <span class="ident">SpanTraceStatus</span>(<span class="ident">SpanTraceStatusInner::Empty</span>);
+    <span class="doccomment">/// The SpanTrace is empty, likely because it was captured outside of any
+    /// `span`s
+    </span><span class="kw">pub const </span>EMPTY: SpanTraceStatus = SpanTraceStatus(SpanTraceStatusInner::Empty);
 
-    <span class="doccomment">/// A span trace has been captured and the `SpanTrace` should print</span>
-    <span class="doccomment">/// reasonable information when rendered.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CAPTURED</span>: <span class="ident">SpanTraceStatus</span> <span class="op">=</span> <span class="ident">SpanTraceStatus</span>(<span class="ident">SpanTraceStatusInner::Captured</span>);
+    <span class="doccomment">/// A span trace has been captured and the `SpanTrace` should print
+    /// reasonable information when rendered.
+    </span><span class="kw">pub const </span>CAPTURED: SpanTraceStatus = SpanTraceStatus(SpanTraceStatusInner::Captured);
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">SpanTraceStatusInner</span> {
-    <span class="ident">Unsupported</span>,
-    <span class="ident">Empty</span>,
-    <span class="ident">Captured</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq)]
+</span><span class="kw">enum </span>SpanTraceStatusInner {
+    Unsupported,
+    Empty,
+    Captured,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">try_bool</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dest</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dest</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>));
+<span class="macro">macro_rules! </span>try_bool {
+    (<span class="macro-nonterminal">$e</span>:expr, <span class="macro-nonterminal">$dest</span>:ident) =&gt; {{
+        <span class="kw">let </span>ret = <span class="macro-nonterminal">$e</span>.unwrap_or_else(|e| <span class="macro-nonterminal">$dest </span>= <span class="prelude-val">Err</span>(e));
 
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dest</span>.<span class="ident">is_err</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span><span class="macro-nonterminal">$dest</span>.is_err() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="ident">ret</span>
+        ret
     }};
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SpanTrace</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SpanTrace {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>err = <span class="prelude-val">Ok</span>(());
+        <span class="kw">let </span><span class="kw-2">mut </span>span = <span class="number">0</span>;
 
-        <span class="self">self</span>.<span class="ident">with_spans</span>(<span class="op">|</span><span class="ident">metadata</span>, <span class="ident">fields</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">span</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n&quot;</span>,), <span class="ident">err</span>);
+        <span class="self">self</span>.with_spans(|metadata, fields| {
+            <span class="kw">if </span>span &gt; <span class="number">0 </span>{
+                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;\n&quot;</span>,), err);
             }
 
             <span class="macro">try_bool!</span>(
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:&gt;4}: {}::{}&quot;</span>, <span class="ident">span</span>, <span class="ident">metadata</span>.<span class="ident">target</span>(), <span class="ident">metadata</span>.<span class="ident">name</span>()),
-                <span class="ident">err</span>
+                <span class="macro">write!</span>(f, <span class="string">&quot;{:&gt;4}: {}::{}&quot;</span>, span, metadata.target(), metadata.name()),
+                err
             );
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n           with {}&quot;</span>, <span class="ident">fields</span>), <span class="ident">err</span>);
+            <span class="kw">if </span>!fields.is_empty() {
+                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;\n           with {}&quot;</span>, fields), err);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">file</span>, <span class="ident">line</span>)) <span class="op">=</span> <span class="ident">metadata</span>
-                .<span class="ident">file</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">file</span><span class="op">|</span> <span class="ident">metadata</span>.<span class="ident">line</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> (<span class="ident">file</span>, <span class="ident">line</span>)))
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((file, line)) = metadata
+                .file()
+                .and_then(|file| metadata.line().map(|line| (file, line)))
             {
-                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\n             at {}:{}&quot;</span>, <span class="ident">file</span>, <span class="ident">line</span>), <span class="ident">err</span>);
+                <span class="macro">try_bool!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;\n             at {}:{}&quot;</span>, file, line), err);
             }
 
-            <span class="ident">span</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="bool-val">true</span>
-        });
+            span += <span class="number">1</span>;
+            <span class="bool-val">true
+        </span>});
 
-        <span class="ident">err</span>
+        err
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SpanTrace</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">struct</span> <span class="ident">DebugSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-            <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SpanTrace {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">struct </span>DebugSpan&lt;<span class="lifetime">&#39;a</span>&gt; {
+            metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Metadata&lt;<span class="lifetime">&#39;a</span>&gt;,
+            fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DebugSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>DebugSpan&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
                 <span class="macro">write!</span>(
-                    <span class="ident">f</span>,
+                    f,
                     <span class="string">&quot;{{ target: {:?}, name: {:?}&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">target</span>(),
-                    <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">name</span>()
+                    <span class="self">self</span>.metadata.target(),
+                    <span class="self">self</span>.metadata.name()
                 )<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, fields: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">fields</span>)<span class="question-mark">?</span>;
+                <span class="kw">if </span>!<span class="self">self</span>.fields.is_empty() {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;, fields: {:?}&quot;</span>, <span class="self">self</span>.fields)<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">file</span>, <span class="ident">line</span>)) <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">metadata</span>
-                    .<span class="ident">file</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">file</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">line</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> (<span class="ident">file</span>, <span class="ident">line</span>)))
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((file, line)) = <span class="self">self
+                    </span>.metadata
+                    .file()
+                    .and_then(|file| <span class="self">self</span>.metadata.line().map(|line| (file, line)))
                 {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, file: {:?}, line: {:?}&quot;</span>, <span class="ident">file</span>, <span class="ident">line</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(f, <span class="string">&quot;, file: {:?}, line: {:?}&quot;</span>, file, line)<span class="question-mark">?</span>;
                 }
 
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; }}&quot;</span>)<span class="question-mark">?</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot; }}&quot;</span>)<span class="question-mark">?</span>;
 
                 <span class="prelude-val">Ok</span>(())
             }
         }
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SpanTrace &quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dbg</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_list</span>();
-        <span class="self">self</span>.<span class="ident">with_spans</span>(<span class="op">|</span><span class="ident">metadata</span>, <span class="ident">fields</span><span class="op">|</span> {
-            <span class="ident">dbg</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">DebugSpan</span> { <span class="ident">metadata</span>, <span class="ident">fields</span> });
-            <span class="bool-val">true</span>
-        });
-        <span class="ident">dbg</span>.<span class="ident">finish</span>()
+        <span class="macro">write!</span>(f, <span class="string">&quot;SpanTrace &quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dbg = f.debug_list();
+        <span class="self">self</span>.with_spans(|metadata, fields| {
+            dbg.entry(<span class="kw-2">&amp;</span>DebugSpan { metadata, fields });
+            <span class="bool-val">true
+        </span>});
+        dbg.finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ErrorLayer</span>;
-    <span class="kw">use</span> <span class="ident">tracing::subscriber::with_default</span>;
-    <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">span</span>, <span class="ident">Level</span>};
-    <span class="kw">use</span> <span class="ident">tracing_subscriber</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">registry::Registry</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::ErrorLayer;
+    <span class="kw">use </span>tracing::subscriber::with_default;
+    <span class="kw">use </span>tracing::{span, Level};
+    <span class="kw">use </span>tracing_subscriber::{prelude::<span class="kw-2">*</span>, registry::Registry};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">capture_supported</span>() {
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">Registry::default</span>().<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>capture_supported() {
+        <span class="kw">let </span>subscriber = Registry::default().with(ErrorLayer::default());
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">span!</span>(<span class="ident">Level::ERROR</span>, <span class="string">&quot;test span&quot;</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        with_default(subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">span!</span>(Level::ERROR, <span class="string">&quot;test span&quot;</span>);
+            <span class="kw">let </span>_guard = span.enter();
 
-            <span class="kw">let</span> <span class="ident">span_trace</span> <span class="op">=</span> <span class="ident">SpanTrace::capture</span>();
+            <span class="kw">let </span>span_trace = SpanTrace::capture();
 
-            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">span_trace</span>);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>span_trace);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">SpanTraceStatus::CAPTURED</span>, <span class="ident">span_trace</span>.<span class="ident">status</span>())
+            <span class="macro">assert_eq!</span>(SpanTraceStatus::CAPTURED, span_trace.status())
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">capture_empty</span>() {
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">Registry::default</span>().<span class="ident">with</span>(<span class="ident">ErrorLayer::default</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>capture_empty() {
+        <span class="kw">let </span>subscriber = Registry::default().with(ErrorLayer::default());
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span_trace</span> <span class="op">=</span> <span class="ident">SpanTrace::capture</span>();
+        with_default(subscriber, || {
+            <span class="kw">let </span>span_trace = SpanTrace::capture();
 
-            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">span_trace</span>);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>span_trace);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">SpanTraceStatus::EMPTY</span>, <span class="ident">span_trace</span>.<span class="ident">status</span>())
+            <span class="macro">assert_eq!</span>(SpanTraceStatus::EMPTY, span_trace.status())
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">capture_unsupported</span>() {
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">Registry::default</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>capture_unsupported() {
+        <span class="kw">let </span>subscriber = Registry::default();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">span!</span>(<span class="ident">Level::ERROR</span>, <span class="string">&quot;test span&quot;</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        with_default(subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">span!</span>(Level::ERROR, <span class="string">&quot;test span&quot;</span>);
+            <span class="kw">let </span>_guard = span.enter();
 
-            <span class="kw">let</span> <span class="ident">span_trace</span> <span class="op">=</span> <span class="ident">SpanTrace::capture</span>();
+            <span class="kw">let </span>span_trace = SpanTrace::capture();
 
-            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">span_trace</span>);
+            <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>span_trace);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">SpanTraceStatus::UNSUPPORTED</span>, <span class="ident">span_trace</span>.<span class="ident">status</span>())
+            <span class="macro">assert_eq!</span>(SpanTraceStatus::UNSUPPORTED, span_trace.status())
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

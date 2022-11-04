@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -113,120 +113,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">FromPrimitive</span>};
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">NaiveDate</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::ConversionFailure</span>;
-<span class="kw">use</span> <span class="ident">quaint::Value</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
+<span class="kw">use </span>chrono::{DateTime, NaiveDate, Utc};
+<span class="kw">use </span>prisma_models::PrismaValue;
+<span class="kw">use </span>prisma_value::ConversionFailure;
+<span class="kw">use </span>quaint::Value;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_prisma_value</span>(<span class="ident">quaint_value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">quaint_value</span> {
-        <span class="ident">Value::Int32</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">PrismaValue::Int</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">i64</span>)).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
-        <span class="ident">Value::Int64</span>(<span class="ident">i</span>) =&gt; <span class="ident">i</span>.<span class="ident">map</span>(<span class="ident">PrismaValue::Int</span>).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
-        <span class="ident">Value::Float</span>(<span class="prelude-val">Some</span>(<span class="ident">f</span>)) =&gt; <span class="kw">match</span> <span class="ident">f</span> {
-            <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConversionFailure</span> {
-                    <span class="ident">from</span>: <span class="string">&quot;NaN&quot;</span>,
-                    <span class="ident">to</span>: <span class="string">&quot;BigDecimal&quot;</span>,
+<span class="kw">pub fn </span>to_prisma_value(quaint_value: Value&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;PrismaValue&gt; {
+    <span class="kw">let </span>val = <span class="kw">match </span>quaint_value {
+        Value::Int32(i) =&gt; i.map(|i| PrismaValue::Int(i <span class="kw">as </span>i64)).unwrap_or(PrismaValue::Null),
+        Value::Int64(i) =&gt; i.map(PrismaValue::Int).unwrap_or(PrismaValue::Null),
+        Value::Float(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
+            f <span class="kw">if </span>f.is_nan() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConversionFailure {
+                    from: <span class="string">&quot;NaN&quot;</span>,
+                    to: <span class="string">&quot;BigDecimal&quot;</span>,
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
-            <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_infinite</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConversionFailure</span> {
-                    <span class="ident">from</span>: <span class="string">&quot;Infinity&quot;</span>,
-                    <span class="ident">to</span>: <span class="string">&quot;BigDecimal&quot;</span>,
+            f <span class="kw">if </span>f.is_infinite() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConversionFailure {
+                    from: <span class="string">&quot;Infinity&quot;</span>,
+                    to: <span class="string">&quot;BigDecimal&quot;</span>,
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
-            <span class="kw">_</span> =&gt; <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f32</span>(<span class="ident">f</span>).<span class="ident">unwrap</span>().<span class="ident">normalized</span>()),
+            <span class="kw">_ </span>=&gt; PrismaValue::Float(BigDecimal::from_f32(f).unwrap().normalized()),
         },
 
-        <span class="ident">Value::Float</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">PrismaValue::Null</span>,
+        Value::Float(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        <span class="ident">Value::Double</span>(<span class="prelude-val">Some</span>(<span class="ident">f</span>)) =&gt; <span class="kw">match</span> <span class="ident">f</span> {
-            <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_nan</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConversionFailure</span> {
-                    <span class="ident">from</span>: <span class="string">&quot;NaN&quot;</span>,
-                    <span class="ident">to</span>: <span class="string">&quot;BigDecimal&quot;</span>,
+        Value::Double(<span class="prelude-val">Some</span>(f)) =&gt; <span class="kw">match </span>f {
+            f <span class="kw">if </span>f.is_nan() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConversionFailure {
+                    from: <span class="string">&quot;NaN&quot;</span>,
+                    to: <span class="string">&quot;BigDecimal&quot;</span>,
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
-            <span class="ident">f</span> <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">is_infinite</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConversionFailure</span> {
-                    <span class="ident">from</span>: <span class="string">&quot;Infinity&quot;</span>,
-                    <span class="ident">to</span>: <span class="string">&quot;BigDecimal&quot;</span>,
+            f <span class="kw">if </span>f.is_infinite() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConversionFailure {
+                    from: <span class="string">&quot;Infinity&quot;</span>,
+                    to: <span class="string">&quot;BigDecimal&quot;</span>,
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
-            <span class="kw">_</span> =&gt; <span class="ident">PrismaValue::Float</span>(<span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>).<span class="ident">unwrap</span>().<span class="ident">normalized</span>()),
+            <span class="kw">_ </span>=&gt; PrismaValue::Float(BigDecimal::from_f64(f).unwrap().normalized()),
         },
 
-        <span class="ident">Value::Double</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">PrismaValue::Null</span>,
+        Value::Double(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        <span class="ident">Value::Numeric</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>
-            <span class="comment">// chop the trailing zeroes off so javascript doesn&#39;t start rounding things wrong</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">PrismaValue::Float</span>(<span class="ident">d</span>.<span class="ident">normalized</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Numeric(d) =&gt; d
+            <span class="comment">// chop the trailing zeroes off so javascript doesn&#39;t start rounding things wrong
+            </span>.map(|d| PrismaValue::Float(d.normalized()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Text</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>.<span class="ident">into_owned</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Text(s) =&gt; s
+            .map(|s| PrismaValue::String(s.into_owned()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Enum</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>.<span class="ident">into_owned</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Enum(s) =&gt; s
+            .map(|s| PrismaValue::Enum(s.into_owned()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>.<span class="ident">map</span>(<span class="ident">PrismaValue::Boolean</span>).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Boolean(b) =&gt; b.map(PrismaValue::Boolean).unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Array</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>)) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">v</span>.<span class="ident">len</span>());
+        Value::Array(<span class="prelude-val">Some</span>(v)) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>res = Vec::with_capacity(v.len());
 
-            <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">v</span>.<span class="ident">into_iter</span>() {
-                <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">to_prisma_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>);
+            <span class="kw">for </span>v <span class="kw">in </span>v.into_iter() {
+                res.push(to_prisma_value(v)<span class="question-mark">?</span>);
             }
 
-            <span class="ident">PrismaValue::List</span>(<span class="ident">res</span>)
+            PrismaValue::List(res)
         }
 
-        <span class="ident">Value::Array</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">PrismaValue::Null</span>,
+        Value::Array(<span class="prelude-val">None</span>) =&gt; PrismaValue::Null,
 
-        <span class="ident">Value::Json</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">PrismaValue::Json</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Json(val) =&gt; val
+            .map(|val| PrismaValue::Json(val.to_string()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Uuid</span>(<span class="ident">uuid</span>) =&gt; <span class="ident">uuid</span>.<span class="ident">map</span>(<span class="ident">PrismaValue::Uuid</span>).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Uuid(uuid) =&gt; uuid.map(PrismaValue::Uuid).unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Date</span>(<span class="ident">d</span>) =&gt; <span class="ident">d</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_utc</span>(<span class="ident">d</span>.<span class="ident">and_hms</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="ident">Utc</span>);
-                <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>())
+        Value::Date(d) =&gt; d
+            .map(|d| {
+                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_hms(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), Utc);
+                PrismaValue::DateTime(dt.into())
             })
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Time</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>);
-                <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::from_utc</span>(<span class="ident">d</span>.<span class="ident">and_time</span>(<span class="ident">t</span>), <span class="ident">Utc</span>);
-                <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>())
+        Value::Time(t) =&gt; t
+            .map(|t| {
+                <span class="kw">let </span>d = NaiveDate::from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>);
+                <span class="kw">let </span>dt = DateTime::&lt;Utc&gt;::from_utc(d.and_time(t), Utc);
+                PrismaValue::DateTime(dt.into())
             })
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::DateTime</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>.<span class="ident">into</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::DateTime(dt) =&gt; dt
+            .map(|dt| PrismaValue::DateTime(dt.into()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Char</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">PrismaValue::String</span>(<span class="ident">c</span>.<span class="ident">to_string</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Char(c) =&gt; c
+            .map(|c| PrismaValue::String(c.to_string()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="ident">bytes</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>.<span class="ident">into_owned</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Bytes(bytes) =&gt; bytes
+            .map(|b| PrismaValue::Bytes(b.into_owned()))
+            .unwrap_or(PrismaValue::Null),
 
-        <span class="ident">Value::Xml</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">PrismaValue::Xml</span>(<span class="ident">s</span>.<span class="ident">into_owned</span>())).<span class="ident">unwrap_or</span>(<span class="ident">PrismaValue::Null</span>),
+        Value::Xml(s) =&gt; s.map(|s| PrismaValue::Xml(s.into_owned())).unwrap_or(PrismaValue::Null),
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+    <span class="prelude-val">Ok</span>(val)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

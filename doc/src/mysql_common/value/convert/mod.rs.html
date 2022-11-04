@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/value/convert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/value/convert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1093,79 +1093,79 @@
 <span id="1093">1093</span>
 <span id="1094">1094</span>
 <span id="1095">1095</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">lexical::parse</span>;
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">FromPrimitive</span>, <span class="ident">ToPrimitive</span>};
-<span class="kw">use</span> <span class="ident">regex::bytes::Regex</span>;
+</span><span class="kw">use </span>lexical::parse;
+<span class="kw">use </span>num_traits::{FromPrimitive, ToPrimitive};
+<span class="kw">use </span>regex::bytes::Regex;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">error::Error</span>, <span class="ident">fmt</span>, <span class="ident">str::from_utf8</span>, <span class="ident">time::Duration</span>};
+<span class="kw">use </span>std::{any::type_name, error::Error, fmt, str::from_utf8, time::Duration};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value::Value</span>;
+<span class="kw">use </span><span class="kw">crate</span>::value::Value;
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_from_value</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ir</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::value::convert::FromValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-            <span class="kw">type</span> <span class="ident">Intermediate</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ir</span>;
+<span class="macro">macro_rules! </span>impl_from_value {
+    (<span class="macro-nonterminal">$ty</span>:ty, <span class="macro-nonterminal">$ir</span>:ty) =&gt; {
+        <span class="kw">impl </span><span class="kw">crate</span>::value::convert::FromValue <span class="kw">for </span><span class="macro-nonterminal">$ty </span>{
+            <span class="kw">type </span>Intermediate = <span class="macro-nonterminal">$ir</span>;
         }
     };
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bigdecimal</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bigdecimal03</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bigint</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chrono</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">decimal</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time03</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid</span>;
+<span class="kw">pub mod </span>bigdecimal;
+<span class="kw">pub mod </span>bigdecimal03;
+<span class="kw">pub mod </span>bigint;
+<span class="kw">pub mod </span>chrono;
+<span class="kw">pub mod </span>decimal;
+<span class="kw">pub mod </span>time;
+<span class="kw">pub mod </span>time03;
+<span class="kw">pub mod </span>uuid;
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATETIME_RE_YMD</span>: <span class="ident">Regex</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^\d{4}-\d{2}-\d{2}$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATETIME_RE_YMD_HMS</span>: <span class="ident">Regex</span> <span class="op">=</span>
-        <span class="ident">Regex::new</span>(<span class="string">r&quot;^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DATETIME_RE_YMD_HMS_NS</span>: <span class="ident">Regex</span> <span class="op">=</span>
-        <span class="ident">Regex::new</span>(<span class="string">r&quot;^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{1,6}$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_RE_HH_MM_SS</span>: <span class="ident">Regex</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^\d{2}:[0-5]\d:[0-5]\d$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_RE_HH_MM_SS_MS</span>: <span class="ident">Regex</span> <span class="op">=</span>
-        <span class="ident">Regex::new</span>(<span class="string">r&quot;^\d{2}:[0-5]\d:[0-5]\d\.\d{1,6}$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_RE_HHH_MM_SS</span>: <span class="ident">Regex</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^[0-8]\d\d:[0-5]\d:[0-5]\d$&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TIME_RE_HHH_MM_SS_MS</span>: <span class="ident">Regex</span> <span class="op">=</span>
-        <span class="ident">Regex::new</span>(<span class="string">r&quot;^[0-8]\d\d:[0-5]\d:[0-5]\d\.\d{1,6}$&quot;</span>).<span class="ident">unwrap</span>();
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>DATETIME_RE_YMD: Regex = Regex::new(<span class="string">r&quot;^\d{4}-\d{2}-\d{2}$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>DATETIME_RE_YMD_HMS: Regex =
+        Regex::new(<span class="string">r&quot;^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>DATETIME_RE_YMD_HMS_NS: Regex =
+        Regex::new(<span class="string">r&quot;^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{1,6}$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_RE_HH_MM_SS: Regex = Regex::new(<span class="string">r&quot;^\d{2}:[0-5]\d:[0-5]\d$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_RE_HH_MM_SS_MS: Regex =
+        Regex::new(<span class="string">r&quot;^\d{2}:[0-5]\d:[0-5]\d\.\d{1,6}$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_RE_HHH_MM_SS: Regex = Regex::new(<span class="string">r&quot;^[0-8]\d\d:[0-5]\d:[0-5]\d$&quot;</span>).unwrap();
+    <span class="kw">static </span><span class="kw-2">ref </span>TIME_RE_HHH_MM_SS_MS: Regex =
+        Regex::new(<span class="string">r&quot;^[0-8]\d\d:[0-5]\d:[0-5]\d\.\d{1,6}$&quot;</span>).unwrap();
 }
 
-<span class="doccomment">/// Returns (year, month, day, hour, minute, second, micros)</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>, <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>, <span class="ident">test</span>)))]</span>
-<span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
+<span class="doccomment">/// Returns (year, month, day, hour, minute, second, micros)
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;chrono&quot;</span>, all(feature = <span class="string">&quot;time&quot;</span>, test)))]
+</span><span class="kw">fn </span>parse_mysql_datetime_string(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(u32, u32, u32, u32, u32, u32, u32)&gt; {
+    <span class="kw">let </span>len = bytes.len();
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">DateTimeKind</span> {
-        <span class="ident">Ymd</span> <span class="op">=</span> <span class="number">0</span>,
-        <span class="ident">YmdHms</span>,
-        <span class="ident">YmdHmsMs</span>,
+    <span class="attribute">#[derive(PartialEq, Eq, PartialOrd, Ord)]
+    #[repr(u8)]
+    </span><span class="kw">enum </span>DateTimeKind {
+        Ymd = <span class="number">0</span>,
+        YmdHms,
+        YmdHmsMs,
     }
 
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">10</span> <span class="op">&amp;&amp;</span> <span class="ident">DATETIME_RE_YMD</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">DateTimeKind::Ymd</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">19</span> <span class="op">&amp;&amp;</span> <span class="ident">DATETIME_RE_YMD_HMS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">DateTimeKind::YmdHms</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="number">20</span> <span class="op">&lt;</span> <span class="ident">len</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">27</span> <span class="op">&amp;&amp;</span> <span class="ident">DATETIME_RE_YMD_HMS_NS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">DateTimeKind::YmdHmsMs</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>kind = <span class="kw">if </span>len == <span class="number">10 </span>&amp;&amp; DATETIME_RE_YMD.is_match(bytes) {
+        DateTimeKind::Ymd
+    } <span class="kw">else if </span>len == <span class="number">19 </span>&amp;&amp; DATETIME_RE_YMD_HMS.is_match(bytes) {
+        DateTimeKind::YmdHms
+    } <span class="kw">else if </span><span class="number">20 </span>&lt; len &amp;&amp; len &lt; <span class="number">27 </span>&amp;&amp; DATETIME_RE_YMD_HMS_NS.is_match(bytes) {
+        DateTimeKind::YmdHmsMs
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     };
 
-    <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>, <span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">micros</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">kind</span> {
-        <span class="ident">DateTimeKind::Ymd</span> =&gt; (..<span class="number">4</span>, <span class="number">5</span>..<span class="number">7</span>, <span class="number">8</span>..<span class="number">10</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-        <span class="ident">DateTimeKind::YmdHms</span> =&gt; (
+    <span class="kw">let </span>(year, month, day, hour, minute, second, micros) = <span class="kw">match </span>kind {
+        DateTimeKind::Ymd =&gt; (..<span class="number">4</span>, <span class="number">5</span>..<span class="number">7</span>, <span class="number">8</span>..<span class="number">10</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+        DateTimeKind::YmdHms =&gt; (
             ..<span class="number">4</span>,
             <span class="number">5</span>..<span class="number">7</span>,
             <span class="number">8</span>..<span class="number">10</span>,
@@ -1174,7 +1174,7 @@
             <span class="prelude-val">Some</span>(<span class="number">17</span>..<span class="number">19</span>),
             <span class="prelude-val">None</span>,
         ),
-        <span class="ident">DateTimeKind::YmdHmsMs</span> =&gt; (
+        DateTimeKind::YmdHmsMs =&gt; (
             ..<span class="number">4</span>,
             <span class="number">5</span>..<span class="number">7</span>,
             <span class="number">8</span>..<span class="number">10</span>,
@@ -1186,705 +1186,705 @@
     };
 
     <span class="prelude-val">Some</span>((
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">year</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">month</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">day</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">hour</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">pos</span>]).<span class="ident">unwrap</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-        <span class="ident">minute</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">pos</span>]).<span class="ident">unwrap</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-        <span class="ident">second</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">pos</span>]).<span class="ident">unwrap</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-        <span class="ident">micros</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">parse_micros</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">pos</span>])).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+        parse(<span class="kw-2">&amp;</span>bytes[year]).unwrap(),
+        parse(<span class="kw-2">&amp;</span>bytes[month]).unwrap(),
+        parse(<span class="kw-2">&amp;</span>bytes[day]).unwrap(),
+        hour.map(|pos| parse(<span class="kw-2">&amp;</span>bytes[pos]).unwrap()).unwrap_or(<span class="number">0</span>),
+        minute.map(|pos| parse(<span class="kw-2">&amp;</span>bytes[pos]).unwrap()).unwrap_or(<span class="number">0</span>),
+        second.map(|pos| parse(<span class="kw-2">&amp;</span>bytes[pos]).unwrap()).unwrap_or(<span class="number">0</span>),
+        micros.map(|pos| parse_micros(<span class="kw-2">&amp;</span>bytes[pos])).unwrap_or(<span class="number">0</span>),
     ))
 }
 
-<span class="doccomment">/// `FromValue` conversion error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromValueError</span>(<span class="kw">pub</span> <span class="ident">Value</span>);
+<span class="doccomment">/// `FromValue` conversion error.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>FromValueError(<span class="kw">pub </span>Value);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FromValueError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FromValueError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Couldn&#39;t convert the value `{:?}` to a desired type&quot;</span>,
-            <span class="self">self</span>.<span class="number">0</span>
-        )
+            <span class="self">self</span>.<span class="number">0
+        </span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">FromValueError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;Couldn&#39;t convert the value to a desired type&quot;</span>
-    }
+<span class="kw">impl </span>Error <span class="kw">for </span>FromValueError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;Couldn&#39;t convert the value to a desired type&quot;
+    </span>}
 }
 
-<span class="doccomment">/// Basic operations on `FromValue` conversion intermediate result.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`FromValue`](trait.FromValue.html)</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span>;
+<span class="doccomment">/// Basic operations on `FromValue` conversion intermediate result.
+///
+/// See [`FromValue`](trait.FromValue.html)
+</span><span class="kw">pub trait </span>ConvIr&lt;T&gt;: Sized {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromValueError&gt;;
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; T;
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value;
 }
 
-<span class="doccomment">/// Implement this trait to convert value to something.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `FromRow` requires ability to cheaply rollback `FromValue` conversion. This ability is</span>
-<span class="doccomment">/// provided via `Intermediate` associated type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example implementation:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// pub struct StringIr {</span>
-<span class="doccomment">///     bytes: Vec&lt;u8&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl ConvIr&lt;String&gt; for StringIr {</span>
-<span class="doccomment">///     fn new(v: Value) -&gt; MyResult&lt;StringIr&gt; {</span>
-<span class="doccomment">///         match v {</span>
-<span class="doccomment">///             Value::Bytes(bytes) =&gt; match from_utf8(&amp;*bytes) {</span>
-<span class="doccomment">///                 Ok(_) =&gt; Ok(StringIr { bytes: bytes }),</span>
-<span class="doccomment">///                 Err(_) =&gt; Err(Error::FromValueError(Value::Bytes(bytes))),</span>
-<span class="doccomment">///             },</span>
-<span class="doccomment">///             v =&gt; Err(Error::FromValueError(v)),</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     fn commit(self) -&gt; String {</span>
-<span class="doccomment">///         unsafe { String::from_utf8_unchecked(self.bytes) }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     fn rollback(self) -&gt; Value {</span>
-<span class="doccomment">///         Value::Bytes(self.bytes)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl FromValue for String {</span>
-<span class="doccomment">///     type Intermediate = StringIr;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromValue</span>: <span class="ident">Sized</span> {
-    <span class="kw">type</span> <span class="ident">Intermediate</span>: <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Implement this trait to convert value to something.
+///
+/// `FromRow` requires ability to cheaply rollback `FromValue` conversion. This ability is
+/// provided via `Intermediate` associated type.
+///
+/// Example implementation:
+///
+/// ```ignore
+/// #[derive(Debug)]
+/// pub struct StringIr {
+///     bytes: Vec&lt;u8&gt;,
+/// }
+///
+/// impl ConvIr&lt;String&gt; for StringIr {
+///     fn new(v: Value) -&gt; MyResult&lt;StringIr&gt; {
+///         match v {
+///             Value::Bytes(bytes) =&gt; match from_utf8(&amp;*bytes) {
+///                 Ok(_) =&gt; Ok(StringIr { bytes: bytes }),
+///                 Err(_) =&gt; Err(Error::FromValueError(Value::Bytes(bytes))),
+///             },
+///             v =&gt; Err(Error::FromValueError(v)),
+///         }
+///     }
+///     fn commit(self) -&gt; String {
+///         unsafe { String::from_utf8_unchecked(self.bytes) }
+///     }
+///     fn rollback(self) -&gt; Value {
+///         Value::Bytes(self.bytes)
+///     }
+/// }
+///
+/// impl FromValue for String {
+///     type Intermediate = StringIr;
+/// }
+/// ```
+</span><span class="kw">pub trait </span>FromValue: Sized {
+    <span class="kw">type </span>Intermediate: ConvIr&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Will panic if could not convert `v` to `Self`.</span>
-    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::from_value_opt</span>(<span class="ident">v</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">this</span>) =&gt; <span class="ident">this</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not retrieve {} from Value&quot;</span>, <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>()),
+    <span class="doccomment">/// Will panic if could not convert `v` to `Self`.
+    </span><span class="kw">fn </span>from_value(v: Value) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">Self</span>::from_value_opt(v) {
+            <span class="prelude-val">Ok</span>(this) =&gt; this,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not retrieve {} from Value&quot;</span>, type_name::&lt;<span class="self">Self</span>&gt;()),
         }
     }
 
-    <span class="doccomment">/// Will return `Err(Error::FromValueError(v))` if could not convert `v` to `Self`.</span>
-    <span class="kw">fn</span> <span class="ident">from_value_opt</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ir</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Intermediate::new</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">ir</span>.<span class="ident">commit</span>())
+    <span class="doccomment">/// Will return `Err(Error::FromValueError(v))` if could not convert `v` to `Self`.
+    </span><span class="kw">fn </span>from_value_opt(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromValueError&gt; {
+        <span class="kw">let </span>ir = <span class="self">Self</span>::Intermediate::new(v)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ir.commit())
     }
 
-    <span class="doccomment">/// Will return `Err(Error::FromValueError(v))` if `v` is not convertible to `Self`.</span>
-    <span class="kw">fn</span> <span class="ident">get_intermediate</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Intermediate</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::Intermediate::new</span>(<span class="ident">v</span>)
+    <span class="doccomment">/// Will return `Err(Error::FromValueError(v))` if `v` is not convertible to `Self`.
+    </span><span class="kw">fn </span>get_intermediate(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Intermediate, FromValueError&gt; {
+        <span class="self">Self</span>::Intermediate::new(v)
     }
 }
 
-<span class="doccomment">/// Will panic if could not convert `v` to `T`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromValue</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="ident">T</span> {
-    <span class="ident">FromValue::from_value</span>(<span class="ident">v</span>)
+<span class="doccomment">/// Will panic if could not convert `v` to `T`
+</span><span class="kw">pub fn </span>from_value&lt;T: FromValue&gt;(v: Value) -&gt; T {
+    FromValue::from_value(v)
 }
 
-<span class="doccomment">/// Will return `Err(FromValueError(v))` if could not convert `v` to `T`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value_opt</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromValue</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-    <span class="ident">FromValue::from_value_opt</span>(<span class="ident">v</span>)
+<span class="doccomment">/// Will return `Err(FromValueError(v))` if could not convert `v` to `T`
+</span><span class="kw">pub fn </span>from_value_opt&lt;T: FromValue&gt;(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;T, FromValueError&gt; {
+    FromValue::from_value_opt(v)
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_from_value_num</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="ident">v</span> {
-                    <span class="ident">Value::Int</span>(<span class="ident">x</span>) =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">output</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::from_i64</span>(<span class="ident">x</span>) {
-                            <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                                <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="ident">x</span>),
-                                <span class="ident">output</span>,
+<span class="macro">macro_rules! </span>impl_from_value_num {
+    (<span class="macro-nonterminal">$t</span>:ident) =&gt; {
+        <span class="kw">impl </span>ConvIr&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>ParseIr&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;<span class="macro-nonterminal">$t</span>&gt;, FromValueError&gt; {
+                <span class="kw">match </span>v {
+                    Value::Int(x) =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(output) = <span class="macro-nonterminal">$t::from_i64</span>(x) {
+                            <span class="prelude-val">Ok</span>(ParseIr {
+                                value: Value::Int(x),
+                                output,
                             })
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Int</span>(<span class="ident">x</span>)))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">Err</span>(FromValueError(Value::Int(x)))
                         }
                     }
-                    <span class="ident">Value::UInt</span>(<span class="ident">x</span>) =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">output</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::from_u64</span>(<span class="ident">x</span>) {
-                            <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                                <span class="ident">value</span>: <span class="ident">Value::UInt</span>(<span class="ident">x</span>),
-                                <span class="ident">output</span>,
+                    Value::UInt(x) =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(output) = <span class="macro-nonterminal">$t::from_u64</span>(x) {
+                            <span class="prelude-val">Ok</span>(ParseIr {
+                                value: Value::UInt(x),
+                                output,
                             })
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::UInt</span>(<span class="ident">x</span>)))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">Err</span>(FromValueError(Value::UInt(x)))
                         }
                     }
-                    <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                            <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                            <span class="ident">output</span>: <span class="ident">x</span>,
+                    Value::Bytes(bytes) =&gt; <span class="kw">match </span>parse(<span class="kw-2">&amp;*</span>bytes) {
+                        <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                            value: Value::Bytes(bytes),
+                            output: x,
                         }),
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
                     },
-                    <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+                    v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
                 }
             }
-            <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-                <span class="self">self</span>.<span class="ident">output</span>
+            <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$t </span>{
+                <span class="self">self</span>.output
             }
-            <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-                <span class="self">self</span>.<span class="ident">value</span>
+            <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+                <span class="self">self</span>.value
             }
         }
 
-        <span class="macro">impl_from_value!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>);
+        <span class="macro">impl_from_value!</span>(<span class="macro-nonterminal">$t</span>, ParseIr&lt;<span class="macro-nonterminal">$t</span>&gt;);
     };
 }
 
-<span class="doccomment">/// Intermediate result of a Value-to-Option&lt;T&gt; conversion.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OptionIr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
-    <span class="ident">ir</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Intermediate result of a Value-to-Option&lt;T&gt; conversion.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>OptionIr&lt;T&gt; {
+    value: <span class="prelude-ty">Option</span>&lt;Value&gt;,
+    ir: <span class="prelude-ty">Option</span>&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Ir</span><span class="op">&gt;</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptionIr</span><span class="op">&lt;</span><span class="ident">Ir</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">FromValue</span><span class="op">&lt;</span><span class="ident">Intermediate</span> <span class="op">=</span> <span class="ident">Ir</span><span class="op">&gt;</span>,
-    <span class="ident">Ir</span>: <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Ir&gt; ConvIr&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; <span class="kw">for </span>OptionIr&lt;Ir&gt;
+<span class="kw">where
+    </span>T: FromValue&lt;Intermediate = Ir&gt;,
+    Ir: ConvIr&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">OptionIr</span><span class="op">&lt;</span><span class="ident">Ir</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::NULL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OptionIr</span> {
-                <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">Value::NULL</span>),
-                <span class="ident">ir</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;OptionIr&lt;Ir&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::NULL =&gt; <span class="prelude-val">Ok</span>(OptionIr {
+                value: <span class="prelude-val">Some</span>(Value::NULL),
+                ir: <span class="prelude-val">None</span>,
             }),
-            <span class="ident">v</span> =&gt; <span class="kw">match</span> <span class="ident">T::get_intermediate</span>(<span class="ident">v</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">ir</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">OptionIr</span> {
-                    <span class="ident">value</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">ir</span>: <span class="prelude-val">Some</span>(<span class="ident">ir</span>),
+            v =&gt; <span class="kw">match </span>T::get_intermediate(v) {
+                <span class="prelude-val">Ok</span>(ir) =&gt; <span class="prelude-val">Ok</span>(OptionIr {
+                    value: <span class="prelude-val">None</span>,
+                    ir: <span class="prelude-val">Some</span>(ir),
                 }),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err),
             },
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ir</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ir</span><span class="op">|</span> <span class="ident">ir</span>.<span class="ident">commit</span>())
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.ir.map(|ir| ir.commit())
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">let</span> <span class="ident">OptionIr</span> { <span class="ident">value</span>, <span class="ident">ir</span> } <span class="op">=</span> <span class="self">self</span>;
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">ir</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ir</span>) =&gt; <span class="ident">ir</span>.<span class="ident">rollback</span>(),
-                <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="kw">let </span>OptionIr { value, ir } = <span class="self">self</span>;
+        <span class="kw">match </span>value {
+            <span class="prelude-val">Some</span>(v) =&gt; v,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>ir {
+                <span class="prelude-val">Some</span>(ir) =&gt; ir.rollback(),
+                <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
             },
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromValue</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T&gt; FromValue <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: FromValue,
 {
-    <span class="kw">type</span> <span class="ident">Intermediate</span> <span class="op">=</span> <span class="ident">OptionIr</span><span class="op">&lt;</span><span class="ident">T::Intermediate</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Intermediate = OptionIr&lt;T::Intermediate&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
+<span class="kw">impl </span>ConvIr&lt;Value&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromValueError&gt; {
+        <span class="prelude-val">Ok</span>(v)
     }
 
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>FromValue <span class="kw">for </span>Value {
+    <span class="kw">type </span>Intermediate = Value;
+    <span class="kw">fn </span>from_value(v: Value) -&gt; Value {
+        v
+    }
+    <span class="kw">fn </span>from_value_opt(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;Value, FromValueError&gt; {
+        <span class="prelude-val">Ok</span>(v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromValue</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">type</span> <span class="ident">Intermediate</span> <span class="op">=</span> <span class="ident">Value</span>;
-    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">v</span>
-    }
-    <span class="kw">fn</span> <span class="ident">from_value_opt</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Value</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+<span class="kw">impl </span>ConvIr&lt;String&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Bytes(bytes) =&gt; <span class="kw">match </span>from_utf8(<span class="kw-2">&amp;*</span>bytes) {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(bytes),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
             },
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">unsafe</span> { <span class="ident">String::from_utf8_unchecked</span>(<span class="self">self</span>) }
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; String {
+        <span class="kw">unsafe </span>{ String::from_utf8_unchecked(<span class="self">self</span>) }
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Bytes</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        Value::Bytes(<span class="self">self</span>)
     }
 }
 
-<span class="doccomment">/// Intermediate result of a Value-to-Integer conversion.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">Value</span>,
-    <span class="ident">output</span>: <span class="ident">T</span>,
+<span class="doccomment">/// Intermediate result of a Value-to-Integer conversion.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ParseIr&lt;T&gt; {
+    value: Value,
+    output: T,
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Int</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span>,
+<span class="kw">impl </span>ConvIr&lt;i64&gt; <span class="kw">for </span>ParseIr&lt;i64&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;i64&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Int(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Int(x),
+                output: x,
             }),
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">::std::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::UInt</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span> <span class="kw">as</span> <span class="ident">i64</span>,
+            Value::UInt(x) <span class="kw">if </span>x &lt;= ::std::i64::MAX <span class="kw">as </span>u64 =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::UInt(x),
+                output: x <span class="kw">as </span>i64,
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                    <span class="ident">output</span>: <span class="ident">x</span>,
+            Value::Bytes(bytes) =&gt; <span class="kw">match </span>parse(<span class="kw-2">&amp;*</span>bytes) {
+                <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(bytes),
+                    output: x,
                 }),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
             },
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Int</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>,
+<span class="kw">impl </span>ConvIr&lt;u64&gt; <span class="kw">for </span>ParseIr&lt;u64&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;u64&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Int(x) <span class="kw">if </span>x &gt;= <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Int(x),
+                output: x <span class="kw">as </span>u64,
             }),
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::UInt</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span>,
+            Value::UInt(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::UInt(x),
+                output: x,
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="kw">match</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                    <span class="ident">output</span>: <span class="ident">x</span>,
+            Value::Bytes(bytes) =&gt; <span class="kw">match </span>parse(<span class="kw-2">&amp;*</span>bytes) {
+                <span class="prelude-val">Ok</span>(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(bytes),
+                    output: x,
                 }),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
             },
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Float</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Float</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span>,
+<span class="kw">impl </span>ConvIr&lt;f32&gt; <span class="kw">for </span>ParseIr&lt;f32&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;f32&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Float(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Float(x),
+                output: x,
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>).<span class="ident">ok</span>();
-                <span class="kw">match</span> <span class="ident">val</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                        <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                        <span class="ident">output</span>: <span class="ident">x</span>,
+            Value::Bytes(bytes) =&gt; {
+                <span class="kw">let </span>val = parse(<span class="kw-2">&amp;*</span>bytes).ok();
+                <span class="kw">match </span>val {
+                    <span class="prelude-val">Some</span>(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                        value: Value::Bytes(bytes),
+                        output: x,
                     }),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
                 }
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">f32</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; f32 {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Double</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Double</span>(<span class="ident">x</span>),
-                <span class="ident">output</span>: <span class="ident">x</span>,
+<span class="kw">impl </span>ConvIr&lt;f64&gt; <span class="kw">for </span>ParseIr&lt;f64&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;f64&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Double(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Double(x),
+                output: x,
             }),
-            <span class="ident">Value::Float</span>(<span class="ident">x</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">double</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">into</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Double</span>(<span class="ident">double</span>),
-                    <span class="ident">output</span>: <span class="ident">double</span>,
+            Value::Float(x) =&gt; {
+                <span class="kw">let </span>double = x.into();
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Double(double),
+                    output: double,
                 })
             }
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bytes</span>).<span class="ident">ok</span>();
-                <span class="kw">match</span> <span class="ident">val</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                        <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                        <span class="ident">output</span>: <span class="ident">x</span>,
+            Value::Bytes(bytes) =&gt; {
+                <span class="kw">let </span>val = parse(<span class="kw-2">&amp;*</span>bytes).ok();
+                <span class="kw">match </span>val {
+                    <span class="prelude-val">Some</span>(x) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                        value: Value::Bytes(bytes),
+                        output: x,
                     }),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
                 }
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; f64 {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Int</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="number">0</span>),
-                <span class="ident">output</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>ConvIr&lt;bool&gt; <span class="kw">for </span>ParseIr&lt;bool&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;bool&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Int(<span class="number">0</span>) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Int(<span class="number">0</span>),
+                output: <span class="bool-val">false</span>,
             }),
-            <span class="ident">Value::Int</span>(<span class="number">1</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                <span class="ident">value</span>: <span class="ident">Value::Int</span>(<span class="number">1</span>),
-                <span class="ident">output</span>: <span class="bool-val">true</span>,
+            Value::Int(<span class="number">1</span>) =&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                value: Value::Int(<span class="number">1</span>),
+                output: <span class="bool-val">true</span>,
             }),
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                    <span class="kw">match</span> <span class="ident">bytes</span>[<span class="number">0</span>] {
-                        <span class="number">0x30</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                            <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                            <span class="ident">output</span>: <span class="bool-val">false</span>,
+            Value::Bytes(bytes) =&gt; {
+                <span class="kw">if </span>bytes.len() == <span class="number">1 </span>{
+                    <span class="kw">match </span>bytes[<span class="number">0</span>] {
+                        <span class="number">0x30 </span>=&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                            value: Value::Bytes(bytes),
+                            output: <span class="bool-val">false</span>,
                         }),
-                        <span class="number">0x31</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                            <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>),
-                            <span class="ident">output</span>: <span class="bool-val">true</span>,
+                        <span class="number">0x31 </span>=&gt; <span class="prelude-val">Ok</span>(ParseIr {
+                            value: Value::Bytes(bytes),
+                            output: <span class="bool-val">true</span>,
                         }),
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>))),
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes))),
                     }
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>)))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(FromValueError(Value::Bytes(bytes)))
                 }
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>),
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+<span class="kw">impl </span>ConvIr&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Bytes(bytes) =&gt; <span class="prelude-val">Ok</span>(bytes),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>
-    }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Bytes</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self
+    </span>}
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        Value::Bytes(<span class="self">self</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_micros</span>(<span class="ident">micros_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u32</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">micros</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">micros_bytes</span>).<span class="ident">unwrap</span>();
+<span class="kw">fn </span>parse_micros(micros_bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; u32 {
+    <span class="kw">let </span><span class="kw-2">mut </span>micros = parse(micros_bytes).unwrap();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pad_zero_cnt</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">micros_bytes</span>.<span class="ident">iter</span>() {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;0&#39;</span> {
-            <span class="ident">pad_zero_cnt</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        } <span class="kw">else</span> {
+    <span class="kw">let </span><span class="kw-2">mut </span>pad_zero_cnt = <span class="number">0</span>;
+    <span class="kw">for </span>b <span class="kw">in </span>micros_bytes.iter() {
+        <span class="kw">if </span><span class="kw-2">*</span>b == <span class="string">b&#39;0&#39; </span>{
+            pad_zero_cnt += <span class="number">1</span>;
+        } <span class="kw">else </span>{
             <span class="kw">break</span>;
         }
     }
 
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="number">6</span> <span class="op">-</span> <span class="ident">pad_zero_cnt</span> <span class="op">-</span> (<span class="ident">micros_bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">pad_zero_cnt</span>)) {
-        <span class="ident">micros</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">10</span>;
+    <span class="kw">for _ in </span><span class="number">0</span>..(<span class="number">6 </span>- pad_zero_cnt - (micros_bytes.len() - pad_zero_cnt)) {
+        micros <span class="kw-2">*</span>= <span class="number">10</span>;
     }
-    <span class="ident">micros</span>
+    micros
 }
 
-<span class="doccomment">/// Returns (is_neg, hours, minutes, seconds, microseconds)</span>
-<span class="kw">fn</span> <span class="ident">parse_mysql_time_string</span>(<span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">TimeKind</span> {
-        <span class="ident">HhMmSs</span> <span class="op">=</span> <span class="number">0</span>,
-        <span class="ident">HhhMmSs</span>,
-        <span class="ident">HhMmSsMs</span>,
-        <span class="ident">HhhMmSsMs</span>,
+<span class="doccomment">/// Returns (is_neg, hours, minutes, seconds, microseconds)
+</span><span class="kw">fn </span>parse_mysql_time_string(<span class="kw-2">mut </span>bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(bool, u32, u32, u32, u32)&gt; {
+    <span class="attribute">#[derive(PartialEq, Eq, PartialOrd, Ord)]
+    #[repr(u8)]
+    </span><span class="kw">enum </span>TimeKind {
+        HhMmSs = <span class="number">0</span>,
+        HhhMmSs,
+        HhMmSsMs,
+        HhhMmSsMs,
     }
 
-    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">8</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>bytes.len() &lt; <span class="number">8 </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">is_neg</span> <span class="op">=</span> <span class="ident">bytes</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">b&#39;-&#39;</span>;
-    <span class="kw">if</span> <span class="ident">is_neg</span> {
-        <span class="ident">bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="number">1</span>..];
+    <span class="kw">let </span>is_neg = bytes[<span class="number">0</span>] == <span class="string">b&#39;-&#39;</span>;
+    <span class="kw">if </span>is_neg {
+        bytes = <span class="kw-2">&amp;</span>bytes[<span class="number">1</span>..];
     }
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
+    <span class="kw">let </span>len = bytes.len();
 
-    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">8</span> <span class="op">&amp;&amp;</span> <span class="ident">TIME_RE_HH_MM_SS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">TimeKind::HhMmSs</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">9</span> <span class="op">&amp;&amp;</span> <span class="ident">TIME_RE_HHH_MM_SS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">TimeKind::HhhMmSs</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TIME_RE_HH_MM_SS_MS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">TimeKind::HhMmSsMs</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">TIME_RE_HHH_MM_SS_MS</span>.<span class="ident">is_match</span>(<span class="ident">bytes</span>) {
-        <span class="ident">TimeKind::HhhMmSsMs</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>kind = <span class="kw">if </span>len == <span class="number">8 </span>&amp;&amp; TIME_RE_HH_MM_SS.is_match(bytes) {
+        TimeKind::HhMmSs
+    } <span class="kw">else if </span>len == <span class="number">9 </span>&amp;&amp; TIME_RE_HHH_MM_SS.is_match(bytes) {
+        TimeKind::HhhMmSs
+    } <span class="kw">else if </span>TIME_RE_HH_MM_SS_MS.is_match(bytes) {
+        TimeKind::HhMmSsMs
+    } <span class="kw">else if </span>TIME_RE_HHH_MM_SS_MS.is_match(bytes) {
+        TimeKind::HhhMmSsMs
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     };
 
-    <span class="kw">let</span> (<span class="ident">hour_pos</span>, <span class="ident">min_pos</span>, <span class="ident">sec_pos</span>, <span class="ident">micros_pos</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">kind</span> {
-        <span class="ident">TimeKind::HhMmSs</span> =&gt; (..<span class="number">2</span>, <span class="number">3</span>..<span class="number">5</span>, <span class="number">6</span>..<span class="number">8</span>, <span class="prelude-val">None</span>),
-        <span class="ident">TimeKind::HhMmSsMs</span> =&gt; (..<span class="number">2</span>, <span class="number">3</span>..<span class="number">5</span>, <span class="number">6</span>..<span class="number">8</span>, <span class="prelude-val">Some</span>(<span class="number">9</span>..)),
-        <span class="ident">TimeKind::HhhMmSs</span> =&gt; (..<span class="number">3</span>, <span class="number">4</span>..<span class="number">6</span>, <span class="number">7</span>..<span class="number">9</span>, <span class="prelude-val">None</span>),
-        <span class="ident">TimeKind::HhhMmSsMs</span> =&gt; (..<span class="number">3</span>, <span class="number">4</span>..<span class="number">6</span>, <span class="number">7</span>..<span class="number">9</span>, <span class="prelude-val">Some</span>(<span class="number">10</span>..)),
+    <span class="kw">let </span>(hour_pos, min_pos, sec_pos, micros_pos) = <span class="kw">match </span>kind {
+        TimeKind::HhMmSs =&gt; (..<span class="number">2</span>, <span class="number">3</span>..<span class="number">5</span>, <span class="number">6</span>..<span class="number">8</span>, <span class="prelude-val">None</span>),
+        TimeKind::HhMmSsMs =&gt; (..<span class="number">2</span>, <span class="number">3</span>..<span class="number">5</span>, <span class="number">6</span>..<span class="number">8</span>, <span class="prelude-val">Some</span>(<span class="number">9</span>..)),
+        TimeKind::HhhMmSs =&gt; (..<span class="number">3</span>, <span class="number">4</span>..<span class="number">6</span>, <span class="number">7</span>..<span class="number">9</span>, <span class="prelude-val">None</span>),
+        TimeKind::HhhMmSsMs =&gt; (..<span class="number">3</span>, <span class="number">4</span>..<span class="number">6</span>, <span class="number">7</span>..<span class="number">9</span>, <span class="prelude-val">Some</span>(<span class="number">10</span>..)),
     };
 
     <span class="prelude-val">Some</span>((
-        <span class="ident">is_neg</span>,
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">hour_pos</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">min_pos</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">sec_pos</span>]).<span class="ident">unwrap</span>(),
-        <span class="ident">micros_pos</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">parse_micros</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">pos</span>])).<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+        is_neg,
+        parse(<span class="kw-2">&amp;</span>bytes[hour_pos]).unwrap(),
+        parse(<span class="kw-2">&amp;</span>bytes[min_pos]).unwrap(),
+        parse(<span class="kw-2">&amp;</span>bytes[sec_pos]).unwrap(),
+        micros_pos.map(|pos| parse_micros(<span class="kw-2">&amp;</span>bytes[pos])).unwrap_or(<span class="number">0</span>),
     ))
 }
 
-<span class="kw">impl</span> <span class="ident">ConvIr</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>, <span class="ident">FromValueError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span> {
-            <span class="ident">Value::Time</span>(<span class="bool-val">false</span>, <span class="ident">days</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">nanos</span> <span class="op">=</span> (<span class="ident">microseconds</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">*</span> <span class="number">1000</span>;
-                <span class="kw">let</span> <span class="ident">secs</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">seconds</span>)
-                    <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">minutes</span>) <span class="op">*</span> <span class="number">60</span>
-                    <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">hours</span>) <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>
-                    <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">days</span>) <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">24</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Time</span>(<span class="bool-val">false</span>, <span class="ident">days</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>),
-                    <span class="ident">output</span>: <span class="ident">Duration::new</span>(<span class="ident">secs</span>, <span class="ident">nanos</span>),
+<span class="kw">impl </span>ConvIr&lt;Duration&gt; <span class="kw">for </span>ParseIr&lt;Duration&gt; {
+    <span class="kw">fn </span>new(v: Value) -&gt; <span class="prelude-ty">Result</span>&lt;ParseIr&lt;Duration&gt;, FromValueError&gt; {
+        <span class="kw">match </span>v {
+            Value::Time(<span class="bool-val">false</span>, days, hours, minutes, seconds, microseconds) =&gt; {
+                <span class="kw">let </span>nanos = (microseconds <span class="kw">as </span>u32) * <span class="number">1000</span>;
+                <span class="kw">let </span>secs = u64::from(seconds)
+                    + u64::from(minutes) * <span class="number">60
+                    </span>+ u64::from(hours) * <span class="number">60 </span>* <span class="number">60
+                    </span>+ u64::from(days) * <span class="number">60 </span>* <span class="number">60 </span>* <span class="number">24</span>;
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Time(<span class="bool-val">false</span>, days, hours, minutes, seconds, microseconds),
+                    output: Duration::new(secs, nanos),
                 })
             }
-            <span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_mysql_time_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">val_bytes</span>) {
-                    <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, <span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">microseconds</span>)) =&gt; {
-                        <span class="kw">let</span> <span class="ident">nanos</span> <span class="op">=</span> <span class="ident">microseconds</span> <span class="op">*</span> <span class="number">1000</span>;
-                        <span class="kw">let</span> <span class="ident">secs</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">seconds</span>)
-                            <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">minutes</span>) <span class="op">*</span> <span class="number">60</span>
-                            <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">hours</span>) <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>;
-                        <span class="ident">Duration::new</span>(<span class="ident">secs</span>, <span class="ident">nanos</span>)
+            Value::Bytes(val_bytes) =&gt; {
+                <span class="kw">let </span>duration = <span class="kw">match </span>parse_mysql_time_string(<span class="kw-2">&amp;*</span>val_bytes) {
+                    <span class="prelude-val">Some</span>((<span class="bool-val">false</span>, hours, minutes, seconds, microseconds)) =&gt; {
+                        <span class="kw">let </span>nanos = microseconds * <span class="number">1000</span>;
+                        <span class="kw">let </span>secs = u64::from(seconds)
+                            + u64::from(minutes) * <span class="number">60
+                            </span>+ u64::from(hours) * <span class="number">60 </span>* <span class="number">60</span>;
+                        Duration::new(secs, nanos)
                     }
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>))),
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromValueError(Value::Bytes(val_bytes))),
                 };
-                <span class="prelude-val">Ok</span>(<span class="ident">ParseIr</span> {
-                    <span class="ident">value</span>: <span class="ident">Value::Bytes</span>(<span class="ident">val_bytes</span>),
-                    <span class="ident">output</span>: <span class="ident">duration</span>,
+                <span class="prelude-val">Ok</span>(ParseIr {
+                    value: Value::Bytes(val_bytes),
+                    output: duration,
                 })
             }
-            <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">v</span>)),
+            v =&gt; <span class="prelude-val">Err</span>(FromValueError(v)),
         }
     }
-    <span class="kw">fn</span> <span class="ident">commit</span>(<span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">output</span>
+    <span class="kw">fn </span>commit(<span class="self">self</span>) -&gt; Duration {
+        <span class="self">self</span>.output
     }
-    <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>rollback(<span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secs_total</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">as_secs</span>();
-        <span class="kw">let</span> <span class="ident">micros</span> <span class="op">=</span> (<span class="ident">f64::from</span>(<span class="ident">x</span>.<span class="ident">subsec_nanos</span>()) <span class="op">/</span> <span class="number">1000_f64</span>).<span class="ident">round</span>() <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> (<span class="ident">secs_total</span> <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">secs_total</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">seconds</span>);
-        <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> ((<span class="ident">secs_total</span> <span class="op">%</span> (<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>)) <span class="op">/</span> <span class="number">60</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">secs_total</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">minutes</span>) <span class="op">*</span> <span class="number">60</span>;
-        <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> ((<span class="ident">secs_total</span> <span class="op">%</span> (<span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">24</span>)) <span class="op">/</span> (<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>)) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">secs_total</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">hours</span>) <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>;
-        <span class="ident">Value::Time</span>(
+<span class="kw">impl </span>From&lt;Duration&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: Duration) -&gt; Value {
+        <span class="kw">let </span><span class="kw-2">mut </span>secs_total = x.as_secs();
+        <span class="kw">let </span>micros = (f64::from(x.subsec_nanos()) / <span class="number">1000_f64</span>).round() <span class="kw">as </span>u32;
+        <span class="kw">let </span>seconds = (secs_total % <span class="number">60</span>) <span class="kw">as </span>u8;
+        secs_total -= u64::from(seconds);
+        <span class="kw">let </span>minutes = ((secs_total % (<span class="number">60 </span>* <span class="number">60</span>)) / <span class="number">60</span>) <span class="kw">as </span>u8;
+        secs_total -= u64::from(minutes) * <span class="number">60</span>;
+        <span class="kw">let </span>hours = ((secs_total % (<span class="number">60 </span>* <span class="number">60 </span>* <span class="number">24</span>)) / (<span class="number">60 </span>* <span class="number">60</span>)) <span class="kw">as </span>u8;
+        secs_total -= u64::from(hours) * <span class="number">60 </span>* <span class="number">60</span>;
+        Value::Time(
             <span class="bool-val">false</span>,
-            (<span class="ident">secs_total</span> <span class="op">/</span> (<span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">24</span>)) <span class="kw">as</span> <span class="ident">u32</span>,
-            <span class="ident">hours</span>,
-            <span class="ident">minutes</span>,
-            <span class="ident">seconds</span>,
-            <span class="ident">micros</span>,
+            (secs_total / (<span class="number">60 </span>* <span class="number">60 </span>* <span class="number">24</span>)) <span class="kw">as </span>u32,
+            hours,
+            minutes,
+            seconds,
+            micros,
         )
     }
 }
 
-<span class="macro">impl_from_value!</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">bool</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">i64</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">u64</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">f32</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">f64</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value!</span>(<span class="ident">Duration</span>, <span class="ident">ParseIr</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">i8</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">u8</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">i16</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">u16</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">i32</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">u32</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">isize</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">usize</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">i128</span>);
-<span class="macro">impl_from_value_num!</span>(<span class="ident">u128</span>);
+<span class="macro">impl_from_value!</span>(String, Vec&lt;u8&gt;);
+<span class="macro">impl_from_value!</span>(Vec&lt;u8&gt;, Vec&lt;u8&gt;);
+<span class="macro">impl_from_value!</span>(bool, ParseIr&lt;bool&gt;);
+<span class="macro">impl_from_value!</span>(i64, ParseIr&lt;i64&gt;);
+<span class="macro">impl_from_value!</span>(u64, ParseIr&lt;u64&gt;);
+<span class="macro">impl_from_value!</span>(f32, ParseIr&lt;f32&gt;);
+<span class="macro">impl_from_value!</span>(f64, ParseIr&lt;f64&gt;);
+<span class="macro">impl_from_value!</span>(Duration, ParseIr&lt;Duration&gt;);
+<span class="macro">impl_from_value_num!</span>(i8);
+<span class="macro">impl_from_value_num!</span>(u8);
+<span class="macro">impl_from_value_num!</span>(i16);
+<span class="macro">impl_from_value_num!</span>(u16);
+<span class="macro">impl_from_value_num!</span>(i32);
+<span class="macro">impl_from_value_num!</span>(u32);
+<span class="macro">impl_from_value_num!</span>(isize);
+<span class="macro">impl_from_value_num!</span>(usize);
+<span class="macro">impl_from_value_num!</span>(i128);
+<span class="macro">impl_from_value_num!</span>(u128);
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToValue</span> {
-    <span class="kw">fn</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Value</span>;
+<span class="kw">pub trait </span>ToValue {
+    <span class="kw">fn </span>to_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Value;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">ToValue</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">to_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Value</span> {
-        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into</span>()
+<span class="kw">impl</span>&lt;T: Into&lt;Value&gt; + Clone&gt; ToValue <span class="kw">for </span>T {
+    <span class="kw">fn </span>to_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Value {
+        <span class="self">self</span>.clone().into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">ToValue</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">x</span>.<span class="ident">to_value</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: ToValue&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; Value {
+        x.to_value()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Value::NULL</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">into</span>(),
+<span class="kw">impl</span>&lt;T: Into&lt;Value&gt;&gt; From&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; Value {
+        <span class="kw">match </span>x {
+            <span class="prelude-val">None </span>=&gt; Value::NULL,
+            <span class="prelude-val">Some</span>(x) =&gt; x.into(),
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">into_value_impl</span> (
-    (<span class="ident">signed</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; (
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="ident">Value</span> {
-                <span class="ident">Value::Int</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">i64</span>)
+<span class="macro">macro_rules! </span>into_value_impl (
+    (signed <span class="macro-nonterminal">$t</span>:ty) =&gt; (
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Value {
+            <span class="kw">fn </span>from(x: <span class="macro-nonterminal">$t</span>) -&gt; Value {
+                Value::Int(x <span class="kw">as </span>i64)
             }
         }
     );
-    (<span class="ident">unsigned</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; (
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="ident">Value</span> {
-                <span class="ident">Value::UInt</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>)
+    (unsigned <span class="macro-nonterminal">$t</span>:ty) =&gt; (
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Value {
+            <span class="kw">fn </span>from(x: <span class="macro-nonterminal">$t</span>) -&gt; Value {
+                Value::UInt(x <span class="kw">as </span>u64)
             }
         }
     );
 );
 
-<span class="macro">into_value_impl!</span>(<span class="ident">signed</span> <span class="ident">i8</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">signed</span> <span class="ident">i16</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">signed</span> <span class="ident">i32</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">signed</span> <span class="ident">i64</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">signed</span> <span class="ident">isize</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">unsigned</span> <span class="ident">u8</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">unsigned</span> <span class="ident">u16</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">unsigned</span> <span class="ident">u32</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">unsigned</span> <span class="ident">u64</span>);
-<span class="macro">into_value_impl!</span>(<span class="ident">unsigned</span> <span class="ident">usize</span>);
+<span class="macro">into_value_impl!</span>(signed i8);
+<span class="macro">into_value_impl!</span>(signed i16);
+<span class="macro">into_value_impl!</span>(signed i32);
+<span class="macro">into_value_impl!</span>(signed i64);
+<span class="macro">into_value_impl!</span>(signed isize);
+<span class="macro">into_value_impl!</span>(unsigned u8);
+<span class="macro">into_value_impl!</span>(unsigned u16);
+<span class="macro">into_value_impl!</span>(unsigned u32);
+<span class="macro">into_value_impl!</span>(unsigned u64);
+<span class="macro">into_value_impl!</span>(unsigned usize);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">i128</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_i64</span>() {
-            <span class="ident">Value::Int</span>(<span class="ident">x</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_u64</span>() {
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Value::Bytes</span>(<span class="ident">x</span>.<span class="ident">to_string</span>().<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;i128&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: i128) -&gt; Value {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = x.to_i64() {
+            Value::Int(x)
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(x) = x.to_u64() {
+            Value::UInt(x)
+        } <span class="kw">else </span>{
+            Value::Bytes(x.to_string().into())
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u128</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">x</span>.<span class="ident">to_u64</span>() {
-            <span class="ident">Value::UInt</span>(<span class="ident">x</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Value::Bytes</span>(<span class="ident">x</span>.<span class="ident">to_string</span>().<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;u128&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: u128) -&gt; Value {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = x.to_u64() {
+            Value::UInt(x)
+        } <span class="kw">else </span>{
+            Value::Bytes(x.to_string().into())
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">f32</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Float</span>(<span class="ident">x</span>)
+<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: f32) -&gt; Value {
+        Value::Float(x)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">f64</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Double</span>(<span class="ident">x</span>)
+<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: f64) -&gt; Value {
+        Value::Double(x)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Int</span>(<span class="kw">if</span> <span class="ident">x</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> })
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: bool) -&gt; Value {
+        Value::Int(<span class="kw">if </span>x { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>})
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Bytes</span>(<span class="ident">x</span>.<span class="ident">into</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; Value {
+        Value::Bytes(x.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Bytes</span>(<span class="ident">x</span>)
+<span class="kw">impl </span>From&lt;Vec&lt;u8&gt;&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: Vec&lt;u8&gt;) -&gt; Value {
+        Value::Bytes(x)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">let</span> <span class="ident">string</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">into</span>();
-        <span class="ident">Value::Bytes</span>(<span class="ident">string</span>.<span class="ident">into_bytes</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Value {
+        <span class="kw">let </span>string: String = x.into();
+        Value::Bytes(string.into_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">String</span>) -&gt; <span class="ident">Value</span> {
-        <span class="ident">Value::Bytes</span>(<span class="ident">x</span>.<span class="ident">into_bytes</span>())
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Value {
+    <span class="kw">fn </span>from(x: String) -&gt; Value {
+        Value::Bytes(x.into_bytes())
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">from_array_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n</span>]) -&gt; <span class="ident">Value</span> {
-                <span class="ident">Value::from</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>[..])
+<span class="macro">macro_rules! </span>from_array_impl {
+    (<span class="macro-nonterminal">$n</span>:expr) =&gt; {
+        <span class="kw">impl </span>From&lt;[u8; <span class="macro-nonterminal">$n</span>]&gt; <span class="kw">for </span>Value {
+            <span class="kw">fn </span>from(x: [u8; <span class="macro-nonterminal">$n</span>]) -&gt; Value {
+                Value::from(<span class="kw-2">&amp;</span>x[..])
             }
         }
     };
@@ -1924,269 +1924,269 @@
 <span class="macro">from_array_impl!</span>(<span class="number">31</span>);
 <span class="macro">from_array_impl!</span>(<span class="number">32</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">signed_primitive_roundtrip</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; {
-            <span class="macro">proptest!</span> {
-                <span class="attribute">#[<span class="ident">test</span>]</span>
-                <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">n</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) {
-                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::Int</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">i64</span>);
-                    <span class="kw">let</span> <span class="ident">val_bytes</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
-                    <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-                    <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val_bytes</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-                    <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="kw">let</span> <span class="ident">val_uint</span> <span class="op">=</span> <span class="ident">Value::UInt</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                        <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val_uint</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
+    <span class="macro">macro_rules! </span>signed_primitive_roundtrip {
+        (<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$name</span>:ident) =&gt; {
+            <span class="macro">proptest! </span>{
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>(n: <span class="macro-nonterminal">$t</span>) {
+                    <span class="kw">let </span>val = Value::Int(n <span class="kw">as </span>i64);
+                    <span class="kw">let </span>val_bytes = Value::Bytes(n.to_string().into());
+                    <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val.clone())), val);
+                    <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val_bytes.clone())), val);
+                    <span class="kw">if </span>n &gt;= <span class="number">0 </span>{
+                        <span class="kw">let </span>val_uint = Value::UInt(n <span class="kw">as </span>u64);
+                        <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val_uint.clone())), val);
                     }
                 }
             }
         };
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">unsigned_primitive_roundtrip</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; {
-            <span class="macro">proptest!</span> {
-                <span class="attribute">#[<span class="ident">test</span>]</span>
-                <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">n</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) {
-                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::UInt</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                    <span class="kw">let</span> <span class="ident">val_bytes</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
-                    <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-                    <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val_bytes</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-                    <span class="kw">if</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span> {
-                        <span class="kw">let</span> <span class="ident">val_int</span> <span class="op">=</span> <span class="ident">Value::Int</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">i64</span>);
-                        <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>(<span class="ident">val_int</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
+    <span class="macro">macro_rules! </span>unsigned_primitive_roundtrip {
+        (<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$name</span>:ident) =&gt; {
+            <span class="macro">proptest! </span>{
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>(n: <span class="macro-nonterminal">$t</span>) {
+                    <span class="kw">let </span>val = Value::UInt(n <span class="kw">as </span>u64);
+                    <span class="kw">let </span>val_bytes = Value::Bytes(n.to_string().into());
+                    <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val.clone())), val);
+                    <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val_bytes.clone())), val);
+                    <span class="kw">if </span>n <span class="kw">as </span>u64 &lt;= i64::max_value() <span class="kw">as </span>u64 {
+                        <span class="kw">let </span>val_int = Value::Int(n <span class="kw">as </span>i64);
+                        <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;<span class="macro-nonterminal">$t</span>&gt;(val_int.clone())), val);
                     }
                 }
             }
         };
     }
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bytes_roundtrip</span>(<span class="ident">s</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">s</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>bytes_roundtrip(s: Vec&lt;u8&gt;) {
+            <span class="kw">let </span>val = Value::Bytes(s);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;Vec&lt;u8&gt;&gt;(val.clone())), val);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">string_roundtrip</span>(<span class="ident">s</span>: <span class="ident">String</span>) {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>string_roundtrip(s: String) {
+            <span class="kw">let </span>val = Value::Bytes(s.as_bytes().to_vec());
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;String&gt;(val.clone())), val);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_time_string_parses_valid_time</span>(
-            <span class="ident">s</span> <span class="kw">in</span> <span class="string">r&quot;-?[0-8][0-9][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]{1,6})?&quot;</span>
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_time_string_parses_valid_time(
+            s <span class="kw">in </span><span class="string">r&quot;-?[0-8][0-9][0-9]:[0-5][0-9]:[0-5][0-9](\.[0-9]{1,6})?&quot;
+        </span>) {
+            parse_mysql_time_string(s.as_bytes()).unwrap();
+            <span class="comment">// Don&#39;t test `parse_mysql_time_string_with_time` here,
+            // as this tests valid MySQL TIME values, not valid time ranges within a day.
+            // Due to that, `time::parse` will return an Err for invalid time strings.
+        </span>}
+
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>parse_mysql_time_string_parses_correctly(
+            sign <span class="kw">in </span><span class="number">0</span>..<span class="number">2</span>,
+            h <span class="kw">in </span><span class="number">0u32</span>..<span class="number">900</span>,
+            m <span class="kw">in </span><span class="number">0u32</span>..<span class="number">59</span>,
+            s <span class="kw">in </span><span class="number">0u32</span>..<span class="number">59</span>,
+            have_us <span class="kw">in </span><span class="number">0</span>..<span class="number">2</span>,
+            us <span class="kw">in </span><span class="number">0u32</span>..<span class="number">1000000</span>,
         ) {
-            <span class="ident">parse_mysql_time_string</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
-            <span class="comment">// Don&#39;t test `parse_mysql_time_string_with_time` here,</span>
-            <span class="comment">// as this tests valid MySQL TIME values, not valid time ranges within a day.</span>
-            <span class="comment">// Due to that, `time::parse` will return an Err for invalid time strings.</span>
-        }
-
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_time_string_parses_correctly</span>(
-            <span class="ident">sign</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span>,
-            <span class="ident">h</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">900</span>,
-            <span class="ident">m</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">59</span>,
-            <span class="ident">s</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">59</span>,
-            <span class="ident">have_us</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">2</span>,
-            <span class="ident">us</span> <span class="kw">in</span> <span class="number">0u32</span>..<span class="number">1000000</span>,
-        ) {
-            <span class="kw">let</span> <span class="ident">time_string</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>time_string = <span class="macro">format!</span>(
                 <span class="string">&quot;{}{:02}:{:02}:{:02}{}&quot;</span>,
-                <span class="kw">if</span> <span class="ident">sign</span> <span class="op">==</span> <span class="number">1</span> { <span class="string">&quot;-&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-                <span class="ident">h</span>, <span class="ident">m</span>, <span class="ident">s</span>,
-                <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, <span class="ident">us</span>)
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;&quot;</span>.<span class="ident">into</span>()
+                <span class="kw">if </span>sign == <span class="number">1 </span>{ <span class="string">&quot;-&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+                h, m, s,
+                <span class="kw">if </span>have_us == <span class="number">1 </span>{
+                    <span class="macro">format!</span>(<span class="string">&quot;.{:06}&quot;</span>, us)
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;&quot;</span>.into()
                 }
             );
-            <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">parse_mysql_time_string</span>(<span class="ident">time_string</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">time</span>, (<span class="ident">sign</span> <span class="op">==</span> <span class="number">1</span>, <span class="ident">h</span>, <span class="ident">m</span>, <span class="ident">s</span>, <span class="kw">if</span> <span class="ident">have_us</span> <span class="op">==</span> <span class="number">1</span> { <span class="ident">us</span> } <span class="kw">else</span> { <span class="number">0</span> }));
+            <span class="kw">let </span>time = parse_mysql_time_string(time_string.as_bytes()).unwrap();
+            <span class="macro">assert_eq!</span>(time, (sign == <span class="number">1</span>, h, m, s, <span class="kw">if </span>have_us == <span class="number">1 </span>{ us } <span class="kw">else </span>{ <span class="number">0 </span>}));
 
-            <span class="comment">// Don&#39;t test `parse_mysql_time_string_with_time` here,</span>
-            <span class="comment">// as this tests valid MySQL TIME values, not valid time ranges within a day.</span>
-            <span class="comment">// Due to that, `time::parse` will return an Err for invalid time strings.</span>
+            <span class="comment">// Don&#39;t test `parse_mysql_time_string_with_time` here,
+            // as this tests valid MySQL TIME values, not valid time ranges within a day.
+            // Due to that, `time::parse` will return an Err for invalid time strings.
+        </span>}
+
+        <span class="attribute">#[test]
+        #[cfg(all(feature = <span class="string">&quot;time&quot;</span>, test))]
+        </span><span class="kw">fn </span>parse_mysql_datetime_string_parses_valid_time(
+            s <span class="kw">in </span><span class="string">r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?&quot;
+        </span>) {
+            parse_mysql_datetime_string(s.as_bytes()).unwrap();
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>, <span class="ident">test</span>))]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string_parses_valid_time</span>(
-            <span class="ident">s</span> <span class="kw">in</span> <span class="string">r&quot;[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]{1,6})?&quot;</span>
+        <span class="attribute">#[test]
+        #[cfg(all(feature = <span class="string">&quot;time&quot;</span>, test))]
+        </span><span class="kw">fn </span>parse_mysql_datetime_string_doesnt_crash(s <span class="kw">in </span><span class="string">&quot;\\PC*&quot;</span>) {
+            parse_mysql_datetime_string(s.as_bytes());
+            <span class="kw">let _ </span>= <span class="kw">super</span>::time::parse_mysql_datetime_string_with_time(s.as_bytes());
+        }
+
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>i128_roundtrip(
+            bytes_pos <span class="kw">in </span><span class="string">r&quot;16[0-9]{37}&quot;</span>,
+            bytes_neg <span class="kw">in </span><span class="string">r&quot;-16[0-9]{37}&quot;</span>,
+            uint <span class="kw">in </span>(i64::max_value() <span class="kw">as </span>u64 + <span class="number">1</span>)..u64::max_value(),
+            int: i64,
         ) {
-            <span class="ident">parse_mysql_datetime_string</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let </span>val_bytes_pos = Value::Bytes(bytes_pos.as_bytes().into());
+            <span class="kw">let </span>val_bytes_neg = Value::Bytes(bytes_neg.as_bytes().into());
+            <span class="kw">let </span>val_uint = Value::UInt(uint);
+            <span class="kw">let </span>val_int = Value::Int(int);
+
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;i128&gt;(val_bytes_pos.clone())), val_bytes_pos);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;i128&gt;(val_bytes_neg.clone())), val_bytes_neg);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;i128&gt;(val_uint.clone())), val_uint);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;i128&gt;(val_int.clone())), val_int);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>, <span class="ident">test</span>))]</span>
-        <span class="kw">fn</span> <span class="ident">parse_mysql_datetime_string_doesnt_crash</span>(<span class="ident">s</span> <span class="kw">in</span> <span class="string">&quot;\\PC*&quot;</span>) {
-            <span class="ident">parse_mysql_datetime_string</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::time::parse_mysql_datetime_string_with_time</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
-        }
-
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">i128_roundtrip</span>(
-            <span class="ident">bytes_pos</span> <span class="kw">in</span> <span class="string">r&quot;16[0-9]{37}&quot;</span>,
-            <span class="ident">bytes_neg</span> <span class="kw">in</span> <span class="string">r&quot;-16[0-9]{37}&quot;</span>,
-            <span class="ident">uint</span> <span class="kw">in</span> (<span class="ident">i64::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="number">1</span>)..<span class="ident">u64::max_value</span>(),
-            <span class="ident">int</span>: <span class="ident">i64</span>,
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>u128_roundtrip(
+            bytes <span class="kw">in </span><span class="string">r&quot;16[0-9]{37}&quot;</span>,
+            uint: u64,
+            int <span class="kw">in </span><span class="number">0i64</span>..i64::max_value(),
         ) {
-            <span class="kw">let</span> <span class="ident">val_bytes_pos</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">bytes_pos</span>.<span class="ident">as_bytes</span>().<span class="ident">into</span>());
-            <span class="kw">let</span> <span class="ident">val_bytes_neg</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">bytes_neg</span>.<span class="ident">as_bytes</span>().<span class="ident">into</span>());
-            <span class="kw">let</span> <span class="ident">val_uint</span> <span class="op">=</span> <span class="ident">Value::UInt</span>(<span class="ident">uint</span>);
-            <span class="kw">let</span> <span class="ident">val_int</span> <span class="op">=</span> <span class="ident">Value::Int</span>(<span class="ident">int</span>);
+            <span class="kw">let </span>val_bytes = Value::Bytes(bytes.as_bytes().into());
+            <span class="kw">let </span>val_uint = Value::UInt(uint);
+            <span class="kw">let </span>val_int = Value::Int(int);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">val_bytes_pos</span>.<span class="ident">clone</span>())), <span class="ident">val_bytes_pos</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">val_bytes_neg</span>.<span class="ident">clone</span>())), <span class="ident">val_bytes_neg</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">val_uint</span>.<span class="ident">clone</span>())), <span class="ident">val_uint</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">val_int</span>.<span class="ident">clone</span>())), <span class="ident">val_int</span>);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;u128&gt;(val_bytes.clone())), val_bytes);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;u128&gt;(val_uint.clone())), val_uint);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;u128&gt;(val_int)), Value::UInt(int <span class="kw">as </span>u64));
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">u128_roundtrip</span>(
-            <span class="ident">bytes</span> <span class="kw">in</span> <span class="string">r&quot;16[0-9]{37}&quot;</span>,
-            <span class="ident">uint</span>: <span class="ident">u64</span>,
-            <span class="ident">int</span> <span class="kw">in</span> <span class="number">0i64</span>..<span class="ident">i64::max_value</span>(),
-        ) {
-            <span class="kw">let</span> <span class="ident">val_bytes</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">bytes</span>.<span class="ident">as_bytes</span>().<span class="ident">into</span>());
-            <span class="kw">let</span> <span class="ident">val_uint</span> <span class="op">=</span> <span class="ident">Value::UInt</span>(<span class="ident">uint</span>);
-            <span class="kw">let</span> <span class="ident">val_int</span> <span class="op">=</span> <span class="ident">Value::Int</span>(<span class="ident">int</span>);
-
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">val_bytes</span>.<span class="ident">clone</span>())), <span class="ident">val_bytes</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">val_uint</span>.<span class="ident">clone</span>())), <span class="ident">val_uint</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">val_int</span>)), <span class="ident">Value::UInt</span>(<span class="ident">int</span> <span class="kw">as</span> <span class="ident">u64</span>));
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>f32_roundtrip(n: f32) {
+            <span class="kw">let </span>val = Value::Float(n);
+            <span class="kw">let </span>val_bytes = Value::Bytes(n.to_string().into());
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;f32&gt;(val.clone())), val);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;f32&gt;(val_bytes)), val);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">f32_roundtrip</span>(<span class="ident">n</span>: <span class="ident">f32</span>) {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::Float</span>(<span class="ident">n</span>);
-            <span class="kw">let</span> <span class="ident">val_bytes</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span>(<span class="ident">val_bytes</span>)), <span class="ident">val</span>);
-        }
-
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">f64_roundtrip</span>(<span class="ident">n</span>: <span class="ident">f64</span>) {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Value::Double</span>(<span class="ident">n</span>);
-            <span class="kw">let</span> <span class="ident">val_bytes</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="ident">n</span>.<span class="ident">to_string</span>().<span class="ident">into</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">val</span>.<span class="ident">clone</span>())), <span class="ident">val</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">Value::from</span>(<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="ident">val_bytes</span>)), <span class="ident">val</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>f64_roundtrip(n: f64) {
+            <span class="kw">let </span>val = Value::Double(n);
+            <span class="kw">let </span>val_bytes = Value::Bytes(n.to_string().into());
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;f64&gt;(val.clone())), val);
+            <span class="macro">assert_eq!</span>(Value::from(from_value::&lt;f64&gt;(val_bytes)), val);
         }
     }
 
-    <span class="macro">signed_primitive_roundtrip!</span>(<span class="ident">i8</span>, <span class="ident">i8_roundtrip</span>);
-    <span class="macro">signed_primitive_roundtrip!</span>(<span class="ident">i16</span>, <span class="ident">i16_roundtrip</span>);
-    <span class="macro">signed_primitive_roundtrip!</span>(<span class="ident">i32</span>, <span class="ident">i32_roundtrip</span>);
-    <span class="macro">signed_primitive_roundtrip!</span>(<span class="ident">i64</span>, <span class="ident">i64_roundtrip</span>);
+    <span class="macro">signed_primitive_roundtrip!</span>(i8, i8_roundtrip);
+    <span class="macro">signed_primitive_roundtrip!</span>(i16, i16_roundtrip);
+    <span class="macro">signed_primitive_roundtrip!</span>(i32, i32_roundtrip);
+    <span class="macro">signed_primitive_roundtrip!</span>(i64, i64_roundtrip);
 
-    <span class="macro">unsigned_primitive_roundtrip!</span>(<span class="ident">u8</span>, <span class="ident">u8_roundtrip</span>);
-    <span class="macro">unsigned_primitive_roundtrip!</span>(<span class="ident">u16</span>, <span class="ident">u16_roundtrip</span>);
-    <span class="macro">unsigned_primitive_roundtrip!</span>(<span class="ident">u32</span>, <span class="ident">u32_roundtrip</span>);
-    <span class="macro">unsigned_primitive_roundtrip!</span>(<span class="ident">u64</span>, <span class="ident">u64_roundtrip</span>);
+    <span class="macro">unsigned_primitive_roundtrip!</span>(u8, u8_roundtrip);
+    <span class="macro">unsigned_primitive_roundtrip!</span>(u16, u16_roundtrip);
+    <span class="macro">unsigned_primitive_roundtrip!</span>(u32, u32_roundtrip);
+    <span class="macro">unsigned_primitive_roundtrip!</span>(u64, u64_roundtrip);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_value_should_fail_on_integer_overflow</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="string">b&quot;340282366920938463463374607431768211456&quot;</span>[..].<span class="ident">into</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>from_value_should_fail_on_integer_overflow() {
+        <span class="kw">let </span>value = Value::Bytes(<span class="string">b&quot;340282366920938463463374607431768211456&quot;</span>[..].into());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u8&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i8&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u16&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i16&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u32&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i32&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u64&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i64&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u128&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i128&gt;(value).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_value_should_fail_on_integer_underflow</span>() {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::Bytes</span>(<span class="string">b&quot;-170141183460469231731687303715884105729&quot;</span>[..].<span class="ident">into</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">clone</span>()).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">from_value_opt</span>::<span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span>(<span class="ident">value</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>from_value_should_fail_on_integer_underflow() {
+        <span class="kw">let </span>value = Value::Bytes(<span class="string">b&quot;-170141183460469231731687303715884105729&quot;</span>[..].into());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u8&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i8&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u16&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i16&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u32&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i32&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u64&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i64&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;u128&gt;(value.clone()).is_err());
+        <span class="macro">assert!</span>(from_value_opt::&lt;i128&gt;(value).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_parse_mysql_datetime_string</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;1234-12-12 12:12:12.123456&quot;</span>;
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">parse_mysql_datetime_string</span>(<span class="ident">text</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    #[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+    #[bench]
+    </span><span class="kw">fn </span>bench_parse_mysql_datetime_string(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>text = <span class="string">&quot;1234-12-12 12:12:12.123456&quot;</span>;
+        bencher.bytes = text.len() <span class="kw">as </span>u64;
+        bencher.iter(|| {
+            parse_mysql_datetime_string(text.as_bytes()).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_parse_mysql_time_string</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;-012:34:56.012345&quot;</span>;
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">parse_mysql_time_string</span>(<span class="ident">text</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    #[bench]
+    </span><span class="kw">fn </span>bench_parse_mysql_time_string(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>text = <span class="string">&quot;-012:34:56.012345&quot;</span>;
+        bencher.bytes = text.len() <span class="kw">as </span>u64;
+        bencher.iter(|| {
+            parse_mysql_time_string(text.as_bytes()).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value_float_read_conversions_work</span>() {
-        <span class="kw">let</span> <span class="ident">original_f32</span> <span class="op">=</span> <span class="ident">std::f32::consts::PI</span>;
-        <span class="kw">let</span> <span class="ident">float_value</span> <span class="op">=</span> <span class="ident">Value::Float</span>(<span class="ident">original_f32</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>value_float_read_conversions_work() {
+        <span class="kw">let </span>original_f32 = std::f32::consts::PI;
+        <span class="kw">let </span>float_value = Value::Float(original_f32);
 
-        <span class="comment">// Reading an f32 from a MySQL float works.</span>
-        <span class="kw">let</span> <span class="ident">converted_f32</span>: <span class="ident">f32</span> <span class="op">=</span> <span class="ident">f32::from_value_opt</span>(<span class="ident">float_value</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">converted_f32</span>, <span class="ident">original_f32</span>);
+        <span class="comment">// Reading an f32 from a MySQL float works.
+        </span><span class="kw">let </span>converted_f32: f32 = f32::from_value_opt(float_value.clone()).unwrap();
+        <span class="macro">assert_eq!</span>(converted_f32, original_f32);
 
-        <span class="comment">// Reading an f64 from a MySQL float also works (lossless cast).</span>
-        <span class="kw">let</span> <span class="ident">converted_f64</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">f64::from_value_opt</span>(<span class="ident">float_value</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">converted_f64</span>, <span class="ident">original_f32</span> <span class="kw">as</span> <span class="ident">f64</span>);
+        <span class="comment">// Reading an f64 from a MySQL float also works (lossless cast).
+        </span><span class="kw">let </span>converted_f64: f64 = f64::from_value_opt(float_value).unwrap();
+        <span class="macro">assert_eq!</span>(converted_f64, original_f32 <span class="kw">as </span>f64);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value_double_read_conversions_work</span>() {
-        <span class="kw">let</span> <span class="ident">original_f64</span> <span class="op">=</span> <span class="ident">std::f64::consts::PI</span>;
-        <span class="kw">let</span> <span class="ident">double_value</span> <span class="op">=</span> <span class="ident">Value::Double</span>(<span class="ident">original_f64</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>value_double_read_conversions_work() {
+        <span class="kw">let </span>original_f64 = std::f64::consts::PI;
+        <span class="kw">let </span>double_value = Value::Double(original_f64);
 
-        <span class="comment">// Reading an f64 from a MySQL double works.</span>
-        <span class="kw">let</span> <span class="ident">converted_f64</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">f64::from_value_opt</span>(<span class="ident">double_value</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">converted_f64</span>, <span class="ident">original_f64</span>);
+        <span class="comment">// Reading an f64 from a MySQL double works.
+        </span><span class="kw">let </span>converted_f64: f64 = f64::from_value_opt(double_value.clone()).unwrap();
+        <span class="macro">assert_eq!</span>(converted_f64, original_f64);
 
-        <span class="comment">// Reading an f32 from a MySQL double fails (precision loss).</span>
-        <span class="macro">assert!</span>(<span class="ident">f32::from_value_opt</span>(<span class="ident">double_value</span>).<span class="ident">is_err</span>());
+        <span class="comment">// Reading an f32 from a MySQL double fails (precision loss).
+        </span><span class="macro">assert!</span>(f32::from_value_opt(double_value).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_parse_mysql_datetime_string_with_time</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;1234-12-12 12:12:12.123456&quot;</span>;
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">parse_mysql_datetime_string_with_time</span>(<span class="ident">text</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    #[bench]
+    </span><span class="kw">fn </span>bench_parse_mysql_datetime_string_with_time(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>text = <span class="string">&quot;1234-12-12 12:12:12.123456&quot;</span>;
+        bencher.bytes = text.len() <span class="kw">as </span>u64;
+        bencher.iter(|| {
+            parse_mysql_datetime_string_with_time(text.as_bytes()).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_parse_mysql_time_string_with_time</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">text</span> <span class="op">=</span> <span class="string">&quot;12:34:56.012345&quot;</span>;
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">parse_mysql_time_string_with_time</span>(<span class="ident">text</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    #[bench]
+    </span><span class="kw">fn </span>bench_parse_mysql_time_string_with_time(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>text = <span class="string">&quot;12:34:56.012345&quot;</span>;
+        bencher.bytes = text.len() <span class="kw">as </span>u64;
+        bencher.iter(|| {
+            parse_mysql_time_string_with_time(text.as_bytes()).unwrap();
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

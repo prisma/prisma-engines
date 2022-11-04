@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -574,218 +574,218 @@
 <span id="574">574</span>
 <span id="575">575</span>
 <span id="576">576</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">connection</span>;
-<span class="kw">mod</span> <span class="ident">shadow_db</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>connection;
+<span class="kw">mod </span>shadow_db;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::connection</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFlavour</span>;
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>, <span class="ident">Namespaces</span>,
+<span class="kw">use </span><span class="self">self</span>::connection::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::SqlFlavour;
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>indoc::indoc;
+<span class="kw">use </span>migration_connector::{
+    migrations_directory::MigrationDirectory, BoxFuture, ConnectorError, ConnectorParams, ConnectorResult, Namespaces,
 };
-<span class="kw">use</span> <span class="ident">quaint::connector::PostgresUrl</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">future</span>, <span class="ident">time</span>};
-<span class="kw">use</span> <span class="ident">url::Url</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{
-    <span class="ident">common</span>::{<span class="ident">DatabaseAccessDenied</span>, <span class="ident">DatabaseDoesNotExist</span>},
-    <span class="ident">migration_engine</span>, <span class="ident">UserFacingError</span>,
+<span class="kw">use </span>quaint::connector::PostgresUrl;
+<span class="kw">use </span>sql_schema_describer::SqlSchema;
+<span class="kw">use </span>std::{collections::HashMap, future, time};
+<span class="kw">use </span>url::Url;
+<span class="kw">use </span>user_facing_errors::{
+    common::{DatabaseAccessDenied, DatabaseDoesNotExist},
+    migration_engine, UserFacingError,
 };
 
-<span class="kw">const</span> <span class="ident">ADVISORY_LOCK_TIMEOUT</span>: <span class="ident">time::Duration</span> <span class="op">=</span> <span class="ident">time::Duration::from_secs</span>(<span class="number">10</span>);
+<span class="kw">const </span>ADVISORY_LOCK_TIMEOUT: time::Duration = time::Duration::from_secs(<span class="number">10</span>);
 
-<span class="doccomment">/// Connection settings applied to every new connection on CockroachDB.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// https://www.cockroachlabs.com/docs/stable/experimental-features.html</span>
-<span class="kw">const</span> <span class="ident">COCKROACHDB_PRELUDE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;
+<span class="doccomment">/// Connection settings applied to every new connection on CockroachDB.
+///
+/// https://www.cockroachlabs.com/docs/stable/experimental-features.html
+</span><span class="kw">const </span>COCKROACHDB_PRELUDE: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot;
 SET enable_experimental_alter_column_type_general = true;
 &quot;#</span>;
 
-<span class="kw">type</span> <span class="ident">State</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::State</span><span class="op">&lt;</span><span class="ident">Params</span>, (<span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Circumstances</span><span class="op">&gt;</span>, <span class="ident">Connection</span>)<span class="op">&gt;</span>;
+<span class="kw">type </span>State = <span class="kw">super</span>::State&lt;Params, (BitFlags&lt;Circumstances&gt;, Connection)&gt;;
 
-<span class="kw">struct</span> <span class="ident">Params</span> {
-    <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>,
-    <span class="ident">url</span>: <span class="ident">PostgresUrl</span>,
+<span class="kw">struct </span>Params {
+    connector_params: ConnectorParams,
+    url: PostgresUrl,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">PostgresFlavour</span> {
-    <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="doccomment">/// Should only be set in the constructor.</span>
-    <span class="ident">is_cockroach</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PostgresFlavour {
+    state: State,
+    <span class="doccomment">/// Should only be set in the constructor.
+    </span>is_cockroach: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PostgresFlavour</span> {
-            <span class="ident">state</span>: <span class="ident">State::Initial</span>,
-            <span class="ident">is_cockroach</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>PostgresFlavour {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        PostgresFlavour {
+            state: State::Initial,
+            is_cockroach: <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;&lt;PostgreSQL connector&gt;&quot;</span>)
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>PostgresFlavour {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.write_str(<span class="string">&quot;&lt;PostgreSQL connector&gt;&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_cockroach</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PostgresFlavour</span> {
-            <span class="ident">state</span>: <span class="ident">State::Initial</span>,
-            <span class="ident">is_cockroach</span>: <span class="bool-val">true</span>,
+<span class="kw">impl </span>PostgresFlavour {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_cockroach() -&gt; <span class="self">Self </span>{
+        PostgresFlavour {
+            state: State::Initial,
+            is_cockroach: <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">circumstances</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Circumstances</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident">State::Initial</span> <span class="op">|</span> <span class="ident">State::WithParams</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">State::Connected</span>(<span class="kw">_</span>, (<span class="ident">circ</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">circ</span>),
+    <span class="kw">fn </span>circumstances(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;BitFlags&lt;Circumstances&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.state {
+            State::Initial | State::WithParams(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            State::Connected(<span class="kw">_</span>, (circ, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>circ),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_cockroachdb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_cockroach</span>
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
-                .<span class="ident">circumstances</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">contains</span>(<span class="ident">Circumstances::IsCockroachDb</span>))
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_cockroachdb(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_cockroach
+            || <span class="self">self
+                </span>.circumstances()
+                .map(|c| c.contains(Circumstances::IsCockroachDb))
+                .unwrap_or(<span class="bool-val">false</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SqlFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="comment">// They do not support advisory locking:</span>
-            <span class="comment">// https://github.com/cockroachdb/cockroach/issues/13546</span>
-            <span class="kw">if</span> <span class="ident">circumstances</span>.<span class="ident">contains</span>(<span class="ident">Circumstances::IsCockroachDb</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="kw">impl </span>SqlFlavour <span class="kw">for </span>PostgresFlavour {
+    <span class="kw">fn </span>acquire_lock(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, circumstances, connection| <span class="kw">async move </span>{
+            <span class="comment">// They do not support advisory locking:
+            // https://github.com/cockroachdb/cockroach/issues/13546
+            </span><span class="kw">if </span>circumstances.contains(Circumstances::IsCockroachDb) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
-            <span class="comment">// https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS</span>
+            <span class="comment">// https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
-            <span class="comment">// 72707369 is a unique number we chose to identify Migrate. It does not</span>
-            <span class="comment">// have any meaning, but it should not be used by any other tool.</span>
-            <span class="ident">tokio::time::timeout</span>(
-                <span class="ident">ADVISORY_LOCK_TIMEOUT</span>,
-                <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT pg_advisory_lock(72707369)&quot;</span>,  <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>),
+            // 72707369 is a unique number we chose to identify Migrate. It does not
+            // have any meaning, but it should not be used by any other tool.
+            </span>tokio::time::timeout(
+                ADVISORY_LOCK_TIMEOUT,
+                connection.raw_cmd(<span class="string">&quot;SELECT pg_advisory_lock(72707369)&quot;</span>,  <span class="kw-2">&amp;</span>params.url),
             )
-                .<span class="kw">await</span>
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_elapsed</span><span class="op">|</span> {
-                    <span class="ident">ConnectorError::user_facing</span>(<span class="ident">user_facing_errors::common::DatabaseTimeout</span> {
-                        <span class="ident">database_host</span>: <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">host</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">database_port</span>: <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">port</span>().<span class="ident">to_string</span>(),
-                        <span class="ident">context</span>: <span class="macro">format!</span>(
-                            <span class="string">&quot;Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.&quot;</span>, <span class="ident">ADVISORY_LOCK_TIMEOUT</span>.<span class="ident">as_millis</span>()
+                .<span class="kw">await
+                </span>.map_err(|_elapsed| {
+                    ConnectorError::user_facing(user_facing_errors::common::DatabaseTimeout {
+                        database_host: params.url.host().to_owned(),
+                        database_port: params.url.port().to_string(),
+                        context: <span class="macro">format!</span>(
+                            <span class="string">&quot;Timed out trying to acquire a postgres advisory lock (SELECT pg_advisory_lock(72707369)). Elapsed: {}ms. See https://pris.ly/d/migrate-advisory-locking for details.&quot;</span>, ADVISORY_LOCK_TIMEOUT.as_millis()
                             ),
                     })
-                })<span class="question-mark">?</span><span class="question-mark">?</span>;
+                })<span class="question-mark">??</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">connector_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroach</span> {
-            <span class="string">&quot;cockroachdb&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;postgresql&quot;</span>
+    <span class="kw">fn </span>connector_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">if </span><span class="self">self</span>.is_cockroach {
+            <span class="string">&quot;cockroachdb&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;postgresql&quot;
+        </span>}
+    }
+
+    <span class="kw">fn </span>datamodel_connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>psl::datamodel_connector::Connector {
+        <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
+            psl::builtin_connectors::COCKROACH
+        } <span class="kw">else </span>{
+            psl::builtin_connectors::POSTGRES
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">psl::datamodel_connector::Connector</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="ident">psl::builtin_connectors::COCKROACH</span>
-        } <span class="kw">else</span> {
-            <span class="ident">psl::builtin_connectors::POSTGRES</span>
-        }
+    <span class="kw">fn </span>describe_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>, namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;SqlSchema&gt;&gt; {
+        with_connection(<span class="self">self</span>, |params, circumstances, conn| <span class="kw">async move </span>{
+            conn.describe_schema(circumstances, params, namespaces).<span class="kw">await
+        </span>})
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">conn</span>.<span class="ident">describe_schema</span>(<span class="ident">circumstances</span>, <span class="ident">params</span>, <span class="ident">namespaces</span>).<span class="kw">await</span>
+    <span class="kw">fn </span>query&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        q: quaint::ast::Query&lt;<span class="lifetime">&#39;a</span>&gt;,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;quaint::prelude::ResultSet&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, <span class="kw">_</span>, conn| conn.query(q, <span class="kw-2">&amp;</span>params.url))
+    }
+
+    <span class="kw">fn </span>query_raw&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[quaint::Value&lt;<span class="lifetime">&#39;a</span>&gt;],
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;quaint::prelude::ResultSet&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|conn_params, <span class="kw">_</span>, conn| {
+            conn.query_raw(sql, params, <span class="kw-2">&amp;</span>conn_params.url)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">q</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>))
+    <span class="kw">fn </span>apply_migration_script&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migration_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        script: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|_params, _circumstances, connection| <span class="kw">async move </span>{
+            connection.apply_migration_script(migration_name, script).<span class="kw">await
+        </span>})
     }
 
-    <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">conn_params</span>, <span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> {
-            <span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw-2">&amp;</span><span class="ident">conn_params</span>.<span class="ident">url</span>)
-        })
+    <span class="kw">fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.state
+            .params()
+            .map(|p| p.connector_params.connection_string.as_str())
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_migration_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">_params</span>, <span class="ident">_circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">connection</span>.<span class="ident">apply_migration_script</span>(<span class="ident">migration_name</span>, <span class="ident">script</span>).<span class="kw">await</span>
-        })
-    }
+    <span class="kw">fn </span>create_database(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;String&gt;&gt; {
+        Box::pin(<span class="kw">async </span>{
+            <span class="kw">let </span>params = <span class="self">self</span>.state.get_unwrapped_params();
+            <span class="kw">let </span>connection_string = <span class="kw-2">&amp;</span>params.connector_params.connection_string;
+            <span class="kw">let </span>schema_name = params.url.schema();
 
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>
-            .<span class="ident">params</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>.<span class="ident">as_str</span>())
-    }
+            <span class="kw">let </span><span class="kw-2">mut </span>url = Url::parse(connection_string).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+            <span class="kw">let </span>db_name = params.url.dbname();
 
-    <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_unwrapped_params</span>();
-            <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>;
-            <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
+            strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>url);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">connection_string</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">dbname</span>();
+            <span class="kw">let </span>(<span class="kw-2">mut </span>conn, admin_url) = create_postgres_admin_conn(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>);
+            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, db_name);
 
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">conn</span>, <span class="ident">admin_url</span>) <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>database_already_exists_error = <span class="prelude-val">None</span>;
 
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">db_name</span>);
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-            <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;</span><span class="ident">admin_url</span>).<span class="kw">await</span> {
+            <span class="kw">match </span>conn.raw_cmd(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>admin_url).<span class="kw">await </span>{
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; (),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseAlreadyExists</span><span class="op">&gt;</span>() =&gt; {
-                    <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
+                <span class="prelude-val">Err</span>(err) <span class="kw">if </span>err.is_user_facing_error::&lt;user_facing_errors::common::DatabaseAlreadyExists&gt;() =&gt; {
+                    database_already_exists_error = <span class="prelude-val">Some</span>(err)
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_user_facing_error</span>::<span class="op">&lt;</span><span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span><span class="op">&gt;</span>() =&gt; {
-                    <span class="ident">database_already_exists_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>)
+                <span class="prelude-val">Err</span>(err) <span class="kw">if </span>err.is_user_facing_error::&lt;user_facing_errors::query_engine::UniqueKeyViolation&gt;() =&gt; {
+                    database_already_exists_error = <span class="prelude-val">Some</span>(err)
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
             };
 
-            <span class="comment">// Now create the schema</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::new</span>(<span class="ident">connection_string</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="comment">// Now create the schema
+            </span><span class="kw">let </span><span class="kw-2">mut </span>conn = Connection::new(connection_string.parse().unwrap()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">schema_sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA IF NOT EXISTS \&quot;{}\&quot;;&quot;</span>, <span class="ident">schema_name</span>);
+            <span class="kw">let </span>schema_sql = <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA IF NOT EXISTS \&quot;{}\&quot;;&quot;</span>, schema_name);
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">schema_sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            conn.raw_cmd(<span class="kw-2">&amp;</span>schema_sql, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">database_already_exists_error</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = database_already_exists_error {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(err);
             }
 
-            <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>.<span class="ident">to_owned</span>())
+            <span class="prelude-val">Ok</span>(db_name.to_owned())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">indoc!</span> {<span class="string">r#&quot;
+    <span class="kw">fn </span>create_migrations_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="kw">let </span>sql = <span class="macro">indoc! </span>{<span class="string">r#&quot;
             CREATE TABLE _prisma_migrations (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
                 checksum                VARCHAR(64) NOT NULL,
@@ -798,357 +798,357 @@ SET enable_experimental_alter_column_type_general = true;
             );
         &quot;#</span>};
 
-        <span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)
+        <span class="self">self</span>.raw_cmd(sql)
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_unwrapped_params</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span>
-                <span class="ident">Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">trim_start_matches</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">to_owned</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db_name</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;Database name should not be empty.&quot;</span>);
+    <span class="kw">fn </span>drop_database(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>params = <span class="self">self</span>.state.get_unwrapped_params();
+            <span class="kw">let </span><span class="kw-2">mut </span>url =
+                Url::parse(<span class="kw-2">&amp;</span>params.connector_params.connection_string).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+            <span class="kw">let </span>db_name = url.path().trim_start_matches(<span class="string">&#39;/&#39;</span>).to_owned();
+            <span class="macro">assert!</span>(!db_name.is_empty(), <span class="string">&quot;Database name should not be empty.&quot;</span>);
 
-            <span class="ident">strip_schema_param_from_url</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>);
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">admin_conn</span>, <span class="ident">admin_url</span>) <span class="op">=</span> <span class="ident">create_postgres_admin_conn</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            strip_schema_param_from_url(<span class="kw-2">&amp;mut </span>url);
+            <span class="kw">let </span>(<span class="kw-2">mut </span>admin_conn, admin_url) = create_postgres_admin_conn(url.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">admin_conn</span>
-                .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">db_name</span>), <span class="kw-2">&amp;</span><span class="ident">admin_url</span>)
+            admin_conn
+                .raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE \&quot;{}\&quot;&quot;</span>, db_name), <span class="kw-2">&amp;</span>admin_url)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>))
+    <span class="kw">fn </span>drop_migrations_table(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        Box::pin(<span class="self">self</span>.raw_cmd(<span class="string">&quot;DROP TABLE _prisma_migrations&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">empty_database_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlSchema</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">SqlSchema::default</span>();
-        <span class="ident">schema</span>.<span class="ident">set_connector_data</span>(<span class="ident">Box::new</span>(<span class="ident">sql_schema_describer::postgres::PostgresSchemaExt::default</span>()));
-        <span class="ident">schema</span>
+    <span class="kw">fn </span>empty_database_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlSchema {
+        <span class="kw">let </span><span class="kw-2">mut </span>schema = SqlSchema::default();
+        schema.set_connector_data(Box::new(sql_schema_describer::postgres::PostgresSchemaExt::default()));
+        schema
     }
 
-    <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(())))
+    <span class="kw">fn </span>ensure_connection_validity(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        with_connection(<span class="self">self</span>, |<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>| future::ready(<span class="prelude-val">Ok</span>(())))
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_cmd</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span>
-        })
+    <span class="kw">fn </span>raw_cmd&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, _circumstances, conn| <span class="kw">async move </span>{
+            conn.raw_cmd(sql, <span class="kw-2">&amp;</span>params.url).<span class="kw">await
+        </span>})
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, _circumstances, conn| <span class="kw">async move </span>{
+            <span class="kw">let </span>schema_name = params.url.schema();
 
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, <span class="ident">schema_name</span>), <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)
+            conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;DROP SCHEMA \&quot;{}\&quot; CASCADE&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>), <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)
+            conn.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span> <span class="op">=</span> <span class="ident">connector_params</span>
-            .<span class="ident">connection_string</span>
-            .<span class="ident">parse</span>()
-            .<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
-        <span class="ident">disable_postgres_statement_cache</span>(<span class="kw-2">&amp;mut</span> <span class="ident">url</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">PostgresUrl::new</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
-        <span class="ident">connector_params</span>.<span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">connection_string</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">Params</span> { <span class="ident">connector_params</span>, <span class="ident">url</span> };
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_params</span>(<span class="ident">params</span>);
+    <span class="kw">fn </span>set_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>connector_params: ConnectorParams) -&gt; ConnectorResult&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>url: Url = connector_params
+            .connection_string
+            .parse()
+            .map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+        disable_postgres_statement_cache(<span class="kw-2">&amp;mut </span>url)<span class="question-mark">?</span>;
+        <span class="kw">let </span>connection_string = url.to_string();
+        <span class="kw">let </span>url = PostgresUrl::new(url).map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+        connector_params.connection_string = connection_string;
+        <span class="kw">let </span>params = Params { connector_params, url };
+        <span class="self">self</span>.state.set_params(params);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">set_preview_features</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">preview_features</span>: <span class="ident">enumflags2::BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident"><span class="kw">super</span>::State::Initial</span> =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">fn </span>set_preview_features(<span class="kw-2">&amp;mut </span><span class="self">self</span>, preview_features: enumflags2::BitFlags&lt;psl::PreviewFeature&gt;) {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.state {
+            <span class="kw">super</span>::State::Initial =&gt; {
+                <span class="kw">if </span>!preview_features.is_empty() {
                     <span class="macro">tracing::warn!</span>(<span class="string">&quot;set_preview_feature on Initial state has no effect ({preview_features}).&quot;</span>);
                 }
             }
-            <span class="ident"><span class="kw">super</span>::State::WithParams</span>(<span class="ident">params</span>) <span class="op">|</span> <span class="ident"><span class="kw">super</span>::State::Connected</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">preview_features</span>
+            <span class="kw">super</span>::State::WithParams(params) | <span class="kw">super</span>::State::Connected(params, <span class="kw">_</span>) =&gt; {
+                params.connector_params.preview_features = preview_features
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">migrations</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">sql_schema_from_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
-        <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shadow_database_connection_string</span> <span class="op">=</span> <span class="ident">shadow_database_connection_string</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">state</span>
-                .<span class="ident">params</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">connector_params</span>.<span class="ident">shadow_database_connection_string</span>.<span class="ident">clone</span>())
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>, migrations))]
+    </span><span class="kw">fn </span>sql_schema_from_migration_history&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[MigrationDirectory],
+        shadow_database_connection_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;SqlSchema&gt;&gt; {
+        <span class="kw">let </span>shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
+            <span class="self">self</span>.state
+                .params()
+                .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
         });
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shadow_database</span> <span class="op">=</span> <span class="ident">PostgresFlavour::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>shadow_database = PostgresFlavour::default();
 
-        <span class="kw">match</span> <span class="ident">shadow_database_connection_string</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">shadow_database_connection_string</span>) =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">params</span>() {
-                    <span class="ident"><span class="kw">super</span>::validate_connection_infos_do_not_match</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">shadow_database_connection_string</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>,
+        <span class="kw">match </span>shadow_database_connection_string {
+            <span class="prelude-val">Some</span>(shadow_database_connection_string) =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = <span class="self">self</span>.state.params() {
+                    <span class="kw">super</span>::validate_connection_infos_do_not_match(
+                        <span class="kw-2">&amp;</span>shadow_database_connection_string,
+                        <span class="kw-2">&amp;</span>params.connector_params.connection_string,
                     )<span class="question-mark">?</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">shadow_db_params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-                    <span class="ident">connection_string</span>: <span class="ident">shadow_database_connection_string</span>,
-                    <span class="ident">preview_features</span>: <span class="self">self</span>
-                        .<span class="ident">state</span>
-                        .<span class="ident">params</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>)
-                        .<span class="ident">unwrap_or_default</span>(),
-                    <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+                <span class="kw">let </span>shadow_db_params = ConnectorParams {
+                    connection_string: shadow_database_connection_string,
+                    preview_features: <span class="self">self
+                        </span>.state
+                        .params()
+                        .map(|p| p.connector_params.preview_features)
+                        .unwrap_or_default(),
+                    shadow_database_connection_string: <span class="prelude-val">None</span>,
                 };
 
-                <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">shadow_db_params</span>)<span class="question-mark">?</span>;
-                <span class="ident">shadow_database</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                shadow_database.set_params(shadow_db_params)<span class="question-mark">?</span>;
+                shadow_database.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="macro">tracing::info!</span>(<span class="string">&quot;Connecting to user-provided shadow database.&quot;</span>);
 
-                <span class="kw">if</span> <span class="ident">shadow_database</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">is_err</span>() {
-                    <span class="ident"><span class="kw">crate</span>::best_effort_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">shadow_database</span>, <span class="ident">namespaces</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">if </span>shadow_database.reset().<span class="kw">await</span>.is_err() {
+                    <span class="kw">crate</span>::best_effort_reset(<span class="kw-2">&amp;mut </span>shadow_database, namespaces.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 
-                <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>, <span class="ident">namespaces</span>).<span class="kw">await</span>
-            }),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">main_connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">shadow_database_name</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::new_shadow_database_name</span>();
+                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).<span class="kw">await
+            </span>}),
+            <span class="prelude-val">None </span>=&gt; {
+                with_connection(<span class="self">self</span>, <span class="kw">move </span>|params, _circumstances, main_connection| <span class="kw">async move </span>{
+                    <span class="kw">let </span>shadow_database_name = <span class="kw">crate</span>::new_shadow_database_name();
 
                     {
-                        <span class="kw">let</span> <span class="ident">create_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, <span class="ident">shadow_database_name</span>);
-                        <span class="ident">main_connection</span>
-                            .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_database</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>)
-                            .<span class="kw">await</span>
-                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into_shadow_db_creation_error</span>())<span class="question-mark">?</span>;
+                        <span class="kw">let </span>create_database = <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE \&quot;{}\&quot;&quot;</span>, shadow_database_name);
+                        main_connection
+                            .raw_cmd(<span class="kw-2">&amp;</span>create_database, <span class="kw-2">&amp;</span>params.url)
+                            .<span class="kw">await
+                            </span>.map_err(|err| err.into_shadow_db_creation_error())<span class="question-mark">?</span>;
                     }
 
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shadow_database_url</span>: <span class="ident">Url</span> <span class="op">=</span> <span class="ident">params</span>
-                        .<span class="ident">connector_params</span>
-                        .<span class="ident">connection_string</span>
-                        .<span class="ident">parse</span>()
-                        .<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
-                    <span class="ident">shadow_database_url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">shadow_database_name</span>));
-                    <span class="kw">let</span> <span class="ident">shadow_db_params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-                        <span class="ident">connection_string</span>: <span class="ident">shadow_database_url</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">preview_features</span>: <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>,
-                        <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+                    <span class="kw">let </span><span class="kw-2">mut </span>shadow_database_url: Url = params
+                        .connector_params
+                        .connection_string
+                        .parse()
+                        .map_err(ConnectorError::url_parse_error)<span class="question-mark">?</span>;
+                    shadow_database_url.set_path(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, shadow_database_name));
+                    <span class="kw">let </span>shadow_db_params = ConnectorParams {
+                        connection_string: shadow_database_url.to_string(),
+                        preview_features: params.connector_params.preview_features,
+                        shadow_database_connection_string: <span class="prelude-val">None</span>,
                     };
-                    <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">shadow_db_params</span>)<span class="question-mark">?</span>;
-                    <span class="macro">tracing::debug!</span>(<span class="string">&quot;Connecting to shadow database `{}`&quot;</span>, <span class="ident">shadow_database_name</span>);
-                    <span class="ident">shadow_database</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                    shadow_database.set_params(shadow_db_params)<span class="question-mark">?</span>;
+                    <span class="macro">tracing::debug!</span>(<span class="string">&quot;Connecting to shadow database `{}`&quot;</span>, shadow_database_name);
+                    shadow_database.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="comment">// We go through the whole process without early return, then clean up</span>
-                    <span class="comment">// the shadow database, and only then return the result. This avoids</span>
-                    <span class="comment">// leaving shadow databases behind in case of e.g. faulty migrations.</span>
-                    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
-                        <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>, <span class="ident">namespaces</span>).<span class="kw">await</span>;
+                    <span class="comment">// We go through the whole process without early return, then clean up
+                    // the shadow database, and only then return the result. This avoids
+                    // leaving shadow databases behind in case of e.g. faulty migrations.
+                    </span><span class="kw">let </span>ret =
+                        shadow_db::sql_schema_from_migrations_history(migrations, shadow_database, namespaces).<span class="kw">await</span>;
 
-                    <span class="kw">let</span> <span class="ident">drop_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE IF EXISTS \&quot;{}\&quot;&quot;</span>, <span class="ident">shadow_database_name</span>);
-                    <span class="ident">main_connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_database</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>drop_database = <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE IF EXISTS \&quot;{}\&quot;&quot;</span>, shadow_database_name);
+                    main_connection.raw_cmd(<span class="kw-2">&amp;</span>drop_database, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="ident">ret</span>
+                    ret
                 })
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">with_connection</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">_circumstances</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">connection</span>.<span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span>
-        })
+    <span class="kw">fn </span>version(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt; {
+        with_connection(<span class="self">self</span>, |params, _circumstances, connection| <span class="kw">async move </span>{
+            connection.version(<span class="kw-2">&amp;</span>params.url).<span class="kw">await
+        </span>})
     }
 }
 
-<span class="kw">fn</span> <span class="ident">strip_schema_param_from_url</span>(<span class="ident">url</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Url</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">into_owned</span>().<span class="ident">collect</span>();
-    <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;schema&quot;</span>);
-    <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, <span class="ident">k</span>, <span class="ident">v</span>)).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">join</span>(<span class="string">&quot;&amp;&quot;</span>);
-    <span class="ident">url</span>.<span class="ident">set_query</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>));
+<span class="kw">fn </span>strip_schema_param_from_url(url: <span class="kw-2">&amp;mut </span>Url) {
+    <span class="kw">let </span><span class="kw-2">mut </span>params: HashMap&lt;String, String&gt; = url.query_pairs().into_owned().collect();
+    params.remove(<span class="string">&quot;schema&quot;</span>);
+    <span class="kw">let </span>params: Vec&lt;String&gt; = params.into_iter().map(|(k, v)| <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, k, v)).collect();
+    <span class="kw">let </span>params: String = params.join(<span class="string">&quot;&amp;&quot;</span>);
+    url.set_query(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>params));
 }
 
-<span class="doccomment">/// Try to connect as an admin to a postgres database. We try to pick a default database from which</span>
-<span class="doccomment">/// we can create another database.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_postgres_admin_conn</span>(<span class="kw-2">mut</span> <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>(<span class="ident">Connection</span>, <span class="ident">PostgresUrl</span>)<span class="op">&gt;</span> {
-    <span class="comment">// &quot;postgres&quot; is the default database on most postgres installations,</span>
-    <span class="comment">// &quot;template1&quot; is guaranteed to exist, and &quot;defaultdb&quot; is the only working</span>
-    <span class="comment">// option on DigitalOcean managed postgres databases.</span>
-    <span class="kw">const</span> <span class="ident">CANDIDATE_DEFAULT_DATABASES</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;postgres&quot;</span>, <span class="string">&quot;template1&quot;</span>, <span class="string">&quot;defaultdb&quot;</span>];
+<span class="doccomment">/// Try to connect as an admin to a postgres database. We try to pick a default database from which
+/// we can create another database.
+</span><span class="kw">async fn </span>create_postgres_admin_conn(<span class="kw-2">mut </span>url: Url) -&gt; ConnectorResult&lt;(Connection, PostgresUrl)&gt; {
+    <span class="comment">// &quot;postgres&quot; is the default database on most postgres installations,
+    // &quot;template1&quot; is guaranteed to exist, and &quot;defaultdb&quot; is the only working
+    // option on DigitalOcean managed postgres databases.
+    </span><span class="kw">const </span>CANDIDATE_DEFAULT_DATABASES: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str] = <span class="kw-2">&amp;</span>[<span class="string">&quot;postgres&quot;</span>, <span class="string">&quot;template1&quot;</span>, <span class="string">&quot;defaultdb&quot;</span>];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="prelude-val">None</span>;
 
-    <span class="kw">for</span> <span class="ident">database_name</span> <span class="kw">in</span> <span class="ident">CANDIDATE_DEFAULT_DATABASES</span> {
-        <span class="ident">url</span>.<span class="ident">set_path</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, <span class="ident">database_name</span>));
-        <span class="kw">let</span> <span class="ident">postgres_url</span> <span class="op">=</span> <span class="ident">PostgresUrl::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">match</span> <span class="ident">Connection::new</span>(<span class="ident">url</span>.<span class="ident">clone</span>()).<span class="kw">await</span> {
-            <span class="comment">// If the database does not exist, try the next one.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">error_code</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">DatabaseDoesNotExist::ERROR_CODE</span>) =&gt; (),
-                <span class="prelude-val">Some</span>(<span class="ident">DatabaseAccessDenied::ERROR_CODE</span>) =&gt; (),
-                <span class="kw">_</span> =&gt; {
-                    <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+    <span class="kw">for </span>database_name <span class="kw">in </span>CANDIDATE_DEFAULT_DATABASES {
+        url.set_path(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;/{}&quot;</span>, database_name));
+        <span class="kw">let </span>postgres_url = PostgresUrl::new(url.clone()).unwrap();
+        <span class="kw">match </span>Connection::new(url.clone()).<span class="kw">await </span>{
+            <span class="comment">// If the database does not exist, try the next one.
+            </span><span class="prelude-val">Err</span>(err) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>err.error_code() {
+                <span class="prelude-val">Some</span>(DatabaseDoesNotExist::ERROR_CODE) =&gt; (),
+                <span class="prelude-val">Some</span>(DatabaseAccessDenied::ERROR_CODE) =&gt; (),
+                <span class="kw">_ </span>=&gt; {
+                    conn = <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err));
                     <span class="kw">break</span>;
                 }
             },
-            <span class="comment">// If the outcome is anything else, use this.</span>
-            <span class="ident">other_outcome</span> =&gt; {
-                <span class="ident">conn</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">other_outcome</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">conn</span><span class="op">|</span> (<span class="ident">conn</span>, <span class="ident">postgres_url</span>)));
+            <span class="comment">// If the outcome is anything else, use this.
+            </span>other_outcome =&gt; {
+                conn = <span class="prelude-val">Some</span>(other_outcome.map(|conn| (conn, postgres_url)));
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">ConnectorError::user_facing</span>(<span class="ident">migration_engine::DatabaseCreationFailed</span> { <span class="ident">database_error</span>: <span class="string">&quot;Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.&quot;</span>.<span class="ident">to_owned</span>() })
-    })<span class="question-mark">?</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>conn = conn.ok_or_else(|| {
+        ConnectorError::user_facing(migration_engine::DatabaseCreationFailed { database_error: <span class="string">&quot;Prisma could not connect to a default database (`postgres` or `template1`), it cannot create the specified database.&quot;</span>.to_owned() })
+    })<span class="question-mark">??</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">conn</span>)
+    <span class="prelude-val">Ok</span>(conn)
 }
 
-<span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Circumstances</span> {
-    <span class="ident">IsCockroachDb</span>,
+<span class="attribute">#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[repr(u8)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Circumstances {
+    IsCockroachDb,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// clippy is wrong</span>
-<span class="kw">fn</span> <span class="ident">disable_postgres_statement_cache</span>(<span class="ident">url</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Url</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">v</span>.<span class="ident">to_string</span>())).<span class="ident">collect</span>();
+<span class="attribute">#[allow(clippy::needless_collect)] </span><span class="comment">// clippy is wrong
+</span><span class="kw">fn </span>disable_postgres_statement_cache(url: <span class="kw-2">&amp;mut </span>Url) -&gt; ConnectorResult&lt;()&gt; {
+    <span class="kw">let </span>params: Vec&lt;(String, String)&gt; = url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
-    <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">clear</span>();
+    url.query_pairs_mut().clear();
 
-    <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">into_iter</span>() {
-        <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span> {
-            <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+    <span class="kw">for </span>(k, v) <span class="kw">in </span>params.into_iter() {
+        <span class="kw">if </span>k == <span class="string">&quot;statement_cache_size&quot; </span>{
+            url.query_pairs_mut().append_pair(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
+        } <span class="kw">else </span>{
+            url.query_pairs_mut().append_pair(<span class="kw-2">&amp;</span>k, <span class="kw-2">&amp;</span>v);
         }
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span>) {
-        <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
+    <span class="kw">if </span>!url.query_pairs().any(|(k, <span class="kw">_</span>)| k == <span class="string">&quot;statement_cache_size&quot;</span>) {
+        url.query_pairs_mut().append_pair(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">with_connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">PostgresFlavour</span>, <span class="ident">f</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">O</span>: <span class="lifetime">&#39;a</span>,
-    <span class="ident">F</span>: <span class="ident">future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    <span class="ident">C</span>: (<span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Params</span>, <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Circumstances</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span>) -&gt; <span class="ident">F</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">fn </span>with_connection&lt;<span class="lifetime">&#39;a</span>, O, F, C&gt;(flavour: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>PostgresFlavour, f: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;O&gt;&gt;
+<span class="kw">where
+    </span>O: <span class="lifetime">&#39;a</span>,
+    F: future::Future&lt;Output = ConnectorResult&lt;O&gt;&gt; + Send + <span class="lifetime">&#39;a</span>,
+    C: (FnOnce(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Params, BitFlags&lt;Circumstances&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Connection) -&gt; F) + Send + <span class="lifetime">&#39;a</span>,
 {
-    <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">match</span> <span class="ident">flavour</span>.<span class="ident">state</span> {
-            <span class="ident"><span class="kw">super</span>::State::Initial</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;logic error: Initial&quot;</span>),
-            <span class="ident"><span class="kw">super</span>::State::Connected</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">p</span>, (<span class="ident">circumstances</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>)) =&gt; {
-                <span class="kw">return</span> <span class="ident">f</span>(<span class="ident">p</span>, <span class="ident">circumstances</span>, <span class="ident">conn</span>).<span class="kw">await</span>
-            }
-            <span class="ident"><span class="kw">super</span>::State::WithParams</span>(<span class="kw">_</span>) =&gt; (),
+    Box::pin(<span class="kw">async move </span>{
+        <span class="kw">match </span>flavour.state {
+            <span class="kw">super</span>::State::Initial =&gt; <span class="macro">panic!</span>(<span class="string">&quot;logic error: Initial&quot;</span>),
+            <span class="kw">super</span>::State::Connected(<span class="kw-2">ref mut </span>p, (circumstances, <span class="kw-2">ref mut </span>conn)) =&gt; {
+                <span class="kw">return </span>f(p, circumstances, conn).<span class="kw">await
+            </span>}
+            <span class="kw">super</span>::State::WithParams(<span class="kw">_</span>) =&gt; (),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">circumstances</span> <span class="op">=</span> <span class="ident">BitFlags</span>::<span class="op">&lt;</span><span class="ident">Circumstances</span><span class="op">&gt;</span><span class="ident">::default</span>();
-        <span class="kw">let</span> <span class="ident">provider_is_cockroachdb</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">is_cockroach</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>circumstances = BitFlags::&lt;Circumstances&gt;::default();
+        <span class="kw">let </span>provider_is_cockroachdb = flavour.is_cockroach;
 
-        <span class="kw">if</span> <span class="ident">provider_is_cockroachdb</span> {
-            <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
+        <span class="kw">if </span>provider_is_cockroachdb {
+            circumstances |= Circumstances::IsCockroachDb;
         }
 
-        <span class="ident">flavour</span>.<span class="ident">state</span>
-                .<span class="ident">try_connect</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">params</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::new</span>(<span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
+        flavour.state
+                .try_connect(<span class="kw">move </span>|params| Box::pin(<span class="kw">async move </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::new(params.connector_params.connection_string.parse().unwrap()).<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>schema_name = params.url.schema();
 
-                    <span class="kw">let</span> <span class="ident">schema_exists_result</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">query_raw</span>(
+                    <span class="kw">let </span>schema_exists_result = connection.query_raw(
                             <span class="string">&quot;SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = $1), version()&quot;</span>,
-                            <span class="kw-2">&amp;</span>[<span class="ident">schema_name</span>.<span class="ident">into</span>()],
-                            <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>,
+                            <span class="kw-2">&amp;</span>[schema_name.into()],
+                            <span class="kw-2">&amp;</span>params.url,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">schema_exists_result</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">1</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>());
+                    <span class="kw">let </span>version = schema_exists_result.get(<span class="number">0</span>).and_then(|row| row.at(<span class="number">1</span>)).and_then(|v| v.to_string());
 
-                    <span class="kw">match</span> <span class="ident">version</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">version</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">db_is_cockroach</span> <span class="op">=</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>);
+                    <span class="kw">match </span>version {
+                        <span class="prelude-val">Some</span>(version) =&gt; {
+                            <span class="kw">let </span>db_is_cockroach = version.contains(<span class="string">&quot;CockroachDB&quot;</span>);
 
-                            <span class="comment">// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222</span>
-                            <span class="comment">// if db_is_cockroach &amp;&amp; !provider_is_cockroachdb  {</span>
-                            <span class="comment">//     let msg = &quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;;</span>
+                            <span class="comment">// We will want to validate this in the future: https://github.com/prisma/prisma/issues/13222
+                            // if db_is_cockroach &amp;&amp; !provider_is_cockroachdb  {
+                            //     let msg = &quot;You are trying to connect to a CockroachDB database, but the provider in your Prisma schema is `postgresql`. Please change it to `cockroachdb`.&quot;;
 
-                            <span class="comment">//     return Err(ConnectorError::from_msg(msg.to_owned()));</span>
+                            //     return Err(ConnectorError::from_msg(msg.to_owned()));
 
-                            <span class="kw">if</span> <span class="op">!</span><span class="ident">db_is_cockroach</span> <span class="op">&amp;&amp;</span> <span class="ident">provider_is_cockroachdb</span> {
-                                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.&quot;</span>;
+                            </span><span class="kw">if </span>!db_is_cockroach &amp;&amp; provider_is_cockroachdb {
+                                <span class="kw">let </span>msg = <span class="string">&quot;You are trying to connect to a PostgreSQL database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.&quot;</span>;
 
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="ident">msg</span>.<span class="ident">to_owned</span>()));
-                            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">db_is_cockroach</span> {
-                                <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
-                                <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">COCKROACHDB_PRELUDE</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(msg.to_owned()));
+                            } <span class="kw">else if </span>db_is_cockroach {
+                                circumstances |= Circumstances::IsCockroachDb;
+                                connection.raw_cmd(COCKROACHDB_PRELUDE, <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
                             }
                         }
-                        <span class="prelude-val">None</span> =&gt; {
+                        <span class="prelude-val">None </span>=&gt; {
                             <span class="macro">tracing::warn!</span>(<span class="string">&quot;Could not determine the version of the database.&quot;</span>)
                         }
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">schema_exists_result</span>
-                        .<span class="ident">get</span>(<span class="number">0</span>)
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_bool</span>()))
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = schema_exists_result
+                        .get(<span class="number">0</span>)
+                        .and_then(|row| row.at(<span class="number">0</span>).and_then(|value| value.as_bool()))
                     {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">circumstances</span>, <span class="ident">connection</span>))
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>((circumstances, connection))
                     }
 
                     <span class="macro">tracing::debug!</span>(
                             <span class="string">&quot;Detected that the `{schema_name}` schema does not exist on the target database. Attempting to create it.&quot;</span>,
-                        <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">schema_name</span>,
+                        schema_name = schema_name,
                     );
 
-                    <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, <span class="ident">schema_name</span>), <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">url</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    connection.raw_cmd(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA \&quot;{}\&quot;&quot;</span>, schema_name), <span class="kw-2">&amp;</span>params.url).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Ok</span>((<span class="ident">circumstances</span>, <span class="ident">connection</span>))
+                    <span class="prelude-val">Ok</span>((circumstances, connection))
                 })).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">with_connection</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">flavour</span>, <span class="ident">f</span>).<span class="kw">await</span>
-    })
+        with_connection::&lt;O, F, C&gt;(flavour, f).<span class="kw">await
+    </span>})
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">debug_impl_does_not_leak_connection_info</span>() {
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;postgresql://myname:mypassword@myserver:8765/mydbname&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>debug_impl_does_not_leak_connection_info() {
+        <span class="kw">let </span>url = <span class="string">&quot;postgresql://myname:mypassword@myserver:8765/mydbname&quot;</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flavour</span> <span class="op">=</span> <span class="ident">PostgresFlavour::default</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-            <span class="ident">connection_string</span>: <span class="ident">url</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">preview_features</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>flavour = PostgresFlavour::default();
+        <span class="kw">let </span>params = ConnectorParams {
+            connection_string: url.to_owned(),
+            preview_features: Default::default(),
+            shadow_database_connection_string: <span class="prelude-val">None</span>,
         };
-        <span class="ident">flavour</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">debugged</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">flavour</span>);
+        flavour.set_params(params).unwrap();
+        <span class="kw">let </span>debugged = <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, flavour);
 
-        <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;myname&quot;</span>, <span class="string">&quot;mypassword&quot;</span>, <span class="string">&quot;myserver&quot;</span>, <span class="string">&quot;8765&quot;</span>, <span class="string">&quot;mydbname&quot;</span>];
+        <span class="kw">let </span>words = <span class="kw-2">&amp;</span>[<span class="string">&quot;myname&quot;</span>, <span class="string">&quot;mypassword&quot;</span>, <span class="string">&quot;myserver&quot;</span>, <span class="string">&quot;8765&quot;</span>, <span class="string">&quot;mydbname&quot;</span>];
 
-        <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">words</span> {
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">debugged</span>.<span class="ident">contains</span>(<span class="ident">word</span>));
+        <span class="kw">for </span>word <span class="kw">in </span>words {
+            <span class="macro">assert!</span>(!debugged.contains(word));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

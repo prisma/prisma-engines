@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/prioritize.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prioritize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/prioritize.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>prioritize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -901,908 +901,908 @@
 <span id="901">901</span>
 <span id="902">902</span>
 <span id="903">903</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::store::Resolve</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::store::Resolve;
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>::{<span class="ident">Reason</span>, <span class="ident">StreamId</span>};
+<span class="kw">use </span><span class="kw">crate</span>::frame::{Reason, StreamId};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::codec::UserError;
+<span class="kw">use </span><span class="kw">crate</span>::codec::UserError::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">bytes::buf</span>::{<span class="ident">Buf</span>, <span class="ident">Take</span>};
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">Waker</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">fmt</span>, <span class="ident">mem</span>};
+<span class="kw">use </span>bytes::buf::{Buf, Take};
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::task::{Context, Poll, Waker};
+<span class="kw">use </span>std::{cmp, fmt, mem};
 
-<span class="doccomment">/// # Warning</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Queued streams are ordered by stream ID, as we need to ensure that</span>
-<span class="doccomment">/// lower-numbered streams are sent headers before higher-numbered ones.</span>
-<span class="doccomment">/// This is because &quot;idle&quot; stream IDs – those which have been initiated but</span>
-<span class="doccomment">/// have yet to receive frames – will be implicitly closed on receipt of a</span>
-<span class="doccomment">/// frame on a higher stream ID. If these queues was not ordered by stream</span>
-<span class="doccomment">/// IDs, some mechanism would be necessary to ensure that the lowest-numbered]</span>
-<span class="doccomment">/// idle stream is opened first.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Prioritize</span> {
-    <span class="doccomment">/// Queue of streams waiting for socket capacity to send a frame.</span>
-    <span class="ident">pending_send</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextSend</span><span class="op">&gt;</span>,
+<span class="doccomment">/// # Warning
+///
+/// Queued streams are ordered by stream ID, as we need to ensure that
+/// lower-numbered streams are sent headers before higher-numbered ones.
+/// This is because &quot;idle&quot; stream IDs – those which have been initiated but
+/// have yet to receive frames – will be implicitly closed on receipt of a
+/// frame on a higher stream ID. If these queues was not ordered by stream
+/// IDs, some mechanism would be necessary to ensure that the lowest-numbered]
+/// idle stream is opened first.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Prioritize {
+    <span class="doccomment">/// Queue of streams waiting for socket capacity to send a frame.
+    </span>pending_send: store::Queue&lt;stream::NextSend&gt;,
 
-    <span class="doccomment">/// Queue of streams waiting for window capacity to produce data.</span>
-    <span class="ident">pending_capacity</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextSendCapacity</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Queue of streams waiting for window capacity to produce data.
+    </span>pending_capacity: store::Queue&lt;stream::NextSendCapacity&gt;,
 
-    <span class="doccomment">/// Streams waiting for capacity due to max concurrency</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `SendRequest` handle is `Clone`. This enables initiating requests</span>
-    <span class="doccomment">/// from many tasks. However, offering this capability while supporting</span>
-    <span class="doccomment">/// backpressure at some level is tricky. If there are many `SendRequest`</span>
-    <span class="doccomment">/// handles and a single stream becomes available, which handle gets</span>
-    <span class="doccomment">/// assigned that stream? Maybe that handle is no longer ready to send a</span>
-    <span class="doccomment">/// request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The strategy used is to allow each `SendRequest` handle one buffered</span>
-    <span class="doccomment">/// request. A `SendRequest` handle is ready to send a request if it has no</span>
-    <span class="doccomment">/// associated buffered requests. This is the same strategy as `mpsc` in the</span>
-    <span class="doccomment">/// futures library.</span>
-    <span class="ident">pending_open</span>: <span class="ident">store::Queue</span><span class="op">&lt;</span><span class="ident">stream::NextOpen</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Streams waiting for capacity due to max concurrency
+    ///
+    /// The `SendRequest` handle is `Clone`. This enables initiating requests
+    /// from many tasks. However, offering this capability while supporting
+    /// backpressure at some level is tricky. If there are many `SendRequest`
+    /// handles and a single stream becomes available, which handle gets
+    /// assigned that stream? Maybe that handle is no longer ready to send a
+    /// request.
+    ///
+    /// The strategy used is to allow each `SendRequest` handle one buffered
+    /// request. A `SendRequest` handle is ready to send a request if it has no
+    /// associated buffered requests. This is the same strategy as `mpsc` in the
+    /// futures library.
+    </span>pending_open: store::Queue&lt;stream::NextOpen&gt;,
 
-    <span class="doccomment">/// Connection level flow control governing sent data</span>
-    <span class="ident">flow</span>: <span class="ident">FlowControl</span>,
+    <span class="doccomment">/// Connection level flow control governing sent data
+    </span>flow: FlowControl,
 
-    <span class="doccomment">/// Stream ID of the last stream opened.</span>
-    <span class="ident">last_opened_id</span>: <span class="ident">StreamId</span>,
+    <span class="doccomment">/// Stream ID of the last stream opened.
+    </span>last_opened_id: StreamId,
 
-    <span class="doccomment">/// What `DATA` frame is currently being sent in the codec.</span>
-    <span class="ident">in_flight_data_frame</span>: <span class="ident">InFlightData</span>,
+    <span class="doccomment">/// What `DATA` frame is currently being sent in the codec.
+    </span>in_flight_data_frame: InFlightData,
 
-    <span class="doccomment">/// The maximum amount of bytes a stream should buffer.</span>
-    <span class="ident">max_buffer_size</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The maximum amount of bytes a stream should buffer.
+    </span>max_buffer_size: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InFlightData</span> {
-    <span class="doccomment">/// There is no `DATA` frame in flight.</span>
-    <span class="ident">Nothing</span>,
-    <span class="doccomment">/// There is a `DATA` frame in flight belonging to the given stream.</span>
-    <span class="ident">DataFrame</span>(<span class="ident">store::Key</span>),
-    <span class="doccomment">/// There was a `DATA` frame, but the stream&#39;s queue was since cleared.</span>
-    <span class="ident">Drop</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>InFlightData {
+    <span class="doccomment">/// There is no `DATA` frame in flight.
+    </span>Nothing,
+    <span class="doccomment">/// There is a `DATA` frame in flight belonging to the given stream.
+    </span>DataFrame(store::Key),
+    <span class="doccomment">/// There was a `DATA` frame, but the stream&#39;s queue was since cleared.
+    </span>Drop,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="comment">// The buffer</span>
-    <span class="ident">inner</span>: <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Prioritized&lt;B&gt; {
+    <span class="comment">// The buffer
+    </span>inner: Take&lt;B&gt;,
 
-    <span class="ident">end_of_stream</span>: <span class="ident">bool</span>,
+    end_of_stream: bool,
 
-    <span class="comment">// The stream that this is associated with</span>
-    <span class="ident">stream</span>: <span class="ident">store::Key</span>,
+    <span class="comment">// The stream that this is associated with
+    </span>stream: store::Key,
 }
 
-<span class="comment">// ===== impl Prioritize =====</span>
+<span class="comment">// ===== impl Prioritize =====
 
-<span class="kw">impl</span> <span class="ident">Prioritize</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="ident">Prioritize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flow</span> <span class="op">=</span> <span class="ident">FlowControl::new</span>();
+</span><span class="kw">impl </span>Prioritize {
+    <span class="kw">pub fn </span>new(config: <span class="kw-2">&amp;</span>Config) -&gt; Prioritize {
+        <span class="kw">let </span><span class="kw-2">mut </span>flow = FlowControl::new();
 
-        <span class="ident">flow</span>.<span class="ident">inc_window</span>(<span class="ident">config</span>.<span class="ident">remote_init_window_sz</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;invalid initial window size&quot;</span>);
+        flow.inc_window(config.remote_init_window_sz)
+            .expect(<span class="string">&quot;invalid initial window size&quot;</span>);
 
-        <span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">config</span>.<span class="ident">remote_init_window_sz</span>);
+        flow.assign_capacity(config.remote_init_window_sz);
 
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;Prioritize::new; flow={:?}&quot;</span>, <span class="ident">flow</span>);
+        <span class="macro">tracing::trace!</span>(<span class="string">&quot;Prioritize::new; flow={:?}&quot;</span>, flow);
 
-        <span class="ident">Prioritize</span> {
-            <span class="ident">pending_send</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">pending_capacity</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">pending_open</span>: <span class="ident">store::Queue::new</span>(),
-            <span class="ident">flow</span>,
-            <span class="ident">last_opened_id</span>: <span class="ident">StreamId::ZERO</span>,
-            <span class="ident">in_flight_data_frame</span>: <span class="ident">InFlightData::Nothing</span>,
-            <span class="ident">max_buffer_size</span>: <span class="ident">config</span>.<span class="ident">local_max_buffer_size</span>,
+        Prioritize {
+            pending_send: store::Queue::new(),
+            pending_capacity: store::Queue::new(),
+            pending_open: store::Queue::new(),
+            flow,
+            last_opened_id: StreamId::ZERO,
+            in_flight_data_frame: InFlightData::Nothing,
+            max_buffer_size: config.local_max_buffer_size,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_buffer_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">max_buffer_size</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_buffer_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.max_buffer_size
     }
 
-    <span class="doccomment">/// Queue a frame to be sent to the remote</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">queue_frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-        <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Queue a frame to be sent to the remote
+    </span><span class="kw">pub fn </span>queue_frame&lt;B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: Frame&lt;B&gt;,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+        task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;Prioritize::queue_frame&quot;</span>, <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
-        <span class="comment">// Queue the frame in the buffer</span>
-        <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">push_back</span>(<span class="ident">buffer</span>, <span class="ident">frame</span>);
-        <span class="self">self</span>.<span class="ident">schedule_send</span>(<span class="ident">stream</span>, <span class="ident">task</span>);
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;Prioritize::queue_frame&quot;</span>, <span class="question-mark">?</span>stream.id);
+        <span class="kw">let </span>_e = span.enter();
+        <span class="comment">// Queue the frame in the buffer
+        </span>stream.pending_send.push_back(buffer, frame);
+        <span class="self">self</span>.schedule_send(stream, task);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule_send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>) {
-        <span class="comment">// If the stream is waiting to be opened, nothing more to do.</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">is_send_ready</span>() {
-            <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>, <span class="string">&quot;schedule_send&quot;</span>);
-            <span class="comment">// Queue the stream</span>
-            <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+    <span class="kw">pub fn </span>schedule_send(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr, task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;) {
+        <span class="comment">// If the stream is waiting to be opened, nothing more to do.
+        </span><span class="kw">if </span>stream.is_send_ready() {
+            <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span>stream.id, <span class="string">&quot;schedule_send&quot;</span>);
+            <span class="comment">// Queue the stream
+            </span><span class="self">self</span>.pending_send.push(stream);
 
-            <span class="comment">// Notify the connection.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="ident">task</span>.<span class="ident">take</span>() {
-                <span class="ident">task</span>.<span class="ident">wake</span>();
+            <span class="comment">// Notify the connection.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(task) = task.take() {
+                task.wake();
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">queue_open</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="self">self</span>.<span class="ident">pending_open</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+    <span class="kw">pub fn </span>queue_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="self">self</span>.pending_open.push(stream);
     }
 
-    <span class="doccomment">/// Send a data frame</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::Data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-        <span class="ident">task</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Send a data frame
+    </span><span class="kw">pub fn </span>send_data&lt;B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: frame::Data&lt;B&gt;,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+        task: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Waker&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt;
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">remaining</span>();
+        <span class="kw">let </span>sz = frame.payload().remaining();
 
-        <span class="kw">if</span> <span class="ident">sz</span> <span class="op">&gt;</span> <span class="ident">MAX_WINDOW_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UserError::PayloadTooBig</span>);
+        <span class="kw">if </span>sz &gt; MAX_WINDOW_SIZE <span class="kw">as </span>usize {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(UserError::PayloadTooBig);
         }
 
-        <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="ident">WindowSize</span>;
+        <span class="kw">let </span>sz = sz <span class="kw">as </span>WindowSize;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_streaming</span>() {
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_closed</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InactiveStreamId</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">UnexpectedFrameType</span>);
+        <span class="kw">if </span>!stream.state.is_send_streaming() {
+            <span class="kw">if </span>stream.state.is_closed() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(InactiveStreamId);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(UnexpectedFrameType);
             }
         }
 
-        <span class="comment">// Update the buffered data counter</span>
-        <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sz</span> <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="comment">// Update the buffered data counter
+        </span>stream.buffered_send_data += sz <span class="kw">as </span>usize;
 
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span>
-            <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;send_data&quot;</span>, <span class="ident">sz</span>, <span class="ident">requested</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
-        <span class="macro">tracing::trace!</span>(<span class="ident">buffered</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>);
+        <span class="kw">let </span>span =
+            <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;send_data&quot;</span>, sz, requested = stream.requested_send_capacity);
+        <span class="kw">let </span>_e = span.enter();
+        <span class="macro">tracing::trace!</span>(buffered = stream.buffered_send_data);
 
-        <span class="comment">// Implicitly request more send capacity if not enough has been</span>
-        <span class="comment">// requested yet.</span>
-        <span class="kw">if</span> (<span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> {
-            <span class="comment">// Update the target requested capacity</span>
-            <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">=</span>
-                <span class="ident">cmp::min</span>(<span class="ident">stream</span>.<span class="ident">buffered_send_data</span>, <span class="ident">WindowSize::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">WindowSize</span>;
+        <span class="comment">// Implicitly request more send capacity if not enough has been
+        // requested yet.
+        </span><span class="kw">if </span>(stream.requested_send_capacity <span class="kw">as </span>usize) &lt; stream.buffered_send_data {
+            <span class="comment">// Update the target requested capacity
+            </span>stream.requested_send_capacity =
+                cmp::min(stream.buffered_send_data, WindowSize::MAX <span class="kw">as </span>usize) <span class="kw">as </span>WindowSize;
 
-            <span class="self">self</span>.<span class="ident">try_assign_capacity</span>(<span class="ident">stream</span>);
+            <span class="self">self</span>.try_assign_capacity(stream);
         }
 
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_end_stream</span>() {
-            <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">send_close</span>();
-            <span class="self">self</span>.<span class="ident">reserve_capacity</span>(<span class="number">0</span>, <span class="ident">stream</span>, <span class="ident">counts</span>);
+        <span class="kw">if </span>frame.is_end_stream() {
+            stream.state.send_close();
+            <span class="self">self</span>.reserve_capacity(<span class="number">0</span>, stream, counts);
         }
 
         <span class="macro">tracing::trace!</span>(
-            <span class="ident">available</span> <span class="op">=</span> <span class="op">%</span><span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>(),
-            <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
+            available = %stream.send_flow.available(),
+            buffered = stream.buffered_send_data,
         );
 
-        <span class="comment">// The `stream.buffered_send_data == 0` check is here so that, if a zero</span>
-        <span class="comment">// length data frame is queued to the front (there is no previously</span>
-        <span class="comment">// queued data), it gets sent out immediately even if there is no</span>
-        <span class="comment">// available send window.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Sending out zero length data frames can be done to signal</span>
-        <span class="comment">// end-of-stream.</span>
-        <span class="comment">//</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// The stream currently has capacity to send the data frame, so</span>
-            <span class="comment">// queue it up and notify the connection task.</span>
-            <span class="self">self</span>.<span class="ident">queue_frame</span>(<span class="ident">frame</span>.<span class="ident">into</span>(), <span class="ident">buffer</span>, <span class="ident">stream</span>, <span class="ident">task</span>);
-        } <span class="kw">else</span> {
-            <span class="comment">// The stream has no capacity to send the frame now, save it but</span>
-            <span class="comment">// don&#39;t notify the connection task. Once additional capacity</span>
-            <span class="comment">// becomes available, the frame will be flushed.</span>
-            <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">push_back</span>(<span class="ident">buffer</span>, <span class="ident">frame</span>.<span class="ident">into</span>());
+        <span class="comment">// The `stream.buffered_send_data == 0` check is here so that, if a zero
+        // length data frame is queued to the front (there is no previously
+        // queued data), it gets sent out immediately even if there is no
+        // available send window.
+        //
+        // Sending out zero length data frames can be done to signal
+        // end-of-stream.
+        //
+        </span><span class="kw">if </span>stream.send_flow.available() &gt; <span class="number">0 </span>|| stream.buffered_send_data == <span class="number">0 </span>{
+            <span class="comment">// The stream currently has capacity to send the data frame, so
+            // queue it up and notify the connection task.
+            </span><span class="self">self</span>.queue_frame(frame.into(), buffer, stream, task);
+        } <span class="kw">else </span>{
+            <span class="comment">// The stream has no capacity to send the frame now, save it but
+            // don&#39;t notify the connection task. Once additional capacity
+            // becomes available, the frame will be flushed.
+            </span>stream.pending_send.push_back(buffer, frame.into());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Request capacity to send data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_capacity</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">capacity</span>: <span class="ident">WindowSize</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
+    <span class="doccomment">/// Request capacity to send data
+    </span><span class="kw">pub fn </span>reserve_capacity(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        capacity: WindowSize,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
     ) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(
             <span class="string">&quot;reserve_capacity&quot;</span>,
-            <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>,
-            <span class="ident">requested</span> <span class="op">=</span> <span class="ident">capacity</span>,
-            <span class="ident">effective</span> <span class="op">=</span> (<span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
-            <span class="ident">curr</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span>
+            <span class="question-mark">?</span>stream.id,
+            requested = capacity,
+            effective = (capacity <span class="kw">as </span>usize) + stream.buffered_send_data,
+            curr = stream.requested_send_capacity
         );
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="comment">// Actual capacity is `capacity` + the current amount of buffered data.</span>
-        <span class="comment">// If it were less, then we could never send out the buffered data.</span>
-        <span class="kw">let</span> <span class="ident">capacity</span> <span class="op">=</span> (<span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">+</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>;
+        <span class="comment">// Actual capacity is `capacity` + the current amount of buffered data.
+        // If it were less, then we could never send out the buffered data.
+        </span><span class="kw">let </span>capacity = (capacity <span class="kw">as </span>usize) + stream.buffered_send_data;
 
-        <span class="kw">if</span> <span class="ident">capacity</span> <span class="op">==</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="comment">// Nothing to do</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">capacity</span> <span class="op">&lt;</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="comment">// Update the target requested capacity</span>
-            <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">=</span> <span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">WindowSize</span>;
+        <span class="kw">if </span>capacity == stream.requested_send_capacity <span class="kw">as </span>usize {
+            <span class="comment">// Nothing to do
+        </span>} <span class="kw">else if </span>capacity &lt; stream.requested_send_capacity <span class="kw">as </span>usize {
+            <span class="comment">// Update the target requested capacity
+            </span>stream.requested_send_capacity = capacity <span class="kw">as </span>WindowSize;
 
-            <span class="comment">// Currently available capacity assigned to the stream</span>
-            <span class="kw">let</span> <span class="ident">available</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>().<span class="ident">as_size</span>();
+            <span class="comment">// Currently available capacity assigned to the stream
+            </span><span class="kw">let </span>available = stream.send_flow.available().as_size();
 
-            <span class="comment">// If the stream has more assigned capacity than requested, reclaim</span>
-            <span class="comment">// some for the connection</span>
-            <span class="kw">if</span> <span class="ident">available</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">capacity</span> {
-                <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">available</span> <span class="op">-</span> <span class="ident">capacity</span> <span class="kw">as</span> <span class="ident">WindowSize</span>;
+            <span class="comment">// If the stream has more assigned capacity than requested, reclaim
+            // some for the connection
+            </span><span class="kw">if </span>available <span class="kw">as </span>usize &gt; capacity {
+                <span class="kw">let </span>diff = available - capacity <span class="kw">as </span>WindowSize;
 
-                <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">claim_capacity</span>(<span class="ident">diff</span>);
+                stream.send_flow.claim_capacity(diff);
 
-                <span class="self">self</span>.<span class="ident">assign_connection_capacity</span>(<span class="ident">diff</span>, <span class="ident">stream</span>, <span class="ident">counts</span>);
+                <span class="self">self</span>.assign_connection_capacity(diff, stream, counts);
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// If trying to *add* capacity, but the stream send side is closed,</span>
-            <span class="comment">// there&#39;s nothing to be done.</span>
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_closed</span>() {
+        } <span class="kw">else </span>{
+            <span class="comment">// If trying to *add* capacity, but the stream send side is closed,
+            // there&#39;s nothing to be done.
+            </span><span class="kw">if </span>stream.state.is_send_closed() {
                 <span class="kw">return</span>;
             }
 
-            <span class="comment">// Update the target requested capacity</span>
-            <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">=</span>
-                <span class="ident">cmp::min</span>(<span class="ident">capacity</span>, <span class="ident">WindowSize::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">WindowSize</span>;
+            <span class="comment">// Update the target requested capacity
+            </span>stream.requested_send_capacity =
+                cmp::min(capacity, WindowSize::MAX <span class="kw">as </span>usize) <span class="kw">as </span>WindowSize;
 
-            <span class="comment">// Try to assign additional capacity to the stream. If none is</span>
-            <span class="comment">// currently available, the stream will be queued to receive some</span>
-            <span class="comment">// when more becomes available.</span>
-            <span class="self">self</span>.<span class="ident">try_assign_capacity</span>(<span class="ident">stream</span>);
+            <span class="comment">// Try to assign additional capacity to the stream. If none is
+            // currently available, the stream will be queued to receive some
+            // when more becomes available.
+            </span><span class="self">self</span>.try_assign_capacity(stream);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_stream_window_update</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">inc</span>: <span class="ident">WindowSize</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Reason</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(
+    <span class="kw">pub fn </span>recv_stream_window_update(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        inc: WindowSize,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Reason&gt; {
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(
             <span class="string">&quot;recv_stream_window_update&quot;</span>,
-            <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>,
-            <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">state</span>,
-            <span class="ident">inc</span>,
-            <span class="ident">flow</span> <span class="op">=</span> <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">send_flow</span>
+            <span class="question-mark">?</span>stream.id,
+            <span class="question-mark">?</span>stream.state,
+            inc,
+            flow = <span class="question-mark">?</span>stream.send_flow
         );
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_closed</span>() <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// We can&#39;t send any data, so don&#39;t bother doing anything else.</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span>stream.state.is_send_closed() &amp;&amp; stream.buffered_send_data == <span class="number">0 </span>{
+            <span class="comment">// We can&#39;t send any data, so don&#39;t bother doing anything else.
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="comment">// Update the stream level flow control.</span>
-        <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">inc_window</span>(<span class="ident">inc</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Update the stream level flow control.
+        </span>stream.send_flow.inc_window(inc)<span class="question-mark">?</span>;
 
-        <span class="comment">// If the stream is waiting on additional capacity, then this will</span>
-        <span class="comment">// assign it (if available on the connection) and notify the producer</span>
-        <span class="self">self</span>.<span class="ident">try_assign_capacity</span>(<span class="ident">stream</span>);
+        <span class="comment">// If the stream is waiting on additional capacity, then this will
+        // assign it (if available on the connection) and notify the producer
+        </span><span class="self">self</span>.try_assign_capacity(stream);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_connection_window_update</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">inc</span>: <span class="ident">WindowSize</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Reason</span><span class="op">&gt;</span> {
-        <span class="comment">// Update the connection&#39;s window</span>
-        <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">inc_window</span>(<span class="ident">inc</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>recv_connection_window_update(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        inc: WindowSize,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Reason&gt; {
+        <span class="comment">// Update the connection&#39;s window
+        </span><span class="self">self</span>.flow.inc_window(inc)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">assign_connection_capacity</span>(<span class="ident">inc</span>, <span class="ident">store</span>, <span class="ident">counts</span>);
+        <span class="self">self</span>.assign_connection_capacity(inc, store, counts);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Reclaim all capacity assigned to the stream and re-assign it to the</span>
-    <span class="doccomment">/// connection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reclaim_all_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">let</span> <span class="ident">available</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>().<span class="ident">as_size</span>();
-        <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">claim_capacity</span>(<span class="ident">available</span>);
-        <span class="comment">// Re-assign all capacity to the connection</span>
-        <span class="self">self</span>.<span class="ident">assign_connection_capacity</span>(<span class="ident">available</span>, <span class="ident">stream</span>, <span class="ident">counts</span>);
+    <span class="doccomment">/// Reclaim all capacity assigned to the stream and re-assign it to the
+    /// connection
+    </span><span class="kw">pub fn </span>reclaim_all_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">let </span>available = stream.send_flow.available().as_size();
+        stream.send_flow.claim_capacity(available);
+        <span class="comment">// Re-assign all capacity to the connection
+        </span><span class="self">self</span>.assign_connection_capacity(available, stream, counts);
     }
 
-    <span class="doccomment">/// Reclaim just reserved capacity, not buffered capacity, and re-assign</span>
-    <span class="doccomment">/// it to the connection</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reclaim_reserved_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="comment">// only reclaim requested capacity that isn&#39;t already buffered</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> {
-            <span class="kw">let</span> <span class="ident">reserved</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">-</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="kw">as</span> <span class="ident">WindowSize</span>;
+    <span class="doccomment">/// Reclaim just reserved capacity, not buffered capacity, and re-assign
+    /// it to the connection
+    </span><span class="kw">pub fn </span>reclaim_reserved_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="comment">// only reclaim requested capacity that isn&#39;t already buffered
+        </span><span class="kw">if </span>stream.requested_send_capacity <span class="kw">as </span>usize &gt; stream.buffered_send_data {
+            <span class="kw">let </span>reserved = stream.requested_send_capacity - stream.buffered_send_data <span class="kw">as </span>WindowSize;
 
-            <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">claim_capacity</span>(<span class="ident">reserved</span>);
-            <span class="self">self</span>.<span class="ident">assign_connection_capacity</span>(<span class="ident">reserved</span>, <span class="ident">stream</span>, <span class="ident">counts</span>);
+            stream.send_flow.claim_capacity(reserved);
+            <span class="self">self</span>.assign_connection_capacity(reserved, stream, counts);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_pending_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;clear_pending_capacity&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_capacity</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="ident">counts</span>.<span class="ident">transition</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">stream</span><span class="op">|</span> {
-                <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>, <span class="string">&quot;clear_pending_capacity&quot;</span>);
+    <span class="kw">pub fn </span>clear_pending_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;clear_pending_capacity&quot;</span>);
+        <span class="kw">let </span>_e = span.enter();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_capacity.pop(store) {
+            counts.transition(stream, |<span class="kw">_</span>, stream| {
+                <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span>stream.id, <span class="string">&quot;clear_pending_capacity&quot;</span>);
             })
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assign_connection_capacity</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">inc</span>: <span class="ident">WindowSize</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-    ) <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">Resolve</span>,
+    <span class="kw">pub fn </span>assign_connection_capacity&lt;R&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        inc: WindowSize,
+        store: <span class="kw-2">&amp;mut </span>R,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+    ) <span class="kw">where
+        </span>R: Resolve,
     {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;assign_connection_capacity&quot;</span>, <span class="ident">inc</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;assign_connection_capacity&quot;</span>, inc);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">inc</span>);
+        <span class="self">self</span>.flow.assign_capacity(inc);
 
-        <span class="comment">// Assign newly acquired capacity to streams pending capacity.</span>
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">available</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pending_capacity</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">stream</span>) =&gt; <span class="ident">stream</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        <span class="comment">// Assign newly acquired capacity to streams pending capacity.
+        </span><span class="kw">while </span><span class="self">self</span>.flow.available() &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>stream = <span class="kw">match </span><span class="self">self</span>.pending_capacity.pop(store) {
+                <span class="prelude-val">Some</span>(stream) =&gt; stream,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
             };
 
-            <span class="comment">// Streams pending capacity may have been reset before capacity</span>
-            <span class="comment">// became available. In that case, the stream won&#39;t want any</span>
-            <span class="comment">// capacity, and so we shouldn&#39;t &quot;transition&quot; on it, but just evict</span>
-            <span class="comment">// it and continue the loop.</span>
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_streaming</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">&gt;</span> <span class="number">0</span>) {
+            <span class="comment">// Streams pending capacity may have been reset before capacity
+            // became available. In that case, the stream won&#39;t want any
+            // capacity, and so we shouldn&#39;t &quot;transition&quot; on it, but just evict
+            // it and continue the loop.
+            </span><span class="kw">if </span>!(stream.state.is_send_streaming() || stream.buffered_send_data &gt; <span class="number">0</span>) {
                 <span class="kw">continue</span>;
             }
 
-            <span class="ident">counts</span>.<span class="ident">transition</span>(<span class="ident">stream</span>, <span class="op">|</span><span class="kw">_</span>, <span class="kw-2">mut</span> <span class="ident">stream</span><span class="op">|</span> {
-                <span class="comment">// Try to assign capacity to the stream. This will also re-queue the</span>
-                <span class="comment">// stream if there isn&#39;t enough connection level capacity to fulfill</span>
-                <span class="comment">// the capacity request.</span>
-                <span class="self">self</span>.<span class="ident">try_assign_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
+            counts.transition(stream, |<span class="kw">_</span>, <span class="kw-2">mut </span>stream| {
+                <span class="comment">// Try to assign capacity to the stream. This will also re-queue the
+                // stream if there isn&#39;t enough connection level capacity to fulfill
+                // the capacity request.
+                </span><span class="self">self</span>.try_assign_capacity(<span class="kw-2">&amp;mut </span>stream);
             })
         }
     }
 
-    <span class="doccomment">/// Request capacity to send data</span>
-    <span class="kw">fn</span> <span class="ident">try_assign_capacity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="kw">let</span> <span class="ident">total_requested</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span>;
+    <span class="doccomment">/// Request capacity to send data
+    </span><span class="kw">fn </span>try_assign_capacity(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="kw">let </span>total_requested = stream.requested_send_capacity;
 
-        <span class="comment">// Total requested should never go below actual assigned</span>
-        <span class="comment">// (Note: the window size can go lower than assigned)</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">total_requested</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="comment">// Total requested should never go below actual assigned
+        // (Note: the window size can go lower than assigned)
+        </span><span class="macro">debug_assert!</span>(stream.send_flow.available() &lt;= total_requested <span class="kw">as </span>usize);
 
-        <span class="comment">// The amount of additional capacity that the stream requests.</span>
-        <span class="comment">// Don&#39;t assign more than the window has available!</span>
-        <span class="kw">let</span> <span class="ident">additional</span> <span class="op">=</span> <span class="ident">cmp::min</span>(
-            <span class="ident">total_requested</span> <span class="op">-</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>().<span class="ident">as_size</span>(),
-            <span class="comment">// Can&#39;t assign more than what is available</span>
-            <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">window_size</span>() <span class="op">-</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>().<span class="ident">as_size</span>(),
+        <span class="comment">// The amount of additional capacity that the stream requests.
+        // Don&#39;t assign more than the window has available!
+        </span><span class="kw">let </span>additional = cmp::min(
+            total_requested - stream.send_flow.available().as_size(),
+            <span class="comment">// Can&#39;t assign more than what is available
+            </span>stream.send_flow.window_size() - stream.send_flow.available().as_size(),
         );
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;try_assign_capacity&quot;</span>, <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;try_assign_capacity&quot;</span>, <span class="question-mark">?</span>stream.id);
+        <span class="kw">let </span>_e = span.enter();
         <span class="macro">tracing::trace!</span>(
-            <span class="ident">requested</span> <span class="op">=</span> <span class="ident">total_requested</span>,
-            <span class="ident">additional</span>,
-            <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
-            <span class="ident">window</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">window_size</span>(),
-            <span class="ident">conn</span> <span class="op">=</span> <span class="op">%</span><span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">available</span>()
+            requested = total_requested,
+            additional,
+            buffered = stream.buffered_send_data,
+            window = stream.send_flow.window_size(),
+            conn = %<span class="self">self</span>.flow.available()
         );
 
-        <span class="kw">if</span> <span class="ident">additional</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// Nothing more to do</span>
-            <span class="kw">return</span>;
+        <span class="kw">if </span>additional == <span class="number">0 </span>{
+            <span class="comment">// Nothing more to do
+            </span><span class="kw">return</span>;
         }
 
-        <span class="comment">// If the stream has requested capacity, then it must be in the</span>
-        <span class="comment">// streaming state (more data could be sent) or there is buffered data</span>
-        <span class="comment">// waiting to be sent.</span>
-        <span class="macro">debug_assert!</span>(
-            <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_send_streaming</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">&gt;</span> <span class="number">0</span>,
+        <span class="comment">// If the stream has requested capacity, then it must be in the
+        // streaming state (more data could be sent) or there is buffered data
+        // waiting to be sent.
+        </span><span class="macro">debug_assert!</span>(
+            stream.state.is_send_streaming() || stream.buffered_send_data &gt; <span class="number">0</span>,
             <span class="string">&quot;state={:?}&quot;</span>,
-            <span class="ident">stream</span>.<span class="ident">state</span>
+            stream.state
         );
 
-        <span class="comment">// The amount of currently available capacity on the connection</span>
-        <span class="kw">let</span> <span class="ident">conn_available</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">available</span>().<span class="ident">as_size</span>();
+        <span class="comment">// The amount of currently available capacity on the connection
+        </span><span class="kw">let </span>conn_available = <span class="self">self</span>.flow.available().as_size();
 
-        <span class="comment">// First check if capacity is immediately available</span>
-        <span class="kw">if</span> <span class="ident">conn_available</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="comment">// The amount of capacity to assign to the stream</span>
-            <span class="comment">// TODO: Should prioritization factor into this?</span>
-            <span class="kw">let</span> <span class="ident">assign</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">conn_available</span>, <span class="ident">additional</span>);
+        <span class="comment">// First check if capacity is immediately available
+        </span><span class="kw">if </span>conn_available &gt; <span class="number">0 </span>{
+            <span class="comment">// The amount of capacity to assign to the stream
+            // TODO: Should prioritization factor into this?
+            </span><span class="kw">let </span>assign = cmp::min(conn_available, additional);
 
-            <span class="macro">tracing::trace!</span>(<span class="ident">capacity</span> <span class="op">=</span> <span class="ident">assign</span>, <span class="string">&quot;assigning&quot;</span>);
+            <span class="macro">tracing::trace!</span>(capacity = assign, <span class="string">&quot;assigning&quot;</span>);
 
-            <span class="comment">// Assign the capacity to the stream</span>
-            <span class="ident">stream</span>.<span class="ident">assign_capacity</span>(<span class="ident">assign</span>, <span class="self">self</span>.<span class="ident">max_buffer_size</span>);
+            <span class="comment">// Assign the capacity to the stream
+            </span>stream.assign_capacity(assign, <span class="self">self</span>.max_buffer_size);
 
-            <span class="comment">// Claim the capacity from the connection</span>
-            <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">claim_capacity</span>(<span class="ident">assign</span>);
+            <span class="comment">// Claim the capacity from the connection
+            </span><span class="self">self</span>.flow.claim_capacity(assign);
         }
 
         <span class="macro">tracing::trace!</span>(
-            <span class="ident">available</span> <span class="op">=</span> <span class="op">%</span><span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>(),
-            <span class="ident">requested</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span>,
-            <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
-            <span class="ident">has_unavailable</span> <span class="op">=</span> <span class="op">%</span><span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">has_unavailable</span>()
+            available = %stream.send_flow.available(),
+            requested = stream.requested_send_capacity,
+            buffered = stream.buffered_send_data,
+            has_unavailable = %stream.send_flow.has_unavailable()
         );
 
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>() <span class="op">&lt;</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="kw">as</span> <span class="ident">usize</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">has_unavailable</span>()
+        <span class="kw">if </span>stream.send_flow.available() &lt; stream.requested_send_capacity <span class="kw">as </span>usize
+            &amp;&amp; stream.send_flow.has_unavailable()
         {
-            <span class="comment">// The stream requires additional capacity and the stream&#39;s</span>
-            <span class="comment">// window has available capacity, but the connection window</span>
-            <span class="comment">// does not.</span>
-            <span class="comment">//</span>
-            <span class="comment">// In this case, the stream needs to be queued up for when the</span>
-            <span class="comment">// connection has more capacity.</span>
-            <span class="self">self</span>.<span class="ident">pending_capacity</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+            <span class="comment">// The stream requires additional capacity and the stream&#39;s
+            // window has available capacity, but the connection window
+            // does not.
+            //
+            // In this case, the stream needs to be queued up for when the
+            // connection has more capacity.
+            </span><span class="self">self</span>.pending_capacity.push(stream);
         }
 
-        <span class="comment">// If data is buffered and the stream is send ready, then</span>
-        <span class="comment">// schedule the stream for execution</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">is_send_ready</span>() {
-            <span class="comment">// TODO: This assertion isn&#39;t *exactly* correct. There can still be</span>
-            <span class="comment">// buffered send data while the stream&#39;s pending send queue is</span>
-            <span class="comment">// empty. This can happen when a large data frame is in the process</span>
-            <span class="comment">// of being **partially** sent. Once the window has been sent, the</span>
-            <span class="comment">// data frame will be returned to the prioritization layer to be</span>
-            <span class="comment">// re-scheduled.</span>
-            <span class="comment">//</span>
-            <span class="comment">// That said, it would be nice to figure out how to make this</span>
-            <span class="comment">// assertion correctly.</span>
-            <span class="comment">//</span>
-            <span class="comment">// debug_assert!(!stream.pending_send.is_empty());</span>
+        <span class="comment">// If data is buffered and the stream is send ready, then
+        // schedule the stream for execution
+        </span><span class="kw">if </span>stream.buffered_send_data &gt; <span class="number">0 </span>&amp;&amp; stream.is_send_ready() {
+            <span class="comment">// TODO: This assertion isn&#39;t *exactly* correct. There can still be
+            // buffered send data while the stream&#39;s pending send queue is
+            // empty. This can happen when a large data frame is in the process
+            // of being **partially** sent. Once the window has been sent, the
+            // data frame will be returned to the prioritization layer to be
+            // re-scheduled.
+            //
+            // That said, it would be nice to figure out how to make this
+            // assertion correctly.
+            //
+            // debug_assert!(!stream.pending_send.is_empty());
 
-            <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+            </span><span class="self">self</span>.pending_send.push(stream);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_complete</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">pub fn </span>poll_complete&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
     {
-        <span class="comment">// Ensure codec is ready</span>
-        <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+        <span class="comment">// Ensure codec is ready
+        </span><span class="macro">ready!</span>(dst.poll_ready(cx))<span class="question-mark">?</span>;
 
-        <span class="comment">// Reclaim any frame that has previously been written</span>
-        <span class="self">self</span>.<span class="ident">reclaim_frame</span>(<span class="ident">buffer</span>, <span class="ident">store</span>, <span class="ident">dst</span>);
+        <span class="comment">// Reclaim any frame that has previously been written
+        </span><span class="self">self</span>.reclaim_frame(buffer, store, dst);
 
-        <span class="comment">// The max frame length</span>
-        <span class="kw">let</span> <span class="ident">max_frame_len</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">max_send_frame_size</span>();
+        <span class="comment">// The max frame length
+        </span><span class="kw">let </span>max_frame_len = dst.max_send_frame_size();
 
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;poll_complete&quot;</span>);
 
-        <span class="kw">loop</span> {
-            <span class="self">self</span>.<span class="ident">schedule_pending_open</span>(<span class="ident">store</span>, <span class="ident">counts</span>);
+        <span class="kw">loop </span>{
+            <span class="self">self</span>.schedule_pending_open(store, counts);
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pop_frame</span>(<span class="ident">buffer</span>, <span class="ident">store</span>, <span class="ident">max_frame_len</span>, <span class="ident">counts</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">frame</span>) =&gt; {
-                    <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span><span class="ident">frame</span>, <span class="string">&quot;writing&quot;</span>);
+            <span class="kw">match </span><span class="self">self</span>.pop_frame(buffer, store, max_frame_len, counts) {
+                <span class="prelude-val">Some</span>(frame) =&gt; {
+                    <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span>frame, <span class="string">&quot;writing&quot;</span>);
 
-                    <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">in_flight_data_frame</span>, <span class="ident">InFlightData::Nothing</span>);
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Frame::Data</span>(<span class="kw-2">ref</span> <span class="ident">frame</span>) <span class="op">=</span> <span class="ident">frame</span> {
-                        <span class="self">self</span>.<span class="ident">in_flight_data_frame</span> <span class="op">=</span> <span class="ident">InFlightData::DataFrame</span>(<span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">stream</span>);
+                    <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.in_flight_data_frame, InFlightData::Nothing);
+                    <span class="kw">if let </span>Frame::Data(<span class="kw-2">ref </span>frame) = frame {
+                        <span class="self">self</span>.in_flight_data_frame = InFlightData::DataFrame(frame.payload().stream);
                     }
-                    <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">frame</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid frame&quot;</span>);
+                    dst.buffer(frame).expect(<span class="string">&quot;invalid frame&quot;</span>);
 
-                    <span class="comment">// Ensure the codec is ready to try the loop again.</span>
-                    <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+                    <span class="comment">// Ensure the codec is ready to try the loop again.
+                    </span><span class="macro">ready!</span>(dst.poll_ready(cx))<span class="question-mark">?</span>;
 
-                    <span class="comment">// Because, always try to reclaim...</span>
-                    <span class="self">self</span>.<span class="ident">reclaim_frame</span>(<span class="ident">buffer</span>, <span class="ident">store</span>, <span class="ident">dst</span>);
+                    <span class="comment">// Because, always try to reclaim...
+                    </span><span class="self">self</span>.reclaim_frame(buffer, store, dst);
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// Try to flush the codec.</span>
-                    <span class="macro">ready!</span>(<span class="ident">dst</span>.<span class="ident">flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// Try to flush the codec.
+                    </span><span class="macro">ready!</span>(dst.flush(cx))<span class="question-mark">?</span>;
 
-                    <span class="comment">// This might release a data frame...</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">reclaim_frame</span>(<span class="ident">buffer</span>, <span class="ident">store</span>, <span class="ident">dst</span>) {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+                    <span class="comment">// This might release a data frame...
+                    </span><span class="kw">if </span>!<span class="self">self</span>.reclaim_frame(buffer, store, dst) {
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
                     }
 
-                    <span class="comment">// No need to poll ready as poll_complete() does this for</span>
-                    <span class="comment">// us...</span>
-                }
+                    <span class="comment">// No need to poll ready as poll_complete() does this for
+                    // us...
+                </span>}
             }
         }
     }
 
-    <span class="doccomment">/// Tries to reclaim a pending data frame from the codec.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if a frame was reclaimed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a data frame is written to the codec, it may not be written in its</span>
-    <span class="doccomment">/// entirety (large chunks are split up into potentially many data frames).</span>
-    <span class="doccomment">/// In this case, the stream needs to be reprioritized.</span>
-    <span class="kw">fn</span> <span class="ident">reclaim_frame</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="doccomment">/// Tries to reclaim a pending data frame from the codec.
+    ///
+    /// Returns true if a frame was reclaimed.
+    ///
+    /// When a data frame is written to the codec, it may not be written in its
+    /// entirety (large chunks are split up into potentially many data frames).
+    /// In this case, the stream needs to be reprioritized.
+    </span><span class="kw">fn </span>reclaim_frame&lt;T, B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, Prioritized&lt;B&gt;&gt;,
+    ) -&gt; bool
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;try_reclaim_frame&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;try_reclaim_frame&quot;</span>);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="comment">// First check if there are any data chunks to take back</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">take_last_data_frame</span>() {
-            <span class="self">self</span>.<span class="ident">reclaim_frame_inner</span>(<span class="ident">buffer</span>, <span class="ident">store</span>, <span class="ident">frame</span>)
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+        <span class="comment">// First check if there are any data chunks to take back
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(frame) = dst.take_last_data_frame() {
+            <span class="self">self</span>.reclaim_frame_inner(buffer, store, frame)
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">reclaim_frame_inner</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::Data</span><span class="op">&lt;</span><span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">bool</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">fn </span>reclaim_frame_inner&lt;B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        frame: frame::Data&lt;Prioritized&lt;B&gt;&gt;,
+    ) -&gt; bool
+    <span class="kw">where
+        </span>B: Buf,
     {
         <span class="macro">tracing::trace!</span>(
-            <span class="question-mark">?</span><span class="ident">frame</span>,
-            <span class="ident">sz</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">inner</span>.<span class="ident">get_ref</span>().<span class="ident">remaining</span>(),
-            <span class="string">&quot;reclaimed&quot;</span>
-        );
+            <span class="question-mark">?</span>frame,
+            sz = frame.payload().inner.get_ref().remaining(),
+            <span class="string">&quot;reclaimed&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">eos</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">stream</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>eos = <span class="bool-val">false</span>;
+        <span class="kw">let </span>key = frame.payload().stream;
 
-        <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_flight_data_frame</span>, <span class="ident">InFlightData::Nothing</span>) {
-            <span class="ident">InFlightData::Nothing</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;wasn&#39;t expecting a frame to reclaim&quot;</span>),
-            <span class="ident">InFlightData::Drop</span> =&gt; {
+        <span class="kw">match </span>mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.in_flight_data_frame, InFlightData::Nothing) {
+            InFlightData::Nothing =&gt; <span class="macro">panic!</span>(<span class="string">&quot;wasn&#39;t expecting a frame to reclaim&quot;</span>),
+            InFlightData::Drop =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;not reclaiming frame for cancelled stream&quot;</span>);
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
-            <span class="ident">InFlightData::DataFrame</span>(<span class="ident">k</span>) =&gt; {
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">k</span>, <span class="ident">key</span>);
+            InFlightData::DataFrame(k) =&gt; {
+                <span class="macro">debug_assert_eq!</span>(k, key);
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">prioritized</span><span class="op">|</span> {
-            <span class="comment">// TODO: Ensure fully written</span>
-            <span class="ident">eos</span> <span class="op">=</span> <span class="ident">prioritized</span>.<span class="ident">end_of_stream</span>;
-            <span class="ident">prioritized</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>()
+        <span class="kw">let </span><span class="kw-2">mut </span>frame = frame.map(|prioritized| {
+            <span class="comment">// TODO: Ensure fully written
+            </span>eos = prioritized.end_of_stream;
+            prioritized.inner.into_inner()
         });
 
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">has_remaining</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">resolve</span>(<span class="ident">key</span>);
+        <span class="kw">if </span>frame.payload().has_remaining() {
+            <span class="kw">let </span><span class="kw-2">mut </span>stream = store.resolve(key);
 
-            <span class="kw">if</span> <span class="ident">eos</span> {
-                <span class="ident">frame</span>.<span class="ident">set_end_stream</span>(<span class="bool-val">true</span>);
+            <span class="kw">if </span>eos {
+                frame.set_end_stream(<span class="bool-val">true</span>);
             }
 
-            <span class="self">self</span>.<span class="ident">push_back_frame</span>(<span class="ident">frame</span>.<span class="ident">into</span>(), <span class="ident">buffer</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
+            <span class="self">self</span>.push_back_frame(frame.into(), buffer, <span class="kw-2">&amp;mut </span>stream);
 
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Push the frame to the front of the stream&#39;s deque, scheduling the</span>
-    <span class="doccomment">/// stream if needed.</span>
-    <span class="kw">fn</span> <span class="ident">push_back_frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>,
+    <span class="doccomment">/// Push the frame to the front of the stream&#39;s deque, scheduling the
+    /// stream if needed.
+    </span><span class="kw">fn </span>push_back_frame&lt;B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: Frame&lt;B&gt;,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        stream: <span class="kw-2">&amp;mut </span>store::Ptr,
     ) {
-        <span class="comment">// Push the frame to the front of the stream&#39;s deque</span>
-        <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">push_front</span>(<span class="ident">buffer</span>, <span class="ident">frame</span>);
+        <span class="comment">// Push the frame to the front of the stream&#39;s deque
+        </span>stream.pending_send.push_front(buffer, frame);
 
-        <span class="comment">// If needed, schedule the sender</span>
-        <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">is_empty</span>());
-            <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="ident">stream</span>);
+        <span class="comment">// If needed, schedule the sender
+        </span><span class="kw">if </span>stream.send_flow.available() &gt; <span class="number">0 </span>{
+            <span class="macro">debug_assert!</span>(!stream.pending_send.is_empty());
+            <span class="self">self</span>.pending_send.push(stream);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_queue</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;clear_queue&quot;</span>, <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+    <span class="kw">pub fn </span>clear_queue&lt;B&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;, stream: <span class="kw-2">&amp;mut </span>store::Ptr) {
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;clear_queue&quot;</span>, <span class="question-mark">?</span>stream.id);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="comment">// TODO: make this more efficient?</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">pop_front</span>(<span class="ident">buffer</span>) {
-            <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span><span class="ident">frame</span>, <span class="string">&quot;dropping&quot;</span>);
+        <span class="comment">// TODO: make this more efficient?
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(frame) = stream.pending_send.pop_front(buffer) {
+            <span class="macro">tracing::trace!</span>(<span class="question-mark">?</span>frame, <span class="string">&quot;dropping&quot;</span>);
         }
 
-        <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">InFlightData::DataFrame</span>(<span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">in_flight_data_frame</span> {
-            <span class="kw">if</span> <span class="ident">stream</span>.<span class="ident">key</span>() <span class="op">==</span> <span class="ident">key</span> {
-                <span class="comment">// This stream could get cleaned up now - don&#39;t allow the buffered frame to get reclaimed.</span>
-                <span class="self">self</span>.<span class="ident">in_flight_data_frame</span> <span class="op">=</span> <span class="ident">InFlightData::Drop</span>;
+        stream.buffered_send_data = <span class="number">0</span>;
+        stream.requested_send_capacity = <span class="number">0</span>;
+        <span class="kw">if let </span>InFlightData::DataFrame(key) = <span class="self">self</span>.in_flight_data_frame {
+            <span class="kw">if </span>stream.key() == key {
+                <span class="comment">// This stream could get cleaned up now - don&#39;t allow the buffered frame to get reclaimed.
+                </span><span class="self">self</span>.in_flight_data_frame = InFlightData::Drop;
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_pending_send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="kw">let</span> <span class="ident">is_pending_reset</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>();
-            <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="ident">is_pending_reset</span>);
+    <span class="kw">pub fn </span>clear_pending_send(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_send.pop(store) {
+            <span class="kw">let </span>is_pending_reset = stream.is_pending_reset_expiration();
+            counts.transition_after(stream, is_pending_reset);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_pending_open</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_open</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-            <span class="kw">let</span> <span class="ident">is_pending_reset</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>();
-            <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="ident">is_pending_reset</span>);
+    <span class="kw">pub fn </span>clear_pending_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = <span class="self">self</span>.pending_open.pop(store) {
+            <span class="kw">let </span>is_pending_reset = stream.is_pending_reset_expiration();
+            counts.transition_after(stream, is_pending_reset);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>,
-        <span class="ident">max_len</span>: <span class="ident">usize</span>,
-        <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
+    <span class="kw">fn </span>pop_frame&lt;B&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;Frame&lt;B&gt;&gt;,
+        store: <span class="kw-2">&amp;mut </span>Store,
+        max_len: usize,
+        counts: <span class="kw-2">&amp;mut </span>Counts,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Frame&lt;Prioritized&lt;B&gt;&gt;&gt;
+    <span class="kw">where
+        </span>B: Buf,
     {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;pop_frame&quot;</span>);
-        <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;pop_frame&quot;</span>);
+        <span class="kw">let </span>_e = span.enter();
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-                <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;popped&quot;</span>, <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">id</span>, <span class="question-mark">?</span><span class="ident">stream</span>.<span class="ident">state</span>);
-                    <span class="kw">let</span> <span class="ident">_e</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.pending_send.pop(store) {
+                <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>stream) =&gt; {
+                    <span class="kw">let </span>span = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;popped&quot;</span>, <span class="question-mark">?</span>stream.id, <span class="question-mark">?</span>stream.state);
+                    <span class="kw">let </span>_e = span.enter();
 
-                    <span class="comment">// It&#39;s possible that this stream, besides having data to send,</span>
-                    <span class="comment">// is also queued to send a reset, and thus is already in the queue</span>
-                    <span class="comment">// to wait for &quot;some time&quot; after a reset.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// To be safe, we just always ask the stream.</span>
-                    <span class="kw">let</span> <span class="ident">is_pending_reset</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">is_pending_reset_expiration</span>();
+                    <span class="comment">// It&#39;s possible that this stream, besides having data to send,
+                    // is also queued to send a reset, and thus is already in the queue
+                    // to wait for &quot;some time&quot; after a reset.
+                    //
+                    // To be safe, we just always ask the stream.
+                    </span><span class="kw">let </span>is_pending_reset = stream.is_pending_reset_expiration();
 
-                    <span class="macro">tracing::trace!</span>(<span class="ident">is_pending_reset</span>);
+                    <span class="macro">tracing::trace!</span>(is_pending_reset);
 
-                    <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">pop_front</span>(<span class="ident">buffer</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Frame::Data</span>(<span class="kw-2">mut</span> <span class="ident">frame</span>)) =&gt; {
-                            <span class="comment">// Get the amount of capacity remaining for stream&#39;s</span>
-                            <span class="comment">// window.</span>
-                            <span class="kw">let</span> <span class="ident">stream_capacity</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>();
-                            <span class="kw">let</span> <span class="ident">sz</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">remaining</span>();
+                    <span class="kw">let </span>frame = <span class="kw">match </span>stream.pending_send.pop_front(buffer) {
+                        <span class="prelude-val">Some</span>(Frame::Data(<span class="kw-2">mut </span>frame)) =&gt; {
+                            <span class="comment">// Get the amount of capacity remaining for stream&#39;s
+                            // window.
+                            </span><span class="kw">let </span>stream_capacity = stream.send_flow.available();
+                            <span class="kw">let </span>sz = frame.payload().remaining();
 
                             <span class="macro">tracing::trace!</span>(
-                                <span class="ident">sz</span>,
-                                <span class="ident">eos</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">is_end_stream</span>(),
-                                <span class="ident">window</span> <span class="op">=</span> <span class="op">%</span><span class="ident">stream_capacity</span>,
-                                <span class="ident">available</span> <span class="op">=</span> <span class="op">%</span><span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">available</span>(),
-                                <span class="ident">requested</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span>,
-                                <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">buffered_send_data</span>,
-                                <span class="string">&quot;data frame&quot;</span>
-                            );
+                                sz,
+                                eos = frame.is_end_stream(),
+                                window = %stream_capacity,
+                                available = %stream.send_flow.available(),
+                                requested = stream.requested_send_capacity,
+                                buffered = stream.buffered_send_data,
+                                <span class="string">&quot;data frame&quot;
+                            </span>);
 
-                            <span class="comment">// Zero length data frames always have capacity to</span>
-                            <span class="comment">// be sent.</span>
-                            <span class="kw">if</span> <span class="ident">sz</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">stream_capacity</span> <span class="op">==</span> <span class="number">0</span> {
+                            <span class="comment">// Zero length data frames always have capacity to
+                            // be sent.
+                            </span><span class="kw">if </span>sz &gt; <span class="number">0 </span>&amp;&amp; stream_capacity == <span class="number">0 </span>{
                                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;stream capacity is 0&quot;</span>);
 
-                                <span class="comment">// Ensure that the stream is waiting for</span>
-                                <span class="comment">// connection level capacity</span>
-                                <span class="comment">//</span>
-                                <span class="comment">// TODO: uncomment</span>
-                                <span class="comment">// debug_assert!(stream.is_pending_send_capacity);</span>
+                                <span class="comment">// Ensure that the stream is waiting for
+                                // connection level capacity
+                                //
+                                // TODO: uncomment
+                                // debug_assert!(stream.is_pending_send_capacity);
 
-                                <span class="comment">// The stream has no more capacity, this can</span>
-                                <span class="comment">// happen if the remote reduced the stream</span>
-                                <span class="comment">// window. In this case, we need to buffer the</span>
-                                <span class="comment">// frame and wait for a window update...</span>
-                                <span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">push_front</span>(<span class="ident">buffer</span>, <span class="ident">frame</span>.<span class="ident">into</span>());
+                                // The stream has no more capacity, this can
+                                // happen if the remote reduced the stream
+                                // window. In this case, we need to buffer the
+                                // frame and wait for a window update...
+                                </span>stream.pending_send.push_front(buffer, frame.into());
 
                                 <span class="kw">continue</span>;
                             }
 
-                            <span class="comment">// Only send up to the max frame length</span>
-                            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">sz</span>, <span class="ident">max_len</span>);
+                            <span class="comment">// Only send up to the max frame length
+                            </span><span class="kw">let </span>len = cmp::min(sz, max_len);
 
-                            <span class="comment">// Only send up to the stream&#39;s window capacity</span>
-                            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span>
-                                <span class="ident">cmp::min</span>(<span class="ident">len</span>, <span class="ident">stream_capacity</span>.<span class="ident">as_size</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="kw">as</span> <span class="ident">WindowSize</span>;
+                            <span class="comment">// Only send up to the stream&#39;s window capacity
+                            </span><span class="kw">let </span>len =
+                                cmp::min(len, stream_capacity.as_size() <span class="kw">as </span>usize) <span class="kw">as </span>WindowSize;
 
-                            <span class="comment">// There *must* be be enough connection level</span>
-                            <span class="comment">// capacity at this point.</span>
-                            <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">window_size</span>());
+                            <span class="comment">// There *must* be be enough connection level
+                            // capacity at this point.
+                            </span><span class="macro">debug_assert!</span>(len &lt;= <span class="self">self</span>.flow.window_size());
 
-                            <span class="macro">tracing::trace!</span>(<span class="ident">len</span>, <span class="string">&quot;sending data frame&quot;</span>);
+                            <span class="macro">tracing::trace!</span>(len, <span class="string">&quot;sending data frame&quot;</span>);
 
-                            <span class="comment">// Update the flow control</span>
-                            <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;updating stream flow&quot;</span>).<span class="ident">in_scope</span>(<span class="op">|</span><span class="op">|</span> {
-                                <span class="ident">stream</span>.<span class="ident">send_flow</span>.<span class="ident">send_data</span>(<span class="ident">len</span>);
+                            <span class="comment">// Update the flow control
+                            </span><span class="macro">tracing::trace_span!</span>(<span class="string">&quot;updating stream flow&quot;</span>).in_scope(|| {
+                                stream.send_flow.send_data(len);
 
-                                <span class="comment">// Decrement the stream&#39;s buffered data counter</span>
-                                <span class="macro">debug_assert!</span>(<span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>);
-                                <span class="ident">stream</span>.<span class="ident">buffered_send_data</span> <span class="op">-</span><span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                                <span class="ident">stream</span>.<span class="ident">requested_send_capacity</span> <span class="op">-</span><span class="op">=</span> <span class="ident">len</span>;
+                                <span class="comment">// Decrement the stream&#39;s buffered data counter
+                                </span><span class="macro">debug_assert!</span>(stream.buffered_send_data &gt;= len <span class="kw">as </span>usize);
+                                stream.buffered_send_data -= len <span class="kw">as </span>usize;
+                                stream.requested_send_capacity -= len;
 
-                                <span class="comment">// If the capacity was limited because of the</span>
-                                <span class="comment">// max_send_buffer_size, then consider waking</span>
-                                <span class="comment">// the send task again...</span>
-                                <span class="ident">stream</span>.<span class="ident">notify_if_can_buffer_more</span>(<span class="self">self</span>.<span class="ident">max_buffer_size</span>);
+                                <span class="comment">// If the capacity was limited because of the
+                                // max_send_buffer_size, then consider waking
+                                // the send task again...
+                                </span>stream.notify_if_can_buffer_more(<span class="self">self</span>.max_buffer_size);
 
-                                <span class="comment">// Assign the capacity back to the connection that</span>
-                                <span class="comment">// was just consumed from the stream in the previous</span>
-                                <span class="comment">// line.</span>
-                                <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">assign_capacity</span>(<span class="ident">len</span>);
+                                <span class="comment">// Assign the capacity back to the connection that
+                                // was just consumed from the stream in the previous
+                                // line.
+                                </span><span class="self">self</span>.flow.assign_capacity(len);
                             });
 
-                            <span class="kw">let</span> (<span class="ident">eos</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;updating connection flow&quot;</span>)
-                                .<span class="ident">in_scope</span>(<span class="op">|</span><span class="op">|</span> {
-                                    <span class="self">self</span>.<span class="ident">flow</span>.<span class="ident">send_data</span>(<span class="ident">len</span>);
+                            <span class="kw">let </span>(eos, len) = <span class="macro">tracing::trace_span!</span>(<span class="string">&quot;updating connection flow&quot;</span>)
+                                .in_scope(|| {
+                                    <span class="self">self</span>.flow.send_data(len);
 
-                                    <span class="comment">// Wrap the frame&#39;s data payload to ensure that the</span>
-                                    <span class="comment">// correct amount of data gets written.</span>
+                                    <span class="comment">// Wrap the frame&#39;s data payload to ensure that the
+                                    // correct amount of data gets written.
 
-                                    <span class="kw">let</span> <span class="ident">eos</span> <span class="op">=</span> <span class="ident">frame</span>.<span class="ident">is_end_stream</span>();
-                                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
+                                    </span><span class="kw">let </span>eos = frame.is_end_stream();
+                                    <span class="kw">let </span>len = len <span class="kw">as </span>usize;
 
-                                    <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">payload</span>().<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="ident">len</span> {
-                                        <span class="ident">frame</span>.<span class="ident">set_end_stream</span>(<span class="bool-val">false</span>);
+                                    <span class="kw">if </span>frame.payload().remaining() &gt; len {
+                                        frame.set_end_stream(<span class="bool-val">false</span>);
                                     }
-                                    (<span class="ident">eos</span>, <span class="ident">len</span>)
+                                    (eos, len)
                                 });
 
-                            <span class="ident">Frame::Data</span>(<span class="ident">frame</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">Prioritized</span> {
-                                <span class="ident">inner</span>: <span class="ident">buf</span>.<span class="ident">take</span>(<span class="ident">len</span>),
-                                <span class="ident">end_of_stream</span>: <span class="ident">eos</span>,
-                                <span class="ident">stream</span>: <span class="ident">stream</span>.<span class="ident">key</span>(),
+                            Frame::Data(frame.map(|buf| Prioritized {
+                                inner: buf.take(len),
+                                end_of_stream: eos,
+                                stream: stream.key(),
                             }))
                         }
-                        <span class="prelude-val">Some</span>(<span class="ident">Frame::PushPromise</span>(<span class="ident">pp</span>)) =&gt; {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pushed</span> <span class="op">=</span>
-                                <span class="ident">stream</span>.<span class="ident">store_mut</span>().<span class="ident">find_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pp</span>.<span class="ident">promised_id</span>()).<span class="ident">unwrap</span>();
-                            <span class="ident">pushed</span>.<span class="ident">is_pending_push</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                            <span class="comment">// Transition stream from pending_push to pending_open</span>
-                            <span class="comment">// if possible</span>
-                            <span class="kw">if</span> <span class="op">!</span><span class="ident">pushed</span>.<span class="ident">pending_send</span>.<span class="ident">is_empty</span>() {
-                                <span class="kw">if</span> <span class="ident">counts</span>.<span class="ident">can_inc_num_send_streams</span>() {
-                                    <span class="ident">counts</span>.<span class="ident">inc_num_send_streams</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pushed</span>);
-                                    <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pushed</span>);
-                                } <span class="kw">else</span> {
-                                    <span class="self">self</span>.<span class="ident">queue_open</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pushed</span>);
+                        <span class="prelude-val">Some</span>(Frame::PushPromise(pp)) =&gt; {
+                            <span class="kw">let </span><span class="kw-2">mut </span>pushed =
+                                stream.store_mut().find_mut(<span class="kw-2">&amp;</span>pp.promised_id()).unwrap();
+                            pushed.is_pending_push = <span class="bool-val">false</span>;
+                            <span class="comment">// Transition stream from pending_push to pending_open
+                            // if possible
+                            </span><span class="kw">if </span>!pushed.pending_send.is_empty() {
+                                <span class="kw">if </span>counts.can_inc_num_send_streams() {
+                                    counts.inc_num_send_streams(<span class="kw-2">&amp;mut </span>pushed);
+                                    <span class="self">self</span>.pending_send.push(<span class="kw-2">&amp;mut </span>pushed);
+                                } <span class="kw">else </span>{
+                                    <span class="self">self</span>.queue_open(<span class="kw-2">&amp;mut </span>pushed);
                                 }
                             }
-                            <span class="ident">Frame::PushPromise</span>(<span class="ident">pp</span>)
+                            Frame::PushPromise(pp)
                         }
-                        <span class="prelude-val">Some</span>(<span class="ident">frame</span>) =&gt; <span class="ident">frame</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+                        <span class="prelude-val">Some</span>(frame) =&gt; frame.map(|<span class="kw">_</span>| {
                             <span class="macro">unreachable!</span>(
                                 <span class="string">&quot;Frame::map closure will only be called \
-                                 on DATA frames.&quot;</span>
-                            )
+                                 on DATA frames.&quot;
+                            </span>)
                         }),
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reason</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">get_scheduled_reset</span>() {
-                                <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">id</span>;
-                                <span class="ident">stream</span>
-                                    .<span class="ident">state</span>
-                                    .<span class="ident">set_reset</span>(<span class="ident">stream_id</span>, <span class="ident">reason</span>, <span class="ident">Initiator::Library</span>);
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(reason) = stream.state.get_scheduled_reset() {
+                                <span class="kw">let </span>stream_id = stream.id;
+                                stream
+                                    .state
+                                    .set_reset(stream_id, reason, Initiator::Library);
 
-                                <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame::Reset::new</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="ident">reason</span>);
-                                <span class="ident">Frame::Reset</span>(<span class="ident">frame</span>)
-                            } <span class="kw">else</span> {
-                                <span class="comment">// If the stream receives a RESET from the peer, it may have</span>
-                                <span class="comment">// had data buffered to be sent, but all the frames are cleared</span>
-                                <span class="comment">// in clear_queue(). Instead of doing O(N) traversal through queue</span>
-                                <span class="comment">// to remove, lets just ignore the stream here.</span>
-                                <span class="macro">tracing::trace!</span>(<span class="string">&quot;removing dangling stream from pending_send&quot;</span>);
-                                <span class="comment">// Since this should only happen as a consequence of `clear_queue`,</span>
-                                <span class="comment">// we must be in a closed state of some kind.</span>
-                                <span class="macro">debug_assert!</span>(<span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_closed</span>());
-                                <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="ident">is_pending_reset</span>);
+                                <span class="kw">let </span>frame = frame::Reset::new(stream.id, reason);
+                                Frame::Reset(frame)
+                            } <span class="kw">else </span>{
+                                <span class="comment">// If the stream receives a RESET from the peer, it may have
+                                // had data buffered to be sent, but all the frames are cleared
+                                // in clear_queue(). Instead of doing O(N) traversal through queue
+                                // to remove, lets just ignore the stream here.
+                                </span><span class="macro">tracing::trace!</span>(<span class="string">&quot;removing dangling stream from pending_send&quot;</span>);
+                                <span class="comment">// Since this should only happen as a consequence of `clear_queue`,
+                                // we must be in a closed state of some kind.
+                                </span><span class="macro">debug_assert!</span>(stream.state.is_closed());
+                                counts.transition_after(stream, is_pending_reset);
                                 <span class="kw">continue</span>;
                             }
                         }
                     };
 
-                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;pop_frame; frame={:?}&quot;</span>, <span class="ident">frame</span>);
+                    <span class="macro">tracing::trace!</span>(<span class="string">&quot;pop_frame; frame={:?}&quot;</span>, frame);
 
-                    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) <span class="op">&amp;&amp;</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_idle</span>() {
-                        <span class="macro">debug_assert!</span>(<span class="ident">stream</span>.<span class="ident">id</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">last_opened_id</span>);
-                        <span class="self">self</span>.<span class="ident">last_opened_id</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">id</span>;
+                    <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) &amp;&amp; stream.state.is_idle() {
+                        <span class="macro">debug_assert!</span>(stream.id &gt; <span class="self">self</span>.last_opened_id);
+                        <span class="self">self</span>.last_opened_id = stream.id;
                     }
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">stream</span>.<span class="ident">pending_send</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">stream</span>.<span class="ident">state</span>.<span class="ident">is_scheduled_reset</span>() {
-                        <span class="comment">// TODO: Only requeue the sender IF it is ready to send</span>
-                        <span class="comment">// the next frame. i.e. don&#39;t requeue it if the next</span>
-                        <span class="comment">// frame is a data frame and the stream does not have</span>
-                        <span class="comment">// any more capacity.</span>
-                        <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
+                    <span class="kw">if </span>!stream.pending_send.is_empty() || stream.state.is_scheduled_reset() {
+                        <span class="comment">// TODO: Only requeue the sender IF it is ready to send
+                        // the next frame. i.e. don&#39;t requeue it if the next
+                        // frame is a data frame and the stream does not have
+                        // any more capacity.
+                        </span><span class="self">self</span>.pending_send.push(<span class="kw-2">&amp;mut </span>stream);
                     }
 
-                    <span class="ident">counts</span>.<span class="ident">transition_after</span>(<span class="ident">stream</span>, <span class="ident">is_pending_reset</span>);
+                    counts.transition_after(stream, is_pending_reset);
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(frame);
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">schedule_pending_open</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Store</span>, <span class="ident">counts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Counts</span>) {
+    <span class="kw">fn </span>schedule_pending_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;mut </span>Store, counts: <span class="kw-2">&amp;mut </span>Counts) {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;schedule_pending_open&quot;</span>);
-        <span class="comment">// check for any pending open streams</span>
-        <span class="kw">while</span> <span class="ident">counts</span>.<span class="ident">can_inc_num_send_streams</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_open</span>.<span class="ident">pop</span>(<span class="ident">store</span>) {
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;schedule_pending_open; stream={:?}&quot;</span>, <span class="ident">stream</span>.<span class="ident">id</span>);
+        <span class="comment">// check for any pending open streams
+        </span><span class="kw">while </span>counts.can_inc_num_send_streams() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>stream) = <span class="self">self</span>.pending_open.pop(store) {
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;schedule_pending_open; stream={:?}&quot;</span>, stream.id);
 
-                <span class="ident">counts</span>.<span class="ident">inc_num_send_streams</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
-                <span class="self">self</span>.<span class="ident">pending_send</span>.<span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>);
-                <span class="ident">stream</span>.<span class="ident">notify_send</span>();
-            } <span class="kw">else</span> {
+                counts.inc_num_send_streams(<span class="kw-2">&amp;mut </span>stream);
+                <span class="self">self</span>.pending_send.push(<span class="kw-2">&amp;mut </span>stream);
+                stream.notify_send();
+            } <span class="kw">else </span>{
                 <span class="kw">return</span>;
             }
         }
     }
 }
 
-<span class="comment">// ===== impl Prioritized =====</span>
+<span class="comment">// ===== impl Prioritized =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+</span><span class="kw">impl</span>&lt;B&gt; Buf <span class="kw">for </span>Prioritized&lt;B&gt;
+<span class="kw">where
+    </span>B: Buf,
 {
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">remaining</span>()
+    <span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.remaining()
     }
 
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">chunk</span>()
+    <span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.inner.chunk()
     }
 
-    <span class="kw">fn</span> <span class="ident">chunks_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">std::io::IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>)
+    <span class="kw">fn </span>chunks_vectored&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>[std::io::IoSlice&lt;<span class="lifetime">&#39;a</span>&gt;]) -&gt; usize {
+        <span class="self">self</span>.inner.chunks_vectored(dst)
     }
 
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>)
+    <span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="self">self</span>.inner.advance(cnt)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Prioritized</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Prioritized&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;remaining&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_ref</span>().<span class="ident">remaining</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;end_of_stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end_of_stream</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;B: Buf&gt; fmt::Debug <span class="kw">for </span>Prioritized&lt;B&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Prioritized&quot;</span>)
+            .field(<span class="string">&quot;remaining&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner.get_ref().remaining())
+            .field(<span class="string">&quot;end_of_stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.end_of_stream)
+            .field(<span class="string">&quot;stream&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.stream)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cursor/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cursor/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -445,452 +445,452 @@
 <span id="445">445</span>
 <span id="446">446</span>
 <span id="447">447</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">session</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>common;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>session;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::{
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="kw">use</span> <span class="ident">bson::RawDocument</span>;
+<span class="kw">use </span>bson::RawDocument;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">bson::RawDocumentBuf</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::DeserializeOwned</span>, <span class="ident">Deserialize</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>bson::RawDocumentBuf;
+<span class="kw">use </span>futures_core::{future::BoxFuture, Stream};
+<span class="kw">use </span>serde::{de::DeserializeOwned, Deserialize};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>tokio::sync::oneshot;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">change_stream::event::ResumeToken</span>,
-    <span class="ident">client::options::ServerAddress</span>,
-    <span class="ident">cmap::conn::PinnedConnectionHandle</span>,
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation::GetMore</span>,
-    <span class="ident">results::GetMoreResult</span>,
-    <span class="ident">Client</span>,
-    <span class="ident">ClientSession</span>,
+<span class="kw">use crate</span>::{
+    change_stream::event::ResumeToken,
+    client::options::ServerAddress,
+    cmap::conn::PinnedConnectionHandle,
+    error::{Error, <span class="prelude-ty">Result</span>},
+    operation::GetMore,
+    results::GetMoreResult,
+    Client,
+    ClientSession,
 };
-<span class="kw">use</span> <span class="ident">common</span>::{<span class="ident">kill_cursor</span>, <span class="ident">GenericCursor</span>, <span class="ident">GetMoreProvider</span>, <span class="ident">GetMoreProviderResult</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">common</span>::{
-    <span class="ident">stream_poll_next</span>,
-    <span class="ident">BatchValue</span>,
-    <span class="ident">CursorInformation</span>,
-    <span class="ident">CursorSpecification</span>,
-    <span class="ident">CursorStream</span>,
-    <span class="ident">NextInBatchFuture</span>,
-    <span class="ident">PinnedConnection</span>,
+<span class="kw">use </span>common::{kill_cursor, GenericCursor, GetMoreProvider, GetMoreProviderResult};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>common::{
+    stream_poll_next,
+    BatchValue,
+    CursorInformation,
+    CursorSpecification,
+    CursorStream,
+    NextInBatchFuture,
+    PinnedConnection,
 };
 
-<span class="doccomment">/// A [`Cursor`] streams the result of a query. When a query is made, the returned [`Cursor`] will</span>
-<span class="doccomment">/// contain the first batch of results from the server; the individual results will then be returned</span>
-<span class="doccomment">/// as the [`Cursor`] is iterated. When the batch is exhausted and if there are more results, the</span>
-<span class="doccomment">/// [`Cursor`] will fetch the next batch of documents, and so forth until the results are exhausted.</span>
-<span class="doccomment">/// Note that because of this batching, additional network I/O may occur on any given call to</span>
-<span class="doccomment">/// `next`. Because of this, a [`Cursor`] iterates over `Result&lt;T&gt;` items rather than</span>
-<span class="doccomment">/// simply `T` items.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The batch size of the `Cursor` can be configured using the options to the method that returns</span>
-<span class="doccomment">/// it. For example, setting the `batch_size` field of</span>
-<span class="doccomment">/// [`FindOptions`](options/struct.FindOptions.html) will set the batch size of the</span>
-<span class="doccomment">/// `Cursor` returned by [`Collection::find`](struct.Collection.html#method.find).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that the batch size determines both the number of documents stored in memory by the</span>
-<span class="doccomment">/// `Cursor` at a given time as well as the total number of network round-trips needed to fetch all</span>
-<span class="doccomment">/// results from the server; both of these factors should be taken into account when choosing the</span>
-<span class="doccomment">/// optimal batch size.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Cursor`] implements [`Stream`](https://docs.rs/futures/latest/futures/stream/trait.Stream.html), which means</span>
-<span class="doccomment">/// it can be iterated over much in the same way that an `Iterator` can be in synchronous Rust. In</span>
-<span class="doccomment">/// order to do so, the [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html) trait must</span>
-<span class="doccomment">/// be imported. Because a [`Cursor`] iterates over a `Result&lt;T&gt;`, it also has access to the</span>
-<span class="doccomment">/// potentially more ergonomic functionality provided by</span>
-<span class="doccomment">/// [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html), which can be</span>
-<span class="doccomment">/// imported instead of or in addition to</span>
-<span class="doccomment">/// [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html). The methods from</span>
-<span class="doccomment">/// [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html) are especially useful when</span>
-<span class="doccomment">/// used in conjunction with the `?` operator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use mongodb::{bson::Document, Client, error::Result};</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # async fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use futures::stream::{StreamExt, TryStreamExt};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut cursor = coll.find(None, None).await?;</span>
-<span class="doccomment">/// // regular Stream uses next() and iterates over Option&lt;Result&lt;T&gt;&gt;</span>
-<span class="doccomment">/// while let Some(doc) = cursor.next().await {</span>
-<span class="doccomment">///   println!(&quot;{}&quot;, doc?)</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// // regular Stream uses collect() and collects into a Vec&lt;Result&lt;T&gt;&gt;</span>
-<span class="doccomment">/// let v: Vec&lt;Result&lt;_&gt;&gt; = cursor.collect().await;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut cursor = coll.find(None, None).await?;</span>
-<span class="doccomment">/// // TryStream uses try_next() and iterates over Result&lt;Option&lt;T&gt;&gt;</span>
-<span class="doccomment">/// while let Some(doc) = cursor.try_next().await? {</span>
-<span class="doccomment">///   println!(&quot;{}&quot;, doc)</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// // TryStream uses try_collect() and collects into a Result&lt;Vec&lt;T&gt;&gt;</span>
-<span class="doccomment">/// let v: Vec&lt;_&gt; = cursor.try_collect().await?;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="comment">// `wrapped_cursor` is an `Option` so that it can be `None` for the `drop` impl for a cursor</span>
-    <span class="comment">// that&#39;s had `with_type` called; in all other circumstances it will be `Some`.</span>
-    <span class="ident">wrapped_cursor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ImplicitSessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">drop_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="ident">kill_watcher</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oneshot::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">_phantom</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A [`Cursor`] streams the result of a query. When a query is made, the returned [`Cursor`] will
+/// contain the first batch of results from the server; the individual results will then be returned
+/// as the [`Cursor`] is iterated. When the batch is exhausted and if there are more results, the
+/// [`Cursor`] will fetch the next batch of documents, and so forth until the results are exhausted.
+/// Note that because of this batching, additional network I/O may occur on any given call to
+/// `next`. Because of this, a [`Cursor`] iterates over `Result&lt;T&gt;` items rather than
+/// simply `T` items.
+///
+/// The batch size of the `Cursor` can be configured using the options to the method that returns
+/// it. For example, setting the `batch_size` field of
+/// [`FindOptions`](options/struct.FindOptions.html) will set the batch size of the
+/// `Cursor` returned by [`Collection::find`](struct.Collection.html#method.find).
+///
+/// Note that the batch size determines both the number of documents stored in memory by the
+/// `Cursor` at a given time as well as the total number of network round-trips needed to fetch all
+/// results from the server; both of these factors should be taken into account when choosing the
+/// optimal batch size.
+///
+/// [`Cursor`] implements [`Stream`](https://docs.rs/futures/latest/futures/stream/trait.Stream.html), which means
+/// it can be iterated over much in the same way that an `Iterator` can be in synchronous Rust. In
+/// order to do so, the [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html) trait must
+/// be imported. Because a [`Cursor`] iterates over a `Result&lt;T&gt;`, it also has access to the
+/// potentially more ergonomic functionality provided by
+/// [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html), which can be
+/// imported instead of or in addition to
+/// [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html). The methods from
+/// [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html) are especially useful when
+/// used in conjunction with the `?` operator.
+///
+/// ```rust
+/// # use mongodb::{bson::Document, Client, error::Result};
+/// #
+/// # async fn do_stuff() -&gt; Result&lt;()&gt; {
+/// # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+/// # let coll = client.database(&quot;foo&quot;).collection::&lt;Document&gt;(&quot;bar&quot;);
+/// #
+/// use futures::stream::{StreamExt, TryStreamExt};
+///
+/// let mut cursor = coll.find(None, None).await?;
+/// // regular Stream uses next() and iterates over Option&lt;Result&lt;T&gt;&gt;
+/// while let Some(doc) = cursor.next().await {
+///   println!(&quot;{}&quot;, doc?)
+/// }
+/// // regular Stream uses collect() and collects into a Vec&lt;Result&lt;T&gt;&gt;
+/// let v: Vec&lt;Result&lt;_&gt;&gt; = cursor.collect().await;
+///
+/// let mut cursor = coll.find(None, None).await?;
+/// // TryStream uses try_next() and iterates over Result&lt;Option&lt;T&gt;&gt;
+/// while let Some(doc) = cursor.try_next().await? {
+///   println!(&quot;{}&quot;, doc)
+/// }
+/// // TryStream uses try_collect() and collects into a Result&lt;Vec&lt;T&gt;&gt;
+/// let v: Vec&lt;_&gt; = cursor.try_collect().await?;
+/// #
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Cursor&lt;T&gt; {
+    client: Client,
+    <span class="comment">// `wrapped_cursor` is an `Option` so that it can be `None` for the `drop` impl for a cursor
+    // that&#39;s had `with_type` called; in all other circumstances it will be `Some`.
+    </span>wrapped_cursor: <span class="prelude-ty">Option</span>&lt;ImplicitSessionCursor&lt;T&gt;&gt;,
+    drop_address: <span class="prelude-ty">Option</span>&lt;ServerAddress&gt;,
+    <span class="attribute">#[cfg(test)]
+    </span>kill_watcher: <span class="prelude-ty">Option</span>&lt;oneshot::Sender&lt;()&gt;&gt;,
+    _phantom: std::marker::PhantomData&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">spec</span>: <span class="ident">CursorSpecification</span>,
-        <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span>,
-        <span class="ident">pin</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">ImplicitSessionGetMoreProvider::new</span>(<span class="kw-2">&amp;</span><span class="ident">spec</span>, <span class="ident">session</span>);
+<span class="kw">impl</span>&lt;T&gt; Cursor&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        client: Client,
+        spec: CursorSpecification,
+        session: <span class="prelude-ty">Option</span>&lt;ClientSession&gt;,
+        pin: <span class="prelude-ty">Option</span>&lt;PinnedConnectionHandle&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>provider = ImplicitSessionGetMoreProvider::new(<span class="kw-2">&amp;</span>spec, session);
 
-        <span class="self">Self</span> {
-            <span class="ident">client</span>: <span class="ident">client</span>.<span class="ident">clone</span>(),
-            <span class="ident">wrapped_cursor</span>: <span class="prelude-val">Some</span>(<span class="ident">ImplicitSessionCursor::new</span>(
-                <span class="ident">client</span>,
-                <span class="ident">spec</span>,
-                <span class="ident">PinnedConnection::new</span>(<span class="ident">pin</span>),
-                <span class="ident">provider</span>,
+        <span class="self">Self </span>{
+            client: client.clone(),
+            wrapped_cursor: <span class="prelude-val">Some</span>(ImplicitSessionCursor::new(
+                client,
+                spec,
+                PinnedConnection::new(pin),
+                provider,
             )),
-            <span class="ident">drop_address</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">kill_watcher</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
+            drop_address: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(test)]
+            </span>kill_watcher: <span class="prelude-val">None</span>,
+            _phantom: Default::default(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">post_batch_resume_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">post_batch_resume_token</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>post_batch_resume_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ResumeToken&gt; {
+        <span class="self">self</span>.wrapped_cursor
+            .as_ref()
+            .and_then(|c| c.post_batch_resume_token())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_exhausted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">is_exhausted</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_exhausted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.wrapped_cursor.as_ref().unwrap().is_exhausted()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Client</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>client(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Client {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.client
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">address</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ServerAddress {
+        <span class="self">self</span>.wrapped_cursor.as_ref().unwrap().address()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_drop_address</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">address</span>: <span class="ident">ServerAddress</span>) {
-        <span class="self">self</span>.<span class="ident">drop_address</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">address</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_drop_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, address: ServerAddress) {
+        <span class="self">self</span>.drop_address = <span class="prelude-val">Some</span>(address);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_implicit_session</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">provider_mut</span>().<span class="ident">take_implicit_session</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_implicit_session(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ClientSession&gt; {
+        <span class="self">self</span>.wrapped_cursor
+            .as_mut()
+            .and_then(|c| c.provider_mut().take_implicit_session())
     }
 
-    <span class="doccomment">/// Move the cursor forward, potentially triggering requests to the database for more results</span>
-    <span class="doccomment">/// if the local buffer has been exhausted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will keep requesting data from the server until either the cursor is exhausted</span>
-    <span class="doccomment">/// or batch with results in it has been received.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value indicates whether new results were successfully returned (true) or if</span>
-    <span class="doccomment">/// the cursor has been closed (false).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: [`Cursor::current`] and [`Cursor::deserialize_current`] must only be called after</span>
-    <span class="doccomment">/// [`Cursor::advance`] returned `Ok(true)`. It is an error to call either of them without</span>
-    <span class="doccomment">/// calling [`Cursor::advance`] first or after [`Cursor::advance`] returns an error / false.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use mongodb::{Client, bson::Document, error::Result};</span>
-    <span class="doccomment">/// # async fn foo() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;stuff&quot;).collection::&lt;Document&gt;(&quot;stuff&quot;);</span>
-    <span class="doccomment">/// let mut cursor = coll.find(None, None).await?;</span>
-    <span class="doccomment">/// while cursor.advance().await? {</span>
-    <span class="doccomment">///     println!(&quot;{:?}&quot;, cursor.current());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">advance</span>().<span class="kw">await</span>
+    <span class="doccomment">/// Move the cursor forward, potentially triggering requests to the database for more results
+    /// if the local buffer has been exhausted.
+    ///
+    /// This will keep requesting data from the server until either the cursor is exhausted
+    /// or batch with results in it has been received.
+    ///
+    /// The return value indicates whether new results were successfully returned (true) or if
+    /// the cursor has been closed (false).
+    ///
+    /// Note: [`Cursor::current`] and [`Cursor::deserialize_current`] must only be called after
+    /// [`Cursor::advance`] returned `Ok(true)`. It is an error to call either of them without
+    /// calling [`Cursor::advance`] first or after [`Cursor::advance`] returns an error / false.
+    ///
+    /// ```
+    /// # use mongodb::{Client, bson::Document, error::Result};
+    /// # async fn foo() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;
+    /// # let coll = client.database(&quot;stuff&quot;).collection::&lt;Document&gt;(&quot;stuff&quot;);
+    /// let mut cursor = coll.find(None, None).await?;
+    /// while cursor.advance().await? {
+    ///     println!(&quot;{:?}&quot;, cursor.current());
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="self">self</span>.wrapped_cursor.as_mut().unwrap().advance().<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Returns a reference to the current result in the cursor.
+    ///
+    /// # Panics
+    /// [`Cursor::advance`] must return `Ok(true)` before [`Cursor::current`] can be
+    /// invoked. Calling [`Cursor::current`] after [`Cursor::advance`] does not return true
+    /// or without calling [`Cursor::advance`] at all may result in a panic.
+    ///
+    /// ```
+    /// # use mongodb::{Client, bson::Document, error::Result};
+    /// # async fn foo() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;
+    /// # let coll = client.database(&quot;stuff&quot;).collection::&lt;Document&gt;(&quot;stuff&quot;);
+    /// let mut cursor = coll.find(None, None).await?;
+    /// while cursor.advance().await? {
+    ///     println!(&quot;{:?}&quot;, cursor.current());
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RawDocument {
+        <span class="self">self</span>.wrapped_cursor.as_ref().unwrap().current().unwrap()
     }
 
-    <span class="doccomment">/// Returns a reference to the current result in the cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// [`Cursor::advance`] must return `Ok(true)` before [`Cursor::current`] can be</span>
-    <span class="doccomment">/// invoked. Calling [`Cursor::current`] after [`Cursor::advance`] does not return true</span>
-    <span class="doccomment">/// or without calling [`Cursor::advance`] at all may result in a panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use mongodb::{Client, bson::Document, error::Result};</span>
-    <span class="doccomment">/// # async fn foo() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;</span>
-    <span class="doccomment">/// # let coll = client.database(&quot;stuff&quot;).collection::&lt;Document&gt;(&quot;stuff&quot;);</span>
-    <span class="doccomment">/// let mut cursor = coll.find(None, None).await?;</span>
-    <span class="doccomment">/// while cursor.advance().await? {</span>
-    <span class="doccomment">///     println!(&quot;{:?}&quot;, cursor.current());</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">current</span>().<span class="ident">unwrap</span>()
-    }
-
-    <span class="doccomment">/// Deserialize the current result to the generic type associated with this cursor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// [`Cursor::advance`] must return `Ok(true)` before [`Cursor::deserialize_current`] can be</span>
-    <span class="doccomment">/// invoked. Calling [`Cursor::deserialize_current`] after [`Cursor::advance`] does not return</span>
-    <span class="doccomment">/// true or without calling [`Cursor::advance`] at all may result in a panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use mongodb::{Client, error::Result};</span>
-    <span class="doccomment">/// # async fn foo() -&gt; Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;</span>
-    <span class="doccomment">/// # let db = client.database(&quot;foo&quot;);</span>
-    <span class="doccomment">/// use serde::Deserialize;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[derive(Debug, Deserialize)]</span>
-    <span class="doccomment">/// struct Cat&lt;&#39;a&gt; {</span>
-    <span class="doccomment">///     #[serde(borrow)]</span>
-    <span class="doccomment">///     name: &amp;&#39;a str</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let coll = db.collection::&lt;Cat&gt;(&quot;cat&quot;);</span>
-    <span class="doccomment">/// let mut cursor = coll.find(None, None).await?;</span>
-    <span class="doccomment">/// while cursor.advance().await? {</span>
-    <span class="doccomment">///     println!(&quot;{:?}&quot;, cursor.deserialize_current()?);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_current</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserialize the current result to the generic type associated with this cursor.
+    ///
+    /// # Panics
+    /// [`Cursor::advance`] must return `Ok(true)` before [`Cursor::deserialize_current`] can be
+    /// invoked. Calling [`Cursor::deserialize_current`] after [`Cursor::advance`] does not return
+    /// true or without calling [`Cursor::advance`] at all may result in a panic.
+    ///
+    /// ```
+    /// # use mongodb::{Client, error::Result};
+    /// # async fn foo() -&gt; Result&lt;()&gt; {
+    /// # let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;).await?;
+    /// # let db = client.database(&quot;foo&quot;);
+    /// use serde::Deserialize;
+    ///
+    /// #[derive(Debug, Deserialize)]
+    /// struct Cat&lt;&#39;a&gt; {
+    ///     #[serde(borrow)]
+    ///     name: &amp;&#39;a str
+    /// }
+    ///
+    /// let coll = db.collection::&lt;Cat&gt;(&quot;cat&quot;);
+    /// let mut cursor = coll.find(None, None).await?;
+    /// while cursor.advance().await? {
+    ///     println!(&quot;{:?}&quot;, cursor.deserialize_current()?);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>deserialize_current&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;
+    <span class="kw">where
+        </span>T: Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">bson::from_slice</span>(<span class="self">self</span>.<span class="ident">current</span>().<span class="ident">as_bytes</span>()).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
+        bson::from_slice(<span class="self">self</span>.current().as_bytes()).map_err(Error::from)
     }
 
-    <span class="doccomment">/// Update the type streamed values will be parsed as.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Update the type streamed values will be parsed as.
+    </span><span class="kw">pub fn </span>with_type&lt;<span class="lifetime">&#39;a</span>, D&gt;(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Cursor&lt;D&gt;
+    <span class="kw">where
+        </span>D: Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">Cursor</span> {
-            <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(),
-            <span class="ident">wrapped_cursor</span>: <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">with_type</span>()),
-            <span class="ident">drop_address</span>: <span class="self">self</span>.<span class="ident">drop_address</span>.<span class="ident">take</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="ident">kill_watcher</span>: <span class="self">self</span>.<span class="ident">kill_watcher</span>.<span class="ident">take</span>(),
-            <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
+        Cursor {
+            client: <span class="self">self</span>.client.clone(),
+            wrapped_cursor: <span class="self">self</span>.wrapped_cursor.take().map(|c| c.with_type()),
+            drop_address: <span class="self">self</span>.drop_address.take(),
+            <span class="attribute">#[cfg(test)]
+            </span>kill_watcher: <span class="self">self</span>.kill_watcher.take(),
+            _phantom: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Some tests need to be able to observe the events generated by `killCommand` execution;</span>
-    <span class="doccomment">/// however, because that happens asynchronously on `drop`, the test runner can conclude before</span>
-    <span class="doccomment">/// the event is published.  To fix that, tests can set a &quot;kill watcher&quot; on cursors - a</span>
-    <span class="doccomment">/// one-shot channel with a `()` value pushed after `killCommand` is run that the test can wait</span>
-    <span class="doccomment">/// on.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_kill_watcher</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx</span>: <span class="ident">oneshot::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) {
+    <span class="doccomment">/// Some tests need to be able to observe the events generated by `killCommand` execution;
+    /// however, because that happens asynchronously on `drop`, the test runner can conclude before
+    /// the event is published.  To fix that, tests can set a &quot;kill watcher&quot; on cursors - a
+    /// one-shot channel with a `()` value pushed after `killCommand` is run that the test can wait
+    /// on.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_kill_watcher(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tx: oneshot::Sender&lt;()&gt;) {
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">kill_watcher</span>.<span class="ident">is_none</span>(),
-            <span class="string">&quot;cursor already has a kill_watcher&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">kill_watcher</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
+            <span class="self">self</span>.kill_watcher.is_none(),
+            <span class="string">&quot;cursor already has a kill_watcher&quot;
+        </span>);
+        <span class="self">self</span>.kill_watcher = <span class="prelude-val">Some</span>(tx);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">current_batch</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current_batch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>VecDeque&lt;RawDocumentBuf&gt; {
+        <span class="self">self</span>.wrapped_cursor.as_ref().unwrap().current_batch()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CursorStream</span> <span class="kw">for</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; CursorStream <span class="kw">for </span>Cursor&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">fn</span> <span class="ident">poll_next_in_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BatchValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">poll_next_in_batch</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next_in_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;BatchValue&gt;&gt; {
+        <span class="self">self</span>.wrapped_cursor.as_mut().unwrap().poll_next_in_batch(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+<span class="kw">impl</span>&lt;T&gt; Stream <span class="kw">for </span>Cursor&lt;T&gt;
+<span class="kw">where
+    </span>T: DeserializeOwned + Unpin + Send + Sync,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// This `unwrap` is safe because `wrapped_cursor` is always `Some` outside of `drop`.</span>
-        <span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">wrapped_cursor</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_next</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="comment">// This `unwrap` is safe because `wrapped_cursor` is always `Some` outside of `drop`.
+        </span>Pin::new(<span class="self">self</span>.wrapped_cursor.as_mut().unwrap()).poll_next(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">wrapped_cursor</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">wrapped_cursor</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Cursor&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>wrapped_cursor = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.wrapped_cursor {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
+            <span class="prelude-val">Some</span>(c) =&gt; c,
         };
-        <span class="kw">if</span> <span class="ident">wrapped_cursor</span>.<span class="ident">is_exhausted</span>() {
+        <span class="kw">if </span>wrapped_cursor.is_exhausted() {
             <span class="kw">return</span>;
         }
 
-        <span class="ident">kill_cursor</span>(
-            <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>(),
-            <span class="ident">wrapped_cursor</span>.<span class="ident">namespace</span>(),
-            <span class="ident">wrapped_cursor</span>.<span class="ident">id</span>(),
-            <span class="ident">wrapped_cursor</span>.<span class="ident">pinned_connection</span>().<span class="ident">replicate</span>(),
-            <span class="self">self</span>.<span class="ident">drop_address</span>.<span class="ident">take</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="self">self</span>.<span class="ident">kill_watcher</span>.<span class="ident">take</span>(),
+        kill_cursor(
+            <span class="self">self</span>.client.clone(),
+            wrapped_cursor.namespace(),
+            wrapped_cursor.id(),
+            wrapped_cursor.pinned_connection().replicate(),
+            <span class="self">self</span>.drop_address.take(),
+            <span class="attribute">#[cfg(test)]
+            </span><span class="self">self</span>.kill_watcher.take(),
         );
     }
 }
 
-<span class="doccomment">/// A `GenericCursor` that optionally owns its own sessions.</span>
-<span class="doccomment">/// This is to be used by cursors associated with implicit sessions.</span>
-<span class="kw">type</span> <span class="ident">ImplicitSessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">ImplicitSessionGetMoreProvider</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `GenericCursor` that optionally owns its own sessions.
+/// This is to be used by cursors associated with implicit sessions.
+</span><span class="kw">type </span>ImplicitSessionCursor&lt;T&gt; = GenericCursor&lt;ImplicitSessionGetMoreProvider, T&gt;;
 
-<span class="kw">struct</span> <span class="ident">ImplicitSessionGetMoreResult</span> {
-    <span class="ident">get_more_result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span>,
-    <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>ImplicitSessionGetMoreResult {
+    get_more_result: <span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;,
+    session: <span class="prelude-ty">Option</span>&lt;Box&lt;ClientSession&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">GetMoreProviderResult</span> <span class="kw">for</span> <span class="ident">ImplicitSessionGetMoreResult</span> {
-    <span class="kw">type</span> <span class="ident">Session</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>GetMoreProviderResult <span class="kw">for </span>ImplicitSessionGetMoreResult {
+    <span class="kw">type </span>Session = <span class="prelude-ty">Option</span>&lt;Box&lt;ClientSession&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GetMoreResult</span>, <span class="kw-2">&amp;</span><span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_more_result</span>.<span class="ident">as_ref</span>()
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::result::Result&lt;<span class="kw-2">&amp;</span>GetMoreResult, <span class="kw-2">&amp;</span>Error&gt; {
+        <span class="self">self</span>.get_more_result.as_ref()
     }
 
-    <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Session</span>) {
-        (<span class="self">self</span>.<span class="ident">get_more_result</span>, <span class="self">self</span>.<span class="ident">session</span>)
-    }
-}
-
-<span class="doccomment">/// A `GetMoreProvider` that optionally owns its own session.</span>
-<span class="doccomment">/// This is to be used with cursors associated with implicit sessions.</span>
-<span class="kw">enum</span> <span class="ident">ImplicitSessionGetMoreProvider</span> {
-    <span class="ident">Executing</span>(<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">ImplicitSessionGetMoreResult</span><span class="op">&gt;</span>),
-    <span class="ident">Idle</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Done</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ImplicitSessionGetMoreProvider</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">CursorSpecification</span>, <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">map</span>(<span class="ident">Box::new</span>);
-        <span class="kw">if</span> <span class="ident">spec</span>.<span class="ident">id</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident"><span class="self">Self</span>::Done</span>
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::Idle</span>(<span class="ident">session</span>)
-        }
-    }
-
-    <span class="doccomment">/// Extract the stored implicit session, if any.  The provider cannot be started again after</span>
-    <span class="doccomment">/// this call.</span>
-    <span class="kw">fn</span> <span class="ident">take_implicit_session</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ImplicitSessionGetMoreProvider::Idle</span>(<span class="ident">session</span>) =&gt; <span class="ident">session</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
+    <span class="kw">fn </span>into_parts(<span class="self">self</span>) -&gt; (<span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;, <span class="self">Self</span>::Session) {
+        (<span class="self">self</span>.get_more_result, <span class="self">self</span>.session)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GetMoreProvider</span> <span class="kw">for</span> <span class="ident">ImplicitSessionGetMoreProvider</span> {
-    <span class="kw">type</span> <span class="ident">ResultType</span> <span class="op">=</span> <span class="ident">ImplicitSessionGetMoreResult</span>;
-    <span class="kw">type</span> <span class="ident">GetMoreFuture</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">ImplicitSessionGetMoreResult</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `GetMoreProvider` that optionally owns its own session.
+/// This is to be used with cursors associated with implicit sessions.
+</span><span class="kw">enum </span>ImplicitSessionGetMoreProvider {
+    Executing(BoxFuture&lt;<span class="lifetime">&#39;static</span>, ImplicitSessionGetMoreResult&gt;),
+    Idle(<span class="prelude-ty">Option</span>&lt;Box&lt;ClientSession&gt;&gt;),
+    Done,
+}
 
-    <span class="kw">fn</span> <span class="ident">executing_future</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::GetMoreFuture</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Executing</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">future</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">future</span>),
-            <span class="ident"><span class="self">Self</span>::Idle</span> { .. } <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Done</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ImplicitSessionGetMoreProvider {
+    <span class="kw">fn </span>new(spec: <span class="kw-2">&amp;</span>CursorSpecification, session: <span class="prelude-ty">Option</span>&lt;ClientSession&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>session = session.map(Box::new);
+        <span class="kw">if </span>spec.id() == <span class="number">0 </span>{
+            <span class="self">Self</span>::Done
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::Idle(session)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_execution</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">exhausted</span>: <span class="ident">bool</span>) {
-        <span class="comment">// If cursor is exhausted, immediately return implicit session to the pool.</span>
-        <span class="kw">if</span> <span class="ident">exhausted</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Done</span>;
-        } <span class="kw">else</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Idle</span>(<span class="ident">session</span>);
+    <span class="doccomment">/// Extract the stored implicit session, if any.  The provider cannot be started again after
+    /// this call.
+    </span><span class="kw">fn </span>take_implicit_session(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ClientSession&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ImplicitSessionGetMoreProvider::Idle(session) =&gt; session.take().map(|s| <span class="kw-2">*</span>s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>GetMoreProvider <span class="kw">for </span>ImplicitSessionGetMoreProvider {
+    <span class="kw">type </span>ResultType = ImplicitSessionGetMoreResult;
+    <span class="kw">type </span>GetMoreFuture = BoxFuture&lt;<span class="lifetime">&#39;static</span>, ImplicitSessionGetMoreResult&gt;;
+
+    <span class="kw">fn </span>executing_future(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::GetMoreFuture&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Executing(<span class="kw-2">ref mut </span>future) =&gt; <span class="prelude-val">Some</span>(future),
+            <span class="self">Self</span>::Idle { .. } | <span class="self">Self</span>::Done =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">start_execution</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">info</span>: <span class="ident">CursorInformation</span>,
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">pinned_connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>clear_execution(<span class="kw-2">&amp;mut </span><span class="self">self</span>, session: <span class="prelude-ty">Option</span>&lt;Box&lt;ClientSession&gt;&gt;, exhausted: bool) {
+        <span class="comment">// If cursor is exhausted, immediately return implicit session to the pool.
+        </span><span class="kw">if </span>exhausted {
+            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::Done;
+        } <span class="kw">else </span>{
+            <span class="kw-2">*</span><span class="self">self </span>= <span class="self">Self</span>::Idle(session);
+        }
+    }
+
+    <span class="kw">fn </span>start_execution(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        info: CursorInformation,
+        client: Client,
+        pinned_connection: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt;,
     ) {
-        <span class="ident">take_mut::take</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">self_</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">self_</span> {
-            <span class="ident"><span class="self">Self</span>::Idle</span>(<span class="kw-2">mut</span> <span class="ident">session</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">pinned_connection</span> <span class="op">=</span> <span class="ident">pinned_connection</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">replicate</span>());
-                <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">get_more</span> <span class="op">=</span> <span class="ident">GetMore::new</span>(<span class="ident">info</span>, <span class="ident">pinned_connection</span>.<span class="ident">as_ref</span>());
-                    <span class="kw">let</span> <span class="ident">get_more_result</span> <span class="op">=</span> <span class="ident">client</span>
-                        .<span class="ident">execute_operation</span>(<span class="ident">get_more</span>, <span class="ident">session</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">as_mut</span>()))
+        take_mut::take(<span class="self">self</span>, |self_| <span class="kw">match </span>self_ {
+            <span class="self">Self</span>::Idle(<span class="kw-2">mut </span>session) =&gt; {
+                <span class="kw">let </span>pinned_connection = pinned_connection.map(|c| c.replicate());
+                <span class="kw">let </span>future = Box::pin(<span class="kw">async move </span>{
+                    <span class="kw">let </span>get_more = GetMore::new(info, pinned_connection.as_ref());
+                    <span class="kw">let </span>get_more_result = client
+                        .execute_operation(get_more, session.as_mut().map(|b| b.as_mut()))
                         .<span class="kw">await</span>;
-                    <span class="ident">ImplicitSessionGetMoreResult</span> {
-                        <span class="ident">get_more_result</span>,
-                        <span class="ident">session</span>,
+                    ImplicitSessionGetMoreResult {
+                        get_more_result,
+                        session,
                     }
                 });
-                <span class="ident"><span class="self">Self</span>::Executing</span>(<span class="ident">future</span>)
+                <span class="self">Self</span>::Executing(future)
             }
-            <span class="ident"><span class="self">Self</span>::Executing</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Done</span> =&gt; <span class="ident">self_</span>,
+            <span class="self">Self</span>::Executing(<span class="kw">_</span>) | <span class="self">Self</span>::Done =&gt; self_,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">info</span>: <span class="ident">CursorInformation</span>,
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">pinned_connection</span>: <span class="ident">PinnedConnection</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Idle</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">let</span> <span class="ident">get_more</span> <span class="op">=</span> <span class="ident">GetMore::new</span>(<span class="ident">info</span>, <span class="ident">pinned_connection</span>.<span class="ident">handle</span>());
-                <span class="kw">let</span> <span class="ident">get_more_result</span> <span class="op">=</span> <span class="ident">client</span>
-                    .<span class="ident">execute_operation</span>(<span class="ident">get_more</span>, <span class="ident">session</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">as_mut</span>()))
+    <span class="kw">fn </span>execute(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        info: CursorInformation,
+        client: Client,
+        pinned_connection: PinnedConnection,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Idle(<span class="kw-2">ref mut </span>session) =&gt; Box::pin(<span class="kw">async move </span>{
+                <span class="kw">let </span>get_more = GetMore::new(info, pinned_connection.handle());
+                <span class="kw">let </span>get_more_result = client
+                    .execute_operation(get_more, session.as_mut().map(|b| b.as_mut()))
                     .<span class="kw">await</span>;
-                <span class="ident">get_more_result</span>
+                get_more_result
             }),
-            <span class="ident"><span class="self">Self</span>::Executing</span>(<span class="ident">_fut</span>) =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">Error::internal</span>(
+            <span class="self">Self</span>::Executing(_fut) =&gt; Box::pin(<span class="kw">async </span>{
+                <span class="prelude-val">Err</span>(Error::internal(
                     <span class="string">&quot;streaming the cursor was cancelled while a request was in progress and must \
                      be continued before iterating manually&quot;</span>,
                 ))
             }),
-            <span class="ident"><span class="self">Self</span>::Done</span> =&gt; {
-                <span class="comment">// this should never happen</span>
-                <span class="ident">Box::pin</span>(<span class="kw">async</span> { <span class="prelude-val">Err</span>(<span class="ident">Error::internal</span>(<span class="string">&quot;cursor iterated after already exhausted&quot;</span>)) })
+            <span class="self">Self</span>::Done =&gt; {
+                <span class="comment">// this should never happen
+                </span>Box::pin(<span class="kw">async </span>{ <span class="prelude-val">Err</span>(Error::internal(<span class="string">&quot;cursor iterated after already exhausted&quot;</span>)) })
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/document.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/document.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>document.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -584,591 +584,591 @@
 <span id="584">584</span>
 <span id="585">585</span>
 <span id="586">586</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    borrow::Cow,
+    convert::{TryFrom, TryInto},
 };
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeMap</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{ser::SerializeMap, Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">de::MIN_BSON_DOCUMENT_SIZE</span>,
-    <span class="ident">raw</span>::{<span class="ident">error::ErrorKind</span>, <span class="ident">serde::OwnedOrBorrowedRawDocument</span>, <span class="ident">RAW_DOCUMENT_NEWTYPE</span>},
-    <span class="ident">DateTime</span>,
-    <span class="ident">Timestamp</span>,
+<span class="kw">use crate</span>::{
+    de::MIN_BSON_DOCUMENT_SIZE,
+    raw::{error::ErrorKind, serde::OwnedOrBorrowedRawDocument, RAW_DOCUMENT_NEWTYPE},
+    DateTime,
+    Timestamp,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">error</span>::{<span class="ident">ValueAccessError</span>, <span class="ident">ValueAccessErrorKind</span>, <span class="ident">ValueAccessResult</span>},
-    <span class="ident">i32_from_slice</span>,
-    <span class="ident">Error</span>,
-    <span class="ident">Iter</span>,
-    <span class="ident">RawArray</span>,
-    <span class="ident">RawBinaryRef</span>,
-    <span class="ident">RawBsonRef</span>,
-    <span class="ident">RawDocumentBuf</span>,
-    <span class="ident">RawRegexRef</span>,
+<span class="kw">use super</span>::{
+    error::{ValueAccessError, ValueAccessErrorKind, ValueAccessResult},
+    i32_from_slice,
+    Error,
+    Iter,
+    RawArray,
+    RawBinaryRef,
+    RawBsonRef,
+    RawDocumentBuf,
+    RawRegexRef,
     <span class="prelude-ty">Result</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">spec::ElementType</span>, <span class="ident">Document</span>};
+<span class="kw">use crate</span>::{oid::ObjectId, spec::ElementType, Document};
 
-<span class="doccomment">/// A slice of a BSON document (akin to [`std::str`]). This can be created from a</span>
-<span class="doccomment">/// [`RawDocumentBuf`] or any type that contains valid BSON data, including static binary literals,</span>
-<span class="doccomment">/// [Vec&lt;u8&gt;](std::vec::Vec), or arrays.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is an _unsized_ type, meaning that it must always be used behind a pointer like `&amp;`. For an</span>
-<span class="doccomment">/// owned version of this type, see [`RawDocumentBuf`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Accessing elements within a [`RawDocument`] is similar to element access in [`crate::Document`],</span>
-<span class="doccomment">/// but because the contents are parsed during iteration instead of at creation time, format errors</span>
-<span class="doccomment">/// can happen at any time during use.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Iterating over a [`RawDocument`] yields either an error or a key-value pair that borrows from</span>
-<span class="doccomment">/// the original document without making any additional allocations.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use bson::raw::{Error};</span>
-<span class="doccomment">/// use bson::raw::RawDocument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = RawDocument::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;)?;</span>
-<span class="doccomment">/// let mut iter = doc.into_iter();</span>
-<span class="doccomment">/// let (key, value) = iter.next().unwrap()?;</span>
-<span class="doccomment">/// assert_eq!(key, &quot;hi&quot;);</span>
-<span class="doccomment">/// assert_eq!(value.as_str(), Some(&quot;y&#39;all&quot;));</span>
-<span class="doccomment">/// assert!(iter.next().is_none());</span>
-<span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Individual elements can be accessed using [`RawDocument::get`] or any of</span>
-<span class="doccomment">/// the type-specific getters, such as [`RawDocument::get_object_id`] or</span>
-<span class="doccomment">/// [`RawDocument::get_str`]. Note that accessing elements is an O(N) operation, as it</span>
-<span class="doccomment">/// requires iterating through the document from the beginning to find the requested key.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bson::raw::RawDocument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = RawDocument::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;)?;</span>
-<span class="doccomment">/// assert_eq!(doc.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawDocument</span> {
-    <span class="ident">data</span>: [<span class="ident">u8</span>],
+<span class="doccomment">/// A slice of a BSON document (akin to [`std::str`]). This can be created from a
+/// [`RawDocumentBuf`] or any type that contains valid BSON data, including static binary literals,
+/// [Vec&lt;u8&gt;](std::vec::Vec), or arrays.
+///
+/// This is an _unsized_ type, meaning that it must always be used behind a pointer like `&amp;`. For an
+/// owned version of this type, see [`RawDocumentBuf`].
+///
+/// Accessing elements within a [`RawDocument`] is similar to element access in [`crate::Document`],
+/// but because the contents are parsed during iteration instead of at creation time, format errors
+/// can happen at any time during use.
+///
+/// Iterating over a [`RawDocument`] yields either an error or a key-value pair that borrows from
+/// the original document without making any additional allocations.
+/// ```
+/// # use bson::raw::{Error};
+/// use bson::raw::RawDocument;
+///
+/// let doc = RawDocument::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;)?;
+/// let mut iter = doc.into_iter();
+/// let (key, value) = iter.next().unwrap()?;
+/// assert_eq!(key, &quot;hi&quot;);
+/// assert_eq!(value.as_str(), Some(&quot;y&#39;all&quot;));
+/// assert!(iter.next().is_none());
+/// # Ok::&lt;(), Error&gt;(())
+/// ```
+///
+/// Individual elements can be accessed using [`RawDocument::get`] or any of
+/// the type-specific getters, such as [`RawDocument::get_object_id`] or
+/// [`RawDocument::get_str`]. Note that accessing elements is an O(N) operation, as it
+/// requires iterating through the document from the beginning to find the requested key.
+///
+/// ```
+/// use bson::raw::RawDocument;
+///
+/// let doc = RawDocument::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;)?;
+/// assert_eq!(doc.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="attribute">#[derive(PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>RawDocument {
+    data: [u8],
 }
 
-<span class="kw">impl</span> <span class="ident">RawDocument</span> {
-    <span class="doccomment">/// Constructs a new [`RawDocument`], validating _only_ the</span>
-    <span class="doccomment">/// following invariants:</span>
-    <span class="doccomment">///   * `data` is at least five bytes long (the minimum for a valid BSON document)</span>
-    <span class="doccomment">///   * the initial four bytes of `data` accurately represent the length of the bytes as</span>
-    <span class="doccomment">///     required by the BSON spec.</span>
-    <span class="doccomment">///   * the last byte of `data` is a 0</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the internal structure of the bytes representing the</span>
-    <span class="doccomment">/// BSON elements is _not_ validated at all by this method. If the</span>
-    <span class="doccomment">/// bytes do not conform to the BSON spec, then method calls on</span>
-    <span class="doccomment">/// the [`RawDocument`] will return Errors where appropriate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::raw::RawDocument;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = RawDocument::from_bytes(b&quot;\x05\0\0\0\0&quot;)?;</span>
-    <span class="doccomment">/// # Ok::&lt;(), bson::raw::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>();
+<span class="kw">impl </span>RawDocument {
+    <span class="doccomment">/// Constructs a new [`RawDocument`], validating _only_ the
+    /// following invariants:
+    ///   * `data` is at least five bytes long (the minimum for a valid BSON document)
+    ///   * the initial four bytes of `data` accurately represent the length of the bytes as
+    ///     required by the BSON spec.
+    ///   * the last byte of `data` is a 0
+    ///
+    /// Note that the internal structure of the bytes representing the
+    /// BSON elements is _not_ validated at all by this method. If the
+    /// bytes do not conform to the BSON spec, then method calls on
+    /// the [`RawDocument`] will return Errors where appropriate.
+    ///
+    /// ```
+    /// use bson::raw::RawDocument;
+    ///
+    /// let doc = RawDocument::from_bytes(b&quot;\x05\0\0\0\0&quot;)?;
+    /// # Ok::&lt;(), bson::raw::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>from_bytes&lt;D: AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized&gt;(data: <span class="kw-2">&amp;</span>D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>RawDocument&gt; {
+        <span class="kw">let </span>data = data.as_ref();
 
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">5</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span> {
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;document too short&quot;</span>.<span class="ident">into</span>(),
+        <span class="kw">if </span>data.len() &lt; <span class="number">5 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error {
+                key: <span class="prelude-val">None</span>,
+                kind: ErrorKind::MalformedValue {
+                    message: <span class="string">&quot;document too short&quot;</span>.into(),
                 },
             });
         }
 
-        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>length = i32_from_slice(data)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">!</span><span class="op">=</span> <span class="ident">length</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span> {
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;document length incorrect&quot;</span>.<span class="ident">into</span>(),
+        <span class="kw">if </span>data.len() <span class="kw">as </span>i32 != length {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error {
+                key: <span class="prelude-val">None</span>,
+                kind: ErrorKind::MalformedValue {
+                    message: <span class="string">&quot;document length incorrect&quot;</span>.into(),
                 },
             });
         }
 
-        <span class="kw">if</span> <span class="ident">data</span>[<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span> {
-                <span class="ident">key</span>: <span class="prelude-val">None</span>,
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::MalformedValue</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;document not null-terminated&quot;</span>.<span class="ident">into</span>(),
+        <span class="kw">if </span>data[data.len() - <span class="number">1</span>] != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error {
+                key: <span class="prelude-val">None</span>,
+                kind: ErrorKind::MalformedValue {
+                    message: <span class="string">&quot;document not null-terminated&quot;</span>.into(),
                 },
             });
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RawDocument::new_unchecked</span>(<span class="ident">data</span>))
+        <span class="prelude-val">Ok</span>(RawDocument::new_unchecked(data))
     }
 
-    <span class="doccomment">/// Creates a new `RawDocument` referencing the provided data slice.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_unchecked</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> {
-        <span class="comment">// SAFETY:</span>
-        <span class="comment">//</span>
-        <span class="comment">// Dereferencing a raw pointer requires unsafe due to the potential that the pointer is</span>
-        <span class="comment">// null, dangling, or misaligned. We know the pointer is not null or dangling due to the</span>
-        <span class="comment">// fact that it&#39;s created by a safe reference. Converting &amp;[u8] to *const [u8] will be</span>
-        <span class="comment">// properly aligned due to them being references to the same type, and converting *const</span>
-        <span class="comment">// [u8] to *const RawDocument is aligned due to the fact that the only field in a</span>
-        <span class="comment">// RawDocument is a [u8] and it is #[repr(transparent), meaning the structs are represented</span>
-        <span class="comment">// identically at the byte level.</span>
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">RawDocument</span>) }
+    <span class="doccomment">/// Creates a new `RawDocument` referencing the provided data slice.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_unchecked&lt;D: AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized&gt;(data: <span class="kw-2">&amp;</span>D) -&gt; <span class="kw-2">&amp;</span>RawDocument {
+        <span class="comment">// SAFETY:
+        //
+        // Dereferencing a raw pointer requires unsafe due to the potential that the pointer is
+        // null, dangling, or misaligned. We know the pointer is not null or dangling due to the
+        // fact that it&#39;s created by a safe reference. Converting &amp;[u8] to *const [u8] will be
+        // properly aligned due to them being references to the same type, and converting *const
+        // [u8] to *const RawDocument is aligned due to the fact that the only field in a
+        // RawDocument is a [u8] and it is #[repr(transparent), meaning the structs are represented
+        // identically at the byte level.
+        </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(data.as_ref() <span class="kw">as </span><span class="kw-2">*const </span>[u8] <span class="kw">as </span><span class="kw-2">*const </span>RawDocument) }
     }
 
-    <span class="doccomment">/// Creates a new [`RawDocumentBuf`] with an owned copy of the BSON bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::raw::{RawDocument, RawDocumentBuf, Error};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let data = b&quot;\x05\0\0\0\0&quot;;</span>
-    <span class="doccomment">/// let doc_ref = RawDocument::from_bytes(data)?;</span>
-    <span class="doccomment">/// let doc: RawDocumentBuf = doc_ref.to_raw_document_buf();</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_raw_document_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawDocumentBuf</span> {
-        <span class="comment">// unwrap is ok here because we already verified the bytes in `RawDocumentRef::new`</span>
-        <span class="ident">RawDocumentBuf::from_bytes</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Creates a new [`RawDocumentBuf`] with an owned copy of the BSON bytes.
+    ///
+    /// ```
+    /// use bson::raw::{RawDocument, RawDocumentBuf, Error};
+    ///
+    /// let data = b&quot;\x05\0\0\0\0&quot;;
+    /// let doc_ref = RawDocument::from_bytes(data)?;
+    /// let doc: RawDocumentBuf = doc_ref.to_raw_document_buf();
+    /// # Ok::&lt;(), Error&gt;(())
+    </span><span class="kw">pub fn </span>to_raw_document_buf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawDocumentBuf {
+        <span class="comment">// unwrap is ok here because we already verified the bytes in `RawDocumentRef::new`
+        </span>RawDocumentBuf::from_bytes(<span class="self">self</span>.data.to_owned()).unwrap()
     }
 
-    <span class="doccomment">/// Gets a reference to the value corresponding to the given key by iterating until the key is</span>
-    <span class="doccomment">/// found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, oid::ObjectId};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;_id&quot;: ObjectId::new(),</span>
-    <span class="doccomment">///     &quot;f64&quot;: 2.5,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let element = doc.get(&quot;f64&quot;)?.expect(&quot;finding key f64&quot;);</span>
-    <span class="doccomment">/// assert_eq!(element.as_f64(), Some(2.5));</span>
-    <span class="doccomment">/// assert!(doc.get(&quot;unknown&quot;)?.is_none());</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">result</span><span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">key</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">k</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">v</span>));
+    <span class="doccomment">/// Gets a reference to the value corresponding to the given key by iterating until the key is
+    /// found.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, oid::ObjectId};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;_id&quot;: ObjectId::new(),
+    ///     &quot;f64&quot;: 2.5,
+    /// };
+    ///
+    /// let element = doc.get(&quot;f64&quot;)?.expect(&quot;finding key f64&quot;);
+    /// assert_eq!(element.as_f64(), Some(2.5));
+    /// assert!(doc.get(&quot;unknown&quot;)?.is_none());
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;RawBsonRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt;&gt; {
+        <span class="kw">for </span>result <span class="kw">in </span><span class="self">self</span>.into_iter() {
+            <span class="kw">let </span>(k, v) = result<span class="question-mark">?</span>;
+            <span class="kw">if </span>key.as_ref() == k {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(v));
             }
         }
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">get_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">expected_type</span>: <span class="ident">ElementType</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">as_ref</span>();
+    <span class="kw">fn </span>get_with&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        key: <span class="kw">impl </span>AsRef&lt;str&gt;,
+        expected_type: ElementType,
+        f: <span class="kw">impl </span>FnOnce(RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;,
+    ) -&gt; ValueAccessResult&lt;T&gt; {
+        <span class="kw">let </span>key = key.as_ref();
 
-        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">get</span>(<span class="ident">key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ValueAccessError</span> {
-                <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">to_string</span>(),
-                <span class="ident">kind</span>: <span class="ident">ValueAccessErrorKind::InvalidBson</span>(<span class="ident">e</span>),
-            })<span class="question-mark">?</span>
-            .<span class="ident">ok_or</span>(<span class="ident">ValueAccessError</span> {
-                <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">to_string</span>(),
-                <span class="ident">kind</span>: <span class="ident">ValueAccessErrorKind::NotPresent</span>,
+        <span class="kw">let </span>bson = <span class="self">self
+            </span>.get(key)
+            .map_err(|e| ValueAccessError {
+                key: key.to_string(),
+                kind: ValueAccessErrorKind::InvalidBson(e),
+            })<span class="question-mark">?
+            </span>.ok_or(ValueAccessError {
+                key: key.to_string(),
+                kind: ValueAccessErrorKind::NotPresent,
             })<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">bson</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">t</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ValueAccessError</span> {
-                <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">to_string</span>(),
-                <span class="ident">kind</span>: <span class="ident">ValueAccessErrorKind::UnexpectedType</span> {
-                    <span class="ident">expected</span>: <span class="ident">expected_type</span>,
-                    <span class="ident">actual</span>: <span class="ident">bson</span>.<span class="ident">element_type</span>(),
+        <span class="kw">match </span>f(bson) {
+            <span class="prelude-val">Some</span>(t) =&gt; <span class="prelude-val">Ok</span>(t),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(ValueAccessError {
+                key: key.to_string(),
+                kind: ValueAccessErrorKind::UnexpectedType {
+                    expected: expected_type,
+                    actual: bson.element_type(),
                 },
             }),
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON double value corresponding to a given key or returns an error</span>
-    <span class="doccomment">/// if the key corresponds to a value which isn&#39;t a double.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::raw::ValueAccessErrorKind;</span>
-    <span class="doccomment">/// use bson::rawdoc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">///     &quot;f64&quot;: 2.5,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_f64(&quot;f64&quot;)?, 2.5);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_f64(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_f64(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Double</span>, <span class="ident">RawBsonRef::as_f64</span>)
+    <span class="doccomment">/// Gets a reference to the BSON double value corresponding to a given key or returns an error
+    /// if the key corresponds to a value which isn&#39;t a double.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::raw::ValueAccessErrorKind;
+    /// use bson::rawdoc;
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;bool&quot;: true,
+    ///     &quot;f64&quot;: 2.5,
+    /// };
+    ///
+    /// assert_eq!(doc.get_f64(&quot;f64&quot;)?, 2.5);
+    /// assert!(matches!(doc.get_f64(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_f64(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_f64(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;f64&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Double, RawBsonRef::as_f64)
     }
 
-    <span class="doccomment">/// Gets a reference to the string value corresponding to a given key or returns an error if the</span>
-    <span class="doccomment">/// key corresponds to a value which isn&#39;t a string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;string&quot;: &quot;hello&quot;,</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_str(&quot;string&quot;)?, &quot;hello&quot;);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_str(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_str(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::String</span>, <span class="ident">RawBsonRef::as_str</span>)
+    <span class="doccomment">/// Gets a reference to the string value corresponding to a given key or returns an error if the
+    /// key corresponds to a value which isn&#39;t a string.
+    ///
+    /// ```
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;string&quot;: &quot;hello&quot;,
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert_eq!(doc.get_str(&quot;string&quot;)?, &quot;hello&quot;);
+    /// assert!(matches!(doc.get_str(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_str(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_str(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::String, RawBsonRef::as_str)
     }
 
-    <span class="doccomment">/// Gets a reference to the document value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t a document.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;doc&quot;: { &quot;key&quot;: &quot;value&quot;},</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_document(&quot;doc&quot;)?.get_str(&quot;key&quot;)?, &quot;value&quot;);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_document(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_document(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_document</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::EmbeddedDocument</span>, <span class="ident">RawBsonRef::as_document</span>)
+    <span class="doccomment">/// Gets a reference to the document value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t a document.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;doc&quot;: { &quot;key&quot;: &quot;value&quot;},
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert_eq!(doc.get_document(&quot;doc&quot;)?.get_str(&quot;key&quot;)?, &quot;value&quot;);
+    /// assert!(matches!(doc.get_document(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_document(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_document(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>RawDocument&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::EmbeddedDocument, RawBsonRef::as_document)
     }
 
-    <span class="doccomment">/// Gets a reference to the array value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t an array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;array&quot;: [true, 3],</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut arr_iter = doc.get_array(&quot;array&quot;)?.into_iter();</span>
-    <span class="doccomment">/// let _: bool = arr_iter.next().unwrap()?.as_bool().unwrap();</span>
-    <span class="doccomment">/// let _: i32 = arr_iter.next().unwrap()?.as_i32().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(arr_iter.next().is_none());</span>
-    <span class="doccomment">/// assert!(doc.get_array(&quot;bool&quot;).is_err());</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_array(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">RawArray</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Array</span>, <span class="ident">RawBsonRef::as_array</span>)
+    <span class="doccomment">/// Gets a reference to the array value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t an array.
+    ///
+    /// ```
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;array&quot;: [true, 3],
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// let mut arr_iter = doc.get_array(&quot;array&quot;)?.into_iter();
+    /// let _: bool = arr_iter.next().unwrap()?.as_bool().unwrap();
+    /// let _: i32 = arr_iter.next().unwrap()?.as_i32().unwrap();
+    ///
+    /// assert!(arr_iter.next().is_none());
+    /// assert!(doc.get_array(&quot;bool&quot;).is_err());
+    /// assert!(matches!(doc.get_array(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_array(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>RawArray&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Array, RawBsonRef::as_array)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON binary value corresponding to a given key or returns an error</span>
-    <span class="doccomment">/// if the key corresponds to a value which isn&#39;t a binary value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::{</span>
-    <span class="doccomment">///     rawdoc,</span>
-    <span class="doccomment">///     raw::ValueAccessErrorKind,</span>
-    <span class="doccomment">///     spec::BinarySubtype,</span>
-    <span class="doccomment">///     Binary,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;binary&quot;: Binary { subtype: BinarySubtype::Generic, bytes: vec![1, 2, 3] },</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&amp;doc.get_binary(&quot;binary&quot;)?.bytes, &amp;[1, 2, 3]);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_binary(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_binary(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_binary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">RawBinaryRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Binary</span>, <span class="ident">RawBsonRef::as_binary</span>)
+    <span class="doccomment">/// Gets a reference to the BSON binary value corresponding to a given key or returns an error
+    /// if the key corresponds to a value which isn&#39;t a binary value.
+    ///
+    /// ```
+    /// use bson::{
+    ///     rawdoc,
+    ///     raw::ValueAccessErrorKind,
+    ///     spec::BinarySubtype,
+    ///     Binary,
+    /// };
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;binary&quot;: Binary { subtype: BinarySubtype::Generic, bytes: vec![1, 2, 3] },
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert_eq!(&amp;doc.get_binary(&quot;binary&quot;)?.bytes, &amp;[1, 2, 3]);
+    /// assert!(matches!(doc.get_binary(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_binary(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_binary(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;RawBinaryRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Binary, RawBsonRef::as_binary)
     }
 
-    <span class="doccomment">/// Gets a reference to the ObjectId value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t an ObjectId.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, oid::ObjectId, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;_id&quot;: ObjectId::new(),</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let oid = doc.get_object_id(&quot;_id&quot;)?;</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_object_id(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_object_id(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_object_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::ObjectId</span>, <span class="ident">RawBsonRef::as_object_id</span>)
+    <span class="doccomment">/// Gets a reference to the ObjectId value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t an ObjectId.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, oid::ObjectId, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;_id&quot;: ObjectId::new(),
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// let oid = doc.get_object_id(&quot;_id&quot;)?;
+    /// assert!(matches!(doc.get_object_id(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_object_id(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_object_id(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;ObjectId&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::ObjectId, RawBsonRef::as_object_id)
     }
 
-    <span class="doccomment">/// Gets a reference to the boolean value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t a boolean.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, oid::ObjectId, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;_id&quot;: ObjectId::new(),</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(doc.get_bool(&quot;bool&quot;)?);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_bool(&quot;_id&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_bool(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_bool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Boolean</span>, <span class="ident">RawBsonRef::as_bool</span>)
+    <span class="doccomment">/// Gets a reference to the boolean value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t a boolean.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, oid::ObjectId, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;_id&quot;: ObjectId::new(),
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert!(doc.get_bool(&quot;bool&quot;)?);
+    /// assert!(matches!(doc.get_bool(&quot;_id&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_bool(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_bool(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;bool&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Boolean, RawBsonRef::as_bool)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON DateTime value corresponding to a given key or returns an</span>
-    <span class="doccomment">/// error if the key corresponds to a value which isn&#39;t a DateTime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind, DateTime};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let dt = DateTime::now();</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;created_at&quot;: dt,</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_datetime(&quot;created_at&quot;)?, dt);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_datetime(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_datetime(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::DateTime</span>, <span class="ident">RawBsonRef::as_datetime</span>)
+    <span class="doccomment">/// Gets a reference to the BSON DateTime value corresponding to a given key or returns an
+    /// error if the key corresponds to a value which isn&#39;t a DateTime.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind, DateTime};
+    ///
+    /// let dt = DateTime::now();
+    /// let doc = rawdoc! {
+    ///     &quot;created_at&quot;: dt,
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert_eq!(doc.get_datetime(&quot;created_at&quot;)?, dt);
+    /// assert!(matches!(doc.get_datetime(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_datetime(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;DateTime&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::DateTime, RawBsonRef::as_datetime)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON regex value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t a regex.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use bson::{rawdoc, Regex, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;regex&quot;: Regex {</span>
-    <span class="doccomment">///         pattern: r&quot;end\s*$&quot;.into(),</span>
-    <span class="doccomment">///         options: &quot;i&quot;.into(),</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_regex(&quot;regex&quot;)?.pattern, r&quot;end\s*$&quot;);</span>
-    <span class="doccomment">/// assert_eq!(doc.get_regex(&quot;regex&quot;)?.options, &quot;i&quot;);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_regex(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_regex(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_regex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">RawRegexRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::RegularExpression</span>, <span class="ident">RawBsonRef::as_regex</span>)
+    <span class="doccomment">/// Gets a reference to the BSON regex value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t a regex.
+    ///
+    /// ```
+    /// use bson::{rawdoc, Regex, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;regex&quot;: Regex {
+    ///         pattern: r&quot;end\s*$&quot;.into(),
+    ///         options: &quot;i&quot;.into(),
+    ///     },
+    ///     &quot;bool&quot;: true,
+    /// };
+    ///
+    /// assert_eq!(doc.get_regex(&quot;regex&quot;)?.pattern, r&quot;end\s*$&quot;);
+    /// assert_eq!(doc.get_regex(&quot;regex&quot;)?.options, &quot;i&quot;);
+    /// assert!(matches!(doc.get_regex(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_regex(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_regex(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;RawRegexRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::RegularExpression, RawBsonRef::as_regex)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON timestamp value corresponding to a given key or returns an</span>
-    <span class="doccomment">/// error if the key corresponds to a value which isn&#39;t a timestamp.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, Timestamp, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">///     &quot;ts&quot;: Timestamp { time: 649876543, increment: 9 },</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let timestamp = doc.get_timestamp(&quot;ts&quot;)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(timestamp.time, 649876543);</span>
-    <span class="doccomment">/// assert_eq!(timestamp.increment, 9);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_timestamp(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_timestamp(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Timestamp</span>, <span class="ident">RawBsonRef::as_timestamp</span>)
+    <span class="doccomment">/// Gets a reference to the BSON timestamp value corresponding to a given key or returns an
+    /// error if the key corresponds to a value which isn&#39;t a timestamp.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, Timestamp, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;bool&quot;: true,
+    ///     &quot;ts&quot;: Timestamp { time: 649876543, increment: 9 },
+    /// };
+    ///
+    /// let timestamp = doc.get_timestamp(&quot;ts&quot;)?;
+    ///
+    /// assert_eq!(timestamp.time, 649876543);
+    /// assert_eq!(timestamp.increment, 9);
+    /// assert!(matches!(doc.get_timestamp(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_timestamp(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;Timestamp&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Timestamp, RawBsonRef::as_timestamp)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON int32 value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t a 32-bit integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">///     &quot;i32&quot;: 1_000_000,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_i32(&quot;i32&quot;)?, 1_000_000);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_i32(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { ..}));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_i32(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_i32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Int32</span>, <span class="ident">RawBsonRef::as_i32</span>)
+    <span class="doccomment">/// Gets a reference to the BSON int32 value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t a 32-bit integer.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;bool&quot;: true,
+    ///     &quot;i32&quot;: 1_000_000,
+    /// };
+    ///
+    /// assert_eq!(doc.get_i32(&quot;i32&quot;)?, 1_000_000);
+    /// assert!(matches!(doc.get_i32(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { ..}));
+    /// assert!(matches!(doc.get_i32(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_i32(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;i32&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Int32, RawBsonRef::as_i32)
     }
 
-    <span class="doccomment">/// Gets a reference to the BSON int64 value corresponding to a given key or returns an error if</span>
-    <span class="doccomment">/// the key corresponds to a value which isn&#39;t a 64-bit integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::{rawdoc, raw::ValueAccessErrorKind};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let doc = rawdoc! {</span>
-    <span class="doccomment">///     &quot;bool&quot;: true,</span>
-    <span class="doccomment">///     &quot;i64&quot;: 9223372036854775807_i64,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(doc.get_i64(&quot;i64&quot;)?, 9223372036854775807);</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_i64(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));</span>
-    <span class="doccomment">/// assert!(matches!(doc.get_i64(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));</span>
-    <span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_i64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">ValueAccessResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_with</span>(<span class="ident">key</span>, <span class="ident">ElementType::Int64</span>, <span class="ident">RawBsonRef::as_i64</span>)
+    <span class="doccomment">/// Gets a reference to the BSON int64 value corresponding to a given key or returns an error if
+    /// the key corresponds to a value which isn&#39;t a 64-bit integer.
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::{rawdoc, raw::ValueAccessErrorKind};
+    ///
+    /// let doc = rawdoc! {
+    ///     &quot;bool&quot;: true,
+    ///     &quot;i64&quot;: 9223372036854775807_i64,
+    /// };
+    ///
+    /// assert_eq!(doc.get_i64(&quot;i64&quot;)?, 9223372036854775807);
+    /// assert!(matches!(doc.get_i64(&quot;bool&quot;).unwrap_err().kind, ValueAccessErrorKind::UnexpectedType { .. }));
+    /// assert!(matches!(doc.get_i64(&quot;unknown&quot;).unwrap_err().kind, ValueAccessErrorKind::NotPresent));
+    /// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>get_i64(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; ValueAccessResult&lt;i64&gt; {
+        <span class="self">self</span>.get_with(key, ElementType::Int64, RawBsonRef::as_i64)
     }
 
-    <span class="doccomment">/// Return a reference to the contained data as a `&amp;[u8]`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use bson::raw::Error;</span>
-    <span class="doccomment">/// use bson::rawdoc;</span>
-    <span class="doccomment">/// let docbuf = rawdoc! {};</span>
-    <span class="doccomment">/// assert_eq!(docbuf.as_bytes(), b&quot;\x05\x00\x00\x00\x00&quot;);</span>
-    <span class="doccomment">/// # Ok::&lt;(), Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
+    <span class="doccomment">/// Return a reference to the contained data as a `&amp;[u8]`
+    ///
+    /// ```
+    /// # use bson::raw::Error;
+    /// use bson::rawdoc;
+    /// let docbuf = rawdoc! {};
+    /// assert_eq!(docbuf.as_bytes(), b&quot;\x05\x00\x00\x00\x00&quot;);
+    /// # Ok::&lt;(), Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Returns whether this document contains any elements or not.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">MIN_BSON_DOCUMENT_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="doccomment">/// Returns whether this document contains any elements or not.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_bytes().len() == MIN_BSON_DOCUMENT_SIZE <span class="kw">as </span>usize
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">OwnedOrBorrowedRawDocument::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span> {
-            <span class="ident">OwnedOrBorrowedRawDocument::Borrowed</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>),
-            <span class="ident">OwnedOrBorrowedRawDocument::Owned</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="macro">format!</span>(
+        <span class="kw">match </span>OwnedOrBorrowedRawDocument::deserialize(deserializer)<span class="question-mark">? </span>{
+            OwnedOrBorrowedRawDocument::Borrowed(b) =&gt; <span class="prelude-val">Ok</span>(b),
+            OwnedOrBorrowedRawDocument::Owned(d) =&gt; <span class="prelude-val">Err</span>(serde::de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;expected borrowed raw document, instead got owned {:?}&quot;</span>,
-                <span class="ident">d</span>
+                d
             ))),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Serialize <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">struct</span> <span class="ident">KvpSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span>);
+        <span class="kw">struct </span>KvpSerializer&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">KvpSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Serialize <span class="kw">for </span>KvpSerializer&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+            <span class="kw">where
+                </span>S: serde::Serializer,
             {
-                <span class="kw">if</span> <span class="ident">serializer</span>.<span class="ident">is_human_readable</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-                    <span class="kw">for</span> <span class="ident">kvp</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span> {
-                        <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">kvp</span>.<span class="ident">map_err</span>(<span class="ident">serde::ser::Error::custom</span>)<span class="question-mark">?</span>;
-                        <span class="ident">map</span>.<span class="ident">serialize_entry</span>(<span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>)<span class="question-mark">?</span>;
+                <span class="kw">if </span>serializer.is_human_readable() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>map = serializer.serialize_map(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                    <span class="kw">for </span>kvp <span class="kw">in </span><span class="self">self</span>.<span class="number">0 </span>{
+                        <span class="kw">let </span>(k, v) = kvp.map_err(serde::ser::Error::custom)<span class="question-mark">?</span>;
+                        map.serialize_entry(k, <span class="kw-2">&amp;</span>v)<span class="question-mark">?</span>;
                     }
-                    <span class="ident">map</span>.<span class="ident">end</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>())
+                    map.end()
+                } <span class="kw">else </span>{
+                    serializer.serialize_bytes(<span class="self">self</span>.<span class="number">0</span>.as_bytes())
                 }
             }
         }
-        <span class="ident">serializer</span>.<span class="ident">serialize_newtype_struct</span>(<span class="ident">RAW_DOCUMENT_NEWTYPE</span>, <span class="kw-2">&amp;</span><span class="ident">KvpSerializer</span>(<span class="self">self</span>))
+        serializer.serialize_newtype_struct(RAW_DOCUMENT_NEWTYPE, <span class="kw-2">&amp;</span>KvpSerializer(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">RawDocument</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RawDocument&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">hex::encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>))
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>RawDocument {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;RawDocument&quot;</span>)
+            .field(<span class="string">&quot;data&quot;</span>, <span class="kw-2">&amp;</span>hex::encode(<span class="kw-2">&amp;</span><span class="self">self</span>.data))
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawDocument</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawDocument</span> {
-        <span class="self">self</span>
+<span class="kw">impl </span>AsRef&lt;RawDocument&gt; <span class="kw">for </span>RawDocument {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RawDocument {
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>ToOwned <span class="kw">for </span>RawDocument {
+    <span class="kw">type </span>Owned = RawDocumentBuf;
+
+    <span class="kw">fn </span>to_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Owned {
+        <span class="self">self</span>.to_raw_document_buf()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToOwned</span> <span class="kw">for</span> <span class="ident">RawDocument</span> {
-    <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">RawDocumentBuf</span>;
-
-    <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span> {
-        <span class="self">self</span>.<span class="ident">to_raw_document_buf</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, RawDocument&gt; {
+    <span class="kw">fn </span>from(rdr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument) -&gt; <span class="self">Self </span>{
+        Cow::Borrowed(rdr)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">RawDocument</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rdr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">rdr</span>)
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>RawDocument&gt; <span class="kw">for </span><span class="kw">crate</span>::Document {
+    <span class="kw">type </span>Error = Error;
+
+    <span class="kw">fn </span>try_from(rawdoc: <span class="kw-2">&amp;</span>RawDocument) -&gt; <span class="prelude-ty">Result</span>&lt;Document&gt; {
+        rawdoc
+            .into_iter()
+            .map(|res| res.and_then(|(k, v)| <span class="prelude-val">Ok</span>((k.to_owned(), v.try_into()<span class="question-mark">?</span>))))
+            .collect()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::Document</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RawDocument {
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, RawBsonRef&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">rawdoc</span>: <span class="kw-2">&amp;</span><span class="ident">RawDocument</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> {
-        <span class="ident">rawdoc</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">k</span>.<span class="ident">to_owned</span>(), <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))))
-            .<span class="ident">collect</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawDocument</span> {
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">RawBsonRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Iter::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; Iter&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Iter::new(<span class="self">self</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

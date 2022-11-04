@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/collation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/collation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>collation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -416,394 +416,394 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="doccomment">///! legacy implementation of collations (or codepages rather) for dealing with varchar&#39;s with legacy databases</span>
-<span class="doccomment">///! references [1] which has some mappings from the katmai (SQL Server 2008) source code and is a TDS driver</span>
-<span class="doccomment">///! directly from microsoft</span>
-<span class="doccomment">///! [2] is helpful to map CP1234 to the appropriate encoding</span>
-<span class="doccomment">///!</span>
-<span class="doccomment">///! [1] https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java</span>
-<span class="doccomment">///! [2] https://github.com/lifthrasiir/rust-encoding/blob/496823171f15d9b9446b2ec3fb7765f22346256b/src/label.rs#L282</span>
-<span class="kw">use</span> <span class="ident">encoding</span>::{<span class="self">self</span>, <span class="ident">Encoding</span>};
+<span class="doccomment">///! legacy implementation of collations (or codepages rather) for dealing with varchar&#39;s with legacy databases
+///! references [1] which has some mappings from the katmai (SQL Server 2008) source code and is a TDS driver
+///! directly from microsoft
+///! [2] is helpful to map CP1234 to the appropriate encoding
+///!
+///! [1] https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java
+///! [2] https://github.com/lifthrasiir/rust-encoding/blob/496823171f15d9b9446b2ec3fb7765f22346256b/src/label.rs#L282
+</span><span class="kw">use </span>encoding::{<span class="self">self</span>, Encoding};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Collation</span> {
-    <span class="doccomment">/// LCID ColFlags Version</span>
-    <span class="ident">info</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// Sortid</span>
-    <span class="ident">sort_id</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Collation {
+    <span class="doccomment">/// LCID ColFlags Version
+    </span>info: u32,
+    <span class="doccomment">/// Sortid
+    </span>sort_id: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">Collation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">info</span>: <span class="ident">u32</span>, <span class="ident">sort_id</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">info</span>, <span class="ident">sort_id</span> }
+<span class="kw">impl </span>Collation {
+    <span class="kw">pub fn </span>new(info: u32, sort_id: u8) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ info, sort_id }
     }
 
-    <span class="doccomment">/// return the locale id part of the LCID (the specification here uses ambiguous terms)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lcid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        (<span class="self">self</span>.<span class="ident">info</span> <span class="op">&amp;</span> <span class="number">0xffff</span>) <span class="kw">as</span> <span class="ident">u16</span>
+    <span class="doccomment">/// return the locale id part of the LCID (the specification here uses ambiguous terms)
+    </span><span class="kw">pub fn </span>lcid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        (<span class="self">self</span>.info &amp; <span class="number">0xffff</span>) <span class="kw">as </span>u16
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">sort_id</span>
+    <span class="kw">pub fn </span>sort_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.sort_id
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">info</span>
+    <span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.info
     }
 
-    <span class="doccomment">/// return an encoding for a given collation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> (<span class="kw">dyn</span> <span class="ident">Encoding</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sort_id</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">lcid_to_encoding</span>(<span class="self">self</span>.<span class="ident">lcid</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">sortid_to_encoding</span>(<span class="self">self</span>.<span class="ident">sort_id</span>)
+    <span class="doccomment">/// return an encoding for a given collation
+    </span><span class="kw">pub fn </span>encoding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Encoding + Send + Sync)&gt; {
+        <span class="kw">let </span>res = <span class="kw">if </span><span class="self">self</span>.sort_id == <span class="number">0 </span>{
+            lcid_to_encoding(<span class="self">self</span>.lcid())
+        } <span class="kw">else </span>{
+            sortid_to_encoding(<span class="self">self</span>.sort_id)
         };
 
-        <span class="ident">res</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::Encoding</span>(
+        res.ok_or_else(|| {
+            Error::Encoding(
                 <span class="macro">format!</span>(
                     <span class="string">&quot;encoding: unspported encoding (LCID: {:#02x}, sort ID: {})&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">lcid</span>(),
-                    <span class="self">self</span>.<span class="ident">sort_id</span>(),
+                    <span class="self">self</span>.lcid(),
+                    <span class="self">self</span>.sort_id(),
                 )
-                .<span class="ident">into</span>(),
+                .into(),
             )
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Collation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">encoding</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">encoding</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">encoding</span>.<span class="ident">name</span>()),
-            <span class="kw">_</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;None&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Collation {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.encoding() {
+            <span class="prelude-val">Ok</span>(encoding) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, encoding.name()),
+            <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;None&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java#L102-L310</span>
-<span class="doccomment">/// maps an LCID (it&#39;s locale part which is only 2 bytes) to a codepage</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// generate the code below from source code:</span>
-<span class="doccomment">/// 1. (regex)replace: (.*?)\((.*?),(.*?)\) with $2 =&gt; $3</span>
-<span class="doccomment">/// 2. replace: Encoding.CP(.*?) with encoding::all::WINDOWS_$1</span>
-<span class="doccomment">/// 3. replace: Encoding.UNICODE with encoding::all::UTF16_LE</span>
-<span class="comment">//</span>
-<span class="doccomment">/// the unimplemented!() one&#39;s are not supported by rust-encoding</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lcid_to_encoding</span>(<span class="ident">locale</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> (<span class="kw">dyn</span> <span class="ident">Encoding</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>)<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">locale</span> {
-        <span class="number">0x0401</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x0402</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0403</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="comment">// CP950</span>
-        <span class="number">0x0404</span> <span class="op">|</span> <span class="number">0x0c04</span> <span class="op">|</span> <span class="number">0x1404</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::BIG5_2003</span>),
-        <span class="number">0x0405</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x0406</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0407</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0408</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">0x0409</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x040a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x040b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x040c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x040d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1255</span>),
-        <span class="number">0x040e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x040f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0410</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="comment">// CP932</span>
-        <span class="number">0x0411</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_31J</span>),
-        <span class="number">0x0412</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_949</span>),
-        <span class="number">0x0413</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0414</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0415</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x0416</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0417</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0418</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x0419</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x041a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x041b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x041c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x041d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x041e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_874</span>),
-        <span class="number">0x041f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">0x0420</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x0421</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0422</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0423</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0424</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x0425</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">0x0426</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">0x0427</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">0x0428</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0429</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x042a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1258</span>),
-        <span class="number">0x042b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x042c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">0x042d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x042e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x042f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0432</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0434</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0435</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0436</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0437</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0438</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0439</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x043a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x043b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x043e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x043f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0440</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0441</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0442</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x0443</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">0x0444</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0445</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0446</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0447</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0448</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0449</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x044f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0450</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0451</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0452</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0453</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0454</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0456</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0457</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x045a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x045b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x045d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x045e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0461</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0462</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0463</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0464</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0465</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0468</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x046a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x046b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x046c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x046d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x046e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x046f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0470</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0478</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x047a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x047c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x047e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0480</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x0481</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0482</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0483</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0484</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0485</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0486</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0487</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0488</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x048c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x0801</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="comment">// CP936</span>
-        <span class="number">0x0804</span> <span class="op">|</span> <span class="number">0x1004</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::GB18030</span>),
-        <span class="number">0x0807</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0809</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x080a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x080c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0810</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0813</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0814</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0816</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x081a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x081d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0827</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">0x082c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x082e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x083b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x083c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x083e</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0843</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0845</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::UTF_16LE</span>),
-        <span class="number">0x0850</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x085d</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x085f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x086b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c01</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x0c07</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c09</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c0a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c0c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c1a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x0c3b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x0c6b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1001</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x1007</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1009</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x100a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x100c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x101a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x103b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1401</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x1407</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1409</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x140a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x140c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x141a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x143b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1801</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x1809</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x180a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x180c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x181a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">0x183b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1c01</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x1c09</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1c0a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x1c1a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x1c3b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x2001</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x2009</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x200a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x201a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">0x203b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x2401</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x2409</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x240a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x243b</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x2801</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x2809</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x280a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x2c01</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x2c09</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x2c0a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x3001</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x3009</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x300a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x3401</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x3409</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x340a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x3801</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x380a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x3c01</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x3c0a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x4001</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">0x4009</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x400a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x4409</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x440a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x4809</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x480a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x4c0a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x500a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">0x540a</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java#L102-L310
+/// maps an LCID (it&#39;s locale part which is only 2 bytes) to a codepage
+///
+/// generate the code below from source code:
+/// 1. (regex)replace: (.*?)\((.*?),(.*?)\) with $2 =&gt; $3
+/// 2. replace: Encoding.CP(.*?) with encoding::all::WINDOWS_$1
+/// 3. replace: Encoding.UNICODE with encoding::all::UTF16_LE
+</span><span class="comment">//
+</span><span class="doccomment">/// the unimplemented!() one&#39;s are not supported by rust-encoding
+</span><span class="kw">pub fn </span>lcid_to_encoding(locale: u16) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Encoding + Send + Sync)&gt; {
+    <span class="kw">match </span>locale {
+        <span class="number">0x0401 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x0402 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0403 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="comment">// CP950
+        </span><span class="number">0x0404 </span>| <span class="number">0x0c04 </span>| <span class="number">0x1404 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::BIG5_2003),
+        <span class="number">0x0405 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x0406 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0407 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0408 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">0x0409 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x040a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x040b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x040c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x040d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1255),
+        <span class="number">0x040e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x040f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0410 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="comment">// CP932
+        </span><span class="number">0x0411 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_31J),
+        <span class="number">0x0412 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_949),
+        <span class="number">0x0413 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0414 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0415 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x0416 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0417 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0418 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x0419 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x041a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x041b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x041c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x041d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x041e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_874),
+        <span class="number">0x041f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">0x0420 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x0421 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0422 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0423 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0424 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x0425 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">0x0426 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">0x0427 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">0x0428 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0429 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x042a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1258),
+        <span class="number">0x042b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x042c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">0x042d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x042e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x042f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0432 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0434 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0435 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0436 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0437 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0438 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0439 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x043a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x043b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x043e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x043f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0440 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0441 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0442 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x0443 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">0x0444 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0445 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0446 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0447 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0448 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0449 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x044f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0450 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0451 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0452 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0453 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0454 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0456 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0457 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x045a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x045b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x045d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x045e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0461 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0462 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0463 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0464 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0465 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0468 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x046a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x046b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x046c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x046d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x046e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x046f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0470 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0478 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x047a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x047c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x047e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0480 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x0481 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0482 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0483 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0484 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0485 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0486 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0487 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0488 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x048c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x0801 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="comment">// CP936
+        </span><span class="number">0x0804 </span>| <span class="number">0x1004 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::GB18030),
+        <span class="number">0x0807 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0809 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x080a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x080c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0810 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0813 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0814 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0816 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x081a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x081d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0827 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">0x082c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x082e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x083b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x083c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x083e </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0843 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0845 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::UTF_16LE),
+        <span class="number">0x0850 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x085d </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x085f </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x086b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c01 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x0c07 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c09 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c0a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c0c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c1a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x0c3b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x0c6b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1001 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x1007 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1009 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x100a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x100c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x101a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x103b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1401 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x1407 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1409 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x140a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x140c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x141a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x143b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1801 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x1809 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x180a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x180c </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x181a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">0x183b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1c01 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x1c09 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1c0a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x1c1a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x1c3b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x2001 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x2009 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x200a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x201a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">0x203b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x2401 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x2409 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x240a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x243b </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x2801 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x2809 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x280a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x2c01 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x2c09 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x2c0a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x3001 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x3009 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x300a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x3401 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x3409 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x340a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x3801 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x380a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x3c01 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x3c0a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x4001 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">0x4009 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x400a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x4409 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x440a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x4809 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x480a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x4c0a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x500a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">0x540a </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// [1] https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java#L362-L482</span>
-<span class="doccomment">/// [2] https://msdn.microsoft.com/de-de/library/ms144250(v=sql.105).aspx</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [2] does only contain 3/4 of the content [1] contains, so the source code is again the better source of information</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// generate the code below from source code:</span>
-<span class="doccomment">/// 1. (regex)replace .*\((.*?),.*?,(.*?)\) with $1 =&gt; $2</span>
-<span class="doccomment">/// 2. see above/as above</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sortid_to_encoding</span>(<span class="ident">sort_id</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> (<span class="kw">dyn</span> <span class="ident">Encoding</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>)<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">sort_id</span> {
-        <span class="comment">// 30 | 31 | 32 | 33 | 34 | 35 =&gt; Some(encoding::all::WINDOWS_437),</span>
-        <span class="comment">// 40 | 41 | 42 | 43 | 44 | 45 | 49 =&gt; Some(encoding::all::WINDOWS_850),</span>
-        <span class="number">50</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">51</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">52</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">53</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">54</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="comment">// 55 | 56 | 57 | 58 | 59 | 60 | 61 =&gt; Some(encoding::all::WINDOWS_850),</span>
-        <span class="number">71</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">72</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">73</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">74</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">75</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">80</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">81</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">82</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">83</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">84</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">85</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">86</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">87</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">88</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">89</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">90</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">91</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">92</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">93</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">94</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">95</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">96</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">97</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">98</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1250</span>),
-        <span class="number">104</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">105</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">106</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">107</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">108</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1251</span>),
-        <span class="number">112</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">113</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">114</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">120</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">121</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">122</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">124</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1253</span>),
-        <span class="number">128</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">129</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">130</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1254</span>),
-        <span class="number">136</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1255</span>),
-        <span class="number">137</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1255</span>),
-        <span class="number">138</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1255</span>),
-        <span class="number">144</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">145</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">146</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1256</span>),
-        <span class="number">152</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">153</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">154</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">155</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">156</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">157</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">158</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">159</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">160</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1257</span>),
-        <span class="number">183</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">184</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">185</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">186</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="comment">// CP 932</span>
-        <span class="number">192</span> <span class="op">|</span> <span class="number">193</span> <span class="op">|</span> <span class="number">200</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_31J</span>),
-        <span class="number">194</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_949</span>),
-        <span class="number">195</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_949</span>),
-        <span class="comment">// CP950</span>
-        <span class="number">196</span> <span class="op">|</span> <span class="number">197</span> <span class="op">|</span> <span class="number">202</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::BIG5_2003</span>),
-        <span class="comment">// CP936 (GB18030 is an extension of it with more chars), should be backwards-compatible)</span>
-        <span class="number">198</span> <span class="op">|</span> <span class="number">199</span> <span class="op">|</span> <span class="number">203</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::GB18030</span>),
-        <span class="number">201</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_949</span>),
-        <span class="number">204</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_874</span>),
-        <span class="number">205</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_874</span>),
-        <span class="number">206</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_874</span>),
-        <span class="number">210</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">211</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">212</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">213</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">214</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">215</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">216</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="number">217</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">encoding::all::WINDOWS_1252</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// [1] https://github.com/Microsoft/mssql-jdbc/blob/eb14f63077c47ef1fc1c690deb8cfab602baeb85/src/main/java/com/microsoft/sqlserver/jdbc/SQLCollation.java#L362-L482
+/// [2] https://msdn.microsoft.com/de-de/library/ms144250(v=sql.105).aspx
+///
+/// [2] does only contain 3/4 of the content [1] contains, so the source code is again the better source of information
+///
+/// generate the code below from source code:
+/// 1. (regex)replace .*\((.*?),.*?,(.*?)\) with $1 =&gt; $2
+/// 2. see above/as above
+</span><span class="kw">pub fn </span>sortid_to_encoding(sort_id: u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Encoding + Send + Sync)&gt; {
+    <span class="kw">match </span>sort_id {
+        <span class="comment">// 30 | 31 | 32 | 33 | 34 | 35 =&gt; Some(encoding::all::WINDOWS_437),
+        // 40 | 41 | 42 | 43 | 44 | 45 | 49 =&gt; Some(encoding::all::WINDOWS_850),
+        </span><span class="number">50 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">51 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">52 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">53 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">54 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="comment">// 55 | 56 | 57 | 58 | 59 | 60 | 61 =&gt; Some(encoding::all::WINDOWS_850),
+        </span><span class="number">71 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">72 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">73 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">74 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">75 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">80 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">81 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">82 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">83 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">84 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">85 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">86 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">87 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">88 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">89 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">90 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">91 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">92 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">93 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">94 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">95 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">96 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">97 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">98 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1250),
+        <span class="number">104 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">105 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">106 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">107 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">108 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1251),
+        <span class="number">112 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">113 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">114 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">120 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">121 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">122 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">124 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1253),
+        <span class="number">128 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">129 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">130 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1254),
+        <span class="number">136 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1255),
+        <span class="number">137 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1255),
+        <span class="number">138 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1255),
+        <span class="number">144 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">145 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">146 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1256),
+        <span class="number">152 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">153 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">154 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">155 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">156 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">157 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">158 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">159 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">160 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1257),
+        <span class="number">183 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">184 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">185 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">186 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="comment">// CP 932
+        </span><span class="number">192 </span>| <span class="number">193 </span>| <span class="number">200 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_31J),
+        <span class="number">194 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_949),
+        <span class="number">195 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_949),
+        <span class="comment">// CP950
+        </span><span class="number">196 </span>| <span class="number">197 </span>| <span class="number">202 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::BIG5_2003),
+        <span class="comment">// CP936 (GB18030 is an extension of it with more chars), should be backwards-compatible)
+        </span><span class="number">198 </span>| <span class="number">199 </span>| <span class="number">203 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::GB18030),
+        <span class="number">201 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_949),
+        <span class="number">204 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_874),
+        <span class="number">205 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_874),
+        <span class="number">206 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_874),
+        <span class="number">210 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">211 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">212 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">213 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">214 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">215 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">216 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="number">217 </span>=&gt; <span class="prelude-val">Some</span>(encoding::all::WINDOWS_1252),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
@@ -833,6 +833,6 @@ mod tests {
         assert_eq!(i, 1);
     }
 }
-*/</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+*/
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

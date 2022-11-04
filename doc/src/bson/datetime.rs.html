@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -473,480 +473,480 @@
 <span id="473">473</span>
 <span id="474">474</span>
 <span id="475">475</span>
-</pre><pre class="rust"><code><span class="doccomment">//! BSON DateTime</span>
+</pre><pre class="rust"><code><span class="doccomment">//! BSON DateTime
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert::TryInto</span>,
-    <span class="ident">error</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>},
-    <span class="ident">result</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>},
+</span><span class="kw">use </span>std::{
+    convert::TryInto,
+    error,
+    fmt::{<span class="self">self</span>, Display},
+    result,
+    time::{Duration, SystemTime},
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datetime::builder::DateTimeBuilder</span>;
-<span class="kw">use</span> <span class="ident">time::format_description::well_known::Rfc3339</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>builder;
+<span class="kw">pub use </span><span class="kw">crate</span>::datetime::builder::DateTimeBuilder;
+<span class="kw">use </span>time::format_description::well_known::Rfc3339;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">LocalResult</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>,
-    <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)
-))]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>,
-    <span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)
-))]</span>
-<span class="kw">use</span> <span class="ident">serde_with</span>::{<span class="ident">DeserializeAs</span>, <span class="ident">SerializeAs</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+</span><span class="kw">use </span>chrono::{LocalResult, TimeZone, Utc};
+<span class="attribute">#[cfg(all(
+    feature = <span class="string">&quot;serde_with&quot;</span>,
+    any(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;time-0_3&quot;</span>)
+))]
+</span><span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize};
+<span class="attribute">#[cfg(all(
+    feature = <span class="string">&quot;serde_with&quot;</span>,
+    any(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;time-0_3&quot;</span>)
+))]
+</span><span class="kw">use </span>serde_with::{DeserializeAs, SerializeAs};
 
-<span class="doccomment">/// Struct representing a BSON datetime.</span>
-<span class="doccomment">/// Note: BSON datetimes have millisecond precision.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To enable conversions between this type and [`chrono::DateTime`], enable the `&quot;chrono-0_4&quot;`</span>
-<span class="doccomment">/// feature flag in your `Cargo.toml`.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use chrono::prelude::*;</span>
-<span class="doccomment">/// # fn main() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;chrono-0_4&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// let chrono_dt: chrono::DateTime&lt;Utc&gt; = &quot;2014-11-28T12:00:09Z&quot;.parse()?;</span>
-<span class="doccomment">/// let bson_dt: bson::DateTime = chrono_dt.into();</span>
-<span class="doccomment">/// let bson_dt = bson::DateTime::from_chrono(chrono_dt);</span>
-<span class="doccomment">/// let back_to_chrono: chrono::DateTime&lt;Utc&gt; = bson_dt.into();</span>
-<span class="doccomment">/// let back_to_chrono = bson_dt.to_chrono();</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You may also construct this type from a given `year`, `month`, `day`, and optionally,</span>
-<span class="doccomment">/// an `hour`, `minute`, `second` and `millisecond`, which default to 0 if not explicitly set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// let dt = bson::DateTime::builder().year(1998).month(2).day(12).minute(1).millisecond(23).build()?;</span>
-<span class="doccomment">/// let expected = bson::DateTime::parse_rfc3339_str(&quot;1998-02-12T00:01:00.023Z&quot;)?;</span>
-<span class="doccomment">/// assert_eq!(dt, expected);</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type differs from [`chrono::DateTime`] in that it serializes to and deserializes from a</span>
-<span class="doccomment">/// BSON datetime rather than an RFC 3339 formatted string. Additionally, in non-BSON formats, it</span>
-<span class="doccomment">/// will serialize to and deserialize from that format&#39;s equivalent of the</span>
-<span class="doccomment">/// [extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) of a datetime.</span>
-<span class="doccomment">/// To serialize a [`chrono::DateTime`] as a BSON datetime, you can use</span>
-<span class="doccomment">/// [`crate::serde_helpers::chrono_datetime_as_bson_datetime`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;chrono-0_4&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Foo {</span>
-<span class="doccomment">///     // serializes as a BSON datetime.</span>
-<span class="doccomment">///     date_time: bson::DateTime,</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // serializes as an RFC 3339 / ISO-8601 string.</span>
-<span class="doccomment">///     chrono_datetime: chrono::DateTime&lt;chrono::Utc&gt;,</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // serializes as a BSON datetime.</span>
-<span class="doccomment">///     // this requires the &quot;chrono-0_4&quot; feature flag</span>
-<span class="doccomment">///     #[serde(with = &quot;bson::serde_helpers::chrono_datetime_as_bson_datetime&quot;)]</span>
-<span class="doccomment">///     chrono_as_bson: chrono::DateTime&lt;chrono::Utc&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// ## The `serde_with` feature flag</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `serde_with` feature can be enabled to support more ergonomic serde attributes for</span>
-<span class="doccomment">/// (de)serializing `chrono::DateTime` from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)</span>
-<span class="doccomment">/// crate. The main benefit of this compared to the regular `serde_helpers` is that `serde_with` can</span>
-<span class="doccomment">/// handle nested `chrono::DateTime` values (e.g. in `Option`), whereas the former only works on</span>
-<span class="doccomment">/// fields that are exactly `chrono::DateTime`.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;chrono-0_4&quot;, feature = &quot;serde_with&quot;))]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">/// use bson::doc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[serde_with::serde_as]</span>
-<span class="doccomment">/// #[derive(Deserialize, Serialize, PartialEq, Debug)]</span>
-<span class="doccomment">/// struct Foo {</span>
-<span class="doccomment">///   /// Serializes as a BSON datetime rather than using `chrono::DateTime`&#39;s serialization</span>
-<span class="doccomment">///   #[serde_as(as = &quot;Option&lt;bson::DateTime&gt;&quot;)]</span>
-<span class="doccomment">///   as_bson: Option&lt;chrono::DateTime&lt;chrono::Utc&gt;&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let dt = chrono::Utc::now();</span>
-<span class="doccomment">/// let foo = Foo {</span>
-<span class="doccomment">///   as_bson: Some(dt),</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let expected = doc! {</span>
-<span class="doccomment">///   &quot;as_bson&quot;: bson::DateTime::from_chrono(dt),</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(bson::to_document(&amp;foo)?, expected);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DateTime</span>(<span class="ident">i64</span>);
+<span class="doccomment">/// Struct representing a BSON datetime.
+/// Note: BSON datetimes have millisecond precision.
+///
+/// To enable conversions between this type and [`chrono::DateTime`], enable the `&quot;chrono-0_4&quot;`
+/// feature flag in your `Cargo.toml`.
+/// ```
+/// use chrono::prelude::*;
+/// # fn main() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// # #[cfg(feature = &quot;chrono-0_4&quot;)]
+/// # {
+/// let chrono_dt: chrono::DateTime&lt;Utc&gt; = &quot;2014-11-28T12:00:09Z&quot;.parse()?;
+/// let bson_dt: bson::DateTime = chrono_dt.into();
+/// let bson_dt = bson::DateTime::from_chrono(chrono_dt);
+/// let back_to_chrono: chrono::DateTime&lt;Utc&gt; = bson_dt.into();
+/// let back_to_chrono = bson_dt.to_chrono();
+/// # }
+/// # Ok(())
+/// # }
+/// ```
+///
+/// You may also construct this type from a given `year`, `month`, `day`, and optionally,
+/// an `hour`, `minute`, `second` and `millisecond`, which default to 0 if not explicitly set.
+///
+/// ```
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let dt = bson::DateTime::builder().year(1998).month(2).day(12).minute(1).millisecond(23).build()?;
+/// let expected = bson::DateTime::parse_rfc3339_str(&quot;1998-02-12T00:01:00.023Z&quot;)?;
+/// assert_eq!(dt, expected);
+/// # Ok(())
+/// # }
+/// ```
+///
+/// This type differs from [`chrono::DateTime`] in that it serializes to and deserializes from a
+/// BSON datetime rather than an RFC 3339 formatted string. Additionally, in non-BSON formats, it
+/// will serialize to and deserialize from that format&#39;s equivalent of the
+/// [extended JSON representation](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/) of a datetime.
+/// To serialize a [`chrono::DateTime`] as a BSON datetime, you can use
+/// [`crate::serde_helpers::chrono_datetime_as_bson_datetime`].
+///
+/// ```rust
+/// # #[cfg(feature = &quot;chrono-0_4&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Foo {
+///     // serializes as a BSON datetime.
+///     date_time: bson::DateTime,
+///
+///     // serializes as an RFC 3339 / ISO-8601 string.
+///     chrono_datetime: chrono::DateTime&lt;chrono::Utc&gt;,
+///
+///     // serializes as a BSON datetime.
+///     // this requires the &quot;chrono-0_4&quot; feature flag
+///     #[serde(with = &quot;bson::serde_helpers::chrono_datetime_as_bson_datetime&quot;)]
+///     chrono_as_bson: chrono::DateTime&lt;chrono::Utc&gt;,
+/// }
+/// # }
+/// ```
+/// ## The `serde_with` feature flag
+///
+/// The `serde_with` feature can be enabled to support more ergonomic serde attributes for
+/// (de)serializing `chrono::DateTime` from/to BSON via the [`serde_with`](https://docs.rs/serde_with/1.11.0/serde_with/)
+/// crate. The main benefit of this compared to the regular `serde_helpers` is that `serde_with` can
+/// handle nested `chrono::DateTime` values (e.g. in `Option`), whereas the former only works on
+/// fields that are exactly `chrono::DateTime`.
+/// ```
+/// # #[cfg(all(feature = &quot;chrono-0_4&quot;, feature = &quot;serde_with&quot;))]
+/// # {
+/// use serde::{Deserialize, Serialize};
+/// use bson::doc;
+///
+/// #[serde_with::serde_as]
+/// #[derive(Deserialize, Serialize, PartialEq, Debug)]
+/// struct Foo {
+///   /// Serializes as a BSON datetime rather than using `chrono::DateTime`&#39;s serialization
+///   #[serde_as(as = &quot;Option&lt;bson::DateTime&gt;&quot;)]
+///   as_bson: Option&lt;chrono::DateTime&lt;chrono::Utc&gt;&gt;,
+/// }
+///
+/// let dt = chrono::Utc::now();
+/// let foo = Foo {
+///   as_bson: Some(dt),
+/// };
+///
+/// let expected = doc! {
+///   &quot;as_bson&quot;: bson::DateTime::from_chrono(dt),
+/// };
+///
+/// assert_eq!(bson::to_document(&amp;foo)?, expected);
+/// # }
+/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+/// ```
+</span><span class="attribute">#[derive(Eq, PartialEq, Ord, PartialOrd, Hash, Copy, Clone)]
+</span><span class="kw">pub struct </span>DateTime(i64);
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="doccomment">/// The latest possible date that can be represented in BSON.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">i64::MAX</span>);
+<span class="kw">impl </span><span class="kw">crate</span>::DateTime {
+    <span class="doccomment">/// The latest possible date that can be represented in BSON.
+    </span><span class="kw">pub const </span>MAX: <span class="self">Self </span>= <span class="self">Self</span>::from_millis(i64::MAX);
 
-    <span class="doccomment">/// The earliest possible date that can be represented in BSON.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">i64::MIN</span>);
+    <span class="doccomment">/// The earliest possible date that can be represented in BSON.
+    </span><span class="kw">pub const </span>MIN: <span class="self">Self </span>= <span class="self">Self</span>::from_millis(i64::MIN);
 
-    <span class="doccomment">/// Makes a new [`DateTime`] from the number of non-leap milliseconds since</span>
-    <span class="doccomment">/// January 1, 1970 0:00:00 UTC (aka &quot;UNIX timestamp&quot;).</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_millis</span>(<span class="ident">date</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">date</span>)
+    <span class="doccomment">/// Makes a new [`DateTime`] from the number of non-leap milliseconds since
+    /// January 1, 1970 0:00:00 UTC (aka &quot;UNIX timestamp&quot;).
+    </span><span class="kw">pub const fn </span>from_millis(date: i64) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(date)
     }
 
-    <span class="doccomment">/// Returns a [`DateTime`] which corresponds to the current date and time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="ident">DateTime</span> {
-        <span class="ident"><span class="self">Self</span>::from_system_time</span>(<span class="ident">SystemTime::now</span>())
+    <span class="doccomment">/// Returns a [`DateTime`] which corresponds to the current date and time.
+    </span><span class="kw">pub fn </span>now() -&gt; DateTime {
+        <span class="self">Self</span>::from_system_time(SystemTime::now())
     }
 
-    <span class="doccomment">/// Convert the given `chrono::DateTime` into a `bson::DateTime`, truncating it to millisecond</span>
-    <span class="doccomment">/// precision.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_chrono</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span>(<span class="ident">dt</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">dt</span>.<span class="ident">timestamp_millis</span>())
+    <span class="doccomment">/// Convert the given `chrono::DateTime` into a `bson::DateTime`, truncating it to millisecond
+    /// precision.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+    </span><span class="kw">pub fn </span>from_chrono&lt;T: chrono::TimeZone&gt;(dt: chrono::DateTime&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_millis(dt.timestamp_millis())
     }
 
-    <span class="doccomment">/// Returns a builder used to construct a [`DateTime`] from a given year, month,</span>
-    <span class="doccomment">/// day, and optionally, an hour, minute, second and millisecond, which default to</span>
-    <span class="doccomment">/// 0 if not explicitly set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: You cannot call `build()` before setting at least the year, month and day.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">DateTimeBuilder</span> {
-        <span class="ident">DateTimeBuilder::default</span>()
+    <span class="doccomment">/// Returns a builder used to construct a [`DateTime`] from a given year, month,
+    /// day, and optionally, an hour, minute, second and millisecond, which default to
+    /// 0 if not explicitly set.
+    ///
+    /// Note: You cannot call `build()` before setting at least the year, month and day.
+    </span><span class="kw">pub fn </span>builder() -&gt; DateTimeBuilder {
+        DateTimeBuilder::default()
     }
 
-    <span class="doccomment">/// Convert this [`DateTime`] to a [`chrono::DateTime&lt;Utc&gt;`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: Not every BSON datetime can be represented as a [`chrono::DateTime`]. For such dates,</span>
-    <span class="doccomment">/// [`chrono::MIN_DATETIME`] or [`chrono::MAX_DATETIME`] will be returned, whichever is closer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// let bson_dt = bson::DateTime::now();</span>
-    <span class="doccomment">/// let chrono_dt = bson_dt.to_chrono();</span>
-    <span class="doccomment">/// assert_eq!(bson_dt.timestamp_millis(), chrono_dt.timestamp_millis());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let big = bson::DateTime::from_millis(i64::MAX);</span>
-    <span class="doccomment">/// let chrono_big = big.to_chrono();</span>
-    <span class="doccomment">/// assert_eq!(chrono_big, chrono::MAX_DATETIME)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_chrono</span>(<span class="self">self</span>) -&gt; <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">Utc</span>.<span class="ident">timestamp_millis_opt</span>(<span class="self">self</span>.<span class="number">0</span>) {
-            <span class="ident">LocalResult::Single</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                    <span class="ident">chrono::MIN_DATETIME</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">chrono::MAX_DATETIME</span>
+    <span class="doccomment">/// Convert this [`DateTime`] to a [`chrono::DateTime&lt;Utc&gt;`].
+    ///
+    /// Note: Not every BSON datetime can be represented as a [`chrono::DateTime`]. For such dates,
+    /// [`chrono::MIN_DATETIME`] or [`chrono::MAX_DATETIME`] will be returned, whichever is closer.
+    ///
+    /// ```
+    /// let bson_dt = bson::DateTime::now();
+    /// let chrono_dt = bson_dt.to_chrono();
+    /// assert_eq!(bson_dt.timestamp_millis(), chrono_dt.timestamp_millis());
+    ///
+    /// let big = bson::DateTime::from_millis(i64::MAX);
+    /// let chrono_big = big.to_chrono();
+    /// assert_eq!(chrono_big, chrono::MAX_DATETIME)
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+    </span><span class="kw">pub fn </span>to_chrono(<span class="self">self</span>) -&gt; chrono::DateTime&lt;Utc&gt; {
+        <span class="kw">match </span>Utc.timestamp_millis_opt(<span class="self">self</span>.<span class="number">0</span>) {
+            LocalResult::Single(dt) =&gt; dt,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&lt; <span class="number">0 </span>{
+                    chrono::MIN_DATETIME
+                } <span class="kw">else </span>{
+                    chrono::MAX_DATETIME
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">from_time_private</span>(<span class="ident">dt</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="ident">dt</span>.<span class="ident">unix_timestamp_nanos</span>() <span class="op">/</span> <span class="number">1_000_000</span>;
-        <span class="kw">match</span> <span class="ident">millis</span>.<span class="ident">try_into</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">ts</span>) =&gt; <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">ts</span>),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">millis</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident"><span class="self">Self</span>::MAX</span>
-                } <span class="kw">else</span> {
-                    <span class="ident"><span class="self">Self</span>::MIN</span>
+    <span class="kw">fn </span>from_time_private(dt: time::OffsetDateTime) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>millis = dt.unix_timestamp_nanos() / <span class="number">1_000_000</span>;
+        <span class="kw">match </span>millis.try_into() {
+            <span class="prelude-val">Ok</span>(ts) =&gt; <span class="self">Self</span>::from_millis(ts),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">if </span>millis &gt; <span class="number">0 </span>{
+                    <span class="self">Self</span>::MAX
+                } <span class="kw">else </span>{
+                    <span class="self">Self</span>::MIN
                 }
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_time_0_3</span>(<span class="ident">dt</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_time_private</span>(<span class="ident">dt</span>)
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;time-0_3&quot;</span>))]
+    #[allow(unused)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_time_0_3(dt: time::OffsetDateTime) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_time_private(dt)
     }
 
-    <span class="doccomment">/// Convert the given `time::OffsetDateTime` into a `bson::DateTime`, truncating it to</span>
-    <span class="doccomment">/// millisecond precision.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the provided time is too far in the future or too far in the past to be represented</span>
-    <span class="doccomment">/// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be</span>
-    <span class="doccomment">/// returned, whichever is closer.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_time_0_3</span>(<span class="ident">dt</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_time_private</span>(<span class="ident">dt</span>)
+    <span class="doccomment">/// Convert the given `time::OffsetDateTime` into a `bson::DateTime`, truncating it to
+    /// millisecond precision.
+    ///
+    /// If the provided time is too far in the future or too far in the past to be represented
+    /// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be
+    /// returned, whichever is closer.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+    </span><span class="kw">pub fn </span>from_time_0_3(dt: time::OffsetDateTime) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_time_private(dt)
     }
 
-    <span class="kw">fn</span> <span class="ident">to_time_private</span>(<span class="self">self</span>) -&gt; <span class="ident">time::OffsetDateTime</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_time_opt</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">dt</span>) =&gt; <span class="ident">dt</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                <span class="ident">time::PrimitiveDateTime::MIN</span>
-            } <span class="kw">else</span> {
-                <span class="ident">time::PrimitiveDateTime::MAX</span>
+    <span class="kw">fn </span>to_time_private(<span class="self">self</span>) -&gt; time::OffsetDateTime {
+        <span class="kw">match </span><span class="self">self</span>.to_time_opt() {
+            <span class="prelude-val">Some</span>(dt) =&gt; dt,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&lt; <span class="number">0 </span>{
+                time::PrimitiveDateTime::MIN
+            } <span class="kw">else </span>{
+                time::PrimitiveDateTime::MAX
             }
-            .<span class="ident">assume_utc</span>(),
+            .assume_utc(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_time_opt</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> {
-        <span class="ident">time::OffsetDateTime::UNIX_EPOCH</span>.<span class="ident">checked_add</span>(<span class="ident">time::Duration::milliseconds</span>(<span class="self">self</span>.<span class="number">0</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_time_opt(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;time::OffsetDateTime&gt; {
+        time::OffsetDateTime::UNIX_EPOCH.checked_add(time::Duration::milliseconds(<span class="self">self</span>.<span class="number">0</span>))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_time_0_3</span>(<span class="self">self</span>) -&gt; <span class="ident">time::OffsetDateTime</span> {
-        <span class="self">self</span>.<span class="ident">to_time_private</span>()
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;time-0_3&quot;</span>))]
+    #[allow(unused)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_time_0_3(<span class="self">self</span>) -&gt; time::OffsetDateTime {
+        <span class="self">self</span>.to_time_private()
     }
 
-    <span class="doccomment">/// Convert this [`DateTime`] to a [`time::OffsetDateTime`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: Not every BSON datetime can be represented as a [`time::OffsetDateTime`]. For such</span>
-    <span class="doccomment">/// dates, [`time::PrimitiveDateTime::MIN`] or [`time::PrimitiveDateTime::MAX`] will be</span>
-    <span class="doccomment">/// returned, whichever is closer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// let bson_dt = bson::DateTime::now();</span>
-    <span class="doccomment">/// let time_dt = bson_dt.to_time_0_3();</span>
-    <span class="doccomment">/// assert_eq!(bson_dt.timestamp_millis() / 1000, time_dt.unix_timestamp());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let big = bson::DateTime::from_millis(i64::MIN);</span>
-    <span class="doccomment">/// let time_big = big.to_time_0_3();</span>
-    <span class="doccomment">/// assert_eq!(time_big, time::PrimitiveDateTime::MIN.assume_utc())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_time_0_3</span>(<span class="self">self</span>) -&gt; <span class="ident">time::OffsetDateTime</span> {
-        <span class="self">self</span>.<span class="ident">to_time_private</span>()
+    <span class="doccomment">/// Convert this [`DateTime`] to a [`time::OffsetDateTime`].
+    ///
+    /// Note: Not every BSON datetime can be represented as a [`time::OffsetDateTime`]. For such
+    /// dates, [`time::PrimitiveDateTime::MIN`] or [`time::PrimitiveDateTime::MAX`] will be
+    /// returned, whichever is closer.
+    ///
+    /// ```
+    /// let bson_dt = bson::DateTime::now();
+    /// let time_dt = bson_dt.to_time_0_3();
+    /// assert_eq!(bson_dt.timestamp_millis() / 1000, time_dt.unix_timestamp());
+    ///
+    /// let big = bson::DateTime::from_millis(i64::MIN);
+    /// let time_big = big.to_time_0_3();
+    /// assert_eq!(time_big, time::PrimitiveDateTime::MIN.assume_utc())
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+    </span><span class="kw">pub fn </span>to_time_0_3(<span class="self">self</span>) -&gt; time::OffsetDateTime {
+        <span class="self">self</span>.to_time_private()
     }
 
-    <span class="doccomment">/// Convert the given [`std::time::SystemTime`] to a [`DateTime`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the provided time is too far in the future or too far in the past to be represented</span>
-    <span class="doccomment">/// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be</span>
-    <span class="doccomment">/// returned, whichever is closer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_time</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">st</span>.<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">d</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">as_millis</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> {
-                    <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="ident">d</span>.<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">i64</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident"><span class="self">Self</span>::MAX</span>
+    <span class="doccomment">/// Convert the given [`std::time::SystemTime`] to a [`DateTime`].
+    ///
+    /// If the provided time is too far in the future or too far in the past to be represented
+    /// by a BSON datetime, either [`DateTime::MAX`] or [`DateTime::MIN`] will be
+    /// returned, whichever is closer.
+    </span><span class="kw">pub fn </span>from_system_time(st: SystemTime) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>st.duration_since(SystemTime::UNIX_EPOCH) {
+            <span class="prelude-val">Ok</span>(d) =&gt; {
+                <span class="kw">if </span>d.as_millis() &lt;= i64::MAX <span class="kw">as </span>u128 {
+                    <span class="self">Self</span>::from_millis(d.as_millis() <span class="kw">as </span>i64)
+                } <span class="kw">else </span>{
+                    <span class="self">Self</span>::MAX
                 }
             }
-            <span class="comment">// handle SystemTime from before the Unix Epoch</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">millis</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">duration</span>().<span class="ident">as_millis</span>();
-                <span class="kw">if</span> <span class="ident">millis</span> <span class="op">&gt;</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> {
-                    <span class="ident"><span class="self">Self</span>::MIN</span>
-                } <span class="kw">else</span> {
-                    <span class="ident"><span class="self">Self</span>::from_millis</span>(<span class="op">-</span>(<span class="ident">millis</span> <span class="kw">as</span> <span class="ident">i64</span>))
+            <span class="comment">// handle SystemTime from before the Unix Epoch
+            </span><span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">let </span>millis = e.duration().as_millis();
+                <span class="kw">if </span>millis &gt; i64::MAX <span class="kw">as </span>u128 {
+                    <span class="self">Self</span>::MIN
+                } <span class="kw">else </span>{
+                    <span class="self">Self</span>::from_millis(-(millis <span class="kw">as </span>i64))
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Convert this [`DateTime`] to a [`std::time::SystemTime`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_system_time</span>(<span class="self">self</span>) -&gt; <span class="ident">SystemTime</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">SystemTime::UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u64</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// need to convert to i128 before calculating absolute value since i64::MIN.abs()</span>
-            <span class="comment">// overflows and panics.</span>
-            <span class="ident">SystemTime::UNIX_EPOCH</span> <span class="op">-</span> <span class="ident">Duration::from_millis</span>((<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">i128</span>).<span class="ident">unsigned_abs</span>() <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="doccomment">/// Convert this [`DateTime`] to a [`std::time::SystemTime`].
+    </span><span class="kw">pub fn </span>to_system_time(<span class="self">self</span>) -&gt; SystemTime {
+        <span class="kw">if </span><span class="self">self</span>.<span class="number">0 </span>&gt;= <span class="number">0 </span>{
+            SystemTime::UNIX_EPOCH + Duration::from_millis(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>u64)
+        } <span class="kw">else </span>{
+            <span class="comment">// need to convert to i128 before calculating absolute value since i64::MIN.abs()
+            // overflows and panics.
+            </span>SystemTime::UNIX_EPOCH - Duration::from_millis((<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>i128).unsigned_abs() <span class="kw">as </span>u64)
         }
     }
 
-    <span class="doccomment">/// Returns the number of non-leap-milliseconds since January 1, 1970 UTC.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">timestamp_millis</span>(<span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the number of non-leap-milliseconds since January 1, 1970 UTC.
+    </span><span class="kw">pub const fn </span>timestamp_millis(<span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="attribute">#[deprecated(since = <span class="string">&quot;2.3.0&quot;</span>, note = <span class="string">&quot;Use try_to_rfc3339_string instead.&quot;</span>)]
+    </span><span class="doccomment">/// Convert this [`DateTime`] to an RFC 3339 formatted string.  Panics if it could not be
+    /// represented in that format.
+    </span><span class="kw">pub fn </span>to_rfc3339_string(<span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.try_to_rfc3339_string().unwrap()
     }
 
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;2.3.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use try_to_rfc3339_string instead.&quot;</span>)]</span>
-    <span class="doccomment">/// Convert this [`DateTime`] to an RFC 3339 formatted string.  Panics if it could not be</span>
-    <span class="doccomment">/// represented in that format.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_rfc3339_string</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">try_to_rfc3339_string</span>().<span class="ident">unwrap</span>()
-    }
-
-    <span class="doccomment">/// Convert this [`DateTime`] to an RFC 3339 formatted string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_to_rfc3339_string</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">to_time_0_3</span>()
-            .<span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="ident">Rfc3339</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::CannotFormat</span> {
-                <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+    <span class="doccomment">/// Convert this [`DateTime`] to an RFC 3339 formatted string.
+    </span><span class="kw">pub fn </span>try_to_rfc3339_string(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+        <span class="self">self</span>.to_time_0_3()
+            .format(<span class="kw-2">&amp;</span>Rfc3339)
+            .map_err(|e| Error::CannotFormat {
+                message: e.to_string(),
             })
     }
 
-    <span class="doccomment">/// Convert the given RFC 3339 formatted string to a [`DateTime`], truncating it to millisecond</span>
-    <span class="doccomment">/// precision.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_rfc3339_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">odt</span> <span class="op">=</span> <span class="ident">time::OffsetDateTime::parse</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">Rfc3339</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-            <span class="ident">Error::InvalidTimestamp</span> {
-                <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+    <span class="doccomment">/// Convert the given RFC 3339 formatted string to a [`DateTime`], truncating it to millisecond
+    /// precision.
+    </span><span class="kw">pub fn </span>parse_rfc3339_str(s: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>odt = time::OffsetDateTime::parse(s.as_ref(), <span class="kw-2">&amp;</span>Rfc3339).map_err(|e| {
+            Error::InvalidTimestamp {
+                message: e.to_string(),
             }
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_time_0_3</span>(<span class="ident">odt</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_time_0_3(odt))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tup</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DateTime&quot;</span>);
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_time_opt</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">dt</span>) =&gt; <span class="ident">tup</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">tup</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>),
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>tup = f.debug_tuple(<span class="string">&quot;DateTime&quot;</span>);
+        <span class="kw">match </span><span class="self">self</span>.to_time_opt() {
+            <span class="prelude-val">Some</span>(dt) =&gt; tup.field(<span class="kw-2">&amp;</span>dt),
+            <span class="kw">_ </span>=&gt; tup.field(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>),
         };
-        <span class="ident">tup</span>.<span class="ident">finish</span>()
+        tup.finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_time_opt</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">dt</span>) =&gt; <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>, <span class="ident">f</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.to_time_opt() {
+            <span class="prelude-val">Some</span>(dt) =&gt; Display::fmt(<span class="kw-2">&amp;</span>dt, f),
+            <span class="kw">_ </span>=&gt; Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">st</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_system_time</span>(<span class="ident">st</span>)
+<span class="kw">impl </span>From&lt;SystemTime&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>from(st: SystemTime) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_system_time(st)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SystemTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dt</span>: <span class="ident"><span class="kw">crate</span>::DateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">dt</span>.<span class="ident">to_system_time</span>()
+<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::DateTime&gt; <span class="kw">for </span>SystemTime {
+    <span class="kw">fn </span>from(dt: <span class="kw">crate</span>::DateTime) -&gt; <span class="self">Self </span>{
+        dt.to_system_time()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson_dt</span>: <span class="ident">DateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">bson_dt</span>.<span class="ident">to_chrono</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;<span class="kw">crate</span>::DateTime&gt; <span class="kw">for </span>chrono::DateTime&lt;Utc&gt; {
+    <span class="kw">fn </span>from(bson_dt: DateTime) -&gt; <span class="self">Self </span>{
+        bson_dt.to_chrono()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">chrono::TimeZone</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_chrono</span>(<span class="ident">x</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;T: chrono::TimeZone&gt; From&lt;chrono::DateTime&lt;T&gt;&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>from(x: chrono::DateTime&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_chrono(x)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, chrono::DateTime&lt;Utc&gt;&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;chrono::DateTime&lt;Utc&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">dt</span>.<span class="ident">to_chrono</span>())
+        <span class="kw">let </span>dt = DateTime::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(dt.to_chrono())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>))))]</span>
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;chrono-0_4&quot;</span>, feature = <span class="string">&quot;chrono-0_4&quot;</span>))))]
+</span><span class="kw">impl </span>SerializeAs&lt;chrono::DateTime&lt;Utc&gt;&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(
+        source: <span class="kw-2">&amp;</span>chrono::DateTime&lt;Utc&gt;,
+        serializer: S,
+    ) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime::from_chrono</span>(<span class="kw-2">*</span><span class="ident">source</span>);
-        <span class="ident">dt</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let </span>dt = DateTime::from_chrono(<span class="kw-2">*</span>source);
+        dt.serialize(serializer)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::DateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">time::OffsetDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson_dt</span>: <span class="ident">DateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">bson_dt</span>.<span class="ident">to_time_0_3</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;<span class="kw">crate</span>::DateTime&gt; <span class="kw">for </span>time::OffsetDateTime {
+    <span class="kw">fn </span>from(bson_dt: DateTime) -&gt; <span class="self">Self </span>{
+        bson_dt.to_time_0_3()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">time::OffsetDateTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_time_0_3</span>(<span class="ident">x</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+</span><span class="kw">impl </span>From&lt;time::OffsetDateTime&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>from(x: time::OffsetDateTime) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_time_0_3(x)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;time-0_3&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;time-0_3&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, time::OffsetDateTime&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;time::OffsetDateTime, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">dt</span>.<span class="ident">to_time_0_3</span>())
+        <span class="kw">let </span>dt = DateTime::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(dt.to_time_0_3())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_with&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>))))]</span>
-<span class="kw">impl</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">time::OffsetDateTime</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;time-0_3&quot;</span>, feature = <span class="string">&quot;serde_with&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;time-0_3&quot;</span>, feature = <span class="string">&quot;chrono-0_4&quot;</span>))))]
+</span><span class="kw">impl </span>SerializeAs&lt;time::OffsetDateTime&gt; <span class="kw">for </span><span class="kw">crate</span>::DateTime {
+    <span class="kw">fn </span>serialize_as&lt;S&gt;(
+        source: <span class="kw-2">&amp;</span>time::OffsetDateTime,
+        serializer: S,
+    ) -&gt; std::result::Result&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime::from_time_0_3</span>(<span class="kw-2">*</span><span class="ident">source</span>);
-        <span class="ident">dt</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">let </span>dt = DateTime::from_time_0_3(<span class="kw-2">*</span>source);
+        dt.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Errors that can occur during [`DateTime`] construction and generation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Error returned when an invalid datetime format is provided to a conversion method.</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">InvalidTimestamp</span> { <span class="ident">message</span>: <span class="ident">String</span> },
-    <span class="doccomment">/// Error returned when a `DateTime` cannot be represented in a particular format.</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">CannotFormat</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+<span class="doccomment">/// Errors that can occur during [`DateTime`] construction and generation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// Error returned when an invalid datetime format is provided to a conversion method.
+    </span><span class="attribute">#[non_exhaustive]
+    </span>InvalidTimestamp { message: String },
+    <span class="doccomment">/// Error returned when a `DateTime` cannot be represented in a particular format.
+    </span><span class="attribute">#[non_exhaustive]
+    </span>CannotFormat { message: String },
 }
 
-<span class="doccomment">/// Alias for `Result&lt;T, DateTime::Error&gt;`</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias for `Result&lt;T, DateTime::Error&gt;`
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = result::Result&lt;T, Error&gt;;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidTimestamp</span> { <span class="ident">message</span> } <span class="op">|</span> <span class="ident">Error::CannotFormat</span> { <span class="ident">message</span> } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::InvalidTimestamp { message } | Error::CannotFormat { message } =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, message)
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

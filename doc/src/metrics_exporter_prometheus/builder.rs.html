@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1020,581 +1020,581 @@
 <span id="1020">1020</span>
 <span id="1021">1021</span>
 <span id="1022">1022</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">SocketAddr</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::thread</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+</span><span class="kw">use </span>std::convert::TryFrom;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">use </span>std::future::Future;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+</span><span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, SocketAddr};
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">use </span>std::pin::Pin;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">use </span>std::thread;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">hyper::Body</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">use </span>hyper::Body;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">hyper</span>::{
-    <span class="ident">server</span>::{<span class="ident">conn::AddrStream</span>, <span class="ident">Server</span>},
-    <span class="ident">service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>},
-    <span class="ident">Response</span>, <span class="ident">StatusCode</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+</span><span class="kw">use </span>hyper::{
+    server::{conn::AddrStream, Server},
+    service::{make_service_fn, service_fn},
+    Response, StatusCode,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">hyper</span>::{
-    <span class="ident">body</span>::{<span class="ident">aggregate</span>, <span class="ident">Buf</span>},
-    <span class="ident">client::Client</span>,
-    <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Uri</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+</span><span class="kw">use </span>hyper::{
+    body::{aggregate, Buf},
+    client::Client,
+    Method, Request, Uri,
 };
 
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">ipnet::IpNet</span>;
-<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
-<span class="kw">use</span> <span class="ident">quanta::Clock</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::runtime</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tracing::error</span>;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+</span><span class="kw">use </span>ipnet::IpNet;
+<span class="kw">use </span>parking_lot::RwLock;
+<span class="kw">use </span>quanta::Clock;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">use </span>tokio::runtime;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+</span><span class="kw">use </span>tracing::error;
 
-<span class="kw">use</span> <span class="ident">metrics_util</span>::{
-    <span class="ident">parse_quantiles</span>,
-    <span class="ident">registry</span>::{<span class="ident">GenerationalStorage</span>, <span class="ident">Recency</span>, <span class="ident">Registry</span>},
-    <span class="ident">MetricKindMask</span>, <span class="ident">Quantile</span>,
+<span class="kw">use </span>metrics_util::{
+    parse_quantiles,
+    registry::{GenerationalStorage, Recency, Registry},
+    MetricKindMask, Quantile,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::Matcher</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::distribution::DistributionBuilder</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::recorder</span>::{<span class="ident">Inner</span>, <span class="ident">PrometheusRecorder</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">common::BuildError</span>, <span class="ident">PrometheusHandle</span>};
+<span class="kw">use </span><span class="kw">crate</span>::common::Matcher;
+<span class="kw">use </span><span class="kw">crate</span>::distribution::DistributionBuilder;
+<span class="kw">use </span><span class="kw">crate</span>::recorder::{Inner, PrometheusRecorder};
+<span class="kw">use crate</span>::{common::BuildError, PrometheusHandle};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-<span class="kw">type</span> <span class="ident">ExporterFuture</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">hyper::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+</span><span class="kw">type </span>ExporterFuture = Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;(), hyper::Error&gt;&gt; + Send + <span class="lifetime">&#39;static</span>&gt;&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ExporterConfig</span> {
-    <span class="comment">// Run an HTTP listener on the given `listen_address`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-    <span class="ident">HttpListener</span> { <span class="ident">listen_address</span>: <span class="ident">SocketAddr</span> },
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">enum </span>ExporterConfig {
+    <span class="comment">// Run an HTTP listener on the given `listen_address`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+    </span>HttpListener { listen_address: SocketAddr },
 
-    <span class="comment">// Run a push gateway task sending to the given `endpoint` after `interval` time has elapsed,</span>
-    <span class="comment">// infinitely.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-    <span class="ident">PushGateway</span> { <span class="ident">endpoint</span>: <span class="ident">Uri</span>, <span class="ident">interval</span>: <span class="ident">Duration</span> },
+    <span class="comment">// Run a push gateway task sending to the given `endpoint` after `interval` time has elapsed,
+    // infinitely.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+    </span>PushGateway { endpoint: Uri, interval: Duration },
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">Unconfigured</span>,
+    <span class="attribute">#[allow(dead_code)]
+    </span>Unconfigured,
 }
 
-<span class="kw">impl</span> <span class="ident">ExporterConfig</span> {
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">as_type_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::HttpListener</span> { .. } =&gt; <span class="string">&quot;http-listener&quot;</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-            <span class="ident"><span class="self">Self</span>::PushGateway</span> { .. } =&gt; <span class="string">&quot;push-gateway&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Unconfigured</span> =&gt; <span class="string">&quot;unconfigured,&quot;</span>,
+<span class="kw">impl </span>ExporterConfig {
+    <span class="attribute">#[cfg_attr(not(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>)), allow(dead_code))]
+    </span><span class="kw">fn </span>as_type_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+            </span><span class="self">Self</span>::HttpListener { .. } =&gt; <span class="string">&quot;http-listener&quot;</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+            </span><span class="self">Self</span>::PushGateway { .. } =&gt; <span class="string">&quot;push-gateway&quot;</span>,
+            <span class="self">Self</span>::Unconfigured =&gt; <span class="string">&quot;unconfigured,&quot;</span>,
         }
     }
 }
 
-<span class="doccomment">/// Builder for creating and installing a Prometheus recorder/exporter.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrometheusBuilder</span> {
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
-    <span class="ident">exporter_config</span>: <span class="ident">ExporterConfig</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-    <span class="ident">allowed_addresses</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpNet</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">quantiles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Quantile</span><span class="op">&gt;</span>,
-    <span class="ident">buckets</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">bucket_overrides</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Matcher</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">idle_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">recency_mask</span>: <span class="ident">MetricKindMask</span>,
-    <span class="ident">global_labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Builder for creating and installing a Prometheus recorder/exporter.
+</span><span class="kw">pub struct </span>PrometheusBuilder {
+    <span class="attribute">#[cfg_attr(not(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>)), allow(dead_code))]
+    </span>exporter_config: ExporterConfig,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+    </span>allowed_addresses: <span class="prelude-ty">Option</span>&lt;Vec&lt;IpNet&gt;&gt;,
+    quantiles: Vec&lt;Quantile&gt;,
+    buckets: <span class="prelude-ty">Option</span>&lt;Vec&lt;f64&gt;&gt;,
+    bucket_overrides: <span class="prelude-ty">Option</span>&lt;HashMap&lt;Matcher, Vec&lt;f64&gt;&gt;&gt;,
+    idle_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    recency_mask: MetricKindMask,
+    global_labels: <span class="prelude-ty">Option</span>&lt;IndexMap&lt;String, String&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PrometheusBuilder</span> {
-    <span class="doccomment">/// Creates a new [`PrometheusBuilder`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">quantiles</span> <span class="op">=</span> <span class="ident">parse_quantiles</span>(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">0.95</span>, <span class="number">0.99</span>, <span class="number">0.999</span>, <span class="number">1.0</span>]);
+<span class="kw">impl </span>PrometheusBuilder {
+    <span class="doccomment">/// Creates a new [`PrometheusBuilder`].
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>quantiles = parse_quantiles(<span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">0.95</span>, <span class="number">0.99</span>, <span class="number">0.999</span>, <span class="number">1.0</span>]);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">exporter_config</span> <span class="op">=</span> <span class="ident">ExporterConfig::HttpListener</span> {
-            <span class="ident">listen_address</span>: <span class="ident">SocketAddr::new</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="number">9000</span>),
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+        </span><span class="kw">let </span>exporter_config = ExporterConfig::HttpListener {
+            listen_address: SocketAddr::new(IpAddr::V4(Ipv4Addr::new(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)), <span class="number">9000</span>),
         };
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">exporter_config</span> <span class="op">=</span> <span class="ident">ExporterConfig::Unconfigured</span>;
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;http-listener&quot;</span>))]
+        </span><span class="kw">let </span>exporter_config = ExporterConfig::Unconfigured;
 
-        <span class="self">Self</span> {
-            <span class="ident">exporter_config</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-            <span class="ident">allowed_addresses</span>: <span class="prelude-val">None</span>,
-            <span class="ident">quantiles</span>,
-            <span class="ident">buckets</span>: <span class="prelude-val">None</span>,
-            <span class="ident">bucket_overrides</span>: <span class="prelude-val">None</span>,
-            <span class="ident">idle_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">recency_mask</span>: <span class="ident">MetricKindMask::NONE</span>,
-            <span class="ident">global_labels</span>: <span class="prelude-val">None</span>,
+        <span class="self">Self </span>{
+            exporter_config,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+            </span>allowed_addresses: <span class="prelude-val">None</span>,
+            quantiles,
+            buckets: <span class="prelude-val">None</span>,
+            bucket_overrides: <span class="prelude-val">None</span>,
+            idle_timeout: <span class="prelude-val">None</span>,
+            recency_mask: MetricKindMask::NONE,
+            global_labels: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Configures the exporter to expose an HTTP listener that functions as a [scrape endpoint].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The HTTP listener that is spawned will respond to GET requests on any request path.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Running in HTTP listener mode is mutually exclusive with the push gateway i.e. enabling the</span>
-    <span class="doccomment">/// HTTP listener will disable the push gateway, and vise versa.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to enabled, listening at `0.0.0.0:9000`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [scrape endpoint]: https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_http_listener</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">exporter_config</span> <span class="op">=</span> <span class="ident">ExporterConfig::HttpListener</span> { <span class="ident">listen_address</span>: <span class="ident">addr</span>.<span class="ident">into</span>() };
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Configures the exporter to expose an HTTP listener that functions as a [scrape endpoint].
+    ///
+    /// The HTTP listener that is spawned will respond to GET requests on any request path.
+    ///
+    /// Running in HTTP listener mode is mutually exclusive with the push gateway i.e. enabling the
+    /// HTTP listener will disable the push gateway, and vise versa.
+    ///
+    /// Defaults to enabled, listening at `0.0.0.0:9000`.
+    ///
+    /// [scrape endpoint]: https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http-listener&quot;</span>)))]
+    #[must_use]
+    </span><span class="kw">pub fn </span>with_http_listener(<span class="kw-2">mut </span><span class="self">self</span>, addr: <span class="kw">impl </span>Into&lt;SocketAddr&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.exporter_config = ExporterConfig::HttpListener { listen_address: addr.into() };
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Configures the exporter to push periodic requests to a Prometheus [push gateway].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Running in push gateway mode is mutually exclusive with the HTTP listener i.e. enabling the</span>
-    <span class="doccomment">/// push gateway will disable the HTTP listener, and vise versa.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the given endpoint cannot be parsed into a valid URI, an error variant will be</span>
-    <span class="doccomment">/// returned describing the error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [push gateway]: https://prometheus.io/docs/instrumenting/pushing/</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_push_gateway</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">endpoint</span>: <span class="ident">T</span>,
-        <span class="ident">interval</span>: <span class="ident">Duration</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">BuildError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Configures the exporter to push periodic requests to a Prometheus [push gateway].
+    ///
+    /// Running in push gateway mode is mutually exclusive with the HTTP listener i.e. enabling the
+    /// push gateway will disable the HTTP listener, and vise versa.
+    ///
+    /// Defaults to disabled.
+    ///
+    /// ## Errors
+    ///
+    /// If the given endpoint cannot be parsed into a valid URI, an error variant will be
+    /// returned describing the error.
+    ///
+    /// [push gateway]: https://prometheus.io/docs/instrumenting/pushing/
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)))]
+    </span><span class="kw">pub fn </span>with_push_gateway&lt;T&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        endpoint: T,
+        interval: Duration,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, BuildError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;str&gt;,
     {
-        <span class="self">self</span>.<span class="ident">exporter_config</span> <span class="op">=</span> <span class="ident">ExporterConfig::PushGateway</span> {
-            <span class="ident">endpoint</span>: <span class="ident">Uri::try_from</span>(<span class="ident">endpoint</span>.<span class="ident">as_ref</span>())
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">BuildError::InvalidPushGatewayEndpoint</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>,
-            <span class="ident">interval</span>,
-        };
-
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Adds an IP address or subnet to the allowlist for the scrape endpoint.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a client makes a request to the scrape endpoint and their IP is not present in the</span>
-    <span class="doccomment">/// allowlist, either directly or within any of the allowed subnets, they will receive a 403</span>
-    <span class="doccomment">/// Forbidden response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to allowing all IPs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Security Considerations</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On its own, an IP allowlist is insufficient for access control, if the exporter is running</span>
-    <span class="doccomment">/// in an environment alongside applications (such as web browsers) that are susceptible to [DNS</span>
-    <span class="doccomment">/// rebinding](https://en.wikipedia.org/wiki/DNS_rebinding) attacks.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the given address cannot be parsed into an IP address or subnet, an error variant will be</span>
-    <span class="doccomment">/// returned describing the error.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_allowed_address</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">address</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">BuildError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-
-        <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">IpNet::from_str</span>(<span class="ident">address</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">BuildError::InvalidAllowlistAddress</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">allowed_addresses</span>.<span class="ident">get_or_insert</span>(<span class="macro">vec!</span>[]).<span class="ident">push</span>(<span class="ident">address</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Sets the quantiles to use when rendering histograms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Quantiles represent a scale of 0 to 1, where percentiles represent a scale of 1 to 100, so</span>
-    <span class="doccomment">/// a quantile of 0.99 is the 99th percentile, and a quantile of 0.99 is the 99.9th percentile.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to a hard-coded set of quantiles: 0.0, 0.5, 0.9, 0.95, 0.99, 0.999, and 1.0. This means</span>
-    <span class="doccomment">/// that all histograms will be exposed as Prometheus summaries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If buckets are set (via [`set_buckets`][Self::set_buckets] or</span>
-    <span class="doccomment">/// [`set_buckets_for_metric`][Self::set_buckets_for_metric]) then all histograms will be exposed</span>
-    <span class="doccomment">/// as summaries instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `quantiles` is empty, an error variant will be thrown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_quantiles</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">quantiles</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">quantiles</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">BuildError::EmptyBucketsOrQuantiles</span>);
-        }
-
-        <span class="self">self</span>.<span class="ident">quantiles</span> <span class="op">=</span> <span class="ident">parse_quantiles</span>(<span class="ident">quantiles</span>);
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Sets the buckets to use when rendering histograms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Buckets values represent the higher bound of each buckets.  If buckets are set, then all</span>
-    <span class="doccomment">/// histograms will be rendered as true Prometheus histograms, instead of summaries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `values` is empty, an error variant will be thrown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_buckets</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">values</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">BuildError::EmptyBucketsOrQuantiles</span>);
-        }
-
-        <span class="self">self</span>.<span class="ident">buckets</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">values</span>.<span class="ident">to_vec</span>());
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Sets the bucket for a specific pattern.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The match pattern can be a full match (equality), prefix match, or suffix match.  The</span>
-    <span class="doccomment">/// matchers are applied in that order if two or more matchers would apply to a single metric.</span>
-    <span class="doccomment">/// That is to say, if a full match and a prefix match applied to a metric, the full match would</span>
-    <span class="doccomment">/// win, and if a prefix match and a suffix match applied to a metric, the prefix match would win.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Buckets values represent the higher bound of each buckets.  If buckets are set, then any</span>
-    <span class="doccomment">/// histograms that match will be rendered as true Prometheus histograms, instead of summaries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This option changes the observer&#39;s output of histogram-type metric into summaries.</span>
-    <span class="doccomment">/// It only affects matching metrics if [`set_buckets`][Self::set_buckets] was not used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `values` is empty, an error variant will be thrown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_buckets_for_metric</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">matcher</span>: <span class="ident">Matcher</span>,
-        <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">values</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">BuildError::EmptyBucketsOrQuantiles</span>);
-        }
-
-        <span class="kw">let</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bucket_overrides</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">HashMap::new</span>);
-        <span class="ident">buckets</span>.<span class="ident">insert</span>(<span class="ident">matcher</span>.<span class="ident">sanitized</span>(), <span class="ident">values</span>.<span class="ident">to_vec</span>());
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Sets the idle timeout for metrics.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a metric hasn&#39;t been updated within this timeout, it will be removed from the registry</span>
-    <span class="doccomment">/// and in turn removed from the normal scrape output until the metric is emitted again.  This</span>
-    <span class="doccomment">/// behavior is driven by requests to generate rendered output, and so metrics will not be</span>
-    <span class="doccomment">/// removed unless a request has been made recently enough to prune the idle metrics.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Further, the metric kind &quot;mask&quot; configures which metrics will be considered by the idle</span>
-    <span class="doccomment">/// timeout.  If the kind of a metric being considered for idle timeout is not of a kind</span>
-    <span class="doccomment">/// represented by the mask, it will not be affected, even if it would have othered been removed</span>
-    <span class="doccomment">/// for exceeding the idle timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to the documentation for [`MetricKindMask`](metrics_util::MetricKindMask) for more</span>
-    <span class="doccomment">/// information on defining a metric kind mask.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idle_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">MetricKindMask</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">idle_timeout</span> <span class="op">=</span> <span class="ident">timeout</span>;
-        <span class="self">self</span>.<span class="ident">recency_mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">idle_timeout</span>.<span class="ident">is_none</span>() { <span class="ident">MetricKindMask::NONE</span> } <span class="kw">else</span> { <span class="ident">mask</span> };
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Adds a global label to this exporter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Global labels are applied to all metrics.  Labels defined on the metric key itself have precedence</span>
-    <span class="doccomment">/// over any global labels.  If this method is called multiple times, the latest value for a given label</span>
-    <span class="doccomment">/// key will be used.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_global_label</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    {
-        <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global_labels</span>.<span class="ident">get_or_insert_with</span>(<span class="ident">IndexMap::new</span>);
-        <span class="ident">labels</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Builds the recorder and exporter and installs them globally.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When called from within a Tokio runtime, the exporter future is spawned directly</span>
-    <span class="doccomment">/// into the runtime.  Otherwise, a new single-threaded Tokio runtime is created</span>
-    <span class="doccomment">/// on a background thread, and the exporter is spawned there.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error while either building the recorder and exporter, or installing the</span>
-    <span class="doccomment">/// recorder and exporter, an error variant will be returned describing the error.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">handle</span>) <span class="op">=</span> <span class="ident">runtime::Handle::try_current</span>() {
-            <span class="kw">let</span> (<span class="ident">recorder</span>, <span class="ident">exporter</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">enter</span>();
-                <span class="self">self</span>.<span class="ident">build</span>()<span class="question-mark">?</span>
-            };
-
-            <span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">exporter</span>);
-
-            <span class="ident">recorder</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">thread_name</span> <span class="op">=</span>
-                <span class="macro">format!</span>(<span class="string">&quot;metrics-exporter-prometheus-{}&quot;</span>, <span class="self">self</span>.<span class="ident">exporter_config</span>.<span class="ident">as_type_str</span>());
-
-            <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">runtime::Builder::new_current_thread</span>()
-                .<span class="ident">enable_all</span>()
-                .<span class="ident">build</span>()
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">BuildError::FailedToCreateRuntime</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> (<span class="ident">recorder</span>, <span class="ident">exporter</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">enter</span>();
-                <span class="self">self</span>.<span class="ident">build</span>()<span class="question-mark">?</span>
-            };
-
-            <span class="ident">thread::Builder::new</span>()
-                .<span class="ident">name</span>(<span class="ident">thread_name</span>)
-                .<span class="ident">spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">exporter</span>))
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">BuildError::FailedToCreateRuntime</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-
-            <span class="ident">recorder</span>
+        <span class="self">self</span>.exporter_config = ExporterConfig::PushGateway {
+            endpoint: Uri::try_from(endpoint.as_ref())
+                .map_err(|e| BuildError::InvalidPushGatewayEndpoint(e.to_string()))<span class="question-mark">?</span>,
+            interval,
         };
 
-        <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Adds an IP address or subnet to the allowlist for the scrape endpoint.
+    ///
+    /// If a client makes a request to the scrape endpoint and their IP is not present in the
+    /// allowlist, either directly or within any of the allowed subnets, they will receive a 403
+    /// Forbidden response.
+    ///
+    /// Defaults to allowing all IPs.
+    ///
+    /// ## Security Considerations
+    ///
+    /// On its own, an IP allowlist is insufficient for access control, if the exporter is running
+    /// in an environment alongside applications (such as web browsers) that are susceptible to [DNS
+    /// rebinding](https://en.wikipedia.org/wiki/DNS_rebinding) attacks.
+    ///
+    /// ## Errors
+    ///
+    /// If the given address cannot be parsed into an IP address or subnet, an error variant will be
+    /// returned describing the error.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;http-listener&quot;</span>)))]
+    </span><span class="kw">pub fn </span>add_allowed_address&lt;A&gt;(<span class="kw-2">mut </span><span class="self">self</span>, address: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, BuildError&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;str&gt;,
+    {
+        <span class="kw">use </span>std::str::FromStr;
+
+        <span class="kw">let </span>address = IpNet::from_str(address.as_ref())
+            .map_err(|e| BuildError::InvalidAllowlistAddress(e.to_string()))<span class="question-mark">?</span>;
+        <span class="self">self</span>.allowed_addresses.get_or_insert(<span class="macro">vec!</span>[]).push(address);
+
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Sets the quantiles to use when rendering histograms.
+    ///
+    /// Quantiles represent a scale of 0 to 1, where percentiles represent a scale of 1 to 100, so
+    /// a quantile of 0.99 is the 99th percentile, and a quantile of 0.99 is the 99.9th percentile.
+    ///
+    /// Defaults to a hard-coded set of quantiles: 0.0, 0.5, 0.9, 0.95, 0.99, 0.999, and 1.0. This means
+    /// that all histograms will be exposed as Prometheus summaries.
+    ///
+    /// If buckets are set (via [`set_buckets`][Self::set_buckets] or
+    /// [`set_buckets_for_metric`][Self::set_buckets_for_metric]) then all histograms will be exposed
+    /// as summaries instead.
+    ///
+    /// ## Errors
+    ///
+    /// If `quantiles` is empty, an error variant will be thrown.
+    </span><span class="kw">pub fn </span>set_quantiles(<span class="kw-2">mut </span><span class="self">self</span>, quantiles: <span class="kw-2">&amp;</span>[f64]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, BuildError&gt; {
+        <span class="kw">if </span>quantiles.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(BuildError::EmptyBucketsOrQuantiles);
+        }
+
+        <span class="self">self</span>.quantiles = parse_quantiles(quantiles);
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Sets the buckets to use when rendering histograms.
+    ///
+    /// Buckets values represent the higher bound of each buckets.  If buckets are set, then all
+    /// histograms will be rendered as true Prometheus histograms, instead of summaries.
+    ///
+    /// ## Errors
+    ///
+    /// If `values` is empty, an error variant will be thrown.
+    </span><span class="kw">pub fn </span>set_buckets(<span class="kw-2">mut </span><span class="self">self</span>, values: <span class="kw-2">&amp;</span>[f64]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, BuildError&gt; {
+        <span class="kw">if </span>values.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(BuildError::EmptyBucketsOrQuantiles);
+        }
+
+        <span class="self">self</span>.buckets = <span class="prelude-val">Some</span>(values.to_vec());
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Sets the bucket for a specific pattern.
+    ///
+    /// The match pattern can be a full match (equality), prefix match, or suffix match.  The
+    /// matchers are applied in that order if two or more matchers would apply to a single metric.
+    /// That is to say, if a full match and a prefix match applied to a metric, the full match would
+    /// win, and if a prefix match and a suffix match applied to a metric, the prefix match would win.
+    ///
+    /// Buckets values represent the higher bound of each buckets.  If buckets are set, then any
+    /// histograms that match will be rendered as true Prometheus histograms, instead of summaries.
+    ///
+    /// This option changes the observer&#39;s output of histogram-type metric into summaries.
+    /// It only affects matching metrics if [`set_buckets`][Self::set_buckets] was not used.
+    ///
+    /// ## Errors
+    ///
+    /// If `values` is empty, an error variant will be thrown.
+    </span><span class="kw">pub fn </span>set_buckets_for_metric(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        matcher: Matcher,
+        values: <span class="kw-2">&amp;</span>[f64],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, BuildError&gt; {
+        <span class="kw">if </span>values.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(BuildError::EmptyBucketsOrQuantiles);
+        }
+
+        <span class="kw">let </span>buckets = <span class="self">self</span>.bucket_overrides.get_or_insert_with(HashMap::new);
+        buckets.insert(matcher.sanitized(), values.to_vec());
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>)
+    }
+
+    <span class="doccomment">/// Sets the idle timeout for metrics.
+    ///
+    /// If a metric hasn&#39;t been updated within this timeout, it will be removed from the registry
+    /// and in turn removed from the normal scrape output until the metric is emitted again.  This
+    /// behavior is driven by requests to generate rendered output, and so metrics will not be
+    /// removed unless a request has been made recently enough to prune the idle metrics.
+    ///
+    /// Further, the metric kind &quot;mask&quot; configures which metrics will be considered by the idle
+    /// timeout.  If the kind of a metric being considered for idle timeout is not of a kind
+    /// represented by the mask, it will not be affected, even if it would have othered been removed
+    /// for exceeding the idle timeout.
+    ///
+    /// Refer to the documentation for [`MetricKindMask`](metrics_util::MetricKindMask) for more
+    /// information on defining a metric kind mask.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>idle_timeout(<span class="kw-2">mut </span><span class="self">self</span>, mask: MetricKindMask, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.idle_timeout = timeout;
+        <span class="self">self</span>.recency_mask = <span class="kw">if </span><span class="self">self</span>.idle_timeout.is_none() { MetricKindMask::NONE } <span class="kw">else </span>{ mask };
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Adds a global label to this exporter.
+    ///
+    /// Global labels are applied to all metrics.  Labels defined on the metric key itself have precedence
+    /// over any global labels.  If this method is called multiple times, the latest value for a given label
+    /// key will be used.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">pub fn </span>add_global_label&lt;K, V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, key: K, value: V) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;String&gt;,
+        V: Into&lt;String&gt;,
+    {
+        <span class="kw">let </span>labels = <span class="self">self</span>.global_labels.get_or_insert_with(IndexMap::new);
+        labels.insert(key.into(), value.into());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Builds the recorder and exporter and installs them globally.
+    ///
+    /// When called from within a Tokio runtime, the exporter future is spawned directly
+    /// into the runtime.  Otherwise, a new single-threaded Tokio runtime is created
+    /// on a background thread, and the exporter is spawned there.
+    ///
+    /// ## Errors
+    ///
+    /// If there is an error while either building the recorder and exporter, or installing the
+    /// recorder and exporter, an error variant will be returned describing the error.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))))]
+    </span><span class="kw">pub fn </span>install(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), BuildError&gt; {
+        <span class="kw">let </span>recorder = <span class="kw">if let </span><span class="prelude-val">Ok</span>(handle) = runtime::Handle::try_current() {
+            <span class="kw">let </span>(recorder, exporter) = {
+                <span class="kw">let </span>_g = handle.enter();
+                <span class="self">self</span>.build()<span class="question-mark">?
+            </span>};
+
+            handle.spawn(exporter);
+
+            recorder
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>thread_name =
+                <span class="macro">format!</span>(<span class="string">&quot;metrics-exporter-prometheus-{}&quot;</span>, <span class="self">self</span>.exporter_config.as_type_str());
+
+            <span class="kw">let </span>runtime = runtime::Builder::new_current_thread()
+                .enable_all()
+                .build()
+                .map_err(|e| BuildError::FailedToCreateRuntime(e.to_string()))<span class="question-mark">?</span>;
+
+            <span class="kw">let </span>(recorder, exporter) = {
+                <span class="kw">let </span>_g = runtime.enter();
+                <span class="self">self</span>.build()<span class="question-mark">?
+            </span>};
+
+            thread::Builder::new()
+                .name(thread_name)
+                .spawn(<span class="kw">move </span>|| runtime.block_on(exporter))
+                .map_err(|e| BuildError::FailedToCreateRuntime(e.to_string()))<span class="question-mark">?</span>;
+
+            recorder
+        };
+
+        metrics::set_boxed_recorder(Box::new(recorder))<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Builds the recorder and installs it globally, returning a handle to it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The handle can be used to generate valid Prometheus scrape endpoint payloads directly.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error while building the recorder, or installing the recorder, an error</span>
-    <span class="doccomment">/// variant will be returned describing the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_recorder</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrometheusHandle</span>, <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build_recorder</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
+    <span class="doccomment">/// Builds the recorder and installs it globally, returning a handle to it.
+    ///
+    /// The handle can be used to generate valid Prometheus scrape endpoint payloads directly.
+    ///
+    /// ## Errors
+    ///
+    /// If there is an error while building the recorder, or installing the recorder, an error
+    /// variant will be returned describing the error.
+    </span><span class="kw">pub fn </span>install_recorder(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PrometheusHandle, BuildError&gt; {
+        <span class="kw">let </span>recorder = <span class="self">self</span>.build_recorder();
+        <span class="kw">let </span>handle = recorder.handle();
 
-        <span class="ident">metrics::set_boxed_recorder</span>(<span class="ident">Box::new</span>(<span class="ident">recorder</span>))<span class="question-mark">?</span>;
+        metrics::set_boxed_recorder(Box::new(recorder))<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">handle</span>)
+        <span class="prelude-val">Ok</span>(handle)
     }
 
-    <span class="doccomment">/// Builds the recorder and exporter and returns them both.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In most cases, users should prefer to use [`install`][PrometheusBuilder::install] to create</span>
-    <span class="doccomment">/// and install the recorder and exporter automatically for them.  If a caller is combining</span>
-    <span class="doccomment">/// recorders, or needs to schedule the exporter to run in a particular way, this method, or</span>
-    <span class="doccomment">/// [`build_recorder`][PrometheusBuilder::build_recorder], provide the flexibility to do so.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method must be called from within an existing Tokio runtime or it will panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is an error while building the recorder and exporter, an error variant will be</span>
-    <span class="doccomment">/// returned describing the error.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>))))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>), <span class="ident">allow</span>(<span class="ident">unused_mut</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">PrometheusRecorder</span>, <span class="ident">ExporterFuture</span>), <span class="ident">BuildError</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">allowed_addresses</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">allowed_addresses</span>.<span class="ident">take</span>();
+    <span class="doccomment">/// Builds the recorder and exporter and returns them both.
+    ///
+    /// In most cases, users should prefer to use [`install`][PrometheusBuilder::install] to create
+    /// and install the recorder and exporter automatically for them.  If a caller is combining
+    /// recorders, or needs to schedule the exporter to run in a particular way, this method, or
+    /// [`build_recorder`][PrometheusBuilder::build_recorder], provide the flexibility to do so.
+    ///
+    /// ## Panics
+    ///
+    /// This method must be called from within an existing Tokio runtime or it will panic.
+    ///
+    /// ## Errors
+    ///
+    /// If there is an error while building the recorder and exporter, an error variant will be
+    /// returned describing the error.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))]
+    #[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;http-listener&quot;</span>, feature = <span class="string">&quot;push-gateway&quot;</span>))))]
+    #[cfg_attr(not(feature = <span class="string">&quot;http-listener&quot;</span>), allow(unused_mut))]
+    </span><span class="kw">pub fn </span>build(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(PrometheusRecorder, ExporterFuture), BuildError&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+        </span><span class="kw">let </span>allowed_addresses = <span class="self">self</span>.allowed_addresses.take();
 
-        <span class="kw">let</span> <span class="ident">exporter_config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exporter_config</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build_recorder</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
+        <span class="kw">let </span>exporter_config = <span class="self">self</span>.exporter_config.clone();
+        <span class="kw">let </span>recorder = <span class="self">self</span>.build_recorder();
+        <span class="kw">let </span>handle = recorder.handle();
 
-        <span class="kw">match</span> <span class="ident">exporter_config</span> {
-            <span class="ident">ExporterConfig::Unconfigured</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">BuildError::MissingExporterConfiguration</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-listener&quot;</span>)]</span>
-            <span class="ident">ExporterConfig::HttpListener</span> { <span class="ident">listen_address</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server::try_bind</span>(<span class="kw-2">&amp;</span><span class="ident">listen_address</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">BuildError::FailedToCreateHTTPListener</span>(<span class="ident">e</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">make_svc</span> <span class="op">=</span> <span class="ident">make_service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">socket</span>: <span class="kw-2">&amp;</span><span class="ident">AddrStream</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">remote_addr</span> <span class="op">=</span> <span class="ident">socket</span>.<span class="ident">remote_addr</span>().<span class="ident">ip</span>();
+        <span class="kw">match </span>exporter_config {
+            ExporterConfig::Unconfigured =&gt; <span class="prelude-val">Err</span>(BuildError::MissingExporterConfiguration),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;http-listener&quot;</span>)]
+            </span>ExporterConfig::HttpListener { listen_address } =&gt; {
+                <span class="kw">let </span>server = Server::try_bind(<span class="kw-2">&amp;</span>listen_address)
+                    .map_err(|e| BuildError::FailedToCreateHTTPListener(e.to_string()))<span class="question-mark">?</span>;
+                <span class="kw">let </span>exporter = <span class="kw">async move </span>{
+                    <span class="kw">let </span>make_svc = make_service_fn(<span class="kw">move </span>|socket: <span class="kw-2">&amp;</span>AddrStream| {
+                        <span class="kw">let </span>remote_addr = socket.remote_addr().ip();
 
-                        <span class="comment">// If the allowlist is empty, the request is allowed.  Otherwise, it must</span>
-                        <span class="comment">// match one of the entries in the allowlist or it will be denied.</span>
-                        <span class="kw">let</span> <span class="ident">is_allowed</span> <span class="op">=</span> <span class="ident">allowed_addresses</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">addresses</span><span class="op">|</span> {
-                            <span class="ident">addresses</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">address</span><span class="op">|</span> <span class="ident">address</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">remote_addr</span>))
+                        <span class="comment">// If the allowlist is empty, the request is allowed.  Otherwise, it must
+                        // match one of the entries in the allowlist or it will be denied.
+                        </span><span class="kw">let </span>is_allowed = allowed_addresses.as_ref().map_or(<span class="bool-val">true</span>, |addresses| {
+                            addresses.iter().any(|address| address.contains(<span class="kw-2">&amp;</span>remote_addr))
                         });
 
-                        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">clone</span>();
+                        <span class="kw">let </span>handle = handle.clone();
 
-                        <span class="kw">async</span> <span class="kw">move</span> {
-                            <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span>(<span class="ident">service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                                <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">clone</span>();
+                        <span class="kw">async move </span>{
+                            <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(service_fn(<span class="kw">move </span>|<span class="kw">_</span>| {
+                                <span class="kw">let </span>handle = handle.clone();
 
-                                <span class="kw">async</span> <span class="kw">move</span> {
-                                    <span class="kw">if</span> <span class="ident">is_allowed</span> {
-                                        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-                                        <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span>(<span class="ident">Response::new</span>(<span class="ident">Body::from</span>(<span class="ident">output</span>)))
-                                    } <span class="kw">else</span> {
-                                        <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span>(
-                                            <span class="ident">Response::builder</span>()
-                                                .<span class="ident">status</span>(<span class="ident">StatusCode::FORBIDDEN</span>)
-                                                .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
-                                                .<span class="ident">expect</span>(<span class="string">&quot;static response is valid&quot;</span>),
+                                <span class="kw">async move </span>{
+                                    <span class="kw">if </span>is_allowed {
+                                        <span class="kw">let </span>output = handle.render();
+                                        <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(Response::new(Body::from(output)))
+                                    } <span class="kw">else </span>{
+                                        <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, hyper::Error&gt;(
+                                            Response::builder()
+                                                .status(StatusCode::FORBIDDEN)
+                                                .body(Body::empty())
+                                                .expect(<span class="string">&quot;static response is valid&quot;</span>),
                                         )
                                     }
                                 }
                             }))
                         }
                     });
-                    <span class="ident">server</span>.<span class="ident">serve</span>(<span class="ident">make_svc</span>).<span class="kw">await</span>
-                };
+                    server.serve(make_svc).<span class="kw">await
+                </span>};
 
-                <span class="prelude-val">Ok</span>((<span class="ident">recorder</span>, <span class="ident">Box::pin</span>(<span class="ident">exporter</span>)))
+                <span class="prelude-val">Ok</span>((recorder, Box::pin(exporter)))
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;push-gateway&quot;</span>)]</span>
-            <span class="ident">ExporterConfig::PushGateway</span> { <span class="ident">endpoint</span>, <span class="ident">interval</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::new</span>();
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;push-gateway&quot;</span>)]
+            </span>ExporterConfig::PushGateway { endpoint, interval } =&gt; {
+                <span class="kw">let </span>exporter = <span class="kw">async move </span>{
+                    <span class="kw">let </span>client = Client::new();
 
-                    <span class="kw">loop</span> {
-                        <span class="comment">// Sleep for `interval` amount of time, and then do a push.</span>
-                        <span class="ident">tokio::time::sleep</span>(<span class="ident">interval</span>).<span class="kw">await</span>;
+                    <span class="kw">loop </span>{
+                        <span class="comment">// Sleep for `interval` amount of time, and then do a push.
+                        </span>tokio::time::sleep(interval).<span class="kw">await</span>;
 
-                        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-                        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Request::builder</span>()
-                            .<span class="ident">method</span>(<span class="ident">Method::PUT</span>)
-                            .<span class="ident">uri</span>(<span class="ident">endpoint</span>.<span class="ident">clone</span>())
-                            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">output</span>));
-                        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result</span> {
-                            <span class="prelude-val">Ok</span>(<span class="ident">req</span>) =&gt; <span class="ident">req</span>,
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                                <span class="macro">error!</span>(<span class="string">&quot;failed to build push gateway request: {}&quot;</span>, <span class="ident">e</span>);
+                        <span class="kw">let </span>output = handle.render();
+                        <span class="kw">let </span>result = Request::builder()
+                            .method(Method::PUT)
+                            .uri(endpoint.clone())
+                            .body(Body::from(output));
+                        <span class="kw">let </span>req = <span class="kw">match </span>result {
+                            <span class="prelude-val">Ok</span>(req) =&gt; req,
+                            <span class="prelude-val">Err</span>(e) =&gt; {
+                                <span class="macro">error!</span>(<span class="string">&quot;failed to build push gateway request: {}&quot;</span>, e);
                                 <span class="kw">continue</span>;
                             }
                         };
 
-                        <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">request</span>(<span class="ident">req</span>).<span class="kw">await</span> {
-                            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
-                                <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
-                                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">status</span>();
-                                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">status</span>
-                                        .<span class="ident">canonical_reason</span>()
-                                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">status</span>.<span class="ident">as_str</span>());
-                                    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">aggregate</span>(<span class="ident">response</span>.<span class="ident">into_body</span>()).<span class="kw">await</span>;
-                                    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">body</span>
-                                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-                                        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">copy_to_bytes</span>(<span class="ident">b</span>.<span class="ident">remaining</span>()))
-                                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">b</span>[..]).<span class="ident">to_vec</span>())
-                                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">String::from_utf8</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()))
-                                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                                            <span class="ident">String::from</span>(<span class="string">&quot;&lt;failed to read response body&gt;&quot;</span>)
+                        <span class="kw">match </span>client.request(req).<span class="kw">await </span>{
+                            <span class="prelude-val">Ok</span>(response) =&gt; {
+                                <span class="kw">if </span>!response.status().is_success() {
+                                    <span class="kw">let </span>status = response.status();
+                                    <span class="kw">let </span>status = status
+                                        .canonical_reason()
+                                        .unwrap_or_else(|| status.as_str());
+                                    <span class="kw">let </span>body = aggregate(response.into_body()).<span class="kw">await</span>;
+                                    <span class="kw">let </span>body = body
+                                        .map_err(|<span class="kw">_</span>| ())
+                                        .map(|<span class="kw-2">mut </span>b| b.copy_to_bytes(b.remaining()))
+                                        .map(|b| (<span class="kw-2">&amp;</span>b[..]).to_vec())
+                                        .and_then(|s| String::from_utf8(s).map_err(|<span class="kw">_</span>| ()))
+                                        .unwrap_or_else(|<span class="kw">_</span>| {
+                                            String::from(<span class="string">&quot;&lt;failed to read response body&gt;&quot;</span>)
                                         });
                                     <span class="macro">error!</span>(
-                                        <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;unexpected status after pushing metrics to push gateway&quot;</span>,
-                                        <span class="ident">status</span>,
-                                        <span class="op">%</span><span class="ident">body</span>,
+                                        message = <span class="string">&quot;unexpected status after pushing metrics to push gateway&quot;</span>,
+                                        status,
+                                        %body,
                                     );
                                 }
                             }
-                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">error!</span>(<span class="string">&quot;error sending request to push gateway: {:?}&quot;</span>, <span class="ident">e</span>),
+                            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">error!</span>(<span class="string">&quot;error sending request to push gateway: {:?}&quot;</span>, e),
                         }
                     }
                 };
 
-                <span class="prelude-val">Ok</span>((<span class="ident">recorder</span>, <span class="ident">Box::pin</span>(<span class="ident">exporter</span>)))
+                <span class="prelude-val">Ok</span>((recorder, Box::pin(exporter)))
             }
         }
     }
 
-    <span class="doccomment">/// Builds the recorder and returns it.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_recorder</span>(<span class="self">self</span>) -&gt; <span class="ident">PrometheusRecorder</span> {
-        <span class="self">self</span>.<span class="ident">build_with_clock</span>(<span class="ident">Clock::new</span>())
+    <span class="doccomment">/// Builds the recorder and returns it.
+    </span><span class="kw">pub fn </span>build_recorder(<span class="self">self</span>) -&gt; PrometheusRecorder {
+        <span class="self">self</span>.build_with_clock(Clock::new())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build_with_clock</span>(<span class="self">self</span>, <span class="ident">clock</span>: <span class="ident">Clock</span>) -&gt; <span class="ident">PrometheusRecorder</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Inner</span> {
-            <span class="ident">registry</span>: <span class="ident">Registry::new</span>(<span class="ident">GenerationalStorage::atomic</span>()),
-            <span class="ident">recency</span>: <span class="ident">Recency::new</span>(<span class="ident">clock</span>, <span class="self">self</span>.<span class="ident">recency_mask</span>, <span class="self">self</span>.<span class="ident">idle_timeout</span>),
-            <span class="ident">distributions</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::new</span>()),
-            <span class="ident">distribution_builder</span>: <span class="ident">DistributionBuilder::new</span>(
-                <span class="self">self</span>.<span class="ident">quantiles</span>,
-                <span class="self">self</span>.<span class="ident">buckets</span>,
-                <span class="self">self</span>.<span class="ident">bucket_overrides</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_with_clock(<span class="self">self</span>, clock: Clock) -&gt; PrometheusRecorder {
+        <span class="kw">let </span>inner = Inner {
+            registry: Registry::new(GenerationalStorage::atomic()),
+            recency: Recency::new(clock, <span class="self">self</span>.recency_mask, <span class="self">self</span>.idle_timeout),
+            distributions: RwLock::new(HashMap::new()),
+            distribution_builder: DistributionBuilder::new(
+                <span class="self">self</span>.quantiles,
+                <span class="self">self</span>.buckets,
+                <span class="self">self</span>.bucket_overrides,
             ),
-            <span class="ident">descriptions</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::new</span>()),
-            <span class="ident">global_labels</span>: <span class="self">self</span>.<span class="ident">global_labels</span>.<span class="ident">unwrap_or_default</span>(),
+            descriptions: RwLock::new(HashMap::new()),
+            global_labels: <span class="self">self</span>.global_labels.unwrap_or_default(),
         };
 
-        <span class="ident">PrometheusRecorder::from</span>(<span class="ident">inner</span>)
+        PrometheusRecorder::from(inner)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PrometheusBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PrometheusBuilder::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>PrometheusBuilder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        PrometheusBuilder::new()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">use</span> <span class="ident">quanta::Clock</span>;
+    <span class="kw">use </span>quanta::Clock;
 
-    <span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Key</span>, <span class="ident">KeyName</span>, <span class="ident">Label</span>, <span class="ident">Recorder</span>};
-    <span class="kw">use</span> <span class="ident">metrics_util::MetricKindMask</span>;
+    <span class="kw">use </span>metrics::{Key, KeyName, Label, Recorder};
+    <span class="kw">use </span>metrics_util::MetricKindMask;
 
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Matcher</span>, <span class="ident">PrometheusBuilder</span>};
+    <span class="kw">use super</span>::{Matcher, PrometheusBuilder};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_render</span>() {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>().<span class="ident">build_recorder</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_render() {
+        <span class="kw">let </span>recorder = PrometheusBuilder::new().build_recorder();
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected_counter</span> <span class="op">=</span> <span class="string">&quot;# TYPE basic_counter counter\nbasic_counter 42\n\n&quot;</span>;
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected_counter = <span class="string">&quot;# TYPE basic_counter counter\nbasic_counter 42\n\n&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_counter</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_counter);
 
-        <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;wutang&quot;</span>, <span class="string">&quot;forever&quot;</span>)];
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(<span class="string">&quot;basic_gauge&quot;</span>, <span class="ident">labels</span>);
-        <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">gauge1</span>.<span class="ident">set</span>(<span class="op">-</span><span class="number">3.14</span>);
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected_gauge</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>labels = <span class="macro">vec!</span>[Label::new(<span class="string">&quot;wutang&quot;</span>, <span class="string">&quot;forever&quot;</span>)];
+        <span class="kw">let </span>key = Key::from_parts(<span class="string">&quot;basic_gauge&quot;</span>, labels);
+        <span class="kw">let </span>gauge1 = recorder.register_gauge(<span class="kw-2">&amp;</span>key);
+        gauge1.set(-<span class="number">3.14</span>);
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected_gauge = <span class="macro">format!</span>(
             <span class="string">&quot;{}# TYPE basic_gauge gauge\nbasic_gauge{{wutang=\&quot;forever\&quot;}} -3.14\n\n&quot;</span>,
-            <span class="ident">expected_counter</span>
+            expected_counter
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_gauge</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_gauge);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_histogram&quot;</span>);
-        <span class="kw">let</span> <span class="ident">histogram1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">histogram1</span>.<span class="ident">record</span>(<span class="number">12.0</span>);
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_histogram&quot;</span>);
+        <span class="kw">let </span>histogram1 = recorder.register_histogram(<span class="kw-2">&amp;</span>key);
+        histogram1.record(<span class="number">12.0</span>);
+        <span class="kw">let </span>rendered = handle.render();
 
-        <span class="kw">let</span> <span class="ident">histogram_data</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>histogram_data = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_histogram summary\n&quot;</span>,
             <span class="string">&quot;basic_histogram{quantile=\&quot;0\&quot;} 12\n&quot;</span>,
             <span class="string">&quot;basic_histogram{quantile=\&quot;0.5\&quot;} 12\n&quot;</span>,
@@ -1605,54 +1605,54 @@
             <span class="string">&quot;basic_histogram{quantile=\&quot;1\&quot;} 12\n&quot;</span>,
             <span class="string">&quot;basic_histogram_sum 12\n&quot;</span>,
             <span class="string">&quot;basic_histogram_count 1\n&quot;</span>,
-            <span class="string">&quot;\n&quot;</span>
-        );
-        <span class="kw">let</span> <span class="ident">expected_histogram</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">expected_gauge</span>, <span class="ident">histogram_data</span>);
+            <span class="string">&quot;\n&quot;
+        </span>);
+        <span class="kw">let </span>expected_histogram = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, expected_gauge, histogram_data);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_histogram</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_histogram);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_buckets</span>() {
-        <span class="kw">const</span> <span class="ident">DEFAULT_VALUES</span>: [<span class="ident">f64</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">10.0</span>, <span class="number">100.0</span>, <span class="number">1000.0</span>];
-        <span class="kw">const</span> <span class="ident">PREFIX_VALUES</span>: [<span class="ident">f64</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">15.0</span>, <span class="number">105.0</span>, <span class="number">1005.0</span>];
-        <span class="kw">const</span> <span class="ident">SUFFIX_VALUES</span>: [<span class="ident">f64</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">20.0</span>, <span class="number">110.0</span>, <span class="number">1010.0</span>];
-        <span class="kw">const</span> <span class="ident">FULL_VALUES</span>: [<span class="ident">f64</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="number">25.0</span>, <span class="number">115.0</span>, <span class="number">1015.0</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_buckets() {
+        <span class="kw">const </span>DEFAULT_VALUES: [f64; <span class="number">3</span>] = [<span class="number">10.0</span>, <span class="number">100.0</span>, <span class="number">1000.0</span>];
+        <span class="kw">const </span>PREFIX_VALUES: [f64; <span class="number">3</span>] = [<span class="number">15.0</span>, <span class="number">105.0</span>, <span class="number">1005.0</span>];
+        <span class="kw">const </span>SUFFIX_VALUES: [f64; <span class="number">3</span>] = [<span class="number">20.0</span>, <span class="number">110.0</span>, <span class="number">1010.0</span>];
+        <span class="kw">const </span>FULL_VALUES: [f64; <span class="number">3</span>] = [<span class="number">25.0</span>, <span class="number">115.0</span>, <span class="number">1015.0</span>];
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">set_buckets_for_metric</span>(
-                <span class="ident">Matcher::Full</span>(<span class="string">&quot;metrics.testing foo&quot;</span>.<span class="ident">to_owned</span>()),
-                <span class="kw-2">&amp;</span><span class="ident">FULL_VALUES</span>[..],
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .set_buckets_for_metric(
+                Matcher::Full(<span class="string">&quot;metrics.testing foo&quot;</span>.to_owned()),
+                <span class="kw-2">&amp;</span>FULL_VALUES[..],
             )
-            .<span class="ident">expect</span>(<span class="string">&quot;bounds should not be empty&quot;</span>)
-            .<span class="ident">set_buckets_for_metric</span>(
-                <span class="ident">Matcher::Prefix</span>(<span class="string">&quot;metrics.testing&quot;</span>.<span class="ident">to_owned</span>()),
-                <span class="kw-2">&amp;</span><span class="ident">PREFIX_VALUES</span>[..],
+            .expect(<span class="string">&quot;bounds should not be empty&quot;</span>)
+            .set_buckets_for_metric(
+                Matcher::Prefix(<span class="string">&quot;metrics.testing&quot;</span>.to_owned()),
+                <span class="kw-2">&amp;</span>PREFIX_VALUES[..],
             )
-            .<span class="ident">expect</span>(<span class="string">&quot;bounds should not be empty&quot;</span>)
-            .<span class="ident">set_buckets_for_metric</span>(<span class="ident">Matcher::Suffix</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">to_owned</span>()), <span class="kw-2">&amp;</span><span class="ident">SUFFIX_VALUES</span>[..])
-            .<span class="ident">expect</span>(<span class="string">&quot;bounds should not be empty&quot;</span>)
-            .<span class="ident">set_buckets</span>(<span class="kw-2">&amp;</span><span class="ident">DEFAULT_VALUES</span>[..])
-            .<span class="ident">expect</span>(<span class="string">&quot;bounds should not be empty&quot;</span>)
-            .<span class="ident">build_recorder</span>();
+            .expect(<span class="string">&quot;bounds should not be empty&quot;</span>)
+            .set_buckets_for_metric(Matcher::Suffix(<span class="string">&quot;foo&quot;</span>.to_owned()), <span class="kw-2">&amp;</span>SUFFIX_VALUES[..])
+            .expect(<span class="string">&quot;bounds should not be empty&quot;</span>)
+            .set_buckets(<span class="kw-2">&amp;</span>DEFAULT_VALUES[..])
+            .expect(<span class="string">&quot;bounds should not be empty&quot;</span>)
+            .build_recorder();
 
-        <span class="kw">let</span> <span class="ident">full_key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;metrics.testing_foo&quot;</span>);
-        <span class="kw">let</span> <span class="ident">full_key_histo</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">full_key</span>);
-        <span class="ident">full_key_histo</span>.<span class="ident">record</span>(<span class="ident">FULL_VALUES</span>[<span class="number">0</span>]);
+        <span class="kw">let </span>full_key = Key::from_name(<span class="string">&quot;metrics.testing_foo&quot;</span>);
+        <span class="kw">let </span>full_key_histo = recorder.register_histogram(<span class="kw-2">&amp;</span>full_key);
+        full_key_histo.record(FULL_VALUES[<span class="number">0</span>]);
 
-        <span class="kw">let</span> <span class="ident">prefix_key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;metrics.testing_bar&quot;</span>);
-        <span class="kw">let</span> <span class="ident">prefix_key_histo</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">prefix_key</span>);
-        <span class="ident">prefix_key_histo</span>.<span class="ident">record</span>(<span class="ident">PREFIX_VALUES</span>[<span class="number">1</span>]);
+        <span class="kw">let </span>prefix_key = Key::from_name(<span class="string">&quot;metrics.testing_bar&quot;</span>);
+        <span class="kw">let </span>prefix_key_histo = recorder.register_histogram(<span class="kw-2">&amp;</span>prefix_key);
+        prefix_key_histo.record(PREFIX_VALUES[<span class="number">1</span>]);
 
-        <span class="kw">let</span> <span class="ident">suffix_key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;metrics_testin_foo&quot;</span>);
-        <span class="kw">let</span> <span class="ident">suffix_key_histo</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">suffix_key</span>);
-        <span class="ident">suffix_key_histo</span>.<span class="ident">record</span>(<span class="ident">SUFFIX_VALUES</span>[<span class="number">2</span>]);
+        <span class="kw">let </span>suffix_key = Key::from_name(<span class="string">&quot;metrics_testin_foo&quot;</span>);
+        <span class="kw">let </span>suffix_key_histo = recorder.register_histogram(<span class="kw-2">&amp;</span>suffix_key);
+        suffix_key_histo.record(SUFFIX_VALUES[<span class="number">2</span>]);
 
-        <span class="kw">let</span> <span class="ident">default_key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;metrics.wee&quot;</span>);
-        <span class="kw">let</span> <span class="ident">default_key_histo</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">default_key</span>);
-        <span class="ident">default_key_histo</span>.<span class="ident">record</span>(<span class="ident">DEFAULT_VALUES</span>[<span class="number">2</span>] <span class="op">+</span> <span class="number">1.0</span>);
+        <span class="kw">let </span>default_key = Key::from_name(<span class="string">&quot;metrics.wee&quot;</span>);
+        <span class="kw">let </span>default_key_histo = recorder.register_histogram(<span class="kw-2">&amp;</span>default_key);
+        default_key_histo.record(DEFAULT_VALUES[<span class="number">2</span>] + <span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">full_data</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>full_data = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE metrics_testing_foo histogram\n&quot;</span>,
             <span class="string">&quot;metrics_testing_foo_bucket{le=\&quot;25\&quot;} 1\n&quot;</span>,
             <span class="string">&quot;metrics_testing_foo_bucket{le=\&quot;115\&quot;} 1\n&quot;</span>,
@@ -1662,7 +1662,7 @@
             <span class="string">&quot;metrics_testing_foo_count 1\n&quot;</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">prefix_data</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>prefix_data = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE metrics_testing_bar histogram\n&quot;</span>,
             <span class="string">&quot;metrics_testing_bar_bucket{le=\&quot;15\&quot;} 0\n&quot;</span>,
             <span class="string">&quot;metrics_testing_bar_bucket{le=\&quot;105\&quot;} 1\n&quot;</span>,
@@ -1672,7 +1672,7 @@
             <span class="string">&quot;metrics_testing_bar_count 1\n&quot;</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">suffix_data</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>suffix_data = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE metrics_testin_foo histogram\n&quot;</span>,
             <span class="string">&quot;metrics_testin_foo_bucket{le=\&quot;20\&quot;} 0\n&quot;</span>,
             <span class="string">&quot;metrics_testin_foo_bucket{le=\&quot;110\&quot;} 0\n&quot;</span>,
@@ -1682,7 +1682,7 @@
             <span class="string">&quot;metrics_testin_foo_count 1\n&quot;</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">default_data</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>default_data = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE metrics_wee histogram\n&quot;</span>,
             <span class="string">&quot;metrics_wee_bucket{le=\&quot;10\&quot;} 0\n&quot;</span>,
             <span class="string">&quot;metrics_wee_bucket{le=\&quot;100\&quot;} 0\n&quot;</span>,
@@ -1692,38 +1692,38 @@
             <span class="string">&quot;metrics_wee_count 1\n&quot;</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
 
-        <span class="macro">assert!</span>(<span class="ident">rendered</span>.<span class="ident">contains</span>(<span class="ident">full_data</span>));
-        <span class="macro">assert!</span>(<span class="ident">rendered</span>.<span class="ident">contains</span>(<span class="ident">prefix_data</span>));
-        <span class="macro">assert!</span>(<span class="ident">rendered</span>.<span class="ident">contains</span>(<span class="ident">suffix_data</span>));
-        <span class="macro">assert!</span>(<span class="ident">rendered</span>.<span class="ident">contains</span>(<span class="ident">default_data</span>));
+        <span class="macro">assert!</span>(rendered.contains(full_data));
+        <span class="macro">assert!</span>(rendered.contains(prefix_data));
+        <span class="macro">assert!</span>(rendered.contains(suffix_data));
+        <span class="macro">assert!</span>(rendered.contains(default_data));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_idle_timeout_all</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_idle_timeout_all() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">idle_timeout</span>(<span class="ident">MetricKindMask::ALL</span>, <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)))
-            .<span class="ident">build_with_clock</span>(<span class="ident">clock</span>);
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .idle_timeout(MetricKindMask::ALL, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>)))
+            .build_with_clock(clock);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_gauge&quot;</span>);
-        <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">gauge1</span>.<span class="ident">set</span>(<span class="op">-</span><span class="number">3.14</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_gauge&quot;</span>);
+        <span class="kw">let </span>gauge1 = recorder.register_gauge(<span class="kw-2">&amp;</span>key);
+        gauge1.set(-<span class="number">3.14</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_histogram&quot;</span>);
-        <span class="kw">let</span> <span class="ident">histo1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">histo1</span>.<span class="ident">record</span>(<span class="number">1.0</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_histogram&quot;</span>);
+        <span class="kw">let </span>histo1 = recorder.register_histogram(<span class="kw-2">&amp;</span>key);
+        histo1.record(<span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
@@ -1740,43 +1740,43 @@
             <span class="string">&quot;basic_histogram_count 1\n\n&quot;</span>,
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">9</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        mock.increment(Duration::from_secs(<span class="number">9</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="string">&quot;&quot;</span>);
+        mock.increment(Duration::from_secs(<span class="number">2</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_idle_timeout_partial</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_idle_timeout_partial() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">idle_timeout</span>(
-                <span class="ident">MetricKindMask::COUNTER</span> <span class="op">|</span> <span class="ident">MetricKindMask::HISTOGRAM</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)),
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .idle_timeout(
+                MetricKindMask::COUNTER | MetricKindMask::HISTOGRAM,
+                <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>)),
             )
-            .<span class="ident">build_with_clock</span>(<span class="ident">clock</span>);
+            .build_with_clock(clock);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_gauge&quot;</span>);
-        <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">gauge1</span>.<span class="ident">set</span>(<span class="op">-</span><span class="number">3.14</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_gauge&quot;</span>);
+        <span class="kw">let </span>gauge1 = recorder.register_gauge(<span class="kw-2">&amp;</span>key);
+        gauge1.set(-<span class="number">3.14</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_histogram&quot;</span>);
-        <span class="kw">let</span> <span class="ident">histo1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">histo1</span>.<span class="ident">record</span>(<span class="number">1.0</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_histogram&quot;</span>);
+        <span class="kw">let </span>histo1 = recorder.register_histogram(<span class="kw-2">&amp;</span>key);
+        histo1.record(<span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
@@ -1793,42 +1793,42 @@
             <span class="string">&quot;basic_histogram_count 1\n\n&quot;</span>,
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">9</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        mock.increment(Duration::from_secs(<span class="number">9</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
+        mock.increment(Duration::from_secs(<span class="number">2</span>));
+        <span class="kw">let </span>rendered = handle.render();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;# TYPE basic_gauge gauge\nbasic_gauge -3.14\n\n&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="kw">let </span>expected = <span class="string">&quot;# TYPE basic_gauge gauge\nbasic_gauge -3.14\n\n&quot;</span>;
+        <span class="macro">assert_eq!</span>(rendered, expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_idle_timeout_staggered_distributions</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_idle_timeout_staggered_distributions() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">idle_timeout</span>(<span class="ident">MetricKindMask::ALL</span>, <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)))
-            .<span class="ident">build_with_clock</span>(<span class="ident">clock</span>);
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .idle_timeout(MetricKindMask::ALL, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>)))
+            .build_with_clock(clock);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_gauge&quot;</span>);
-        <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">gauge1</span>.<span class="ident">set</span>(<span class="op">-</span><span class="number">3.14</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_gauge&quot;</span>);
+        <span class="kw">let </span>gauge1 = recorder.register_gauge(<span class="kw-2">&amp;</span>key);
+        gauge1.set(-<span class="number">3.14</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_histogram&quot;</span>);
-        <span class="kw">let</span> <span class="ident">histo1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">histo1</span>.<span class="ident">record</span>(<span class="number">1.0</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_histogram&quot;</span>);
+        <span class="kw">let </span>histo1 = recorder.register_histogram(<span class="kw-2">&amp;</span>key);
+        histo1.record(<span class="number">1.0</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
@@ -1845,17 +1845,17 @@
             <span class="string">&quot;basic_histogram_count 1\n\n&quot;</span>,
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">9</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        mock.increment(Duration::from_secs(<span class="number">9</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(<span class="string">&quot;basic_histogram&quot;</span>, <span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;type&quot;</span>, <span class="string">&quot;special&quot;</span>)]);
-        <span class="kw">let</span> <span class="ident">histo2</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">histo2</span>.<span class="ident">record</span>(<span class="number">2.0</span>);
+        <span class="kw">let </span>key = Key::from_parts(<span class="string">&quot;basic_histogram&quot;</span>, <span class="macro">vec!</span>[Label::new(<span class="string">&quot;type&quot;</span>, <span class="string">&quot;special&quot;</span>)]);
+        <span class="kw">let </span>histo2 = recorder.register_histogram(<span class="kw-2">&amp;</span>key);
+        histo2.record(<span class="number">2.0</span>);
 
-        <span class="kw">let</span> <span class="ident">expected_second</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>expected_second = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
@@ -1880,10 +1880,10 @@
             <span class="string">&quot;basic_histogram_sum{type=\&quot;special\&quot;} 2\n&quot;</span>,
             <span class="string">&quot;basic_histogram_count{type=\&quot;special\&quot;} 1\n\n&quot;</span>,
         );
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_second</span>);
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected_second);
 
-        <span class="kw">let</span> <span class="ident">expected_after</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>expected_after = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_histogram summary\n&quot;</span>,
             <span class="string">&quot;basic_histogram{type=\&quot;special\&quot;,quantile=\&quot;0\&quot;} 2\n&quot;</span>,
             <span class="string">&quot;basic_histogram{type=\&quot;special\&quot;,quantile=\&quot;0.5\&quot;} 2\n&quot;</span>,
@@ -1896,151 +1896,151 @@
             <span class="string">&quot;basic_histogram_count{type=\&quot;special\&quot;} 1\n\n&quot;</span>,
         );
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_after</span>);
+        mock.increment(Duration::from_secs(<span class="number">2</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected_after);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_idle_timeout_doesnt_remove_recents</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_idle_timeout_doesnt_remove_recents() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">idle_timeout</span>(<span class="ident">MetricKindMask::ALL</span>, <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)))
-            .<span class="ident">build_with_clock</span>(<span class="ident">clock</span>);
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .idle_timeout(MetricKindMask::ALL, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>)))
+            .build_with_clock(clock);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_gauge&quot;</span>);
-        <span class="kw">let</span> <span class="ident">gauge1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">gauge1</span>.<span class="ident">set</span>(<span class="op">-</span><span class="number">3.14</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_gauge&quot;</span>);
+        <span class="kw">let </span>gauge1 = recorder.register_gauge(<span class="kw-2">&amp;</span>key);
+        gauge1.set(-<span class="number">3.14</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
             <span class="string">&quot;basic_gauge -3.14\n\n&quot;</span>,
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">9</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        mock.increment(Duration::from_secs(<span class="number">9</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="kw">let</span> <span class="ident">expected_second</span> <span class="op">=</span> <span class="macro">concat!</span>(
+        <span class="kw">let </span>expected_second = <span class="macro">concat!</span>(
             <span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>,
             <span class="string">&quot;basic_counter 42\n\n&quot;</span>,
             <span class="string">&quot;# TYPE basic_gauge gauge\n&quot;</span>,
             <span class="string">&quot;basic_gauge -3.14\n\n&quot;</span>,
         );
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_second</span>);
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected_second);
 
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">1</span>);
+        counter1.increment(<span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">expected_after</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 43\n\n&quot;</span>,);
+        <span class="kw">let </span>expected_after = <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 43\n\n&quot;</span>,);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_after</span>);
+        mock.increment(Duration::from_secs(<span class="number">2</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected_after);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_idle_timeout_catches_delayed_idle</span>() {
-        <span class="kw">let</span> (<span class="ident">clock</span>, <span class="ident">mock</span>) <span class="op">=</span> <span class="ident">Clock::mock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_idle_timeout_catches_delayed_idle() {
+        <span class="kw">let </span>(clock, mock) = Clock::mock();
 
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">idle_timeout</span>(<span class="ident">MetricKindMask::ALL</span>, <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)))
-            .<span class="ident">build_with_clock</span>(<span class="ident">clock</span>);
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .idle_timeout(MetricKindMask::ALL, <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">10</span>)))
+            .build_with_clock(clock);
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="comment">// First render, which starts tracking the counter in the recency state.</span>
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 42\n\n&quot;</span>,);
+        <span class="comment">// First render, which starts tracking the counter in the recency state.
+        </span><span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected = <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 42\n\n&quot;</span>,);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="comment">// Now go forward by 9 seconds, which is close but still right unfer the idle timeout.</span>
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">9</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected</span>);
+        <span class="comment">// Now go forward by 9 seconds, which is close but still right unfer the idle timeout.
+        </span>mock.increment(Duration::from_secs(<span class="number">9</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected);
 
-        <span class="comment">// Now increment the counter and advance time by two seconds: this pushes it over the idle</span>
-        <span class="comment">// timeout threshold, but it should not be removed since it has been updated.</span>
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">1</span>);
+        <span class="comment">// Now increment the counter and advance time by two seconds: this pushes it over the idle
+        // timeout threshold, but it should not be removed since it has been updated.
+        </span>counter1.increment(<span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">expected_after</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 43\n\n&quot;</span>,);
+        <span class="kw">let </span>expected_after = <span class="macro">concat!</span>(<span class="string">&quot;# TYPE basic_counter counter\n&quot;</span>, <span class="string">&quot;basic_counter 43\n\n&quot;</span>,);
 
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_after</span>);
+        mock.increment(Duration::from_secs(<span class="number">2</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, expected_after);
 
-        <span class="comment">// Now advance by 11 seconds, right past the idle timeout threshold.  We&#39;ve made no further</span>
-        <span class="comment">// updates to the counter so it should be properly removed this time.</span>
-        <span class="ident">mock</span>.<span class="ident">increment</span>(<span class="ident">Duration::from_secs</span>(<span class="number">11</span>));
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// Now advance by 11 seconds, right past the idle timeout threshold.  We&#39;ve made no further
+        // updates to the counter so it should be properly removed this time.
+        </span>mock.increment(Duration::from_secs(<span class="number">11</span>));
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="macro">assert_eq!</span>(rendered, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_global_labels</span>() {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>()
-            .<span class="ident">add_global_label</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;foo&quot;</span>)
-            .<span class="ident">add_global_label</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)
-            .<span class="ident">build_recorder</span>();
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;basic_counter&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">42</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_global_labels() {
+        <span class="kw">let </span>recorder = PrometheusBuilder::new()
+            .add_global_label(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;foo&quot;</span>)
+            .add_global_label(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)
+            .build_recorder();
+        <span class="kw">let </span>key = Key::from_name(<span class="string">&quot;basic_counter&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">42</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected_counter</span> <span class="op">=</span> <span class="string">&quot;# TYPE basic_counter counter\nbasic_counter{foo=\&quot;bar\&quot;} 42\n\n&quot;</span>;
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected_counter = <span class="string">&quot;# TYPE basic_counter counter\nbasic_counter{foo=\&quot;bar\&quot;} 42\n\n&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_counter</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_counter);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_global_labels_overrides</span>() {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>().<span class="ident">add_global_label</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;foo&quot;</span>).<span class="ident">build_recorder</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_global_labels_overrides() {
+        <span class="kw">let </span>recorder = PrometheusBuilder::new().add_global_label(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;foo&quot;</span>).build_recorder();
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span>
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;overridden&quot;</span>).<span class="ident">with_extra_labels</span>(<span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;overridden&quot;</span>)]);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">1</span>);
+        <span class="kw">let </span>key =
+            Key::from_name(<span class="string">&quot;overridden&quot;</span>).with_extra_labels(<span class="macro">vec!</span>[Label::new(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;overridden&quot;</span>)]);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected_counter</span> <span class="op">=</span> <span class="string">&quot;# TYPE overridden counter\noverridden{foo=\&quot;overridden\&quot;} 1\n\n&quot;</span>;
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected_counter = <span class="string">&quot;# TYPE overridden counter\noverridden{foo=\&quot;overridden\&quot;} 1\n\n&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_counter</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_counter);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_sanitized_render</span>() {
-        <span class="kw">let</span> <span class="ident">recorder</span> <span class="op">=</span> <span class="ident">PrometheusBuilder::new</span>().<span class="ident">add_global_label</span>(<span class="string">&quot;foo:&quot;</span>, <span class="string">&quot;foo&quot;</span>).<span class="ident">build_recorder</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_sanitized_render() {
+        <span class="kw">let </span>recorder = PrometheusBuilder::new().add_global_label(<span class="string">&quot;foo:&quot;</span>, <span class="string">&quot;foo&quot;</span>).build_recorder();
 
-        <span class="kw">let</span> <span class="ident">key_name</span> <span class="op">=</span> <span class="ident">KeyName::from</span>(<span class="string">&quot;yee_haw:lets go&quot;</span>);
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">key_name</span>.<span class="ident">clone</span>())
-            .<span class="ident">with_extra_labels</span>(<span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;øhno&quot;</span>, <span class="string">&quot;\&quot;yeet\nies\\\&quot;&quot;</span>)]);
-        <span class="ident">recorder</span>.<span class="ident">describe_counter</span>(<span class="ident">key_name</span>, <span class="prelude-val">None</span>, <span class="string">&quot;\&quot;Simplë stuff.\nRëally.\&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">counter1</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>);
-        <span class="ident">counter1</span>.<span class="ident">increment</span>(<span class="number">1</span>);
+        <span class="kw">let </span>key_name = KeyName::from(<span class="string">&quot;yee_haw:lets go&quot;</span>);
+        <span class="kw">let </span>key = Key::from_name(key_name.clone())
+            .with_extra_labels(<span class="macro">vec!</span>[Label::new(<span class="string">&quot;øhno&quot;</span>, <span class="string">&quot;\&quot;yeet\nies\\\&quot;&quot;</span>)]);
+        recorder.describe_counter(key_name, <span class="prelude-val">None</span>, <span class="string">&quot;\&quot;Simplë stuff.\nRëally.\&quot;&quot;</span>);
+        <span class="kw">let </span>counter1 = recorder.register_counter(<span class="kw-2">&amp;</span>key);
+        counter1.increment(<span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">recorder</span>.<span class="ident">handle</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">render</span>();
-        <span class="kw">let</span> <span class="ident">expected_counter</span> <span class="op">=</span> <span class="string">&quot;# HELP yee_haw:lets_go \&quot;Simplë stuff.\\nRëally.\&quot;\n# TYPE yee_haw:lets_go counter\nyee_haw:lets_go{foo_=\&quot;foo\&quot;,_hno=\&quot;\\\&quot;yeet\\nies\\\&quot;\&quot;} 1\n\n&quot;</span>;
+        <span class="kw">let </span>handle = recorder.handle();
+        <span class="kw">let </span>rendered = handle.render();
+        <span class="kw">let </span>expected_counter = <span class="string">&quot;# HELP yee_haw:lets_go \&quot;Simplë stuff.\\nRëally.\&quot;\n# TYPE yee_haw:lets_go counter\nyee_haw:lets_go{foo_=\&quot;foo\&quot;,_hno=\&quot;\\\&quot;yeet\\nies\\\&quot;\&quot;} 1\n\n&quot;</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="ident">expected_counter</span>);
+        <span class="macro">assert_eq!</span>(rendered, expected_counter);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

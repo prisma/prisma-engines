@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/field/delimited.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>delimited.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/field/delimited.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>delimited.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -184,189 +184,189 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A `MakeVisitor` wrapper that separates formatted fields with a delimiter.</span>
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">MakeVisitor</span>, <span class="ident">VisitFmt</span>, <span class="ident">VisitOutput</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! A `MakeVisitor` wrapper that separates formatted fields with a delimiter.
+</span><span class="kw">use super</span>::{MakeVisitor, VisitFmt, VisitOutput};
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">tracing_core::field</span>::{<span class="ident">Field</span>, <span class="ident">Visit</span>};
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>tracing_core::field::{Field, Visit};
 
-<span class="doccomment">/// A `MakeVisitor` wrapper that wraps a visitor that writes formatted output so</span>
-<span class="doccomment">/// that a delimiter is inserted between writing formatted field values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Delimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">delimiter</span>: <span class="ident">D</span>,
-    <span class="ident">inner</span>: <span class="ident">V</span>,
+<span class="doccomment">/// A `MakeVisitor` wrapper that wraps a visitor that writes formatted output so
+/// that a delimiter is inserted between writing formatted field values.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Delimited&lt;D, V&gt; {
+    delimiter: D,
+    inner: V,
 }
 
-<span class="doccomment">/// A visitor wrapper that inserts a delimiter after the wrapped visitor formats</span>
-<span class="doccomment">/// a field value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="ident">delimiter</span>: <span class="ident">D</span>,
-    <span class="ident">seen</span>: <span class="ident">bool</span>,
-    <span class="ident">inner</span>: <span class="ident">V</span>,
-    <span class="ident">err</span>: <span class="ident">fmt::Result</span>,
+<span class="doccomment">/// A visitor wrapper that inserts a delimiter after the wrapped visitor formats
+/// a field value.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>VisitDelimited&lt;D, V&gt; {
+    delimiter: D,
+    seen: bool,
+    inner: V,
+    err: fmt::Result,
 }
 
-<span class="comment">// === impl Delimited ===</span>
+<span class="comment">// === impl Delimited ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Delimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">V</span>: <span class="ident">MakeVisitor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">V::Visitor</span>: <span class="ident">VisitFmt</span>,
+</span><span class="kw">impl</span>&lt;D, V, T&gt; MakeVisitor&lt;T&gt; <span class="kw">for </span>Delimited&lt;D, V&gt;
+<span class="kw">where
+    </span>D: AsRef&lt;str&gt; + Clone,
+    V: MakeVisitor&lt;T&gt;,
+    V::Visitor: VisitFmt,
 {
-    <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V::Visitor</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">make_visitor</span>(<span class="ident">target</span>);
-        <span class="ident">VisitDelimited::new</span>(<span class="self">self</span>.<span class="ident">delimiter</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>)
+    <span class="kw">type </span>Visitor = VisitDelimited&lt;D, V::Visitor&gt;;
+    <span class="kw">fn </span>make_visitor(<span class="kw-2">&amp;</span><span class="self">self</span>, target: T) -&gt; <span class="self">Self</span>::Visitor {
+        <span class="kw">let </span>inner = <span class="self">self</span>.inner.make_visitor(target);
+        VisitDelimited::new(<span class="self">self</span>.delimiter.clone(), inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Delimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a new [`MakeVisitor`] implementation that wraps `inner` so that</span>
-    <span class="doccomment">/// it will format each visited field separated by the provided `delimiter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MakeVisitor`]: ../trait.MakeVisitor.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">delimiter</span>: <span class="ident">D</span>, <span class="ident">inner</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">delimiter</span>, <span class="ident">inner</span> }
+<span class="kw">impl</span>&lt;D, V&gt; Delimited&lt;D, V&gt; {
+    <span class="doccomment">/// Returns a new [`MakeVisitor`] implementation that wraps `inner` so that
+    /// it will format each visited field separated by the provided `delimiter`.
+    ///
+    /// [`MakeVisitor`]: ../trait.MakeVisitor.html
+    </span><span class="kw">pub fn </span>new(delimiter: D, inner: V) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ delimiter, inner }
     }
 }
 
-<span class="comment">// === impl VisitDelimited ===</span>
+<span class="comment">// === impl VisitDelimited ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a new [`Visit`] implementation that wraps `inner` so that</span>
-    <span class="doccomment">/// each formatted field is separated by the provided `delimiter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Visit`]: https://docs.rs/tracing-core/0.1.6/tracing_core/field/trait.Visit.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">delimiter</span>: <span class="ident">D</span>, <span class="ident">inner</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">delimiter</span>,
-            <span class="ident">inner</span>,
-            <span class="ident">seen</span>: <span class="bool-val">false</span>,
-            <span class="ident">err</span>: <span class="prelude-val">Ok</span>(()),
+</span><span class="kw">impl</span>&lt;D, V&gt; VisitDelimited&lt;D, V&gt; {
+    <span class="doccomment">/// Returns a new [`Visit`] implementation that wraps `inner` so that
+    /// each formatted field is separated by the provided `delimiter`.
+    ///
+    /// [`Visit`]: https://docs.rs/tracing-core/0.1.6/tracing_core/field/trait.Visit.html
+    </span><span class="kw">pub fn </span>new(delimiter: D, inner: V) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            delimiter,
+            inner,
+            seen: <span class="bool-val">false</span>,
+            err: <span class="prelude-val">Ok</span>(()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">delimit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">VisitFmt</span>,
-        <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>delimit(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
+    <span class="kw">where
+        </span>V: VisitFmt,
+        D: AsRef&lt;str&gt;,
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">err</span>.<span class="ident">is_err</span>() {
+        <span class="kw">if </span><span class="self">self</span>.err.is_err() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seen</span> {
-            <span class="self">self</span>.<span class="ident">err</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">writer</span>().<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">delimiter</span>.<span class="ident">as_ref</span>());
+        <span class="kw">if </span><span class="self">self</span>.seen {
+            <span class="self">self</span>.err = <span class="self">self</span>.inner.writer().write_str(<span class="self">self</span>.delimiter.as_ref());
         }
 
-        <span class="self">self</span>.<span class="ident">seen</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="self">self</span>.seen = <span class="bool-val">true</span>;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">VisitFmt</span>,
-    <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;D, V&gt; Visit <span class="kw">for </span>VisitDelimited&lt;D, V&gt;
+<span class="kw">where
+    </span>V: VisitFmt,
+    D: AsRef&lt;str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">record_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">delimit</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_i64</span>(<span class="ident">field</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>record_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: i64) {
+        <span class="self">self</span>.delimit();
+        <span class="self">self</span>.inner.record_i64(field, value);
     }
 
-    <span class="kw">fn</span> <span class="ident">record_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">delimit</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_u64</span>(<span class="ident">field</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>record_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: u64) {
+        <span class="self">self</span>.delimit();
+        <span class="self">self</span>.inner.record_u64(field, value);
     }
 
-    <span class="kw">fn</span> <span class="ident">record_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">delimit</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_bool</span>(<span class="ident">field</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>record_bool(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: bool) {
+        <span class="self">self</span>.delimit();
+        <span class="self">self</span>.inner.record_bool(field, value);
     }
 
-    <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">delimit</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_str</span>(<span class="ident">field</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>record_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.delimit();
+        <span class="self">self</span>.inner.record_str(field, value);
     }
 
-    <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
-        <span class="self">self</span>.<span class="ident">delimit</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_debug</span>(<span class="ident">field</span>, <span class="ident">value</span>);
+    <span class="kw">fn </span>record_debug(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>fmt::Debug) {
+        <span class="self">self</span>.delimit();
+        <span class="self">self</span>.inner.record_debug(field, value);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">VisitFmt</span>,
-    <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;D, V&gt; VisitOutput&lt;fmt::Result&gt; <span class="kw">for </span>VisitDelimited&lt;D, V&gt;
+<span class="kw">where
+    </span>V: VisitFmt,
+    D: AsRef&lt;str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">err</span><span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">finish</span>()
+    <span class="kw">fn </span>finish(<span class="self">self</span>) -&gt; fmt::Result {
+        <span class="self">self</span>.err<span class="question-mark">?</span>;
+        <span class="self">self</span>.inner.finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">VisitFmt</span> <span class="kw">for</span> <span class="ident">VisitDelimited</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">V</span>: <span class="ident">VisitFmt</span>,
-    <span class="ident">D</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;D, V&gt; VisitFmt <span class="kw">for </span>VisitDelimited&lt;D, V&gt;
+<span class="kw">where
+    </span>V: VisitFmt,
+    D: AsRef&lt;str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">writer</span>()
+    <span class="kw">fn </span>writer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write {
+        <span class="self">self</span>.inner.writer()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field::test_util</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+#[cfg(all(test, feature = <span class="string">&quot;alloc&quot;</span>))]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::field::test_util::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">delimited_visitor</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">let</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">DebugVisitor::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">VisitDelimited::new</span>(<span class="string">&quot;, &quot;</span>, <span class="ident">visitor</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>delimited_visitor() {
+        <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
+        <span class="kw">let </span>visitor = DebugVisitor::new(<span class="kw-2">&amp;mut </span>s);
+        <span class="kw">let </span><span class="kw-2">mut </span>visitor = VisitDelimited::new(<span class="string">&quot;, &quot;</span>, visitor);
 
-        <span class="ident">TestAttrs1::with</span>(<span class="op">|</span><span class="ident">attrs</span><span class="op">|</span> <span class="ident">attrs</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">visitor</span>));
-        <span class="ident">visitor</span>.<span class="ident">finish</span>().<span class="ident">unwrap</span>();
+        TestAttrs1::with(|attrs| attrs.record(<span class="kw-2">&amp;mut </span>visitor));
+        visitor.finish().unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">s</span>.<span class="ident">as_str</span>(),
-            <span class="string">&quot;question=\&quot;life, the universe, and everything\&quot;, tricky=true, can_you_do_it=true&quot;</span>
-        );
+            s.as_str(),
+            <span class="string">&quot;question=\&quot;life, the universe, and everything\&quot;, tricky=true, can_you_do_it=true&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">delimited_new_visitor</span>() {
-        <span class="kw">let</span> <span class="ident">make</span> <span class="op">=</span> <span class="ident">Delimited::new</span>(<span class="string">&quot;; &quot;</span>, <span class="ident">MakeDebug</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>delimited_new_visitor() {
+        <span class="kw">let </span>make = Delimited::new(<span class="string">&quot;; &quot;</span>, MakeDebug);
 
-        <span class="ident">TestAttrs1::with</span>(<span class="op">|</span><span class="ident">attrs</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        TestAttrs1::with(|attrs| {
+            <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">make</span>.<span class="ident">make_visitor</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>);
-                <span class="ident">attrs</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>v = make.make_visitor(<span class="kw-2">&amp;mut </span>s);
+                attrs.record(<span class="kw-2">&amp;mut </span>v);
             }
             <span class="macro">assert_eq!</span>(
-                <span class="ident">s</span>.<span class="ident">as_str</span>(),
-                <span class="string">&quot;question=\&quot;life, the universe, and everything\&quot;; tricky=true; can_you_do_it=true&quot;</span>
-            );
+                s.as_str(),
+                <span class="string">&quot;question=\&quot;life, the universe, and everything\&quot;; tricky=true; can_you_do_it=true&quot;
+            </span>);
         });
 
-        <span class="ident">TestAttrs2::with</span>(<span class="op">|</span><span class="ident">attrs</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        TestAttrs2::with(|attrs| {
+            <span class="kw">let </span><span class="kw-2">mut </span>s = String::new();
             {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">make</span>.<span class="ident">make_visitor</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>);
-                <span class="ident">attrs</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>v = make.make_visitor(<span class="kw-2">&amp;mut </span>s);
+                attrs.record(<span class="kw-2">&amp;mut </span>v);
             }
             <span class="macro">assert_eq!</span>(
-                <span class="ident">s</span>.<span class="ident">as_str</span>(),
-                <span class="string">&quot;question=None; question.answer=42; tricky=true; can_you_do_it=false&quot;</span>
-            );
+                s.as_str(),
+                <span class="string">&quot;question=None; question.answer=42; tricky=true; can_you_do_it=false&quot;
+            </span>);
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

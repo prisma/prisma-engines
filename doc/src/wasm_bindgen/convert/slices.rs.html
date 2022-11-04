@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/convert/slices.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slices.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../wasm_bindgen/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/convert/slices.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slices.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../wasm_bindgen/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -309,316 +309,316 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::prelude::v1</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">core::slice</span>;
-<span class="kw">use</span> <span class="ident">core::str</span>;
+<span class="kw">use </span>core::slice;
+<span class="kw">use </span>core::str;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cast::JsObject</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::convert::OptionIntoWasmAbi</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::convert</span>::{<span class="ident">FromWasmAbi</span>, <span class="ident">IntoWasmAbi</span>, <span class="ident">RefFromWasmAbi</span>, <span class="ident">RefMutFromWasmAbi</span>, <span class="ident">WasmAbi</span>};
-<span class="kw">use</span> <span class="ident">cfg_if::cfg_if</span>;
+<span class="kw">use </span><span class="kw">crate</span>::cast::JsObject;
+<span class="kw">use </span><span class="kw">crate</span>::convert::OptionIntoWasmAbi;
+<span class="kw">use </span><span class="kw">crate</span>::convert::{FromWasmAbi, IntoWasmAbi, RefFromWasmAbi, RefMutFromWasmAbi, WasmAbi};
+<span class="kw">use </span>cfg_if::cfg_if;
 
-<span class="macro">if_std!</span> {
-    <span class="kw">use</span> <span class="ident">core::mem</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::convert::OptionFromWasmAbi</span>;
+<span class="macro">if_std! </span>{
+    <span class="kw">use </span>core::mem;
+    <span class="kw">use </span><span class="kw">crate</span>::convert::OptionFromWasmAbi;
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WasmSlice</span> {
-    <span class="kw">pub</span> <span class="ident">ptr</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">len</span>: <span class="ident">u32</span>,
+<span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>WasmSlice {
+    <span class="kw">pub </span>ptr: u32,
+    <span class="kw">pub </span>len: u32,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">WasmAbi</span> <span class="kw">for</span> <span class="ident">WasmSlice</span> {}
+<span class="kw">unsafe impl </span>WasmAbi <span class="kw">for </span>WasmSlice {}
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">null_slice</span>() -&gt; <span class="ident">WasmSlice</span> {
-    <span class="ident">WasmSlice</span> { <span class="ident">ptr</span>: <span class="number">0</span>, <span class="ident">len</span>: <span class="number">0</span> }
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>null_slice() -&gt; WasmSlice {
+    WasmSlice { ptr: <span class="number">0</span>, len: <span class="number">0 </span>}
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">vectors</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="macro">if_std!</span> {
-            <span class="kw">impl</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span> {
-                <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+<span class="macro">macro_rules! </span>vectors {
+    ($(<span class="macro-nonterminal">$t</span>:ident)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="macro">if_std! </span>{
+            <span class="kw">impl </span>IntoWasmAbi <span class="kw">for </span>Box&lt;[<span class="macro-nonterminal">$t</span>]&gt; {
+                <span class="kw">type </span>Abi = WasmSlice;
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">WasmSlice</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ptr</span>();
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-                    <span class="ident">mem::forget</span>(<span class="self">self</span>);
-                    <span class="ident">WasmSlice</span> {
-                        <span class="ident">ptr</span>: <span class="ident">ptr</span>.<span class="ident">into_abi</span>(),
-                        <span class="ident">len</span>: <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>,
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; WasmSlice {
+                    <span class="kw">let </span>ptr = <span class="self">self</span>.as_ptr();
+                    <span class="kw">let </span>len = <span class="self">self</span>.len();
+                    mem::forget(<span class="self">self</span>);
+                    WasmSlice {
+                        ptr: ptr.into_abi(),
+                        len: len <span class="kw">as </span>u32,
                     }
                 }
             }
 
-            <span class="kw">impl</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span> {
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
+            <span class="kw">impl </span>OptionIntoWasmAbi <span class="kw">for </span>Box&lt;[<span class="macro-nonterminal">$t</span>]&gt; {
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
             }
 
-            <span class="kw">impl</span> <span class="ident">FromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span> {
-                <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+            <span class="kw">impl </span>FromWasmAbi <span class="kw">for </span>Box&lt;[<span class="macro-nonterminal">$t</span>]&gt; {
+                <span class="kw">type </span>Abi = WasmSlice;
 
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_abi</span>(<span class="ident">js</span>: <span class="ident">WasmSlice</span>) -&gt; <span class="self">Self</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>.<span class="ident">ptr</span>);
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">js</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>, <span class="ident">len</span>).<span class="ident">into_boxed_slice</span>()
+                <span class="attribute">#[inline]
+                </span><span class="kw">unsafe fn </span>from_abi(js: WasmSlice) -&gt; <span class="self">Self </span>{
+                    <span class="kw">let </span>ptr = &lt;<span class="kw-2">*mut </span><span class="macro-nonterminal">$t</span>&gt;::from_abi(js.ptr);
+                    <span class="kw">let </span>len = js.len <span class="kw">as </span>usize;
+                    Vec::from_raw_parts(ptr, len, len).into_boxed_slice()
                 }
             }
 
-            <span class="kw">impl</span> <span class="ident">OptionFromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span> {
-                <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">WasmSlice</span>) -&gt; <span class="ident">bool</span> { <span class="ident">slice</span>.<span class="ident">ptr</span> <span class="op">==</span> <span class="number">0</span> }
+            <span class="kw">impl </span>OptionFromWasmAbi <span class="kw">for </span>Box&lt;[<span class="macro-nonterminal">$t</span>]&gt; {
+                <span class="attribute">#[inline]
+                </span><span class="kw">fn </span>is_none(slice: <span class="kw-2">&amp;</span>WasmSlice) -&gt; bool { slice.ptr == <span class="number">0 </span>}
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">type </span>Abi = WasmSlice;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">WasmSlice</span> {
-                <span class="ident">WasmSlice</span> {
-                    <span class="ident">ptr</span>: <span class="self">self</span>.<span class="ident">as_ptr</span>().<span class="ident">into_abi</span>(),
-                    <span class="ident">len</span>: <span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>,
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; WasmSlice {
+                WasmSlice {
+                    ptr: <span class="self">self</span>.as_ptr().into_abi(),
+                    len: <span class="self">self</span>.len() <span class="kw">as </span>u32,
                 }
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OptionIntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">type </span>Abi = WasmSlice;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">WasmSlice</span> {
-                (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">into_abi</span>()
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; WasmSlice {
+                (<span class="kw-2">&amp;*</span><span class="self">self</span>).into_abi()
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OptionIntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
         }
 
-        <span class="kw">impl</span> <span class="ident">RefFromWasmAbi</span> <span class="kw">for</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
-            <span class="kw">type</span> <span class="ident">Anchor</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span>;
+        <span class="kw">impl </span>RefFromWasmAbi <span class="kw">for </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">type </span>Abi = WasmSlice;
+            <span class="kw">type </span>Anchor = Box&lt;[<span class="macro-nonterminal">$t</span>]&gt;;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_abi</span>(<span class="ident">js</span>: <span class="ident">WasmSlice</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span> {
-                <span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">unsafe fn </span>ref_from_abi(js: WasmSlice) -&gt; Box&lt;[<span class="macro-nonterminal">$t</span>]&gt; {
+                &lt;Box&lt;[<span class="macro-nonterminal">$t</span>]&gt;&gt;::from_abi(js)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">RefMutFromWasmAbi</span> <span class="kw">for</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
-            <span class="kw">type</span> <span class="ident">Anchor</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>];
+        <span class="kw">impl </span>RefMutFromWasmAbi <span class="kw">for </span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">type </span>Abi = WasmSlice;
+            <span class="kw">type </span>Anchor = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>[<span class="macro-nonterminal">$t</span>];
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_mut_from_abi</span>(<span class="ident">js</span>: <span class="ident">WasmSlice</span>)
-                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>]
+            <span class="attribute">#[inline]
+            </span><span class="kw">unsafe fn </span>ref_mut_from_abi(js: WasmSlice)
+                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>[<span class="macro-nonterminal">$t</span>]
             {
-                <span class="ident">slice::from_raw_parts_mut</span>(
-                    <span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>.<span class="ident">ptr</span>),
-                    <span class="ident">js</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+                slice::from_raw_parts_mut(
+                    &lt;<span class="kw-2">*mut </span><span class="macro-nonterminal">$t</span>&gt;::from_abi(js.ptr),
+                    js.len <span class="kw">as </span>usize,
                 )
             }
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">vectors!</span> {
-    <span class="ident">u8</span> <span class="ident">i8</span> <span class="ident">u16</span> <span class="ident">i16</span> <span class="ident">u32</span> <span class="ident">i32</span> <span class="ident">u64</span> <span class="ident">i64</span> <span class="ident">usize</span> <span class="ident">isize</span> <span class="ident">f32</span> <span class="ident">f64</span>
+<span class="macro">vectors! </span>{
+    u8 i8 u16 i16 u32 i32 u64 i64 usize isize f32 f64
 }
 
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;enable-interning&quot;</span>)]</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">unsafe_get_cached_str</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-            <span class="comment">// This uses 0 for the ptr as an indication that it is a JsValue and not a str.</span>
-            <span class="ident"><span class="kw">crate</span>::cache::intern::unsafe_get_str</span>(<span class="ident">x</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">WasmSlice</span> { <span class="ident">ptr</span>: <span class="number">0</span>, <span class="ident">len</span>: <span class="ident">x</span> })
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;enable-interning&quot;</span>)] </span>{
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>unsafe_get_cached_str(x: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;WasmSlice&gt; {
+            <span class="comment">// This uses 0 for the ptr as an indication that it is a JsValue and not a str.
+            </span><span class="kw">crate</span>::cache::intern::unsafe_get_str(x).map(|x| WasmSlice { ptr: <span class="number">0</span>, len: x })
         }
 
-    } <span class="kw">else</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">unsafe_get_cached_str</span>(<span class="ident">_x</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="macro">if_std!</span> {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>: <span class="ident">IntoWasmAbi</span><span class="op">&lt;</span><span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> {
-            <span class="self">self</span>.<span class="ident">into_boxed_slice</span>().<span class="ident">into_abi</span>()
-        }
-    }
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>: <span class="ident">IntoWasmAbi</span><span class="op">&lt;</span><span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
-    }
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromWasmAbi</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>: <span class="ident">FromWasmAbi</span><span class="op">&lt;</span><span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_abi</span>(<span class="ident">js</span>: <span class="ident"><span class="self">Self</span>::Abi</span>) -&gt; <span class="self">Self</span> {
-            <span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>).<span class="ident">into</span>()
-        }
-    }
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionFromWasmAbi</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span>: <span class="ident">FromWasmAbi</span><span class="op">&lt;</span><span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="ident">abi</span>: <span class="kw-2">&amp;</span><span class="ident">WasmSlice</span>) -&gt; <span class="ident">bool</span> { <span class="ident">abi</span>.<span class="ident">ptr</span> <span class="op">==</span> <span class="number">0</span> }
-    }
-
-    <span class="kw">impl</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="ident">String</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> {
-            <span class="comment">// This is safe because the JsValue is immediately looked up in the heap and</span>
-            <span class="comment">// then returned, so use-after-free cannot occur.</span>
-            <span class="ident">unsafe_get_cached_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">into_bytes</span>().<span class="ident">into_abi</span>())
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="ident">String</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> { <span class="ident">null_slice</span>() }
-    }
-
-    <span class="kw">impl</span> <span class="ident">FromWasmAbi</span> <span class="kw">for</span> <span class="ident">String</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
-
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_abi</span>(<span class="ident">js</span>: <span class="ident"><span class="self">Self</span>::Abi</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">String::from_utf8_unchecked</span>(<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>))
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">OptionFromWasmAbi</span> <span class="kw">for</span> <span class="ident">String</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">WasmSlice</span>) -&gt; <span class="ident">bool</span> { <span class="ident">slice</span>.<span class="ident">ptr</span> <span class="op">==</span> <span class="number">0</span> }
+    } <span class="kw">else </span>{
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>unsafe_get_cached_str(_x: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;WasmSlice&gt; {
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">IntoWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
+<span class="macro">if_std! </span>{
+    <span class="kw">impl</span>&lt;T&gt; IntoWasmAbi <span class="kw">for </span>Vec&lt;T&gt; <span class="kw">where </span>Box&lt;[T]&gt;: IntoWasmAbi&lt;Abi = WasmSlice&gt; {
+        <span class="kw">type </span>Abi = &lt;Box&lt;[T]&gt; <span class="kw">as </span>IntoWasmAbi&gt;::Abi;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> {
-        <span class="comment">// This is safe because the JsValue is immediately looked up in the heap and</span>
-        <span class="comment">// then returned, so use-after-free cannot occur.</span>
-        <span class="ident">unsafe_get_cached_str</span>(<span class="self">self</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">into_abi</span>())
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Abi {
+            <span class="self">self</span>.into_boxed_slice().into_abi()
+        }
+    }
+
+    <span class="kw">impl</span>&lt;T&gt; OptionIntoWasmAbi <span class="kw">for </span>Vec&lt;T&gt; <span class="kw">where </span>Box&lt;[T]&gt;: IntoWasmAbi&lt;Abi = WasmSlice&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
+    }
+
+    <span class="kw">impl</span>&lt;T&gt; FromWasmAbi <span class="kw">for </span>Vec&lt;T&gt; <span class="kw">where </span>Box&lt;[T]&gt;: FromWasmAbi&lt;Abi = WasmSlice&gt; {
+        <span class="kw">type </span>Abi = &lt;Box&lt;[T]&gt; <span class="kw">as </span>FromWasmAbi&gt;::Abi;
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">unsafe fn </span>from_abi(js: <span class="self">Self</span>::Abi) -&gt; <span class="self">Self </span>{
+            &lt;Box&lt;[T]&gt;&gt;::from_abi(js).into()
+        }
+    }
+
+    <span class="kw">impl</span>&lt;T&gt; OptionFromWasmAbi <span class="kw">for </span>Vec&lt;T&gt; <span class="kw">where </span>Box&lt;[T]&gt;: FromWasmAbi&lt;Abi = WasmSlice&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>is_none(abi: <span class="kw-2">&amp;</span>WasmSlice) -&gt; bool { abi.ptr == <span class="number">0 </span>}
+    }
+
+    <span class="kw">impl </span>IntoWasmAbi <span class="kw">for </span>String {
+        <span class="kw">type </span>Abi = &lt;Vec&lt;u8&gt; <span class="kw">as </span>IntoWasmAbi&gt;::Abi;
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Abi {
+            <span class="comment">// This is safe because the JsValue is immediately looked up in the heap and
+            // then returned, so use-after-free cannot occur.
+            </span>unsafe_get_cached_str(<span class="kw-2">&amp;</span><span class="self">self</span>).unwrap_or_else(|| <span class="self">self</span>.into_bytes().into_abi())
+        }
+    }
+
+    <span class="kw">impl </span>OptionIntoWasmAbi <span class="kw">for </span>String {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>none() -&gt; <span class="self">Self</span>::Abi { null_slice() }
+    }
+
+    <span class="kw">impl </span>FromWasmAbi <span class="kw">for </span>String {
+        <span class="kw">type </span>Abi = &lt;Vec&lt;u8&gt; <span class="kw">as </span>FromWasmAbi&gt;::Abi;
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">unsafe fn </span>from_abi(js: <span class="self">Self</span>::Abi) -&gt; <span class="self">Self </span>{
+            String::from_utf8_unchecked(&lt;Vec&lt;u8&gt;&gt;::from_abi(js))
+        }
+    }
+
+    <span class="kw">impl </span>OptionFromWasmAbi <span class="kw">for </span>String {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>is_none(slice: <span class="kw-2">&amp;</span>WasmSlice) -&gt; bool { slice.ptr == <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> {
-        <span class="ident">null_slice</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">type </span>Abi = &lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] <span class="kw">as </span>IntoWasmAbi&gt;::Abi;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Abi {
+        <span class="comment">// This is safe because the JsValue is immediately looked up in the heap and
+        // then returned, so use-after-free cannot occur.
+        </span>unsafe_get_cached_str(<span class="self">self</span>).unwrap_or_else(|| <span class="self">self</span>.as_bytes().into_abi())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RefFromWasmAbi</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="op">&lt;</span>[<span class="ident">u8</span>] <span class="kw">as</span> <span class="ident">RefFromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>;
-    <span class="kw">type</span> <span class="ident">Anchor</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_abi</span>(<span class="ident">js</span>: <span class="ident"><span class="self">Self</span>::Abi</span>) -&gt; <span class="ident"><span class="self">Self</span>::Anchor</span> {
-        <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OptionIntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>none() -&gt; <span class="self">Self</span>::Abi {
+        null_slice()
     }
 }
 
-<span class="macro">if_std!</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::JsValue</span>;
+<span class="kw">impl </span>RefFromWasmAbi <span class="kw">for </span>str {
+    <span class="kw">type </span>Abi = &lt;[u8] <span class="kw">as </span>RefFromWasmAbi&gt;::Abi;
+    <span class="kw">type </span>Anchor = Box&lt;str&gt;;
 
-    <span class="kw">impl</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">JsValue</span>]<span class="op">&gt;</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>ref_from_abi(js: <span class="self">Self</span>::Abi) -&gt; <span class="self">Self</span>::Anchor {
+        mem::transmute::&lt;Box&lt;[u8]&gt;, Box&lt;str&gt;&gt;(&lt;Box&lt;[u8]&gt;&gt;::from_abi(js))
+    }
+}
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">WasmSlice</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ptr</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-            <span class="ident">mem::forget</span>(<span class="self">self</span>);
-            <span class="ident">WasmSlice</span> {
-                <span class="ident">ptr</span>: <span class="ident">ptr</span>.<span class="ident">into_abi</span>(),
-                <span class="ident">len</span>: <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>,
+<span class="macro">if_std! </span>{
+    <span class="kw">use </span><span class="kw">crate</span>::JsValue;
+
+    <span class="kw">impl </span>IntoWasmAbi <span class="kw">for </span>Box&lt;[JsValue]&gt; {
+        <span class="kw">type </span>Abi = WasmSlice;
+
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; WasmSlice {
+            <span class="kw">let </span>ptr = <span class="self">self</span>.as_ptr();
+            <span class="kw">let </span>len = <span class="self">self</span>.len();
+            mem::forget(<span class="self">self</span>);
+            WasmSlice {
+                ptr: ptr.into_abi(),
+                len: len <span class="kw">as </span>u32,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">JsValue</span>]<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
+    <span class="kw">impl </span>OptionIntoWasmAbi <span class="kw">for </span>Box&lt;[JsValue]&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
     }
 
-    <span class="kw">impl</span> <span class="ident">FromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">JsValue</span>]<span class="op">&gt;</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+    <span class="kw">impl </span>FromWasmAbi <span class="kw">for </span>Box&lt;[JsValue]&gt; {
+        <span class="kw">type </span>Abi = WasmSlice;
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_abi</span>(<span class="ident">js</span>: <span class="ident">WasmSlice</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">JsValue</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>.<span class="ident">ptr</span>);
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">js</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>, <span class="ident">len</span>).<span class="ident">into_boxed_slice</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">unsafe fn </span>from_abi(js: WasmSlice) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>ptr = &lt;<span class="kw-2">*mut </span>JsValue&gt;::from_abi(js.ptr);
+            <span class="kw">let </span>len = js.len <span class="kw">as </span>usize;
+            Vec::from_raw_parts(ptr, len, len).into_boxed_slice()
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">OptionFromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">JsValue</span>]<span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">WasmSlice</span>) -&gt; <span class="ident">bool</span> { <span class="ident">slice</span>.<span class="ident">ptr</span> <span class="op">==</span> <span class="number">0</span> }
+    <span class="kw">impl </span>OptionFromWasmAbi <span class="kw">for </span>Box&lt;[JsValue]&gt; {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>is_none(slice: <span class="kw-2">&amp;</span>WasmSlice) -&gt; bool { slice.ptr == <span class="number">0 </span>}
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">JsObject</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+    <span class="kw">impl</span>&lt;T&gt; IntoWasmAbi <span class="kw">for </span>Box&lt;[T]&gt; <span class="kw">where </span>T: JsObject {
+        <span class="kw">type </span>Abi = WasmSlice;
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">WasmSlice</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_ptr</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-            <span class="ident">mem::forget</span>(<span class="self">self</span>);
-            <span class="ident">WasmSlice</span> {
-                <span class="ident">ptr</span>: <span class="ident">ptr</span>.<span class="ident">into_abi</span>(),
-                <span class="ident">len</span>: <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>,
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; WasmSlice {
+            <span class="kw">let </span>ptr = <span class="self">self</span>.as_ptr();
+            <span class="kw">let </span>len = <span class="self">self</span>.len();
+            mem::forget(<span class="self">self</span>);
+            WasmSlice {
+                ptr: ptr.into_abi(),
+                len: len <span class="kw">as </span>u32,
             }
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">JsObject</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">WasmSlice</span> { <span class="ident">null_slice</span>() }
+    <span class="kw">impl</span>&lt;T&gt; OptionIntoWasmAbi <span class="kw">for </span>Box&lt;[T]&gt; <span class="kw">where </span>T: JsObject {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>none() -&gt; WasmSlice { null_slice() }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">JsObject</span> {
-        <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">WasmSlice</span>;
+    <span class="kw">impl</span>&lt;T&gt; FromWasmAbi <span class="kw">for </span>Box&lt;[T]&gt; <span class="kw">where </span>T: JsObject {
+        <span class="kw">type </span>Abi = WasmSlice;
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_abi</span>(<span class="ident">js</span>: <span class="ident">WasmSlice</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">JsValue</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="ident">js</span>.<span class="ident">ptr</span>);
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">js</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="ident">len</span>, <span class="ident">len</span>).<span class="ident">drain</span>(..).<span class="ident">map</span>(<span class="op">|</span><span class="ident">js_value</span><span class="op">|</span> <span class="ident">T::unchecked_from_js</span>(<span class="ident">js_value</span>)).<span class="ident">collect</span>();
-            <span class="kw">return</span> <span class="ident">vec</span>.<span class="ident">into_boxed_slice</span>();
+        <span class="attribute">#[inline]
+        </span><span class="kw">unsafe fn </span>from_abi(js: WasmSlice) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>ptr = &lt;<span class="kw-2">*mut </span>JsValue&gt;::from_abi(js.ptr);
+            <span class="kw">let </span>len = js.len <span class="kw">as </span>usize;
+            <span class="kw">let </span>vec: Vec&lt;T&gt; = Vec::from_raw_parts(ptr, len, len).drain(..).map(|js_value| T::unchecked_from_js(js_value)).collect();
+            <span class="kw">return </span>vec.into_boxed_slice();
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionFromWasmAbi</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">JsObject</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">is_none</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="ident">WasmSlice</span>) -&gt; <span class="ident">bool</span> { <span class="ident">slice</span>.<span class="ident">ptr</span> <span class="op">==</span> <span class="number">0</span> }
+    <span class="kw">impl</span>&lt;T&gt; OptionFromWasmAbi <span class="kw">for </span>Box&lt;[T]&gt; <span class="kw">where </span>T: JsObject {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>is_none(slice: <span class="kw-2">&amp;</span>WasmSlice) -&gt; bool { slice.ptr == <span class="number">0 </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

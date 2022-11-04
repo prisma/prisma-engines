@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/mysql_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_renderer/mysql_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -521,528 +521,528 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">SqlRenderer</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">flavour::MysqlFlavour</span>,
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_migration</span>::{<span class="ident">AlterColumn</span>, <span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">TableChange</span>},
-    <span class="ident">sql_schema_differ::ColumnChanges</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{common::<span class="kw-2">*</span>, IteratorJoin, SqlRenderer};
+<span class="kw">use crate</span>::{
+    flavour::MysqlFlavour,
+    pair::Pair,
+    sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
+    sql_schema_differ::ColumnChanges,
 };
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MySqlType</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">regex::Regex</span>;
-<span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">mysql</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::{
-        <span class="ident">ColumnWalker</span>, <span class="ident">EnumWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>, <span class="ident">UserDefinedTypeWalker</span>, <span class="ident">ViewWalker</span>,
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>psl::builtin_connectors::MySqlType;
+<span class="kw">use </span>psl::dml::PrismaValue;
+<span class="kw">use </span>regex::Regex;
+<span class="kw">use </span>sql_ddl::{mysql <span class="kw">as </span>ddl, IndexColumn, SortOrder};
+<span class="kw">use </span>sql_schema_describer::{
+    walkers::{
+        ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">ForeignKeyAction</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>};
+<span class="kw">use </span>std::{borrow::Cow, fmt::Write <span class="kw">as _</span>};
 
-<span class="kw">impl</span> <span class="ident">MysqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">render_column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">col</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ddl::Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ddl::Column</span> {
-            <span class="ident">column_name</span>: <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">not_null</span>: <span class="ident">col</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>(),
-            <span class="ident">column_type</span>: <span class="ident">render_column_type</span>(<span class="ident">col</span>),
-            <span class="ident">default</span>: <span class="ident">col</span>
-                .<span class="ident">default</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> {
-                    <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">default</span>.<span class="ident">kind</span>(),  <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>))
-                    <span class="comment">// We do not want to render JSON defaults because</span>
-                    <span class="comment">// they are not supported by MySQL.</span>
-                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">col</span>.<span class="ident">column_type_family</span>(), <span class="ident">ColumnTypeFamily::Json</span>)
-                    <span class="comment">// We do not want to render binary defaults because</span>
-                    <span class="comment">// they are not supported by MySQL.</span>
-                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">col</span>.<span class="ident">column_type_family</span>(), <span class="ident">ColumnTypeFamily::Binary</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">default</span>.<span class="ident">is_db_generated</span>())
+<span class="kw">impl </span>MysqlFlavour {
+    <span class="kw">fn </span>render_column&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, col: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ddl::Column&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ddl::Column {
+            column_name: col.name().into(),
+            not_null: col.arity().is_required(),
+            column_type: render_column_type(col),
+            default: col
+                .default()
+                .filter(|default| {
+                    !<span class="macro">matches!</span>(default.kind(),  DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::DbGenerated(<span class="prelude-val">None</span>))
+                    <span class="comment">// We do not want to render JSON defaults because
+                    // they are not supported by MySQL.
+                    </span>&amp;&amp; !<span class="macro">matches!</span>(col.column_type_family(), ColumnTypeFamily::Json)
+                    <span class="comment">// We do not want to render binary defaults because
+                    // they are not supported by MySQL.
+                    </span>&amp;&amp; !<span class="macro">matches!</span>(col.column_type_family(), ColumnTypeFamily::Binary <span class="kw">if </span>!default.is_db_generated())
                 })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">render_default</span>(<span class="ident">col</span>, <span class="ident">default</span>)),
-            <span class="ident">auto_increment</span>: <span class="ident">col</span>.<span class="ident">is_autoincrement</span>(),
-            ..<span class="ident">Default::default</span>()
+                .map(|default| render_default(col, default)),
+            auto_increment: col.is_autoincrement(),
+            ..Default::default()
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SqlRenderer</span> <span class="kw">for</span> <span class="ident">MysqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">quote</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Quoted</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">Quoted::Backticks</span>(<span class="ident">name</span>)
+<span class="kw">impl </span>SqlRenderer <span class="kw">for </span>MysqlFlavour {
+    <span class="kw">fn </span>quote&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Quoted&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        Quoted::Backticks(name)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_add_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">ddl::AlterTable</span> {
-            <span class="ident">table_name</span>: <span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">changes</span>: <span class="macro">vec!</span>[<span class="ident">ddl::AlterTableClause::AddForeignKey</span>(<span class="ident">ddl::ForeignKey</span> {
-                <span class="ident">constraint_name</span>: <span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">map</span>(<span class="ident">From::from</span>),
-                <span class="ident">constrained_columns</span>: <span class="ident">foreign_key</span>
-                    .<span class="ident">constrained_columns</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">c</span>.<span class="ident">name</span>()))
-                    .<span class="ident">collect</span>(),
-                <span class="ident">referenced_table</span>: <span class="ident">foreign_key</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                <span class="ident">referenced_columns</span>: <span class="ident">foreign_key</span>
-                    .<span class="ident">referenced_columns</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">Cow::Borrowed</span>(<span class="ident">c</span>.<span class="ident">name</span>()))
-                    .<span class="ident">collect</span>(),
-                <span class="ident">on_delete</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">on_delete_action</span>() {
-                    <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="ident">ddl::ForeignKeyAction::Cascade</span>,
-                    <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="ident">ddl::ForeignKeyAction::NoAction</span>,
-                    <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="ident">ddl::ForeignKeyAction::Restrict</span>,
-                    <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">ddl::ForeignKeyAction::SetDefault</span>,
-                    <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="ident">ddl::ForeignKeyAction::SetNull</span>,
+    <span class="kw">fn </span>render_add_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        ddl::AlterTable {
+            table_name: foreign_key.table().name().into(),
+            changes: <span class="macro">vec!</span>[ddl::AlterTableClause::AddForeignKey(ddl::ForeignKey {
+                constraint_name: foreign_key.constraint_name().map(From::from),
+                constrained_columns: foreign_key
+                    .constrained_columns()
+                    .map(|c| Cow::Borrowed(c.name()))
+                    .collect(),
+                referenced_table: foreign_key.referenced_table().name().into(),
+                referenced_columns: foreign_key
+                    .referenced_columns()
+                    .map(|c| Cow::Borrowed(c.name()))
+                    .collect(),
+                on_delete: <span class="prelude-val">Some</span>(<span class="kw">match </span>foreign_key.on_delete_action() {
+                    ForeignKeyAction::Cascade =&gt; ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction =&gt; ddl::ForeignKeyAction::NoAction,
+                    ForeignKeyAction::Restrict =&gt; ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault =&gt; ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull =&gt; ddl::ForeignKeyAction::SetNull,
                 }),
-                <span class="ident">on_update</span>: <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">foreign_key</span>.<span class="ident">on_update_action</span>() {
-                    <span class="ident">ForeignKeyAction::Cascade</span> =&gt; <span class="ident">ddl::ForeignKeyAction::Cascade</span>,
-                    <span class="ident">ForeignKeyAction::NoAction</span> =&gt; <span class="ident">ddl::ForeignKeyAction::NoAction</span>,
-                    <span class="ident">ForeignKeyAction::Restrict</span> =&gt; <span class="ident">ddl::ForeignKeyAction::Restrict</span>,
-                    <span class="ident">ForeignKeyAction::SetDefault</span> =&gt; <span class="ident">ddl::ForeignKeyAction::SetDefault</span>,
-                    <span class="ident">ForeignKeyAction::SetNull</span> =&gt; <span class="ident">ddl::ForeignKeyAction::SetNull</span>,
+                on_update: <span class="prelude-val">Some</span>(<span class="kw">match </span>foreign_key.on_update_action() {
+                    ForeignKeyAction::Cascade =&gt; ddl::ForeignKeyAction::Cascade,
+                    ForeignKeyAction::NoAction =&gt; ddl::ForeignKeyAction::NoAction,
+                    ForeignKeyAction::Restrict =&gt; ddl::ForeignKeyAction::Restrict,
+                    ForeignKeyAction::SetDefault =&gt; ddl::ForeignKeyAction::SetDefault,
+                    ForeignKeyAction::SetNull =&gt; ddl::ForeignKeyAction::SetNull,
                 }),
             })],
         }
-        .<span class="ident">to_string</span>()
+        .to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_alter_enum</span>: <span class="kw-2">&amp;</span><span class="ident">AlterEnum</span>, <span class="ident">_differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_alter_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _alter_enum: <span class="kw-2">&amp;</span>AlterEnum, _differ: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_alter_enum on MySQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
-            <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-                <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">ddl::AlterTable</span> {
-                    <span class="ident">table_name</span>: <span class="ident">indexes</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                    <span class="ident">changes</span>: <span class="macro">vec!</span>[<span class="ident">sql_ddl::mysql::AlterTableClause::RenameIndex</span> {
-                        <span class="ident">previous_name</span>: <span class="ident">indexes</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-                        <span class="ident">next_name</span>: <span class="ident">indexes</span>.<span class="ident">next</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
+    <span class="kw">fn </span>render_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
+        render_step(<span class="kw-2">&amp;mut </span>|step| {
+            step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                stmt.push_display(<span class="kw-2">&amp;</span>ddl::AlterTable {
+                    table_name: indexes.previous.table().name().into(),
+                    changes: <span class="macro">vec!</span>[sql_ddl::mysql::AlterTableClause::RenameIndex {
+                        previous_name: indexes.previous.name().into(),
+                        next_name: indexes.next.name().into(),
                     }],
                 })
             })
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alter_table</span>: <span class="kw-2">&amp;</span><span class="ident">AlterTable</span>, <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">AlterTable</span> {
-            <span class="ident">table_ids</span>: <span class="ident">table_index</span>,
-            <span class="ident">changes</span>,
-        } <span class="op">=</span> <span class="ident">alter_table</span>;
+    <span class="kw">fn </span>render_alter_table(<span class="kw-2">&amp;</span><span class="self">self</span>, alter_table: <span class="kw-2">&amp;</span>AlterTable, schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span>AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
 
-        <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_index</span>);
+        <span class="kw">let </span>tables = schemas.walk(<span class="kw-2">*</span>table_index);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lines</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>lines = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="ident">changes</span> {
-            <span class="kw">match</span> <span class="ident">change</span> {
-                <span class="ident">TableChange::DropPrimaryKey</span> =&gt; <span class="ident">lines</span>.<span class="ident">push</span>(<span class="ident">sql_ddl::mysql::AlterTableClause::DropPrimaryKey</span>.<span class="ident">to_string</span>()),
-                <span class="ident">TableChange::RenamePrimaryKey</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No Renaming Primary Keys on Mysql&quot;</span>),
-                <span class="ident">TableChange::AddPrimaryKey</span> =&gt; <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">for </span>change <span class="kw">in </span>changes {
+            <span class="kw">match </span>change {
+                TableChange::DropPrimaryKey =&gt; lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
+                TableChange::RenamePrimaryKey =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No Renaming Primary Keys on Mysql&quot;</span>),
+                TableChange::AddPrimaryKey =&gt; lines.push(<span class="macro">format!</span>(
                     <span class="string">&quot;ADD PRIMARY KEY ({})&quot;</span>,
-                    <span class="ident">tables</span>
-                        .<span class="ident">next</span>
-                        .<span class="ident">primary_key_columns</span>()
-                        .<span class="ident">unwrap</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()));
+                    tables
+                        .next
+                        .primary_key_columns()
+                        .unwrap()
+                        .map(|c| {
+                            <span class="kw">let </span><span class="kw-2">mut </span>rendered = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.quote(c.as_column().name()));
 
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">length</span>() {
-                                <span class="macro">write!</span>(<span class="ident">rendered</span>, <span class="string">&quot;({})&quot;</span>, <span class="ident">length</span>).<span class="ident">unwrap</span>();
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(length) = c.length() {
+                                <span class="macro">write!</span>(rendered, <span class="string">&quot;({})&quot;</span>, length).unwrap();
                             }
 
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_order</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>() {
-                                <span class="ident">rendered</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-                                <span class="ident">rendered</span>.<span class="ident">push_str</span>(<span class="ident">sort_order</span>.<span class="ident">as_ref</span>());
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(sort_order) = c.sort_order() {
+                                rendered.push(<span class="string">&#39; &#39;</span>);
+                                rendered.push_str(sort_order.as_ref());
                             }
 
-                            <span class="ident">rendered</span>
+                            rendered
                         })
-                        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+                        .join(<span class="string">&quot;, &quot;</span>)
                 )),
-                <span class="ident">TableChange::AddColumn</span> {
-                    <span class="ident">column_id</span>,
-                    <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: <span class="kw">_</span>,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
-                    <span class="kw">let</span> <span class="ident">col_sql</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">column</span>);
+                    <span class="kw">let </span>column = tables.next.walk(<span class="kw-2">*</span>column_id);
+                    <span class="kw">let </span>col_sql = <span class="self">self</span>.render_column(column);
 
-                    <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, <span class="ident">col_sql</span>));
+                    lines.push(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, col_sql));
                 }
-                <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } =&gt; <span class="ident">lines</span>.<span class="ident">push</span>(
-                    <span class="ident">sql_ddl::mysql::AlterTableClause::DropColumn</span> {
-                        <span class="ident">column_name</span>: <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>().<span class="ident">into</span>(),
+                TableChange::DropColumn { column_id } =&gt; lines.push(
+                    sql_ddl::mysql::AlterTableClause::DropColumn {
+                        column_name: tables.previous.walk(<span class="kw-2">*</span>column_id).name().into(),
                     }
-                    .<span class="ident">to_string</span>(),
+                    .to_string(),
                 ),
-                <span class="ident">TableChange::AlterColumn</span>(<span class="ident">AlterColumn</span> {
-                    <span class="ident">changes</span>,
-                    <span class="ident">column_id</span>,
-                    <span class="ident">type_change</span>: <span class="kw">_</span>,
+                TableChange::AlterColumn(AlterColumn {
+                    changes,
+                    column_id,
+                    type_change: <span class="kw">_</span>,
                 }) =&gt; {
-                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
-                    <span class="kw">let</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="ident">MysqlAlterColumn::new</span>(<span class="ident">columns</span>, <span class="kw-2">*</span><span class="ident">changes</span>);
+                    <span class="kw">let </span>columns = schemas.walk(<span class="kw-2">*</span>column_id);
+                    <span class="kw">let </span>expanded = MysqlAlterColumn::new(columns, <span class="kw-2">*</span>changes);
 
-                    <span class="kw">match</span> <span class="ident">expanded</span> {
-                        <span class="ident">MysqlAlterColumn::DropDefault</span> =&gt; <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+                    <span class="kw">match </span>expanded {
+                        MysqlAlterColumn::DropDefault =&gt; lines.push(<span class="macro">format!</span>(
                             <span class="string">&quot;ALTER COLUMN {column} DROP DEFAULT&quot;</span>,
-                            <span class="ident">column</span> <span class="op">=</span> <span class="ident">Quoted::mysql_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>())
+                            column = Quoted::mysql_ident(columns.previous.name())
                         )),
-                        <span class="ident">MysqlAlterColumn::Modify</span> { <span class="ident">new_default</span>, <span class="ident">changes</span> } =&gt; {
-                            <span class="ident">lines</span>.<span class="ident">push</span>(<span class="ident">render_mysql_modify</span>(<span class="kw-2">&amp;</span><span class="ident">changes</span>, <span class="ident">new_default</span>.<span class="ident">as_ref</span>(), <span class="ident">columns</span>.<span class="ident">next</span>))
+                        MysqlAlterColumn::Modify { new_default, changes } =&gt; {
+                            lines.push(render_mysql_modify(<span class="kw-2">&amp;</span>changes, new_default.as_ref(), columns.next))
                         }
                     };
                 }
-                <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, <span class="ident">changes</span>: <span class="kw">_</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
-                    <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN `{}`&quot;</span>, <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>()));
-                    <span class="ident">lines</span>.<span class="ident">push</span>(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">columns</span>.<span class="ident">next</span>)));
+                TableChange::DropAndRecreateColumn { column_id, changes: <span class="kw">_ </span>} =&gt; {
+                    <span class="kw">let </span>columns = schemas.walk(<span class="kw-2">*</span>column_id);
+                    lines.push(<span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN `{}`&quot;</span>, columns.previous.name()));
+                    lines.push(<span class="macro">format!</span>(<span class="string">&quot;ADD COLUMN {}&quot;</span>, <span class="self">self</span>.render_column(columns.next)));
                 }
             };
         }
 
-        <span class="kw">if</span> <span class="ident">lines</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">Vec::new</span>();
+        <span class="kw">if </span>lines.is_empty() {
+            <span class="kw">return </span>Vec::new();
         }
 
         <span class="macro">vec!</span>[<span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {} {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">name</span>()),
-            <span class="ident">lines</span>.<span class="ident">join</span>(<span class="string">&quot;,\n    &quot;</span>)
+            <span class="self">self</span>.quote(tables.previous.name()),
+            lines.join(<span class="string">&quot;,\n    &quot;</span>)
         )]
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_create_enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_create_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _create_enum: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(
-            <span class="string">&quot;Unreachable render_create_enum() on MySQL. enums are defined on each column that uses them on MySQL&quot;</span>
-        )
+            <span class="string">&quot;Unreachable render_create_enum() on MySQL. enums are defined on each column that uses them on MySQL&quot;
+        </span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">ddl::CreateIndex</span> {
-            <span class="ident">r#type</span>: <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-                <span class="ident">sql_schema_describer::IndexType::Unique</span> =&gt; <span class="ident">ddl::IndexType::Unique</span>,
-                <span class="ident">sql_schema_describer::IndexType::Normal</span> =&gt; <span class="ident">ddl::IndexType::Normal</span>,
-                <span class="ident">sql_schema_describer::IndexType::Fulltext</span> =&gt; <span class="ident">ddl::IndexType::Fulltext</span>,
-                <span class="ident">sql_schema_describer::IndexType::PrimaryKey</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">fn </span>render_create_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        ddl::CreateIndex {
+            r#type: <span class="kw">match </span>index.index_type() {
+                sql_schema_describer::IndexType::Unique =&gt; ddl::IndexType::Unique,
+                sql_schema_describer::IndexType::Normal =&gt; ddl::IndexType::Normal,
+                sql_schema_describer::IndexType::Fulltext =&gt; ddl::IndexType::Fulltext,
+                sql_schema_describer::IndexType::PrimaryKey =&gt; <span class="macro">unreachable!</span>(),
             },
-            <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">on</span>: (
-                <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                <span class="ident">index</span>
-                    .<span class="ident">columns</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">IndexColumn</span> {
-                        <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                        <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
-                        <span class="ident">sort_order</span>: <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
-                            <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                            <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+            index_name: index.name().into(),
+            on: (
+                index.table().name().into(),
+                index
+                    .columns()
+                    .map(|c| IndexColumn {
+                        name: c.as_column().name().into(),
+                        length: c.length(),
+                        sort_order: c.sort_order().map(|so| <span class="kw">match </span>so {
+                            SQLSortOrder::Asc =&gt; SortOrder::Asc,
+                            SQLSortOrder::Desc =&gt; SortOrder::Desc,
                         }),
-                        <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+                        operator_class: <span class="prelude-val">None</span>,
                     })
-                    .<span class="ident">collect</span>(),
+                    .collect(),
             ),
         }
-        .<span class="ident">to_string</span>()
+        .to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table_as</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table_name</span>: <span class="ident">TableName</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">ddl::CreateTable</span> {
-            <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">table_name</span>,
-            <span class="ident">columns</span>: <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">render_column</span>(<span class="ident">col</span>)).<span class="ident">collect</span>(),
-            <span class="ident">indexes</span>: <span class="ident">table</span>
-                .<span class="ident">indexes</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
-                .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">ddl::IndexClause</span> {
-                    <span class="ident">index_name</span>: <span class="prelude-val">Some</span>(<span class="ident">Cow::from</span>(<span class="ident">index</span>.<span class="ident">name</span>())),
-                    <span class="ident">r#type</span>: <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-                        <span class="ident">sql_schema_describer::IndexType::Unique</span> =&gt; <span class="ident">ddl::IndexType::Unique</span>,
-                        <span class="ident">sql_schema_describer::IndexType::Normal</span> =&gt; <span class="ident">ddl::IndexType::Normal</span>,
-                        <span class="ident">sql_schema_describer::IndexType::Fulltext</span> =&gt; <span class="ident">ddl::IndexType::Fulltext</span>,
-                        <span class="ident">sql_schema_describer::IndexType::PrimaryKey</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">fn </span>render_create_table_as(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, table_name: TableName&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        ddl::CreateTable {
+            table_name: <span class="kw-2">&amp;</span>table_name,
+            columns: table.columns().map(|col| <span class="self">self</span>.render_column(col)).collect(),
+            indexes: table
+                .indexes()
+                .filter(|idx| !idx.is_primary_key())
+                .map(<span class="kw">move </span>|index| ddl::IndexClause {
+                    index_name: <span class="prelude-val">Some</span>(Cow::from(index.name())),
+                    r#type: <span class="kw">match </span>index.index_type() {
+                        sql_schema_describer::IndexType::Unique =&gt; ddl::IndexType::Unique,
+                        sql_schema_describer::IndexType::Normal =&gt; ddl::IndexType::Normal,
+                        sql_schema_describer::IndexType::Fulltext =&gt; ddl::IndexType::Fulltext,
+                        sql_schema_describer::IndexType::PrimaryKey =&gt; <span class="macro">unreachable!</span>(),
                     },
-                    <span class="ident">columns</span>: <span class="ident">index</span>
-                        .<span class="ident">columns</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">IndexColumn</span> {
-                            <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                            <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
-                            <span class="ident">sort_order</span>: <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
-                                <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                                <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+                    columns: index
+                        .columns()
+                        .map(|c| IndexColumn {
+                            name: c.as_column().name().into(),
+                            length: c.length(),
+                            sort_order: c.sort_order().map(|so| <span class="kw">match </span>so {
+                                SQLSortOrder::Asc =&gt; SortOrder::Asc,
+                                SQLSortOrder::Desc =&gt; SortOrder::Desc,
                             }),
-                            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+                            operator_class: <span class="prelude-val">None</span>,
                         })
-                        .<span class="ident">collect</span>(),
+                        .collect(),
                 })
-                .<span class="ident">collect</span>(),
-            <span class="ident">primary_key</span>: <span class="ident">table</span>
-                .<span class="ident">primary_key_columns</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flatten</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">IndexColumn</span> {
-                    <span class="ident">name</span>: <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-                    <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
-                    <span class="ident">sort_order</span>: <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">so</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">so</span> {
-                        <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="ident">SortOrder::Asc</span>,
-                        <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="ident">SortOrder::Desc</span>,
+                .collect(),
+            primary_key: table
+                .primary_key_columns()
+                .into_iter()
+                .flatten()
+                .map(|c| IndexColumn {
+                    name: c.as_column().name().into(),
+                    length: c.length(),
+                    sort_order: c.sort_order().map(|so| <span class="kw">match </span>so {
+                        SQLSortOrder::Asc =&gt; SortOrder::Asc,
+                        SQLSortOrder::Desc =&gt; SortOrder::Desc,
                     }),
-                    <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+                    operator_class: <span class="prelude-val">None</span>,
                 })
-                .<span class="ident">collect</span>(),
-            <span class="ident">default_character_set</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;utf8mb4&quot;</span>.<span class="ident">into</span>()),
-            <span class="ident">collate</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;utf8mb4_unicode_ci&quot;</span>.<span class="ident">into</span>()),
+                .collect(),
+            default_character_set: <span class="prelude-val">Some</span>(<span class="string">&quot;utf8mb4&quot;</span>.into()),
+            collate: <span class="prelude-val">Some</span>(<span class="string">&quot;utf8mb4_unicode_ci&quot;</span>.into()),
         }
-        .<span class="ident">to_string</span>()
+        .to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_and_recreate_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Order matters: dropping the old index first wouldn&#39;t work when foreign key constraints are still relying on it.</span>
-        <span class="macro">vec!</span>[
-            <span class="self">self</span>.<span class="ident">render_create_index</span>(<span class="ident">indexes</span>.<span class="ident">next</span>),
-            <span class="ident">sql_ddl::mysql::DropIndex</span> {
-                <span class="ident">index_name</span>: <span class="ident">indexes</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
-                <span class="ident">table_name</span>: <span class="ident">indexes</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
+    <span class="kw">fn </span>render_drop_and_recreate_index(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; Vec&lt;String&gt; {
+        <span class="comment">// Order matters: dropping the old index first wouldn&#39;t work when foreign key constraints are still relying on it.
+        </span><span class="macro">vec!</span>[
+            <span class="self">self</span>.render_create_index(indexes.next),
+            sql_ddl::mysql::DropIndex {
+                index_name: indexes.previous.name().into(),
+                table_name: indexes.previous.table().name().into(),
             }
-            .<span class="ident">to_string</span>(),
+            .to_string(),
         ]
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_drop_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(
-            <span class="string">&quot;Unreachable render_drop_enum() on MySQL. enums are defined on each column that uses them on MySQL&quot;</span>
-        )
+            <span class="string">&quot;Unreachable render_drop_enum() on MySQL. enums are defined on each column that uses them on MySQL&quot;
+        </span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreign_key</span>: <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_drop_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, foreign_key: ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">format!</span>(
             <span class="string">&quot;ALTER TABLE {table} DROP FOREIGN KEY {constraint_name}&quot;</span>,
-            <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">foreign_key</span>.<span class="ident">table</span>().<span class="ident">name</span>()),
-            <span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">Quoted::mysql_ident</span>(<span class="ident">foreign_key</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>()),
+            table = <span class="self">self</span>.quote(foreign_key.table().name()),
+            constraint_name = Quoted::mysql_ident(foreign_key.constraint_name().unwrap()),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">sql_ddl::mysql::DropIndex</span> {
-            <span class="ident">table_name</span>: <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">into</span>(),
-            <span class="ident">index_name</span>: <span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">into</span>(),
+    <span class="kw">fn </span>render_drop_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        sql_ddl::mysql::DropIndex {
+            table_name: index.table().name().into(),
+            index_name: index.name().into(),
         }
-        .<span class="ident">to_string</span>()
+        .to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">render_step</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">step</span><span class="op">|</span> {
-            <span class="ident">step</span>.<span class="ident">render_statement</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">stmt</span><span class="op">|</span> {
-                <span class="ident">stmt</span>.<span class="ident">push_display</span>(<span class="kw-2">&amp;</span><span class="ident">sql_ddl::mysql::DropTable</span> {
-                    <span class="ident">table_name</span>: <span class="ident">table_name</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>render_drop_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;String&gt; {
+        render_step(<span class="kw-2">&amp;mut </span>|step| {
+            step.render_statement(<span class="kw-2">&amp;mut </span>|stmt| {
+                stmt.push_display(<span class="kw-2">&amp;</span>sql_ddl::mysql::DropTable {
+                    table_name: table_name.into(),
                 })
             })
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">render_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>], <span class="ident">_schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>render_redefine_tables(<span class="kw-2">&amp;</span><span class="self">self</span>, _names: <span class="kw-2">&amp;</span>[RedefineTable], _schemas: Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt;) -&gt; Vec&lt;String&gt; {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_redefine_table on MySQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">sql_ddl::mysql::AlterTable</span> {
-            <span class="ident">table_name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">changes</span>: <span class="macro">vec!</span>[<span class="ident">sql_ddl::mysql::AlterTableClause::RenameTo</span> {
-                <span class="ident">next_name</span>: <span class="ident">new_name</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>render_rename_table(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, new_name: <span class="kw-2">&amp;</span>str) -&gt; String {
+        sql_ddl::mysql::AlterTable {
+            table_name: name.into(),
+            changes: <span class="macro">vec!</span>[sql_ddl::mysql::AlterTableClause::RenameTo {
+                next_name: new_name.into(),
             }],
         }
-        .<span class="ident">to_string</span>()
+        .to_string()
     }
 
-    <span class="kw">fn</span> <span class="ident">render_create_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">render_create_table_as</span>(<span class="ident">table</span>, <span class="ident">TableName</span>(<span class="prelude-val">None</span>, <span class="ident">Quoted::mysql_ident</span>(<span class="ident">table</span>.<span class="ident">name</span>())))
+    <span class="kw">fn </span>render_create_table(<span class="kw-2">&amp;</span><span class="self">self</span>, table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="self">self</span>.render_create_table_as(table, TableName(<span class="prelude-val">None</span>, Quoted::mysql_ident(table.name())))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_view</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">view</span>: <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP VIEW {}&quot;</span>, <span class="ident">Quoted::mysql_ident</span>(<span class="ident">view</span>.<span class="ident">name</span>()))
+    <span class="kw">fn </span>render_drop_view(<span class="kw-2">&amp;</span><span class="self">self</span>, view: ViewWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP VIEW {}&quot;</span>, Quoted::mysql_ident(view.name()))
     }
 
-    <span class="kw">fn</span> <span class="ident">render_drop_user_defined_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_drop_user_defined_type(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>UserDefinedTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render_drop_user_defined_type on MySQL&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">render_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_fks</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">fn </span>render_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>, _fks: Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; String {
         <span class="macro">unreachable!</span>(<span class="string">&quot;render RenameForeignKey on MySQL&quot;</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_mysql_modify</span>(
-    <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>,
-    <span class="ident">new_default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sql_schema_describer::DefaultValue</span><span class="op">&gt;</span>,
-    <span class="ident">next_column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">column_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">type_changed</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">next_column</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span>.<span class="ident">clone</span>()).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">contains</span>(<span class="string">&quot;datetime&quot;</span>))
-    <span class="comment">// @default(now()) does not work with datetimes of certain sizes</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">next_column</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span>.<span class="ident">clone</span>()).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">!</span><span class="ident">r</span>.<span class="ident">is_empty</span>())
+<span class="kw">fn </span>render_mysql_modify(
+    changes: <span class="kw-2">&amp;</span>ColumnChanges,
+    new_default: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>sql_schema_describer::DefaultValue&gt;,
+    next_column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; String {
+    <span class="kw">let </span>column_type: <span class="prelude-ty">Option</span>&lt;String&gt; = <span class="kw">if </span>changes.type_changed() {
+        <span class="prelude-val">Some</span>(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty() || r.contains(<span class="string">&quot;datetime&quot;</span>))
+    <span class="comment">// @default(now()) does not work with datetimes of certain sizes
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(next_column.column_type().full_data_type.clone()).filter(|r| !r.is_empty())
     };
 
-    <span class="kw">let</span> <span class="ident">column_type</span> <span class="op">=</span> <span class="ident">column_type</span>
-        .<span class="ident">map</span>(<span class="ident">Cow::Owned</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">render_column_type</span>(<span class="ident">next_column</span>));
+    <span class="kw">let </span>column_type = column_type
+        .map(Cow::Owned)
+        .unwrap_or_else(|| render_column_type(next_column));
 
-    <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">new_default</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">render_default</span>(<span class="ident">next_column</span>, <span class="ident">default</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">expr</span><span class="op">|</span> <span class="op">!</span><span class="ident">expr</span>.<span class="ident">is_empty</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">expression</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="ident">expression</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>);
+    <span class="kw">let </span>default = new_default
+        .map(|default| render_default(next_column, default))
+        .filter(|expr| !expr.is_empty())
+        .map(|expression| <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, expression))
+        .unwrap_or_else(String::new);
 
     <span class="macro">format!</span>(
         <span class="string">&quot;MODIFY {column_name} {column_type}{nullability}{default}{sequence}&quot;</span>,
-        <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">Quoted::mysql_ident</span>(<span class="kw-2">&amp;</span><span class="ident">next_column</span>.<span class="ident">name</span>()),
-        <span class="ident">column_type</span> <span class="op">=</span> <span class="ident">column_type</span>,
-        <span class="ident">nullability</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">next_column</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() {
-            <span class="string">&quot; NOT NULL&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot; NULL&quot;</span>
-        },
-        <span class="ident">default</span> <span class="op">=</span> <span class="ident">default</span>,
-        <span class="ident">sequence</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">next_column</span>.<span class="ident">is_autoincrement</span>() {
-            <span class="string">&quot; AUTO_INCREMENT&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;&quot;</span>
-        },
+        column_name = Quoted::mysql_ident(<span class="kw-2">&amp;</span>next_column.name()),
+        column_type = column_type,
+        nullability = <span class="kw">if </span>next_column.arity().is_required() {
+            <span class="string">&quot; NOT NULL&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot; NULL&quot;
+        </span>},
+        default = default,
+        sequence = <span class="kw">if </span>next_column.is_autoincrement() {
+            <span class="string">&quot; AUTO_INCREMENT&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>},
     )
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">enum_id</span>) <span class="op">=</span> <span class="ident">column</span>.<span class="ident">column_type_family</span>() {
-        <span class="kw">let</span> <span class="ident">variants</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">column</span>
-            .<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>)
-            .<span class="ident">values</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="ident">Quoted::mysql_string</span>)
-            .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+<span class="kw">fn </span>render_column_type(column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
+    <span class="kw">if let </span>ColumnTypeFamily::Enum(enum_id) = column.column_type_family() {
+        <span class="kw">let </span>variants: String = column
+            .walk(<span class="kw-2">*</span>enum_id)
+            .values()
+            .iter()
+            .map(Quoted::mysql_string)
+            .join(<span class="string">&quot;, &quot;</span>);
 
-        <span class="kw">return</span> <span class="macro">format!</span>(<span class="string">&quot;ENUM({})&quot;</span>, <span class="ident">variants</span>).<span class="ident">into</span>();
+        <span class="kw">return </span><span class="macro">format!</span>(<span class="string">&quot;ENUM({})&quot;</span>, variants).into();
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">family</span> {
-        <span class="kw">return</span> <span class="ident">description</span>.<span class="ident">to_string</span>().<span class="ident">into</span>();
+    <span class="kw">if let </span>ColumnTypeFamily::Unsupported(description) = <span class="kw-2">&amp;</span>column.column_type().family {
+        <span class="kw">return </span>description.to_string().into();
     }
 
-    <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">column</span>
-        .<span class="ident">column_native_type</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;Column native type missing in mysql_renderer::render_column_type()&quot;</span>);
+    <span class="kw">let </span>native_type = column
+        .column_native_type()
+        .expect(<span class="string">&quot;Column native type missing in mysql_renderer::render_column_type()&quot;</span>);
 
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">arg</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">arg</span>),
+    <span class="kw">fn </span>render(input: <span class="prelude-ty">Option</span>&lt;u32&gt;) -&gt; String {
+        <span class="kw">match </span>input {
+            <span class="prelude-val">None </span>=&gt; <span class="string">&quot;&quot;</span>.to_string(),
+            <span class="prelude-val">Some</span>(arg) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, arg),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">render_decimal</span>(<span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">input</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({}, {})&quot;</span>, <span class="ident">precision</span>, <span class="ident">scale</span>),
+    <span class="kw">fn </span>render_decimal(input: <span class="prelude-ty">Option</span>&lt;(u32, u32)&gt;) -&gt; String {
+        <span class="kw">match </span>input {
+            <span class="prelude-val">None </span>=&gt; <span class="string">&quot;&quot;</span>.to_string(),
+            <span class="prelude-val">Some</span>((precision, scale)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;({}, {})&quot;</span>, precision, scale),
         }
     }
 
-    <span class="kw">match</span> <span class="ident">native_type</span> {
-        <span class="ident">MySqlType::Int</span> =&gt; <span class="string">&quot;INTEGER&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::SmallInt</span> =&gt; <span class="string">&quot;SMALLINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::TinyInt</span> <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">column_type_family</span>().<span class="ident">is_boolean</span>() =&gt; <span class="string">&quot;BOOLEAN&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="string">&quot;TINYINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::MediumInt</span> =&gt; <span class="string">&quot;MEDIUMINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::BigInt</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Float</span> =&gt; <span class="string">&quot;FLOAT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Double</span> =&gt; <span class="string">&quot;DOUBLE&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Bit</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Char</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::VarChar</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Binary</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BINARY({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::VarBinary</span>(<span class="ident">size</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBINARY({size})&quot;</span>, <span class="ident">size</span> <span class="op">=</span> <span class="ident">size</span>).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="string">&quot;TINYBLOB&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Blob</span> =&gt; <span class="string">&quot;BLOB&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="string">&quot;MEDIUMBLOB&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::LongBlob</span> =&gt; <span class="string">&quot;LONGBLOB&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::TinyText</span> =&gt; <span class="string">&quot;TINYTEXT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Text</span> =&gt; <span class="string">&quot;TEXT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::MediumText</span> =&gt; <span class="string">&quot;MEDIUMTEXT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::LongText</span> =&gt; <span class="string">&quot;LONGTEXT&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Date</span> =&gt; <span class="string">&quot;DATE&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Time</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::DateTime</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Timestamp</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, <span class="ident">render</span>(<span class="kw-2">*</span><span class="ident">precision</span>)).<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Year</span> =&gt; <span class="string">&quot;YEAR&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::Json</span> =&gt; <span class="string">&quot;JSON&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="string">&quot;INTEGER UNSIGNED&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="string">&quot;SMALLINT UNSIGNED&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="string">&quot;TINYINT UNSIGNED&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::UnsignedMediumInt</span> =&gt; <span class="string">&quot;MEDIUMINT UNSIGNED&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">MySqlType::UnsignedBigInt</span> =&gt; <span class="string">&quot;BIGINT UNSIGNED&quot;</span>.<span class="ident">into</span>(),
+    <span class="kw">match </span>native_type {
+        MySqlType::Int =&gt; <span class="string">&quot;INTEGER&quot;</span>.into(),
+        MySqlType::SmallInt =&gt; <span class="string">&quot;SMALLINT&quot;</span>.into(),
+        MySqlType::TinyInt <span class="kw">if </span>column.column_type_family().is_boolean() =&gt; <span class="string">&quot;BOOLEAN&quot;</span>.into(),
+        MySqlType::TinyInt =&gt; <span class="string">&quot;TINYINT&quot;</span>.into(),
+        MySqlType::MediumInt =&gt; <span class="string">&quot;MEDIUMINT&quot;</span>.into(),
+        MySqlType::BigInt =&gt; <span class="string">&quot;BIGINT&quot;</span>.into(),
+        MySqlType::Decimal(precision) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, render_decimal(<span class="kw-2">*</span>precision)).into(),
+        MySqlType::Float =&gt; <span class="string">&quot;FLOAT&quot;</span>.into(),
+        MySqlType::Double =&gt; <span class="string">&quot;DOUBLE&quot;</span>.into(),
+        MySqlType::Bit(size) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT({size})&quot;</span>, size = size).into(),
+        MySqlType::Char(size) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR({size})&quot;</span>, size = size).into(),
+        MySqlType::VarChar(size) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({size})&quot;</span>, size = size).into(),
+        MySqlType::Binary(size) =&gt; <span class="macro">format!</span>(<span class="string">&quot;BINARY({size})&quot;</span>, size = size).into(),
+        MySqlType::VarBinary(size) =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBINARY({size})&quot;</span>, size = size).into(),
+        MySqlType::TinyBlob =&gt; <span class="string">&quot;TINYBLOB&quot;</span>.into(),
+        MySqlType::Blob =&gt; <span class="string">&quot;BLOB&quot;</span>.into(),
+        MySqlType::MediumBlob =&gt; <span class="string">&quot;MEDIUMBLOB&quot;</span>.into(),
+        MySqlType::LongBlob =&gt; <span class="string">&quot;LONGBLOB&quot;</span>.into(),
+        MySqlType::TinyText =&gt; <span class="string">&quot;TINYTEXT&quot;</span>.into(),
+        MySqlType::Text =&gt; <span class="string">&quot;TEXT&quot;</span>.into(),
+        MySqlType::MediumText =&gt; <span class="string">&quot;MEDIUMTEXT&quot;</span>.into(),
+        MySqlType::LongText =&gt; <span class="string">&quot;LONGTEXT&quot;</span>.into(),
+        MySqlType::Date =&gt; <span class="string">&quot;DATE&quot;</span>.into(),
+        MySqlType::Time(precision) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME{}&quot;</span>, render(<span class="kw-2">*</span>precision)).into(),
+        MySqlType::DateTime(precision) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME{}&quot;</span>, render(<span class="kw-2">*</span>precision)).into(),
+        MySqlType::Timestamp(precision) =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIMESTAMP{}&quot;</span>, render(<span class="kw-2">*</span>precision)).into(),
+        MySqlType::Year =&gt; <span class="string">&quot;YEAR&quot;</span>.into(),
+        MySqlType::Json =&gt; <span class="string">&quot;JSON&quot;</span>.into(),
+        MySqlType::UnsignedInt =&gt; <span class="string">&quot;INTEGER UNSIGNED&quot;</span>.into(),
+        MySqlType::UnsignedSmallInt =&gt; <span class="string">&quot;SMALLINT UNSIGNED&quot;</span>.into(),
+        MySqlType::UnsignedTinyInt =&gt; <span class="string">&quot;TINYINT UNSIGNED&quot;</span>.into(),
+        MySqlType::UnsignedMediumInt =&gt; <span class="string">&quot;MEDIUMINT UNSIGNED&quot;</span>.into(),
+        MySqlType::UnsignedBigInt =&gt; <span class="string">&quot;BIGINT UNSIGNED&quot;</span>.into(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">escape_string_literal</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">static</span> <span class="ident">STRING_LITERAL_CHARACTER_TO_ESCAPE_RE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;&#39;&quot;#</span>).<span class="ident">unwrap</span>());
+<span class="kw">fn </span>escape_string_literal(s: <span class="kw-2">&amp;</span>str) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="kw">static </span>STRING_LITERAL_CHARACTER_TO_ESCAPE_RE: Lazy&lt;Regex&gt; = Lazy::new(|| Regex::new(<span class="string">r#&quot;&#39;&quot;#</span>).unwrap());
 
-    <span class="ident">STRING_LITERAL_CHARACTER_TO_ESCAPE_RE</span>.<span class="ident">replace_all</span>(<span class="ident">s</span>, <span class="string">&quot;&#39;$0&quot;</span>)
+    STRING_LITERAL_CHARACTER_TO_ESCAPE_RE.replace_all(s, <span class="string">&quot;&#39;$0&quot;</span>)
 }
 
-<span class="doccomment">/// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We don&#39;t use SET DEFAULT because it can&#39;t be used to set the default to an expression on most</span>
-<span class="doccomment">/// MySQL versions. We use MODIFY for default changes instead.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">MysqlAlterColumn</span> {
-    <span class="ident">DropDefault</span>,
-    <span class="ident">Modify</span> {
-        <span class="ident">new_default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
-        <span class="ident">changes</span>: <span class="ident">ColumnChanges</span>,
+<span class="doccomment">/// https://dev.mysql.com/doc/refman/8.0/en/alter-table.html
+///
+/// We don&#39;t use SET DEFAULT because it can&#39;t be used to set the default to an expression on most
+/// MySQL versions. We use MODIFY for default changes instead.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>MysqlAlterColumn {
+    DropDefault,
+    Modify {
+        new_default: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
+        changes: ColumnChanges,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">MysqlAlterColumn</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">changes</span>: <span class="ident">ColumnChanges</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">only_default_changed</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="ident">MysqlAlterColumn::DropDefault</span>;
+<span class="kw">impl </span>MysqlAlterColumn {
+    <span class="kw">fn </span>new(columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, changes: ColumnChanges) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>changes.only_default_changed() &amp;&amp; columns.next.default().is_none() {
+            <span class="kw">return </span>MysqlAlterColumn::DropDefault;
         }
 
-        <span class="kw">let</span> <span class="ident">defaults</span> <span class="op">=</span> (
-            <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">default</span>().<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()),
-            <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()),
+        <span class="kw">let </span>defaults = (
+            columns.previous.default().as_ref().map(|d| d.kind()),
+            columns.next.default().as_ref().map(|d| d.kind()),
         );
 
-        <span class="comment">// @default(dbgenerated()) does not give us the information in the prisma schema, so we have to</span>
-        <span class="comment">// transfer it from the introspected current state of the database.</span>
-        <span class="kw">let</span> <span class="ident">new_default</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">defaults</span> {
-            (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">previous</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">next</span>)))
-                <span class="kw">if</span> (<span class="ident">next</span>.<span class="ident">is_none</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>)) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">previous</span>.<span class="ident">is_empty</span>() =&gt;
+        <span class="comment">// @default(dbgenerated()) does not give us the information in the prisma schema, so we have to
+        // transfer it from the introspected current state of the database.
+        </span><span class="kw">let </span>new_default = <span class="kw">match </span>defaults {
+            (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(previous))), <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(next)))
+                <span class="kw">if </span>(next.is_none() || next.as_deref() == <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>)) &amp;&amp; !previous.is_empty() =&gt;
             {
-                <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::db_generated</span>(<span class="ident">previous</span>.<span class="ident">clone</span>()))
+                <span class="prelude-val">Some</span>(DefaultValue::db_generated(previous.clone()))
             }
-            <span class="kw">_</span> =&gt; <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">cloned</span>(),
+            <span class="kw">_ </span>=&gt; columns.next.default().cloned(),
         };
 
-        <span class="ident">MysqlAlterColumn::Modify</span> { <span class="ident">changes</span>, <span class="ident">new_default</span> }
+        MysqlAlterColumn::Modify { changes, new_default }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_default</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DefaultValue</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">default</span>.<span class="ident">kind</span>() {
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">val</span>)) =&gt; <span class="ident">val</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
-            <span class="ident">Quoted::mysql_string</span>(<span class="ident">escape_string_literal</span>(<span class="ident">val</span>)).<span class="ident">to_string</span>().<span class="ident">into</span>()
+<span class="kw">fn </span>render_default&lt;<span class="lifetime">&#39;a</span>&gt;(column: ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;, default: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DefaultValue) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="kw">match </span>default.kind() {
+        DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(val)) =&gt; val.as_str().into(),
+        DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) =&gt; {
+            Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }
-        <span class="ident">DefaultKind::Now</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">column</span>
-                .<span class="ident">column_native_type</span>()
-                .<span class="ident">and_then</span>(<span class="ident">MySqlType::timestamp_precision</span>)
-                .<span class="ident">unwrap_or</span>(<span class="number">3</span>);
+        DefaultKind::Now =&gt; {
+            <span class="kw">let </span>precision = column
+                .column_native_type()
+                .and_then(MySqlType::timestamp_precision)
+                .unwrap_or(<span class="number">3</span>);
 
-            <span class="macro">format!</span>(<span class="string">&quot;CURRENT_TIMESTAMP({})&quot;</span>, <span class="ident">precision</span>).<span class="ident">into</span>()
+            <span class="macro">format!</span>(<span class="string">&quot;CURRENT_TIMESTAMP({})&quot;</span>, precision).into()
         }
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">dt</span>)) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">column_type_family</span>().<span class="ident">is_datetime</span>() =&gt; {
-            <span class="ident">Quoted::mysql_string</span>(<span class="ident">dt</span>.<span class="ident">to_rfc3339</span>()).<span class="ident">to_string</span>().<span class="ident">into</span>()
+        DefaultKind::Value(PrismaValue::DateTime(dt)) <span class="kw">if </span>column.column_type_family().is_datetime() =&gt; {
+            Quoted::mysql_string(dt.to_rfc3339()).to_string().into()
         }
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">to_string</span>().<span class="ident">into</span>(),
-        <span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>) <span class="op">|</span> <span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DefaultKind::UniqueRowid</span> =&gt; <span class="macro">unreachable!</span>(),
+        DefaultKind::Value(val) =&gt; val.to_string().into(),
+        DefaultKind::DbGenerated(<span class="prelude-val">None</span>) | DefaultKind::Sequence(<span class="kw">_</span>) | DefaultKind::UniqueRowid =&gt; <span class="macro">unreachable!</span>(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-integer-0.8.6/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-integer-0.8.6/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -393,400 +393,400 @@
 <span id="393">393</span>
 <span id="394">394</span>
 <span id="395">395</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared algorithms and utilities for parsing integers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These allow implementations of partial and complete parsers</span>
-<span class="doccomment">//! using a single code-path via macros.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This looks relatively, complex, but it&#39;s quite simple. Almost all</span>
-<span class="doccomment">//! of these branches are resolved at compile-time, so the resulting</span>
-<span class="doccomment">//! code is quite small while handling all of the internal complexity.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 1. Helpers to process ok and error results for both complete and partial</span>
-<span class="doccomment">//!     parsers. They have different APIs, and mixing the APIs leads to</span>
-<span class="doccomment">//!     substantial performance hits.</span>
-<span class="doccomment">//! 2. Overflow checking on invalid digits for partial parsers, while</span>
-<span class="doccomment">//!     just returning invalid digits for complete parsers.</span>
-<span class="doccomment">//! 3. A format-aware sign parser.</span>
-<span class="doccomment">//! 4. Digit parsing algorithms which explicitly wrap on overflow, for no</span>
-<span class="doccomment">//!     additional overhead. This has major performance wins for **most**</span>
-<span class="doccomment">//!     real-world integers, so most valid input will be substantially faster.</span>
-<span class="doccomment">//! 5. An algorithm to detect if overflow occurred. This is comprehensive,</span>
-<span class="doccomment">//!     and short-circuits for common cases.</span>
-<span class="doccomment">//! 6. A parsing algorithm for unsigned integers, always producing positive</span>
-<span class="doccomment">//!     values. This avoids any unnecessary branching.</span>
-<span class="doccomment">//! 7. Multi-digit optimizations for larger sizes.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared algorithms and utilities for parsing integers.
+//!
+//! These allow implementations of partial and complete parsers
+//! using a single code-path via macros.
+//!
+//! This looks relatively, complex, but it&#39;s quite simple. Almost all
+//! of these branches are resolved at compile-time, so the resulting
+//! code is quite small while handling all of the internal complexity.
+//!
+//! 1. Helpers to process ok and error results for both complete and partial
+//!     parsers. They have different APIs, and mixing the APIs leads to
+//!     substantial performance hits.
+//! 2. Overflow checking on invalid digits for partial parsers, while
+//!     just returning invalid digits for complete parsers.
+//! 3. A format-aware sign parser.
+//! 4. Digit parsing algorithms which explicitly wrap on overflow, for no
+//!     additional overhead. This has major performance wins for **most**
+//!     real-world integers, so most valid input will be substantially faster.
+//! 5. An algorithm to detect if overflow occurred. This is comprehensive,
+//!     and short-circuits for common cases.
+//! 6. A parsing algorithm for unsigned integers, always producing positive
+//!     values. This avoids any unnecessary branching.
+//! 7. Multi-digit optimizations for larger sizes.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">as_cast</span>, <span class="ident">Integer</span>, <span class="ident">UnsignedInteger</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::step::max_step</span>;
+</span><span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_util::num::{as_cast, Integer, UnsignedInteger};
+<span class="kw">use </span>lexical_util::step::max_step;
 
-<span class="doccomment">/// Return an error, returning the index and the error.</span>
-<span class="macro">macro_rules!</span> <span class="ident">into_error</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="prelude-val">Err</span>((<span class="ident">lexical_util::error::Error</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">code</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>)))
+<span class="doccomment">/// Return an error, returning the index and the error.
+</span><span class="macro">macro_rules! </span>into_error {
+    (<span class="macro-nonterminal">$code</span>:ident, <span class="macro-nonterminal">$index</span>:expr) =&gt; {
+        <span class="prelude-val">Err</span>((lexical_util::error::Error::<span class="macro-nonterminal">$code</span>(<span class="macro-nonterminal">$index</span>)))
     };
 }
 
-<span class="doccomment">/// Return an value for a complete parser.</span>
-<span class="macro">macro_rules!</span> <span class="ident">into_ok_complete</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="prelude-val">Ok</span>(<span class="ident">as_cast</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>))
+<span class="doccomment">/// Return an value for a complete parser.
+</span><span class="macro">macro_rules! </span>into_ok_complete {
+    (<span class="macro-nonterminal">$value</span>:expr, <span class="macro-nonterminal">$index</span>:expr) =&gt; {
+        <span class="prelude-val">Ok</span>(as_cast(<span class="macro-nonterminal">$value</span>))
     };
 }
 
-<span class="doccomment">/// Return an value and index for a partial parser.</span>
-<span class="macro">macro_rules!</span> <span class="ident">into_ok_partial</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="prelude-val">Ok</span>((<span class="ident">as_cast</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>))
+<span class="doccomment">/// Return an value and index for a partial parser.
+</span><span class="macro">macro_rules! </span>into_ok_partial {
+    (<span class="macro-nonterminal">$value</span>:expr, <span class="macro-nonterminal">$index</span>:expr) =&gt; {
+        <span class="prelude-val">Ok</span>((as_cast(<span class="macro-nonterminal">$value</span>), <span class="macro-nonterminal">$index</span>))
     };
 }
 
-<span class="doccomment">/// Return an error for a complete parser upon an invalid digit.</span>
-<span class="macro">macro_rules!</span> <span class="ident">invalid_digit_complete</span> {
+<span class="doccomment">/// Return an error for a complete parser upon an invalid digit.
+</span><span class="macro">macro_rules! </span>invalid_digit_complete {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$value</span>:ident,
+        <span class="macro-nonterminal">$iter</span>:ident,
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$is_negative</span>:ident,
+        <span class="macro-nonterminal">$start_index</span>:ident,
+        <span class="macro-nonterminal">$t</span>:ident,
+        <span class="macro-nonterminal">$u</span>:ident
     ) =&gt; {{
-        <span class="comment">// Don&#39;t do any overflow checking here: we don&#39;t need it.</span>
-        <span class="macro">into_error!</span>(<span class="ident">InvalidDigit</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="number">1</span>)
+        <span class="comment">// Don&#39;t do any overflow checking here: we don&#39;t need it.
+        </span><span class="macro">into_error!</span>(InvalidDigit, <span class="macro-nonterminal">$iter</span>.cursor() - <span class="number">1</span>)
     }};
 }
 
-<span class="doccomment">/// Return a value for a partial parser upon an invalid digit.</span>
-<span class="doccomment">/// This checks for numeric overflow, and returns the appropriate error.</span>
-<span class="macro">macro_rules!</span> <span class="ident">invalid_digit_partial</span> {
+<span class="doccomment">/// Return a value for a partial parser upon an invalid digit.
+/// This checks for numeric overflow, and returns the appropriate error.
+</span><span class="macro">macro_rules! </span>invalid_digit_partial {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$value</span>:ident,
+        <span class="macro-nonterminal">$iter</span>:ident,
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$is_negative</span>:ident,
+        <span class="macro-nonterminal">$start_index</span>:ident,
+        <span class="macro-nonterminal">$t</span>:ident,
+        <span class="macro-nonterminal">$u</span>:ident
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span><span class="ident">::MANTISSA_RADIX</span>;
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">current_count</span>() <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="ident">is_overflow</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>, <span class="ident">count</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>) {
-            <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">min_step</span>(<span class="ident">radix</span>, <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="ident">Integer</span><span class="op">&gt;</span><span class="ident">::BITS</span>, <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span>);
-            <span class="kw">if</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span> {
-                <span class="macro">into_error!</span>(<span class="ident">Underflow</span>, (<span class="ident">count</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">min</span>(<span class="ident">min</span> <span class="op">+</span> <span class="number">1</span>))
-            } <span class="kw">else</span> {
-                <span class="macro">into_error!</span>(<span class="ident">Overflow</span>, (<span class="ident">count</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">min</span>(<span class="ident">min</span> <span class="op">+</span> <span class="number">1</span>))
+        <span class="kw">let </span>radix = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt;::MANTISSA_RADIX;
+        <span class="kw">let </span>count = <span class="macro-nonterminal">$iter</span>.current_count() - <span class="macro-nonterminal">$start_index </span>- <span class="number">1</span>;
+        <span class="kw">if </span>is_overflow::&lt;<span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$u</span>, <span class="macro-nonterminal">$format</span>&gt;(<span class="macro-nonterminal">$value</span>, count, <span class="macro-nonterminal">$is_negative</span>) {
+            <span class="kw">let </span>min = min_step(radix, &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>Integer&gt;::BITS, &lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED);
+            <span class="kw">if </span>&lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED &amp;&amp; <span class="macro-nonterminal">$is_negative </span>{
+                <span class="macro">into_error!</span>(Underflow, (count - <span class="number">1</span>).min(min + <span class="number">1</span>))
+            } <span class="kw">else </span>{
+                <span class="macro">into_error!</span>(Overflow, (count - <span class="number">1</span>).min(min + <span class="number">1</span>))
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span> {
-            <span class="macro">into_ok_partial!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>.<span class="ident">wrapping_neg</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="number">1</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">into_ok_partial!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="number">1</span>)
+        } <span class="kw">else if </span>&lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED &amp;&amp; <span class="macro-nonterminal">$is_negative </span>{
+            <span class="macro">into_ok_partial!</span>(<span class="macro-nonterminal">$value</span>.wrapping_neg(), <span class="macro-nonterminal">$iter</span>.cursor() - <span class="number">1</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">into_ok_partial!</span>(<span class="macro-nonterminal">$value</span>, <span class="macro-nonterminal">$iter</span>.cursor() - <span class="number">1</span>)
         }
     }};
 }
 
-<span class="doccomment">/// Parse the sign from the leading digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This routine does the following:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. Parses the sign digit.</span>
-<span class="doccomment">/// 2. Handles if positive signs before integers are not allowed.</span>
-<span class="doccomment">/// 3. Handles negative signs if the type is unsigned.</span>
-<span class="doccomment">/// 4. Handles if the sign is required, but missing.</span>
-<span class="doccomment">/// 5. Handles if the iterator is empty, before or after parsing the sign.</span>
-<span class="doccomment">/// 6. Handles if the iterator has invalid, leading zeros.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns if the value is negative, or any values detected when</span>
-<span class="doccomment">/// validating the input.</span>
-<span class="macro">macro_rules!</span> <span class="ident">parse_sign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="comment">//  This works in all cases, and gets a few handy</span>
-        <span class="comment">//  optimizations:</span>
-        <span class="comment">//  1. It minimizes branching: we either need to subslice</span>
-        <span class="comment">//      or return an offset from the loop. We can&#39;t increment</span>
-        <span class="comment">//      the iterator in the loop or it decimates performance.</span>
-        <span class="comment">//</span>
-        <span class="comment">//  Using `iter.peek()` means we respect digit separators at</span>
-        <span class="comment">//  the start of the number, when they&#39;re valid.</span>
-        <span class="comment">//</span>
-        <span class="comment">//  All the other cases are removed at compile time.</span>
-        <span class="comment">//  Note: the compiler isn&#39;t smart enough to realize that</span>
-        <span class="comment">//  `Some(_) if !$format.call() =&gt;` and `Some(_) =&gt;` are</span>
-        <span class="comment">//  mutually exclusive, so make sure we manually expand</span>
-        <span class="comment">//  these cases.</span>
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_mantissa_sign</span>() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_mantissa_sign</span>() =&gt; {
-                <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">InvalidPositiveSign</span>, <span class="number">0</span>);
+<span class="doccomment">/// Parse the sign from the leading digits.
+///
+/// This routine does the following:
+///
+/// 1. Parses the sign digit.
+/// 2. Handles if positive signs before integers are not allowed.
+/// 3. Handles negative signs if the type is unsigned.
+/// 4. Handles if the sign is required, but missing.
+/// 5. Handles if the iterator is empty, before or after parsing the sign.
+/// 6. Handles if the iterator has invalid, leading zeros.
+///
+/// Returns if the value is negative, or any values detected when
+/// validating the input.
+</span><span class="macro">macro_rules! </span>parse_sign {
+    (<span class="macro-nonterminal">$iter</span>:ident, <span class="macro-nonterminal">$format</span>:ident) =&gt; {
+        <span class="comment">//  This works in all cases, and gets a few handy
+        //  optimizations:
+        //  1. It minimizes branching: we either need to subslice
+        //      or return an offset from the loop. We can&#39;t increment
+        //      the iterator in the loop or it decimates performance.
+        //
+        //  Using `iter.peek()` means we respect digit separators at
+        //  the start of the number, when they&#39;re valid.
+        //
+        //  All the other cases are removed at compile time.
+        //  Note: the compiler isn&#39;t smart enough to realize that
+        //  `Some(_) if !$format.call() =&gt;` and `Some(_) =&gt;` are
+        //  mutually exclusive, so make sure we manually expand
+        //  these cases.
+        </span><span class="kw">match </span><span class="macro-nonterminal">$iter</span>.peek() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span>!<span class="macro-nonterminal">$format</span>.no_positive_mantissa_sign() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.no_positive_mantissa_sign() =&gt; {
+                <span class="kw">return </span><span class="macro">into_error!</span>(InvalidPositiveSign, <span class="number">0</span>);
             },
-            <span class="comment">// Don&#39;t add the check for the negative sign here if unsigned,</span>
-            <span class="comment">// since it absolutely decimates performance. If it&#39;s for a</span>
-            <span class="comment">// partial parser, we&#39;ll simply get 0 digits parsed, like before.</span>
-            <span class="comment">// Complete parsers will still error, like before. That is, it&#39;s</span>
-            <span class="comment">// correct **enough**.</span>
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>) <span class="kw">if</span> <span class="ident">T::IS_SIGNED</span> =&gt; (<span class="bool-val">true</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">required_mantissa_sign</span>() =&gt; <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">MissingSign</span>, <span class="number">0</span>),
-            <span class="kw">_</span> =&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
+            <span class="comment">// Don&#39;t add the check for the negative sign here if unsigned,
+            // since it absolutely decimates performance. If it&#39;s for a
+            // partial parser, we&#39;ll simply get 0 digits parsed, like before.
+            // Complete parsers will still error, like before. That is, it&#39;s
+            // correct **enough**.
+            </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>) <span class="kw">if </span>T::IS_SIGNED =&gt; (<span class="bool-val">true</span>, <span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.required_mantissa_sign() =&gt; <span class="kw">return </span><span class="macro">into_error!</span>(MissingSign, <span class="number">0</span>),
+            <span class="kw">_ </span>=&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
         }
     };
 }
 
-<span class="doccomment">/// Determine if the value has overflowed.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_overflow</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="ident">U</span>,
-    <span class="ident">count</span>: <span class="ident">usize</span>,
-    <span class="ident">is_negative</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Integer</span>,
-    <span class="ident">U</span>: <span class="ident">UnsignedInteger</span>,
+<span class="doccomment">/// Determine if the value has overflowed.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_overflow&lt;T, U, <span class="kw">const </span>FORMAT: u128&gt;(
+    value: U,
+    count: usize,
+    is_negative: bool,
+) -&gt; bool
+<span class="kw">where
+    </span>T: Integer,
+    U: UnsignedInteger,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
 
-    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">max_step</span>(<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="ident">T::BITS</span>, <span class="ident">T::IS_SIGNED</span>);
-    <span class="kw">let</span> <span class="ident">radix</span>: <span class="ident">U</span> <span class="op">=</span> <span class="ident">as_cast</span>(<span class="ident">format</span>.<span class="ident">radix</span>());
-    <span class="kw">let</span> <span class="ident">min_value</span>: <span class="ident">U</span> <span class="op">=</span> <span class="ident">radix</span>.<span class="ident">pow</span>(<span class="ident">max</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="number">1</span>);
-    <span class="kw">if</span> <span class="ident">T::IS_SIGNED</span> {
-        <span class="comment">// Signed type: have to deal with 2&#39;s complement.</span>
-        <span class="kw">let</span> <span class="ident">max_value</span>: <span class="ident">U</span> <span class="op">=</span> <span class="ident">as_cast</span>::<span class="op">&lt;</span><span class="ident">U</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">T::MAX</span>) <span class="op">+</span> <span class="ident">U::ONE</span>;
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">max</span>
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">count</span> <span class="op">==</span> <span class="ident">max</span>
-                <span class="op">&amp;&amp;</span> (<span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">min_value</span> <span class="op">|</span><span class="op">|</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">max_value</span> <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">is_negative</span> <span class="op">&amp;&amp;</span> <span class="ident">value</span> <span class="op">==</span> <span class="ident">max_value</span>)))
+    <span class="kw">let </span>max = max_step(format.radix(), T::BITS, T::IS_SIGNED);
+    <span class="kw">let </span>radix: U = as_cast(format.radix());
+    <span class="kw">let </span>min_value: U = radix.pow(max <span class="kw">as </span>u32 - <span class="number">1</span>);
+    <span class="kw">if </span>T::IS_SIGNED {
+        <span class="comment">// Signed type: have to deal with 2&#39;s complement.
+        </span><span class="kw">let </span>max_value: U = as_cast::&lt;U, <span class="kw">_</span>&gt;(T::MAX) + U::ONE;
+        <span class="kw">if </span>count &gt; max
+            || (count == max
+                &amp;&amp; (value &lt; min_value || value &gt; max_value || (!is_negative &amp;&amp; value == max_value)))
         {
-            <span class="comment">// Must have overflowed, or wrapped.</span>
-            <span class="comment">// 1. Guaranteed overflow due to too many digits.</span>
-            <span class="comment">// 2. Guaranteed overflow due to wrap.</span>
-            <span class="comment">// 3. Guaranteed overflow since it&#39;s too large for the signed type.</span>
-            <span class="comment">// 4. Guaranteed overflow due to 2&#39;s complement.</span>
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+            <span class="comment">// Must have overflowed, or wrapped.
+            // 1. Guaranteed overflow due to too many digits.
+            // 2. Guaranteed overflow due to wrap.
+            // 3. Guaranteed overflow since it&#39;s too large for the signed type.
+            // 4. Guaranteed overflow due to 2&#39;s complement.
+            </span><span class="kw">return </span><span class="bool-val">true</span>;
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">max</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">count</span> <span class="op">==</span> <span class="ident">max</span> <span class="op">&amp;&amp;</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">min_value</span>) {
-        <span class="comment">// Must have overflowed: too many digits or wrapped.</span>
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    } <span class="kw">else if </span>count &gt; max || (count == max &amp;&amp; value &lt; min_value) {
+        <span class="comment">// Must have overflowed: too many digits or wrapped.
+        </span><span class="kw">return </span><span class="bool-val">true</span>;
     }
-    <span class="bool-val">false</span>
-}
+    <span class="bool-val">false
+</span>}
 
-<span class="doccomment">/// Parse the value for the given type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">parse_value</span> {
+<span class="doccomment">/// Parse the value for the given type.
+</span><span class="macro">macro_rules! </span>parse_value {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_digit</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">into_ok</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$iter</span>:ident,
+        <span class="macro-nonterminal">$is_negative</span>:ident,
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$start_index</span>:ident,
+        <span class="macro-nonterminal">$t</span>:ident,
+        <span class="macro-nonterminal">$u</span>:ident,
+        <span class="macro-nonterminal">$parser</span>:ident,
+        <span class="macro-nonterminal">$invalid_digit</span>:ident,
+        <span class="macro-nonterminal">$into_ok</span>:ident
     ) =&gt; {{
-        <span class="comment">// Use a simple optimization: parse as an unsigned integer, using</span>
-        <span class="comment">// unsigned arithmetic , avoiding any branching in the initial stage.</span>
-        <span class="comment">// We can then validate the input based on the signed integer limits,</span>
-        <span class="comment">// and cast the value over, which is fast. Leads to substantial</span>
-        <span class="comment">// improvements due to decreased branching for all but `i8`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="ident">::ZERO</span>;
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span> {};
-        <span class="macro-nonterminal">$</span><span class="macro">parser!</span>(<span class="macro-nonterminal">value</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_digit</span>);
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">current_count</span>() <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>;
+        <span class="comment">// Use a simple optimization: parse as an unsigned integer, using
+        // unsigned arithmetic , avoiding any branching in the initial stage.
+        // We can then validate the input based on the signed integer limits,
+        // and cast the value over, which is fast. Leads to substantial
+        // improvements due to decreased branching for all but `i8`.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>value = &lt;<span class="macro-nonterminal">$u</span>&gt;::ZERO;
+        <span class="kw">let </span>format = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt; {};
+        <span class="macro-nonterminal">$</span><span class="macro">parser!</span>(<span class="macro-nonterminal">value</span>, <span class="macro-nonterminal">$iter</span>, <span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$is_negative</span>, <span class="macro-nonterminal">$start_index</span>, <span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$u</span>, <span class="macro-nonterminal">$invalid_digit</span>);
+        <span class="kw">let </span>count = <span class="macro-nonterminal">$iter</span>.current_count() - <span class="macro-nonterminal">$start_index</span>;
 
-        <span class="kw">if</span> <span class="ident">is_overflow</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span><span class="op">&gt;</span>(<span class="ident">value</span>, <span class="ident">count</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>) {
-            <span class="kw">let</span> <span class="ident">min</span> <span class="op">=</span> <span class="ident">min_step</span>(<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="ident">Integer</span><span class="op">&gt;</span><span class="ident">::BITS</span>, <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span>);
-            <span class="kw">if</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span> {
-                <span class="macro">into_error!</span>(<span class="ident">Underflow</span>, (<span class="ident">count</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">min</span>(<span class="ident">min</span> <span class="op">+</span> <span class="number">1</span>))
-            } <span class="kw">else</span> {
-                <span class="macro">into_error!</span>(<span class="ident">Overflow</span>, (<span class="ident">count</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">min</span>(<span class="ident">min</span> <span class="op">+</span> <span class="number">1</span>))
+        <span class="kw">if </span>is_overflow::&lt;<span class="macro-nonterminal">$t</span>, <span class="macro-nonterminal">$u</span>, <span class="macro-nonterminal">$format</span>&gt;(value, count, <span class="macro-nonterminal">$is_negative</span>) {
+            <span class="kw">let </span>min = min_step(format.radix(), &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span>Integer&gt;::BITS, &lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED);
+            <span class="kw">if </span>&lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED &amp;&amp; <span class="macro-nonterminal">$is_negative </span>{
+                <span class="macro">into_error!</span>(Underflow, (count - <span class="number">1</span>).min(min + <span class="number">1</span>))
+            } <span class="kw">else </span>{
+                <span class="macro">into_error!</span>(Overflow, (count - <span class="number">1</span>).min(min + <span class="number">1</span>))
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::IS_SIGNED</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span> {
-            <span class="comment">// Need to cast it to the signed type first, so we don&#39;t</span>
-            <span class="comment">// get an invalid representation for i128 if it&#39;s widened.</span>
-            <span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(<span class="macro-nonterminal">as_cast</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">value</span>.<span class="ident">wrapping_neg</span>()), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">length</span>())
-        } <span class="kw">else</span> {
-            <span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(<span class="macro-nonterminal">value</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">length</span>())
+        } <span class="kw">else if </span>&lt;<span class="macro-nonterminal">$t</span>&gt;::IS_SIGNED &amp;&amp; <span class="macro-nonterminal">$is_negative </span>{
+            <span class="comment">// Need to cast it to the signed type first, so we don&#39;t
+            // get an invalid representation for i128 if it&#39;s widened.
+            </span><span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(<span class="macro-nonterminal">as_cast</span>::&lt;<span class="macro-nonterminal">$t</span>, <span class="kw">_</span>&gt;(value.wrapping_neg()), <span class="macro-nonterminal">$iter</span>.length())
+        } <span class="kw">else </span>{
+            <span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(<span class="macro-nonterminal">value</span>, <span class="macro-nonterminal">$iter</span>.length())
         }
     }};
 }
 
-<span class="doccomment">/// Parse a single digit at a time.</span>
-<span class="doccomment">/// This has no multiple-digit optimizations.</span>
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">parse_1digit</span> {
+<span class="doccomment">/// Parse a single digit at a time.
+/// This has no multiple-digit optimizations.
+</span><span class="attribute">#[rustfmt::skip]
+</span><span class="macro">macro_rules! </span>parse_1digit {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_digit</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$value</span>:ident,
+        <span class="macro-nonterminal">$iter</span>:ident,
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$is_negative</span>:ident,
+        <span class="macro-nonterminal">$start_index</span>:ident,
+        <span class="macro-nonterminal">$t</span>:ident,
+        <span class="macro-nonterminal">$u</span>:ident,
+        <span class="macro-nonterminal">$invalid_digit</span>:ident
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span>;
-        <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span><span class="ident">::MANTISSA_RADIX</span>;
+        <span class="kw">let </span>format = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt;;
+        <span class="kw">let </span>radix = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt;::MANTISSA_RADIX;
 
-        <span class="comment">// Do our slow parsing algorithm: 1 digit at a time.</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">next</span>() {
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">char_to_digit_const</span>(<span class="ident">c</span>, <span class="ident">radix</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// Need to check for a base suffix, if so, return a valid value.</span>
-                    <span class="comment">// We can&#39;t have a base suffix at the first value (need at least</span>
-                    <span class="comment">// 1 digit).</span>
-                    <span class="kw">let</span> <span class="ident">base_suffix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">base_suffix</span>();
-                    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">base_suffix</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                        <span class="kw">let</span> <span class="ident">is_suffix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">case_sensitive_base_suffix</span>() {
-                            <span class="ident">c</span> <span class="op">==</span> <span class="ident">base_suffix</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">base_suffix</span>.<span class="ident">to_ascii_lowercase</span>()
+        <span class="comment">// Do our slow parsing algorithm: 1 digit at a time.
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = <span class="macro-nonterminal">$iter</span>.next() {
+            <span class="kw">let </span>digit = <span class="kw">match </span>char_to_digit_const(c, radix) {
+                <span class="prelude-val">Some</span>(v) =&gt; v,
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// Need to check for a base suffix, if so, return a valid value.
+                    // We can&#39;t have a base suffix at the first value (need at least
+                    // 1 digit).
+                    </span><span class="kw">let </span>base_suffix = format.base_suffix();
+                    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; base_suffix != <span class="number">0 </span>&amp;&amp; <span class="macro-nonterminal">$iter</span>.cursor() - <span class="macro-nonterminal">$start_index </span>&gt; <span class="number">1 </span>{
+                        <span class="kw">let </span>is_suffix = <span class="kw">if </span>format.case_sensitive_base_suffix() {
+                            c == base_suffix
+                        } <span class="kw">else </span>{
+                            c.to_ascii_lowercase() == base_suffix.to_ascii_lowercase()
                         };
-                        <span class="kw">if</span> <span class="ident">is_suffix</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">is_done</span>() {
-                            <span class="comment">// Break out of the loop, we&#39;ve finished parsing.</span>
-                            <span class="kw">break</span>;
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_suffix</span> {
-                            <span class="comment">// Haven&#39;t finished parsing, so we&#39;re going to call</span>
-                            <span class="comment">// invalid_digit!. Need to ensure we include the</span>
-                            <span class="comment">// base suffix in that.</span>
-                            <span class="comment">// SAFETY: safe since the iterator is not empty, as checked</span>
-                            <span class="comment">// in `$iter.is_done()` above.</span>
-                            <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">step_unchecked</span>() };
+                        <span class="kw">if </span>is_suffix &amp;&amp; <span class="macro-nonterminal">$iter</span>.is_done() {
+                            <span class="comment">// Break out of the loop, we&#39;ve finished parsing.
+                            </span><span class="kw">break</span>;
+                        } <span class="kw">else if </span>is_suffix {
+                            <span class="comment">// Haven&#39;t finished parsing, so we&#39;re going to call
+                            // invalid_digit!. Need to ensure we include the
+                            // base suffix in that.
+                            // SAFETY: safe since the iterator is not empty, as checked
+                            // in `$iter.is_done()` above.
+                            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$iter</span>.step_unchecked() };
                         }
                     }
-                    <span class="comment">// Might have handled our base-prefix here.</span>
-                    <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro">invalid_digit!</span>(
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start_index</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>
-                    );
+                    <span class="comment">// Might have handled our base-prefix here.
+                    </span><span class="kw">return </span><span class="macro-nonterminal">$</span><span class="macro">invalid_digit!</span>(
+                        <span class="macro-nonterminal">$value</span>,
+                        <span class="macro-nonterminal">$iter</span>,
+                        <span class="macro-nonterminal">$format</span>,
+                        <span class="macro-nonterminal">$is_negative</span>,
+                        <span class="macro-nonterminal">$start_index</span>,
+                        <span class="macro-nonterminal">$t</span>,
+                        <span class="macro-nonterminal">$u
+                    </span>);
                 },
             };
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">as_cast</span>(<span class="ident">radix</span>));
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>.<span class="ident">wrapping_add</span>(<span class="ident">as_cast</span>(<span class="ident">digit</span>));
+            <span class="macro-nonterminal">$value </span>= <span class="macro-nonterminal">$value</span>.wrapping_mul(as_cast(radix));
+            <span class="macro-nonterminal">$value </span>= <span class="macro-nonterminal">$value</span>.wrapping_add(as_cast(digit));
         }
     }};
 }
 
-<span class="doccomment">/// Generic algorithm for both partial and complete parsers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `invalid_digit` - Behavior on finding an invalid digit.</span>
-<span class="doccomment">/// * `into_ok` - Behavior when returning a valid value.</span>
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">algorithm</span> {
+<span class="doccomment">/// Generic algorithm for both partial and complete parsers.
+///
+/// * `invalid_digit` - Behavior on finding an invalid digit.
+/// * `into_ok` - Behavior when returning a valid value.
+</span><span class="attribute">#[rustfmt::skip]
+</span><span class="macro">macro_rules! </span>algorithm {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_digit</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">into_ok</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$bytes</span>:ident,
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$t</span>:ident,
+        <span class="macro-nonterminal">$u</span>:ident,
+        <span class="macro-nonterminal">$parser</span>:ident,
+        <span class="macro-nonterminal">$invalid_digit</span>:ident,
+        <span class="macro-nonterminal">$into_ok</span>:ident
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span> {};
+        <span class="kw">let </span>format = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt; {};
 
-        <span class="comment">// WARNING:</span>
-        <span class="comment">// --------</span>
-        <span class="comment">// None of this code can be changed for optimization reasons.</span>
-        <span class="comment">// Do not change it without benchmarking every change.</span>
-        <span class="comment">//  1. You cannot use the NoSkipIterator in the loop,</span>
-        <span class="comment">//      you must either return a subslice (indexing)</span>
-        <span class="comment">//      or increment outside of the loop.</span>
-        <span class="comment">//      Failing to do so leads to numerous more, unnecessary</span>
-        <span class="comment">//      conditional move instructions, killing performance.</span>
-        <span class="comment">//  2. Return a 0 or 1 shift, and indexing unchecked outside</span>
-        <span class="comment">//      of the loop is slightly faster.</span>
-        <span class="comment">//  3. Partial and complete parsers cannot be efficiently done</span>
-        <span class="comment">//      together.</span>
-        <span class="comment">//</span>
-        <span class="comment">// If you try to refactor without carefully monitoring benchmarks or</span>
-        <span class="comment">// assembly generation, please log the number of wasted hours: so</span>
-        <span class="comment">//  16 hours so far.</span>
+        <span class="comment">// WARNING:
+        // --------
+        // None of this code can be changed for optimization reasons.
+        // Do not change it without benchmarking every change.
+        //  1. You cannot use the NoSkipIterator in the loop,
+        //      you must either return a subslice (indexing)
+        //      or increment outside of the loop.
+        //      Failing to do so leads to numerous more, unnecessary
+        //      conditional move instructions, killing performance.
+        //  2. Return a 0 or 1 shift, and indexing unchecked outside
+        //      of the loop is slightly faster.
+        //  3. Partial and complete parsers cannot be efficiently done
+        //      together.
+        //
+        // If you try to refactor without carefully monitoring benchmarks or
+        // assembly generation, please log the number of wasted hours: so
+        //  16 hours so far.
 
-        <span class="comment">// With `step_by_unchecked`, this is sufficiently optimized.</span>
-        <span class="comment">// Removes conditional paths, to, which simplifies maintenance.</span>
-        <span class="comment">// The skip version of the iterator automatically coalesces to</span>
-        <span class="comment">// the noskip iterator.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span>();
+        // With `step_by_unchecked`, this is sufficiently optimized.
+        // Removes conditional paths, to, which simplifies maintenance.
+        // The skip version of the iterator automatically coalesces to
+        // the noskip iterator.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>byte = <span class="macro-nonterminal">$bytes</span>.bytes::&lt;{ <span class="macro-nonterminal">$format </span>}&gt;();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>();
-        <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_sign!</span>(<span class="ident">iter</span>, <span class="ident">format</span>);
-        <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-        <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-        <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">is_done</span>() {
-            <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">Empty</span>, <span class="ident">shift</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = byte.integer_iter();
+        <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_sign!</span>(iter, format);
+        <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+        </span><span class="kw">unsafe </span>{ iter.step_by_unchecked(shift) };
+        <span class="kw">if </span>iter.is_done() {
+            <span class="kw">return </span><span class="macro">into_error!</span>(Empty, shift);
         }
-        <span class="comment">// Skip any leading zeros.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start_index</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">cursor</span>();
-        <span class="kw">let</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">skip_zeros</span>();
-        <span class="ident">start_index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">zeros</span>;
+        <span class="comment">// Skip any leading zeros.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>start_index = iter.cursor();
+        <span class="kw">let </span>zeros = iter.skip_zeros();
+        start_index += zeros;
 
-        <span class="comment">// Now, check to see if we have a valid base prefix.</span>
-        <span class="kw">let</span> <span class="ident">base_prefix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">base_prefix</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_prefix</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">base_prefix</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">zeros</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="comment">// Check to see if the next character is the base prefix.</span>
-            <span class="comment">// We must have a format like `0x`, `0d`, `0o`. Note:</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-                <span class="ident">is_prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">case_sensitive_base_prefix</span>() {
-                    <span class="ident">c</span> <span class="op">==</span> <span class="ident">base_prefix</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">base_prefix</span>.<span class="ident">to_ascii_lowercase</span>()
+        <span class="comment">// Now, check to see if we have a valid base prefix.
+        </span><span class="kw">let </span>base_prefix = format.base_prefix();
+        <span class="kw">let </span><span class="kw-2">mut </span>is_prefix = <span class="bool-val">false</span>;
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; base_prefix != <span class="number">0 </span>&amp;&amp; zeros == <span class="number">1 </span>{
+            <span class="comment">// Check to see if the next character is the base prefix.
+            // We must have a format like `0x`, `0d`, `0o`. Note:
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = iter.peek() {
+                is_prefix = <span class="kw">if </span>format.case_sensitive_base_prefix() {
+                    c == base_prefix
+                } <span class="kw">else </span>{
+                    c.to_ascii_lowercase() == base_prefix.to_ascii_lowercase()
                 };
-                <span class="kw">if</span> <span class="ident">is_prefix</span> {
-                    <span class="comment">// SAFETY: safe since we `byte.len() &gt;= 1`.</span>
-                    <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_unchecked</span>() };
-                    <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">is_done</span>() {
-                        <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">Empty</span>, <span class="ident">iter</span>.<span class="ident">cursor</span>());
-                    } <span class="kw">else</span> {
-                        <span class="ident">start_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="kw">if </span>is_prefix {
+                    <span class="comment">// SAFETY: safe since we `byte.len() &gt;= 1`.
+                    </span><span class="kw">unsafe </span>{ iter.step_unchecked() };
+                    <span class="kw">if </span>iter.is_done() {
+                        <span class="kw">return </span><span class="macro">into_error!</span>(Empty, iter.cursor());
+                    } <span class="kw">else </span>{
+                        start_index += <span class="number">1</span>;
                     }
                 }
             }
         }
 
-        <span class="comment">// If we have a format that doesn&#39;t accept leading zeros,</span>
-        <span class="comment">// check if the next value is invalid. It&#39;s invalid if the</span>
-        <span class="comment">// first is 0, and the next is not a valid digit.</span>
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">no_integer_leading_zeros</span>() <span class="op">&amp;&amp;</span> <span class="ident">zeros</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="comment">// Cannot have a base prefix and no leading zeros.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">cursor</span>() <span class="op">-</span> <span class="ident">zeros</span>;
-            <span class="kw">if</span> <span class="ident">zeros</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">InvalidLeadingZeros</span>, <span class="ident">index</span>);
+        <span class="comment">// If we have a format that doesn&#39;t accept leading zeros,
+        // check if the next value is invalid. It&#39;s invalid if the
+        // first is 0, and the next is not a valid digit.
+        </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; !is_prefix &amp;&amp; format.no_integer_leading_zeros() &amp;&amp; zeros != <span class="number">0 </span>{
+            <span class="comment">// Cannot have a base prefix and no leading zeros.
+            </span><span class="kw">let </span>index = iter.cursor() - zeros;
+            <span class="kw">if </span>zeros &gt; <span class="number">1 </span>{
+                <span class="kw">return </span><span class="macro">into_error!</span>(InvalidLeadingZeros, index);
             }
-            <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">char_to_digit_const</span>(<span class="ident">c</span>, <span class="ident">format</span>.<span class="ident">radix</span>())) {
-                <span class="comment">// Valid digit, we have an invalid value.</span>
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="macro">into_error!</span>(<span class="ident">InvalidLeadingZeros</span>, <span class="ident">index</span>),
-                <span class="comment">// Either not a digit that follows, or nothing follows.</span>
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span><span class="ident">::ZERO</span>, <span class="ident">index</span>),
+            <span class="kw">match </span>iter.peek().map(|<span class="kw-2">&amp;</span>c| char_to_digit_const(c, format.radix())) {
+                <span class="comment">// Valid digit, we have an invalid value.
+                </span><span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="macro">into_error!</span>(InvalidLeadingZeros, index),
+                <span class="comment">// Either not a digit that follows, or nothing follows.
+                </span><span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="macro-nonterminal">$</span><span class="macro">into_ok!</span>(&lt;<span class="macro-nonterminal">$t</span>&gt;::ZERO, index),
             };
         }
 
-        <span class="comment">//  NOTE:</span>
-        <span class="comment">//      Don&#39;t add optimizations for 128-bit integers.</span>
-        <span class="comment">//      128-bit multiplication is rather efficient, it&#39;s only division</span>
-        <span class="comment">//      that&#39;s very slow. Any shortcut optimizations increasing branching,</span>
-        <span class="comment">//      and even if parsing a 64-bit integer is marginally faster, it</span>
-        <span class="comment">//      culminates in **way** slower performance overall for simple</span>
-        <span class="comment">//      integers, and no improvement for large integers.</span>
-        <span class="macro">parse_value!</span>(
-            <span class="ident">iter</span>,
-            <span class="ident">is_negative</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>,
-            <span class="ident">start_index</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parser</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">invalid_digit</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">into_ok</span>
-        )
+        <span class="comment">//  NOTE:
+        //      Don&#39;t add optimizations for 128-bit integers.
+        //      128-bit multiplication is rather efficient, it&#39;s only division
+        //      that&#39;s very slow. Any shortcut optimizations increasing branching,
+        //      and even if parsing a 64-bit integer is marginally faster, it
+        //      culminates in **way** slower performance overall for simple
+        //      integers, and no improvement for large integers.
+        </span><span class="macro">parse_value!</span>(
+            iter,
+            is_negative,
+            <span class="macro-nonterminal">$format</span>,
+            start_index,
+            <span class="macro-nonterminal">$t</span>,
+            <span class="macro-nonterminal">$u</span>,
+            <span class="macro-nonterminal">$parser</span>,
+            <span class="macro-nonterminal">$invalid_digit</span>,
+            <span class="macro-nonterminal">$into_ok
+        </span>)
     }};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

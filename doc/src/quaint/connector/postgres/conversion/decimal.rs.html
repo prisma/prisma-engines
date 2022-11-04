@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/postgres/conversion/decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../quaint/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/postgres/conversion/decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../quaint/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -268,275 +268,275 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bigdecimal</span>::{
-    <span class="ident">num_bigint</span>::{<span class="ident">BigInt</span>, <span class="ident">Sign</span>},
-    <span class="ident">BigDecimal</span>, <span class="ident">Zero</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>bigdecimal::{
+    num_bigint::{BigInt, Sign},
+    BigDecimal, Zero,
 };
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ReadBytesExt</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">postgres_types</span>::{<span class="ident">to_sql_checked</span>, <span class="ident">FromSql</span>, <span class="ident">IsNull</span>, <span class="ident">ToSql</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">convert::TryInto</span>, <span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">io::Cursor</span>};
+<span class="kw">use </span>byteorder::{BigEndian, ReadBytesExt};
+<span class="kw">use </span>bytes::{BufMut, BytesMut};
+<span class="kw">use </span>postgres_types::{to_sql_checked, FromSql, IsNull, ToSql, Type};
+<span class="kw">use </span>std::{cmp, convert::TryInto, error, fmt, io::Cursor};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DecimalWrapper</span>(<span class="kw">pub</span> <span class="ident">BigDecimal</span>);
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>DecimalWrapper(<span class="kw">pub </span>BigDecimal);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidDecimal</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>InvalidDecimal(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidDecimal</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;Invalid Decimal: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidDecimal {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;Invalid Decimal: {}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">InvalidDecimal</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>InvalidDecimal {}
 
-<span class="kw">struct</span> <span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="ident">neg</span>: <span class="ident">bool</span>,
-    <span class="ident">weight</span>: <span class="ident">i16</span>,
-    <span class="ident">scale</span>: <span class="ident">u16</span>,
-    <span class="ident">digits</span>: <span class="ident">D</span>,
+<span class="kw">struct </span>PostgresDecimal&lt;D&gt; {
+    neg: bool,
+    weight: i16,
+    scale: u16,
+    digits: D,
 }
 
-<span class="kw">fn</span> <span class="ident">from_postgres</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">dec</span>: <span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BigDecimal</span>, <span class="ident">InvalidDecimal</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">PostgresDecimal</span> {
-        <span class="ident">neg</span>, <span class="ident">digits</span>, <span class="ident">weight</span>, ..
-    } <span class="op">=</span> <span class="ident">dec</span>;
+<span class="kw">fn </span>from_postgres&lt;D: ExactSizeIterator&lt;Item = u16&gt;&gt;(dec: PostgresDecimal&lt;D&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;BigDecimal, InvalidDecimal&gt; {
+    <span class="kw">let </span>PostgresDecimal {
+        neg, digits, weight, ..
+    } = dec;
 
-    <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0u64</span>.<span class="ident">into</span>());
+    <span class="kw">if </span>digits.len() == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0u64</span>.into());
     }
 
-    <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">neg</span> {
-        <span class="bool-val">false</span> =&gt; <span class="ident">Sign::Plus</span>,
-        <span class="bool-val">true</span> =&gt; <span class="ident">Sign::Minus</span>,
+    <span class="kw">let </span>sign = <span class="kw">match </span>neg {
+        <span class="bool-val">false </span>=&gt; Sign::Plus,
+        <span class="bool-val">true </span>=&gt; Sign::Minus,
     };
 
-    <span class="comment">// weight is 0 if the decimal point falls after the first base-10000 digit</span>
-    <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> (<span class="ident">digits</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">weight</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">*</span> <span class="number">4</span>;
+    <span class="comment">// weight is 0 if the decimal point falls after the first base-10000 digit
+    </span><span class="kw">let </span>scale = (digits.len() <span class="kw">as </span>i64 - weight <span class="kw">as </span>i64 - <span class="number">1</span>) * <span class="number">4</span>;
 
-    <span class="comment">// no optimized algorithm for base-10 so use base-100 for faster processing</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cents</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">digits</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>);
+    <span class="comment">// no optimized algorithm for base-10 so use base-100 for faster processing
+    </span><span class="kw">let </span><span class="kw-2">mut </span>cents = Vec::with_capacity(digits.len() * <span class="number">2</span>);
 
-    <span class="kw">for</span> <span class="ident">digit</span> <span class="kw">in</span> <span class="ident">digits</span> {
-        <span class="ident">cents</span>.<span class="ident">push</span>((<span class="ident">digit</span> <span class="op">/</span> <span class="number">100</span>) <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="ident">cents</span>.<span class="ident">push</span>((<span class="ident">digit</span> <span class="op">%</span> <span class="number">100</span>) <span class="kw">as</span> <span class="ident">u8</span>);
+    <span class="kw">for </span>digit <span class="kw">in </span>digits {
+        cents.push((digit / <span class="number">100</span>) <span class="kw">as </span>u8);
+        cents.push((digit % <span class="number">100</span>) <span class="kw">as </span>u8);
     }
 
-    <span class="kw">let</span> <span class="ident">bigint</span> <span class="op">=</span> <span class="ident">BigInt::from_radix_be</span>(<span class="ident">sign</span>, <span class="kw-2">&amp;</span><span class="ident">cents</span>, <span class="number">100</span>)
-        .<span class="ident">ok_or</span>(<span class="ident">InvalidDecimal</span>(<span class="string">&quot;PostgresDecimal contained an out-of-range digit&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>bigint = BigInt::from_radix_be(sign, <span class="kw-2">&amp;</span>cents, <span class="number">100</span>)
+        .ok_or(InvalidDecimal(<span class="string">&quot;PostgresDecimal contained an out-of-range digit&quot;</span>))<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">BigDecimal::new</span>(<span class="ident">bigint</span>, <span class="ident">scale</span>))
+    <span class="prelude-val">Ok</span>(BigDecimal::new(bigint, scale))
 }
 
-<span class="kw">fn</span> <span class="ident">to_postgres</span>(<span class="ident">decimal</span>: <span class="kw-2">&amp;</span><span class="ident">BigDecimal</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PostgresDecimal</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">decimal</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">PostgresDecimal</span> {
-            <span class="ident">neg</span>: <span class="bool-val">false</span>,
-            <span class="ident">weight</span>: <span class="number">0</span>,
-            <span class="ident">scale</span>: <span class="number">0</span>,
-            <span class="ident">digits</span>: <span class="macro">vec!</span>[],
+<span class="kw">fn </span>to_postgres(decimal: <span class="kw-2">&amp;</span>BigDecimal) -&gt; <span class="kw">crate</span>::Result&lt;PostgresDecimal&lt;Vec&lt;i16&gt;&gt;&gt; {
+    <span class="kw">if </span>decimal.is_zero() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(PostgresDecimal {
+            neg: <span class="bool-val">false</span>,
+            weight: <span class="number">0</span>,
+            scale: <span class="number">0</span>,
+            digits: <span class="macro">vec!</span>[],
         });
     }
 
-    <span class="kw">let</span> <span class="ident">base_10_to_10000</span> <span class="op">=</span> <span class="op">|</span><span class="ident">chunk</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">chunk</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0i16</span>, <span class="op">|</span><span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">d</span><span class="op">|</span> <span class="ident">a</span> <span class="op">*</span> <span class="number">10</span> <span class="op">+</span> <span class="ident">d</span> <span class="kw">as</span> <span class="ident">i16</span>);
+    <span class="kw">let </span>base_10_to_10000 = |chunk: <span class="kw-2">&amp;</span>[u8]| chunk.iter().fold(<span class="number">0i16</span>, |a, <span class="kw-2">&amp;</span>d| a * <span class="number">10 </span>+ d <span class="kw">as </span>i16);
 
-    <span class="comment">// NOTE: this unfortunately copies the BigInt internally</span>
-    <span class="kw">let</span> (<span class="ident">integer</span>, <span class="ident">exp</span>) <span class="op">=</span> <span class="ident">decimal</span>.<span class="ident">as_bigint_and_exponent</span>();
+    <span class="comment">// NOTE: this unfortunately copies the BigInt internally
+    </span><span class="kw">let </span>(integer, exp) = decimal.as_bigint_and_exponent();
 
-    <span class="comment">// this routine is specifically optimized for base-10</span>
-    <span class="comment">// FIXME: is there a way to iterate over the digits to avoid the Vec allocation</span>
-    <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">base_10</span>) <span class="op">=</span> <span class="ident">integer</span>.<span class="ident">to_radix_be</span>(<span class="number">10</span>);
+    <span class="comment">// this routine is specifically optimized for base-10
+    // FIXME: is there a way to iterate over the digits to avoid the Vec allocation
+    </span><span class="kw">let </span>(sign, base_10) = integer.to_radix_be(<span class="number">10</span>);
 
-    <span class="comment">// weight is positive power of 10000</span>
-    <span class="comment">// exp is the negative power of 10</span>
-    <span class="kw">let</span> <span class="ident">weight_10</span> <span class="op">=</span> <span class="ident">base_10</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="ident">exp</span>;
+    <span class="comment">// weight is positive power of 10000
+    // exp is the negative power of 10
+    </span><span class="kw">let </span>weight_10 = base_10.len() <span class="kw">as </span>i64 - exp;
 
-    <span class="comment">// scale is only nonzero when we have fractional digits</span>
-    <span class="comment">// since `exp` is the _negative_ decimal exponent, it tells us</span>
-    <span class="comment">// exactly what our scale should be</span>
-    <span class="kw">let</span> <span class="ident">scale</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">cmp::max</span>(<span class="number">0</span>, <span class="ident">exp</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="comment">// scale is only nonzero when we have fractional digits
+    // since `exp` is the _negative_ decimal exponent, it tells us
+    // exactly what our scale should be
+    </span><span class="kw">let </span>scale: u16 = cmp::max(<span class="number">0</span>, exp).try_into()<span class="question-mark">?</span>;
 
-    <span class="comment">// there&#39;s an implicit +1 offset in the interpretation</span>
-    <span class="kw">let</span> <span class="ident">weight</span>: <span class="ident">i16</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">weight_10</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">weight_10</span> <span class="op">/</span> <span class="number">4</span> <span class="op">-</span> <span class="number">1</span>
-    } <span class="kw">else</span> {
-        <span class="comment">// the `-1` is a fix for an off by 1 error (4 digits should still be 0 weight)</span>
-        (<span class="ident">weight_10</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">4</span>
-    }
-    .<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="comment">// there&#39;s an implicit +1 offset in the interpretation
+    </span><span class="kw">let </span>weight: i16 = <span class="kw">if </span>weight_10 &lt;= <span class="number">0 </span>{
+        weight_10 / <span class="number">4 </span>- <span class="number">1
+    </span>} <span class="kw">else </span>{
+        <span class="comment">// the `-1` is a fix for an off by 1 error (4 digits should still be 0 weight)
+        </span>(weight_10 - <span class="number">1</span>) / <span class="number">4
+    </span>}
+    .try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">digits_len</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">base_10</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">4</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">base_10</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>
-    } <span class="kw">else</span> {
-        <span class="ident">base_10</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">4</span>
-    };
+    <span class="kw">let </span>digits_len = <span class="kw">if </span>base_10.len() % <span class="number">4 </span>!= <span class="number">0 </span>{
+        base_10.len() / <span class="number">4 </span>+ <span class="number">1
+    </span>} <span class="kw">else </span>{
+        base_10.len() / <span class="number">4
+    </span>};
 
-    <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">weight_10</span>.<span class="ident">rem_euclid</span>(<span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="kw">let </span>offset = weight_10.rem_euclid(<span class="number">4</span>) <span class="kw">as </span>usize;
 
-    <span class="comment">// Array to store max mantissa of Decimal in Postgres decimal format.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digits</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">digits_len</span>);
+    <span class="comment">// Array to store max mantissa of Decimal in Postgres decimal format.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>digits = Vec::with_capacity(digits_len);
 
-    <span class="comment">// Convert to base 10000</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">first</span>) <span class="op">=</span> <span class="ident">base_10</span>.<span class="ident">get</span>(..<span class="ident">offset</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">digits</span>.<span class="ident">push</span>(<span class="ident">base_10_to_10000</span>(<span class="ident">first</span>));
+    <span class="comment">// Convert to base 10000
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(first) = base_10.get(..offset) {
+        <span class="kw">if </span>!first.is_empty() {
+            digits.push(base_10_to_10000(first));
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">offset</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">digits</span>.<span class="ident">push</span>(<span class="ident">base_10_to_10000</span>(<span class="kw-2">&amp;</span><span class="ident">base_10</span>) <span class="op">*</span> <span class="number">10i16</span>.<span class="ident">pow</span>((<span class="ident">offset</span> <span class="op">-</span> <span class="ident">base_10</span>.<span class="ident">len</span>()) <span class="kw">as</span> <span class="ident">u32</span>));
+    } <span class="kw">else if </span>offset != <span class="number">0 </span>{
+        digits.push(base_10_to_10000(<span class="kw-2">&amp;</span>base_10) * <span class="number">10i16</span>.pow((offset - base_10.len()) <span class="kw">as </span>u32));
     }
 
-    <span class="comment">// Convert to base 10000</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span> <span class="ident">base_10</span>.<span class="ident">get</span>(<span class="ident">offset</span>..) {
-        <span class="ident">digits</span>.<span class="ident">extend</span>(
-            <span class="ident">rest</span>.<span class="ident">chunks</span>(<span class="number">4</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> <span class="ident">base_10_to_10000</span>(<span class="ident">chunk</span>) <span class="op">*</span> <span class="number">10i16</span>.<span class="ident">pow</span>(<span class="number">4</span> <span class="op">-</span> <span class="ident">chunk</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>)),
+    <span class="comment">// Convert to base 10000
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(rest) = base_10.get(offset..) {
+        digits.extend(
+            rest.chunks(<span class="number">4</span>)
+                .map(|chunk| base_10_to_10000(chunk) * <span class="number">10i16</span>.pow(<span class="number">4 </span>- chunk.len() <span class="kw">as </span>u32)),
         );
     }
 
-    <span class="comment">// Remove non-significant zeroes.</span>
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) <span class="op">=</span> <span class="ident">digits</span>.<span class="ident">last</span>() {
-        <span class="ident">digits</span>.<span class="ident">pop</span>();
+    <span class="comment">// Remove non-significant zeroes.
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) = digits.last() {
+        digits.pop();
     }
 
-    <span class="kw">let</span> <span class="ident">neg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">sign</span> {
-        <span class="ident">Sign::Plus</span> <span class="op">|</span> <span class="ident">Sign::NoSign</span> =&gt; <span class="bool-val">false</span>,
-        <span class="ident">Sign::Minus</span> =&gt; <span class="bool-val">true</span>,
+    <span class="kw">let </span>neg = <span class="kw">match </span>sign {
+        Sign::Plus | Sign::NoSign =&gt; <span class="bool-val">false</span>,
+        Sign::Minus =&gt; <span class="bool-val">true</span>,
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">PostgresDecimal</span> {
-        <span class="ident">neg</span>,
-        <span class="ident">weight</span>,
-        <span class="ident">scale</span>,
-        <span class="ident">digits</span>,
+    <span class="prelude-val">Ok</span>(PostgresDecimal {
+        neg,
+        weight,
+        scale,
+        digits,
     })
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FromSql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecimalWrapper</span> {
-    <span class="comment">// Decimals are represented as follows:</span>
-    <span class="comment">// Header:</span>
-    <span class="comment">//  u16 numGroups</span>
-    <span class="comment">//  i16 weightFirstGroup (10000^weight)</span>
-    <span class="comment">//  u16 sign (0x0000 = positive, 0x4000 = negative, 0xC000 = NaN)</span>
-    <span class="comment">//  i16 dscale. Number of digits (in base 10) to print after decimal separator</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Pseudo code :</span>
-    <span class="comment">//  const Decimals [</span>
-    <span class="comment">//          0.0000000000000000000000000001,</span>
-    <span class="comment">//          0.000000000000000000000001,</span>
-    <span class="comment">//          0.00000000000000000001,</span>
-    <span class="comment">//          0.0000000000000001,</span>
-    <span class="comment">//          0.000000000001,</span>
-    <span class="comment">//          0.00000001,</span>
-    <span class="comment">//          0.0001,</span>
-    <span class="comment">//          1,</span>
-    <span class="comment">//          10000,</span>
-    <span class="comment">//          100000000,</span>
-    <span class="comment">//          1000000000000,</span>
-    <span class="comment">//          10000000000000000,</span>
-    <span class="comment">//          100000000000000000000,</span>
-    <span class="comment">//          1000000000000000000000000,</span>
-    <span class="comment">//          10000000000000000000000000000</span>
-    <span class="comment">//  ]</span>
-    <span class="comment">//  overflow = false</span>
-    <span class="comment">//  result = 0</span>
-    <span class="comment">//  for i = 0, weight = weightFirstGroup + 7; i &lt; numGroups; i++, weight--</span>
-    <span class="comment">//    group = read.u16</span>
-    <span class="comment">//    if weight &lt; 0 or weight &gt; MaxNum</span>
-    <span class="comment">//       overflow = true</span>
-    <span class="comment">//    else</span>
-    <span class="comment">//       result += Decimals[weight] * group</span>
-    <span class="comment">//  sign == 0x4000 ? -result : result</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FromSql&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>DecimalWrapper {
+    <span class="comment">// Decimals are represented as follows:
+    // Header:
+    //  u16 numGroups
+    //  i16 weightFirstGroup (10000^weight)
+    //  u16 sign (0x0000 = positive, 0x4000 = negative, 0xC000 = NaN)
+    //  i16 dscale. Number of digits (in base 10) to print after decimal separator
+    //
+    //  Pseudo code :
+    //  const Decimals [
+    //          0.0000000000000000000000000001,
+    //          0.000000000000000000000001,
+    //          0.00000000000000000001,
+    //          0.0000000000000001,
+    //          0.000000000001,
+    //          0.00000001,
+    //          0.0001,
+    //          1,
+    //          10000,
+    //          100000000,
+    //          1000000000000,
+    //          10000000000000000,
+    //          100000000000000000000,
+    //          1000000000000000000000000,
+    //          10000000000000000000000000000
+    //  ]
+    //  overflow = false
+    //  result = 0
+    //  for i = 0, weight = weightFirstGroup + 7; i &lt; numGroups; i++, weight--
+    //    group = read.u16
+    //    if weight &lt; 0 or weight &gt; MaxNum
+    //       overflow = true
+    //    else
+    //       result += Decimals[weight] * group
+    //  sign == 0x4000 ? -result : result
 
-    <span class="comment">// So if we were to take the number: 3950.123456</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Stored on Disk:</span>
-    <span class="comment">//    00 03 00 00 00 00 00 06 0F 6E 04 D2 15 E0</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Number of groups: 00 03</span>
-    <span class="comment">//  Weight of first group: 00 00</span>
-    <span class="comment">//  Sign: 00 00</span>
-    <span class="comment">//  DScale: 00 06</span>
-    <span class="comment">//</span>
-    <span class="comment">// 0F 6E = 3950</span>
-    <span class="comment">//   result = result + 3950 * 1;</span>
-    <span class="comment">// 04 D2 = 1234</span>
-    <span class="comment">//   result = result + 1234 * 0.0001;</span>
-    <span class="comment">// 15 E0 = 5600</span>
-    <span class="comment">//   result = result + 5600 * 0.00000001;</span>
-    <span class="comment">//</span>
+    // So if we were to take the number: 3950.123456
+    //
+    //  Stored on Disk:
+    //    00 03 00 00 00 00 00 06 0F 6E 04 D2 15 E0
+    //
+    //  Number of groups: 00 03
+    //  Weight of first group: 00 00
+    //  Sign: 00 00
+    //  DScale: 00 06
+    //
+    // 0F 6E = 3950
+    //   result = result + 3950 * 1;
+    // 04 D2 = 1234
+    //   result = result + 1234 * 0.0001;
+    // 15 E0 = 5600
+    //   result = result + 5600 * 0.00000001;
+    //
 
-    <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalWrapper</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">raw</span>);
-        <span class="kw">let</span> <span class="ident">num_groups</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// 10000^weight</span>
-                                                   <span class="comment">// Sign: 0x0000 = positive, 0x4000 = negative, 0xC000 = NaN</span>
-        <span class="kw">let</span> <span class="ident">sign</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    </span><span class="kw">fn </span>from_sql(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, raw: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;DecimalWrapper, Box&lt;<span class="kw">dyn </span>error::Error + <span class="lifetime">&#39;static </span>+ Sync + Send&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>raw = Cursor::new(raw);
+        <span class="kw">let </span>num_groups = raw.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>weight = raw.read_i16::&lt;BigEndian&gt;()<span class="question-mark">?</span>; <span class="comment">// 10000^weight
+                                                   // Sign: 0x0000 = positive, 0x4000 = negative, 0xC000 = NaN
+        </span><span class="kw">let </span>sign = raw.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
 
-        <span class="comment">// Number of digits (in base 10) to print after decimal separator</span>
-        <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Number of digits (in base 10) to print after decimal separator
+        </span><span class="kw">let </span>scale = raw.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
 
-        <span class="comment">// Read all of the groups</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">groups</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_groups</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="ident">groups</span>.<span class="ident">push</span>(<span class="ident">raw</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
+        <span class="comment">// Read all of the groups
+        </span><span class="kw">let </span><span class="kw-2">mut </span>groups = Vec::new();
+        <span class="kw">for _ in </span><span class="number">0</span>..num_groups <span class="kw">as </span>usize {
+            groups.push(raw.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">dec</span> <span class="op">=</span> <span class="ident">from_postgres</span>(<span class="ident">PostgresDecimal</span> {
-            <span class="ident">neg</span>: <span class="ident">sign</span> <span class="op">==</span> <span class="number">0x4000</span>,
-            <span class="ident">weight</span>,
-            <span class="ident">scale</span>,
-            <span class="ident">digits</span>: <span class="ident">groups</span>.<span class="ident">into_iter</span>(),
+        <span class="kw">let </span>dec = from_postgres(PostgresDecimal {
+            neg: sign == <span class="number">0x4000</span>,
+            weight,
+            scale,
+            digits: groups.into_iter(),
         })
-        .<span class="ident">map_err</span>(<span class="ident">Box::new</span>)<span class="question-mark">?</span>;
+        .map_err(Box::new)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">DecimalWrapper</span>(<span class="ident">dec</span>))
+        <span class="prelude-val">Ok</span>(DecimalWrapper(dec))
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">Type::NUMERIC</span>)
+    <span class="kw">fn </span>accepts(ty: <span class="kw-2">&amp;</span>Type) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span>ty, Type::NUMERIC)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DecimalWrapper</span> {
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">PostgresDecimal</span> {
-            <span class="ident">neg</span>,
-            <span class="ident">weight</span>,
-            <span class="ident">scale</span>,
-            <span class="ident">digits</span>,
-        } <span class="op">=</span> <span class="ident">to_postgres</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>ToSql <span class="kw">for </span>DecimalWrapper {
+    <span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Type, out: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="prelude-ty">Result</span>&lt;IsNull, Box&lt;<span class="kw">dyn </span>error::Error + <span class="lifetime">&#39;static </span>+ Sync + Send&gt;&gt; {
+        <span class="kw">let </span>PostgresDecimal {
+            neg,
+            weight,
+            scale,
+            digits,
+        } = to_postgres(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">num_digits</span> <span class="op">=</span> <span class="ident">digits</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>num_digits = digits.len();
 
-        <span class="comment">// Reserve bytes</span>
-        <span class="ident">out</span>.<span class="ident">reserve</span>(<span class="number">8</span> <span class="op">+</span> <span class="ident">num_digits</span> <span class="op">*</span> <span class="number">2</span>);
+        <span class="comment">// Reserve bytes
+        </span>out.reserve(<span class="number">8 </span>+ num_digits * <span class="number">2</span>);
 
-        <span class="comment">// Number of groups</span>
-        <span class="ident">out</span>.<span class="ident">put_u16</span>(<span class="ident">num_digits</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>);
+        <span class="comment">// Number of groups
+        </span>out.put_u16(num_digits.try_into()<span class="question-mark">?</span>);
 
-        <span class="comment">// Weight of first group</span>
-        <span class="ident">out</span>.<span class="ident">put_i16</span>(<span class="ident">weight</span>);
+        <span class="comment">// Weight of first group
+        </span>out.put_i16(weight);
 
-        <span class="comment">// Sign</span>
-        <span class="ident">out</span>.<span class="ident">put_u16</span>(<span class="kw">if</span> <span class="ident">neg</span> { <span class="number">0x4000</span> } <span class="kw">else</span> { <span class="number">0x0000</span> });
+        <span class="comment">// Sign
+        </span>out.put_u16(<span class="kw">if </span>neg { <span class="number">0x4000 </span>} <span class="kw">else </span>{ <span class="number">0x0000 </span>});
 
-        <span class="comment">// DScale</span>
-        <span class="ident">out</span>.<span class="ident">put_u16</span>(<span class="ident">scale</span>);
+        <span class="comment">// DScale
+        </span>out.put_u16(scale);
 
-        <span class="comment">// Now process the number</span>
-        <span class="kw">for</span> <span class="ident">digit</span> <span class="kw">in</span> <span class="ident">digits</span>[<span class="number">0</span>..<span class="ident">num_digits</span>].<span class="ident">iter</span>() {
-            <span class="ident">out</span>.<span class="ident">put_i16</span>(<span class="kw-2">*</span><span class="ident">digit</span>);
+        <span class="comment">// Now process the number
+        </span><span class="kw">for </span>digit <span class="kw">in </span>digits[<span class="number">0</span>..num_digits].iter() {
+            out.put_i16(<span class="kw-2">*</span>digit);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">IsNull::No</span>)
+        <span class="prelude-val">Ok</span>(IsNull::No)
     }
 
-    <span class="kw">fn</span> <span class="ident">accepts</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">Type::NUMERIC</span>)
+    <span class="kw">fn </span>accepts(ty: <span class="kw-2">&amp;</span>Type) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span>ty, Type::NUMERIC)
     }
 
     <span class="macro">to_sql_checked!</span>();
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/page/slot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sharded_slab/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/page/slot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sharded_slab/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -918,925 +918,925 @@
 <span id="918">918</span>
 <span id="919">919</span>
 <span id="920">920</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FreeList</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync</span>::{
-    <span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
-    <span class="ident">hint</span>, <span class="ident">UnsafeCell</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::FreeList;
+<span class="kw">use </span><span class="kw">crate</span>::sync::{
+    atomic::{AtomicUsize, Ordering},
+    hint, UnsafeCell,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cfg</span>, <span class="ident">clear::Clear</span>, <span class="ident">Pack</span>, <span class="ident">Tid</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">mem</span>, <span class="ident">ptr</span>, <span class="ident">thread</span>};
+<span class="kw">use crate</span>::{cfg, clear::Clear, Pack, Tid};
+<span class="kw">use </span>std::{fmt, marker::PhantomData, mem, ptr, thread};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">lifecycle</span>: <span class="ident">AtomicUsize</span>,
-    <span class="doccomment">/// The offset of the next item on the free list.</span>
-    <span class="ident">next</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The data stored in the slot.</span>
-    <span class="ident">item</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Slot&lt;T, C&gt; {
+    lifecycle: AtomicUsize,
+    <span class="doccomment">/// The offset of the next item on the free list.
+    </span>next: UnsafeCell&lt;usize&gt;,
+    <span class="doccomment">/// The data stored in the slot.
+    </span>item: UnsafeCell&lt;T&gt;,
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">slot</span>: <span class="ident">ptr::NonNull</span><span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Guard&lt;T, C: cfg::Config = cfg::DefaultConfig&gt; {
+    slot: ptr::NonNull&lt;Slot&lt;T, C&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InitGuard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">slot</span>: <span class="ident">ptr::NonNull</span><span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">curr_lifecycle</span>: <span class="ident">usize</span>,
-    <span class="ident">released</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InitGuard&lt;T, C: cfg::Config = cfg::DefaultConfig&gt; {
+    slot: ptr::NonNull&lt;Slot&lt;T, C&gt;&gt;,
+    curr_lifecycle: usize,
+    released: bool,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span> <span class="op">=</span> <span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">usize</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Generation&lt;C = cfg::DefaultConfig&gt; {
+    value: usize,
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span> <span class="op">=</span> <span class="ident">cfg::DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">usize</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RefCount&lt;C = cfg::DefaultConfig&gt; {
+    value: usize,
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Lifecycle&lt;C&gt; {
+    state: State,
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
-<span class="kw">struct</span> <span class="ident">LifecycleGen</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>);
+<span class="kw">struct </span>LifecycleGen&lt;C&gt;(Generation&lt;C&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">usize</span>)]</span>
-<span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="ident">Present</span> <span class="op">=</span> <span class="number">0b00</span>,
-    <span class="ident">Marked</span> <span class="op">=</span> <span class="number">0b01</span>,
-    <span class="ident">Removing</span> <span class="op">=</span> <span class="number">0b11</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[repr(usize)]
+</span><span class="kw">enum </span>State {
+    Present = <span class="number">0b00</span>,
+    Marked = <span class="number">0b01</span>,
+    Removing = <span class="number">0b11</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Use all the remaining bits in the word for the generation counter, minus</span>
-    <span class="doccomment">/// any bits reserved by the user.</span>
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="ident">cfg::WIDTH</span> <span class="op">-</span> <span class="ident">C::RESERVED_BITS</span>) <span class="op">-</span> <span class="ident"><span class="self">Self</span>::SHIFT</span>;
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="doccomment">/// Use all the remaining bits in the word for the generation counter, minus
+    /// any bits reserved by the user.
+    </span><span class="kw">const </span>LEN: usize = (cfg::WIDTH - C::RESERVED_BITS) - <span class="self">Self</span>::SHIFT;
 
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> <span class="ident">Tid</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Prev = Tid&lt;C&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">u</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">u</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span>);
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">u</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>from_usize(u: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(u &lt;= <span class="self">Self</span>::BITS);
+        <span class="self">Self</span>::new(u)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value</span>,
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Generation&lt;C&gt; {
+    <span class="kw">fn </span>new(value: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value,
+            _cfg: PhantomData,
         }
     }
 }
 
-<span class="comment">// Slot methods which should work across all trait bounds</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="comment">// Slot methods which should work across all trait bounds
+</span><span class="kw">impl</span>&lt;T, C&gt; Slot&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="ident">next</span> })
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.next.with(|next| <span class="kw">unsafe </span>{ <span class="kw-2">*</span>next })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">item</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">item</span> })
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.item.with(|item| <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>item })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">set_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">next</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            (<span class="kw-2">*</span><span class="ident">n</span>) <span class="op">=</span> <span class="ident">next</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_next(<span class="kw-2">&amp;</span><span class="self">self</span>, next: usize) {
+        <span class="self">self</span>.next.with_mut(|n| <span class="kw">unsafe </span>{
+            (<span class="kw-2">*</span>n) = next;
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">loop</span> {
-            <span class="comment">// Unpack the current state.</span>
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>);
-            <span class="kw">let</span> <span class="ident">current_gen</span> <span class="op">=</span> <span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, gen: Generation&lt;C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Guard&lt;T, C&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Acquire);
+        <span class="kw">loop </span>{
+            <span class="comment">// Unpack the current state.
+            </span><span class="kw">let </span>state = Lifecycle::&lt;C&gt;::from_packed(lifecycle);
+            <span class="kw">let </span>current_gen = LifecycleGen::&lt;C&gt;::from_packed(lifecycle).<span class="number">0</span>;
+            <span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(lifecycle);
 
             <span class="macro">test_println!</span>(
                 <span class="string">&quot;-&gt; get {:?}; current_gen={:?}; lifecycle={:#x}; state={:?}; refs={:?};&quot;</span>,
-                <span class="ident">gen</span>,
-                <span class="ident">current_gen</span>,
-                <span class="ident">lifecycle</span>,
-                <span class="ident">state</span>,
-                <span class="ident">refs</span>,
+                gen,
+                current_gen,
+                lifecycle,
+                state,
+                refs,
             );
 
-            <span class="comment">// Is it okay to access this slot? The accessed generation must be</span>
-            <span class="comment">// current, and the slot must not be in the process of being</span>
-            <span class="comment">// removed. If we can no longer access the slot at the given</span>
-            <span class="comment">// generation, return `None`.</span>
-            <span class="kw">if</span> <span class="ident">gen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">current_gen</span> <span class="op">|</span><span class="op">|</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Lifecycle::PRESENT</span> {
+            <span class="comment">// Is it okay to access this slot? The accessed generation must be
+            // current, and the slot must not be in the process of being
+            // removed. If we can no longer access the slot at the given
+            // generation, return `None`.
+            </span><span class="kw">if </span>gen != current_gen || state != Lifecycle::PRESENT {
                 <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get: no longer exists!&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="comment">// Try to increment the slot&#39;s ref count by one.</span>
-            <span class="kw">let</span> <span class="ident">new_refs</span> <span class="op">=</span> <span class="ident">refs</span>.<span class="ident">incr</span>()<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-                <span class="ident">lifecycle</span>,
-                <span class="ident">new_refs</span>.<span class="ident">pack</span>(<span class="ident">current_gen</span>.<span class="ident">pack</span>(<span class="ident">state</span>.<span class="ident">pack</span>(<span class="number">0</span>))),
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="comment">// Try to increment the slot&#39;s ref count by one.
+            </span><span class="kw">let </span>new_refs = refs.incr()<span class="question-mark">?</span>;
+            <span class="kw">match </span><span class="self">self</span>.lifecycle.compare_exchange(
+                lifecycle,
+                new_refs.pack(current_gen.pack(state.pack(<span class="number">0</span>))),
+                Ordering::AcqRel,
+                Ordering::Acquire,
             ) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; {:?}&quot;</span>, <span class="ident">new_refs</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Guard</span> {
-                        <span class="ident">slot</span>: <span class="ident">ptr::NonNull::from</span>(<span class="self">self</span>),
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; {:?}&quot;</span>, new_refs);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Guard {
+                        slot: ptr::NonNull::from(<span class="self">self</span>),
                     });
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
-                    <span class="comment">// Another thread modified the slot&#39;s state before us! We</span>
-                    <span class="comment">// need to retry with the new state.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// Since the new state may mean that the accessed generation</span>
-                    <span class="comment">// is no longer valid, we&#39;ll check again on the next</span>
-                    <span class="comment">// iteration of the loop.</span>
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get: retrying; lifecycle={:#x};&quot;</span>, <span class="ident">actual</span>);
-                    <span class="ident">lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
+                <span class="prelude-val">Err</span>(actual) =&gt; {
+                    <span class="comment">// Another thread modified the slot&#39;s state before us! We
+                    // need to retry with the new state.
+                    //
+                    // Since the new state may mean that the accessed generation
+                    // is no longer valid, we&#39;ll check again on the next
+                    // iteration of the loop.
+                    </span><span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get: retrying; lifecycle={:#x};&quot;</span>, actual);
+                    lifecycle = actual;
                 }
             };
         }
     }
 
-    <span class="doccomment">/// Marks this slot to be released, returning `true` if the slot can be</span>
-    <span class="doccomment">/// mutated *now* and `false` otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method checks if there are any references to this slot. If there _are_ valid</span>
-    <span class="doccomment">/// references, it just marks them for modification and returns and the next thread calling</span>
-    <span class="doccomment">/// either `clear_storage` or `remove_value` will try and modify the storage</span>
-    <span class="kw">fn</span> <span class="ident">mark_release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr_gen</span>;
+    <span class="doccomment">/// Marks this slot to be released, returning `true` if the slot can be
+    /// mutated *now* and `false` otherwise.
+    ///
+    /// This method checks if there are any references to this slot. If there _are_ valid
+    /// references, it just marks them for modification and returns and the next thread calling
+    /// either `clear_storage` or `remove_value` will try and modify the storage
+    </span><span class="kw">fn </span>mark_release(<span class="kw-2">&amp;</span><span class="self">self</span>, gen: Generation&lt;C&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>curr_gen;
 
-        <span class="comment">// Try to advance the slot&#39;s state to &quot;MARKED&quot;, which indicates that it</span>
-        <span class="comment">// should be removed when it is no longer concurrently accessed.</span>
-        <span class="kw">loop</span> {
-            <span class="ident">curr_gen</span> <span class="op">=</span> <span class="ident">LifecycleGen::from_packed</span>(<span class="ident">lifecycle</span>).<span class="number">0</span>;
+        <span class="comment">// Try to advance the slot&#39;s state to &quot;MARKED&quot;, which indicates that it
+        // should be removed when it is no longer concurrently accessed.
+        </span><span class="kw">loop </span>{
+            curr_gen = LifecycleGen::from_packed(lifecycle).<span class="number">0</span>;
             <span class="macro">test_println!</span>(
                 <span class="string">&quot;-&gt; mark_release; gen={:?}; current_gen={:?};&quot;</span>,
-                <span class="ident">gen</span>,
-                <span class="ident">curr_gen</span>
+                gen,
+                curr_gen
             );
 
-            <span class="comment">// Is the slot still at the generation we are trying to remove?</span>
-            <span class="kw">if</span> <span class="ident">gen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">curr_gen</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="comment">// Is the slot still at the generation we are trying to remove?
+            </span><span class="kw">if </span>gen != curr_gen {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="ident">state</span>;
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; mark_release; state={:?};&quot;</span>, <span class="ident">state</span>);
-            <span class="kw">match</span> <span class="ident">state</span> {
-                <span class="ident">State::Removing</span> =&gt; {
+            <span class="kw">let </span>state = Lifecycle::&lt;C&gt;::from_packed(lifecycle).state;
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; mark_release; state={:?};&quot;</span>, state);
+            <span class="kw">match </span>state {
+                State::Removing =&gt; {
                     <span class="macro">test_println!</span>(<span class="string">&quot;--&gt; mark_release; cannot release (already removed!)&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
-                <span class="ident">State::Marked</span> =&gt; {
+                State::Marked =&gt; {
                     <span class="macro">test_println!</span>(<span class="string">&quot;--&gt; mark_release; already marked;&quot;</span>);
                     <span class="kw">break</span>;
                 }
-                <span class="ident">State::Present</span> =&gt; {}
+                State::Present =&gt; {}
             };
 
-            <span class="comment">// Set the new state to `MARKED`.</span>
-            <span class="kw">let</span> <span class="ident">new_lifecycle</span> <span class="op">=</span> <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::MARKED</span>.<span class="ident">pack</span>(<span class="ident">lifecycle</span>);
+            <span class="comment">// Set the new state to `MARKED`.
+            </span><span class="kw">let </span>new_lifecycle = Lifecycle::&lt;C&gt;::MARKED.pack(lifecycle);
             <span class="macro">test_println!</span>(
                 <span class="string">&quot;-&gt; mark_release; old_lifecycle={:#x}; new_lifecycle={:#x};&quot;</span>,
-                <span class="ident">lifecycle</span>,
-                <span class="ident">new_lifecycle</span>
+                lifecycle,
+                new_lifecycle
             );
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-                <span class="ident">lifecycle</span>,
-                <span class="ident">new_lifecycle</span>,
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="kw">match </span><span class="self">self</span>.lifecycle.compare_exchange(
+                lifecycle,
+                new_lifecycle,
+                Ordering::AcqRel,
+                Ordering::Acquire,
             ) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
+                <span class="prelude-val">Err</span>(actual) =&gt; {
                     <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; mark_release; retrying&quot;</span>);
-                    <span class="ident">lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
+                    lifecycle = actual;
                 }
             }
         }
 
-        <span class="comment">// Unpack the current reference count to see if we can remove the slot now.</span>
-        <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>);
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; mark_release: marked; refs={:?};&quot;</span>, <span class="ident">refs</span>);
+        <span class="comment">// Unpack the current reference count to see if we can remove the slot now.
+        </span><span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(lifecycle);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; mark_release: marked; refs={:?};&quot;</span>, refs);
 
-        <span class="comment">// Are there currently outstanding references to the slot? If so, it</span>
-        <span class="comment">// will have to be removed when those references are dropped.</span>
-        <span class="prelude-val">Some</span>(<span class="ident">refs</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">0</span>)
+        <span class="comment">// Are there currently outstanding references to the slot? If so, it
+        // will have to be removed when those references are dropped.
+        </span><span class="prelude-val">Some</span>(refs.value == <span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Mutates this slot.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method spins until no references to this slot are left, and calls the mutator</span>
-    <span class="kw">fn</span> <span class="ident">release_with</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">free</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>, <span class="ident">mutator</span>: <span class="ident">M</span>) -&gt; <span class="ident">R</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">M</span>: <span class="ident">FnOnce</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">R</span>,
+    <span class="doccomment">/// Mutates this slot.
+    ///
+    /// This method spins until no references to this slot are left, and calls the mutator
+    </span><span class="kw">fn </span>release_with&lt;F, M, R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, gen: Generation&lt;C&gt;, offset: usize, free: <span class="kw-2">&amp;</span>F, mutator: M) -&gt; R
+    <span class="kw">where
+        </span>F: FreeList&lt;C&gt;,
+        M: FnOnce(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>T&gt;) -&gt; R,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="comment">// Exponential spin backoff while waiting for the slot to be released.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spin_exp</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">next_gen</span> <span class="op">=</span> <span class="ident">gen</span>.<span class="ident">advance</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">current_gen</span> <span class="op">=</span> <span class="ident">Generation::from_packed</span>(<span class="ident">lifecycle</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>advanced = <span class="bool-val">false</span>;
+        <span class="comment">// Exponential spin backoff while waiting for the slot to be released.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>spin_exp = <span class="number">0</span>;
+        <span class="kw">let </span>next_gen = gen.advance();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>current_gen = Generation::from_packed(lifecycle);
             <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; release_with; lifecycle={:#x}; expected_gen={:?}; current_gen={:?}; next_gen={:?};&quot;</span>,
-                <span class="ident">lifecycle</span>,
-                <span class="ident">gen</span>,
-                <span class="ident">current_gen</span>,
-                <span class="ident">next_gen</span>
+                lifecycle,
+                gen,
+                current_gen,
+                next_gen
             );
 
-            <span class="comment">// First, make sure we are actually able to remove the value.</span>
-            <span class="comment">// If we&#39;re going to remove the value, the generation has to match</span>
-            <span class="comment">// the value that `remove_value` was called with...unless we&#39;ve</span>
-            <span class="comment">// already stored the new generation.</span>
-            <span class="kw">if</span> (<span class="op">!</span><span class="ident">advanced</span>) <span class="op">&amp;&amp;</span> <span class="ident">gen</span> <span class="op">!</span><span class="op">=</span> <span class="ident">current_gen</span> {
+            <span class="comment">// First, make sure we are actually able to remove the value.
+            // If we&#39;re going to remove the value, the generation has to match
+            // the value that `remove_value` was called with...unless we&#39;ve
+            // already stored the new generation.
+            </span><span class="kw">if </span>(!advanced) &amp;&amp; gen != current_gen {
                 <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; already removed!&quot;</span>);
-                <span class="kw">return</span> <span class="ident">mutator</span>(<span class="prelude-val">None</span>);
+                <span class="kw">return </span>mutator(<span class="prelude-val">None</span>);
             }
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-                <span class="ident">lifecycle</span>,
-                <span class="ident">next_gen</span>.<span class="ident">pack</span>(<span class="ident">lifecycle</span>),
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="kw">match </span><span class="self">self</span>.lifecycle.compare_exchange(
+                lifecycle,
+                next_gen.pack(lifecycle),
+                Ordering::AcqRel,
+                Ordering::Acquire,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="ident">actual</span>) =&gt; {
-                    <span class="comment">// If we&#39;re in this state, we have successfully advanced to</span>
-                    <span class="comment">// the next generation.</span>
-                    <span class="ident">advanced</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="prelude-val">Ok</span>(actual) =&gt; {
+                    <span class="comment">// If we&#39;re in this state, we have successfully advanced to
+                    // the next generation.
+                    </span>advanced = <span class="bool-val">true</span>;
 
-                    <span class="comment">// Make sure that there are no outstanding references.</span>
-                    <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">actual</span>);
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; advanced gen; lifecycle={:#x}; refs={:?};&quot;</span>, <span class="ident">actual</span>, <span class="ident">refs</span>);
-                    <span class="kw">if</span> <span class="ident">refs</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">0</span> {
+                    <span class="comment">// Make sure that there are no outstanding references.
+                    </span><span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(actual);
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; advanced gen; lifecycle={:#x}; refs={:?};&quot;</span>, actual, refs);
+                    <span class="kw">if </span>refs.value == <span class="number">0 </span>{
                         <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; ok to remove!&quot;</span>);
-                        <span class="comment">// safety: we&#39;ve modified the generation of this slot and any other thread</span>
-                        <span class="comment">// calling this method will exit out at the generation check above in the</span>
-                        <span class="comment">// next iteraton of the loop.</span>
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>
-                            .<span class="ident">item</span>
-                            .<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="ident">mutator</span>(<span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">item</span> })));
-                        <span class="ident">free</span>.<span class="ident">push</span>(<span class="ident">offset</span>, <span class="self">self</span>);
-                        <span class="kw">return</span> <span class="ident">value</span>;
+                        <span class="comment">// safety: we&#39;ve modified the generation of this slot and any other thread
+                        // calling this method will exit out at the generation check above in the
+                        // next iteraton of the loop.
+                        </span><span class="kw">let </span>value = <span class="self">self
+                            </span>.item
+                            .with_mut(|item| mutator(<span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>item })));
+                        free.push(offset, <span class="self">self</span>);
+                        <span class="kw">return </span>value;
                     }
 
-                    <span class="comment">// Otherwise, a reference must be dropped before we can</span>
-                    <span class="comment">// remove the value. Spin here until there are no refs remaining...</span>
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; refs={:?}; spin...&quot;</span>, <span class="ident">refs</span>);
+                    <span class="comment">// Otherwise, a reference must be dropped before we can
+                    // remove the value. Spin here until there are no refs remaining...
+                    </span><span class="macro">test_println!</span>(<span class="string">&quot;-&gt; refs={:?}; spin...&quot;</span>, refs);
 
-                    <span class="comment">// Back off, spinning and possibly yielding.</span>
-                    <span class="ident">exponential_backoff</span>(<span class="kw-2">&amp;mut</span> <span class="ident">spin_exp</span>);
+                    <span class="comment">// Back off, spinning and possibly yielding.
+                    </span>exponential_backoff(<span class="kw-2">&amp;mut </span>spin_exp);
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; retrying; lifecycle={:#x};&quot;</span>, <span class="ident">actual</span>);
-                    <span class="ident">lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
-                    <span class="comment">// The state changed; reset the spin backoff.</span>
-                    <span class="ident">spin_exp</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="prelude-val">Err</span>(actual) =&gt; {
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; retrying; lifecycle={:#x};&quot;</span>, actual);
+                    lifecycle = actual;
+                    <span class="comment">// The state changed; reset the spin backoff.
+                    </span>spin_exp = <span class="number">0</span>;
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Initialize a slot</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method initializes and sets up the state for a slot. When being used in `Pool`, we</span>
-    <span class="doccomment">/// only need to ensure that the `Slot` is in the right `state, while when being used in a</span>
-    <span class="doccomment">/// `Slab` we want to insert a value into it, as the memory is not initialized</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InitGuard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Load the current lifecycle state.</span>
-        <span class="kw">let</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>);
+    <span class="doccomment">/// Initialize a slot
+    ///
+    /// This method initializes and sets up the state for a slot. When being used in `Pool`, we
+    /// only need to ensure that the `Slot` is in the right `state, while when being used in a
+    /// `Slab` we want to insert a value into it, as the memory is not initialized
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;InitGuard&lt;T, C&gt;&gt; {
+        <span class="comment">// Load the current lifecycle state.
+        </span><span class="kw">let </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Acquire);
+        <span class="kw">let </span>gen = LifecycleGen::&lt;C&gt;::from_packed(lifecycle).<span class="number">0</span>;
+        <span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(lifecycle);
 
         <span class="macro">test_println!</span>(
             <span class="string">&quot;-&gt; initialize_state; state={:?}; gen={:?}; refs={:?};&quot;</span>,
-            <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>),
-            <span class="ident">gen</span>,
-            <span class="ident">refs</span>,
+            Lifecycle::&lt;C&gt;::from_packed(lifecycle),
+            gen,
+            refs,
         );
 
-        <span class="kw">if</span> <span class="ident">refs</span>.<span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if </span>refs.value != <span class="number">0 </span>{
             <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; initialize while referenced! cancelling&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">InitGuard</span> {
-            <span class="ident">slot</span>: <span class="ident">ptr::NonNull::from</span>(<span class="self">self</span>),
-            <span class="ident">curr_lifecycle</span>: <span class="ident">lifecycle</span>,
-            <span class="ident">released</span>: <span class="bool-val">false</span>,
+        <span class="prelude-val">Some</span>(InitGuard {
+            slot: ptr::NonNull::from(<span class="self">self</span>),
+            curr_lifecycle: lifecycle,
+            released: <span class="bool-val">false</span>,
         })
     }
 }
 
-<span class="comment">// Slot impl which _needs_ an `Option` for self.item, this is for `Slab` to use.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="comment">// Slot impl which _needs_ an `Option` for self.item, this is for `Slab` to use.
+</span><span class="kw">impl</span>&lt;T, C&gt; Slot&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">item</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">item</span>).<span class="ident">is_none</span>() })
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.item.with(|item| <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>item).is_none() })
     }
 
-    <span class="doccomment">/// Insert a value into a slot</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We first initialize the state and then insert the pased in value into the slot.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_empty</span>(), <span class="string">&quot;inserted into full slot&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">value</span>.<span class="ident">is_some</span>(), <span class="string">&quot;inserted twice&quot;</span>);
+    <span class="doccomment">/// Insert a value into a slot
+    ///
+    /// We first initialize the state and then insert the pased in value into the slot.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, value: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Generation&lt;C&gt;&gt; {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.is_empty(), <span class="string">&quot;inserted into full slot&quot;</span>);
+        <span class="macro">debug_assert!</span>(value.is_some(), <span class="string">&quot;inserted twice&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">init</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">guard</span>.<span class="ident">generation</span>();
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: Accessing the value of an `InitGuard` is unsafe because</span>
-            <span class="comment">// it has a pointer to a slot which may dangle. Here, we know the</span>
-            <span class="comment">// pointed slot is alive because we have a reference to it in scope,</span>
-            <span class="comment">// and the `InitGuard` will be dropped when this function returns.</span>
-            <span class="ident">mem::swap</span>(<span class="ident">guard</span>.<span class="ident">value_mut</span>(), <span class="ident">value</span>);
-            <span class="ident">guard</span>.<span class="ident">release</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>guard = <span class="self">self</span>.init()<span class="question-mark">?</span>;
+        <span class="kw">let </span>gen = guard.generation();
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: Accessing the value of an `InitGuard` is unsafe because
+            // it has a pointer to a slot which may dangle. Here, we know the
+            // pointed slot is alive because we have a reference to it in scope,
+            // and the `InitGuard` will be dropped when this function returns.
+            </span>mem::swap(guard.value_mut(), value);
+            guard.release();
         };
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; inserted at {:?}&quot;</span>, <span class="ident">gen</span>);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; inserted at {:?}&quot;</span>, gen);
 
-        <span class="prelude-val">Some</span>(<span class="ident">gen</span>)
+        <span class="prelude-val">Some</span>(gen)
     }
 
-    <span class="doccomment">/// Tries to remove the value in the slot, returning `true` if the value was</span>
-    <span class="doccomment">/// removed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method tries to remove the value in the slot. If there are existing references, then</span>
-    <span class="doccomment">/// the slot is marked for removal and the next thread calling either this method or</span>
-    <span class="doccomment">/// `remove_value` will do the work instead.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">try_remove_value</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Tries to remove the value in the slot, returning `true` if the value was
+    /// removed.
+    ///
+    /// This method tries to remove the value in the slot. If there are existing references, then
+    /// the slot is marked for removal and the next thread calling either this method or
+    /// `remove_value` will do the work instead.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>try_remove_value&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="ident">usize</span>,
-        <span class="ident">free</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">should_remove</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mark_release</span>(<span class="ident">gen</span>) {
-            <span class="comment">// If `mark_release` returns `Some`, a value exists at this</span>
-            <span class="comment">// generation. The bool inside this option indicates whether or not</span>
-            <span class="comment">// _we&#39;re_ allowed to remove the value.</span>
-            <span class="prelude-val">Some</span>(<span class="ident">should_remove</span>) =&gt; <span class="ident">should_remove</span>,
-            <span class="comment">// Otherwise, the generation we tried to remove has already expired,</span>
-            <span class="comment">// and we did not mark anything for removal.</span>
-            <span class="prelude-val">None</span> =&gt; {
+        gen: Generation&lt;C&gt;,
+        offset: usize,
+        free: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="kw">let </span>should_remove = <span class="kw">match </span><span class="self">self</span>.mark_release(gen) {
+            <span class="comment">// If `mark_release` returns `Some`, a value exists at this
+            // generation. The bool inside this option indicates whether or not
+            // _we&#39;re_ allowed to remove the value.
+            </span><span class="prelude-val">Some</span>(should_remove) =&gt; should_remove,
+            <span class="comment">// Otherwise, the generation we tried to remove has already expired,
+            // and we did not mark anything for removal.
+            </span><span class="prelude-val">None </span>=&gt; {
                 <span class="macro">test_println!</span>(
                     <span class="string">&quot;-&gt; try_remove_value; nothing exists at generation={:?}&quot;</span>,
-                    <span class="ident">gen</span>
+                    gen
                 );
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         };
 
         <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_remove_value; marked!&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">should_remove</span> {
-            <span class="comment">// We&#39;re allowed to remove the slot now!</span>
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_remove_value; can remove now&quot;</span>);
-            <span class="self">self</span>.<span class="ident">remove_value</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free</span>);
+        <span class="kw">if </span>should_remove {
+            <span class="comment">// We&#39;re allowed to remove the slot now!
+            </span><span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_remove_value; can remove now&quot;</span>);
+            <span class="self">self</span>.remove_value(gen, offset, free);
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">remove_value</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>remove_value&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="ident">usize</span>,
-        <span class="ident">free</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">release_with</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free</span>, <span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="ident">item</span>.<span class="ident">and_then</span>(<span class="ident">Option::take</span>))
+        gen: Generation&lt;C&gt;,
+        offset: usize,
+        free: <span class="kw-2">&amp;</span>F,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.release_with(gen, offset, free, |item| item.and_then(Option::take))
     }
 }
 
-<span class="comment">// These impls are specific to `Pool`</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Clear</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="comment">// These impls are specific to `Pool`
+</span><span class="kw">impl</span>&lt;T, C&gt; Slot&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Default + Clear,
+    C: cfg::Config,
 {
-    <span class="kw">pub</span>(<span class="kw">in</span> <span class="ident"><span class="kw">crate</span>::page</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">next</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">lifecycle</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::REMOVING</span>.<span class="ident">as_usize</span>()),
-            <span class="ident">item</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">T::default</span>()),
-            <span class="ident">next</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">next</span>),
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">pub</span>(<span class="kw">in </span><span class="kw">crate</span>::page) <span class="kw">fn </span>new(next: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            lifecycle: AtomicUsize::new(Lifecycle::&lt;C&gt;::REMOVING.as_usize()),
+            item: UnsafeCell::new(T::default()),
+            next: UnsafeCell::new(next),
+            _cfg: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Try to clear this slot&#39;s storage</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there are references to this slot, then we mark this slot for clearing and let the last</span>
-    <span class="doccomment">/// thread do the work for us.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">try_clear_storage</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Try to clear this slot&#39;s storage
+    ///
+    /// If there are references to this slot, then we mark this slot for clearing and let the last
+    /// thread do the work for us.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>try_clear_storage&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="ident">usize</span>,
-        <span class="ident">free</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">mark_release</span>(<span class="ident">gen</span>) {
-            <span class="comment">// If `mark_release` returns `Some`, a value exists at this</span>
-            <span class="comment">// generation. The bool inside this option indicates whether or not</span>
-            <span class="comment">// _we&#39;re_ allowed to clear the value.</span>
-            <span class="prelude-val">Some</span>(<span class="ident">should_clear</span>) =&gt; <span class="ident">should_clear</span>,
-            <span class="comment">// Otherwise, the generation we tried to remove has already expired,</span>
-            <span class="comment">// and we did not mark anything for removal.</span>
-            <span class="prelude-val">None</span> =&gt; {
+        gen: Generation&lt;C&gt;,
+        offset: usize,
+        free: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="kw">let </span>should_clear = <span class="kw">match </span><span class="self">self</span>.mark_release(gen) {
+            <span class="comment">// If `mark_release` returns `Some`, a value exists at this
+            // generation. The bool inside this option indicates whether or not
+            // _we&#39;re_ allowed to clear the value.
+            </span><span class="prelude-val">Some</span>(should_clear) =&gt; should_clear,
+            <span class="comment">// Otherwise, the generation we tried to remove has already expired,
+            // and we did not mark anything for removal.
+            </span><span class="prelude-val">None </span>=&gt; {
                 <span class="macro">test_println!</span>(
                     <span class="string">&quot;-&gt; try_clear_storage; nothing exists at generation={:?}&quot;</span>,
-                    <span class="ident">gen</span>
+                    gen
                 );
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         };
 
         <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_clear_storage; marked!&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="comment">// We&#39;re allowed to remove the slot now!</span>
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_remove_value; can clear now&quot;</span>);
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">clear_storage</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free</span>);
+        <span class="kw">if </span>should_clear {
+            <span class="comment">// We&#39;re allowed to remove the slot now!
+            </span><span class="macro">test_println!</span>(<span class="string">&quot;-&gt; try_remove_value; can clear now&quot;</span>);
+            <span class="kw">return </span><span class="self">self</span>.clear_storage(gen, offset, free);
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Clear this slot&#39;s storage</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method blocks until all references have been dropped and clears the storage.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">clear_storage</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FreeList</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Clear this slot&#39;s storage
+    ///
+    /// This method blocks until all references have been dropped and clears the storage.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>clear_storage&lt;F: FreeList&lt;C&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">gen</span>: <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="ident">usize</span>,
-        <span class="ident">free</span>: <span class="kw-2">&amp;</span><span class="ident">F</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// release_with will _always_ wait unitl it can release the slot or just return if the slot</span>
-        <span class="comment">// has already been released.</span>
-        <span class="self">self</span>.<span class="ident">release_with</span>(<span class="ident">gen</span>, <span class="ident">offset</span>, <span class="ident">free</span>, <span class="op">|</span><span class="ident">item</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">cleared</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">Clear::clear</span>(<span class="ident">inner</span>)).<span class="ident">is_some</span>();
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; cleared: {}&quot;</span>, <span class="ident">cleared</span>);
-            <span class="ident">cleared</span>
+        gen: Generation&lt;C&gt;,
+        offset: usize,
+        free: <span class="kw-2">&amp;</span>F,
+    ) -&gt; bool {
+        <span class="comment">// release_with will _always_ wait unitl it can release the slot or just return if the slot
+        // has already been released.
+        </span><span class="self">self</span>.release_with(gen, offset, free, |item| {
+            <span class="kw">let </span>cleared = item.map(|inner| Clear::clear(inner)).is_some();
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; cleared: {}&quot;</span>, cleared);
+            cleared
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>);
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="ident">state</span>;
-            <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="number">0</span>;
+<span class="kw">impl</span>&lt;T, C: cfg::Config&gt; Slot&lt;T, C&gt; {
+    <span class="kw">fn </span>release(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Acquire);
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(lifecycle);
+            <span class="kw">let </span>state = Lifecycle::&lt;C&gt;::from_packed(lifecycle).state;
+            <span class="kw">let </span>gen = LifecycleGen::&lt;C&gt;::from_packed(lifecycle).<span class="number">0</span>;
 
-            <span class="comment">// Are we the last guard, and is the slot marked for removal?</span>
-            <span class="kw">let</span> <span class="ident">dropping</span> <span class="op">=</span> <span class="ident">refs</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">State::Marked</span>;
-            <span class="kw">let</span> <span class="ident">new_lifecycle</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">dropping</span> {
-                <span class="comment">// If so, we want to advance the state to &quot;removing&quot;</span>
-                <span class="ident">gen</span>.<span class="ident">pack</span>(<span class="ident">State::Removing</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            } <span class="kw">else</span> {
-                <span class="comment">// Otherwise, just subtract 1 from the ref count.</span>
-                <span class="ident">refs</span>.<span class="ident">decr</span>().<span class="ident">pack</span>(<span class="ident">lifecycle</span>)
+            <span class="comment">// Are we the last guard, and is the slot marked for removal?
+            </span><span class="kw">let </span>dropping = refs.value == <span class="number">1 </span>&amp;&amp; state == State::Marked;
+            <span class="kw">let </span>new_lifecycle = <span class="kw">if </span>dropping {
+                <span class="comment">// If so, we want to advance the state to &quot;removing&quot;
+                </span>gen.pack(State::Removing <span class="kw">as </span>usize)
+            } <span class="kw">else </span>{
+                <span class="comment">// Otherwise, just subtract 1 from the ref count.
+                </span>refs.decr().pack(lifecycle)
             };
 
             <span class="macro">test_println!</span>(
                 <span class="string">&quot;-&gt; drop guard: state={:?}; gen={:?}; refs={:?}; lifecycle={:#x}; new_lifecycle={:#x}; dropping={:?}&quot;</span>,
-                <span class="ident">state</span>,
-                <span class="ident">gen</span>,
-                <span class="ident">refs</span>,
-                <span class="ident">lifecycle</span>,
-                <span class="ident">new_lifecycle</span>,
-                <span class="ident">dropping</span>
+                state,
+                gen,
+                refs,
+                lifecycle,
+                new_lifecycle,
+                dropping
             );
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-                <span class="ident">lifecycle</span>,
-                <span class="ident">new_lifecycle</span>,
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="kw">match </span><span class="self">self</span>.lifecycle.compare_exchange(
+                lifecycle,
+                new_lifecycle,
+                Ordering::AcqRel,
+                Ordering::Acquire,
             ) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; drop guard: done;  dropping={:?}&quot;</span>, <span class="ident">dropping</span>);
-                    <span class="kw">return</span> <span class="ident">dropping</span>;
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; drop guard: done;  dropping={:?}&quot;</span>, dropping);
+                    <span class="kw">return </span>dropping;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; drop guard; retry, actual={:#x}&quot;</span>, <span class="ident">actual</span>);
-                    <span class="ident">lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
+                <span class="prelude-val">Err</span>(actual) =&gt; {
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; drop guard; retry, actual={:#x}&quot;</span>, actual);
+                    lifecycle = actual;
                 }
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lifecycle</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Slot&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;lifecycle&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#x}&quot;</span>, <span class="ident">lifecycle</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="ident">state</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;gen&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>).<span class="number">0</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;refs&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">lifecycle</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;next&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">next</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T, C: cfg::Config&gt; fmt::Debug <span class="kw">for </span>Slot&lt;T, C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>lifecycle = <span class="self">self</span>.lifecycle.load(Ordering::Relaxed);
+        f.debug_struct(<span class="string">&quot;Slot&quot;</span>)
+            .field(<span class="string">&quot;lifecycle&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{:#x}&quot;</span>, lifecycle))
+            .field(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span>Lifecycle::&lt;C&gt;::from_packed(lifecycle).state)
+            .field(<span class="string">&quot;gen&quot;</span>, <span class="kw-2">&amp;</span>LifecycleGen::&lt;C&gt;::from_packed(lifecycle).<span class="number">0</span>)
+            .field(<span class="string">&quot;refs&quot;</span>, <span class="kw-2">&amp;</span>RefCount::&lt;C&gt;::from_packed(lifecycle))
+            .field(<span class="string">&quot;next&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.next())
+            .finish()
     }
 }
 
-<span class="comment">// === impl Generation ===</span>
+<span class="comment">// === impl Generation ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Generation&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>).<span class="ident">finish</span>()
+</span><span class="kw">impl</span>&lt;C&gt; fmt::Debug <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;Generation&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.value).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_usize</span>((<span class="self">self</span>.<span class="ident">value</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">%</span> <span class="ident"><span class="self">Self</span>::BITS</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Generation&lt;C&gt; {
+    <span class="kw">fn </span>advance(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_usize((<span class="self">self</span>.value + <span class="number">1</span>) % <span class="self">Self</span>::BITS)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">value</span>
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialEq <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.value == other.value
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Eq <span class="kw">for </span>Generation&lt;C&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialOrd <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="self">self</span>.value.partial_cmp(<span class="kw-2">&amp;</span>other.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Ord <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="self">self</span>.value.cmp(<span class="kw-2">&amp;</span>other.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="self">self</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Clone <span class="kw">for </span>Generation&lt;C&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(<span class="self">self</span>.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Copy <span class="kw">for </span>Generation&lt;C&gt; {}
 
-<span class="comment">// === impl Guard ===</span>
+<span class="comment">// === impl Guard ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Releases the guard, returning `true` if the slot should be cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `Guard` does not outlive the slab that contains</span>
-    <span class="doccomment">/// the pointed slot. Failure to do so means this pointer may dangle.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">slot</span>().<span class="ident">release</span>()
+</span><span class="kw">impl</span>&lt;T, C: cfg::Config&gt; Guard&lt;T, C&gt; {
+    <span class="doccomment">/// Releases the guard, returning `true` if the slot should be cleared.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `Guard` does not outlive the slab that contains
+    /// the pointed slot. Failure to do so means this pointer may dangle.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>release(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.slot().release()
     }
 
-    <span class="doccomment">/// Returns a borrowed reference to the slot.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `Guard` does not outlive the slab that contains</span>
-    <span class="doccomment">/// the pointed slot. Failure to do so means this pointer may dangle.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">slot</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns a borrowed reference to the slot.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `Guard` does not outlive the slab that contains
+    /// the pointed slot. Failure to do so means this pointer may dangle.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>slot(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Slot&lt;T, C&gt; {
+        <span class="self">self</span>.slot.as_ref()
     }
 
-    <span class="doccomment">/// Returns a borrowed reference to the slot&#39;s value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `Guard` does not outlive the slab that contains</span>
-    <span class="doccomment">/// the pointed slot. Failure to do so means this pointer may dangle.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">slot</span>().<span class="ident">item</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">item</span>)
+    <span class="doccomment">/// Returns a borrowed reference to the slot&#39;s value.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `Guard` does not outlive the slab that contains
+    /// the pointed slot. Failure to do so means this pointer may dangle.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.slot().item.with(|item| <span class="kw-2">&amp;*</span>item)
     }
 }
 
-<span class="comment">// === impl Lifecycle ===</span>
+<span class="comment">// === impl Lifecycle ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">MARKED</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">state</span>: <span class="ident">State::Marked</span>,
-        <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+</span><span class="kw">impl</span>&lt;C: cfg::Config&gt; Lifecycle&lt;C&gt; {
+    <span class="kw">const </span>MARKED: <span class="self">Self </span>= <span class="self">Self </span>{
+        state: State::Marked,
+        _cfg: PhantomData,
     };
-    <span class="kw">const</span> <span class="ident">REMOVING</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">state</span>: <span class="ident">State::Removing</span>,
-        <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">const </span>REMOVING: <span class="self">Self </span>= <span class="self">Self </span>{
+        state: State::Removing,
+        _cfg: PhantomData,
     };
-    <span class="kw">const</span> <span class="ident">PRESENT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">state</span>: <span class="ident">State::Present</span>,
-        <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">const </span>PRESENT: <span class="self">Self </span>= <span class="self">Self </span>{
+        state: State::Present,
+        _cfg: PhantomData,
     };
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>Lifecycle&lt;C&gt; {
+    <span class="kw">const </span>LEN: usize = <span class="number">2</span>;
+    <span class="kw">type </span>Prev = ();
 
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">u</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">state</span>: <span class="kw">match</span> <span class="ident">u</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::MASK</span> {
-                <span class="number">0b00</span> =&gt; <span class="ident">State::Present</span>,
-                <span class="number">0b01</span> =&gt; <span class="ident">State::Marked</span>,
-                <span class="number">0b11</span> =&gt; <span class="ident">State::Removing</span>,
-                <span class="ident">bad</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;weird lifecycle {:#b}&quot;</span>, <span class="ident">bad</span>),
+    <span class="kw">fn </span>from_usize(u: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            state: <span class="kw">match </span>u &amp; <span class="self">Self</span>::MASK {
+                <span class="number">0b00 </span>=&gt; State::Present,
+                <span class="number">0b01 </span>=&gt; State::Marked,
+                <span class="number">0b11 </span>=&gt; State::Removing,
+                bad =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;weird lifecycle {:#b}&quot;</span>, bad),
             },
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+            _cfg: PhantomData,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.state <span class="kw">as </span>usize
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">state</span>
+<span class="kw">impl</span>&lt;C&gt; PartialEq <span class="kw">for </span>Lifecycle&lt;C&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.state == other.state
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;C&gt; Eq <span class="kw">for </span>Lifecycle&lt;C&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Lifecycle&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;C&gt; fmt::Debug <span class="kw">for </span>Lifecycle&lt;C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;Lifecycle&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.state).finish()
     }
 }
 
-<span class="comment">// === impl RefCount ===</span>
+<span class="comment">// === impl RefCount ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">cfg::WIDTH</span> <span class="op">-</span> (<span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::LEN</span> <span class="op">+</span> <span class="ident">Generation</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::LEN</span>);
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> <span class="ident">Lifecycle</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>;
+</span><span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">const </span>LEN: usize = cfg::WIDTH - (Lifecycle::&lt;C&gt;::LEN + Generation::&lt;C&gt;::LEN);
+    <span class="kw">type </span>Prev = Lifecycle&lt;C&gt;;
 
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span>);
-        <span class="self">Self</span> {
-            <span class="ident">value</span>,
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>from_usize(value: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(value &lt;= <span class="self">Self</span>::BITS);
+        <span class="self">Self </span>{
+            value,
+            _cfg: PhantomData,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span> <span class="op">-</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; RefCount&lt;C&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX: usize = <span class="self">Self</span>::BITS - <span class="number">1</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">incr</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX</span> {
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get: {}; MAX={}&quot;</span>, <span class="self">self</span>.<span class="ident">value</span>, <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::MAX</span>);
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>incr(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.value &gt;= <span class="self">Self</span>::MAX {
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; get: {}; MAX={}&quot;</span>, <span class="self">self</span>.value, RefCount::&lt;C&gt;::MAX);
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::from_usize</span>(<span class="self">self</span>.<span class="ident">value</span> <span class="op">+</span> <span class="number">1</span>))
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>::from_usize(<span class="self">self</span>.value + <span class="number">1</span>))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">decr</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_usize</span>(<span class="self">self</span>.<span class="ident">value</span> <span class="op">-</span> <span class="number">1</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;RefCount&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>).<span class="ident">finish</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>decr(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_usize(<span class="self">self</span>.value - <span class="number">1</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">value</span>
+<span class="kw">impl</span>&lt;C&gt; fmt::Debug <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;RefCount&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.value).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialEq <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.value == other.value
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Eq <span class="kw">for </span>RefCount&lt;C&gt; {}
+
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; PartialOrd <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="self">self</span>.value.partial_cmp(<span class="kw-2">&amp;</span>other.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_usize</span>(<span class="self">self</span>.<span class="ident">value</span>)
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Ord <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="self">self</span>.value.cmp(<span class="kw-2">&amp;</span>other.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {}
-
-<span class="comment">// === impl LifecycleGen ===</span>
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LifecycleGen</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">Generation</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::LEN</span>;
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> <span class="ident">RefCount</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">Generation::from_usize</span>(<span class="ident">value</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_usize</span>()
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Clone <span class="kw">for </span>RefCount&lt;C&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_usize(<span class="self">self</span>.value)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">InitGuard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Generation</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">curr_lifecycle</span>).<span class="number">0</span>
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Copy <span class="kw">for </span>RefCount&lt;C&gt; {}
+
+<span class="comment">// === impl LifecycleGen ===
+
+</span><span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>LifecycleGen&lt;C&gt; {
+    <span class="kw">const </span>LEN: usize = Generation::&lt;C&gt;::LEN;
+    <span class="kw">type </span>Prev = RefCount&lt;C&gt;;
+
+    <span class="kw">fn </span>from_usize(value: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(Generation::from_usize(value))
     }
 
-    <span class="doccomment">/// Returns a borrowed reference to the slot&#39;s value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `InitGuard` does not outlive the slab that</span>
-    <span class="doccomment">/// contains the pointed slot. Failure to do so means this pointer may</span>
-    <span class="doccomment">/// dangle.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">slot</span>.<span class="ident">as_ref</span>().<span class="ident">item</span>.<span class="ident">with</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">val</span>)
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.as_usize()
+    }
+}
+
+<span class="kw">impl</span>&lt;T, C: cfg::Config&gt; InitGuard&lt;T, C&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>generation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Generation&lt;C&gt; {
+        LifecycleGen::&lt;C&gt;::from_packed(<span class="self">self</span>.curr_lifecycle).<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns a borrowed reference to the slot&#39;s value.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `InitGuard` does not outlive the slab that
+    /// contains the pointed slot. Failure to do so means this pointer may
+    /// dangle.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.slot.as_ref().item.with(|val| <span class="kw-2">&amp;*</span>val)
     }
 
-    <span class="doccomment">/// Returns a mutably borrowed reference to the slot&#39;s value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `InitGuard` does not outlive the slab that</span>
-    <span class="doccomment">/// contains the pointed slot. Failure to do so means this pointer may</span>
-    <span class="doccomment">/// dangle.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;s safe to reference the slot mutably, though, because creating an</span>
-    <span class="doccomment">/// `InitGuard` ensures there are no outstanding immutable references.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">value_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">slot</span>.<span class="ident">as_ref</span>().<span class="ident">item</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">val</span>)
+    <span class="doccomment">/// Returns a mutably borrowed reference to the slot&#39;s value.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `InitGuard` does not outlive the slab that
+    /// contains the pointed slot. Failure to do so means this pointer may
+    /// dangle.
+    ///
+    /// It&#39;s safe to reference the slot mutably, though, because creating an
+    /// `InitGuard` ensures there are no outstanding immutable references.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>value_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="self">self</span>.slot.as_ref().item.with_mut(|val| <span class="kw-2">&amp;mut *</span>val)
     }
 
-    <span class="doccomment">/// Releases the guard, returning `true` if the slot should be cleared.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `InitGuard` does not outlive the slab that</span>
-    <span class="doccomment">/// contains the pointed slot. Failure to do so means this pointer may</span>
-    <span class="doccomment">/// dangle.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">release2</span>(<span class="number">0</span>)
+    <span class="doccomment">/// Releases the guard, returning `true` if the slot should be cleared.
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `InitGuard` does not outlive the slab that
+    /// contains the pointed slot. Failure to do so means this pointer may
+    /// dangle.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>release(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.release2(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Downgrades the guard to an immutable guard</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This dereferences a raw pointer to the slot. The caller is responsible</span>
-    <span class="doccomment">/// for ensuring that the `InitGuard` does not outlive the slab that</span>
-    <span class="doccomment">/// contains the pointed slot. Failure to do so means this pointer may</span>
-    <span class="doccomment">/// dangle.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">release2</span>(<span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_usize</span>(<span class="number">1</span>).<span class="ident">pack</span>(<span class="number">0</span>));
-        <span class="ident">Guard</span> { <span class="ident">slot</span>: <span class="self">self</span>.<span class="ident">slot</span> }
+    <span class="doccomment">/// Downgrades the guard to an immutable guard
+    ///
+    /// ## Safety
+    ///
+    /// This dereferences a raw pointer to the slot. The caller is responsible
+    /// for ensuring that the `InitGuard` does not outlive the slab that
+    /// contains the pointed slot. Failure to do so means this pointer may
+    /// dangle.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>downgrade(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Guard&lt;T, C&gt; {
+        <span class="kw">let _ </span>= <span class="self">self</span>.release2(RefCount::&lt;C&gt;::from_usize(<span class="number">1</span>).pack(<span class="number">0</span>));
+        Guard { slot: <span class="self">self</span>.slot }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">release2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_refs</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">unsafe fn </span>release2(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_refs: usize) -&gt; bool {
         <span class="macro">test_println!</span>(
             <span class="string">&quot;InitGuard::release; curr_lifecycle={:?}; downgrading={}&quot;</span>,
-            <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">curr_lifecycle</span>),
-            <span class="ident">new_refs</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+            Lifecycle::&lt;C&gt;::from_packed(<span class="self">self</span>.curr_lifecycle),
+            new_refs != <span class="number">0</span>,
         );
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">released</span> {
+        <span class="kw">if </span><span class="self">self</span>.released {
             <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; already released!&quot;</span>);
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="self">self</span>.<span class="ident">released</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr_lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">curr_lifecycle</span>;
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slot</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">new_lifecycle</span> <span class="op">=</span> <span class="ident">LifecycleGen</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">curr_lifecycle</span>)
-            .<span class="ident">pack</span>(<span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::PRESENT</span>.<span class="ident">pack</span>(<span class="ident">new_refs</span>));
+        <span class="self">self</span>.released = <span class="bool-val">true</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>curr_lifecycle = <span class="self">self</span>.curr_lifecycle;
+        <span class="kw">let </span>slot = <span class="self">self</span>.slot.as_ref();
+        <span class="kw">let </span>new_lifecycle = LifecycleGen::&lt;C&gt;::from_packed(<span class="self">self</span>.curr_lifecycle)
+            .pack(Lifecycle::&lt;C&gt;::PRESENT.pack(new_refs));
 
-        <span class="kw">match</span> <span class="ident">slot</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-            <span class="ident">curr_lifecycle</span>,
-            <span class="ident">new_lifecycle</span>,
-            <span class="ident">Ordering::AcqRel</span>,
-            <span class="ident">Ordering::Acquire</span>,
+        <span class="kw">match </span>slot.lifecycle.compare_exchange(
+            curr_lifecycle,
+            new_lifecycle,
+            Ordering::AcqRel,
+            Ordering::Acquire,
         ) {
             <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">test_println!</span>(<span class="string">&quot;--&gt; advanced to PRESENT; done&quot;</span>);
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
+            <span class="prelude-val">Err</span>(actual) =&gt; {
                 <span class="macro">test_println!</span>(
                     <span class="string">&quot;--&gt; lifecycle changed; actual={:?}&quot;</span>,
-                    <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">actual</span>)
+                    Lifecycle::&lt;C&gt;::from_packed(actual)
                 );
-                <span class="ident">curr_lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
+                curr_lifecycle = actual;
             }
         }
 
-        <span class="comment">// if the state was no longer the prior state, we are now responsible</span>
-        <span class="comment">// for releasing the slot.</span>
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">refs</span> <span class="op">=</span> <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">curr_lifecycle</span>);
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Lifecycle</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="ident">curr_lifecycle</span>).<span class="ident">state</span>;
+        <span class="comment">// if the state was no longer the prior state, we are now responsible
+        // for releasing the slot.
+        </span><span class="kw">loop </span>{
+            <span class="kw">let </span>refs = RefCount::&lt;C&gt;::from_packed(curr_lifecycle);
+            <span class="kw">let </span>state = Lifecycle::&lt;C&gt;::from_packed(curr_lifecycle).state;
 
             <span class="macro">test_println!</span>(
                 <span class="string">&quot;-&gt; InitGuard::release; lifecycle={:#x}; state={:?}; refs={:?};&quot;</span>,
-                <span class="ident">curr_lifecycle</span>,
-                <span class="ident">state</span>,
-                <span class="ident">refs</span>,
+                curr_lifecycle,
+                state,
+                refs,
             );
 
-            <span class="macro">debug_assert!</span>(<span class="ident">state</span> <span class="op">==</span> <span class="ident">State::Marked</span> <span class="op">|</span><span class="op">|</span> <span class="ident">thread::panicking</span>(), <span class="string">&quot;state was not MARKED; someone else has removed the slot while we have exclusive access!\nactual={:?}&quot;</span>, <span class="ident">state</span>);
-            <span class="macro">debug_assert!</span>(<span class="ident">refs</span>.<span class="ident">value</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">thread::panicking</span>(), <span class="string">&quot;ref count was not 0; someone else has referenced the slot while we have exclusive access!\nactual={:?}&quot;</span>, <span class="ident">refs</span>);
-            <span class="kw">let</span> <span class="ident">new_lifecycle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">generation</span>().<span class="ident">pack</span>(<span class="ident">State::Removing</span> <span class="kw">as</span> <span class="ident">usize</span>);
+            <span class="macro">debug_assert!</span>(state == State::Marked || thread::panicking(), <span class="string">&quot;state was not MARKED; someone else has removed the slot while we have exclusive access!\nactual={:?}&quot;</span>, state);
+            <span class="macro">debug_assert!</span>(refs.value == <span class="number">0 </span>|| thread::panicking(), <span class="string">&quot;ref count was not 0; someone else has referenced the slot while we have exclusive access!\nactual={:?}&quot;</span>, refs);
+            <span class="kw">let </span>new_lifecycle = <span class="self">self</span>.generation().pack(State::Removing <span class="kw">as </span>usize);
 
-            <span class="kw">match</span> <span class="ident">slot</span>.<span class="ident">lifecycle</span>.<span class="ident">compare_exchange</span>(
-                <span class="ident">curr_lifecycle</span>,
-                <span class="ident">new_lifecycle</span>,
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="kw">match </span>slot.lifecycle.compare_exchange(
+                curr_lifecycle,
+                new_lifecycle,
+                Ordering::AcqRel,
+                Ordering::Acquire,
             ) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
                     <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; InitGuard::RELEASE: done!&quot;</span>);
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
-                    <span class="macro">debug_assert!</span>(<span class="ident">thread::panicking</span>(), <span class="string">&quot;we should not have to retry this CAS!&quot;</span>);
-                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; InitGuard::release; retry, actual={:#x}&quot;</span>, <span class="ident">actual</span>);
-                    <span class="ident">curr_lifecycle</span> <span class="op">=</span> <span class="ident">actual</span>;
+                <span class="prelude-val">Err</span>(actual) =&gt; {
+                    <span class="macro">debug_assert!</span>(thread::panicking(), <span class="string">&quot;we should not have to retry this CAS!&quot;</span>);
+                    <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; InitGuard::release; retry, actual={:#x}&quot;</span>, actual);
+                    curr_lifecycle = actual;
                 }
             }
         }
     }
 }
 
-<span class="comment">// === helpers ===</span>
+<span class="comment">// === helpers ===
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">exponential_backoff</span>(<span class="ident">exp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>) {
-    <span class="doccomment">/// Maximum exponent we can back off to.</span>
-    <span class="kw">const</span> <span class="ident">MAX_EXPONENT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>exponential_backoff(exp: <span class="kw-2">&amp;mut </span>usize) {
+    <span class="doccomment">/// Maximum exponent we can back off to.
+    </span><span class="kw">const </span>MAX_EXPONENT: usize = <span class="number">8</span>;
 
-    <span class="comment">// Issue 2^exp pause instructions.</span>
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">exp</span>) {
-        <span class="ident">hint::spin_loop</span>();
+    <span class="comment">// Issue 2^exp pause instructions.
+    </span><span class="kw">for _ in </span><span class="number">0</span>..(<span class="number">1 </span>&lt;&lt; <span class="kw-2">*</span>exp) {
+        hint::spin_loop();
     }
 
-    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MAX_EXPONENT</span> {
-        <span class="comment">// If we have reached the max backoff, also yield to the scheduler</span>
-        <span class="comment">// explicitly.</span>
-        <span class="ident"><span class="kw">crate</span>::sync::yield_now</span>();
-    } <span class="kw">else</span> {
-        <span class="comment">// Otherwise, increment the exponent.</span>
-        <span class="kw-2">*</span><span class="ident">exp</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">if </span><span class="kw-2">*</span>exp &gt;= MAX_EXPONENT {
+        <span class="comment">// If we have reached the max backoff, also yield to the scheduler
+        // explicitly.
+        </span><span class="kw">crate</span>::sync::yield_now();
+    } <span class="kw">else </span>{
+        <span class="comment">// Otherwise, increment the exponent.
+        </span><span class="kw-2">*</span>exp += <span class="number">1</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/name_server/name_server_state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name_server_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/name_server/name_server_state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name_server_state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -170,177 +170,177 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicU8</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::sync::atomic::{<span class="self">self</span>, AtomicU8};
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">futures_util::lock::Mutex</span>;
-<span class="kw">use</span> <span class="ident">proto::op::Edns</span>;
+<span class="kw">use </span>futures_util::lock::Mutex;
+<span class="kw">use </span>proto::op::Edns;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">NameServerState</span> {
-    <span class="ident">conn_state</span>: <span class="ident">AtomicU8</span>,
-    <span class="ident">remote_edns</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>NameServerState {
+    conn_state: AtomicU8,
+    remote_edns: Mutex&lt;Arc&lt;<span class="prelude-ty">Option</span>&lt;Edns&gt;&gt;&gt;,
 }
 
-<span class="doccomment">/// State of a connection with a remote NameServer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">enum</span> <span class="ident">NameServerStateInner</span> {
-    <span class="doccomment">/// For some reason the connection failed. For UDP this would generally be a timeout</span>
-    <span class="doccomment">///  for TCP this could be either Connection could never be established, or it</span>
-    <span class="doccomment">///  failed at some point after. The Failed state should *not* be entered due to an</span>
-    <span class="doccomment">///  error contained in a Message received from the server. In All cases to reestablish</span>
-    <span class="doccomment">///  a new connection will need to be created.</span>
-    <span class="ident">Failed</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Initial state, if Edns is not none, then Edns will be requested</span>
-    <span class="ident">Init</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// There has been successful communication with the remote.</span>
-    <span class="doccomment">///  if no Edns is associated, then the remote does not support Edns</span>
-    <span class="ident">Established</span> <span class="op">=</span> <span class="number">2</span>,
+<span class="doccomment">/// State of a connection with a remote NameServer.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Copy, Clone)]
+#[repr(u8)]
+</span><span class="kw">enum </span>NameServerStateInner {
+    <span class="doccomment">/// For some reason the connection failed. For UDP this would generally be a timeout
+    ///  for TCP this could be either Connection could never be established, or it
+    ///  failed at some point after. The Failed state should *not* be entered due to an
+    ///  error contained in a Message received from the server. In All cases to reestablish
+    ///  a new connection will need to be created.
+    </span>Failed = <span class="number">0</span>,
+    <span class="doccomment">/// Initial state, if Edns is not none, then Edns will be requested
+    </span>Init = <span class="number">1</span>,
+    <span class="doccomment">/// There has been successful communication with the remote.
+    ///  if no Edns is associated, then the remote does not support Edns
+    </span>Established = <span class="number">2</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">NameServerStateInner</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="doccomment">/// used for ordering purposes. The highest priority is placed on open connections</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">NameServerStateInner</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">val</span> <span class="kw">as</span> <span class="self">Self</span>
-    }
+<span class="kw">impl </span>From&lt;NameServerStateInner&gt; <span class="kw">for </span>u8 {
+    <span class="doccomment">/// used for ordering purposes. The highest priority is placed on open connections
+    </span><span class="kw">fn </span>from(val: NameServerStateInner) -&gt; <span class="self">Self </span>{
+        val <span class="kw">as </span><span class="self">Self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NameServerStateInner</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">val</span> {
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::Established</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Init</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Failed</span>,
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>NameServerStateInner {
+    <span class="kw">fn </span>from(val: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>val {
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::Established,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::Init,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Failed,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">NameServerState</span> {
-    <span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">conn_state</span>: <span class="ident">NameServerStateInner</span>) {
-        <span class="self">self</span>.<span class="ident">conn_state</span>
-            .<span class="ident">store</span>(<span class="ident">conn_state</span>.<span class="ident">into</span>(), <span class="ident">atomic::Ordering::Release</span>);
+<span class="kw">impl </span>NameServerState {
+    <span class="kw">fn </span>store(<span class="kw-2">&amp;</span><span class="self">self</span>, conn_state: NameServerStateInner) {
+        <span class="self">self</span>.conn_state
+            .store(conn_state.into(), atomic::Ordering::Release);
     }
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NameServerStateInner</span> {
-        <span class="ident">NameServerStateInner::from</span>(<span class="self">self</span>.<span class="ident">conn_state</span>.<span class="ident">load</span>(<span class="ident">atomic::Ordering::Acquire</span>))
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NameServerStateInner {
+        NameServerStateInner::from(<span class="self">self</span>.conn_state.load(atomic::Ordering::Acquire))
     }
 
-    <span class="doccomment">/// Set at the new Init state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If send_dns is some, this will be sent on the first request when it is established</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">_send_edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// TODO: need to track send_edns</span>
-        <span class="self">Self</span> {
-            <span class="ident">conn_state</span>: <span class="ident">AtomicU8::new</span>(<span class="ident">NameServerStateInner::Init</span>.<span class="ident">into</span>()),
-            <span class="ident">remote_edns</span>: <span class="ident">Mutex::new</span>(<span class="ident">Arc::new</span>(<span class="prelude-val">None</span>)),
+    <span class="doccomment">/// Set at the new Init state
+    ///
+    /// If send_dns is some, this will be sent on the first request when it is established
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init(_send_edns: <span class="prelude-ty">Option</span>&lt;Edns&gt;) -&gt; <span class="self">Self </span>{
+        <span class="comment">// TODO: need to track send_edns
+        </span><span class="self">Self </span>{
+            conn_state: AtomicU8::new(NameServerStateInner::Init.into()),
+            remote_edns: Mutex::new(Arc::new(<span class="prelude-val">None</span>)),
         }
     }
 
-    <span class="doccomment">/// Set at the new Init state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If send_dns is some, this will be sent on the first request when it is established</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reinit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_send_edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>) {
-        <span class="comment">// eventually do this</span>
-        <span class="comment">// self.send_edns.lock() = send_edns;</span>
+    <span class="doccomment">/// Set at the new Init state
+    ///
+    /// If send_dns is some, this will be sent on the first request when it is established
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reinit(<span class="kw-2">&amp;</span><span class="self">self</span>, _send_edns: <span class="prelude-ty">Option</span>&lt;Edns&gt;) {
+        <span class="comment">// eventually do this
+        // self.send_edns.lock() = send_edns;
 
-        <span class="self">self</span>.<span class="ident">store</span>(<span class="ident">NameServerStateInner::Init</span>);
+        </span><span class="self">self</span>.store(NameServerStateInner::Init);
     }
 
-    <span class="doccomment">/// Transition to the Established state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If remote_edns is Some, then it will be used to effect things like buffer sizes based on</span>
-    <span class="doccomment">///   the remote&#39;s support.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">establish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">remote_edns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Edns</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="ident">remote_edns</span>.<span class="ident">is_some</span>() {
-            <span class="comment">// best effort locking, we&#39;ll assume a different user of this connection is storing the same thing...</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">current_edns</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">remote_edns</span>.<span class="ident">try_lock</span>() {
-                <span class="kw-2">*</span><span class="ident">current_edns</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">remote_edns</span>)
+    <span class="doccomment">/// Transition to the Established state
+    ///
+    /// If remote_edns is Some, then it will be used to effect things like buffer sizes based on
+    ///   the remote&#39;s support.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>establish(<span class="kw-2">&amp;</span><span class="self">self</span>, remote_edns: <span class="prelude-ty">Option</span>&lt;Edns&gt;) {
+        <span class="kw">if </span>remote_edns.is_some() {
+            <span class="comment">// best effort locking, we&#39;ll assume a different user of this connection is storing the same thing...
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>current_edns) = <span class="self">self</span>.remote_edns.try_lock() {
+                <span class="kw-2">*</span>current_edns = Arc::new(remote_edns)
             }
         }
 
-        <span class="self">self</span>.<span class="ident">store</span>(<span class="ident">NameServerStateInner::Established</span>);
+        <span class="self">self</span>.store(NameServerStateInner::Established);
     }
 
-    <span class="doccomment">/// transition to the Failed state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// when is the time of the failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * when - deprecated</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_when</span>: <span class="comment">/* FIXME: remove in 0.20 */</span> <span class="ident">Instant</span>) {
-        <span class="self">self</span>.<span class="ident">store</span>(<span class="ident">NameServerStateInner::Failed</span>);
+    <span class="doccomment">/// transition to the Failed state
+    ///
+    /// when is the time of the failure
+    ///
+    /// * when - deprecated
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fail(<span class="kw-2">&amp;</span><span class="self">self</span>, _when: <span class="comment">/* FIXME: remove in 0.20 */ </span>Instant) {
+        <span class="self">self</span>.store(NameServerStateInner::Failed);
     }
 
-    <span class="doccomment">/// True if this is in the Failed state</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_failed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">NameServerStateInner::Failed</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">load</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">NameServerStateInner</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> (<span class="ident">self_num</span>, <span class="ident">other_num</span>) <span class="op">=</span> (<span class="ident">u8::from</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">u8::from</span>(<span class="kw-2">*</span><span class="ident">other</span>));
-        <span class="ident">self_num</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other_num</span>)
+    <span class="doccomment">/// True if this is in the Failed state
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_failed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        NameServerStateInner::Failed == <span class="self">self</span>.load()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">NameServerStateInner</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>Ord <span class="kw">for </span>NameServerStateInner {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span>(self_num, other_num) = (u8::from(<span class="kw-2">*</span><span class="self">self</span>), u8::from(<span class="kw-2">*</span>other));
+        self_num.cmp(<span class="kw-2">&amp;</span>other_num)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">NameServerState</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">load</span>();
-        <span class="self">self</span>.<span class="ident">load</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>)
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>NameServerStateInner {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">NameServerState</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>Ord <span class="kw">for </span>NameServerState {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span>other = other.load();
+        <span class="self">self</span>.load().cmp(<span class="kw-2">&amp;</span>other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">NameServerState</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">load</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">load</span>()
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>NameServerState {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">NameServerState</span> {}
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>NameServerState {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.load() == other.load()
+    }
+}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::name_server::NameServerState</span>;
+<span class="kw">impl </span>Eq <span class="kw">for </span>NameServerState {}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_state_cmp</span>() {
-        <span class="kw">let</span> <span class="ident">init</span> <span class="op">=</span> <span class="ident">NameServerState::init</span>(<span class="prelude-val">None</span>);
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::name_server::NameServerState;
 
-        <span class="kw">let</span> <span class="ident">established</span> <span class="op">=</span> <span class="ident">NameServerState::init</span>(<span class="prelude-val">None</span>);
-        <span class="ident">established</span>.<span class="ident">establish</span>(<span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_state_cmp() {
+        <span class="kw">let </span>init = NameServerState::init(<span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="ident">failed</span> <span class="op">=</span> <span class="ident">NameServerState::init</span>(<span class="prelude-val">None</span>);
-        <span class="ident">failed</span>.<span class="ident">fail</span>(<span class="ident">Instant::now</span>());
+        <span class="kw">let </span>established = NameServerState::init(<span class="prelude-val">None</span>);
+        established.establish(<span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">init</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">init</span>), <span class="ident">Ordering::Equal</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">init</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">established</span>), <span class="ident">Ordering::Less</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">init</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">failed</span>), <span class="ident">Ordering::Greater</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">established</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">established</span>), <span class="ident">Ordering::Equal</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">established</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">failed</span>), <span class="ident">Ordering::Greater</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">failed</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">failed</span>), <span class="ident">Ordering::Equal</span>);
+        <span class="kw">let </span>failed = NameServerState::init(<span class="prelude-val">None</span>);
+        failed.fail(Instant::now());
+
+        <span class="macro">assert_eq!</span>(init.cmp(<span class="kw-2">&amp;</span>init), Ordering::Equal);
+        <span class="macro">assert_eq!</span>(init.cmp(<span class="kw-2">&amp;</span>established), Ordering::Less);
+        <span class="macro">assert_eq!</span>(init.cmp(<span class="kw-2">&amp;</span>failed), Ordering::Greater);
+        <span class="macro">assert_eq!</span>(established.cmp(<span class="kw-2">&amp;</span>established), Ordering::Equal);
+        <span class="macro">assert_eq!</span>(established.cmp(<span class="kw-2">&amp;</span>failed), Ordering::Greater);
+        <span class="macro">assert_eq!</span>(failed.cmp(<span class="kw-2">&amp;</span>failed), Ordering::Equal);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

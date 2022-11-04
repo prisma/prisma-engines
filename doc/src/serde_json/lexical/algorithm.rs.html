@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -191,198 +191,198 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="doccomment">//! Algorithms to efficiently convert strings to floats.</span>
+</span><span class="doccomment">//! Algorithms to efficiently convert strings to floats.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::bhcomp</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::cached</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::errors</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::float::ExtendedFloat</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::num</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::small_powers</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::bhcomp::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::cached::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::errors::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::float::ExtendedFloat;
+<span class="kw">use </span><span class="kw">super</span>::num::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::small_powers::<span class="kw-2">*</span>;
 
-<span class="comment">// FAST</span>
-<span class="comment">// ----</span>
+<span class="comment">// FAST
+// ----
 
-<span class="doccomment">/// Convert mantissa to exact value for a non-base2 power.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the resulting float and if the value can be represented exactly.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fast_path</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">mantissa</span>: <span class="ident">u64</span>, <span class="ident">exponent</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+</span><span class="doccomment">/// Convert mantissa to exact value for a non-base2 power.
+///
+/// Returns the resulting float and if the value can be represented exactly.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fast_path&lt;F&gt;(mantissa: u64, exponent: i32) -&gt; <span class="prelude-ty">Option</span>&lt;F&gt;
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="comment">// `mantissa &gt;&gt; (F::MANTISSA_SIZE+1) != 0` effectively checks if the</span>
-    <span class="comment">// value has a no bits above the hidden bit, which is what we want.</span>
-    <span class="kw">let</span> (<span class="ident">min_exp</span>, <span class="ident">max_exp</span>) <span class="op">=</span> <span class="ident">F::exponent_limit</span>();
-    <span class="kw">let</span> <span class="ident">shift_exp</span> <span class="op">=</span> <span class="ident">F::mantissa_limit</span>();
-    <span class="kw">let</span> <span class="ident">mantissa_size</span> <span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">if</span> <span class="ident">mantissa</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">F::ZERO</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mantissa</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">mantissa_size</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="comment">// Would require truncation of the mantissa.</span>
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="comment">// 0 exponent, same as value, exact representation.</span>
-        <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="ident">F::as_cast</span>(<span class="ident">mantissa</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">float</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">min_exp</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_exp</span> {
-        <span class="comment">// Value can be exactly represented, return the value.</span>
-        <span class="comment">// Do not use powi, since powi can incrementally introduce</span>
-        <span class="comment">// error.</span>
-        <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="ident">F::as_cast</span>(<span class="ident">mantissa</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">float</span>.<span class="ident">pow10</span>(<span class="ident">exponent</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">exponent</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_exp</span> <span class="op">+</span> <span class="ident">shift_exp</span> {
-        <span class="comment">// Check to see if we have a disguised fast-path, where the</span>
-        <span class="comment">// number of digits in the mantissa is very small, but and</span>
-        <span class="comment">// so digits can be shifted from the exponent to the mantissa.</span>
-        <span class="comment">// https://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/</span>
-        <span class="kw">let</span> <span class="ident">small_powers</span> <span class="op">=</span> <span class="ident">POW10_64</span>;
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">-</span> <span class="ident">max_exp</span>;
-        <span class="kw">let</span> <span class="ident">power</span> <span class="op">=</span> <span class="ident">small_powers</span>[<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">usize</span>];
+    <span class="comment">// `mantissa &gt;&gt; (F::MANTISSA_SIZE+1) != 0` effectively checks if the
+    // value has a no bits above the hidden bit, which is what we want.
+    </span><span class="kw">let </span>(min_exp, max_exp) = F::exponent_limit();
+    <span class="kw">let </span>shift_exp = F::mantissa_limit();
+    <span class="kw">let </span>mantissa_size = F::MANTISSA_SIZE + <span class="number">1</span>;
+    <span class="kw">if </span>mantissa == <span class="number">0 </span>{
+        <span class="prelude-val">Some</span>(F::ZERO)
+    } <span class="kw">else if </span>mantissa &gt;&gt; mantissa_size != <span class="number">0 </span>{
+        <span class="comment">// Would require truncation of the mantissa.
+        </span><span class="prelude-val">None
+    </span>} <span class="kw">else if </span>exponent == <span class="number">0 </span>{
+        <span class="comment">// 0 exponent, same as value, exact representation.
+        </span><span class="kw">let </span>float = F::as_cast(mantissa);
+        <span class="prelude-val">Some</span>(float)
+    } <span class="kw">else if </span>exponent &gt;= min_exp &amp;&amp; exponent &lt;= max_exp {
+        <span class="comment">// Value can be exactly represented, return the value.
+        // Do not use powi, since powi can incrementally introduce
+        // error.
+        </span><span class="kw">let </span>float = F::as_cast(mantissa);
+        <span class="prelude-val">Some</span>(float.pow10(exponent))
+    } <span class="kw">else if </span>exponent &gt;= <span class="number">0 </span>&amp;&amp; exponent &lt;= max_exp + shift_exp {
+        <span class="comment">// Check to see if we have a disguised fast-path, where the
+        // number of digits in the mantissa is very small, but and
+        // so digits can be shifted from the exponent to the mantissa.
+        // https://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
+        </span><span class="kw">let </span>small_powers = POW10_64;
+        <span class="kw">let </span>shift = exponent - max_exp;
+        <span class="kw">let </span>power = small_powers[shift <span class="kw">as </span>usize];
 
-        <span class="comment">// Compute the product of the power, if it overflows,</span>
-        <span class="comment">// prematurely return early, otherwise, if we didn&#39;t overshoot,</span>
-        <span class="comment">// we can get an exact value.</span>
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">mantissa</span>.<span class="ident">checked_mul</span>(<span class="ident">power</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">mantissa_size</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// Use powi, since it&#39;s correct, and faster on</span>
-            <span class="comment">// the fast-path.</span>
-            <span class="kw">let</span> <span class="ident">float</span> <span class="op">=</span> <span class="ident">F::as_cast</span>(<span class="ident">value</span>);
-            <span class="prelude-val">Some</span>(<span class="ident">float</span>.<span class="ident">pow10</span>(<span class="ident">max_exp</span>))
+        <span class="comment">// Compute the product of the power, if it overflows,
+        // prematurely return early, otherwise, if we didn&#39;t overshoot,
+        // we can get an exact value.
+        </span><span class="kw">let </span>value = mantissa.checked_mul(power)<span class="question-mark">?</span>;
+        <span class="kw">if </span>value &gt;&gt; mantissa_size != <span class="number">0 </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// Use powi, since it&#39;s correct, and faster on
+            // the fast-path.
+            </span><span class="kw">let </span>float = F::as_cast(value);
+            <span class="prelude-val">Some</span>(float.pow10(max_exp))
         }
-    } <span class="kw">else</span> {
-        <span class="comment">// Cannot be exactly represented, exponent too small or too big,</span>
-        <span class="comment">// would require truncation.</span>
-        <span class="prelude-val">None</span>
-    }
+    } <span class="kw">else </span>{
+        <span class="comment">// Cannot be exactly represented, exponent too small or too big,
+        // would require truncation.
+        </span><span class="prelude-val">None
+    </span>}
 }
 
-<span class="comment">// MODERATE</span>
-<span class="comment">// --------</span>
+<span class="comment">// MODERATE
+// --------
 
-<span class="doccomment">/// Multiply the floating-point by the exponent.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Multiply by pre-calculated powers of the base, modify the extended-</span>
-<span class="doccomment">/// float, and return if new value and if the value can be represented</span>
-<span class="doccomment">/// accurately.</span>
-<span class="kw">fn</span> <span class="ident">multiply_exponent_extended</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">exponent</span>: <span class="ident">i32</span>, <span class="ident">truncated</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+</span><span class="doccomment">/// Multiply the floating-point by the exponent.
+///
+/// Multiply by pre-calculated powers of the base, modify the extended-
+/// float, and return if new value and if the value can be represented
+/// accurately.
+</span><span class="kw">fn </span>multiply_exponent_extended&lt;F&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, exponent: i32, truncated: bool) -&gt; bool
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="kw">let</span> <span class="ident">powers</span> <span class="op">=</span> <span class="ident">ExtendedFloat::get_powers</span>();
-    <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">exponent</span>.<span class="ident">saturating_add</span>(<span class="ident">powers</span>.<span class="ident">bias</span>);
-    <span class="kw">let</span> <span class="ident">small_index</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">%</span> <span class="ident">powers</span>.<span class="ident">step</span>;
-    <span class="kw">let</span> <span class="ident">large_index</span> <span class="op">=</span> <span class="ident">exponent</span> <span class="op">/</span> <span class="ident">powers</span>.<span class="ident">step</span>;
-    <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="comment">// Guaranteed underflow (assign 0).</span>
-        <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="bool-val">true</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">large_index</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">powers</span>.<span class="ident">large</span>.<span class="ident">len</span>() {
-        <span class="comment">// Overflow (assign infinity)</span>
-        <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>;
-        <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">=</span> <span class="number">0x7FF</span>;
-        <span class="bool-val">true</span>
-    } <span class="kw">else</span> {
-        <span class="comment">// Within the valid exponent range, multiply by the large and small</span>
-        <span class="comment">// exponents and return the resulting value.</span>
+    <span class="kw">let </span>powers = ExtendedFloat::get_powers();
+    <span class="kw">let </span>exponent = exponent.saturating_add(powers.bias);
+    <span class="kw">let </span>small_index = exponent % powers.step;
+    <span class="kw">let </span>large_index = exponent / powers.step;
+    <span class="kw">if </span>exponent &lt; <span class="number">0 </span>{
+        <span class="comment">// Guaranteed underflow (assign 0).
+        </span>fp.mant = <span class="number">0</span>;
+        <span class="bool-val">true
+    </span>} <span class="kw">else if </span>large_index <span class="kw">as </span>usize &gt;= powers.large.len() {
+        <span class="comment">// Overflow (assign infinity)
+        </span>fp.mant = <span class="number">1 </span>&lt;&lt; <span class="number">63</span>;
+        fp.exp = <span class="number">0x7FF</span>;
+        <span class="bool-val">true
+    </span>} <span class="kw">else </span>{
+        <span class="comment">// Within the valid exponent range, multiply by the large and small
+        // exponents and return the resulting value.
 
-        <span class="comment">// Track errors to as a factor of unit in last-precision.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="ident">truncated</span> {
-            <span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u64::error_halfscale</span>();
+        // Track errors to as a factor of unit in last-precision.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>errors: u32 = <span class="number">0</span>;
+        <span class="kw">if </span>truncated {
+            errors += u64::error_halfscale();
         }
 
-        <span class="comment">// Multiply by the small power.</span>
-        <span class="comment">// Check if we can directly multiply by an integer, if not,</span>
-        <span class="comment">// use extended-precision multiplication.</span>
-        <span class="kw">match</span> <span class="ident">fp</span>
-            .<span class="ident">mant</span>
-            .<span class="ident">overflowing_mul</span>(<span class="ident">powers</span>.<span class="ident">get_small_int</span>(<span class="ident">small_index</span> <span class="kw">as</span> <span class="ident">usize</span>))
+        <span class="comment">// Multiply by the small power.
+        // Check if we can directly multiply by an integer, if not,
+        // use extended-precision multiplication.
+        </span><span class="kw">match </span>fp
+            .mant
+            .overflowing_mul(powers.get_small_int(small_index <span class="kw">as </span>usize))
         {
-            <span class="comment">// Overflow, multiplication unsuccessful, go slow path.</span>
-            (<span class="kw">_</span>, <span class="bool-val">true</span>) =&gt; {
-                <span class="ident">fp</span>.<span class="ident">normalize</span>();
-                <span class="ident">fp</span>.<span class="ident">imul</span>(<span class="kw-2">&amp;</span><span class="ident">powers</span>.<span class="ident">get_small</span>(<span class="ident">small_index</span> <span class="kw">as</span> <span class="ident">usize</span>));
-                <span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u64::error_halfscale</span>();
+            <span class="comment">// Overflow, multiplication unsuccessful, go slow path.
+            </span>(<span class="kw">_</span>, <span class="bool-val">true</span>) =&gt; {
+                fp.normalize();
+                fp.imul(<span class="kw-2">&amp;</span>powers.get_small(small_index <span class="kw">as </span>usize));
+                errors += u64::error_halfscale();
             }
-            <span class="comment">// No overflow, multiplication successful.</span>
-            (<span class="ident">mant</span>, <span class="bool-val">false</span>) =&gt; {
-                <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="ident">mant</span>;
-                <span class="ident">fp</span>.<span class="ident">normalize</span>();
+            <span class="comment">// No overflow, multiplication successful.
+            </span>(mant, <span class="bool-val">false</span>) =&gt; {
+                fp.mant = mant;
+                fp.normalize();
             }
         }
 
-        <span class="comment">// Multiply by the large power</span>
-        <span class="ident">fp</span>.<span class="ident">imul</span>(<span class="kw-2">&amp;</span><span class="ident">powers</span>.<span class="ident">get_large</span>(<span class="ident">large_index</span> <span class="kw">as</span> <span class="ident">usize</span>));
-        <span class="kw">if</span> <span class="ident">errors</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Multiply by the large power
+        </span>fp.imul(<span class="kw-2">&amp;</span>powers.get_large(large_index <span class="kw">as </span>usize));
+        <span class="kw">if </span>errors &gt; <span class="number">0 </span>{
+            errors += <span class="number">1</span>;
         }
-        <span class="ident">errors</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u64::error_halfscale</span>();
+        errors += u64::error_halfscale();
 
-        <span class="comment">// Normalize the floating point (and the errors).</span>
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">normalize</span>();
-        <span class="ident">errors</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">shift</span>;
+        <span class="comment">// Normalize the floating point (and the errors).
+        </span><span class="kw">let </span>shift = fp.normalize();
+        errors &lt;&lt;= shift;
 
-        <span class="ident">u64::error_is_accurate</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">errors</span>, <span class="ident">fp</span>)
+        u64::error_is_accurate::&lt;F&gt;(errors, fp)
     }
 }
 
-<span class="doccomment">/// Create a precise native float using an intermediate extended-precision float.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Return the float approximation and if the value can be accurately</span>
-<span class="doccomment">/// represented with mantissa bits of precision.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">moderate_path</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">mantissa</span>: <span class="ident">u64</span>,
-    <span class="ident">exponent</span>: <span class="ident">i32</span>,
-    <span class="ident">truncated</span>: <span class="ident">bool</span>,
-) -&gt; (<span class="ident">ExtendedFloat</span>, <span class="ident">bool</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+<span class="doccomment">/// Create a precise native float using an intermediate extended-precision float.
+///
+/// Return the float approximation and if the value can be accurately
+/// represented with mantissa bits of precision.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>moderate_path&lt;F&gt;(
+    mantissa: u64,
+    exponent: i32,
+    truncated: bool,
+) -&gt; (ExtendedFloat, bool)
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fp</span> <span class="op">=</span> <span class="ident">ExtendedFloat</span> {
-        <span class="ident">mant</span>: <span class="ident">mantissa</span>,
-        <span class="ident">exp</span>: <span class="number">0</span>,
+    <span class="kw">let </span><span class="kw-2">mut </span>fp = ExtendedFloat {
+        mant: mantissa,
+        exp: <span class="number">0</span>,
     };
-    <span class="kw">let</span> <span class="ident">valid</span> <span class="op">=</span> <span class="ident">multiply_exponent_extended</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fp</span>, <span class="ident">exponent</span>, <span class="ident">truncated</span>);
-    (<span class="ident">fp</span>, <span class="ident">valid</span>)
+    <span class="kw">let </span>valid = multiply_exponent_extended::&lt;F&gt;(<span class="kw-2">&amp;mut </span>fp, exponent, truncated);
+    (fp, valid)
 }
 
-<span class="comment">// FALLBACK</span>
-<span class="comment">// --------</span>
+<span class="comment">// FALLBACK
+// --------
 
-<span class="doccomment">/// Fallback path when the fast path does not work.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Uses the moderate path, if applicable, otherwise, uses the slow path</span>
-<span class="doccomment">/// as required.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fallback_path</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">integer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">fraction</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">mantissa</span>: <span class="ident">u64</span>,
-    <span class="ident">exponent</span>: <span class="ident">i32</span>,
-    <span class="ident">mantissa_exponent</span>: <span class="ident">i32</span>,
-    <span class="ident">truncated</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">F</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+</span><span class="doccomment">/// Fallback path when the fast path does not work.
+///
+/// Uses the moderate path, if applicable, otherwise, uses the slow path
+/// as required.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fallback_path&lt;F&gt;(
+    integer: <span class="kw-2">&amp;</span>[u8],
+    fraction: <span class="kw-2">&amp;</span>[u8],
+    mantissa: u64,
+    exponent: i32,
+    mantissa_exponent: i32,
+    truncated: bool,
+) -&gt; F
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="comment">// Moderate path (use an extended 80-bit representation).</span>
-    <span class="kw">let</span> (<span class="ident">fp</span>, <span class="ident">valid</span>) <span class="op">=</span> <span class="ident">moderate_path</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">mantissa</span>, <span class="ident">mantissa_exponent</span>, <span class="ident">truncated</span>);
-    <span class="kw">if</span> <span class="ident">valid</span> {
-        <span class="kw">return</span> <span class="ident">fp</span>.<span class="ident">into_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>();
+    <span class="comment">// Moderate path (use an extended 80-bit representation).
+    </span><span class="kw">let </span>(fp, valid) = moderate_path::&lt;F&gt;(mantissa, mantissa_exponent, truncated);
+    <span class="kw">if </span>valid {
+        <span class="kw">return </span>fp.into_float::&lt;F&gt;();
     }
 
-    <span class="comment">// Slow path, fast path didn&#39;t work.</span>
-    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">into_downward_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>();
-    <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_special</span>() {
-        <span class="comment">// We have a non-finite number, we get to leave early.</span>
-        <span class="ident">b</span>
-    } <span class="kw">else</span> {
-        <span class="ident">bhcomp</span>(<span class="ident">b</span>, <span class="ident">integer</span>, <span class="ident">fraction</span>, <span class="ident">exponent</span>)
+    <span class="comment">// Slow path, fast path didn&#39;t work.
+    </span><span class="kw">let </span>b = fp.into_downward_float::&lt;F&gt;();
+    <span class="kw">if </span>b.is_special() {
+        <span class="comment">// We have a non-finite number, we get to leave early.
+        </span>b
+    } <span class="kw">else </span>{
+        bhcomp(b, integer, fraction, exponent)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

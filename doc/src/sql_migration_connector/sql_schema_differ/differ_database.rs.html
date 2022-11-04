@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/differ_database.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>differ_database.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/differ_database.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>differ_database.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -323,330 +323,330 @@
 <span id="323">323</span>
 <span id="324">324</span>
 <span id="325">325</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">column</span>, <span class="ident">enums::EnumDiffer</span>, <span class="ident">table::TableDiffer</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">SqlDatabaseSchema</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">postgres</span>::{<span class="ident">ExtensionId</span>, <span class="ident">ExtensionWalker</span>, <span class="ident">PostgresSchemaExt</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">EnumWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ColumnId</span>, <span class="ident">NamespaceId</span>, <span class="ident">NamespaceWalker</span>, <span class="ident">TableId</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{column, enums::EnumDiffer, table::TableDiffer};
+<span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
+<span class="kw">use </span>sql_schema_describer::{
+    postgres::{ExtensionId, ExtensionWalker, PostgresSchemaExt},
+    walkers::{ColumnWalker, EnumWalker, TableWalker},
+    ColumnId, NamespaceId, NamespaceWalker, TableId,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">BTreeSet</span>, <span class="ident">HashMap</span>},
-    <span class="ident">ops::Bound</span>,
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    collections::{BTreeMap, BTreeSet, HashMap},
+    ops::Bound,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">SqlFlavour</span>,
-    <span class="doccomment">/// The schemas being diffed</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Namespace name -&gt; namespace indexes.</span>
-    <span class="ident">namespaces</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NamespaceId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Table name -&gt; table indexes.</span>
-    <span class="ident">tables</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// (table_idxs, column_name) -&gt; column_idxs. BTreeMap because we want range</span>
-    <span class="doccomment">/// queries (-&gt; all the columns in a table).</span>
-    <span class="ident">columns</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// (table_idx, column_idx) -&gt; ColumnChanges</span>
-    <span class="ident">column_changes</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">column::ColumnChanges</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Postgres extension name -&gt; extension indexes.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">extensions</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtensionId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Tables that will need to be completely redefined (dropped and recreated) for the migration</span>
-    <span class="doccomment">/// to succeed. It needs to be crate public because it is set from the flavour.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tables_to_redefine</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) flavour: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>SqlFlavour,
+    <span class="doccomment">/// The schemas being diffed
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) schemas: Pair&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SqlDatabaseSchema&gt;,
+    <span class="doccomment">/// Namespace name -&gt; namespace indexes.
+    </span>namespaces: HashMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Pair&lt;<span class="prelude-ty">Option</span>&lt;NamespaceId&gt;&gt;&gt;,
+    <span class="doccomment">/// Table name -&gt; table indexes.
+    </span>tables: HashMap&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Pair&lt;<span class="prelude-ty">Option</span>&lt;TableId&gt;&gt;&gt;,
+    <span class="doccomment">/// (table_idxs, column_name) -&gt; column_idxs. BTreeMap because we want range
+    /// queries (-&gt; all the columns in a table).
+    </span>columns: BTreeMap&lt;(Pair&lt;TableId&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), Pair&lt;<span class="prelude-ty">Option</span>&lt;ColumnId&gt;&gt;&gt;,
+    <span class="doccomment">/// (table_idx, column_idx) -&gt; ColumnChanges
+    </span>column_changes: HashMap&lt;Pair&lt;ColumnId&gt;, column::ColumnChanges&gt;,
+    <span class="doccomment">/// Postgres extension name -&gt; extension indexes.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) extensions: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Pair&lt;<span class="prelude-ty">Option</span>&lt;ExtensionId&gt;&gt;&gt;,
+    <span class="doccomment">/// Tables that will need to be completely redefined (dropped and recreated) for the migration
+    /// to succeed. It needs to be crate public because it is set from the flavour.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) tables_to_redefine: BTreeSet&lt;Pair&lt;TableId&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">namespace_count_lb</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(
-            <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">namespaces_count</span>(),
-            <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">namespaces_count</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(schemas: Pair&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SqlDatabaseSchema&gt;, flavour: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>SqlFlavour) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>namespace_count_lb = std::cmp::max(
+            schemas.previous.describer_schema.namespaces_count(),
+            schemas.next.describer_schema.namespaces_count(),
         );
-        <span class="kw">let</span> <span class="ident">table_count_lb</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(
-            <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">tables_count</span>(),
-            <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">tables_count</span>(),
+        <span class="kw">let </span>table_count_lb = std::cmp::max(
+            schemas.previous.describer_schema.tables_count(),
+            schemas.next.describer_schema.tables_count(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">DifferDatabase</span> {
-            <span class="ident">flavour</span>,
-            <span class="ident">schemas</span>,
-            <span class="ident">namespaces</span>: <span class="ident">HashMap::with_capacity</span>(<span class="ident">namespace_count_lb</span>),
-            <span class="ident">tables</span>: <span class="ident">HashMap::with_capacity</span>(<span class="ident">table_count_lb</span>),
-            <span class="ident">columns</span>: <span class="ident">BTreeMap::new</span>(),
-            <span class="ident">column_changes</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">extensions</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">tables_to_redefine</span>: <span class="ident">Default::default</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>db = DifferDatabase {
+            flavour,
+            schemas,
+            namespaces: HashMap::with_capacity(namespace_count_lb),
+            tables: HashMap::with_capacity(table_count_lb),
+            columns: BTreeMap::new(),
+            column_changes: Default::default(),
+            extensions: Default::default(),
+            tables_to_redefine: Default::default(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns_cache</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="kw">let</span> <span class="ident">table_is_ignored</span> <span class="op">=</span> <span class="op">|</span><span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="ident">table_name</span> <span class="op">==</span> <span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span> <span class="op">|</span><span class="op">|</span> <span class="ident">flavour</span>.<span class="ident">table_should_be_ignored</span>(<span class="ident">table_name</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>columns_cache = HashMap::new();
+        <span class="kw">let </span>table_is_ignored = |table_name: <span class="kw-2">&amp;</span>str| {
+            table_name == <span class="kw">crate</span>::MIGRATIONS_TABLE_NAME || flavour.table_should_be_ignored(table_name)
         };
 
-        <span class="comment">// First insert all namespaces from the previous schema.</span>
-        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">walk_namespaces</span>() {
-            <span class="kw">let</span> <span class="ident">namespace_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
-                <span class="ident">namespace</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="ident">namespace</span>.<span class="ident">name</span>())
+        <span class="comment">// First insert all namespaces from the previous schema.
+        </span><span class="kw">for </span>namespace <span class="kw">in </span>schemas.previous.describer_schema.walk_namespaces() {
+            <span class="kw">let </span>namespace_name = <span class="kw">if </span>flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } <span class="kw">else </span>{
+                Cow::Borrowed(namespace.name())
             };
-            <span class="ident">db</span>.<span class="ident">namespaces</span>
-                .<span class="ident">insert</span>(<span class="ident">namespace_name</span>, <span class="ident">Pair::new</span>(<span class="prelude-val">Some</span>(<span class="ident">namespace</span>.<span class="ident">id</span>), <span class="prelude-val">None</span>));
+            db.namespaces
+                .insert(namespace_name, Pair::new(<span class="prelude-val">Some</span>(namespace.id), <span class="prelude-val">None</span>));
         }
 
-        <span class="comment">// Then insert all namespaces from the next schema.</span>
-        <span class="kw">for</span> <span class="ident">namespace</span> <span class="kw">in</span> <span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">walk_namespaces</span>() {
-            <span class="kw">let</span> <span class="ident">namespace_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
-                <span class="ident">namespace</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="ident">namespace</span>.<span class="ident">name</span>())
+        <span class="comment">// Then insert all namespaces from the next schema.
+        </span><span class="kw">for </span>namespace <span class="kw">in </span>schemas.next.describer_schema.walk_namespaces() {
+            <span class="kw">let </span>namespace_name = <span class="kw">if </span>flavour.lower_cases_table_names() {
+                namespace.name().to_ascii_lowercase().into()
+            } <span class="kw">else </span>{
+                Cow::Borrowed(namespace.name())
             };
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">namespaces</span>.<span class="ident">entry</span>(<span class="ident">namespace_name</span>).<span class="ident">or_default</span>();
-            <span class="ident">entry</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">namespace</span>.<span class="ident">id</span>);
+            <span class="kw">let </span>entry = db.namespaces.entry(namespace_name).or_default();
+            entry.next = <span class="prelude-val">Some</span>(namespace.id);
         }
 
-        <span class="comment">// First insert all tables from the previous schema.</span>
-        <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">schemas</span>
-            .<span class="ident">previous</span>
-            .<span class="ident">describer_schema</span>
-            .<span class="ident">table_walkers</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="ident">table_is_ignored</span>(<span class="ident">t</span>.<span class="ident">name</span>()))
+        <span class="comment">// First insert all tables from the previous schema.
+        </span><span class="kw">for </span>table <span class="kw">in </span>schemas
+            .previous
+            .describer_schema
+            .table_walkers()
+            .filter(|t| !table_is_ignored(t.name()))
         {
-            <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
-                <span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="ident">table</span>.<span class="ident">name</span>())
+            <span class="kw">let </span>table_name = <span class="kw">if </span>flavour.lower_cases_table_names() {
+                table.name().to_ascii_lowercase().into()
+            } <span class="kw">else </span>{
+                Cow::Borrowed(table.name())
             };
-            <span class="ident">db</span>.<span class="ident">tables</span>.<span class="ident">insert</span>(<span class="ident">table_name</span>, <span class="ident">Pair::new</span>(<span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">id</span>), <span class="prelude-val">None</span>));
+            db.tables.insert(table_name, Pair::new(<span class="prelude-val">Some</span>(table.id), <span class="prelude-val">None</span>));
         }
 
-        <span class="comment">// Then insert all tables from the next schema. Since we have all the</span>
-        <span class="comment">// relevant tables, we can fill in columns at this step.</span>
-        <span class="kw">for</span> <span class="ident">table</span> <span class="kw">in</span> <span class="ident">schemas</span>
-            .<span class="ident">next</span>
-            .<span class="ident">describer_schema</span>
-            .<span class="ident">table_walkers</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="ident">table_is_ignored</span>(<span class="ident">t</span>.<span class="ident">name</span>()))
+        <span class="comment">// Then insert all tables from the next schema. Since we have all the
+        // relevant tables, we can fill in columns at this step.
+        </span><span class="kw">for </span>table <span class="kw">in </span>schemas
+            .next
+            .describer_schema
+            .table_walkers()
+            .filter(|t| !table_is_ignored(t.name()))
         {
-            <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">lower_cases_table_names</span>() {
-                <span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">to_ascii_lowercase</span>().<span class="ident">into</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="ident">table</span>.<span class="ident">name</span>())
+            <span class="kw">let </span>table_name = <span class="kw">if </span>flavour.lower_cases_table_names() {
+                table.name().to_ascii_lowercase().into()
+            } <span class="kw">else </span>{
+                Cow::Borrowed(table.name())
             };
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">tables</span>.<span class="ident">entry</span>(<span class="ident">table_name</span>).<span class="ident">or_default</span>();
-            <span class="ident">entry</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">id</span>);
+            <span class="kw">let </span>entry = db.tables.entry(table_name).or_default();
+            entry.next = <span class="prelude-val">Some</span>(table.id);
 
-            <span class="comment">// Deal with tables that are both in the previous and the next</span>
-            <span class="comment">// schema: we are going to look at heir columns.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table_pair</span>) <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">transpose</span>() {
-                <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">table_pair</span>);
+            <span class="comment">// Deal with tables that are both in the previous and the next
+            // schema: we are going to look at heir columns.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(table_pair) = entry.transpose() {
+                <span class="kw">let </span>tables = schemas.walk(table_pair);
 
-                <span class="ident">columns_cache</span>.<span class="ident">clear</span>();
+                columns_cache.clear();
 
-                <span class="comment">// Same as for tables, walk the previous columns first.</span>
-                <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">columns</span>() {
-                    <span class="ident">columns_cache</span>.<span class="ident">insert</span>(<span class="ident">column</span>.<span class="ident">name</span>(), <span class="ident">Pair::new</span>(<span class="prelude-val">Some</span>(<span class="ident">column</span>.<span class="ident">id</span>), <span class="prelude-val">None</span>));
+                <span class="comment">// Same as for tables, walk the previous columns first.
+                </span><span class="kw">for </span>column <span class="kw">in </span>tables.previous.columns() {
+                    columns_cache.insert(column.name(), Pair::new(<span class="prelude-val">Some</span>(column.id), <span class="prelude-val">None</span>));
                 }
 
-                <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">columns</span>() {
-                    <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">columns_cache</span>.<span class="ident">entry</span>(<span class="ident">column</span>.<span class="ident">name</span>()).<span class="ident">or_default</span>();
-                    <span class="ident">entry</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">column</span>.<span class="ident">id</span>);
+                <span class="kw">for </span>column <span class="kw">in </span>tables.next.columns() {
+                    <span class="kw">let </span>entry = columns_cache.entry(column.name()).or_default();
+                    entry.next = <span class="prelude-val">Some</span>(column.id);
                 }
 
-                <span class="comment">// Special treatment for columns that are in both previous and</span>
-                <span class="comment">// next table: diff the column.</span>
-                <span class="kw">for</span> (<span class="ident">column_name</span>, <span class="ident">column_ids</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">columns_cache</span> {
-                    <span class="ident">db</span>.<span class="ident">columns</span>.<span class="ident">insert</span>((<span class="ident">table_pair</span>, <span class="ident">column_name</span>), <span class="kw-2">*</span><span class="ident">column_ids</span>);
+                <span class="comment">// Special treatment for columns that are in both previous and
+                // next table: diff the column.
+                </span><span class="kw">for </span>(column_name, column_ids) <span class="kw">in </span><span class="kw-2">&amp;</span>columns_cache {
+                    db.columns.insert((table_pair, column_name), <span class="kw-2">*</span>column_ids);
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">column_ids</span>) <span class="op">=</span> <span class="ident">column_ids</span>.<span class="ident">transpose</span>() {
-                        <span class="kw">let</span> <span class="ident">column_walkers</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">column_ids</span>);
-                        <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">column::all_changes</span>(<span class="ident">column_walkers</span>, <span class="ident">flavour</span>);
-                        <span class="ident">db</span>.<span class="ident">column_changes</span>.<span class="ident">insert</span>(<span class="ident">column_ids</span>, <span class="ident">changes</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(column_ids) = column_ids.transpose() {
+                        <span class="kw">let </span>column_walkers = schemas.walk(column_ids);
+                        <span class="kw">let </span>changes = column::all_changes(column_walkers, flavour);
+                        db.column_changes.insert(column_ids, changes);
                     }
                 }
             }
         }
 
-        <span class="ident">flavour</span>.<span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>);
-        <span class="ident">flavour</span>.<span class="ident">define_extensions</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>);
+        flavour.set_tables_to_redefine(<span class="kw-2">&amp;mut </span>db);
+        flavour.define_extensions(<span class="kw-2">&amp;mut </span>db);
 
-        <span class="ident">db</span>
+        db
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">all_column_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">cols</span>)<span class="op">|</span> <span class="ident">cols</span>.<span class="ident">transpose</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>all_column_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ColumnId&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.columns.iter().filter_map(|(<span class="kw">_</span>, cols)| cols.transpose())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">range_columns</span>(<span class="ident">table</span>).<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">transpose</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>, table: Pair&lt;TableId&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ColumnId&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.range_columns(table).filter_map(|(_k, v)| v.transpose())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_changes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>) -&gt; <span class="ident">column::ColumnChanges</span> {
-        <span class="self">self</span>.<span class="ident">column_changes</span>[<span class="kw-2">&amp;</span><span class="ident">column</span>]
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_changes(<span class="kw-2">&amp;</span><span class="self">self</span>, column: Pair&lt;ColumnId&gt;) -&gt; column::ColumnChanges {
+        <span class="self">self</span>.column_changes[<span class="kw-2">&amp;</span>column]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_changes_for_walkers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">walkers</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">column::ColumnChanges</span> {
-        <span class="self">self</span>.<span class="ident">column_changes</span>(<span class="ident">walkers</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_changes_for_walkers(<span class="kw-2">&amp;</span><span class="self">self</span>, walkers: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; column::ColumnChanges {
+        <span class="self">self</span>.column_changes(walkers.map(|c| c.id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">range_columns</span>(<span class="ident">table</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">previous</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">next</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, table: Pair&lt;TableId&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ColumnId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.range_columns(table)
+            .filter(|(_k, v)| v.previous.is_none())
+            .filter_map(|(_k, v)| v.next)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">previous</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">next</span>)
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">table_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.tables
+            .values()
+            .filter(|p| p.previous.is_none())
+            .filter_map(|p| p.next)
+            .map(<span class="kw">move </span>|table_id| <span class="self">self</span>.schemas.next.walk(table_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_namespaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">namespaces</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">previous</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">next</span>)
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">namespace_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">namespace_id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_namespaces(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = NamespaceWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.namespaces
+            .values()
+            .filter(|p| p.previous.is_none())
+            .filter_map(|p| p.next)
+            .map(<span class="kw">move </span>|namespace_id| <span class="self">self</span>.schemas.next.walk(namespace_id))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">range_columns</span>(<span class="ident">table</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">next</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">_k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>.<span class="ident">previous</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_columns(<span class="kw-2">&amp;</span><span class="self">self</span>, table: Pair&lt;TableId&gt;) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ColumnId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.range_columns(table)
+            .filter(|(_k, v)| v.next.is_none())
+            .filter_map(|(_k, v)| v.previous)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">next</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">previous</span>)
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">table_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.tables
+            .values()
+            .filter(|p| p.next.is_none())
+            .filter_map(|p| p.previous)
+            .map(<span class="kw">move </span>|table_id| <span class="self">self</span>.schemas.previous.walk(table_id))
     }
 
-    <span class="kw">fn</span> <span class="ident">range_columns</span>(
+    <span class="kw">fn </span>range_columns(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">table</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>
-            .<span class="ident">range</span>((<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span>(<span class="ident">table</span>, <span class="string">&quot;&quot;</span>)), <span class="ident">Bound::Unbounded</span>))
-            .<span class="ident">take_while</span>(<span class="kw">move</span> <span class="op">|</span>((<span class="ident">t</span>, <span class="kw">_</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">==</span> <span class="ident">table</span>)
+        table: Pair&lt;TableId&gt;,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (<span class="kw-2">&amp;</span>(Pair&lt;TableId&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), <span class="kw-2">&amp;</span>Pair&lt;<span class="prelude-ty">Option</span>&lt;ColumnId&gt;&gt;)&gt; {
+        <span class="self">self</span>.columns
+            .range((Bound::Included(<span class="kw-2">&amp;</span>(table, <span class="string">&quot;&quot;</span>)), Bound::Unbounded))
+            .take_while(<span class="kw">move </span>|((t, <span class="kw">_</span>), <span class="kw">_</span>)| <span class="kw-2">*</span>t == table)
     }
 
-    <span class="doccomment">/// An iterator over the tables that are present in both schemas.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">table_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TableDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">transpose</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">table_ids</span><span class="op">|</span> <span class="ident">TableDiffer</span> {
-                <span class="ident">tables</span>: <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">table_ids</span>),
-                <span class="ident">db</span>: <span class="self">self</span>,
+    <span class="doccomment">/// An iterator over the tables that are present in both schemas.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_pairs&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TableDiffer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.tables
+            .values()
+            .filter_map(|p| p.transpose())
+            .map(<span class="kw">move </span>|table_ids| TableDiffer {
+                tables: <span class="self">self</span>.schemas.walk(table_ids),
+                db: <span class="self">self</span>,
             })
     }
 
-    <span class="doccomment">/// Same as `table_pairs()`, but with the redefined tables filtered out.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">non_redefined_table_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TableDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">table_pairs</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">differ</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">tables_to_redefine</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">differ</span>.<span class="ident">table_ids</span>()))
+    <span class="doccomment">/// Same as `table_pairs()`, but with the redefined tables filtered out.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>non_redefined_table_pairs&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = TableDiffer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.table_pairs()
+            .filter(<span class="kw">move </span>|differ| !<span class="self">self</span>.tables_to_redefine.contains(<span class="kw-2">&amp;</span>differ.table_ids()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">table_is_redefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>
-            .<span class="ident">get</span>(<span class="ident">table_name</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">transpose</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ids</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tables_to_redefine</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ids</span>))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>table_is_redefined(<span class="kw-2">&amp;</span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.tables
+            .get(table_name)
+            .and_then(|pair| pair.transpose())
+            .map(|ids| <span class="self">self</span>.tables_to_redefine.contains(<span class="kw-2">&amp;</span>ids))
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">enum_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">previous_enums</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">next_enums</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">enums_match</span>(<span class="kw-2">&amp;</span><span class="ident">previous</span>, <span class="ident">next</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">EnumDiffer</span> {
-                    <span class="ident">enums</span>: <span class="ident">Pair::new</span>(<span class="ident">previous</span>, <span class="ident">next</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enum_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumDiffer&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.previous_enums().filter_map(<span class="kw">move </span>|previous| {
+            <span class="self">self</span>.next_enums()
+                .find(|next| enums_match(<span class="kw-2">&amp;</span>previous, next))
+                .map(|next| EnumDiffer {
+                    enums: Pair::new(previous, next),
                 })
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_enums</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">next_enums</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">previous_enums</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">previous</span><span class="op">|</span> <span class="ident">enums_match</span>(<span class="kw-2">&amp;</span><span class="ident">previous</span>, <span class="ident">next</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_enums&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.next_enums()
+            .filter(<span class="kw">move </span>|next| !<span class="self">self</span>.previous_enums().any(|previous| enums_match(<span class="kw-2">&amp;</span>previous, next)))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_enums</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">previous_enums</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">next_enums</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">enums_match</span>(<span class="ident">previous</span>, <span class="kw-2">&amp;</span><span class="ident">next</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_enums&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.previous_enums()
+            .filter(<span class="kw">move </span>|previous| !<span class="self">self</span>.next_enums().any(|next| enums_match(previous, <span class="kw-2">&amp;</span>next)))
     }
 
-    <span class="doccomment">/// Extensions not present in the previous schema.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">extensions</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">previous</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">next</span>)
+    <span class="doccomment">/// Extensions not present in the previous schema.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ExtensionId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.extensions
+            .values()
+            .filter(|pair| pair.previous.is_none())
+            .filter_map(|pair| pair.next)
     }
 
-    <span class="doccomment">/// Non-relocatable extensions present in both schemas with changed values.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">non_relocatable_extension_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">previous_extensions</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">next_extensions</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> {
-                    <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>()
-                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">extensions_match</span>(<span class="ident">previous</span>, <span class="kw-2">*</span><span class="ident">next</span>)
-                        <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">previous</span>.<span class="ident">relocatable</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">relocatable</span>())
+    <span class="doccomment">/// Non-relocatable extensions present in both schemas with changed values.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>non_relocatable_extension_pairs&lt;<span class="lifetime">&#39;db</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>,
+    ) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ExtensionWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.previous_extensions().filter_map(<span class="kw">move </span>|previous| {
+            <span class="self">self</span>.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        &amp;&amp; !extensions_match(previous, <span class="kw-2">*</span>next)
+                        &amp;&amp; (!previous.relocatable() &amp;&amp; !next.relocatable())
                 })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous</span>, <span class="ident">next</span>))
+                .map(|next| Pair::new(previous, next))
         })
     }
 
-    <span class="doccomment">/// Relocatable extensions present in both schemas with changed values.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relocatable_extension_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">previous_extensions</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">next_extensions</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> {
-                    <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>()
-                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">extensions_match</span>(<span class="ident">previous</span>, <span class="kw-2">*</span><span class="ident">next</span>)
-                        <span class="op">&amp;&amp;</span> (<span class="ident">previous</span>.<span class="ident">relocatable</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">relocatable</span>())
+    <span class="doccomment">/// Relocatable extensions present in both schemas with changed values.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relocatable_extension_pairs&lt;<span class="lifetime">&#39;db</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ExtensionWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.previous_extensions().filter_map(<span class="kw">move </span>|previous| {
+            <span class="self">self</span>.next_extensions()
+                .find(|next| {
+                    previous.name() == next.name()
+                        &amp;&amp; !extensions_match(previous, <span class="kw-2">*</span>next)
+                        &amp;&amp; (previous.relocatable() || next.relocatable())
                 })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous</span>, <span class="ident">next</span>))
+                .map(|next| Pair::new(previous, next))
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">previous_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">enum_walkers</span>()
+    <span class="kw">fn </span>previous_enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.schemas.previous.describer_schema.enum_walkers()
     }
 
-    <span class="kw">fn</span> <span class="ident">next_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">enum_walkers</span>()
+    <span class="kw">fn </span>next_enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.schemas.next.describer_schema.enum_walkers()
     }
 
-    <span class="kw">fn</span> <span class="ident">previous_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">conn_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">previous</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="ident">conn_data</span>.<span class="ident">extension_walkers</span>()
+    <span class="kw">fn </span>previous_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ExtensionWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>conn_data: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas.previous.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
     }
 
-    <span class="kw">fn</span> <span class="ident">next_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">conn_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>.<span class="ident">next</span>.<span class="ident">describer_schema</span>.<span class="ident">downcast_connector_data</span>();
-        <span class="ident">conn_data</span>.<span class="ident">extension_walkers</span>()
+    <span class="kw">fn </span>next_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ExtensionWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>conn_data: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas.next.describer_schema.downcast_connector_data();
+        conn_data.extension_walkers()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extensions_match</span>(<span class="ident">previous</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">ExtensionWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extensions_match(previous: ExtensionWalker&lt;<span class="lifetime">&#39;_</span>&gt;, next: ExtensionWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    <span class="kw">let </span>names_match = previous.name() == next.name();
 
-    <span class="kw">let</span> <span class="ident">versions_match</span> <span class="op">=</span>
-        <span class="ident">previous</span>.<span class="ident">version</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">version</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">previous</span>.<span class="ident">version</span>().<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">version</span>().<span class="ident">is_empty</span>();
+    <span class="kw">let </span>versions_match =
+        previous.version() == next.version() || previous.version().is_empty() || next.version().is_empty();
 
-    <span class="kw">let</span> <span class="ident">schemas_match</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">schema</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">schema</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">previous</span>.<span class="ident">schema</span>().<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">schema</span>().<span class="ident">is_empty</span>();
+    <span class="kw">let </span>schemas_match = previous.schema() == next.schema() || previous.schema().is_empty() || next.schema().is_empty();
 
-    <span class="ident">names_match</span> <span class="op">&amp;&amp;</span> <span class="ident">versions_match</span> <span class="op">&amp;&amp;</span> <span class="ident">schemas_match</span>
+    names_match &amp;&amp; versions_match &amp;&amp; schemas_match
 }
 
-<span class="kw">fn</span> <span class="ident">enums_match</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">name</span>()
+<span class="kw">fn </span>enums_match(previous: <span class="kw-2">&amp;</span>EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, next: <span class="kw-2">&amp;</span>EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    previous.name() == next.name()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

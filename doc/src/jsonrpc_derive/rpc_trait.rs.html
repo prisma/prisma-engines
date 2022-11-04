@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/rpc_trait.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc_trait.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/rpc_trait.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc_trait.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -284,126 +284,126 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::DeriveOptions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::params_style::ParamStyle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rpc_attr</span>::{<span class="ident">AttributeKind</span>, <span class="ident">PubSubMethodKind</span>, <span class="ident">RpcMethodAttribute</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_client::generate_client_module</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_delegate</span>::{<span class="ident">generate_trait_item_method</span>, <span class="ident">MethodRegistration</span>, <span class="ident">RpcMethod</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{
-	<span class="ident">fold</span>::{<span class="self">self</span>, <span class="ident">Fold</span>},
-	<span class="ident">parse_quote</span>,
-	<span class="ident">punctuated::Punctuated</span>,
-	<span class="ident">Error</span>, <span class="ident">Ident</span>, <span class="prelude-ty">Result</span>, <span class="ident">Token</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::options::DeriveOptions;
+<span class="kw">use </span><span class="kw">crate</span>::params_style::ParamStyle;
+<span class="kw">use </span><span class="kw">crate</span>::rpc_attr::{AttributeKind, PubSubMethodKind, RpcMethodAttribute};
+<span class="kw">use </span><span class="kw">crate</span>::to_client::generate_client_module;
+<span class="kw">use </span><span class="kw">crate</span>::to_delegate::{generate_trait_item_method, MethodRegistration, RpcMethod};
+<span class="kw">use </span>proc_macro2::{Span, TokenStream};
+<span class="kw">use </span>quote::{quote, ToTokens};
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>syn::{
+	fold::{<span class="self">self</span>, Fold},
+	parse_quote,
+	punctuated::Punctuated,
+	Error, Ident, <span class="prelude-ty">Result</span>, Token,
 };
 
-<span class="kw">const</span> <span class="ident">METADATA_TYPE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Metadata&quot;</span>;
+<span class="kw">const </span>METADATA_TYPE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Metadata&quot;</span>;
 
-<span class="kw">const</span> <span class="ident">MISSING_SUBSCRIBE_METHOD_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Can&#39;t find subscribe method, expected a method annotated with `subscribe` \
+<span class="kw">const </span>MISSING_SUBSCRIBE_METHOD_ERR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Can&#39;t find subscribe method, expected a method annotated with `subscribe` \
 	 e.g. `#[pubsub(subscription = \&quot;hello\&quot;, subscribe, name = \&quot;hello_subscribe\&quot;)]`&quot;</span>;
 
-<span class="kw">const</span> <span class="ident">MISSING_UNSUBSCRIBE_METHOD_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span>
+<span class="kw">const </span>MISSING_UNSUBSCRIBE_METHOD_ERR: <span class="kw-2">&amp;</span>str =
 	<span class="string">&quot;Can&#39;t find unsubscribe method, expected a method annotated with `unsubscribe` \
 	 e.g. `#[pubsub(subscription = \&quot;hello\&quot;, unsubscribe, name = \&quot;hello_unsubscribe\&quot;)]`&quot;</span>;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USING_NAMED_PARAMS_WITH_SERVER_ERR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span>
+<span class="kw">pub const </span>USING_NAMED_PARAMS_WITH_SERVER_ERR: <span class="kw-2">&amp;</span>str =
 	<span class="string">&quot;`params = \&quot;named\&quot;` can only be used to generate a client (on a trait annotated with #[rpc(client)]). \
 	 At this time the server does not support named parameters.&quot;</span>;
 
-<span class="kw">const</span> <span class="ident">RPC_MOD_NAME_PREFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;rpc_impl_&quot;</span>;
+<span class="kw">const </span>RPC_MOD_NAME_PREFIX: <span class="kw-2">&amp;</span>str = <span class="string">&quot;rpc_impl_&quot;</span>;
 
-<span class="kw">struct</span> <span class="ident">RpcTrait</span> {
-	<span class="ident">has_pubsub_methods</span>: <span class="ident">bool</span>,
-	<span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcMethod</span><span class="op">&gt;</span>,
-	<span class="ident">has_metadata</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>RpcTrait {
+	has_pubsub_methods: bool,
+	methods: Vec&lt;RpcMethod&gt;,
+	has_metadata: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fold</span> <span class="kw">for</span> <span class="ident">RpcTrait</span> {
-	<span class="kw">fn</span> <span class="ident">fold_trait_item_method</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">method</span>: <span class="ident">syn::TraitItemMethod</span>) -&gt; <span class="ident">syn::TraitItemMethod</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foldable_method</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">clone</span>();
-		<span class="comment">// strip rpc attributes</span>
-		<span class="ident">foldable_method</span>.<span class="ident">attrs</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">rpc_method</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">trait_item</span> <span class="op">==</span> <span class="ident">method</span>);
-			<span class="ident">rpc_method</span>.<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">rpc</span><span class="op">|</span> <span class="ident">rpc</span>.<span class="ident">attr</span>.<span class="ident">attr</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">a</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fold <span class="kw">for </span>RpcTrait {
+	<span class="kw">fn </span>fold_trait_item_method(<span class="kw-2">&amp;mut </span><span class="self">self</span>, method: syn::TraitItemMethod) -&gt; syn::TraitItemMethod {
+		<span class="kw">let </span><span class="kw-2">mut </span>foldable_method = method.clone();
+		<span class="comment">// strip rpc attributes
+		</span>foldable_method.attrs.retain(|a| {
+			<span class="kw">let </span>rpc_method = <span class="self">self</span>.methods.iter().find(|m| m.trait_item == method);
+			rpc_method.map_or(<span class="bool-val">true</span>, |rpc| rpc.attr.attr != <span class="kw-2">*</span>a)
 		});
-		<span class="ident">fold::fold_trait_item_method</span>(<span class="self">self</span>, <span class="ident">foldable_method</span>)
+		fold::fold_trait_item_method(<span class="self">self</span>, foldable_method)
 	}
 
-	<span class="kw">fn</span> <span class="ident">fold_trait_item_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="ident">syn::TraitItemType</span>) -&gt; <span class="ident">syn::TraitItemType</span> {
-		<span class="kw">if</span> <span class="ident">ty</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="ident">METADATA_TYPE</span> {
-			<span class="self">self</span>.<span class="ident">has_metadata</span> <span class="op">=</span> <span class="bool-val">true</span>;
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">clone</span>();
-			<span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_pubsub_methods</span> {
-				<span class="ident">ty</span>.<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_pubsub::PubSubMetadata</span>))
-			} <span class="kw">else</span> {
-				<span class="ident">ty</span>.<span class="ident">bounds</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="ident">_jsonrpc_core::Metadata</span>))
+	<span class="kw">fn </span>fold_trait_item_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: syn::TraitItemType) -&gt; syn::TraitItemType {
+		<span class="kw">if </span>ty.ident == METADATA_TYPE {
+			<span class="self">self</span>.has_metadata = <span class="bool-val">true</span>;
+			<span class="kw">let </span><span class="kw-2">mut </span>ty = ty.clone();
+			<span class="kw">if </span><span class="self">self</span>.has_pubsub_methods {
+				ty.bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_pubsub::PubSubMetadata))
+			} <span class="kw">else </span>{
+				ty.bounds.push(<span class="macro">parse_quote!</span>(_jsonrpc_core::Metadata))
 			}
-			<span class="kw">return</span> <span class="ident">ty</span>;
+			<span class="kw">return </span>ty;
 		}
-		<span class="ident">ty</span>
+		ty
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">compute_method_registrations</span>(<span class="ident">item_trait</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MethodRegistration</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcMethod</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">methods_result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">item_trait</span>
-		.<span class="ident">items</span>
-		.<span class="ident">iter</span>()
-		.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">trait_item</span><span class="op">|</span> {
-			<span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::TraitItem::Method</span>(<span class="ident">method</span>) <span class="op">=</span> <span class="ident">trait_item</span> {
-				<span class="kw">match</span> <span class="ident">RpcMethodAttribute::parse_attr</span>(<span class="ident">method</span>) {
-					<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">attr</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">RpcMethod::new</span>(<span class="ident">attr</span>, <span class="ident">method</span>.<span class="ident">clone</span>()))),
-					<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// non rpc annotated trait method</span>
-					<span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">method</span>, <span class="ident">err</span>))),
+<span class="kw">fn </span>compute_method_registrations(item_trait: <span class="kw-2">&amp;</span>syn::ItemTrait) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;MethodRegistration&gt;, Vec&lt;RpcMethod&gt;)&gt; {
+	<span class="kw">let </span>methods_result: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt; = item_trait
+		.items
+		.iter()
+		.filter_map(|trait_item| {
+			<span class="kw">if let </span>syn::TraitItem::Method(method) = trait_item {
+				<span class="kw">match </span>RpcMethodAttribute::parse_attr(method) {
+					<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(attr)) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(RpcMethod::new(attr, method.clone()))),
+					<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// non rpc annotated trait method
+					</span><span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(syn::Error::new_spanned(method, err))),
 				}
-			} <span class="kw">else</span> {
-				<span class="prelude-val">None</span>
-			}
+			} <span class="kw">else </span>{
+				<span class="prelude-val">None
+			</span>}
 		})
-		.<span class="ident">collect</span>();
-	<span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="ident">methods_result</span><span class="question-mark">?</span>;
+		.collect();
+	<span class="kw">let </span>methods = methods_result<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pubsub_method_pairs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcMethod</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RpcMethod</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">method_registrations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MethodRegistration</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+	<span class="kw">let </span><span class="kw-2">mut </span>pubsub_method_pairs: HashMap&lt;String, (Vec&lt;RpcMethod&gt;, <span class="prelude-ty">Option</span>&lt;RpcMethod&gt;)&gt; = HashMap::new();
+	<span class="kw">let </span><span class="kw-2">mut </span>method_registrations: Vec&lt;MethodRegistration&gt; = Vec::new();
 
-	<span class="kw">for</span> <span class="ident">method</span> <span class="kw">in</span> <span class="ident">methods</span>.<span class="ident">iter</span>() {
-		<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">attr</span>().<span class="ident">kind</span> {
-			<span class="ident">AttributeKind::Rpc</span> {
-				<span class="ident">has_metadata</span>,
-				<span class="ident">is_notification</span>,
+	<span class="kw">for </span>method <span class="kw">in </span>methods.iter() {
+		<span class="kw">match </span><span class="kw-2">&amp;</span>method.attr().kind {
+			AttributeKind::Rpc {
+				has_metadata,
+				is_notification,
 				..
 			} =&gt; {
-				<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">is_notification</span> {
-					<span class="ident">method_registrations</span>.<span class="ident">push</span>(<span class="ident">MethodRegistration::Notification</span> {
-						<span class="ident">method</span>: <span class="ident">method</span>.<span class="ident">clone</span>(),
-						<span class="ident">has_metadata</span>: <span class="kw-2">*</span><span class="ident">has_metadata</span>,
+				<span class="kw">if </span><span class="kw-2">*</span>is_notification {
+					method_registrations.push(MethodRegistration::Notification {
+						method: method.clone(),
+						has_metadata: <span class="kw-2">*</span>has_metadata,
 					})
-				} <span class="kw">else</span> {
-					<span class="ident">method_registrations</span>.<span class="ident">push</span>(<span class="ident">MethodRegistration::Standard</span> {
-						<span class="ident">method</span>: <span class="ident">method</span>.<span class="ident">clone</span>(),
-						<span class="ident">has_metadata</span>: <span class="kw-2">*</span><span class="ident">has_metadata</span>,
+				} <span class="kw">else </span>{
+					method_registrations.push(MethodRegistration::Standard {
+						method: method.clone(),
+						has_metadata: <span class="kw-2">*</span>has_metadata,
 					})
 				}
 			}
-			<span class="ident">AttributeKind::PubSub</span> {
-				<span class="ident">subscription_name</span>,
-				<span class="ident">kind</span>,
+			AttributeKind::PubSub {
+				subscription_name,
+				kind,
 			} =&gt; {
-				<span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">sub</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">unsub</span>) <span class="op">=</span> <span class="ident">pubsub_method_pairs</span>
-					.<span class="ident">entry</span>(<span class="ident">subscription_name</span>.<span class="ident">clone</span>())
-					.<span class="ident">or_insert</span>((<span class="macro">vec!</span>[], <span class="prelude-val">None</span>));
-				<span class="kw">match</span> <span class="ident">kind</span> {
-					<span class="ident">PubSubMethodKind::Subscribe</span> =&gt; <span class="ident">sub</span>.<span class="ident">push</span>(<span class="ident">method</span>.<span class="ident">clone</span>()),
-					<span class="ident">PubSubMethodKind::Unsubscribe</span> =&gt; {
-						<span class="kw">if</span> <span class="ident">unsub</span>.<span class="ident">is_none</span>() {
-							<span class="kw-2">*</span><span class="ident">unsub</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">method</span>.<span class="ident">clone</span>())
-						} <span class="kw">else</span> {
-							<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-								<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>,
+				<span class="kw">let </span>(<span class="kw-2">ref mut </span>sub, <span class="kw-2">ref mut </span>unsub) = pubsub_method_pairs
+					.entry(subscription_name.clone())
+					.or_insert((<span class="macro">vec!</span>[], <span class="prelude-val">None</span>));
+				<span class="kw">match </span>kind {
+					PubSubMethodKind::Subscribe =&gt; sub.push(method.clone()),
+					PubSubMethodKind::Unsubscribe =&gt; {
+						<span class="kw">if </span>unsub.is_none() {
+							<span class="kw-2">*</span>unsub = <span class="prelude-val">Some</span>(method.clone())
+						} <span class="kw">else </span>{
+							<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+								<span class="kw-2">&amp;</span>method.trait_item,
 								<span class="macro">format!</span>(
 									<span class="string">&quot;Subscription &#39;{}&#39; unsubscribe method is already defined&quot;</span>,
-									<span class="ident">subscription_name</span>
+									subscription_name
 								),
 							));
 						}
@@ -413,162 +413,162 @@
 		}
 	}
 
-	<span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">pair</span>) <span class="kw">in</span> <span class="ident">pubsub_method_pairs</span> {
-		<span class="kw">match</span> <span class="ident">pair</span> {
-			(<span class="ident">subscribers</span>, <span class="prelude-val">Some</span>(<span class="ident">unsubscribe</span>)) =&gt; {
-				<span class="kw">if</span> <span class="ident">subscribers</span>.<span class="ident">is_empty</span>() {
-					<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-						<span class="kw-2">&amp;</span><span class="ident">unsubscribe</span>.<span class="ident">trait_item</span>,
-						<span class="macro">format!</span>(<span class="string">&quot;subscription &#39;{}&#39;. {}&quot;</span>, <span class="ident">name</span>, <span class="ident">MISSING_SUBSCRIBE_METHOD_ERR</span>),
+	<span class="kw">for </span>(name, pair) <span class="kw">in </span>pubsub_method_pairs {
+		<span class="kw">match </span>pair {
+			(subscribers, <span class="prelude-val">Some</span>(unsubscribe)) =&gt; {
+				<span class="kw">if </span>subscribers.is_empty() {
+					<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+						<span class="kw-2">&amp;</span>unsubscribe.trait_item,
+						<span class="macro">format!</span>(<span class="string">&quot;subscription &#39;{}&#39;. {}&quot;</span>, name, MISSING_SUBSCRIBE_METHOD_ERR),
 					));
 				}
 
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subscriber_args</span> <span class="op">=</span> <span class="ident">subscribers</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">subscriber_arg</span>());
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">subscriber_arg</span>) <span class="op">=</span> <span class="ident">subscriber_args</span>.<span class="ident">next</span>() {
-					<span class="kw">for</span> <span class="ident">next_method_arg</span> <span class="kw">in</span> <span class="ident">subscriber_args</span> {
-						<span class="kw">if</span> <span class="ident">next_method_arg</span> <span class="op">!</span><span class="op">=</span> <span class="ident">subscriber_arg</span> {
-							<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-								<span class="kw-2">&amp;</span><span class="ident">next_method_arg</span>,
+				<span class="kw">let </span><span class="kw-2">mut </span>subscriber_args = subscribers.iter().filter_map(|s| s.subscriber_arg());
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(subscriber_arg) = subscriber_args.next() {
+					<span class="kw">for </span>next_method_arg <span class="kw">in </span>subscriber_args {
+						<span class="kw">if </span>next_method_arg != subscriber_arg {
+							<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+								<span class="kw-2">&amp;</span>next_method_arg,
 								<span class="macro">format!</span>(
 									<span class="string">&quot;Inconsistent signature for &#39;Subscriber&#39; argument: {}, previously defined: {}&quot;</span>,
-									<span class="ident">next_method_arg</span>.<span class="ident">clone</span>().<span class="ident">into_token_stream</span>(),
-									<span class="ident">subscriber_arg</span>.<span class="ident">clone</span>().<span class="ident">into_token_stream</span>()
+									next_method_arg.clone().into_token_stream(),
+									subscriber_arg.clone().into_token_stream()
 								),
 							));
 						}
 					}
 				}
 
-				<span class="ident">method_registrations</span>.<span class="ident">push</span>(<span class="ident">MethodRegistration::PubSub</span> {
-					<span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
-					<span class="ident">subscribes</span>: <span class="ident">subscribers</span>.<span class="ident">clone</span>(),
-					<span class="ident">unsubscribe</span>: <span class="ident">unsubscribe</span>.<span class="ident">clone</span>(),
+				method_registrations.push(MethodRegistration::PubSub {
+					name: name.clone(),
+					subscribes: subscribers.clone(),
+					unsubscribe: unsubscribe.clone(),
 				});
 			}
 			(<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; {
-				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-					<span class="kw-2">&amp;</span><span class="ident">item_trait</span>,
-					<span class="macro">format!</span>(<span class="string">&quot;subscription &#39;{}&#39;. {}&quot;</span>, <span class="ident">name</span>, <span class="ident">MISSING_UNSUBSCRIBE_METHOD_ERR</span>),
+				<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+					<span class="kw-2">&amp;</span>item_trait,
+					<span class="macro">format!</span>(<span class="string">&quot;subscription &#39;{}&#39;. {}&quot;</span>, name, MISSING_UNSUBSCRIBE_METHOD_ERR),
 				));
 			}
 		}
 	}
 
-	<span class="prelude-val">Ok</span>((<span class="ident">method_registrations</span>, <span class="ident">methods</span>))
+	<span class="prelude-val">Ok</span>((method_registrations, methods))
 }
 
-<span class="kw">fn</span> <span class="ident">generate_server_module</span>(
-	<span class="ident">method_registrations</span>: <span class="kw-2">&amp;</span>[<span class="ident">MethodRegistration</span>],
-	<span class="ident">item_trait</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>,
-	<span class="ident">methods</span>: <span class="kw-2">&amp;</span>[<span class="ident">RpcMethod</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">has_pubsub_methods</span> <span class="op">=</span> <span class="ident">methods</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">RpcMethod::is_pubsub</span>);
+<span class="kw">fn </span>generate_server_module(
+	method_registrations: <span class="kw-2">&amp;</span>[MethodRegistration],
+	item_trait: <span class="kw-2">&amp;</span>syn::ItemTrait,
+	methods: <span class="kw-2">&amp;</span>[RpcMethod],
+) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream&gt; {
+	<span class="kw">let </span>has_pubsub_methods = methods.iter().any(RpcMethod::is_pubsub);
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rpc_trait</span> <span class="op">=</span> <span class="ident">RpcTrait</span> {
-		<span class="ident">methods</span>: <span class="ident">methods</span>.<span class="ident">to_owned</span>(),
-		<span class="ident">has_pubsub_methods</span>,
-		<span class="ident">has_metadata</span>: <span class="bool-val">false</span>,
+	<span class="kw">let </span><span class="kw-2">mut </span>rpc_trait = RpcTrait {
+		methods: methods.to_owned(),
+		has_pubsub_methods,
+		has_metadata: <span class="bool-val">false</span>,
 	};
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rpc_server_trait</span> <span class="op">=</span> <span class="ident">fold::fold_item_trait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rpc_trait</span>, <span class="ident">item_trait</span>.<span class="ident">clone</span>());
+	<span class="kw">let </span><span class="kw-2">mut </span>rpc_server_trait = fold::fold_item_trait(<span class="kw-2">&amp;mut </span>rpc_trait, item_trait.clone());
 
-	<span class="kw">let</span> <span class="ident">to_delegate_method</span> <span class="op">=</span> <span class="ident">generate_trait_item_method</span>(
-		<span class="kw-2">&amp;</span><span class="ident">method_registrations</span>,
-		<span class="kw-2">&amp;</span><span class="ident">rpc_server_trait</span>,
-		<span class="ident">rpc_trait</span>.<span class="ident">has_metadata</span>,
-		<span class="ident">has_pubsub_methods</span>,
+	<span class="kw">let </span>to_delegate_method = generate_trait_item_method(
+		<span class="kw-2">&amp;</span>method_registrations,
+		<span class="kw-2">&amp;</span>rpc_server_trait,
+		rpc_trait.has_metadata,
+		has_pubsub_methods,
 	)<span class="question-mark">?</span>;
 
-	<span class="ident">rpc_server_trait</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">syn::TraitItem::Method</span>(<span class="ident">to_delegate_method</span>));
+	rpc_server_trait.items.push(syn::TraitItem::Method(to_delegate_method));
 
-	<span class="kw">let</span> <span class="ident">trait_bounds</span>: <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">syn::TypeParamBound</span>, <span class="macro">Token!</span>[<span class="op">+</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">parse_quote!</span>(<span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>);
-	<span class="ident">rpc_server_trait</span>.<span class="ident">supertraits</span>.<span class="ident">extend</span>(<span class="ident">trait_bounds</span>);
+	<span class="kw">let </span>trait_bounds: Punctuated&lt;syn::TypeParamBound, <span class="macro">Token!</span>[+]&gt; = <span class="macro">parse_quote!</span>(Sized + Send + Sync + <span class="lifetime">&#39;static</span>);
+	rpc_server_trait.supertraits.extend(trait_bounds);
 
-	<span class="kw">let</span> <span class="ident">optional_pubsub_import</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_pubsub_methods</span> {
-		<span class="ident">crate_name</span>(<span class="string">&quot;jsonrpc-pubsub&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pubsub_name</span><span class="op">|</span> <span class="macro">quote!</span>(<span class="kw">use</span> #<span class="ident">pubsub_name</span> <span class="kw">as</span> <span class="ident">_jsonrpc_pubsub</span>;))
-	} <span class="kw">else</span> {
+	<span class="kw">let </span>optional_pubsub_import = <span class="kw">if </span>has_pubsub_methods {
+		crate_name(<span class="string">&quot;jsonrpc-pubsub&quot;</span>).map(|pubsub_name| <span class="macro">quote!</span>(<span class="kw">use </span>#pubsub_name <span class="kw">as </span>_jsonrpc_pubsub;))
+	} <span class="kw">else </span>{
 		<span class="prelude-val">Ok</span>(<span class="macro">quote!</span>())
 	}<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="ident">rpc_server_module</span> <span class="op">=</span> <span class="macro">quote!</span> {
-		<span class="doccomment">/// The generated server module.</span>
-		<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gen_server</span> {
-			#<span class="ident">optional_pubsub_import</span>
-			<span class="kw">use</span> <span class="ident"><span class="self">self</span>::_jsonrpc_core::futures</span> <span class="kw">as</span> <span class="ident">_futures</span>;
-			<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+	<span class="kw">let </span>rpc_server_module = <span class="macro">quote! </span>{
+		<span class="doccomment">/// The generated server module.
+		</span><span class="kw">pub mod </span>gen_server {
+			#optional_pubsub_import
+			<span class="kw">use </span><span class="self">self</span>::_jsonrpc_core::futures <span class="kw">as </span>_futures;
+			<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-			#<span class="ident">rpc_server_trait</span>
+			#rpc_server_trait
 		}
 	};
 
-	<span class="prelude-val">Ok</span>(<span class="ident">rpc_server_module</span>)
+	<span class="prelude-val">Ok</span>(rpc_server_module)
 }
 
-<span class="kw">fn</span> <span class="ident">rpc_wrapper_mod_name</span>(<span class="ident">rpc_trait</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>) -&gt; <span class="ident">syn::Ident</span> {
-	<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">rpc_trait</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
-	<span class="kw">let</span> <span class="ident">mod_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">RPC_MOD_NAME_PREFIX</span>, <span class="ident">name</span>.<span class="ident">to_string</span>());
-	<span class="ident">syn::Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">mod_name</span>, <span class="ident">proc_macro2::Span::call_site</span>())
+<span class="kw">fn </span>rpc_wrapper_mod_name(rpc_trait: <span class="kw-2">&amp;</span>syn::ItemTrait) -&gt; syn::Ident {
+	<span class="kw">let </span>name = rpc_trait.ident.clone();
+	<span class="kw">let </span>mod_name = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, RPC_MOD_NAME_PREFIX, name.to_string());
+	syn::Ident::new(<span class="kw-2">&amp;</span>mod_name, proc_macro2::Span::call_site())
 }
 
-<span class="kw">fn</span> <span class="ident">has_named_params</span>(<span class="ident">methods</span>: <span class="kw-2">&amp;</span>[<span class="ident">RpcMethod</span>]) -&gt; <span class="ident">bool</span> {
-	<span class="ident">methods</span>
-		.<span class="ident">iter</span>()
-		.<span class="ident">any</span>(<span class="op">|</span><span class="ident">method</span><span class="op">|</span> <span class="ident">method</span>.<span class="ident">attr</span>.<span class="ident">params_style</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">ParamStyle::Named</span>))
+<span class="kw">fn </span>has_named_params(methods: <span class="kw-2">&amp;</span>[RpcMethod]) -&gt; bool {
+	methods
+		.iter()
+		.any(|method| method.attr.params_style == <span class="prelude-val">Some</span>(ParamStyle::Named))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crate_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
-	<span class="ident">proc_macro_crate::crate_name</span>(<span class="ident">name</span>)
-		.<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">Span::call_site</span>()))
-		.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">Span::call_site</span>(), <span class="kw-2">&amp;</span><span class="ident">e</span>))
+<span class="kw">pub fn </span>crate_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Ident&gt; {
+	proc_macro_crate::crate_name(name)
+		.map(|name| Ident::new(<span class="kw-2">&amp;</span>name, Span::call_site()))
+		.map_err(|e| Error::new(Span::call_site(), <span class="kw-2">&amp;</span>e))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rpc_impl</span>(<span class="ident">input</span>: <span class="ident">syn::Item</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proc_macro2::TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">rpc_trait</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
-		<span class="ident">syn::Item::Trait</span>(<span class="ident">item_trait</span>) =&gt; <span class="ident">item_trait</span>,
-		<span class="ident">item</span> =&gt; {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-				<span class="ident">item</span>,
+<span class="kw">pub fn </span>rpc_impl(input: syn::Item, options: <span class="kw-2">&amp;</span>DeriveOptions) -&gt; <span class="prelude-ty">Result</span>&lt;proc_macro2::TokenStream&gt; {
+	<span class="kw">let </span>rpc_trait = <span class="kw">match </span>input {
+		syn::Item::Trait(item_trait) =&gt; item_trait,
+		item =&gt; {
+			<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+				item,
 				<span class="string">&quot;The #[rpc] custom attribute only works with trait declarations&quot;</span>,
 			));
 		}
 	};
 
-	<span class="kw">let</span> (<span class="ident">method_registrations</span>, <span class="ident">methods</span>) <span class="op">=</span> <span class="ident">compute_method_registrations</span>(<span class="kw-2">&amp;</span><span class="ident">rpc_trait</span>)<span class="question-mark">?</span>;
+	<span class="kw">let </span>(method_registrations, methods) = compute_method_registrations(<span class="kw-2">&amp;</span>rpc_trait)<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">rpc_trait</span>.<span class="ident">ident</span>.<span class="ident">clone</span>();
-	<span class="kw">let</span> <span class="ident">mod_name_ident</span> <span class="op">=</span> <span class="ident">rpc_wrapper_mod_name</span>(<span class="kw-2">&amp;</span><span class="ident">rpc_trait</span>);
+	<span class="kw">let </span>name = rpc_trait.ident.clone();
+	<span class="kw">let </span>mod_name_ident = rpc_wrapper_mod_name(<span class="kw-2">&amp;</span>rpc_trait);
 
-	<span class="kw">let</span> <span class="ident">core_name</span> <span class="op">=</span> <span class="ident">crate_name</span>(<span class="string">&quot;jsonrpc-core&quot;</span>)<span class="question-mark">?</span>;
+	<span class="kw">let </span>core_name = crate_name(<span class="string">&quot;jsonrpc-core&quot;</span>)<span class="question-mark">?</span>;
 
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">submodules</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exports</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-	<span class="kw">if</span> <span class="ident">options</span>.<span class="ident">enable_client</span> {
-		<span class="kw">let</span> <span class="ident">rpc_client_module</span> <span class="op">=</span> <span class="ident">generate_client_module</span>(<span class="kw-2">&amp;</span><span class="ident">method_registrations</span>, <span class="kw-2">&amp;</span><span class="ident">rpc_trait</span>, <span class="ident">options</span>)<span class="question-mark">?</span>;
-		<span class="ident">submodules</span>.<span class="ident">push</span>(<span class="ident">rpc_client_module</span>);
-		<span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">syn::Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}Client&quot;</span>, <span class="ident">name</span>), <span class="ident">proc_macro2::Span::call_site</span>());
-		<span class="ident">exports</span>.<span class="ident">push</span>(<span class="macro">quote!</span> {
-			<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::#<span class="ident">mod_name_ident::gen_client</span>;
-			<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::#<span class="ident">mod_name_ident::gen_client::Client</span> <span class="kw">as</span> #<span class="ident">client_name</span>;
+	<span class="kw">let </span><span class="kw-2">mut </span>submodules = Vec::new();
+	<span class="kw">let </span><span class="kw-2">mut </span>exports = Vec::new();
+	<span class="kw">if </span>options.enable_client {
+		<span class="kw">let </span>rpc_client_module = generate_client_module(<span class="kw-2">&amp;</span>method_registrations, <span class="kw-2">&amp;</span>rpc_trait, options)<span class="question-mark">?</span>;
+		submodules.push(rpc_client_module);
+		<span class="kw">let </span>client_name = syn::Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}Client&quot;</span>, name), proc_macro2::Span::call_site());
+		exports.push(<span class="macro">quote! </span>{
+			<span class="kw">pub use </span><span class="self">self</span>::#mod_name_ident::gen_client;
+			<span class="kw">pub use </span><span class="self">self</span>::#mod_name_ident::gen_client::Client <span class="kw">as </span>#client_name;
 		});
 	}
-	<span class="kw">if</span> <span class="ident">options</span>.<span class="ident">enable_server</span> {
-		<span class="kw">if</span> <span class="ident">has_named_params</span>(<span class="kw-2">&amp;</span><span class="ident">methods</span>) {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">rpc_trait</span>, <span class="ident">USING_NAMED_PARAMS_WITH_SERVER_ERR</span>));
+	<span class="kw">if </span>options.enable_server {
+		<span class="kw">if </span>has_named_params(<span class="kw-2">&amp;</span>methods) {
+			<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(rpc_trait, USING_NAMED_PARAMS_WITH_SERVER_ERR));
 		}
-		<span class="kw">let</span> <span class="ident">rpc_server_module</span> <span class="op">=</span> <span class="ident">generate_server_module</span>(<span class="kw-2">&amp;</span><span class="ident">method_registrations</span>, <span class="kw-2">&amp;</span><span class="ident">rpc_trait</span>, <span class="kw-2">&amp;</span><span class="ident">methods</span>)<span class="question-mark">?</span>;
-		<span class="ident">submodules</span>.<span class="ident">push</span>(<span class="ident">rpc_server_module</span>);
-		<span class="ident">exports</span>.<span class="ident">push</span>(<span class="macro">quote!</span> {
-			<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::#<span class="ident">mod_name_ident::gen_server</span>::#<span class="ident">name</span>;
+		<span class="kw">let </span>rpc_server_module = generate_server_module(<span class="kw-2">&amp;</span>method_registrations, <span class="kw-2">&amp;</span>rpc_trait, <span class="kw-2">&amp;</span>methods)<span class="question-mark">?</span>;
+		submodules.push(rpc_server_module);
+		exports.push(<span class="macro">quote! </span>{
+			<span class="kw">pub use </span><span class="self">self</span>::#mod_name_ident::gen_server::#name;
 		});
 	}
 	<span class="prelude-val">Ok</span>(<span class="macro">quote!</span>(
-		<span class="kw">mod</span> #<span class="ident">mod_name_ident</span> {
-			<span class="kw">use</span> #<span class="ident">core_name</span> <span class="kw">as</span> <span class="ident">_jsonrpc_core</span>;
-			<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+		<span class="kw">mod </span>#mod_name_ident {
+			<span class="kw">use </span>#core_name <span class="kw">as </span>_jsonrpc_core;
+			<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-			#(#<span class="ident">submodules</span>)<span class="op">*</span>
+			#(#submodules)*
 		}
-		#(#<span class="ident">exports</span>)<span class="op">*</span>
+		#(#exports)*
 	))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

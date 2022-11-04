@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/schema_renderer/object_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/schema_renderer/object_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../request_handlers/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -81,88 +81,88 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GqlObjectRenderer</span> {
-    <span class="ident">Input</span>(<span class="ident">InputObjectTypeWeakRef</span>),
-    <span class="ident">Output</span>(<span class="ident">ObjectTypeWeakRef</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>GqlObjectRenderer {
+    Input(InputObjectTypeWeakRef),
+    Output(ObjectTypeWeakRef),
 }
 
-<span class="kw">impl</span> <span class="ident">Renderer</span> <span class="kw">for</span> <span class="ident">GqlObjectRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span> {
-            <span class="ident">GqlObjectRenderer::Input</span>(<span class="ident">input</span>) =&gt; <span class="self">self</span>.<span class="ident">render_input_object</span>(<span class="ident">input</span>, <span class="ident">ctx</span>),
-            <span class="ident">GqlObjectRenderer::Output</span>(<span class="ident">output</span>) =&gt; <span class="self">self</span>.<span class="ident">render_output_object</span>(<span class="ident">output</span>, <span class="ident">ctx</span>),
+<span class="kw">impl </span>Renderer <span class="kw">for </span>GqlObjectRenderer {
+    <span class="kw">fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self </span>{
+            GqlObjectRenderer::Input(input) =&gt; <span class="self">self</span>.render_input_object(input, ctx),
+            GqlObjectRenderer::Output(output) =&gt; <span class="self">self</span>.render_output_object(output, ctx),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GqlObjectRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render_input_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input_object</span>: <span class="kw-2">&amp;</span><span class="ident">InputObjectTypeWeakRef</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">input_object</span>.<span class="ident">into_arc</span>();
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">already_rendered</span>(<span class="ident">input_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>()) {
-            <span class="kw">return</span> <span class="string">&quot;&quot;</span>.<span class="ident">into</span>();
-        } <span class="kw">else</span> {
-            <span class="comment">// This short circuits recursive processing for fields.</span>
-            <span class="ident">ctx</span>.<span class="ident">mark_as_rendered</span>(<span class="ident">input_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+<span class="kw">impl </span>GqlObjectRenderer {
+    <span class="kw">fn </span>render_input_object(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object: <span class="kw-2">&amp;</span>InputObjectTypeWeakRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let </span>input_object = input_object.into_arc();
+        <span class="kw">if </span>ctx.already_rendered(input_object.identifier.name()) {
+            <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
+        } <span class="kw">else </span>{
+            <span class="comment">// This short circuits recursive processing for fields.
+            </span>ctx.mark_as_rendered(input_object.identifier.name().to_owned())
         }
 
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">input_object</span>.<span class="ident">get_fields</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered_fields</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">fields</span>.<span class="ident">len</span>());
+        <span class="kw">let </span>fields = input_object.get_fields();
+        <span class="kw">let </span><span class="kw-2">mut </span>rendered_fields = Vec::with_capacity(fields.len());
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-            <span class="ident">rendered_fields</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>))
+        <span class="kw">for </span>field <span class="kw">in </span>fields {
+            rendered_fields.push(field.into_renderer().render(ctx))
         }
 
-        <span class="kw">let</span> <span class="ident">indented</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rendered_fields</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">ctx</span>.<span class="ident">indent</span>(), <span class="ident">f</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>indented: Vec&lt;String&gt; = rendered_fields
+            .into_iter()
+            .map(|f| <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, ctx.indent(), f))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>rendered = <span class="macro">format!</span>(
             <span class="string">&quot;input {} {{\n{}\n}}&quot;</span>,
-            <span class="ident">input_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>(),
-            <span class="ident">indented</span>.<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>)
+            input_object.identifier.name(),
+            indented.join(<span class="string">&quot;\n&quot;</span>)
         );
 
-        <span class="ident">ctx</span>.<span class="ident">add</span>(<span class="ident">input_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(), <span class="ident">rendered</span>.<span class="ident">clone</span>());
+        ctx.add(input_object.identifier.name().to_owned(), rendered.clone());
 
-        <span class="ident">rendered</span>
+        rendered
     }
 
-    <span class="kw">fn</span> <span class="ident">render_output_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">output_object</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeWeakRef</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">output_object</span> <span class="op">=</span> <span class="ident">output_object</span>.<span class="ident">into_arc</span>();
+    <span class="kw">fn </span>render_output_object(<span class="kw-2">&amp;</span><span class="self">self</span>, output_object: <span class="kw-2">&amp;</span>ObjectTypeWeakRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; String {
+        <span class="kw">let </span>output_object = output_object.into_arc();
 
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">already_rendered</span>(<span class="ident">output_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>()) {
-            <span class="kw">return</span> <span class="string">&quot;&quot;</span>.<span class="ident">into</span>();
-        } <span class="kw">else</span> {
-            <span class="comment">// This short circuits recursive processing for fields.</span>
-            <span class="ident">ctx</span>.<span class="ident">mark_as_rendered</span>(<span class="ident">output_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>().<span class="ident">to_string</span>())
+        <span class="kw">if </span>ctx.already_rendered(output_object.identifier.name()) {
+            <span class="kw">return </span><span class="string">&quot;&quot;</span>.into();
+        } <span class="kw">else </span>{
+            <span class="comment">// This short circuits recursive processing for fields.
+            </span>ctx.mark_as_rendered(output_object.identifier.name().to_string())
         }
 
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">output_object</span>.<span class="ident">get_fields</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered_fields</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">fields</span>.<span class="ident">len</span>());
+        <span class="kw">let </span>fields = output_object.get_fields();
+        <span class="kw">let </span><span class="kw-2">mut </span>rendered_fields = Vec::with_capacity(fields.len());
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-            <span class="ident">rendered_fields</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">into_renderer</span>().<span class="ident">render</span>(<span class="ident">ctx</span>))
+        <span class="kw">for </span>field <span class="kw">in </span>fields {
+            rendered_fields.push(field.into_renderer().render(ctx))
         }
 
-        <span class="kw">let</span> <span class="ident">indented</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rendered_fields</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">ctx</span>.<span class="ident">indent</span>(), <span class="ident">f</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>indented: Vec&lt;String&gt; = rendered_fields
+            .into_iter()
+            .map(|f| <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, ctx.indent(), f))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>rendered = <span class="macro">format!</span>(
             <span class="string">&quot;type {} {{\n{}\n}}&quot;</span>,
-            <span class="ident">output_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>(),
-            <span class="ident">indented</span>.<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>)
+            output_object.identifier.name(),
+            indented.join(<span class="string">&quot;\n&quot;</span>)
         );
 
-        <span class="ident">ctx</span>.<span class="ident">add_output</span>(<span class="ident">rendered</span>.<span class="ident">clone</span>());
+        ctx.add_output(rendered.clone());
 
-        <span class="ident">rendered</span>
+        rendered
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

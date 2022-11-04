@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/task/waker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>waker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/task/waker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>waker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -128,135 +128,135 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::future::Future</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task::harness::Harness</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task</span>::{<span class="ident">Header</span>, <span class="ident">Schedule</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::future::Future;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::harness::Harness;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::{Header, Schedule};
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>;
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">RawWaker</span>, <span class="ident">RawWakerVTable</span>, <span class="ident">Waker</span>};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::mem::ManuallyDrop;
+<span class="kw">use </span>std::ops;
+<span class="kw">use </span>std::ptr::NonNull;
+<span class="kw">use </span>std::task::{RawWaker, RawWakerVTable, Waker};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">WakerRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="ident">waker</span>: <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    <span class="ident">_p</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Header</span>, <span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>WakerRef&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;static</span>&gt; {
+    waker: ManuallyDrop&lt;Waker&gt;,
+    _p: PhantomData&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Header, S)&gt;,
 }
 
-<span class="doccomment">/// Returns a `WakerRef` which avoids having to preemptively increase the</span>
-<span class="doccomment">/// refcount if there is no need to do so.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">waker_ref</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">WakerRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="doccomment">/// Returns a `WakerRef` which avoids having to preemptively increase the
+/// refcount if there is no need to do so.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>waker_ref&lt;T, S&gt;(header: <span class="kw-2">&amp;</span>NonNull&lt;Header&gt;) -&gt; WakerRef&lt;<span class="lifetime">&#39;_</span>, S&gt;
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="comment">// `Waker::will_wake` uses the VTABLE pointer as part of the check. This</span>
-    <span class="comment">// means that `will_wake` will always return false when using the current</span>
-    <span class="comment">// task&#39;s waker. (discussion at rust-lang/rust#66281).</span>
-    <span class="comment">//</span>
-    <span class="comment">// To fix this, we use a single vtable. Since we pass in a reference at this</span>
-    <span class="comment">// point and not an *owned* waker, we must ensure that `drop` is never</span>
-    <span class="comment">// called on this waker instance. This is done by wrapping it with</span>
-    <span class="comment">// `ManuallyDrop` and then never calling drop.</span>
-    <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ManuallyDrop::new</span>(<span class="ident">Waker::from_raw</span>(<span class="ident">raw_waker</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">*</span><span class="ident">header</span>))) };
+    <span class="comment">// `Waker::will_wake` uses the VTABLE pointer as part of the check. This
+    // means that `will_wake` will always return false when using the current
+    // task&#39;s waker. (discussion at rust-lang/rust#66281).
+    //
+    // To fix this, we use a single vtable. Since we pass in a reference at this
+    // point and not an *owned* waker, we must ensure that `drop` is never
+    // called on this waker instance. This is done by wrapping it with
+    // `ManuallyDrop` and then never calling drop.
+    </span><span class="kw">let </span>waker = <span class="kw">unsafe </span>{ ManuallyDrop::new(Waker::from_raw(raw_waker::&lt;T, S&gt;(<span class="kw-2">*</span>header))) };
 
-    <span class="ident">WakerRef</span> {
-        <span class="ident">waker</span>,
-        <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+    WakerRef {
+        waker,
+        _p: PhantomData,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">ops::Deref</span> <span class="kw">for</span> <span class="ident">WakerRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Waker</span>;
+<span class="kw">impl</span>&lt;S&gt; ops::Deref <span class="kw">for </span>WakerRef&lt;<span class="lifetime">&#39;_</span>, S&gt; {
+    <span class="kw">type </span>Target = Waker;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Waker</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">waker</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Waker {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.waker
     }
 }
 
-<span class="macro">cfg_trace!</span> {
-    <span class="macro">macro_rules!</span> <span class="ident">trace</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">harness</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">expr</span>) =&gt; {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">harness</span>.<span class="ident">id</span>() {
+<span class="macro">cfg_trace! </span>{
+    <span class="macro">macro_rules! </span>trace {
+        (<span class="macro-nonterminal">$harness</span>:expr, <span class="macro-nonterminal">$op</span>:expr) =&gt; {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = <span class="macro-nonterminal">$harness</span>.id() {
                 <span class="macro">tracing::trace!</span>(
-                    <span class="ident">target</span>: <span class="string">&quot;tokio::task::waker&quot;</span>,
-                    <span class="ident">op</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>,
-                    <span class="ident">task</span>.<span class="ident">id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">into_u64</span>(),
+                    target: <span class="string">&quot;tokio::task::waker&quot;</span>,
+                    op = <span class="macro-nonterminal">$op</span>,
+                    task.id = id.into_u64(),
                 );
             }
         }
     }
 }
 
-<span class="macro">cfg_not_trace!</span> {
-    <span class="macro">macro_rules!</span> <span class="ident">trace</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">harness</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">expr</span>) =&gt; {
-            <span class="comment">// noop</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">harness</span>;
+<span class="macro">cfg_not_trace! </span>{
+    <span class="macro">macro_rules! </span>trace {
+        (<span class="macro-nonterminal">$harness</span>:expr, <span class="macro-nonterminal">$op</span>:expr) =&gt; {
+            <span class="comment">// noop
+            </span><span class="kw">let _ </span>= <span class="kw-2">&amp;</span><span class="macro-nonterminal">$harness</span>;
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clone_waker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*const</span> ()) -&gt; <span class="ident">RawWaker</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="kw">unsafe fn </span>clone_waker&lt;T, S&gt;(ptr: <span class="kw-2">*const </span>()) -&gt; RawWaker
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Header</span>;
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">NonNull::new_unchecked</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Header</span>);
-    <span class="kw">let</span> <span class="ident">harness</span> <span class="op">=</span> <span class="ident">Harness</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="ident">ptr</span>);
-    <span class="macro">trace!</span>(<span class="ident">harness</span>, <span class="string">&quot;waker.clone&quot;</span>);
-    (<span class="kw-2">*</span><span class="ident">header</span>).<span class="ident">state</span>.<span class="ident">ref_inc</span>();
-    <span class="ident">raw_waker</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">ptr</span>)
+    <span class="kw">let </span>header = ptr <span class="kw">as </span><span class="kw-2">*const </span>Header;
+    <span class="kw">let </span>ptr = NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>Header);
+    <span class="kw">let </span>harness = Harness::&lt;T, S&gt;::from_raw(ptr);
+    <span class="macro">trace!</span>(harness, <span class="string">&quot;waker.clone&quot;</span>);
+    (<span class="kw-2">*</span>header).state.ref_inc();
+    raw_waker::&lt;T, S&gt;(ptr)
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop_waker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*const</span> ())
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="kw">unsafe fn </span>drop_waker&lt;T, S&gt;(ptr: <span class="kw-2">*const </span>())
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">NonNull::new_unchecked</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Header</span>);
-    <span class="kw">let</span> <span class="ident">harness</span> <span class="op">=</span> <span class="ident">Harness</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="ident">ptr</span>);
-    <span class="macro">trace!</span>(<span class="ident">harness</span>, <span class="string">&quot;waker.drop&quot;</span>);
-    <span class="ident">harness</span>.<span class="ident">drop_reference</span>();
+    <span class="kw">let </span>ptr = NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>Header);
+    <span class="kw">let </span>harness = Harness::&lt;T, S&gt;::from_raw(ptr);
+    <span class="macro">trace!</span>(harness, <span class="string">&quot;waker.drop&quot;</span>);
+    harness.drop_reference();
 }
 
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wake_by_val</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*const</span> ())
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="kw">unsafe fn </span>wake_by_val&lt;T, S&gt;(ptr: <span class="kw-2">*const </span>())
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">NonNull::new_unchecked</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Header</span>);
-    <span class="kw">let</span> <span class="ident">harness</span> <span class="op">=</span> <span class="ident">Harness</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="ident">ptr</span>);
-    <span class="macro">trace!</span>(<span class="ident">harness</span>, <span class="string">&quot;waker.wake&quot;</span>);
-    <span class="ident">harness</span>.<span class="ident">wake_by_val</span>();
+    <span class="kw">let </span>ptr = NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>Header);
+    <span class="kw">let </span>harness = Harness::&lt;T, S&gt;::from_raw(ptr);
+    <span class="macro">trace!</span>(harness, <span class="string">&quot;waker.wake&quot;</span>);
+    harness.wake_by_val();
 }
 
-<span class="comment">// Wake without consuming the waker</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">wake_by_ref</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">ptr</span>: <span class="kw-2">*const</span> ())
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="comment">// Wake without consuming the waker
+</span><span class="kw">unsafe fn </span>wake_by_ref&lt;T, S&gt;(ptr: <span class="kw-2">*const </span>())
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">NonNull::new_unchecked</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Header</span>);
-    <span class="kw">let</span> <span class="ident">harness</span> <span class="op">=</span> <span class="ident">Harness</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="ident">::from_raw</span>(<span class="ident">ptr</span>);
-    <span class="macro">trace!</span>(<span class="ident">harness</span>, <span class="string">&quot;waker.wake_by_ref&quot;</span>);
-    <span class="ident">harness</span>.<span class="ident">wake_by_ref</span>();
+    <span class="kw">let </span>ptr = NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>Header);
+    <span class="kw">let </span>harness = Harness::&lt;T, S&gt;::from_raw(ptr);
+    <span class="macro">trace!</span>(harness, <span class="string">&quot;waker.wake_by_ref&quot;</span>);
+    harness.wake_by_ref();
 }
 
-<span class="kw">fn</span> <span class="ident">raw_waker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">header</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">RawWaker</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="kw">fn </span>raw_waker&lt;T, S&gt;(header: NonNull&lt;Header&gt;) -&gt; RawWaker
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> ();
-    <span class="kw">let</span> <span class="ident">vtable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RawWakerVTable::new</span>(
-        <span class="ident">clone_waker</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">wake_by_val</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">wake_by_ref</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">drop_waker</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>,
+    <span class="kw">let </span>ptr = header.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>();
+    <span class="kw">let </span>vtable = <span class="kw-2">&amp;</span>RawWakerVTable::new(
+        clone_waker::&lt;T, S&gt;,
+        wake_by_val::&lt;T, S&gt;,
+        wake_by_ref::&lt;T, S&gt;,
+        drop_waker::&lt;T, S&gt;,
     );
-    <span class="ident">RawWaker::new</span>(<span class="ident">ptr</span>, <span class="ident">vtable</span>)
+    RawWaker::new(ptr, vtable)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

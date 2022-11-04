@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/introspection-engine-tests/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/introspection-engine-tests/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -69,76 +69,76 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">test_api</span>;
+</pre><pre class="rust"><code><span class="kw">pub mod </span>test_api;
 
-<span class="kw">use</span> <span class="ident">barrel::Migration</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::Queryable</span>, <span class="ident">single::Quaint</span>};
-<span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Tags</span>};
+<span class="kw">use </span>barrel::Migration;
+<span class="kw">use </span>quaint::{prelude::Queryable, single::Quaint};
+<span class="kw">use </span>test_setup::{BitFlags, Tags};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TestResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+<span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;;
+<span class="kw">pub type </span>TestResult = <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_eq_schema</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">let</span> <span class="ident">no_whitespace_expected</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">left</span>.<span class="ident">replace</span>(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">replace</span>(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">no_whitespace_result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">right</span>.<span class="ident">replace</span>(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">replace</span>(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
+<span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_eq_schema {
+    (<span class="macro-nonterminal">$left</span>:expr, <span class="macro-nonterminal">$right</span>:expr) =&gt; {
+        <span class="kw">let </span>no_whitespace_expected = <span class="macro-nonterminal">$left</span>.replace(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span>no_whitespace_result = <span class="macro-nonterminal">$right</span>.replace(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot;&quot;</span>);
 
-        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="ident">no_whitespace_result</span>, <span class="ident">no_whitespace_expected</span>);
+        <span class="macro">pretty_assertions::assert_eq!</span>(no_whitespace_result, no_whitespace_expected);
     };
 }
 
-<span class="doccomment">/// Left side should be `serde_json::Value` and the right side a string that can</span>
-<span class="doccomment">/// be converted to JSON.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_eq_json</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span>
-            <span class="ident">serde_json::from_str</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">as_str</span>()).<span class="ident">expect</span>(<span class="string">&quot;The right side value was not valid JSON.&quot;</span>);
+<span class="doccomment">/// Left side should be `serde_json::Value` and the right side a string that can
+/// be converted to JSON.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_eq_json {
+    (<span class="macro-nonterminal">$expected</span>:expr, <span class="macro-nonterminal">$result</span>:expr) =&gt; {
+        <span class="kw">let </span>val: serde_json::Value =
+            serde_json::from_str(<span class="macro-nonterminal">$result</span>.as_str()).expect(<span class="string">&quot;The right side value was not valid JSON.&quot;</span>);
 
-        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>, <span class="ident">val</span>);
+        <span class="macro">pretty_assertions::assert_eq!</span>(<span class="macro-nonterminal">$expected</span>, val);
     };
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BarrelMigrationExecutor</span> {
-    <span class="ident">database</span>: <span class="ident">Quaint</span>,
-    <span class="ident">sql_variant</span>: <span class="ident">barrel::backend::SqlVariant</span>,
-    <span class="ident">schema_name</span>: <span class="ident">String</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>BarrelMigrationExecutor {
+    database: Quaint,
+    sql_variant: barrel::backend::SqlVariant,
+    schema_name: String,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">BarrelMigrationExecutor</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_fn</span>: <span class="ident">F</span>) -&gt; <span class="ident">TestResult</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Migration</span>),
+<span class="kw">impl </span>BarrelMigrationExecutor {
+    <span class="kw">pub async fn </span>execute&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, migration_fn: F) -&gt; TestResult
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Migration),
     {
-        <span class="self">self</span>.<span class="ident">execute_with_schema</span>(<span class="ident">migration_fn</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema_name</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.execute_with_schema(migration_fn, <span class="kw-2">&amp;</span><span class="self">self</span>.schema_name).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_with_schema</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_fn</span>: <span class="ident">F</span>, <span class="ident">schema_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TestResult</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Migration</span>),
+    <span class="kw">pub async fn </span>execute_with_schema&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, migration_fn: F, schema_name: <span class="kw-2">&amp;</span>str) -&gt; TestResult
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Migration),
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">migration</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tags</span>.<span class="ident">intersects</span>(<span class="ident">Tags::Vitess</span>) {
-            <span class="ident">Migration::new</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">Migration::new</span>().<span class="ident">schema</span>(<span class="ident">schema_name</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>migration = <span class="kw">if </span><span class="self">self</span>.tags.intersects(Tags::Vitess) {
+            Migration::new()
+        } <span class="kw">else </span>{
+            Migration::new().schema(schema_name)
         };
 
-        <span class="ident">migration_fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">migration</span>);
+        migration_fn(<span class="kw-2">&amp;mut </span>migration);
 
-        <span class="kw">let</span> <span class="ident">full_sql</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">make_from</span>(<span class="self">self</span>.<span class="ident">sql_variant</span>);
+        <span class="kw">let </span>full_sql = migration.make_from(<span class="self">self</span>.sql_variant);
 
-        <span class="kw">if</span> <span class="ident">full_sql</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span>full_sql.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="self">self</span>.<span class="ident">database</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">full_sql</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.database.raw_cmd(<span class="kw-2">&amp;</span>full_sql).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

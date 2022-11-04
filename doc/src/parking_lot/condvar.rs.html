@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot-0.12.1/src/condvar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>condvar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot-0.12.1/src/condvar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>condvar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1269,1276 +1269,1276 @@
 <span id="1269">1269</span>
 <span id="1270">1270</span>
 <span id="1271">1271</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Amanieu d&#39;Antras</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Amanieu d&#39;Antras
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mutex::MutexGuard</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::raw_mutex</span>::{<span class="ident">RawMutex</span>, <span class="ident">TOKEN_HANDOFF</span>, <span class="ident">TOKEN_NORMAL</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">deadlock</span>, <span class="ident">util</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">fmt</span>, <span class="ident">ptr</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicPtr</span>, <span class="ident">Ordering</span>},
+</span><span class="kw">use </span><span class="kw">crate</span>::mutex::MutexGuard;
+<span class="kw">use </span><span class="kw">crate</span>::raw_mutex::{RawMutex, TOKEN_HANDOFF, TOKEN_NORMAL};
+<span class="kw">use crate</span>::{deadlock, util};
+<span class="kw">use </span>core::{
+    fmt, ptr,
+    sync::atomic::{AtomicPtr, Ordering},
 };
-<span class="kw">use</span> <span class="ident">lock_api::RawMutex</span> <span class="kw">as</span> <span class="ident">RawMutex_</span>;
-<span class="kw">use</span> <span class="ident">parking_lot_core</span>::{<span class="self">self</span>, <span class="ident">ParkResult</span>, <span class="ident">RequeueOp</span>, <span class="ident">UnparkResult</span>, <span class="ident">DEFAULT_PARK_TOKEN</span>};
-<span class="kw">use</span> <span class="ident">std::ops::DerefMut</span>;
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+<span class="kw">use </span>lock_api::RawMutex <span class="kw">as </span>RawMutex_;
+<span class="kw">use </span>parking_lot_core::{<span class="self">self</span>, ParkResult, RequeueOp, UnparkResult, DEFAULT_PARK_TOKEN};
+<span class="kw">use </span>std::ops::DerefMut;
+<span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="doccomment">/// A type indicating whether a timed wait on a condition variable returned</span>
-<span class="doccomment">/// due to a time out or not.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WaitTimeoutResult</span>(<span class="ident">bool</span>);
+<span class="doccomment">/// A type indicating whether a timed wait on a condition variable returned
+/// due to a time out or not.
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+</span><span class="kw">pub struct </span>WaitTimeoutResult(bool);
 
-<span class="kw">impl</span> <span class="ident">WaitTimeoutResult</span> {
-    <span class="doccomment">/// Returns whether the wait was known to have timed out.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timed_out</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>WaitTimeoutResult {
+    <span class="doccomment">/// Returns whether the wait was known to have timed out.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>timed_out(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// A Condition Variable</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Condition variables represent the ability to block a thread such that it</span>
-<span class="doccomment">/// consumes no CPU time while waiting for an event to occur. Condition</span>
-<span class="doccomment">/// variables are typically associated with a boolean predicate (a condition)</span>
-<span class="doccomment">/// and a mutex. The predicate is always verified inside of the mutex before</span>
-<span class="doccomment">/// determining that thread must block.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this module places one additional restriction over the system</span>
-<span class="doccomment">/// condition variables: each condvar can be used with only one mutex at a</span>
-<span class="doccomment">/// time. Any attempt to use multiple mutexes on the same condition variable</span>
-<span class="doccomment">/// simultaneously will result in a runtime panic. However it is possible to</span>
-<span class="doccomment">/// switch to a different mutex if there are no threads currently waiting on</span>
-<span class="doccomment">/// the condition variable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Differences from the standard library `Condvar`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - No spurious wakeups: A wait will only return a non-timeout result if it</span>
-<span class="doccomment">///   was woken up by `notify_one` or `notify_all`.</span>
-<span class="doccomment">/// - `Condvar::notify_all` will only wake up a single thread, the rest are</span>
-<span class="doccomment">///   requeued to wait for the `Mutex` to be unlocked by the thread that was</span>
-<span class="doccomment">///   woken up.</span>
-<span class="doccomment">/// - Only requires 1 word of space, whereas the standard library boxes the</span>
-<span class="doccomment">///   `Condvar` due to platform limitations.</span>
-<span class="doccomment">/// - Can be statically constructed.</span>
-<span class="doccomment">/// - Does not require any drop glue when dropped.</span>
-<span class="doccomment">/// - Inline fast path for the uncontended case.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parking_lot::{Mutex, Condvar};</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">/// use std::thread;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pair = Arc::new((Mutex::new(false), Condvar::new()));</span>
-<span class="doccomment">/// let pair2 = pair.clone();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Inside of our lock, spawn a new thread, and then wait for it to start</span>
-<span class="doccomment">/// thread::spawn(move|| {</span>
-<span class="doccomment">///     let &amp;(ref lock, ref cvar) = &amp;*pair2;</span>
-<span class="doccomment">///     let mut started = lock.lock();</span>
-<span class="doccomment">///     *started = true;</span>
-<span class="doccomment">///     cvar.notify_one();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // wait for the thread to start up</span>
-<span class="doccomment">/// let &amp;(ref lock, ref cvar) = &amp;*pair;</span>
-<span class="doccomment">/// let mut started = lock.lock();</span>
-<span class="doccomment">/// if !*started {</span>
-<span class="doccomment">///     cvar.wait(&amp;mut started);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// // Note that we used an if instead of a while loop above. This is only</span>
-<span class="doccomment">/// // possible because parking_lot&#39;s Condvar will never spuriously wake up.</span>
-<span class="doccomment">/// // This means that wait() will only return after notify_one or notify_all is</span>
-<span class="doccomment">/// // called.</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Condvar</span> {
-    <span class="ident">state</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">RawMutex</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A Condition Variable
+///
+/// Condition variables represent the ability to block a thread such that it
+/// consumes no CPU time while waiting for an event to occur. Condition
+/// variables are typically associated with a boolean predicate (a condition)
+/// and a mutex. The predicate is always verified inside of the mutex before
+/// determining that thread must block.
+///
+/// Note that this module places one additional restriction over the system
+/// condition variables: each condvar can be used with only one mutex at a
+/// time. Any attempt to use multiple mutexes on the same condition variable
+/// simultaneously will result in a runtime panic. However it is possible to
+/// switch to a different mutex if there are no threads currently waiting on
+/// the condition variable.
+///
+/// # Differences from the standard library `Condvar`
+///
+/// - No spurious wakeups: A wait will only return a non-timeout result if it
+///   was woken up by `notify_one` or `notify_all`.
+/// - `Condvar::notify_all` will only wake up a single thread, the rest are
+///   requeued to wait for the `Mutex` to be unlocked by the thread that was
+///   woken up.
+/// - Only requires 1 word of space, whereas the standard library boxes the
+///   `Condvar` due to platform limitations.
+/// - Can be statically constructed.
+/// - Does not require any drop glue when dropped.
+/// - Inline fast path for the uncontended case.
+///
+/// # Examples
+///
+/// ```
+/// use parking_lot::{Mutex, Condvar};
+/// use std::sync::Arc;
+/// use std::thread;
+///
+/// let pair = Arc::new((Mutex::new(false), Condvar::new()));
+/// let pair2 = pair.clone();
+///
+/// // Inside of our lock, spawn a new thread, and then wait for it to start
+/// thread::spawn(move|| {
+///     let &amp;(ref lock, ref cvar) = &amp;*pair2;
+///     let mut started = lock.lock();
+///     *started = true;
+///     cvar.notify_one();
+/// });
+///
+/// // wait for the thread to start up
+/// let &amp;(ref lock, ref cvar) = &amp;*pair;
+/// let mut started = lock.lock();
+/// if !*started {
+///     cvar.wait(&amp;mut started);
+/// }
+/// // Note that we used an if instead of a while loop above. This is only
+/// // possible because parking_lot&#39;s Condvar will never spuriously wake up.
+/// // This means that wait() will only return after notify_one or notify_all is
+/// // called.
+/// ```
+</span><span class="kw">pub struct </span>Condvar {
+    state: AtomicPtr&lt;RawMutex&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Condvar</span> {
-    <span class="doccomment">/// Creates a new condition variable which is ready to be waited on and</span>
-    <span class="doccomment">/// notified.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Condvar</span> {
-        <span class="ident">Condvar</span> {
-            <span class="ident">state</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
+<span class="kw">impl </span>Condvar {
+    <span class="doccomment">/// Creates a new condition variable which is ready to be waited on and
+    /// notified.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>new() -&gt; Condvar {
+        Condvar {
+            state: AtomicPtr::new(ptr::null_mut()),
         }
     }
 
-    <span class="doccomment">/// Wakes up one blocked thread on this condvar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns whether a thread was woken up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If there is a blocked thread on this condition variable, then it will</span>
-    <span class="doccomment">/// be woken up from its call to `wait` or `wait_timeout`. Calls to</span>
-    <span class="doccomment">/// `notify_one` are not buffered in any way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To wake up all threads, see `notify_all()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use parking_lot::Condvar;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let condvar = Condvar::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // do something with condvar, share it with other threads</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// if !condvar.notify_one() {</span>
-    <span class="doccomment">///     println!(&quot;Nobody was listening for this.&quot;);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Nothing to do if there are no waiting threads</span>
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Wakes up one blocked thread on this condvar.
+    ///
+    /// Returns whether a thread was woken up.
+    ///
+    /// If there is a blocked thread on this condition variable, then it will
+    /// be woken up from its call to `wait` or `wait_timeout`. Calls to
+    /// `notify_one` are not buffered in any way.
+    ///
+    /// To wake up all threads, see `notify_all()`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use parking_lot::Condvar;
+    ///
+    /// let condvar = Condvar::new();
+    ///
+    /// // do something with condvar, share it with other threads
+    ///
+    /// if !condvar.notify_one() {
+    ///     println!(&quot;Nobody was listening for this.&quot;);
+    /// }
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>notify_one(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="comment">// Nothing to do if there are no waiting threads
+        </span><span class="kw">let </span>state = <span class="self">self</span>.state.load(Ordering::Relaxed);
+        <span class="kw">if </span>state.is_null() {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">notify_one_slow</span>(<span class="ident">state</span>)
+        <span class="self">self</span>.notify_one_slow(state)
     }
 
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_one_slow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mutex</span>: <span class="kw-2">*mut</span> <span class="ident">RawMutex</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Unpark one thread and requeue the rest onto the mutex</span>
-        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">mutex</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="ident">validate</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="comment">// Make sure that our atomic state still points to the same</span>
-                <span class="comment">// mutex. If not then it means that all threads on the current</span>
-                <span class="comment">// mutex were woken up and a new waiting thread switched to a</span>
-                <span class="comment">// different mutex. In that case we can get away with doing</span>
-                <span class="comment">// nothing.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">mutex</span> {
-                    <span class="kw">return</span> <span class="ident">RequeueOp::Abort</span>;
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>notify_one_slow(<span class="kw-2">&amp;</span><span class="self">self</span>, mutex: <span class="kw-2">*mut </span>RawMutex) -&gt; bool {
+        <span class="comment">// Unpark one thread and requeue the rest onto the mutex
+        </span><span class="kw">let </span>from = <span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize;
+        <span class="kw">let </span>to = mutex <span class="kw">as </span>usize;
+            <span class="kw">let </span>validate = || {
+                <span class="comment">// Make sure that our atomic state still points to the same
+                // mutex. If not then it means that all threads on the current
+                // mutex were woken up and a new waiting thread switched to a
+                // different mutex. In that case we can get away with doing
+                // nothing.
+                </span><span class="kw">if </span><span class="self">self</span>.state.load(Ordering::Relaxed) != mutex {
+                    <span class="kw">return </span>RequeueOp::Abort;
                 }
 
-                <span class="comment">// Unpark one thread if the mutex is unlocked, otherwise just</span>
-                <span class="comment">// requeue everything to the mutex. This is safe to do here</span>
-                <span class="comment">// since unlocking the mutex when the parked bit is set requires</span>
-                <span class="comment">// locking the queue. There is the possibility of a race if the</span>
-                <span class="comment">// mutex gets locked after we check, but that doesn&#39;t matter in</span>
-                <span class="comment">// this case.</span>
-                <span class="kw">if</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">mutex</span>).<span class="ident">mark_parked_if_locked</span>() } {
-                    <span class="ident">RequeueOp::RequeueOne</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">RequeueOp::UnparkOne</span>
+                <span class="comment">// Unpark one thread if the mutex is unlocked, otherwise just
+                // requeue everything to the mutex. This is safe to do here
+                // since unlocking the mutex when the parked bit is set requires
+                // locking the queue. There is the possibility of a race if the
+                // mutex gets locked after we check, but that doesn&#39;t matter in
+                // this case.
+                </span><span class="kw">if unsafe </span>{ (<span class="kw-2">*</span>mutex).mark_parked_if_locked() } {
+                    RequeueOp::RequeueOne
+                } <span class="kw">else </span>{
+                    RequeueOp::UnparkOne
                 }
             };
-            <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="op">|</span><span class="ident">_op</span>, <span class="ident">result</span>: <span class="ident">UnparkResult</span><span class="op">|</span> {
-                <span class="comment">// Clear our state if there are no more waiting threads</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">have_more_threads</span> {
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">let </span>callback = |_op, result: UnparkResult| {
+                <span class="comment">// Clear our state if there are no more waiting threads
+                </span><span class="kw">if </span>!result.have_more_threads {
+                    <span class="self">self</span>.state.store(ptr::null_mut(), Ordering::Relaxed);
                 }
-                <span class="ident">TOKEN_NORMAL</span>
+                TOKEN_NORMAL
             };
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">parking_lot_core::unpark_requeue</span>(<span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">validate</span>, <span class="ident">callback</span>) };
+            <span class="kw">let </span>res = <span class="kw">unsafe </span>{ parking_lot_core::unpark_requeue(from, to, validate, callback) };
 
-            <span class="ident">res</span>.<span class="ident">unparked_threads</span> <span class="op">+</span> <span class="ident">res</span>.<span class="ident">requeued_threads</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    }
+            res.unparked_threads + res.requeued_threads != <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Wakes up all blocked threads on this condvar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the number of threads woken up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will ensure that any current waiters on the condition</span>
-    <span class="doccomment">/// variable are awoken. Calls to `notify_all()` are not buffered in any</span>
-    <span class="doccomment">/// way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To wake up only one thread, see `notify_one()`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">notify_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="comment">// Nothing to do if there are no waiting threads</span>
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="number">0</span>;
+    <span class="doccomment">/// Wakes up all blocked threads on this condvar.
+    ///
+    /// Returns the number of threads woken up.
+    ///
+    /// This method will ensure that any current waiters on the condition
+    /// variable are awoken. Calls to `notify_all()` are not buffered in any
+    /// way.
+    ///
+    /// To wake up only one thread, see `notify_one()`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>notify_all(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="comment">// Nothing to do if there are no waiting threads
+        </span><span class="kw">let </span>state = <span class="self">self</span>.state.load(Ordering::Relaxed);
+        <span class="kw">if </span>state.is_null() {
+            <span class="kw">return </span><span class="number">0</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">notify_all_slow</span>(<span class="ident">state</span>)
+        <span class="self">self</span>.notify_all_slow(state)
     }
 
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_all_slow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mutex</span>: <span class="kw-2">*mut</span> <span class="ident">RawMutex</span>) -&gt; <span class="ident">usize</span> {
-            <span class="comment">// Unpark one thread and requeue the rest onto the mutex</span>
-            <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">mutex</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">let</span> <span class="ident">validate</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="comment">// Make sure that our atomic state still points to the same</span>
-                <span class="comment">// mutex. If not then it means that all threads on the current</span>
-                <span class="comment">// mutex were woken up and a new waiting thread switched to a</span>
-                <span class="comment">// different mutex. In that case we can get away with doing</span>
-                <span class="comment">// nothing.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">mutex</span> {
-                    <span class="kw">return</span> <span class="ident">RequeueOp::Abort</span>;
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>notify_all_slow(<span class="kw-2">&amp;</span><span class="self">self</span>, mutex: <span class="kw-2">*mut </span>RawMutex) -&gt; usize {
+            <span class="comment">// Unpark one thread and requeue the rest onto the mutex
+            </span><span class="kw">let </span>from = <span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize;
+            <span class="kw">let </span>to = mutex <span class="kw">as </span>usize;
+            <span class="kw">let </span>validate = || {
+                <span class="comment">// Make sure that our atomic state still points to the same
+                // mutex. If not then it means that all threads on the current
+                // mutex were woken up and a new waiting thread switched to a
+                // different mutex. In that case we can get away with doing
+                // nothing.
+                </span><span class="kw">if </span><span class="self">self</span>.state.load(Ordering::Relaxed) != mutex {
+                    <span class="kw">return </span>RequeueOp::Abort;
                 }
 
-                <span class="comment">// Clear our state since we are going to unpark or requeue all</span>
-                <span class="comment">// threads.</span>
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">Ordering::Relaxed</span>);
+                <span class="comment">// Clear our state since we are going to unpark or requeue all
+                // threads.
+                </span><span class="self">self</span>.state.store(ptr::null_mut(), Ordering::Relaxed);
 
-                <span class="comment">// Unpark one thread if the mutex is unlocked, otherwise just</span>
-                <span class="comment">// requeue everything to the mutex. This is safe to do here</span>
-                <span class="comment">// since unlocking the mutex when the parked bit is set requires</span>
-                <span class="comment">// locking the queue. There is the possibility of a race if the</span>
-                <span class="comment">// mutex gets locked after we check, but that doesn&#39;t matter in</span>
-                <span class="comment">// this case.</span>
-                <span class="kw">if</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">mutex</span>).<span class="ident">mark_parked_if_locked</span>() } {
-                    <span class="ident">RequeueOp::RequeueAll</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">RequeueOp::UnparkOneRequeueRest</span>
+                <span class="comment">// Unpark one thread if the mutex is unlocked, otherwise just
+                // requeue everything to the mutex. This is safe to do here
+                // since unlocking the mutex when the parked bit is set requires
+                // locking the queue. There is the possibility of a race if the
+                // mutex gets locked after we check, but that doesn&#39;t matter in
+                // this case.
+                </span><span class="kw">if unsafe </span>{ (<span class="kw-2">*</span>mutex).mark_parked_if_locked() } {
+                    RequeueOp::RequeueAll
+                } <span class="kw">else </span>{
+                    RequeueOp::UnparkOneRequeueRest
                 }
             };
-            <span class="kw">let</span> <span class="ident">callback</span> <span class="op">=</span> <span class="op">|</span><span class="ident">op</span>, <span class="ident">result</span>: <span class="ident">UnparkResult</span><span class="op">|</span> {
-                <span class="comment">// If we requeued threads to the mutex, mark it as having</span>
-                <span class="comment">// parked threads. The RequeueAll case is already handled above.</span>
-                <span class="kw">if</span> <span class="ident">op</span> <span class="op">==</span> <span class="ident">RequeueOp::UnparkOneRequeueRest</span> <span class="op">&amp;&amp;</span> <span class="ident">result</span>.<span class="ident">requeued_threads</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">mutex</span>).<span class="ident">mark_parked</span>() };
+            <span class="kw">let </span>callback = |op, result: UnparkResult| {
+                <span class="comment">// If we requeued threads to the mutex, mark it as having
+                // parked threads. The RequeueAll case is already handled above.
+                </span><span class="kw">if </span>op == RequeueOp::UnparkOneRequeueRest &amp;&amp; result.requeued_threads != <span class="number">0 </span>{
+                    <span class="kw">unsafe </span>{ (<span class="kw-2">*</span>mutex).mark_parked() };
                 }
-                <span class="ident">TOKEN_NORMAL</span>
+                TOKEN_NORMAL
             };
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">parking_lot_core::unpark_requeue</span>(<span class="ident">from</span>, <span class="ident">to</span>, <span class="ident">validate</span>, <span class="ident">callback</span>) };
+            <span class="kw">let </span>res = <span class="kw">unsafe </span>{ parking_lot_core::unpark_requeue(from, to, validate, callback) };
 
-            <span class="ident">res</span>.<span class="ident">unparked_threads</span> <span class="op">+</span> <span class="ident">res</span>.<span class="ident">requeued_threads</span>
+            res.unparked_threads + res.requeued_threads
     }
 
-    <span class="doccomment">/// Blocks the current thread until this condition variable receives a</span>
-    <span class="doccomment">/// notification.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will atomically unlock the mutex specified (represented by</span>
-    <span class="doccomment">/// `mutex_guard`) and block the current thread. This means that any calls</span>
-    <span class="doccomment">/// to `notify_*()` which happen logically after the mutex is unlocked are</span>
-    <span class="doccomment">/// candidates to wake this thread up. When this function call returns, the</span>
-    <span class="doccomment">/// lock specified will have been re-acquired.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if another thread is waiting on the `Condvar`</span>
-    <span class="doccomment">/// with a different `Mutex` object.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">wait_until_internal</span>(<span class="kw">unsafe</span> { <span class="ident">MutexGuard::mutex</span>(<span class="ident">mutex_guard</span>).<span class="ident">raw</span>() }, <span class="prelude-val">None</span>);
+    <span class="doccomment">/// Blocks the current thread until this condition variable receives a
+    /// notification.
+    ///
+    /// This function will atomically unlock the mutex specified (represented by
+    /// `mutex_guard`) and block the current thread. This means that any calls
+    /// to `notify_*()` which happen logically after the mutex is unlocked are
+    /// candidates to wake this thread up. When this function call returns, the
+    /// lock specified will have been re-acquired.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if another thread is waiting on the `Condvar`
+    /// with a different `Mutex` object.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait&lt;T: <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;) {
+        <span class="self">self</span>.wait_until_internal(<span class="kw">unsafe </span>{ MutexGuard::mutex(mutex_guard).raw() }, <span class="prelude-val">None</span>);
     }
 
-    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after</span>
-    <span class="doccomment">/// the specified time instant.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The semantics of this function are equivalent to `wait()` except that</span>
-    <span class="doccomment">/// the thread will be blocked roughly until `timeout` is reached. This</span>
-    <span class="doccomment">/// method should not be used for precise timing due to anomalies such as</span>
-    <span class="doccomment">/// preemption or platform differences that may not cause the maximum</span>
-    <span class="doccomment">/// amount of time waited to be precisely `timeout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the best effort is made to ensure that the time waited is</span>
-    <span class="doccomment">/// measured with a monotonic clock, and not affected by the changes made to</span>
-    <span class="doccomment">/// the system time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `WaitTimeoutResult` value indicates if the timeout is</span>
-    <span class="doccomment">/// known to have elapsed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like `wait`, the lock specified will be re-acquired when this function</span>
-    <span class="doccomment">/// returns, regardless of whether the timeout elapsed or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if another thread is waiting on the `Condvar`</span>
-    <span class="doccomment">/// with a different `Mutex` object.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_until</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after
+    /// the specified time instant.
+    ///
+    /// The semantics of this function are equivalent to `wait()` except that
+    /// the thread will be blocked roughly until `timeout` is reached. This
+    /// method should not be used for precise timing due to anomalies such as
+    /// preemption or platform differences that may not cause the maximum
+    /// amount of time waited to be precisely `timeout`.
+    ///
+    /// Note that the best effort is made to ensure that the time waited is
+    /// measured with a monotonic clock, and not affected by the changes made to
+    /// the system time.
+    ///
+    /// The returned `WaitTimeoutResult` value indicates if the timeout is
+    /// known to have elapsed.
+    ///
+    /// Like `wait`, the lock specified will be re-acquired when this function
+    /// returns, regardless of whether the timeout elapsed or not.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if another thread is waiting on the `Condvar`
+    /// with a different `Mutex` object.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_until&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">timeout</span>: <span class="ident">Instant</span>,
-    ) -&gt; <span class="ident">WaitTimeoutResult</span> {
-        <span class="self">self</span>.<span class="ident">wait_until_internal</span>(
-            <span class="kw">unsafe</span> { <span class="ident">MutexGuard::mutex</span>(<span class="ident">mutex_guard</span>).<span class="ident">raw</span>() },
-            <span class="prelude-val">Some</span>(<span class="ident">timeout</span>),
+        mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        timeout: Instant,
+    ) -&gt; WaitTimeoutResult {
+        <span class="self">self</span>.wait_until_internal(
+            <span class="kw">unsafe </span>{ MutexGuard::mutex(mutex_guard).raw() },
+            <span class="prelude-val">Some</span>(timeout),
         )
     }
 
-    <span class="comment">// This is a non-generic function to reduce the monomorphization cost of</span>
-    <span class="comment">// using `wait_until`.</span>
-    <span class="kw">fn</span> <span class="ident">wait_until_internal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mutex</span>: <span class="kw-2">&amp;</span><span class="ident">RawMutex</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) -&gt; <span class="ident">WaitTimeoutResult</span> {
-            <span class="kw">let</span> <span class="ident">result</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bad_mutex</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">requeued</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="comment">// This is a non-generic function to reduce the monomorphization cost of
+    // using `wait_until`.
+    </span><span class="kw">fn </span>wait_until_internal(<span class="kw-2">&amp;</span><span class="self">self</span>, mutex: <span class="kw-2">&amp;</span>RawMutex, timeout: <span class="prelude-ty">Option</span>&lt;Instant&gt;) -&gt; WaitTimeoutResult {
+            <span class="kw">let </span>result;
+            <span class="kw">let </span><span class="kw-2">mut </span>bad_mutex = <span class="bool-val">false</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>requeued = <span class="bool-val">false</span>;
             {
-                <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">lock_addr</span> <span class="op">=</span> <span class="ident">mutex</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>;
-                <span class="kw">let</span> <span class="ident">validate</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="comment">// Ensure we don&#39;t use two different mutexes with the same</span>
-                    <span class="comment">// Condvar at the same time. This is done while locked to</span>
-                    <span class="comment">// avoid races with notify_one</span>
-                    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-                    <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">is_null</span>() {
-                        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">lock_addr</span>, <span class="ident">Ordering::Relaxed</span>);
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">lock_addr</span> {
-                        <span class="ident">bad_mutex</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">let </span>addr = <span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize;
+                <span class="kw">let </span>lock_addr = mutex <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*mut </span><span class="kw">_</span>;
+                <span class="kw">let </span>validate = || {
+                    <span class="comment">// Ensure we don&#39;t use two different mutexes with the same
+                    // Condvar at the same time. This is done while locked to
+                    // avoid races with notify_one
+                    </span><span class="kw">let </span>state = <span class="self">self</span>.state.load(Ordering::Relaxed);
+                    <span class="kw">if </span>state.is_null() {
+                        <span class="self">self</span>.state.store(lock_addr, Ordering::Relaxed);
+                    } <span class="kw">else if </span>state != lock_addr {
+                        bad_mutex = <span class="bool-val">true</span>;
+                        <span class="kw">return </span><span class="bool-val">false</span>;
                     }
-                    <span class="bool-val">true</span>
+                    <span class="bool-val">true
+                </span>};
+                <span class="kw">let </span>before_sleep = || {
+                    <span class="comment">// Unlock the mutex before sleeping...
+                    </span><span class="kw">unsafe </span>{ mutex.unlock() };
                 };
-                <span class="kw">let</span> <span class="ident">before_sleep</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-                    <span class="comment">// Unlock the mutex before sleeping...</span>
-                    <span class="kw">unsafe</span> { <span class="ident">mutex</span>.<span class="ident">unlock</span>() };
-                };
-                <span class="kw">let</span> <span class="ident">timed_out</span> <span class="op">=</span> <span class="op">|</span><span class="ident">k</span>, <span class="ident">was_last_thread</span><span class="op">|</span> {
-                    <span class="comment">// If we were requeued to a mutex, then we did not time out.</span>
-                    <span class="comment">// We&#39;ll just park ourselves on the mutex again when we try</span>
-                    <span class="comment">// to lock it later.</span>
-                    <span class="ident">requeued</span> <span class="op">=</span> <span class="ident">k</span> <span class="op">!</span><span class="op">=</span> <span class="ident">addr</span>;
+                <span class="kw">let </span>timed_out = |k, was_last_thread| {
+                    <span class="comment">// If we were requeued to a mutex, then we did not time out.
+                    // We&#39;ll just park ourselves on the mutex again when we try
+                    // to lock it later.
+                    </span>requeued = k != addr;
 
-                    <span class="comment">// If we were the last thread on the queue then we need to</span>
-                    <span class="comment">// clear our state. This is normally done by the</span>
-                    <span class="comment">// notify_{one,all} functions when not timing out.</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">requeued</span> <span class="op">&amp;&amp;</span> <span class="ident">was_last_thread</span> {
-                        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">Ordering::Relaxed</span>);
+                    <span class="comment">// If we were the last thread on the queue then we need to
+                    // clear our state. This is normally done by the
+                    // notify_{one,all} functions when not timing out.
+                    </span><span class="kw">if </span>!requeued &amp;&amp; was_last_thread {
+                        <span class="self">self</span>.state.store(ptr::null_mut(), Ordering::Relaxed);
                     }
                 };
-                <span class="ident">result</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">parking_lot_core::park</span>(
-                    <span class="ident">addr</span>,
-                    <span class="ident">validate</span>,
-                    <span class="ident">before_sleep</span>,
-                    <span class="ident">timed_out</span>,
-                    <span class="ident">DEFAULT_PARK_TOKEN</span>,
-                    <span class="ident">timeout</span>,
+                result = <span class="kw">unsafe </span>{ parking_lot_core::park(
+                    addr,
+                    validate,
+                    before_sleep,
+                    timed_out,
+                    DEFAULT_PARK_TOKEN,
+                    timeout,
                 ) };
             }
 
-            <span class="comment">// Panic if we tried to use multiple mutexes with a Condvar. Note</span>
-            <span class="comment">// that at this point the MutexGuard is still locked. It will be</span>
-            <span class="comment">// unlocked by the unwinding logic.</span>
-            <span class="kw">if</span> <span class="ident">bad_mutex</span> {
+            <span class="comment">// Panic if we tried to use multiple mutexes with a Condvar. Note
+            // that at this point the MutexGuard is still locked. It will be
+            // unlocked by the unwinding logic.
+            </span><span class="kw">if </span>bad_mutex {
                 <span class="macro">panic!</span>(<span class="string">&quot;attempted to use a condition variable with more than one mutex&quot;</span>);
             }
 
-            <span class="comment">// ... and re-lock it once we are done sleeping</span>
-            <span class="kw">if</span> <span class="ident">result</span> <span class="op">==</span> <span class="ident">ParkResult::Unparked</span>(<span class="ident">TOKEN_HANDOFF</span>) {
-                <span class="kw">unsafe</span> { <span class="ident">deadlock::acquire_resource</span>(<span class="ident">mutex</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>) };
-            } <span class="kw">else</span> {
-                <span class="ident">mutex</span>.<span class="ident">lock</span>();
+            <span class="comment">// ... and re-lock it once we are done sleeping
+            </span><span class="kw">if </span>result == ParkResult::Unparked(TOKEN_HANDOFF) {
+                <span class="kw">unsafe </span>{ deadlock::acquire_resource(mutex <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize) };
+            } <span class="kw">else </span>{
+                mutex.lock();
             }
 
-            <span class="ident">WaitTimeoutResult</span>(<span class="op">!</span>(<span class="ident">result</span>.<span class="ident">is_unparked</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">requeued</span>))
+            WaitTimeoutResult(!(result.is_unparked() || requeued))
     }
 
-    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after a</span>
-    <span class="doccomment">/// specified duration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The semantics of this function are equivalent to `wait()` except that</span>
-    <span class="doccomment">/// the thread will be blocked for roughly no longer than `timeout`. This</span>
-    <span class="doccomment">/// method should not be used for precise timing due to anomalies such as</span>
-    <span class="doccomment">/// preemption or platform differences that may not cause the maximum</span>
-    <span class="doccomment">/// amount of time waited to be precisely `timeout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the best effort is made to ensure that the time waited is</span>
-    <span class="doccomment">/// measured with a monotonic clock, and not affected by the changes made to</span>
-    <span class="doccomment">/// the system time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `WaitTimeoutResult` value indicates if the timeout is</span>
-    <span class="doccomment">/// known to have elapsed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like `wait`, the lock specified will be re-acquired when this function</span>
-    <span class="doccomment">/// returns, regardless of whether the timeout elapsed or not.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_for</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after a
+    /// specified duration.
+    ///
+    /// The semantics of this function are equivalent to `wait()` except that
+    /// the thread will be blocked for roughly no longer than `timeout`. This
+    /// method should not be used for precise timing due to anomalies such as
+    /// preemption or platform differences that may not cause the maximum
+    /// amount of time waited to be precisely `timeout`.
+    ///
+    /// Note that the best effort is made to ensure that the time waited is
+    /// measured with a monotonic clock, and not affected by the changes made to
+    /// the system time.
+    ///
+    /// The returned `WaitTimeoutResult` value indicates if the timeout is
+    /// known to have elapsed.
+    ///
+    /// Like `wait`, the lock specified will be re-acquired when this function
+    /// returns, regardless of whether the timeout elapsed or not.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_for&lt;T: <span class="question-mark">?</span>Sized&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    ) -&gt; <span class="ident">WaitTimeoutResult</span> {
-        <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="ident">util::to_deadline</span>(<span class="ident">timeout</span>);
-        <span class="self">self</span>.<span class="ident">wait_until_internal</span>(<span class="kw">unsafe</span> { <span class="ident">MutexGuard::mutex</span>(<span class="ident">mutex_guard</span>).<span class="ident">raw</span>() }, <span class="ident">deadline</span>)
+        mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        timeout: Duration,
+    ) -&gt; WaitTimeoutResult {
+        <span class="kw">let </span>deadline = util::to_deadline(timeout);
+        <span class="self">self</span>.wait_until_internal(<span class="kw">unsafe </span>{ MutexGuard::mutex(mutex_guard).raw() }, deadline)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_while_until_internal</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>wait_while_until_internal&lt;T, F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">condition</span>: <span class="ident">F</span>,
-        <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">WaitTimeoutResult</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+        mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        <span class="kw-2">mut </span>condition: F,
+        timeout: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    ) -&gt; WaitTimeoutResult
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized,
+        F: FnMut(<span class="kw-2">&amp;mut </span>T) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">WaitTimeoutResult</span>(<span class="bool-val">false</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = WaitTimeoutResult(<span class="bool-val">false</span>);
 
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">timed_out</span>() <span class="op">&amp;&amp;</span> <span class="ident">condition</span>(<span class="ident">mutex_guard</span>.<span class="ident">deref_mut</span>()) {
-            <span class="ident">result</span> <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">wait_until_internal</span>(<span class="kw">unsafe</span> { <span class="ident">MutexGuard::mutex</span>(<span class="ident">mutex_guard</span>).<span class="ident">raw</span>() }, <span class="ident">timeout</span>);
+        <span class="kw">while </span>!result.timed_out() &amp;&amp; condition(mutex_guard.deref_mut()) {
+            result =
+                <span class="self">self</span>.wait_until_internal(<span class="kw">unsafe </span>{ MutexGuard::mutex(mutex_guard).raw() }, timeout);
         }
 
-        <span class="ident">result</span>
+        result
     }
-    <span class="doccomment">/// Blocks the current thread until this condition variable receives a</span>
-    <span class="doccomment">/// notification. If the provided condition evaluates to `false`, then the</span>
-    <span class="doccomment">/// thread is no longer blocked and the operation is completed. If the</span>
-    <span class="doccomment">/// condition evaluates to `true`, then the thread is blocked again and</span>
-    <span class="doccomment">/// waits for another notification before repeating this process.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will atomically unlock the mutex specified (represented by</span>
-    <span class="doccomment">/// `mutex_guard`) and block the current thread. This means that any calls</span>
-    <span class="doccomment">/// to `notify_*()` which happen logically after the mutex is unlocked are</span>
-    <span class="doccomment">/// candidates to wake this thread up. When this function call returns, the</span>
-    <span class="doccomment">/// lock specified will have been re-acquired.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if another thread is waiting on the `Condvar`</span>
-    <span class="doccomment">/// with a different `Mutex` object.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_while</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">condition</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+    <span class="doccomment">/// Blocks the current thread until this condition variable receives a
+    /// notification. If the provided condition evaluates to `false`, then the
+    /// thread is no longer blocked and the operation is completed. If the
+    /// condition evaluates to `true`, then the thread is blocked again and
+    /// waits for another notification before repeating this process.
+    ///
+    /// This function will atomically unlock the mutex specified (represented by
+    /// `mutex_guard`) and block the current thread. This means that any calls
+    /// to `notify_*()` which happen logically after the mutex is unlocked are
+    /// candidates to wake this thread up. When this function call returns, the
+    /// lock specified will have been re-acquired.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if another thread is waiting on the `Condvar`
+    /// with a different `Mutex` object.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_while&lt;T, F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;, condition: F)
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized,
+        F: FnMut(<span class="kw-2">&amp;mut </span>T) -&gt; bool,
     {
-        <span class="self">self</span>.<span class="ident">wait_while_until_internal</span>(<span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="prelude-val">None</span>);
+        <span class="self">self</span>.wait_while_until_internal(mutex_guard, condition, <span class="prelude-val">None</span>);
     }
 
-    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after</span>
-    <span class="doccomment">/// the specified time instant. If the provided condition evaluates to</span>
-    <span class="doccomment">/// `false`, then the thread is no longer blocked and the operation is</span>
-    <span class="doccomment">/// completed. If the condition evaluates to `true`, then the thread is</span>
-    <span class="doccomment">/// blocked again and waits for another notification before repeating</span>
-    <span class="doccomment">/// this process.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The semantics of this function are equivalent to `wait()` except that</span>
-    <span class="doccomment">/// the thread will be blocked roughly until `timeout` is reached. This</span>
-    <span class="doccomment">/// method should not be used for precise timing due to anomalies such as</span>
-    <span class="doccomment">/// preemption or platform differences that may not cause the maximum</span>
-    <span class="doccomment">/// amount of time waited to be precisely `timeout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the best effort is made to ensure that the time waited is</span>
-    <span class="doccomment">/// measured with a monotonic clock, and not affected by the changes made to</span>
-    <span class="doccomment">/// the system time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `WaitTimeoutResult` value indicates if the timeout is</span>
-    <span class="doccomment">/// known to have elapsed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like `wait`, the lock specified will be re-acquired when this function</span>
-    <span class="doccomment">/// returns, regardless of whether the timeout elapsed or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will panic if another thread is waiting on the `Condvar`</span>
-    <span class="doccomment">/// with a different `Mutex` object.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_while_until</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after
+    /// the specified time instant. If the provided condition evaluates to
+    /// `false`, then the thread is no longer blocked and the operation is
+    /// completed. If the condition evaluates to `true`, then the thread is
+    /// blocked again and waits for another notification before repeating
+    /// this process.
+    ///
+    /// The semantics of this function are equivalent to `wait()` except that
+    /// the thread will be blocked roughly until `timeout` is reached. This
+    /// method should not be used for precise timing due to anomalies such as
+    /// preemption or platform differences that may not cause the maximum
+    /// amount of time waited to be precisely `timeout`.
+    ///
+    /// Note that the best effort is made to ensure that the time waited is
+    /// measured with a monotonic clock, and not affected by the changes made to
+    /// the system time.
+    ///
+    /// The returned `WaitTimeoutResult` value indicates if the timeout is
+    /// known to have elapsed.
+    ///
+    /// Like `wait`, the lock specified will be re-acquired when this function
+    /// returns, regardless of whether the timeout elapsed or not.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if another thread is waiting on the `Condvar`
+    /// with a different `Mutex` object.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_while_until&lt;T, F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">condition</span>: <span class="ident">F</span>,
-        <span class="ident">timeout</span>: <span class="ident">Instant</span>,
-    ) -&gt; <span class="ident">WaitTimeoutResult</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+        mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        condition: F,
+        timeout: Instant,
+    ) -&gt; WaitTimeoutResult
+    <span class="kw">where
+        </span>T: <span class="question-mark">?</span>Sized,
+        F: FnMut(<span class="kw-2">&amp;mut </span>T) -&gt; bool,
     {
-        <span class="self">self</span>.<span class="ident">wait_while_until_internal</span>(<span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="prelude-val">Some</span>(<span class="ident">timeout</span>))
+        <span class="self">self</span>.wait_while_until_internal(mutex_guard, condition, <span class="prelude-val">Some</span>(timeout))
     }
 
-    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after a</span>
-    <span class="doccomment">/// specified duration. If the provided condition evaluates to `false`,</span>
-    <span class="doccomment">/// then the thread is no longer blocked and the operation is completed.</span>
-    <span class="doccomment">/// If the condition evaluates to `true`, then the thread is blocked again</span>
-    <span class="doccomment">/// and waits for another notification before repeating this process.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The semantics of this function are equivalent to `wait()` except that</span>
-    <span class="doccomment">/// the thread will be blocked for roughly no longer than `timeout`. This</span>
-    <span class="doccomment">/// method should not be used for precise timing due to anomalies such as</span>
-    <span class="doccomment">/// preemption or platform differences that may not cause the maximum</span>
-    <span class="doccomment">/// amount of time waited to be precisely `timeout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the best effort is made to ensure that the time waited is</span>
-    <span class="doccomment">/// measured with a monotonic clock, and not affected by the changes made to</span>
-    <span class="doccomment">/// the system time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned `WaitTimeoutResult` value indicates if the timeout is</span>
-    <span class="doccomment">/// known to have elapsed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like `wait`, the lock specified will be re-acquired when this function</span>
-    <span class="doccomment">/// returns, regardless of whether the timeout elapsed or not.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_while_for</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Waits on this condition variable for a notification, timing out after a
+    /// specified duration. If the provided condition evaluates to `false`,
+    /// then the thread is no longer blocked and the operation is completed.
+    /// If the condition evaluates to `true`, then the thread is blocked again
+    /// and waits for another notification before repeating this process.
+    ///
+    /// The semantics of this function are equivalent to `wait()` except that
+    /// the thread will be blocked for roughly no longer than `timeout`. This
+    /// method should not be used for precise timing due to anomalies such as
+    /// preemption or platform differences that may not cause the maximum
+    /// amount of time waited to be precisely `timeout`.
+    ///
+    /// Note that the best effort is made to ensure that the time waited is
+    /// measured with a monotonic clock, and not affected by the changes made to
+    /// the system time.
+    ///
+    /// The returned `WaitTimeoutResult` value indicates if the timeout is
+    /// known to have elapsed.
+    ///
+    /// Like `wait`, the lock specified will be re-acquired when this function
+    /// returns, regardless of whether the timeout elapsed or not.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_while_for&lt;T: <span class="question-mark">?</span>Sized, F&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">mutex_guard</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">condition</span>: <span class="ident">F</span>,
-        <span class="ident">timeout</span>: <span class="ident">Duration</span>,
-    ) -&gt; <span class="ident">WaitTimeoutResult</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+        mutex_guard: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        condition: F,
+        timeout: Duration,
+    ) -&gt; WaitTimeoutResult
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;mut </span>T) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="ident">deadline</span> <span class="op">=</span> <span class="ident">util::to_deadline</span>(<span class="ident">timeout</span>);
-        <span class="self">self</span>.<span class="ident">wait_while_until_internal</span>(<span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="ident">deadline</span>)
+        <span class="kw">let </span>deadline = util::to_deadline(timeout);
+        <span class="self">self</span>.wait_while_until_internal(mutex_guard, condition, deadline)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Condvar</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Condvar</span> {
-        <span class="ident">Condvar::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Condvar {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; Condvar {
+        Condvar::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Condvar</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Condvar { .. }&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Condvar {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;Condvar { .. }&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Condvar</span>, <span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
-    <span class="kw">use</span> <span class="ident">std::sync::mpsc::channel</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
-    <span class="kw">use</span> <span class="ident">std::thread::sleep</span>;
-    <span class="kw">use</span> <span class="ident">std::thread::JoinHandle</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{Condvar, Mutex, MutexGuard};
+    <span class="kw">use </span>std::sync::mpsc::channel;
+    <span class="kw">use </span>std::sync::Arc;
+    <span class="kw">use </span>std::thread;
+    <span class="kw">use </span>std::thread::sleep;
+    <span class="kw">use </span>std::thread::JoinHandle;
+    <span class="kw">use </span>std::time::Duration;
+    <span class="kw">use </span>std::time::Instant;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Condvar::new</span>();
-        <span class="ident">c</span>.<span class="ident">notify_one</span>();
-        <span class="ident">c</span>.<span class="ident">notify_all</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke() {
+        <span class="kw">let </span>c = Condvar::new();
+        c.notify_one();
+        c.notify_all();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_one</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>notify_one() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">c2</span>.<span class="ident">notify_one</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            c2.notify_one();
         });
-        <span class="ident">c</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
+        c.wait(<span class="kw-2">&amp;mut </span>g);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_all</span>() {
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>notify_all() {
+        <span class="kw">const </span>N: usize = <span class="number">10</span>;
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Arc::new</span>((<span class="ident">Mutex::new</span>(<span class="number">0</span>), <span class="ident">Condvar::new</span>()));
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">lock</span>, <span class="kw-2">ref</span> <span class="ident">cond</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">data</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
-                <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">==</span> <span class="ident">N</span> {
-                    <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>data = Arc::new((Mutex::new(<span class="number">0</span>), Condvar::new()));
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">for _ in </span><span class="number">0</span>..N {
+            <span class="kw">let </span>data = data.clone();
+            <span class="kw">let </span>tx = tx.clone();
+            thread::spawn(<span class="kw">move </span>|| {
+                <span class="kw">let </span><span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>lock, <span class="kw-2">ref </span>cond) = <span class="kw-2">&amp;*</span>data;
+                <span class="kw">let </span><span class="kw-2">mut </span>cnt = lock.lock();
+                <span class="kw-2">*</span>cnt += <span class="number">1</span>;
+                <span class="kw">if </span><span class="kw-2">*</span>cnt == N {
+                    tx.send(()).unwrap();
                 }
-                <span class="kw">while</span> <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">cond</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cnt</span>);
+                <span class="kw">while </span><span class="kw-2">*</span>cnt != <span class="number">0 </span>{
+                    cond.wait(<span class="kw-2">&amp;mut </span>cnt);
                 }
-                <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+                tx.send(()).unwrap();
             });
         }
-        <span class="ident">drop</span>(<span class="ident">tx</span>);
+        drop(tx);
 
-        <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">lock</span>, <span class="kw-2">ref</span> <span class="ident">cond</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">data</span>;
-        <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
-        <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">cond</span>.<span class="ident">notify_all</span>();
-        <span class="ident">drop</span>(<span class="ident">cnt</span>);
+        <span class="kw">let </span><span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>lock, <span class="kw-2">ref </span>cond) = <span class="kw-2">&amp;*</span>data;
+        rx.recv().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>cnt = lock.lock();
+        <span class="kw-2">*</span>cnt = <span class="number">0</span>;
+        cond.notify_all();
+        drop(cnt);
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for _ in </span><span class="number">0</span>..N {
+            rx.recv().unwrap();
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_one_return_true</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>notify_one_return_true() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="macro">assert!</span>(<span class="ident">c2</span>.<span class="ident">notify_one</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            <span class="macro">assert!</span>(c2.notify_one());
         });
-        <span class="ident">c</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
+        c.wait(<span class="kw-2">&amp;mut </span>g);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_one_return_false</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>notify_one_return_false() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
 
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">c</span>.<span class="ident">notify_one</span>());
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m.lock();
+            <span class="macro">assert!</span>(!c.notify_one());
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">notify_all_return</span>() {
-        <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>notify_all_return() {
+        <span class="kw">const </span>N: usize = <span class="number">10</span>;
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Arc::new</span>((<span class="ident">Mutex::new</span>(<span class="number">0</span>), <span class="ident">Condvar::new</span>()));
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">lock</span>, <span class="kw-2">ref</span> <span class="ident">cond</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">data</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
-                <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">==</span> <span class="ident">N</span> {
-                    <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>data = Arc::new((Mutex::new(<span class="number">0</span>), Condvar::new()));
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">for _ in </span><span class="number">0</span>..N {
+            <span class="kw">let </span>data = data.clone();
+            <span class="kw">let </span>tx = tx.clone();
+            thread::spawn(<span class="kw">move </span>|| {
+                <span class="kw">let </span><span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>lock, <span class="kw-2">ref </span>cond) = <span class="kw-2">&amp;*</span>data;
+                <span class="kw">let </span><span class="kw-2">mut </span>cnt = lock.lock();
+                <span class="kw-2">*</span>cnt += <span class="number">1</span>;
+                <span class="kw">if </span><span class="kw-2">*</span>cnt == N {
+                    tx.send(()).unwrap();
                 }
-                <span class="kw">while</span> <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">cond</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cnt</span>);
+                <span class="kw">while </span><span class="kw-2">*</span>cnt != <span class="number">0 </span>{
+                    cond.wait(<span class="kw-2">&amp;mut </span>cnt);
                 }
-                <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+                tx.send(()).unwrap();
             });
         }
-        <span class="ident">drop</span>(<span class="ident">tx</span>);
+        drop(tx);
 
-        <span class="kw">let</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">lock</span>, <span class="kw-2">ref</span> <span class="ident">cond</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">data</span>;
-        <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cnt</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">lock</span>();
-        <span class="kw-2">*</span><span class="ident">cnt</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">cond</span>.<span class="ident">notify_all</span>(), <span class="ident">N</span>);
-        <span class="ident">drop</span>(<span class="ident">cnt</span>);
+        <span class="kw">let </span><span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>lock, <span class="kw-2">ref </span>cond) = <span class="kw-2">&amp;*</span>data;
+        rx.recv().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>cnt = lock.lock();
+        <span class="kw-2">*</span>cnt = <span class="number">0</span>;
+        <span class="macro">assert_eq!</span>(cond.notify_all(), N);
+        drop(cnt);
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for _ in </span><span class="number">0</span>..N {
+            rx.recv().unwrap();
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">cond</span>.<span class="ident">notify_all</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(cond.notify_all(), <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_for</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait_for() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">no_timeout</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">wait_for</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1</span>));
-        <span class="macro">assert!</span>(<span class="ident">no_timeout</span>.<span class="ident">timed_out</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">let </span>no_timeout = c.wait_for(<span class="kw-2">&amp;mut </span>g, Duration::from_millis(<span class="number">1</span>));
+        <span class="macro">assert!</span>(no_timeout.timed_out());
 
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">c2</span>.<span class="ident">notify_one</span>();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            c2.notify_one();
         });
-        <span class="kw">let</span> <span class="ident">timeout_res</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">wait_for</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>, <span class="ident">Duration::from_secs</span>(<span class="ident">u64::max_value</span>()));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">timeout_res</span>.<span class="ident">timed_out</span>());
+        <span class="kw">let </span>timeout_res = c.wait_for(<span class="kw-2">&amp;mut </span>g, Duration::from_secs(u64::max_value()));
+        <span class="macro">assert!</span>(!timeout_res.timed_out());
 
-        <span class="ident">drop</span>(<span class="ident">g</span>);
+        drop(g);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_until</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait_until() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">no_timeout</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">wait_until</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>, <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">1</span>));
-        <span class="macro">assert!</span>(<span class="ident">no_timeout</span>.<span class="ident">timed_out</span>());
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">c2</span>.<span class="ident">notify_one</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">let </span>no_timeout = c.wait_until(<span class="kw-2">&amp;mut </span>g, Instant::now() + Duration::from_millis(<span class="number">1</span>));
+        <span class="macro">assert!</span>(no_timeout.timed_out());
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            c2.notify_one();
         });
-        <span class="kw">let</span> <span class="ident">timeout_res</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">wait_until</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">g</span>,
-            <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">u64</span>),
+        <span class="kw">let </span>timeout_res = c.wait_until(
+            <span class="kw-2">&amp;mut </span>g,
+            Instant::now() + Duration::from_millis(u32::max_value() <span class="kw">as </span>u64),
         );
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">timeout_res</span>.<span class="ident">timed_out</span>());
-        <span class="ident">drop</span>(<span class="ident">g</span>);
+        <span class="macro">assert!</span>(!timeout_res.timed_out());
+        drop(g);
     }
 
-    <span class="kw">fn</span> <span class="ident">spawn_wait_while_notifier</span>(
-        <span class="ident">mutex</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">cv</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Condvar</span><span class="op">&gt;</span>,
-        <span class="ident">num_iters</span>: <span class="ident">u32</span>,
-        <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="ident">epoch</span> <span class="kw">in</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">num_iters</span> {
-                <span class="comment">// spin to wait for main test thread to block</span>
-                <span class="comment">// before notifying it to wake back up and check</span>
-                <span class="comment">// its condition.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sleep_backoff</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">1</span>);
-                <span class="kw">let</span> <span class="ident">_mutex_guard</span> <span class="op">=</span> <span class="kw">loop</span> {
-                    <span class="kw">let</span> <span class="ident">mutex_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>();
+    <span class="kw">fn </span>spawn_wait_while_notifier(
+        mutex: Arc&lt;Mutex&lt;u32&gt;&gt;,
+        cv: Arc&lt;Condvar&gt;,
+        num_iters: u32,
+        timeout: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    ) -&gt; JoinHandle&lt;()&gt; {
+        thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">for </span>epoch <span class="kw">in </span><span class="number">1</span>..=num_iters {
+                <span class="comment">// spin to wait for main test thread to block
+                // before notifying it to wake back up and check
+                // its condition.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>sleep_backoff = Duration::from_millis(<span class="number">1</span>);
+                <span class="kw">let </span>_mutex_guard = <span class="kw">loop </span>{
+                    <span class="kw">let </span>mutex_guard = mutex.lock();
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) <span class="op">=</span> <span class="ident">timeout</span> {
-                        <span class="kw">if</span> <span class="ident">Instant::now</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">timeout</span> {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(timeout) = timeout {
+                        <span class="kw">if </span>Instant::now() &gt;= timeout {
                             <span class="kw">return</span>;
                         }
                     }
 
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">mutex_guard</span> <span class="op">==</span> <span class="ident">epoch</span> {
-                        <span class="kw">break</span> <span class="ident">mutex_guard</span>;
+                    <span class="kw">if </span><span class="kw-2">*</span>mutex_guard == epoch {
+                        <span class="kw">break </span>mutex_guard;
                     }
 
-                    <span class="ident">drop</span>(<span class="ident">mutex_guard</span>);
+                    drop(mutex_guard);
 
-                    <span class="comment">// give main test thread a good chance to</span>
-                    <span class="comment">// acquire the lock before this thread does.</span>
-                    <span class="ident">sleep</span>(<span class="ident">sleep_backoff</span>);
-                    <span class="ident">sleep_backoff</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">2</span>;
+                    <span class="comment">// give main test thread a good chance to
+                    // acquire the lock before this thread does.
+                    </span>sleep(sleep_backoff);
+                    sleep_backoff <span class="kw-2">*</span>= <span class="number">2</span>;
                 };
 
-                <span class="ident">cv</span>.<span class="ident">notify_one</span>();
+                cv.notify_one();
             }
         })
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_while_until_internal_does_not_wait_if_initially_false</span>() {
-        <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">cv</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait_while_until_internal_does_not_wait_if_initially_false() {
+        <span class="kw">let </span>mutex = Arc::new(Mutex::new(<span class="number">0</span>));
+        <span class="kw">let </span>cv = Arc::new(Condvar::new());
 
-        <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="op">|</span><span class="ident">counter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="bool-val">false</span>
-        };
+        <span class="kw">let </span>condition = |counter: <span class="kw-2">&amp;mut </span>u32| {
+            <span class="kw-2">*</span>counter += <span class="number">1</span>;
+            <span class="bool-val">false
+        </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutex_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">timeout_result</span> <span class="op">=</span> <span class="ident">cv</span>
-            .<span class="ident">wait_while_until_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>mutex_guard = mutex.lock();
+        <span class="kw">let </span>timeout_result = cv
+            .wait_while_until_internal(<span class="kw-2">&amp;mut </span>mutex_guard, condition, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">timeout_result</span>.<span class="ident">timed_out</span>());
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">mutex_guard</span> <span class="op">==</span> <span class="number">1</span>);
+        <span class="macro">assert!</span>(!timeout_result.timed_out());
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>mutex_guard == <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_while_until_internal_times_out_before_false</span>() {
-        <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">cv</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait_while_until_internal_times_out_before_false() {
+        <span class="kw">let </span>mutex = Arc::new(Mutex::new(<span class="number">0</span>));
+        <span class="kw">let </span>cv = Arc::new(Condvar::new());
 
-        <span class="kw">let</span> <span class="ident">num_iters</span> <span class="op">=</span> <span class="number">3</span>;
-        <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="op">|</span><span class="ident">counter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="bool-val">true</span>
-        };
+        <span class="kw">let </span>num_iters = <span class="number">3</span>;
+        <span class="kw">let </span>condition = |counter: <span class="kw-2">&amp;mut </span>u32| {
+            <span class="kw-2">*</span>counter += <span class="number">1</span>;
+            <span class="bool-val">true
+        </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutex_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>));
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">spawn_wait_while_notifier</span>(<span class="ident">mutex</span>.<span class="ident">clone</span>(), <span class="ident">cv</span>.<span class="ident">clone</span>(), <span class="ident">num_iters</span>, <span class="ident">timeout</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>mutex_guard = mutex.lock();
+        <span class="kw">let </span>timeout = <span class="prelude-val">Some</span>(Instant::now() + Duration::from_millis(<span class="number">500</span>));
+        <span class="kw">let </span>handle = spawn_wait_while_notifier(mutex.clone(), cv.clone(), num_iters, timeout);
 
-        <span class="kw">let</span> <span class="ident">timeout_result</span> <span class="op">=</span>
-            <span class="ident">cv</span>.<span class="ident">wait_while_until_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="ident">timeout</span>);
+        <span class="kw">let </span>timeout_result =
+            cv.wait_while_until_internal(<span class="kw-2">&amp;mut </span>mutex_guard, condition, timeout);
 
-        <span class="macro">assert!</span>(<span class="ident">timeout_result</span>.<span class="ident">timed_out</span>());
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">mutex_guard</span> <span class="op">==</span> <span class="ident">num_iters</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="macro">assert!</span>(timeout_result.timed_out());
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>mutex_guard == num_iters + <span class="number">1</span>);
 
-        <span class="comment">// prevent deadlock with notifier</span>
-        <span class="ident">drop</span>(<span class="ident">mutex_guard</span>);
-        <span class="ident">handle</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// prevent deadlock with notifier
+        </span>drop(mutex_guard);
+        handle.join().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait_while_until_internal</span>() {
-        <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">cv</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait_while_until_internal() {
+        <span class="kw">let </span>mutex = Arc::new(Mutex::new(<span class="number">0</span>));
+        <span class="kw">let </span>cv = Arc::new(Condvar::new());
 
-        <span class="kw">let</span> <span class="ident">num_iters</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="kw">let </span>num_iters = <span class="number">4</span>;
 
-        <span class="kw">let</span> <span class="ident">condition</span> <span class="op">=</span> <span class="op">|</span><span class="ident">counter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">num_iters</span>
+        <span class="kw">let </span>condition = |counter: <span class="kw-2">&amp;mut </span>u32| {
+            <span class="kw-2">*</span>counter += <span class="number">1</span>;
+            <span class="kw-2">*</span>counter &lt;= num_iters
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutex_guard</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">spawn_wait_while_notifier</span>(<span class="ident">mutex</span>.<span class="ident">clone</span>(), <span class="ident">cv</span>.<span class="ident">clone</span>(), <span class="ident">num_iters</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>mutex_guard = mutex.lock();
+        <span class="kw">let </span>handle = spawn_wait_while_notifier(mutex.clone(), cv.clone(), num_iters, <span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="ident">timeout_result</span> <span class="op">=</span>
-            <span class="ident">cv</span>.<span class="ident">wait_while_until_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>timeout_result =
+            cv.wait_while_until_internal(<span class="kw-2">&amp;mut </span>mutex_guard, condition, <span class="prelude-val">None</span>);
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">timeout_result</span>.<span class="ident">timed_out</span>());
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">mutex_guard</span> <span class="op">==</span> <span class="ident">num_iters</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="macro">assert!</span>(!timeout_result.timed_out());
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>mutex_guard == num_iters + <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">timeout_result</span> <span class="op">=</span> <span class="ident">cv</span>.<span class="ident">wait_while_until_internal</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutex_guard</span>, <span class="ident">condition</span>, <span class="prelude-val">None</span>);
-        <span class="ident">handle</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>timeout_result = cv.wait_while_until_internal(<span class="kw-2">&amp;mut </span>mutex_guard, condition, <span class="prelude-val">None</span>);
+        handle.join().unwrap();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">timeout_result</span>.<span class="ident">timed_out</span>());
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">mutex_guard</span> <span class="op">==</span> <span class="ident">num_iters</span> <span class="op">+</span> <span class="number">2</span>);
+        <span class="macro">assert!</span>(!timeout_result.timed_out());
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>mutex_guard == num_iters + <span class="number">2</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="kw">fn</span> <span class="ident">two_mutexes</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m3</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>two_mutexes() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>m3 = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="comment">// Make sure we don&#39;t leave the child thread dangling</span>
-        <span class="kw">struct</span> <span class="ident">PanicGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Condvar</span>);
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">PanicGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">notify_one</span>();
+        <span class="comment">// Make sure we don&#39;t leave the child thread dangling
+        </span><span class="kw">struct </span>PanicGuard&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Condvar);
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>PanicGuard&lt;<span class="lifetime">&#39;a</span>&gt; {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="self">self</span>.<span class="number">0</span>.notify_one();
             }
         }
 
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
-            <span class="ident">c2</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">let </span>g = m.lock();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>g = m2.lock();
+            tx.send(()).unwrap();
+            c2.wait(<span class="kw-2">&amp;mut </span>g);
         });
-        <span class="ident">drop</span>(<span class="ident">g</span>);
-        <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">PanicGuard</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">c</span>);
-        <span class="ident">c</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">m3</span>.<span class="ident">lock</span>());
+        drop(g);
+        rx.recv().unwrap();
+        <span class="kw">let </span>_g = m.lock();
+        <span class="kw">let </span>_guard = PanicGuard(<span class="kw-2">&amp;*</span>c);
+        c.wait(<span class="kw-2">&amp;mut </span>m3.lock());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">two_mutexes_disjoint</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m3</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>two_mutexes_disjoint() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>m3 = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">_t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">c2</span>.<span class="ident">notify_one</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">let </span>_t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            c2.notify_one();
         });
-        <span class="ident">c</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
-        <span class="ident">drop</span>(<span class="ident">g</span>);
+        c.wait(<span class="kw-2">&amp;mut </span>g);
+        drop(g);
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">wait_for</span>(<span class="kw-2">&amp;mut</span> <span class="ident">m3</span>.<span class="ident">lock</span>(), <span class="ident">Duration::from_millis</span>(<span class="number">1</span>));
+        <span class="kw">let _ </span>= c.wait_for(<span class="kw-2">&amp;mut </span>m3.lock(), Duration::from_millis(<span class="number">1</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_debug_condvar</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Condvar::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">c</span>), <span class="string">&quot;Condvar { .. }&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_debug_condvar() {
+        <span class="kw">let </span>c = Condvar::new();
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, c), <span class="string">&quot;Condvar { .. }&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_condvar_requeue</span>() {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(()));
-        <span class="kw">let</span> <span class="ident">m2</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">c2</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_condvar_requeue() {
+        <span class="kw">let </span>m = Arc::new(Mutex::new(()));
+        <span class="kw">let </span>m2 = m.clone();
+        <span class="kw">let </span>c = Arc::new(Condvar::new());
+        <span class="kw">let </span>c2 = c.clone();
+        <span class="kw">let </span>t = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>g = m2.lock();
+            c2.wait(<span class="kw-2">&amp;mut </span>g);
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">lock</span>();
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">notify_one</span>() {
-            <span class="comment">// Wait for the thread to get into wait()</span>
-            <span class="ident">MutexGuard::bump</span>(<span class="kw-2">&amp;mut</span> <span class="ident">g</span>);
-            <span class="comment">// Yield, so the other thread gets a chance to do something.</span>
-            <span class="comment">// (At least Miri needs this, because it doesn&#39;t preempt threads.)</span>
-            <span class="ident">thread::yield_now</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>g = m.lock();
+        <span class="kw">while </span>!c.notify_one() {
+            <span class="comment">// Wait for the thread to get into wait()
+            </span>MutexGuard::bump(<span class="kw-2">&amp;mut </span>g);
+            <span class="comment">// Yield, so the other thread gets a chance to do something.
+            // (At least Miri needs this, because it doesn&#39;t preempt threads.)
+            </span>thread::yield_now();
         }
-        <span class="comment">// The thread should have been requeued to the mutex, which we wake up now.</span>
-        <span class="ident">drop</span>(<span class="ident">g</span>);
-        <span class="ident">t</span>.<span class="ident">join</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// The thread should have been requeued to the mutex, which we wake up now.
+        </span>drop(g);
+        t.join().unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_issue_129</span>() {
-        <span class="kw">let</span> <span class="ident">locks</span> <span class="op">=</span> <span class="ident">Arc::new</span>((<span class="ident">Mutex::new</span>(()), <span class="ident">Condvar::new</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_issue_129() {
+        <span class="kw">let </span>locks = Arc::new((Mutex::new(()), Condvar::new()));
 
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> {
-            <span class="kw">let</span> <span class="ident">locks</span> <span class="op">=</span> <span class="ident">locks</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">locks</span>.<span class="number">0</span>.<span class="ident">lock</span>();
-                <span class="ident">locks</span>.<span class="number">1</span>.<span class="ident">wait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">guard</span>);
-                <span class="ident">locks</span>.<span class="number">1</span>.<span class="ident">wait_for</span>(<span class="kw-2">&amp;mut</span> <span class="ident">guard</span>, <span class="ident">Duration::from_millis</span>(<span class="number">1</span>));
-                <span class="ident">locks</span>.<span class="number">1</span>.<span class="ident">notify_one</span>();
-                <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">4 </span>{
+            <span class="kw">let </span>locks = locks.clone();
+            <span class="kw">let </span>tx = tx.clone();
+            thread::spawn(<span class="kw">move </span>|| {
+                <span class="kw">let </span><span class="kw-2">mut </span>guard = locks.<span class="number">0</span>.lock();
+                locks.<span class="number">1</span>.wait(<span class="kw-2">&amp;mut </span>guard);
+                locks.<span class="number">1</span>.wait_for(<span class="kw-2">&amp;mut </span>guard, Duration::from_millis(<span class="number">1</span>));
+                locks.<span class="number">1</span>.notify_one();
+                tx.send(()).unwrap();
             });
         }
 
-        <span class="ident">thread::sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">100</span>));
-        <span class="ident">locks</span>.<span class="number">1</span>.<span class="ident">notify_one</span>();
+        thread::sleep(Duration::from_millis(<span class="number">100</span>));
+        locks.<span class="number">1</span>.notify_one();
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">rx</span>.<span class="ident">recv_timeout</span>(<span class="ident">Duration::from_millis</span>(<span class="number">500</span>)), <span class="prelude-val">Ok</span>(()));
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">4 </span>{
+            <span class="macro">assert_eq!</span>(rx.recv_timeout(Duration::from_millis(<span class="number">500</span>)), <span class="prelude-val">Ok</span>(()));
         }
     }
 }
 
-<span class="doccomment">/// This module contains an integration test that is heavily inspired from WebKit&#39;s own integration</span>
-<span class="doccomment">/// tests for it&#39;s own Condvar.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">webkit_queue_test</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Condvar</span>, <span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">sync::Arc</span>, <span class="ident">thread</span>, <span class="ident">time::Duration</span>};
+<span class="doccomment">/// This module contains an integration test that is heavily inspired from WebKit&#39;s own integration
+/// tests for it&#39;s own Condvar.
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>webkit_queue_test {
+    <span class="kw">use crate</span>::{Condvar, Mutex, MutexGuard};
+    <span class="kw">use </span>std::{collections::VecDeque, sync::Arc, thread, time::Duration};
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">Timeout</span> {
-        <span class="ident">Bounded</span>(<span class="ident">Duration</span>),
-        <span class="ident">Forever</span>,
+    <span class="attribute">#[derive(Clone, Copy)]
+    </span><span class="kw">enum </span>Timeout {
+        Bounded(Duration),
+        Forever,
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">NotifyStyle</span> {
-        <span class="ident">One</span>,
-        <span class="ident">All</span>,
+    <span class="attribute">#[derive(Clone, Copy)]
+    </span><span class="kw">enum </span>NotifyStyle {
+        One,
+        All,
     }
 
-    <span class="kw">struct</span> <span class="ident">Queue</span> {
-        <span class="ident">items</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-        <span class="ident">should_continue</span>: <span class="ident">bool</span>,
+    <span class="kw">struct </span>Queue {
+        items: VecDeque&lt;usize&gt;,
+        should_continue: bool,
     }
 
-    <span class="kw">impl</span> <span class="ident">Queue</span> {
-        <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">items</span>: <span class="ident">VecDeque::new</span>(),
-                <span class="ident">should_continue</span>: <span class="bool-val">true</span>,
+    <span class="kw">impl </span>Queue {
+        <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                items: VecDeque::new(),
+                should_continue: <span class="bool-val">true</span>,
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wait</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(
-        <span class="ident">condition</span>: <span class="kw-2">&amp;</span><span class="ident">Condvar</span>,
-        <span class="ident">lock</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">predicate</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>,
-        <span class="ident">timeout</span>: <span class="kw-2">&amp;</span><span class="ident">Timeout</span>,
+    <span class="kw">fn </span>wait&lt;T: <span class="question-mark">?</span>Sized&gt;(
+        condition: <span class="kw-2">&amp;</span>Condvar,
+        lock: <span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;,
+        predicate: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;mut </span>MutexGuard&lt;<span class="lifetime">&#39;_</span>, T&gt;) -&gt; bool,
+        timeout: <span class="kw-2">&amp;</span>Timeout,
     ) {
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">predicate</span>(<span class="ident">lock</span>) {
-            <span class="kw">match</span> <span class="ident">timeout</span> {
-                <span class="ident">Timeout::Forever</span> =&gt; <span class="ident">condition</span>.<span class="ident">wait</span>(<span class="ident">lock</span>),
-                <span class="ident">Timeout::Bounded</span>(<span class="ident">bound</span>) =&gt; {
-                    <span class="ident">condition</span>.<span class="ident">wait_for</span>(<span class="ident">lock</span>, <span class="kw-2">*</span><span class="ident">bound</span>);
+        <span class="kw">while </span>!predicate(lock) {
+            <span class="kw">match </span>timeout {
+                Timeout::Forever =&gt; condition.wait(lock),
+                Timeout::Bounded(bound) =&gt; {
+                    condition.wait_for(lock, <span class="kw-2">*</span>bound);
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">notify</span>(<span class="ident">style</span>: <span class="ident">NotifyStyle</span>, <span class="ident">condition</span>: <span class="kw-2">&amp;</span><span class="ident">Condvar</span>, <span class="ident">should_notify</span>: <span class="ident">bool</span>) {
-        <span class="kw">match</span> <span class="ident">style</span> {
-            <span class="ident">NotifyStyle::One</span> =&gt; {
-                <span class="ident">condition</span>.<span class="ident">notify_one</span>();
+    <span class="kw">fn </span>notify(style: NotifyStyle, condition: <span class="kw-2">&amp;</span>Condvar, should_notify: bool) {
+        <span class="kw">match </span>style {
+            NotifyStyle::One =&gt; {
+                condition.notify_one();
             }
-            <span class="ident">NotifyStyle::All</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">should_notify</span> {
-                    <span class="ident">condition</span>.<span class="ident">notify_all</span>();
+            NotifyStyle::All =&gt; {
+                <span class="kw">if </span>should_notify {
+                    condition.notify_all();
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">run_queue_test</span>(
-        <span class="ident">num_producers</span>: <span class="ident">usize</span>,
-        <span class="ident">num_consumers</span>: <span class="ident">usize</span>,
-        <span class="ident">max_queue_size</span>: <span class="ident">usize</span>,
-        <span class="ident">messages_per_producer</span>: <span class="ident">usize</span>,
-        <span class="ident">notify_style</span>: <span class="ident">NotifyStyle</span>,
-        <span class="ident">timeout</span>: <span class="ident">Timeout</span>,
-        <span class="ident">delay</span>: <span class="ident">Duration</span>,
+    <span class="kw">fn </span>run_queue_test(
+        num_producers: usize,
+        num_consumers: usize,
+        max_queue_size: usize,
+        messages_per_producer: usize,
+        notify_style: NotifyStyle,
+        timeout: Timeout,
+        delay: Duration,
     ) {
-        <span class="kw">let</span> <span class="ident">input_queue</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Queue::new</span>()));
-        <span class="kw">let</span> <span class="ident">empty_condition</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
-        <span class="kw">let</span> <span class="ident">full_condition</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Condvar::new</span>());
+        <span class="kw">let </span>input_queue = Arc::new(Mutex::new(Queue::new()));
+        <span class="kw">let </span>empty_condition = Arc::new(Condvar::new());
+        <span class="kw">let </span>full_condition = Arc::new(Condvar::new());
 
-        <span class="kw">let</span> <span class="ident">output_vec</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="macro">vec!</span>[]));
+        <span class="kw">let </span>output_vec = Arc::new(Mutex::new(<span class="macro">vec!</span>[]));
 
-        <span class="kw">let</span> <span class="ident">consumers</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">num_consumers</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">consumer_thread</span>(
-                    <span class="ident">input_queue</span>.<span class="ident">clone</span>(),
-                    <span class="ident">empty_condition</span>.<span class="ident">clone</span>(),
-                    <span class="ident">full_condition</span>.<span class="ident">clone</span>(),
-                    <span class="ident">timeout</span>,
-                    <span class="ident">notify_style</span>,
-                    <span class="ident">output_vec</span>.<span class="ident">clone</span>(),
-                    <span class="ident">max_queue_size</span>,
+        <span class="kw">let </span>consumers = (<span class="number">0</span>..num_consumers)
+            .map(|<span class="kw">_</span>| {
+                consumer_thread(
+                    input_queue.clone(),
+                    empty_condition.clone(),
+                    full_condition.clone(),
+                    timeout,
+                    notify_style,
+                    output_vec.clone(),
+                    max_queue_size,
                 )
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">producers</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">num_producers</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">producer_thread</span>(
-                    <span class="ident">messages_per_producer</span>,
-                    <span class="ident">input_queue</span>.<span class="ident">clone</span>(),
-                    <span class="ident">empty_condition</span>.<span class="ident">clone</span>(),
-                    <span class="ident">full_condition</span>.<span class="ident">clone</span>(),
-                    <span class="ident">timeout</span>,
-                    <span class="ident">notify_style</span>,
-                    <span class="ident">max_queue_size</span>,
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">let </span>producers = (<span class="number">0</span>..num_producers)
+            .map(|<span class="kw">_</span>| {
+                producer_thread(
+                    messages_per_producer,
+                    input_queue.clone(),
+                    empty_condition.clone(),
+                    full_condition.clone(),
+                    timeout,
+                    notify_style,
+                    max_queue_size,
                 )
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="ident">thread::sleep</span>(<span class="ident">delay</span>);
+        thread::sleep(delay);
 
-        <span class="kw">for</span> <span class="ident">producer</span> <span class="kw">in</span> <span class="ident">producers</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">producer</span>.<span class="ident">join</span>().<span class="ident">expect</span>(<span class="string">&quot;Producer thread panicked&quot;</span>);
+        <span class="kw">for </span>producer <span class="kw">in </span>producers.into_iter() {
+            producer.join().expect(<span class="string">&quot;Producer thread panicked&quot;</span>);
         }
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_queue</span> <span class="op">=</span> <span class="ident">input_queue</span>.<span class="ident">lock</span>();
-            <span class="ident">input_queue</span>.<span class="ident">should_continue</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>input_queue = input_queue.lock();
+            input_queue.should_continue = <span class="bool-val">false</span>;
         }
-        <span class="ident">empty_condition</span>.<span class="ident">notify_all</span>();
+        empty_condition.notify_all();
 
-        <span class="kw">for</span> <span class="ident">consumer</span> <span class="kw">in</span> <span class="ident">consumers</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">consumer</span>.<span class="ident">join</span>().<span class="ident">expect</span>(<span class="string">&quot;Consumer thread panicked&quot;</span>);
+        <span class="kw">for </span>consumer <span class="kw">in </span>consumers.into_iter() {
+            consumer.join().expect(<span class="string">&quot;Consumer thread panicked&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_vec</span> <span class="op">=</span> <span class="ident">output_vec</span>.<span class="ident">lock</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">output_vec</span>.<span class="ident">len</span>(), <span class="ident">num_producers</span> <span class="op">*</span> <span class="ident">messages_per_producer</span>);
-        <span class="ident">output_vec</span>.<span class="ident">sort</span>();
-        <span class="kw">for</span> <span class="ident">msg_idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">messages_per_producer</span> {
-            <span class="kw">for</span> <span class="ident">producer_idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_producers</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">msg_idx</span>, <span class="ident">output_vec</span>[<span class="ident">msg_idx</span> <span class="op">*</span> <span class="ident">num_producers</span> <span class="op">+</span> <span class="ident">producer_idx</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>output_vec = output_vec.lock();
+        <span class="macro">assert_eq!</span>(output_vec.len(), num_producers * messages_per_producer);
+        output_vec.sort();
+        <span class="kw">for </span>msg_idx <span class="kw">in </span><span class="number">0</span>..messages_per_producer {
+            <span class="kw">for </span>producer_idx <span class="kw">in </span><span class="number">0</span>..num_producers {
+                <span class="macro">assert_eq!</span>(msg_idx, output_vec[msg_idx * num_producers + producer_idx]);
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">consumer_thread</span>(
-        <span class="ident">input_queue</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Queue</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">empty_condition</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Condvar</span><span class="op">&gt;</span>,
-        <span class="ident">full_condition</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Condvar</span><span class="op">&gt;</span>,
-        <span class="ident">timeout</span>: <span class="ident">Timeout</span>,
-        <span class="ident">notify_style</span>: <span class="ident">NotifyStyle</span>,
-        <span class="ident">output_queue</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">max_queue_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">thread::JoinHandle</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">loop</span> {
-            <span class="kw">let</span> (<span class="ident">should_notify</span>, <span class="ident">result</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">queue</span> <span class="op">=</span> <span class="ident">input_queue</span>.<span class="ident">lock</span>();
-                <span class="ident">wait</span>(
-                    <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">empty_condition</span>,
-                    <span class="kw-2">&amp;mut</span> <span class="ident">queue</span>,
-                    <span class="op">|</span><span class="ident">state</span><span class="op">|</span> -&gt; <span class="ident">bool</span> { <span class="op">!</span><span class="ident">state</span>.<span class="ident">items</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">should_continue</span> },
-                    <span class="kw-2">&amp;</span><span class="ident">timeout</span>,
+    <span class="kw">fn </span>consumer_thread(
+        input_queue: Arc&lt;Mutex&lt;Queue&gt;&gt;,
+        empty_condition: Arc&lt;Condvar&gt;,
+        full_condition: Arc&lt;Condvar&gt;,
+        timeout: Timeout,
+        notify_style: NotifyStyle,
+        output_queue: Arc&lt;Mutex&lt;Vec&lt;usize&gt;&gt;&gt;,
+        max_queue_size: usize,
+    ) -&gt; thread::JoinHandle&lt;()&gt; {
+        thread::spawn(<span class="kw">move </span>|| <span class="kw">loop </span>{
+            <span class="kw">let </span>(should_notify, result) = {
+                <span class="kw">let </span><span class="kw-2">mut </span>queue = input_queue.lock();
+                wait(
+                    <span class="kw-2">&amp;*</span>empty_condition,
+                    <span class="kw-2">&amp;mut </span>queue,
+                    |state| -&gt; bool { !state.items.is_empty() || !state.should_continue },
+                    <span class="kw-2">&amp;</span>timeout,
                 );
-                <span class="kw">if</span> <span class="ident">queue</span>.<span class="ident">items</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">queue</span>.<span class="ident">should_continue</span> {
+                <span class="kw">if </span>queue.items.is_empty() &amp;&amp; !queue.should_continue {
                     <span class="kw">return</span>;
                 }
-                <span class="kw">let</span> <span class="ident">should_notify</span> <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">items</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">max_queue_size</span>;
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">items</span>.<span class="ident">pop_front</span>();
-                <span class="ident">std::mem::drop</span>(<span class="ident">queue</span>);
-                (<span class="ident">should_notify</span>, <span class="ident">result</span>)
+                <span class="kw">let </span>should_notify = queue.items.len() == max_queue_size;
+                <span class="kw">let </span>result = queue.items.pop_front();
+                std::mem::drop(queue);
+                (should_notify, result)
             };
-            <span class="ident">notify</span>(<span class="ident">notify_style</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">full_condition</span>, <span class="ident">should_notify</span>);
+            notify(notify_style, <span class="kw-2">&amp;*</span>full_condition, should_notify);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">result</span> {
-                <span class="ident">output_queue</span>.<span class="ident">lock</span>().<span class="ident">push</span>(<span class="ident">result</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(result) = result {
+                output_queue.lock().push(result);
             }
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">producer_thread</span>(
-        <span class="ident">num_messages</span>: <span class="ident">usize</span>,
-        <span class="ident">queue</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Queue</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">empty_condition</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Condvar</span><span class="op">&gt;</span>,
-        <span class="ident">full_condition</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Condvar</span><span class="op">&gt;</span>,
-        <span class="ident">timeout</span>: <span class="ident">Timeout</span>,
-        <span class="ident">notify_style</span>: <span class="ident">NotifyStyle</span>,
-        <span class="ident">max_queue_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">thread::JoinHandle</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="ident">message</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_messages</span> {
-                <span class="kw">let</span> <span class="ident">should_notify</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">queue</span> <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">lock</span>();
-                    <span class="ident">wait</span>(
-                        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">full_condition</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="ident">queue</span>,
-                        <span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">items</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">max_queue_size</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">timeout</span>,
+    <span class="kw">fn </span>producer_thread(
+        num_messages: usize,
+        queue: Arc&lt;Mutex&lt;Queue&gt;&gt;,
+        empty_condition: Arc&lt;Condvar&gt;,
+        full_condition: Arc&lt;Condvar&gt;,
+        timeout: Timeout,
+        notify_style: NotifyStyle,
+        max_queue_size: usize,
+    ) -&gt; thread::JoinHandle&lt;()&gt; {
+        thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">for </span>message <span class="kw">in </span><span class="number">0</span>..num_messages {
+                <span class="kw">let </span>should_notify = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>queue = queue.lock();
+                    wait(
+                        <span class="kw-2">&amp;*</span>full_condition,
+                        <span class="kw-2">&amp;mut </span>queue,
+                        |state| state.items.len() &lt; max_queue_size,
+                        <span class="kw-2">&amp;</span>timeout,
                     );
-                    <span class="kw">let</span> <span class="ident">should_notify</span> <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">items</span>.<span class="ident">is_empty</span>();
-                    <span class="ident">queue</span>.<span class="ident">items</span>.<span class="ident">push_back</span>(<span class="ident">message</span>);
-                    <span class="ident">std::mem::drop</span>(<span class="ident">queue</span>);
-                    <span class="ident">should_notify</span>
+                    <span class="kw">let </span>should_notify = queue.items.is_empty();
+                    queue.items.push_back(message);
+                    std::mem::drop(queue);
+                    should_notify
                 };
-                <span class="ident">notify</span>(<span class="ident">notify_style</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">empty_condition</span>, <span class="ident">should_notify</span>);
+                notify(notify_style, <span class="kw-2">&amp;*</span>empty_condition, should_notify);
             }
         })
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">run_queue_tests</span> {
-        ( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>(
-            <span class="ident">num_producers</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num_producers</span>:<span class="ident">expr</span>,
-            <span class="ident">num_consumers</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num_consumers</span>:<span class="ident">expr</span>,
-            <span class="ident">max_queue_size</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max_queue_size</span>:<span class="ident">expr</span>,
-            <span class="ident">messages_per_producer</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">messages_per_producer</span>:<span class="ident">expr</span>,
-            <span class="ident">notification_style</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">notification_style</span>:<span class="ident">expr</span>,
-            <span class="ident">timeout</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>:<span class="ident">expr</span>,
-            <span class="ident">delay_seconds</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">delay_seconds</span>:<span class="ident">expr</span>);
-        )<span class="op">*</span> ) =&gt; {
-            $(<span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                <span class="kw">let</span> <span class="ident">delay</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">delay_seconds</span>);
-                <span class="ident">run_queue_test</span>(
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num_producers</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num_consumers</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max_queue_size</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">messages_per_producer</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">notification_style</span>,
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>,
-                    <span class="ident">delay</span>,
+    <span class="macro">macro_rules! </span>run_queue_tests {
+        ( $( <span class="macro-nonterminal">$name</span>:ident(
+            num_producers: <span class="macro-nonterminal">$num_producers</span>:expr,
+            num_consumers: <span class="macro-nonterminal">$num_consumers</span>:expr,
+            max_queue_size: <span class="macro-nonterminal">$max_queue_size</span>:expr,
+            messages_per_producer: <span class="macro-nonterminal">$messages_per_producer</span>:expr,
+            notification_style: <span class="macro-nonterminal">$notification_style</span>:expr,
+            timeout: <span class="macro-nonterminal">$timeout</span>:expr,
+            delay_seconds: <span class="macro-nonterminal">$delay_seconds</span>:expr);
+        )* ) =&gt; {
+            $(<span class="attribute">#[test]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                <span class="kw">let </span>delay = Duration::from_secs(<span class="macro-nonterminal">$delay_seconds</span>);
+                run_queue_test(
+                    <span class="macro-nonterminal">$num_producers</span>,
+                    <span class="macro-nonterminal">$num_consumers</span>,
+                    <span class="macro-nonterminal">$max_queue_size</span>,
+                    <span class="macro-nonterminal">$messages_per_producer</span>,
+                    <span class="macro-nonterminal">$notification_style</span>,
+                    <span class="macro-nonterminal">$timeout</span>,
+                    delay,
                     );
-            })<span class="op">*</span>
+            })*
         };
     }
 
-    <span class="macro">run_queue_tests!</span> {
-        <span class="ident">sanity_check_queue</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Bounded</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>)),
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">sanity_check_queue_timeout</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">new_test_without_timeout_5</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">5</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">one_producer_one_consumer_one_slot</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">one_producer_one_consumer_one_slot_timeout</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">1</span>
-        );
-        <span class="ident">one_producer_one_consumer_hundred_slots</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">1_000_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_one_consumer_one_slot</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">10000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_one_consumer_hundred_slots_notify_all</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">10000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_one_consumer_hundred_slots_notify_one</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">1</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">10000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::One</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">one_producer_ten_consumers_one_slot</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">10000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">one_producer_ten_consumers_hundred_slots_notify_all</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">one_producer_ten_consumers_hundred_slots_notify_one</span>(
-            <span class="ident">num_producers</span>: <span class="number">1</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">100_000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::One</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_ten_consumers_one_slot</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">1</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">50000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_ten_consumers_hundred_slots_notify_all</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">50000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::All</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
-        <span class="ident">ten_producers_ten_consumers_hundred_slots_notify_one</span>(
-            <span class="ident">num_producers</span>: <span class="number">10</span>,
-            <span class="ident">num_consumers</span>: <span class="number">10</span>,
-            <span class="ident">max_queue_size</span>: <span class="number">100</span>,
-            <span class="ident">messages_per_producer</span>: <span class="number">50000</span>,
-            <span class="ident">notification_style</span>: <span class="ident">NotifyStyle::One</span>,
-            <span class="ident">timeout</span>: <span class="ident">Timeout::Forever</span>,
-            <span class="ident">delay_seconds</span>: <span class="number">0</span>
-        );
+    <span class="macro">run_queue_tests! </span>{
+        sanity_check_queue(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Bounded(Duration::from_secs(<span class="number">1</span>)),
+            delay_seconds: <span class="number">0
+        </span>);
+        sanity_check_queue_timeout(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        new_test_without_timeout_5(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">5</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        one_producer_one_consumer_one_slot(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        one_producer_one_consumer_one_slot_timeout(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">1
+        </span>);
+        one_producer_one_consumer_hundred_slots(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">1_000_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_one_consumer_one_slot(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">10000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_one_consumer_hundred_slots_notify_all(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">10000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_one_consumer_hundred_slots_notify_one(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">1</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">10000</span>,
+            notification_style: NotifyStyle::One,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        one_producer_ten_consumers_one_slot(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">10000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        one_producer_ten_consumers_hundred_slots_notify_all(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        one_producer_ten_consumers_hundred_slots_notify_one(
+            num_producers: <span class="number">1</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">100_000</span>,
+            notification_style: NotifyStyle::One,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_ten_consumers_one_slot(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">1</span>,
+            messages_per_producer: <span class="number">50000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_ten_consumers_hundred_slots_notify_all(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">50000</span>,
+            notification_style: NotifyStyle::All,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
+        ten_producers_ten_consumers_hundred_slots_notify_one(
+            num_producers: <span class="number">10</span>,
+            num_consumers: <span class="number">10</span>,
+            max_queue_size: <span class="number">100</span>,
+            messages_per_producer: <span class="number">50000</span>,
+            notification_style: NotifyStyle::One,
+            timeout: Timeout::Forever,
+            delay_seconds: <span class="number">0
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

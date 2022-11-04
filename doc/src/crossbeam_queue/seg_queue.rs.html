@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.6/src/seg_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>seg_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_queue/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-queue-0.3.6/src/seg_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>seg_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_queue/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -545,552 +545,552 @@
 <span id="545">545</span>
 <span id="546">546</span>
 <span id="547">547</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::boxed::Box;
+<span class="kw">use </span>core::cell::UnsafeCell;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>core::mem::MaybeUninit;
+<span class="kw">use </span>core::ptr;
+<span class="kw">use </span>core::sync::atomic::{<span class="self">self</span>, AtomicPtr, AtomicUsize, Ordering};
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils</span>::{<span class="ident">Backoff</span>, <span class="ident">CachePadded</span>};
+<span class="kw">use </span>crossbeam_utils::{Backoff, CachePadded};
 
-<span class="comment">// Bits indicating the state of a slot:</span>
-<span class="comment">// * If a value has been written into the slot, `WRITE` is set.</span>
-<span class="comment">// * If a value has been read from the slot, `READ` is set.</span>
-<span class="comment">// * If the block is being destroyed, `DESTROY` is set.</span>
-<span class="kw">const</span> <span class="ident">WRITE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="kw">const</span> <span class="ident">READ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">DESTROY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+<span class="comment">// Bits indicating the state of a slot:
+// * If a value has been written into the slot, `WRITE` is set.
+// * If a value has been read from the slot, `READ` is set.
+// * If the block is being destroyed, `DESTROY` is set.
+</span><span class="kw">const </span>WRITE: usize = <span class="number">1</span>;
+<span class="kw">const </span>READ: usize = <span class="number">2</span>;
+<span class="kw">const </span>DESTROY: usize = <span class="number">4</span>;
 
-<span class="comment">// Each block covers one &quot;lap&quot; of indices.</span>
-<span class="kw">const</span> <span class="ident">LAP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
-<span class="comment">// The maximum number of values a block can hold.</span>
-<span class="kw">const</span> <span class="ident">BLOCK_CAP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>;
-<span class="comment">// How many lower bits are reserved for metadata.</span>
-<span class="kw">const</span> <span class="ident">SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="comment">// Indicates that the block is not the last one.</span>
-<span class="kw">const</span> <span class="ident">HAS_NEXT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="comment">// Each block covers one &quot;lap&quot; of indices.
+</span><span class="kw">const </span>LAP: usize = <span class="number">32</span>;
+<span class="comment">// The maximum number of values a block can hold.
+</span><span class="kw">const </span>BLOCK_CAP: usize = LAP - <span class="number">1</span>;
+<span class="comment">// How many lower bits are reserved for metadata.
+</span><span class="kw">const </span>SHIFT: usize = <span class="number">1</span>;
+<span class="comment">// Indicates that the block is not the last one.
+</span><span class="kw">const </span>HAS_NEXT: usize = <span class="number">1</span>;
 
-<span class="doccomment">/// A slot in a block.</span>
-<span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The value.</span>
-    <span class="ident">value</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A slot in a block.
+</span><span class="kw">struct </span>Slot&lt;T&gt; {
+    <span class="doccomment">/// The value.
+    </span>value: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// The state of the slot.</span>
-    <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
+    <span class="doccomment">/// The state of the slot.
+    </span>state: AtomicUsize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">UNINIT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">value</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">MaybeUninit::uninit</span>()),
-        <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+<span class="kw">impl</span>&lt;T&gt; Slot&lt;T&gt; {
+    <span class="kw">const </span>UNINIT: <span class="self">Self </span>= <span class="self">Self </span>{
+        value: UnsafeCell::new(MaybeUninit::uninit()),
+        state: AtomicUsize::new(<span class="number">0</span>),
     };
 
-    <span class="doccomment">/// Waits until a value is written into the slot.</span>
-    <span class="kw">fn</span> <span class="ident">wait_write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) <span class="op">&amp;</span> <span class="ident">WRITE</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+    <span class="doccomment">/// Waits until a value is written into the slot.
+    </span><span class="kw">fn </span>wait_write(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">while </span><span class="self">self</span>.state.load(Ordering::Acquire) &amp; WRITE == <span class="number">0 </span>{
+            backoff.snooze();
         }
     }
 }
 
-<span class="doccomment">/// A block in a linked list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each block in the list can hold up to `BLOCK_CAP` values.</span>
-<span class="kw">struct</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The next block in the linked list.</span>
-    <span class="ident">next</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A block in a linked list.
+///
+/// Each block in the list can hold up to `BLOCK_CAP` values.
+</span><span class="kw">struct </span>Block&lt;T&gt; {
+    <span class="doccomment">/// The next block in the linked list.
+    </span>next: AtomicPtr&lt;Block&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// Slots for values.</span>
-    <span class="ident">slots</span>: [<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>; <span class="ident">BLOCK_CAP</span>],
+    <span class="doccomment">/// Slots for values.
+    </span>slots: [Slot&lt;T&gt;; BLOCK_CAP],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates an empty block that starts at `start_index`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">Self</span> {
-            <span class="ident">next</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-            <span class="ident">slots</span>: [<span class="ident">Slot::UNINIT</span>; <span class="ident">BLOCK_CAP</span>],
+<span class="kw">impl</span>&lt;T&gt; Block&lt;T&gt; {
+    <span class="doccomment">/// Creates an empty block that starts at `start_index`.
+    </span><span class="kw">fn </span>new() -&gt; Block&lt;T&gt; {
+        <span class="self">Self </span>{
+            next: AtomicPtr::new(ptr::null_mut()),
+            slots: [Slot::UNINIT; BLOCK_CAP],
         }
     }
 
-    <span class="doccomment">/// Waits until the next pointer is set.</span>
-    <span class="kw">fn</span> <span class="ident">wait_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_null</span>() {
-                <span class="kw">return</span> <span class="ident">next</span>;
+    <span class="doccomment">/// Waits until the next pointer is set.
+    </span><span class="kw">fn </span>wait_next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>Block&lt;T&gt; {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>next = <span class="self">self</span>.next.load(Ordering::Acquire);
+            <span class="kw">if </span>!next.is_null() {
+                <span class="kw">return </span>next;
             }
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+            backoff.snooze();
         }
     }
 
-    <span class="doccomment">/// Sets the `DESTROY` bit in slots starting from `start` and destroys the block.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">destroy</span>(<span class="ident">this</span>: <span class="kw-2">*mut</span> <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">start</span>: <span class="ident">usize</span>) {
-        <span class="comment">// It is not necessary to set the `DESTROY` bit in the last slot because that slot has</span>
-        <span class="comment">// begun destruction of the block.</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="ident">BLOCK_CAP</span> <span class="op">-</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">this</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>);
+    <span class="doccomment">/// Sets the `DESTROY` bit in slots starting from `start` and destroys the block.
+    </span><span class="kw">unsafe fn </span>destroy(this: <span class="kw-2">*mut </span>Block&lt;T&gt;, start: usize) {
+        <span class="comment">// It is not necessary to set the `DESTROY` bit in the last slot because that slot has
+        // begun destruction of the block.
+        </span><span class="kw">for </span>i <span class="kw">in </span>start..BLOCK_CAP - <span class="number">1 </span>{
+            <span class="kw">let </span>slot = (<span class="kw-2">*</span>this).slots.get_unchecked(i);
 
-            <span class="comment">// Mark the `DESTROY` bit if a thread is still using the slot.</span>
-            <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) <span class="op">&amp;</span> <span class="ident">READ</span> <span class="op">==</span> <span class="number">0</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">DESTROY</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">&amp;</span> <span class="ident">READ</span> <span class="op">==</span> <span class="number">0</span>
-            {
-                <span class="comment">// If a thread is still using the slot, it will continue destruction of the block.</span>
-                <span class="kw">return</span>;
+            <span class="comment">// Mark the `DESTROY` bit if a thread is still using the slot.
+            </span><span class="kw">if </span>slot.state.load(Ordering::Acquire) &amp; READ == <span class="number">0
+                </span>&amp;&amp; slot.state.fetch_or(DESTROY, Ordering::AcqRel) &amp; READ == <span class="number">0
+            </span>{
+                <span class="comment">// If a thread is still using the slot, it will continue destruction of the block.
+                </span><span class="kw">return</span>;
             }
         }
 
-        <span class="comment">// No thread is using the block, now it is safe to destroy it.</span>
-        <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">this</span>));
+        <span class="comment">// No thread is using the block, now it is safe to destroy it.
+        </span>drop(Box::from_raw(this));
     }
 }
 
-<span class="doccomment">/// A position in a queue.</span>
-<span class="kw">struct</span> <span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The index in the queue.</span>
-    <span class="ident">index</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// A position in a queue.
+</span><span class="kw">struct </span>Position&lt;T&gt; {
+    <span class="doccomment">/// The index in the queue.
+    </span>index: AtomicUsize,
 
-    <span class="doccomment">/// The block in the linked list.</span>
-    <span class="ident">block</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The block in the linked list.
+    </span>block: AtomicPtr&lt;Block&lt;T&gt;&gt;,
 }
 
-<span class="doccomment">/// An unbounded multi-producer multi-consumer queue.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This queue is implemented as a linked list of segments, where each segment is a small buffer</span>
-<span class="doccomment">/// that can hold a handful of elements. There is no limit to how many elements can be in the queue</span>
-<span class="doccomment">/// at a time. However, since segments need to be dynamically allocated as elements get pushed,</span>
-<span class="doccomment">/// this queue is somewhat slower than [`ArrayQueue`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ArrayQueue`]: super::ArrayQueue</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let q = SegQueue::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// q.push(&#39;a&#39;);</span>
-<span class="doccomment">/// q.push(&#39;b&#39;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Some(&#39;a&#39;));</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Some(&#39;b&#39;));</span>
-<span class="doccomment">/// assert!(q.pop().is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the queue.</span>
-    <span class="ident">head</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An unbounded multi-producer multi-consumer queue.
+///
+/// This queue is implemented as a linked list of segments, where each segment is a small buffer
+/// that can hold a handful of elements. There is no limit to how many elements can be in the queue
+/// at a time. However, since segments need to be dynamically allocated as elements get pushed,
+/// this queue is somewhat slower than [`ArrayQueue`].
+///
+/// [`ArrayQueue`]: super::ArrayQueue
+///
+/// # Examples
+///
+/// ```
+/// use crossbeam_queue::SegQueue;
+///
+/// let q = SegQueue::new();
+///
+/// q.push(&#39;a&#39;);
+/// q.push(&#39;b&#39;);
+///
+/// assert_eq!(q.pop(), Some(&#39;a&#39;));
+/// assert_eq!(q.pop(), Some(&#39;b&#39;));
+/// assert!(q.pop().is_none());
+/// ```
+</span><span class="kw">pub struct </span>SegQueue&lt;T&gt; {
+    <span class="doccomment">/// The head of the queue.
+    </span>head: CachePadded&lt;Position&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// The tail of the queue.</span>
-    <span class="ident">tail</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">Position</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The tail of the queue.
+    </span>tail: CachePadded&lt;Position&lt;T&gt;&gt;,
 
-    <span class="doccomment">/// Indicates that dropping a `SegQueue&lt;T&gt;` may drop values of type `T`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates that dropping a `SegQueue&lt;T&gt;` may drop values of type `T`.
+    </span>_marker: PhantomData&lt;T&gt;,
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>SegQueue&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>SegQueue&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new unbounded queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = SegQueue::&lt;i32&gt;::new();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">SegQueue</span> {
-            <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Position</span> {
-                <span class="ident">block</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-                <span class="ident">index</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+<span class="kw">impl</span>&lt;T&gt; SegQueue&lt;T&gt; {
+    <span class="doccomment">/// Creates a new unbounded queue.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::SegQueue;
+    ///
+    /// let q = SegQueue::&lt;i32&gt;::new();
+    /// ```
+    </span><span class="kw">pub const fn </span>new() -&gt; SegQueue&lt;T&gt; {
+        SegQueue {
+            head: CachePadded::new(Position {
+                block: AtomicPtr::new(ptr::null_mut()),
+                index: AtomicUsize::new(<span class="number">0</span>),
             }),
-            <span class="ident">tail</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Position</span> {
-                <span class="ident">block</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-                <span class="ident">index</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>),
+            tail: CachePadded::new(Position {
+                block: AtomicPtr::new(ptr::null_mut()),
+                index: AtomicUsize::new(<span class="number">0</span>),
             }),
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+            _marker: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Pushes an element into the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = SegQueue::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(10);</span>
-    <span class="doccomment">/// q.push(20);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_block</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Pushes an element into the queue.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::SegQueue;
+    ///
+    /// let q = SegQueue::new();
+    ///
+    /// q.push(10);
+    /// q.push(20);
+    /// ```
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>next_block = <span class="prelude-val">None</span>;
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Calculate the offset of the index into the block.</span>
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Calculate the offset of the index into the block.
+            </span><span class="kw">let </span>offset = (tail &gt;&gt; SHIFT) % LAP;
 
-            <span class="comment">// If we reached the end of the block, wait until the next one is installed.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// If we reached the end of the block, wait until the next one is installed.
+            </span><span class="kw">if </span>offset == BLOCK_CAP {
+                backoff.snooze();
+                tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// If we&#39;re going to have to install the next block, allocate it in advance in order to</span>
-            <span class="comment">// make the wait for other threads as short as possible.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> <span class="op">&amp;&amp;</span> <span class="ident">next_block</span>.<span class="ident">is_none</span>() {
-                <span class="ident">next_block</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Block</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+            <span class="comment">// If we&#39;re going to have to install the next block, allocate it in advance in order to
+            // make the wait for other threads as short as possible.
+            </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP &amp;&amp; next_block.is_none() {
+                next_block = <span class="prelude-val">Some</span>(Box::new(Block::&lt;T&gt;::new()));
             }
 
-            <span class="comment">// If this is the first push operation, we need to allocate the first block.</span>
-            <span class="kw">if</span> <span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">Box::new</span>(<span class="ident">Block</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::new</span>()));
+            <span class="comment">// If this is the first push operation, we need to allocate the first block.
+            </span><span class="kw">if </span>block.is_null() {
+                <span class="kw">let </span>new = Box::into_raw(Box::new(Block::&lt;T&gt;::new()));
 
-                <span class="kw">if</span> <span class="self">self</span>
-                    .<span class="ident">tail</span>
-                    .<span class="ident">block</span>
-                    .<span class="ident">compare_exchange</span>(<span class="ident">block</span>, <span class="ident">new</span>, <span class="ident">Ordering::Release</span>, <span class="ident">Ordering::Relaxed</span>)
-                    .<span class="ident">is_ok</span>()
+                <span class="kw">if </span><span class="self">self
+                    </span>.tail
+                    .block
+                    .compare_exchange(block, new, Ordering::Release, Ordering::Relaxed)
+                    .is_ok()
                 {
-                    <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">new</span>, <span class="ident">Ordering::Release</span>);
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">new</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">next_block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="ident">Box::from_raw</span>(<span class="ident">new</span>)) };
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+                    <span class="self">self</span>.head.block.store(new, Ordering::Release);
+                    block = new;
+                } <span class="kw">else </span>{
+                    next_block = <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(Box::from_raw(new)) };
+                    tail = <span class="self">self</span>.tail.index.load(Ordering::Acquire);
+                    block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
                     <span class="kw">continue</span>;
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+            <span class="kw">let </span>new_tail = tail + (<span class="number">1 </span>&lt;&lt; SHIFT);
 
-            <span class="comment">// Try advancing the tail forward.</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">compare_exchange_weak</span>(
-                <span class="ident">tail</span>,
-                <span class="ident">new_tail</span>,
-                <span class="ident">Ordering::SeqCst</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="comment">// Try advancing the tail forward.
+            </span><span class="kw">match </span><span class="self">self</span>.tail.index.compare_exchange_weak(
+                tail,
+                new_tail,
+                Ordering::SeqCst,
+                Ordering::Acquire,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe</span> {
-                    <span class="comment">// If we&#39;ve reached the end of the block, install the next one.</span>
-                    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                        <span class="kw">let</span> <span class="ident">next_block</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">next_block</span>.<span class="ident">unwrap</span>());
-                        <span class="kw">let</span> <span class="ident">next_index</span> <span class="op">=</span> <span class="ident">new_tail</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe </span>{
+                    <span class="comment">// If we&#39;ve reached the end of the block, install the next one.
+                    </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                        <span class="kw">let </span>next_block = Box::into_raw(next_block.unwrap());
+                        <span class="kw">let </span>next_index = new_tail.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
 
-                        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">next_block</span>, <span class="ident">Ordering::Release</span>);
-                        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">store</span>(<span class="ident">next_index</span>, <span class="ident">Ordering::Release</span>);
-                        (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">store</span>(<span class="ident">next_block</span>, <span class="ident">Ordering::Release</span>);
+                        <span class="self">self</span>.tail.block.store(next_block, Ordering::Release);
+                        <span class="self">self</span>.tail.index.store(next_index, Ordering::Release);
+                        (<span class="kw-2">*</span>block).next.store(next_block, Ordering::Release);
                     }
 
-                    <span class="comment">// Write the value into the slot.</span>
-                    <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>));
-                    <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">WRITE</span>, <span class="ident">Ordering::Release</span>);
+                    <span class="comment">// Write the value into the slot.
+                    </span><span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                    slot.value.get().write(MaybeUninit::new(value));
+                    slot.state.fetch_or(WRITE, Ordering::Release);
 
                     <span class="kw">return</span>;
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">t</span>) =&gt; {
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="ident">t</span>;
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                <span class="prelude-val">Err</span>(t) =&gt; {
+                    tail = t;
+                    block = <span class="self">self</span>.tail.block.load(Ordering::Acquire);
+                    backoff.spin();
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Pops an element from the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is empty, `None` is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = SegQueue::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(10);</span>
-    <span class="doccomment">/// assert_eq!(q.pop(), Some(10));</span>
-    <span class="doccomment">/// assert!(q.pop().is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+    <span class="doccomment">/// Pops an element from the queue.
+    ///
+    /// If the queue is empty, `None` is returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::SegQueue;
+    ///
+    /// let q = SegQueue::new();
+    ///
+    /// q.push(10);
+    /// assert_eq!(q.pop(), Some(10));
+    /// assert!(q.pop().is_none());
+    /// ```
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Calculate the offset of the index into the block.</span>
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Calculate the offset of the index into the block.
+            </span><span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-            <span class="comment">// If we reached the end of the block, wait until the next one is installed.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// If we reached the end of the block, wait until the next one is installed.
+            </span><span class="kw">if </span>offset == BLOCK_CAP {
+                backoff.snooze();
+                head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_head</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">+</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>new_head = head + (<span class="number">1 </span>&lt;&lt; SHIFT);
 
-            <span class="kw">if</span> <span class="ident">new_head</span> <span class="op">&amp;</span> <span class="ident">HAS_NEXT</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            <span class="kw">if </span>new_head &amp; HAS_NEXT == <span class="number">0 </span>{
+                atomic::fence(Ordering::SeqCst);
+                <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.load(Ordering::Relaxed);
 
-                <span class="comment">// If the tail equals the head, that means the queue is empty.</span>
-                <span class="kw">if</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="comment">// If the tail equals the head, that means the queue is empty.
+                </span><span class="kw">if </span>head &gt;&gt; SHIFT == tail &gt;&gt; SHIFT {
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="comment">// If head and tail are not in the same block, set `HAS_NEXT` in head.</span>
-                <span class="kw">if</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span> <span class="op">!</span><span class="op">=</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span> {
-                    <span class="ident">new_head</span> <span class="op">|</span><span class="op">=</span> <span class="ident">HAS_NEXT</span>;
+                <span class="comment">// If head and tail are not in the same block, set `HAS_NEXT` in head.
+                </span><span class="kw">if </span>(head &gt;&gt; SHIFT) / LAP != (tail &gt;&gt; SHIFT) / LAP {
+                    new_head |= HAS_NEXT;
                 }
             }
 
-            <span class="comment">// The block can be null here only if the first push operation is in progress. In that</span>
-            <span class="comment">// case, just wait until it gets initialized.</span>
-            <span class="kw">if</span> <span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// The block can be null here only if the first push operation is in progress. In that
+            // case, just wait until it gets initialized.
+            </span><span class="kw">if </span>block.is_null() {
+                backoff.snooze();
+                head = <span class="self">self</span>.head.index.load(Ordering::Acquire);
+                block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Try moving the head index forward.</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">compare_exchange_weak</span>(
-                <span class="ident">head</span>,
-                <span class="ident">new_head</span>,
-                <span class="ident">Ordering::SeqCst</span>,
-                <span class="ident">Ordering::Acquire</span>,
+            <span class="comment">// Try moving the head index forward.
+            </span><span class="kw">match </span><span class="self">self</span>.head.index.compare_exchange_weak(
+                head,
+                new_head,
+                Ordering::SeqCst,
+                Ordering::Acquire,
             ) {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe</span> {
-                    <span class="comment">// If we&#39;ve reached the end of the block, move to the next one.</span>
-                    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">wait_next</span>();
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_index</span> <span class="op">=</span> (<span class="ident">new_head</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">HAS_NEXT</span>).<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
-                        <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">*</span><span class="ident">next</span>).<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>).<span class="ident">is_null</span>() {
-                            <span class="ident">next_index</span> <span class="op">|</span><span class="op">=</span> <span class="ident">HAS_NEXT</span>;
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">unsafe </span>{
+                    <span class="comment">// If we&#39;ve reached the end of the block, move to the next one.
+                    </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                        <span class="kw">let </span>next = (<span class="kw-2">*</span>block).wait_next();
+                        <span class="kw">let </span><span class="kw-2">mut </span>next_index = (new_head &amp; !HAS_NEXT).wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
+                        <span class="kw">if </span>!(<span class="kw-2">*</span>next).next.load(Ordering::Relaxed).is_null() {
+                            next_index |= HAS_NEXT;
                         }
 
-                        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">next</span>, <span class="ident">Ordering::Release</span>);
-                        <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">store</span>(<span class="ident">next_index</span>, <span class="ident">Ordering::Release</span>);
+                        <span class="self">self</span>.head.block.store(next, Ordering::Release);
+                        <span class="self">self</span>.head.index.store(next_index, Ordering::Release);
                     }
 
-                    <span class="comment">// Read the value.</span>
-                    <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class="ident">slot</span>.<span class="ident">wait_write</span>();
-                    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>();
+                    <span class="comment">// Read the value.
+                    </span><span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                    slot.wait_write();
+                    <span class="kw">let </span>value = slot.value.get().read().assume_init();
 
-                    <span class="comment">// Destroy the block if we&#39;ve reached the end, or if another thread wanted to</span>
-                    <span class="comment">// destroy but couldn&#39;t because we were busy reading from the slot.</span>
-                    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                        <span class="ident">Block::destroy</span>(<span class="ident">block</span>, <span class="number">0</span>);
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="ident">READ</span>, <span class="ident">Ordering::AcqRel</span>) <span class="op">&amp;</span> <span class="ident">DESTROY</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="ident">Block::destroy</span>(<span class="ident">block</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>);
+                    <span class="comment">// Destroy the block if we&#39;ve reached the end, or if another thread wanted to
+                    // destroy but couldn&#39;t because we were busy reading from the slot.
+                    </span><span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                        Block::destroy(block, <span class="number">0</span>);
+                    } <span class="kw">else if </span>slot.state.fetch_or(READ, Ordering::AcqRel) &amp; DESTROY != <span class="number">0 </span>{
+                        Block::destroy(block, offset + <span class="number">1</span>);
                     }
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(value);
                 },
-                <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
-                    <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
-                    <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                    <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                <span class="prelude-val">Err</span>(h) =&gt; {
+                    head = h;
+                    block = <span class="self">self</span>.head.block.load(Ordering::Acquire);
+                    backoff.spin();
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Returns `true` if the queue is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = SegQueue::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(q.is_empty());</span>
-    <span class="doccomment">/// q.push(1);</span>
-    <span class="doccomment">/// assert!(!q.is_empty());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>
+    <span class="doccomment">/// Returns `true` if the queue is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::SegQueue;
+    ///
+    /// let q = SegQueue::new();
+    ///
+    /// assert!(q.is_empty());
+    /// q.push(1);
+    /// assert!(!q.is_empty());
+    /// ```
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>head = <span class="self">self</span>.head.index.load(Ordering::SeqCst);
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.index.load(Ordering::SeqCst);
+        head &gt;&gt; SHIFT == tail &gt;&gt; SHIFT
     }
 
-    <span class="doccomment">/// Returns the number of elements in the queue.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let q = SegQueue::new();</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 0);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(10);</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// q.push(20);</span>
-    <span class="doccomment">/// assert_eq!(q.len(), 2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Load the tail index, then load the head index.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns the number of elements in the queue.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use crossbeam_queue::SegQueue;
+    ///
+    /// let q = SegQueue::new();
+    /// assert_eq!(q.len(), 0);
+    ///
+    /// q.push(10);
+    /// assert_eq!(q.len(), 1);
+    ///
+    /// q.push(20);
+    /// assert_eq!(q.len(), 2);
+    /// ```
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">loop </span>{
+            <span class="comment">// Load the tail index, then load the head index.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.index.load(Ordering::SeqCst);
+            <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.index.load(Ordering::SeqCst);
 
-            <span class="comment">// If the tail index didn&#39;t change, we&#39;ve got consistent indices to work with.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                <span class="comment">// Erase the lower bits.</span>
-                <span class="ident">tail</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
-                <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
+            <span class="comment">// If the tail index didn&#39;t change, we&#39;ve got consistent indices to work with.
+            </span><span class="kw">if </span><span class="self">self</span>.tail.index.load(Ordering::SeqCst) == tail {
+                <span class="comment">// Erase the lower bits.
+                </span>tail &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
+                head &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
 
-                <span class="comment">// Fix up indices if they fall onto block ends.</span>
-                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// Fix up indices if they fall onto block ends.
+                </span><span class="kw">if </span>(tail &gt;&gt; SHIFT) &amp; (LAP - <span class="number">1</span>) == LAP - <span class="number">1 </span>{
+                    tail = tail.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
                 }
-                <span class="kw">if</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="kw">if </span>(head &gt;&gt; SHIFT) &amp; (LAP - <span class="number">1</span>) == LAP - <span class="number">1 </span>{
+                    head = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
                 }
 
-                <span class="comment">// Rotate indices so that head falls into the first block.</span>
-                <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span>;
-                <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_sub</span>((<span class="ident">lap</span> <span class="op">*</span> <span class="ident">LAP</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
-                <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_sub</span>((<span class="ident">lap</span> <span class="op">*</span> <span class="ident">LAP</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// Rotate indices so that head falls into the first block.
+                </span><span class="kw">let </span>lap = (head &gt;&gt; SHIFT) / LAP;
+                tail = tail.wrapping_sub((lap * LAP) &lt;&lt; SHIFT);
+                head = head.wrapping_sub((lap * LAP) &lt;&lt; SHIFT);
 
-                <span class="comment">// Remove the lower bits.</span>
-                <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
-                <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
+                <span class="comment">// Remove the lower bits.
+                </span>tail &gt;&gt;= SHIFT;
+                head &gt;&gt;= SHIFT;
 
-                <span class="comment">// Return the difference minus the number of blocks between tail and head.</span>
-                <span class="kw">return</span> <span class="ident">tail</span> <span class="op">-</span> <span class="ident">head</span> <span class="op">-</span> <span class="ident">tail</span> <span class="op">/</span> <span class="ident">LAP</span>;
+                <span class="comment">// Return the difference minus the number of blocks between tail and head.
+                </span><span class="kw">return </span>tail - head - tail / LAP;
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>();
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>SegQueue&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="kw-2">*</span><span class="self">self</span>.head.index.get_mut();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="kw-2">*</span><span class="self">self</span>.tail.index.get_mut();
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="kw-2">*</span><span class="self">self</span>.head.block.get_mut();
 
-        <span class="comment">// Erase the lower bits.</span>
-        <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">tail</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
+        <span class="comment">// Erase the lower bits.
+        </span>head &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
+        tail &amp;= !((<span class="number">1 </span>&lt;&lt; SHIFT) - <span class="number">1</span>);
 
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Drop all values between `head` and `tail` and deallocate the heap-allocated blocks.</span>
-            <span class="kw">while</span> <span class="ident">head</span> <span class="op">!</span><span class="op">=</span> <span class="ident">tail</span> {
-                <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Drop all values between `head` and `tail` and deallocate the heap-allocated blocks.
+            </span><span class="kw">while </span>head != tail {
+                <span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-                <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">BLOCK_CAP</span> {
-                    <span class="comment">// Drop the value in the slot.</span>
-                    <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                    <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>();
-                    <span class="ident">p</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">drop_in_place</span>();
-                } <span class="kw">else</span> {
-                    <span class="comment">// Deallocate the block and move to the next one.</span>
-                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">get_mut</span>();
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">next</span>;
+                <span class="kw">if </span>offset &lt; BLOCK_CAP {
+                    <span class="comment">// Drop the value in the slot.
+                    </span><span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                    <span class="kw">let </span>p = <span class="kw-2">&amp;mut *</span>slot.value.get();
+                    p.as_mut_ptr().drop_in_place();
+                } <span class="kw">else </span>{
+                    <span class="comment">// Deallocate the block and move to the next one.
+                    </span><span class="kw">let </span>next = <span class="kw-2">*</span>(<span class="kw-2">*</span>block).next.get_mut();
+                    drop(Box::from_raw(block));
+                    block = next;
                 }
 
-                <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                head = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
             }
 
-            <span class="comment">// Deallocate the last remaining block.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">block</span>.<span class="ident">is_null</span>() {
-                <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
+            <span class="comment">// Deallocate the last remaining block.
+            </span><span class="kw">if </span>!block.is_null() {
+                drop(Box::from_raw(block));
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;SegQueue { .. }&quot;</span>)
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>SegQueue&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;SegQueue { .. }&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">SegQueue::new</span>()
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>SegQueue&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; SegQueue&lt;T&gt; {
+        SegQueue::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; IntoIterator <span class="kw">for </span>SegQueue&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>IntoIter = IntoIter&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IntoIter</span> { <span class="ident">value</span>: <span class="self">self</span> }
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IntoIter { value: <span class="self">self </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoIter&lt;T&gt; {
+    value: SegQueue&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; Iterator <span class="kw">for </span>IntoIter&lt;T&gt; {
+    <span class="kw">type </span>Item = T;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">value</span>;
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
-        <span class="kw">if</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>();
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>value = <span class="kw-2">&amp;mut </span><span class="self">self</span>.value;
+        <span class="kw">let </span>head = <span class="kw-2">*</span>value.head.index.get_mut();
+        <span class="kw">let </span>tail = <span class="kw-2">*</span>value.tail.index.get_mut();
+        <span class="kw">if </span>head &gt;&gt; SHIFT == tail &gt;&gt; SHIFT {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span>block = <span class="kw-2">*</span>value.head.block.get_mut();
+            <span class="kw">let </span>offset = (head &gt;&gt; SHIFT) % LAP;
 
-            <span class="comment">// SAFETY: We have mutable access to this, so we can read without</span>
-            <span class="comment">// worrying about concurrency. Furthermore, we know this is</span>
-            <span class="comment">// initialized because it is the value pointed at by `value.head`</span>
-            <span class="comment">// and this is a non-empty queue.</span>
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>();
-                <span class="ident">p</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">read</span>()
+            <span class="comment">// SAFETY: We have mutable access to this, so we can read without
+            // worrying about concurrency. Furthermore, we know this is
+            // initialized because it is the value pointed at by `value.head`
+            // and this is a non-empty queue.
+            </span><span class="kw">let </span>item = <span class="kw">unsafe </span>{
+                <span class="kw">let </span>slot = (<span class="kw-2">*</span>block).slots.get_unchecked(offset);
+                <span class="kw">let </span>p = <span class="kw-2">&amp;mut *</span>slot.value.get();
+                p.as_mut_ptr().read()
             };
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                <span class="comment">// Deallocate the block and move to the next one.</span>
-                <span class="comment">// SAFETY: The block is initialized because we&#39;ve been reading</span>
-                <span class="comment">// from it this entire time. We can drop it b/c everything has</span>
-                <span class="comment">// been read out of it, so nothing is pointing to it anymore.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">get_mut</span>();
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
-                    <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">next</span>;
+            <span class="kw">if </span>offset + <span class="number">1 </span>== BLOCK_CAP {
+                <span class="comment">// Deallocate the block and move to the next one.
+                // SAFETY: The block is initialized because we&#39;ve been reading
+                // from it this entire time. We can drop it b/c everything has
+                // been read out of it, so nothing is pointing to it anymore.
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>next = <span class="kw-2">*</span>(<span class="kw-2">*</span>block).next.get_mut();
+                    drop(Box::from_raw(block));
+                    <span class="kw-2">*</span>value.head.block.get_mut() = next;
                 }
-                <span class="comment">// The last value in a block is empty, so skip it</span>
-                <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
-                <span class="comment">// Double-check that we&#39;re pointing to the first item in a block.</span>
-                <span class="macro">debug_assert_eq!</span>((<span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>, <span class="number">0</span>);
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// The last value in a block is empty, so skip it
+                </span><span class="kw-2">*</span>value.head.index.get_mut() = head.wrapping_add(<span class="number">2 </span>&lt;&lt; SHIFT);
+                <span class="comment">// Double-check that we&#39;re pointing to the first item in a block.
+                </span><span class="macro">debug_assert_eq!</span>((<span class="kw-2">*</span>value.head.index.get_mut() &gt;&gt; SHIFT) % LAP, <span class="number">0</span>);
+            } <span class="kw">else </span>{
+                <span class="kw-2">*</span>value.head.index.get_mut() = head.wrapping_add(<span class="number">1 </span>&lt;&lt; SHIFT);
             }
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>)
+            <span class="prelude-val">Some</span>(item)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_queue" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_queue" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

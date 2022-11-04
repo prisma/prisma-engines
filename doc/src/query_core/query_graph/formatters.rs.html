@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph/formatters.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatters.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph/formatters.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatters.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -133,140 +133,140 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">pub fn </span>format(graph: <span class="kw-2">&amp;</span>QueryGraph) -&gt; String {
     <span class="macro">format!</span>(
         <span class="string">&quot;---- Query Graph ----\nResult Nodes: {}\nMarked Nodes: {}\nRoot Nodes: {}\n\n{}\n----------------------&quot;</span>,
-        <span class="ident">fmt_raw_indices</span>(<span class="kw-2">&amp;</span><span class="ident">graph</span>.<span class="ident">result_nodes</span>),
-        <span class="ident">fmt_node_tuples</span>(<span class="kw-2">&amp;</span><span class="ident">graph</span>.<span class="ident">marked_node_pairs</span>),
-        <span class="ident">fmt_node_list</span>(<span class="kw-2">&amp;</span><span class="ident">graph</span>.<span class="ident">root_nodes</span>()),
-        <span class="ident">stringify_nodes</span>(<span class="ident">graph</span>, <span class="ident">graph</span>.<span class="ident">root_nodes</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">Vec::new</span>()).<span class="ident">join</span>(<span class="string">&quot;\n\n&quot;</span>)
+        fmt_raw_indices(<span class="kw-2">&amp;</span>graph.result_nodes),
+        fmt_node_tuples(<span class="kw-2">&amp;</span>graph.marked_node_pairs),
+        fmt_node_list(<span class="kw-2">&amp;</span>graph.root_nodes()),
+        stringify_nodes(graph, graph.root_nodes(), <span class="kw-2">&amp;mut </span>Vec::new()).join(<span class="string">&quot;\n\n&quot;</span>)
     )
 }
 
-<span class="kw">fn</span> <span class="ident">stringify_nodes</span>(<span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="ident">QueryGraph</span>, <span class="ident">nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>, <span class="ident">seen_nodes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rendered_nodes</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>stringify_nodes(graph: <span class="kw-2">&amp;</span>QueryGraph, nodes: Vec&lt;NodeRef&gt;, seen_nodes: <span class="kw-2">&amp;mut </span>Vec&lt;NodeRef&gt;) -&gt; Vec&lt;String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rendered_nodes = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="ident">nodes</span> {
-        <span class="kw">if</span> <span class="ident">seen_nodes</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>) {
+    <span class="kw">for </span>node <span class="kw">in </span>nodes {
+        <span class="kw">if </span>seen_nodes.contains(<span class="kw-2">&amp;</span>node) {
             <span class="kw">continue</span>;
         }
 
-        <span class="ident">seen_nodes</span>.<span class="ident">push</span>(<span class="ident">node</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node_child_info</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        seen_nodes.push(node);
+        <span class="kw">let </span><span class="kw-2">mut </span>node_child_info = <span class="macro">vec!</span>[];
 
-        <span class="kw">let</span> <span class="ident">children</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">graph</span>
-            .<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>)
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">child_edge</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">child_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">edge_target</span>(<span class="ident">child_edge</span>);
-                <span class="ident">node_child_info</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        <span class="kw">let </span>children: Vec&lt;NodeRef&gt; = graph
+            .outgoing_edges(<span class="kw-2">&amp;</span>node)
+            .iter()
+            .map(|child_edge| {
+                <span class="kw">let </span>child_node = graph.edge_target(child_edge);
+                node_child_info.push(<span class="macro">format!</span>(
                     <span class="string">&quot;Child (edge {}): Node {} - {}&quot;</span>,
-                    <span class="ident">child_edge</span>.<span class="ident">id</span>(),
-                    <span class="ident">child_node</span>.<span class="ident">id</span>(),
-                    <span class="ident">graph</span>.<span class="ident">edge_content</span>(<span class="ident">child_edge</span>).<span class="ident">unwrap</span>()
+                    child_edge.id(),
+                    child_node.id(),
+                    graph.edge_content(child_edge).unwrap()
                 ));
 
-                <span class="ident">child_node</span>
+                child_node
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="ident">rendered_nodes</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
+        rendered_nodes.push(<span class="macro">format!</span>(
             <span class="string">&quot;Node {}: {}\n  {}&quot;</span>,
-            <span class="ident">node</span>.<span class="ident">id</span>(),
-            <span class="ident">graph</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">node_child_info</span>.<span class="ident">join</span>(<span class="string">&quot;\n  &quot;</span>)
+            node.id(),
+            graph.node_content(<span class="kw-2">&amp;</span>node).unwrap(),
+            node_child_info.join(<span class="string">&quot;\n  &quot;</span>)
         ));
 
-        <span class="ident">rendered_nodes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stringify_nodes</span>(<span class="ident">graph</span>, <span class="ident">children</span>, <span class="ident">seen_nodes</span>));
+        rendered_nodes.append(<span class="kw-2">&amp;mut </span>stringify_nodes(graph, children, seen_nodes));
     }
 
-    <span class="ident">rendered_nodes</span>
+    rendered_nodes
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Flow</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::If</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(If (condition func)&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Return</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(return results)&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>Flow {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::If(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(If (condition func)&quot;</span>),
+            <span class="self">Self</span>::Return(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(return results)&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Computation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Diff</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Diff&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>Computation {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Diff(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Diff&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Node</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Query</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">q</span>),
-            <span class="ident"><span class="self">Self</span>::Flow</span>(<span class="ident">flow</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">flow</span>),
-            <span class="ident"><span class="self">Self</span>::Computation</span>(<span class="ident">c</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>),
-            <span class="ident"><span class="self">Self</span>::Empty</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Empty&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>Node {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Query(q) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, q),
+            <span class="self">Self</span>::Flow(flow) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, flow),
+            <span class="self">Self</span>::Computation(c) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, c),
+            <span class="self">Self</span>::Empty =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Empty&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">NodeRef</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Node {}&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>())
+<span class="kw">impl </span>Display <span class="kw">for </span>NodeRef {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Node {}&quot;</span>, <span class="self">self</span>.id())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">format</span>(<span class="self">self</span>))
+<span class="kw">impl </span>Display <span class="kw">for </span>QueryGraph {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, format(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">QueryGraphDependency</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::ExecutionOrder</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecutionOrder&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::DataDependency</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ParentResult&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ProjectedDataDependency</span>(<span class="ident">selection</span>, <span class="kw">_</span>) =&gt; {
+<span class="kw">impl </span>Display <span class="kw">for </span>QueryGraphDependency {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::ExecutionOrder =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ExecutionOrder&quot;</span>),
+            <span class="self">Self</span>::DataDependency(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;ParentResult&quot;</span>),
+            <span class="self">Self</span>::ProjectedDataDependency(selection, <span class="kw">_</span>) =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">f</span>,
+                    f,
                     <span class="string">&quot;ProjectedDataDependency ({:?})&quot;</span>,
-                    <span class="ident">selection</span>
-                        .<span class="ident">selections</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, <span class="ident">f</span>.<span class="ident">container</span>().<span class="ident">name</span>(), <span class="ident">f</span>.<span class="ident">prisma_name</span>()))
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                    selection
+                        .selections()
+                        .map(|f| <span class="macro">format!</span>(<span class="string">&quot;{}.{}&quot;</span>, f.container().name(), f.prisma_name()))
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                 )
             }
-            <span class="ident"><span class="self">Self</span>::Then</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Then&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::Else</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Else&quot;</span>),
+            <span class="self">Self</span>::Then =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Then&quot;</span>),
+            <span class="self">Self</span>::Else =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Else&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_raw_indices</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeIndex</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">refs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node_ix</span><span class="op">|</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span>: <span class="kw-2">*</span><span class="ident">node_ix</span> }).<span class="ident">collect</span>();
+<span class="kw">fn </span>fmt_raw_indices(i: <span class="kw-2">&amp;</span>[NodeIndex]) -&gt; String {
+    <span class="kw">let </span>refs: Vec&lt;NodeRef&gt; = i.iter().map(|node_ix| NodeRef { node_ix: <span class="kw-2">*</span>node_ix }).collect();
 
-    <span class="ident">fmt_node_list</span>(<span class="kw-2">&amp;</span><span class="ident">refs</span>)
+    fmt_node_list(<span class="kw-2">&amp;</span>refs)
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_node_list</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">NodeRef</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">inner_string</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+<span class="kw">fn </span>fmt_node_list(v: <span class="kw-2">&amp;</span>[NodeRef]) -&gt; String {
+    <span class="kw">let </span>inner_string = v.iter().map(|x| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, x)).collect::&lt;Vec&lt;String&gt;&gt;().join(<span class="string">&quot;, &quot;</span>);
 
-    <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">inner_string</span>.<span class="ident">as_str</span>())
+    <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, inner_string.as_str())
 }
 
-<span class="kw">fn</span> <span class="ident">fmt_node_tuples</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span>[(<span class="ident">NodeRef</span>, <span class="ident">NodeRef</span>)]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">inner_string</span> <span class="op">=</span> <span class="ident">t</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;({}, {})&quot;</span>, <span class="ident">x</span>.<span class="number">0</span>, <span class="ident">x</span>.<span class="number">1</span>))
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+<span class="kw">fn </span>fmt_node_tuples(t: <span class="kw-2">&amp;</span>[(NodeRef, NodeRef)]) -&gt; String {
+    <span class="kw">let </span>inner_string = t
+        .iter()
+        .map(|x| <span class="macro">format!</span>(<span class="string">&quot;({}, {})&quot;</span>, x.<span class="number">0</span>, x.<span class="number">1</span>))
+        .collect::&lt;Vec&lt;String&gt;&gt;()
+        .join(<span class="string">&quot;, &quot;</span>);
 
-    <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">inner_string</span>.<span class="ident">as_str</span>())
+    <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, inner_string.as_str())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

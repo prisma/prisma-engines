@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/io/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -515,469 +515,469 @@
 <span id="515">515</span>
 <span id="516">516</span>
 <span id="517">517</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">read_packet::ReadPacket</span>, <span class="ident">write_packet::WritePacket</span>};
+</span><span class="kw">pub use </span><span class="self">self</span>::{read_packet::ReadPacket, write_packet::WritePacket};
 
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">ready</span>, <span class="ident">stream</span>};
-<span class="kw">use</span> <span class="ident">mysql_common::proto::codec::PacketCodec</span> <span class="kw">as</span> <span class="ident">PacketCodecInner</span>;
-<span class="kw">use</span> <span class="ident">native_tls</span>::{<span class="ident">Certificate</span>, <span class="ident">Identity</span>, <span class="ident">TlsConnector</span>};
-<span class="kw">use</span> <span class="ident">pin_project::pin_project</span>;
-<span class="kw">use</span> <span class="ident">socket2</span>::{<span class="ident">Socket</span> <span class="kw">as</span> <span class="ident">Socket2Socket</span>, <span class="ident">TcpKeepalive</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::io::AsyncWriteExt</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{
-    <span class="ident">io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ErrorKind::Interrupted</span>, <span class="ident">ReadBuf</span>},
-    <span class="ident">net::TcpStream</span>,
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>futures_core::{ready, stream};
+<span class="kw">use </span>mysql_common::proto::codec::PacketCodec <span class="kw">as </span>PacketCodecInner;
+<span class="kw">use </span>native_tls::{Certificate, Identity, TlsConnector};
+<span class="kw">use </span>pin_project::pin_project;
+<span class="kw">use </span>socket2::{Socket <span class="kw">as </span>Socket2Socket, TcpKeepalive};
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>tokio::io::AsyncWriteExt;
+<span class="kw">use </span>tokio::{
+    io::{AsyncRead, AsyncWrite, ErrorKind::Interrupted, ReadBuf},
+    net::TcpStream,
 };
-<span class="kw">use</span> <span class="ident">tokio_util::codec</span>::{<span class="ident">Decoder</span>, <span class="ident">Encoder</span>, <span class="ident">Framed</span>, <span class="ident">FramedParts</span>};
+<span class="kw">use </span>tokio_util::codec::{Decoder, Encoder, Framed, FramedParts};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">fs::File</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">io</span>::{
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>std::path::Path;
+<span class="kw">use </span>std::{
+    fmt,
+    fs::File,
+    future::Future,
+    io::{
         <span class="self">self</span>,
-        <span class="ident">ErrorKind</span>::{<span class="ident">BrokenPipe</span>, <span class="ident">NotConnected</span>, <span class="ident">Other</span>},
-        <span class="ident">Read</span>,
+        ErrorKind::{BrokenPipe, NotConnected, Other},
+        Read,
     },
-    <span class="ident">mem::replace</span>,
-    <span class="ident">ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>},
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
+    mem::replace,
+    ops::{Deref, DerefMut},
+    pin::Pin,
+    task::{Context, Poll},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">buffer_pool::PooledBuf</span>,
-    <span class="ident">error::IoError</span>,
-    <span class="ident">opts</span>::{<span class="ident">HostPortOrUrl</span>, <span class="ident">SslOpts</span>, <span class="ident">DEFAULT_PORT</span>},
+<span class="kw">use crate</span>::{
+    buffer_pool::PooledBuf,
+    error::IoError,
+    opts::{HostPortOrUrl, SslOpts, DEFAULT_PORT},
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io::socket::Socket</span>;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span><span class="kw">crate</span>::io::socket::Socket;
 
-<span class="macro">macro_rules!</span> <span class="ident">with_interrupted</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">Interrupted</span> =&gt; <span class="kw">continue</span>,
-                <span class="ident">x</span> =&gt; <span class="kw">break</span> <span class="ident">x</span>,
+<span class="macro">macro_rules! </span>with_interrupted {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+                Poll::Ready(<span class="prelude-val">Err</span>(err)) <span class="kw">if </span>err.kind() == Interrupted =&gt; <span class="kw">continue</span>,
+                x =&gt; <span class="kw">break </span>x,
             }
         }
     };
 }
 
-<span class="kw">mod</span> <span class="ident">read_packet</span>;
-<span class="kw">mod</span> <span class="ident">socket</span>;
-<span class="kw">mod</span> <span class="ident">write_packet</span>;
+<span class="kw">mod </span>read_packet;
+<span class="kw">mod </span>socket;
+<span class="kw">mod </span>write_packet;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PacketCodec</span> {
-    <span class="ident">inner</span>: <span class="ident">PacketCodecInner</span>,
-    <span class="ident">decode_buf</span>: <span class="ident">PooledBuf</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PacketCodec {
+    inner: PacketCodecInner,
+    decode_buf: PooledBuf,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">decode_buf</span>: <span class="ident"><span class="kw">crate</span>::BUFFER_POOL</span>.<span class="ident">get</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>PacketCodec {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: Default::default(),
+            decode_buf: <span class="kw">crate</span>::BUFFER_POOL.get(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">PacketCodecInner</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>PacketCodec {
+    <span class="kw">type </span>Target = PacketCodecInner;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+<span class="kw">impl </span>DerefMut <span class="kw">for </span>PacketCodec {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Decoder</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">PooledBuf</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">IoError</span>;
+<span class="kw">impl </span>Decoder <span class="kw">for </span>PacketCodec {
+    <span class="kw">type </span>Item = PooledBuf;
+    <span class="kw">type </span>Error = IoError;
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="self">self</span>.<span class="ident">decode_buf</span>.<span class="ident">as_mut</span>())<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">new_buf</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::BUFFER_POOL</span>.<span class="ident">get</span>();
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">decode_buf</span>, <span class="ident">new_buf</span>)))
-        } <span class="kw">else</span> {
+    <span class="kw">fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; std::result::Result&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;, IoError&gt; {
+        <span class="kw">if </span><span class="self">self</span>.inner.decode(src, <span class="self">self</span>.decode_buf.as_mut())<span class="question-mark">? </span>{
+            <span class="kw">let </span>new_buf = <span class="kw">crate</span>::BUFFER_POOL.get();
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.decode_buf, new_buf)))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Encoder</span><span class="op">&lt;</span><span class="ident">PooledBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">IoError</span>;
+<span class="kw">impl </span>Encoder&lt;PooledBuf&gt; <span class="kw">for </span>PacketCodec {
+    <span class="kw">type </span>Error = IoError;
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">PooledBuf</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">item</span>.<span class="ident">as_ref</span>(), <span class="ident">dst</span>)<span class="question-mark">?</span>)
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: PooledBuf, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; std::result::Result&lt;(), IoError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.inner.encode(<span class="kw-2">&amp;mut </span>item.as_ref(), dst)<span class="question-mark">?</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">pin_project</span>(<span class="ident">project</span> <span class="op">=</span> <span class="ident">EndpointProj</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Endpoint</span> {
-    <span class="ident">Plain</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>),
-    <span class="ident">Secure</span>(<span class="attribute">#[<span class="ident">pin</span>]</span> <span class="ident">tokio_native_tls::TlsStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="ident">Socket</span>(<span class="attribute">#[<span class="ident">pin</span>]</span> <span class="ident">Socket</span>),
+<span class="attribute">#[pin_project(project = EndpointProj)]
+#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Endpoint {
+    Plain(<span class="prelude-ty">Option</span>&lt;TcpStream&gt;),
+    Secure(<span class="attribute">#[pin] </span>tokio_native_tls::TlsStream&lt;TcpStream&gt;),
+    <span class="attribute">#[cfg(unix)]
+    </span>Socket(<span class="attribute">#[pin] </span>Socket),
 }
 
-<span class="doccomment">/// This future will check that TcpStream is live.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This check is similar to a one, implemented by GitHub team for the go-sql-driver/mysql.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CheckTcpStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">TcpStream</span>);
+<span class="doccomment">/// This future will check that TcpStream is live.
+///
+/// This check is similar to a one, implemented by GitHub team for the go-sql-driver/mysql.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CheckTcpStream&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>TcpStream);
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">CheckTcpStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_read_ready</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; {
-                <span class="comment">// stream is readable</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="number">1</span>];
-                <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">try_read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">BrokenPipe</span>, <span class="string">&quot;broken pipe&quot;</span>))),
-                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">Other</span>, <span class="string">&quot;stream should be empty&quot;</span>))),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">io::ErrorKind::WouldBlock</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+<span class="kw">impl </span>Future <span class="kw">for </span>CheckTcpStream&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">type </span>Output = io::Result&lt;()&gt;;
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.poll_read_ready(cx) {
+            Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; {
+                <span class="comment">// stream is readable
+                </span><span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0_u8</span>; <span class="number">1</span>];
+                <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.try_read(<span class="kw-2">&amp;mut </span>buf) {
+                    <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(BrokenPipe, <span class="string">&quot;broken pipe&quot;</span>))),
+                    <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(Other, <span class="string">&quot;stream should be empty&quot;</span>))),
+                    <span class="prelude-val">Err</span>(err) <span class="kw">if </span>err.kind() == io::ErrorKind::WouldBlock =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
+                    <span class="prelude-val">Err</span>(err) =&gt; Poll::Ready(<span class="prelude-val">Err</span>(err)),
                 }
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())),
+            Poll::Ready(<span class="prelude-val">Err</span>(err)) =&gt; Poll::Ready(<span class="prelude-val">Err</span>(err)),
+            Poll::Pending =&gt; Poll::Ready(<span class="prelude-val">Ok</span>(())),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Endpoint</span> {
-    <span class="doccomment">/// Checks, that connection is alive.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="comment">//return Ok(());</span>
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Endpoint::Plain</span>(<span class="prelude-val">Some</span>(<span class="ident">stream</span>)) =&gt; {
-                <span class="ident">CheckTcpStream</span>(<span class="ident">stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>Endpoint {
+    <span class="doccomment">/// Checks, that connection is alive.
+    </span><span class="kw">async fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::result::Result&lt;(), IoError&gt; {
+        <span class="comment">//return Ok(());
+        </span><span class="kw">match </span><span class="self">self </span>{
+            Endpoint::Plain(<span class="prelude-val">Some</span>(stream)) =&gt; {
+                CheckTcpStream(stream).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">Endpoint::Secure</span>(<span class="ident">tls_stream</span>) =&gt; {
-                <span class="ident">CheckTcpStream</span>(<span class="ident">tls_stream</span>.<span class="ident">get_mut</span>().<span class="ident">get_mut</span>().<span class="ident">get_mut</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            Endpoint::Secure(tls_stream) =&gt; {
+                CheckTcpStream(tls_stream.get_mut().get_mut().get_mut()).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">Endpoint::Socket</span>(<span class="ident">socket</span>) =&gt; {
-                <span class="ident">socket</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="attribute">#[cfg(unix)]
+            </span>Endpoint::Socket(socket) =&gt; {
+                socket.write(<span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="ident">Endpoint::Plain</span>(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
+            Endpoint::Plain(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_secure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Endpoint::Secure</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Endpoint::Secure(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tcp_nodelay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Endpoint::Plain</span>(<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">stream</span>)) =&gt; <span class="ident">stream</span>.<span class="ident">set_nodelay</span>(<span class="ident">val</span>)<span class="question-mark">?</span>,
-            <span class="ident">Endpoint::Plain</span>(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
-            <span class="ident">Endpoint::Secure</span>(<span class="kw-2">ref</span> <span class="ident">stream</span>) =&gt; {
-                <span class="ident">stream</span>.<span class="ident">get_ref</span>().<span class="ident">get_ref</span>().<span class="ident">get_ref</span>().<span class="ident">set_nodelay</span>(<span class="ident">val</span>)<span class="question-mark">?</span>
-            }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">Endpoint::Socket</span>(<span class="kw">_</span>) =&gt; (<span class="comment">/* inapplicable */</span>),
+    <span class="kw">pub fn </span>set_tcp_nodelay(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Endpoint::Plain(<span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stream)) =&gt; stream.set_nodelay(val)<span class="question-mark">?</span>,
+            Endpoint::Plain(<span class="prelude-val">None</span>) =&gt; <span class="macro">unreachable!</span>(),
+            Endpoint::Secure(<span class="kw-2">ref </span>stream) =&gt; {
+                stream.get_ref().get_ref().get_ref().set_nodelay(val)<span class="question-mark">?
+            </span>}
+            <span class="attribute">#[cfg(unix)]
+            </span>Endpoint::Socket(<span class="kw">_</span>) =&gt; (<span class="comment">/* inapplicable */</span>),
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">make_secure</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">domain</span>: <span class="ident">String</span>,
-        <span class="ident">ssl_opts</span>: <span class="ident">SslOpts</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Endpoint::Socket</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="comment">// inapplicable</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">pub async fn </span>make_secure(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        domain: String,
+        ssl_opts: SslOpts,
+    ) -&gt; std::result::Result&lt;(), IoError&gt; {
+        <span class="attribute">#[cfg(unix)]
+        </span><span class="kw">if let </span>Endpoint::Socket(<span class="kw">_</span>) = <span class="self">self </span>{
+            <span class="comment">// inapplicable
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">TlsConnector::builder</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">root_cert_path</span>) <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">root_cert_path</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root_cert_data</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">root_cert_file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">root_cert_path</span>)<span class="question-mark">?</span>;
-            <span class="ident">root_cert_file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">root_cert_data</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = TlsConnector::builder();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(root_cert_path) = ssl_opts.root_cert_path() {
+            <span class="kw">let </span><span class="kw-2">mut </span>root_cert_data = <span class="macro">vec!</span>[];
+            <span class="kw">let </span><span class="kw-2">mut </span>root_cert_file = File::open(root_cert_path)<span class="question-mark">?</span>;
+            root_cert_file.read_to_end(<span class="kw-2">&amp;mut </span>root_cert_data)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">root_certs</span> <span class="op">=</span> <span class="ident">Certificate::from_der</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">root_cert_data</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">x</span>])
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">pem::parse_many</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">root_cert_data</span>)
-                        .<span class="ident">unwrap_or_default</span>()
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="ident">pem::encode</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Certificate::from_pem</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()))
-                        .<span class="ident">collect</span>()
+            <span class="kw">let </span>root_certs = Certificate::from_der(<span class="kw-2">&amp;*</span>root_cert_data)
+                .map(|x| <span class="macro">vec!</span>[x])
+                .or_else(|<span class="kw">_</span>| {
+                    pem::parse_many(<span class="kw-2">&amp;*</span>root_cert_data)
+                        .unwrap_or_default()
+                        .iter()
+                        .map(pem::encode)
+                        .map(|s| Certificate::from_pem(s.as_bytes()))
+                        .collect()
                 })<span class="question-mark">?</span>;
 
-            <span class="kw">for</span> <span class="ident">root_cert</span> <span class="kw">in</span> <span class="ident">root_certs</span> {
-                <span class="ident">builder</span>.<span class="ident">add_root_certificate</span>(<span class="ident">root_cert</span>);
+            <span class="kw">for </span>root_cert <span class="kw">in </span>root_certs {
+                builder.add_root_certificate(root_cert);
             }
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pkcs12_path</span>) <span class="op">=</span> <span class="ident">ssl_opts</span>.<span class="ident">pkcs12_path</span>() {
-            <span class="kw">let</span> <span class="ident">der</span> <span class="op">=</span> <span class="ident">std::fs::read</span>(<span class="ident">pkcs12_path</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">Identity::from_pkcs12</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">der</span>, <span class="ident">ssl_opts</span>.<span class="ident">password</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
-            <span class="ident">builder</span>.<span class="ident">identity</span>(<span class="ident">identity</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(pkcs12_path) = ssl_opts.pkcs12_path() {
+            <span class="kw">let </span>der = std::fs::read(pkcs12_path)<span class="question-mark">?</span>;
+            <span class="kw">let </span>identity = Identity::from_pkcs12(<span class="kw-2">&amp;*</span>der, ssl_opts.password().unwrap_or(<span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
+            builder.identity(identity);
         }
-        <span class="ident">builder</span>.<span class="ident">danger_accept_invalid_hostnames</span>(<span class="ident">ssl_opts</span>.<span class="ident">skip_domain_validation</span>());
-        <span class="ident">builder</span>.<span class="ident">danger_accept_invalid_certs</span>(<span class="ident">ssl_opts</span>.<span class="ident">accept_invalid_certs</span>());
-        <span class="kw">let</span> <span class="ident">tls_connector</span>: <span class="ident">tokio_native_tls::TlsConnector</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>()<span class="question-mark">?</span>.<span class="ident">into</span>();
+        builder.danger_accept_invalid_hostnames(ssl_opts.skip_domain_validation());
+        builder.danger_accept_invalid_certs(ssl_opts.accept_invalid_certs());
+        <span class="kw">let </span>tls_connector: tokio_native_tls::TlsConnector = builder.build()<span class="question-mark">?</span>.into();
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Endpoint::Plain</span>(<span class="ident">stream</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">tls_stream</span> <span class="op">=</span> <span class="ident">tls_connector</span>.<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">domain</span>, <span class="ident">stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">Endpoint::Secure</span>(<span class="ident">tls_stream</span>)
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span><span class="self">self </span>{
+            Endpoint::Plain(stream) =&gt; {
+                <span class="kw">let </span>stream = stream.take().unwrap();
+                <span class="kw">let </span>tls_stream = tls_connector.connect(<span class="kw-2">&amp;*</span>domain, stream).<span class="kw">await</span><span class="question-mark">?</span>;
+                Endpoint::Secure(tls_stream)
             }
-            <span class="ident">Endpoint::Secure</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">Endpoint::Socket</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            Endpoint::Secure(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+            <span class="attribute">#[cfg(unix)]
+            </span>Endpoint::Socket(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
         };
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stream</span>: <span class="ident">TcpStream</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint::Plain</span>(<span class="prelude-val">Some</span>(<span class="ident">stream</span>))
+<span class="kw">impl </span>From&lt;TcpStream&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>from(stream: TcpStream) -&gt; <span class="self">Self </span>{
+        Endpoint::Plain(<span class="prelude-val">Some</span>(stream))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">socket</span>: <span class="ident">Socket</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint::Socket</span>(<span class="ident">socket</span>)
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">impl </span>From&lt;Socket&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>from(socket: Socket) -&gt; <span class="self">Self </span>{
+        Endpoint::Socket(socket)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tokio_native_tls::TlsStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">stream</span>: <span class="ident">tokio_native_tls::TlsStream</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint::Secure</span>(<span class="ident">stream</span>)
+<span class="kw">impl </span>From&lt;tokio_native_tls::TlsStream&lt;TcpStream&gt;&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>from(stream: tokio_native_tls::TlsStream&lt;TcpStream&gt;) -&gt; <span class="self">Self </span>{
+        Endpoint::Secure(stream)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">tokio::io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="macro">with_interrupted!</span>(<span class="kw">match</span> <span class="ident">this</span> {
-            <span class="ident">EndpointProj::Plain</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
-                <span class="ident">Pin::new</span>(<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::result::Result&lt;(), tokio::io::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
+        <span class="macro">with_interrupted!</span>(<span class="kw">match </span>this {
+            EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
+                Pin::new(stream.as_mut().unwrap()).poll_read(cx, buf)
             }
-            <span class="ident">EndpointProj::Secure</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">EndpointProj::Socket</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
+            <span class="attribute">#[cfg(unix)]
+            </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_read(cx, buf),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">tokio::io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="macro">with_interrupted!</span>(<span class="kw">match</span> <span class="ident">this</span> {
-            <span class="ident">EndpointProj::Plain</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
-                <span class="ident">Pin::new</span>(<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;std::result::Result&lt;usize, tokio::io::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
+        <span class="macro">with_interrupted!</span>(<span class="kw">match </span>this {
+            EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
+                Pin::new(stream.as_mut().unwrap()).poll_write(cx, buf)
             }
-            <span class="ident">EndpointProj::Secure</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">EndpointProj::Socket</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
+            <span class="attribute">#[cfg(unix)]
+            </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_write(cx, buf),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">tokio::io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="macro">with_interrupted!</span>(<span class="kw">match</span> <span class="ident">this</span> {
-            <span class="ident">EndpointProj::Plain</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
-                <span class="ident">Pin::new</span>(<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+    ) -&gt; Poll&lt;std::result::Result&lt;(), tokio::io::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
+        <span class="macro">with_interrupted!</span>(<span class="kw">match </span>this {
+            EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
+                Pin::new(stream.as_mut().unwrap()).poll_flush(cx)
             }
-            <span class="ident">EndpointProj::Secure</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">EndpointProj::Socket</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
+            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
+            <span class="attribute">#[cfg(unix)]
+            </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_flush(cx),
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">tokio::io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="macro">with_interrupted!</span>(<span class="kw">match</span> <span class="ident">this</span> {
-            <span class="ident">EndpointProj::Plain</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; {
-                <span class="ident">Pin::new</span>(<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_shutdown(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+    ) -&gt; Poll&lt;std::result::Result&lt;(), tokio::io::Error&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
+        <span class="macro">with_interrupted!</span>(<span class="kw">match </span>this {
+            EndpointProj::Plain(<span class="kw-2">ref mut </span>stream) =&gt; {
+                Pin::new(stream.as_mut().unwrap()).poll_shutdown(cx)
             }
-            <span class="ident">EndpointProj::Secure</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="ident">EndpointProj::Socket</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">stream</span>) =&gt; <span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>),
+            EndpointProj::Secure(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
+            <span class="attribute">#[cfg(unix)]
+            </span>EndpointProj::Socket(<span class="kw-2">ref mut </span>stream) =&gt; stream.as_mut().poll_shutdown(cx),
         })
     }
 }
 
-<span class="doccomment">/// A Stream, connected to MySql server.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Stream</span> {
-    <span class="ident">closed</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">codec</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">Endpoint</span>, <span class="ident">PacketCodec</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A Stream, connected to MySql server.
+</span><span class="kw">pub struct </span>Stream {
+    closed: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) codec: <span class="prelude-ty">Option</span>&lt;Box&lt;Framed&lt;Endpoint, PacketCodec&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Stream</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Stream {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Stream (endpoint={:?})&quot;</span>,
-            <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_ref</span>()
+            <span class="self">self</span>.codec.as_ref().unwrap().get_ref()
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Stream</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Endpoint</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">endpoint</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">endpoint</span> <span class="op">=</span> <span class="ident">endpoint</span>.<span class="ident">into</span>();
+<span class="kw">impl </span>Stream {
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">fn </span>new&lt;T: Into&lt;Endpoint&gt;&gt;(endpoint: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>endpoint = endpoint.into();
 
-        <span class="self">Self</span> {
-            <span class="ident">closed</span>: <span class="bool-val">false</span>,
-            <span class="ident">codec</span>: <span class="ident">Box::new</span>(<span class="ident">Framed::new</span>(<span class="ident">endpoint</span>, <span class="ident">PacketCodec::default</span>())).<span class="ident">into</span>(),
+        <span class="self">Self </span>{
+            closed: <span class="bool-val">false</span>,
+            codec: Box::new(Framed::new(endpoint, PacketCodec::default())).into(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_tcp</span>(
-        <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">HostPortOrUrl</span>,
-        <span class="ident">keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tcp_stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">addr</span> {
-            <span class="ident">HostPortOrUrl::HostPort</span>(<span class="ident">host</span>, <span class="ident">port</span>) =&gt; {
-                <span class="ident">TcpStream::connect</span>((<span class="ident">host</span>.<span class="ident">as_str</span>(), <span class="kw-2">*</span><span class="ident">port</span>)).<span class="kw">await</span><span class="question-mark">?</span>
-            }
-            <span class="ident">HostPortOrUrl::Url</span>(<span class="ident">url</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">socket_addrs</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">DEFAULT_PORT</span>))<span class="question-mark">?</span>;
-                <span class="ident">TcpStream::connect</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">addrs</span>).<span class="kw">await</span><span class="question-mark">?</span>
-            }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect_tcp(
+        addr: <span class="kw-2">&amp;</span>HostPortOrUrl,
+        keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    ) -&gt; io::Result&lt;Stream&gt; {
+        <span class="kw">let </span>tcp_stream = <span class="kw">match </span>addr {
+            HostPortOrUrl::HostPort(host, port) =&gt; {
+                TcpStream::connect((host.as_str(), <span class="kw-2">*</span>port)).<span class="kw">await</span><span class="question-mark">?
+            </span>}
+            HostPortOrUrl::Url(url) =&gt; {
+                <span class="kw">let </span>addrs = url.socket_addrs(|| <span class="prelude-val">Some</span>(DEFAULT_PORT))<span class="question-mark">?</span>;
+                TcpStream::connect(<span class="kw-2">&amp;*</span>addrs).<span class="kw">await</span><span class="question-mark">?
+            </span>}
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span> <span class="ident">keepalive</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-            <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> {
-                <span class="kw">use</span> <span class="ident">std::os::unix::prelude</span>::<span class="kw-2">*</span>;
-                <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">tcp_stream</span>.<span class="ident">as_raw_fd</span>();
-                <span class="kw">unsafe</span> { <span class="ident">Socket2Socket::from_raw_fd</span>(<span class="ident">fd</span>) }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(duration) = keepalive {
+            <span class="attribute">#[cfg(unix)]
+            </span><span class="kw">let </span>socket = {
+                <span class="kw">use </span>std::os::unix::prelude::<span class="kw-2">*</span>;
+                <span class="kw">let </span>fd = tcp_stream.as_raw_fd();
+                <span class="kw">unsafe </span>{ Socket2Socket::from_raw_fd(fd) }
             };
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-            <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> {
-                <span class="kw">use</span> <span class="ident">std::os::windows::prelude</span>::<span class="kw-2">*</span>;
-                <span class="kw">let</span> <span class="ident">sock</span> <span class="op">=</span> <span class="ident">tcp_stream</span>.<span class="ident">as_raw_socket</span>();
-                <span class="kw">unsafe</span> { <span class="ident">Socket2Socket::from_raw_socket</span>(<span class="ident">sock</span>) }
+            <span class="attribute">#[cfg(windows)]
+            </span><span class="kw">let </span>socket = {
+                <span class="kw">use </span>std::os::windows::prelude::<span class="kw-2">*</span>;
+                <span class="kw">let </span>sock = tcp_stream.as_raw_socket();
+                <span class="kw">unsafe </span>{ Socket2Socket::from_raw_socket(sock) }
             };
-            <span class="ident">socket</span>.<span class="ident">set_tcp_keepalive</span>(<span class="kw-2">&amp;</span><span class="ident">TcpKeepalive::new</span>().<span class="ident">with_time</span>(<span class="ident">duration</span>))<span class="question-mark">?</span>;
-            <span class="ident">std::mem::forget</span>(<span class="ident">socket</span>);
+            socket.set_tcp_keepalive(<span class="kw-2">&amp;</span>TcpKeepalive::new().with_time(duration))<span class="question-mark">?</span>;
+            std::mem::forget(socket);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Stream</span> {
-            <span class="ident">closed</span>: <span class="bool-val">false</span>,
-            <span class="ident">codec</span>: <span class="ident">Box::new</span>(<span class="ident">Framed::new</span>(<span class="ident">tcp_stream</span>.<span class="ident">into</span>(), <span class="ident">PacketCodec::default</span>())).<span class="ident">into</span>(),
+        <span class="prelude-val">Ok</span>(Stream {
+            closed: <span class="bool-val">false</span>,
+            codec: Box::new(Framed::new(tcp_stream.into(), PacketCodec::default())).into(),
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_socket</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Stream::new</span>(<span class="ident">Socket::new</span>(<span class="ident">path</span>).<span class="kw">await</span><span class="question-mark">?</span>))
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect_socket&lt;P: AsRef&lt;Path&gt;&gt;(path: P) -&gt; io::Result&lt;Stream&gt; {
+        <span class="prelude-val">Ok</span>(Stream::new(Socket::new(path).<span class="kw">await</span><span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tcp_nodelay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_ref</span>().<span class="ident">set_tcp_nodelay</span>(<span class="ident">val</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_tcp_nodelay(<span class="kw-2">&amp;</span><span class="self">self</span>, val: bool) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.codec.as_ref().unwrap().get_ref().set_tcp_nodelay(val)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">make_secure</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">domain</span>: <span class="ident">String</span>,
-        <span class="ident">ssl_opts</span>: <span class="ident">SslOpts</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::error::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">codec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">FramedParts</span> { <span class="kw-2">mut</span> <span class="ident">io</span>, <span class="ident">codec</span>, .. } <span class="op">=</span> <span class="ident">codec</span>.<span class="ident">into_parts</span>();
-        <span class="ident">io</span>.<span class="ident">make_secure</span>(<span class="ident">domain</span>, <span class="ident">ssl_opts</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">codec</span> <span class="op">=</span> <span class="ident">Framed::new</span>(<span class="ident">io</span>, <span class="ident">codec</span>);
-        <span class="self">self</span>.<span class="ident">codec</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">codec</span>));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>make_secure(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        domain: String,
+        ssl_opts: SslOpts,
+    ) -&gt; <span class="kw">crate</span>::error::Result&lt;()&gt; {
+        <span class="kw">let </span>codec = <span class="self">self</span>.codec.take().unwrap();
+        <span class="kw">let </span>FramedParts { <span class="kw-2">mut </span>io, codec, .. } = codec.into_parts();
+        io.make_secure(domain, ssl_opts).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>codec = Framed::new(io, codec);
+        <span class="self">self</span>.codec = <span class="prelude-val">Some</span>(Box::new(codec));
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_secure</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">get_ref</span>().<span class="ident">is_secure</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_secure(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.codec.as_ref().unwrap().get_ref().is_secure()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>() {
-            <span class="ident">codec</span>.<span class="ident">codec_mut</span>().<span class="ident">reset_seq_id</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>reset_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(codec) = <span class="self">self</span>.codec.as_mut() {
+            codec.codec_mut().reset_seq_id();
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>() {
-            <span class="ident">codec</span>.<span class="ident">codec_mut</span>().<span class="ident">sync_seq_id</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sync_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(codec) = <span class="self">self</span>.codec.as_mut() {
+            codec.codec_mut().sync_seq_id();
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_max_allowed_packet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>() {
-            <span class="ident">codec</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="ident">max_allowed_packet</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_max_allowed_packet(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max_allowed_packet: usize) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(codec) = <span class="self">self</span>.codec.as_mut() {
+            codec.codec_mut().max_allowed_packet = max_allowed_packet;
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compress</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident"><span class="kw">crate</span>::Compression</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>() {
-            <span class="ident">codec</span>.<span class="ident">codec_mut</span>().<span class="ident">compress</span>(<span class="ident">level</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compress(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: <span class="kw">crate</span>::Compression) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(codec) = <span class="self">self</span>.codec.as_mut() {
+            codec.codec_mut().compress(level);
         }
     }
 
-    <span class="doccomment">/// Checks, that connection is alive.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>() {
-            <span class="ident">codec</span>.<span class="ident">get_mut</span>().<span class="ident">check</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Checks, that connection is alive.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>check(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; std::result::Result&lt;(), IoError&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(codec) = <span class="self">self</span>.codec.as_mut() {
+            codec.get_mut().check().<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">IoError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">codec</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codec</span> {
-            <span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-            <span class="ident">futures_util::future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">codec</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">IoError::Io</span>(<span class="ident">err</span>))) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">NotConnected</span> =&gt; {
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>close(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; std::result::Result&lt;(), IoError&gt; {
+        <span class="self">self</span>.closed = <span class="bool-val">true</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>codec) = <span class="self">self</span>.codec {
+            <span class="kw">use </span>futures_sink::Sink;
+            futures_util::future::poll_fn(|cx| <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut *</span>codec).poll_close(cx) {
+                Poll::Ready(<span class="prelude-val">Err</span>(IoError::Io(err))) <span class="kw">if </span>err.kind() == NotConnected =&gt; {
+                    Poll::Ready(<span class="prelude-val">Ok</span>(()))
                 }
-                <span class="ident">x</span> =&gt; <span class="ident">x</span>,
+                x =&gt; x,
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
         }
@@ -985,52 +985,52 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">stream::Stream</span> <span class="kw">for</span> <span class="ident">Stream</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">PooledBuf</span>, <span class="ident">IoError</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>stream::Stream <span class="kw">for </span>Stream {
+    <span class="kw">type </span>Item = std::result::Result&lt;PooledBuf, IoError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">closed</span> {
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_next</span>(<span class="ident">cx</span>)).<span class="ident">transpose</span>()<span class="question-mark">?</span>;
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>).<span class="ident">transpose</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.closed {
+            <span class="kw">let </span>item = <span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.codec.as_mut().unwrap()).poll_next(cx)).transpose()<span class="question-mark">?</span>;
+            Poll::Ready(<span class="prelude-val">Ok</span>(item).transpose())
+        } <span class="kw">else </span>{
+            Poll::Ready(<span class="prelude-val">None</span>)
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span> <span class="comment">// no sane way to retrieve current keepalive value on windows</span>
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_connect_with_keepalive</span>() {
-        <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">test_misc::get_opts</span>, <span class="ident">Conn</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="attribute">#[cfg(unix)] </span><span class="comment">// no sane way to retrieve current keepalive value on windows
+    </span><span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_connect_with_keepalive() {
+        <span class="kw">use crate</span>::{test_misc::get_opts, Conn};
 
-        <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">get_opts</span>()
-            .<span class="ident">tcp_keepalive</span>(<span class="prelude-val">Some</span>(<span class="number">42_000_u32</span>))
-            .<span class="ident">prefer_socket</span>(<span class="bool-val">false</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">opts</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">stream_mut</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">endpoint</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">codec</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">get_ref</span>();
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">endpoint</span> {
-            <span class="ident"><span class="kw">super</span>::Endpoint::Plain</span>(<span class="prelude-val">Some</span>(<span class="ident">stream</span>)) =&gt; <span class="ident">stream</span>,
-            <span class="ident"><span class="kw">super</span>::Endpoint::Secure</span>(<span class="ident">tls_stream</span>) =&gt; <span class="ident">tls_stream</span>.<span class="ident">get_ref</span>().<span class="ident">get_ref</span>().<span class="ident">get_ref</span>(),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span>opts = get_opts()
+            .tcp_keepalive(<span class="prelude-val">Some</span>(<span class="number">42_000_u32</span>))
+            .prefer_socket(<span class="bool-val">false</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>conn: Conn = Conn::new(opts).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>stream = conn.stream_mut().unwrap();
+        <span class="kw">let </span>endpoint = stream.codec.as_mut().unwrap().get_ref();
+        <span class="kw">let </span>stream = <span class="kw">match </span>endpoint {
+            <span class="kw">super</span>::Endpoint::Plain(<span class="prelude-val">Some</span>(stream)) =&gt; stream,
+            <span class="kw">super</span>::Endpoint::Secure(tls_stream) =&gt; tls_stream.get_ref().get_ref().get_ref(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
-        <span class="kw">let</span> <span class="ident">sock</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">use</span> <span class="ident">std::os::unix::prelude</span>::<span class="kw-2">*</span>;
-            <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">as_raw_fd</span>();
-            <span class="ident">socket2::Socket::from_raw_fd</span>(<span class="ident">raw</span>)
+        <span class="kw">let </span>sock = <span class="kw">unsafe </span>{
+            <span class="kw">use </span>std::os::unix::prelude::<span class="kw-2">*</span>;
+            <span class="kw">let </span>raw = stream.as_raw_fd();
+            socket2::Socket::from_raw_fd(raw)
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">sock</span>.<span class="ident">keepalive_time</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">std::time::Duration::from_millis</span>(<span class="number">42_000</span>),
+            sock.keepalive_time().unwrap(),
+            std::time::Duration::from_millis(<span class="number">42_000</span>),
         );
 
-        <span class="ident">std::mem::forget</span>(<span class="ident">sock</span>);
+        std::mem::forget(sock);
 
-        <span class="ident">conn</span>.<span class="ident">disconnect</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        conn.disconnect().<span class="kw">await</span>.unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

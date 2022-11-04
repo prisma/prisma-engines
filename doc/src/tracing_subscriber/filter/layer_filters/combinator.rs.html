@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/layer_filters/combinator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>combinator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/filter/layer_filters/combinator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>combinator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -469,474 +469,474 @@
 <span id="467">467</span>
 <span id="468">468</span>
 <span id="469">469</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Filter combinators</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer</span>::{<span class="ident">Context</span>, <span class="ident">Filter</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">span</span>::{<span class="ident">Attributes</span>, <span class="ident">Id</span>, <span class="ident">Record</span>},
-    <span class="ident">subscriber::Interest</span>,
-    <span class="ident">LevelFilter</span>, <span class="ident">Metadata</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! Filter combinators
+</span><span class="kw">use </span><span class="kw">crate</span>::layer::{Context, Filter};
+<span class="kw">use </span>std::{cmp, fmt, marker::PhantomData};
+<span class="kw">use </span>tracing_core::{
+    span::{Attributes, Id, Record},
+    subscriber::Interest,
+    LevelFilter, Metadata,
 };
 
-<span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if and only if</span>
-<span class="doccomment">/// *both* filters return `true`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is typically returned by the [`FilterExt::and`] method. See that</span>
-<span class="doccomment">/// method&#39;s documentation for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [`FilterExt::and`]: crate::filter::FilterExt::and</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">And</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">a</span>: <span class="ident">A</span>,
-    <span class="ident">b</span>: <span class="ident">B</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if and only if
+/// *both* filters return `true`.
+///
+/// This type is typically returned by the [`FilterExt::and`] method. See that
+/// method&#39;s documentation for details.
+///
+/// [`Filter`]: crate::layer::Filter
+/// [`FilterExt::and`]: crate::filter::FilterExt::and
+</span><span class="kw">pub struct </span>And&lt;A, B, S&gt; {
+    a: A,
+    b: B,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter</span>
-<span class="doccomment">/// returns `true`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is typically returned by the [`FilterExt::or`] method. See that</span>
-<span class="doccomment">/// method&#39;s documentation for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [`FilterExt::or`]: crate::filter::FilterExt::or</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">a</span>: <span class="ident">A</span>,
-    <span class="ident">b</span>: <span class="ident">B</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter
+/// returns `true`.
+///
+/// This type is typically returned by the [`FilterExt::or`] method. See that
+/// method&#39;s documentation for details.
+///
+/// [`Filter`]: crate::layer::Filter
+/// [`FilterExt::or`]: crate::filter::FilterExt::or
+</span><span class="kw">pub struct </span>Or&lt;A, B, S&gt; {
+    a: A,
+    b: B,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="doccomment">/// Inverts the result of a [`Filter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the wrapped filter would enable a span or event, it will be disabled. If</span>
-<span class="doccomment">/// it would disable a span or event, that span or event will be enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is typically returned by the [`FilterExt::or`] method. See that</span>
-<span class="doccomment">/// method&#39;s documentation for details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">/// [`FilterExt::or`]: crate::filter::FilterExt::or</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">a</span>: <span class="ident">A</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Inverts the result of a [`Filter`].
+///
+/// If the wrapped filter would enable a span or event, it will be disabled. If
+/// it would disable a span or event, that span or event will be enabled.
+///
+/// This type is typically returned by the [`FilterExt::or`] method. See that
+/// method&#39;s documentation for details.
+///
+/// [`Filter`]: crate::layer::Filter
+/// [`FilterExt::or`]: crate::filter::FilterExt::or
+</span><span class="kw">pub struct </span>Not&lt;A, S&gt; {
+    a: A,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="comment">// === impl And ===</span>
+<span class="comment">// === impl And ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">And</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+</span><span class="kw">impl</span>&lt;A, B, S&gt; And&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
+    B: Filter&lt;S&gt;,
 {
-    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if and only if</span>
-    <span class="doccomment">/// *both* filters return `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling spans or events if they have both a particular target *and* are</span>
-    <span class="doccomment">/// above a certain level:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, combinator::And},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with targets starting with `interesting_target`:</span>
-    <span class="doccomment">/// let target_filter = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;interesting_target&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with levels `INFO` and below:</span>
-    <span class="doccomment">/// let level_filter = LevelFilter::INFO;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Combine the two filters together so that a span or event is only enabled</span>
-    <span class="doccomment">/// // if *both* filters would enable it:</span>
-    <span class="doccomment">/// let filter = And::new(level_filter, target_filter);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(&quot;an event with an uninteresting target&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">A</span>, <span class="ident">b</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">a</span>,
-            <span class="ident">b</span>,
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if and only if
+    /// *both* filters return `true`.
+    ///
+    /// # Examples
+    ///
+    /// Enabling spans or events if they have both a particular target *and* are
+    /// above a certain level:
+    ///
+    /// ```ignore
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, combinator::And},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // Enables spans and events with targets starting with `interesting_target`:
+    /// let target_filter = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;interesting_target&quot;)
+    /// });
+    ///
+    /// // Enables spans and events with levels `INFO` and below:
+    /// let level_filter = LevelFilter::INFO;
+    ///
+    /// // Combine the two filters together so that a span or event is only enabled
+    /// // if *both* filters would enable it:
+    /// let filter = And::new(level_filter, target_filter);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::info!(&quot;an event with an uninteresting target&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);
+    /// ```
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(a: A, b: B) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            a,
+            b,
+            _s: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">And</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; Filter&lt;S&gt; <span class="kw">for </span>And&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
+    B: Filter&lt;S&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, cx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="self">self</span>.a.enabled(meta, cx) &amp;&amp; <span class="self">self</span>.b.enabled(meta, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>);
-        <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_never</span>() {
-            <span class="kw">return</span> <span class="ident">a</span>;
+    <span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">let </span>a = <span class="self">self</span>.a.callsite_enabled(meta);
+        <span class="kw">if </span>a.is_never() {
+            <span class="kw">return </span>a;
         }
 
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>);
+        <span class="kw">let </span>b = <span class="self">self</span>.b.callsite_enabled(meta);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">b</span>.<span class="ident">is_always</span>() {
-            <span class="kw">return</span> <span class="ident">b</span>;
+        <span class="kw">if </span>!b.is_always() {
+            <span class="kw">return </span>b;
         }
 
-        <span class="ident">a</span>
+        a
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="comment">// If either hint is `None`, return `None`. Otherwise, return the most restrictive.</span>
-        <span class="ident">cmp::min</span>(<span class="self">self</span>.<span class="ident">a</span>.<span class="ident">max_level_hint</span>(), <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">max_level_hint</span>())
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="comment">// If either hint is `None`, return `None`. Otherwise, return the most restrictive.
+        </span>cmp::min(<span class="self">self</span>.a.max_level_hint(), <span class="self">self</span>.b.max_level_hint())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_new_span(attrs, id, ctx.clone());
+        <span class="self">self</span>.b.on_new_span(attrs, id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, values: <span class="kw-2">&amp;</span>Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_record(id, values, ctx.clone());
+        <span class="self">self</span>.b.on_record(id, values, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_enter(id, ctx.clone());
+        <span class="self">self</span>.b.on_enter(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_exit(id, ctx.clone());
+        <span class="self">self</span>.b.on_exit(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_close(id.clone(), ctx.clone());
+        <span class="self">self</span>.b.on_close(id, ctx);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">And</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
-    <span class="ident">B</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; Clone <span class="kw">for </span>And&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Clone,
+    B: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">a</span>: <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">clone</span>(),
-            <span class="ident">b</span>: <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">clone</span>(),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">And</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">B</span>: <span class="ident">fmt::Debug</span>,
-{
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;And&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">a</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">b</span>)
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="comment">// === impl Or ===</span>
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-{
-    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter</span>
-    <span class="doccomment">/// returns `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling spans and events at the `INFO` level and above, and all spans</span>
-    <span class="doccomment">/// and events with a particular target:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, combinator::Or},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with targets starting with `interesting_target`:</span>
-    <span class="doccomment">/// let target_filter = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;interesting_target&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Enables spans and events with levels `INFO` and below:</span>
-    <span class="doccomment">/// let level_filter = LevelFilter::INFO;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Combine the two filters together so that a span or event is enabled</span>
-    <span class="doccomment">/// // if it is at INFO or lower, or if it has a target starting with</span>
-    <span class="doccomment">/// // `interesting_target`.</span>
-    <span class="doccomment">/// let filter = Or::new(level_filter, target_filter);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event will *not* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(&quot;an uninteresting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(&quot;an uninteresting INFO event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This event *will* be enabled:</span>
-    <span class="doccomment">/// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling a higher level for a particular target by using `Or` in</span>
-    <span class="doccomment">/// conjunction with the [`And`] combinator:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     filter::{filter_fn, LevelFilter, combinator},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This filter will enable spans and events with targets beginning with</span>
-    <span class="doccomment">/// // `my_crate`:</span>
-    <span class="doccomment">/// let my_crate = filter_fn(|meta| {</span>
-    <span class="doccomment">///     meta.target().starts_with(&quot;my_crate&quot;)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Combine the `my_crate` filter with a `LevelFilter` to produce a filter</span>
-    <span class="doccomment">/// // that will enable the `INFO` level and lower for spans and events with</span>
-    <span class="doccomment">/// // `my_crate` targets:</span>
-    <span class="doccomment">/// let filter = combinator::And::new(my_crate, LevelFilter::INFO);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // If a span or event *doesn&#39;t* have a target beginning with</span>
-    <span class="doccomment">/// // `my_crate`, enable it if it has the `WARN` level or lower:</span>
-    <span class="doccomment">/// // let filter = combinator::Or::new(filter, LevelFilter::WARN);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing_subscriber::registry()</span>
-    <span class="doccomment">///     .with(tracing_subscriber::fmt::layer().with_filter(filter))</span>
-    <span class="doccomment">///     .init();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">A</span>, <span class="ident">b</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">a</span>,
-            <span class="ident">b</span>,
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            a: <span class="self">self</span>.a.clone(),
+            b: <span class="self">self</span>.b.clone(),
+            _s: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; fmt::Debug <span class="kw">for </span>And&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: fmt::Debug,
+    B: fmt::Debug,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;And&quot;</span>)
+            .field(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.a)
+            .field(<span class="string">&quot;b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.b)
+            .finish()
+    }
+}
+
+<span class="comment">// === impl Or ===
+
+</span><span class="kw">impl</span>&lt;A, B, S&gt; Or&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
+    B: Filter&lt;S&gt;,
+{
+    <span class="doccomment">/// Combines two [`Filter`]s so that spans and events are enabled if *either* filter
+    /// returns `true`.
+    ///
+    /// # Examples
+    ///
+    /// Enabling spans and events at the `INFO` level and above, and all spans
+    /// and events with a particular target:
+    ///
+    /// ```ignore
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, combinator::Or},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // Enables spans and events with targets starting with `interesting_target`:
+    /// let target_filter = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;interesting_target&quot;)
+    /// });
+    ///
+    /// // Enables spans and events with levels `INFO` and below:
+    /// let level_filter = LevelFilter::INFO;
+    ///
+    /// // Combine the two filters together so that a span or event is enabled
+    /// // if it is at INFO or lower, or if it has a target starting with
+    /// // `interesting_target`.
+    /// let filter = Or::new(level_filter, target_filter);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    ///
+    /// // This event will *not* be enabled:
+    /// tracing::debug!(&quot;an uninteresting event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(&quot;an uninteresting INFO event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::info!(target: &quot;interesting_target&quot;, &quot;a very interesting event&quot;);
+    ///
+    /// // This event *will* be enabled:
+    /// tracing::debug!(target: &quot;interesting_target&quot;, &quot;interesting debug event...&quot;);
+    /// ```
+    ///
+    /// Enabling a higher level for a particular target by using `Or` in
+    /// conjunction with the [`And`] combinator:
+    ///
+    /// ```ignore
+    /// use tracing_subscriber::{
+    ///     filter::{filter_fn, LevelFilter, combinator},
+    ///     prelude::*,
+    /// };
+    ///
+    /// // This filter will enable spans and events with targets beginning with
+    /// // `my_crate`:
+    /// let my_crate = filter_fn(|meta| {
+    ///     meta.target().starts_with(&quot;my_crate&quot;)
+    /// });
+    ///
+    /// // Combine the `my_crate` filter with a `LevelFilter` to produce a filter
+    /// // that will enable the `INFO` level and lower for spans and events with
+    /// // `my_crate` targets:
+    /// let filter = combinator::And::new(my_crate, LevelFilter::INFO);
+    ///
+    /// // If a span or event *doesn&#39;t* have a target beginning with
+    /// // `my_crate`, enable it if it has the `WARN` level or lower:
+    /// // let filter = combinator::Or::new(filter, LevelFilter::WARN);
+    ///
+    /// tracing_subscriber::registry()
+    ///     .with(tracing_subscriber::fmt::layer().with_filter(filter))
+    ///     .init();
+    /// ```
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(a: A, b: B) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            a,
+            b,
+            _s: PhantomData,
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;A, B, S&gt; Filter&lt;S&gt; <span class="kw">for </span>Or&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
+    B: Filter&lt;S&gt;,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, cx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="self">self</span>.a.enabled(meta, cx) || <span class="self">self</span>.b.enabled(meta, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>);
+    <span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">let </span>a = <span class="self">self</span>.a.callsite_enabled(meta);
+        <span class="kw">let </span>b = <span class="self">self</span>.b.callsite_enabled(meta);
 
-        <span class="comment">// If either filter will always enable the span or event, return `always`.</span>
-        <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_always</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_always</span>() {
-            <span class="kw">return</span> <span class="ident">Interest::always</span>();
+        <span class="comment">// If either filter will always enable the span or event, return `always`.
+        </span><span class="kw">if </span>a.is_always() || b.is_always() {
+            <span class="kw">return </span>Interest::always();
         }
 
-        <span class="comment">// Okay, if either filter will sometimes enable the span or event,</span>
-        <span class="comment">// return `sometimes`.</span>
-        <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_sometimes</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_sometimes</span>() {
-            <span class="kw">return</span> <span class="ident">Interest::sometimes</span>();
+        <span class="comment">// Okay, if either filter will sometimes enable the span or event,
+        // return `sometimes`.
+        </span><span class="kw">if </span>a.is_sometimes() || b.is_sometimes() {
+            <span class="kw">return </span>Interest::sometimes();
         }
 
         <span class="macro">debug_assert!</span>(
-            <span class="ident">a</span>.<span class="ident">is_never</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">is_never</span>(),
+            a.is_never() &amp;&amp; b.is_never(),
             <span class="string">&quot;if neither filter was `always` or `sometimes`, both must be `never` (a={:?}; b={:?})&quot;</span>,
-            <span class="ident">a</span>,
-            <span class="ident">b</span>,
+            a,
+            b,
         );
-        <span class="ident">Interest::never</span>()
+        Interest::never()
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="comment">// If either hint is `None`, return `None`. Otherwise, return the less restrictive.</span>
-        <span class="prelude-val">Some</span>(<span class="ident">cmp::max</span>(<span class="self">self</span>.<span class="ident">a</span>.<span class="ident">max_level_hint</span>()<span class="question-mark">?</span>, <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">max_level_hint</span>()<span class="question-mark">?</span>))
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="comment">// If either hint is `None`, return `None`. Otherwise, return the less restrictive.
+        </span><span class="prelude-val">Some</span>(cmp::max(<span class="self">self</span>.a.max_level_hint()<span class="question-mark">?</span>, <span class="self">self</span>.b.max_level_hint()<span class="question-mark">?</span>))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_new_span(attrs, id, ctx.clone());
+        <span class="self">self</span>.b.on_new_span(attrs, id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, values: <span class="kw-2">&amp;</span>Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_record(id, values, ctx.clone());
+        <span class="self">self</span>.b.on_record(id, values, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_enter(id, ctx.clone());
+        <span class="self">self</span>.b.on_enter(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_exit(id, ctx.clone());
+        <span class="self">self</span>.b.on_exit(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_close(id.clone(), ctx.clone());
+        <span class="self">self</span>.b.on_close(id, ctx);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
-    <span class="ident">B</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; Clone <span class="kw">for </span>Or&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Clone,
+    B: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">a</span>: <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">clone</span>(),
-            <span class="ident">b</span>: <span class="self">self</span>.<span class="ident">b</span>.<span class="ident">clone</span>(),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            a: <span class="self">self</span>.a.clone(),
+            b: <span class="self">self</span>.b.clone(),
+            _s: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Or</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">B</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; fmt::Debug <span class="kw">for </span>Or&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: fmt::Debug,
+    B: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Or&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">a</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">b</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Or&quot;</span>)
+            .field(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.a)
+            .field(<span class="string">&quot;b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.b)
+            .finish()
     }
 }
 
-<span class="comment">// === impl Not ===</span>
+<span class="comment">// === impl Not ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+</span><span class="kw">impl</span>&lt;A, S&gt; Not&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
 {
-    <span class="doccomment">/// Inverts the result of a [`Filter`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the wrapped filter would enable a span or event, it will be disabled. If</span>
-    <span class="doccomment">/// it would disable a span or event, that span or event will be enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">a</span>, <span class="ident">_s</span>: <span class="ident">PhantomData</span> }
+    <span class="doccomment">/// Inverts the result of a [`Filter`].
+    ///
+    /// If the wrapped filter would enable a span or event, it will be disabled. If
+    /// it would disable a span or event, that span or event will be enabled.
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(a: A) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ a, _s: PhantomData }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Filter</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Filter&lt;S&gt; <span class="kw">for </span>Not&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Filter&lt;S&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">a</span>.<span class="ident">enabled</span>(<span class="ident">meta</span>, <span class="ident">cx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, cx: <span class="kw-2">&amp;</span>Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        !<span class="self">self</span>.a.enabled(meta, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">callsite_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">callsite_enabled</span>(<span class="ident">meta</span>) {
-            <span class="ident">i</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">is_always</span>() =&gt; <span class="ident">Interest::never</span>(),
-            <span class="ident">i</span> <span class="kw">if</span> <span class="ident">i</span>.<span class="ident">is_never</span>() =&gt; <span class="ident">Interest::always</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">Interest::sometimes</span>(),
+    <span class="kw">fn </span>callsite_enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, meta: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="kw">match </span><span class="self">self</span>.a.callsite_enabled(meta) {
+            i <span class="kw">if </span>i.is_always() =&gt; Interest::never(),
+            i <span class="kw">if </span>i.is_never() =&gt; Interest::always(),
+            <span class="kw">_ </span>=&gt; Interest::sometimes(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO(eliza): figure this out???</span>
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="comment">// TODO(eliza): figure this out???
+        </span><span class="prelude-val">None
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_new_span(attrs, id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, values: <span class="kw-2">&amp;</span>Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_record(id, values, ctx.clone());
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_record</span>(<span class="ident">id</span>, <span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_enter(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_exit(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.a.on_close(id, ctx);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;A, S&gt; Clone <span class="kw">for </span>Not&lt;A, S&gt;
+<span class="kw">where
+    </span>A: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">a</span>: <span class="self">self</span>.<span class="ident">a</span>.<span class="ident">clone</span>(),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            a: <span class="self">self</span>.a.clone(),
+            _s: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;A, S&gt; fmt::Debug <span class="kw">for </span>Not&lt;A, S&gt;
+<span class="kw">where
+    </span>A: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Not&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">a</span>).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;Not&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.a).finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

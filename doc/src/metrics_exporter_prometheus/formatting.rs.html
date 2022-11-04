@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/formatting.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/formatting.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatting.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -423,252 +423,252 @@
 <span id="423">423</span>
 <span id="424">424</span>
 <span id="425">425</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Helpers for rendering metrics in the Prometheus exposition format.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Helpers for rendering metrics in the Prometheus exposition format.
 
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">metrics::Key</span>;
+</span><span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>metrics::Key;
 
-<span class="doccomment">/// Breaks a key into the name and label components, with optional default labels.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If any of the default labels are not already present, they will be added to the overall list of labels.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both the metric name, and labels, are sanitized. See [`sanitize_metric_name`], [`sanitize_label_key`],</span>
-<span class="doccomment">/// and [`sanitize_label_value`] for more information.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_to_parts</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>,
-    <span class="ident">default_labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; (<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">sanitize_metric_name</span>(<span class="ident">key</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">default_labels</span>.<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
-    <span class="ident">key</span>.<span class="ident">labels</span>().<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">label</span><span class="op">|</span> {
-        <span class="ident">values</span>.<span class="ident">insert</span>(<span class="ident">label</span>.<span class="ident">key</span>().<span class="ident">to_string</span>(), <span class="ident">label</span>.<span class="ident">value</span>().<span class="ident">to_string</span>());
+<span class="doccomment">/// Breaks a key into the name and label components, with optional default labels.
+///
+/// If any of the default labels are not already present, they will be added to the overall list of labels.
+///
+/// Both the metric name, and labels, are sanitized. See [`sanitize_metric_name`], [`sanitize_label_key`],
+/// and [`sanitize_label_value`] for more information.
+</span><span class="kw">pub fn </span>key_to_parts(
+    key: <span class="kw-2">&amp;</span>Key,
+    default_labels: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>IndexMap&lt;String, String&gt;&gt;,
+) -&gt; (String, Vec&lt;String&gt;) {
+    <span class="kw">let </span>name = sanitize_metric_name(key.name());
+    <span class="kw">let </span><span class="kw-2">mut </span>values = default_labels.cloned().unwrap_or_default();
+    key.labels().into_iter().for_each(|label| {
+        values.insert(label.key().to_string(), label.value().to_string());
     });
-    <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="ident">values</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}=\&quot;{}\&quot;&quot;</span>, <span class="ident">sanitize_label_key</span>(<span class="ident">k</span>), <span class="ident">sanitize_label_value</span>(<span class="ident">v</span>)))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>labels = values
+        .iter()
+        .map(|(k, v)| <span class="macro">format!</span>(<span class="string">&quot;{}=\&quot;{}\&quot;&quot;</span>, sanitize_label_key(k), sanitize_label_value(v)))
+        .collect();
 
-    (<span class="ident">name</span>, <span class="ident">labels</span>)
+    (name, labels)
 }
 
-<span class="doccomment">/// Writes a help (description) line in the Prometheus [exposition format].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_help_line</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">desc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="string">&quot;# HELP &quot;</span>);
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-    <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="ident">sanitize_description</span>(<span class="ident">desc</span>);
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">desc</span>);
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+<span class="doccomment">/// Writes a help (description) line in the Prometheus [exposition format].
+///
+/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details
+</span><span class="kw">pub fn </span>write_help_line(buffer: <span class="kw-2">&amp;mut </span>String, name: <span class="kw-2">&amp;</span>str, desc: <span class="kw-2">&amp;</span>str) {
+    buffer.push_str(<span class="string">&quot;# HELP &quot;</span>);
+    buffer.push_str(name);
+    buffer.push(<span class="string">&#39; &#39;</span>);
+    <span class="kw">let </span>desc = sanitize_description(desc);
+    buffer.push_str(<span class="kw-2">&amp;</span>desc);
+    buffer.push(<span class="string">&#39;\n&#39;</span>);
 }
 
-<span class="doccomment">/// Writes a metric type line in the Prometheus [exposition format].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_type_line</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">metric_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="string">&quot;# TYPE &quot;</span>);
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">metric_type</span>);
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+<span class="doccomment">/// Writes a metric type line in the Prometheus [exposition format].
+///
+/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details
+</span><span class="kw">pub fn </span>write_type_line(buffer: <span class="kw-2">&amp;mut </span>String, name: <span class="kw-2">&amp;</span>str, metric_type: <span class="kw-2">&amp;</span>str) {
+    buffer.push_str(<span class="string">&quot;# TYPE &quot;</span>);
+    buffer.push_str(name);
+    buffer.push(<span class="string">&#39; &#39;</span>);
+    buffer.push_str(metric_type);
+    buffer.push(<span class="string">&#39;\n&#39;</span>);
 }
 
-<span class="doccomment">/// Writes a metric in the Prometheus [exposition format].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When `suffix` is specified, it is appended to the `name`, which is useful for writing summary</span>
-<span class="doccomment">/// statistics, such as the sum or total of an aggregated histogram or aggregated summary.  Likewise,</span>
-<span class="doccomment">/// `additional_label` would typically be used to specify a data type-specific label, such as `le` for</span>
-<span class="doccomment">/// for aggregated histograms, or `quantile` for aggregated summaries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_metric_line</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T2</span><span class="op">&gt;</span>(
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">suffix</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">labels</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-    <span class="ident">additional_label</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">T</span>)<span class="op">&gt;</span>,
-    <span class="ident">value</span>: <span class="ident">T2</span>,
-) <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">std::fmt::Display</span>,
-    <span class="ident">T2</span>: <span class="ident">std::fmt::Display</span>,
+<span class="doccomment">/// Writes a metric in the Prometheus [exposition format].
+///
+/// When `suffix` is specified, it is appended to the `name`, which is useful for writing summary
+/// statistics, such as the sum or total of an aggregated histogram or aggregated summary.  Likewise,
+/// `additional_label` would typically be used to specify a data type-specific label, such as `le` for
+/// for aggregated histograms, or `quantile` for aggregated summaries.
+///
+/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details
+</span><span class="kw">pub fn </span>write_metric_line&lt;T, T2&gt;(
+    buffer: <span class="kw-2">&amp;mut </span>String,
+    name: <span class="kw-2">&amp;</span>str,
+    suffix: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    labels: <span class="kw-2">&amp;</span>[String],
+    additional_label: <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, T)&gt;,
+    value: T2,
+) <span class="kw">where
+    </span>T: std::fmt::Display,
+    T2: std::fmt::Display,
 {
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">suffix</span>) <span class="op">=</span> <span class="ident">suffix</span> {
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
-        <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">suffix</span>);
+    buffer.push_str(name);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(suffix) = suffix {
+        buffer.push(<span class="string">&#39;_&#39;</span>);
+        buffer.push_str(suffix);
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">labels</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">additional_label</span>.<span class="ident">is_some</span>() {
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;{&#39;</span>);
+    <span class="kw">if </span>!labels.is_empty() || additional_label.is_some() {
+        buffer.push(<span class="string">&#39;{&#39;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="ident">labels</span> {
-            <span class="kw">if</span> <span class="ident">first</span> {
-                <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+        <span class="kw">for </span>label <span class="kw">in </span>labels {
+            <span class="kw">if </span>first {
+                first = <span class="bool-val">false</span>;
+            } <span class="kw">else </span>{
+                buffer.push(<span class="string">&#39;,&#39;</span>);
             }
-            <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">label</span>);
+            buffer.push_str(label);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">name</span>, <span class="ident">value</span>)) <span class="op">=</span> <span class="ident">additional_label</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-                <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((name, value)) = additional_label {
+            <span class="kw">if </span>!first {
+                buffer.push(<span class="string">&#39;,&#39;</span>);
             }
-            <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
-            <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="string">&quot;=\&quot;&quot;</span>);
-            <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>());
-            <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
+            buffer.push_str(name);
+            buffer.push_str(<span class="string">&quot;=\&quot;&quot;</span>);
+            buffer.push_str(value.to_string().as_str());
+            buffer.push(<span class="string">&#39;&quot;&#39;</span>);
         }
 
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;}&#39;</span>);
+        buffer.push(<span class="string">&#39;}&#39;</span>);
     }
 
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
-    <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">value</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>());
-    <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    buffer.push(<span class="string">&#39; &#39;</span>);
+    buffer.push_str(value.to_string().as_str());
+    buffer.push(<span class="string">&#39;\n&#39;</span>);
 }
 
-<span class="doccomment">/// Sanitizes a metric name to be valid under the Prometheus [data model].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sanitize_metric_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="comment">// The first character must be [a-zA-Z_:], and all subsequent characters must be [a-zA-Z0-9_:].</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">name</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_invalid</span>: <span class="kw">fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span> <span class="op">=</span> <span class="ident">invalid_metric_name_start_character</span>;
-    <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">name</span>.<span class="ident">chars</span>() {
-        <span class="kw">if</span> <span class="ident">is_invalid</span>(<span class="ident">c</span>) {
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+<span class="doccomment">/// Sanitizes a metric name to be valid under the Prometheus [data model].
+///
+/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+</span><span class="kw">pub fn </span>sanitize_metric_name(name: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="comment">// The first character must be [a-zA-Z_:], and all subsequent characters must be [a-zA-Z0-9_:].
+    </span><span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(name.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>is_invalid: <span class="kw">fn</span>(char) -&gt; bool = invalid_metric_name_start_character;
+    <span class="kw">for </span>c <span class="kw">in </span>name.chars() {
+        <span class="kw">if </span>is_invalid(c) {
+            out.push(<span class="string">&#39;_&#39;</span>);
+        } <span class="kw">else </span>{
+            out.push(c);
         }
-        <span class="ident">is_invalid</span> <span class="op">=</span> <span class="ident">invalid_metric_name_character</span>;
+        is_invalid = invalid_metric_name_character;
     }
-    <span class="ident">out</span>
+    out
 }
 
-<span class="doccomment">/// Sanitizes a label key to be valid under the Prometheus [data model].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sanitize_label_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="comment">// The first character must be [a-zA-Z_], and all subsequent characters must be [a-zA-Z0-9_].</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">key</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_invalid</span>: <span class="kw">fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span> <span class="op">=</span> <span class="ident">invalid_label_key_start_character</span>;
-    <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">key</span>.<span class="ident">chars</span>() {
-        <span class="kw">if</span> <span class="ident">is_invalid</span>(<span class="ident">c</span>) {
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+<span class="doccomment">/// Sanitizes a label key to be valid under the Prometheus [data model].
+///
+/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+</span><span class="kw">pub fn </span>sanitize_label_key(key: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="comment">// The first character must be [a-zA-Z_], and all subsequent characters must be [a-zA-Z0-9_].
+    </span><span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(key.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>is_invalid: <span class="kw">fn</span>(char) -&gt; bool = invalid_label_key_start_character;
+    <span class="kw">for </span>c <span class="kw">in </span>key.chars() {
+        <span class="kw">if </span>is_invalid(c) {
+            out.push(<span class="string">&#39;_&#39;</span>);
+        } <span class="kw">else </span>{
+            out.push(c);
         }
-        <span class="ident">is_invalid</span> <span class="op">=</span> <span class="ident">invalid_label_key_character</span>;
+        is_invalid = invalid_label_key_character;
     }
-    <span class="ident">out</span>
+    out
 }
 
-<span class="doccomment">/// Sanitizes a label value to be valid under the Prometheus [data model].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sanitize_label_value</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">sanitize_label_value_or_description</span>(<span class="ident">value</span>, <span class="bool-val">false</span>)
+<span class="doccomment">/// Sanitizes a label value to be valid under the Prometheus [data model].
+///
+/// [data model]: https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+</span><span class="kw">pub fn </span>sanitize_label_value(value: <span class="kw-2">&amp;</span>str) -&gt; String {
+    sanitize_label_value_or_description(value, <span class="bool-val">false</span>)
 }
 
-<span class="doccomment">/// Sanitizes a metric description to be valid under the Prometheus [exposition format].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sanitize_description</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">sanitize_label_value_or_description</span>(<span class="ident">value</span>, <span class="bool-val">true</span>)
+<span class="doccomment">/// Sanitizes a metric description to be valid under the Prometheus [exposition format].
+///
+/// [exposition format]: https://github.com/prometheus/docs/blob/main/content/docs/instrumenting/exposition_formats.md#text-format-details
+</span><span class="kw">pub fn </span>sanitize_description(value: <span class="kw-2">&amp;</span>str) -&gt; String {
+    sanitize_label_value_or_description(value, <span class="bool-val">true</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">sanitize_label_value_or_description</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_desc</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-    <span class="comment">// All Unicode characters are valid, but backslashes, double quotes, and line feeds must be</span>
-    <span class="comment">// escaped.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sanitized</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">value</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>());
+<span class="kw">fn </span>sanitize_label_value_or_description(value: <span class="kw-2">&amp;</span>str, is_desc: bool) -&gt; String {
+    <span class="comment">// All Unicode characters are valid, but backslashes, double quotes, and line feeds must be
+    // escaped.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>sanitized = String::with_capacity(value.as_bytes().len());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_backslash</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">chars</span>() {
-        <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="comment">// Any raw newlines get escaped, period.</span>
-            <span class="string">&#39;\n&#39;</span> =&gt; <span class="ident">sanitized</span>.<span class="ident">push_str</span>(<span class="string">&quot;\\n&quot;</span>),
-            <span class="comment">// Any double quote we see gets escaped, but only for label values, not descriptions.</span>
-            <span class="string">&#39;&quot;&#39;</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">is_desc</span> =&gt; {
-                <span class="ident">previous_backslash</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="ident">sanitized</span>.<span class="ident">push_str</span>(<span class="string">&quot;\\\&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>previous_backslash = <span class="bool-val">false</span>;
+    <span class="kw">for </span>c <span class="kw">in </span>value.chars() {
+        <span class="kw">match </span>c {
+            <span class="comment">// Any raw newlines get escaped, period.
+            </span><span class="string">&#39;\n&#39; </span>=&gt; sanitized.push_str(<span class="string">&quot;\\n&quot;</span>),
+            <span class="comment">// Any double quote we see gets escaped, but only for label values, not descriptions.
+            </span><span class="string">&#39;&quot;&#39; </span><span class="kw">if </span>!is_desc =&gt; {
+                previous_backslash = <span class="bool-val">false</span>;
+                sanitized.push_str(<span class="string">&quot;\\\&quot;&quot;</span>);
             }
-            <span class="comment">// If we see a backslash, we might be either seeing one that is being used to escape</span>
-            <span class="comment">// something, or seeing one that has being escaped. If our last character was a</span>
-            <span class="comment">// backslash, then we know this one has already been escaped, and we just emit the</span>
-            <span class="comment">// escaped backslash.</span>
-            <span class="string">&#39;\\&#39;</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">previous_backslash</span> {
-                    <span class="comment">// This backslash was preceded by another backslash, so we can safely emit an</span>
-                    <span class="comment">// escaped backslash.</span>
-                    <span class="ident">sanitized</span>.<span class="ident">push_str</span>(<span class="string">&quot;\\\\&quot;</span>);
+            <span class="comment">// If we see a backslash, we might be either seeing one that is being used to escape
+            // something, or seeing one that has being escaped. If our last character was a
+            // backslash, then we know this one has already been escaped, and we just emit the
+            // escaped backslash.
+            </span><span class="string">&#39;\\&#39; </span>=&gt; {
+                <span class="kw">if </span>previous_backslash {
+                    <span class="comment">// This backslash was preceded by another backslash, so we can safely emit an
+                    // escaped backslash.
+                    </span>sanitized.push_str(<span class="string">&quot;\\\\&quot;</span>);
                 }
 
-                <span class="comment">// This may or may not be a backslash that is about to escape something else, so if</span>
-                <span class="comment">// we toggle the value here: if it was false, then we&#39;re marking ourselves as having</span>
-                <span class="comment">// seen a previous backslash (duh) or we just emitted an escaped backslash and now</span>
-                <span class="comment">// we&#39;re clearing the flag.</span>
-                <span class="ident">previous_backslash</span> <span class="op">=</span> <span class="op">!</span><span class="ident">previous_backslash</span>;
+                <span class="comment">// This may or may not be a backslash that is about to escape something else, so if
+                // we toggle the value here: if it was false, then we&#39;re marking ourselves as having
+                // seen a previous backslash (duh) or we just emitted an escaped backslash and now
+                // we&#39;re clearing the flag.
+                </span>previous_backslash = !previous_backslash;
             }
-            <span class="ident">c</span> =&gt; {
-                <span class="comment">// If we had a backslash in holding, and we&#39;re here, we know it wasn&#39;t escaping</span>
-                <span class="comment">// something we care about, so it&#39;s on its own, and we emit an escaped backslash,</span>
-                <span class="comment">// before emitting the actual character we&#39;re handling.</span>
-                <span class="kw">if</span> <span class="ident">previous_backslash</span> {
-                    <span class="ident">previous_backslash</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                    <span class="ident">sanitized</span>.<span class="ident">push_str</span>(<span class="string">&quot;\\\\&quot;</span>);
+            c =&gt; {
+                <span class="comment">// If we had a backslash in holding, and we&#39;re here, we know it wasn&#39;t escaping
+                // something we care about, so it&#39;s on its own, and we emit an escaped backslash,
+                // before emitting the actual character we&#39;re handling.
+                </span><span class="kw">if </span>previous_backslash {
+                    previous_backslash = <span class="bool-val">false</span>;
+                    sanitized.push_str(<span class="string">&quot;\\\\&quot;</span>);
                 }
-                <span class="ident">sanitized</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+                sanitized.push(c);
             }
         }
     }
 
-    <span class="comment">// Handle any dangling backslash by writing it out in an escaped fashion.</span>
-    <span class="kw">if</span> <span class="ident">previous_backslash</span> {
-        <span class="ident">sanitized</span>.<span class="ident">push_str</span>(<span class="string">&quot;\\\\&quot;</span>);
+    <span class="comment">// Handle any dangling backslash by writing it out in an escaped fashion.
+    </span><span class="kw">if </span>previous_backslash {
+        sanitized.push_str(<span class="string">&quot;\\\\&quot;</span>);
     }
 
-    <span class="ident">sanitized</span>
+    sanitized
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">invalid_metric_name_start_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z_:].</span>
-    <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_ascii_alphabetic</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>invalid_metric_name_start_character(c: char) -&gt; bool {
+    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z_:].
+    </span>!(c.is_ascii_alphabetic() || c == <span class="string">&#39;_&#39; </span>|| c == <span class="string">&#39;:&#39;</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">invalid_metric_name_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z0-9_:].</span>
-    <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_ascii_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>invalid_metric_name_character(c: char) -&gt; bool {
+    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z0-9_:].
+    </span>!(c.is_ascii_alphanumeric() || c == <span class="string">&#39;_&#39; </span>|| c == <span class="string">&#39;:&#39;</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">invalid_label_key_start_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z_].</span>
-    <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_ascii_alphabetic</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>invalid_label_key_start_character(c: char) -&gt; bool {
+    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z_].
+    </span>!(c.is_ascii_alphabetic() || c == <span class="string">&#39;_&#39;</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">invalid_label_key_character</span>(<span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z0-9_].</span>
-    <span class="op">!</span>(<span class="ident">c</span>.<span class="ident">is_ascii_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>invalid_label_key_character(c: char) -&gt; bool {
+    <span class="comment">// Essentially, needs to match the regex pattern of [a-zA-Z0-9_].
+    </span>!(c.is_ascii_alphanumeric() || c == <span class="string">&#39;_&#39;</span>)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting</span>::{
-        <span class="ident">invalid_label_key_character</span>, <span class="ident">invalid_label_key_start_character</span>,
-        <span class="ident">invalid_metric_name_character</span>, <span class="ident">invalid_metric_name_start_character</span>, <span class="ident">sanitize_description</span>,
-        <span class="ident">sanitize_label_key</span>, <span class="ident">sanitize_label_value</span>, <span class="ident">sanitize_metric_name</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::formatting::{
+        invalid_label_key_character, invalid_label_key_start_character,
+        invalid_metric_name_character, invalid_metric_name_start_character, sanitize_description,
+        sanitize_label_key, sanitize_label_value, sanitize_metric_name,
     };
-    <span class="kw">use</span> <span class="ident">proptest::prelude</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>proptest::prelude::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sanitize_metric_name_known_cases</span>() {
-        <span class="kw">let</span> <span class="ident">cases</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sanitize_metric_name_known_cases() {
+        <span class="kw">let </span>cases = <span class="kw-2">&amp;</span>[
             (<span class="string">&quot;*&quot;</span>, <span class="string">&quot;_&quot;</span>),
             (<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;_&quot;</span>),
             (<span class="string">&quot;foo_bar&quot;</span>, <span class="string">&quot;foo_bar&quot;</span>),
@@ -678,15 +678,15 @@
             (<span class="string">&quot;123&quot;</span>, <span class="string">&quot;_23&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_metric_name</span>(<span class="ident">input</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>);
+        <span class="kw">for </span>(input, expected) <span class="kw">in </span>cases {
+            <span class="kw">let </span>result = sanitize_metric_name(input);
+            <span class="macro">assert_eq!</span>(expected, <span class="kw-2">&amp;</span>result);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sanitize_label_key_known_cases</span>() {
-        <span class="kw">let</span> <span class="ident">cases</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sanitize_label_key_known_cases() {
+        <span class="kw">let </span>cases = <span class="kw-2">&amp;</span>[
             (<span class="string">&quot;*&quot;</span>, <span class="string">&quot;_&quot;</span>),
             (<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;_&quot;</span>),
             (<span class="string">&quot;:&quot;</span>, <span class="string">&quot;_&quot;</span>),
@@ -697,15 +697,15 @@
             (<span class="string">&quot;123&quot;</span>, <span class="string">&quot;_23&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_label_key</span>(<span class="ident">input</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>);
+        <span class="kw">for </span>(input, expected) <span class="kw">in </span>cases {
+            <span class="kw">let </span>result = sanitize_label_key(input);
+            <span class="macro">assert_eq!</span>(expected, <span class="kw-2">&amp;</span>result);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sanitize_label_value_known_cases</span>() {
-        <span class="kw">let</span> <span class="ident">cases</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sanitize_label_value_known_cases() {
+        <span class="kw">let </span>cases = <span class="kw-2">&amp;</span>[
             (<span class="string">&quot;*&quot;</span>, <span class="string">&quot;*&quot;</span>),
             (<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;\\\&quot;&quot;</span>),
             (<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;\\\\&quot;</span>),
@@ -715,15 +715,15 @@
             (<span class="string">&quot;1foobar&quot;</span>, <span class="string">&quot;1foobar&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_label_value</span>(<span class="ident">input</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>);
+        <span class="kw">for </span>(input, expected) <span class="kw">in </span>cases {
+            <span class="kw">let </span>result = sanitize_label_value(input);
+            <span class="macro">assert_eq!</span>(expected, <span class="kw-2">&amp;</span>result);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sanitize_description_known_cases</span>() {
-        <span class="kw">let</span> <span class="ident">cases</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sanitize_description_known_cases() {
+        <span class="kw">let </span>cases = <span class="kw-2">&amp;</span>[
             (<span class="string">&quot;*&quot;</span>, <span class="string">&quot;*&quot;</span>),
             (<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;\&quot;&quot;</span>),
             (<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;\\\\&quot;</span>),
@@ -733,120 +733,120 @@
             (<span class="string">&quot;1foobar&quot;</span>, <span class="string">&quot;1foobar&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">cases</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_description</span>(<span class="ident">input</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">result</span>);
+        <span class="kw">for </span>(input, expected) <span class="kw">in </span>cases {
+            <span class="kw">let </span>result = sanitize_description(input);
+            <span class="macro">assert_eq!</span>(expected, <span class="kw-2">&amp;</span>result);
         }
     }
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_sanitize_metric_name</span>(<span class="ident">input</span> <span class="kw">in</span> <span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_metric_name</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>);
-            <span class="kw">let</span> <span class="ident">as_chars</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">chars</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>test_sanitize_metric_name(input <span class="kw">in </span><span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
+            <span class="kw">let </span>result = sanitize_metric_name(<span class="kw-2">&amp;</span>input);
+            <span class="kw">let </span>as_chars = result.chars().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">as_chars</span>.<span class="ident">first</span>() {
-                <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, <span class="ident">invalid_metric_name_start_character</span>(<span class="kw-2">*</span><span class="ident">c</span>),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = as_chars.first() {
+                <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, invalid_metric_name_start_character(<span class="kw-2">*</span>c),
                     <span class="string">&quot;first character of metric name was not valid&quot;</span>);
             }
 
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">as_chars</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">invalid_metric_name_character</span>(<span class="kw-2">*</span><span class="ident">c</span>)),
+            <span class="macro">assert!</span>(!as_chars.iter().any(|c| invalid_metric_name_character(<span class="kw-2">*</span>c)),
                 <span class="string">&quot;invalid character in metric name&quot;</span>);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_sanitize_label_key</span>(<span class="ident">input</span> <span class="kw">in</span> <span class="string">&quot;[\n\&quot;\\\\:]?.*[\n\&quot;\\\\:]?&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_label_key</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>);
-            <span class="kw">let</span> <span class="ident">as_chars</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">chars</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>test_sanitize_label_key(input <span class="kw">in </span><span class="string">&quot;[\n\&quot;\\\\:]?.*[\n\&quot;\\\\:]?&quot;</span>) {
+            <span class="kw">let </span>result = sanitize_label_key(<span class="kw-2">&amp;</span>input);
+            <span class="kw">let </span>as_chars = result.chars().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">as_chars</span>.<span class="ident">first</span>() {
-                <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, <span class="ident">invalid_label_key_start_character</span>(<span class="kw-2">*</span><span class="ident">c</span>),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = as_chars.first() {
+                <span class="macro">assert_eq!</span>(<span class="bool-val">false</span>, invalid_label_key_start_character(<span class="kw-2">*</span>c),
                     <span class="string">&quot;first character of label key was not valid&quot;</span>);
             }
 
-            <span class="comment">// Label keys cannot begin with two underscores, as that format is reserved for internal</span>
-            <span class="comment">// use.</span>
-            <span class="comment">//</span>
-            <span class="comment">// TODO: More closely examine how official Prometheus client libraries handle label key sanitization</span>
-            <span class="comment">// and follow whatever they do, so it&#39;s not actually clear if transforming `__foo` to `___foo` would</span>
-            <span class="comment">// be valid, given that it still technically starts with two underscores.</span>
-            <span class="comment">/*if as_chars.len() == 2 {
+            <span class="comment">// Label keys cannot begin with two underscores, as that format is reserved for internal
+            // use.
+            //
+            // TODO: More closely examine how official Prometheus client libraries handle label key sanitization
+            // and follow whatever they do, so it&#39;s not actually clear if transforming `__foo` to `___foo` would
+            // be valid, given that it still technically starts with two underscores.
+            /*if as_chars.len() == 2 {
                 assert!(!(as_chars[0] == &#39;_&#39; &amp;&amp; as_chars[1] == &#39;_&#39;));
             } else if as_chars.len() == 3 {
                 if as_chars[0] == &#39;_&#39; &amp;&amp; as_chars[1] == &#39;_&#39; {
                     assert_eq!(as_chars[2], &#39;_&#39;);
                 }
-            }*/</span>
+            }*/
 
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">as_chars</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">invalid_label_key_character</span>(<span class="kw-2">*</span><span class="ident">c</span>)),
+            </span><span class="macro">assert!</span>(!as_chars.iter().any(|c| invalid_label_key_character(<span class="kw-2">*</span>c)),
                 <span class="string">&quot;invalid character in label key&quot;</span>);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_sanitize_label_value</span>(<span class="ident">input</span> <span class="kw">in</span> <span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_label_value</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>test_sanitize_label_value(input <span class="kw">in </span><span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
+            <span class="kw">let </span>result = sanitize_label_value(<span class="kw-2">&amp;</span>input);
 
-            <span class="comment">// If any raw newlines are still present, then we messed up.</span>
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">result</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>), <span class="string">&quot;raw/unescaped newlines present&quot;</span>);
+            <span class="comment">// If any raw newlines are still present, then we messed up.
+            </span><span class="macro">assert!</span>(!result.contains(<span class="string">&#39;\n&#39;</span>), <span class="string">&quot;raw/unescaped newlines present&quot;</span>);
 
-            <span class="comment">// We specifically remove instances of &quot;\\&quot; because we only care about dangling backslashes.</span>
-            <span class="kw">let</span> <span class="ident">delayered_backslashes</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;&quot;</span>);
-            <span class="kw">let</span> <span class="ident">as_chars</span> <span class="op">=</span> <span class="ident">delayered_backslashes</span>.<span class="ident">chars</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="comment">// We specifically remove instances of &quot;\\&quot; because we only care about dangling backslashes.
+            </span><span class="kw">let </span>delayered_backslashes = result.replace(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span>as_chars = delayered_backslashes.chars().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-            <span class="comment">// If the first character is a double quote, then we messed up.</span>
-            <span class="macro">assert!</span>(<span class="ident">as_chars</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;&quot;&#39;</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>),
-                <span class="string">&quot;first character cannot be a double quote: {}&quot;</span>, <span class="ident">result</span>);
+            <span class="comment">// If the first character is a double quote, then we messed up.
+            </span><span class="macro">assert!</span>(as_chars.first().map(|c| <span class="kw-2">*</span>c != <span class="string">&#39;&quot;&#39;</span>).unwrap_or(<span class="bool-val">true</span>),
+                <span class="string">&quot;first character cannot be a double quote: {}&quot;</span>, result);
 
-            <span class="comment">// Now look for unescaped characters in the rest of the string, in a windowed fashion.</span>
-            <span class="kw">let</span> <span class="ident">contained_unescaped_chars</span> <span class="op">=</span> <span class="ident">as_chars</span>.<span class="ident">as_slice</span>()
-                .<span class="ident">windows</span>(<span class="number">2</span>)
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">s</span>[<span class="number">0</span>];
-                    <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">s</span>[<span class="number">1</span>];
+            <span class="comment">// Now look for unescaped characters in the rest of the string, in a windowed fashion.
+            </span><span class="kw">let </span>contained_unescaped_chars = as_chars.as_slice()
+                .windows(<span class="number">2</span>)
+                .any(|s| {
+                    <span class="kw">let </span>first = s[<span class="number">0</span>];
+                    <span class="kw">let </span>second = s[<span class="number">1</span>];
 
-                    <span class="kw">match</span> (<span class="ident">first</span>, <span class="ident">second</span>) {
-                        <span class="comment">// If there&#39;s a double quote, it has to have been preceded by an escaping</span>
-                        <span class="comment">// backslash.</span>
-                        (<span class="ident">c</span>, <span class="string">&#39;&quot;&#39;</span>) =&gt; <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\\&#39;</span>,
-                        <span class="comment">// If there&#39;s a backslash, it can only be in front of an &#39;n&#39; for escaping</span>
-                        <span class="comment">// newlines.</span>
-                        (<span class="string">&#39;\\&#39;</span>, <span class="ident">c</span>) =&gt; <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;n&#39;</span>,
-                        <span class="comment">// Everything else is valid.</span>
-                        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+                    <span class="kw">match </span>(first, second) {
+                        <span class="comment">// If there&#39;s a double quote, it has to have been preceded by an escaping
+                        // backslash.
+                        </span>(c, <span class="string">&#39;&quot;&#39;</span>) =&gt; c != <span class="string">&#39;\\&#39;</span>,
+                        <span class="comment">// If there&#39;s a backslash, it can only be in front of an &#39;n&#39; for escaping
+                        // newlines.
+                        </span>(<span class="string">&#39;\\&#39;</span>, c) =&gt; c != <span class="string">&#39;n&#39;</span>,
+                        <span class="comment">// Everything else is valid.
+                        </span><span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
                     }
                 });
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">contained_unescaped_chars</span>, <span class="string">&quot;invalid or missing escape detected&quot;</span>);
+            <span class="macro">assert!</span>(!contained_unescaped_chars, <span class="string">&quot;invalid or missing escape detected&quot;</span>);
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">test_sanitize_description</span>(<span class="ident">input</span> <span class="kw">in</span> <span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">sanitize_description</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>test_sanitize_description(input <span class="kw">in </span><span class="string">&quot;[\n\&quot;\\\\]?.*[\n\&quot;\\\\]?&quot;</span>) {
+            <span class="kw">let </span>result = sanitize_description(<span class="kw-2">&amp;</span>input);
 
-            <span class="comment">// If any raw newlines are still present, then we messed up.</span>
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">result</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>), <span class="string">&quot;raw/unescaped newlines present&quot;</span>);
+            <span class="comment">// If any raw newlines are still present, then we messed up.
+            </span><span class="macro">assert!</span>(!result.contains(<span class="string">&#39;\n&#39;</span>), <span class="string">&quot;raw/unescaped newlines present&quot;</span>);
 
-            <span class="comment">// We specifically remove instances of &quot;\\&quot; because we only care about dangling backslashes.</span>
-            <span class="kw">let</span> <span class="ident">delayered_backslashes</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">replace</span>(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;&quot;</span>);
-            <span class="kw">let</span> <span class="ident">as_chars</span> <span class="op">=</span> <span class="ident">delayered_backslashes</span>.<span class="ident">chars</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="comment">// We specifically remove instances of &quot;\\&quot; because we only care about dangling backslashes.
+            </span><span class="kw">let </span>delayered_backslashes = result.replace(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span>as_chars = delayered_backslashes.chars().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-            <span class="comment">// Now look for unescaped characters in the rest of the string, in a windowed fashion.</span>
-            <span class="kw">let</span> <span class="ident">contained_unescaped_chars</span> <span class="op">=</span> <span class="ident">as_chars</span>.<span class="ident">as_slice</span>()
-                .<span class="ident">windows</span>(<span class="number">2</span>)
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">s</span>[<span class="number">0</span>];
-                    <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">s</span>[<span class="number">1</span>];
+            <span class="comment">// Now look for unescaped characters in the rest of the string, in a windowed fashion.
+            </span><span class="kw">let </span>contained_unescaped_chars = as_chars.as_slice()
+                .windows(<span class="number">2</span>)
+                .any(|s| {
+                    <span class="kw">let </span>first = s[<span class="number">0</span>];
+                    <span class="kw">let </span>second = s[<span class="number">1</span>];
 
-                    <span class="kw">match</span> (<span class="ident">first</span>, <span class="ident">second</span>) {
-                        <span class="comment">// If there&#39;s a backslash, it can only be in front of an &#39;n&#39; for escaping</span>
-                        <span class="comment">// newlines.</span>
-                        (<span class="string">&#39;\\&#39;</span>, <span class="ident">c</span>) =&gt; <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;n&#39;</span>,
-                        <span class="comment">// Everything else is valid.</span>
-                        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+                    <span class="kw">match </span>(first, second) {
+                        <span class="comment">// If there&#39;s a backslash, it can only be in front of an &#39;n&#39; for escaping
+                        // newlines.
+                        </span>(<span class="string">&#39;\\&#39;</span>, c) =&gt; c != <span class="string">&#39;n&#39;</span>,
+                        <span class="comment">// Everything else is valid.
+                        </span><span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
                     }
                 });
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">contained_unescaped_chars</span>, <span class="string">&quot;invalid or missing escape detected&quot;</span>);
+            <span class="macro">assert!</span>(!contained_unescaped_chars, <span class="string">&quot;invalid or missing escape detected&quot;</span>);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

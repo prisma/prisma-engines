@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/field/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/field/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -267,274 +267,274 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
-<span class="kw">mod</span> <span class="ident">relation</span>;
-<span class="kw">mod</span> <span class="ident">scalar</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>composite;
+<span class="kw">mod </span>relation;
+<span class="kw">mod </span>scalar;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">scalar</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>composite::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>relation::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>scalar::<span class="kw-2">*</span>;
 
-<span class="comment">// use crate::prelude::*;</span>
-<span class="kw">use</span> <span class="ident">psl::dml::ScalarType</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">hash::Hash</span>, <span class="ident">sync::Arc</span>};
+<span class="comment">// use crate::prelude::*;
+</span><span class="kw">use </span>psl::dml::ScalarType;
+<span class="kw">use </span>std::{hash::Hash, sync::Arc};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ModelRef</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ModelRef;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Field</span> {
-    <span class="ident">Relation</span>(<span class="ident">RelationFieldRef</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFieldRef</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeFieldRef</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>Field {
+    Relation(RelationFieldRef),
+    Scalar(ScalarFieldRef),
+    Composite(CompositeFieldRef),
 }
 
-<span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>,
-            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">name</span>,
-            <span class="ident">Field::Composite</span>(<span class="kw-2">ref</span> <span class="ident">cf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">name</span>,
+<span class="kw">impl </span>Field {
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; <span class="kw-2">&amp;</span>sf.name,
+            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw-2">&amp;</span>rf.name,
+            Field::Composite(<span class="kw-2">ref </span>cf) =&gt; <span class="kw-2">&amp;</span>cf.name,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">db_name</span>(),
-            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">name</span>,
-            <span class="ident">Field::Composite</span>(<span class="kw-2">ref</span> <span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">db_name</span>(),
+    <span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.db_name(),
+            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw-2">&amp;</span>rf.name,
+            Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.db_name(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Scalar(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Relation</span>(..))
+    <span class="kw">pub fn </span>is_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Relation(..))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Composite(<span class="kw">_</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_scalar</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>into_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_id</span>,
-            <span class="ident">Field::Relation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub fn </span>is_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(sf) =&gt; sf.is_id,
+            Field::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            Field::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_list</span>(),
-            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_list</span>(),
-            <span class="ident">Field::Composite</span>(<span class="kw-2">ref</span> <span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">is_list</span>(),
+    <span class="kw">pub fn </span>is_list(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.is_list(),
+            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; rf.is_list(),
+            Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.is_list(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_into_scalar</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">scalar</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">scalar</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>try_into_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarFieldRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(scalar) =&gt; <span class="prelude-val">Some</span>(scalar),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">is_required</span>(),
-            <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">is_required</span>(),
-            <span class="ident">Field::Composite</span>(<span class="kw-2">ref</span> <span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">is_required</span>(),
+    <span class="kw">pub fn </span>is_required(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.is_required(),
+            Field::Relation(<span class="kw-2">ref </span>rf) =&gt; rf.is_required(),
+            Field::Composite(<span class="kw-2">ref </span>cf) =&gt; cf.is_required(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">unique</span>(),
-            <span class="ident">Field::Relation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    <span class="kw">pub fn </span>is_unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Scalar(<span class="kw-2">ref </span>sf) =&gt; sf.unique(),
+            Field::Relation(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            Field::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">container</span>.<span class="ident">as_model</span>(),
-            <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>.<span class="ident">model</span>()),
-            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">container</span>.<span class="ident">as_model</span>(),
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ModelRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.container.as_model(),
+            <span class="self">Self</span>::Relation(rf) =&gt; <span class="prelude-val">Some</span>(rf.model()),
+            <span class="self">Self</span>::Composite(cf) =&gt; cf.container.as_model(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">clone</span>()],
-            <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">scalar_fields</span>(),
-            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">_cf</span>) =&gt; <span class="macro">vec!</span>[], <span class="comment">// [Composites] todo</span>
+    <span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ScalarFieldRef&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Scalar(sf) =&gt; <span class="macro">vec!</span>[sf.clone()],
+            <span class="self">Self</span>::Relation(rf) =&gt; rf.scalar_fields(),
+            <span class="self">Self</span>::Composite(_cf) =&gt; <span class="macro">vec!</span>[], <span class="comment">// [Composites] todo
+        </span>}
+    }
+
+    <span class="kw">pub fn </span>downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldWeak {
+        <span class="kw">match </span><span class="self">self </span>{
+            Field::Relation(field) =&gt; FieldWeak::Relation(Arc::downgrade(field)),
+            Field::Scalar(field) =&gt; FieldWeak::Scalar(Arc::downgrade(field)),
+            Field::Composite(field) =&gt; FieldWeak::Composite(Arc::downgrade(field)),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldWeak</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Field::Relation</span>(<span class="ident">field</span>) =&gt; <span class="ident">FieldWeak::Relation</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">field</span>)),
-            <span class="ident">Field::Scalar</span>(<span class="ident">field</span>) =&gt; <span class="ident">FieldWeak::Scalar</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">field</span>)),
-            <span class="ident">Field::Composite</span>(<span class="ident">field</span>) =&gt; <span class="ident">FieldWeak::Composite</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">field</span>)),
-        }
+    <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Composite(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldWeak</span> {
-    <span class="ident">Relation</span>(<span class="ident">RelationFieldWeak</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarFieldWeak</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeFieldWeak</span>),
-}
-
-<span class="kw">impl</span> <span class="ident">FieldWeak</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Field</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>(),
-            <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>(),
-            <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">upgrade</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>(),
-        }
+    <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Field</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWeak</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">f</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">into</span>(),
-            <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">into</span>(),
-            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">into</span>(),
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>FieldWeak {
+    Relation(RelationFieldWeak),
+    Scalar(ScalarFieldWeak),
+    Composite(CompositeFieldWeak),
+}
+
+<span class="kw">impl </span>FieldWeak {
+    <span class="kw">pub fn </span>upgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Field {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Relation(rf) =&gt; rf.upgrade().unwrap().into(),
+            <span class="self">Self</span>::Scalar(sf) =&gt; sf.upgrade().unwrap().into(),
+            <span class="self">Self</span>::Composite(cf) =&gt; cf.upgrade().unwrap().into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWeak</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">FieldWeak::Scalar</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">f</span>))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>Field&gt; <span class="kw">for </span>FieldWeak {
+    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>Field) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>f {
+            Field::Scalar(sf) =&gt; sf.into(),
+            Field::Relation(rf) =&gt; rf.into(),
+            Field::Composite(cf) =&gt; cf.into(),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWeak</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">FieldWeak::Relation</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">f</span>))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; <span class="kw">for </span>FieldWeak {
+    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        FieldWeak::Scalar(Arc::downgrade(f))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldWeak</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">FieldWeak::Composite</span>(<span class="ident">Arc::downgrade</span>(<span class="ident">f</span>))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt; <span class="kw">for </span>FieldWeak {
+    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; <span class="self">Self </span>{
+        FieldWeak::Relation(Arc::downgrade(f))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeIdentifier</span> {
-    <span class="ident">String</span>,
-    <span class="ident">Int</span>,
-    <span class="ident">BigInt</span>,
-    <span class="ident">Float</span>,
-    <span class="ident">Decimal</span>,
-    <span class="ident">Boolean</span>,
-    <span class="ident">Enum</span>(<span class="ident">String</span>),
-    <span class="ident">UUID</span>,
-    <span class="ident">Json</span>,
-    <span class="ident">Xml</span>,
-    <span class="ident">DateTime</span>,
-    <span class="ident">Bytes</span>,
-    <span class="ident">Unsupported</span>,
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; <span class="kw">for </span>FieldWeak {
+    <span class="kw">fn </span>from(f: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        FieldWeak::Composite(Arc::downgrade(f))
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">TypeIdentifier</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_numeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[allow(clippy::upper_case_acronyms)]
+</span><span class="kw">pub enum </span>TypeIdentifier {
+    String,
+    Int,
+    BigInt,
+    Float,
+    Decimal,
+    Boolean,
+    Enum(String),
+    UUID,
+    Json,
+    Xml,
+    DateTime,
+    Bytes,
+    Unsupported,
+}
+
+<span class="kw">impl </span>TypeIdentifier {
+    <span class="kw">pub fn </span>is_numeric(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="macro">matches!</span>(
             <span class="self">self</span>,
-            <span class="ident">TypeIdentifier::Int</span> <span class="op">|</span> <span class="ident">TypeIdentifier::BigInt</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Float</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Decimal</span>
+            TypeIdentifier::Int | TypeIdentifier::BigInt | TypeIdentifier::Float | TypeIdentifier::Decimal
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">TypeIdentifier</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TypeIdentifier::String</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;String&quot;</span>),
-            <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Int&quot;</span>),
-            <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;BigInt&quot;</span>),
-            <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Float&quot;</span>),
-            <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Decimal&quot;</span>),
-            <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bool&quot;</span>),
-            <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Enum{}&quot;</span>, <span class="ident">e</span>),
-            <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;UUID&quot;</span>),
-            <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Json&quot;</span>),
-            <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Xml&quot;</span>),
-            <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DateTime&quot;</span>),
-            <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Bytes&quot;</span>),
-            <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Unsupported&quot;</span>),
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>TypeIdentifier {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            TypeIdentifier::String =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;String&quot;</span>),
+            TypeIdentifier::Int =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Int&quot;</span>),
+            TypeIdentifier::BigInt =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;BigInt&quot;</span>),
+            TypeIdentifier::Float =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Float&quot;</span>),
+            TypeIdentifier::Decimal =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Decimal&quot;</span>),
+            TypeIdentifier::Boolean =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Bool&quot;</span>),
+            TypeIdentifier::Enum(e) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Enum{}&quot;</span>, e),
+            TypeIdentifier::UUID =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;UUID&quot;</span>),
+            TypeIdentifier::Json =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Json&quot;</span>),
+            TypeIdentifier::Xml =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Xml&quot;</span>),
+            TypeIdentifier::DateTime =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DateTime&quot;</span>),
+            TypeIdentifier::Bytes =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Bytes&quot;</span>),
+            TypeIdentifier::Unsupported =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Unsupported&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DateType</span> {
-    <span class="ident">Date</span>,
-    <span class="ident">Time</span>,
-    <span class="ident">DateTime</span>,
+<span class="attribute">#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>DateType {
+    Date,
+    Time,
+    DateTime,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>)
+<span class="kw">impl </span>From&lt;ScalarFieldRef&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from(sf: ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        Field::Scalar(sf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">rf</span>: <span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Field::Relation</span>(<span class="ident">rf</span>)
+<span class="kw">impl </span>From&lt;RelationFieldRef&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from(rf: RelationFieldRef) -&gt; <span class="self">Self </span>{
+        Field::Relation(rf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Field</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Field::Composite</span>(<span class="ident">cf</span>)
+<span class="kw">impl </span>From&lt;CompositeFieldRef&gt; <span class="kw">for </span>Field {
+    <span class="kw">fn </span>from(cf: CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        Field::Composite(cf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TypeIdentifier</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">st</span>: <span class="ident">ScalarType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">st</span> {
-            <span class="ident">ScalarType::String</span> =&gt; <span class="ident"><span class="self">Self</span>::String</span>,
-            <span class="ident">ScalarType::Int</span> =&gt; <span class="ident"><span class="self">Self</span>::Int</span>,
-            <span class="ident">ScalarType::BigInt</span> =&gt; <span class="ident"><span class="self">Self</span>::BigInt</span>,
-            <span class="ident">ScalarType::Float</span> =&gt; <span class="ident"><span class="self">Self</span>::Float</span>,
-            <span class="ident">ScalarType::Boolean</span> =&gt; <span class="ident"><span class="self">Self</span>::Boolean</span>,
-            <span class="ident">ScalarType::DateTime</span> =&gt; <span class="ident"><span class="self">Self</span>::DateTime</span>,
-            <span class="ident">ScalarType::Json</span> =&gt; <span class="ident"><span class="self">Self</span>::Json</span>,
-            <span class="ident">ScalarType::Decimal</span> =&gt; <span class="ident"><span class="self">Self</span>::Decimal</span>,
-            <span class="ident">ScalarType::Bytes</span> =&gt; <span class="ident"><span class="self">Self</span>::Bytes</span>,
+<span class="kw">impl </span>From&lt;ScalarType&gt; <span class="kw">for </span>TypeIdentifier {
+    <span class="kw">fn </span>from(st: ScalarType) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>st {
+            ScalarType::String =&gt; <span class="self">Self</span>::String,
+            ScalarType::Int =&gt; <span class="self">Self</span>::Int,
+            ScalarType::BigInt =&gt; <span class="self">Self</span>::BigInt,
+            ScalarType::Float =&gt; <span class="self">Self</span>::Float,
+            ScalarType::Boolean =&gt; <span class="self">Self</span>::Boolean,
+            ScalarType::DateTime =&gt; <span class="self">Self</span>::DateTime,
+            ScalarType::Json =&gt; <span class="self">Self</span>::Json,
+            ScalarType::Decimal =&gt; <span class="self">Self</span>::Decimal,
+            ScalarType::Bytes =&gt; <span class="self">Self</span>::Bytes,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

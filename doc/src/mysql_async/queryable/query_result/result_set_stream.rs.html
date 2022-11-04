@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/query_result/result_set_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>result_set_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/query_result/result_set_stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>result_set_stream.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -347,354 +347,354 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 mysql_async developers.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 mysql_async developers.
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::any::type_name</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task::Poll</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
+</span><span class="kw">use </span>std::any::type_name;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::Poll;
+<span class="kw">use </span>std::{fmt, marker::PhantomData};
 
-<span class="kw">use</span> <span class="ident">futures_core::FusedStream</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">mysql_common::packets</span>::{<span class="ident">Column</span>, <span class="ident">OkPacket</span>};
+<span class="kw">use </span>futures_core::FusedStream;
+<span class="kw">use </span>futures_core::{future::BoxFuture, Stream};
+<span class="kw">use </span>futures_util::FutureExt;
+<span class="kw">use </span>mysql_common::packets::{Column, OkPacket};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn::PendingResult</span>,
-    <span class="ident">prelude</span>::{<span class="ident">FromRow</span>, <span class="ident">Protocol</span>},
-    <span class="ident">QueryResult</span>, <span class="ident">Row</span>,
+<span class="kw">use crate</span>::{
+    conn::PendingResult,
+    prelude::{FromRow, Protocol},
+    QueryResult, Row,
 };
 
-<span class="kw">enum</span> <span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">Borrowed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="kw-2">mut</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>),
-    <span class="ident">Owned</span>(<span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>),
+<span class="kw">enum </span>CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; {
+    Borrowed(<span class="kw-2">&amp;</span><span class="lifetime">&#39;r </span><span class="kw-2">mut </span>QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;),
+    Owned(QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Borrowed</span>(<span class="ident">arg0</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Borrowed&quot;</span>).<span class="ident">field</span>(<span class="ident">arg0</span>).<span class="ident">finish</span>(),
-            <span class="ident"><span class="self">Self</span>::Owned</span>(<span class="ident">arg0</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Owned&quot;</span>).<span class="ident">field</span>(<span class="ident">arg0</span>).<span class="ident">finish</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; fmt::Debug <span class="kw">for </span>CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Borrowed(arg0) =&gt; f.debug_tuple(<span class="string">&quot;Borrowed&quot;</span>).field(arg0).finish(),
+            <span class="self">Self</span>::Owned(arg0) =&gt; f.debug_tuple(<span class="string">&quot;Owned&quot;</span>).field(arg0).finish(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CowMut::Borrowed</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>,
-            <span class="ident">CowMut::Owned</span>(<span class="ident">q</span>) =&gt; <span class="ident">q</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; AsMut&lt;QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;&gt; <span class="kw">for </span>CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt; {
+    <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            CowMut::Borrowed(q) =&gt; q,
+            CowMut::Owned(q) =&gt; q,
         }
     }
 }
 
-<span class="kw">enum</span> <span class="ident">ResultSetStreamState</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">Idle</span>(<span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>),
-    <span class="ident">NextFut</span>(<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, (<span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>)<span class="op">&gt;</span>),
+<span class="kw">enum </span>ResultSetStreamState&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; {
+    Idle(CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;),
+    NextFut(BoxFuture&lt;<span class="lifetime">&#39;r</span>, (<span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt;, CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;)&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ResultSetStreamState</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Idle</span>(<span class="ident">arg0</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Idle&quot;</span>).<span class="ident">field</span>(<span class="ident">arg0</span>).<span class="ident">finish</span>(),
-            <span class="ident"><span class="self">Self</span>::NextFut</span>(<span class="ident">_arg0</span>) =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_tuple</span>(<span class="string">&quot;NextFut&quot;</span>)
-                .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">type_name</span>::<span class="op">&lt;</span>
-                    <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, (<span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">CowMut</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-                <span class="op">&gt;</span>())
-                .<span class="ident">finish</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; fmt::Debug <span class="kw">for </span>ResultSetStreamState&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Idle(arg0) =&gt; f.debug_tuple(<span class="string">&quot;Idle&quot;</span>).field(arg0).finish(),
+            <span class="self">Self</span>::NextFut(_arg0) =&gt; f
+                .debug_tuple(<span class="string">&quot;NextFut&quot;</span>)
+                .field(<span class="kw-2">&amp;</span>type_name::&lt;
+                    BoxFuture&lt;<span class="lifetime">&#39;r</span>, (<span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Row&gt;&gt;, CowMut&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;)&gt;,
+                &gt;())
+                .finish(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="doccomment">/// Rows stream for a single result set.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="ident">query_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultSetStreamState</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">ok_packet</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>,
-    <span class="ident">__from_row_type</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="doccomment">/// Rows stream for a single result set.
+</span><span class="kw">pub struct </span>ResultSetStream&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, P&gt; {
+    query_result: <span class="prelude-ty">Option</span>&lt;ResultSetStreamState&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;&gt;,
+    ok_packet: <span class="prelude-ty">Option</span>&lt;OkPacket&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    columns: Arc&lt;[Column]&gt;,
+    __from_row_type: PhantomData&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">FusedStream</span> <span class="kw">for</span> <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Protocol</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, P&gt; FusedStream <span class="kw">for </span>ResultSetStream&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt;
+<span class="kw">where
+    </span>P: Protocol + Unpin,
+    T: FromRow + Unpin + Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">is_terminated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">query_result</span>.<span class="ident">is_none</span>()
+    <span class="kw">fn </span>is_terminated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.query_result.is_none()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// See [`Conn::last_insert_id`][1].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [1]: crate::Conn::last_insert_id</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last_insert_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ok_packet</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ok</span><span class="op">|</span> <span class="ident">ok</span>.<span class="ident">last_insert_id</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, P&gt; ResultSetStream&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt; {
+    <span class="doccomment">/// See [`Conn::last_insert_id`][1].
+    ///
+    /// [1]: crate::Conn::last_insert_id
+    </span><span class="kw">pub fn </span>last_insert_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="self">self</span>.ok_packet.as_ref().and_then(|ok| ok.last_insert_id())
     }
 
-    <span class="doccomment">/// See [`Conn::affected_rows`][1].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [1]: crate::Conn::affected_rows</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">affected_rows</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">ok_packet</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ok</span><span class="op">|</span> <span class="ident">ok</span>.<span class="ident">affected_rows</span>())
-            .<span class="ident">unwrap_or_default</span>()
+    <span class="doccomment">/// See [`Conn::affected_rows`][1].
+    ///
+    /// [1]: crate::Conn::affected_rows
+    </span><span class="kw">pub fn </span>affected_rows(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.ok_packet
+            .as_ref()
+            .map(|ok| ok.affected_rows())
+            .unwrap_or_default()
     }
 
-    <span class="doccomment">/// See [`Conn::info`][1].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [1]: crate::Conn::info</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ok_packet</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ok</span><span class="op">|</span> <span class="ident">ok</span>.<span class="ident">info_str</span>())
-            .<span class="ident">unwrap_or_default</span>()
+    <span class="doccomment">/// See [`Conn::info`][1].
+    ///
+    /// [1]: crate::Conn::info
+    </span><span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="self">self</span>.ok_packet
+            .as_ref()
+            .and_then(|ok| ok.info_str())
+            .unwrap_or_default()
     }
 
-    <span class="doccomment">/// See [`Conn::get_warnings`][1].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [1]: crate::Conn::get_warnings</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_warnings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">ok_packet</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ok</span><span class="op">|</span> <span class="ident">ok</span>.<span class="ident">warnings</span>())
-            .<span class="ident">unwrap_or_default</span>()
+    <span class="doccomment">/// See [`Conn::get_warnings`][1].
+    ///
+    /// [1]: crate::Conn::get_warnings
+    </span><span class="kw">pub fn </span>get_warnings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.ok_packet
+            .as_ref()
+            .map(|ok| ok.warnings())
+            .unwrap_or_default()
     }
 
-    <span class="doccomment">/// Returns an `OkPacket` corresponding to this result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will be `None` if there is no OK packet (result set contains an error).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ok_packet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ok_packet</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns an `OkPacket` corresponding to this result set.
+    ///
+    /// Will be `None` if there is no OK packet (result set contains an error).
+    </span><span class="kw">pub fn </span>ok_packet(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OkPacket&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+        <span class="self">self</span>.ok_packet.as_ref()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Protocol</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, P&gt; Stream <span class="kw">for </span>ResultSetStream&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt;
+<span class="kw">where
+    </span>P: Protocol + Unpin,
+    T: FromRow + Unpin + Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="kw">crate</span>::Result&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(
-        <span class="self">self</span>: <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">columns</span>.<span class="ident">clone</span>();
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">query_result</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::Idle</span>(<span class="kw-2">mut</span> <span class="ident">query_result</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">query_result</span>.<span class="ident">as_mut</span>().<span class="ident">next_row_or_next_set2</span>(<span class="ident">columns</span>).<span class="kw">await</span>;
-                        (<span class="ident">row</span>, <span class="ident">query_result</span>)
+    <span class="kw">fn </span>poll_next(
+        <span class="self">self</span>: std::pin::Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>std::task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.get_mut();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>columns = this.columns.clone();
+            <span class="kw">match </span>this.query_result.take() {
+                <span class="prelude-val">Some</span>(ResultSetStreamState::Idle(<span class="kw-2">mut </span>query_result)) =&gt; {
+                    <span class="kw">let </span>fut = Box::pin(<span class="kw">async move </span>{
+                        <span class="kw">let </span>row = query_result.as_mut().next_row_or_next_set2(columns).<span class="kw">await</span>;
+                        (row, query_result)
                     });
-                    <span class="ident">this</span>.<span class="ident">query_result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::NextFut</span>(<span class="ident">fut</span>));
+                    this.query_result = <span class="prelude-val">Some</span>(ResultSetStreamState::NextFut(fut));
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::NextFut</span>(<span class="kw-2">mut</span> <span class="ident">fut</span>)) =&gt; <span class="kw">match</span> <span class="ident">fut</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>) {
-                    <span class="ident">Poll::Ready</span>((<span class="ident">row</span>, <span class="ident">query_result</span>)) =&gt; <span class="kw">match</span> <span class="ident">row</span> {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">row</span>)) =&gt; {
-                            <span class="ident">this</span>.<span class="ident">query_result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::Idle</span>(<span class="ident">query_result</span>));
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>))));
+                <span class="prelude-val">Some</span>(ResultSetStreamState::NextFut(<span class="kw-2">mut </span>fut)) =&gt; <span class="kw">match </span>fut.poll_unpin(cx) {
+                    Poll::Ready((row, query_result)) =&gt; <span class="kw">match </span>row {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(row)) =&gt; {
+                            this.query_result = <span class="prelude-val">Some</span>(ResultSetStreamState::Idle(query_result));
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">crate</span>::from_row(row))));
                         }
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-                        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+                        <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err))),
                     },
-                    <span class="ident">Poll::Pending</span> =&gt; {
-                        <span class="ident">this</span>.<span class="ident">query_result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::NextFut</span>(<span class="ident">fut</span>));
-                        <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                    Poll::Pending =&gt; {
+                        this.query_result = <span class="prelude-val">Some</span>(ResultSetStreamState::NextFut(fut));
+                        <span class="kw">return </span>Poll::Pending;
                     }
                 },
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Protocol</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, P&gt; QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, P&gt;
+<span class="kw">where
+    </span>P: Protocol + Unpin,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup_stream</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">use_pending_result</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">PendingResult::Taken</span>(<span class="ident">meta</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">meta</span>).<span class="ident">clone</span>();
-                <span class="self">self</span>.<span class="ident">skip_taken</span>(<span class="ident">meta</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>setup_stream(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;(<span class="prelude-ty">Option</span>&lt;OkPacket&lt;<span class="lifetime">&#39;static</span>&gt;&gt;, Arc&lt;[Column]&gt;)&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.conn.use_pending_result()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(PendingResult::Taken(meta)) =&gt; {
+                <span class="kw">let </span>meta = (<span class="kw-2">*</span>meta).clone();
+                <span class="self">self</span>.skip_taken(meta).<span class="kw">await</span><span class="question-mark">?</span>;
             }
             <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
 
-        <span class="kw">let</span> <span class="ident">ok_packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">last_ok_packet</span>().<span class="ident">cloned</span>();
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">take_pending_result</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">meta</span>) =&gt; <span class="ident">meta</span>.<span class="ident">columns</span>().<span class="ident">clone</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">let </span>ok_packet = <span class="self">self</span>.conn.last_ok_packet().cloned();
+        <span class="kw">let </span>columns = <span class="kw">match </span><span class="self">self</span>.conn.take_pending_result()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(meta) =&gt; meta.columns().clone(),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">ok_packet</span>, <span class="ident">columns</span>)))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((ok_packet, columns)))
     }
 
-    <span class="doccomment">/// Returns a [`Stream`] for the current result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned stream satisfies [`futures_util::TryStream`],</span>
-    <span class="doccomment">/// so you can use [`futures_util::TryStreamExt`] functions on it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Behavior</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Consumption</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The call to [`QueryResult::stream`] entails the consumption of the current result set,</span>
-    <span class="doccomment">/// practically this means that the second call to [`QueryResult::stream`] will return</span>
-    <span class="doccomment">/// the next result set stream even if the stream returned from the first call wasn&#39;t</span>
-    <span class="doccomment">/// explicitly consumed:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # use mysql_async::*;</span>
-    <span class="doccomment">/// # use mysql_async::prelude::*;</span>
-    <span class="doccomment">/// # use futures_util::StreamExt;</span>
-    <span class="doccomment">/// let mut conn = Conn::new(get_opts()).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This query result will contain two result sets.</span>
-    <span class="doccomment">/// let mut result = conn.query_iter(&quot;SELECT 1; SELECT 2;&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The first result set stream is dropped here without being consumed,</span>
-    <span class="doccomment">/// let _ = result.stream::&lt;u8&gt;().await?;</span>
-    <span class="doccomment">/// // so it will be implicitly consumed here.</span>
-    <span class="doccomment">/// let mut stream = result.stream::&lt;u8&gt;().await?.expect(&quot;the second result set must be here&quot;);</span>
-    <span class="doccomment">/// assert_eq!(2_u8, stream.next().await.unwrap()?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # drop(stream); drop(result); conn.disconnect().await }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note, that [`QueryResult::stream`] may error if:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - current result set contains an error,</span>
-    <span class="doccomment">/// - previously unconsumed result set stream contained an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {</span>
-    <span class="doccomment">/// # use mysql_async::*;</span>
-    <span class="doccomment">/// # use mysql_async::prelude::*;</span>
-    <span class="doccomment">/// # use futures_util::StreamExt;</span>
-    <span class="doccomment">/// let mut conn = Conn::new(get_opts()).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The second result set of this query will contain an error.</span>
-    <span class="doccomment">/// let mut result = conn.query_iter(&quot;SELECT 1; SELECT FOO(); SELECT 2;&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // First result set stream is dropped here without being consumed,</span>
-    <span class="doccomment">/// let _ = result.stream::&lt;Row&gt;().await?;</span>
-    <span class="doccomment">/// // so it will be implicitly consumed on the second call to `QueryResult::stream`</span>
-    <span class="doccomment">/// // that will error complaining about unknown FOO</span>
-    <span class="doccomment">/// assert!(result.stream::&lt;Row&gt;().await.unwrap_err().to_string().contains(&quot;FOO&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # drop(result); conn.disconnect().await }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="ident">T</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;r</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="prelude-val">Ok</span>(<span class="self">self</span>
-                .<span class="ident">setup_stream</span>()
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">map</span>(
-                    <span class="kw">move</span> <span class="op">|</span>(<span class="ident">ok_packet</span>, <span class="ident">columns</span>)<span class="op">|</span> <span class="ident">ResultSetStream</span>::<span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-                        <span class="ident">ok_packet</span>,
-                        <span class="ident">columns</span>,
-                        <span class="ident">query_result</span>: <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::Idle</span>(<span class="ident">CowMut::Borrowed</span>(<span class="self">self</span>))),
-                        <span class="ident">__from_row_type</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns a [`Stream`] for the current result set.
+    ///
+    /// The returned stream satisfies [`futures_util::TryStream`],
+    /// so you can use [`futures_util::TryStreamExt`] functions on it.
+    ///
+    /// # Behavior
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    ///
+    /// ## Consumption
+    ///
+    /// The call to [`QueryResult::stream`] entails the consumption of the current result set,
+    /// practically this means that the second call to [`QueryResult::stream`] will return
+    /// the next result set stream even if the stream returned from the first call wasn&#39;t
+    /// explicitly consumed:
+    ///
+    /// ```rust
+    /// # use mysql_async::test_misc::get_opts;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {
+    /// # use mysql_async::*;
+    /// # use mysql_async::prelude::*;
+    /// # use futures_util::StreamExt;
+    /// let mut conn = Conn::new(get_opts()).await?;
+    ///
+    /// // This query result will contain two result sets.
+    /// let mut result = conn.query_iter(&quot;SELECT 1; SELECT 2;&quot;).await?;
+    ///
+    /// // The first result set stream is dropped here without being consumed,
+    /// let _ = result.stream::&lt;u8&gt;().await?;
+    /// // so it will be implicitly consumed here.
+    /// let mut stream = result.stream::&lt;u8&gt;().await?.expect(&quot;the second result set must be here&quot;);
+    /// assert_eq!(2_u8, stream.next().await.unwrap()?);
+    ///
+    /// # drop(stream); drop(result); conn.disconnect().await }
+    /// ```
+    ///
+    /// ## Errors
+    ///
+    /// Note, that [`QueryResult::stream`] may error if:
+    ///
+    /// - current result set contains an error,
+    /// - previously unconsumed result set stream contained an error.
+    ///
+    /// ```rust
+    /// # use mysql_async::test_misc::get_opts;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {
+    /// # use mysql_async::*;
+    /// # use mysql_async::prelude::*;
+    /// # use futures_util::StreamExt;
+    /// let mut conn = Conn::new(get_opts()).await?;
+    ///
+    /// // The second result set of this query will contain an error.
+    /// let mut result = conn.query_iter(&quot;SELECT 1; SELECT FOO(); SELECT 2;&quot;).await?;
+    ///
+    /// // First result set stream is dropped here without being consumed,
+    /// let _ = result.stream::&lt;Row&gt;().await?;
+    /// // so it will be implicitly consumed on the second call to `QueryResult::stream`
+    /// // that will error complaining about unknown FOO
+    /// assert!(result.stream::&lt;Row&gt;().await.unwrap_err().to_string().contains(&quot;FOO&quot;));
+    ///
+    /// # drop(result); conn.disconnect().await }
+    /// ```
+    </span><span class="kw">pub fn </span>stream&lt;<span class="lifetime">&#39;r</span>, T: Unpin + FromRow + Send + <span class="lifetime">&#39;static</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;r </span><span class="kw-2">mut </span><span class="self">self</span>,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;r</span>, <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;ResultSetStream&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt;&gt;&gt;&gt; {
+        <span class="kw">async move </span>{
+            <span class="prelude-val">Ok</span>(<span class="self">self
+                </span>.setup_stream()
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.map(
+                    <span class="kw">move </span>|(ok_packet, columns)| ResultSetStream::&lt;<span class="lifetime">&#39;r</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt; {
+                        ok_packet,
+                        columns,
+                        query_result: <span class="prelude-val">Some</span>(ResultSetStreamState::Idle(CowMut::Borrowed(<span class="self">self</span>))),
+                        __from_row_type: PhantomData,
                     },
                 ))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="doccomment">/// Owned version of the [`QueryResult::stream`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returned stream will stop iteration on the first result set boundary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`Query::stream`][query_stream], [`Queryable::query_stream`][queryable_query_stream],</span>
-    <span class="doccomment">/// [`Queryable::exec_stream`][queryable_exec_stream].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The following example uses the [`Query::stream`][query_stream] function</span>
-    <span class="doccomment">/// that is based on the [`QueryResult::stream_and_drop`]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # use mysql_async::*;</span>
-    <span class="doccomment">/// # use mysql_async::prelude::*;</span>
-    <span class="doccomment">/// # use futures_util::TryStreamExt;</span>
-    <span class="doccomment">/// let pool = Pool::new(get_opts());</span>
-    <span class="doccomment">/// let mut conn = pool.get_conn().await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This example uses the `Query::stream` function that is based on `QueryResult::stream_and_drop`:</span>
-    <span class="doccomment">/// let mut stream = &quot;SELECT 1 UNION ALL SELECT 2&quot;.stream::&lt;u8, _&gt;(&amp;mut conn).await?;</span>
-    <span class="doccomment">/// let rows = stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(vec![1, 2], rows);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Only the first result set will go into the stream:</span>
-    <span class="doccomment">/// let mut stream = r&quot;</span>
-    <span class="doccomment">///     SELECT &#39;foo&#39; UNION ALL SELECT &#39;bar&#39;;</span>
-    <span class="doccomment">///     SELECT &#39;baz&#39; UNION ALL SELECT &#39;quux&#39;;&quot;.stream::&lt;String, _&gt;(&amp;mut conn).await?;</span>
-    <span class="doccomment">/// let rows = stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(vec![&quot;foo&quot;.to_owned(), &quot;bar&quot;.to_owned()], rows);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can also build a `&#39;static` stream by giving away the connection:</span>
-    <span class="doccomment">/// let stream = &quot;SELECT 2 UNION ALL SELECT 3&quot;.stream::&lt;u8, _&gt;(conn).await?;</span>
-    <span class="doccomment">/// // `tokio::spawn` requires `&#39;static`</span>
-    <span class="doccomment">/// let handle = tokio::spawn(async move {</span>
-    <span class="doccomment">///     stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap()</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// assert_eq!(vec![2, 3], handle.await?);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Ok(()) }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [queryable_query_stream]: crate::prelude::Queryable::query_stream</span>
-    <span class="doccomment">/// [queryable_exec_stream]: crate::prelude::Queryable::exec_stream</span>
-    <span class="doccomment">/// [query_stream]: crate::prelude::Query::stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream_and_drop</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="prelude-val">Ok</span>(<span class="self">self</span>
-                .<span class="ident">setup_stream</span>()
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ok_packet</span>, <span class="ident">columns</span>)<span class="op">|</span> <span class="ident">ResultSetStream</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-                    <span class="ident">ok_packet</span>,
-                    <span class="ident">columns</span>,
-                    <span class="ident">query_result</span>: <span class="prelude-val">Some</span>(<span class="ident">ResultSetStreamState::Idle</span>(<span class="ident">CowMut::Owned</span>(<span class="self">self</span>))),
-                    <span class="ident">__from_row_type</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Owned version of the [`QueryResult::stream`].
+    ///
+    /// Returned stream will stop iteration on the first result set boundary.
+    ///
+    /// See also [`Query::stream`][query_stream], [`Queryable::query_stream`][queryable_query_stream],
+    /// [`Queryable::exec_stream`][queryable_exec_stream].
+    ///
+    /// The following example uses the [`Query::stream`][query_stream] function
+    /// that is based on the [`QueryResult::stream_and_drop`]:
+    ///
+    /// ```rust
+    /// # use mysql_async::test_misc::get_opts;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # use mysql_async::*;
+    /// # use mysql_async::prelude::*;
+    /// # use futures_util::TryStreamExt;
+    /// let pool = Pool::new(get_opts());
+    /// let mut conn = pool.get_conn().await?;
+    ///
+    /// // This example uses the `Query::stream` function that is based on `QueryResult::stream_and_drop`:
+    /// let mut stream = &quot;SELECT 1 UNION ALL SELECT 2&quot;.stream::&lt;u8, _&gt;(&amp;mut conn).await?;
+    /// let rows = stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap();
+    /// assert_eq!(vec![1, 2], rows);
+    ///
+    /// // Only the first result set will go into the stream:
+    /// let mut stream = r&quot;
+    ///     SELECT &#39;foo&#39; UNION ALL SELECT &#39;bar&#39;;
+    ///     SELECT &#39;baz&#39; UNION ALL SELECT &#39;quux&#39;;&quot;.stream::&lt;String, _&gt;(&amp;mut conn).await?;
+    /// let rows = stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap();
+    /// assert_eq!(vec![&quot;foo&quot;.to_owned(), &quot;bar&quot;.to_owned()], rows);
+    ///
+    /// // We can also build a `&#39;static` stream by giving away the connection:
+    /// let stream = &quot;SELECT 2 UNION ALL SELECT 3&quot;.stream::&lt;u8, _&gt;(conn).await?;
+    /// // `tokio::spawn` requires `&#39;static`
+    /// let handle = tokio::spawn(async move {
+    ///     stream.try_collect::&lt;Vec&lt;_&gt;&gt;().await.unwrap()
+    /// });
+    /// assert_eq!(vec![2, 3], handle.await?);
+    ///
+    /// # Ok(()) }
+    /// ```
+    ///
+    /// [queryable_query_stream]: crate::prelude::Queryable::query_stream
+    /// [queryable_exec_stream]: crate::prelude::Queryable::exec_stream
+    /// [query_stream]: crate::prelude::Query::stream
+    </span><span class="kw">pub fn </span>stream_and_drop&lt;T: Unpin + FromRow + Send + <span class="lifetime">&#39;static</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;ResultSetStream&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt;&gt;&gt;&gt; {
+        <span class="kw">async move </span>{
+            <span class="prelude-val">Ok</span>(<span class="self">self
+                </span>.setup_stream()
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.map(|(ok_packet, columns)| ResultSetStream::&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, P&gt; {
+                    ok_packet,
+                    columns,
+                    query_result: <span class="prelude-val">Some</span>(ResultSetStreamState::Idle(CowMut::Owned(<span class="self">self</span>))),
+                    __from_row_type: PhantomData,
                 }))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

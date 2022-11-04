@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -1036,1041 +1036,1041 @@
 <span id="1034">1034</span>
 <span id="1035">1035</span>
 <span id="1036">1036</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The [`Date`] struct and its associated `impl`s.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The [`Date`] struct and its associated `impl`s.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
-<span class="kw">use</span> <span class="ident">core::time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::io</span>;
+</span><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::ops::{Add, Sub};
+<span class="kw">use </span>core::time::Duration <span class="kw">as </span>StdDuration;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">use </span>std::io;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::Formattable</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::Parsable</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">days_in_year</span>, <span class="ident">days_in_year_month</span>, <span class="ident">is_leap_year</span>, <span class="ident">weeks_in_year</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Duration</span>, <span class="ident">Month</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">Weekday</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::formatting::Formattable;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::parsing::Parsable;
+<span class="kw">use </span><span class="kw">crate</span>::util::{days_in_year, days_in_year_month, is_leap_year, weeks_in_year};
+<span class="kw">use crate</span>::{error, Duration, Month, PrimitiveDateTime, Time, Weekday};
 
-<span class="doccomment">/// The minimum valid year.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) {
-    <span class="op">-</span><span class="number">999_999</span>
-} <span class="kw">else</span> {
-    <span class="op">-</span><span class="number">9999</span>
-};
-<span class="doccomment">/// The maximum valid year.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) {
-    <span class="number">999_999</span>
-} <span class="kw">else</span> {
-    <span class="number">9999</span>
-};
+<span class="doccomment">/// The minimum valid year.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_YEAR: i32 = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;large-dates&quot;</span>) {
+    -<span class="number">999_999
+</span>} <span class="kw">else </span>{
+    -<span class="number">9999
+</span>};
+<span class="doccomment">/// The maximum valid year.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_YEAR: i32 = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;large-dates&quot;</span>) {
+    <span class="number">999_999
+</span>} <span class="kw">else </span>{
+    <span class="number">9999
+</span>};
 
-<span class="doccomment">/// Date in the proleptic Gregorian calendar.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default, years between ±9999 inclusive are representable. This can be expanded to ±999,999</span>
-<span class="doccomment">/// inclusive by enabling the `large-dates` crate feature. Doing so has performance implications</span>
-<span class="doccomment">/// and introduces some ambiguities when parsing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Date</span> {
-    <span class="doccomment">/// Bitpacked field containing both the year and ordinal.</span>
-    <span class="comment">// |     xx     | xxxxxxxxxxxxxxxxxxxxx | xxxxxxxxx |</span>
-    <span class="comment">// |   2 bits   |        21 bits        |  9 bits   |</span>
-    <span class="comment">// | unassigned |         year          |  ordinal  |</span>
-    <span class="comment">// The year is 15 bits when `large-dates` is not enabled.</span>
-    <span class="ident">value</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// Date in the proleptic Gregorian calendar.
+///
+/// By default, years between ±9999 inclusive are representable. This can be expanded to ±999,999
+/// inclusive by enabling the `large-dates` crate feature. Doing so has performance implications
+/// and introduces some ambiguities when parsing.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>Date {
+    <span class="doccomment">/// Bitpacked field containing both the year and ordinal.
+    </span><span class="comment">// |     xx     | xxxxxxxxxxxxxxxxxxxxx | xxxxxxxxx |
+    // |   2 bits   |        21 bits        |  9 bits   |
+    // | unassigned |         year          |  ordinal  |
+    // The year is 15 bits when `large-dates` is not enabled.
+    </span>value: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Date&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;year&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">year</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;ordinal&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ordinal</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Date {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Date&quot;</span>)
+            .field(<span class="string">&quot;year&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.year())
+            .field(<span class="string">&quot;ordinal&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ordinal())
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Date</span> {
-    <span class="doccomment">/// The minimum valid `Date`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value of this may vary depending on the feature flags enabled.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">MIN_YEAR</span>, <span class="number">1</span>);
+<span class="kw">impl </span>Date {
+    <span class="doccomment">/// The minimum valid `Date`.
+    ///
+    /// The value of this may vary depending on the feature flags enabled.
+    </span><span class="kw">pub const </span>MIN: <span class="self">Self </span>= <span class="self">Self</span>::__from_ordinal_date_unchecked(MIN_YEAR, <span class="number">1</span>);
 
-    <span class="doccomment">/// The maximum valid `Date`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The value of this may vary depending on the feature flags enabled.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">MAX_YEAR</span>, <span class="ident">days_in_year</span>(<span class="ident">MAX_YEAR</span>));
+    <span class="doccomment">/// The maximum valid `Date`.
+    ///
+    /// The value of this may vary depending on the feature flags enabled.
+    </span><span class="kw">pub const </span>MAX: <span class="self">Self </span>= <span class="self">Self</span>::__from_ordinal_date_unchecked(MAX_YEAR, days_in_year(MAX_YEAR));
 
-    <span class="comment">// region: constructors</span>
-    <span class="doccomment">/// Construct a `Date` from the year and ordinal values, the validity of which must be</span>
-    <span class="doccomment">/// guaranteed by the caller.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">__from_ordinal_date_unchecked</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">ordinal</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">year</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_YEAR</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">year</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_YEAR</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">ordinal</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">ordinal</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>));
+    <span class="comment">// region: constructors
+    </span><span class="doccomment">/// Construct a `Date` from the year and ordinal values, the validity of which must be
+    /// guaranteed by the caller.
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub const fn </span>__from_ordinal_date_unchecked(year: i32, ordinal: u16) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(year &gt;= MIN_YEAR);
+        <span class="macro">debug_assert!</span>(year &lt;= MAX_YEAR);
+        <span class="macro">debug_assert!</span>(ordinal != <span class="number">0</span>);
+        <span class="macro">debug_assert!</span>(ordinal &lt;= days_in_year(year));
 
-        <span class="self">Self</span> {
-            <span class="ident">value</span>: (<span class="ident">year</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>) <span class="op">|</span> <span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">i32</span>,
+        <span class="self">Self </span>{
+            value: (year &lt;&lt; <span class="number">9</span>) | ordinal <span class="kw">as </span>i32,
         }
     }
 
-    <span class="doccomment">/// Attempt to create a `Date` from the year, month, and day.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, Month};</span>
-    <span class="doccomment">/// assert!(Date::from_calendar_date(2019, Month::January, 1).is_ok());</span>
-    <span class="doccomment">/// assert!(Date::from_calendar_date(2019, Month::December, 31).is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, Month};</span>
-    <span class="doccomment">/// assert!(Date::from_calendar_date(2019, Month::February, 29).is_err()); // 2019 isn&#39;t a leap year.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_calendar_date</span>(
-        <span class="ident">year</span>: <span class="ident">i32</span>,
-        <span class="ident">month</span>: <span class="ident">Month</span>,
-        <span class="ident">day</span>: <span class="ident">u8</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="doccomment">/// Cumulative days through the beginning of a month in both common and leap years.</span>
-        <span class="kw">const</span> <span class="ident">DAYS_CUMULATIVE_COMMON_LEAP</span>: [[<span class="ident">u16</span>; <span class="number">12</span>]; <span class="number">2</span>] <span class="op">=</span> [
+    <span class="doccomment">/// Attempt to create a `Date` from the year, month, and day.
+    ///
+    /// ```rust
+    /// # use time::{Date, Month};
+    /// assert!(Date::from_calendar_date(2019, Month::January, 1).is_ok());
+    /// assert!(Date::from_calendar_date(2019, Month::December, 31).is_ok());
+    /// ```
+    ///
+    /// ```rust
+    /// # use time::{Date, Month};
+    /// assert!(Date::from_calendar_date(2019, Month::February, 29).is_err()); // 2019 isn&#39;t a leap year.
+    /// ```
+    </span><span class="kw">pub const fn </span>from_calendar_date(
+        year: i32,
+        month: Month,
+        day: u8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="doccomment">/// Cumulative days through the beginning of a month in both common and leap years.
+        </span><span class="kw">const </span>DAYS_CUMULATIVE_COMMON_LEAP: [[u16; <span class="number">12</span>]; <span class="number">2</span>] = [
             [<span class="number">0</span>, <span class="number">31</span>, <span class="number">59</span>, <span class="number">90</span>, <span class="number">120</span>, <span class="number">151</span>, <span class="number">181</span>, <span class="number">212</span>, <span class="number">243</span>, <span class="number">273</span>, <span class="number">304</span>, <span class="number">334</span>],
             [<span class="number">0</span>, <span class="number">31</span>, <span class="number">60</span>, <span class="number">91</span>, <span class="number">121</span>, <span class="number">152</span>, <span class="number">182</span>, <span class="number">213</span>, <span class="number">244</span>, <span class="number">274</span>, <span class="number">305</span>, <span class="number">335</span>],
         ];
 
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">year</span> <span class="kw">in</span> <span class="ident">MIN_YEAR</span> =&gt; <span class="ident">MAX_YEAR</span>);
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">day</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="number">1</span> =&gt; <span class="ident">days_in_year_month</span>(<span class="ident">year</span>, <span class="ident">month</span>));
+        <span class="macro">ensure_value_in_range!</span>(year <span class="kw">in </span>MIN_YEAR =&gt; MAX_YEAR);
+        <span class="macro">ensure_value_in_range!</span>(day conditionally <span class="kw">in </span><span class="number">1 </span>=&gt; days_in_year_month(year, month));
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(
-            <span class="ident">year</span>,
-            <span class="ident">DAYS_CUMULATIVE_COMMON_LEAP</span>[<span class="ident">is_leap_year</span>(<span class="ident">year</span>) <span class="kw">as</span> <span class="ident">usize</span>][<span class="ident">month</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="number">1</span>]
-                <span class="op">+</span> <span class="ident">day</span> <span class="kw">as</span> <span class="ident">u16</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(
+            year,
+            DAYS_CUMULATIVE_COMMON_LEAP[is_leap_year(year) <span class="kw">as </span>usize][month <span class="kw">as </span>usize - <span class="number">1</span>]
+                + day <span class="kw">as </span>u16,
         ))
     }
 
-    <span class="doccomment">/// Attempt to create a `Date` from the year and ordinal day number.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::Date;</span>
-    <span class="doccomment">/// assert!(Date::from_ordinal_date(2019, 1).is_ok());</span>
-    <span class="doccomment">/// assert!(Date::from_ordinal_date(2019, 365).is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::Date;</span>
-    <span class="doccomment">/// assert!(Date::from_ordinal_date(2019, 366).is_err()); // 2019 isn&#39;t a leap year.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_ordinal_date</span>(<span class="ident">year</span>: <span class="ident">i32</span>, <span class="ident">ordinal</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">year</span> <span class="kw">in</span> <span class="ident">MIN_YEAR</span> =&gt; <span class="ident">MAX_YEAR</span>);
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">ordinal</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="number">1</span> =&gt; <span class="ident">days_in_year</span>(<span class="ident">year</span>));
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>))
+    <span class="doccomment">/// Attempt to create a `Date` from the year and ordinal day number.
+    ///
+    /// ```rust
+    /// # use time::Date;
+    /// assert!(Date::from_ordinal_date(2019, 1).is_ok());
+    /// assert!(Date::from_ordinal_date(2019, 365).is_ok());
+    /// ```
+    ///
+    /// ```rust
+    /// # use time::Date;
+    /// assert!(Date::from_ordinal_date(2019, 366).is_err()); // 2019 isn&#39;t a leap year.
+    /// ```
+    </span><span class="kw">pub const fn </span>from_ordinal_date(year: i32, ordinal: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="macro">ensure_value_in_range!</span>(year <span class="kw">in </span>MIN_YEAR =&gt; MAX_YEAR);
+        <span class="macro">ensure_value_in_range!</span>(ordinal conditionally <span class="kw">in </span><span class="number">1 </span>=&gt; days_in_year(year));
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal))
     }
 
-    <span class="doccomment">/// Attempt to create a `Date` from the ISO year, week, and weekday.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, Weekday::*};</span>
-    <span class="doccomment">/// assert!(Date::from_iso_week_date(2019, 1, Monday).is_ok());</span>
-    <span class="doccomment">/// assert!(Date::from_iso_week_date(2019, 1, Tuesday).is_ok());</span>
-    <span class="doccomment">/// assert!(Date::from_iso_week_date(2020, 53, Friday).is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, Weekday::*};</span>
-    <span class="doccomment">/// assert!(Date::from_iso_week_date(2019, 53, Monday).is_err()); // 2019 doesn&#39;t have 53 weeks.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_iso_week_date</span>(
-        <span class="ident">year</span>: <span class="ident">i32</span>,
-        <span class="ident">week</span>: <span class="ident">u8</span>,
-        <span class="ident">weekday</span>: <span class="ident">Weekday</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">year</span> <span class="kw">in</span> <span class="ident">MIN_YEAR</span> =&gt; <span class="ident">MAX_YEAR</span>);
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">week</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="number">1</span> =&gt; <span class="ident">weeks_in_year</span>(<span class="ident">year</span>));
+    <span class="doccomment">/// Attempt to create a `Date` from the ISO year, week, and weekday.
+    ///
+    /// ```rust
+    /// # use time::{Date, Weekday::*};
+    /// assert!(Date::from_iso_week_date(2019, 1, Monday).is_ok());
+    /// assert!(Date::from_iso_week_date(2019, 1, Tuesday).is_ok());
+    /// assert!(Date::from_iso_week_date(2020, 53, Friday).is_ok());
+    /// ```
+    ///
+    /// ```rust
+    /// # use time::{Date, Weekday::*};
+    /// assert!(Date::from_iso_week_date(2019, 53, Monday).is_err()); // 2019 doesn&#39;t have 53 weeks.
+    /// ```
+    </span><span class="kw">pub const fn </span>from_iso_week_date(
+        year: i32,
+        week: u8,
+        weekday: Weekday,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="macro">ensure_value_in_range!</span>(year <span class="kw">in </span>MIN_YEAR =&gt; MAX_YEAR);
+        <span class="macro">ensure_value_in_range!</span>(week conditionally <span class="kw">in </span><span class="number">1 </span>=&gt; weeks_in_year(year));
 
-        <span class="kw">let</span> <span class="ident">adj_year</span> <span class="op">=</span> <span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="number">365</span> <span class="op">*</span> <span class="ident">adj_year</span> <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">4</span>) <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">100</span>)
-            <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">adj_year</span>, <span class="number">400</span>);
-        <span class="kw">let</span> <span class="ident">jan_4</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">raw</span> <span class="op">%</span> <span class="number">7</span>) <span class="kw">as</span> <span class="ident">i8</span> {
-            <span class="op">-</span><span class="number">6</span> <span class="op">|</span> <span class="number">1</span> =&gt; <span class="number">8</span>,
-            <span class="op">-</span><span class="number">5</span> <span class="op">|</span> <span class="number">2</span> =&gt; <span class="number">9</span>,
-            <span class="op">-</span><span class="number">4</span> <span class="op">|</span> <span class="number">3</span> =&gt; <span class="number">10</span>,
-            <span class="op">-</span><span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; <span class="number">4</span>,
-            <span class="op">-</span><span class="number">2</span> <span class="op">|</span> <span class="number">5</span> =&gt; <span class="number">5</span>,
-            <span class="op">-</span><span class="number">1</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="number">6</span>,
-            <span class="kw">_</span> =&gt; <span class="number">7</span>,
+        <span class="kw">let </span>adj_year = year - <span class="number">1</span>;
+        <span class="kw">let </span>raw = <span class="number">365 </span>* adj_year + <span class="macro">div_floor!</span>(adj_year, <span class="number">4</span>) - <span class="macro">div_floor!</span>(adj_year, <span class="number">100</span>)
+            + <span class="macro">div_floor!</span>(adj_year, <span class="number">400</span>);
+        <span class="kw">let </span>jan_4 = <span class="kw">match </span>(raw % <span class="number">7</span>) <span class="kw">as </span>i8 {
+            -<span class="number">6 </span>| <span class="number">1 </span>=&gt; <span class="number">8</span>,
+            -<span class="number">5 </span>| <span class="number">2 </span>=&gt; <span class="number">9</span>,
+            -<span class="number">4 </span>| <span class="number">3 </span>=&gt; <span class="number">10</span>,
+            -<span class="number">3 </span>| <span class="number">4 </span>=&gt; <span class="number">4</span>,
+            -<span class="number">2 </span>| <span class="number">5 </span>=&gt; <span class="number">5</span>,
+            -<span class="number">1 </span>| <span class="number">6 </span>=&gt; <span class="number">6</span>,
+            <span class="kw">_ </span>=&gt; <span class="number">7</span>,
         };
-        <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> <span class="ident">week</span> <span class="kw">as</span> <span class="ident">i16</span> <span class="op">*</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">weekday</span>.<span class="ident">number_from_monday</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">-</span> <span class="ident">jan_4</span>;
+        <span class="kw">let </span>ordinal = week <span class="kw">as </span>i16 * <span class="number">7 </span>+ weekday.number_from_monday() <span class="kw">as </span>i16 - jan_4;
 
-        <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(
-                <span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>,
-                (<span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">wrapping_add</span>(<span class="ident">days_in_year</span>(<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>)),
+        <span class="prelude-val">Ok</span>(<span class="kw">if </span>ordinal &lt;= <span class="number">0 </span>{
+            <span class="self">Self</span>::__from_ordinal_date_unchecked(
+                year - <span class="number">1</span>,
+                (ordinal <span class="kw">as </span>u16).wrapping_add(days_in_year(year - <span class="number">1</span>)),
             )
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>) <span class="kw">as</span> <span class="ident">i16</span> {
-            <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">ordinal</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">-</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>))
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="kw">as</span> <span class="kw">_</span>)
+        } <span class="kw">else if </span>ordinal &gt; days_in_year(year) <span class="kw">as </span>i16 {
+            <span class="self">Self</span>::__from_ordinal_date_unchecked(year + <span class="number">1</span>, ordinal <span class="kw">as </span>u16 - days_in_year(year))
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal <span class="kw">as _</span>)
         })
     }
 
-    <span class="doccomment">/// Create a `Date` from the Julian day.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is</span>
-    <span class="doccomment">/// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::from_julian_day(0), Ok(date!(-4713 - 11 - 24)));</span>
-    <span class="doccomment">/// assert_eq!(Date::from_julian_day(2_451_545), Ok(date!(2000 - 01 - 01)));</span>
-    <span class="doccomment">/// assert_eq!(Date::from_julian_day(2_458_485), Ok(date!(2019 - 01 - 01)));</span>
-    <span class="doccomment">/// assert_eq!(Date::from_julian_day(2_458_849), Ok(date!(2019 - 12 - 31)));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;from_julian_date&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_julian_day</span>(<span class="ident">julian_day</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a `Date` from the Julian day.
+    ///
+    /// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is
+    /// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).
+    ///
+    /// ```rust
+    /// # use time::{Date, macros::date};
+    /// assert_eq!(Date::from_julian_day(0), Ok(date!(-4713 - 11 - 24)));
+    /// assert_eq!(Date::from_julian_day(2_451_545), Ok(date!(2000 - 01 - 01)));
+    /// assert_eq!(Date::from_julian_day(2_458_485), Ok(date!(2019 - 01 - 01)));
+    /// assert_eq!(Date::from_julian_day(2_458_849), Ok(date!(2019 - 12 - 31)));
+    /// ```
+    </span><span class="attribute">#[doc(alias = <span class="string">&quot;from_julian_date&quot;</span>)]
+    </span><span class="kw">pub const fn </span>from_julian_day(julian_day: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
         <span class="macro">ensure_value_in_range!</span>(
-            <span class="ident">julian_day</span> <span class="kw">in</span> <span class="ident"><span class="self">Self</span>::MIN</span>.<span class="ident">to_julian_day</span>() =&gt; <span class="ident"><span class="self">Self</span>::MAX</span>.<span class="ident">to_julian_day</span>()
+            julian_day <span class="kw">in </span><span class="self">Self</span>::MIN.to_julian_day() =&gt; <span class="self">Self</span>::MAX.to_julian_day()
         );
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_julian_day_unchecked</span>(<span class="ident">julian_day</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_julian_day_unchecked(julian_day))
     }
 
-    <span class="doccomment">/// Create a `Date` from the Julian day.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does not check the validity of the provided Julian day, and as such may result in an</span>
-    <span class="doccomment">/// internally invalid value.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;from_julian_date_unchecked&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_julian_day_unchecked</span>(<span class="ident">julian_day</span>: <span class="ident">i32</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">julian_day</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MIN</span>.<span class="ident">to_julian_day</span>());
-        <span class="macro">debug_assert!</span>(<span class="ident">julian_day</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX</span>.<span class="ident">to_julian_day</span>());
+    <span class="doccomment">/// Create a `Date` from the Julian day.
+    ///
+    /// This does not check the validity of the provided Julian day, and as such may result in an
+    /// internally invalid value.
+    </span><span class="attribute">#[doc(alias = <span class="string">&quot;from_julian_date_unchecked&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>from_julian_day_unchecked(julian_day: i32) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(julian_day &gt;= <span class="self">Self</span>::MIN.to_julian_day());
+        <span class="macro">debug_assert!</span>(julian_day &lt;= <span class="self">Self</span>::MAX.to_julian_day());
 
-        <span class="comment">// To avoid a potential overflow, the value may need to be widened for some arithmetic.</span>
+        <span class="comment">// To avoid a potential overflow, the value may need to be widened for some arithmetic.
 
-        <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">julian_day</span> <span class="op">-</span> <span class="number">1_721_119</span>;
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">year</span>, <span class="kw-2">mut</span> <span class="ident">ordinal</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">julian_day</span> <span class="op">&lt;</span> <span class="op">-</span><span class="number">19_752_948</span> <span class="op">|</span><span class="op">|</span> <span class="ident">julian_day</span> <span class="op">&gt;</span> <span class="number">23_195_514</span> {
-            <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">z</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="number">25</span>;
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> (<span class="ident">g</span> <span class="op">/</span> <span class="number">3_652_425</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">/</span> <span class="number">4</span>;
-            <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="macro">div_floor!</span>(<span class="number">100</span> <span class="op">*</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">+</span> <span class="ident">g</span>, <span class="number">36525</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">z</span> <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="number">36525</span> <span class="op">*</span> <span class="ident">year</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">100</span>) <span class="kw">as</span> <span class="ident">i32</span>) <span class="kw">as</span> <span class="kw">_</span>;
-            (<span class="ident">year</span>, <span class="ident">ordinal</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">g</span> <span class="op">=</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">z</span> <span class="op">-</span> <span class="number">25</span>;
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">g</span> <span class="op">/</span> <span class="number">3_652_425</span>;
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">-</span> <span class="ident">a</span> <span class="op">/</span> <span class="number">4</span>;
-            <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="macro">div_floor!</span>(<span class="number">100</span> <span class="op">*</span> <span class="ident">b</span> <span class="op">+</span> <span class="ident">g</span>, <span class="number">36525</span>);
-            <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">+</span> <span class="ident">z</span> <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="number">36525</span> <span class="op">*</span> <span class="ident">year</span>, <span class="number">100</span>)) <span class="kw">as</span> <span class="kw">_</span>;
-            (<span class="ident">year</span>, <span class="ident">ordinal</span>)
+        </span><span class="kw">let </span>z = julian_day - <span class="number">1_721_119</span>;
+        <span class="kw">let </span>(<span class="kw-2">mut </span>year, <span class="kw-2">mut </span>ordinal) = <span class="kw">if </span>julian_day &lt; -<span class="number">19_752_948 </span>|| julian_day &gt; <span class="number">23_195_514 </span>{
+            <span class="kw">let </span>g = <span class="number">100 </span>* z <span class="kw">as </span>i64 - <span class="number">25</span>;
+            <span class="kw">let </span>a = (g / <span class="number">3_652_425</span>) <span class="kw">as </span>i32;
+            <span class="kw">let </span>b = a - a / <span class="number">4</span>;
+            <span class="kw">let </span>year = <span class="macro">div_floor!</span>(<span class="number">100 </span>* b <span class="kw">as </span>i64 + g, <span class="number">36525</span>) <span class="kw">as </span>i32;
+            <span class="kw">let </span>ordinal = (b + z - <span class="macro">div_floor!</span>(<span class="number">36525 </span>* year <span class="kw">as </span>i64, <span class="number">100</span>) <span class="kw">as </span>i32) <span class="kw">as _</span>;
+            (year, ordinal)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>g = <span class="number">100 </span>* z - <span class="number">25</span>;
+            <span class="kw">let </span>a = g / <span class="number">3_652_425</span>;
+            <span class="kw">let </span>b = a - a / <span class="number">4</span>;
+            <span class="kw">let </span>year = <span class="macro">div_floor!</span>(<span class="number">100 </span>* b + g, <span class="number">36525</span>);
+            <span class="kw">let </span>ordinal = (b + z - <span class="macro">div_floor!</span>(<span class="number">36525 </span>* year, <span class="number">100</span>)) <span class="kw">as _</span>;
+            (year, ordinal)
         };
 
-        <span class="kw">if</span> <span class="ident">is_leap_year</span>(<span class="ident">year</span>) {
-            <span class="ident">ordinal</span> <span class="op">+</span><span class="op">=</span> <span class="number">60</span>;
-            <span class="macro">cascade!</span>(<span class="ident">ordinal</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">367</span> =&gt; <span class="ident">year</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">ordinal</span> <span class="op">+</span><span class="op">=</span> <span class="number">59</span>;
-            <span class="macro">cascade!</span>(<span class="ident">ordinal</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">366</span> =&gt; <span class="ident">year</span>);
+        <span class="kw">if </span>is_leap_year(year) {
+            ordinal += <span class="number">60</span>;
+            <span class="macro">cascade!</span>(ordinal <span class="kw">in </span><span class="number">1</span>..<span class="number">367 </span>=&gt; year);
+        } <span class="kw">else </span>{
+            ordinal += <span class="number">59</span>;
+            <span class="macro">cascade!</span>(ordinal <span class="kw">in </span><span class="number">1</span>..<span class="number">366 </span>=&gt; year);
         }
 
-        <span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>)
+        <span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal)
     }
-    <span class="comment">// endregion constructors</span>
+    <span class="comment">// endregion constructors
 
-    <span class="comment">// region: getters</span>
-    <span class="doccomment">/// Get the year of the date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).year(), 2019);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 31).year(), 2019);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 01 - 01).year(), 2020);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">year</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">9</span>
-    }
+    // region: getters
+    </span><span class="doccomment">/// Get the year of the date.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).year(), 2019);
+    /// assert_eq!(date!(2019 - 12 - 31).year(), 2019);
+    /// assert_eq!(date!(2020 - 01 - 01).year(), 2020);
+    /// ```
+    </span><span class="kw">pub const fn </span>year(<span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.value &gt;&gt; <span class="number">9
+    </span>}
 
-    <span class="doccomment">/// Get the month.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{macros::date, Month};</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).month(), Month::January);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 31).month(), Month::December);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">month</span>(<span class="self">self</span>) -&gt; <span class="ident">Month</span> {
-        <span class="self">self</span>.<span class="ident">month_day</span>().<span class="number">0</span>
-    }
+    <span class="doccomment">/// Get the month.
+    ///
+    /// ```rust
+    /// # use time::{macros::date, Month};
+    /// assert_eq!(date!(2019 - 01 - 01).month(), Month::January);
+    /// assert_eq!(date!(2019 - 12 - 31).month(), Month::December);
+    /// ```
+    </span><span class="kw">pub const fn </span>month(<span class="self">self</span>) -&gt; Month {
+        <span class="self">self</span>.month_day().<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Get the day of the month.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `1..=31`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).day(), 1);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 31).day(), 31);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">day</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">month_day</span>().<span class="number">1</span>
-    }
+    <span class="doccomment">/// Get the day of the month.
+    ///
+    /// The returned value will always be in the range `1..=31`.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).day(), 1);
+    /// assert_eq!(date!(2019 - 12 - 31).day(), 31);
+    /// ```
+    </span><span class="kw">pub const fn </span>day(<span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.month_day().<span class="number">1
+    </span>}
 
-    <span class="doccomment">/// Get the month and day. This is more efficient than fetching the components individually.</span>
-    <span class="comment">// For whatever reason, rustc has difficulty optimizing this function. It&#39;s significantly faster</span>
-    <span class="comment">// to write the statements out by hand.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">month_day</span>(<span class="self">self</span>) -&gt; (<span class="ident">Month</span>, <span class="ident">u8</span>) {
-        <span class="doccomment">/// The number of days up to and including the given month. Common years</span>
-        <span class="doccomment">/// are first, followed by leap years.</span>
-        <span class="kw">const</span> <span class="ident">CUMULATIVE_DAYS_IN_MONTH_COMMON_LEAP</span>: [[<span class="ident">u16</span>; <span class="number">11</span>]; <span class="number">2</span>] <span class="op">=</span> [
+    <span class="doccomment">/// Get the month and day. This is more efficient than fetching the components individually.
+    </span><span class="comment">// For whatever reason, rustc has difficulty optimizing this function. It&#39;s significantly faster
+    // to write the statements out by hand.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>month_day(<span class="self">self</span>) -&gt; (Month, u8) {
+        <span class="doccomment">/// The number of days up to and including the given month. Common years
+        /// are first, followed by leap years.
+        </span><span class="kw">const </span>CUMULATIVE_DAYS_IN_MONTH_COMMON_LEAP: [[u16; <span class="number">11</span>]; <span class="number">2</span>] = [
             [<span class="number">31</span>, <span class="number">59</span>, <span class="number">90</span>, <span class="number">120</span>, <span class="number">151</span>, <span class="number">181</span>, <span class="number">212</span>, <span class="number">243</span>, <span class="number">273</span>, <span class="number">304</span>, <span class="number">334</span>],
             [<span class="number">31</span>, <span class="number">60</span>, <span class="number">91</span>, <span class="number">121</span>, <span class="number">152</span>, <span class="number">182</span>, <span class="number">213</span>, <span class="number">244</span>, <span class="number">274</span>, <span class="number">305</span>, <span class="number">335</span>],
         ];
 
-        <span class="kw">let</span> <span class="ident">days</span> <span class="op">=</span> <span class="ident">CUMULATIVE_DAYS_IN_MONTH_COMMON_LEAP</span>[<span class="ident">is_leap_year</span>(<span class="self">self</span>.<span class="ident">year</span>()) <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ordinal</span>();
+        <span class="kw">let </span>days = CUMULATIVE_DAYS_IN_MONTH_COMMON_LEAP[is_leap_year(<span class="self">self</span>.year()) <span class="kw">as </span>usize];
+        <span class="kw">let </span>ordinal = <span class="self">self</span>.ordinal();
 
-        <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">10</span>] {
-            (<span class="ident">Month::December</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">10</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">9</span>] {
-            (<span class="ident">Month::November</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">9</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">8</span>] {
-            (<span class="ident">Month::October</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">8</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">7</span>] {
-            (<span class="ident">Month::September</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">7</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">6</span>] {
-            (<span class="ident">Month::August</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">6</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">5</span>] {
-            (<span class="ident">Month::July</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">5</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">4</span>] {
-            (<span class="ident">Month::June</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">4</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">3</span>] {
-            (<span class="ident">Month::May</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">3</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">2</span>] {
-            (<span class="ident">Month::April</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">2</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">1</span>] {
-            (<span class="ident">Month::March</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">1</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days</span>[<span class="number">0</span>] {
-            (<span class="ident">Month::February</span>, (<span class="ident">ordinal</span> <span class="op">-</span> <span class="ident">days</span>[<span class="number">0</span>]) <span class="kw">as</span> <span class="kw">_</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">Month::January</span>, <span class="ident">ordinal</span> <span class="kw">as</span> <span class="kw">_</span>)
+        <span class="kw">if </span>ordinal &gt; days[<span class="number">10</span>] {
+            (Month::December, (ordinal - days[<span class="number">10</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">9</span>] {
+            (Month::November, (ordinal - days[<span class="number">9</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">8</span>] {
+            (Month::October, (ordinal - days[<span class="number">8</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">7</span>] {
+            (Month::September, (ordinal - days[<span class="number">7</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">6</span>] {
+            (Month::August, (ordinal - days[<span class="number">6</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">5</span>] {
+            (Month::July, (ordinal - days[<span class="number">5</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">4</span>] {
+            (Month::June, (ordinal - days[<span class="number">4</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">3</span>] {
+            (Month::May, (ordinal - days[<span class="number">3</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">2</span>] {
+            (Month::April, (ordinal - days[<span class="number">2</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">1</span>] {
+            (Month::March, (ordinal - days[<span class="number">1</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else if </span>ordinal &gt; days[<span class="number">0</span>] {
+            (Month::February, (ordinal - days[<span class="number">0</span>]) <span class="kw">as _</span>)
+        } <span class="kw">else </span>{
+            (Month::January, ordinal <span class="kw">as _</span>)
         }
     }
 
-    <span class="doccomment">/// Get the day of the year.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `1..=366` (`1..=365` for common years).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).ordinal(), 1);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 31).ordinal(), 365);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">ordinal</span>(<span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        (<span class="self">self</span>.<span class="ident">value</span> <span class="op">&amp;</span> <span class="number">0x1FF</span>) <span class="kw">as</span> <span class="kw">_</span>
-    }
+    <span class="doccomment">/// Get the day of the year.
+    ///
+    /// The returned value will always be in the range `1..=366` (`1..=365` for common years).
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).ordinal(), 1);
+    /// assert_eq!(date!(2019 - 12 - 31).ordinal(), 365);
+    /// ```
+    </span><span class="kw">pub const fn </span>ordinal(<span class="self">self</span>) -&gt; u16 {
+        (<span class="self">self</span>.value &amp; <span class="number">0x1FF</span>) <span class="kw">as _
+    </span>}
 
-    <span class="doccomment">/// Get the ISO 8601 year and week number.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">iso_year_week</span>(<span class="self">self</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u8</span>) {
-        <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">ordinal</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ordinal_date</span>();
+    <span class="doccomment">/// Get the ISO 8601 year and week number.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>iso_year_week(<span class="self">self</span>) -&gt; (i32, u8) {
+        <span class="kw">let </span>(year, ordinal) = <span class="self">self</span>.to_ordinal_date();
 
-        <span class="kw">match</span> ((<span class="ident">ordinal</span> <span class="op">+</span> <span class="number">10</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">weekday</span>().<span class="ident">number_from_monday</span>() <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">/</span> <span class="number">7</span>) <span class="kw">as</span> <span class="kw">_</span> {
-            <span class="number">0</span> =&gt; (<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">weeks_in_year</span>(<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>)),
-            <span class="number">53</span> <span class="kw">if</span> <span class="ident">weeks_in_year</span>(<span class="ident">year</span>) <span class="op">==</span> <span class="number">52</span> =&gt; (<span class="ident">year</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">1</span>),
-            <span class="ident">week</span> =&gt; (<span class="ident">year</span>, <span class="ident">week</span>),
+        <span class="kw">match </span>((ordinal + <span class="number">10 </span>- <span class="self">self</span>.weekday().number_from_monday() <span class="kw">as </span>u16) / <span class="number">7</span>) <span class="kw">as _ </span>{
+            <span class="number">0 </span>=&gt; (year - <span class="number">1</span>, weeks_in_year(year - <span class="number">1</span>)),
+            <span class="number">53 </span><span class="kw">if </span>weeks_in_year(year) == <span class="number">52 </span>=&gt; (year + <span class="number">1</span>, <span class="number">1</span>),
+            week =&gt; (year, week),
         }
     }
 
-    <span class="doccomment">/// Get the ISO week number.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `1..=53`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).iso_week(), 1);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 10 - 04).iso_week(), 40);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 01 - 01).iso_week(), 1);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 12 - 31).iso_week(), 53);</span>
-    <span class="doccomment">/// assert_eq!(date!(2021 - 01 - 01).iso_week(), 53);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">iso_week</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">iso_year_week</span>().<span class="number">1</span>
+    <span class="doccomment">/// Get the ISO week number.
+    ///
+    /// The returned value will always be in the range `1..=53`.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).iso_week(), 1);
+    /// assert_eq!(date!(2019 - 10 - 04).iso_week(), 40);
+    /// assert_eq!(date!(2020 - 01 - 01).iso_week(), 1);
+    /// assert_eq!(date!(2020 - 12 - 31).iso_week(), 53);
+    /// assert_eq!(date!(2021 - 01 - 01).iso_week(), 53);
+    /// ```
+    </span><span class="kw">pub const fn </span>iso_week(<span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.iso_year_week().<span class="number">1
+    </span>}
+
+    <span class="doccomment">/// Get the week number where week 1 begins on the first Sunday.
+    ///
+    /// The returned value will always be in the range `0..=53`.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).sunday_based_week(), 0);
+    /// assert_eq!(date!(2020 - 01 - 01).sunday_based_week(), 0);
+    /// assert_eq!(date!(2020 - 12 - 31).sunday_based_week(), 52);
+    /// assert_eq!(date!(2021 - 01 - 01).sunday_based_week(), 0);
+    /// ```
+    </span><span class="kw">pub const fn </span>sunday_based_week(<span class="self">self</span>) -&gt; u8 {
+        ((<span class="self">self</span>.ordinal() <span class="kw">as </span>i16 - <span class="self">self</span>.weekday().number_days_from_sunday() <span class="kw">as </span>i16 + <span class="number">6</span>) / <span class="number">7</span>) <span class="kw">as _
+    </span>}
+
+    <span class="doccomment">/// Get the week number where week 1 begins on the first Monday.
+    ///
+    /// The returned value will always be in the range `0..=53`.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).monday_based_week(), 0);
+    /// assert_eq!(date!(2020 - 01 - 01).monday_based_week(), 0);
+    /// assert_eq!(date!(2020 - 12 - 31).monday_based_week(), 52);
+    /// assert_eq!(date!(2021 - 01 - 01).monday_based_week(), 0);
+    /// ```
+    </span><span class="kw">pub const fn </span>monday_based_week(<span class="self">self</span>) -&gt; u8 {
+        ((<span class="self">self</span>.ordinal() <span class="kw">as </span>i16 - <span class="self">self</span>.weekday().number_days_from_monday() <span class="kw">as </span>i16 + <span class="number">6</span>) / <span class="number">7</span>) <span class="kw">as _
+    </span>}
+
+    <span class="doccomment">/// Get the year, month, and day.
+    ///
+    /// ```rust
+    /// # use time::{macros::date, Month};
+    /// assert_eq!(
+    ///     date!(2019 - 01 - 01).to_calendar_date(),
+    ///     (2019, Month::January, 1)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>to_calendar_date(<span class="self">self</span>) -&gt; (i32, Month, u8) {
+        <span class="kw">let </span>(month, day) = <span class="self">self</span>.month_day();
+        (<span class="self">self</span>.year(), month, day)
     }
 
-    <span class="doccomment">/// Get the week number where week 1 begins on the first Sunday.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `0..=53`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).sunday_based_week(), 0);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 01 - 01).sunday_based_week(), 0);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 12 - 31).sunday_based_week(), 52);</span>
-    <span class="doccomment">/// assert_eq!(date!(2021 - 01 - 01).sunday_based_week(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">sunday_based_week</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        ((<span class="self">self</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">weekday</span>().<span class="ident">number_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">+</span> <span class="number">6</span>) <span class="op">/</span> <span class="number">7</span>) <span class="kw">as</span> <span class="kw">_</span>
+    <span class="doccomment">/// Get the year and ordinal day number.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(2019 - 01 - 01).to_ordinal_date(), (2019, 1));
+    /// ```
+    </span><span class="kw">pub const fn </span>to_ordinal_date(<span class="self">self</span>) -&gt; (i32, u16) {
+        (<span class="self">self</span>.year(), <span class="self">self</span>.ordinal())
     }
 
-    <span class="doccomment">/// Get the week number where week 1 begins on the first Monday.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned value will always be in the range `0..=53`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).monday_based_week(), 0);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 01 - 01).monday_based_week(), 0);</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 12 - 31).monday_based_week(), 52);</span>
-    <span class="doccomment">/// assert_eq!(date!(2021 - 01 - 01).monday_based_week(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">monday_based_week</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        ((<span class="self">self</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">weekday</span>().<span class="ident">number_days_from_monday</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">+</span> <span class="number">6</span>) <span class="op">/</span> <span class="number">7</span>) <span class="kw">as</span> <span class="kw">_</span>
-    }
+    <span class="doccomment">/// Get the ISO 8601 year, week number, and weekday.
+    ///
+    /// ```rust
+    /// # use time::{Weekday::*, macros::date};
+    /// assert_eq!(date!(2019 - 01 - 01).to_iso_week_date(), (2019, 1, Tuesday));
+    /// assert_eq!(date!(2019 - 10 - 04).to_iso_week_date(), (2019, 40, Friday));
+    /// assert_eq!(
+    ///     date!(2020 - 01 - 01).to_iso_week_date(),
+    ///     (2020, 1, Wednesday)
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).to_iso_week_date(),
+    ///     (2020, 53, Thursday)
+    /// );
+    /// assert_eq!(date!(2021 - 01 - 01).to_iso_week_date(), (2020, 53, Friday));
+    /// ```
+    </span><span class="kw">pub const fn </span>to_iso_week_date(<span class="self">self</span>) -&gt; (i32, u8, Weekday) {
+        <span class="kw">let </span>(year, ordinal) = <span class="self">self</span>.to_ordinal_date();
+        <span class="kw">let </span>weekday = <span class="self">self</span>.weekday();
 
-    <span class="doccomment">/// Get the year, month, and day.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{macros::date, Month};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 01 - 01).to_calendar_date(),</span>
-    <span class="doccomment">///     (2019, Month::January, 1)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_calendar_date</span>(<span class="self">self</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">Month</span>, <span class="ident">u8</span>) {
-        <span class="kw">let</span> (<span class="ident">month</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">month_day</span>();
-        (<span class="self">self</span>.<span class="ident">year</span>(), <span class="ident">month</span>, <span class="ident">day</span>)
-    }
-
-    <span class="doccomment">/// Get the year and ordinal day number.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).to_ordinal_date(), (2019, 1));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_ordinal_date</span>(<span class="self">self</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u16</span>) {
-        (<span class="self">self</span>.<span class="ident">year</span>(), <span class="self">self</span>.<span class="ident">ordinal</span>())
-    }
-
-    <span class="doccomment">/// Get the ISO 8601 year, week number, and weekday.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Weekday::*, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).to_iso_week_date(), (2019, 1, Tuesday));</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 10 - 04).to_iso_week_date(), (2019, 40, Friday));</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 01 - 01).to_iso_week_date(),</span>
-    <span class="doccomment">///     (2020, 1, Wednesday)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).to_iso_week_date(),</span>
-    <span class="doccomment">///     (2020, 53, Thursday)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(date!(2021 - 01 - 01).to_iso_week_date(), (2020, 53, Friday));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_iso_week_date</span>(<span class="self">self</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">u8</span>, <span class="ident">Weekday</span>) {
-        <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">ordinal</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ordinal_date</span>();
-        <span class="kw">let</span> <span class="ident">weekday</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">weekday</span>();
-
-        <span class="kw">match</span> ((<span class="ident">ordinal</span> <span class="op">+</span> <span class="number">10</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">weekday</span>().<span class="ident">number_from_monday</span>() <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">/</span> <span class="number">7</span>) <span class="kw">as</span> <span class="kw">_</span> {
-            <span class="number">0</span> =&gt; (<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">weeks_in_year</span>(<span class="ident">year</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">weekday</span>),
-            <span class="number">53</span> <span class="kw">if</span> <span class="ident">weeks_in_year</span>(<span class="ident">year</span>) <span class="op">==</span> <span class="number">52</span> =&gt; (<span class="ident">year</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">1</span>, <span class="ident">weekday</span>),
-            <span class="ident">week</span> =&gt; (<span class="ident">year</span>, <span class="ident">week</span>, <span class="ident">weekday</span>),
+        <span class="kw">match </span>((ordinal + <span class="number">10 </span>- <span class="self">self</span>.weekday().number_from_monday() <span class="kw">as </span>u16) / <span class="number">7</span>) <span class="kw">as _ </span>{
+            <span class="number">0 </span>=&gt; (year - <span class="number">1</span>, weeks_in_year(year - <span class="number">1</span>), weekday),
+            <span class="number">53 </span><span class="kw">if </span>weeks_in_year(year) == <span class="number">52 </span>=&gt; (year + <span class="number">1</span>, <span class="number">1</span>, weekday),
+            week =&gt; (year, week, weekday),
         }
     }
 
-    <span class="doccomment">/// Get the weekday.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Weekday::*, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).weekday(), Tuesday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 02 - 01).weekday(), Friday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 03 - 01).weekday(), Friday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 04 - 01).weekday(), Monday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 05 - 01).weekday(), Wednesday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 06 - 01).weekday(), Saturday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 07 - 01).weekday(), Monday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 08 - 01).weekday(), Thursday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 09 - 01).weekday(), Sunday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 10 - 01).weekday(), Tuesday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 11 - 01).weekday(), Friday);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 01).weekday(), Sunday);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">weekday</span>(<span class="self">self</span>) -&gt; <span class="ident">Weekday</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">to_julian_day</span>() <span class="op">%</span> <span class="number">7</span> {
-            <span class="op">-</span><span class="number">6</span> <span class="op">|</span> <span class="number">1</span> =&gt; <span class="ident">Weekday::Tuesday</span>,
-            <span class="op">-</span><span class="number">5</span> <span class="op">|</span> <span class="number">2</span> =&gt; <span class="ident">Weekday::Wednesday</span>,
-            <span class="op">-</span><span class="number">4</span> <span class="op">|</span> <span class="number">3</span> =&gt; <span class="ident">Weekday::Thursday</span>,
-            <span class="op">-</span><span class="number">3</span> <span class="op">|</span> <span class="number">4</span> =&gt; <span class="ident">Weekday::Friday</span>,
-            <span class="op">-</span><span class="number">2</span> <span class="op">|</span> <span class="number">5</span> =&gt; <span class="ident">Weekday::Saturday</span>,
-            <span class="op">-</span><span class="number">1</span> <span class="op">|</span> <span class="number">6</span> =&gt; <span class="ident">Weekday::Sunday</span>,
-            <span class="ident">val</span> =&gt; {
-                <span class="macro">debug_assert!</span>(<span class="ident">val</span> <span class="op">==</span> <span class="number">0</span>);
-                <span class="ident">Weekday::Monday</span>
+    <span class="doccomment">/// Get the weekday.
+    ///
+    /// ```rust
+    /// # use time::{Weekday::*, macros::date};
+    /// assert_eq!(date!(2019 - 01 - 01).weekday(), Tuesday);
+    /// assert_eq!(date!(2019 - 02 - 01).weekday(), Friday);
+    /// assert_eq!(date!(2019 - 03 - 01).weekday(), Friday);
+    /// assert_eq!(date!(2019 - 04 - 01).weekday(), Monday);
+    /// assert_eq!(date!(2019 - 05 - 01).weekday(), Wednesday);
+    /// assert_eq!(date!(2019 - 06 - 01).weekday(), Saturday);
+    /// assert_eq!(date!(2019 - 07 - 01).weekday(), Monday);
+    /// assert_eq!(date!(2019 - 08 - 01).weekday(), Thursday);
+    /// assert_eq!(date!(2019 - 09 - 01).weekday(), Sunday);
+    /// assert_eq!(date!(2019 - 10 - 01).weekday(), Tuesday);
+    /// assert_eq!(date!(2019 - 11 - 01).weekday(), Friday);
+    /// assert_eq!(date!(2019 - 12 - 01).weekday(), Sunday);
+    /// ```
+    </span><span class="kw">pub const fn </span>weekday(<span class="self">self</span>) -&gt; Weekday {
+        <span class="kw">match </span><span class="self">self</span>.to_julian_day() % <span class="number">7 </span>{
+            -<span class="number">6 </span>| <span class="number">1 </span>=&gt; Weekday::Tuesday,
+            -<span class="number">5 </span>| <span class="number">2 </span>=&gt; Weekday::Wednesday,
+            -<span class="number">4 </span>| <span class="number">3 </span>=&gt; Weekday::Thursday,
+            -<span class="number">3 </span>| <span class="number">4 </span>=&gt; Weekday::Friday,
+            -<span class="number">2 </span>| <span class="number">5 </span>=&gt; Weekday::Saturday,
+            -<span class="number">1 </span>| <span class="number">6 </span>=&gt; Weekday::Sunday,
+            val =&gt; {
+                <span class="macro">debug_assert!</span>(val == <span class="number">0</span>);
+                Weekday::Monday
             }
         }
     }
 
-    <span class="doccomment">/// Get the next calendar date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 01 - 01).next_day(),</span>
-    <span class="doccomment">///     Some(date!(2019 - 01 - 02))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 01 - 31).next_day(),</span>
-    <span class="doccomment">///     Some(date!(2019 - 02 - 01))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 12 - 31).next_day(),</span>
-    <span class="doccomment">///     Some(date!(2020 - 01 - 01))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.next_day(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next_day</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ordinal</span>() <span class="op">==</span> <span class="number">366</span> <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">ordinal</span>() <span class="op">==</span> <span class="number">365</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_leap_year</span>(<span class="self">self</span>.<span class="ident">year</span>())) {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::MAX</span>.<span class="ident">value</span> {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="self">self</span>.<span class="ident">year</span>() <span class="op">+</span> <span class="number">1</span>, <span class="number">1</span>))
+    <span class="doccomment">/// Get the next calendar date.
+    ///
+    /// ```rust
+    /// # use time::{Date, macros::date};
+    /// assert_eq!(
+    ///     date!(2019 - 01 - 01).next_day(),
+    ///     Some(date!(2019 - 01 - 02))
+    /// );
+    /// assert_eq!(
+    ///     date!(2019 - 01 - 31).next_day(),
+    ///     Some(date!(2019 - 02 - 01))
+    /// );
+    /// assert_eq!(
+    ///     date!(2019 - 12 - 31).next_day(),
+    ///     Some(date!(2020 - 01 - 01))
+    /// );
+    /// assert_eq!(Date::MAX.next_day(), None);
+    /// ```
+    </span><span class="kw">pub const fn </span>next_day(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.ordinal() == <span class="number">366 </span>|| (<span class="self">self</span>.ordinal() == <span class="number">365 </span>&amp;&amp; !is_leap_year(<span class="self">self</span>.year())) {
+            <span class="kw">if </span><span class="self">self</span>.value == <span class="self">Self</span>::MAX.value {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="prelude-val">Some</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(<span class="self">self</span>.year() + <span class="number">1</span>, <span class="number">1</span>))
             }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="self">self</span>.<span class="ident">value</span> <span class="op">+</span> <span class="number">1</span>,
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+                value: <span class="self">self</span>.value + <span class="number">1</span>,
             })
         }
     }
 
-    <span class="doccomment">/// Get the previous calendar date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 01 - 02).previous_day(),</span>
-    <span class="doccomment">///     Some(date!(2019 - 01 - 01))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2019 - 02 - 01).previous_day(),</span>
-    <span class="doccomment">///     Some(date!(2019 - 01 - 31))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 01 - 01).previous_day(),</span>
-    <span class="doccomment">///     Some(date!(2019 - 12 - 31))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.previous_day(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">previous_day</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ordinal</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                <span class="ident">value</span>: <span class="self">self</span>.<span class="ident">value</span> <span class="op">-</span> <span class="number">1</span>,
+    <span class="doccomment">/// Get the previous calendar date.
+    ///
+    /// ```rust
+    /// # use time::{Date, macros::date};
+    /// assert_eq!(
+    ///     date!(2019 - 01 - 02).previous_day(),
+    ///     Some(date!(2019 - 01 - 01))
+    /// );
+    /// assert_eq!(
+    ///     date!(2019 - 02 - 01).previous_day(),
+    ///     Some(date!(2019 - 01 - 31))
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 01 - 01).previous_day(),
+    ///     Some(date!(2019 - 12 - 31))
+    /// );
+    /// assert_eq!(Date::MIN.previous_day(), None);
+    /// ```
+    </span><span class="kw">pub const fn </span>previous_day(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.ordinal() != <span class="number">1 </span>{
+            <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+                value: <span class="self">self</span>.value - <span class="number">1</span>,
             })
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">value</span> <span class="op">==</span> <span class="ident"><span class="self">Self</span>::MIN</span>.<span class="ident">value</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(
-                <span class="self">self</span>.<span class="ident">year</span>() <span class="op">-</span> <span class="number">1</span>,
-                <span class="ident">days_in_year</span>(<span class="self">self</span>.<span class="ident">year</span>() <span class="op">-</span> <span class="number">1</span>),
+        } <span class="kw">else if </span><span class="self">self</span>.value == <span class="self">Self</span>::MIN.value {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(
+                <span class="self">self</span>.year() - <span class="number">1</span>,
+                days_in_year(<span class="self">self</span>.year() - <span class="number">1</span>),
             ))
         }
     }
 
-    <span class="doccomment">/// Get the Julian day for the date.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is</span>
-    <span class="doccomment">/// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(date!(-4713 - 11 - 24).to_julian_day(), 0);</span>
-    <span class="doccomment">/// assert_eq!(date!(2000 - 01 - 01).to_julian_day(), 2_451_545);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 01 - 01).to_julian_day(), 2_458_485);</span>
-    <span class="doccomment">/// assert_eq!(date!(2019 - 12 - 31).to_julian_day(), 2_458_849);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_julian_day</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">year</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="doccomment">/// Get the Julian day for the date.
+    ///
+    /// The algorithm to perform this conversion is derived from one provided by Peter Baum; it is
+    /// freely available [here](https://www.researchgate.net/publication/316558298_Date_Algorithms).
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(date!(-4713 - 11 - 24).to_julian_day(), 0);
+    /// assert_eq!(date!(2000 - 01 - 01).to_julian_day(), 2_451_545);
+    /// assert_eq!(date!(2019 - 01 - 01).to_julian_day(), 2_458_485);
+    /// assert_eq!(date!(2019 - 12 - 31).to_julian_day(), 2_458_849);
+    /// ```
+    </span><span class="kw">pub const fn </span>to_julian_day(<span class="self">self</span>) -&gt; i32 {
+        <span class="kw">let </span>year = <span class="self">self</span>.year() - <span class="number">1</span>;
+        <span class="kw">let </span>ordinal = <span class="self">self</span>.ordinal() <span class="kw">as </span>i32;
 
-        <span class="ident">ordinal</span> <span class="op">+</span> <span class="number">365</span> <span class="op">*</span> <span class="ident">year</span> <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">year</span>, <span class="number">4</span>) <span class="op">-</span> <span class="macro">div_floor!</span>(<span class="ident">year</span>, <span class="number">100</span>)
-            <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">year</span>, <span class="number">400</span>)
-            <span class="op">+</span> <span class="number">1_721_425</span>
-    }
-    <span class="comment">// endregion getters</span>
+        ordinal + <span class="number">365 </span>* year + <span class="macro">div_floor!</span>(year, <span class="number">4</span>) - <span class="macro">div_floor!</span>(year, <span class="number">100</span>)
+            + <span class="macro">div_floor!</span>(year, <span class="number">400</span>)
+            + <span class="number">1_721_425
+    </span>}
+    <span class="comment">// endregion getters
 
-    <span class="comment">// region: checked arithmetic</span>
-    <span class="doccomment">/// Computes `self + duration`, returning `None` if an overflow occurred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.checked_add(1.days()), None);</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.checked_add((-2).days()), None);</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_add(2.days()),</span>
-    <span class="doccomment">///     Some(date!(2021 - 01 - 02))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function only takes whole days into account.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.checked_add(23.hours()), Some(Date::MAX));</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.checked_add((-23).hours()), Some(Date::MIN));</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_add(23.hours()),</span>
-    <span class="doccomment">///     Some(date!(2020 - 12 - 31))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_add(47.hours()),</span>
-    <span class="doccomment">///     Some(date!(2021 - 01 - 01))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">whole_days</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">whole_days</span>();
-        <span class="kw">if</span> <span class="ident">whole_days</span> <span class="op">&lt;</span> <span class="ident">i32::MIN</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">|</span><span class="op">|</span> <span class="ident">whole_days</span> <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    // region: checked arithmetic
+    </span><span class="doccomment">/// Computes `self + duration`, returning `None` if an overflow occurred.
+    ///
+    /// ```rust
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.checked_add(1.days()), None);
+    /// assert_eq!(Date::MIN.checked_add((-2).days()), None);
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_add(2.days()),
+    ///     Some(date!(2021 - 01 - 02))
+    /// );
+    /// ```
+    ///
+    /// # Note
+    ///
+    /// This function only takes whole days into account.
+    ///
+    /// ```rust
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.checked_add(23.hours()), Some(Date::MAX));
+    /// assert_eq!(Date::MIN.checked_add((-23).hours()), Some(Date::MIN));
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_add(23.hours()),
+    ///     Some(date!(2020 - 12 - 31))
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_add(47.hours()),
+    ///     Some(date!(2021 - 01 - 01))
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>checked_add(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>whole_days = duration.whole_days();
+        <span class="kw">if </span>whole_days &lt; i32::MIN <span class="kw">as </span>i64 || whole_days &gt; i32::MAX <span class="kw">as </span>i64 {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">julian_day</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">to_julian_day</span>().<span class="ident">checked_add</span>(<span class="ident">whole_days</span> <span class="kw">as</span> <span class="kw">_</span>));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_julian_day</span>(<span class="ident">julian_day</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">date</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="doccomment">/// Computes `self - duration`, returning `None` if an overflow occurred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.checked_sub((-2).days()), None);</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.checked_sub(1.days()), None);</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_sub(2.days()),</span>
-    <span class="doccomment">///     Some(date!(2020 - 12 - 29))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function only takes whole days into account.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.checked_sub((-23).hours()), Some(Date::MAX));</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.checked_sub(23.hours()), Some(Date::MIN));</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_sub(23.hours()),</span>
-    <span class="doccomment">///     Some(date!(2020 - 12 - 31))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).checked_sub(47.hours()),</span>
-    <span class="doccomment">///     Some(date!(2020 - 12 - 30))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">whole_days</span> <span class="op">=</span> <span class="ident">duration</span>.<span class="ident">whole_days</span>();
-        <span class="kw">if</span> <span class="ident">whole_days</span> <span class="op">&lt;</span> <span class="ident">i32::MIN</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">|</span><span class="op">|</span> <span class="ident">whole_days</span> <span class="op">&gt;</span> <span class="ident">i32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-
-        <span class="kw">let</span> <span class="ident">julian_day</span> <span class="op">=</span> <span class="macro">const_try_opt!</span>(<span class="self">self</span>.<span class="ident">to_julian_day</span>().<span class="ident">checked_sub</span>(<span class="ident">whole_days</span> <span class="kw">as</span> <span class="kw">_</span>));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">date</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::from_julian_day</span>(<span class="ident">julian_day</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">date</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-    <span class="comment">// endregion: checked arithmetic</span>
-
-    <span class="comment">// region: saturating arithmetic</span>
-    <span class="doccomment">/// Computes `self + duration`, saturating value on overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.saturating_add(1.days()), Date::MAX);</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.saturating_add((-2).days()), Date::MIN);</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_add(2.days()),</span>
-    <span class="doccomment">///     date!(2021 - 01 - 02)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function only takes whole days into account.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_add(23.hours()),</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_add(47.hours()),</span>
-    <span class="doccomment">///     date!(2021 - 01 - 01)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datetime</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>) {
-            <span class="ident">datetime</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
-            <span class="ident"><span class="self">Self</span>::MIN</span>
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_positive</span>());
-            <span class="ident"><span class="self">Self</span>::MAX</span>
-        }
+        <span class="kw">let </span>julian_day = <span class="macro">const_try_opt!</span>(<span class="self">self</span>.to_julian_day().checked_add(whole_days <span class="kw">as _</span>));
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = <span class="self">Self</span>::from_julian_day(julian_day) {
+            <span class="prelude-val">Some</span>(date)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Computes `self - duration`, saturating value on overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use time::{Date, ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(Date::MAX.saturating_sub((-2).days()), Date::MAX);</span>
-    <span class="doccomment">/// assert_eq!(Date::MIN.saturating_sub(1.days()), Date::MIN);</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_sub(2.days()),</span>
-    <span class="doccomment">///     date!(2020 - 12 - 29)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function only takes whole days into account.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use time::{ext::NumericalDuration, macros::date};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_sub(23.hours()),</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2020 - 12 - 31).saturating_sub(47.hours()),</span>
-    <span class="doccomment">///     date!(2020 - 12 - 30)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datetime</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>) {
-            <span class="ident">datetime</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
-            <span class="ident"><span class="self">Self</span>::MAX</span>
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_positive</span>());
-            <span class="ident"><span class="self">Self</span>::MIN</span>
+    <span class="doccomment">/// Computes `self - duration`, returning `None` if an overflow occurred.
+    ///
+    /// ```
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.checked_sub((-2).days()), None);
+    /// assert_eq!(Date::MIN.checked_sub(1.days()), None);
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_sub(2.days()),
+    ///     Some(date!(2020 - 12 - 29))
+    /// );
+    /// ```
+    ///
+    /// # Note
+    ///
+    /// This function only takes whole days into account.
+    ///
+    /// ```
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.checked_sub((-23).hours()), Some(Date::MAX));
+    /// assert_eq!(Date::MIN.checked_sub(23.hours()), Some(Date::MIN));
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_sub(23.hours()),
+    ///     Some(date!(2020 - 12 - 31))
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).checked_sub(47.hours()),
+    ///     Some(date!(2020 - 12 - 30))
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>checked_sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>whole_days = duration.whole_days();
+        <span class="kw">if </span>whole_days &lt; i32::MIN <span class="kw">as </span>i64 || whole_days &gt; i32::MAX <span class="kw">as </span>i64 {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="kw">let </span>julian_day = <span class="macro">const_try_opt!</span>(<span class="self">self</span>.to_julian_day().checked_sub(whole_days <span class="kw">as _</span>));
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(date) = <span class="self">Self</span>::from_julian_day(julian_day) {
+            <span class="prelude-val">Some</span>(date)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+    <span class="comment">// endregion: checked arithmetic
+
+    // region: saturating arithmetic
+    </span><span class="doccomment">/// Computes `self + duration`, saturating value on overflow.
+    ///
+    /// ```rust
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.saturating_add(1.days()), Date::MAX);
+    /// assert_eq!(Date::MIN.saturating_add((-2).days()), Date::MIN);
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_add(2.days()),
+    ///     date!(2021 - 01 - 02)
+    /// );
+    /// ```
+    ///
+    /// # Note
+    ///
+    /// This function only takes whole days into account.
+    ///
+    /// ```rust
+    /// # use time::{ext::NumericalDuration, macros::date};
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_add(23.hours()),
+    ///     date!(2020 - 12 - 31)
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_add(47.hours()),
+    ///     date!(2021 - 01 - 01)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>saturating_add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(datetime) = <span class="self">self</span>.checked_add(duration) {
+            datetime
+        } <span class="kw">else if </span>duration.is_negative() {
+            <span class="self">Self</span>::MIN
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_positive());
+            <span class="self">Self</span>::MAX
         }
     }
-    <span class="comment">// region: saturating arithmetic</span>
 
-    <span class="comment">// region: replacement</span>
-    <span class="doccomment">/// Replace the year. The month and day will be unchanged.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2022 - 02 - 18).replace_year(2019),</span>
-    <span class="doccomment">///     Ok(date!(2019 - 02 - 18))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(date!(2022 - 02 - 18).replace_year(-1_000_000_000).is_err()); // -1_000_000_000 isn&#39;t a valid year</span>
-    <span class="doccomment">/// assert!(date!(2022 - 02 - 18).replace_year(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid year</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_year</span>(<span class="self">self</span>, <span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">year</span> <span class="kw">in</span> <span class="ident">MIN_YEAR</span> =&gt; <span class="ident">MAX_YEAR</span>);
+    <span class="doccomment">/// Computes `self - duration`, saturating value on overflow.
+    ///
+    /// ```
+    /// # use time::{Date, ext::NumericalDuration, macros::date};
+    /// assert_eq!(Date::MAX.saturating_sub((-2).days()), Date::MAX);
+    /// assert_eq!(Date::MIN.saturating_sub(1.days()), Date::MIN);
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_sub(2.days()),
+    ///     date!(2020 - 12 - 29)
+    /// );
+    /// ```
+    ///
+    /// # Note
+    ///
+    /// This function only takes whole days into account.
+    ///
+    /// ```
+    /// # use time::{ext::NumericalDuration, macros::date};
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_sub(23.hours()),
+    ///     date!(2020 - 12 - 31)
+    /// );
+    /// assert_eq!(
+    ///     date!(2020 - 12 - 31).saturating_sub(47.hours()),
+    ///     date!(2020 - 12 - 30)
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>saturating_sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(datetime) = <span class="self">self</span>.checked_sub(duration) {
+            datetime
+        } <span class="kw">else if </span>duration.is_negative() {
+            <span class="self">Self</span>::MAX
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_positive());
+            <span class="self">Self</span>::MIN
+        }
+    }
+    <span class="comment">// region: saturating arithmetic
 
-        <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ordinal</span>();
+    // region: replacement
+    </span><span class="doccomment">/// Replace the year. The month and day will be unchanged.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(
+    ///     date!(2022 - 02 - 18).replace_year(2019),
+    ///     Ok(date!(2019 - 02 - 18))
+    /// );
+    /// assert!(date!(2022 - 02 - 18).replace_year(-1_000_000_000).is_err()); // -1_000_000_000 isn&#39;t a valid year
+    /// assert!(date!(2022 - 02 - 18).replace_year(1_000_000_000).is_err()); // 1_000_000_000 isn&#39;t a valid year
+    /// ```
+    </span><span class="attribute">#[must_use = <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]
+    </span><span class="kw">pub const fn </span>replace_year(<span class="self">self</span>, year: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="macro">ensure_value_in_range!</span>(year <span class="kw">in </span>MIN_YEAR =&gt; MAX_YEAR);
 
-        <span class="comment">// Dates in January and February are unaffected by leap years.</span>
-        <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">59</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>));
+        <span class="kw">let </span>ordinal = <span class="self">self</span>.ordinal();
+
+        <span class="comment">// Dates in January and February are unaffected by leap years.
+        </span><span class="kw">if </span>ordinal &lt;= <span class="number">59 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal));
         }
 
-        <span class="kw">match</span> (<span class="ident">is_leap_year</span>(<span class="self">self</span>.<span class="ident">year</span>()), <span class="ident">is_leap_year</span>(<span class="ident">year</span>)) {
-            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span>)),
-            <span class="comment">// February 29 does not exist in common years.</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">==</span> <span class="number">60</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">error::ComponentRange</span> {
-                <span class="ident">name</span>: <span class="string">&quot;day&quot;</span>,
-                <span class="ident">value</span>: <span class="number">29</span>,
-                <span class="ident">minimum</span>: <span class="number">1</span>,
-                <span class="ident">maximum</span>: <span class="number">28</span>,
-                <span class="ident">conditional_range</span>: <span class="bool-val">true</span>,
+        <span class="kw">match </span>(is_leap_year(<span class="self">self</span>.year()), is_leap_year(year)) {
+            (<span class="bool-val">false</span>, <span class="bool-val">false</span>) | (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal)),
+            <span class="comment">// February 29 does not exist in common years.
+            </span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>) <span class="kw">if </span>ordinal == <span class="number">60 </span>=&gt; <span class="prelude-val">Err</span>(error::ComponentRange {
+                name: <span class="string">&quot;day&quot;</span>,
+                value: <span class="number">29</span>,
+                minimum: <span class="number">1</span>,
+                maximum: <span class="number">28</span>,
+                conditional_range: <span class="bool-val">true</span>,
             }),
-            <span class="comment">// We&#39;re going from a common year to a leap year. Shift dates in March and later by</span>
-            <span class="comment">// one day.</span>
-            (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="op">+</span> <span class="number">1</span>)),
-            <span class="comment">// We&#39;re going from a leap year to a common year. Shift dates in January and</span>
-            <span class="comment">// February by one day.</span>
-            (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(<span class="ident">year</span>, <span class="ident">ordinal</span> <span class="op">-</span> <span class="number">1</span>)),
+            <span class="comment">// We&#39;re going from a common year to a leap year. Shift dates in March and later by
+            // one day.
+            </span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal + <span class="number">1</span>)),
+            <span class="comment">// We&#39;re going from a leap year to a common year. Shift dates in January and
+            // February by one day.
+            </span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(year, ordinal - <span class="number">1</span>)),
         }
     }
 
-    <span class="doccomment">/// Replace the month of the year.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// # use time::Month;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2022 - 02 - 18).replace_month(Month::January),</span>
-    <span class="doccomment">///     Ok(date!(2022 - 01 - 18))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(</span>
-    <span class="doccomment">///     date!(2022 - 01 - 30)</span>
-    <span class="doccomment">///         .replace_month(Month::February)</span>
-    <span class="doccomment">///         .is_err()</span>
-    <span class="doccomment">/// ); // 30 isn&#39;t a valid day in February</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_month</span>(<span class="self">self</span>, <span class="ident">month</span>: <span class="ident">Month</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">year</span>, <span class="kw">_</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_calendar_date</span>();
-        <span class="ident"><span class="self">Self</span>::from_calendar_date</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>)
+    <span class="doccomment">/// Replace the month of the year.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// # use time::Month;
+    /// assert_eq!(
+    ///     date!(2022 - 02 - 18).replace_month(Month::January),
+    ///     Ok(date!(2022 - 01 - 18))
+    /// );
+    /// assert!(
+    ///     date!(2022 - 01 - 30)
+    ///         .replace_month(Month::February)
+    ///         .is_err()
+    /// ); // 30 isn&#39;t a valid day in February
+    /// ```
+    </span><span class="attribute">#[must_use = <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]
+    </span><span class="kw">pub const fn </span>replace_month(<span class="self">self</span>, month: Month) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="kw">let </span>(year, <span class="kw">_</span>, day) = <span class="self">self</span>.to_calendar_date();
+        <span class="self">Self</span>::from_calendar_date(year, month, day)
     }
 
-    <span class="doccomment">/// Replace the day of the month.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(2022 - 02 - 18).replace_day(1),</span>
-    <span class="doccomment">///     Ok(date!(2022 - 02 - 01))</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert!(date!(2022 - 02 - 18).replace_day(0).is_err()); // 0 isn&#39;t a valid day</span>
-    <span class="doccomment">/// assert!(date!(2022 - 02 - 18).replace_day(30).is_err()); // 30 isn&#39;t a valid day in February</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">replace_day</span>(<span class="self">self</span>, <span class="ident">day</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="comment">// Days 1-28 are present in every month, so we can skip checking.</span>
-        <span class="kw">if</span> <span class="ident">day</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">day</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">29</span> {
+    <span class="doccomment">/// Replace the day of the month.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert_eq!(
+    ///     date!(2022 - 02 - 18).replace_day(1),
+    ///     Ok(date!(2022 - 02 - 01))
+    /// );
+    /// assert!(date!(2022 - 02 - 18).replace_day(0).is_err()); // 0 isn&#39;t a valid day
+    /// assert!(date!(2022 - 02 - 18).replace_day(30).is_err()); // 30 isn&#39;t a valid day in February
+    /// ```
+    </span><span class="attribute">#[must_use = <span class="string">&quot;This method does not mutate the original `Date`.&quot;</span>]
+    </span><span class="kw">pub const fn </span>replace_day(<span class="self">self</span>, day: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="comment">// Days 1-28 are present in every month, so we can skip checking.
+        </span><span class="kw">if </span>day == <span class="number">0 </span>|| day &gt;= <span class="number">29 </span>{
             <span class="macro">ensure_value_in_range!</span>(
-                <span class="ident">day</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="number">1</span> =&gt; <span class="ident">days_in_year_month</span>(<span class="self">self</span>.<span class="ident">year</span>(), <span class="self">self</span>.<span class="ident">month</span>())
+                day conditionally <span class="kw">in </span><span class="number">1 </span>=&gt; days_in_year_month(<span class="self">self</span>.year(), <span class="self">self</span>.month())
             );
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_ordinal_date_unchecked</span>(
-            <span class="self">self</span>.<span class="ident">year</span>(),
-            (<span class="self">self</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">day</span>() <span class="kw">as</span> <span class="ident">i16</span> <span class="op">+</span> <span class="ident">day</span> <span class="kw">as</span> <span class="ident">i16</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_ordinal_date_unchecked(
+            <span class="self">self</span>.year(),
+            (<span class="self">self</span>.ordinal() <span class="kw">as </span>i16 - <span class="self">self</span>.day() <span class="kw">as </span>i16 + day <span class="kw">as </span>i16) <span class="kw">as _</span>,
         ))
     }
-    <span class="comment">// endregion replacement</span>
-}
+    <span class="comment">// endregion replacement
+</span>}
 
-<span class="comment">// region: attach time</span>
-<span class="doccomment">/// Methods to add a [`Time`] component, resulting in a [`PrimitiveDateTime`].</span>
-<span class="kw">impl</span> <span class="ident">Date</span> {
-    <span class="doccomment">/// Create a [`PrimitiveDateTime`] using the existing date. The [`Time`] component will be set</span>
-    <span class="doccomment">/// to midnight.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::{date, datetime};</span>
-    <span class="doccomment">/// assert_eq!(date!(1970-01-01).midnight(), datetime!(1970-01-01 0:00));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">midnight</span>(<span class="self">self</span>) -&gt; <span class="ident">PrimitiveDateTime</span> {
-        <span class="ident">PrimitiveDateTime::new</span>(<span class="self">self</span>, <span class="ident">Time::MIDNIGHT</span>)
+<span class="comment">// region: attach time
+</span><span class="doccomment">/// Methods to add a [`Time`] component, resulting in a [`PrimitiveDateTime`].
+</span><span class="kw">impl </span>Date {
+    <span class="doccomment">/// Create a [`PrimitiveDateTime`] using the existing date. The [`Time`] component will be set
+    /// to midnight.
+    ///
+    /// ```rust
+    /// # use time::macros::{date, datetime};
+    /// assert_eq!(date!(1970-01-01).midnight(), datetime!(1970-01-01 0:00));
+    /// ```
+    </span><span class="kw">pub const fn </span>midnight(<span class="self">self</span>) -&gt; PrimitiveDateTime {
+        PrimitiveDateTime::new(<span class="self">self</span>, Time::MIDNIGHT)
     }
 
-    <span class="doccomment">/// Create a [`PrimitiveDateTime`] using the existing date and the provided [`Time`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::{date, datetime, time};</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     date!(1970-01-01).with_time(time!(0:00)),</span>
-    <span class="doccomment">///     datetime!(1970-01-01 0:00),</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_time</span>(<span class="self">self</span>, <span class="ident">time</span>: <span class="ident">Time</span>) -&gt; <span class="ident">PrimitiveDateTime</span> {
-        <span class="ident">PrimitiveDateTime::new</span>(<span class="self">self</span>, <span class="ident">time</span>)
+    <span class="doccomment">/// Create a [`PrimitiveDateTime`] using the existing date and the provided [`Time`].
+    ///
+    /// ```rust
+    /// # use time::macros::{date, datetime, time};
+    /// assert_eq!(
+    ///     date!(1970-01-01).with_time(time!(0:00)),
+    ///     datetime!(1970-01-01 0:00),
+    /// );
+    /// ```
+    </span><span class="kw">pub const fn </span>with_time(<span class="self">self</span>, time: Time) -&gt; PrimitiveDateTime {
+        PrimitiveDateTime::new(<span class="self">self</span>, time)
     }
 
-    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms(0, 0, 0).is_ok());</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms(24, 0, 0).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_hms</span>(
+    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert!(date!(1970 - 01 - 01).with_hms(0, 0, 0).is_ok());
+    /// assert!(date!(1970 - 01 - 01).with_hms(24, 0, 0).is_err());
+    /// ```
+    </span><span class="kw">pub const fn </span>with_hms(
         <span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u8</span>,
-        <span class="ident">minute</span>: <span class="ident">u8</span>,
-        <span class="ident">second</span>: <span class="ident">u8</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::new</span>(
+        hour: u8,
+        minute: u8,
+        second: u8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveDateTime, error::ComponentRange&gt; {
+        <span class="prelude-val">Ok</span>(PrimitiveDateTime::new(
             <span class="self">self</span>,
-            <span class="macro">const_try!</span>(<span class="ident">Time::from_hms</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>)),
+            <span class="macro">const_try!</span>(Time::from_hms(hour, minute, second)),
         ))
     }
 
-    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_milli(0, 0, 0, 0).is_ok());</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_milli(24, 0, 0, 0).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_hms_milli</span>(
+    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert!(date!(1970 - 01 - 01).with_hms_milli(0, 0, 0, 0).is_ok());
+    /// assert!(date!(1970 - 01 - 01).with_hms_milli(24, 0, 0, 0).is_err());
+    /// ```
+    </span><span class="kw">pub const fn </span>with_hms_milli(
         <span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u8</span>,
-        <span class="ident">minute</span>: <span class="ident">u8</span>,
-        <span class="ident">second</span>: <span class="ident">u8</span>,
-        <span class="ident">millisecond</span>: <span class="ident">u16</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::new</span>(
+        hour: u8,
+        minute: u8,
+        second: u8,
+        millisecond: u16,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveDateTime, error::ComponentRange&gt; {
+        <span class="prelude-val">Ok</span>(PrimitiveDateTime::new(
             <span class="self">self</span>,
-            <span class="macro">const_try!</span>(<span class="ident">Time::from_hms_milli</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">millisecond</span>)),
+            <span class="macro">const_try!</span>(Time::from_hms_milli(hour, minute, second, millisecond)),
         ))
     }
 
-    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_micro(0, 0, 0, 0).is_ok());</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_micro(24, 0, 0, 0).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_hms_micro</span>(
+    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert!(date!(1970 - 01 - 01).with_hms_micro(0, 0, 0, 0).is_ok());
+    /// assert!(date!(1970 - 01 - 01).with_hms_micro(24, 0, 0, 0).is_err());
+    /// ```
+    </span><span class="kw">pub const fn </span>with_hms_micro(
         <span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u8</span>,
-        <span class="ident">minute</span>: <span class="ident">u8</span>,
-        <span class="ident">second</span>: <span class="ident">u8</span>,
-        <span class="ident">microsecond</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::new</span>(
+        hour: u8,
+        minute: u8,
+        second: u8,
+        microsecond: u32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveDateTime, error::ComponentRange&gt; {
+        <span class="prelude-val">Ok</span>(PrimitiveDateTime::new(
             <span class="self">self</span>,
-            <span class="macro">const_try!</span>(<span class="ident">Time::from_hms_micro</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">microsecond</span>)),
+            <span class="macro">const_try!</span>(Time::from_hms_micro(hour, minute, second, microsecond)),
         ))
     }
 
-    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::date;</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_nano(0, 0, 0, 0).is_ok());</span>
-    <span class="doccomment">/// assert!(date!(1970 - 01 - 01).with_hms_nano(24, 0, 0, 0).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">with_hms_nano</span>(
+    <span class="doccomment">/// Attempt to create a [`PrimitiveDateTime`] using the existing date and the provided time.
+    ///
+    /// ```rust
+    /// # use time::macros::date;
+    /// assert!(date!(1970 - 01 - 01).with_hms_nano(0, 0, 0, 0).is_ok());
+    /// assert!(date!(1970 - 01 - 01).with_hms_nano(24, 0, 0, 0).is_err());
+    /// ```
+    </span><span class="kw">pub const fn </span>with_hms_nano(
         <span class="self">self</span>,
-        <span class="ident">hour</span>: <span class="ident">u8</span>,
-        <span class="ident">minute</span>: <span class="ident">u8</span>,
-        <span class="ident">second</span>: <span class="ident">u8</span>,
-        <span class="ident">nanosecond</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrimitiveDateTime</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">PrimitiveDateTime::new</span>(
+        hour: u8,
+        minute: u8,
+        second: u8,
+        nanosecond: u32,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrimitiveDateTime, error::ComponentRange&gt; {
+        <span class="prelude-val">Ok</span>(PrimitiveDateTime::new(
             <span class="self">self</span>,
-            <span class="macro">const_try!</span>(<span class="ident">Time::from_hms_nano</span>(<span class="ident">hour</span>, <span class="ident">minute</span>, <span class="ident">second</span>, <span class="ident">nanosecond</span>)),
+            <span class="macro">const_try!</span>(Time::from_hms_nano(hour, minute, second, nanosecond)),
         ))
-    }
-}
-<span class="comment">// endregion attach time</span>
-
-<span class="comment">// region: formatting &amp; parsing</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Date</span> {
-    <span class="doccomment">/// Format the `Date` using the provided [format description](crate::format_description).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_into</span>(
-        <span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>,
-        <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-        <span class="ident">format</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
-    }
-
-    <span class="doccomment">/// Format the `Date` using the provided [format description](crate::format_description).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{format_description, macros::date};</span>
-    <span class="doccomment">/// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;</span>
-    <span class="doccomment">/// assert_eq!(date!(2020 - 01 - 02).format(&amp;format)?, &quot;2020-01-02&quot;);</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="self">self</span>, <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-        <span class="ident">format</span>.<span class="ident">format</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
     }
 }
+<span class="comment">// endregion attach time
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Date</span> {
-    <span class="doccomment">/// Parse a `Date` from the input using the provided [format</span>
-    <span class="doccomment">/// description](crate::format_description).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{format_description, macros::date, Date};</span>
-    <span class="doccomment">/// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;</span>
-    <span class="doccomment">/// assert_eq!(Date::parse(&quot;2020-01-02&quot;, &amp;format)?, date!(2020 - 01 - 02));</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">description</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Parsable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Parse</span><span class="op">&gt;</span> {
-        <span class="ident">description</span>.<span class="ident">parse_date</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>())
+// region: formatting &amp; parsing
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">impl </span>Date {
+    <span class="doccomment">/// Format the `Date` using the provided [format description](crate::format_description).
+    </span><span class="kw">pub fn </span>format_into(
+        <span class="self">self</span>,
+        output: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>io::Write,
+        format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized),
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
+        format.format_into(output, <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+    }
+
+    <span class="doccomment">/// Format the `Date` using the provided [format description](crate::format_description).
+    ///
+    /// ```rust
+    /// # use time::{format_description, macros::date};
+    /// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;
+    /// assert_eq!(date!(2020 - 01 - 02).format(&amp;format)?, &quot;2020-01-02&quot;);
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>format(<span class="self">self</span>, format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized)) -&gt; <span class="prelude-ty">Result</span>&lt;String, error::Format&gt; {
+        format.format(<span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">year</span>().<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10_000</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
+</span><span class="kw">impl </span>Date {
+    <span class="doccomment">/// Parse a `Date` from the input using the provided [format
+    /// description](crate::format_description).
+    ///
+    /// ```rust
+    /// # use time::{format_description, macros::date, Date};
+    /// let format = format_description::parse(&quot;[year]-[month]-[day]&quot;)?;
+    /// assert_eq!(Date::parse(&quot;2020-01-02&quot;, &amp;format)?, date!(2020 - 01 - 02));
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>parse(
+        input: <span class="kw-2">&amp;</span>str,
+        description: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Parsable + <span class="question-mark">?</span>Sized),
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Parse&gt; {
+        description.parse_date(input.as_bytes())
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Date {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;large-dates&quot;</span>) &amp;&amp; <span class="self">self</span>.year().abs() &gt;= <span class="number">10_000 </span>{
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;{:+}-{:02}-{:02}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">year</span>(),
-                <span class="self">self</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-                <span class="self">self</span>.<span class="ident">day</span>()
+                <span class="self">self</span>.year(),
+                <span class="self">self</span>.month() <span class="kw">as </span>u8,
+                <span class="self">self</span>.day()
             )
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;{:0width$}-{:02}-{:02}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">year</span>(),
-                <span class="self">self</span>.<span class="ident">month</span>() <span class="kw">as</span> <span class="ident">u8</span>,
-                <span class="self">self</span>.<span class="ident">day</span>(),
-                <span class="ident">width</span> <span class="op">=</span> <span class="number">4</span> <span class="op">+</span> (<span class="self">self</span>.<span class="ident">year</span>() <span class="op">&lt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>
+                <span class="self">self</span>.year(),
+                <span class="self">self</span>.month() <span class="kw">as </span>u8,
+                <span class="self">self</span>.day(),
+                width = <span class="number">4 </span>+ (<span class="self">self</span>.year() &lt; <span class="number">0</span>) <span class="kw">as </span>usize
             )
         }
     }
 }
-<span class="comment">// endregion formatting &amp; parsing</span>
+<span class="comment">// endregion formatting &amp; parsing
 
-<span class="comment">// region: trait impls</span>
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+// region: trait impls
+</span><span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>Date {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;overflow adding duration to date&quot;</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.checked_add(duration)
+            .expect(<span class="string">&quot;overflow adding duration to date&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Add&lt;StdDuration&gt; <span class="kw">for </span>Date {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident"><span class="self">Self</span>::from_julian_day</span>(<span class="self">self</span>.<span class="ident">to_julian_day</span>() <span class="op">+</span> (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">/</span> <span class="number">86_400</span>) <span class="kw">as</span> <span class="ident">i32</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;overflow adding duration to date&quot;</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>::from_julian_day(<span class="self">self</span>.to_julian_day() + (duration.as_secs() / <span class="number">86_400</span>) <span class="kw">as </span>i32)
+            .expect(<span class="string">&quot;overflow adding duration to date&quot;</span>)
     }
 }
 
-<span class="macro">impl_add_assign!</span>(<span class="ident">Date</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
+<span class="macro">impl_add_assign!</span>(Date: Duration, StdDuration);
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>Date {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self</span>.checked_sub(duration)
+            .expect(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Sub&lt;StdDuration&gt; <span class="kw">for </span>Date {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident"><span class="self">Self</span>::from_julian_day</span>(<span class="self">self</span>.<span class="ident">to_julian_day</span>() <span class="op">-</span> (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">/</span> <span class="number">86_400</span>) <span class="kw">as</span> <span class="ident">i32</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>::from_julian_day(<span class="self">self</span>.to_julian_day() - (duration.as_secs() / <span class="number">86_400</span>) <span class="kw">as </span>i32)
+            .expect(<span class="string">&quot;overflow subtracting duration from date&quot;</span>)
     }
 }
 
-<span class="macro">impl_sub_assign!</span>(<span class="ident">Date</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
+<span class="macro">impl_sub_assign!</span>(Date: Duration, StdDuration);
 
-<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
+<span class="kw">impl </span>Sub <span class="kw">for </span>Date {
+    <span class="kw">type </span>Output = Duration;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Duration::days</span>((<span class="self">self</span>.<span class="ident">to_julian_day</span>() <span class="op">-</span> <span class="ident">other</span>.<span class="ident">to_julian_day</span>()) <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        Duration::days((<span class="self">self</span>.to_julian_day() - other.to_julian_day()) <span class="kw">as _</span>)
     }
 }
-<span class="comment">// endregion trait impls</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+<span class="comment">// endregion trait impls
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

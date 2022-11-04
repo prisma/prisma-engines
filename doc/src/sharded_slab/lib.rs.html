@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1090,1097 +1090,1097 @@
 <span id="1090">1090</span>
 <span id="1091">1091</span>
 <span id="1092">1092</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A lock-free concurrent slab.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Slabs provide pre-allocated storage for many instances of a single data</span>
-<span class="doccomment">//! type. When a large number of values of a single type are required,</span>
-<span class="doccomment">//! this can be more efficient than allocating each item individually. Since the</span>
-<span class="doccomment">//! allocated items are the same size, memory fragmentation is reduced, and</span>
-<span class="doccomment">//! creating and removing new items can be very cheap.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate implements a lock-free concurrent slab, indexed by `usize`s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First, add this to your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! sharded-slab = &quot;0.1.1&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate provides two  types, [`Slab`] and [`Pool`], which provide</span>
-<span class="doccomment">//! slightly different APIs for using a sharded slab.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Slab`] implements a slab for _storing_ small types, sharing them between</span>
-<span class="doccomment">//! threads, and accessing them by index. New entries are allocated by</span>
-<span class="doccomment">//! [inserting] data, moving it in by value. Similarly, entries may be</span>
-<span class="doccomment">//! deallocated by [taking] from the slab, moving the value out. This API is</span>
-<span class="doccomment">//! similar to a `Vec&lt;Option&lt;T&gt;&gt;`, but allowing lock-free concurrent insertion</span>
-<span class="doccomment">//! and removal.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In contrast, the [`Pool`] type provides an [object pool] style API for</span>
-<span class="doccomment">//! _reusing storage_. Rather than constructing values and moving them into the</span>
-<span class="doccomment">//! pool, as with [`Slab`], [allocating an entry][create] from the pool takes a</span>
-<span class="doccomment">//! closure that&#39;s provided with a mutable reference to initialize the entry in</span>
-<span class="doccomment">//! place. When entries are deallocated, they are [cleared] in place. Types</span>
-<span class="doccomment">//! which own a heap allocation can be cleared by dropping any _data_ they</span>
-<span class="doccomment">//! store, but retaining any previously-allocated capacity. This means that a</span>
-<span class="doccomment">//! [`Pool`] may be used to reuse a set of existing heap allocations, reducing</span>
-<span class="doccomment">//! allocator load.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [inserting]: Slab::insert</span>
-<span class="doccomment">//! [taking]: Slab::take</span>
-<span class="doccomment">//! [create]: Pool::create</span>
-<span class="doccomment">//! [cleared]: Clear</span>
-<span class="doccomment">//! [object pool]: https://en.wikipedia.org/wiki/Object_pool_pattern</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Inserting an item into the slab, returning an index:</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use sharded_slab::Slab;</span>
-<span class="doccomment">//! let slab = Slab::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-<span class="doccomment">//! assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To share a slab across threads, it may be wrapped in an `Arc`:</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use sharded_slab::Slab;</span>
-<span class="doccomment">//! use std::sync::Arc;</span>
-<span class="doccomment">//! let slab = Arc::new(Slab::new());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let slab2 = slab.clone();</span>
-<span class="doccomment">//! let thread2 = std::thread::spawn(move || {</span>
-<span class="doccomment">//!     let key = slab2.insert(&quot;hello from thread two&quot;).unwrap();</span>
-<span class="doccomment">//!     assert_eq!(slab2.get(key).unwrap(), &quot;hello from thread two&quot;);</span>
-<span class="doccomment">//!     key</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let key1 = slab.insert(&quot;hello from thread one&quot;).unwrap();</span>
-<span class="doccomment">//! assert_eq!(slab.get(key1).unwrap(), &quot;hello from thread one&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Wait for thread 2 to complete.</span>
-<span class="doccomment">//! let key2 = thread2.join().unwrap();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // The item inserted by thread 2 remains in the slab.</span>
-<span class="doccomment">//! assert_eq!(slab.get(key2).unwrap(), &quot;hello from thread two&quot;);</span>
-<span class="doccomment">//!```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If items in the slab must be mutated, a `Mutex` or `RwLock` may be used for</span>
-<span class="doccomment">//! each item, providing granular locking of items rather than of the slab:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use sharded_slab::Slab;</span>
-<span class="doccomment">//! use std::sync::{Arc, Mutex};</span>
-<span class="doccomment">//! let slab = Arc::new(Slab::new());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let key = slab.insert(Mutex::new(String::from(&quot;hello world&quot;))).unwrap();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let slab2 = slab.clone();</span>
-<span class="doccomment">//! let thread2 = std::thread::spawn(move || {</span>
-<span class="doccomment">//!     let hello = slab2.get(key).expect(&quot;item missing&quot;);</span>
-<span class="doccomment">//!     let mut hello = hello.lock().expect(&quot;mutex poisoned&quot;);</span>
-<span class="doccomment">//!     *hello = String::from(&quot;hello everyone!&quot;);</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! thread2.join().unwrap();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let hello = slab.get(key).expect(&quot;item missing&quot;);</span>
-<span class="doccomment">//! let mut hello = hello.lock().expect(&quot;mutex poisoned&quot;);</span>
-<span class="doccomment">//! assert_eq!(hello.as_str(), &quot;hello everyone!&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Configuration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For performance reasons, several values used by the slab are calculated as</span>
-<span class="doccomment">//! constants. In order to allow users to tune the slab&#39;s parameters, we provide</span>
-<span class="doccomment">//! a [`Config`] trait which defines these parameters as associated `consts`.</span>
-<span class="doccomment">//! The `Slab` type is generic over a `C: Config` parameter.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Config`]: trait.Config.html</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Comparison with Similar Crates</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`slab`]: Carl Lerche&#39;s `slab` crate provides a slab implementation with a</span>
-<span class="doccomment">//!   similar API, implemented by storing all data in a single vector.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Unlike `sharded_slab`, inserting and removing elements from the slab</span>
-<span class="doccomment">//!   requires  mutable access. This means that if the slab is accessed</span>
-<span class="doccomment">//!   concurrently by multiple threads, it is necessary for it to be protected</span>
-<span class="doccomment">//!   by a `Mutex` or `RwLock`. Items may not be inserted or removed (or</span>
-<span class="doccomment">//!   accessed, if a `Mutex` is used) concurrently, even when they are</span>
-<span class="doccomment">//!   unrelated. In many cases, the lock can become a significant bottleneck. On</span>
-<span class="doccomment">//!   the other hand, this crate allows separate indices in the slab to be</span>
-<span class="doccomment">//!   accessed, inserted, and removed concurrently without requiring a global</span>
-<span class="doccomment">//!   lock. Therefore, when the slab is shared across multiple threads, this</span>
-<span class="doccomment">//!   crate offers significantly better performance than `slab`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   However, the lock free slab introduces some additional constant-factor</span>
-<span class="doccomment">//!   overhead. This means that in use-cases where a slab is _not_ shared by</span>
-<span class="doccomment">//!   multiple threads and locking is not required, this crate will likely offer</span>
-<span class="doccomment">//!   slightly worse performance.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   In summary: `sharded-slab` offers significantly improved performance in</span>
-<span class="doccomment">//!   concurrent use-cases, while `slab` should be preferred in single-threaded</span>
-<span class="doccomment">//!   use-cases.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`slab`]: https://crates.io/crates/loom</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Safety and Correctness</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Most implementations of lock-free data structures in Rust require some</span>
-<span class="doccomment">//! amount of unsafe code, and this crate is not an exception. In order to catch</span>
-<span class="doccomment">//! potential bugs in this unsafe code, we make use of [`loom`], a</span>
-<span class="doccomment">//! permutation-testing tool for concurrent Rust programs. All `unsafe` blocks</span>
-<span class="doccomment">//! this crate occur in accesses to `loom` `UnsafeCell`s. This means that when</span>
-<span class="doccomment">//! those accesses occur in this crate&#39;s tests, `loom` will assert that they are</span>
-<span class="doccomment">//! valid under the C11 memory model across multiple permutations of concurrent</span>
-<span class="doccomment">//! executions of those tests.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In order to guard against the [ABA problem][aba], this crate makes use of</span>
-<span class="doccomment">//! _generational indices_. Each slot in the slab tracks a generation counter</span>
-<span class="doccomment">//! which is incremented every time a value is inserted into that slot, and the</span>
-<span class="doccomment">//! indices returned by [`Slab::insert`] include the generation of the slot when</span>
-<span class="doccomment">//! the value was inserted, packed into the high-order bits of the index. This</span>
-<span class="doccomment">//! ensures that if a value is inserted, removed,  and a new value is inserted</span>
-<span class="doccomment">//! into the same slot in the slab, the key returned by the first call to</span>
-<span class="doccomment">//! `insert` will not map to the new value.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Since a fixed number of bits are set aside to use for storing the generation</span>
-<span class="doccomment">//! counter, the counter will wrap  around after being incremented a number of</span>
-<span class="doccomment">//! times. To avoid situations where a returned index lives long enough to see the</span>
-<span class="doccomment">//! generation counter wrap around to the same value, it is good to be fairly</span>
-<span class="doccomment">//! generous when configuring the allocation of index bits.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`loom`]: https://crates.io/crates/loom</span>
-<span class="doccomment">//! [aba]: https://en.wikipedia.org/wiki/ABA_problem</span>
-<span class="doccomment">//! [`Slab::insert`]: struct.Slab.html#method.insert</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Performance</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These graphs were produced by [benchmarks] of the sharded slab implementation,</span>
-<span class="doccomment">//! using the [`criterion`] crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The first shows the results of a benchmark where an increasing number of</span>
-<span class="doccomment">//! items are inserted and then removed into a slab concurrently by five</span>
-<span class="doccomment">//! threads. It compares the performance of the sharded slab implementation</span>
-<span class="doccomment">//! with a `RwLock&lt;slab::Slab&gt;`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;img width=&quot;1124&quot; alt=&quot;Screen Shot 2019-10-01 at 5 09 49 PM&quot; src=&quot;https://user-images.githubusercontent.com/2796466/66078398-cd6c9f80-e516-11e9-9923-0ed6292e8498.png&quot;&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The second graph shows the results of a benchmark where an increasing</span>
-<span class="doccomment">//! number of items are inserted and then removed by a _single_ thread. It</span>
-<span class="doccomment">//! compares the performance of the sharded slab implementation with an</span>
-<span class="doccomment">//! `RwLock&lt;slab::Slab&gt;` and a `mut slab::Slab`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;img width=&quot;925&quot; alt=&quot;Screen Shot 2019-10-01 at 5 13 45 PM&quot; src=&quot;https://user-images.githubusercontent.com/2796466/66078469-f0974f00-e516-11e9-95b5-f65f0aa7e494.png&quot;&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These benchmarks demonstrate that, while the sharded approach introduces</span>
-<span class="doccomment">//! a small constant-factor overhead, it offers significantly better</span>
-<span class="doccomment">//! performance across concurrent accesses.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [benchmarks]: https://github.com/hawkw/sharded-slab/blob/master/benches/bench.rs</span>
-<span class="doccomment">//! [`criterion`]: https://crates.io/crates/criterion</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Implementation Notes</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [this page](crate::implementation) for details on this crate&#39;s design</span>
-<span class="doccomment">//! and implementation.</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/sharded-slab/0.1.4&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">warn</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! A lock-free concurrent slab.
+//!
+//! Slabs provide pre-allocated storage for many instances of a single data
+//! type. When a large number of values of a single type are required,
+//! this can be more efficient than allocating each item individually. Since the
+//! allocated items are the same size, memory fragmentation is reduced, and
+//! creating and removing new items can be very cheap.
+//!
+//! This crate implements a lock-free concurrent slab, indexed by `usize`s.
+//!
+//! ## Usage
+//!
+//! First, add this to your `Cargo.toml`:
+//!
+//! ```toml
+//! sharded-slab = &quot;0.1.1&quot;
+//! ```
+//!
+//! This crate provides two  types, [`Slab`] and [`Pool`], which provide
+//! slightly different APIs for using a sharded slab.
+//!
+//! [`Slab`] implements a slab for _storing_ small types, sharing them between
+//! threads, and accessing them by index. New entries are allocated by
+//! [inserting] data, moving it in by value. Similarly, entries may be
+//! deallocated by [taking] from the slab, moving the value out. This API is
+//! similar to a `Vec&lt;Option&lt;T&gt;&gt;`, but allowing lock-free concurrent insertion
+//! and removal.
+//!
+//! In contrast, the [`Pool`] type provides an [object pool] style API for
+//! _reusing storage_. Rather than constructing values and moving them into the
+//! pool, as with [`Slab`], [allocating an entry][create] from the pool takes a
+//! closure that&#39;s provided with a mutable reference to initialize the entry in
+//! place. When entries are deallocated, they are [cleared] in place. Types
+//! which own a heap allocation can be cleared by dropping any _data_ they
+//! store, but retaining any previously-allocated capacity. This means that a
+//! [`Pool`] may be used to reuse a set of existing heap allocations, reducing
+//! allocator load.
+//!
+//! [inserting]: Slab::insert
+//! [taking]: Slab::take
+//! [create]: Pool::create
+//! [cleared]: Clear
+//! [object pool]: https://en.wikipedia.org/wiki/Object_pool_pattern
+//!
+//! # Examples
+//!
+//! Inserting an item into the slab, returning an index:
+//! ```rust
+//! # use sharded_slab::Slab;
+//! let slab = Slab::new();
+//!
+//! let key = slab.insert(&quot;hello world&quot;).unwrap();
+//! assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);
+//! ```
+//!
+//! To share a slab across threads, it may be wrapped in an `Arc`:
+//! ```rust
+//! # use sharded_slab::Slab;
+//! use std::sync::Arc;
+//! let slab = Arc::new(Slab::new());
+//!
+//! let slab2 = slab.clone();
+//! let thread2 = std::thread::spawn(move || {
+//!     let key = slab2.insert(&quot;hello from thread two&quot;).unwrap();
+//!     assert_eq!(slab2.get(key).unwrap(), &quot;hello from thread two&quot;);
+//!     key
+//! });
+//!
+//! let key1 = slab.insert(&quot;hello from thread one&quot;).unwrap();
+//! assert_eq!(slab.get(key1).unwrap(), &quot;hello from thread one&quot;);
+//!
+//! // Wait for thread 2 to complete.
+//! let key2 = thread2.join().unwrap();
+//!
+//! // The item inserted by thread 2 remains in the slab.
+//! assert_eq!(slab.get(key2).unwrap(), &quot;hello from thread two&quot;);
+//!```
+//!
+//! If items in the slab must be mutated, a `Mutex` or `RwLock` may be used for
+//! each item, providing granular locking of items rather than of the slab:
+//!
+//! ```rust
+//! # use sharded_slab::Slab;
+//! use std::sync::{Arc, Mutex};
+//! let slab = Arc::new(Slab::new());
+//!
+//! let key = slab.insert(Mutex::new(String::from(&quot;hello world&quot;))).unwrap();
+//!
+//! let slab2 = slab.clone();
+//! let thread2 = std::thread::spawn(move || {
+//!     let hello = slab2.get(key).expect(&quot;item missing&quot;);
+//!     let mut hello = hello.lock().expect(&quot;mutex poisoned&quot;);
+//!     *hello = String::from(&quot;hello everyone!&quot;);
+//! });
+//!
+//! thread2.join().unwrap();
+//!
+//! let hello = slab.get(key).expect(&quot;item missing&quot;);
+//! let mut hello = hello.lock().expect(&quot;mutex poisoned&quot;);
+//! assert_eq!(hello.as_str(), &quot;hello everyone!&quot;);
+//! ```
+//!
+//! # Configuration
+//!
+//! For performance reasons, several values used by the slab are calculated as
+//! constants. In order to allow users to tune the slab&#39;s parameters, we provide
+//! a [`Config`] trait which defines these parameters as associated `consts`.
+//! The `Slab` type is generic over a `C: Config` parameter.
+//!
+//! [`Config`]: trait.Config.html
+//!
+//! # Comparison with Similar Crates
+//!
+//! - [`slab`]: Carl Lerche&#39;s `slab` crate provides a slab implementation with a
+//!   similar API, implemented by storing all data in a single vector.
+//!
+//!   Unlike `sharded_slab`, inserting and removing elements from the slab
+//!   requires  mutable access. This means that if the slab is accessed
+//!   concurrently by multiple threads, it is necessary for it to be protected
+//!   by a `Mutex` or `RwLock`. Items may not be inserted or removed (or
+//!   accessed, if a `Mutex` is used) concurrently, even when they are
+//!   unrelated. In many cases, the lock can become a significant bottleneck. On
+//!   the other hand, this crate allows separate indices in the slab to be
+//!   accessed, inserted, and removed concurrently without requiring a global
+//!   lock. Therefore, when the slab is shared across multiple threads, this
+//!   crate offers significantly better performance than `slab`.
+//!
+//!   However, the lock free slab introduces some additional constant-factor
+//!   overhead. This means that in use-cases where a slab is _not_ shared by
+//!   multiple threads and locking is not required, this crate will likely offer
+//!   slightly worse performance.
+//!
+//!   In summary: `sharded-slab` offers significantly improved performance in
+//!   concurrent use-cases, while `slab` should be preferred in single-threaded
+//!   use-cases.
+//!
+//! [`slab`]: https://crates.io/crates/loom
+//!
+//! # Safety and Correctness
+//!
+//! Most implementations of lock-free data structures in Rust require some
+//! amount of unsafe code, and this crate is not an exception. In order to catch
+//! potential bugs in this unsafe code, we make use of [`loom`], a
+//! permutation-testing tool for concurrent Rust programs. All `unsafe` blocks
+//! this crate occur in accesses to `loom` `UnsafeCell`s. This means that when
+//! those accesses occur in this crate&#39;s tests, `loom` will assert that they are
+//! valid under the C11 memory model across multiple permutations of concurrent
+//! executions of those tests.
+//!
+//! In order to guard against the [ABA problem][aba], this crate makes use of
+//! _generational indices_. Each slot in the slab tracks a generation counter
+//! which is incremented every time a value is inserted into that slot, and the
+//! indices returned by [`Slab::insert`] include the generation of the slot when
+//! the value was inserted, packed into the high-order bits of the index. This
+//! ensures that if a value is inserted, removed,  and a new value is inserted
+//! into the same slot in the slab, the key returned by the first call to
+//! `insert` will not map to the new value.
+//!
+//! Since a fixed number of bits are set aside to use for storing the generation
+//! counter, the counter will wrap  around after being incremented a number of
+//! times. To avoid situations where a returned index lives long enough to see the
+//! generation counter wrap around to the same value, it is good to be fairly
+//! generous when configuring the allocation of index bits.
+//!
+//! [`loom`]: https://crates.io/crates/loom
+//! [aba]: https://en.wikipedia.org/wiki/ABA_problem
+//! [`Slab::insert`]: struct.Slab.html#method.insert
+//!
+//! # Performance
+//!
+//! These graphs were produced by [benchmarks] of the sharded slab implementation,
+//! using the [`criterion`] crate.
+//!
+//! The first shows the results of a benchmark where an increasing number of
+//! items are inserted and then removed into a slab concurrently by five
+//! threads. It compares the performance of the sharded slab implementation
+//! with a `RwLock&lt;slab::Slab&gt;`:
+//!
+//! &lt;img width=&quot;1124&quot; alt=&quot;Screen Shot 2019-10-01 at 5 09 49 PM&quot; src=&quot;https://user-images.githubusercontent.com/2796466/66078398-cd6c9f80-e516-11e9-9923-0ed6292e8498.png&quot;&gt;
+//!
+//! The second graph shows the results of a benchmark where an increasing
+//! number of items are inserted and then removed by a _single_ thread. It
+//! compares the performance of the sharded slab implementation with an
+//! `RwLock&lt;slab::Slab&gt;` and a `mut slab::Slab`.
+//!
+//! &lt;img width=&quot;925&quot; alt=&quot;Screen Shot 2019-10-01 at 5 13 45 PM&quot; src=&quot;https://user-images.githubusercontent.com/2796466/66078469-f0974f00-e516-11e9-95b5-f65f0aa7e494.png&quot;&gt;
+//!
+//! These benchmarks demonstrate that, while the sharded approach introduces
+//! a small constant-factor overhead, it offers significantly better
+//! performance across concurrent accesses.
+//!
+//! [benchmarks]: https://github.com/hawkw/sharded-slab/blob/master/benches/bench.rs
+//! [`criterion`]: https://crates.io/crates/criterion
+//!
+//! # Implementation Notes
+//!
+//! See [this page](crate::implementation) for details on this crate&#39;s design
+//! and implementation.
+//!
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/sharded-slab/0.1.4&quot;</span>)]
+#![warn(missing_debug_implementations, missing_docs)]
+#![cfg_attr(docsrs, warn(rustdoc::broken_intra_doc_links))]
+#[macro_use]
+</span><span class="kw">mod </span>macros;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">implementation</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pool</span>;
+<span class="kw">pub mod </span>implementation;
+<span class="kw">pub mod </span>pool;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">cfg</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">sync</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>cfg;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>sync;
 
-<span class="kw">mod</span> <span class="ident">clear</span>;
-<span class="kw">mod</span> <span class="ident">iter</span>;
-<span class="kw">mod</span> <span class="ident">page</span>;
-<span class="kw">mod</span> <span class="ident">shard</span>;
-<span class="kw">mod</span> <span class="ident">tid</span>;
+<span class="kw">mod </span>clear;
+<span class="kw">mod </span>iter;
+<span class="kw">mod </span>page;
+<span class="kw">mod </span>shard;
+<span class="kw">mod </span>tid;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cfg</span>::{<span class="ident">Config</span>, <span class="ident">DefaultConfig</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">clear::Clear</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pool::Pool</span>;
+<span class="kw">pub use </span>cfg::{Config, DefaultConfig};
+<span class="kw">pub use </span>clear::Clear;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>pool::Pool;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">tid::Tid</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>tid::Tid;
 
-<span class="kw">use</span> <span class="ident">cfg::CfgPrivate</span>;
-<span class="kw">use</span> <span class="ident">shard::Shard</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">ptr</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>cfg::CfgPrivate;
+<span class="kw">use </span>shard::Shard;
+<span class="kw">use </span>std::{fmt, marker::PhantomData, ptr, sync::Arc};
 
-<span class="doccomment">/// A sharded slab.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [crate-level documentation](crate) for details on using this type.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">shards</span>: <span class="ident">shard::Array</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A sharded slab.
+///
+/// See the [crate-level documentation](crate) for details on using this type.
+</span><span class="kw">pub struct </span>Slab&lt;T, C: cfg::Config = DefaultConfig&gt; {
+    shards: shard::Array&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;,
+    _cfg: PhantomData&lt;C&gt;,
 }
 
-<span class="doccomment">/// A handle that allows access to an occupied entry in a [`Slab`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the slab that the item the guard</span>
-<span class="doccomment">/// references is currently being accessed. If the item is removed from the slab</span>
-<span class="doccomment">/// while a guard exists, the removal will be deferred until all guards are</span>
-<span class="doccomment">/// dropped.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">page::slot::Guard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">value</span>: <span class="ident">ptr::NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A handle that allows access to an occupied entry in a [`Slab`].
+///
+/// While the guard exists, it indicates to the slab that the item the guard
+/// references is currently being accessed. If the item is removed from the slab
+/// while a guard exists, the removal will be deferred until all guards are
+/// dropped.
+</span><span class="kw">pub struct </span>Entry&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config = DefaultConfig&gt; {
+    inner: page::slot::Guard&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;,
+    value: ptr::NonNull&lt;T&gt;,
+    shard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shard&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;,
+    key: usize,
 }
 
-<span class="doccomment">/// A handle to a vacant entry in a [`Slab`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `VacantEntry` allows constructing values with the key that they will be</span>
-<span class="doccomment">/// assigned to.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Slab;</span>
-<span class="doccomment">/// let mut slab = Slab::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let hello = {</span>
-<span class="doccomment">///     let entry = slab.vacant_entry().unwrap();</span>
-<span class="doccomment">///     let key = entry.key();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     entry.insert((key, &quot;hello&quot;));</span>
-<span class="doccomment">///     key</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(hello, slab.get(hello).unwrap().0);</span>
-<span class="doccomment">/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">page::slot::InitGuard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
-    <span class="ident">_lt</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to a vacant entry in a [`Slab`].
+///
+/// `VacantEntry` allows constructing values with the key that they will be
+/// assigned to.
+///
+/// # Examples
+///
+/// ```
+/// # use sharded_slab::Slab;
+/// let mut slab = Slab::new();
+///
+/// let hello = {
+///     let entry = slab.vacant_entry().unwrap();
+///     let key = entry.key();
+///
+///     entry.insert((key, &quot;hello&quot;));
+///     key
+/// };
+///
+/// assert_eq!(hello, slab.get(hello).unwrap().0);
+/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>VacantEntry&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config = DefaultConfig&gt; {
+    inner: page::slot::InitGuard&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;,
+    key: usize,
+    _lt: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>()&gt;,
 }
 
-<span class="doccomment">/// An owned reference to an occupied entry in a [`Slab`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the slab that the item the guard</span>
-<span class="doccomment">/// references is currently being accessed. If the item is removed from the slab</span>
-<span class="doccomment">/// while the guard exists, the  removal will be deferred until all guards are</span>
-<span class="doccomment">/// dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`Entry`], which borrows the slab, an `OwnedEntry` clones the [`Arc`]</span>
-<span class="doccomment">/// around the slab. Therefore, it keeps the slab from being dropped until all</span>
-<span class="doccomment">/// such guards have been dropped. This means that an `OwnedEntry` may be held for</span>
-<span class="doccomment">/// an arbitrary lifetime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Slab;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-<span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-<span class="doccomment">/// let value = slab.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Now, the original `Arc` clone of the slab may be dropped, but the</span>
-<span class="doccomment">/// // returned `OwnedEntry` can still access the value.</span>
-<span class="doccomment">/// assert_eq!(value, &quot;hello world&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`Entry`], an `OwnedEntry` may be stored in a struct which must live</span>
-<span class="doccomment">/// for the `&#39;static` lifetime:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Slab;</span>
-<span class="doccomment">/// use sharded_slab::OwnedEntry;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// pub struct MyStruct {</span>
-<span class="doccomment">///     entry: OwnedEntry&lt;&amp;&#39;static str&gt;,</span>
-<span class="doccomment">///     // ... other fields ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-<span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-<span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-<span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-<span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-<span class="doccomment">/// let entry = slab.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">/// let my_struct = MyStruct {</span>
-<span class="doccomment">///     entry,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-<span class="doccomment">/// // `&#39;static` lifetime:</span>
-<span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `OwnedEntry`s may be sent between threads:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Slab;</span>
-<span class="doccomment">/// use std::{thread, sync::Arc};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-<span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-<span class="doccomment">/// let value = slab.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     assert_eq!(value, &quot;hello world&quot;);</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }).join().unwrap();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`get`]: Slab::get</span>
-<span class="doccomment">/// [`Arc`]: std::sync::Arc</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// An owned reference to an occupied entry in a [`Slab`].
+///
+/// While the guard exists, it indicates to the slab that the item the guard
+/// references is currently being accessed. If the item is removed from the slab
+/// while the guard exists, the  removal will be deferred until all guards are
+/// dropped.
+///
+/// Unlike [`Entry`], which borrows the slab, an `OwnedEntry` clones the [`Arc`]
+/// around the slab. Therefore, it keeps the slab from being dropped until all
+/// such guards have been dropped. This means that an `OwnedEntry` may be held for
+/// an arbitrary lifetime.
+///
+/// # Examples
+///
+/// ```
+/// # use sharded_slab::Slab;
+/// use std::sync::Arc;
+///
+/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+/// let key = slab.insert(&quot;hello world&quot;).unwrap();
+///
+/// // Look up the created key, returning an `OwnedEntry`.
+/// let value = slab.clone().get_owned(key).unwrap();
+///
+/// // Now, the original `Arc` clone of the slab may be dropped, but the
+/// // returned `OwnedEntry` can still access the value.
+/// assert_eq!(value, &quot;hello world&quot;);
+/// ```
+///
+/// Unlike [`Entry`], an `OwnedEntry` may be stored in a struct which must live
+/// for the `&#39;static` lifetime:
+///
+/// ```
+/// # use sharded_slab::Slab;
+/// use sharded_slab::OwnedEntry;
+/// use std::sync::Arc;
+///
+/// pub struct MyStruct {
+///     entry: OwnedEntry&lt;&amp;&#39;static str&gt;,
+///     // ... other fields ...
+/// }
+///
+/// // Suppose this is some arbitrary function which requires a value that
+/// // lives for the &#39;static lifetime...
+/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+///     // ... do something extremely important and interesting ...
+/// }
+///
+/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+/// let key = slab.insert(&quot;hello world&quot;).unwrap();
+///
+/// // Look up the created key, returning an `OwnedEntry`.
+/// let entry = slab.clone().get_owned(key).unwrap();
+/// let my_struct = MyStruct {
+///     entry,
+///     // ...
+/// };
+///
+/// // We can use `my_struct` anywhere where it is required to have the
+/// // `&#39;static` lifetime:
+/// function_requiring_static(&amp;my_struct);
+/// ```
+///
+/// `OwnedEntry`s may be sent between threads:
+///
+/// ```
+/// # use sharded_slab::Slab;
+/// use std::{thread, sync::Arc};
+///
+/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+/// let key = slab.insert(&quot;hello world&quot;).unwrap();
+///
+/// // Look up the created key, returning an `OwnedEntry`.
+/// let value = slab.clone().get_owned(key).unwrap();
+///
+/// thread::spawn(move || {
+///     assert_eq!(value, &quot;hello world&quot;);
+///     // ...
+/// }).join().unwrap();
+/// ```
+///
+/// [`get`]: Slab::get
+/// [`Arc`]: std::sync::Arc
+</span><span class="kw">pub struct </span>OwnedEntry&lt;T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="ident">inner</span>: <span class="ident">page::slot::Guard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">value</span>: <span class="ident">ptr::NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">slab</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+    inner: page::slot::Guard&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, C&gt;,
+    value: ptr::NonNull&lt;T&gt;,
+    slab: Arc&lt;Slab&lt;T, C&gt;&gt;,
+    key: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a new slab with the default configuration parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new_with_config</span>()
+<span class="kw">impl</span>&lt;T&gt; Slab&lt;T&gt; {
+    <span class="doccomment">/// Returns a new slab with the default configuration parameters.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_with_config()
     }
 
-    <span class="doccomment">/// Returns a new slab with the provided configuration parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span>() -&gt; <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">C::validate</span>();
-        <span class="ident">Slab</span> {
-            <span class="ident">shards</span>: <span class="ident">shard::Array::new</span>(),
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns a new slab with the provided configuration parameters.
+    </span><span class="kw">pub fn </span>new_with_config&lt;C: cfg::Config&gt;() -&gt; Slab&lt;T, C&gt; {
+        C::validate();
+        Slab {
+            shards: shard::Array::new(),
+            _cfg: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The number of bits in each index which are used by the slab.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If other data is packed into the `usize` indices returned by</span>
-    <span class="doccomment">/// [`Slab::insert`], user code is free to use any bits higher than the</span>
-    <span class="doccomment">/// `USED_BITS`-th bit freely.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is determined by the [`Config`] type that configures the slab&#39;s</span>
-    <span class="doccomment">/// parameters. By default, all bits are used; this can be changed by</span>
-    <span class="doccomment">/// overriding the [`Config::RESERVED_BITS`][res] constant.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [res]: crate::Config#RESERVED_BITS</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USED_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">C::USED_BITS</span>;
+<span class="kw">impl</span>&lt;T, C: cfg::Config&gt; Slab&lt;T, C&gt; {
+    <span class="doccomment">/// The number of bits in each index which are used by the slab.
+    ///
+    /// If other data is packed into the `usize` indices returned by
+    /// [`Slab::insert`], user code is free to use any bits higher than the
+    /// `USED_BITS`-th bit freely.
+    ///
+    /// This is determined by the [`Config`] type that configures the slab&#39;s
+    /// parameters. By default, all bits are used; this can be changed by
+    /// overriding the [`Config::RESERVED_BITS`][res] constant.
+    ///
+    /// [res]: crate::Config#RESERVED_BITS
+    </span><span class="kw">pub const </span>USED_BITS: usize = C::USED_BITS;
 
-    <span class="doccomment">/// Inserts a value into the slab, returning the integer index at which that</span>
-    <span class="doccomment">/// value was inserted. This index can then be used to access the entry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this function returns `None`, then the shard for the current thread</span>
-    <span class="doccomment">/// is full and no items can be added until some are removed, or the maximum</span>
-    <span class="doccomment">/// number of shards has been reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// let slab = Slab::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tid</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">current</span>();
-        <span class="macro">test_println!</span>(<span class="string">&quot;insert {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
-        <span class="ident">shard</span>
-            .<span class="ident">init_with</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">slot</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">gen</span>.<span class="ident">pack</span>(<span class="ident">idx</span>))
+    <span class="doccomment">/// Inserts a value into the slab, returning the integer index at which that
+    /// value was inserted. This index can then be used to access the entry.
+    ///
+    /// If this function returns `None`, then the shard for the current thread
+    /// is full and no items can be added until some are removed, or the maximum
+    /// number of shards has been reached.
+    ///
+    /// # Examples
+    /// ```rust
+    /// # use sharded_slab::Slab;
+    /// let slab = Slab::new();
+    ///
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    /// assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">let </span>(tid, shard) = <span class="self">self</span>.shards.current();
+        <span class="macro">test_println!</span>(<span class="string">&quot;insert {:?}&quot;</span>, tid);
+        <span class="kw">let </span><span class="kw-2">mut </span>value = <span class="prelude-val">Some</span>(value);
+        shard
+            .init_with(|idx, slot| {
+                <span class="kw">let </span>gen = slot.insert(<span class="kw-2">&amp;mut </span>value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Some</span>(gen.pack(idx))
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">tid</span>.<span class="ident">pack</span>(<span class="ident">idx</span>))
+            .map(|idx| tid.pack(idx))
     }
 
-    <span class="doccomment">/// Return a handle to a vacant entry allowing for further manipulation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is useful when creating values that must contain their</span>
-    <span class="doccomment">/// slab index. The returned [`VacantEntry`] reserves a slot in the slab and</span>
-    <span class="doccomment">/// is able to return the index of the entry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// let mut slab = Slab::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let hello = {</span>
-    <span class="doccomment">///     let entry = slab.vacant_entry().unwrap();</span>
-    <span class="doccomment">///     let key = entry.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     entry.insert((key, &quot;hello&quot;));</span>
-    <span class="doccomment">///     key</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(hello, slab.get(hello).unwrap().0);</span>
-    <span class="doccomment">/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">vacant_entry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tid</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">current</span>();
-        <span class="macro">test_println!</span>(<span class="string">&quot;vacant_entry {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="ident">shard</span>.<span class="ident">init_with</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">init</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">generation</span>().<span class="ident">pack</span>(<span class="ident">tid</span>.<span class="ident">pack</span>(<span class="ident">idx</span>));
-            <span class="prelude-val">Some</span>(<span class="ident">VacantEntry</span> {
-                <span class="ident">inner</span>,
-                <span class="ident">key</span>,
-                <span class="ident">_lt</span>: <span class="ident">PhantomData</span>,
-            })
-        })
-    }
-
-    <span class="doccomment">/// Remove the value at the given index in the slab, returning `true` if a</span>
-    <span class="doccomment">/// value was removed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`take`], this method does _not_ block the current thread until</span>
-    <span class="doccomment">/// the value can be removed. Instead, if another thread is currently</span>
-    <span class="doccomment">/// accessing that value, this marks it to be removed by that thread when it</span>
-    <span class="doccomment">/// finishes accessing the value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// let slab = sharded_slab::Slab::new();</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Remove the item from the slab.</span>
-    <span class="doccomment">/// assert!(slab.remove(key));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, the slot is empty.</span>
-    <span class="doccomment">/// assert!(!slab.contains(key));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab = Arc::new(sharded_slab::Slab::new());</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab2 = slab.clone();</span>
-    <span class="doccomment">/// let thread2 = std::thread::spawn(move || {</span>
-    <span class="doccomment">///     // Depending on when this thread begins executing, the item may</span>
-    <span class="doccomment">///     // or may not have already been removed...</span>
-    <span class="doccomment">///     if let Some(item) = slab2.get(key) {</span>
-    <span class="doccomment">///         assert_eq!(item, &quot;hello world&quot;);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The item will be removed by thread2 when it finishes accessing it.</span>
-    <span class="doccomment">/// assert!(slab.remove(key));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// thread2.join().unwrap();</span>
-    <span class="doccomment">/// assert!(!slab.contains(key));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`take`]: Slab::take</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// The `Drop` impl for `Entry` calls `remove_local` or `remove_remote` based</span>
-        <span class="comment">// on where the guard was dropped from. If the dropped guard was the last one, this will</span>
-        <span class="comment">// call `Slot::remove_value` which actually clears storage.</span>
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">idx</span>);
-
-        <span class="macro">test_println!</span>(<span class="string">&quot;rm_deferred {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>());
-        <span class="kw">if</span> <span class="ident">tid</span>.<span class="ident">is_current</span>() {
-            <span class="ident">shard</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">remove_local</span>(<span class="ident">idx</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">shard</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">remove_remote</span>(<span class="ident">idx</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-        }
-    }
-
-    <span class="doccomment">/// Removes the value associated with the given key from the slab, returning</span>
-    <span class="doccomment">/// it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the slab does not contain a value for that key, `None` is returned</span>
-    <span class="doccomment">/// instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the value associated with the given key is currently being</span>
-    <span class="doccomment">/// accessed by another thread, this method will block the current thread</span>
-    <span class="doccomment">/// until the item is no longer accessed. If this is not desired, use</span>
-    <span class="doccomment">/// [`remove`] instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This method blocks the calling thread by spinning until the</span>
-    <span class="doccomment">/// currently outstanding references are released. Spinning for long periods</span>
-    <span class="doccomment">/// of time can result in high CPU time and power consumption. Therefore,</span>
-    <span class="doccomment">/// `take` should only be called when other references to the slot are</span>
-    <span class="doccomment">/// expected to be dropped soon (e.g., when all accesses are relatively</span>
-    <span class="doccomment">/// short).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// let slab = sharded_slab::Slab::new();</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Remove the item from the slab, returning it.</span>
-    <span class="doccomment">/// assert_eq!(slab.take(key), Some(&quot;hello world&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, the slot is empty.</span>
-    <span class="doccomment">/// assert!(!slab.contains(key));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab = Arc::new(sharded_slab::Slab::new());</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab2 = slab.clone();</span>
-    <span class="doccomment">/// let thread2 = std::thread::spawn(move || {</span>
-    <span class="doccomment">///     // Depending on when this thread begins executing, the item may</span>
-    <span class="doccomment">///     // or may not have already been removed...</span>
-    <span class="doccomment">///     if let Some(item) = slab2.get(key) {</span>
-    <span class="doccomment">///         assert_eq!(item, &quot;hello world&quot;);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The item will only be removed when the other thread finishes</span>
-    <span class="doccomment">/// // accessing it.</span>
-    <span class="doccomment">/// assert_eq!(slab.take(key), Some(&quot;hello world&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// thread2.join().unwrap();</span>
-    <span class="doccomment">/// assert!(!slab.contains(key));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`remove`]: Slab::remove</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">idx</span>);
-
-        <span class="macro">test_println!</span>(<span class="string">&quot;rm {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">tid</span>.<span class="ident">is_current</span>() {
-            <span class="ident">shard</span>.<span class="ident">take_local</span>(<span class="ident">idx</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">shard</span>.<span class="ident">take_remote</span>(<span class="ident">idx</span>)
-        }
-    }
-
-    <span class="doccomment">/// Return a reference to the value associated with the given key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the slab does not contain a value for the given key, or if the</span>
-    <span class="doccomment">/// maximum number of concurrent references to the slot has been reached,</span>
-    <span class="doccomment">/// `None` is returned instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// let slab = sharded_slab::Slab::new();</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);</span>
-    <span class="doccomment">/// assert!(slab.get(12345).is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
-
-        <span class="macro">test_println!</span>(<span class="string">&quot;get {:?}; current={:?}&quot;</span>, <span class="ident">tid</span>, <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>());
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())<span class="question-mark">?</span>;
-        <span class="ident">shard</span>.<span class="ident">with_slot</span>(<span class="ident">key</span>, <span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">get</span>(<span class="ident">C::unpack_gen</span>(<span class="ident">key</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">ptr::NonNull::from</span>(<span class="ident">slot</span>.<span class="ident">value</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-            <span class="prelude-val">Some</span>(<span class="ident">Entry</span> {
-                <span class="ident">inner</span>,
-                <span class="ident">value</span>,
-                <span class="ident">shard</span>,
-                <span class="ident">key</span>,
+    <span class="doccomment">/// Return a handle to a vacant entry allowing for further manipulation.
+    ///
+    /// This function is useful when creating values that must contain their
+    /// slab index. The returned [`VacantEntry`] reserves a slot in the slab and
+    /// is able to return the index of the entry.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use sharded_slab::Slab;
+    /// let mut slab = Slab::new();
+    ///
+    /// let hello = {
+    ///     let entry = slab.vacant_entry().unwrap();
+    ///     let key = entry.key();
+    ///
+    ///     entry.insert((key, &quot;hello&quot;));
+    ///     key
+    /// };
+    ///
+    /// assert_eq!(hello, slab.get(hello).unwrap().0);
+    /// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);
+    /// ```
+    </span><span class="kw">pub fn </span>vacant_entry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;VacantEntry&lt;<span class="lifetime">&#39;_</span>, T, C&gt;&gt; {
+        <span class="kw">let </span>(tid, shard) = <span class="self">self</span>.shards.current();
+        <span class="macro">test_println!</span>(<span class="string">&quot;vacant_entry {:?}&quot;</span>, tid);
+        shard.init_with(|idx, slot| {
+            <span class="kw">let </span>inner = slot.init()<span class="question-mark">?</span>;
+            <span class="kw">let </span>key = inner.generation().pack(tid.pack(idx));
+            <span class="prelude-val">Some</span>(VacantEntry {
+                inner,
+                key,
+                _lt: PhantomData,
             })
         })
     }
 
-    <span class="doccomment">/// Return an owned reference to the value at the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the slab does not contain a value for the given key, `None` is</span>
-    <span class="doccomment">/// returned instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`get`], which borrows the slab, this method _clones_ the [`Arc`]</span>
-    <span class="doccomment">/// around the slab. This means that the returned [`OwnedEntry`] can be held</span>
-    <span class="doccomment">/// for an arbitrary lifetime. However,  this method requires that the slab</span>
-    <span class="doccomment">/// itself be wrapped in an `Arc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-    <span class="doccomment">/// let value = slab.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, the original `Arc` clone of the slab may be dropped, but the</span>
-    <span class="doccomment">/// // returned `OwnedEntry` can still access the value.</span>
-    <span class="doccomment">/// assert_eq!(value, &quot;hello world&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`Entry`], an `OwnedEntry` may be stored in a struct which must live</span>
-    <span class="doccomment">/// for the `&#39;static` lifetime:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// use sharded_slab::OwnedEntry;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pub struct MyStruct {</span>
-    <span class="doccomment">///     entry: OwnedEntry&lt;&amp;&#39;static str&gt;,</span>
-    <span class="doccomment">///     // ... other fields ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-    <span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-    <span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-    <span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-    <span class="doccomment">/// let entry = slab.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">/// let my_struct = MyStruct {</span>
-    <span class="doccomment">///     entry,</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-    <span class="doccomment">/// // `&#39;static` lifetime:</span>
-    <span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`OwnedEntry`]s may be sent between threads:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// use std::{thread, sync::Arc};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created key, returning an `OwnedEntry`.</span>
-    <span class="doccomment">/// let value = slab.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     assert_eq!(value, &quot;hello world&quot;);</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`get`]: Slab::get</span>
-    <span class="doccomment">/// [`Arc`]: std::sync::Arc</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_owned</span>(<span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
+    <span class="doccomment">/// Remove the value at the given index in the slab, returning `true` if a
+    /// value was removed.
+    ///
+    /// Unlike [`take`], this method does _not_ block the current thread until
+    /// the value can be removed. Instead, if another thread is currently
+    /// accessing that value, this marks it to be removed by that thread when it
+    /// finishes accessing the value.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// let slab = sharded_slab::Slab::new();
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// // Remove the item from the slab.
+    /// assert!(slab.remove(key));
+    ///
+    /// // Now, the slot is empty.
+    /// assert!(!slab.contains(key));
+    /// ```
+    ///
+    /// ```rust
+    /// use std::sync::Arc;
+    ///
+    /// let slab = Arc::new(sharded_slab::Slab::new());
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// let slab2 = slab.clone();
+    /// let thread2 = std::thread::spawn(move || {
+    ///     // Depending on when this thread begins executing, the item may
+    ///     // or may not have already been removed...
+    ///     if let Some(item) = slab2.get(key) {
+    ///         assert_eq!(item, &quot;hello world&quot;);
+    ///     }
+    /// });
+    ///
+    /// // The item will be removed by thread2 when it finishes accessing it.
+    /// assert!(slab.remove(key));
+    ///
+    /// thread2.join().unwrap();
+    /// assert!(!slab.contains(key));
+    /// ```
+    /// [`take`]: Slab::take
+    </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; bool {
+        <span class="comment">// The `Drop` impl for `Entry` calls `remove_local` or `remove_remote` based
+        // on where the guard was dropped from. If the dropped guard was the last one, this will
+        // call `Slot::remove_value` which actually clears storage.
+        </span><span class="kw">let </span>tid = C::unpack_tid(idx);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;get_owned {:?}; current={:?}&quot;</span>, <span class="ident">tid</span>, <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>());
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())<span class="question-mark">?</span>;
-        <span class="ident">shard</span>.<span class="ident">with_slot</span>(<span class="ident">key</span>, <span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">get</span>(<span class="ident">C::unpack_gen</span>(<span class="ident">key</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">ptr::NonNull::from</span>(<span class="ident">slot</span>.<span class="ident">value</span>().<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
-            <span class="prelude-val">Some</span>(<span class="ident">OwnedEntry</span> {
-                <span class="ident">inner</span>,
-                <span class="ident">value</span>,
-                <span class="ident">slab</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
-                <span class="ident">key</span>,
+        <span class="macro">test_println!</span>(<span class="string">&quot;rm_deferred {:?}&quot;</span>, tid);
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize());
+        <span class="kw">if </span>tid.is_current() {
+            shard.map(|shard| shard.remove_local(idx)).unwrap_or(<span class="bool-val">false</span>)
+        } <span class="kw">else </span>{
+            shard.map(|shard| shard.remove_remote(idx)).unwrap_or(<span class="bool-val">false</span>)
+        }
+    }
+
+    <span class="doccomment">/// Removes the value associated with the given key from the slab, returning
+    /// it.
+    ///
+    /// If the slab does not contain a value for that key, `None` is returned
+    /// instead.
+    ///
+    /// If the value associated with the given key is currently being
+    /// accessed by another thread, this method will block the current thread
+    /// until the item is no longer accessed. If this is not desired, use
+    /// [`remove`] instead.
+    ///
+    /// **Note**: This method blocks the calling thread by spinning until the
+    /// currently outstanding references are released. Spinning for long periods
+    /// of time can result in high CPU time and power consumption. Therefore,
+    /// `take` should only be called when other references to the slot are
+    /// expected to be dropped soon (e.g., when all accesses are relatively
+    /// short).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// let slab = sharded_slab::Slab::new();
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// // Remove the item from the slab, returning it.
+    /// assert_eq!(slab.take(key), Some(&quot;hello world&quot;));
+    ///
+    /// // Now, the slot is empty.
+    /// assert!(!slab.contains(key));
+    /// ```
+    ///
+    /// ```rust
+    /// use std::sync::Arc;
+    ///
+    /// let slab = Arc::new(sharded_slab::Slab::new());
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// let slab2 = slab.clone();
+    /// let thread2 = std::thread::spawn(move || {
+    ///     // Depending on when this thread begins executing, the item may
+    ///     // or may not have already been removed...
+    ///     if let Some(item) = slab2.get(key) {
+    ///         assert_eq!(item, &quot;hello world&quot;);
+    ///     }
+    /// });
+    ///
+    /// // The item will only be removed when the other thread finishes
+    /// // accessing it.
+    /// assert_eq!(slab.take(key), Some(&quot;hello world&quot;));
+    ///
+    /// thread2.join().unwrap();
+    /// assert!(!slab.contains(key));
+    /// ```
+    /// [`remove`]: Slab::remove
+    </span><span class="kw">pub fn </span>take(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">let </span>tid = C::unpack_tid(idx);
+
+        <span class="macro">test_println!</span>(<span class="string">&quot;rm {:?}&quot;</span>, tid);
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize())<span class="question-mark">?</span>;
+        <span class="kw">if </span>tid.is_current() {
+            shard.take_local(idx)
+        } <span class="kw">else </span>{
+            shard.take_remote(idx)
+        }
+    }
+
+    <span class="doccomment">/// Return a reference to the value associated with the given key.
+    ///
+    /// If the slab does not contain a value for the given key, or if the
+    /// maximum number of concurrent references to the slot has been reached,
+    /// `None` is returned instead.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// let slab = sharded_slab::Slab::new();
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// assert_eq!(slab.get(key).unwrap(), &quot;hello world&quot;);
+    /// assert!(slab.get(12345).is_none());
+    /// ```
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Entry&lt;<span class="lifetime">&#39;_</span>, T, C&gt;&gt; {
+        <span class="kw">let </span>tid = C::unpack_tid(key);
+
+        <span class="macro">test_println!</span>(<span class="string">&quot;get {:?}; current={:?}&quot;</span>, tid, Tid::&lt;C&gt;::current());
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize())<span class="question-mark">?</span>;
+        shard.with_slot(key, |slot| {
+            <span class="kw">let </span>inner = slot.get(C::unpack_gen(key))<span class="question-mark">?</span>;
+            <span class="kw">let </span>value = ptr::NonNull::from(slot.value().as_ref().unwrap());
+            <span class="prelude-val">Some</span>(Entry {
+                inner,
+                value,
+                shard,
+                key,
             })
         })
     }
 
-    <span class="doccomment">/// Returns `true` if the slab contains a value for the given key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// let slab = sharded_slab::Slab::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let key = slab.insert(&quot;hello world&quot;).unwrap();</span>
-    <span class="doccomment">/// assert!(slab.contains(key));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// slab.take(key).unwrap();</span>
-    <span class="doccomment">/// assert!(!slab.contains(key));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">is_some</span>()
+    <span class="doccomment">/// Return an owned reference to the value at the given index.
+    ///
+    /// If the slab does not contain a value for the given key, `None` is
+    /// returned instead.
+    ///
+    /// Unlike [`get`], which borrows the slab, this method _clones_ the [`Arc`]
+    /// around the slab. This means that the returned [`OwnedEntry`] can be held
+    /// for an arbitrary lifetime. However,  this method requires that the slab
+    /// itself be wrapped in an `Arc`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use sharded_slab::Slab;
+    /// use std::sync::Arc;
+    ///
+    /// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// // Look up the created key, returning an `OwnedEntry`.
+    /// let value = slab.clone().get_owned(key).unwrap();
+    ///
+    /// // Now, the original `Arc` clone of the slab may be dropped, but the
+    /// // returned `OwnedEntry` can still access the value.
+    /// assert_eq!(value, &quot;hello world&quot;);
+    /// ```
+    ///
+    /// Unlike [`Entry`], an `OwnedEntry` may be stored in a struct which must live
+    /// for the `&#39;static` lifetime:
+    ///
+    /// ```
+    /// # use sharded_slab::Slab;
+    /// use sharded_slab::OwnedEntry;
+    /// use std::sync::Arc;
+    ///
+    /// pub struct MyStruct {
+    ///     entry: OwnedEntry&lt;&amp;&#39;static str&gt;,
+    ///     // ... other fields ...
+    /// }
+    ///
+    /// // Suppose this is some arbitrary function which requires a value that
+    /// // lives for the &#39;static lifetime...
+    /// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+    ///     // ... do something extremely important and interesting ...
+    /// }
+    ///
+    /// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// // Look up the created key, returning an `OwnedEntry`.
+    /// let entry = slab.clone().get_owned(key).unwrap();
+    /// let my_struct = MyStruct {
+    ///     entry,
+    ///     // ...
+    /// };
+    ///
+    /// // We can use `my_struct` anywhere where it is required to have the
+    /// // `&#39;static` lifetime:
+    /// function_requiring_static(&amp;my_struct);
+    /// ```
+    ///
+    /// [`OwnedEntry`]s may be sent between threads:
+    ///
+    /// ```
+    /// # use sharded_slab::Slab;
+    /// use std::{thread, sync::Arc};
+    ///
+    /// let slab: Arc&lt;Slab&lt;&amp;&#39;static str&gt;&gt; = Arc::new(Slab::new());
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    ///
+    /// // Look up the created key, returning an `OwnedEntry`.
+    /// let value = slab.clone().get_owned(key).unwrap();
+    ///
+    /// thread::spawn(move || {
+    ///     assert_eq!(value, &quot;hello world&quot;);
+    ///     // ...
+    /// }).join().unwrap();
+    /// ```
+    ///
+    /// [`get`]: Slab::get
+    /// [`Arc`]: std::sync::Arc
+    </span><span class="kw">pub fn </span>get_owned(<span class="self">self</span>: Arc&lt;<span class="self">Self</span>&gt;, key: usize) -&gt; <span class="prelude-ty">Option</span>&lt;OwnedEntry&lt;T, C&gt;&gt; {
+        <span class="kw">let </span>tid = C::unpack_tid(key);
+
+        <span class="macro">test_println!</span>(<span class="string">&quot;get_owned {:?}; current={:?}&quot;</span>, tid, Tid::&lt;C&gt;::current());
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize())<span class="question-mark">?</span>;
+        shard.with_slot(key, |slot| {
+            <span class="kw">let </span>inner = slot.get(C::unpack_gen(key))<span class="question-mark">?</span>;
+            <span class="kw">let </span>value = ptr::NonNull::from(slot.value().as_ref().unwrap());
+            <span class="prelude-val">Some</span>(OwnedEntry {
+                inner,
+                value,
+                slab: <span class="self">self</span>.clone(),
+                key,
+            })
+        })
     }
 
-    <span class="doccomment">/// Returns an iterator over all the items in the slab.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_iter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">iter::UniqueIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shards</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">iter_mut</span>();
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="ident">shards</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;must be at least 1 shard&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pages</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">iter</span>();
-        <span class="kw">let</span> <span class="ident">slots</span> <span class="op">=</span> <span class="ident">pages</span>.<span class="ident">next</span>().<span class="ident">and_then</span>(<span class="ident">page::Shared::iter</span>);
-        <span class="ident">iter::UniqueIter</span> {
-            <span class="ident">shards</span>,
-            <span class="ident">slots</span>,
-            <span class="ident">pages</span>,
+    <span class="doccomment">/// Returns `true` if the slab contains a value for the given key.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let slab = sharded_slab::Slab::new();
+    ///
+    /// let key = slab.insert(&quot;hello world&quot;).unwrap();
+    /// assert!(slab.contains(key));
+    ///
+    /// slab.take(key).unwrap();
+    /// assert!(!slab.contains(key));
+    /// ```
+    </span><span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, key: usize) -&gt; bool {
+        <span class="self">self</span>.get(key).is_some()
+    }
+
+    <span class="doccomment">/// Returns an iterator over all the items in the slab.
+    </span><span class="kw">pub fn </span>unique_iter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; iter::UniqueIter&lt;<span class="lifetime">&#39;_</span>, T, C&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>shards = <span class="self">self</span>.shards.iter_mut();
+        <span class="kw">let </span>shard = shards.next().expect(<span class="string">&quot;must be at least 1 shard&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>pages = shard.iter();
+        <span class="kw">let </span>slots = pages.next().and_then(page::Shared::iter);
+        iter::UniqueIter {
+            shards,
+            slots,
+            pages,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>Slab&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Slab&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;shards&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::debug</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T: fmt::Debug, C: cfg::Config&gt; fmt::Debug <span class="kw">for </span>Slab&lt;T, C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Slab&quot;</span>)
+            .field(<span class="string">&quot;shards&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.shards)
+            .field(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span>C::debug())
+            .finish()
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send, C: cfg::Config&gt; Send <span class="kw">for </span>Slab&lt;T, C&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Sync, C: cfg::Config&gt; Sync <span class="kw">for </span>Slab&lt;T, C&gt; {}
 
-<span class="comment">// === impl Entry ===</span>
+<span class="comment">// === impl Entry ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the key used to access the guard.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; Entry&lt;<span class="lifetime">&#39;a</span>, T, C&gt; {
+    <span class="doccomment">/// Returns the key used to access the guard.
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: this is always going to be valid, as it&#39;s projected from</span>
-            <span class="comment">// the safe reference to `self.value` --- this is just to avoid</span>
-            <span class="comment">// having to `expect` an option in the hot path when dereferencing.</span>
-            <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: this is always going to be valid, as it&#39;s projected from
+            // the safe reference to `self.value` --- this is just to avoid
+            // having to `expect` an option in the hot path when dereferencing.
+            </span><span class="self">self</span>.value.as_ref()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; std::ops::Deref <span class="kw">for </span>Entry&lt;<span class="lifetime">&#39;a</span>, T, C&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">should_remove</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the</span>
-            <span class="comment">// `Guard` value contains a pointer to the slot that may outlive the</span>
-            <span class="comment">// slab containing that slot. Here, the `Entry` guard owns a</span>
-            <span class="comment">// borrowed reference to the shard containing that slot, which</span>
-            <span class="comment">// ensures that the slot will not be dropped while this `Guard`</span>
-            <span class="comment">// exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; Drop <span class="kw">for </span>Entry&lt;<span class="lifetime">&#39;a</span>, T, C&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>should_remove = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the
+            // `Guard` value contains a pointer to the slot that may outlive the
+            // slab containing that slot. Here, the `Entry` guard owns a
+            // borrowed reference to the shard containing that slot, which
+            // ensures that the slot will not be dropped while this `Guard`
+            // exists.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_remove</span> {
-            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>)
+        <span class="kw">if </span>should_remove {
+            <span class="self">self</span>.shard.clear_after_release(<span class="self">self</span>.key)
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; fmt::Debug <span class="kw">for </span>Entry&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>Entry&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt;,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">value</span>().<span class="ident">eq</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="self">self</span>.value().eq(other)
     }
 }
 
-<span class="comment">// === impl VacantEntry ===</span>
+<span class="comment">// === impl VacantEntry ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Insert a value in the entry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To get the integer index at which this value will be inserted, use</span>
-    <span class="doccomment">/// [`key`] prior to calling `insert`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Slab;</span>
-    <span class="doccomment">/// let mut slab = Slab::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let hello = {</span>
-    <span class="doccomment">///     let entry = slab.vacant_entry().unwrap();</span>
-    <span class="doccomment">///     let key = entry.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     entry.insert((key, &quot;hello&quot;));</span>
-    <span class="doccomment">///     key</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(hello, slab.get(hello).unwrap().0);</span>
-    <span class="doccomment">/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`key`]: VacantEntry::key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: this `VacantEntry` only lives as long as the `Slab` it was</span>
-            <span class="comment">// borrowed from, so it cannot outlive the entry&#39;s slot.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value_mut</span>()
-        };
-        <span class="macro">debug_assert!</span>(
-            <span class="ident">value</span>.<span class="ident">is_none</span>(),
-            <span class="string">&quot;tried to insert to a slot that already had a value!&quot;</span>
-        );
-        <span class="kw-2">*</span><span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
-        <span class="kw">let</span> <span class="ident">_released</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: again, this `VacantEntry` only lives as long as the</span>
-            <span class="comment">// `Slab` it was borrowed from, so it cannot outlive the entry&#39;s</span>
-            <span class="comment">// slot.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; VacantEntry&lt;<span class="lifetime">&#39;a</span>, T, C&gt; {
+    <span class="doccomment">/// Insert a value in the entry.
+    ///
+    /// To get the integer index at which this value will be inserted, use
+    /// [`key`] prior to calling `insert`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use sharded_slab::Slab;
+    /// let mut slab = Slab::new();
+    ///
+    /// let hello = {
+    ///     let entry = slab.vacant_entry().unwrap();
+    ///     let key = entry.key();
+    ///
+    ///     entry.insert((key, &quot;hello&quot;));
+    ///     key
+    /// };
+    ///
+    /// assert_eq!(hello, slab.get(hello).unwrap().0);
+    /// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);
+    /// ```
+    ///
+    /// [`key`]: VacantEntry::key
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">mut </span><span class="self">self</span>, val: T) {
+        <span class="kw">let </span>value = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: this `VacantEntry` only lives as long as the `Slab` it was
+            // borrowed from, so it cannot outlive the entry&#39;s slot.
+            </span><span class="self">self</span>.inner.value_mut()
         };
         <span class="macro">debug_assert!</span>(
-            <span class="op">!</span><span class="ident">_released</span>,
-            <span class="string">&quot;removing a value before it was inserted should be a no-op&quot;</span>
-        )
+            value.is_none(),
+            <span class="string">&quot;tried to insert to a slot that already had a value!&quot;
+        </span>);
+        <span class="kw-2">*</span>value = <span class="prelude-val">Some</span>(val);
+        <span class="kw">let </span>_released = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: again, this `VacantEntry` only lives as long as the
+            // `Slab` it was borrowed from, so it cannot outlive the entry&#39;s
+            // slot.
+            </span><span class="self">self</span>.inner.release()
+        };
+        <span class="macro">debug_assert!</span>(
+            !_released,
+            <span class="string">&quot;removing a value before it was inserted should be a no-op&quot;
+        </span>)
     }
 
-    <span class="doccomment">/// Return the integer index at which this entry will be inserted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A value stored in this entry will be associated with this key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::*;</span>
-    <span class="doccomment">/// let mut slab = Slab::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let hello = {</span>
-    <span class="doccomment">///     let entry = slab.vacant_entry().unwrap();</span>
-    <span class="doccomment">///     let key = entry.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     entry.insert((key, &quot;hello&quot;));</span>
-    <span class="doccomment">///     key</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(hello, slab.get(hello).unwrap().0);</span>
-    <span class="doccomment">/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Return the integer index at which this entry will be inserted.
+    ///
+    /// A value stored in this entry will be associated with this key.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use sharded_slab::*;
+    /// let mut slab = Slab::new();
+    ///
+    /// let hello = {
+    ///     let entry = slab.vacant_entry().unwrap();
+    ///     let key = entry.key();
+    ///
+    ///     entry.insert((key, &quot;hello&quot;));
+    ///     key
+    /// };
+    ///
+    /// assert_eq!(hello, slab.get(hello).unwrap().0);
+    /// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);
+    /// ```
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 }
-<span class="comment">// === impl OwnedEntry ===</span>
+<span class="comment">// === impl OwnedEntry ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;T, C&gt; OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="doccomment">/// Returns the key used to access this guard</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Returns the key used to access this guard
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: this is always going to be valid, as it&#39;s projected from</span>
-            <span class="comment">// the safe reference to `self.value` --- this is just to avoid</span>
-            <span class="comment">// having to `expect` an option in the hot path when dereferencing.</span>
-            <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: this is always going to be valid, as it&#39;s projected from
+            // the safe reference to `self.value` --- this is just to avoid
+            // having to `expect` an option in the hot path when dereferencing.
+            </span><span class="self">self</span>.value.as_ref()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; std::ops::Deref <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Drop <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">test_println!</span>(<span class="string">&quot;drop OwnedEntry: try clearing data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the</span>
-            <span class="comment">// `Guard` value contains a pointer to the slot that may outlive the</span>
-            <span class="comment">// slab containing that slot. Here, the `OwnedEntry` owns an `Arc`</span>
-            <span class="comment">// clone of the pool, which keeps it alive as long as the `OwnedEntry`</span>
-            <span class="comment">// exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+        <span class="kw">let </span>should_clear = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the
+            // `Guard` value contains a pointer to the slot that may outlive the
+            // slab containing that slot. Here, the `OwnedEntry` owns an `Arc`
+            // clone of the pool, which keeps it alive as long as the `OwnedEntry`
+            // exists.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="kw">let</span> <span class="ident">shard_idx</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">key</span>);
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, <span class="ident">shard_idx</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">shard_idx</span>.<span class="ident">as_usize</span>()) {
-                <span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>)
-            } <span class="kw">else</span> {
-                <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?} does not exist! THIS IS A BUG&quot;</span>, <span class="ident">shard_idx</span>);
-                <span class="macro">debug_assert!</span>(<span class="ident">std::thread::panicking</span>(), <span class="string">&quot;[internal error] tried to drop an `OwnedEntry` to a slot on a shard that never existed!&quot;</span>);
+        <span class="kw">if </span>should_clear {
+            <span class="kw">let </span>shard_idx = Tid::&lt;C&gt;::from_packed(<span class="self">self</span>.key);
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, shard_idx);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.slab.shards.get(shard_idx.as_usize()) {
+                shard.clear_after_release(<span class="self">self</span>.key)
+            } <span class="kw">else </span>{
+                <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?} does not exist! THIS IS A BUG&quot;</span>, shard_idx);
+                <span class="macro">debug_assert!</span>(std::thread::panicking(), <span class="string">&quot;[internal error] tried to drop an `OwnedEntry` to a slot on a shard that never existed!&quot;</span>);
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; fmt::Debug <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt;,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self</span>.value() == <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Sync <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync,
+    C: cfg::Config,
 {
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Send <span class="kw">for </span>OwnedEntry&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync,
+    C: cfg::Config,
 {
 }
 
-<span class="comment">// === pack ===</span>
+<span class="comment">// === pack ===
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
-    <span class="comment">// ====== provided by each implementation =================================</span>
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Pack&lt;C: cfg::Config&gt;: Sized {
+    <span class="comment">// ====== provided by each implementation =================================
 
-    <span class="doccomment">/// The number of bits occupied by this type when packed into a usize.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This must be provided to determine the number of bits into which to pack</span>
-    <span class="doccomment">/// the type.</span>
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span>;
-    <span class="doccomment">/// The type packed on the less significant side of this type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this type is packed into the least significant bit of a usize, this</span>
-    <span class="doccomment">/// should be `()`, which occupies no bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to calculate the shift amount for packing this value.</span>
-    <span class="kw">type</span> <span class="ident">Prev</span>: <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>;
+    </span><span class="doccomment">/// The number of bits occupied by this type when packed into a usize.
+    ///
+    /// This must be provided to determine the number of bits into which to pack
+    /// the type.
+    </span><span class="kw">const </span>LEN: usize;
+    <span class="doccomment">/// The type packed on the less significant side of this type.
+    ///
+    /// If this type is packed into the least significant bit of a usize, this
+    /// should be `()`, which occupies no bytes.
+    ///
+    /// This is used to calculate the shift amount for packing this value.
+    </span><span class="kw">type </span>Prev: Pack&lt;C&gt;;
 
-    <span class="comment">// ====== calculated automatically ========================================</span>
+    <span class="comment">// ====== calculated automatically ========================================
 
-    <span class="doccomment">/// A number consisting of `Self::LEN` 1 bits, starting at the least</span>
-    <span class="doccomment">/// significant bit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the higest value this type can represent. This number is shifted</span>
-    <span class="doccomment">/// left by `Self::SHIFT` bits to calculate this type&#39;s `MASK`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is computed automatically based on `Self::LEN`.</span>
-    <span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident"><span class="self">Self</span>::LEN</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">shift</span> <span class="op">|</span> (<span class="ident">shift</span> <span class="op">-</span> <span class="number">1</span>)
+    </span><span class="doccomment">/// A number consisting of `Self::LEN` 1 bits, starting at the least
+    /// significant bit.
+    ///
+    /// This is the higest value this type can represent. This number is shifted
+    /// left by `Self::SHIFT` bits to calculate this type&#39;s `MASK`.
+    ///
+    /// This is computed automatically based on `Self::LEN`.
+    </span><span class="kw">const </span>BITS: usize = {
+        <span class="kw">let </span>shift = <span class="number">1 </span>&lt;&lt; (<span class="self">Self</span>::LEN - <span class="number">1</span>);
+        shift | (shift - <span class="number">1</span>)
     };
-    <span class="doccomment">/// The number of bits to shift a number to pack it into a usize with other</span>
-    <span class="doccomment">/// values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is caculated automatically based on the `LEN` and `SHIFT` constants</span>
-    <span class="doccomment">/// of the previous value.</span>
-    <span class="kw">const</span> <span class="ident">SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Prev::SHIFT</span> <span class="op">+</span> <span class="ident"><span class="self">Self</span>::Prev::LEN</span>;
+    <span class="doccomment">/// The number of bits to shift a number to pack it into a usize with other
+    /// values.
+    ///
+    /// This is caculated automatically based on the `LEN` and `SHIFT` constants
+    /// of the previous value.
+    </span><span class="kw">const </span>SHIFT: usize = <span class="self">Self</span>::Prev::SHIFT + <span class="self">Self</span>::Prev::LEN;
 
-    <span class="doccomment">/// The mask to extract only this type from a packed `usize`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is calculated by shifting `Self::BITS` left by `Self::SHIFT`.</span>
-    <span class="kw">const</span> <span class="ident">MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::SHIFT</span>;
+    <span class="doccomment">/// The mask to extract only this type from a packed `usize`.
+    ///
+    /// This is calculated by shifting `Self::BITS` left by `Self::SHIFT`.
+    </span><span class="kw">const </span>MASK: usize = <span class="self">Self</span>::BITS &lt;&lt; <span class="self">Self</span>::SHIFT;
 
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
+    <span class="kw">fn </span>from_usize(val: usize) -&gt; <span class="self">Self</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">to</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_usize</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>pack(<span class="kw-2">&amp;</span><span class="self">self</span>, to: usize) -&gt; usize {
+        <span class="kw">let </span>value = <span class="self">self</span>.as_usize();
+        <span class="macro">debug_assert!</span>(value &lt;= <span class="self">Self</span>::BITS);
 
-        (<span class="ident">to</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident"><span class="self">Self</span>::MASK</span>) <span class="op">|</span> (<span class="ident">value</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::SHIFT</span>)
+        (to &amp; !<span class="self">Self</span>::MASK) | (value &lt;&lt; <span class="self">Self</span>::SHIFT)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from_packed</span>(<span class="ident">from</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> (<span class="ident">from</span> <span class="op">&amp;</span> <span class="ident"><span class="self">Self</span>::MASK</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::SHIFT</span>;
-        <span class="macro">debug_assert!</span>(<span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::BITS</span>);
-        <span class="ident"><span class="self">Self</span>::from_usize</span>(<span class="ident">value</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">Pack</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> <span class="kw">for</span> () {
-    <span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">MASK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-
-    <span class="kw">type</span> <span class="ident">Prev</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">as_usize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="macro">unreachable!</span>()
-    }
-    <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">_val</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">unreachable!</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">pack</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_to</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="macro">unreachable!</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">from_packed</span>(<span class="ident">_from</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">unreachable!</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>from_packed(from: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>value = (from &amp; <span class="self">Self</span>::MASK) &gt;&gt; <span class="self">Self</span>::SHIFT;
+        <span class="macro">debug_assert!</span>(value &lt;= <span class="self">Self</span>::BITS);
+        <span class="self">Self</span>::from_usize(value)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::tests::util</span> <span class="kw">as</span> <span class="ident">test_util</span>;
+<span class="kw">impl</span>&lt;C: cfg::Config&gt; Pack&lt;C&gt; <span class="kw">for </span>() {
+    <span class="kw">const </span>BITS: usize = <span class="number">0</span>;
+    <span class="kw">const </span>LEN: usize = <span class="number">0</span>;
+    <span class="kw">const </span>SHIFT: usize = <span class="number">0</span>;
+    <span class="kw">const </span>MASK: usize = <span class="number">0</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
+    <span class="kw">type </span>Prev = ();
+
+    <span class="kw">fn </span>as_usize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="macro">unreachable!</span>()
+    }
+    <span class="kw">fn </span>from_usize(_val: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">unreachable!</span>()
+    }
+
+    <span class="kw">fn </span>pack(<span class="kw-2">&amp;</span><span class="self">self</span>, _to: usize) -&gt; usize {
+        <span class="macro">unreachable!</span>()
+    }
+
+    <span class="kw">fn </span>from_packed(_from: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">unreachable!</span>()
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::tests::util <span class="kw">as </span>test_util;
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

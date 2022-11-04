@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/executor/execute_operation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>execute_operation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/executor/execute_operation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>execute_operation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -161,168 +161,168 @@
 <span id="161">161</span>
 <span id="162">162</span>
 <span id="163">163</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pipeline::QueryPipeline</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IrSerializer</span>, <span class="ident">Operation</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphBuilder</span>, <span class="ident">QueryInterpreter</span>, <span class="ident">ResponseData</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Connector</span>};
-<span class="kw">use</span> <span class="ident">futures::future</span>;
-<span class="kw">use</span> <span class="ident">query_engine_metrics</span>::{
-    <span class="ident">histogram</span>, <span class="ident">increment_counter</span>, <span class="ident">metrics</span>, <span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>,
+<span class="kw">use </span><span class="kw">super</span>::pipeline::QueryPipeline;
+<span class="kw">use crate</span>::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, ResponseData};
+<span class="kw">use </span>connector::{Connection, ConnectionLike, Connector};
+<span class="kw">use </span>futures::future;
+<span class="kw">use </span>query_engine_metrics::{
+    histogram, increment_counter, metrics, PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, PRISMA_CLIENT_QUERIES_TOTAL,
 };
-<span class="kw">use</span> <span class="ident">schema::QuerySchemaRef</span>;
-<span class="kw">use</span> <span class="ident">tracing::Instrument</span>;
-<span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
+<span class="kw">use </span>schema::QuerySchemaRef;
+<span class="kw">use </span>tracing::Instrument;
+<span class="kw">use </span>tracing_futures::WithSubscriber;
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single_operation</span>(
-    <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">Operation</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">operation_timer</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-    <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
-    <span class="kw">let</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="op">=</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">operation</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+<span class="kw">pub async fn </span>execute_single_operation(
+    query_schema: QuerySchemaRef,
+    conn: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    operation: <span class="kw-2">&amp;</span>Operation,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="kw">let </span>operation_timer = Instant::now();
+    <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
+    <span class="kw">let </span>(query_graph, serializer) = QueryGraphBuilder::new(query_schema.clone()).build(operation.clone())<span class="question-mark">?</span>;
 
-    <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
+    <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
 
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">query_graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
-        .<span class="ident">execute</span>(<span class="ident">trace_id</span>)
+    <span class="kw">let </span>result = QueryPipeline::new(query_graph, interpreter, serializer)
+        .execute(trace_id)
         .<span class="kw">await</span>;
 
-    <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
-    <span class="ident">result</span>
+    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    result
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_many_operations</span>(
-    <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">operations</span>: <span class="kw-2">&amp;</span>[<span class="ident">Operation</span>],
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">queries</span> <span class="op">=</span> <span class="ident">operations</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">operation</span><span class="op">|</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">operation</span>.<span class="ident">clone</span>()))
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+<span class="kw">pub async fn </span>execute_many_operations(
+    query_schema: QuerySchemaRef,
+    conn: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    operations: <span class="kw-2">&amp;</span>[Operation],
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">crate</span>::Result&lt;ResponseData&gt;&gt;&gt; {
+    <span class="kw">let </span>queries = operations
+        .iter()
+        .map(|operation| QueryGraphBuilder::new(query_schema.clone()).build(operation.clone()))
+        .collect::&lt;std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">queries</span>.<span class="ident">len</span>());
+    <span class="kw">let </span><span class="kw-2">mut </span>results = Vec::with_capacity(queries.len());
 
-    <span class="kw">for</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="kw">in</span> <span class="ident">queries</span> {
-        <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
-        <span class="kw">let</span> <span class="ident">operation_timer</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryPipeline::new</span>(<span class="ident">query_graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
-            .<span class="ident">execute</span>(<span class="ident">trace_id</span>.<span class="ident">clone</span>())
+    <span class="kw">for </span>(query_graph, serializer) <span class="kw">in </span>queries {
+        <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
+        <span class="kw">let </span>operation_timer = Instant::now();
+        <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
+        <span class="kw">let </span>result = QueryPipeline::new(query_graph, interpreter, serializer)
+            .execute(trace_id.clone())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
-        <span class="ident">results</span>.<span class="ident">push</span>(<span class="prelude-val">Ok</span>(<span class="ident">result</span>));
+        <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+        results.push(<span class="prelude-val">Ok</span>(result));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">results</span>)
+    <span class="prelude-val">Ok</span>(results)
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_single_self_contained</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>,
-    <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    <span class="ident">operation</span>: <span class="ident">Operation</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">force_transactions</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">query_graph</span>, <span class="ident">serializer</span>) <span class="op">=</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>).<span class="ident">build</span>(<span class="ident">operation</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">connection_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">name</span>();
-    <span class="kw">let</span> <span class="ident">conn_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+<span class="kw">pub async fn </span>execute_single_self_contained&lt;C: Connector + Send + Sync&gt;(
+    connector: <span class="kw-2">&amp;</span>C,
+    query_schema: QuerySchemaRef,
+    operation: Operation,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    force_transactions: bool,
+) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="kw">let </span>(query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)<span class="question-mark">?</span>;
+    <span class="kw">let </span>connection_name = connector.name();
+    <span class="kw">let </span>conn_span = <span class="macro">info_span!</span>(
         <span class="string">&quot;prisma:engine:connection&quot;</span>,
-        <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-        <span class="string">&quot;db.type&quot;</span> <span class="op">=</span> <span class="ident">connection_name</span>.<span class="ident">as_str</span>()
+        user_facing = <span class="bool-val">true</span>,
+        <span class="string">&quot;db.type&quot; </span>= connection_name.as_str()
     );
-    <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="ident">instrument</span>(<span class="ident">conn_span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="ident">execute_self_contained</span>(<span class="ident">conn</span>, <span class="ident">query_graph</span>, <span class="ident">serializer</span>, <span class="ident">force_transactions</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-}
+    <span class="kw">let </span>conn = connector.get_connection().instrument(conn_span).<span class="kw">await</span><span class="question-mark">?</span>;
+    execute_self_contained(conn, query_graph, serializer, force_transactions, trace_id).<span class="kw">await
+</span>}
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_many_self_contained</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Connector</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>(
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>,
-    <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
-    <span class="ident">operations</span>: <span class="kw-2">&amp;</span>[<span class="ident">Operation</span>],
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">force_transactions</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futures</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">operations</span>.<span class="ident">len</span>());
+<span class="kw">pub async fn </span>execute_many_self_contained&lt;C: Connector + Send + Sync&gt;(
+    connector: <span class="kw-2">&amp;</span>C,
+    query_schema: QuerySchemaRef,
+    operations: <span class="kw-2">&amp;</span>[Operation],
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    force_transactions: bool,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">crate</span>::Result&lt;ResponseData&gt;&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>futures = Vec::with_capacity(operations.len());
 
-    <span class="kw">let</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::get_current_dispatcher</span>();
-    <span class="kw">for</span> <span class="ident">op</span> <span class="kw">in</span> <span class="ident">operations</span> {
-        <span class="kw">match</span> <span class="ident">QueryGraphBuilder::new</span>(<span class="ident">query_schema</span>.<span class="ident">clone</span>()).<span class="ident">build</span>(<span class="ident">op</span>.<span class="ident">clone</span>()) {
-            <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>)) =&gt; {
-                <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
+    <span class="kw">let </span>dispatcher = <span class="kw">crate</span>::get_current_dispatcher();
+    <span class="kw">for </span>op <span class="kw">in </span>operations {
+        <span class="kw">match </span>QueryGraphBuilder::new(query_schema.clone()).build(op.clone()) {
+            <span class="prelude-val">Ok</span>((graph, serializer)) =&gt; {
+                <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
 
-                <span class="kw">let</span> <span class="ident">connection_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">conn_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(
+                <span class="kw">let </span>connection_name = connector.name();
+                <span class="kw">let </span>conn_span = <span class="macro">info_span!</span>(
                     <span class="string">&quot;prisma:engine:connection&quot;</span>,
-                    <span class="ident">user_facing</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                    <span class="string">&quot;db.type&quot;</span> <span class="op">=</span> <span class="ident">connection_name</span>.<span class="ident">as_str</span>()
+                    user_facing = <span class="bool-val">true</span>,
+                    <span class="string">&quot;db.type&quot; </span>= connection_name.as_str()
                 );
-                <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">get_connection</span>().<span class="ident">instrument</span>(<span class="ident">conn_span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>conn = connector.get_connection().instrument(conn_span).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(
-                    <span class="ident">execute_self_contained</span>(<span class="ident">conn</span>, <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">force_transactions</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>())
-                        .<span class="ident">with_subscriber</span>(<span class="ident">dispatcher</span>.<span class="ident">clone</span>()),
+                futures.push(tokio::spawn(
+                    execute_self_contained(conn, graph, serializer, force_transactions, trace_id.clone())
+                        .with_subscriber(dispatcher.clone()),
                 ));
             }
 
-            <span class="comment">// This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">tokio::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()) })),
+            <span class="comment">// This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.
+            </span><span class="prelude-val">Err</span>(err) =&gt; futures.push(tokio::spawn(<span class="kw">async move </span>{ <span class="prelude-val">Err</span>(err.into()) })),
         }
     }
 
-    <span class="kw">let</span> <span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">future::join_all</span>(<span class="ident">futures</span>)
-        .<span class="kw">await</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">expect</span>(<span class="string">&quot;IO Error in tokio::spawn&quot;</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>responses: Vec&lt;<span class="kw">_</span>&gt; = future::join_all(futures)
+        .<span class="kw">await
+        </span>.into_iter()
+        .map(|res| res.expect(<span class="string">&quot;IO Error in tokio::spawn&quot;</span>))
+        .collect();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">responses</span>)
+    <span class="prelude-val">Ok</span>(responses)
 }
 
-<span class="doccomment">/// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_self_contained</span>(
-    <span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span><span class="op">&gt;</span>,
-    <span class="ident">graph</span>: <span class="ident">QueryGraph</span>,
-    <span class="ident">serializer</span>: <span class="ident">IrSerializer</span>,
-    <span class="ident">force_transactions</span>: <span class="ident">bool</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">operation_timer</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">force_transactions</span> <span class="op">|</span><span class="op">|</span> <span class="ident">graph</span>.<span class="ident">needs_transaction</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">execute_on</span>(<span class="ident">tx</span>.<span class="ident">as_connection_like</span>(), <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>;
+<span class="doccomment">/// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
+</span><span class="kw">async fn </span>execute_self_contained(
+    <span class="kw-2">mut </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;,
+    graph: QueryGraph,
+    serializer: IrSerializer,
+    force_transactions: bool,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="kw">let </span>operation_timer = Instant::now();
+    <span class="kw">let </span>result = <span class="kw">if </span>force_transactions || graph.needs_transaction() {
+        <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result = execute_on(tx.as_connection_like(), graph, serializer, trace_id).<span class="kw">await</span>;
 
-        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
-            <span class="ident">tx</span>.<span class="ident">commit</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">tx</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if </span>result.is_ok() {
+            tx.commit().<span class="kw">await</span><span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="ident">result</span>
-    } <span class="kw">else</span> {
-        <span class="ident">execute_on</span>(<span class="ident">conn</span>.<span class="ident">as_connection_like</span>(), <span class="ident">graph</span>, <span class="ident">serializer</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-    };
+        result
+    } <span class="kw">else </span>{
+        execute_on(conn.as_connection_like(), graph, serializer, trace_id).<span class="kw">await
+    </span>};
 
-    <span class="macro">histogram!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_HISTOGRAM_MS</span>, <span class="ident">operation_timer</span>.<span class="ident">elapsed</span>());
-    <span class="ident">result</span>
+    <span class="macro">histogram!</span>(PRISMA_CLIENT_QUERIES_HISTOGRAM_MS, operation_timer.elapsed());
+    result
 }
 
-<span class="comment">// Simplest execution on anything that&#39;s a ConnectionLike. Caller decides handling of connections and transactions.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_on</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">graph</span>: <span class="ident">QueryGraph</span>,
-    <span class="ident">serializer</span>: <span class="ident">IrSerializer</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResponseData</span><span class="op">&gt;</span> {
-    <span class="macro">increment_counter!</span>(<span class="ident">PRISMA_CLIENT_QUERIES_TOTAL</span>);
-    <span class="kw">let</span> <span class="ident">interpreter</span> <span class="op">=</span> <span class="ident">QueryInterpreter::new</span>(<span class="ident">conn</span>);
-    <span class="ident">QueryPipeline::new</span>(<span class="ident">graph</span>, <span class="ident">interpreter</span>, <span class="ident">serializer</span>)
-        .<span class="ident">execute</span>(<span class="ident">trace_id</span>)
-        .<span class="kw">await</span>
-}
+<span class="comment">// Simplest execution on anything that&#39;s a ConnectionLike. Caller decides handling of connections and transactions.
+</span><span class="kw">async fn </span>execute_on(
+    conn: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    graph: QueryGraph,
+    serializer: IrSerializer,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;ResponseData&gt; {
+    <span class="macro">increment_counter!</span>(PRISMA_CLIENT_QUERIES_TOTAL);
+    <span class="kw">let </span>interpreter = QueryInterpreter::new(conn);
+    QueryPipeline::new(graph, interpreter, serializer)
+        .execute(trace_id)
+        .<span class="kw">await
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

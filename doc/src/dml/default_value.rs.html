@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/default_value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>default_value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/default_value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>default_value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -361,368 +361,368 @@
 <span id="361">361</span>
 <span id="362">362</span>
 <span id="363">363</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
+<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Represents a default specified on a field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultValue</span> {
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">DefaultKind</span>,
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a default specified on a field.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>DefaultValue {
+    <span class="kw">pub </span>kind: DefaultKind,
+    <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// Represents a default specified on a field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultKind</span> {
-    <span class="doccomment">/// a static value, e.g. `@default(1)`</span>
-    <span class="ident">Single</span>(<span class="ident">PrismaValue</span>),
-    <span class="doccomment">/// a dynamic value, e.g. `@default(uuid())`</span>
-    <span class="ident">Expression</span>(<span class="ident">ValueGenerator</span>),
+<span class="doccomment">/// Represents a default specified on a field.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub enum </span>DefaultKind {
+    <span class="doccomment">/// a static value, e.g. `@default(1)`
+    </span>Single(PrismaValue),
+    <span class="doccomment">/// a dynamic value, e.g. `@default(uuid())`
+    </span>Expression(ValueGenerator),
 }
 
-<span class="kw">impl</span> <span class="ident">DefaultKind</span> {
-    <span class="doccomment">/// Does this match @default(autoincrement())?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span>)
+<span class="kw">impl </span>DefaultKind {
+    <span class="doccomment">/// Does this match @default(autoincrement())?
+    </span><span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, DefaultKind::Expression(generator) <span class="kw">if </span>generator.name == <span class="string">&quot;autoincrement&quot;</span>)
     }
 
-    <span class="doccomment">/// Does this match @default(cuid(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span>)
+    <span class="doccomment">/// Does this match @default(cuid(_))?
+    </span><span class="kw">pub fn </span>is_cuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, DefaultKind::Expression(generator) <span class="kw">if </span>generator.name == <span class="string">&quot;cuid&quot;</span>)
     }
 
-    <span class="doccomment">/// Does this match @default(dbgenerated(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
+    <span class="doccomment">/// Does this match @default(dbgenerated(_))?
+    </span><span class="kw">pub fn </span>is_dbgenerated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, DefaultKind::Expression(generator) <span class="kw">if </span>generator.name == <span class="string">&quot;dbgenerated&quot;</span>)
     }
 
-    <span class="doccomment">/// Does this match @default(now())?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_now</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span>)
+    <span class="doccomment">/// Does this match @default(now())?
+    </span><span class="kw">pub fn </span>is_now(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, DefaultKind::Expression(generator) <span class="kw">if </span>generator.name == <span class="string">&quot;now&quot;</span>)
     }
 
-    <span class="doccomment">/// Does this match @default(uuid(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>) <span class="kw">if</span> <span class="ident">generator</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span>)
+    <span class="doccomment">/// Does this match @default(uuid(_))?
+    </span><span class="kw">pub fn </span>is_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, DefaultKind::Expression(generator) <span class="kw">if </span>generator.name == <span class="string">&quot;uuid&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_single</span>(<span class="self">self</span>) -&gt; <span class="ident">PrismaValue</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DefaultKind::Single</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;called DefaultValue::unwrap_single() on wrong variant&quot;</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">DefaultValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_expression</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ValueGenerator</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">expr</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_single</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Single</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DefaultKind</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_kind</span>(<span class="self">self</span>) -&gt; <span class="ident">DefaultKind</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mut_kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">DefaultKind</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">kind</span>
-    }
-
-    <span class="doccomment">/// Returns either a copy of the contained single value or produces a new</span>
-    <span class="doccomment">/// value as defined by the expression.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Single</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">clone</span>()),
-            <span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">g</span>) =&gt; <span class="ident">g</span>.<span class="ident">generate</span>(),
-        }
-    }
-
-    <span class="doccomment">/// Does this match @default(autoincrement())?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">is_autoincrement</span>()
-    }
-
-    <span class="doccomment">/// Does this match @default(cuid(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">is_cuid</span>()
-    }
-
-    <span class="doccomment">/// Does this match @default(dbgenerated(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">is_dbgenerated</span>()
-    }
-
-    <span class="doccomment">/// Does this match @default(now())?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_now</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">is_now</span>()
-    }
-
-    <span class="doccomment">/// Does this match @default(uuid(_))?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uuid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">is_uuid</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_expression</span>(<span class="ident">generator</span>: <span class="ident">ValueGenerator</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">DefaultKind::Expression</span>(<span class="ident">generator</span>);
-
-        <span class="self">Self</span> { <span class="ident">kind</span>, <span class="ident">db_name</span>: <span class="prelude-val">None</span> }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_single</span>(<span class="ident">value</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">DefaultKind::Single</span>(<span class="ident">value</span>);
-
-        <span class="self">Self</span> { <span class="ident">kind</span>, <span class="ident">db_name</span>: <span class="prelude-val">None</span> }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_db_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="self">self</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">to_string</span>());
-    }
-
-    <span class="doccomment">/// The default value constraint name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db_name</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="comment">// Returns the dbgenerated function for a default value</span>
-    <span class="comment">// intended for primary key values!</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_dbgenerated_func</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Expression</span>(<span class="kw-2">ref</span> <span class="ident">expr</span>) <span class="kw">if</span> <span class="ident">expr</span>.<span class="ident">is_dbgenerated</span>() =&gt; <span class="ident">expr</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="number">1</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>unwrap_single(<span class="self">self</span>) -&gt; PrismaValue {
+        <span class="kw">match </span><span class="self">self </span>{
+            DefaultKind::Single(val) =&gt; val,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;called DefaultValue::unwrap_single() on wrong variant&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueGenerator</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>,
-    <span class="ident">generator</span>: <span class="ident">ValueGeneratorFn</span>,
+<span class="kw">impl </span>DefaultValue {
+    <span class="kw">pub fn </span>as_expression(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ValueGenerator&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            DefaultKind::Expression(<span class="kw-2">ref </span>expr) =&gt; <span class="prelude-val">Some</span>(expr),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>as_single(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DefaultKind {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
+    }
+
+    <span class="kw">pub fn </span>into_kind(<span class="self">self</span>) -&gt; DefaultKind {
+        <span class="self">self</span>.kind
+    }
+
+    <span class="kw">pub fn </span>mut_kind(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>DefaultKind {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.kind
+    }
+
+    <span class="doccomment">/// Returns either a copy of the contained single value or produces a new
+    /// value as defined by the expression.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="prelude-val">Some</span>(v.clone()),
+            DefaultKind::Expression(<span class="kw-2">ref </span>g) =&gt; g.generate(),
+        }
+    }
+
+    <span class="doccomment">/// Does this match @default(autoincrement())?
+    </span><span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.kind.is_autoincrement()
+    }
+
+    <span class="doccomment">/// Does this match @default(cuid(_))?
+    </span><span class="kw">pub fn </span>is_cuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.kind.is_cuid()
+    }
+
+    <span class="doccomment">/// Does this match @default(dbgenerated(_))?
+    </span><span class="kw">pub fn </span>is_dbgenerated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.kind.is_dbgenerated()
+    }
+
+    <span class="doccomment">/// Does this match @default(now())?
+    </span><span class="kw">pub fn </span>is_now(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.kind.is_now()
+    }
+
+    <span class="doccomment">/// Does this match @default(uuid(_))?
+    </span><span class="kw">pub fn </span>is_uuid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.kind.is_uuid()
+    }
+
+    <span class="kw">pub fn </span>new_expression(generator: ValueGenerator) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>kind = DefaultKind::Expression(generator);
+
+        <span class="self">Self </span>{ kind, db_name: <span class="prelude-val">None </span>}
+    }
+
+    <span class="kw">pub fn </span>new_single(value: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>kind = DefaultKind::Single(value);
+
+        <span class="self">Self </span>{ kind, db_name: <span class="prelude-val">None </span>}
+    }
+
+    <span class="kw">pub fn </span>set_db_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) {
+        <span class="self">self</span>.db_name = <span class="prelude-val">Some</span>(name.to_string());
+    }
+
+    <span class="doccomment">/// The default value constraint name.
+    </span><span class="kw">pub fn </span>db_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.db_name.as_deref()
+    }
+
+    <span class="comment">// Returns the dbgenerated function for a default value
+    // intended for primary key values!
+    </span><span class="kw">pub fn </span>to_dbgenerated_func(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">match </span><span class="self">self</span>.kind {
+            DefaultKind::Expression(<span class="kw-2">ref </span>expr) <span class="kw">if </span>expr.is_dbgenerated() =&gt; expr.args.get(<span class="number">0</span>).map(|val| val.<span class="number">1</span>.to_string()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">ValueGenerator</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">generator</span> <span class="op">=</span> <span class="ident">ValueGeneratorFn::new</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>ValueGenerator {
+    name: String,
+    args: Vec&lt;(<span class="prelude-ty">Option</span>&lt;String&gt;, PrismaValue)&gt;,
+    generator: ValueGeneratorFn,
+}
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ValueGenerator</span> { <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">generator</span> })
+<span class="kw">impl </span>ValueGenerator {
+    <span class="kw">pub fn </span>new(name: String, args: Vec&lt;(<span class="prelude-ty">Option</span>&lt;String&gt;, PrismaValue)&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, String&gt; {
+        <span class="kw">let </span>generator = ValueGeneratorFn::new(name.as_ref())<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(ValueGenerator { name, args, generator })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_autoincrement</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;autoincrement&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_autoincrement() -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;autoincrement&quot;</span>.to_owned(), <span class="macro">vec!</span>[]).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sequence</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;sequence&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">args</span>).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_sequence(args: Vec&lt;(<span class="prelude-ty">Option</span>&lt;String&gt;, PrismaValue)&gt;) -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;sequence&quot;</span>.to_owned(), args).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dbgenerated</span>(<span class="ident">description</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">description</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\0&#39;</span>).<span class="ident">is_empty</span>() {
-            <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[(<span class="prelude-val">None</span>, <span class="ident">PrismaValue::String</span>(<span class="ident">description</span>))]).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_dbgenerated(description: String) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>description.trim_matches(<span class="string">&#39;\0&#39;</span>).is_empty() {
+            ValueGenerator::new(<span class="string">&quot;dbgenerated&quot;</span>.to_owned(), Vec::new()).unwrap()
+        } <span class="kw">else </span>{
+            ValueGenerator::new(<span class="string">&quot;dbgenerated&quot;</span>.to_owned(), <span class="macro">vec!</span>[(<span class="prelude-val">None</span>, PrismaValue::String(description))]).unwrap()
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_auto</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;auto&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_auto() -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;auto&quot;</span>.to_owned(), Vec::new()).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_now</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;now&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_now() -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;now&quot;</span>.to_owned(), <span class="macro">vec!</span>[]).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_cuid</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;cuid&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_cuid() -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;cuid&quot;</span>.to_owned(), <span class="macro">vec!</span>[]).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_uuid</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;uuid&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
+    <span class="kw">pub fn </span>new_uuid() -&gt; <span class="self">Self </span>{
+        ValueGenerator::new(<span class="string">&quot;uuid&quot;</span>.to_owned(), <span class="macro">vec!</span>[]).unwrap()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">PrismaValue</span>)] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>
+    <span class="kw">pub fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[(<span class="prelude-ty">Option</span>&lt;String&gt;, PrismaValue)] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.args
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ValueGeneratorFn</span> {
-        <span class="self">self</span>.<span class="ident">generator</span>
+    <span class="kw">pub fn </span>generator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ValueGeneratorFn {
+        <span class="self">self</span>.generator
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">is_dbgenerated</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub fn </span>as_dbgenerated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">if </span>!(<span class="self">self</span>.is_dbgenerated()) {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="number">1</span>.<span class="ident">as_string</span>())
+        <span class="self">self</span>.args.get(<span class="number">0</span>).and_then(|v| v.<span class="number">1</span>.as_string())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">generator</span>.<span class="ident">invoke</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">pub fn </span>generate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="self">self</span>.generator.invoke()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_compatibility_with_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">generator</span>.<span class="ident">can_handle</span>(<span class="ident">scalar_type</span>) {
+    <span class="kw">pub fn </span>check_compatibility_with_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: ScalarType) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
+        <span class="kw">if </span><span class="self">self</span>.generator.can_handle(scalar_type) {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;The function `{}()` cannot be used on fields of type `{}`.&quot;</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">scalar_type</span>
+                <span class="kw-2">&amp;</span><span class="self">self</span>.name, scalar_type
             ))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>
-    }
+    <span class="kw">pub fn </span>is_dbgenerated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.name == <span class="string">&quot;dbgenerated&quot;
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;sequence&quot;</span>
-    }
+    <span class="kw">pub fn </span>is_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.name == <span class="string">&quot;autoincrement&quot; </span>|| <span class="self">self</span>.name == <span class="string">&quot;sequence&quot;
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueGeneratorFn</span> {
-    <span class="ident">Uuid</span>,
-    <span class="ident">Cuid</span>,
-    <span class="ident">Now</span>,
-    <span class="ident">Autoincrement</span>,
-    <span class="ident">DbGenerated</span>,
-    <span class="ident">Auto</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">pub enum </span>ValueGeneratorFn {
+    Uuid,
+    Cuid,
+    Now,
+    Autoincrement,
+    DbGenerated,
+    Auto,
 }
 
-<span class="kw">impl</span> <span class="ident">ValueGeneratorFn</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="string">&quot;cuid&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Cuid</span>),
-            <span class="string">&quot;uuid&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Uuid</span>),
-            <span class="string">&quot;now&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Now</span>),
-            <span class="string">&quot;autoincrement&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Autoincrement</span>),
-            <span class="string">&quot;sequence&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Autoincrement</span>),
-            <span class="string">&quot;dbgenerated&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DbGenerated</span>),
-            <span class="string">&quot;auto&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Auto</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;The function {} is not a known function.&quot;</span>, <span class="ident">name</span>)),
+<span class="kw">impl </span>ValueGeneratorFn {
+    <span class="kw">fn </span>new(name: <span class="kw-2">&amp;</span>str) -&gt; std::result::Result&lt;<span class="self">Self</span>, String&gt; {
+        <span class="kw">match </span>name {
+            <span class="string">&quot;cuid&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Cuid),
+            <span class="string">&quot;uuid&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Uuid),
+            <span class="string">&quot;now&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Now),
+            <span class="string">&quot;autoincrement&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Autoincrement),
+            <span class="string">&quot;sequence&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Autoincrement),
+            <span class="string">&quot;dbgenerated&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DbGenerated),
+            <span class="string">&quot;auto&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Auto),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;The function {} is not a known function.&quot;</span>, name)),
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">invoke</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Uuid</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::generate_uuid</span>()),
-            <span class="ident"><span class="self">Self</span>::Cuid</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::generate_cuid</span>()),
-            <span class="ident"><span class="self">Self</span>::Now</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::generate_now</span>()),
-            <span class="ident"><span class="self">Self</span>::Autoincrement</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::DbGenerated</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident"><span class="self">Self</span>::Auto</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">fn </span>invoke(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Uuid =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::generate_uuid()),
+            <span class="self">Self</span>::Cuid =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::generate_cuid()),
+            <span class="self">Self</span>::Now =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::generate_now()),
+            <span class="self">Self</span>::Autoincrement =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::DbGenerated =&gt; <span class="prelude-val">None</span>,
+            <span class="self">Self</span>::Auto =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">can_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>) -&gt; <span class="ident">bool</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::match_like_matches_macro</span>)]</span>
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">scalar_type</span>) {
-            (<span class="ident"><span class="self">Self</span>::Uuid</span>, <span class="ident">ScalarType::String</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::Cuid</span>, <span class="ident">ScalarType::String</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::Now</span>, <span class="ident">ScalarType::DateTime</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::Autoincrement</span>, <span class="ident">ScalarType::Int</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::Autoincrement</span>, <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::DbGenerated</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident"><span class="self">Self</span>::Auto</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>can_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: ScalarType) -&gt; bool {
+        <span class="attribute">#[allow(clippy::match_like_matches_macro)]
+        </span><span class="kw">match </span>(<span class="self">self</span>, scalar_type) {
+            (<span class="self">Self</span>::Uuid, ScalarType::String) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::Cuid, ScalarType::String) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::Now, ScalarType::DateTime) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::Autoincrement, ScalarType::Int) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::Autoincrement, ScalarType::BigInt) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::DbGenerated, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="self">Self</span>::Auto, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">generate_cuid</span>() -&gt; <span class="ident">PrismaValue</span> {
-        <span class="ident">PrismaValue::String</span>(<span class="ident">cuid::cuid</span>().<span class="ident">unwrap</span>())
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">fn </span>generate_cuid() -&gt; PrismaValue {
+        PrismaValue::String(cuid::cuid().unwrap())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">generate_uuid</span>() -&gt; <span class="ident">PrismaValue</span> {
-        <span class="ident">PrismaValue::Uuid</span>(<span class="ident">uuid::Uuid::new_v4</span>())
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">fn </span>generate_uuid() -&gt; PrismaValue {
+        PrismaValue::Uuid(uuid::Uuid::new_v4())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;default_generators&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">generate_now</span>() -&gt; <span class="ident">PrismaValue</span> {
-        <span class="ident">PrismaValue::DateTime</span>(<span class="ident">chrono::Utc::now</span>().<span class="ident">into</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ValueGenerator</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">args</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">args</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;default_generators&quot;</span>)]
+    </span><span class="kw">fn </span>generate_now() -&gt; PrismaValue {
+        PrismaValue::DateTime(chrono::Utc::now().into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DefaultValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">DefaultKind::Single</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DefaultValue::Single({:?})&quot;</span>, <span class="ident">v</span>),
-            <span class="ident">DefaultKind::Expression</span>(<span class="ident">g</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DefaultValue::Expression({}(){:?})&quot;</span>, <span class="ident">g</span>.<span class="ident">name</span>(), <span class="ident">g</span>.<span class="ident">args</span>),
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>ValueGenerator {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.name() == other.name() &amp;&amp; <span class="self">self</span>.args() == other.args()
+    }
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>DefaultValue {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.kind {
+            DefaultKind::Single(<span class="kw-2">ref </span>v) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DefaultValue::Single({:?})&quot;</span>, v),
+            DefaultKind::Expression(g) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DefaultValue::Expression({}(){:?})&quot;</span>, g.name(), g.args),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DefaultValue</span>, <span class="ident">ValueGenerator</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{DefaultValue, ValueGenerator};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_value_is_autoincrement</span>() {
-        <span class="kw">let</span> <span class="ident">auto_increment_default</span> <span class="op">=</span> <span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default_value_is_autoincrement() {
+        <span class="kw">let </span>auto_increment_default = DefaultValue::new_expression(ValueGenerator::new_autoincrement());
 
-        <span class="macro">assert!</span>(<span class="ident">auto_increment_default</span>.<span class="ident">is_autoincrement</span>());
+        <span class="macro">assert!</span>(auto_increment_default.is_autoincrement());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_value_is_now</span>() {
-        <span class="kw">let</span> <span class="ident">now_default</span> <span class="op">=</span> <span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_now</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default_value_is_now() {
+        <span class="kw">let </span>now_default = DefaultValue::new_expression(ValueGenerator::new_now());
 
-        <span class="macro">assert!</span>(<span class="ident">now_default</span>.<span class="ident">is_now</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">now_default</span>.<span class="ident">is_autoincrement</span>());
+        <span class="macro">assert!</span>(now_default.is_now());
+        <span class="macro">assert!</span>(!now_default.is_autoincrement());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_value_is_uuid</span>() {
-        <span class="kw">let</span> <span class="ident">uuid_default</span> <span class="op">=</span> <span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_uuid</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default_value_is_uuid() {
+        <span class="kw">let </span>uuid_default = DefaultValue::new_expression(ValueGenerator::new_uuid());
 
-        <span class="macro">assert!</span>(<span class="ident">uuid_default</span>.<span class="ident">is_uuid</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">uuid_default</span>.<span class="ident">is_autoincrement</span>());
+        <span class="macro">assert!</span>(uuid_default.is_uuid());
+        <span class="macro">assert!</span>(!uuid_default.is_autoincrement());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_value_is_cuid</span>() {
-        <span class="kw">let</span> <span class="ident">cuid_default</span> <span class="op">=</span> <span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_cuid</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default_value_is_cuid() {
+        <span class="kw">let </span>cuid_default = DefaultValue::new_expression(ValueGenerator::new_cuid());
 
-        <span class="macro">assert!</span>(<span class="ident">cuid_default</span>.<span class="ident">is_cuid</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cuid_default</span>.<span class="ident">is_now</span>());
+        <span class="macro">assert!</span>(cuid_default.is_cuid());
+        <span class="macro">assert!</span>(!cuid_default.is_now());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_value_is_dbgenerated</span>() {
-        <span class="kw">let</span> <span class="ident">db_generated_default</span> <span class="op">=</span> <span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_dbgenerated</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default_value_is_dbgenerated() {
+        <span class="kw">let </span>db_generated_default = DefaultValue::new_expression(ValueGenerator::new_dbgenerated(<span class="string">&quot;test&quot;</span>.to_string()));
 
-        <span class="macro">assert!</span>(<span class="ident">db_generated_default</span>.<span class="ident">is_dbgenerated</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db_generated_default</span>.<span class="ident">is_now</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">db_generated_default</span>.<span class="ident">is_autoincrement</span>());
+        <span class="macro">assert!</span>(db_generated_default.is_dbgenerated());
+        <span class="macro">assert!</span>(!db_generated_default.is_now());
+        <span class="macro">assert!</span>(!db_generated_default.is_autoincrement());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

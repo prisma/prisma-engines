@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/registry/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/registry/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -604,609 +604,609 @@
 <span id="602">602</span>
 <span id="603">603</span>
 <span id="604">604</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Storage for span data shared by multiple [`Layer`]s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using the Span Registry</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the [`Registry`] type, a [`Subscriber`] implementation</span>
-<span class="doccomment">//! which tracks per-span data and exposes it to [`Layer`]s. When a `Registry`</span>
-<span class="doccomment">//! is used as the base `Subscriber` of a `Layer` stack, the</span>
-<span class="doccomment">//! [`layer::Context`][ctx] type will provide methods allowing `Layer`s to</span>
-<span class="doccomment">//! [look up span data][lookup] stored in the registry. While [`Registry`] is a</span>
-<span class="doccomment">//! reasonable default for storing spans and events, other stores that implement</span>
-<span class="doccomment">//! [`LookupSpan`] and [`Subscriber`] themselves (with [`SpanData`] implemented</span>
-<span class="doccomment">//! by the per-span data they store) can be used as a drop-in replacement.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, we might create a `Registry` and add multiple `Layer`s like so:</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use tracing_subscriber::{registry::Registry, Layer, prelude::*};</span>
-<span class="doccomment">//! # use tracing_core::Subscriber;</span>
-<span class="doccomment">//! # pub struct FooLayer {}</span>
-<span class="doccomment">//! # pub struct BarLayer {}</span>
-<span class="doccomment">//! # impl&lt;S: Subscriber&gt; Layer&lt;S&gt; for FooLayer {}</span>
-<span class="doccomment">//! # impl&lt;S: Subscriber&gt; Layer&lt;S&gt; for BarLayer {}</span>
-<span class="doccomment">//! # impl FooLayer {</span>
-<span class="doccomment">//! # fn new() -&gt; Self { Self {} }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # impl BarLayer {</span>
-<span class="doccomment">//! # fn new() -&gt; Self { Self {} }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let subscriber = Registry::default()</span>
-<span class="doccomment">//!     .with(FooLayer::new())</span>
-<span class="doccomment">//!     .with(BarLayer::new());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! If a type implementing `Layer` depends on the functionality of a `Registry`</span>
-<span class="doccomment">//! implementation, it should bound its `Subscriber` type parameter with the</span>
-<span class="doccomment">//! [`LookupSpan`] trait, like so:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use tracing_subscriber::{registry, Layer};</span>
-<span class="doccomment">//! use tracing_core::Subscriber;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! pub struct MyLayer {</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl&lt;S&gt; Layer&lt;S&gt; for MyLayer</span>
-<span class="doccomment">//! where</span>
-<span class="doccomment">//!     S: Subscriber + for&lt;&#39;a&gt; registry::LookupSpan&lt;&#39;a&gt;,</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! When this bound is added, the `Layer` implementation will be guaranteed</span>
-<span class="doccomment">//! access to the [`Context`][ctx] methods, such as [`Context::span`][lookup], that</span>
-<span class="doccomment">//! require the root subscriber to be a registry.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Layer`]: crate::layer::Layer</span>
-<span class="doccomment">//! [`Subscriber`]:</span>
-<span class="doccomment">//!     https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html</span>
-<span class="doccomment">//! [ctx]: crate::layer::Context</span>
-<span class="doccomment">//! [lookup]: crate::layer::Context::span()</span>
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{<span class="ident">field::FieldSet</span>, <span class="ident">span::Id</span>, <span class="ident">Metadata</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! Storage for span data shared by multiple [`Layer`]s.
+//!
+//! ## Using the Span Registry
+//!
+//! This module provides the [`Registry`] type, a [`Subscriber`] implementation
+//! which tracks per-span data and exposes it to [`Layer`]s. When a `Registry`
+//! is used as the base `Subscriber` of a `Layer` stack, the
+//! [`layer::Context`][ctx] type will provide methods allowing `Layer`s to
+//! [look up span data][lookup] stored in the registry. While [`Registry`] is a
+//! reasonable default for storing spans and events, other stores that implement
+//! [`LookupSpan`] and [`Subscriber`] themselves (with [`SpanData`] implemented
+//! by the per-span data they store) can be used as a drop-in replacement.
+//!
+//! For example, we might create a `Registry` and add multiple `Layer`s like so:
+//! ```rust
+//! use tracing_subscriber::{registry::Registry, Layer, prelude::*};
+//! # use tracing_core::Subscriber;
+//! # pub struct FooLayer {}
+//! # pub struct BarLayer {}
+//! # impl&lt;S: Subscriber&gt; Layer&lt;S&gt; for FooLayer {}
+//! # impl&lt;S: Subscriber&gt; Layer&lt;S&gt; for BarLayer {}
+//! # impl FooLayer {
+//! # fn new() -&gt; Self { Self {} }
+//! # }
+//! # impl BarLayer {
+//! # fn new() -&gt; Self { Self {} }
+//! # }
+//!
+//! let subscriber = Registry::default()
+//!     .with(FooLayer::new())
+//!     .with(BarLayer::new());
+//! ```
+//!
+//! If a type implementing `Layer` depends on the functionality of a `Registry`
+//! implementation, it should bound its `Subscriber` type parameter with the
+//! [`LookupSpan`] trait, like so:
+//!
+//! ```rust
+//! use tracing_subscriber::{registry, Layer};
+//! use tracing_core::Subscriber;
+//!
+//! pub struct MyLayer {
+//!     // ...
+//! }
+//!
+//! impl&lt;S&gt; Layer&lt;S&gt; for MyLayer
+//! where
+//!     S: Subscriber + for&lt;&#39;a&gt; registry::LookupSpan&lt;&#39;a&gt;,
+//! {
+//!     // ...
+//! }
+//! ```
+//! When this bound is added, the `Layer` implementation will be guaranteed
+//! access to the [`Context`][ctx] methods, such as [`Context::span`][lookup], that
+//! require the root subscriber to be a registry.
+//!
+//! [`Layer`]: crate::layer::Layer
+//! [`Subscriber`]:
+//!     https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html
+//! [ctx]: crate::layer::Context
+//! [lookup]: crate::layer::Context::span()
+</span><span class="kw">use </span>tracing_core::{field::FieldSet, span::Id, Metadata};
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>]</span>
-    <span class="doccomment">/// A module containing a type map of span extensions.</span>
-    <span class="kw">mod</span> <span class="ident">extensions</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">extensions</span>::{<span class="ident">Extensions</span>, <span class="ident">ExtensionsMut</span>};
+<span class="macro">feature! </span>{
+    <span class="attribute">#![feature = <span class="string">&quot;std&quot;</span>]
+    </span><span class="doccomment">/// A module containing a type map of span extensions.
+    </span><span class="kw">mod </span>extensions;
+    <span class="kw">pub use </span>extensions::{Extensions, ExtensionsMut};
 
 }
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="macro">feature! </span>{
+    <span class="attribute">#![all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
 
-    <span class="kw">mod</span> <span class="ident">sharded</span>;
-    <span class="kw">mod</span> <span class="ident">stack</span>;
+    </span><span class="kw">mod </span>sharded;
+    <span class="kw">mod </span>stack;
 
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sharded::Data</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">sharded::Registry</span>;
+    <span class="kw">pub use </span>sharded::Data;
+    <span class="kw">pub use </span>sharded::Registry;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::FilterId</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::filter::FilterId;
 }
 
-<span class="doccomment">/// Provides access to stored span data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Subscribers which store span data and associate it with span IDs should</span>
-<span class="doccomment">/// implement this trait; if they do, any [`Layer`]s wrapping them can look up</span>
-<span class="doccomment">/// metadata via the [`Context`] type&#39;s [`span()`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Layer`]: ../layer/trait.Layer.html</span>
-<span class="doccomment">/// [`Context`]: ../layer/struct.Context.html</span>
-<span class="doccomment">/// [`span()`]: ../layer/struct.Context.html#method.span</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The type of span data stored in this registry.</span>
-    <span class="kw">type</span> <span class="ident">Data</span>: <span class="ident">SpanData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Provides access to stored span data.
+///
+/// Subscribers which store span data and associate it with span IDs should
+/// implement this trait; if they do, any [`Layer`]s wrapping them can look up
+/// metadata via the [`Context`] type&#39;s [`span()`] method.
+///
+/// [`Layer`]: ../layer/trait.Layer.html
+/// [`Context`]: ../layer/struct.Context.html
+/// [`span()`]: ../layer/struct.Context.html#method.span
+</span><span class="kw">pub trait </span>LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The type of span data stored in this registry.
+    </span><span class="kw">type </span>Data: SpanData&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="doccomment">/// Returns the [`SpanData`] for a given `Id`, if it exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
-    <span class="doccomment">/// &lt;strong&gt;Note&lt;/strong&gt;: users of the &lt;code&gt;LookupSpan&lt;/code&gt; trait should</span>
-    <span class="doccomment">/// typically call the &lt;a href=&quot;#method.span&quot;&gt;&lt;code&gt;span&lt;/code&gt;&lt;/a&gt; method rather</span>
-    <span class="doccomment">/// than this method. The &lt;code&gt;span&lt;/code&gt; method is implemented by</span>
-    <span class="doccomment">/// &lt;em&gt;calling&lt;/em&gt; &lt;code&gt;span_data&lt;/code&gt;, but returns a reference which is</span>
-    <span class="doccomment">/// capable of performing more sophisiticated queries.</span>
-    <span class="doccomment">/// &lt;/pre&gt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SpanData`]: trait.SpanData.html</span>
-    <span class="kw">fn</span> <span class="ident">span_data</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns the [`SpanData`] for a given `Id`, if it exists.
+    ///
+    /// &lt;pre class=&quot;ignore&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;
+    /// &lt;strong&gt;Note&lt;/strong&gt;: users of the &lt;code&gt;LookupSpan&lt;/code&gt; trait should
+    /// typically call the &lt;a href=&quot;#method.span&quot;&gt;&lt;code&gt;span&lt;/code&gt;&lt;/a&gt; method rather
+    /// than this method. The &lt;code&gt;span&lt;/code&gt; method is implemented by
+    /// &lt;em&gt;calling&lt;/em&gt; &lt;code&gt;span_data&lt;/code&gt;, but returns a reference which is
+    /// capable of performing more sophisiticated queries.
+    /// &lt;/pre&gt;
+    ///
+    /// [`SpanData`]: trait.SpanData.html
+    </span><span class="kw">fn </span>span_data(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Data&gt;;
 
-    <span class="doccomment">/// Returns a [`SpanRef`] for the span with the given `Id`, if it exists.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A `SpanRef` is similar to [`SpanData`], but it allows performing</span>
-    <span class="doccomment">/// additional lookups against the registryr that stores the wrapped data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In general, _users_ of the `LookupSpan` trait should use this method</span>
-    <span class="doccomment">/// rather than the [`span_data`] method; while _implementors_ of this trait</span>
-    <span class="doccomment">/// should only implement `span_data`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`SpanRef`]: struct.SpanRef.html</span>
-    <span class="doccomment">/// [`SpanData`]: trait.SpanData.html</span>
-    <span class="doccomment">/// [`span_data`]: #method.span_data</span>
-    <span class="kw">fn</span> <span class="ident">span</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Returns a [`SpanRef`] for the span with the given `Id`, if it exists.
+    ///
+    /// A `SpanRef` is similar to [`SpanData`], but it allows performing
+    /// additional lookups against the registryr that stores the wrapped data.
+    ///
+    /// In general, _users_ of the `LookupSpan` trait should use this method
+    /// rather than the [`span_data`] method; while _implementors_ of this trait
+    /// should only implement `span_data`.
+    ///
+    /// [`SpanRef`]: struct.SpanRef.html
+    /// [`SpanData`]: trait.SpanData.html
+    /// [`span_data`]: #method.span_data
+    </span><span class="kw">fn </span>span(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Id) -&gt; <span class="prelude-ty">Option</span>&lt;SpanRef&lt;<span class="lifetime">&#39;_</span>, <span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">span_data</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">SpanRef</span> {
-            <span class="ident">registry</span>: <span class="self">self</span>,
-            <span class="ident">data</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-            <span class="ident">filter</span>: <span class="ident">FilterId::none</span>(),
+        <span class="kw">let </span>data = <span class="self">self</span>.span_data(id)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(SpanRef {
+            registry: <span class="self">self</span>,
+            data,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+            </span>filter: FilterId::none(),
         })
     }
 
-    <span class="doccomment">/// Registers a [`Filter`] for [per-layer filtering] with this</span>
-    <span class="doccomment">/// [`Subscriber`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`Filter`] can then use the returned [`FilterId`] to</span>
-    <span class="doccomment">/// [check if it previously enabled a span][check].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this `Subscriber` does not support [per-layer filtering].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Filter`]: crate::layer::Filter</span>
-    <span class="doccomment">/// [per-layer filtering]: crate::layer::Layer#per-layer-filtering</span>
-    <span class="doccomment">/// [`Subscriber`]: tracing_core::Subscriber</span>
-    <span class="doccomment">/// [`FilterId`]: crate::filter::FilterId</span>
-    <span class="doccomment">/// [check]: SpanData::is_enabled_for</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">register_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">FilterId</span> {
+    <span class="doccomment">/// Registers a [`Filter`] for [per-layer filtering] with this
+    /// [`Subscriber`].
+    ///
+    /// The [`Filter`] can then use the returned [`FilterId`] to
+    /// [check if it previously enabled a span][check].
+    ///
+    /// # Panics
+    ///
+    /// If this `Subscriber` does not support [per-layer filtering].
+    ///
+    /// [`Filter`]: crate::layer::Filter
+    /// [per-layer filtering]: crate::layer::Layer#per-layer-filtering
+    /// [`Subscriber`]: tracing_core::Subscriber
+    /// [`FilterId`]: crate::filter::FilterId
+    /// [check]: SpanData::is_enabled_for
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+    </span><span class="kw">fn </span>register_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; FilterId {
         <span class="macro">panic!</span>(
             <span class="string">&quot;{} does not currently support filters&quot;</span>,
-            <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>()
+            std::any::type_name::&lt;<span class="self">Self</span>&gt;()
         )
     }
 }
 
-<span class="doccomment">/// A stored representation of data associated with a span.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SpanData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns this span&#39;s ID.</span>
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Id</span>;
+<span class="doccomment">/// A stored representation of data associated with a span.
+</span><span class="kw">pub trait </span>SpanData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns this span&#39;s ID.
+    </span><span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Id;
 
-    <span class="doccomment">/// Returns a reference to the span&#39;s `Metadata`.</span>
-    <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a reference to the span&#39;s `Metadata`.
+    </span><span class="kw">fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;;
 
-    <span class="doccomment">/// Returns a reference to the ID</span>
-    <span class="kw">fn</span> <span class="ident">parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Id</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a reference to the ID
+    </span><span class="kw">fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Id&gt;;
 
-    <span class="doccomment">/// Returns a reference to this span&#39;s `Extensions`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The extensions may be used by `Layer`s to store additional data</span>
-    <span class="doccomment">/// describing the span.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Extensions</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a reference to this span&#39;s `Extensions`.
+    ///
+    /// The extensions may be used by `Layer`s to store additional data
+    /// describing the span.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Extensions&lt;<span class="lifetime">&#39;_</span>&gt;;
 
-    <span class="doccomment">/// Returns a mutable reference to this span&#39;s `Extensions`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The extensions may be used by `Layer`s to store additional data</span>
-    <span class="doccomment">/// describing the span.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ExtensionsMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a mutable reference to this span&#39;s `Extensions`.
+    ///
+    /// The extensions may be used by `Layer`s to store additional data
+    /// describing the span.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">fn </span>extensions_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ExtensionsMut&lt;<span class="lifetime">&#39;_</span>&gt;;
 
-    <span class="doccomment">/// Returns `true` if this span is enabled for the [per-layer filter][plf]</span>
-    <span class="doccomment">/// corresponding to the provided [`FilterId`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Default Implementation</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, this method assumes that the [`LookupSpan`] implementation</span>
-    <span class="doccomment">/// does not support [per-layer filtering][plf], and always returns `true`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [plf]: crate::layer::Layer#per-layer-filtering</span>
-    <span class="doccomment">/// [`FilterId`]: crate::filter::FilterId</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">is_enabled_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">filter</span>;
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Returns `true` if this span is enabled for the [per-layer filter][plf]
+    /// corresponding to the provided [`FilterId`].
+    ///
+    /// ## Default Implementation
+    ///
+    /// By default, this method assumes that the [`LookupSpan`] implementation
+    /// does not support [per-layer filtering][plf], and always returns `true`.
+    ///
+    /// [plf]: crate::layer::Layer#per-layer-filtering
+    /// [`FilterId`]: crate::filter::FilterId
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;registry&quot;</span>)))]
+    </span><span class="kw">fn </span>is_enabled_for(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: FilterId) -&gt; bool {
+        <span class="kw">let _ </span>= filter;
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="doccomment">/// A reference to [span data] and the associated [registry].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements all the same methods as [`SpanData`][span data], and</span>
-<span class="doccomment">/// provides additional methods for querying the registry based on values from</span>
-<span class="doccomment">/// the span.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [span data]: trait.SpanData.html</span>
-<span class="doccomment">/// [registry]: trait.LookupSpan.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">R</span>,
-    <span class="ident">data</span>: <span class="ident">R::Data</span>,
+<span class="doccomment">/// A reference to [span data] and the associated [registry].
+///
+/// This type implements all the same methods as [`SpanData`][span data], and
+/// provides additional methods for querying the registry based on values from
+/// the span.
+///
+/// [span data]: trait.SpanData.html
+/// [registry]: trait.LookupSpan.html
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SpanRef&lt;<span class="lifetime">&#39;a</span>, R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    registry: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>R,
+    data: R::Data,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-    <span class="ident">filter</span>: <span class="ident">FilterId</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+    </span>filter: FilterId,
 }
 
-<span class="doccomment">/// An iterator over the parents of a span, ordered from leaf to root.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is returned by the [`SpanRef::scope`] method.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">R</span>,
-    <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Id</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator over the parents of a span, ordered from leaf to root.
+///
+/// This is returned by the [`SpanRef::scope`] method.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Scope&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+    registry: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>R,
+    next: <span class="prelude-ty">Option</span>&lt;Id&gt;,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="ident">filter</span>: <span class="ident">FilterId</span>,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span>filter: FilterId,
 }
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="macro">feature! </span>{
+    <span class="attribute">#![any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>))]</span>
-    <span class="kw">use</span> <span class="ident">alloc::vec</span>::{<span class="self">self</span>, <span class="ident">Vec</span>};
+    #[cfg(not(feature = <span class="string">&quot;smallvec&quot;</span>))]
+    </span><span class="kw">use </span>alloc::vec::{<span class="self">self</span>, Vec};
 
-    <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>,<span class="ident">iter</span>};
+    <span class="kw">use </span>core::{fmt,iter};
 
-    <span class="doccomment">/// An iterator over the parents of a span, ordered from root to leaf.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is returned by the [`Scope::from_root`] method.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScopeFromRoot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// An iterator over the parents of a span, ordered from root to leaf.
+    ///
+    /// This is returned by the [`Scope::from_root`] method.
+    </span><span class="kw">pub struct </span>ScopeFromRoot&lt;<span class="lifetime">&#39;a</span>, R&gt;
+    <span class="kw">where
+        </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>)]</span>
-        <span class="ident">spans</span>: <span class="ident">iter::Rev</span><span class="op">&lt;</span><span class="ident">smallvec::IntoIter</span><span class="op">&lt;</span><span class="ident">SpanRefVecArray</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>))]</span>
-        <span class="ident">spans</span>: <span class="ident">iter::Rev</span><span class="op">&lt;</span><span class="ident">vec::IntoIter</span><span class="op">&lt;</span><span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;smallvec&quot;</span>)]
+        </span>spans: iter::Rev&lt;smallvec::IntoIter&lt;SpanRefVecArray&lt;<span class="lifetime">&#39;a</span>, R&gt;&gt;&gt;,
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;smallvec&quot;</span>))]
+        </span>spans: iter::Rev&lt;vec::IntoIter&lt;SpanRef&lt;<span class="lifetime">&#39;a</span>, R&gt;&gt;&gt;,
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>)]</span>
-    <span class="kw">type</span> <span class="ident">SpanRefVecArray</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="op">=</span> [<span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;span</span>, <span class="ident">L</span><span class="op">&gt;</span>; <span class="number">16</span>];
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;smallvec&quot;</span>)]
+    </span><span class="kw">type </span>SpanRefVecArray&lt;<span class="lifetime">&#39;span</span>, L&gt; = [SpanRef&lt;<span class="lifetime">&#39;span</span>, L&gt;; <span class="number">16</span>];
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R&gt; Scope&lt;<span class="lifetime">&#39;a</span>, R&gt;
+    <span class="kw">where
+        </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="doccomment">/// Flips the order of the iterator, so that it is ordered from root to leaf.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The iterator will first return the root span, then that span&#39;s immediate child,</span>
-        <span class="doccomment">/// and so on until it finally returns the span that [`SpanRef::scope`] was called on.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// If any items were consumed from the [`Scope`] before calling this method then they</span>
-        <span class="doccomment">/// will *not* be returned from the [`ScopeFromRoot`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// **Note**: this will allocate if there are many spans remaining, or if the</span>
-        <span class="doccomment">/// &quot;smallvec&quot; feature flag is not enabled.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_root</span>(<span class="self">self</span>) -&gt; <span class="ident">ScopeFromRoot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>)]</span>
-            <span class="kw">type</span> <span class="ident">Buf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">smallvec::SmallVec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;smallvec&quot;</span>))]</span>
-            <span class="kw">type</span> <span class="ident">Buf</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-            <span class="ident">ScopeFromRoot</span> {
-                <span class="ident">spans</span>: <span class="self">self</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Buf</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">into_iter</span>().<span class="ident">rev</span>(),
+        <span class="doccomment">/// Flips the order of the iterator, so that it is ordered from root to leaf.
+        ///
+        /// The iterator will first return the root span, then that span&#39;s immediate child,
+        /// and so on until it finally returns the span that [`SpanRef::scope`] was called on.
+        ///
+        /// If any items were consumed from the [`Scope`] before calling this method then they
+        /// will *not* be returned from the [`ScopeFromRoot`].
+        ///
+        /// **Note**: this will allocate if there are many spans remaining, or if the
+        /// &quot;smallvec&quot; feature flag is not enabled.
+        </span><span class="attribute">#[allow(clippy::wrong_self_convention)]
+        </span><span class="kw">pub fn </span>from_root(<span class="self">self</span>) -&gt; ScopeFromRoot&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;smallvec&quot;</span>)]
+            </span><span class="kw">type </span>Buf&lt;T&gt; = smallvec::SmallVec&lt;T&gt;;
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;smallvec&quot;</span>))]
+            </span><span class="kw">type </span>Buf&lt;T&gt; = Vec&lt;T&gt;;
+            ScopeFromRoot {
+                spans: <span class="self">self</span>.collect::&lt;Buf&lt;<span class="kw">_</span>&gt;&gt;().into_iter().rev(),
             }
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ScopeFromRoot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R&gt; Iterator <span class="kw">for </span>ScopeFromRoot&lt;<span class="lifetime">&#39;a</span>, R&gt;
+    <span class="kw">where
+        </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+        <span class="kw">type </span>Item = SpanRef&lt;<span class="lifetime">&#39;a</span>, R&gt;;
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">spans</span>.<span class="ident">next</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+            <span class="self">self</span>.spans.next()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-            <span class="self">self</span>.<span class="ident">spans</span>.<span class="ident">size_hint</span>()
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+            <span class="self">self</span>.spans.size_hint()
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ScopeFromRoot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R&gt; fmt::Debug <span class="kw">for </span>ScopeFromRoot&lt;<span class="lifetime">&#39;a</span>, R&gt;
+    <span class="kw">where
+        </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;ScopeFromRoot { .. }&quot;</span>)
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            f.pad(<span class="string">&quot;ScopeFromRoot { .. }&quot;</span>)
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R&gt; Iterator <span class="kw">for </span>Scope&lt;<span class="lifetime">&#39;a</span>, R&gt;
+<span class="kw">where
+    </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = SpanRef&lt;<span class="lifetime">&#39;a</span>, R&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">curr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">span</span>(<span class="self">self</span>.<span class="ident">next</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>curr = <span class="self">self</span>.registry.span(<span class="self">self</span>.next.as_ref()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-            <span class="kw">let</span> <span class="ident">curr</span> <span class="op">=</span> <span class="ident">curr</span>.<span class="ident">with_filter</span>(<span class="self">self</span>.<span class="ident">filter</span>);
-            <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">curr</span>.<span class="ident">data</span>.<span class="ident">parent</span>().<span class="ident">cloned</span>();
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+            </span><span class="kw">let </span>curr = curr.with_filter(<span class="self">self</span>.filter);
+            <span class="self">self</span>.next = curr.data.parent().cloned();
 
-            <span class="comment">// If the `Scope` is filtered, check if the current span is enabled</span>
-            <span class="comment">// by the selected filter ID.</span>
+            <span class="comment">// If the `Scope` is filtered, check if the current span is enabled
+            // by the selected filter ID.
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-            {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">curr</span>.<span class="ident">is_enabled_for</span>(<span class="self">self</span>.<span class="ident">filter</span>) {
-                    <span class="comment">// The current span in the chain is disabled for this</span>
-                    <span class="comment">// filter. Try its parent.</span>
-                    <span class="kw">continue</span>;
+            </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+            </span>{
+                <span class="kw">if </span>!curr.is_enabled_for(<span class="self">self</span>.filter) {
+                    <span class="comment">// The current span in the chain is disabled for this
+                    // filter. Try its parent.
+                    </span><span class="kw">continue</span>;
                 }
             }
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">curr</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(curr);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, R&gt; SpanRef&lt;<span class="lifetime">&#39;a</span>, R&gt;
+<span class="kw">where
+    </span>R: LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="doccomment">/// Returns this span&#39;s ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Id</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">id</span>()
+    <span class="doccomment">/// Returns this span&#39;s ID.
+    </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Id {
+        <span class="self">self</span>.data.id()
     }
 
-    <span class="doccomment">/// Returns a static reference to the span&#39;s metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">metadata</span>()
+    <span class="doccomment">/// Returns a static reference to the span&#39;s metadata.
+    </span><span class="kw">pub fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="self">self</span>.data.metadata()
     }
 
-    <span class="doccomment">/// Returns the span&#39;s name,</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">metadata</span>().<span class="ident">name</span>()
+    <span class="doccomment">/// Returns the span&#39;s name,
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="self">self</span>.data.metadata().name()
     }
 
-    <span class="doccomment">/// Returns a list of [fields] defined by the span.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [fields]: https://docs.rs/tracing-core/latest/tracing_core/field/index.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FieldSet</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">metadata</span>().<span class="ident">fields</span>()
+    <span class="doccomment">/// Returns a list of [fields] defined by the span.
+    ///
+    /// [fields]: https://docs.rs/tracing-core/latest/tracing_core/field/index.html
+    </span><span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FieldSet {
+        <span class="self">self</span>.data.metadata().fields()
     }
 
-    <span class="doccomment">/// Returns a `SpanRef` describing this span&#39;s parent, or `None` if this</span>
-    <span class="doccomment">/// span is the root of its trace tree.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">span_data</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Returns a `SpanRef` describing this span&#39;s parent, or `None` if this
+    /// span is the root of its trace tree.
+    </span><span class="kw">pub fn </span>parent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>id = <span class="self">self</span>.data.parent()<span class="question-mark">?</span>;
+        <span class="kw">let </span>data = <span class="self">self</span>.registry.span_data(id)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        {
-            <span class="comment">// move these into mut bindings if the registry feature is enabled,</span>
-            <span class="comment">// since they may be mutated in the loop.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>;
-            <span class="kw">loop</span> {
-                <span class="comment">// Is this parent enabled by our filter?</span>
-                <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">is_enabled_for</span>(<span class="self">self</span>.<span class="ident">filter</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                        <span class="ident">registry</span>: <span class="self">self</span>.<span class="ident">registry</span>,
-                        <span class="ident">filter</span>: <span class="self">self</span>.<span class="ident">filter</span>,
-                        <span class="ident">data</span>,
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span>{
+            <span class="comment">// move these into mut bindings if the registry feature is enabled,
+            // since they may be mutated in the loop.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>data = data;
+            <span class="kw">loop </span>{
+                <span class="comment">// Is this parent enabled by our filter?
+                </span><span class="kw">if </span>data.is_enabled_for(<span class="self">self</span>.filter) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">Self </span>{
+                        registry: <span class="self">self</span>.registry,
+                        filter: <span class="self">self</span>.filter,
+                        data,
                     });
                 }
 
-                <span class="comment">// It&#39;s not enabled. If the disabled span has a parent, try that!</span>
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>;
-                <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">span_data</span>(<span class="ident">id</span>)<span class="question-mark">?</span>;
+                <span class="comment">// It&#39;s not enabled. If the disabled span has a parent, try that!
+                </span><span class="kw">let </span>id = data.parent()<span class="question-mark">?</span>;
+                data = <span class="self">self</span>.registry.span_data(id)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">registry</span>: <span class="self">self</span>.<span class="ident">registry</span>,
-            <span class="ident">data</span>,
+        <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)))]
+        </span><span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            registry: <span class="self">self</span>.registry,
+            data,
         })
     }
 
-    <span class="doccomment">/// Returns an iterator over all parents of this span, starting with this span,</span>
-    <span class="doccomment">/// ordered from leaf to root.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The iterator will first return the span, then the span&#39;s immediate parent,</span>
-    <span class="doccomment">/// followed by that span&#39;s parent, and so on, until it reaches a root span.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing::{span, Subscriber};</span>
-    <span class="doccomment">/// use tracing_subscriber::{</span>
-    <span class="doccomment">///     layer::{Context, Layer},</span>
-    <span class="doccomment">///     prelude::*,</span>
-    <span class="doccomment">///     registry::LookupSpan,</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct PrintingLayer;</span>
-    <span class="doccomment">/// impl&lt;S&gt; Layer&lt;S&gt; for PrintingLayer</span>
-    <span class="doccomment">/// where</span>
-    <span class="doccomment">///     S: Subscriber + for&lt;&#39;lookup&gt; LookupSpan&lt;&#39;lookup&gt;,</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     fn on_enter(&amp;self, id: &amp;span::Id, ctx: Context&lt;S&gt;) {</span>
-    <span class="doccomment">///         let span = ctx.span(id).unwrap();</span>
-    <span class="doccomment">///         let scope = span.scope().map(|span| span.name()).collect::&lt;Vec&lt;_&gt;&gt;();</span>
-    <span class="doccomment">///         println!(&quot;Entering span: {:?}&quot;, scope);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing::subscriber::with_default(tracing_subscriber::registry().with(PrintingLayer), || {</span>
-    <span class="doccomment">///     let _root = tracing::info_span!(&quot;root&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;root&quot;]</span>
-    <span class="doccomment">///     let _child = tracing::info_span!(&quot;child&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;child&quot;, &quot;root&quot;]</span>
-    <span class="doccomment">///     let _leaf = tracing::info_span!(&quot;leaf&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;leaf&quot;, &quot;child&quot;, &quot;root&quot;]</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the opposite order (from the root to this span) is desired, calling [`Scope::from_root`] on</span>
-    <span class="doccomment">/// the returned iterator reverses the order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tracing::{span, Subscriber};</span>
-    <span class="doccomment">/// # use tracing_subscriber::{</span>
-    <span class="doccomment">/// #     layer::{Context, Layer},</span>
-    <span class="doccomment">/// #     prelude::*,</span>
-    <span class="doccomment">/// #     registry::LookupSpan,</span>
-    <span class="doccomment">/// # };</span>
-    <span class="doccomment">/// # struct PrintingLayer;</span>
-    <span class="doccomment">/// impl&lt;S&gt; Layer&lt;S&gt; for PrintingLayer</span>
-    <span class="doccomment">/// where</span>
-    <span class="doccomment">///     S: Subscriber + for&lt;&#39;lookup&gt; LookupSpan&lt;&#39;lookup&gt;,</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     fn on_enter(&amp;self, id: &amp;span::Id, ctx: Context&lt;S&gt;) {</span>
-    <span class="doccomment">///         let span = ctx.span(id).unwrap();</span>
-    <span class="doccomment">///         let scope = span.scope().from_root().map(|span| span.name()).collect::&lt;Vec&lt;_&gt;&gt;();</span>
-    <span class="doccomment">///         println!(&quot;Entering span: {:?}&quot;, scope);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// tracing::subscriber::with_default(tracing_subscriber::registry().with(PrintingLayer), || {</span>
-    <span class="doccomment">///     let _root = tracing::info_span!(&quot;root&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;root&quot;]</span>
-    <span class="doccomment">///     let _child = tracing::info_span!(&quot;child&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;root&quot;, &quot;child&quot;]</span>
-    <span class="doccomment">///     let _leaf = tracing::info_span!(&quot;leaf&quot;).entered();</span>
-    <span class="doccomment">///     // Prints: Entering span: [&quot;root&quot;, &quot;child&quot;, &quot;leaf&quot;]</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">Scope</span> {
-            <span class="ident">registry</span>: <span class="self">self</span>.<span class="ident">registry</span>,
-            <span class="ident">next</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">id</span>()),
+    <span class="doccomment">/// Returns an iterator over all parents of this span, starting with this span,
+    /// ordered from leaf to root.
+    ///
+    /// The iterator will first return the span, then the span&#39;s immediate parent,
+    /// followed by that span&#39;s parent, and so on, until it reaches a root span.
+    ///
+    /// ```rust
+    /// use tracing::{span, Subscriber};
+    /// use tracing_subscriber::{
+    ///     layer::{Context, Layer},
+    ///     prelude::*,
+    ///     registry::LookupSpan,
+    /// };
+    ///
+    /// struct PrintingLayer;
+    /// impl&lt;S&gt; Layer&lt;S&gt; for PrintingLayer
+    /// where
+    ///     S: Subscriber + for&lt;&#39;lookup&gt; LookupSpan&lt;&#39;lookup&gt;,
+    /// {
+    ///     fn on_enter(&amp;self, id: &amp;span::Id, ctx: Context&lt;S&gt;) {
+    ///         let span = ctx.span(id).unwrap();
+    ///         let scope = span.scope().map(|span| span.name()).collect::&lt;Vec&lt;_&gt;&gt;();
+    ///         println!(&quot;Entering span: {:?}&quot;, scope);
+    ///     }
+    /// }
+    ///
+    /// tracing::subscriber::with_default(tracing_subscriber::registry().with(PrintingLayer), || {
+    ///     let _root = tracing::info_span!(&quot;root&quot;).entered();
+    ///     // Prints: Entering span: [&quot;root&quot;]
+    ///     let _child = tracing::info_span!(&quot;child&quot;).entered();
+    ///     // Prints: Entering span: [&quot;child&quot;, &quot;root&quot;]
+    ///     let _leaf = tracing::info_span!(&quot;leaf&quot;).entered();
+    ///     // Prints: Entering span: [&quot;leaf&quot;, &quot;child&quot;, &quot;root&quot;]
+    /// });
+    /// ```
+    ///
+    /// If the opposite order (from the root to this span) is desired, calling [`Scope::from_root`] on
+    /// the returned iterator reverses the order.
+    ///
+    /// ```rust
+    /// # use tracing::{span, Subscriber};
+    /// # use tracing_subscriber::{
+    /// #     layer::{Context, Layer},
+    /// #     prelude::*,
+    /// #     registry::LookupSpan,
+    /// # };
+    /// # struct PrintingLayer;
+    /// impl&lt;S&gt; Layer&lt;S&gt; for PrintingLayer
+    /// where
+    ///     S: Subscriber + for&lt;&#39;lookup&gt; LookupSpan&lt;&#39;lookup&gt;,
+    /// {
+    ///     fn on_enter(&amp;self, id: &amp;span::Id, ctx: Context&lt;S&gt;) {
+    ///         let span = ctx.span(id).unwrap();
+    ///         let scope = span.scope().from_root().map(|span| span.name()).collect::&lt;Vec&lt;_&gt;&gt;();
+    ///         println!(&quot;Entering span: {:?}&quot;, scope);
+    ///     }
+    /// }
+    ///
+    /// tracing::subscriber::with_default(tracing_subscriber::registry().with(PrintingLayer), || {
+    ///     let _root = tracing::info_span!(&quot;root&quot;).entered();
+    ///     // Prints: Entering span: [&quot;root&quot;]
+    ///     let _child = tracing::info_span!(&quot;child&quot;).entered();
+    ///     // Prints: Entering span: [&quot;root&quot;, &quot;child&quot;]
+    ///     let _leaf = tracing::info_span!(&quot;leaf&quot;).entered();
+    ///     // Prints: Entering span: [&quot;root&quot;, &quot;child&quot;, &quot;leaf&quot;]
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>scope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Scope&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+        Scope {
+            registry: <span class="self">self</span>.registry,
+            next: <span class="prelude-val">Some</span>(<span class="self">self</span>.id()),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-            <span class="ident">filter</span>: <span class="self">self</span>.<span class="ident">filter</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+            </span>filter: <span class="self">self</span>.filter,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to this span&#39;s `Extensions`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The extensions may be used by `Layer`s to store additional data</span>
-    <span class="doccomment">/// describing the span.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Extensions</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extensions</span>()
+    <span class="doccomment">/// Returns a reference to this span&#39;s `Extensions`.
+    ///
+    /// The extensions may be used by `Layer`s to store additional data
+    /// describing the span.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">pub fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Extensions&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.data.extensions()
     }
 
-    <span class="doccomment">/// Returns a mutable reference to this span&#39;s `Extensions`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The extensions may be used by `Layer`s to store additional data</span>
-    <span class="doccomment">/// describing the span.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ExtensionsMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">extensions_mut</span>()
+    <span class="doccomment">/// Returns a mutable reference to this span&#39;s `Extensions`.
+    ///
+    /// The extensions may be used by `Layer`s to store additional data
+    /// describing the span.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">pub fn </span>extensions_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ExtensionsMut&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.data.extensions_mut()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_with_filter</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_enabled_for</span>(<span class="ident">filter</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">with_filter</span>(<span class="ident">filter</span>));
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_with_filter(<span class="self">self</span>, filter: FilterId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_enabled_for(filter) {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.with_filter(filter));
         }
 
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="attribute">#[inline]
+    #[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_enabled_for(<span class="kw-2">&amp;</span><span class="self">self</span>, filter: FilterId) -&gt; bool {
+        <span class="self">self</span>.data.is_enabled_for(filter)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_enabled_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_enabled_for</span>(<span class="ident">filter</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">with_filter</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="ident">FilterId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">filter</span>, ..<span class="self">self</span> }
+    <span class="attribute">#[inline]
+    #[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span><span class="kw">fn </span>with_filter(<span class="self">self</span>, filter: FilterId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ filter, ..<span class="self">self </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">layer</span>::{<span class="ident">Context</span>, <span class="ident">Layer</span>},
-        <span class="ident">prelude</span>::<span class="kw-2">*</span>,
-        <span class="ident">registry::LookupSpan</span>,
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{
+        layer::{Context, Layer},
+        prelude::<span class="kw-2">*</span>,
+        registry::LookupSpan,
     };
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
-    <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">span</span>, <span class="ident">Subscriber</span>};
+    <span class="kw">use </span>std::sync::{Arc, Mutex};
+    <span class="kw">use </span>tracing::{span, Subscriber};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spanref_scope_iteration_order</span>() {
-        <span class="kw">let</span> <span class="ident">last_entered_scope</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spanref_scope_iteration_order() {
+        <span class="kw">let </span>last_entered_scope = Arc::new(Mutex::new(Vec::new()));
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">PrintingLayer</span> {
-            <span class="ident">last_entered_scope</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[derive(Default)]
+        </span><span class="kw">struct </span>PrintingLayer {
+            last_entered_scope: Arc&lt;Mutex&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt;&gt;,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrintingLayer</span>
-        <span class="kw">where</span>
-            <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span>&lt;S&gt; Layer&lt;S&gt; <span class="kw">for </span>PrintingLayer
+        <span class="kw">where
+            </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
         {
-            <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">scope</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">=</span> <span class="ident">scope</span>;
+            <span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+                <span class="kw">let </span>span = ctx.span(id).unwrap();
+                <span class="kw">let </span>scope = span.scope().map(|span| span.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+                <span class="kw-2">*</span><span class="self">self</span>.last_entered_scope.lock().unwrap() = scope;
             }
         }
 
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">tracing::subscriber::set_default</span>(<span class="ident"><span class="kw">crate</span>::registry</span>().<span class="ident">with</span>(<span class="ident">PrintingLayer</span> {
-            <span class="ident">last_entered_scope</span>: <span class="ident">last_entered_scope</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>_guard = tracing::subscriber::set_default(<span class="kw">crate</span>::registry().with(PrintingLayer {
+            last_entered_scope: last_entered_scope.clone(),
         }));
 
-        <span class="kw">let</span> <span class="ident">_root</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;root&quot;</span>).<span class="ident">entered</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>]);
-        <span class="kw">let</span> <span class="ident">_child</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child&quot;</span>).<span class="ident">entered</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span>[<span class="string">&quot;child&quot;</span>, <span class="string">&quot;root&quot;</span>]);
-        <span class="kw">let</span> <span class="ident">_leaf</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;leaf&quot;</span>).<span class="ident">entered</span>();
+        <span class="kw">let </span>_root = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;root&quot;</span>).entered();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>]);
+        <span class="kw">let </span>_child = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child&quot;</span>).entered();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(), <span class="kw-2">&amp;</span>[<span class="string">&quot;child&quot;</span>, <span class="string">&quot;root&quot;</span>]);
+        <span class="kw">let </span>_leaf = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;leaf&quot;</span>).entered();
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
+            <span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(),
             <span class="kw-2">&amp;</span>[<span class="string">&quot;leaf&quot;</span>, <span class="string">&quot;child&quot;</span>, <span class="string">&quot;root&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spanref_scope_fromroot_iteration_order</span>() {
-        <span class="kw">let</span> <span class="ident">last_entered_scope</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spanref_scope_fromroot_iteration_order() {
+        <span class="kw">let </span>last_entered_scope = Arc::new(Mutex::new(Vec::new()));
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">PrintingLayer</span> {
-            <span class="ident">last_entered_scope</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="attribute">#[derive(Default)]
+        </span><span class="kw">struct </span>PrintingLayer {
+            last_entered_scope: Arc&lt;Mutex&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt;&gt;,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrintingLayer</span>
-        <span class="kw">where</span>
-            <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span>&lt;S&gt; Layer&lt;S&gt; <span class="kw">for </span>PrintingLayer
+        <span class="kw">where
+            </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
         {
-            <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">span</span>
-                    .<span class="ident">scope</span>()
-                    .<span class="ident">from_root</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">name</span>())
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">=</span> <span class="ident">scope</span>;
+            <span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+                <span class="kw">let </span>span = ctx.span(id).unwrap();
+                <span class="kw">let </span>scope = span
+                    .scope()
+                    .from_root()
+                    .map(|span| span.name())
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+                <span class="kw-2">*</span><span class="self">self</span>.last_entered_scope.lock().unwrap() = scope;
             }
         }
 
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">tracing::subscriber::set_default</span>(<span class="ident"><span class="kw">crate</span>::registry</span>().<span class="ident">with</span>(<span class="ident">PrintingLayer</span> {
-            <span class="ident">last_entered_scope</span>: <span class="ident">last_entered_scope</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>_guard = tracing::subscriber::set_default(<span class="kw">crate</span>::registry().with(PrintingLayer {
+            last_entered_scope: last_entered_scope.clone(),
         }));
 
-        <span class="kw">let</span> <span class="ident">_root</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;root&quot;</span>).<span class="ident">entered</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>]);
-        <span class="kw">let</span> <span class="ident">_child</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child&quot;</span>).<span class="ident">entered</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>, <span class="string">&quot;child&quot;</span>,]);
-        <span class="kw">let</span> <span class="ident">_leaf</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;leaf&quot;</span>).<span class="ident">entered</span>();
+        <span class="kw">let </span>_root = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;root&quot;</span>).entered();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>]);
+        <span class="kw">let </span>_child = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child&quot;</span>).entered();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(), <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>, <span class="string">&quot;child&quot;</span>,]);
+        <span class="kw">let </span>_leaf = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;leaf&quot;</span>).entered();
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">last_entered_scope</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>(),
+            <span class="kw-2">&amp;*</span>last_entered_scope.lock().unwrap(),
             <span class="kw-2">&amp;</span>[<span class="string">&quot;root&quot;</span>, <span class="string">&quot;child&quot;</span>, <span class="string">&quot;leaf&quot;</span>]
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

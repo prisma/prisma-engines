@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/folding_range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>folding_range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/folding_range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>folding_range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -100,107 +100,107 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">PartialResultParams</span>, <span class="ident">StaticTextDocumentColorProviderOptions</span>, <span class="ident">TextDocumentIdentifier</span>,
-    <span class="ident">WorkDoneProgressParams</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    PartialResultParams, StaticTextDocumentColorProviderOptions, TextDocumentIdentifier,
+    WorkDoneProgressParams,
 };
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FoldingRangeParams</span> {
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FoldingRangeParams {
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FoldingRangeProviderCapability</span> {
-    <span class="ident">Simple</span>(<span class="ident">bool</span>),
-    <span class="ident">FoldingProvider</span>(<span class="ident">FoldingProviderOptions</span>),
-    <span class="ident">Options</span>(<span class="ident">StaticTextDocumentColorProviderOptions</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>FoldingRangeProviderCapability {
+    Simple(bool),
+    FoldingProvider(FoldingProviderOptions),
+    Options(StaticTextDocumentColorProviderOptions),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StaticTextDocumentColorProviderOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FoldingRangeProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">StaticTextDocumentColorProviderOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Options</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;StaticTextDocumentColorProviderOptions&gt; <span class="kw">for </span>FoldingRangeProviderCapability {
+    <span class="kw">fn </span>from(from: StaticTextDocumentColorProviderOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Options(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FoldingProviderOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FoldingRangeProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">FoldingProviderOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::FoldingProvider</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;FoldingProviderOptions&gt; <span class="kw">for </span>FoldingRangeProviderCapability {
+    <span class="kw">fn </span>from(from: FoldingProviderOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::FoldingProvider(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FoldingRangeProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Simple</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>FoldingRangeProviderCapability {
+    <span class="kw">fn </span>from(from: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Simple(from)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FoldingProviderOptions</span> {}
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>FoldingProviderOptions {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FoldingRangeClientCapabilities</span> {
-    <span class="doccomment">/// Whether implementation supports dynamic registration for folding range providers. If this is set to `true`</span>
-    <span class="doccomment">/// the client supports the new `(FoldingRangeProviderOptions &amp; TextDocumentRegistrationOptions &amp; StaticRegistrationOptions)`</span>
-    <span class="doccomment">/// return value for the corresponding server capability as well.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FoldingRangeClientCapabilities {
+    <span class="doccomment">/// Whether implementation supports dynamic registration for folding range providers. If this is set to `true`
+    /// the client supports the new `(FoldingRangeProviderOptions &amp; TextDocumentRegistrationOptions &amp; StaticRegistrationOptions)`
+    /// return value for the corresponding server capability as well.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The maximum number of folding ranges that the client prefers to receive per document. The value serves as a</span>
-    <span class="doccomment">/// hint, servers are free to follow the limit.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">range_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// If set, the client signals that it only supports folding complete lines. If set, client will</span>
-    <span class="doccomment">/// ignore specified `startCharacter` and `endCharacter` properties in a FoldingRange.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">line_folding_only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum number of folding ranges that the client prefers to receive per document. The value serves as a
+    /// hint, servers are free to follow the limit.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>range_limit: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="doccomment">/// If set, the client signals that it only supports folding complete lines. If set, client will
+    /// ignore specified `startCharacter` and `endCharacter` properties in a FoldingRange.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>line_folding_only: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// Enum of known range kinds</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;lowercase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FoldingRangeKind</span> {
-    <span class="doccomment">/// Folding range for a comment</span>
-    <span class="ident">Comment</span>,
-    <span class="doccomment">/// Folding range for a imports or includes</span>
-    <span class="ident">Imports</span>,
-    <span class="doccomment">/// Folding range for a region (e.g. `#region`)</span>
-    <span class="ident">Region</span>,
+<span class="doccomment">/// Enum of known range kinds
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Deserialize, Serialize, Clone)]
+#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
+</span><span class="kw">pub enum </span>FoldingRangeKind {
+    <span class="doccomment">/// Folding range for a comment
+    </span>Comment,
+    <span class="doccomment">/// Folding range for a imports or includes
+    </span>Imports,
+    <span class="doccomment">/// Folding range for a region (e.g. `#region`)
+    </span>Region,
 }
 
-<span class="doccomment">/// Represents a folding range.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FoldingRange</span> {
-    <span class="doccomment">/// The zero-based line number from where the folded range starts.</span>
-    <span class="kw">pub</span> <span class="ident">start_line</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// Represents a folding range.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FoldingRange {
+    <span class="doccomment">/// The zero-based line number from where the folded range starts.
+    </span><span class="kw">pub </span>start_line: u32,
 
-    <span class="doccomment">/// The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">start_character</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>start_character: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// The zero-based line number where the folded range ends.</span>
-    <span class="kw">pub</span> <span class="ident">end_line</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The zero-based line number where the folded range ends.
+    </span><span class="kw">pub </span>end_line: u32,
 
-    <span class="doccomment">/// The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">end_character</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>end_character: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// Describes the kind of the folding range such as `comment&#39; or &#39;region&#39;. The kind</span>
-    <span class="doccomment">/// is used to categorize folding ranges and used by commands like &#39;Fold all comments&#39;. See</span>
-    <span class="doccomment">/// [FoldingRangeKind](#FoldingRangeKind) for an enumeration of standardized kinds.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FoldingRangeKind</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Describes the kind of the folding range such as `comment&#39; or &#39;region&#39;. The kind
+    /// is used to categorize folding ranges and used by commands like &#39;Fold all comments&#39;. See
+    /// [FoldingRangeKind](#FoldingRangeKind) for an enumeration of standardized kinds.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;FoldingRangeKind&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

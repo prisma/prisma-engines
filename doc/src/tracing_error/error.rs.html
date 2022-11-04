@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-error-0.2.0/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_error/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_error/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -289,294 +289,294 @@
 <span id="287">287</span>
 <span id="288">288</span>
 <span id="289">289</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SpanTrace</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Display</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::SpanTrace;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt::{<span class="self">self</span>, Debug, Display};
 
-<span class="kw">struct</span> <span class="ident">Erased</span>;
+<span class="kw">struct </span>Erased;
 
-<span class="doccomment">/// A wrapper type for `Error`s that bundles a `SpanTrace` with an inner `Error`</span>
-<span class="doccomment">/// type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is a good match for the error-kind pattern where you have an error</span>
-<span class="doccomment">/// type with an inner enum of error variants and you would like to capture a</span>
-<span class="doccomment">/// span trace that can be extracted during printing without formatting the span</span>
-<span class="doccomment">/// trace as part of your display impl.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An example of implementing an error type for a library using `TracedError`</span>
-<span class="doccomment">/// might look like this</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,compile_fail</span>
-<span class="doccomment">/// #[derive(Debug, thiserror::Error)]</span>
-<span class="doccomment">/// enum Kind {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// pub struct Error {</span>
-<span class="doccomment">///     source: TracedError&lt;Kind&gt;,</span>
-<span class="doccomment">///     backtrace: Backtrace,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl std::error::Error for Error {</span>
-<span class="doccomment">///     fn source(&amp;self) -&gt; Option&lt;&amp;(dyn std::error::Error + &#39;static)&gt; {</span>
-<span class="doccomment">///         self.source.source()</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     fn backtrace(&amp;self) -&gt; Option&lt;&amp;Backtrace&gt; {</span>
-<span class="doccomment">///         Some(&amp;self.backtrace)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl fmt::Display for Error {</span>
-<span class="doccomment">///     fn fmt(&amp;self, fmt: &amp;mut fmt::Formatter&lt;&#39;_&gt;) -&gt; fmt::Result {</span>
-<span class="doccomment">///         fmt::Display::fmt(&amp;self.source, fmt)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;E&gt; From&lt;E&gt; for Error</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     Kind: From&lt;E&gt;,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn from(source: E) -&gt; Self {</span>
-<span class="doccomment">///         Self {</span>
-<span class="doccomment">///             source: Kind::from(source).into(),</span>
-<span class="doccomment">///             backtrace: Backtrace::capture(),</span>
-<span class="doccomment">///         }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;traced-error&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A wrapper type for `Error`s that bundles a `SpanTrace` with an inner `Error`
+/// type.
+///
+/// This type is a good match for the error-kind pattern where you have an error
+/// type with an inner enum of error variants and you would like to capture a
+/// span trace that can be extracted during printing without formatting the span
+/// trace as part of your display impl.
+///
+/// An example of implementing an error type for a library using `TracedError`
+/// might look like this
+///
+/// ```rust,compile_fail
+/// #[derive(Debug, thiserror::Error)]
+/// enum Kind {
+///     // ...
+/// }
+///
+/// #[derive(Debug)]
+/// pub struct Error {
+///     source: TracedError&lt;Kind&gt;,
+///     backtrace: Backtrace,
+/// }
+///
+/// impl std::error::Error for Error {
+///     fn source(&amp;self) -&gt; Option&lt;&amp;(dyn std::error::Error + &#39;static)&gt; {
+///         self.source.source()
+///     }
+///
+///     fn backtrace(&amp;self) -&gt; Option&lt;&amp;Backtrace&gt; {
+///         Some(&amp;self.backtrace)
+///     }
+/// }
+///
+/// impl fmt::Display for Error {
+///     fn fmt(&amp;self, fmt: &amp;mut fmt::Formatter&lt;&#39;_&gt;) -&gt; fmt::Result {
+///         fmt::Display::fmt(&amp;self.source, fmt)
+///     }
+/// }
+///
+/// impl&lt;E&gt; From&lt;E&gt; for Error
+/// where
+///     Kind: From&lt;E&gt;,
+/// {
+///     fn from(source: E) -&gt; Self {
+///         Self {
+///             source: Kind::from(source).into(),
+///             backtrace: Backtrace::capture(),
+///         }
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;traced-error&quot;</span>)))]
+</span><span class="kw">pub struct </span>TracedError&lt;E&gt; {
+    inner: ErrorImpl&lt;E&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;E&gt; From&lt;E&gt; <span class="kw">for </span>TracedError&lt;E&gt;
+<span class="kw">where
+    </span>E: Error + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">error</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// # SAFETY</span>
-        <span class="comment">//</span>
-        <span class="comment">// This function + the repr(C) on the ErrorImpl make the type erasure throughout the rest</span>
-        <span class="comment">// of this struct&#39;s methods safe. This saves a function pointer that is parameterized on the Error type</span>
-        <span class="comment">// being stored inside the ErrorImpl. This lets the object_ref function safely cast a type</span>
-        <span class="comment">// erased `ErrorImpl` back to its original type, which is needed in order to forward our</span>
-        <span class="comment">// error/display/debug impls to the internal error type from the type erased error type.</span>
-        <span class="comment">//</span>
-        <span class="comment">// The repr(C) is necessary to ensure that the struct is layed out in the order we</span>
-        <span class="comment">// specified it so that we can safely access the vtable and spantrace fields thru a type</span>
-        <span class="comment">// erased pointer to the original object.</span>
-        <span class="kw">let</span> <span class="ident">vtable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ErrorVTable</span> {
-            <span class="ident">object_ref</span>: <span class="ident">object_ref</span>::<span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>from(error: E) -&gt; <span class="self">Self </span>{
+        <span class="comment">// # SAFETY
+        //
+        // This function + the repr(C) on the ErrorImpl make the type erasure throughout the rest
+        // of this struct&#39;s methods safe. This saves a function pointer that is parameterized on the Error type
+        // being stored inside the ErrorImpl. This lets the object_ref function safely cast a type
+        // erased `ErrorImpl` back to its original type, which is needed in order to forward our
+        // error/display/debug impls to the internal error type from the type erased error type.
+        //
+        // The repr(C) is necessary to ensure that the struct is layed out in the order we
+        // specified it so that we can safely access the vtable and spantrace fields thru a type
+        // erased pointer to the original object.
+        </span><span class="kw">let </span>vtable = <span class="kw-2">&amp;</span>ErrorVTable {
+            object_ref: object_ref::&lt;E&gt;,
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">ErrorImpl</span> {
-                <span class="ident">vtable</span>,
-                <span class="ident">span_trace</span>: <span class="ident">SpanTrace::capture</span>(),
-                <span class="ident">error</span>,
+        <span class="self">Self </span>{
+            inner: ErrorImpl {
+                vtable,
+                span_trace: SpanTrace::capture(),
+                error,
             },
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="ident">vtable</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ErrorVTable</span>,
-    <span class="ident">span_trace</span>: <span class="ident">SpanTrace</span>,
-    <span class="comment">// NOTE: Don&#39;t use directly. Use only through vtable. Erased type may have</span>
-    <span class="comment">// different alignment.</span>
-    <span class="ident">error</span>: <span class="ident">E</span>,
+<span class="attribute">#[repr(C)]
+</span><span class="kw">struct </span>ErrorImpl&lt;E&gt; {
+    vtable: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ErrorVTable,
+    span_trace: SpanTrace,
+    <span class="comment">// NOTE: Don&#39;t use directly. Use only through vtable. Erased type may have
+    // different alignment.
+    </span>error: E,
 }
 
-<span class="kw">impl</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>) {
-        <span class="comment">// # SAFETY</span>
-        <span class="comment">//</span>
-        <span class="comment">// this function is used to cast a type-erased pointer to a pointer to error&#39;s</span>
-        <span class="comment">// original type. the `ErrorImpl::error` method, which calls this function, requires that</span>
-        <span class="comment">// the type this function casts to be the original erased type of the error; failure to</span>
-        <span class="comment">// uphold this is UB. since the `From` impl is parameterized over the original error type,</span>
-        <span class="comment">// the function pointer we construct here will also retain the original type. therefore,</span>
-        <span class="comment">// when this is consumed by the `error` method, it will be safe to call.</span>
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="self">self</span>.<span class="ident">vtable</span>.<span class="ident">object_ref</span>)(<span class="self">self</span>) }
+<span class="kw">impl </span>ErrorImpl&lt;Erased&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>) {
+        <span class="comment">// # SAFETY
+        //
+        // this function is used to cast a type-erased pointer to a pointer to error&#39;s
+        // original type. the `ErrorImpl::error` method, which calls this function, requires that
+        // the type this function casts to be the original erased type of the error; failure to
+        // uphold this is UB. since the `From` impl is parameterized over the original error type,
+        // the function pointer we construct here will also retain the original type. therefore,
+        // when this is consumed by the `error` method, it will be safe to call.
+        </span><span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="self">self</span>.vtable.object_ref)(<span class="self">self</span>) }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ErrorVTable</span> {
-    <span class="ident">object_ref</span>: <span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>),
+<span class="kw">struct </span>ErrorVTable {
+    object_ref: <span class="kw">unsafe fn</span>(<span class="kw-2">&amp;</span>ErrorImpl&lt;Erased&gt;) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>),
 }
 
-<span class="comment">// # SAFETY</span>
-<span class="comment">//</span>
-<span class="comment">// This function must be parameterized on the type E of the original error that is being stored</span>
-<span class="comment">// inside of the `ErrorImpl`. When it is parameterized by the correct type, it safely</span>
-<span class="comment">// casts the erased `ErrorImpl` pointer type back to the original pointer type.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">object_ref</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="comment">// # SAFETY
+//
+// This function must be parameterized on the type E of the original error that is being stored
+// inside of the `ErrorImpl`. When it is parameterized by the correct type, it safely
+// casts the erased `ErrorImpl` pointer type back to the original pointer type.
+</span><span class="kw">unsafe fn </span>object_ref&lt;E&gt;(e: <span class="kw-2">&amp;</span>ErrorImpl&lt;Erased&gt;) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>)
+<span class="kw">where
+    </span>E: Error + Send + Sync + <span class="lifetime">&#39;static</span>,
 {
-    <span class="comment">// Attach E&#39;s native Error vtable onto a pointer to e.error.</span>
-    <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="ident">e</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>)).<span class="ident">error</span>
+    <span class="comment">// Attach E&#39;s native Error vtable onto a pointer to e.error.
+    </span><span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(e <span class="kw">as </span><span class="kw-2">*const </span>ErrorImpl&lt;Erased&gt; <span class="kw">as </span><span class="kw-2">*const </span>ErrorImpl&lt;E&gt;)).error
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;E&gt; Error <span class="kw">for </span>TracedError&lt;E&gt;
+<span class="kw">where
+    </span>E: std::error::Error + <span class="lifetime">&#39;static</span>,
 {
-    <span class="comment">// # SAFETY</span>
-    <span class="comment">//</span>
-    <span class="comment">// This function is safe so long as all functions on `ErrorImpl&lt;Erased&gt;` uphold the invariant</span>
-    <span class="comment">// that the wrapped error is only ever accessed by the `error` method. This method uses the</span>
-    <span class="comment">// function in the vtable to safely convert the pointer type back to the original type, and</span>
-    <span class="comment">// then returns the reference to the erased error.</span>
-    <span class="comment">//</span>
-    <span class="comment">// This function is necessary for the `downcast_ref` in `ExtractSpanTrace` to work, because it</span>
-    <span class="comment">// needs a concrete type to downcast to and we cannot downcast to ErrorImpls parameterized on</span>
-    <span class="comment">// errors defined in other crates. By erasing the type here we can always cast back to the</span>
-    <span class="comment">// Erased version of the ErrorImpl pointer, and still access the internal error type safely</span>
-    <span class="comment">// through the vtable.</span>
-    <span class="kw">fn</span> <span class="ident">source</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">erased</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span>) };
-        <span class="prelude-val">Some</span>(<span class="ident">erased</span>)
+    <span class="comment">// # SAFETY
+    //
+    // This function is safe so long as all functions on `ErrorImpl&lt;Erased&gt;` uphold the invariant
+    // that the wrapped error is only ever accessed by the `error` method. This method uses the
+    // function in the vtable to safely convert the pointer type back to the original type, and
+    // then returns the reference to the erased error.
+    //
+    // This function is necessary for the `downcast_ref` in `ExtractSpanTrace` to work, because it
+    // needs a concrete type to downcast to and we cannot downcast to ErrorImpls parameterized on
+    // errors defined in other crates. By erasing the type here we can always cast back to the
+    // Erased version of the ErrorImpl pointer, and still access the internal error type safely
+    // through the vtable.
+    </span><span class="kw">fn </span>source&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="kw">let </span>erased = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.inner <span class="kw">as </span><span class="kw-2">*const </span>ErrorImpl&lt;E&gt; <span class="kw">as </span><span class="kw-2">*const </span>ErrorImpl&lt;Erased&gt;) };
+        <span class="prelude-val">Some</span>(erased)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">std::error::Error</span>,
+<span class="kw">impl</span>&lt;E&gt; Debug <span class="kw">for </span>TracedError&lt;E&gt;
+<span class="kw">where
+    </span>E: std::error::Error,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">error</span>, <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.error, f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">std::error::Error</span>,
+<span class="kw">impl</span>&lt;E&gt; Display <span class="kw">for </span>TracedError&lt;E&gt;
+<span class="kw">where
+    </span>E: std::error::Error,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">error</span>, <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.error, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">error</span>().<span class="ident">source</span>()
+<span class="kw">impl </span>Error <span class="kw">for </span>ErrorImpl&lt;Erased&gt; {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="self">self</span>.error().source()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;span backtrace:\n&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span_trace</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>Debug <span class="kw">for </span>ErrorImpl&lt;Erased&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;span backtrace:\n&quot;</span>)<span class="question-mark">?</span>;
+        Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.span_trace, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;span backtrace:\n&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span_trace</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>ErrorImpl&lt;Erased&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.pad(<span class="string">&quot;span backtrace:\n&quot;</span>)<span class="question-mark">?</span>;
+        Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.span_trace, f)
     }
 }
 
-<span class="doccomment">/// Extension trait for instrumenting errors with `SpanTrace`s</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;traced-error&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InstrumentError</span> {
-    <span class="doccomment">/// The type of the wrapped error after instrumentation</span>
-    <span class="kw">type</span> <span class="ident">Instrumented</span>;
+<span class="doccomment">/// Extension trait for instrumenting errors with `SpanTrace`s
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;traced-error&quot;</span>)))]
+</span><span class="kw">pub trait </span>InstrumentError {
+    <span class="doccomment">/// The type of the wrapped error after instrumentation
+    </span><span class="kw">type </span>Instrumented;
 
-    <span class="doccomment">/// Instrument an Error by bundling it with a SpanTrace</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_error::{TracedError, InstrumentError};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn wrap_error&lt;E&gt;(e: E) -&gt; TracedError&lt;E&gt;</span>
-    <span class="doccomment">/// where</span>
-    <span class="doccomment">///     E: std::error::Error + Send + Sync + &#39;static</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     e.in_current_span()</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">in_current_span</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Instrumented</span>;
+    <span class="doccomment">/// Instrument an Error by bundling it with a SpanTrace
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use tracing_error::{TracedError, InstrumentError};
+    ///
+    /// fn wrap_error&lt;E&gt;(e: E) -&gt; TracedError&lt;E&gt;
+    /// where
+    ///     E: std::error::Error + Send + Sync + &#39;static
+    /// {
+    ///     e.in_current_span()
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>in_current_span(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Instrumented;
 }
 
-<span class="doccomment">/// Extension trait for instrumenting errors in `Result`s with `SpanTrace`s</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;traced-error&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InstrumentResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The type of the wrapped error after instrumentation</span>
-    <span class="kw">type</span> <span class="ident">Instrumented</span>;
+<span class="doccomment">/// Extension trait for instrumenting errors in `Result`s with `SpanTrace`s
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;traced-error&quot;</span>)))]
+</span><span class="kw">pub trait </span>InstrumentResult&lt;T&gt; {
+    <span class="doccomment">/// The type of the wrapped error after instrumentation
+    </span><span class="kw">type </span>Instrumented;
 
-    <span class="doccomment">/// Instrument an Error by bundling it with a SpanTrace</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use std::{io, fs};</span>
-    <span class="doccomment">/// use tracing_error::{TracedError, InstrumentResult};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn fallible_fn() -&gt; io::Result&lt;()&gt; { fs::read_dir(&quot;......&quot;).map(drop) };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn do_thing() -&gt; Result&lt;(), TracedError&lt;io::Error&gt;&gt; {</span>
-    <span class="doccomment">///     fallible_fn().in_current_span()</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">in_current_span</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Instrumented</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Instrument an Error by bundling it with a SpanTrace
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use std::{io, fs};
+    /// use tracing_error::{TracedError, InstrumentResult};
+    ///
+    /// # fn fallible_fn() -&gt; io::Result&lt;()&gt; { fs::read_dir(&quot;......&quot;).map(drop) };
+    ///
+    /// fn do_thing() -&gt; Result&lt;(), TracedError&lt;io::Error&gt;&gt; {
+    ///     fallible_fn().in_current_span()
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>in_current_span(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, <span class="self">Self</span>::Instrumented&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">InstrumentResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">InstrumentError</span>,
+<span class="kw">impl</span>&lt;T, E&gt; InstrumentResult&lt;T&gt; <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;T, E&gt;
+<span class="kw">where
+    </span>E: InstrumentError,
 {
-    <span class="kw">type</span> <span class="ident">Instrumented</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">E</span> <span class="kw">as</span> <span class="ident">InstrumentError</span><span class="op">&gt;</span><span class="ident">::Instrumented</span>;
+    <span class="kw">type </span>Instrumented = &lt;E <span class="kw">as </span>InstrumentError&gt;::Instrumented;
 
-    <span class="kw">fn</span> <span class="ident">in_current_span</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Instrumented</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">map_err</span>(<span class="ident">E::in_current_span</span>)
+    <span class="kw">fn </span>in_current_span(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, <span class="self">Self</span>::Instrumented&gt; {
+        <span class="self">self</span>.map_err(E::in_current_span)
     }
 }
 
-<span class="doccomment">/// A trait for extracting SpanTraces created by `in_current_span()` from `dyn</span>
-<span class="doccomment">/// Error` trait objects</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;traced-error&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ExtractSpanTrace</span> {
-    <span class="doccomment">/// Attempts to downcast to a `TracedError` and return a reference to its</span>
-    <span class="doccomment">/// SpanTrace</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use tracing_error::ExtractSpanTrace;</span>
-    <span class="doccomment">/// use std::error::Error;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn print_span_trace(e: &amp;(dyn Error + &#39;static)) {</span>
-    <span class="doccomment">///     let span_trace = e.span_trace();</span>
-    <span class="doccomment">///     if let Some(span_trace) = span_trace {</span>
-    <span class="doccomment">///         println!(&quot;{}&quot;, span_trace);</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">span_trace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SpanTrace</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A trait for extracting SpanTraces created by `in_current_span()` from `dyn
+/// Error` trait objects
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;traced-error&quot;</span>)))]
+</span><span class="kw">pub trait </span>ExtractSpanTrace {
+    <span class="doccomment">/// Attempts to downcast to a `TracedError` and return a reference to its
+    /// SpanTrace
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use tracing_error::ExtractSpanTrace;
+    /// use std::error::Error;
+    ///
+    /// fn print_span_trace(e: &amp;(dyn Error + &#39;static)) {
+    ///     let span_trace = e.span_trace();
+    ///     if let Some(span_trace) = span_trace {
+    ///         println!(&quot;{}&quot;, span_trace);
+    ///     }
+    /// }
+    /// ```
+    </span><span class="kw">fn </span>span_trace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SpanTrace&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">InstrumentError</span> <span class="kw">for</span> <span class="ident">E</span>
-<span class="kw">where</span>
-    <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;E&gt; InstrumentError <span class="kw">for </span>E
+<span class="kw">where
+    </span>TracedError&lt;E&gt;: From&lt;E&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Instrumented</span> <span class="op">=</span> <span class="ident">TracedError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Instrumented = TracedError&lt;E&gt;;
 
-    <span class="kw">fn</span> <span class="ident">in_current_span</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Instrumented</span> {
-        <span class="ident">TracedError::from</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>in_current_span(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Instrumented {
+        TracedError::from(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ExtractSpanTrace</span> <span class="kw">for</span> <span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="kw">fn</span> <span class="ident">span_trace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SpanTrace</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">ErrorImpl</span><span class="op">&lt;</span><span class="ident">Erased</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">span_trace</span>)
+<span class="kw">impl </span>ExtractSpanTrace <span class="kw">for dyn </span>Error + <span class="lifetime">&#39;static </span>{
+    <span class="kw">fn </span>span_trace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SpanTrace&gt; {
+        <span class="self">self</span>.downcast_ref::&lt;ErrorImpl&lt;Erased&gt;&gt;()
+            .map(|inner| <span class="kw-2">&amp;</span>inner.span_trace)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_error" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

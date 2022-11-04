@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/fields/data_input_mapper/update.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>update.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/fields/data_input_mapper/update.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>update.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -416,423 +416,423 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>::<span class="kw-2">*</span>, <span class="ident">enum_types</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::CompositeFieldRef</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, enum_types::<span class="kw-2">*</span>};
+<span class="kw">use </span>prisma_models::CompositeFieldRef;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UpdateDataInputFieldMapper</span> {
-    <span class="ident">unchecked</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>UpdateDataInputFieldMapper {
+    unchecked: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">UpdateDataInputFieldMapper</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_checked</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">unchecked</span>: <span class="bool-val">false</span> }
+<span class="kw">impl </span>UpdateDataInputFieldMapper {
+    <span class="kw">pub fn </span>new_checked() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ unchecked: <span class="bool-val">false </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_unchecked</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">unchecked</span>: <span class="bool-val">true</span> }
+    <span class="kw">pub fn </span>new_unchecked() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ unchecked: <span class="bool-val">true </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DataInputFieldMapper</span> <span class="kw">for</span> <span class="ident">UpdateDataInputFieldMapper</span> {
-    <span class="kw">fn</span> <span class="ident">map_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">InputField</span> {
-        <span class="kw">let</span> <span class="ident">base_update_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span> {
-            <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Float&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">true</span>)),
-            <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Decimal&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">true</span>)),
-            <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Int&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">true</span>)),
-            <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;BigInt&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">true</span>)),
-            <span class="ident">TypeIdentifier::String</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;String&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
-            <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bool&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
-            <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; {
-                <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{}&quot;</span>, <span class="ident">e</span>), <span class="ident">sf</span>, <span class="bool-val">false</span>))
+<span class="kw">impl </span>DataInputFieldMapper <span class="kw">for </span>UpdateDataInputFieldMapper {
+    <span class="kw">fn </span>map_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+        <span class="kw">let </span>base_update_type = <span class="kw">match </span><span class="kw-2">&amp;</span>sf.type_identifier {
+            TypeIdentifier::Float =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Float&quot;</span>, sf, <span class="bool-val">true</span>)),
+            TypeIdentifier::Decimal =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Decimal&quot;</span>, sf, <span class="bool-val">true</span>)),
+            TypeIdentifier::Int =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Int&quot;</span>, sf, <span class="bool-val">true</span>)),
+            TypeIdentifier::BigInt =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;BigInt&quot;</span>, sf, <span class="bool-val">true</span>)),
+            TypeIdentifier::String =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;String&quot;</span>, sf, <span class="bool-val">false</span>)),
+            TypeIdentifier::Boolean =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Bool&quot;</span>, sf, <span class="bool-val">false</span>)),
+            TypeIdentifier::Enum(e) =&gt; {
+                InputType::object(update_operations_object_type(ctx, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{}&quot;</span>, e), sf, <span class="bool-val">false</span>))
             }
-            <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">sf</span>),
-            <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;DateTime&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
-            <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Uuid&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
-            <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Xml&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
-            <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">update_operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bytes&quot;</span>, <span class="ident">sf</span>, <span class="bool-val">false</span>)),
+            TypeIdentifier::Json =&gt; map_scalar_input_type_for_field(ctx, sf),
+            TypeIdentifier::DateTime =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;DateTime&quot;</span>, sf, <span class="bool-val">false</span>)),
+            TypeIdentifier::UUID =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Uuid&quot;</span>, sf, <span class="bool-val">false</span>)),
+            TypeIdentifier::Xml =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Xml&quot;</span>, sf, <span class="bool-val">false</span>)),
+            TypeIdentifier::Bytes =&gt; InputType::object(update_operations_object_type(ctx, <span class="string">&quot;Bytes&quot;</span>, sf, <span class="bool-val">false</span>)),
 
-            <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
+            TypeIdentifier::Unsupported =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">has_adv_json</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span> {
-            <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">InputType::enum_type</span>(<span class="ident">json_null_input_enum</span>(<span class="ident">ctx</span>, <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>()));
-                <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">enum_type</span>, <span class="ident">base_update_type</span>], <span class="prelude-val">None</span>);
+        <span class="kw">let </span>has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>sf.type_identifier {
+            TypeIdentifier::Json <span class="kw">if </span>has_adv_json =&gt; {
+                <span class="kw">let </span>enum_type = InputType::enum_type(json_null_input_enum(ctx, !sf.is_required()));
+                <span class="kw">let </span>input_field = input_field(sf.name.clone(), <span class="macro">vec!</span>[enum_type, base_update_type], <span class="prelude-val">None</span>);
 
-                <span class="ident">input_field</span>.<span class="ident">optional</span>()
+                input_field.optional()
             }
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">sf</span>), <span class="ident">base_update_type</span>];
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>types = <span class="macro">vec!</span>[map_scalar_input_type_for_field(ctx, sf), base_update_type];
 
-                <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="prelude-val">None</span>);
-                <span class="ident">input_field</span>.<span class="ident">optional</span>().<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>())
+                <span class="kw">let </span>input_field = input_field(sf.name.clone(), types, <span class="prelude-val">None</span>);
+                input_field.optional().nullable_if(!sf.is_required())
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">map_scalar_list</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">InputField</span> {
-        <span class="kw">let</span> <span class="ident">list_input_type</span> <span class="op">=</span> <span class="ident">map_scalar_input_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>, <span class="ident">sf</span>.<span class="ident">is_list</span>());
-        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{}Update{}Input&quot;</span>, <span class="ident">sf</span>.<span class="ident">container</span>.<span class="ident">name</span>(), <span class="ident">sf</span>.<span class="ident">name</span>),
-            <span class="ident">PRISMA_NAMESPACE</span>,
+    <span class="kw">fn </span>map_scalar_list(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; InputField {
+        <span class="kw">let </span>list_input_type = map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier, sf.is_list());
+        <span class="kw">let </span>ident = Identifier::new(
+            <span class="macro">format!</span>(<span class="string">&quot;{}Update{}Input&quot;</span>, sf.container.name(), sf.name),
+            PRISMA_NAMESPACE,
         );
 
-        <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">get_input_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object_fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">list_input_type</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>()];
+        <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
+            <span class="prelude-val">Some</span>(t) =&gt; t,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>object_fields = <span class="macro">vec!</span>[input_field(operations::SET, list_input_type.clone(), <span class="prelude-val">None</span>).optional()];
 
-                <span class="comment">// Todo this capability looks wrong to me.</span>
-                <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::EnumArrayPush</span>) {
-                    <span class="ident">object_fields</span>.<span class="ident">push</span>(
-                        <span class="ident">input_field</span>(
-                            <span class="ident">operations::PUSH</span>,
+                <span class="comment">// Todo this capability looks wrong to me.
+                </span><span class="kw">if </span>ctx.has_capability(ConnectorCapability::EnumArrayPush) {
+                    object_fields.push(
+                        input_field(
+                            operations::PUSH,
                             <span class="macro">vec!</span>[
-                                <span class="ident">map_scalar_input_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>, <span class="bool-val">false</span>),
-                                <span class="ident">list_input_type</span>.<span class="ident">clone</span>(),
+                                map_scalar_input_type(ctx, <span class="kw-2">&amp;</span>sf.type_identifier, <span class="bool-val">false</span>),
+                                list_input_type.clone(),
                             ],
                             <span class="prelude-val">None</span>,
                         )
-                        .<span class="ident">optional</span>(),
+                        .optional(),
                     )
                 }
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">object_fields</span>);
-                <span class="ident">input_object</span>.<span class="ident">require_exactly_one_field</span>();
+                <span class="kw">let </span><span class="kw-2">mut </span>input_object = input_object_type(ident.clone(), object_fields);
+                input_object.require_exactly_one_field();
 
-                <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-                <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+                <span class="kw">let </span>input_object = Arc::new(input_object);
+                ctx.cache_input_type(ident, input_object.clone());
 
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+                Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
             }
         };
 
-        <span class="kw">let</span> <span class="ident">input_type</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">input_object</span>);
-        <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">input_type</span>, <span class="ident">list_input_type</span>], <span class="prelude-val">None</span>).<span class="ident">optional</span>()
+        <span class="kw">let </span>input_type = InputType::object(input_object);
+        input_field(sf.name.clone(), <span class="macro">vec!</span>[input_type, list_input_type], <span class="prelude-val">None</span>).optional()
     }
 
-    <span class="kw">fn</span> <span class="ident">map_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>) -&gt; <span class="ident">InputField</span> {
-        <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-        <span class="kw">let</span> <span class="ident">related_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
+    <span class="kw">fn </span>map_relation(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, rf: <span class="kw-2">&amp;</span>RelationFieldRef) -&gt; InputField {
+        <span class="kw">let </span>related_model = rf.related_model();
+        <span class="kw">let </span>related_field = rf.related_field();
 
-        <span class="comment">// Compute input object name</span>
-        <span class="kw">let</span> <span class="ident">arity_part</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">rf</span>.<span class="ident">is_list</span>(), <span class="ident">rf</span>.<span class="ident">is_required</span>()) {
+        <span class="comment">// Compute input object name
+        </span><span class="kw">let </span>arity_part = <span class="kw">match </span>(rf.is_list(), rf.is_required()) {
             (<span class="bool-val">true</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;Many&quot;</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="string">&quot;OneRequired&quot;</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;One&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">without_part</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">related_field</span>.<span class="ident">name</span>));
-        <span class="kw">let</span> <span class="ident">unchecked_part</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">unchecked</span> { <span class="string">&quot;Unchecked&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
-        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
+        <span class="kw">let </span>without_part = <span class="macro">format!</span>(<span class="string">&quot;Without{}&quot;</span>, capitalize(<span class="kw-2">&amp;</span>related_field.name));
+        <span class="kw">let </span>unchecked_part = <span class="kw">if </span><span class="self">self</span>.unchecked { <span class="string">&quot;Unchecked&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+        <span class="kw">let </span>ident = Identifier::new(
             <span class="macro">format!</span>(
                 <span class="string">&quot;{}{}Update{}{}NestedInput&quot;</span>,
-                <span class="ident">related_model</span>.<span class="ident">name</span>, <span class="ident">unchecked_part</span>, <span class="ident">arity_part</span>, <span class="ident">without_part</span>
+                related_model.name, unchecked_part, arity_part, without_part
             ),
-            <span class="ident">PRISMA_NAMESPACE</span>,
+            PRISMA_NAMESPACE,
         );
 
-        <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">get_input_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
-                <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>input_object = <span class="kw">match </span>ctx.get_input_type(<span class="kw-2">&amp;</span>ident) {
+            <span class="prelude-val">Some</span>(t) =&gt; t,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
+                ctx.cache_input_type(ident, input_object.clone());
 
-                <span class="comment">// Enqueue the nested update input for its fields to be</span>
-                <span class="comment">// created at a later point, to avoid recursing too deep</span>
-                <span class="comment">// (that has caused stack overflows on large schemas in</span>
-                <span class="comment">// the past).</span>
-                <span class="ident">ctx</span>.<span class="ident">nested_update_inputs_queue</span>
-                    .<span class="ident">push</span>((<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>), <span class="ident">Arc::clone</span>(<span class="ident">rf</span>)));
+                <span class="comment">// Enqueue the nested update input for its fields to be
+                // created at a later point, to avoid recursing too deep
+                // (that has caused stack overflows on large schemas in
+                // the past).
+                </span>ctx.nested_update_inputs_queue
+                    .push((Arc::clone(<span class="kw-2">&amp;</span>input_object), Arc::clone(rf)));
 
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+                Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
             }
         };
 
-        <span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">input_object</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>()
+        input_field(rf.name.clone(), InputType::object(input_object), <span class="prelude-val">None</span>).optional()
     }
 
-    <span class="kw">fn</span> <span class="ident">map_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputField</span> {
-        <span class="comment">// Shorthand object (equivalent to the &quot;set&quot; operation).</span>
-        <span class="kw">let</span> <span class="ident">shorthand_type</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">create::composite_create_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
+    <span class="kw">fn </span>map_composite(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
+        <span class="comment">// Shorthand object (equivalent to the &quot;set&quot; operation).
+        </span><span class="kw">let </span>shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
-        <span class="comment">// Operation envelope object.</span>
-        <span class="kw">let</span> <span class="ident">envelope_type</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">composite_update_envelope_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
+        <span class="comment">// Operation envelope object.
+        </span><span class="kw">let </span>envelope_type = InputType::Object(composite_update_envelope_object_type(ctx, cf));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">envelope_type</span>, <span class="ident">shorthand_type</span>.<span class="ident">clone</span>()];
+        <span class="kw">let </span><span class="kw-2">mut </span>input_types = <span class="macro">vec!</span>[envelope_type, shorthand_type.clone()];
 
-        <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-            <span class="ident">input_types</span>.<span class="ident">push</span>(<span class="ident">InputType::list</span>(<span class="ident">shorthand_type</span>));
+        <span class="kw">if </span>cf.is_list() {
+            input_types.push(InputType::list(shorthand_type));
         }
 
-        <span class="ident">input_field</span>(<span class="ident">cf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">input_types</span>, <span class="prelude-val">None</span>)
-            .<span class="ident">nullable_if</span>(<span class="ident">cf</span>.<span class="ident">is_optional</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_list</span>())
-            .<span class="ident">optional</span>()
+        input_field(cf.name.clone(), input_types, <span class="prelude-val">None</span>)
+            .nullable_if(cf.is_optional() &amp;&amp; !cf.is_list())
+            .optional()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">update_operations_object_type</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
-    <span class="ident">with_number_operators</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="comment">// Different names are required to construct and cache different objects.</span>
-    <span class="comment">// - &quot;Nullable&quot; affects the `set` operation (`set` is nullable)</span>
-    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>() { <span class="string">&quot;Nullable&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> };
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}FieldUpdateOperationsInput&quot;</span>, <span class="ident">nullable</span>, <span class="ident">prefix</span>),
-        <span class="ident">PRISMA_NAMESPACE</span>,
+<span class="kw">fn </span>update_operations_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    prefix: <span class="kw-2">&amp;</span>str,
+    sf: <span class="kw-2">&amp;</span>ScalarFieldRef,
+    with_number_operators: bool,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="comment">// Different names are required to construct and cache different objects.
+    // - &quot;Nullable&quot; affects the `set` operation (`set` is nullable)
+    </span><span class="kw">let </span>nullable = <span class="kw">if </span>!sf.is_required() { <span class="string">&quot;Nullable&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>};
+    <span class="kw">let </span>ident = Identifier::new(
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}FieldUpdateOperationsInput&quot;</span>, nullable, prefix),
+        PRISMA_NAMESPACE,
     );
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">obj</span>.<span class="ident">require_exactly_one_field</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>obj = init_input_object_type(ident.clone());
+    obj.require_exactly_one_field();
 
-    <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">obj</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">obj</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>obj = Arc::new(obj);
+    ctx.cache_input_type(ident, obj.clone());
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">sf</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>)
-        .<span class="ident">optional</span>()
-        .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>())];
+    <span class="kw">let </span>typ = map_scalar_input_type_for_field(ctx, sf);
+    <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[input_field(operations::SET, typ.clone(), <span class="prelude-val">None</span>)
+        .optional()
+        .nullable_if(!sf.is_required())];
 
-    <span class="kw">if</span> <span class="ident">with_number_operators</span> {
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::INCREMENT</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::DECREMENT</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::MULTIPLY</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::DIVIDE</span>, <span class="ident">typ</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>());
+    <span class="kw">if </span>with_number_operators {
+        fields.push(input_field(operations::INCREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(operations::DECREMENT, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(operations::MULTIPLY, typ.clone(), <span class="prelude-val">None</span>).optional());
+        fields.push(input_field(operations::DIVIDE, typ, <span class="prelude-val">None</span>).optional());
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::UndefinedType</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>() {
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::UNSET</span>, <span class="ident">InputType::boolean</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::UndefinedType) &amp;&amp; !sf.is_required() {
+        fields.push(input_field(operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional());
     }
 
-    <span class="ident">obj</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    obj.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">obj</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>obj)
 }
 
-<span class="doccomment">/// Build an operation envelope object type for composite updates.</span>
-<span class="doccomment">/// An operation envelope is an object that encapsulates the possible operations, like:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// cf_field: { // this is the envelope object</span>
-<span class="doccomment">///   set:    { ... set type ... }</span>
-<span class="doccomment">///   update: { ... update type ... }</span>
-<span class="doccomment">///   ... more ops ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">composite_update_envelope_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_optional</span>() {
-        <span class="string">&quot;Nullable&quot;</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-        <span class="string">&quot;List&quot;</span>
-    } <span class="kw">else</span> {
-        <span class="string">&quot;&quot;</span>
-    };
+<span class="doccomment">/// Build an operation envelope object type for composite updates.
+/// An operation envelope is an object that encapsulates the possible operations, like:
+/// ```text
+/// cf_field: { // this is the envelope object
+///   set:    { ... set type ... }
+///   update: { ... update type ... }
+///   ... more ops ...
+/// }
+/// ```
+</span><span class="kw">fn </span>composite_update_envelope_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>arity = <span class="kw">if </span>cf.is_optional() {
+        <span class="string">&quot;Nullable&quot;
+    </span>} <span class="kw">else if </span>cf.is_list() {
+        <span class="string">&quot;List&quot;
+    </span>} <span class="kw">else </span>{
+        <span class="string">&quot;&quot;
+    </span>};
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}UpdateEnvelopeInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>, <span class="ident">arity</span>);
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}UpdateEnvelopeInput&quot;</span>, cf.typ.name, arity);
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
 
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">require_exactly_one_field</span>();
-    <span class="ident">input_object</span>.<span class="ident">set_tag</span>(<span class="ident">ObjectTag::CompositeEnvelope</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.require_exactly_one_field();
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">composite_set_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>)];
+    <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="macro">vec!</span>[composite_set_update_input_field(ctx, cf)];
 
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_push_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_upsert_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_update_many_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_delete_many_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-    <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">composite_unset_update_input_field</span>(<span class="ident">cf</span>));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_update_input_field(ctx, cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_push_update_input_field(ctx, cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_upsert_update_input_field(ctx, cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_update_many_update_input_field(ctx, cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_delete_many_update_input_field(ctx, cf));
+    append_opt(<span class="kw-2">&amp;mut </span>fields, composite_unset_update_input_field(cf));
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    input_object.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="doccomment">/// Builds the `update` input object type. Should be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_update_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>);
+<span class="doccomment">/// Builds the `update` input object type. Should be used in the envelope type.
+</span><span class="kw">fn </span>composite_update_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateInput&quot;</span>, cf.typ.name);
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">set_min_fields</span>(<span class="number">1</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.set_min_fields(<span class="number">1</span>);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">mapper</span> <span class="op">=</span> <span class="ident">UpdateDataInputFieldMapper::new_checked</span>();
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">mapper</span>.<span class="ident">map_all</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">fields</span>());
+    <span class="kw">let </span>mapper = UpdateDataInputFieldMapper::new_checked();
+    <span class="kw">let </span>fields = mapper.map_all(ctx, cf.typ.fields());
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    input_object.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="comment">// Builds an `update` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_required</span>() {
-        <span class="kw">let</span> <span class="ident">update_object_type</span> <span class="op">=</span> <span class="ident">composite_update_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>);
+<span class="comment">// Builds an `update` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_required() {
+        <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
 
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::UPDATE</span>, <span class="ident">InputType::Object</span>(<span class="ident">update_object_type</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">Some</span>(input_field(operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="comment">// Builds an `unset` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_unset_update_input_field(cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_optional() {
+        <span class="prelude-val">Some</span>(input_field(operations::UNSET, InputType::boolean(), <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="comment">// Builds an `set` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_set_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputField {
+    <span class="kw">let </span>set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+
+    <span class="kw">let </span><span class="kw-2">mut </span>input_types = <span class="macro">vec!</span>[set_object_type.clone()];
+
+    <span class="kw">if </span>cf.is_list() {
+        input_types.push(InputType::list(set_object_type));
     }
+
+    input_field(operations::SET, input_types, <span class="prelude-val">None</span>)
+        .nullable_if(!cf.is_required() &amp;&amp; !cf.is_list())
+        .optional()
 }
 
-<span class="comment">// Builds an `unset` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_unset_update_input_field</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_optional</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::UNSET</span>, <span class="ident">InputType::boolean</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+<span class="comment">// Builds an `push` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_push_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_list() {
+        <span class="kw">let </span>set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+        <span class="kw">let </span>input_types = <span class="macro">vec!</span>[set_object_type.clone(), InputType::list(set_object_type)];
+
+        <span class="prelude-val">Some</span>(input_field(operations::PUSH, input_types, <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="comment">// Builds an `set` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_set_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputField</span> {
-    <span class="kw">let</span> <span class="ident">set_object_type</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">create::composite_create_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
+<span class="doccomment">/// Builds the `upsert` input object type. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_upsert_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpsertInput&quot;</span>, cf.typ.name);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">set_object_type</span>.<span class="ident">clone</span>()];
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-        <span class="ident">input_types</span>.<span class="ident">push</span>(<span class="ident">InputType::list</span>(<span class="ident">set_object_type</span>));
-    }
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
 
-    <span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">input_types</span>, <span class="prelude-val">None</span>)
-        .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_list</span>())
-        .<span class="ident">optional</span>()
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
+    <span class="kw">let </span>update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
+    <span class="kw">let </span>set_field = composite_set_update_input_field(ctx, cf).required();
+
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[set_field, update_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="comment">// Builds an `push` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_push_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-        <span class="kw">let</span> <span class="ident">set_object_type</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">create::composite_create_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-        <span class="kw">let</span> <span class="ident">input_types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">set_object_type</span>.<span class="ident">clone</span>(), <span class="ident">InputType::list</span>(<span class="ident">set_object_type</span>)];
+<span class="comment">// Builds an `upsert` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_upsert_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_optional() {
+        <span class="kw">let </span>upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
 
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::PUSH</span>, <span class="ident">input_types</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">Some</span>(input_field(operations::UPSERT, upsert_object_type, <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Builds the `upsert` input object type. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_upsert_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}UpsertInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>);
+<span class="kw">fn </span>composite_update_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyInput&quot;</span>, cf.typ.name);
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">set_tag</span>(<span class="ident">ObjectTag::CompositeEnvelope</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
+    <span class="kw">let </span>input_object = Arc::new(input_object);
 
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">update_object_type</span> <span class="op">=</span> <span class="ident">composite_update_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>);
-    <span class="kw">let</span> <span class="ident">update_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">operations::UPDATE</span>, <span class="ident">InputType::Object</span>(<span class="ident">update_object_type</span>), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="ident">set_field</span> <span class="op">=</span> <span class="ident">composite_set_update_input_field</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>).<span class="ident">required</span>();
+    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">set_field</span>, <span class="ident">update_field</span>];
+    <span class="kw">let </span>update_object_type = composite_update_object_type(ctx, cf);
+    <span class="kw">let </span>data_field = input_field(args::DATA, InputType::Object(update_object_type), <span class="prelude-val">None</span>);
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field, data_field];
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    input_object.set_fields(fields);
+
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="comment">// Builds an `upsert` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_upsert_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_optional</span>() {
-        <span class="kw">let</span> <span class="ident">upsert_object_type</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">composite_upsert_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
+<span class="kw">fn </span>composite_delete_many_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, cf.typ.name);
 
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::UPSERT</span>, <span class="ident">upsert_object_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
+
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    <span class="kw">let </span>where_object_type = objects::filter_objects::where_object_type(ctx, <span class="kw-2">&amp;</span>cf.typ);
+    <span class="kw">let </span>where_field = input_field(args::WHERE, InputType::object(where_object_type), <span class="prelude-val">None</span>);
+
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[where_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn</span> <span class="ident">composite_update_many_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}UpdateManyInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>);
+<span class="comment">// Builds an `updateMany` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_update_many_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_list() {
+        <span class="kw">let </span>update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">set_tag</span>(<span class="ident">ObjectTag::CompositeEnvelope</span>);
-
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
-
-    <span class="kw">let</span> <span class="ident">where_object_type</span> <span class="op">=</span> <span class="ident">objects::filter_objects::where_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>);
-    <span class="kw">let</span> <span class="ident">where_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">args::WHERE</span>, <span class="ident">InputType::object</span>(<span class="ident">where_object_type</span>), <span class="prelude-val">None</span>);
-
-    <span class="kw">let</span> <span class="ident">update_object_type</span> <span class="op">=</span> <span class="ident">composite_update_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>);
-    <span class="kw">let</span> <span class="ident">data_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">args::DATA</span>, <span class="ident">InputType::Object</span>(<span class="ident">update_object_type</span>), <span class="prelude-val">None</span>);
-
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">where_field</span>, <span class="ident">data_field</span>];
-
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+        <span class="prelude-val">Some</span>(input_field(operations::UPDATE_MANY, update_many, <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">fn</span> <span class="ident">composite_delete_many_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}DeleteManyInput&quot;</span>, <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">name</span>);
+<span class="comment">// Builds a `deleteMany` input field. Should only be used in the envelope type.
+</span><span class="kw">fn </span>composite_delete_many_update_input_field(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>cf.is_list() {
+        <span class="kw">let </span>delete_many = InputType::Object(composite_delete_many_object_type(ctx, cf));
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">set_tag</span>(<span class="ident">ObjectTag::CompositeEnvelope</span>);
-
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
-
-    <span class="kw">let</span> <span class="ident">where_object_type</span> <span class="op">=</span> <span class="ident">objects::filter_objects::where_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>);
-    <span class="kw">let</span> <span class="ident">where_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">args::WHERE</span>, <span class="ident">InputType::object</span>(<span class="ident">where_object_type</span>), <span class="prelude-val">None</span>);
-
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">where_field</span>];
-
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
-}
-
-<span class="comment">// Builds an `updateMany` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_update_many_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-        <span class="kw">let</span> <span class="ident">update_many</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">composite_update_many_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::UPDATE_MANY</span>, <span class="ident">update_many</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
-}
-
-<span class="comment">// Builds a `deleteMany` input field. Should only be used in the envelope type.</span>
-<span class="kw">fn</span> <span class="ident">composite_delete_many_update_input_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() {
-        <span class="kw">let</span> <span class="ident">delete_many</span> <span class="op">=</span> <span class="ident">InputType::Object</span>(<span class="ident">composite_delete_many_object_type</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>));
-
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">operations::DELETE_MANY</span>, <span class="ident">delete_many</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">Some</span>(input_field(operations::DELETE_MANY, delete_many, <span class="prelude-val">None</span>).optional())
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/retry_dns_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>retry_dns_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/retry_dns_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>retry_dns_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -208,215 +208,215 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! `RetryDnsHandle` allows for DnsQueries to be reattempted on failure</span>
+</span><span class="doccomment">//! `RetryDnsHandle` allows for DnsQueries to be reattempted on failure
 
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</span><span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use </span>futures_util::stream::{Stream, StreamExt};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">ProtoError</span>, <span class="ident">ProtoErrorKind</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsResponse</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DnsHandle</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::{ProtoError, ProtoErrorKind};
+<span class="kw">use </span><span class="kw">crate</span>::xfer::{DnsRequest, DnsResponse};
+<span class="kw">use </span><span class="kw">crate</span>::DnsHandle;
 
-<span class="doccomment">/// Can be used to reattempt queries if they fail</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: this does not reattempt queries that fail with a negative response.</span>
-<span class="doccomment">/// For example, if a query gets a `NODATA` response from a name server, the</span>
-<span class="doccomment">/// query will not be retried. It only reattempts queries that effectively</span>
-<span class="doccomment">/// failed to get a response, such as queries that resulted in IO or timeout</span>
-<span class="doccomment">/// errors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Whether an error is retryable by the [`RetryDnsHandle`] is determined by the</span>
-<span class="doccomment">/// [`RetryableError`] trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *note* Current value of this is not clear, it may be removed</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;queries can only be sent through a ClientHandle&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RetryDnsHandle</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">DnsHandle</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">H::Error</span>: <span class="ident">RetryableError</span>,
+<span class="doccomment">/// Can be used to reattempt queries if they fail
+///
+/// Note: this does not reattempt queries that fail with a negative response.
+/// For example, if a query gets a `NODATA` response from a name server, the
+/// query will not be retried. It only reattempts queries that effectively
+/// failed to get a response, such as queries that resulted in IO or timeout
+/// errors.
+///
+/// Whether an error is retryable by the [`RetryDnsHandle`] is determined by the
+/// [`RetryableError`] trait.
+///
+/// *note* Current value of this is not clear, it may be removed
+</span><span class="attribute">#[derive(Clone)]
+#[must_use = <span class="string">&quot;queries can only be sent through a ClientHandle&quot;</span>]
+</span><span class="kw">pub struct </span>RetryDnsHandle&lt;H&gt;
+<span class="kw">where
+    </span>H: DnsHandle + Unpin + Send,
+    H::Error: RetryableError,
 {
-    <span class="ident">handle</span>: <span class="ident">H</span>,
-    <span class="ident">attempts</span>: <span class="ident">usize</span>,
+    handle: H,
+    attempts: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="ident">RetryDnsHandle</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">DnsHandle</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">H::Error</span>: <span class="ident">RetryableError</span>,
+<span class="kw">impl</span>&lt;H&gt; RetryDnsHandle&lt;H&gt;
+<span class="kw">where
+    </span>H: DnsHandle + Unpin + Send,
+    H::Error: RetryableError,
 {
-    <span class="doccomment">/// Creates a new Client handler for reattempting requests on failures.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `handle` - handle to the dns connection</span>
-    <span class="doccomment">/// * `attempts` - number of attempts before failing</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="ident">H</span>, <span class="ident">attempts</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">handle</span>, <span class="ident">attempts</span> }
+    <span class="doccomment">/// Creates a new Client handler for reattempting requests on failures.
+    ///
+    /// # Arguments
+    ///
+    /// * `handle` - handle to the dns connection
+    /// * `attempts` - number of attempts before failing
+    </span><span class="kw">pub fn </span>new(handle: H, attempts: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ handle, attempts }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">RetryDnsHandle</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">DnsHandle</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">H::Error</span>: <span class="ident">RetryableError</span>,
+<span class="kw">impl</span>&lt;H&gt; DnsHandle <span class="kw">for </span>RetryDnsHandle&lt;H&gt;
+<span class="kw">where
+    </span>H: DnsHandle + Send + Unpin + <span class="lifetime">&#39;static</span>,
+    H::Error: RetryableError,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Error</span>;
+    <span class="kw">type </span>Response = Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, <span class="self">Self</span>::Error&gt;&gt; + Send + Unpin&gt;&gt;;
+    <span class="kw">type </span>Error = &lt;H <span class="kw">as </span>DnsHandle&gt;::Error;
 
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-        <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">request</span>.<span class="ident">into</span>();
+    <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: R) -&gt; <span class="self">Self</span>::Response {
+        <span class="kw">let </span>request = request.into();
 
-        <span class="comment">// need to clone here so that the retry can resend if necessary...</span>
-        <span class="comment">//  obviously it would be nice to be lazy about this...</span>
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">send</span>(<span class="ident">request</span>.<span class="ident">clone</span>());
+        <span class="comment">// need to clone here so that the retry can resend if necessary...
+        //  obviously it would be nice to be lazy about this...
+        </span><span class="kw">let </span>stream = <span class="self">self</span>.handle.send(request.clone());
 
-        <span class="ident">Box::pin</span>(<span class="ident">RetrySendStream</span> {
-            <span class="ident">request</span>,
-            <span class="ident">handle</span>: <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>(),
-            <span class="ident">stream</span>,
-            <span class="ident">remaining_attempts</span>: <span class="self">self</span>.<span class="ident">attempts</span>,
+        Box::pin(RetrySendStream {
+            request,
+            handle: <span class="self">self</span>.handle.clone(),
+            stream,
+            remaining_attempts: <span class="self">self</span>.attempts,
         })
     }
 }
 
-<span class="doccomment">/// A stream for retrying (on failure, for the remaining number of times specified)</span>
-<span class="kw">struct</span> <span class="ident">RetrySendStream</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">H</span>: <span class="ident">DnsHandle</span>,
+<span class="doccomment">/// A stream for retrying (on failure, for the remaining number of times specified)
+</span><span class="kw">struct </span>RetrySendStream&lt;H&gt;
+<span class="kw">where
+    </span>H: DnsHandle,
 {
-    <span class="ident">request</span>: <span class="ident">DnsRequest</span>,
-    <span class="ident">handle</span>: <span class="ident">H</span>,
-    <span class="ident">stream</span>: <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Response</span>,
-    <span class="ident">remaining_attempts</span>: <span class="ident">usize</span>,
+    request: DnsRequest,
+    handle: H,
+    stream: &lt;H <span class="kw">as </span>DnsHandle&gt;::Response,
+    remaining_attempts: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">DnsHandle</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">RetrySendStream</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Error</span>: <span class="ident">RetryableError</span>,
+<span class="kw">impl</span>&lt;H: DnsHandle + Unpin&gt; Stream <span class="kw">for </span>RetrySendStream&lt;H&gt;
+<span class="kw">where
+    </span>&lt;H <span class="kw">as </span>DnsHandle&gt;::Error: RetryableError,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="op">&lt;</span><span class="ident">H</span> <span class="kw">as</span> <span class="ident">DnsHandle</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, &lt;H <span class="kw">as </span>DnsHandle&gt;::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// loop over the stream, on errors, spawn a new stream</span>
-        <span class="comment">//  on ready and not ready return.</span>
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))) =&gt; {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining_attempts</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">e</span>.<span class="ident">should_retry</span>() {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)));
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="comment">// loop over the stream, on errors, spawn a new stream
+        //  on ready and not ready return.
+        </span><span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.stream.poll_next_unpin(cx) {
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))) =&gt; {
+                    <span class="kw">if </span><span class="self">self</span>.remaining_attempts == <span class="number">0 </span>|| !e.should_retry() {
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)));
                     }
 
-                    <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">attempted</span>() {
-                        <span class="self">self</span>.<span class="ident">remaining_attempts</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="kw">if </span>e.attempted() {
+                        <span class="self">self</span>.remaining_attempts -= <span class="number">1</span>;
                     }
 
-                    <span class="comment">// TODO: if the &quot;sent&quot; Message is part of the error result,</span>
-                    <span class="comment">//  then we can just reuse it... and no clone necessary</span>
-                    <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request</span>.<span class="ident">clone</span>();
-                    <span class="self">self</span>.<span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">send</span>(<span class="ident">request</span>);
+                    <span class="comment">// TODO: if the &quot;sent&quot; Message is part of the error result,
+                    //  then we can just reuse it... and no clone necessary
+                    </span><span class="kw">let </span>request = <span class="self">self</span>.request.clone();
+                    <span class="self">self</span>.stream = <span class="self">self</span>.handle.send(request);
                 }
-                <span class="ident">poll</span> =&gt; <span class="kw">return</span> <span class="ident">poll</span>,
+                poll =&gt; <span class="kw">return </span>poll,
             }
         }
     }
 }
 
-<span class="doccomment">/// What errors should be retried</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RetryableError</span> {
-    <span class="doccomment">/// Whether the query should be retried after this error</span>
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
-    <span class="doccomment">/// Whether this error should count as an attempt</span>
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="doccomment">/// What errors should be retried
+</span><span class="kw">pub trait </span>RetryableError {
+    <span class="doccomment">/// Whether the query should be retried after this error
+    </span><span class="kw">fn </span>should_retry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+    <span class="doccomment">/// Whether this error should count as an attempt
+    </span><span class="kw">fn </span>attempted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="kw">impl</span> <span class="ident">RetryableError</span> <span class="kw">for</span> <span class="ident">ProtoError</span> {
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+<span class="kw">impl </span>RetryableError <span class="kw">for </span>ProtoError {
+    <span class="kw">fn </span>should_retry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>(), <span class="ident">ProtoErrorKind::Busy</span>)
+    <span class="kw">fn </span>attempted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="macro">matches!</span>(<span class="self">self</span>.kind(), ProtoErrorKind::Busy)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::op</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::FirstAnswer</span>;
-    <span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::future</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::stream</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{
-        <span class="ident">atomic</span>::{<span class="ident">AtomicU16</span>, <span class="ident">Ordering</span>},
-        <span class="ident">Arc</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::op::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::xfer::FirstAnswer;
+    <span class="kw">use </span>futures_executor::block_on;
+    <span class="kw">use </span>futures_util::future::<span class="kw-2">*</span>;
+    <span class="kw">use </span>futures_util::stream::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::sync::{
+        atomic::{AtomicU16, Ordering},
+        Arc,
     };
-    <span class="kw">use</span> <span class="ident">DnsHandle</span>;
+    <span class="kw">use </span>DnsHandle;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">TestClient</span> {
-        <span class="ident">last_succeed</span>: <span class="ident">bool</span>,
-        <span class="ident">retries</span>: <span class="ident">u16</span>,
-        <span class="ident">attempts</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicU16</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(Clone)]
+    </span><span class="kw">struct </span>TestClient {
+        last_succeed: bool,
+        retries: u16,
+        attempts: Arc&lt;AtomicU16&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">TestClient</span> {
-        <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ProtoError</span>;
+    <span class="kw">impl </span>DnsHandle <span class="kw">for </span>TestClient {
+        <span class="kw">type </span>Response = Box&lt;<span class="kw">dyn </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, ProtoError&gt;&gt; + Send + Unpin&gt;;
+        <span class="kw">type </span>Error = ProtoError;
 
-        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attempts</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+        <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: R) -&gt; <span class="self">Self</span>::Response {
+            <span class="kw">let </span>i = <span class="self">self</span>.attempts.load(Ordering::SeqCst);
 
-            <span class="kw">if</span> (<span class="ident">i</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">retries</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">last_succeed</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-                <span class="ident">message</span>.<span class="ident">set_id</span>(<span class="ident">i</span>);
-                <span class="kw">return</span> <span class="ident">Box::new</span>(<span class="ident">once</span>(<span class="ident">ok</span>(<span class="ident">message</span>.<span class="ident">into</span>())));
+            <span class="kw">if </span>(i &gt; <span class="self">self</span>.retries || <span class="self">self</span>.retries - i == <span class="number">0</span>) &amp;&amp; <span class="self">self</span>.last_succeed {
+                <span class="kw">let </span><span class="kw-2">mut </span>message = Message::new();
+                message.set_id(i);
+                <span class="kw">return </span>Box::new(once(ok(message.into())));
             }
 
-            <span class="self">self</span>.<span class="ident">attempts</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
-            <span class="ident">Box::new</span>(<span class="ident">once</span>(<span class="ident">err</span>(<span class="ident">ProtoError::from</span>(<span class="string">&quot;last retry set to fail&quot;</span>))))
+            <span class="self">self</span>.attempts.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
+            Box::new(once(err(ProtoError::from(<span class="string">&quot;last retry set to fail&quot;</span>))))
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_retry</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">RetryDnsHandle::new</span>(
-            <span class="ident">TestClient</span> {
-                <span class="ident">last_succeed</span>: <span class="bool-val">true</span>,
-                <span class="ident">retries</span>: <span class="number">1</span>,
-                <span class="ident">attempts</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU16::new</span>(<span class="number">0</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_retry() {
+        <span class="kw">let </span><span class="kw-2">mut </span>handle = RetryDnsHandle::new(
+            TestClient {
+                last_succeed: <span class="bool-val">true</span>,
+                retries: <span class="number">1</span>,
+                attempts: Arc::new(AtomicU16::new(<span class="number">0</span>)),
             },
             <span class="number">2</span>,
         );
-        <span class="kw">let</span> <span class="ident">test1</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block_on</span>(<span class="ident">handle</span>.<span class="ident">send</span>(<span class="ident">test1</span>).<span class="ident">first_answer</span>()).<span class="ident">expect</span>(<span class="string">&quot;should have succeeded&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">id</span>(), <span class="number">1</span>); <span class="comment">// this is checking the number of iterations the TestClient ran</span>
-    }
+        <span class="kw">let </span>test1 = Message::new();
+        <span class="kw">let </span>result = block_on(handle.send(test1).first_answer()).expect(<span class="string">&quot;should have succeeded&quot;</span>);
+        <span class="macro">assert_eq!</span>(result.id(), <span class="number">1</span>); <span class="comment">// this is checking the number of iterations the TestClient ran
+    </span>}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_error</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">RetryDnsHandle::new</span>(
-            <span class="ident">TestClient</span> {
-                <span class="ident">last_succeed</span>: <span class="bool-val">false</span>,
-                <span class="ident">retries</span>: <span class="number">1</span>,
-                <span class="ident">attempts</span>: <span class="ident">Arc::new</span>(<span class="ident">AtomicU16::new</span>(<span class="number">0</span>)),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_error() {
+        <span class="kw">let </span><span class="kw-2">mut </span>client = RetryDnsHandle::new(
+            TestClient {
+                last_succeed: <span class="bool-val">false</span>,
+                retries: <span class="number">1</span>,
+                attempts: Arc::new(AtomicU16::new(<span class="number">0</span>)),
             },
             <span class="number">2</span>,
         );
-        <span class="kw">let</span> <span class="ident">test1</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">block_on</span>(<span class="ident">client</span>.<span class="ident">send</span>(<span class="ident">test1</span>).<span class="ident">first_answer</span>()).<span class="ident">is_err</span>());
+        <span class="kw">let </span>test1 = Message::new();
+        <span class="macro">assert!</span>(block_on(client.send(test1).first_answer()).is_err());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

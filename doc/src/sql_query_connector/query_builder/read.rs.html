@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_builder/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/query_builder/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -283,290 +283,290 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cursor_condition</span>, <span class="ident">filter_conversion::AliasedCondition</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">nested_aggregations</span>,
-    <span class="ident">ordering::OrderByBuilder</span>, <span class="ident">sql_trace::SqlTraceComment</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    cursor_condition, filter_conversion::AliasedCondition, model_extensions::<span class="kw-2">*</span>, nested_aggregations,
+    ordering::OrderByBuilder, sql_trace::SqlTraceComment,
 };
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">filter::Filter</span>, <span class="ident">AggregationSelection</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationSelection</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">tracing::Span</span>;
+<span class="kw">use </span>connector_interface::{filter::Filter, AggregationSelection, QueryArguments, RelAggregationSelection};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>tracing::Span;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SelectDefinition</span> {
-    <span class="kw">fn</span> <span class="ident">into_select</span>(
+<span class="kw">pub trait </span>SelectDefinition {
+    <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>ModelRef,
+        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;);
 }
 
-<span class="kw">impl</span> <span class="ident">SelectDefinition</span> <span class="kw">for</span> <span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">into_select</span>(
+<span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Filter {
+    <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">QueryArguments::from</span>((<span class="ident">model</span>.<span class="ident">clone</span>(), <span class="self">self</span>));
-        <span class="ident">args</span>.<span class="ident">into_select</span>(<span class="ident">model</span>, <span class="ident">aggr_selections</span>, <span class="ident">trace_id</span>)
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
+        <span class="kw">let </span>args = QueryArguments::from((model.clone(), <span class="self">self</span>));
+        args.into_select(model, aggr_selections, trace_id)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SelectDefinition</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">Filter</span> {
-    <span class="kw">fn</span> <span class="ident">into_select</span>(
+<span class="kw">impl </span>SelectDefinition <span class="kw">for </span><span class="kw-2">&amp;</span>Filter {
+    <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into_select</span>(<span class="ident">model</span>, <span class="ident">aggr_selections</span>, <span class="ident">trace_id</span>)
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
+        <span class="self">self</span>.clone().into_select(model, aggr_selections, trace_id)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SelectDefinition</span> <span class="kw">for</span> <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_select</span>(
+<span class="kw">impl </span>SelectDefinition <span class="kw">for </span>Select&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>ModelRef,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
         (<span class="self">self</span>, <span class="macro">vec!</span>[])
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SelectDefinition</span> <span class="kw">for</span> <span class="ident">QueryArguments</span> {
-    <span class="kw">fn</span> <span class="ident">into_select</span>(
+<span class="kw">impl </span>SelectDefinition <span class="kw">for </span>QueryArguments {
+    <span class="kw">fn </span>into_select(
         <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">order_by_definitions</span> <span class="op">=</span> <span class="ident">OrderByBuilder::default</span>().<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
-        <span class="kw">let</span> (<span class="ident">table_opt</span>, <span class="ident">cursor_condition</span>) <span class="op">=</span> <span class="ident">cursor_condition::build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">order_by_definitions</span>);
-        <span class="kw">let</span> <span class="ident">aggregation_joins</span> <span class="op">=</span> <span class="ident">nested_aggregations::build</span>(<span class="ident">aggr_selections</span>);
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; (Select&lt;<span class="lifetime">&#39;static</span>&gt;, Vec&lt;Expression&lt;<span class="lifetime">&#39;static</span>&gt;&gt;) {
+        <span class="kw">let </span>order_by_definitions = OrderByBuilder::default().build(<span class="kw-2">&amp;</span><span class="self">self</span>);
+        <span class="kw">let </span>(table_opt, cursor_condition) = cursor_condition::build(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>model, <span class="kw-2">&amp;</span>order_by_definitions);
+        <span class="kw">let </span>aggregation_joins = nested_aggregations::build(aggr_selections);
 
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ignore_take</span> { <span class="prelude-val">None</span> } <span class="kw">else</span> { <span class="self">self</span>.<span class="ident">take_abs</span>() };
-        <span class="kw">let</span> <span class="ident">skip</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ignore_skip</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>) };
+        <span class="kw">let </span>limit = <span class="kw">if </span><span class="self">self</span>.ignore_take { <span class="prelude-val">None </span>} <span class="kw">else </span>{ <span class="self">self</span>.take_abs() };
+        <span class="kw">let </span>skip = <span class="kw">if </span><span class="self">self</span>.ignore_skip { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="self">self</span>.skip.unwrap_or(<span class="number">0</span>) };
 
-        <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">filter</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
-            .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
+        <span class="kw">let </span>filter: ConditionTree = <span class="self">self
+            </span>.filter
+            .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+            .unwrap_or(ConditionTree::NoCondition);
 
-        <span class="kw">let</span> <span class="ident">conditions</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">filter</span>, <span class="ident">cursor_condition</span>) {
-            (<span class="ident">ConditionTree::NoCondition</span>, <span class="ident">cursor</span>) =&gt; <span class="ident">cursor</span>,
-            (<span class="ident">filter</span>, <span class="ident">ConditionTree::NoCondition</span>) =&gt; <span class="ident">filter</span>,
-            (<span class="ident">filter</span>, <span class="ident">cursor</span>) =&gt; <span class="ident">ConditionTree::and</span>(<span class="ident">filter</span>, <span class="ident">cursor</span>),
+        <span class="kw">let </span>conditions = <span class="kw">match </span>(filter, cursor_condition) {
+            (ConditionTree::NoCondition, cursor) =&gt; cursor,
+            (filter, ConditionTree::NoCondition) =&gt; filter,
+            (filter, cursor) =&gt; ConditionTree::and(filter, cursor),
         };
 
-        <span class="comment">// Add joins necessary to the ordering</span>
-        <span class="kw">let</span> <span class="ident">joined_table</span> <span class="op">=</span> <span class="ident">order_by_definitions</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">j</span>.<span class="ident">joins</span>)
-            .<span class="ident">fold</span>(<span class="ident">model</span>.<span class="ident">as_table</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">join</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">left_join</span>(<span class="ident">join</span>.<span class="ident">clone</span>().<span class="ident">data</span>));
+        <span class="comment">// Add joins necessary to the ordering
+        </span><span class="kw">let </span>joined_table = order_by_definitions
+            .iter()
+            .flat_map(|j| <span class="kw-2">&amp;</span>j.joins)
+            .fold(model.as_table(), |acc, join| acc.left_join(join.clone().data));
 
-        <span class="comment">// Add joins necessary to the nested aggregations</span>
-        <span class="kw">let</span> <span class="ident">joined_table</span> <span class="op">=</span> <span class="ident">aggregation_joins</span>
-            .<span class="ident">joins</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">joined_table</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">join</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">left_join</span>(<span class="ident">join</span>.<span class="ident">data</span>));
+        <span class="comment">// Add joins necessary to the nested aggregations
+        </span><span class="kw">let </span>joined_table = aggregation_joins
+            .joins
+            .into_iter()
+            .fold(joined_table, |acc, join| acc.left_join(join.data));
 
-        <span class="kw">let</span> <span class="ident">select_ast</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">joined_table</span>)
-            .<span class="ident">so_that</span>(<span class="ident">conditions</span>)
-            .<span class="ident">offset</span>(<span class="ident">skip</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>())
-            .<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>);
+        <span class="kw">let </span>select_ast = Select::from_table(joined_table)
+            .so_that(conditions)
+            .offset(skip <span class="kw">as </span>usize)
+            .append_trace(<span class="kw-2">&amp;</span>Span::current())
+            .add_trace_id(trace_id);
 
-        <span class="kw">let</span> <span class="ident">select_ast</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>) <span class="op">=</span> <span class="ident">table_opt</span> {
-            <span class="ident">select_ast</span>.<span class="ident">and_from</span>(<span class="ident">table</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">select_ast</span>
+        <span class="kw">let </span>select_ast = <span class="kw">if let </span><span class="prelude-val">Some</span>(table) = table_opt {
+            select_ast.and_from(table)
+        } <span class="kw">else </span>{
+            select_ast
         };
 
-        <span class="kw">let</span> <span class="ident">select_ast</span> <span class="op">=</span> <span class="ident">order_by_definitions</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">select_ast</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">o</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">order_by</span>(<span class="ident">o</span>.<span class="ident">order_definition</span>.<span class="ident">clone</span>()));
+        <span class="kw">let </span>select_ast = order_by_definitions
+            .iter()
+            .fold(select_ast, |acc, o| acc.order_by(o.order_definition.clone()));
 
-        <span class="kw">match</span> <span class="ident">limit</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">limit</span>) =&gt; (<span class="ident">select_ast</span>.<span class="ident">limit</span>(<span class="ident">limit</span> <span class="kw">as</span> <span class="ident">usize</span>), <span class="ident">aggregation_joins</span>.<span class="ident">columns</span>),
-            <span class="prelude-val">None</span> =&gt; (<span class="ident">select_ast</span>, <span class="ident">aggregation_joins</span>.<span class="ident">columns</span>),
+        <span class="kw">match </span>limit {
+            <span class="prelude-val">Some</span>(limit) =&gt; (select_ast.limit(limit <span class="kw">as </span>usize), aggregation_joins.columns),
+            <span class="prelude-val">None </span>=&gt; (select_ast, aggregation_joins.columns),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_records</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">columns</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-    <span class="ident">query</span>: <span class="ident">T</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">SelectDefinition</span>,
+<span class="kw">pub fn </span>get_records&lt;T&gt;(
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    columns: <span class="kw">impl </span>Iterator&lt;Item = Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    query: T,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt;
+<span class="kw">where
+    </span>T: SelectDefinition,
 {
-    <span class="kw">let</span> (<span class="ident">select</span>, <span class="ident">additional_selection_set</span>) <span class="op">=</span> <span class="ident">query</span>.<span class="ident">into_select</span>(<span class="ident">model</span>, <span class="ident">aggr_selections</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
-    <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">col</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">column</span>(<span class="ident">col</span>));
+    <span class="kw">let </span>(select, additional_selection_set) = query.into_select(model, aggr_selections, trace_id.clone());
+    <span class="kw">let </span>select = columns.fold(select, |acc, col| acc.column(col));
 
-    <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">select</span>.<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>()).<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>);
+    <span class="kw">let </span>select = select.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(trace_id);
 
-    <span class="ident">additional_selection_set</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">col</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">value</span>(<span class="ident">col</span>))
+    additional_selection_set
+        .into_iter()
+        .fold(select, |acc, col| acc.value(col))
 }
 
-<span class="doccomment">/// Generates a query of the form:</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">/// SELECT</span>
-<span class="doccomment">///     COUNT(*),</span>
-<span class="doccomment">///     SUM(`float`),</span>
-<span class="doccomment">///     SUM(`int`),</span>
-<span class="doccomment">///     AVG(`float`),</span>
-<span class="doccomment">///     AVG(`int`),</span>
-<span class="doccomment">///     MIN(`float`),</span>
-<span class="doccomment">///     MIN(`int`),</span>
-<span class="doccomment">///     MAX(`float`),</span>
-<span class="doccomment">///     MAX(`int`)</span>
-<span class="doccomment">/// FROM</span>
-<span class="doccomment">///     (</span>
-<span class="doccomment">///         SELECT</span>
-<span class="doccomment">///             `Table`.`id`,</span>
-<span class="doccomment">///             `Table`.`float`,</span>
-<span class="doccomment">///             `Table`.`int`</span>
-<span class="doccomment">///         FROM</span>
-<span class="doccomment">///             `Table`</span>
-<span class="doccomment">///         WHERE</span>
-<span class="doccomment">///             1 = 1</span>
-<span class="doccomment">///     ) AS `sub`;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,</span>
-<span class="doccomment">/// not absolute - e.g. `SELECT &quot;field&quot; FROM (...)` NOT `SELECT &quot;full&quot;.&quot;path&quot;.&quot;to&quot;.&quot;field&quot; FROM (...)`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>],
-    <span class="ident">args</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">extract_columns</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">selections</span>);
-    <span class="kw">let</span> <span class="ident">sub_query</span> <span class="op">=</span> <span class="ident">get_records</span>(<span class="ident">model</span>, <span class="ident">columns</span>.<span class="ident">into_iter</span>(), <span class="kw-2">&amp;</span>[], <span class="ident">args</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
-    <span class="kw">let</span> <span class="ident">sub_table</span> <span class="op">=</span> <span class="ident">Table::from</span>(<span class="ident">sub_query</span>).<span class="ident">alias</span>(<span class="string">&quot;sub&quot;</span>);
+<span class="doccomment">/// Generates a query of the form:
+/// ```sql
+/// SELECT
+///     COUNT(*),
+///     SUM(`float`),
+///     SUM(`int`),
+///     AVG(`float`),
+///     AVG(`int`),
+///     MIN(`float`),
+///     MIN(`int`),
+///     MAX(`float`),
+///     MAX(`int`)
+/// FROM
+///     (
+///         SELECT
+///             `Table`.`id`,
+///             `Table`.`float`,
+///             `Table`.`int`
+///         FROM
+///             `Table`
+///         WHERE
+///             1 = 1
+///     ) AS `sub`;
+/// ```
+/// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
+/// not absolute - e.g. `SELECT &quot;field&quot; FROM (...)` NOT `SELECT &quot;full&quot;.&quot;path&quot;.&quot;to&quot;.&quot;field&quot; FROM (...)`.
+</span><span class="kw">pub fn </span>aggregate(
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    selections: <span class="kw-2">&amp;</span>[AggregationSelection],
+    args: QueryArguments,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>columns = extract_columns(model, <span class="kw-2">&amp;</span>selections);
+    <span class="kw">let </span>sub_query = get_records(model, columns.into_iter(), <span class="kw-2">&amp;</span>[], args, trace_id.clone());
+    <span class="kw">let </span>sub_table = Table::from(sub_query).alias(<span class="string">&quot;sub&quot;</span>);
 
-    <span class="ident">selections</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(
-        <span class="ident">Select::from_table</span>(<span class="ident">sub_table</span>)
-            .<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>())
-            .<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>),
-        <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_op</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">next_op</span> {
-            <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="ident">select</span>.<span class="ident">column</span>(<span class="ident">Column::from</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
+    selections.iter().fold(
+        Select::from_table(sub_table)
+            .append_trace(<span class="kw-2">&amp;</span>Span::current())
+            .add_trace_id(trace_id),
+        |select, next_op| <span class="kw">match </span>next_op {
+            AggregationSelection::Field(field) =&gt; select.column(Column::from(field.db_name().to_owned())),
 
-            <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> {
-                    <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">count</span>(<span class="ident">Column::from</span>(<span class="ident">next_field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())))
+            AggregationSelection::Count { all, fields } =&gt; {
+                <span class="kw">let </span>select = fields.iter().fold(select, |select, next_field| {
+                    select.value(count(Column::from(next_field.db_name().to_owned())))
                 });
 
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                    <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">count</span>(<span class="ident">asterisk</span>()))
-                } <span class="kw">else</span> {
-                    <span class="ident">select</span>
+                <span class="kw">if </span><span class="kw-2">*</span>all {
+                    select.value(count(asterisk()))
+                } <span class="kw">else </span>{
+                    select
                 }
             }
 
-            <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> {
-                <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">avg</span>(<span class="ident">Column::from</span>(<span class="ident">next_field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())))
+            AggregationSelection::Average(fields) =&gt; fields.iter().fold(select, |select, next_field| {
+                select.value(avg(Column::from(next_field.db_name().to_owned())))
             }),
 
-            <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> {
-                <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">sum</span>(<span class="ident">Column::from</span>(<span class="ident">next_field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())))
+            AggregationSelection::Sum(fields) =&gt; fields.iter().fold(select, |select, next_field| {
+                select.value(sum(Column::from(next_field.db_name().to_owned())))
             }),
 
-            <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> {
-                <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">min</span>(<span class="ident">Column::from</span>(<span class="ident">next_field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())))
+            AggregationSelection::Min(fields) =&gt; fields.iter().fold(select, |select, next_field| {
+                select.value(min(Column::from(next_field.db_name().to_owned())))
             }),
 
-            <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> {
-                <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">max</span>(<span class="ident">Column::from</span>(<span class="ident">next_field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())))
+            AggregationSelection::Max(fields) =&gt; fields.iter().fold(select, |select, next_field| {
+                select.value(max(Column::from(next_field.db_name().to_owned())))
             }),
         },
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_by_aggregate</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">args</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>],
-    <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">base_query</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_select</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span>[], <span class="ident">trace_id</span>.<span class="ident">clone</span>());
+<span class="kw">pub fn </span>group_by_aggregate(
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    args: QueryArguments,
+    selections: <span class="kw-2">&amp;</span>[AggregationSelection],
+    group_by: Vec&lt;ScalarFieldRef&gt;,
+    having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; Select&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">let </span>(base_query, <span class="kw">_</span>) = args.into_select(model, <span class="kw-2">&amp;</span>[], trace_id.clone());
 
-    <span class="kw">let</span> <span class="ident">select_query</span> <span class="op">=</span> <span class="ident">selections</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">base_query</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_op</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">next_op</span> {
-        <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="ident">select</span>.<span class="ident">column</span>(<span class="ident">field</span>.<span class="ident">as_column</span>()),
+    <span class="kw">let </span>select_query = selections.iter().fold(base_query, |select, next_op| <span class="kw">match </span>next_op {
+        AggregationSelection::Field(field) =&gt; select.column(field.as_column()),
 
-        <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-            <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">count</span>(<span class="ident">next_field</span>.<span class="ident">as_column</span>())));
+        AggregationSelection::Count { all, fields } =&gt; {
+            <span class="kw">let </span>select = fields
+                .iter()
+                .fold(select, |select, next_field| select.value(count(next_field.as_column())));
 
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">count</span>(<span class="ident">asterisk</span>()))
-            } <span class="kw">else</span> {
-                <span class="ident">select</span>
+            <span class="kw">if </span><span class="kw-2">*</span>all {
+                select.value(count(asterisk()))
+            } <span class="kw">else </span>{
+                select
             }
         }
 
-        <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">avg</span>(<span class="ident">next_field</span>.<span class="ident">as_column</span>()))),
+        AggregationSelection::Average(fields) =&gt; fields
+            .iter()
+            .fold(select, |select, next_field| select.value(avg(next_field.as_column()))),
 
-        <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">sum</span>(<span class="ident">next_field</span>.<span class="ident">as_column</span>()))),
+        AggregationSelection::Sum(fields) =&gt; fields
+            .iter()
+            .fold(select, |select, next_field| select.value(sum(next_field.as_column()))),
 
-        <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">min</span>(<span class="ident">next_field</span>.<span class="ident">as_column</span>()))),
+        AggregationSelection::Min(fields) =&gt; fields
+            .iter()
+            .fold(select, |select, next_field| select.value(min(next_field.as_column()))),
 
-        <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">select</span>, <span class="op">|</span><span class="ident">select</span>, <span class="ident">next_field</span><span class="op">|</span> <span class="ident">select</span>.<span class="ident">value</span>(<span class="ident">max</span>(<span class="ident">next_field</span>.<span class="ident">as_column</span>()))),
+        AggregationSelection::Max(fields) =&gt; fields
+            .iter()
+            .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
     });
 
-    <span class="kw">let</span> <span class="ident">grouped</span> <span class="op">=</span> <span class="ident">group_by</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(
-        <span class="ident">select_query</span>.<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>()).<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>),
-        <span class="op">|</span><span class="ident">query</span>, <span class="ident">field</span><span class="op">|</span> <span class="ident">query</span>.<span class="ident">group_by</span>(<span class="ident">field</span>.<span class="ident">as_column</span>()),
+    <span class="kw">let </span>grouped = group_by.into_iter().fold(
+        select_query.append_trace(<span class="kw-2">&amp;</span>Span::current()).add_trace_id(trace_id),
+        |query, field| query.group_by(field.as_column()),
     );
 
-    <span class="kw">match</span> <span class="ident">having</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="ident">grouped</span>.<span class="ident">having</span>(<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">grouped</span>,
+    <span class="kw">match </span>having {
+        <span class="prelude-val">Some</span>(filter) =&gt; grouped.having(filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>)),
+        <span class="prelude-val">None </span>=&gt; grouped,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_columns</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">selection</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">clone</span>()],
-            <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>: <span class="kw">_</span>, <span class="ident">fields</span> } =&gt; {
-                <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">model</span>
-                        .<span class="ident">primary_identifier</span>()
-                        .<span class="ident">as_scalar_fields</span>()
-                        .<span class="ident">expect</span>(<span class="string">&quot;Primary identifier has non-scalar fields.&quot;</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">fields</span>.<span class="ident">clone</span>()
+<span class="kw">fn </span>extract_columns(model: <span class="kw-2">&amp;</span>ModelRef, selections: <span class="kw-2">&amp;</span>[AggregationSelection]) -&gt; Vec&lt;Column&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = selections
+        .iter()
+        .flat_map(|selection| <span class="kw">match </span>selection {
+            AggregationSelection::Field(field) =&gt; <span class="macro">vec!</span>[field.clone()],
+            AggregationSelection::Count { all: <span class="kw">_</span>, fields } =&gt; {
+                <span class="kw">if </span>fields.is_empty() {
+                    model
+                        .primary_identifier()
+                        .as_scalar_fields()
+                        .expect(<span class="string">&quot;Primary identifier has non-scalar fields.&quot;</span>)
+                } <span class="kw">else </span>{
+                    fields.clone()
                 }
             }
-            <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">clone</span>(),
-            <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">clone</span>(),
-            <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">clone</span>(),
-            <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">clone</span>(),
+            AggregationSelection::Average(fields) =&gt; fields.clone(),
+            AggregationSelection::Sum(fields) =&gt; fields.clone(),
+            AggregationSelection::Min(fields) =&gt; fields.clone(),
+            AggregationSelection::Max(fields) =&gt; fields.clone(),
         })
-        .<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())
-        .<span class="ident">collect</span>();
+        .unique_by(|field| field.db_name().to_owned())
+        .collect();
 
-    <span class="ident">fields</span>.<span class="ident">as_columns</span>().<span class="ident">collect</span>()
+    fields.as_columns().collect()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest_meta-2.3.0/src/validator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest_meta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest_meta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest_meta/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pest_meta-2.3.0/src/validator.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validator.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pest_meta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pest_meta/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pest_meta/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -803,26 +803,26 @@
 <span id="803">803</span>
 <span id="804">804</span>
 <span id="805">805</span>
-</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser</span>
-<span class="comment">// Copyright (c) 2018 Dragoș Tiselice</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// pest. The Elegant Parser
+// Copyright (c) 2018 Dragoș Tiselice
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+</span><span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
 
-<span class="kw">use</span> <span class="ident">pest::error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorVariant</span>, <span class="ident">InputLocation</span>};
-<span class="kw">use</span> <span class="ident">pest::iterators::Pairs</span>;
-<span class="kw">use</span> <span class="ident">pest::Span</span>;
+<span class="kw">use </span>pest::error::{Error, ErrorVariant, InputLocation};
+<span class="kw">use </span>pest::iterators::Pairs;
+<span class="kw">use </span>pest::Span;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser</span>::{<span class="ident">ParserExpr</span>, <span class="ident">ParserNode</span>, <span class="ident">ParserRule</span>, <span class="ident">Rule</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UNICODE_PROPERTY_NAMES</span>;
+<span class="kw">use </span><span class="kw">crate</span>::parser::{ParserExpr, ParserNode, ParserRule, Rule};
+<span class="kw">use </span><span class="kw">crate</span>::UNICODE_PROPERTY_NAMES;
 
-<span class="kw">static</span> <span class="ident">RUST_KEYWORDS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+<span class="kw">static </span>RUST_KEYWORDS: Lazy&lt;HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt; = Lazy::new(|| {
     [
         <span class="string">&quot;abstract&quot;</span>, <span class="string">&quot;alignof&quot;</span>, <span class="string">&quot;as&quot;</span>, <span class="string">&quot;become&quot;</span>, <span class="string">&quot;box&quot;</span>, <span class="string">&quot;break&quot;</span>, <span class="string">&quot;const&quot;</span>, <span class="string">&quot;continue&quot;</span>, <span class="string">&quot;crate&quot;</span>, <span class="string">&quot;do&quot;</span>,
         <span class="string">&quot;else&quot;</span>, <span class="string">&quot;enum&quot;</span>, <span class="string">&quot;extern&quot;</span>, <span class="string">&quot;false&quot;</span>, <span class="string">&quot;final&quot;</span>, <span class="string">&quot;fn&quot;</span>, <span class="string">&quot;for&quot;</span>, <span class="string">&quot;if&quot;</span>, <span class="string">&quot;impl&quot;</span>, <span class="string">&quot;in&quot;</span>, <span class="string">&quot;let&quot;</span>, <span class="string">&quot;loop&quot;</span>,
@@ -830,21 +830,21 @@
         <span class="string">&quot;pub&quot;</span>, <span class="string">&quot;ref&quot;</span>, <span class="string">&quot;return&quot;</span>, <span class="string">&quot;Self&quot;</span>, <span class="string">&quot;self&quot;</span>, <span class="string">&quot;sizeof&quot;</span>, <span class="string">&quot;static&quot;</span>, <span class="string">&quot;struct&quot;</span>, <span class="string">&quot;super&quot;</span>, <span class="string">&quot;trait&quot;</span>,
         <span class="string">&quot;true&quot;</span>, <span class="string">&quot;type&quot;</span>, <span class="string">&quot;typeof&quot;</span>, <span class="string">&quot;unsafe&quot;</span>, <span class="string">&quot;unsized&quot;</span>, <span class="string">&quot;use&quot;</span>, <span class="string">&quot;virtual&quot;</span>, <span class="string">&quot;where&quot;</span>, <span class="string">&quot;while&quot;</span>, <span class="string">&quot;yield&quot;</span>,
     ]
-    .<span class="ident">iter</span>()
-    .<span class="ident">cloned</span>()
-    .<span class="ident">collect</span>()
+    .iter()
+    .cloned()
+    .collect()
 });
 
-<span class="kw">static</span> <span class="ident">PEST_KEYWORDS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+<span class="kw">static </span>PEST_KEYWORDS: Lazy&lt;HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt; = Lazy::new(|| {
     [
         <span class="string">&quot;_&quot;</span>, <span class="string">&quot;ANY&quot;</span>, <span class="string">&quot;DROP&quot;</span>, <span class="string">&quot;EOI&quot;</span>, <span class="string">&quot;PEEK&quot;</span>, <span class="string">&quot;PEEK_ALL&quot;</span>, <span class="string">&quot;POP&quot;</span>, <span class="string">&quot;POP_ALL&quot;</span>, <span class="string">&quot;PUSH&quot;</span>, <span class="string">&quot;SOI&quot;</span>,
     ]
-    .<span class="ident">iter</span>()
-    .<span class="ident">cloned</span>()
-    .<span class="ident">collect</span>()
+    .iter()
+    .cloned()
+    .collect()
 });
 
-<span class="kw">static</span> <span class="ident">BUILTINS</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
+<span class="kw">static </span>BUILTINS: Lazy&lt;HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt; = Lazy::new(|| {
     [
         <span class="string">&quot;ANY&quot;</span>,
         <span class="string">&quot;DROP&quot;</span>,
@@ -866,632 +866,632 @@
         <span class="string">&quot;ASCII&quot;</span>,
         <span class="string">&quot;NEWLINE&quot;</span>,
     ]
-    .<span class="ident">iter</span>()
-    .<span class="ident">cloned</span>()
-    .<span class="ident">chain</span>(<span class="ident">UNICODE_PROPERTY_NAMES</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())
-    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    .iter()
+    .cloned()
+    .chain(UNICODE_PROPERTY_NAMES.iter().cloned())
+    .collect::&lt;HashSet&lt;<span class="kw-2">&amp;</span>str&gt;&gt;()
 });
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_pairs</span>(<span class="ident">pairs</span>: <span class="ident">Pairs</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">definitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">clone</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::grammar_rule</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">into_inner</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_span</span>())
-        .<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">called_rules</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">clone</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::grammar_rule</span>)
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
-            <span class="ident">pair</span>.<span class="ident">into_inner</span>()
-                .<span class="ident">flatten</span>()
-                .<span class="ident">skip</span>(<span class="number">1</span>)
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_rule</span>() <span class="op">==</span> <span class="ident">Rule::identifier</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">as_span</span>())
+<span class="kw">pub fn </span>validate_pairs(pairs: Pairs&lt;Rule&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;, Vec&lt;Error&lt;Rule&gt;&gt;&gt; {
+    <span class="kw">let </span>definitions: Vec&lt;<span class="kw">_</span>&gt; = pairs
+        .clone()
+        .filter(|pair| pair.as_rule() == Rule::grammar_rule)
+        .map(|pair| pair.into_inner().next().unwrap().as_span())
+        .collect();
+    <span class="kw">let </span>called_rules: Vec&lt;<span class="kw">_</span>&gt; = pairs
+        .clone()
+        .filter(|pair| pair.as_rule() == Rule::grammar_rule)
+        .flat_map(|pair| {
+            pair.into_inner()
+                .flatten()
+                .skip(<span class="number">1</span>)
+                .filter(|pair| pair.as_rule() == Rule::identifier)
+                .map(|pair| pair.as_span())
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
 
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_rust_keywords</span>(<span class="kw-2">&amp;</span><span class="ident">definitions</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_pest_keywords</span>(<span class="kw-2">&amp;</span><span class="ident">definitions</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_already_defined</span>(<span class="kw-2">&amp;</span><span class="ident">definitions</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_undefined</span>(<span class="kw-2">&amp;</span><span class="ident">definitions</span>, <span class="kw-2">&amp;</span><span class="ident">called_rules</span>));
+    errors.extend(validate_rust_keywords(<span class="kw-2">&amp;</span>definitions));
+    errors.extend(validate_pest_keywords(<span class="kw-2">&amp;</span>definitions));
+    errors.extend(validate_already_defined(<span class="kw-2">&amp;</span>definitions));
+    errors.extend(validate_undefined(<span class="kw-2">&amp;</span>definitions, <span class="kw-2">&amp;</span>called_rules));
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">errors</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">errors</span>);
+    <span class="kw">if </span>!errors.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(errors);
     }
 
-    <span class="kw">let</span> <span class="ident">definitions</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">definitions</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">called_rules</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">called_rules</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span>definitions: HashSet&lt;<span class="kw">_</span>&gt; = definitions.iter().map(|span| span.as_str()).collect();
+    <span class="kw">let </span>called_rules: HashSet&lt;<span class="kw">_</span>&gt; = called_rules.iter().map(|span| span.as_str()).collect();
 
-    <span class="kw">let</span> <span class="ident">defaults</span> <span class="op">=</span> <span class="ident">called_rules</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">definitions</span>);
+    <span class="kw">let </span>defaults = called_rules.difference(<span class="kw-2">&amp;</span>definitions);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">defaults</span>.<span class="ident">cloned</span>().<span class="ident">collect</span>())
+    <span class="prelude-val">Ok</span>(defaults.cloned().collect())
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_rust_keywords</span>(<span class="ident">definitions</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="attribute">#[allow(clippy::ptr_arg)]
+</span><span class="kw">pub fn </span>validate_rust_keywords(definitions: <span class="kw-2">&amp;</span>Vec&lt;Span&gt;) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">definition</span> <span class="kw">in</span> <span class="ident">definitions</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">definition</span>.<span class="ident">as_str</span>();
+    <span class="kw">for </span>definition <span class="kw">in </span>definitions {
+        <span class="kw">let </span>name = definition.as_str();
 
-        <span class="kw">if</span> <span class="ident">RUST_KEYWORDS</span>.<span class="ident">contains</span>(<span class="ident">name</span>) {
-            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">Error::new_from_span</span>(
-                <span class="ident">ErrorVariant::CustomError</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{} is a rust keyword&quot;</span>, <span class="ident">name</span>),
+        <span class="kw">if </span>RUST_KEYWORDS.contains(name) {
+            errors.push(Error::new_from_span(
+                ErrorVariant::CustomError {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;{} is a rust keyword&quot;</span>, name),
                 },
-                <span class="kw-2">*</span><span class="ident">definition</span>,
+                <span class="kw-2">*</span>definition,
             ))
         }
     }
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_pest_keywords</span>(<span class="ident">definitions</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="attribute">#[allow(clippy::ptr_arg)]
+</span><span class="kw">pub fn </span>validate_pest_keywords(definitions: <span class="kw-2">&amp;</span>Vec&lt;Span&gt;) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">definition</span> <span class="kw">in</span> <span class="ident">definitions</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">definition</span>.<span class="ident">as_str</span>();
+    <span class="kw">for </span>definition <span class="kw">in </span>definitions {
+        <span class="kw">let </span>name = definition.as_str();
 
-        <span class="kw">if</span> <span class="ident">PEST_KEYWORDS</span>.<span class="ident">contains</span>(<span class="ident">name</span>) {
-            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">Error::new_from_span</span>(
-                <span class="ident">ErrorVariant::CustomError</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{} is a pest keyword&quot;</span>, <span class="ident">name</span>),
+        <span class="kw">if </span>PEST_KEYWORDS.contains(name) {
+            errors.push(Error::new_from_span(
+                ErrorVariant::CustomError {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;{} is a pest keyword&quot;</span>, name),
                 },
-                <span class="kw-2">*</span><span class="ident">definition</span>,
+                <span class="kw-2">*</span>definition,
             ))
         }
     }
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_already_defined</span>(<span class="ident">definitions</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">defined</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+<span class="attribute">#[allow(clippy::ptr_arg)]
+</span><span class="kw">pub fn </span>validate_already_defined(definitions: <span class="kw-2">&amp;</span>Vec&lt;Span&gt;) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>defined = HashSet::new();
 
-    <span class="kw">for</span> <span class="ident">definition</span> <span class="kw">in</span> <span class="ident">definitions</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">definition</span>.<span class="ident">as_str</span>();
+    <span class="kw">for </span>definition <span class="kw">in </span>definitions {
+        <span class="kw">let </span>name = definition.as_str();
 
-        <span class="kw">if</span> <span class="ident">defined</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">Error::new_from_span</span>(
-                <span class="ident">ErrorVariant::CustomError</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;rule {} already defined&quot;</span>, <span class="ident">name</span>),
+        <span class="kw">if </span>defined.contains(<span class="kw-2">&amp;</span>name) {
+            errors.push(Error::new_from_span(
+                ErrorVariant::CustomError {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;rule {} already defined&quot;</span>, name),
                 },
-                <span class="kw-2">*</span><span class="ident">definition</span>,
+                <span class="kw-2">*</span>definition,
             ))
-        } <span class="kw">else</span> {
-            <span class="ident">defined</span>.<span class="ident">insert</span>(<span class="ident">name</span>);
+        } <span class="kw">else </span>{
+            defined.insert(name);
         }
     }
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_undefined</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(
-    <span class="ident">definitions</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">called_rules</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="ident">definitions</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">definitions</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">span</span><span class="op">|</span> <span class="ident">span</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
+<span class="attribute">#[allow(clippy::ptr_arg)]
+</span><span class="kw">pub fn </span>validate_undefined&lt;<span class="lifetime">&#39;i</span>&gt;(
+    definitions: <span class="kw-2">&amp;</span>Vec&lt;Span&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+    called_rules: <span class="kw-2">&amp;</span>Vec&lt;Span&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
+    <span class="kw">let </span>definitions: HashSet&lt;<span class="kw">_</span>&gt; = definitions.iter().map(|span| span.as_str()).collect();
 
-    <span class="kw">for</span> <span class="ident">rule</span> <span class="kw">in</span> <span class="ident">called_rules</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">rule</span>.<span class="ident">as_str</span>();
+    <span class="kw">for </span>rule <span class="kw">in </span>called_rules {
+        <span class="kw">let </span>name = rule.as_str();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">definitions</span>.<span class="ident">contains</span>(<span class="ident">name</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">BUILTINS</span>.<span class="ident">contains</span>(<span class="ident">name</span>) {
-            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">Error::new_from_span</span>(
-                <span class="ident">ErrorVariant::CustomError</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;rule {} is undefined&quot;</span>, <span class="ident">name</span>),
+        <span class="kw">if </span>!definitions.contains(name) &amp;&amp; !BUILTINS.contains(name) {
+            errors.push(Error::new_from_span(
+                ErrorVariant::CustomError {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;rule {} is undefined&quot;</span>, name),
                 },
-                <span class="kw-2">*</span><span class="ident">rule</span>,
+                <span class="kw-2">*</span>rule,
             ))
         }
     }
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_ast</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="attribute">#[allow(clippy::ptr_arg)]
+</span><span class="kw">pub fn </span>validate_ast&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;&gt;) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
 
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_repetition</span>(<span class="ident">rules</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_choices</span>(<span class="ident">rules</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_whitespace_comment</span>(<span class="ident">rules</span>));
-    <span class="ident">errors</span>.<span class="ident">extend</span>(<span class="ident">validate_left_recursion</span>(<span class="ident">rules</span>));
+    errors.extend(validate_repetition(rules));
+    errors.extend(validate_choices(rules));
+    errors.extend(validate_whitespace_comment(rules));
+    errors.extend(validate_left_recursion(rules));
 
-    <span class="ident">errors</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">error</span>.<span class="ident">location</span> {
-        <span class="ident">InputLocation::Span</span>(<span class="ident">span</span>) =&gt; <span class="ident">span</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    errors.sort_by_key(|error| <span class="kw">match </span>error.location {
+        InputLocation::Span(span) =&gt; span,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     });
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="kw">fn</span> <span class="ident">is_non_progressing</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(
-    <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ParserExpr</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
-    <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">trace</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-        <span class="ident">ParserExpr::Str</span>(<span class="kw-2">ref</span> <span class="ident">string</span>) =&gt; <span class="ident">string</span>.<span class="ident">is_empty</span>(),
-        <span class="ident">ParserExpr::Ident</span>(<span class="kw-2">ref</span> <span class="ident">ident</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;soi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;eoi&quot;</span> {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+<span class="kw">fn </span>is_non_progressing&lt;<span class="lifetime">&#39;i</span>&gt;(
+    expr: <span class="kw-2">&amp;</span>ParserExpr&lt;<span class="lifetime">&#39;i</span>&gt;,
+    rules: <span class="kw-2">&amp;</span>HashMap&lt;String, <span class="kw-2">&amp;</span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+    trace: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
+) -&gt; bool {
+    <span class="kw">match </span><span class="kw-2">*</span>expr {
+        ParserExpr::Str(<span class="kw-2">ref </span>string) =&gt; string.is_empty(),
+        ParserExpr::Ident(<span class="kw-2">ref </span>ident) =&gt; {
+            <span class="kw">if </span>ident == <span class="string">&quot;soi&quot; </span>|| ident == <span class="string">&quot;eoi&quot; </span>{
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">trace</span>.<span class="ident">contains</span>(<span class="ident">ident</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">rules</span>.<span class="ident">get</span>(<span class="ident">ident</span>) {
-                    <span class="ident">trace</span>.<span class="ident">push</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>);
-                    <span class="ident">trace</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+            <span class="kw">if </span>!trace.contains(ident) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = rules.get(ident) {
+                    trace.push(ident.clone());
+                    <span class="kw">let </span>result = is_non_progressing(<span class="kw-2">&amp;</span>node.expr, rules, trace);
+                    trace.pop().unwrap();
 
-                    <span class="kw">return</span> <span class="ident">result</span>;
+                    <span class="kw">return </span>result;
                 }
             }
 
-            <span class="bool-val">false</span>
+            <span class="bool-val">false
+        </span>}
+        ParserExpr::PosPred(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        ParserExpr::NegPred(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        ParserExpr::Seq(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+            is_non_progressing(<span class="kw-2">&amp;</span>lhs.expr, rules, trace)
+                &amp;&amp; is_non_progressing(<span class="kw-2">&amp;</span>rhs.expr, rules, trace)
         }
-        <span class="ident">ParserExpr::PosPred</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="ident">ParserExpr::NegPred</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="ident">ParserExpr::Seq</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-            <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
+        ParserExpr::Choice(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+            is_non_progressing(<span class="kw-2">&amp;</span>lhs.expr, rules, trace)
+                || is_non_progressing(<span class="kw-2">&amp;</span>rhs.expr, rules, trace)
         }
-        <span class="ident">ParserExpr::Choice</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-            <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
-        }
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">is_non_failing</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(
-    <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ParserExpr</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
-    <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">trace</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">expr</span> {
-        <span class="ident">ParserExpr::Str</span>(<span class="kw-2">ref</span> <span class="ident">string</span>) =&gt; <span class="ident">string</span>.<span class="ident">is_empty</span>(),
-        <span class="ident">ParserExpr::Ident</span>(<span class="kw-2">ref</span> <span class="ident">ident</span>) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">trace</span>.<span class="ident">contains</span>(<span class="ident">ident</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">rules</span>.<span class="ident">get</span>(<span class="ident">ident</span>) {
-                    <span class="ident">trace</span>.<span class="ident">push</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>);
-                    <span class="ident">trace</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+<span class="kw">fn </span>is_non_failing&lt;<span class="lifetime">&#39;i</span>&gt;(
+    expr: <span class="kw-2">&amp;</span>ParserExpr&lt;<span class="lifetime">&#39;i</span>&gt;,
+    rules: <span class="kw-2">&amp;</span>HashMap&lt;String, <span class="kw-2">&amp;</span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+    trace: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
+) -&gt; bool {
+    <span class="kw">match </span><span class="kw-2">*</span>expr {
+        ParserExpr::Str(<span class="kw-2">ref </span>string) =&gt; string.is_empty(),
+        ParserExpr::Ident(<span class="kw-2">ref </span>ident) =&gt; {
+            <span class="kw">if </span>!trace.contains(ident) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = rules.get(ident) {
+                    trace.push(ident.clone());
+                    <span class="kw">let </span>result = is_non_failing(<span class="kw-2">&amp;</span>node.expr, rules, trace);
+                    trace.pop().unwrap();
 
-                    <span class="kw">return</span> <span class="ident">result</span>;
+                    <span class="kw">return </span>result;
                 }
             }
 
-            <span class="bool-val">false</span>
+            <span class="bool-val">false
+        </span>}
+        ParserExpr::Opt(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        ParserExpr::Rep(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        ParserExpr::Seq(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+            is_non_failing(<span class="kw-2">&amp;</span>lhs.expr, rules, trace) &amp;&amp; is_non_failing(<span class="kw-2">&amp;</span>rhs.expr, rules, trace)
         }
-        <span class="ident">ParserExpr::Opt</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="ident">ParserExpr::Rep</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="ident">ParserExpr::Seq</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-            <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>) <span class="op">&amp;&amp;</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
+        ParserExpr::Choice(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+            is_non_failing(<span class="kw-2">&amp;</span>lhs.expr, rules, trace) || is_non_failing(<span class="kw-2">&amp;</span>rhs.expr, rules, trace)
         }
-        <span class="ident">ParserExpr::Choice</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-            <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
-        }
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_repetition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">to_hash_map</span>(<span class="ident">rules</span>);
+<span class="kw">fn </span>validate_repetition&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;]) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[];
+    <span class="kw">let </span>map = to_hash_map(rules);
 
-    <span class="kw">for</span> <span class="ident">rule</span> <span class="kw">in</span> <span class="ident">rules</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">rule</span>.<span class="ident">node</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">filter_map_top_down</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">expr</span> {
-                <span class="ident">ParserExpr::Rep</span>(<span class="kw-2">ref</span> <span class="ident">other</span>)
-                <span class="op">|</span> <span class="ident">ParserExpr::RepOnce</span>(<span class="kw-2">ref</span> <span class="ident">other</span>)
-                <span class="op">|</span> <span class="ident">ParserExpr::RepMin</span>(<span class="kw-2">ref</span> <span class="ident">other</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[]) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                            <span class="ident">ErrorVariant::CustomError</span> {
-                                <span class="ident">message</span>:
+    <span class="kw">for </span>rule <span class="kw">in </span>rules {
+        <span class="kw">let </span><span class="kw-2">mut </span>errors = rule.node
+            .clone()
+            .filter_map_top_down(|node| <span class="kw">match </span>node.expr {
+                ParserExpr::Rep(<span class="kw-2">ref </span>other)
+                | ParserExpr::RepOnce(<span class="kw-2">ref </span>other)
+                | ParserExpr::RepMin(<span class="kw-2">ref </span>other, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">if </span>is_non_failing(<span class="kw-2">&amp;</span>other.expr, <span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[]) {
+                        <span class="prelude-val">Some</span>(Error::new_from_span(
+                            ErrorVariant::CustomError {
+                                message:
                                     <span class="string">&quot;expression inside repetition cannot fail and will repeat \
-                                     infinitely&quot;</span>
-                                        .<span class="ident">to_owned</span>()
+                                     infinitely&quot;
+                                        </span>.to_owned()
                             },
-                            <span class="ident">node</span>.<span class="ident">span</span>
+                            node.span
                         ))
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[]) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                            <span class="ident">ErrorVariant::CustomError</span> {
-                                <span class="ident">message</span>:
+                    } <span class="kw">else if </span>is_non_progressing(<span class="kw-2">&amp;</span>other.expr, <span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[]) {
+                        <span class="prelude-val">Some</span>(Error::new_from_span(
+                            ErrorVariant::CustomError {
+                                message:
                                     <span class="string">&quot;expression inside repetition is non-progressing and will repeat \
-                                     infinitely&quot;</span>
-                                        .<span class="ident">to_owned</span>(),
+                                     infinitely&quot;
+                                        </span>.to_owned(),
                             },
-                            <span class="ident">node</span>.<span class="ident">span</span>
+                            node.span
                         ))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            });
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>});
 
-        <span class="ident">result</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">errors</span>);
+        result.append(<span class="kw-2">&amp;mut </span>errors);
     }
 
-    <span class="ident">result</span>
+    result
 }
 
-<span class="kw">fn</span> <span class="ident">validate_choices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">to_hash_map</span>(<span class="ident">rules</span>);
+<span class="kw">fn </span>validate_choices&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;]) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[];
+    <span class="kw">let </span>map = to_hash_map(rules);
 
-    <span class="kw">for</span> <span class="ident">rule</span> <span class="kw">in</span> <span class="ident">rules</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">rule</span>
-            .<span class="ident">node</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">filter_map_top_down</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">expr</span> {
-                <span class="ident">ParserExpr::Choice</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">lhs</span>.<span class="ident">expr</span> {
-                        <span class="ident">ParserExpr::Choice</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; <span class="ident">rhs</span>,
-                        <span class="kw">_</span> =&gt; <span class="ident">lhs</span>,
+    <span class="kw">for </span>rule <span class="kw">in </span>rules {
+        <span class="kw">let </span><span class="kw-2">mut </span>errors = rule
+            .node
+            .clone()
+            .filter_map_top_down(|node| <span class="kw">match </span>node.expr {
+                ParserExpr::Choice(<span class="kw-2">ref </span>lhs, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">let </span>node = <span class="kw">match </span>lhs.expr {
+                        ParserExpr::Choice(<span class="kw">_</span>, <span class="kw-2">ref </span>rhs) =&gt; rhs,
+                        <span class="kw">_ </span>=&gt; lhs,
                     };
 
-                    <span class="kw">if</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[]) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                            <span class="ident">ErrorVariant::CustomError</span> {
-                                <span class="ident">message</span>:
-                                    <span class="string">&quot;expression cannot fail; following choices cannot be reached&quot;</span>
-                                        .<span class="ident">to_owned</span>(),
+                    <span class="kw">if </span>is_non_failing(<span class="kw-2">&amp;</span>node.expr, <span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[]) {
+                        <span class="prelude-val">Some</span>(Error::new_from_span(
+                            ErrorVariant::CustomError {
+                                message:
+                                    <span class="string">&quot;expression cannot fail; following choices cannot be reached&quot;
+                                        </span>.to_owned(),
                             },
-                            <span class="ident">node</span>.<span class="ident">span</span>,
+                            node.span,
                         ))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             });
 
-        <span class="ident">result</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">errors</span>);
+        result.append(<span class="kw-2">&amp;mut </span>errors);
     }
 
-    <span class="ident">result</span>
+    result
 }
 
-<span class="kw">fn</span> <span class="ident">validate_whitespace_comment</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">to_hash_map</span>(<span class="ident">rules</span>);
+<span class="kw">fn </span>validate_whitespace_comment&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;]) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">let </span>map = to_hash_map(rules);
 
-    <span class="ident">rules</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rule</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">rule</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;WHITESPACE&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">rule</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;COMMENT&quot;</span> {
-                <span class="kw">if</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">rule</span>.<span class="ident">node</span>.<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[]) {
-                    <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                        <span class="ident">ErrorVariant::CustomError</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(
+    rules
+        .iter()
+        .filter_map(|rule| {
+            <span class="kw">if </span>rule.name == <span class="string">&quot;WHITESPACE&quot; </span>|| rule.name == <span class="string">&quot;COMMENT&quot; </span>{
+                <span class="kw">if </span>is_non_failing(<span class="kw-2">&amp;</span>rule.node.expr, <span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[]) {
+                    <span class="prelude-val">Some</span>(Error::new_from_span(
+                        ErrorVariant::CustomError {
+                            message: <span class="macro">format!</span>(
                                 <span class="string">&quot;{} cannot fail and will repeat infinitely&quot;</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">rule</span>.<span class="ident">name</span>
+                                <span class="kw-2">&amp;</span>rule.name
                             ),
                         },
-                        <span class="ident">rule</span>.<span class="ident">node</span>.<span class="ident">span</span>,
+                        rule.node.span,
                     ))
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_non_progressing</span>(<span class="kw-2">&amp;</span><span class="ident">rule</span>.<span class="ident">node</span>.<span class="ident">expr</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[]) {
-                    <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                        <span class="ident">ErrorVariant::CustomError</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(
+                } <span class="kw">else if </span>is_non_progressing(<span class="kw-2">&amp;</span>rule.node.expr, <span class="kw-2">&amp;</span>map, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[]) {
+                    <span class="prelude-val">Some</span>(Error::new_from_span(
+                        ErrorVariant::CustomError {
+                            message: <span class="macro">format!</span>(
                                 <span class="string">&quot;{} is non-progressing and will repeat infinitely&quot;</span>,
-                                <span class="kw-2">&amp;</span><span class="ident">rule</span>.<span class="ident">name</span>
+                                <span class="kw-2">&amp;</span>rule.name
                             ),
                         },
-                        <span class="ident">rule</span>.<span class="ident">node</span>.<span class="ident">span</span>,
+                        rule.node.span,
                     ))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">validate_left_recursion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">left_recursion</span>(<span class="ident">to_hash_map</span>(<span class="ident">rules</span>))
+<span class="kw">fn </span>validate_left_recursion&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;]) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    left_recursion(to_hash_map(rules))
 }
 
-<span class="kw">fn</span> <span class="ident">to_hash_map</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ParserRule</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>]) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">rules</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> (<span class="ident">r</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">node</span>)).<span class="ident">collect</span>()
+<span class="kw">fn </span>to_hash_map&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ParserRule&lt;<span class="lifetime">&#39;i</span>&gt;]) -&gt; HashMap&lt;String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;&gt; {
+    rules.iter().map(|r| (r.name.clone(), <span class="kw-2">&amp;</span>r.node)).collect()
 }
 
-<span class="kw">fn</span> <span class="ident">left_recursion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">rules</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">check_expr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>,
-        <span class="ident">rules</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="ident">ParserNode</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">trace</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="ident">Rule</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">expr</span>.<span class="ident">clone</span>() {
-            <span class="ident">ParserExpr::Ident</span>(<span class="ident">other</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">trace</span>[<span class="number">0</span>] <span class="op">==</span> <span class="ident">other</span> {
-                    <span class="ident">trace</span>.<span class="ident">push</span>(<span class="ident">other</span>);
-                    <span class="kw">let</span> <span class="ident">chain</span> <span class="op">=</span> <span class="ident">trace</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> <span class="ident">ident</span>.<span class="ident">as_ref</span>())
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                        .<span class="ident">join</span>(<span class="string">&quot; -&gt; &quot;</span>);
+<span class="kw">fn </span>left_recursion&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(rules: HashMap&lt;String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;&gt;) -&gt; Vec&lt;Error&lt;Rule&gt;&gt; {
+    <span class="kw">fn </span>check_expr&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;i</span>: <span class="lifetime">&#39;a</span>&gt;(
+        node: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;,
+        rules: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>HashMap&lt;String, <span class="kw-2">&amp;</span>ParserNode&lt;<span class="lifetime">&#39;i</span>&gt;&gt;,
+        trace: <span class="kw-2">&amp;mut </span>Vec&lt;String&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Error&lt;Rule&gt;&gt; {
+        <span class="kw">match </span>node.expr.clone() {
+            ParserExpr::Ident(other) =&gt; {
+                <span class="kw">if </span>trace[<span class="number">0</span>] == other {
+                    trace.push(other);
+                    <span class="kw">let </span>chain = trace
+                        .iter()
+                        .map(|ident| ident.as_ref())
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                        .join(<span class="string">&quot; -&gt; &quot;</span>);
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Error::new_from_span</span>(
-                        <span class="ident">ErrorVariant::CustomError</span> {
-                            <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(Error::new_from_span(
+                        ErrorVariant::CustomError {
+                            message: <span class="macro">format!</span>(
                                 <span class="string">&quot;rule {} is left-recursive ({}); pest::prec_climber might be useful \
                                  in this case&quot;</span>,
-                                <span class="ident">node</span>.<span class="ident">span</span>.<span class="ident">as_str</span>(),
-                                <span class="ident">chain</span>
+                                node.span.as_str(),
+                                chain
                             )
                         },
-                        <span class="ident">node</span>.<span class="ident">span</span>
+                        node.span
                     ));
                 }
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">trace</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">rules</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>) {
-                        <span class="ident">trace</span>.<span class="ident">push</span>(<span class="ident">other</span>);
-                        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>);
-                        <span class="ident">trace</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+                <span class="kw">if </span>!trace.contains(<span class="kw-2">&amp;</span>other) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(node) = rules.get(<span class="kw-2">&amp;</span>other) {
+                        trace.push(other);
+                        <span class="kw">let </span>result = check_expr(node, rules, trace);
+                        trace.pop().unwrap();
 
-                        <span class="kw">return</span> <span class="ident">result</span>;
+                        <span class="kw">return </span>result;
                     }
                 }
 
-                <span class="prelude-val">None</span>
-            }
-            <span class="ident">ParserExpr::Seq</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">is_non_failing</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>.<span class="ident">expr</span>, <span class="ident">rules</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="ident">trace</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>()]) {
-                    <span class="ident">check_expr</span>(<span class="ident">rhs</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">check_expr</span>(<span class="ident">lhs</span>, <span class="ident">rules</span>, <span class="ident">trace</span>)
+                <span class="prelude-val">None
+            </span>}
+            ParserExpr::Seq(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+                <span class="kw">if </span>is_non_failing(<span class="kw-2">&amp;</span>lhs.expr, rules, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[trace.last().unwrap().clone()]) {
+                    check_expr(rhs, rules, trace)
+                } <span class="kw">else </span>{
+                    check_expr(lhs, rules, trace)
                 }
             }
-            <span class="ident">ParserExpr::Choice</span>(<span class="kw-2">ref</span> <span class="ident">lhs</span>, <span class="kw-2">ref</span> <span class="ident">rhs</span>) =&gt; {
-                <span class="ident">check_expr</span>(<span class="ident">lhs</span>, <span class="ident">rules</span>, <span class="ident">trace</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">check_expr</span>(<span class="ident">rhs</span>, <span class="ident">rules</span>, <span class="ident">trace</span>))
+            ParserExpr::Choice(<span class="kw-2">ref </span>lhs, <span class="kw-2">ref </span>rhs) =&gt; {
+                check_expr(lhs, rules, trace).or_else(|| check_expr(rhs, rules, trace))
             }
-            <span class="ident">ParserExpr::Rep</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="ident">ParserExpr::RepOnce</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="ident">ParserExpr::Opt</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="ident">ParserExpr::PosPred</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="ident">ParserExpr::NegPred</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="ident">ParserExpr::Push</span>(<span class="kw-2">ref</span> <span class="ident">node</span>) =&gt; <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="ident">rules</span>, <span class="ident">trace</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            ParserExpr::Rep(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            ParserExpr::RepOnce(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            ParserExpr::Opt(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            ParserExpr::PosPred(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            ParserExpr::NegPred(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            ParserExpr::Push(<span class="kw-2">ref </span>node) =&gt; check_expr(node, rules, trace),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>errors = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">node</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">rules</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">clone</span>();
+    <span class="kw">for </span>(name, node) <span class="kw">in </span><span class="kw-2">&amp;</span>rules {
+        <span class="kw">let </span>name = name.clone();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">check_expr</span>(<span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">rules</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="ident">name</span>]) {
-            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(error) = check_expr(node, <span class="kw-2">&amp;</span>rules, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[name]) {
+            errors.push(error);
         }
     }
 
-    <span class="ident">errors</span>
+    errors
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::parser</span>::{<span class="ident">consume_rules</span>, <span class="ident">PestParser</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::unwrap_or_report</span>;
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">pest::Parser</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::parser::{consume_rules, PestParser};
+    <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::unwrap_or_report;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>pest::Parser;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:1
   |
 1 | let = { \&quot;a\&quot; }
   | ^-^
   |
-  = let is a rust keyword&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">rust_keyword</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;let = { \&quot;a\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">validate_pairs</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = let is a rust keyword&quot;</span>)]
+    </span><span class="kw">fn </span>rust_keyword() {
+        <span class="kw">let </span>input = <span class="string">&quot;let = { \&quot;a\&quot; }&quot;</span>;
+        unwrap_or_report(validate_pairs(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:1
   |
 1 | ANY = { \&quot;a\&quot; }
   | ^-^
   |
-  = ANY is a pest keyword&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pest_keyword</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;ANY = { \&quot;a\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">validate_pairs</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = ANY is a pest keyword&quot;</span>)]
+    </span><span class="kw">fn </span>pest_keyword() {
+        <span class="kw">let </span>input = <span class="string">&quot;ANY = { \&quot;a\&quot; }&quot;</span>;
+        unwrap_or_report(validate_pairs(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:13
   |
 1 | a = { \&quot;a\&quot; } a = { \&quot;a\&quot; }
   |             ^
   |
-  = rule a already defined&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">already_defined</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;a\&quot; } a = { \&quot;a\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">validate_pairs</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule a already defined&quot;</span>)]
+    </span><span class="kw">fn </span>already_defined() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;a\&quot; } a = { \&quot;a\&quot; }&quot;</span>;
+        unwrap_or_report(validate_pairs(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
 1 | a = { b }
   |       ^
   |
-  = rule b is undefined&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">undefined</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { b }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">validate_pairs</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule b is undefined&quot;</span>)]
+    </span><span class="kw">fn </span>undefined() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { b }&quot;</span>;
+        unwrap_or_report(validate_pairs(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">valid_recursion</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;\&quot; ~ \&quot;a\&quot;? ~ \&quot;a\&quot;* ~ (\&quot;a\&quot; | \&quot;b\&quot;) ~ a }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>valid_recursion() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;\&quot; ~ \&quot;a\&quot;? ~ \&quot;a\&quot;* ~ (\&quot;a\&quot; | \&quot;b\&quot;) ~ a }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:16
   |
 1 | WHITESPACE = { \&quot;\&quot; }
   |                ^^
   |
-  = WHITESPACE cannot fail and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_failing_whitespace</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;WHITESPACE = { \&quot;\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = WHITESPACE cannot fail and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>non_failing_whitespace() {
+        <span class="kw">let </span>input = <span class="string">&quot;WHITESPACE = { \&quot;\&quot; }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:13
   |
 1 | COMMENT = { soi }
   |             ^-^
   |
-  = COMMENT is non-progressing and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_progressing_comment</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;COMMENT = { soi }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = COMMENT is non-progressing and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>non_progressing_comment() {
+        <span class="kw">let </span>input = <span class="string">&quot;COMMENT = { soi }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
 1 | a = { (\&quot;\&quot;)* }
   |       ^---^
   |
-  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_failing_repetition</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { (\&quot;\&quot;)* }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>non_failing_repetition() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { (\&quot;\&quot;)* }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:18
   |
 1 | a = { \&quot;\&quot; } b = { a* }
   |                  ^^
   |
-  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">indirect_non_failing_repetition</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;\&quot; } b = { a* }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>indirect_non_failing_repetition() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;\&quot; } b = { a* }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:20
   |
 1 | a = { \&quot;a\&quot; ~ (\&quot;b\&quot; ~ (\&quot;\&quot;)*) }
   |                    ^---^
   |
-  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deep_non_failing_repetition</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;a\&quot; ~ (\&quot;b\&quot; ~ (\&quot;\&quot;)*) }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression inside repetition cannot fail and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>deep_non_failing_repetition() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;a\&quot; ~ (\&quot;b\&quot; ~ (\&quot;\&quot;)*) }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
 1 | a = { (\&quot;\&quot; ~ &amp;\&quot;a\&quot; ~ !\&quot;a\&quot; ~ (soi | eoi))* }
   |       ^-------------------------------^
   |
-  = expression inside repetition is non-progressing and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_progressing_repetition</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { (\&quot;\&quot; ~ &amp;\&quot;a\&quot; ~ !\&quot;a\&quot; ~ (soi | eoi))* }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression inside repetition is non-progressing and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>non_progressing_repetition() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { (\&quot;\&quot; ~ &amp;\&quot;a\&quot; ~ !\&quot;a\&quot; ~ (soi | eoi))* }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:20
   |
 1 | a = { !\&quot;a\&quot; } b = { a* }
   |                    ^^
   |
-  = expression inside repetition is non-progressing and will repeat infinitely&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">indirect_non_progressing_repetition</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { !\&quot;a\&quot; } b = { a* }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression inside repetition is non-progressing and will repeat infinitely&quot;</span>)]
+    </span><span class="kw">fn </span>indirect_non_progressing_repetition() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { !\&quot;a\&quot; } b = { a* }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
 1 | a = { a }
   |       ^
   |
-  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">simple_left_recursion</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { a }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]
+    </span><span class="kw">fn </span>simple_left_recursion() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { a }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
@@ -1505,80 +1505,80 @@
 1 | a = { b } b = { a }
   |                 ^
   |
-  = rule a is left-recursive (a -&gt; b -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">indirect_left_recursion</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { b } b = { a }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule a is left-recursive (a -&gt; b -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]
+    </span><span class="kw">fn </span>indirect_left_recursion() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { b } b = { a }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:39
   |
 1 | a = { \&quot;\&quot; ~ \&quot;a\&quot;? ~ \&quot;a\&quot;* ~ (\&quot;a\&quot; | \&quot;\&quot;) ~ a }
   |                                       ^
   |
-  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_failing_left_recursion</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;\&quot; ~ \&quot;a\&quot;? ~ \&quot;a\&quot;* ~ (\&quot;a\&quot; | \&quot;\&quot;) ~ a }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]
+    </span><span class="kw">fn </span>non_failing_left_recursion() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;\&quot; ~ \&quot;a\&quot;? ~ \&quot;a\&quot;* ~ (\&quot;a\&quot; | \&quot;\&quot;) ~ a }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:13
   |
 1 | a = { \&quot;a\&quot; | a }
   |             ^
   |
-  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">non_primary_choice_left_recursion</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;a\&quot; | a }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = rule a is left-recursive (a -&gt; a); pest::prec_climber might be useful in this case&quot;</span>)]
+    </span><span class="kw">fn </span>non_primary_choice_left_recursion() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;a\&quot; | a }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
 1 | a = { \&quot;a\&quot;* | \&quot;a\&quot; | \&quot;b\&quot; }
   |       ^--^
   |
-  = expression cannot fail; following choices cannot be reached&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lhs_non_failing_choice</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;a\&quot;* | \&quot;a\&quot; | \&quot;b\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression cannot fail; following choices cannot be reached&quot;</span>)]
+    </span><span class="kw">fn </span>lhs_non_failing_choice() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;a\&quot;* | \&quot;a\&quot; | \&quot;b\&quot; }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:13
   |
 1 | a = { \&quot;a\&quot; | \&quot;a\&quot;* | \&quot;b\&quot; }
   |             ^--^
   |
-  = expression cannot fail; following choices cannot be reached&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lhs_non_failing_choice_middle</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { \&quot;a\&quot; | \&quot;a\&quot;* | \&quot;b\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression cannot fail; following choices cannot be reached&quot;</span>)]
+    </span><span class="kw">fn </span>lhs_non_failing_choice_middle() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { \&quot;a\&quot; | \&quot;a\&quot;* | \&quot;b\&quot; }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;grammar error
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;grammar error
 
  --&gt; 1:7
   |
@@ -1592,21 +1592,21 @@
 1 | a = { b | \&quot;a\&quot; } b = { \&quot;b\&quot;* | \&quot;c\&quot; }
   |                       ^--^
   |
-  = expression cannot fail; following choices cannot be reached&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lhs_non_failing_nested_choices</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;a = { b | \&quot;a\&quot; } b = { \&quot;b\&quot;* | \&quot;c\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+  = expression cannot fail; following choices cannot be reached&quot;</span>)]
+    </span><span class="kw">fn </span>lhs_non_failing_nested_choices() {
+        <span class="kw">let </span>input = <span class="string">&quot;a = { b | \&quot;a\&quot; } b = { \&quot;b\&quot;* | \&quot;c\&quot; }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">skip_can_be_defined</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">&quot;skip = { \&quot;\&quot; }&quot;</span>;
-        <span class="ident">unwrap_or_report</span>(<span class="ident">consume_rules</span>(
-            <span class="ident">PestParser::parse</span>(<span class="ident">Rule::grammar_rules</span>, <span class="ident">input</span>).<span class="ident">unwrap</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>skip_can_be_defined() {
+        <span class="kw">let </span>input = <span class="string">&quot;skip = { \&quot;\&quot; }&quot;</span>;
+        unwrap_or_report(consume_rules(
+            PestParser::parse(Rule::grammar_rules, input).unwrap(),
         ));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest_meta" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pest_meta" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

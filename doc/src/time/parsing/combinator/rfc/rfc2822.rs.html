@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/rfc/rfc2822.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rfc2822.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/rfc/rfc2822.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rfc2822.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -115,120 +115,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Rules defined in [RFC 2822].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 2822]: https://datatracker.ietf.org/doc/html/rfc2822</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Rules defined in [RFC 2822].
+//!
+//! [RFC 2822]: https://datatracker.ietf.org/doc/html/rfc2822
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator::rfc::rfc2234::wsp</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator</span>::{<span class="ident">ascii_char</span>, <span class="ident">one_or_more</span>, <span class="ident">zero_or_more</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::ParsedItem</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::parsing::combinator::rfc::rfc2234::wsp;
+<span class="kw">use </span><span class="kw">crate</span>::parsing::combinator::{ascii_char, one_or_more, zero_or_more};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::ParsedItem;
 
-<span class="doccomment">/// Consume the `fws` rule.</span>
-<span class="comment">// The full rule is equivalent to /\r\n[ \t]+|[ \t]+(?:\r\n[ \t]+)*/</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fws</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> [<span class="string">b&#39;\r&#39;</span>, <span class="string">b&#39;\n&#39;</span>, <span class="ident">rest</span> @ ..] <span class="op">=</span> <span class="ident">input</span> {
-        <span class="ident">one_or_more</span>(<span class="ident">wsp</span>)(<span class="ident">rest</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">one_or_more</span>(<span class="ident">wsp</span>)(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
-        <span class="kw">while</span> <span class="kw">let</span> [<span class="string">b&#39;\r&#39;</span>, <span class="string">b&#39;\n&#39;</span>, <span class="ident">rest</span> @ ..] <span class="op">=</span> <span class="ident">input</span> {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">one_or_more</span>(<span class="ident">wsp</span>)(<span class="ident">rest</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+<span class="doccomment">/// Consume the `fws` rule.
+</span><span class="comment">// The full rule is equivalent to /\r\n[ \t]+|[ \t]+(?:\r\n[ \t]+)*/
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fws(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    <span class="kw">if let </span>[<span class="string">b&#39;\r&#39;</span>, <span class="string">b&#39;\n&#39;</span>, rest @ ..] = input {
+        one_or_more(wsp)(rest)
+    } <span class="kw">else </span>{
+        input = one_or_more(wsp)(input)<span class="question-mark">?</span>.into_inner();
+        <span class="kw">while let </span>[<span class="string">b&#39;\r&#39;</span>, <span class="string">b&#39;\n&#39;</span>, rest @ ..] = input {
+            input = one_or_more(wsp)(rest)<span class="question-mark">?</span>.into_inner();
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ()))
+        <span class="prelude-val">Some</span>(ParsedItem(input, ()))
     }
 }
 
-<span class="doccomment">/// Consume the `cfws` rule.</span>
-<span class="comment">// The full rule is equivalent to any combination of `fws` and `comment` so long as it is not empty.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cfws</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">one_or_more</span>(<span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">fws</span>(<span class="ident">input</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">comment</span>(<span class="ident">input</span>)))(<span class="ident">input</span>)
+<span class="doccomment">/// Consume the `cfws` rule.
+</span><span class="comment">// The full rule is equivalent to any combination of `fws` and `comment` so long as it is not empty.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cfws(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    one_or_more(|input| fws(input).or_else(|| comment(input)))(input)
 }
 
-<span class="doccomment">/// Consume the `comment` rule.</span>
-<span class="kw">fn</span> <span class="ident">comment</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;(&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
-    <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">fws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span> <span class="ident">ccontent</span>(<span class="ident">input</span>) {
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">into_inner</span>();
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">fws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+<span class="doccomment">/// Consume the `comment` rule.
+</span><span class="kw">fn </span>comment(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    input = ascii_char::&lt;<span class="string">b&#39;(&#39;</span>&gt;(input)<span class="question-mark">?</span>.into_inner();
+    input = zero_or_more(fws)(input).into_inner();
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(rest) = ccontent(input) {
+        input = rest.into_inner();
+        input = zero_or_more(fws)(input).into_inner();
     }
-    <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;)&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+    input = ascii_char::&lt;<span class="string">b&#39;)&#39;</span>&gt;(input)<span class="question-mark">?</span>.into_inner();
 
-    <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ()))
+    <span class="prelude-val">Some</span>(ParsedItem(input, ()))
 }
 
-<span class="doccomment">/// Consume the `ccontent` rule.</span>
-<span class="kw">fn</span> <span class="ident">ccontent</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">ctext</span>(<span class="ident">input</span>)
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">quoted_pair</span>(<span class="ident">input</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">comment</span>(<span class="ident">input</span>))
+<span class="doccomment">/// Consume the `ccontent` rule.
+</span><span class="kw">fn </span>ccontent(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    ctext(input)
+        .or_else(|| quoted_pair(input))
+        .or_else(|| comment(input))
 }
 
-<span class="doccomment">/// Consume the `ctext` rule.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_lazy_evaluations</span>)]</span> <span class="comment">// rust-lang/rust-clippy#8522</span>
-<span class="kw">fn</span> <span class="ident">ctext</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">no_ws_ctl</span>(<span class="ident">input</span>).<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="number">33</span>..<span class="op">=</span><span class="number">39</span> <span class="op">|</span> <span class="number">42</span>..<span class="op">=</span><span class="number">91</span> <span class="op">|</span> <span class="number">93</span>..<span class="op">=</span><span class="number">126</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">rest</span>, ())),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume the `ctext` rule.
+</span><span class="attribute">#[allow(clippy::unnecessary_lazy_evaluations)] </span><span class="comment">// rust-lang/rust-clippy#8522
+</span><span class="kw">fn </span>ctext(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    no_ws_ctl(input).or_else(|| <span class="kw">match </span>input {
+        [<span class="number">33</span>..=<span class="number">39 </span>| <span class="number">42</span>..=<span class="number">91 </span>| <span class="number">93</span>..=<span class="number">126</span>, rest @ ..] =&gt; <span class="prelude-val">Some</span>(ParsedItem(rest, ())),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     })
 }
 
-<span class="doccomment">/// Consume the `quoted_pair` rule.</span>
-<span class="kw">fn</span> <span class="ident">quoted_pair</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;\\&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+<span class="doccomment">/// Consume the `quoted_pair` rule.
+</span><span class="kw">fn </span>quoted_pair(<span class="kw-2">mut </span>input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    input = ascii_char::&lt;<span class="string">b&#39;\\&#39;</span>&gt;(input)<span class="question-mark">?</span>.into_inner();
 
-    <span class="kw">let</span> <span class="ident">old_input_len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
+    <span class="kw">let </span>old_input_len = input.len();
 
-    <span class="ident">input</span> <span class="op">=</span> <span class="ident">text</span>(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+    input = text(input).into_inner();
 
-    <span class="comment">// If nothing is parsed, this means we hit the `obs-text` rule and nothing matched. This is</span>
-    <span class="comment">// technically a success, but we should still check the `obs-qp` rule to ensure we consume</span>
-    <span class="comment">// everything possible.</span>
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">old_input_len</span> {
-        <span class="kw">match</span> <span class="ident">input</span> {
-            [<span class="number">0</span>..<span class="op">=</span><span class="number">127</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">rest</span>, ())),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())),
+    <span class="comment">// If nothing is parsed, this means we hit the `obs-text` rule and nothing matched. This is
+    // technically a success, but we should still check the `obs-qp` rule to ensure we consume
+    // everything possible.
+    </span><span class="kw">if </span>input.len() == old_input_len {
+        <span class="kw">match </span>input {
+            [<span class="number">0</span>..=<span class="number">127</span>, rest @ ..] =&gt; <span class="prelude-val">Some</span>(ParsedItem(rest, ())),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(ParsedItem(input, ())),
         }
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ()))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(ParsedItem(input, ()))
     }
 }
 
-<span class="doccomment">/// Consume the `no_ws_ctl` rule.</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">no_ws_ctl</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="number">1</span>..<span class="op">=</span><span class="number">8</span> <span class="op">|</span> <span class="number">11</span>..<span class="op">=</span><span class="number">12</span> <span class="op">|</span> <span class="number">14</span>..<span class="op">=</span><span class="number">31</span> <span class="op">|</span> <span class="number">127</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">rest</span>, ())),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume the `no_ws_ctl` rule.
+</span><span class="kw">const fn </span>no_ws_ctl(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    <span class="kw">match </span>input {
+        [<span class="number">1</span>..=<span class="number">8 </span>| <span class="number">11</span>..=<span class="number">12 </span>| <span class="number">14</span>..=<span class="number">31 </span>| <span class="number">127</span>, rest @ ..] =&gt; <span class="prelude-val">Some</span>(ParsedItem(rest, ())),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Consume the `text` rule.</span>
-<span class="kw">fn</span> <span class="ident">text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">new_text</span> <span class="op">=</span> <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">|</span> <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="number">1</span>..<span class="op">=</span><span class="number">9</span> <span class="op">|</span> <span class="number">11</span>..<span class="op">=</span><span class="number">12</span> <span class="op">|</span> <span class="number">14</span>..<span class="op">=</span><span class="number">127</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">rest</span>, ())),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume the `text` rule.
+</span><span class="kw">fn </span>text&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; ParsedItem&lt;<span class="lifetime">&#39;a</span>, ()&gt; {
+    <span class="kw">let </span>new_text = |input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]| <span class="kw">match </span>input {
+        [<span class="number">1</span>..=<span class="number">9 </span>| <span class="number">11</span>..=<span class="number">12 </span>| <span class="number">14</span>..=<span class="number">127</span>, rest @ ..] =&gt; <span class="prelude-val">Some</span>(ParsedItem(rest, ())),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">obs_char</span> <span class="op">=</span> <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">|</span> <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="comment">// This is technically allowed, but consuming this would mean the rest of the string is</span>
-        <span class="comment">// eagerly consumed without consideration for where the comment actually ends.</span>
-        [<span class="string">b&#39;)&#39;</span>, ..] =&gt; <span class="prelude-val">None</span>,
-        [<span class="number">0</span>..<span class="op">=</span><span class="number">9</span> <span class="op">|</span> <span class="number">11</span>..<span class="op">=</span><span class="number">12</span> <span class="op">|</span> <span class="number">14</span>..<span class="op">=</span><span class="number">127</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">rest</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">let </span>obs_char = |input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]| <span class="kw">match </span>input {
+        <span class="comment">// This is technically allowed, but consuming this would mean the rest of the string is
+        // eagerly consumed without consideration for where the comment actually ends.
+        </span>[<span class="string">b&#39;)&#39;</span>, ..] =&gt; <span class="prelude-val">None</span>,
+        [<span class="number">0</span>..=<span class="number">9 </span>| <span class="number">11</span>..=<span class="number">12 </span>| <span class="number">14</span>..=<span class="number">127</span>, rest @ ..] =&gt; <span class="prelude-val">Some</span>(rest),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">obs_text</span> <span class="op">=</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> {
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;\n&#39;</span><span class="op">&gt;</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;\r&#39;</span><span class="op">&gt;</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rest</span>) <span class="op">=</span> <span class="ident">obs_char</span>(<span class="ident">input</span>) {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">rest</span>;
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;\n&#39;</span><span class="op">&gt;</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">zero_or_more</span>(<span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;\r&#39;</span><span class="op">&gt;</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+    <span class="kw">let </span>obs_text = |<span class="kw-2">mut </span>input| {
+        input = zero_or_more(ascii_char::&lt;<span class="string">b&#39;\n&#39;</span>&gt;)(input).into_inner();
+        input = zero_or_more(ascii_char::&lt;<span class="string">b&#39;\r&#39;</span>&gt;)(input).into_inner();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(rest) = obs_char(input) {
+            input = rest;
+            input = zero_or_more(ascii_char::&lt;<span class="string">b&#39;\n&#39;</span>&gt;)(input).into_inner();
+            input = zero_or_more(ascii_char::&lt;<span class="string">b&#39;\r&#39;</span>&gt;)(input).into_inner();
         }
 
-        <span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())
+        ParsedItem(input, ())
     };
 
-    <span class="ident">new_text</span>(<span class="ident">input</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">obs_text</span>(<span class="ident">input</span>))
+    new_text(input).unwrap_or_else(|| obs_text(input))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

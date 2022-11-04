@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/id_generator/aws.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aws.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/id_generator/aws.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aws.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -96,101 +96,101 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">IdGenerator</span>, <span class="ident">SpanId</span>, <span class="ident">TraceId</span>};
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">UNIX_EPOCH</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::sdk;
+<span class="kw">use </span><span class="kw">crate</span>::trace::{IdGenerator, SpanId, TraceId};
+<span class="kw">use </span>std::time::{Duration, UNIX_EPOCH};
 
-<span class="doccomment">/// Generates AWS X-Ray compliant Trace and Span ids.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Generates OpenTelemetry formatted `TraceId`&#39;s and `SpanId`&#39;s. The `TraceId`&#39;s are generated so</span>
-<span class="doccomment">/// they can be backed out into X-Ray format by the [AWS X-Ray Exporter][xray-exporter] in the</span>
-<span class="doccomment">/// [OpenTelemetry Collector][otel-collector].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Trace ID Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `trace_id` consists of three numbers separated by hyphens. For example, `1-58406520-a006649127e371903a2de979`.</span>
-<span class="doccomment">/// This includes:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * The version number, that is, 1.</span>
-<span class="doccomment">/// * The time of the original request, in Unix epoch time, in 8 hexadecimal digits.</span>
-<span class="doccomment">/// * For example, 10:00AM December 1st, 2016 PST in epoch time is 1480615200 seconds, or 58406520 in hexadecimal digits.</span>
-<span class="doccomment">/// * A 96-bit identifier for the trace, globally unique, in 24 hexadecimal digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [AWS X-Ray Documentation][xray-trace-id] for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use opentelemetry::trace::noop::NoopSpanExporter;</span>
-<span class="doccomment">/// use opentelemetry::sdk::trace::{self, TracerProvider, XrayIdGenerator};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let _provider: TracerProvider = TracerProvider::builder()</span>
-<span class="doccomment">///     .with_simple_exporter(NoopSpanExporter::new())</span>
-<span class="doccomment">///     .with_config(trace::config().with_id_generator(XrayIdGenerator::default()))</span>
-<span class="doccomment">///     .build();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [otel-collector]: https://github.com/open-telemetry/opentelemetry-collector-contrib#opentelemetry-collector-contrib</span>
-<span class="doccomment">/// [xray-exporter]: https://godoc.org/github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter</span>
-<span class="doccomment">/// [xray-trace-id]: https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sendingdata.html#xray-api-traceids</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">XrayIdGenerator</span> {
-    <span class="ident">sdk_default_generator</span>: <span class="ident">sdk::trace::IdGenerator</span>,
+<span class="doccomment">/// Generates AWS X-Ray compliant Trace and Span ids.
+///
+/// Generates OpenTelemetry formatted `TraceId`&#39;s and `SpanId`&#39;s. The `TraceId`&#39;s are generated so
+/// they can be backed out into X-Ray format by the [AWS X-Ray Exporter][xray-exporter] in the
+/// [OpenTelemetry Collector][otel-collector].
+///
+/// ## Trace ID Format
+///
+/// A `trace_id` consists of three numbers separated by hyphens. For example, `1-58406520-a006649127e371903a2de979`.
+/// This includes:
+///
+/// * The version number, that is, 1.
+/// * The time of the original request, in Unix epoch time, in 8 hexadecimal digits.
+/// * For example, 10:00AM December 1st, 2016 PST in epoch time is 1480615200 seconds, or 58406520 in hexadecimal digits.
+/// * A 96-bit identifier for the trace, globally unique, in 24 hexadecimal digits.
+///
+/// See the [AWS X-Ray Documentation][xray-trace-id] for more details.
+///
+/// ## Example
+///
+/// ```
+/// use opentelemetry::trace::noop::NoopSpanExporter;
+/// use opentelemetry::sdk::trace::{self, TracerProvider, XrayIdGenerator};
+///
+/// let _provider: TracerProvider = TracerProvider::builder()
+///     .with_simple_exporter(NoopSpanExporter::new())
+///     .with_config(trace::config().with_id_generator(XrayIdGenerator::default()))
+///     .build();
+/// ```
+///
+/// [otel-collector]: https://github.com/open-telemetry/opentelemetry-collector-contrib#opentelemetry-collector-contrib
+/// [xray-exporter]: https://godoc.org/github.com/open-telemetry/opentelemetry-collector-contrib/exporter/awsxrayexporter
+/// [xray-trace-id]: https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sendingdata.html#xray-api-traceids
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>XrayIdGenerator {
+    sdk_default_generator: sdk::trace::IdGenerator,
 }
 
-<span class="kw">impl</span> <span class="ident">IdGenerator</span> <span class="kw">for</span> <span class="ident">XrayIdGenerator</span> {
-    <span class="doccomment">/// Generates a new `TraceId` that can be converted to an X-Ray Trace ID</span>
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceId</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default_trace_id</span>: <span class="ident">String</span> <span class="op">=</span>
-            <span class="macro">format!</span>(<span class="string">&quot;{:024x}&quot;</span>, <span class="self">self</span>.<span class="ident">sdk_default_generator</span>.<span class="ident">new_trace_id</span>());
+<span class="kw">impl </span>IdGenerator <span class="kw">for </span>XrayIdGenerator {
+    <span class="doccomment">/// Generates a new `TraceId` that can be converted to an X-Ray Trace ID
+    </span><span class="kw">fn </span>new_trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceId {
+        <span class="kw">let </span><span class="kw-2">mut </span>default_trace_id: String =
+            <span class="macro">format!</span>(<span class="string">&quot;{:024x}&quot;</span>, <span class="self">self</span>.sdk_default_generator.new_trace_id());
 
-        <span class="ident">default_trace_id</span>.<span class="ident">truncate</span>(<span class="number">24</span>);
+        default_trace_id.truncate(<span class="number">24</span>);
 
-        <span class="kw">let</span> <span class="ident">epoch_time_seconds</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>()
-            .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>))
-            .<span class="ident">as_secs</span>();
+        <span class="kw">let </span>epoch_time_seconds: u64 = <span class="kw">crate</span>::time::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap_or_else(|<span class="kw">_</span>| Duration::from_secs(<span class="number">0</span>))
+            .as_secs();
 
-        <span class="ident">TraceId::from_hex</span>(<span class="macro">format!</span>(<span class="string">&quot;{:08x}{}&quot;</span>, <span class="ident">epoch_time_seconds</span>, <span class="ident">default_trace_id</span>).<span class="ident">as_str</span>())
-            .<span class="ident">unwrap_or</span>(<span class="ident">TraceId::INVALID</span>)
+        TraceId::from_hex(<span class="macro">format!</span>(<span class="string">&quot;{:08x}{}&quot;</span>, epoch_time_seconds, default_trace_id).as_str())
+            .unwrap_or(TraceId::INVALID)
     }
 
-    <span class="doccomment">/// Generates a new `SpanId` that can be converted to an X-Ray Segment ID</span>
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanId</span> {
-        <span class="self">self</span>.<span class="ident">sdk_default_generator</span>.<span class="ident">new_span_id</span>()
+    <span class="doccomment">/// Generates a new `SpanId` that can be converted to an X-Ray Segment ID
+    </span><span class="kw">fn </span>new_span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SpanId {
+        <span class="self">self</span>.sdk_default_generator.new_span_id()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::thread::sleep</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::thread::sleep;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trace_id_generation</span>() {
-        <span class="kw">let</span> <span class="ident">before</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>()
-            .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">as_secs</span>();
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trace_id_generation() {
+        <span class="kw">let </span>before: u64 = <span class="kw">crate</span>::time::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+        sleep(Duration::from_secs(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">generator</span>: <span class="ident">XrayIdGenerator</span> <span class="op">=</span> <span class="ident">XrayIdGenerator::default</span>();
-        <span class="kw">let</span> <span class="ident">trace_id</span>: <span class="ident">TraceId</span> <span class="op">=</span> <span class="ident">generator</span>.<span class="ident">new_trace_id</span>();
+        <span class="kw">let </span>generator: XrayIdGenerator = XrayIdGenerator::default();
+        <span class="kw">let </span>trace_id: TraceId = generator.new_trace_id();
 
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">after</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>()
-            .<span class="ident">duration_since</span>(<span class="ident">UNIX_EPOCH</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">as_secs</span>();
+        sleep(Duration::from_secs(<span class="number">1</span>));
+        <span class="kw">let </span>after: u64 = <span class="kw">crate</span>::time::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
 
-        <span class="kw">let</span> <span class="ident">trace_as_hex</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="ident">trace_id</span>);
-        <span class="kw">let</span> (<span class="ident">timestamp</span>, <span class="ident">_xray_id</span>) <span class="op">=</span> <span class="ident">trace_as_hex</span>.<span class="ident">split_at</span>(<span class="number">8_usize</span>);
+        <span class="kw">let </span>trace_as_hex: String = <span class="macro">format!</span>(<span class="string">&quot;{:032x}&quot;</span>, trace_id);
+        <span class="kw">let </span>(timestamp, _xray_id) = trace_as_hex.split_at(<span class="number">8_usize</span>);
 
-        <span class="kw">let</span> <span class="ident">trace_time</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">u64::from_str_radix</span>(<span class="ident">timestamp</span>, <span class="number">16</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>trace_time: u64 = u64::from_str_radix(timestamp, <span class="number">16</span>).unwrap();
 
-        <span class="macro">assert!</span>(<span class="ident">before</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">trace_time</span>);
-        <span class="macro">assert!</span>(<span class="ident">after</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">trace_time</span>);
+        <span class="macro">assert!</span>(before &lt;= trace_time);
+        <span class="macro">assert!</span>(after &gt;= trace_time);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

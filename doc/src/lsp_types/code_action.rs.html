@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/code_action.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>code_action.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/code_action.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>code_action.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -358,360 +358,360 @@
 <span id="358">358</span>
 <span id="359">359</span>
 <span id="360">360</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Command</span>, <span class="ident">Diagnostic</span>, <span class="ident">PartialResultParams</span>, <span class="ident">Range</span>, <span class="ident">TextDocumentIdentifier</span>,
-    <span class="ident">WorkDoneProgressOptions</span>, <span class="ident">WorkDoneProgressParams</span>, <span class="ident">WorkspaceEdit</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    Command, Diagnostic, PartialResultParams, Range, TextDocumentIdentifier,
+    WorkDoneProgressOptions, WorkDoneProgressParams, WorkspaceEdit,
 };
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="kw">use </span>serde_json::Value;
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeActionProviderCapability</span> {
-    <span class="ident">Simple</span>(<span class="ident">bool</span>),
-    <span class="ident">Options</span>(<span class="ident">CodeActionOptions</span>),
+<span class="kw">use </span>std::borrow::Cow;
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>CodeActionProviderCapability {
+    Simple(bool),
+    Options(CodeActionOptions),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CodeActionOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">CodeActionOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Options</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;CodeActionOptions&gt; <span class="kw">for </span>CodeActionProviderCapability {
+    <span class="kw">fn </span>from(from: CodeActionOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Options(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionProviderCapability</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Simple</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>CodeActionProviderCapability {
+    <span class="kw">fn </span>from(from: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Simple(from)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionClientCapabilities</span> {
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This capability supports dynamic registration.</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionClientCapabilities {
+    <span class="doccomment">///
+    /// This capability supports dynamic registration.
+    ///
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The client support code action literals as a valid</span>
-    <span class="doccomment">/// response of the `textDocument/codeAction` request.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">code_action_literal_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodeActionLiteralSupport</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client support code action literals as a valid
+    /// response of the `textDocument/codeAction` request.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>code_action_literal_support: <span class="prelude-ty">Option</span>&lt;CodeActionLiteralSupport&gt;,
 
-    <span class="doccomment">/// Whether code action supports the `isPreferred` property.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.15.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">is_preferred_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether code action supports the `isPreferred` property.
+    ///
+    /// since 3.15.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>is_preferred_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether code action supports the `disabled` property.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">disabled_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether code action supports the `disabled` property.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>disabled_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether code action supports the `data` property which is</span>
-    <span class="doccomment">/// preserved between a `textDocument/codeAction` and a</span>
-    <span class="doccomment">/// `codeAction/resolve` request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">data_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether code action supports the `data` property which is
+    /// preserved between a `textDocument/codeAction` and a
+    /// `codeAction/resolve` request.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>data_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether the client supports resolving additional code action</span>
-    <span class="doccomment">/// properties via a separate `codeAction/resolve` request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">resolve_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodeActionCapabilityResolveSupport</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the client supports resolving additional code action
+    /// properties via a separate `codeAction/resolve` request.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>resolve_support: <span class="prelude-ty">Option</span>&lt;CodeActionCapabilityResolveSupport&gt;,
 
-    <span class="doccomment">/// Whether the client honors the change annotations in</span>
-    <span class="doccomment">/// text edits and resource operations returned via the</span>
-    <span class="doccomment">/// `CodeAction#edit` property by for example presenting</span>
-    <span class="doccomment">/// the workspace edit in the user interface and asking</span>
-    <span class="doccomment">/// for confirmation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">honors_change_annotations</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the client honors the change annotations in
+    /// text edits and resource operations returned via the
+    /// `CodeAction#edit` property by for example presenting
+    /// the workspace edit in the user interface and asking
+    /// for confirmation.
+    ///
+    /// @since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>honors_change_annotations: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// Whether the client supports resolving additional code action</span>
-<span class="doccomment">///  properties via a separate `codeAction/resolve` request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionCapabilityResolveSupport</span> {
-    <span class="doccomment">/// The properties that a client can resolve lazily.</span>
-    <span class="kw">pub</span> <span class="ident">properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Whether the client supports resolving additional code action
+///  properties via a separate `codeAction/resolve` request.
+///
+/// since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionCapabilityResolveSupport {
+    <span class="doccomment">/// The properties that a client can resolve lazily.
+    </span><span class="kw">pub </span>properties: Vec&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionLiteralSupport</span> {
-    <span class="doccomment">/// The code action kind is support with the following value set.</span>
-    <span class="kw">pub</span> <span class="ident">code_action_kind</span>: <span class="ident">CodeActionKindLiteralSupport</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionLiteralSupport {
+    <span class="doccomment">/// The code action kind is support with the following value set.
+    </span><span class="kw">pub </span>code_action_kind: CodeActionKindLiteralSupport,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionKindLiteralSupport</span> {
-    <span class="doccomment">/// The code action kind values the client supports. When this</span>
-    <span class="doccomment">/// property exists the client also guarantees that it will</span>
-    <span class="doccomment">/// handle values outside its set gracefully and falls back</span>
-    <span class="doccomment">/// to a default value when unknown.</span>
-    <span class="kw">pub</span> <span class="ident">value_set</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionKindLiteralSupport {
+    <span class="doccomment">/// The code action kind values the client supports. When this
+    /// property exists the client also guarantees that it will
+    /// handle values outside its set gracefully and falls back
+    /// to a default value when unknown.
+    </span><span class="kw">pub </span>value_set: Vec&lt;String&gt;,
 }
 
-<span class="doccomment">/// Params for the CodeActionRequest</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionParams</span> {
-    <span class="doccomment">/// The document in which the command was invoked.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+<span class="doccomment">/// Params for the CodeActionRequest
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionParams {
+    <span class="doccomment">/// The document in which the command was invoked.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="doccomment">/// The range for which the command was invoked.</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">Range</span>,
+    <span class="doccomment">/// The range for which the command was invoked.
+    </span><span class="kw">pub </span>range: Range,
 
-    <span class="doccomment">/// Context carrying additional information.</span>
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">CodeActionContext</span>,
+    <span class="doccomment">/// Context carrying additional information.
+    </span><span class="kw">pub </span>context: CodeActionContext,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 }
 
-<span class="doccomment">/// response for CodeActionRequest</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CodeActionResponse</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionOrCommand</span><span class="op">&gt;</span>;
+<span class="doccomment">/// response for CodeActionRequest
+</span><span class="kw">pub type </span>CodeActionResponse = Vec&lt;CodeActionOrCommand&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CodeActionOrCommand</span> {
-    <span class="ident">Command</span>(<span class="ident">Command</span>),
-    <span class="ident">CodeAction</span>(<span class="ident">CodeAction</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>CodeActionOrCommand {
+    Command(Command),
+    CodeAction(CodeAction),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionOrCommand</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">comand</span>: <span class="ident">Command</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CodeActionOrCommand::Command</span>(<span class="ident">comand</span>)
+<span class="kw">impl </span>From&lt;Command&gt; <span class="kw">for </span>CodeActionOrCommand {
+    <span class="kw">fn </span>from(comand: Command) -&gt; <span class="self">Self </span>{
+        CodeActionOrCommand::Command(comand)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CodeAction</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionOrCommand</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">action</span>: <span class="ident">CodeAction</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CodeActionOrCommand::CodeAction</span>(<span class="ident">action</span>)
+<span class="kw">impl </span>From&lt;CodeAction&gt; <span class="kw">for </span>CodeActionOrCommand {
+    <span class="kw">fn </span>from(action: CodeAction) -&gt; <span class="self">Self </span>{
+        CodeActionOrCommand::CodeAction(action)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionKind</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Hash, PartialOrd, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>CodeActionKind(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
 
-<span class="kw">impl</span> <span class="ident">CodeActionKind</span> {
-    <span class="doccomment">/// Empty kind.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;&quot;</span>);
+<span class="kw">impl </span>CodeActionKind {
+    <span class="doccomment">/// Empty kind.
+    </span><span class="kw">pub const </span>EMPTY: CodeActionKind = CodeActionKind::new(<span class="string">&quot;&quot;</span>);
 
-    <span class="doccomment">/// Base kind for quickfix actions: &#39;quickfix&#39;</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">QUICKFIX</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;quickfix&quot;</span>);
+    <span class="doccomment">/// Base kind for quickfix actions: &#39;quickfix&#39;
+    </span><span class="kw">pub const </span>QUICKFIX: CodeActionKind = CodeActionKind::new(<span class="string">&quot;quickfix&quot;</span>);
 
-    <span class="doccomment">/// Base kind for refactoring actions: &#39;refactor&#39;</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REFACTOR</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;refactor&quot;</span>);
+    <span class="doccomment">/// Base kind for refactoring actions: &#39;refactor&#39;
+    </span><span class="kw">pub const </span>REFACTOR: CodeActionKind = CodeActionKind::new(<span class="string">&quot;refactor&quot;</span>);
 
-    <span class="doccomment">/// Base kind for refactoring extraction actions: &#39;refactor.extract&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Example extract actions:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Extract method</span>
-    <span class="doccomment">/// - Extract function</span>
-    <span class="doccomment">/// - Extract variable</span>
-    <span class="doccomment">/// - Extract interface from class</span>
-    <span class="doccomment">/// - ...</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REFACTOR_EXTRACT</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;refactor.extract&quot;</span>);
+    <span class="doccomment">/// Base kind for refactoring extraction actions: &#39;refactor.extract&#39;
+    ///
+    /// Example extract actions:
+    ///
+    /// - Extract method
+    /// - Extract function
+    /// - Extract variable
+    /// - Extract interface from class
+    /// - ...
+    </span><span class="kw">pub const </span>REFACTOR_EXTRACT: CodeActionKind = CodeActionKind::new(<span class="string">&quot;refactor.extract&quot;</span>);
 
-    <span class="doccomment">/// Base kind for refactoring inline actions: &#39;refactor.inline&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Example inline actions:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Inline function</span>
-    <span class="doccomment">/// - Inline variable</span>
-    <span class="doccomment">/// - Inline constant</span>
-    <span class="doccomment">/// - ...</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REFACTOR_INLINE</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;refactor.inline&quot;</span>);
+    <span class="doccomment">/// Base kind for refactoring inline actions: &#39;refactor.inline&#39;
+    ///
+    /// Example inline actions:
+    ///
+    /// - Inline function
+    /// - Inline variable
+    /// - Inline constant
+    /// - ...
+    </span><span class="kw">pub const </span>REFACTOR_INLINE: CodeActionKind = CodeActionKind::new(<span class="string">&quot;refactor.inline&quot;</span>);
 
-    <span class="doccomment">/// Base kind for refactoring rewrite actions: &#39;refactor.rewrite&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Example rewrite actions:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Convert JavaScript function to class</span>
-    <span class="doccomment">/// - Add or remove parameter</span>
-    <span class="doccomment">/// - Encapsulate field</span>
-    <span class="doccomment">/// - Make method static</span>
-    <span class="doccomment">/// - Move method to base class</span>
-    <span class="doccomment">/// - ...</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REFACTOR_REWRITE</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;refactor.rewrite&quot;</span>);
+    <span class="doccomment">/// Base kind for refactoring rewrite actions: &#39;refactor.rewrite&#39;
+    ///
+    /// Example rewrite actions:
+    ///
+    /// - Convert JavaScript function to class
+    /// - Add or remove parameter
+    /// - Encapsulate field
+    /// - Make method static
+    /// - Move method to base class
+    /// - ...
+    </span><span class="kw">pub const </span>REFACTOR_REWRITE: CodeActionKind = CodeActionKind::new(<span class="string">&quot;refactor.rewrite&quot;</span>);
 
-    <span class="doccomment">/// Base kind for source actions: `source`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Source code actions apply to the entire file.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SOURCE</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span> <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;source&quot;</span>);
+    <span class="doccomment">/// Base kind for source actions: `source`
+    ///
+    /// Source code actions apply to the entire file.
+    </span><span class="kw">pub const </span>SOURCE: CodeActionKind = CodeActionKind::new(<span class="string">&quot;source&quot;</span>);
 
-    <span class="doccomment">/// Base kind for an organize imports source action: `source.organizeImports`</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SOURCE_ORGANIZE_IMPORTS</span>: <span class="ident">CodeActionKind</span> <span class="op">=</span>
-        <span class="ident">CodeActionKind::new</span>(<span class="string">&quot;source.organizeImports&quot;</span>);
+    <span class="doccomment">/// Base kind for an organize imports source action: `source.organizeImports`
+    </span><span class="kw">pub const </span>SOURCE_ORGANIZE_IMPORTS: CodeActionKind =
+        CodeActionKind::new(<span class="string">&quot;source.organizeImports&quot;</span>);
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CodeActionKind</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">tag</span>))
+    <span class="kw">pub const fn </span>new(tag: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        CodeActionKind(Cow::Borrowed(tag))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionKind</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CodeActionKind</span>(<span class="ident">Cow::from</span>(<span class="ident">from</span>))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeActionKind</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CodeActionKind::new</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>CodeActionKind {
+    <span class="kw">fn </span>from(from: String) -&gt; <span class="self">Self </span>{
+        CodeActionKind(Cow::from(from))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeAction</span> {
-    <span class="doccomment">/// A short, human-readable, title for this code action.</span>
-    <span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// The kind of the code action.</span>
-    <span class="doccomment">/// Used to filter code actions.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodeActionKind</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// The diagnostics that this code action resolves.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// The workspace edit this code action performs.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">edit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WorkspaceEdit</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// A command this code action executes. If a code action</span>
-    <span class="doccomment">/// provides an edit and a command, first the edit is</span>
-    <span class="doccomment">/// executed and then the command.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">command</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted</span>
-    <span class="doccomment">/// by keybindings.</span>
-    <span class="doccomment">/// A quick fix should be marked preferred if it properly addresses the underlying error.</span>
-    <span class="doccomment">/// A refactoring should be marked preferred if it is the most reasonable choice of actions to take.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.15.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">is_preferred</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Marks that the code action cannot currently be applied.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients should follow the following guidelines regarding disabled code actions:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Disabled code actions are not shown in automatic</span>
-    <span class="doccomment">///   [lightbulb](https://code.visualstudio.com/docs/editor/editingevolved#_code-action)</span>
-    <span class="doccomment">///   code action menu.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Disabled actions are shown as faded out in the code action menu when the user request</span>
-    <span class="doccomment">///   a more specific type of code action, such as refactorings.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - If the user has a keybinding that auto applies a code action and only a disabled code</span>
-    <span class="doccomment">///   actions are returned, the client should show the user an error message with `reason`</span>
-    <span class="doccomment">///   in the editor.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">disabled</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodeActionDisabled</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// A data entry field that is preserved on a code action between</span>
-    <span class="doccomment">/// a `textDocument/codeAction` and a `codeAction/resolve` request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>CodeActionKind {
+    <span class="kw">fn </span>from(from: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        CodeActionKind::new(from)
+    }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionDisabled</span> {
-    <span class="doccomment">/// Human readable description of why the code action is currently disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is displayed in the code actions UI.</span>
-    <span class="kw">pub</span> <span class="ident">reason</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeAction {
+    <span class="doccomment">/// A short, human-readable, title for this code action.
+    </span><span class="kw">pub </span>title: String,
+
+    <span class="doccomment">/// The kind of the code action.
+    /// Used to filter code actions.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>kind: <span class="prelude-ty">Option</span>&lt;CodeActionKind&gt;,
+
+    <span class="doccomment">/// The diagnostics that this code action resolves.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>diagnostics: <span class="prelude-ty">Option</span>&lt;Vec&lt;Diagnostic&gt;&gt;,
+
+    <span class="doccomment">/// The workspace edit this code action performs.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>edit: <span class="prelude-ty">Option</span>&lt;WorkspaceEdit&gt;,
+
+    <span class="doccomment">/// A command this code action executes. If a code action
+    /// provides an edit and a command, first the edit is
+    /// executed and then the command.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>command: <span class="prelude-ty">Option</span>&lt;Command&gt;,
+
+    <span class="doccomment">/// Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
+    /// by keybindings.
+    /// A quick fix should be marked preferred if it properly addresses the underlying error.
+    /// A refactoring should be marked preferred if it is the most reasonable choice of actions to take.
+    ///
+    /// since 3.15.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>is_preferred: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+
+    <span class="doccomment">/// Marks that the code action cannot currently be applied.
+    ///
+    /// Clients should follow the following guidelines regarding disabled code actions:
+    ///
+    /// - Disabled code actions are not shown in automatic
+    ///   [lightbulb](https://code.visualstudio.com/docs/editor/editingevolved#_code-action)
+    ///   code action menu.
+    ///
+    /// - Disabled actions are shown as faded out in the code action menu when the user request
+    ///   a more specific type of code action, such as refactorings.
+    ///
+    /// - If the user has a keybinding that auto applies a code action and only a disabled code
+    ///   actions are returned, the client should show the user an error message with `reason`
+    ///   in the editor.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>disabled: <span class="prelude-ty">Option</span>&lt;CodeActionDisabled&gt;,
+
+    <span class="doccomment">/// A data entry field that is preserved on a code action between
+    /// a `textDocument/codeAction` and a `codeAction/resolve` request.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>data: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 }
 
-<span class="doccomment">/// Contains additional diagnostic information about the context in which</span>
-<span class="doccomment">/// a code action is run.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionContext</span> {
-    <span class="doccomment">/// An array of diagnostics.</span>
-    <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// Requested kind of actions to return.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Actions not of this kind are filtered out by the client before being shown. So servers</span>
-    <span class="doccomment">/// can omit computing them.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionKind</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionDisabled {
+    <span class="doccomment">/// Human readable description of why the code action is currently disabled.
+    ///
+    /// This is displayed in the code actions UI.
+    </span><span class="kw">pub </span>reason: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeActionOptions</span> {
-    <span class="doccomment">/// CodeActionKinds that this server may return.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server</span>
-    <span class="doccomment">/// may list out every specific kind they provide.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">code_action_kinds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeActionKind</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Contains additional diagnostic information about the context in which
+/// a code action is run.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>CodeActionContext {
+    <span class="doccomment">/// An array of diagnostics.
+    </span><span class="kw">pub </span>diagnostics: Vec&lt;Diagnostic&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_options</span>: <span class="ident">WorkDoneProgressOptions</span>,
-
-    <span class="doccomment">/// The server provides support to resolve additional</span>
-    <span class="doccomment">/// information for a code action.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">resolve_provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Requested kind of actions to return.
+    ///
+    /// Actions not of this kind are filtered out by the client before being shown. So servers
+    /// can omit computing them.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>only: <span class="prelude-ty">Option</span>&lt;Vec&lt;CodeActionKind&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::test_serialization</span>;
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CodeActionOptions {
+    <span class="doccomment">/// CodeActionKinds that this server may return.
+    ///
+    /// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
+    /// may list out every specific kind they provide.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>code_action_kinds: <span class="prelude-ty">Option</span>&lt;Vec&lt;CodeActionKind&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_code_action_response</span>() {
-        <span class="ident">test_serialization</span>(
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_options: WorkDoneProgressOptions,
+
+    <span class="doccomment">/// The server provides support to resolve additional
+    /// information for a code action.
+    ///
+    /// since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>resolve_provider: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::tests::test_serialization;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_code_action_response() {
+        test_serialization(
             <span class="kw-2">&amp;</span><span class="macro">vec!</span>[
-                <span class="ident">CodeActionOrCommand::Command</span>(<span class="ident">Command</span> {
-                    <span class="ident">title</span>: <span class="string">&quot;title&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">command</span>: <span class="string">&quot;command&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">arguments</span>: <span class="prelude-val">None</span>,
+                CodeActionOrCommand::Command(Command {
+                    title: <span class="string">&quot;title&quot;</span>.to_string(),
+                    command: <span class="string">&quot;command&quot;</span>.to_string(),
+                    arguments: <span class="prelude-val">None</span>,
                 }),
-                <span class="ident">CodeActionOrCommand::CodeAction</span>(<span class="ident">CodeAction</span> {
-                    <span class="ident">title</span>: <span class="string">&quot;title&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">kind</span>: <span class="prelude-val">Some</span>(<span class="ident">CodeActionKind::QUICKFIX</span>),
-                    <span class="ident">command</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">diagnostics</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">edit</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">is_preferred</span>: <span class="prelude-val">None</span>,
-                    ..<span class="ident">CodeAction::default</span>()
+                CodeActionOrCommand::CodeAction(CodeAction {
+                    title: <span class="string">&quot;title&quot;</span>.to_string(),
+                    kind: <span class="prelude-val">Some</span>(CodeActionKind::QUICKFIX),
+                    command: <span class="prelude-val">None</span>,
+                    diagnostics: <span class="prelude-val">None</span>,
+                    edit: <span class="prelude-val">None</span>,
+                    is_preferred: <span class="prelude-val">None</span>,
+                    ..CodeAction::default()
                 }),
             ],
             <span class="string">r#&quot;[{&quot;title&quot;:&quot;title&quot;,&quot;command&quot;:&quot;command&quot;},{&quot;title&quot;:&quot;title&quot;,&quot;kind&quot;:&quot;quickfix&quot;}]&quot;#</span>,
@@ -719,4 +719,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

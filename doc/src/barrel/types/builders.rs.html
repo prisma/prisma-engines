@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/builders.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builders.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/builders.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builders.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -186,193 +186,193 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Builder API&#39;s module</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Builder API&#39;s module
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::impls</span>::{<span class="ident">BaseType</span>, <span class="ident">WrapVec</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::impls</span>::{<span class="ident">Constraint</span>, <span class="ident">ReferentialAction</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Type</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::impls::{BaseType, WrapVec};
+<span class="kw">use </span><span class="kw">super</span>::impls::{Constraint, ReferentialAction};
+<span class="kw">use </span><span class="kw">crate</span>::types::Type;
 
-<span class="doccomment">/// A standard primary numeric key type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It&#39;s 64-bit wide, can&#39;t be null or non-unique</span>
-<span class="doccomment">/// and auto-increments on inserts.</span>
-<span class="doccomment">/// Maps to `primary` on `Pg` and manually enforces</span>
-<span class="doccomment">/// this behaviour for other Sql variants.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Primary</span>)
-        .<span class="ident">nullable</span>(<span class="bool-val">true</span>) <span class="comment">// Primary keys are non-null implicitly</span>
-        .<span class="ident">increments</span>(<span class="bool-val">false</span>) <span class="comment">// Primary keys are auto-increment implicitly</span>
-        .<span class="ident">primary</span>(<span class="bool-val">false</span>) <span class="comment">// Primary keys are primary implictly</span>
-        .<span class="ident">unique</span>(<span class="bool-val">false</span>) <span class="comment">// Primary keys are unique implicitly</span>
-        .<span class="ident">indexed</span>(<span class="bool-val">false</span>)
+<span class="doccomment">/// A standard primary numeric key type
+///
+/// It&#39;s 64-bit wide, can&#39;t be null or non-unique
+/// and auto-increments on inserts.
+/// Maps to `primary` on `Pg` and manually enforces
+/// this behaviour for other Sql variants.
+</span><span class="kw">pub fn </span>primary() -&gt; Type {
+    Type::new(BaseType::Primary)
+        .nullable(<span class="bool-val">true</span>) <span class="comment">// Primary keys are non-null implicitly
+        </span>.increments(<span class="bool-val">false</span>) <span class="comment">// Primary keys are auto-increment implicitly
+        </span>.primary(<span class="bool-val">false</span>) <span class="comment">// Primary keys are primary implictly
+        </span>.unique(<span class="bool-val">false</span>) <span class="comment">// Primary keys are unique implicitly
+        </span>.indexed(<span class="bool-val">false</span>)
 }
 
-<span class="doccomment">/// A (standardised) UUID primary key type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Similar to `primary()`, but uses a standard</span>
-<span class="doccomment">/// layout UUID type, mapping to `uuid` on `Pg`</span>
-<span class="doccomment">/// and not supported by all Sql variants.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::UUID</span>)
-        .<span class="ident">nullable</span>(<span class="bool-val">false</span>)
-        .<span class="ident">unique</span>(<span class="bool-val">true</span>)
-        .<span class="ident">indexed</span>(<span class="bool-val">true</span>)
+<span class="doccomment">/// A (standardised) UUID primary key type
+///
+/// Similar to `primary()`, but uses a standard
+/// layout UUID type, mapping to `uuid` on `Pg`
+/// and not supported by all Sql variants.
+</span><span class="kw">pub fn </span>uuid() -&gt; Type {
+    Type::new(BaseType::UUID)
+        .nullable(<span class="bool-val">false</span>)
+        .unique(<span class="bool-val">true</span>)
+        .indexed(<span class="bool-val">true</span>)
 }
 
-<span class="doccomment">/// Create a basic integer type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integer</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Integer</span>)
+<span class="doccomment">/// Create a basic integer type
+</span><span class="kw">pub fn </span>integer() -&gt; Type {
+    Type::new(BaseType::Integer)
 }
 
-<span class="doccomment">/// Create an auto-incrementing integer type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serial</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Serial</span>)
+<span class="doccomment">/// Create an auto-incrementing integer type
+</span><span class="kw">pub fn </span>serial() -&gt; Type {
+    Type::new(BaseType::Serial)
 }
 
-<span class="doccomment">/// A 32-bit floating point type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Float</span>)
+<span class="doccomment">/// A 32-bit floating point type
+</span><span class="kw">pub fn </span>float() -&gt; Type {
+    Type::new(BaseType::Float)
 }
 
-<span class="doccomment">/// A 64-bit floating point type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">double</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Double</span>)
+<span class="doccomment">/// A 64-bit floating point type
+</span><span class="kw">pub fn </span>double() -&gt; Type {
+    Type::new(BaseType::Double)
 }
 
-<span class="doccomment">/// A boolean data type (true, false)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">boolean</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Boolean</span>)
+<span class="doccomment">/// A boolean data type (true, false)
+</span><span class="kw">pub fn </span>boolean() -&gt; Type {
+    Type::new(BaseType::Boolean)
 }
 
-<span class="doccomment">/// A variable-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">varchar</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Varchar</span>(<span class="ident">len</span>))
+<span class="doccomment">/// A variable-length string type
+</span><span class="kw">pub fn </span>varchar(len: usize) -&gt; Type {
+    Type::new(BaseType::Varchar(len))
 }
 
-<span class="doccomment">/// A fixed-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r#char</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Char</span>(<span class="ident">len</span>))
+<span class="doccomment">/// A fixed-length string type
+</span><span class="kw">pub fn </span>r#char(len: usize) -&gt; Type {
+    Type::new(BaseType::Char(len))
 }
 
-<span class="doccomment">/// A variable-length string type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Text</span>)
+<span class="doccomment">/// A variable-length string type
+</span><span class="kw">pub fn </span>text() -&gt; Type {
+    Type::new(BaseType::Text)
 }
 
-<span class="doccomment">/// A json-type column – not supported by all backends</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Json</span>)
+<span class="doccomment">/// A json-type column – not supported by all backends
+</span><span class="kw">pub fn </span>json() -&gt; Type {
+    Type::new(BaseType::Json)
 }
 
-<span class="doccomment">/// Embed binary data</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binary</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span><span class="op">&gt;</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Binary</span>)
+<span class="doccomment">/// Embed binary data
+</span><span class="kw">pub fn </span>binary&lt;<span class="lifetime">&#39;inner</span>&gt;() -&gt; Type {
+    Type::new(BaseType::Binary)
 }
 
-<span class="doccomment">/// Create a column that points to some foreign table</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create a column that points to some foreign table
+</span><span class="kw">pub fn </span>foreign&lt;S, I&gt;(table: S, keys: I) -&gt; Type
+<span class="kw">where
+    </span>S: Into&lt;String&gt;,
+    I: Into&lt;WrapVec&lt;String&gt;&gt;,
 {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Foreign</span>(<span class="prelude-val">None</span>, <span class="ident">table</span>.<span class="ident">into</span>(), <span class="ident">keys</span>.<span class="ident">into</span>()))
+    Type::new(BaseType::Foreign(<span class="prelude-val">None</span>, table.into(), keys.into()))
 }
 
-<span class="doccomment">/// Like `foreign(...)` but letting you provide an external schema</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is important when making cross-schema references</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_schema</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">schema</span>: <span class="ident">S</span>, <span class="ident">table</span>: <span class="ident">S</span>, <span class="ident">keys</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WrapVec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Like `foreign(...)` but letting you provide an external schema
+///
+/// This function is important when making cross-schema references
+</span><span class="kw">pub fn </span>foreign_schema&lt;S, I&gt;(schema: S, table: S, keys: I) -&gt; Type
+<span class="kw">where
+    </span>S: Into&lt;String&gt;,
+    I: Into&lt;WrapVec&lt;String&gt;&gt;,
 {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Foreign</span>(
-        <span class="prelude-val">Some</span>(<span class="ident">schema</span>.<span class="ident">into</span>()),
-        <span class="ident">table</span>.<span class="ident">into</span>(),
-        <span class="ident">keys</span>.<span class="ident">into</span>(),
+    Type::new(BaseType::Foreign(
+        <span class="prelude-val">Some</span>(schema.into()),
+        table.into(),
+        keys.into(),
     ))
 }
 
-<span class="doccomment">/// Any custom SQL type that is embedded into a migration</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">custom</span>(<span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Custom</span>(<span class="ident">sql</span>))
+<span class="doccomment">/// Any custom SQL type that is embedded into a migration
+</span><span class="kw">pub fn </span>custom(sql: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; Type {
+    Type::new(BaseType::Custom(sql))
 }
 
-<span class="doccomment">/// An SQL date type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Date</span>)
+<span class="doccomment">/// An SQL date type
+</span><span class="kw">pub fn </span>date() -&gt; Type {
+    Type::new(BaseType::Date)
 }
 
-<span class="doccomment">/// An SQL time type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Time</span>)
+<span class="doccomment">/// An SQL time type
+</span><span class="kw">pub fn </span>time() -&gt; Type {
+    Type::new(BaseType::Time)
 }
 
-<span class="doccomment">/// An SQL datetime type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datetime</span>() -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::DateTime</span>)
+<span class="doccomment">/// An SQL datetime type
+</span><span class="kw">pub fn </span>datetime() -&gt; Type {
+    Type::new(BaseType::DateTime)
 }
 
-<span class="doccomment">/// Create an array of inner types</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">Type</span> {
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Array</span>(<span class="ident">Box::new</span>(<span class="ident">inner</span>.<span class="ident">get_inner</span>())))
+<span class="doccomment">/// Create an array of inner types
+</span><span class="kw">pub fn </span>array(inner: <span class="kw-2">&amp;</span>Type) -&gt; Type {
+    Type::new(BaseType::Array(Box::new(inner.get_inner())))
 }
 
-<span class="doccomment">/// Create an index over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">ToString</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create an index over multiple, existing columns of the same type
+</span><span class="kw">pub fn </span>index&lt;I, S&gt;(columns: I) -&gt; Type
+<span class="kw">where
+    </span>S: ToString,
+    I: IntoIterator&lt;Item = S&gt;,
 {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Index</span>(<span class="ident">vec</span>))
+    <span class="kw">let </span>vec: Vec&lt;String&gt; = columns.into_iter().map(|s| s.to_string()).collect();
+    Type::new(BaseType::Index(vec))
 }
 
-<span class="doccomment">/// Create a constraint over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">ToString</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create a constraint over multiple, existing columns of the same type
+</span><span class="kw">pub fn </span>unique_constraint&lt;I, S&gt;(columns: I) -&gt; Type
+<span class="kw">where
+    </span>S: ToString,
+    I: IntoIterator&lt;Item = S&gt;,
 {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Constraint</span>(<span class="ident">Constraint::Unique</span>, <span class="ident">vec</span>))
+    <span class="kw">let </span>vec: Vec&lt;String&gt; = columns.into_iter().map(|s| s.to_string()).collect();
+    Type::new(BaseType::Constraint(Constraint::Unique, vec))
 }
 
-<span class="doccomment">/// Create a primary key over multiple, existing columns of the same type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_constraint</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">ToString</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create a primary key over multiple, existing columns of the same type
+</span><span class="kw">pub fn </span>primary_constraint&lt;I, S&gt;(columns: I) -&gt; Type
+<span class="kw">where
+    </span>S: ToString,
+    I: IntoIterator&lt;Item = S&gt;,
 {
-    <span class="kw">let</span> <span class="ident">vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Constraint</span>(<span class="ident">Constraint::PrimaryKey</span>, <span class="ident">vec</span>))
+    <span class="kw">let </span>vec: Vec&lt;String&gt; = columns.into_iter().map(|s| s.to_string()).collect();
+    Type::new(BaseType::Constraint(Constraint::PrimaryKey, vec))
 }
 
-<span class="doccomment">/// Create a constraint that points to some foreign table</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_constraint</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">columns</span>: <span class="ident">T</span>,
-    <span class="ident">table</span>: <span class="ident">A</span>,
-    <span class="ident">foreign_columns</span>: <span class="ident">T</span>,
-    <span class="ident">on_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-    <span class="ident">on_update</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Type</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">ToString</span>,
-    <span class="ident">A</span>: <span class="ident">ToString</span>,
-    <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Create a constraint that points to some foreign table
+</span><span class="kw">pub fn </span>foreign_constraint&lt;C, A, T&gt;(
+    columns: T,
+    table: A,
+    foreign_columns: T,
+    on_delete: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
+    on_update: <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt;,
+) -&gt; Type
+<span class="kw">where
+    </span>C: ToString,
+    A: ToString,
+    T: IntoIterator&lt;Item = C&gt;,
 {
-    <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">foreign_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">foreign_columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span>columns: Vec&lt;String&gt; = columns.into_iter().map(|s| s.to_string()).collect();
+    <span class="kw">let </span>table = table.to_string();
+    <span class="kw">let </span>foreign_columns: Vec&lt;String&gt; = foreign_columns.into_iter().map(|s| s.to_string()).collect();
 
-    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">Constraint::ForeignKey</span> {
-        <span class="ident">table</span>,
-        <span class="ident">foreign_columns</span>,
-        <span class="ident">on_delete</span>,
-        <span class="ident">on_update</span>,
+    <span class="kw">let </span>constraint = Constraint::ForeignKey {
+        table,
+        foreign_columns,
+        on_delete,
+        on_update,
     };
 
-    <span class="ident">Type::new</span>(<span class="ident">BaseType::Constraint</span>(<span class="ident">constraint</span>, <span class="ident">columns</span>))
+    Type::new(BaseType::Constraint(constraint, columns))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

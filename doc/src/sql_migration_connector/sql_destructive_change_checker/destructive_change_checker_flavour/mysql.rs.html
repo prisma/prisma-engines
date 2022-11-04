@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_destructive_change_checker/destructive_change_checker_flavour/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_destructive_change_checker/destructive_change_checker_flavour/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -173,180 +173,180 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DestructiveChangeCheckerFlavour</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">flavour</span>::{<span class="ident">MysqlFlavour</span>, <span class="ident">SqlFlavour</span>},
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_destructive_change_checker</span>::{
-        <span class="ident">destructive_check_plan::DestructiveCheckPlan</span>, <span class="ident">unexecutable_step_check::UnexecutableStepCheck</span>,
-        <span class="ident">warning_check::SqlMigrationWarningCheck</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DestructiveChangeCheckerFlavour;
+<span class="kw">use crate</span>::{
+    flavour::{MysqlFlavour, SqlFlavour},
+    pair::Pair,
+    sql_destructive_change_checker::{
+        destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
+        warning_check::SqlMigrationWarningCheck,
     },
-    <span class="ident">sql_migration</span>::{<span class="ident">AlterColumn</span>, <span class="ident">ColumnTypeChange</span>},
-    <span class="ident">sql_schema_differ::ColumnChanges</span>,
+    sql_migration::{AlterColumn, ColumnTypeChange},
+    sql_schema_differ::ColumnChanges,
 };
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">BoxFuture</span>, <span class="ident">ConnectorResult</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer::walkers::ColumnWalker</span>;
+<span class="kw">use </span>migration_connector::{BoxFuture, ConnectorResult};
+<span class="kw">use </span>sql_schema_describer::walkers::ColumnWalker;
 
-<span class="kw">impl</span> <span class="ident">DestructiveChangeCheckerFlavour</span> <span class="kw">for</span> <span class="ident">MysqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">check_alter_column</span>(
+<span class="kw">impl </span>DestructiveChangeCheckerFlavour <span class="kw">for </span>MysqlFlavour {
+    <span class="kw">fn </span>check_alter_column(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">alter_column</span>: <span class="kw-2">&amp;</span><span class="ident">AlterColumn</span>,
-        <span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">plan</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DestructiveCheckPlan</span>,
-        <span class="ident">step_index</span>: <span class="ident">usize</span>,
+        alter_column: <span class="kw-2">&amp;</span>AlterColumn,
+        columns: <span class="kw-2">&amp;</span>Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan,
+        step_index: usize,
     ) {
-        <span class="kw">let</span> <span class="ident">AlterColumn</span> {
-            <span class="ident">column_id</span>: <span class="kw">_</span>,
-            <span class="ident">changes</span>,
-            <span class="ident">type_change</span>,
-        } <span class="op">=</span> <span class="ident">alter_column</span>;
+        <span class="kw">let </span>AlterColumn {
+            column_id: <span class="kw">_</span>,
+            changes,
+            type_change,
+        } = alter_column;
 
-        <span class="comment">// If only the default changed, the migration is safe.</span>
-        <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">only_default_changed</span>() {
+        <span class="comment">// If only the default changed, the migration is safe.
+        </span><span class="kw">if </span>changes.only_default_changed() {
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// Otherwise, case by case.</span>
-        <span class="comment">// Column went from optional to required. This is unexecutable unless the table is</span>
-        <span class="comment">// empty or the column has no existing NULLs.</span>
-        <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">arity_changed</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() {
-            <span class="ident">plan</span>.<span class="ident">push_unexecutable</span>(
-                <span class="ident">UnexecutableStepCheck::MadeOptionalFieldRequired</span> {
-                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+        <span class="comment">// Otherwise, case by case.
+        // Column went from optional to required. This is unexecutable unless the table is
+        // empty or the column has no existing NULLs.
+        </span><span class="kw">if </span>changes.arity_changed() &amp;&amp; columns.next.arity().is_required() {
+            plan.push_unexecutable(
+                UnexecutableStepCheck::MadeOptionalFieldRequired {
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
-                <span class="ident">step_index</span>,
+                step_index,
             );
 
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">only_type_changed</span>() <span class="op">&amp;&amp;</span> <span class="ident">is_safe_enum_change</span>(<span class="ident">columns</span>, <span class="ident">plan</span>, <span class="ident">step_index</span>) {
+        <span class="kw">if </span>changes.only_type_changed() &amp;&amp; is_safe_enum_change(columns, plan, step_index) {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">previous_type</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::display_column_type</span>(<span class="ident">columns</span>.<span class="ident">previous</span>, <span class="self">self</span>.<span class="ident">datamodel_connector</span>());
-        <span class="kw">let</span> <span class="ident">next_type</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::display_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>, <span class="self">self</span>.<span class="ident">datamodel_connector</span>());
+        <span class="kw">let </span>previous_type = <span class="kw">super</span>::display_column_type(columns.previous, <span class="self">self</span>.datamodel_connector());
+        <span class="kw">let </span>next_type = <span class="kw">super</span>::display_column_type(columns.next, <span class="self">self</span>.datamodel_connector());
 
-        <span class="kw">match</span> <span class="ident">type_change</span> {
-            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>) =&gt; (),
-            <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>) =&gt; {
-                <span class="ident">plan</span>.<span class="ident">push_warning</span>(
-                    <span class="ident">SqlMigrationWarningCheck::RiskyCast</span> {
-                        <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">previous_type</span>,
-                        <span class="ident">next_type</span>,
+        <span class="kw">match </span>type_change {
+            <span class="prelude-val">None </span>| <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast) =&gt; (),
+            <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast) =&gt; {
+                plan.push_warning(
+                    SqlMigrationWarningCheck::RiskyCast {
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
+                        previous_type,
+                        next_type,
                     },
-                    <span class="ident">step_index</span>,
+                    step_index,
                 );
             }
-            <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::NotCastable</span>) =&gt; {
-                <span class="ident">plan</span>.<span class="ident">push_warning</span>(
-                    <span class="ident">SqlMigrationWarningCheck::NotCastable</span> {
-                        <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">previous_type</span>,
-                        <span class="ident">next_type</span>,
+            <span class="prelude-val">Some</span>(ColumnTypeChange::NotCastable) =&gt; {
+                plan.push_warning(
+                    SqlMigrationWarningCheck::NotCastable {
+                        table: columns.previous.table().name().to_owned(),
+                        column: columns.previous.name().to_owned(),
+                        previous_type,
+                        next_type,
                     },
-                    <span class="ident">step_index</span>,
+                    step_index,
                 );
             }
         };
     }
 
-    <span class="kw">fn</span> <span class="ident">check_drop_and_recreate_column</span>(
+    <span class="kw">fn </span>check_drop_and_recreate_column(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>,
-        <span class="ident">plan</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DestructiveCheckPlan</span>,
-        <span class="ident">step_index</span>: <span class="ident">usize</span>,
+        columns: <span class="kw-2">&amp;</span>Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;,
+        changes: <span class="kw-2">&amp;</span>ColumnChanges,
+        plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan,
+        step_index: usize,
     ) {
-        <span class="comment">// Unexecutable drop and recreate.</span>
-        <span class="kw">if</span> <span class="ident">changes</span>.<span class="ident">arity_changed</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>().<span class="ident">is_nullable</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">is_none</span>()
+        <span class="comment">// Unexecutable drop and recreate.
+        </span><span class="kw">if </span>changes.arity_changed()
+            &amp;&amp; columns.previous.arity().is_nullable()
+            &amp;&amp; columns.next.arity().is_required()
+            &amp;&amp; columns.next.default().is_none()
         {
-            <span class="ident">plan</span>.<span class="ident">push_unexecutable</span>(
-                <span class="ident">UnexecutableStepCheck::AddedRequiredFieldToTable</span> {
-                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+            plan.push_unexecutable(
+                UnexecutableStepCheck::AddedRequiredFieldToTable {
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
-                <span class="ident">step_index</span>,
+                step_index,
             )
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">is_none</span>() {
-            <span class="ident">plan</span>.<span class="ident">push_unexecutable</span>(
-                <span class="ident">UnexecutableStepCheck::DropAndRecreateRequiredColumn</span> {
-                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+        } <span class="kw">else if </span>columns.next.arity().is_required() &amp;&amp; columns.next.default().is_none() {
+            plan.push_unexecutable(
+                UnexecutableStepCheck::DropAndRecreateRequiredColumn {
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
-                <span class="ident">step_index</span>,
+                step_index,
             )
-        } <span class="kw">else</span> {
-            <span class="comment">//todo this is probably due to a not castable type change. we should give that info in the warning</span>
-            <span class="ident">plan</span>.<span class="ident">push_warning</span>(
-                <span class="ident">SqlMigrationWarningCheck::DropAndRecreateColumn</span> {
-                    <span class="ident">column</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">table</span>: <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+        } <span class="kw">else </span>{
+            <span class="comment">//todo this is probably due to a not castable type change. we should give that info in the warning
+            </span>plan.push_warning(
+                SqlMigrationWarningCheck::DropAndRecreateColumn {
+                    column: columns.previous.name().to_owned(),
+                    table: columns.previous.table().name().to_owned(),
                 },
-                <span class="ident">step_index</span>,
+                step_index,
             )
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">count_rows_in_table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}`&quot;</span>, <span class="ident">table_name</span>);
-            <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident"><span class="kw">super</span>::extract_table_rows_count</span>(<span class="ident">table_name</span>, <span class="ident">result_set</span>)
+    <span class="kw">fn </span>count_rows_in_table&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, table_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}`&quot;</span>, table_name);
+            <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">super</span>::extract_table_rows_count(table_name, result_set)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">count_values_in_column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        (<span class="ident">table</span>, <span class="ident">column</span>): (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL&quot;</span>, <span class="ident">table</span>, <span class="ident">column</span>);
-            <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident"><span class="kw">super</span>::extract_column_values_count</span>(<span class="ident">result_set</span>)
+    <span class="kw">fn </span>count_values_in_column&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        (table, column): (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;i64&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT COUNT(*) FROM `{}` WHERE `{}` IS NOT NULL&quot;</span>, table, column);
+            <span class="kw">let </span>result_set = <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>query, <span class="kw-2">&amp;</span>[]).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">super</span>::extract_column_values_count(result_set)
         })
     }
 }
 
-<span class="doccomment">/// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.</span>
-<span class="kw">fn</span> <span class="ident">is_safe_enum_change</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span><span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">plan</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DestructiveCheckPlan</span>, <span class="ident">step_index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) <span class="op">=</span> (
-        <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">column_type_family_as_enum</span>(),
-        <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">column_type_family_as_enum</span>(),
+<span class="doccomment">/// If the type change is an enum change, diagnose it, and return whether it _was_ an enum change.
+</span><span class="kw">fn </span>is_safe_enum_change(columns: <span class="kw-2">&amp;</span>Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, plan: <span class="kw-2">&amp;mut </span>DestructiveCheckPlan, step_index: usize) -&gt; bool {
+    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(previous_enum), <span class="prelude-val">Some</span>(next_enum)) = (
+        columns.previous.column_type_family_as_enum(),
+        columns.next.column_type_family_as_enum(),
     ) {
-        <span class="kw">let</span> <span class="ident">removed_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous_enum</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">previous_value</span><span class="op">|</span> {
-                <span class="op">!</span><span class="ident">next_enum</span>
-                    .<span class="ident">values</span>()
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_value</span><span class="op">|</span> <span class="ident">previous_value</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">next_value</span>.<span class="ident">as_str</span>())
+        <span class="kw">let </span>removed_values: Vec&lt;String&gt; = previous_enum
+            .values()
+            .iter()
+            .filter(|previous_value| {
+                !next_enum
+                    .values()
+                    .iter()
+                    .any(|next_value| previous_value.as_str() == next_value.as_str())
             })
-            .<span class="ident">cloned</span>()
-            .<span class="ident">collect</span>();
+            .cloned()
+            .collect();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">removed_values</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">plan</span>.<span class="ident">push_warning</span>(
-                <span class="ident">SqlMigrationWarningCheck::EnumValueRemoval</span> {
-                    <span class="ident">enm</span>: <span class="ident">next_enum</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">values</span>: <span class="ident">removed_values</span>,
+        <span class="kw">if </span>!removed_values.is_empty() {
+            plan.push_warning(
+                SqlMigrationWarningCheck::EnumValueRemoval {
+                    enm: next_enum.name().to_owned(),
+                    values: removed_values,
                 },
-                <span class="ident">step_index</span>,
+                step_index,
             );
         }
 
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="bool-val">false</span>
-}
+    <span class="bool-val">false
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

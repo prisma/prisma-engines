@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/vecbuf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vecbuf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/vecbuf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vecbuf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -192,199 +192,199 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::io::Read</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::io::Read;
 
-<span class="doccomment">/// This is a byte buffer that is built from a vector</span>
-<span class="doccomment">/// of byte vectors.  This avoids extra copies when</span>
-<span class="doccomment">/// appending a new byte vector, at the expense of</span>
-<span class="doccomment">/// more complexity when reading out.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ChunkVecBuffer</span> {
-    <span class="ident">chunks</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// This is a byte buffer that is built from a vector
+/// of byte vectors.  This avoids extra copies when
+/// appending a new byte vector, at the expense of
+/// more complexity when reading out.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ChunkVecBuffer {
+    chunks: VecDeque&lt;Vec&lt;u8&gt;&gt;,
+    limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ChunkVecBuffer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">chunks</span>: <span class="ident">VecDeque::new</span>(),
-            <span class="ident">limit</span>,
+<span class="kw">impl </span>ChunkVecBuffer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(limit: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            chunks: VecDeque::new(),
+            limit,
         }
     }
 
-    <span class="doccomment">/// Sets the upper limit on how many bytes this</span>
-    <span class="doccomment">/// object can store.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a lower limit than the currently stored</span>
-    <span class="doccomment">/// data is not an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A [`None`] limit is interpreted as no limit.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">limit</span> <span class="op">=</span> <span class="ident">new_limit</span>;
+    <span class="doccomment">/// Sets the upper limit on how many bytes this
+    /// object can store.
+    ///
+    /// Setting a lower limit than the currently stored
+    /// data is not an error.
+    ///
+    /// A [`None`] limit is interpreted as no limit.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_limit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.limit = new_limit;
     }
 
-    <span class="doccomment">/// If we&#39;re empty</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// If we&#39;re empty
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.chunks.is_empty()
     }
 
-    <span class="doccomment">/// How many bytes we&#39;re storing</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">chunks</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">ch</span>.<span class="ident">len</span>();
+    <span class="doccomment">/// How many bytes we&#39;re storing
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="number">0</span>;
+        <span class="kw">for </span>ch <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.chunks {
+            len += ch.len();
         }
-        <span class="ident">len</span>
+        len
     }
 
-    <span class="doccomment">/// For a proposed append of `len` bytes, how many</span>
-    <span class="doccomment">/// bytes should we actually append to adhere to the</span>
-    <span class="doccomment">/// currently set `limit`?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">apply_limit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">limit</span> {
-            <span class="kw">let</span> <span class="ident">space</span> <span class="op">=</span> <span class="ident">limit</span>.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">len</span>());
-            <span class="ident">cmp::min</span>(<span class="ident">len</span>, <span class="ident">space</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">len</span>
+    <span class="doccomment">/// For a proposed append of `len` bytes, how many
+    /// bytes should we actually append to adhere to the
+    /// currently set `limit`?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>apply_limit(<span class="kw-2">&amp;</span><span class="self">self</span>, len: usize) -&gt; usize {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(limit) = <span class="self">self</span>.limit {
+            <span class="kw">let </span>space = limit.saturating_sub(<span class="self">self</span>.len());
+            cmp::min(len, space)
+        } <span class="kw">else </span>{
+            len
         }
     }
 
-    <span class="doccomment">/// Append a copy of `bytes`, perhaps a prefix if</span>
-    <span class="doccomment">/// we&#39;re near the limit.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append_limited_copy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">take</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply_limit</span>(<span class="ident">bytes</span>.<span class="ident">len</span>());
-        <span class="self">self</span>.<span class="ident">append</span>(<span class="ident">bytes</span>[..<span class="ident">take</span>].<span class="ident">to_vec</span>());
-        <span class="ident">take</span>
+    <span class="doccomment">/// Append a copy of `bytes`, perhaps a prefix if
+    /// we&#39;re near the limit.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append_limited_copy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; usize {
+        <span class="kw">let </span>take = <span class="self">self</span>.apply_limit(bytes.len());
+        <span class="self">self</span>.append(bytes[..take].to_vec());
+        take
     }
 
-    <span class="doccomment">/// Take and append the given `bytes`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
+    <span class="doccomment">/// Take and append the given `bytes`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: Vec&lt;u8&gt;) -&gt; usize {
+        <span class="kw">let </span>len = bytes.len();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">bytes</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">push_back</span>(<span class="ident">bytes</span>);
-        }
-
-        <span class="ident">len</span>
-    }
-
-    <span class="doccomment">/// Take one of the chunks from this object.  This</span>
-    <span class="doccomment">/// function panics if the object `is_empty`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">pop_front</span>()
-    }
-
-    <span class="doccomment">/// Read data out of this object, writing it into `buf`</span>
-    <span class="doccomment">/// and returning how many bytes were written there.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offs</span> <span class="op">=</span> <span class="number">0</span>;
-
-        <span class="kw">while</span> <span class="ident">offs</span> <span class="op">&lt;</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunks</span>[<span class="number">0</span>]
-                .<span class="ident">as_slice</span>()
-                .<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">offs</span>..])<span class="question-mark">?</span>;
-
-            <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">used</span>);
-            <span class="ident">offs</span> <span class="op">+</span><span class="op">=</span> <span class="ident">used</span>;
+        <span class="kw">if </span>!bytes.is_empty() {
+            <span class="self">self</span>.chunks.push_back(bytes);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">offs</span>)
+        len
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">read_buf</span>)]</span>
-    <span class="doccomment">/// Read data out of this object, writing it into `buf`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunks</span>[<span class="number">0</span>].<span class="ident">as_slice</span>();
-            <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">chunk</span>.<span class="ident">len</span>(), <span class="ident">buf</span>.<span class="ident">remaining</span>());
-            <span class="ident">buf</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[..<span class="ident">used</span>]);
-            <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">used</span>);
+    <span class="doccomment">/// Take one of the chunks from this object.  This
+    /// function panics if the object `is_empty`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="self">self</span>.chunks.pop_front()
+    }
+
+    <span class="doccomment">/// Read data out of this object, writing it into `buf`
+    /// and returning how many bytes were written there.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>offs = <span class="number">0</span>;
+
+        <span class="kw">while </span>offs &lt; buf.len() &amp;&amp; !<span class="self">self</span>.is_empty() {
+            <span class="kw">let </span>used = <span class="self">self</span>.chunks[<span class="number">0</span>]
+                .as_slice()
+                .read(<span class="kw-2">&amp;mut </span>buf[offs..])<span class="question-mark">?</span>;
+
+            <span class="self">self</span>.consume(used);
+            offs += used;
+        }
+
+        <span class="prelude-val">Ok</span>(offs)
+    }
+
+    <span class="attribute">#[cfg(read_buf)]
+    </span><span class="doccomment">/// Read data out of this object, writing it into `buf`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">while </span>!<span class="self">self</span>.is_empty() &amp;&amp; buf.remaining() &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>chunk = <span class="self">self</span>.chunks[<span class="number">0</span>].as_slice();
+            <span class="kw">let </span>used = std::cmp::min(chunk.len(), buf.remaining());
+            buf.append(<span class="kw-2">&amp;</span>chunk[..used]);
+            <span class="self">self</span>.consume(used);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">used</span>: <span class="ident">usize</span>) {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">buf</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">pop_front</span>() {
-            <span class="kw">if</span> <span class="ident">used</span> <span class="op">&lt;</span> <span class="ident">buf</span>.<span class="ident">len</span>() {
-                <span class="self">self</span>.<span class="ident">chunks</span>
-                    .<span class="ident">push_front</span>(<span class="ident">buf</span>.<span class="ident">split_off</span>(<span class="ident">used</span>));
+    <span class="kw">fn </span>consume(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>used: usize) {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>buf) = <span class="self">self</span>.chunks.pop_front() {
+            <span class="kw">if </span>used &lt; buf.len() {
+                <span class="self">self</span>.chunks
+                    .push_front(buf.split_off(used));
                 <span class="kw">break</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">used</span> <span class="op">-</span><span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
+            } <span class="kw">else </span>{
+                used -= buf.len();
             }
         }
     }
 
-    <span class="doccomment">/// Read data out of this object, passing it `wr`</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">io::Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Read data out of this object, passing it `wr`
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>write_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>, wr: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>io::Write) -&gt; io::Result&lt;usize&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bufs</span> <span class="op">=</span> [<span class="ident">io::IoSlice::new</span>(<span class="kw-2">&amp;</span>[]); <span class="number">64</span>];
-        <span class="kw">for</span> (<span class="ident">iov</span>, <span class="ident">chunk</span>) <span class="kw">in</span> <span class="ident">bufs</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">iter</span>()) {
-            <span class="kw-2">*</span><span class="ident">iov</span> <span class="op">=</span> <span class="ident">io::IoSlice::new</span>(<span class="ident">chunk</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>bufs = [io::IoSlice::new(<span class="kw-2">&amp;</span>[]); <span class="number">64</span>];
+        <span class="kw">for </span>(iov, chunk) <span class="kw">in </span>bufs.iter_mut().zip(<span class="self">self</span>.chunks.iter()) {
+            <span class="kw-2">*</span>iov = io::IoSlice::new(chunk);
         }
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">bufs</span>.<span class="ident">len</span>(), <span class="self">self</span>.<span class="ident">chunks</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> <span class="ident">wr</span>.<span class="ident">write_vectored</span>(<span class="kw-2">&amp;</span><span class="ident">bufs</span>[..<span class="ident">len</span>])<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">used</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">used</span>)
+        <span class="kw">let </span>len = cmp::min(bufs.len(), <span class="self">self</span>.chunks.len());
+        <span class="kw">let </span>used = wr.write_vectored(<span class="kw-2">&amp;</span>bufs[..len])<span class="question-mark">?</span>;
+        <span class="self">self</span>.consume(used);
+        <span class="prelude-val">Ok</span>(used)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ChunkVecBuffer</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::ChunkVecBuffer;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">short_append_copy_with_limit</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cvb</span> <span class="op">=</span> <span class="ident">ChunkVecBuffer::new</span>(<span class="prelude-val">Some</span>(<span class="number">12</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">cvb</span>.<span class="ident">append_limited_copy</span>(<span class="string">b&quot;hello&quot;</span>), <span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cvb</span>.<span class="ident">append_limited_copy</span>(<span class="string">b&quot;world&quot;</span>), <span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cvb</span>.<span class="ident">append_limited_copy</span>(<span class="string">b&quot;hello&quot;</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cvb</span>.<span class="ident">append_limited_copy</span>(<span class="string">b&quot;world&quot;</span>), <span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>short_append_copy_with_limit() {
+        <span class="kw">let </span><span class="kw-2">mut </span>cvb = ChunkVecBuffer::new(<span class="prelude-val">Some</span>(<span class="number">12</span>));
+        <span class="macro">assert_eq!</span>(cvb.append_limited_copy(<span class="string">b&quot;hello&quot;</span>), <span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(cvb.append_limited_copy(<span class="string">b&quot;world&quot;</span>), <span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(cvb.append_limited_copy(<span class="string">b&quot;hello&quot;</span>), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(cvb.append_limited_copy(<span class="string">b&quot;world&quot;</span>), <span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">12</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">cvb</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>(), <span class="number">12</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">to_vec</span>(), <span class="string">b&quot;helloworldhe&quot;</span>.<span class="ident">to_vec</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0u8</span>; <span class="number">12</span>];
+        <span class="macro">assert_eq!</span>(cvb.read(<span class="kw-2">&amp;mut </span>buf).unwrap(), <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(buf.to_vec(), <span class="string">b&quot;helloworldhe&quot;</span>.to_vec());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">read_buf</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_buf</span>() {
-        <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">io::ReadBuf</span>, <span class="ident">mem::MaybeUninit</span>};
+    <span class="attribute">#[cfg(read_buf)]
+    #[test]
+    </span><span class="kw">fn </span>read_buf() {
+        <span class="kw">use </span>std::{io::ReadBuf, mem::MaybeUninit};
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cvb</span> <span class="op">=</span> <span class="ident">ChunkVecBuffer::new</span>(<span class="prelude-val">None</span>);
-            <span class="ident">cvb</span>.<span class="ident">append</span>(<span class="string">b&quot;test &quot;</span>.<span class="ident">to_vec</span>());
-            <span class="ident">cvb</span>.<span class="ident">append</span>(<span class="string">b&quot;fixture &quot;</span>.<span class="ident">to_vec</span>());
-            <span class="ident">cvb</span>.<span class="ident">append</span>(<span class="string">b&quot;data&quot;</span>.<span class="ident">to_vec</span>());
+            <span class="kw">let </span><span class="kw-2">mut </span>cvb = ChunkVecBuffer::new(<span class="prelude-val">None</span>);
+            cvb.append(<span class="string">b&quot;test &quot;</span>.to_vec());
+            cvb.append(<span class="string">b&quot;fixture &quot;</span>.to_vec());
+            cvb.append(<span class="string">b&quot;data&quot;</span>.to_vec());
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="ident">MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::uninit</span>(); <span class="number">8</span>];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ReadBuf::uninit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-            <span class="ident">cvb</span>.<span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">filled</span>(), <span class="string">b&quot;test fix&quot;</span>);
-            <span class="ident">buf</span>.<span class="ident">clear</span>();
-            <span class="ident">cvb</span>.<span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">filled</span>(), <span class="string">b&quot;ture dat&quot;</span>);
-            <span class="ident">buf</span>.<span class="ident">clear</span>();
-            <span class="ident">cvb</span>.<span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">filled</span>(), <span class="string">b&quot;a&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [MaybeUninit::&lt;u8&gt;::uninit(); <span class="number">8</span>];
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = ReadBuf::uninit(<span class="kw-2">&amp;mut </span>buf);
+            cvb.read_buf(<span class="kw-2">&amp;mut </span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(buf.filled(), <span class="string">b&quot;test fix&quot;</span>);
+            buf.clear();
+            cvb.read_buf(<span class="kw-2">&amp;mut </span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(buf.filled(), <span class="string">b&quot;ture dat&quot;</span>);
+            buf.clear();
+            cvb.read_buf(<span class="kw-2">&amp;mut </span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(buf.filled(), <span class="string">b&quot;a&quot;</span>);
         }
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cvb</span> <span class="op">=</span> <span class="ident">ChunkVecBuffer::new</span>(<span class="prelude-val">None</span>);
-            <span class="ident">cvb</span>.<span class="ident">append</span>(<span class="string">b&quot;short message&quot;</span>.<span class="ident">to_vec</span>());
+            <span class="kw">let </span><span class="kw-2">mut </span>cvb = ChunkVecBuffer::new(<span class="prelude-val">None</span>);
+            cvb.append(<span class="string">b&quot;short message&quot;</span>.to_vec());
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="ident">MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::uninit</span>(); <span class="number">1024</span>];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ReadBuf::uninit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-            <span class="ident">cvb</span>.<span class="ident">read_buf</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">filled</span>(), <span class="string">b&quot;short message&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [MaybeUninit::&lt;u8&gt;::uninit(); <span class="number">1024</span>];
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = ReadBuf::uninit(<span class="kw-2">&amp;mut </span>buf);
+            cvb.read_buf(<span class="kw-2">&amp;mut </span>buf).unwrap();
+            <span class="macro">assert_eq!</span>(buf.filled(), <span class="string">b&quot;short message&quot;</span>);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

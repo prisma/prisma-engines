@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/mongodb-migration-connector/src/differ.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>differ.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/mongodb-migration-connector/src/differ.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>differ.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -151,158 +151,158 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::migration</span>::{<span class="ident">MongoDbMigration</span>, <span class="ident">MongoDbMigrationStep</span>};
-<span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">CollectionId</span>, <span class="ident">IndexField</span>, <span class="ident">IndexId</span>, <span class="ident">IndexWalker</span>, <span class="ident">MongoSchema</span>};
-<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::migration::{MongoDbMigration, MongoDbMigrationStep};
+<span class="kw">use </span>mongodb_schema_describer::{CollectionId, IndexField, IndexId, IndexWalker, MongoSchema};
+<span class="kw">use </span>std::collections::BTreeMap;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">previous</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span>) -&gt; <span class="ident">MongoDbMigration</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">DifferDatabase::new</span>(<span class="ident">previous</span>.<span class="ident">as_ref</span>(), <span class="ident">next</span>.<span class="ident">as_ref</span>());
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>diff(previous: Box&lt;MongoSchema&gt;, next: Box&lt;MongoSchema&gt;) -&gt; MongoDbMigration {
+    <span class="kw">let </span><span class="kw-2">mut </span>steps = Vec::new();
+    <span class="kw">let </span>db = DifferDatabase::new(previous.as_ref(), next.as_ref());
 
-    <span class="kw">for</span> <span class="ident">collection_id</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">created_collections</span>() {
-        <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">MongoDbMigrationStep::CreateCollection</span>(<span class="ident">collection_id</span>));
+    <span class="kw">for </span>collection_id <span class="kw">in </span>db.created_collections() {
+        steps.push(MongoDbMigrationStep::CreateCollection(collection_id));
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">next</span>.<span class="ident">walk_collection</span>(<span class="ident">collection_id</span>).<span class="ident">indexes</span>() {
-            <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">MongoDbMigrationStep::CreateIndex</span>(<span class="ident">index</span>.<span class="ident">id</span>()));
+        <span class="kw">for </span>index <span class="kw">in </span>next.walk_collection(collection_id).indexes() {
+            steps.push(MongoDbMigrationStep::CreateIndex(index.id()));
         }
     }
 
-    <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">created_indexes</span>() {
-        <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">MongoDbMigrationStep::CreateIndex</span>(<span class="ident">index</span>.<span class="ident">id</span>()))
+    <span class="kw">for </span>index <span class="kw">in </span>db.created_indexes() {
+        steps.push(MongoDbMigrationStep::CreateIndex(index.id()))
     }
 
-    <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">dropped_indexes</span>() {
-        <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">MongoDbMigrationStep::DropIndex</span>(<span class="ident">index</span>.<span class="ident">id</span>()))
+    <span class="kw">for </span>index <span class="kw">in </span>db.dropped_indexes() {
+        steps.push(MongoDbMigrationStep::DropIndex(index.id()))
     }
 
-    <span class="ident">steps</span>.<span class="ident">sort</span>(); <span class="comment">// important: this determines the order of execution</span>
+    steps.sort(); <span class="comment">// important: this determines the order of execution
 
-    <span class="ident">MongoDbMigration</span> { <span class="ident">previous</span>, <span class="ident">next</span>, <span class="ident">steps</span> }
+    </span>MongoDbMigration { previous, next, steps }
 }
 
-<span class="kw">struct</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">collections</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollectionId</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CollectionId</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span> <span class="comment">// respectfully disagree</span>
-    <span class="ident">indexes</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">CollectionId</span>, <span class="ident">CollectionId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MongoSchema</span>,
-    <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MongoSchema</span>,
+<span class="kw">struct </span>DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt; {
+    collections: BTreeMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, (<span class="prelude-ty">Option</span>&lt;CollectionId&gt;, <span class="prelude-ty">Option</span>&lt;CollectionId&gt;)&gt;,
+    <span class="attribute">#[allow(clippy::type_complexity)] </span><span class="comment">// respectfully disagree
+    </span>indexes: BTreeMap&lt;(CollectionId, CollectionId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str), (<span class="prelude-ty">Option</span>&lt;IndexId&gt;, <span class="prelude-ty">Option</span>&lt;IndexId&gt;)&gt;,
+    previous: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MongoSchema,
+    next: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MongoSchema,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MongoSchema</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">MongoSchema</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">collections</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(previous: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MongoSchema, next: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>MongoSchema) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>collections = BTreeMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>indexes = BTreeMap::new();
 
-        <span class="kw">for</span> <span class="ident">collection</span> <span class="kw">in</span> <span class="ident">previous</span>.<span class="ident">walk_collections</span>() {
-            <span class="ident">collections</span>.<span class="ident">insert</span>(<span class="ident">collection</span>.<span class="ident">name</span>(), (<span class="prelude-val">Some</span>(<span class="ident">collection</span>.<span class="ident">id</span>()), <span class="prelude-val">None</span>));
+        <span class="kw">for </span>collection <span class="kw">in </span>previous.walk_collections() {
+            collections.insert(collection.name(), (<span class="prelude-val">Some</span>(collection.id()), <span class="prelude-val">None</span>));
         }
 
-        <span class="kw">for</span> <span class="ident">collection</span> <span class="kw">in</span> <span class="ident">next</span>.<span class="ident">walk_collections</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">collections</span>.<span class="ident">entry</span>(<span class="ident">collection</span>.<span class="ident">name</span>()).<span class="ident">or_default</span>();
-            <span class="ident">entry</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">collection</span>.<span class="ident">id</span>());
+        <span class="kw">for </span>collection <span class="kw">in </span>next.walk_collections() {
+            <span class="kw">let </span><span class="kw-2">mut </span>entry = collections.entry(collection.name()).or_default();
+            entry.<span class="number">1 </span>= <span class="prelude-val">Some</span>(collection.id());
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">previous_collection_id</span>) <span class="op">=</span> <span class="ident">entry</span>.<span class="number">0</span> {
-                <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">previous</span>.<span class="ident">walk_collection</span>(<span class="ident">previous_collection_id</span>).<span class="ident">indexes</span>() {
-                    <span class="ident">indexes</span>.<span class="ident">insert</span>(
-                        (<span class="ident">previous_collection_id</span>, <span class="ident">collection</span>.<span class="ident">id</span>(), <span class="ident">index</span>.<span class="ident">name</span>()),
-                        (<span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">id</span>()), <span class="prelude-val">None</span>),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(previous_collection_id) = entry.<span class="number">0 </span>{
+                <span class="kw">for </span>index <span class="kw">in </span>previous.walk_collection(previous_collection_id).indexes() {
+                    indexes.insert(
+                        (previous_collection_id, collection.id(), index.name()),
+                        (<span class="prelude-val">Some</span>(index.id()), <span class="prelude-val">None</span>),
                     );
                 }
 
-                <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">collection</span>.<span class="ident">indexes</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">indexes</span>
-                        .<span class="ident">entry</span>((<span class="ident">previous_collection_id</span>, <span class="ident">collection</span>.<span class="ident">id</span>(), <span class="ident">index</span>.<span class="ident">name</span>()))
-                        .<span class="ident">or_default</span>();
-                    <span class="ident">entry</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">id</span>());
+                <span class="kw">for </span>index <span class="kw">in </span>collection.indexes() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>entry = indexes
+                        .entry((previous_collection_id, collection.id(), index.name()))
+                        .or_default();
+                    entry.<span class="number">1 </span>= <span class="prelude-val">Some</span>(index.id());
                 }
             }
         }
 
-        <span class="ident">DifferDatabase</span> {
-            <span class="ident">collections</span>,
-            <span class="ident">indexes</span>,
-            <span class="ident">previous</span>,
-            <span class="ident">next</span>,
+        DifferDatabase {
+            collections,
+            indexes,
+            previous,
+            next,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">created_collections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CollectionId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">collections</span>
-            .<span class="ident">values</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">previous</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">previous</span>.<span class="ident">is_none</span>())
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="ident">next</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>())
+    <span class="kw">fn </span>created_collections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CollectionId&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.collections
+            .values()
+            .filter(|(previous, <span class="kw">_</span>)| previous.is_none())
+            .filter_map(|(<span class="kw">_</span>, next)| next.as_ref().cloned())
     }
 
-    <span class="doccomment">/// Iterate created indexes over all _collection pairs_ (collections that exist in both previous and next schema).</span>
-    <span class="kw">fn</span> <span class="ident">created_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">all_indexes</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">previous</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) <span class="kw">if</span> <span class="ident">indexes_are_different</span>(<span class="ident">previous</span>, <span class="ident">next</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">next</span>),
-                (<span class="prelude-val">None</span>, <span class="ident">next</span>) =&gt; <span class="ident">next</span>,
+    <span class="doccomment">/// Iterate created indexes over all _collection pairs_ (collections that exist in both previous and next schema).
+    </span><span class="kw">fn </span>created_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.all_indexes()
+            .filter_map(|(previous, next)| <span class="kw">match </span>(previous, next) {
+                (<span class="prelude-val">Some</span>(previous), <span class="prelude-val">Some</span>(next)) <span class="kw">if </span>indexes_are_different(previous, next) =&gt; <span class="prelude-val">Some</span>(next),
+                (<span class="prelude-val">None</span>, next) =&gt; next,
                 (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
     }
 
-    <span class="doccomment">/// Iterate created indexes over all _collection pairs_ (collections that exist in both previous and next schema).</span>
-    <span class="kw">fn</span> <span class="ident">dropped_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">all_indexes</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">previous</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="kw">match</span> (<span class="ident">previous</span>, <span class="ident">next</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">previous</span>), <span class="prelude-val">Some</span>(<span class="ident">next</span>)) <span class="kw">if</span> <span class="ident">indexes_are_different</span>(<span class="ident">previous</span>, <span class="ident">next</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">previous</span>),
-                (<span class="ident">previous</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">previous</span>,
+    <span class="doccomment">/// Iterate created indexes over all _collection pairs_ (collections that exist in both previous and next schema).
+    </span><span class="kw">fn </span>dropped_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.all_indexes()
+            .filter_map(|(previous, next)| <span class="kw">match </span>(previous, next) {
+                (<span class="prelude-val">Some</span>(previous), <span class="prelude-val">Some</span>(next)) <span class="kw">if </span>indexes_are_different(previous, next) =&gt; <span class="prelude-val">Some</span>(previous),
+                (previous, <span class="prelude-val">None</span>) =&gt; previous,
                 (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
             })
     }
 
-    <span class="kw">fn</span> <span class="ident">all_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">values</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">previous_id</span>, <span class="ident">next_id</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">previous_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">previous_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">previous</span>.<span class="ident">walk_index</span>(<span class="ident">previous_id</span>));
-            <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">next_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">next_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">walk_index</span>(<span class="ident">next_id</span>));
-            (<span class="ident">previous</span>, <span class="ident">next</span>)
+    <span class="kw">fn </span>all_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (<span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;, <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.indexes.values().map(<span class="kw">move </span>|(previous_id, next_id)| {
+            <span class="kw">let </span>previous = previous_id.map(|previous_id| <span class="self">self</span>.previous.walk_index(previous_id));
+            <span class="kw">let </span>next = next_id.map(|next_id| <span class="self">self</span>.next.walk_index(next_id));
+            (previous, next)
         })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">indexes_are_different</span>(<span class="ident">previous</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">next</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// sigh</span>
-    <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">is_fulltext</span>() <span class="op">&amp;&amp;</span> <span class="ident">next</span>.<span class="ident">is_fulltext</span>() {
-        <span class="kw">let</span> <span class="ident">is_fts</span> <span class="op">=</span> <span class="op">|</span><span class="ident">v</span>: <span class="op">&amp;&amp;</span><span class="ident">IndexField</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_text</span>();
+<span class="kw">fn </span>indexes_are_different(previous: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, next: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    <span class="comment">// sigh
+    </span><span class="kw">if </span>previous.is_fulltext() &amp;&amp; next.is_fulltext() {
+        <span class="kw">let </span>is_fts = |v: &amp;&amp;IndexField| v.is_text();
 
-        <span class="kw">let</span> <span class="ident">previous_heads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">fields</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">field</span>)).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">next_heads</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">fields</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">field</span>)).<span class="ident">collect</span>();
+        <span class="kw">let </span>previous_heads: Vec&lt;<span class="kw">_</span>&gt; = previous.fields().take_while(|field| !is_fts(field)).collect();
+        <span class="kw">let </span>next_heads: Vec&lt;<span class="kw">_</span>&gt; = next.fields().take_while(|field| !is_fts(field)).collect();
 
-        <span class="comment">// the middles will come in a wrong order from the database. We must be able to compare</span>
-        <span class="comment">// them as equal no matter the order, because the generated index is not per field, but to</span>
-        <span class="comment">// an abstract `$text` field that just holds data from the text columns.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_middles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">fields</span>().<span class="ident">take_while</span>(<span class="ident">is_fts</span>).<span class="ident">collect</span>();
-        <span class="ident">previous_middles</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">left</span>, <span class="ident">right</span><span class="op">|</span> <span class="ident">left</span>.<span class="ident">name</span>().<span class="ident">cmp</span>(<span class="ident">right</span>.<span class="ident">name</span>()));
+        <span class="comment">// the middles will come in a wrong order from the database. We must be able to compare
+        // them as equal no matter the order, because the generated index is not per field, but to
+        // an abstract `$text` field that just holds data from the text columns.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>previous_middles: Vec&lt;<span class="kw">_</span>&gt; = previous.fields().take_while(is_fts).collect();
+        previous_middles.sort_by(|left, right| left.name().cmp(right.name()));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_middles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">fields</span>().<span class="ident">take_while</span>(<span class="ident">is_fts</span>).<span class="ident">collect</span>();
-        <span class="ident">next_middles</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">left</span>, <span class="ident">right</span><span class="op">|</span> <span class="ident">left</span>.<span class="ident">name</span>().<span class="ident">cmp</span>(<span class="ident">right</span>.<span class="ident">name</span>()));
+        <span class="kw">let </span><span class="kw-2">mut </span>next_middles: Vec&lt;<span class="kw">_</span>&gt; = next.fields().take_while(is_fts).collect();
+        next_middles.sort_by(|left, right| left.name().cmp(right.name()));
 
-        <span class="kw">let</span> <span class="ident">previous_tails</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">skip_while</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">field</span>))
-            .<span class="ident">skip_while</span>(<span class="ident">is_fts</span>)
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>previous_tails: Vec&lt;<span class="kw">_</span>&gt; = previous
+            .fields()
+            .skip_while(|field| !is_fts(field))
+            .skip_while(is_fts)
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">next_tails</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">next</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">skip_while</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_fts</span>(<span class="ident">field</span>))
-            .<span class="ident">skip_while</span>(<span class="ident">is_fts</span>)
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>next_tails: Vec&lt;<span class="kw">_</span>&gt; = next
+            .fields()
+            .skip_while(|field| !is_fts(field))
+            .skip_while(is_fts)
+            .collect();
 
-        <span class="ident">previous_heads</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_heads</span> <span class="op">|</span><span class="op">|</span> <span class="ident">previous_middles</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_middles</span> <span class="op">|</span><span class="op">|</span> <span class="ident">previous_tails</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_tails</span>
-    } <span class="kw">else</span> {
-        <span class="comment">// We don&#39;t compare names here because we assume it has been done earlier.</span>
-        <span class="ident">previous</span>.<span class="ident">r#type</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">r#type</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">keys_match</span>(<span class="ident">previous</span>.<span class="ident">fields</span>(), <span class="ident">next</span>.<span class="ident">fields</span>())
+        previous_heads != next_heads || previous_middles != next_middles || previous_tails != next_tails
+    } <span class="kw">else </span>{
+        <span class="comment">// We don&#39;t compare names here because we assume it has been done earlier.
+        </span>previous.r#type() != next.r#type() || !keys_match(previous.fields(), next.fields())
     }
 }
 
-<span class="kw">fn</span> <span class="ident">keys_match</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">previous</span>: <span class="ident">T</span>, <span class="ident">next</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">IndexField</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;schema</span>,
+<span class="kw">fn </span>keys_match&lt;<span class="lifetime">&#39;schema</span>, T&gt;(previous: T, next: T) -&gt; bool
+<span class="kw">where
+    </span>T: ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>IndexField&gt; + <span class="lifetime">&#39;schema</span>,
 {
-    <span class="ident">previous</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">next</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">previous</span>.<span class="ident">zip</span>(<span class="ident">next</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">prev</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="ident">prev</span> <span class="op">==</span> <span class="ident">next</span>)
+    previous.len() == next.len() &amp;&amp; previous.zip(next).all(|(prev, next)| prev == next)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

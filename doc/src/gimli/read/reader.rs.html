@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.2/src/read/reader.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../gimli/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/gimli-0.26.2/src/read/reader.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../gimli/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../gimli/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -500,507 +500,507 @@
 <span id="500">500</span>
 <span id="501">501</span>
 <span id="502">502</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">core::hash::Hash</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">AddAssign</span>, <span class="ident">Sub</span>};
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;read&quot;</span>)]
+</span><span class="kw">use </span>alloc::borrow::Cow;
+<span class="kw">use </span>core::convert::TryInto;
+<span class="kw">use </span>core::fmt::Debug;
+<span class="kw">use </span>core::hash::Hash;
+<span class="kw">use </span>core::ops::{Add, AddAssign, Sub};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::Format</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endianity::Endianity</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::leb128</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::common::Format;
+<span class="kw">use </span><span class="kw">crate</span>::endianity::Endianity;
+<span class="kw">use </span><span class="kw">crate</span>::leb128;
+<span class="kw">use </span><span class="kw">crate</span>::read::{Error, <span class="prelude-ty">Result</span>};
 
-<span class="doccomment">/// An identifier for an offset within a section reader.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used for error reporting. The meaning of this value is specific to</span>
-<span class="doccomment">/// each reader implementation. The values should be chosen to be unique amongst</span>
-<span class="doccomment">/// all readers. If values are not unique then errors may point to the wrong reader.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReaderOffsetId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="doccomment">/// An identifier for an offset within a section reader.
+///
+/// This is used for error reporting. The meaning of this value is specific to
+/// each reader implementation. The values should be chosen to be unique amongst
+/// all readers. If values are not unique then errors may point to the wrong reader.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>ReaderOffsetId(<span class="kw">pub </span>u64);
 
-<span class="doccomment">/// A trait for offsets with a DWARF section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows consumers to choose a size that is appropriate for their address space.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReaderOffset</span>:
-    <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AddAssign</span> <span class="op">+</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
+<span class="doccomment">/// A trait for offsets with a DWARF section.
+///
+/// This allows consumers to choose a size that is appropriate for their address space.
+</span><span class="kw">pub trait </span>ReaderOffset:
+    Debug + Copy + Eq + Ord + Hash + Add&lt;Output = <span class="self">Self</span>&gt; + AddAssign + Sub&lt;Output = <span class="self">Self</span>&gt;
 {
-    <span class="doccomment">/// Convert a u8 to an offset.</span>
-    <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">offset</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Convert a u8 to an offset.
+    </span><span class="kw">fn </span>from_u8(offset: u8) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Convert a u16 to an offset.</span>
-    <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">offset</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Convert a u16 to an offset.
+    </span><span class="kw">fn </span>from_u16(offset: u16) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Convert an i16 to an offset.</span>
-    <span class="kw">fn</span> <span class="ident">from_i16</span>(<span class="ident">offset</span>: <span class="ident">i16</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Convert an i16 to an offset.
+    </span><span class="kw">fn </span>from_i16(offset: i16) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Convert a u32 to an offset.</span>
-    <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">offset</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Convert a u32 to an offset.
+    </span><span class="kw">fn </span>from_u32(offset: u32) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Convert a u64 to an offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Error::UnsupportedOffset` if the value is too large.</span>
-    <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">offset</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Convert a u64 to an offset.
+    ///
+    /// Returns `Error::UnsupportedOffset` if the value is too large.
+    </span><span class="kw">fn </span>from_u64(offset: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Convert an offset to a u64.</span>
-    <span class="kw">fn</span> <span class="ident">into_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span>;
+    <span class="doccomment">/// Convert an offset to a u64.
+    </span><span class="kw">fn </span>into_u64(<span class="self">self</span>) -&gt; u64;
 
-    <span class="doccomment">/// Wrapping (modular) addition. Computes `self + other`.</span>
-    <span class="kw">fn</span> <span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Wrapping (modular) addition. Computes `self + other`.
+    </span><span class="kw">fn </span>wrapping_add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Checked subtraction. Computes `self - other`.</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Checked subtraction. Computes `self - other`.
+    </span><span class="kw">fn </span>checked_sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">ReaderOffset</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">offset</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">u64::from</span>(<span class="ident">offset</span>)
+<span class="kw">impl </span>ReaderOffset <span class="kw">for </span>u64 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u8(offset: u8) -&gt; <span class="self">Self </span>{
+        u64::from(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">offset</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">u64::from</span>(<span class="ident">offset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u16(offset: u16) -&gt; <span class="self">Self </span>{
+        u64::from(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_i16</span>(<span class="ident">offset</span>: <span class="ident">i16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_i16(offset: i16) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>u64
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">offset</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">u64::from</span>(<span class="ident">offset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u32(offset: u32) -&gt; <span class="self">Self </span>{
+        u64::from(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">offset</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">offset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u64(offset: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_u64(<span class="self">self</span>) -&gt; u64 {
+        <span class="self">self
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>wrapping_add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.wrapping_add(other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">wrapping_add</span>(<span class="ident">other</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.checked_sub(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ReaderOffset</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">offset</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">u32::from</span>(<span class="ident">offset</span>)
+<span class="kw">impl </span>ReaderOffset <span class="kw">for </span>u32 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u8(offset: u8) -&gt; <span class="self">Self </span>{
+        u32::from(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">offset</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">u32::from</span>(<span class="ident">offset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u16(offset: u16) -&gt; <span class="self">Self </span>{
+        u32::from(offset)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_i16</span>(<span class="ident">offset</span>: <span class="ident">i16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u32</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_i16(offset: i16) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>u32
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">offset</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u32(offset: u32) -&gt; <span class="self">Self </span>{
+        offset
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">offset64</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset64</span> <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="kw">if</span> <span class="ident">u64::from</span>(<span class="ident">offset</span>) <span class="op">==</span> <span class="ident">offset64</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">offset</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u64(offset64: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>offset = offset64 <span class="kw">as </span>u32;
+        <span class="kw">if </span>u64::from(offset) == offset64 {
+            <span class="prelude-val">Ok</span>(offset)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::UnsupportedOffset)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">u64::from</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_u64(<span class="self">self</span>) -&gt; u64 {
+        u64::from(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">wrapping_add</span>(<span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>wrapping_add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.wrapping_add(other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.checked_sub(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ReaderOffset</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">offset</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>
+<span class="kw">impl </span>ReaderOffset <span class="kw">for </span>usize {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u8(offset: u8) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>usize
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u16</span>(<span class="ident">offset</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u16(offset: u16) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>usize
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_i16</span>(<span class="ident">offset</span>: <span class="ident">i16</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_i16(offset: i16) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>usize
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u32</span>(<span class="ident">offset</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u32(offset: u32) -&gt; <span class="self">Self </span>{
+        offset <span class="kw">as </span>usize
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">offset64</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">offset64</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">==</span> <span class="ident">offset64</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">offset</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffset</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_u64(offset64: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>offset = offset64 <span class="kw">as </span>usize;
+        <span class="kw">if </span>offset <span class="kw">as </span>u64 == offset64 {
+            <span class="prelude-val">Ok</span>(offset)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::UnsupportedOffset)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">into_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>into_u64(<span class="self">self</span>) -&gt; u64 {
+        <span class="self">self </span><span class="kw">as </span>u64
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wrapping_add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">wrapping_add</span>(<span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>wrapping_add(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.wrapping_add(other)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">other</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="self">self</span>.checked_sub(other)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">seal_if_no_alloc</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sealed</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;read&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>seal_if_no_alloc {
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>Sealed;
 }
 
-<span class="doccomment">/// A trait for reading the data from a DWARF section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All read operations advance the section offset of the reader</span>
-<span class="doccomment">/// unless specified otherwise.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Choosing a `Reader` Implementation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `gimli` comes with a few different `Reader` implementations and lets you</span>
-<span class="doccomment">/// choose the one that is right for your use case. A `Reader` is essentially a</span>
-<span class="doccomment">/// view into the raw bytes that make up some DWARF, but this view might borrow</span>
-<span class="doccomment">/// the underlying data or use reference counting ownership, and it might be</span>
-<span class="doccomment">/// thread safe or not.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Implementation    | Ownership         | Thread Safe | Notes |</span>
-<span class="doccomment">/// |:------------------|:------------------|:------------|:------|</span>
-<span class="doccomment">/// | [`EndianSlice`](./struct.EndianSlice.html)        | Borrowed          | Yes         | Fastest, but requires that all of your code work with borrows. |</span>
-<span class="doccomment">/// | [`EndianRcSlice`](./struct.EndianRcSlice.html)    | Reference counted | No          | Shared ownership via reference counting, which alleviates the borrow restrictions of `EndianSlice` but imposes reference counting increments and decrements. Cannot be sent across threads, because the reference count is not atomic. |</span>
-<span class="doccomment">/// | [`EndianArcSlice`](./struct.EndianArcSlice.html)  | Reference counted | Yes         | The same as `EndianRcSlice`, but uses atomic reference counting, and therefore reference counting operations are slower but `EndianArcSlice`s may be sent across threads. |</span>
-<span class="doccomment">/// | [`EndianReader&lt;T&gt;`](./struct.EndianReader.html)   | Same as `T`       | Same as `T` | Escape hatch for easily defining your own type of `Reader`. |</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Reader</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Clone</span> {
-    <span class="doccomment">/// The endianity of bytes that are read.</span>
-    <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">Endianity</span>;
+<span class="doccomment">/// A trait for reading the data from a DWARF section.
+///
+/// All read operations advance the section offset of the reader
+/// unless specified otherwise.
+///
+/// ## Choosing a `Reader` Implementation
+///
+/// `gimli` comes with a few different `Reader` implementations and lets you
+/// choose the one that is right for your use case. A `Reader` is essentially a
+/// view into the raw bytes that make up some DWARF, but this view might borrow
+/// the underlying data or use reference counting ownership, and it might be
+/// thread safe or not.
+///
+/// | Implementation    | Ownership         | Thread Safe | Notes |
+/// |:------------------|:------------------|:------------|:------|
+/// | [`EndianSlice`](./struct.EndianSlice.html)        | Borrowed          | Yes         | Fastest, but requires that all of your code work with borrows. |
+/// | [`EndianRcSlice`](./struct.EndianRcSlice.html)    | Reference counted | No          | Shared ownership via reference counting, which alleviates the borrow restrictions of `EndianSlice` but imposes reference counting increments and decrements. Cannot be sent across threads, because the reference count is not atomic. |
+/// | [`EndianArcSlice`](./struct.EndianArcSlice.html)  | Reference counted | Yes         | The same as `EndianRcSlice`, but uses atomic reference counting, and therefore reference counting operations are slower but `EndianArcSlice`s may be sent across threads. |
+/// | [`EndianReader&lt;T&gt;`](./struct.EndianReader.html)   | Same as `T`       | Same as `T` | Escape hatch for easily defining your own type of `Reader`. |
+</span><span class="kw">pub trait </span>Reader: Debug + Clone {
+    <span class="doccomment">/// The endianity of bytes that are read.
+    </span><span class="kw">type </span>Endian: Endianity;
 
-    <span class="doccomment">/// The type used for offsets and lengths.</span>
-    <span class="kw">type</span> <span class="ident">Offset</span>: <span class="ident">ReaderOffset</span>;
+    <span class="doccomment">/// The type used for offsets and lengths.
+    </span><span class="kw">type </span>Offset: ReaderOffset;
 
-    <span class="doccomment">/// Return the endianity of bytes that are read.</span>
-    <span class="kw">fn</span> <span class="ident">endian</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Endian</span>;
+    <span class="doccomment">/// Return the endianity of bytes that are read.
+    </span><span class="kw">fn </span>endian(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Endian;
 
-    <span class="doccomment">/// Return the number of bytes remaining.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Offset</span>;
+    <span class="doccomment">/// Return the number of bytes remaining.
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Offset;
 
-    <span class="doccomment">/// Set the number of bytes remaining to zero.</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Set the number of bytes remaining to zero.
+    </span><span class="kw">fn </span>empty(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
-    <span class="doccomment">/// Set the number of bytes remaining to the specified length.</span>
-    <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Offset</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="doccomment">/// Set the number of bytes remaining to the specified length.
+    </span><span class="kw">fn </span>truncate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: <span class="self">Self</span>::Offset) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-    <span class="doccomment">/// Return the offset of this reader&#39;s data relative to the start of</span>
-    <span class="doccomment">/// the given base reader&#39;s data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// May panic if this reader&#39;s data is not contained within the given</span>
-    <span class="doccomment">/// base reader&#39;s data.</span>
-    <span class="kw">fn</span> <span class="ident">offset_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">base</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Offset</span>;
+    <span class="doccomment">/// Return the offset of this reader&#39;s data relative to the start of
+    /// the given base reader&#39;s data.
+    ///
+    /// May panic if this reader&#39;s data is not contained within the given
+    /// base reader&#39;s data.
+    </span><span class="kw">fn </span>offset_from(<span class="kw-2">&amp;</span><span class="self">self</span>, base: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>::Offset;
 
-    <span class="doccomment">/// Return an identifier for the current reader offset.</span>
-    <span class="kw">fn</span> <span class="ident">offset_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReaderOffsetId</span>;
+    <span class="doccomment">/// Return an identifier for the current reader offset.
+    </span><span class="kw">fn </span>offset_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReaderOffsetId;
 
-    <span class="doccomment">/// Return the offset corresponding to the given `id` if</span>
-    <span class="doccomment">/// it is associated with this reader.</span>
-    <span class="kw">fn</span> <span class="ident">lookup_offset_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">ReaderOffsetId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Return the offset corresponding to the given `id` if
+    /// it is associated with this reader.
+    </span><span class="kw">fn </span>lookup_offset_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ReaderOffsetId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Offset&gt;;
 
-    <span class="doccomment">/// Find the index of the first occurence of the given byte.</span>
-    <span class="doccomment">/// The offset of the reader is not changed.</span>
-    <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Find the index of the first occurence of the given byte.
+    /// The offset of the reader is not changed.
+    </span><span class="kw">fn </span>find(<span class="kw-2">&amp;</span><span class="self">self</span>, byte: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Offset&gt;;
 
-    <span class="doccomment">/// Discard the specified number of bytes.</span>
-    <span class="kw">fn</span> <span class="ident">skip</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Offset</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="doccomment">/// Discard the specified number of bytes.
+    </span><span class="kw">fn </span>skip(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: <span class="self">Self</span>::Offset) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-    <span class="doccomment">/// Split a reader in two.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A new reader is returned that can be used to read the next</span>
-    <span class="doccomment">/// `len` bytes, and `self` is advanced so that it reads the remainder.</span>
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident"><span class="self">Self</span>::Offset</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Split a reader in two.
+    ///
+    /// A new reader is returned that can be used to read the next
+    /// `len` bytes, and `self` is advanced so that it reads the remainder.
+    </span><span class="kw">fn </span>split(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: <span class="self">Self</span>::Offset) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// This trait cannot be implemented if &quot;read&quot; feature is not enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `Reader` trait has a few methods that depend on `alloc` crate.</span>
-    <span class="doccomment">/// Disallowing `Reader` trait implementation prevents a crate that only depends on</span>
-    <span class="doccomment">/// &quot;read-core&quot; from being broken if another crate depending on `gimli` enables</span>
-    <span class="doccomment">/// &quot;read&quot; feature.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">cannot_implement</span>() -&gt; <span class="ident">seal_if_no_alloc::Sealed</span>;
+    <span class="doccomment">/// This trait cannot be implemented if &quot;read&quot; feature is not enabled.
+    ///
+    /// `Reader` trait has a few methods that depend on `alloc` crate.
+    /// Disallowing `Reader` trait implementation prevents a crate that only depends on
+    /// &quot;read-core&quot; from being broken if another crate depending on `gimli` enables
+    /// &quot;read&quot; feature.
+    </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;read&quot;</span>))]
+    </span><span class="kw">fn </span>cannot_implement() -&gt; seal_if_no_alloc::Sealed;
 
-    <span class="doccomment">/// Return all remaining data as a clone-on-write slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The slice will be borrowed where possible, but some readers may</span>
-    <span class="doccomment">/// always return an owned vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Does not advance the reader.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">to_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Return all remaining data as a clone-on-write slice.
+    ///
+    /// The slice will be borrowed where possible, but some readers may
+    /// always return an owned vector.
+    ///
+    /// Does not advance the reader.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;read&quot;</span>)]
+    </span><span class="kw">fn </span>to_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;[u8]&gt;&gt;;
 
-    <span class="doccomment">/// Convert all remaining data to a clone-on-write string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The string will be borrowed where possible, but some readers may</span>
-    <span class="doccomment">/// always return an owned string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Does not advance the reader.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an error if the data contains invalid characters.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Convert all remaining data to a clone-on-write string.
+    ///
+    /// The string will be borrowed where possible, but some readers may
+    /// always return an owned string.
+    ///
+    /// Does not advance the reader.
+    ///
+    /// Returns an error if the data contains invalid characters.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;read&quot;</span>)]
+    </span><span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;str&gt;&gt;;
 
-    <span class="doccomment">/// Convert all remaining data to a clone-on-write string, including invalid characters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The string will be borrowed where possible, but some readers may</span>
-    <span class="doccomment">/// always return an owned string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Does not advance the reader.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;read&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">to_string_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Convert all remaining data to a clone-on-write string, including invalid characters.
+    ///
+    /// The string will be borrowed where possible, but some readers may
+    /// always return an owned string.
+    ///
+    /// Does not advance the reader.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;read&quot;</span>)]
+    </span><span class="kw">fn </span>to_string_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;str&gt;&gt;;
 
-    <span class="doccomment">/// Read exactly `buf.len()` bytes into `buf`.</span>
-    <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="doccomment">/// Read exactly `buf.len()` bytes into `buf`.
+    </span><span class="kw">fn </span>read_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;;
 
-    <span class="doccomment">/// Read a u8 array.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_u8_array</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Read a u8 array.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_u8_array&lt;A&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;A&gt;
+    <span class="kw">where
+        </span>A: Sized + Default + AsMut&lt;[u8]&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="op">&lt;</span><span class="ident">A</span> <span class="kw">as</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>val = Default::default();
+        <span class="self">self</span>.read_slice(&lt;A <span class="kw">as </span>AsMut&lt;[u8]&gt;&gt;::as_mut(<span class="kw-2">&amp;mut </span>val))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(val)
     }
 
-    <span class="doccomment">/// Return true if the number of bytes remaining is zero.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident"><span class="self">Self</span>::Offset::from_u8</span>(<span class="number">0</span>)
+    <span class="doccomment">/// Return true if the number of bytes remaining is zero.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="self">Self</span>::Offset::from_u8(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Read a u8.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">1</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">a</span>[<span class="number">0</span>])
+    <span class="doccomment">/// Read a u8.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_u8(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u8&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">1</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(a[<span class="number">0</span>])
     }
 
-    <span class="doccomment">/// Read an i8.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_i8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">1</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">a</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">i8</span>)
+    <span class="doccomment">/// Read an i8.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_i8(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i8&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">1</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(a[<span class="number">0</span>] <span class="kw">as </span>i8)
     }
 
-    <span class="doccomment">/// Read a u16.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_u16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read a u16.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u16&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">2</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_u16(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read an i16.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_i16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_i16</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read an i16.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_i16(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i16&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">2</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_i16(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read a u32.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_u32</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read a u32.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u32&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">4</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_u32(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read an i32.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read an i32.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_i32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i32&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">4</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_i32(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read a u64.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_u64</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read a u64.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">8</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_u64(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read an i64.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_i64</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read an i64.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i64&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">8</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_i64(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read a f32.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_f32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_f32</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read a f32.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_f32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;f32&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">4</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_f32(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read a f64.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u8_array</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_f64</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>))
+    <span class="doccomment">/// Read a f64.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;f64&gt; {
+        <span class="kw">let </span>a: [u8; <span class="number">8</span>] = <span class="self">self</span>.read_u8_array()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_f64(<span class="kw-2">&amp;</span>a))
     }
 
-    <span class="doccomment">/// Read an unsigned n-bytes integer u64.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics when nbytes &lt; 1 or nbytes &gt; 8</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_uint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-        <span class="self">self</span>.<span class="ident">read_slice</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..<span class="ident">n</span>])<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">endian</span>().<span class="ident">read_uint</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">n</span>]))
+    <span class="doccomment">/// Read an unsigned n-bytes integer u64.
+    ///
+    /// # Panics
+    ///
+    /// Panics when nbytes &lt; 1 or nbytes &gt; 8
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_uint(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+        <span class="self">self</span>.read_slice(<span class="kw-2">&amp;mut </span>buf[..n])<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.endian().read_uint(<span class="kw-2">&amp;</span>buf[..n]))
     }
 
-    <span class="doccomment">/// Read a null-terminated slice, and return it (excluding the null).</span>
-    <span class="kw">fn</span> <span class="ident">read_null_terminated_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>(<span class="ident">idx</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">skip</span>(<span class="ident"><span class="self">Self</span>::Offset::from_u8</span>(<span class="number">1</span>))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+    <span class="doccomment">/// Read a null-terminated slice, and return it (excluding the null).
+    </span><span class="kw">fn </span>read_null_terminated_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>idx = <span class="self">self</span>.find(<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = <span class="self">self</span>.split(idx)<span class="question-mark">?</span>;
+        <span class="self">self</span>.skip(<span class="self">Self</span>::Offset::from_u8(<span class="number">1</span>))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(val)
     }
 
-    <span class="doccomment">/// Skip a LEB128 encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">skip_leb128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">leb128::read::skip</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Skip a LEB128 encoded integer.
+    </span><span class="kw">fn </span>skip_leb128(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        leb128::read::skip(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Read an unsigned LEB128 encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">read_uleb128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="ident">leb128::read::unsigned</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Read an unsigned LEB128 encoded integer.
+    </span><span class="kw">fn </span>read_uleb128(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
+        leb128::read::unsigned(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Read an unsigned LEB128 encoded u32.</span>
-    <span class="kw">fn</span> <span class="ident">read_uleb128_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="ident">leb128::read::unsigned</span>(<span class="self">self</span>)<span class="question-mark">?</span>
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::BadUnsignedLeb128</span>)
+    <span class="doccomment">/// Read an unsigned LEB128 encoded u32.
+    </span><span class="kw">fn </span>read_uleb128_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u32&gt; {
+        leb128::read::unsigned(<span class="self">self</span>)<span class="question-mark">?
+            </span>.try_into()
+            .map_err(|<span class="kw">_</span>| Error::BadUnsignedLeb128)
     }
 
-    <span class="doccomment">/// Read an unsigned LEB128 encoded u16.</span>
-    <span class="kw">fn</span> <span class="ident">read_uleb128_u16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-        <span class="ident">leb128::read::u16</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Read an unsigned LEB128 encoded u16.
+    </span><span class="kw">fn </span>read_uleb128_u16(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u16&gt; {
+        leb128::read::u16(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Read a signed LEB128 encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">read_sleb128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="ident">leb128::read::signed</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Read a signed LEB128 encoded integer.
+    </span><span class="kw">fn </span>read_sleb128(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i64&gt; {
+        leb128::read::signed(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Read an initial length field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field is encoded as either a 32-bit length or</span>
-    <span class="doccomment">/// a 64-bit length, and the returned `Format` indicates which.</span>
-    <span class="kw">fn</span> <span class="ident">read_initial_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::Offset</span>, <span class="ident">Format</span>)<span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">MAX_DWARF_32_UNIT_LENGTH</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xffff_fff0</span>;
-        <span class="kw">const</span> <span class="ident">DWARF_64_INITIAL_UNIT_LENGTH</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xffff_ffff</span>;
+    <span class="doccomment">/// Read an initial length field.
+    ///
+    /// This field is encoded as either a 32-bit length or
+    /// a 64-bit length, and the returned `Format` indicates which.
+    </span><span class="kw">fn </span>read_initial_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>::Offset, Format)&gt; {
+        <span class="kw">const </span>MAX_DWARF_32_UNIT_LENGTH: u32 = <span class="number">0xffff_fff0</span>;
+        <span class="kw">const </span>DWARF_64_INITIAL_UNIT_LENGTH: u32 = <span class="number">0xffff_ffff</span>;
 
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u32</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="ident">MAX_DWARF_32_UNIT_LENGTH</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident"><span class="self">Self</span>::Offset::from_u32</span>(<span class="ident">val</span>), <span class="ident">Format::Dwarf32</span>))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="ident">DWARF_64_INITIAL_UNIT_LENGTH</span> {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_u64</span>().<span class="ident">and_then</span>(<span class="ident"><span class="self">Self</span>::Offset::from_u64</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>((<span class="ident">val</span>, <span class="ident">Format::Dwarf64</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownReservedLength</span>)
+        <span class="kw">let </span>val = <span class="self">self</span>.read_u32()<span class="question-mark">?</span>;
+        <span class="kw">if </span>val &lt; MAX_DWARF_32_UNIT_LENGTH {
+            <span class="prelude-val">Ok</span>((<span class="self">Self</span>::Offset::from_u32(val), Format::Dwarf32))
+        } <span class="kw">else if </span>val == DWARF_64_INITIAL_UNIT_LENGTH {
+            <span class="kw">let </span>val = <span class="self">self</span>.read_u64().and_then(<span class="self">Self</span>::Offset::from_u64)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>((val, Format::Dwarf64))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(Error::UnknownReservedLength)
         }
     }
 
-    <span class="doccomment">/// Read an address-sized integer, and return it as a `u64`.</span>
-    <span class="kw">fn</span> <span class="ident">read_address</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">address_size</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">address_size</span> {
-            <span class="number">1</span> =&gt; <span class="self">self</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">2</span> =&gt; <span class="self">self</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">4</span> =&gt; <span class="self">self</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">8</span> =&gt; <span class="self">self</span>.<span class="ident">read_u64</span>(),
-            <span class="ident">otherwise</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedAddressSize</span>(<span class="ident">otherwise</span>)),
+    <span class="doccomment">/// Read an address-sized integer, and return it as a `u64`.
+    </span><span class="kw">fn </span>read_address(<span class="kw-2">&amp;mut </span><span class="self">self</span>, address_size: u8) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
+        <span class="kw">match </span>address_size {
+            <span class="number">1 </span>=&gt; <span class="self">self</span>.read_u8().map(u64::from),
+            <span class="number">2 </span>=&gt; <span class="self">self</span>.read_u16().map(u64::from),
+            <span class="number">4 </span>=&gt; <span class="self">self</span>.read_u32().map(u64::from),
+            <span class="number">8 </span>=&gt; <span class="self">self</span>.read_u64(),
+            otherwise =&gt; <span class="prelude-val">Err</span>(Error::UnsupportedAddressSize(otherwise)),
         }
     }
 
-    <span class="doccomment">/// Parse a word-sized integer according to the DWARF format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These are always used to encode section offsets or lengths,</span>
-    <span class="doccomment">/// and so have a type of `Self::Offset`.</span>
-    <span class="kw">fn</span> <span class="ident">read_word</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">format</span>: <span class="ident">Format</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">format</span> {
-            <span class="ident">Format::Dwarf32</span> =&gt; <span class="self">self</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Offset::from_u32</span>),
-            <span class="ident">Format::Dwarf64</span> =&gt; <span class="self">self</span>.<span class="ident">read_u64</span>().<span class="ident">and_then</span>(<span class="ident"><span class="self">Self</span>::Offset::from_u64</span>),
+    <span class="doccomment">/// Parse a word-sized integer according to the DWARF format.
+    ///
+    /// These are always used to encode section offsets or lengths,
+    /// and so have a type of `Self::Offset`.
+    </span><span class="kw">fn </span>read_word(<span class="kw-2">&amp;mut </span><span class="self">self</span>, format: Format) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="kw">match </span>format {
+            Format::Dwarf32 =&gt; <span class="self">self</span>.read_u32().map(<span class="self">Self</span>::Offset::from_u32),
+            Format::Dwarf64 =&gt; <span class="self">self</span>.read_u64().and_then(<span class="self">Self</span>::Offset::from_u64),
         }
     }
 
-    <span class="doccomment">/// Parse a word-sized section length according to the DWARF format.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_length</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">format</span>: <span class="ident">Format</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_word</span>(<span class="ident">format</span>)
+    <span class="doccomment">/// Parse a word-sized section length according to the DWARF format.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_length(<span class="kw-2">&amp;mut </span><span class="self">self</span>, format: Format) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="self">self</span>.read_word(format)
     }
 
-    <span class="doccomment">/// Parse a word-sized section offset according to the DWARF format.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_offset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">format</span>: <span class="ident">Format</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_word</span>(<span class="ident">format</span>)
+    <span class="doccomment">/// Parse a word-sized section offset according to the DWARF format.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_offset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, format: Format) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="self">self</span>.read_word(format)
     }
 
-    <span class="doccomment">/// Parse a section offset of the given size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used for `DW_FORM_ref_addr` values in DWARF version 2.</span>
-    <span class="kw">fn</span> <span class="ident">read_sized_offset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Offset</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">size</span> {
-            <span class="number">1</span> =&gt; <span class="self">self</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">2</span> =&gt; <span class="self">self</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">4</span> =&gt; <span class="self">self</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">u64::from</span>),
-            <span class="number">8</span> =&gt; <span class="self">self</span>.<span class="ident">read_u64</span>(),
-            <span class="ident">otherwise</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedOffsetSize</span>(<span class="ident">otherwise</span>)),
+    <span class="doccomment">/// Parse a section offset of the given size.
+    ///
+    /// This is used for `DW_FORM_ref_addr` values in DWARF version 2.
+    </span><span class="kw">fn </span>read_sized_offset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="kw">match </span>size {
+            <span class="number">1 </span>=&gt; <span class="self">self</span>.read_u8().map(u64::from),
+            <span class="number">2 </span>=&gt; <span class="self">self</span>.read_u16().map(u64::from),
+            <span class="number">4 </span>=&gt; <span class="self">self</span>.read_u32().map(u64::from),
+            <span class="number">8 </span>=&gt; <span class="self">self</span>.read_u64(),
+            otherwise =&gt; <span class="prelude-val">Err</span>(Error::UnsupportedOffsetSize(otherwise)),
         }
-        .<span class="ident">and_then</span>(<span class="ident"><span class="self">Self</span>::Offset::from_u64</span>)
+        .and_then(<span class="self">Self</span>::Offset::from_u64)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gimli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gimli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

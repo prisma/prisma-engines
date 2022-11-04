@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/task/join_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/task/join_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -503,510 +503,510 @@
 <span id="503">503</span>
 <span id="504">504</span>
 <span id="505">505</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A collection of tasks spawned on a Tokio runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the [`JoinSet`] type, a collection which stores a set</span>
-<span class="doccomment">//! of spawned tasks and allows asynchronously awaiting the output of those</span>
-<span class="doccomment">//! tasks as they complete. See the documentation for the [`JoinSet`] type for</span>
-<span class="doccomment">//! details.</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! A collection of tasks spawned on a Tokio runtime.
+//!
+//! This module provides the [`JoinSet`] type, a collection which stores a set
+//! of spawned tasks and allows asynchronously awaiting the output of those
+//! tasks as they complete. See the documentation for the [`JoinSet`] type for
+//! details.
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::Handle</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task::Id</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::task</span>::{<span class="ident">AbortHandle</span>, <span class="ident">JoinError</span>, <span class="ident">JoinHandle</span>, <span class="ident">LocalSet</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::IdleNotifiedSet</span>;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::Handle;
+<span class="attribute">#[cfg(tokio_unstable)]
+</span><span class="kw">use </span><span class="kw">crate</span>::task::Id;
+<span class="kw">use </span><span class="kw">crate</span>::task::{AbortHandle, JoinError, JoinHandle, LocalSet};
+<span class="kw">use </span><span class="kw">crate</span>::util::IdleNotifiedSet;
 
-<span class="doccomment">/// A collection of tasks spawned on a Tokio runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `JoinSet` can be used to await the completion of some or all of the tasks</span>
-<span class="doccomment">/// in the set. The set is not ordered, and the tasks will be returned in the</span>
-<span class="doccomment">/// order they complete.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All of the tasks must have the same return type `T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When the `JoinSet` is dropped, all tasks in the `JoinSet` are immediately aborted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Spawn multiple tasks and wait for them.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use tokio::task::JoinSet;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[tokio::main]</span>
-<span class="doccomment">/// async fn main() {</span>
-<span class="doccomment">///     let mut set = JoinSet::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     for i in 0..10 {</span>
-<span class="doccomment">///         set.spawn(async move { i });</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let mut seen = [false; 10];</span>
-<span class="doccomment">///     while let Some(res) = set.join_next().await {</span>
-<span class="doccomment">///         let idx = res.unwrap();</span>
-<span class="doccomment">///         seen[idx] = true;</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     for i in 0..10 {</span>
-<span class="doccomment">///         assert!(seen[i]);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A collection of tasks spawned on a Tokio runtime.
+///
+/// A `JoinSet` can be used to await the completion of some or all of the tasks
+/// in the set. The set is not ordered, and the tasks will be returned in the
+/// order they complete.
+///
+/// All of the tasks must have the same return type `T`.
+///
+/// When the `JoinSet` is dropped, all tasks in the `JoinSet` are immediately aborted.
+///
+/// # Examples
+///
+/// Spawn multiple tasks and wait for them.
+///
+/// ```
+/// use tokio::task::JoinSet;
+///
+/// #[tokio::main]
+/// async fn main() {
+///     let mut set = JoinSet::new();
+///
+///     for i in 0..10 {
+///         set.spawn(async move { i });
+///     }
+///
+///     let mut seen = [false; 10];
+///     while let Some(res) = set.join_next().await {
+///         let idx = res.unwrap();
+///         seen[idx] = true;
+///     }
+///
+///     for i in 0..10 {
+///         assert!(seen[i]);
+///     }
+/// }
+/// ```
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;rt&quot;</span>)))]
+</span><span class="kw">pub struct </span>JoinSet&lt;T&gt; {
+    inner: IdleNotifiedSet&lt;JoinHandle&lt;T&gt;&gt;,
 }
 
-<span class="doccomment">/// A variant of [`task::Builder`] that spawns tasks on a [`JoinSet`] rather</span>
-<span class="doccomment">/// than on the current default runtime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`task::Builder`]: crate::task::Builder</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))))]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;builders do nothing unless used to spawn a task&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">joinset</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">builder</span>: <span class="ident"><span class="kw">super</span>::Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A variant of [`task::Builder`] that spawns tasks on a [`JoinSet`] rather
+/// than on the current default runtime.
+///
+/// [`task::Builder`]: crate::task::Builder
+</span><span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))))]
+#[must_use = <span class="string">&quot;builders do nothing unless used to spawn a task&quot;</span>]
+</span><span class="kw">pub struct </span>Builder&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    joinset: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>JoinSet&lt;T&gt;,
+    builder: <span class="kw">super</span>::Builder&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new `JoinSet`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">IdleNotifiedSet::new</span>(),
+<span class="kw">impl</span>&lt;T&gt; JoinSet&lt;T&gt; {
+    <span class="doccomment">/// Create a new `JoinSet`.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: IdleNotifiedSet::new(),
         }
     }
 
-    <span class="doccomment">/// Returns the number of tasks currently in the `JoinSet`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Returns the number of tasks currently in the `JoinSet`.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.len()
     }
 
-    <span class="doccomment">/// Returns whether the `JoinSet` is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Returns whether the `JoinSet` is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_empty()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a [`Builder`] that can be used to configure a task prior to</span>
-    <span class="doccomment">/// spawning it on this `JoinSet`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use tokio::task::JoinSet;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[tokio::main]</span>
-    <span class="doccomment">/// async fn main() -&gt; std::io::Result&lt;()&gt; {</span>
-    <span class="doccomment">///     let mut set = JoinSet::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Use the builder to configure a task&#39;s name before spawning it.</span>
-    <span class="doccomment">///     set.build_task()</span>
-    <span class="doccomment">///         .name(&quot;my_task&quot;)</span>
-    <span class="doccomment">///         .spawn(async { /* ... */ })?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     Ok(())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_task</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Builder</span> {
-            <span class="ident">builder</span>: <span class="ident"><span class="kw">super</span>::Builder::new</span>(),
-            <span class="ident">joinset</span>: <span class="self">self</span>,
+<span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; JoinSet&lt;T&gt; {
+    <span class="doccomment">/// Returns a [`Builder`] that can be used to configure a task prior to
+    /// spawning it on this `JoinSet`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use tokio::task::JoinSet;
+    ///
+    /// #[tokio::main]
+    /// async fn main() -&gt; std::io::Result&lt;()&gt; {
+    ///     let mut set = JoinSet::new();
+    ///
+    ///     // Use the builder to configure a task&#39;s name before spawning it.
+    ///     set.build_task()
+    ///         .name(&quot;my_task&quot;)
+    ///         .spawn(async { /* ... */ })?;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    </span><span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))]
+    #[cfg_attr(docsrs, doc(cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))))]
+    </span><span class="kw">pub fn </span>build_task(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Builder&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Builder {
+            builder: <span class="kw">super</span>::Builder::new(),
+            joinset: <span class="self">self</span>,
         }
     }
 
-    <span class="doccomment">/// Spawn the provided task on the `JoinSet`, returning an [`AbortHandle`]</span>
-    <span class="doccomment">/// that can be used to remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method panics if called outside of a Tokio runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">F</span>) -&gt; <span class="ident">AbortHandle</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T</span>: <span class="ident">Send</span>,
+    <span class="doccomment">/// Spawn the provided task on the `JoinSet`, returning an [`AbortHandle`]
+    /// that can be used to remotely cancel the task.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if called outside of a Tokio runtime.
+    ///
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, task: F) -&gt; AbortHandle
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: Send + <span class="lifetime">&#39;static</span>,
+        T: Send,
     {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident"><span class="kw">crate</span>::spawn</span>(<span class="ident">task</span>))
+        <span class="self">self</span>.insert(<span class="kw">crate</span>::spawn(task))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the provided runtime and store it in this</span>
-    <span class="doccomment">/// `JoinSet` returning an [`AbortHandle`] that can be used to remotely</span>
-    <span class="doccomment">/// cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">F</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) -&gt; <span class="ident">AbortHandle</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T</span>: <span class="ident">Send</span>,
+    <span class="doccomment">/// Spawn the provided task on the provided runtime and store it in this
+    /// `JoinSet` returning an [`AbortHandle`] that can be used to remotely
+    /// cancel the task.
+    ///
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_on&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, task: F, handle: <span class="kw-2">&amp;</span>Handle) -&gt; AbortHandle
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: Send + <span class="lifetime">&#39;static</span>,
+        T: Send,
     {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">task</span>))
+        <span class="self">self</span>.insert(handle.spawn(task))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the current [`LocalSet`] and store it in this</span>
-    <span class="doccomment">/// `JoinSet`, returning an [`AbortHandle`] that can be used to remotely</span>
-    <span class="doccomment">/// cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method panics if it is called outside of a `LocalSet`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">F</span>) -&gt; <span class="ident">AbortHandle</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Spawn the provided task on the current [`LocalSet`] and store it in this
+    /// `JoinSet`, returning an [`AbortHandle`] that can be used to remotely
+    /// cancel the task.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if it is called outside of a `LocalSet`.
+    ///
+    /// [`LocalSet`]: crate::task::LocalSet
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_local&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, task: F) -&gt; AbortHandle
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident"><span class="kw">crate</span>::task::spawn_local</span>(<span class="ident">task</span>))
+        <span class="self">self</span>.insert(<span class="kw">crate</span>::task::spawn_local(task))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the provided [`LocalSet`] and store it in</span>
-    <span class="doccomment">/// this `JoinSet`, returning an [`AbortHandle`] that can be used to</span>
-    <span class="doccomment">/// remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">task</span>: <span class="ident">F</span>, <span class="ident">local_set</span>: <span class="kw-2">&amp;</span><span class="ident">LocalSet</span>) -&gt; <span class="ident">AbortHandle</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Spawn the provided task on the provided [`LocalSet`] and store it in
+    /// this `JoinSet`, returning an [`AbortHandle`] that can be used to
+    /// remotely cancel the task.
+    ///
+    /// [`LocalSet`]: crate::task::LocalSet
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_local_on&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, task: F, local_set: <span class="kw-2">&amp;</span>LocalSet) -&gt; AbortHandle
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">self</span>.<span class="ident">insert</span>(<span class="ident">local_set</span>.<span class="ident">spawn_local</span>(<span class="ident">task</span>))
+        <span class="self">self</span>.insert(local_set.spawn_local(task))
     }
 
-    <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">jh</span>: <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">AbortHandle</span> {
-        <span class="kw">let</span> <span class="ident">abort</span> <span class="op">=</span> <span class="ident">jh</span>.<span class="ident">abort_handle</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">insert_idle</span>(<span class="ident">jh</span>);
+    <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, jh: JoinHandle&lt;T&gt;) -&gt; AbortHandle {
+        <span class="kw">let </span>abort = jh.abort_handle();
+        <span class="kw">let </span><span class="kw-2">mut </span>entry = <span class="self">self</span>.inner.insert_idle(jh);
 
-        <span class="comment">// Set the waker that is notified when the task completes.</span>
-        <span class="ident">entry</span>.<span class="ident">with_value_and_context</span>(<span class="op">|</span><span class="ident">jh</span>, <span class="ident">ctx</span><span class="op">|</span> <span class="ident">jh</span>.<span class="ident">set_join_waker</span>(<span class="ident">ctx</span>.<span class="ident">waker</span>()));
-        <span class="ident">abort</span>
+        <span class="comment">// Set the waker that is notified when the task completes.
+        </span>entry.with_value_and_context(|jh, ctx| jh.set_join_waker(ctx.waker()));
+        abort
     }
 
-    <span class="doccomment">/// Waits until one of the tasks in the set completes and returns its output.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the set is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Cancel Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is cancel safe. If `join_next` is used as the event in a `tokio::select!`</span>
-    <span class="doccomment">/// statement and some other branch completes first, it is guaranteed that no tasks were</span>
-    <span class="doccomment">/// removed from this `JoinSet`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">JoinError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">poll_join_next</span>(<span class="ident">cx</span>)).<span class="kw">await</span>
+    <span class="doccomment">/// Waits until one of the tasks in the set completes and returns its output.
+    ///
+    /// Returns `None` if the set is empty.
+    ///
+    /// # Cancel Safety
+    ///
+    /// This method is cancel safe. If `join_next` is used as the event in a `tokio::select!`
+    /// statement and some other branch completes first, it is guaranteed that no tasks were
+    /// removed from this `JoinSet`.
+    </span><span class="kw">pub async fn </span>join_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T, JoinError&gt;&gt; {
+        <span class="kw">crate</span>::future::poll_fn(|cx| <span class="self">self</span>.poll_join_next(cx)).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Waits until one of the tasks in the set completes and returns its
+    /// output, along with the [task ID] of the completed task.
+    ///
+    /// Returns `None` if the set is empty.
+    ///
+    /// When this method returns an error, then the id of the task that failed can be accessed
+    /// using the [`JoinError::id`] method.
+    ///
+    /// # Cancel Safety
+    ///
+    /// This method is cancel safe. If `join_next_with_id` is used as the event in a `tokio::select!`
+    /// statement and some other branch completes first, it is guaranteed that no tasks were
+    /// removed from this `JoinSet`.
+    ///
+    /// [task ID]: crate::task::Id
+    /// [`JoinError::id`]: fn@crate::task::JoinError::id
+    </span><span class="attribute">#[cfg(tokio_unstable)]
+    #[cfg_attr(docsrs, doc(cfg(tokio_unstable)))]
+    </span><span class="kw">pub async fn </span>join_next_with_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;(Id, T), JoinError&gt;&gt; {
+        <span class="kw">crate</span>::future::poll_fn(|cx| <span class="self">self</span>.poll_join_next_with_id(cx)).<span class="kw">await
+    </span>}
+
+    <span class="doccomment">/// Aborts all tasks and waits for them to finish shutting down.
+    ///
+    /// Calling this method is equivalent to calling [`abort_all`] and then calling [`join_next`] in
+    /// a loop until it returns `None`.
+    ///
+    /// This method ignores any panics in the tasks shutting down. When this call returns, the
+    /// `JoinSet` will be empty.
+    ///
+    /// [`abort_all`]: fn@Self::abort_all
+    /// [`join_next`]: fn@Self::join_next
+    </span><span class="kw">pub async fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.abort_all();
+        <span class="kw">while </span><span class="self">self</span>.join_next().<span class="kw">await</span>.is_some() {}
     }
 
-    <span class="doccomment">/// Waits until one of the tasks in the set completes and returns its</span>
-    <span class="doccomment">/// output, along with the [task ID] of the completed task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the set is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When this method returns an error, then the id of the task that failed can be accessed</span>
-    <span class="doccomment">/// using the [`JoinError::id`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Cancel Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is cancel safe. If `join_next_with_id` is used as the event in a `tokio::select!`</span>
-    <span class="doccomment">/// statement and some other branch completes first, it is guaranteed that no tasks were</span>
-    <span class="doccomment">/// removed from this `JoinSet`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [task ID]: crate::task::Id</span>
-    <span class="doccomment">/// [`JoinError::id`]: fn@crate::task::JoinError::id</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">join_next_with_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Id</span>, <span class="ident">T</span>), <span class="ident">JoinError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">poll_join_next_with_id</span>(<span class="ident">cx</span>)).<span class="kw">await</span>
+    <span class="doccomment">/// Aborts all tasks on this `JoinSet`.
+    ///
+    /// This does not remove the tasks from the `JoinSet`. To wait for the tasks to complete
+    /// cancellation, you should call `join_next` in a loop until the `JoinSet` is empty.
+    </span><span class="kw">pub fn </span>abort_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.for_each(|jh| jh.abort());
     }
 
-    <span class="doccomment">/// Aborts all tasks and waits for them to finish shutting down.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this method is equivalent to calling [`abort_all`] and then calling [`join_next`] in</span>
-    <span class="doccomment">/// a loop until it returns `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method ignores any panics in the tasks shutting down. When this call returns, the</span>
-    <span class="doccomment">/// `JoinSet` will be empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`abort_all`]: fn@Self::abort_all</span>
-    <span class="doccomment">/// [`join_next`]: fn@Self::join_next</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">abort_all</span>();
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">join_next</span>().<span class="kw">await</span>.<span class="ident">is_some</span>() {}
+    <span class="doccomment">/// Removes all tasks from this `JoinSet` without aborting them.
+    ///
+    /// The tasks removed by this call will continue to run in the background even if the `JoinSet`
+    /// is dropped.
+    </span><span class="kw">pub fn </span>detach_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.drain(drop);
     }
 
-    <span class="doccomment">/// Aborts all tasks on this `JoinSet`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does not remove the tasks from the `JoinSet`. To wait for the tasks to complete</span>
-    <span class="doccomment">/// cancellation, you should call `join_next` in a loop until the `JoinSet` is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">abort_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">jh</span><span class="op">|</span> <span class="ident">jh</span>.<span class="ident">abort</span>());
-    }
-
-    <span class="doccomment">/// Removes all tasks from this `JoinSet` without aborting them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The tasks removed by this call will continue to run in the background even if the `JoinSet`</span>
-    <span class="doccomment">/// is dropped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detach_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">drain</span>(<span class="ident">drop</span>);
-    }
-
-    <span class="doccomment">/// Polls for one of the tasks in the set to complete.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled</span>
-    <span class="doccomment">/// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to</span>
-    <span class="doccomment">/// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is</span>
-    <span class="doccomment">/// scheduled to receive a wakeup.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is</span>
-    <span class="doccomment">///     available right now.</span>
-    <span class="doccomment">///  * `Poll::Ready(Some(Ok(value)))` if one of the tasks in this `JoinSet` has completed.</span>
-    <span class="doccomment">///     The `value` is the return value of one of the tasks that completed.</span>
-    <span class="doccomment">///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been</span>
-    <span class="doccomment">///     aborted. The `err` is the `JoinError` from the panicked/aborted task.</span>
-    <span class="doccomment">///  * `Poll::Ready(None)` if the `JoinSet` is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this method may return `Poll::Pending` even if one of the tasks has completed.</span>
-    <span class="doccomment">/// This can happen if the [coop budget] is reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [coop budget]: crate::task#cooperative-scheduling</span>
-    <span class="kw">fn</span> <span class="ident">poll_join_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">JoinError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// The call to `pop_notified` moves the entry to the `idle` list. It is moved back to</span>
-        <span class="comment">// the `notified` list if the waker is notified in the `poll` call below.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pop_notified</span>(<span class="ident">cx</span>.<span class="ident">waker</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
-                } <span class="kw">else</span> {
-                    <span class="comment">// The waker was set by `pop_notified`.</span>
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+    <span class="doccomment">/// Polls for one of the tasks in the set to complete.
+    ///
+    /// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.
+    ///
+    /// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled
+    /// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to
+    /// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is
+    /// scheduled to receive a wakeup.
+    ///
+    /// # Returns
+    ///
+    /// This function returns:
+    ///
+    ///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is
+    ///     available right now.
+    ///  * `Poll::Ready(Some(Ok(value)))` if one of the tasks in this `JoinSet` has completed.
+    ///     The `value` is the return value of one of the tasks that completed.
+    ///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been
+    ///     aborted. The `err` is the `JoinError` from the panicked/aborted task.
+    ///  * `Poll::Ready(None)` if the `JoinSet` is empty.
+    ///
+    /// Note that this method may return `Poll::Pending` even if one of the tasks has completed.
+    /// This can happen if the [coop budget] is reached.
+    ///
+    /// [coop budget]: crate::task#cooperative-scheduling
+    </span><span class="kw">fn </span>poll_join_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T, JoinError&gt;&gt;&gt; {
+        <span class="comment">// The call to `pop_notified` moves the entry to the `idle` list. It is moved back to
+        // the `notified` list if the waker is notified in the `poll` call below.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>entry = <span class="kw">match </span><span class="self">self</span>.inner.pop_notified(cx.waker()) {
+            <span class="prelude-val">Some</span>(entry) =&gt; entry,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">if </span><span class="self">self</span>.is_empty() {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
+                } <span class="kw">else </span>{
+                    <span class="comment">// The waker was set by `pop_notified`.
+                    </span><span class="kw">return </span>Poll::Pending;
                 }
             }
         };
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">with_value_and_context</span>(<span class="op">|</span><span class="ident">jh</span>, <span class="ident">ctx</span><span class="op">|</span> <span class="ident">Pin::new</span>(<span class="ident">jh</span>).<span class="ident">poll</span>(<span class="ident">ctx</span>));
+        <span class="kw">let </span>res = entry.with_value_and_context(|jh, ctx| Pin::new(jh).poll(ctx));
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">res</span> {
-            <span class="kw">let</span> <span class="ident">_entry</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">remove</span>();
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>))
-        } <span class="kw">else</span> {
-            <span class="comment">// A JoinHandle generally won&#39;t emit a wakeup without being ready unless</span>
-            <span class="comment">// the coop limit has been reached. We yield to the executor in this</span>
-            <span class="comment">// case.</span>
-            <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
-            <span class="ident">Poll::Pending</span>
+        <span class="kw">if let </span>Poll::Ready(res) = res {
+            <span class="kw">let </span>_entry = entry.remove();
+            Poll::Ready(<span class="prelude-val">Some</span>(res))
+        } <span class="kw">else </span>{
+            <span class="comment">// A JoinHandle generally won&#39;t emit a wakeup without being ready unless
+            // the coop limit has been reached. We yield to the executor in this
+            // case.
+            </span>cx.waker().wake_by_ref();
+            Poll::Pending
         }
     }
 
-    <span class="doccomment">/// Polls for one of the tasks in the set to complete.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled</span>
-    <span class="doccomment">/// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to</span>
-    <span class="doccomment">/// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is</span>
-    <span class="doccomment">/// scheduled to receive a wakeup.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function returns:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is</span>
-    <span class="doccomment">///     available right now.</span>
-    <span class="doccomment">///  * `Poll::Ready(Some(Ok((id, value))))` if one of the tasks in this `JoinSet` has completed.</span>
-    <span class="doccomment">///     The `value` is the return value of one of the tasks that completed, and</span>
-    <span class="doccomment">///    `id` is the [task ID] of that task.</span>
-    <span class="doccomment">///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been</span>
-    <span class="doccomment">///     aborted. The `err` is the `JoinError` from the panicked/aborted task.</span>
-    <span class="doccomment">///  * `Poll::Ready(None)` if the `JoinSet` is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this method may return `Poll::Pending` even if one of the tasks has completed.</span>
-    <span class="doccomment">/// This can happen if the [coop budget] is reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [coop budget]: crate::task#cooperative-scheduling</span>
-    <span class="doccomment">/// [task ID]: crate::task::Id</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tokio_unstable</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_join_next_with_id</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Id</span>, <span class="ident">T</span>), <span class="ident">JoinError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// The call to `pop_notified` moves the entry to the `idle` list. It is moved back to</span>
-        <span class="comment">// the `notified` list if the waker is notified in the `poll` call below.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pop_notified</span>(<span class="ident">cx</span>.<span class="ident">waker</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">entry</span>) =&gt; <span class="ident">entry</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
-                } <span class="kw">else</span> {
-                    <span class="comment">// The waker was set by `pop_notified`.</span>
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+    <span class="doccomment">/// Polls for one of the tasks in the set to complete.
+    ///
+    /// If this returns `Poll::Ready(Some(_))`, then the task that completed is removed from the set.
+    ///
+    /// When the method returns `Poll::Pending`, the `Waker` in the provided `Context` is scheduled
+    /// to receive a wakeup when a task in the `JoinSet` completes. Note that on multiple calls to
+    /// `poll_join_next`, only the `Waker` from the `Context` passed to the most recent call is
+    /// scheduled to receive a wakeup.
+    ///
+    /// # Returns
+    ///
+    /// This function returns:
+    ///
+    ///  * `Poll::Pending` if the `JoinSet` is not empty but there is no task whose output is
+    ///     available right now.
+    ///  * `Poll::Ready(Some(Ok((id, value))))` if one of the tasks in this `JoinSet` has completed.
+    ///     The `value` is the return value of one of the tasks that completed, and
+    ///    `id` is the [task ID] of that task.
+    ///  * `Poll::Ready(Some(Err(err)))` if one of the tasks in this `JoinSet` has panicked or been
+    ///     aborted. The `err` is the `JoinError` from the panicked/aborted task.
+    ///  * `Poll::Ready(None)` if the `JoinSet` is empty.
+    ///
+    /// Note that this method may return `Poll::Pending` even if one of the tasks has completed.
+    /// This can happen if the [coop budget] is reached.
+    ///
+    /// [coop budget]: crate::task#cooperative-scheduling
+    /// [task ID]: crate::task::Id
+    </span><span class="attribute">#[cfg(tokio_unstable)]
+    </span><span class="kw">fn </span>poll_join_next_with_id(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;(Id, T), JoinError&gt;&gt;&gt; {
+        <span class="comment">// The call to `pop_notified` moves the entry to the `idle` list. It is moved back to
+        // the `notified` list if the waker is notified in the `poll` call below.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>entry = <span class="kw">match </span><span class="self">self</span>.inner.pop_notified(cx.waker()) {
+            <span class="prelude-val">Some</span>(entry) =&gt; entry,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">if </span><span class="self">self</span>.is_empty() {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
+                } <span class="kw">else </span>{
+                    <span class="comment">// The waker was set by `pop_notified`.
+                    </span><span class="kw">return </span>Poll::Pending;
                 }
             }
         };
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">with_value_and_context</span>(<span class="op">|</span><span class="ident">jh</span>, <span class="ident">ctx</span><span class="op">|</span> <span class="ident">Pin::new</span>(<span class="ident">jh</span>).<span class="ident">poll</span>(<span class="ident">ctx</span>));
+        <span class="kw">let </span>res = entry.with_value_and_context(|jh, ctx| Pin::new(jh).poll(ctx));
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">res</span> {
-            <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">remove</span>();
-            <span class="comment">// If the task succeeded, add the task ID to the output. Otherwise, the</span>
-            <span class="comment">// `JoinError` will already have the task&#39;s ID.</span>
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">output</span><span class="op">|</span> (<span class="ident">entry</span>.<span class="ident">id</span>(), <span class="ident">output</span>))))
-        } <span class="kw">else</span> {
-            <span class="comment">// A JoinHandle generally won&#39;t emit a wakeup without being ready unless</span>
-            <span class="comment">// the coop limit has been reached. We yield to the executor in this</span>
-            <span class="comment">// case.</span>
-            <span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">wake_by_ref</span>();
-            <span class="ident">Poll::Pending</span>
+        <span class="kw">if let </span>Poll::Ready(res) = res {
+            <span class="kw">let </span>entry = entry.remove();
+            <span class="comment">// If the task succeeded, add the task ID to the output. Otherwise, the
+            // `JoinError` will already have the task&#39;s ID.
+            </span>Poll::Ready(<span class="prelude-val">Some</span>(res.map(|output| (entry.id(), output))))
+        } <span class="kw">else </span>{
+            <span class="comment">// A JoinHandle generally won&#39;t emit a wakeup without being ready unless
+            // the coop limit has been reached. We yield to the executor in this
+            // case.
+            </span>cx.waker().wake_by_ref();
+            Poll::Pending
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">drain</span>(<span class="op">|</span><span class="ident">join_handle</span><span class="op">|</span> <span class="ident">join_handle</span>.<span class="ident">abort</span>());
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>JoinSet&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.drain(|join_handle| join_handle.abort());
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;JoinSet&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>JoinSet&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;JoinSet&quot;</span>).field(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.len()).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">JoinSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>JoinSet&lt;T&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="comment">// === impl Builder ===</span>
+<span class="comment">// === impl Builder ===
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Assigns a name to the task which will be spawned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">name</span>(<span class="ident">name</span>);
-        <span class="self">Self</span> { <span class="ident">builder</span>, ..<span class="self">self</span> }
+</span><span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="lifetime">&#39;static</span>&gt; Builder&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="doccomment">/// Assigns a name to the task which will be spawned.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>builder = <span class="self">self</span>.builder.name(name);
+        <span class="self">Self </span>{ builder, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Spawn the provided task with this builder&#39;s settings and store it in the</span>
-    <span class="doccomment">/// [`JoinSet`], returning an [`AbortHandle`] that can be used to remotely</span>
-    <span class="doccomment">/// cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An [`AbortHandle`] that can be used to remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method panics if called outside of a Tokio runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">AbortHandle</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T</span>: <span class="ident">Send</span>,
+    <span class="doccomment">/// Spawn the provided task with this builder&#39;s settings and store it in the
+    /// [`JoinSet`], returning an [`AbortHandle`] that can be used to remotely
+    /// cancel the task.
+    ///
+    /// # Returns
+    ///
+    /// An [`AbortHandle`] that can be used to remotely cancel the task.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if called outside of a Tokio runtime.
+    ///
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn&lt;F&gt;(<span class="self">self</span>, future: F) -&gt; std::io::Result&lt;AbortHandle&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: Send + <span class="lifetime">&#39;static</span>,
+        T: Send,
     {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">joinset</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">spawn</span>(<span class="ident">future</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.joinset.insert(<span class="self">self</span>.builder.spawn(future)<span class="question-mark">?</span>))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the provided [runtime handle] with this</span>
-    <span class="doccomment">/// builder&#39;s settings, and store it in the [`JoinSet`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An [`AbortHandle`] that can be used to remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="doccomment">/// [runtime handle]: crate::runtime::Handle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">Handle</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">AbortHandle</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">T</span>: <span class="ident">Send</span>,
+    <span class="doccomment">/// Spawn the provided task on the provided [runtime handle] with this
+    /// builder&#39;s settings, and store it in the [`JoinSet`].
+    ///
+    /// # Returns
+    ///
+    /// An [`AbortHandle`] that can be used to remotely cancel the task.
+    ///
+    ///
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    /// [runtime handle]: crate::runtime::Handle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_on&lt;F&gt;(<span class="self">self</span>, future: F, handle: <span class="kw-2">&amp;</span>Handle) -&gt; std::io::Result&lt;AbortHandle&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: Send + <span class="lifetime">&#39;static</span>,
+        T: Send,
     {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">joinset</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">spawn_on</span>(<span class="ident">future</span>, <span class="ident">handle</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.joinset.insert(<span class="self">self</span>.builder.spawn_on(future, handle)<span class="question-mark">?</span>))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the current [`LocalSet`] with this builder&#39;s</span>
-    <span class="doccomment">/// settings, and store it in the [`JoinSet`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An [`AbortHandle`] that can be used to remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method panics if it is called outside of a `LocalSet`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">AbortHandle</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Spawn the provided task on the current [`LocalSet`] with this builder&#39;s
+    /// settings, and store it in the [`JoinSet`].
+    ///
+    /// # Returns
+    ///
+    /// An [`AbortHandle`] that can be used to remotely cancel the task.
+    ///
+    /// # Panics
+    ///
+    /// This method panics if it is called outside of a `LocalSet`.
+    ///
+    /// [`LocalSet`]: crate::task::LocalSet
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_local&lt;F&gt;(<span class="self">self</span>, future: F) -&gt; std::io::Result&lt;AbortHandle&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: <span class="lifetime">&#39;static</span>,
     {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">joinset</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">spawn_local</span>(<span class="ident">future</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.joinset.insert(<span class="self">self</span>.builder.spawn_local(future)<span class="question-mark">?</span>))
     }
 
-    <span class="doccomment">/// Spawn the provided task on the provided [`LocalSet`] with this builder&#39;s</span>
-    <span class="doccomment">/// settings, and store it in the [`JoinSet`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An [`AbortHandle`] that can be used to remotely cancel the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`LocalSet`]: crate::task::LocalSet</span>
-    <span class="doccomment">/// [`AbortHandle`]: crate::task::AbortHandle</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_local_on</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>, <span class="ident">local_set</span>: <span class="kw-2">&amp;</span><span class="ident">LocalSet</span>) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">AbortHandle</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Spawn the provided task on the provided [`LocalSet`] with this builder&#39;s
+    /// settings, and store it in the [`JoinSet`].
+    ///
+    /// # Returns
+    ///
+    /// An [`AbortHandle`] that can be used to remotely cancel the task.
+    ///
+    /// [`LocalSet`]: crate::task::LocalSet
+    /// [`AbortHandle`]: crate::task::AbortHandle
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>spawn_local_on&lt;F&gt;(<span class="self">self</span>, future: F, local_set: <span class="kw-2">&amp;</span>LocalSet) -&gt; std::io::Result&lt;AbortHandle&gt;
+    <span class="kw">where
+        </span>F: Future&lt;Output = T&gt;,
+        F: <span class="lifetime">&#39;static</span>,
     {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>
-            .<span class="ident">joinset</span>
-            .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">spawn_local_on</span>(<span class="ident">future</span>, <span class="ident">local_set</span>)<span class="question-mark">?</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self
+            </span>.joinset
+            .insert(<span class="self">self</span>.builder.spawn_local_on(future, local_set)<span class="question-mark">?</span>))
     }
 }
 
-<span class="comment">// Manual `Debug` impl so that `Builder` is `Debug` regardless of whether `T` is</span>
-<span class="comment">// `Debug`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;join_set::Builder&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;joinset&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">joinset</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;builder&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">builder</span>)
-            .<span class="ident">finish</span>()
+<span class="comment">// Manual `Debug` impl so that `Builder` is `Debug` regardless of whether `T` is
+// `Debug`.
+</span><span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; fmt::Debug <span class="kw">for </span>Builder&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;join_set::Builder&quot;</span>)
+            .field(<span class="string">&quot;joinset&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.joinset)
+            .field(<span class="string">&quot;builder&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.builder)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

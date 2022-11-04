@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/events/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -810,817 +810,817 @@
 <span id="810">810</span>
 <span id="811">811</span>
 <span id="812">812</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">LittleEndian</span>, <span class="ident">WriteBytesExt</span>};
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
-<span class="kw">use</span> <span class="ident">saturating::Saturating</span> <span class="kw">as</span> <span class="ident">S</span>;
+</span><span class="kw">use </span>bitvec::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>byteorder::{LittleEndian, WriteBytesExt};
+<span class="kw">use </span>bytes::BufMut;
+<span class="kw">use </span>saturating::Saturating <span class="kw">as </span>S;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc::raw</span>::{<span class="ident">int</span>::<span class="kw-2">*</span>, <span class="ident">RawConst</span>, <span class="ident">RawFlags</span>},
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+<span class="kw">use crate</span>::{
+    io::ParseBuf,
+    misc::raw::{int::<span class="kw-2">*</span>, RawConst, RawFlags},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">anonymous_gtid_event::AnonymousGtidEvent</span>,
-    <span class="ident">begin_load_query_event::BeginLoadQueryEvent</span>,
-    <span class="ident">delete_rows_event::DeleteRowsEvent</span>,
-    <span class="ident">delete_rows_event_v1::DeleteRowsEventV1</span>,
-    <span class="ident">execute_load_query_event::ExecuteLoadQueryEvent</span>,
-    <span class="ident">format_description_event::FormatDescriptionEvent</span>,
-    <span class="ident">gtid_event::GtidEvent</span>,
-    <span class="ident">incident_event::IncidentEvent</span>,
-    <span class="ident">intvar_event::IntvarEvent</span>,
-    <span class="ident">partial_update_rows_event::PartialUpdateRowsEvent</span>,
-    <span class="ident">query_event</span>::{<span class="ident">QueryEvent</span>, <span class="ident">StatusVar</span>, <span class="ident">StatusVarVal</span>, <span class="ident">StatusVars</span>, <span class="ident">StatusVarsIterator</span>},
-    <span class="ident">rand_event::RandEvent</span>,
-    <span class="ident">rotate_event::RotateEvent</span>,
-    <span class="ident">rows_event</span>::{<span class="ident">RowsEvent</span>, <span class="ident">RowsEventRows</span>},
-    <span class="ident">rows_query_event::RowsQueryEvent</span>,
-    <span class="ident">table_map_event</span>::<span class="kw-2">*</span>,
-    <span class="ident">update_rows_event::UpdateRowsEvent</span>,
-    <span class="ident">update_rows_event_v1::UpdateRowsEventV1</span>,
-    <span class="ident">user_var_event::UserVarEvent</span>,
-    <span class="ident">write_rows_event::WriteRowsEvent</span>,
-    <span class="ident">write_rows_event_v1::WriteRowsEventV1</span>,
-    <span class="ident">xid_event::XidEvent</span>,
+<span class="kw">pub use </span><span class="self">self</span>::{
+    anonymous_gtid_event::AnonymousGtidEvent,
+    begin_load_query_event::BeginLoadQueryEvent,
+    delete_rows_event::DeleteRowsEvent,
+    delete_rows_event_v1::DeleteRowsEventV1,
+    execute_load_query_event::ExecuteLoadQueryEvent,
+    format_description_event::FormatDescriptionEvent,
+    gtid_event::GtidEvent,
+    incident_event::IncidentEvent,
+    intvar_event::IntvarEvent,
+    partial_update_rows_event::PartialUpdateRowsEvent,
+    query_event::{QueryEvent, StatusVar, StatusVarVal, StatusVars, StatusVarsIterator},
+    rand_event::RandEvent,
+    rotate_event::RotateEvent,
+    rows_event::{RowsEvent, RowsEventRows},
+    rows_query_event::RowsQueryEvent,
+    table_map_event::<span class="kw-2">*</span>,
+    update_rows_event::UpdateRowsEvent,
+    update_rows_event_v1::UpdateRowsEventV1,
+    user_var_event::UserVarEvent,
+    write_rows_event::WriteRowsEvent,
+    write_rows_event_v1::WriteRowsEventV1,
+    xid_event::XidEvent,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">any::type_name</span>,
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">cmp::min</span>,
-    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>, <span class="ident">Write</span>},
-    <span class="ident">u16</span>,
+<span class="kw">use </span>std::{
+    any::type_name,
+    borrow::Cow,
+    cmp::min,
+    io::{<span class="self">self</span>, Read, Write},
+    u16,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">consts</span>::{
-        <span class="ident">BinlogChecksumAlg</span>, <span class="ident">BinlogVersion</span>, <span class="ident">EventFlags</span>, <span class="ident">EventType</span>, <span class="ident">UnknownChecksumAlg</span>,
-        <span class="ident">UnknownEventType</span>,
+<span class="kw">use super</span>::{
+    consts::{
+        BinlogChecksumAlg, BinlogVersion, EventFlags, EventType, UnknownChecksumAlg,
+        UnknownEventType,
     },
-    <span class="ident">misc::LimitWrite</span>,
-    <span class="ident">BinlogCtx</span>, <span class="ident">BinlogEvent</span>,
+    misc::LimitWrite,
+    BinlogCtx, BinlogEvent,
 };
 
-<span class="kw">mod</span> <span class="ident">anonymous_gtid_event</span>;
-<span class="kw">mod</span> <span class="ident">begin_load_query_event</span>;
-<span class="kw">mod</span> <span class="ident">delete_rows_event</span>;
-<span class="kw">mod</span> <span class="ident">delete_rows_event_v1</span>;
-<span class="kw">mod</span> <span class="ident">execute_load_query_event</span>;
-<span class="kw">mod</span> <span class="ident">format_description_event</span>;
-<span class="kw">mod</span> <span class="ident">gtid_event</span>;
-<span class="kw">mod</span> <span class="ident">incident_event</span>;
-<span class="kw">mod</span> <span class="ident">intvar_event</span>;
-<span class="kw">mod</span> <span class="ident">partial_update_rows_event</span>;
-<span class="kw">mod</span> <span class="ident">query_event</span>;
-<span class="kw">mod</span> <span class="ident">rand_event</span>;
-<span class="kw">mod</span> <span class="ident">rotate_event</span>;
-<span class="kw">mod</span> <span class="ident">rows_event</span>;
-<span class="kw">mod</span> <span class="ident">rows_query_event</span>;
-<span class="kw">mod</span> <span class="ident">table_map_event</span>;
-<span class="kw">mod</span> <span class="ident">update_rows_event</span>;
-<span class="kw">mod</span> <span class="ident">update_rows_event_v1</span>;
-<span class="kw">mod</span> <span class="ident">user_var_event</span>;
-<span class="kw">mod</span> <span class="ident">write_rows_event</span>;
-<span class="kw">mod</span> <span class="ident">write_rows_event_v1</span>;
-<span class="kw">mod</span> <span class="ident">xid_event</span>;
+<span class="kw">mod </span>anonymous_gtid_event;
+<span class="kw">mod </span>begin_load_query_event;
+<span class="kw">mod </span>delete_rows_event;
+<span class="kw">mod </span>delete_rows_event_v1;
+<span class="kw">mod </span>execute_load_query_event;
+<span class="kw">mod </span>format_description_event;
+<span class="kw">mod </span>gtid_event;
+<span class="kw">mod </span>incident_event;
+<span class="kw">mod </span>intvar_event;
+<span class="kw">mod </span>partial_update_rows_event;
+<span class="kw">mod </span>query_event;
+<span class="kw">mod </span>rand_event;
+<span class="kw">mod </span>rotate_event;
+<span class="kw">mod </span>rows_event;
+<span class="kw">mod </span>rows_query_event;
+<span class="kw">mod </span>table_map_event;
+<span class="kw">mod </span>update_rows_event;
+<span class="kw">mod </span>update_rows_event_v1;
+<span class="kw">mod </span>user_var_event;
+<span class="kw">mod </span>write_rows_event;
+<span class="kw">mod </span>write_rows_event_v1;
+<span class="kw">mod </span>xid_event;
 
-<span class="doccomment">/// Raw binlog event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A binlog event starts with a Binlog Event header and is followed by a Binlog Event Type</span>
-<span class="doccomment">/// specific data part.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Event</span> {
-    <span class="doccomment">/// Format description event.</span>
-    <span class="ident">fde</span>: <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Common header of an event.</span>
-    <span class="ident">header</span>: <span class="ident">BinlogEventHeader</span>,
-    <span class="doccomment">/// An event-type specific data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Checksum-related suffix is truncated:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   checksum algorithm description (for fde) will go to `footer`;</span>
-    <span class="doccomment">/// *   checksum will go to `checksum`.</span>
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Log event footer.</span>
-    <span class="ident">footer</span>: <span class="ident">BinlogEventFooter</span>,
-    <span class="doccomment">/// Event checksum.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Makes sense only if checksum algorithm is defined in `footer`.</span>
-    <span class="ident">checksum</span>: [<span class="ident">u8</span>; <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>],
+<span class="doccomment">/// Raw binlog event.
+///
+/// A binlog event starts with a Binlog Event header and is followed by a Binlog Event Type
+/// specific data part.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Event {
+    <span class="doccomment">/// Format description event.
+    </span>fde: FormatDescriptionEvent&lt;<span class="lifetime">&#39;static</span>&gt;,
+    <span class="doccomment">/// Common header of an event.
+    </span>header: BinlogEventHeader,
+    <span class="doccomment">/// An event-type specific data.
+    ///
+    /// Checksum-related suffix is truncated:
+    ///
+    /// *   checksum algorithm description (for fde) will go to `footer`;
+    /// *   checksum will go to `checksum`.
+    </span>data: Vec&lt;u8&gt;,
+    <span class="doccomment">/// Log event footer.
+    </span>footer: BinlogEventFooter,
+    <span class="doccomment">/// Event checksum.
+    ///
+    /// Makes sense only if checksum algorithm is defined in `footer`.
+    </span>checksum: [u8; BinlogEventFooter::BINLOG_CHECKSUM_LEN],
 }
 
-<span class="kw">impl</span> <span class="ident">Event</span> {
-    <span class="doccomment">/// Reads an event from `input`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
-        <span class="ident">fde</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">binlog_header_len</span> <span class="op">=</span> <span class="ident">BinlogEventHeader::LEN</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fde</span> <span class="op">=</span> <span class="ident">fde</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>();
+<span class="kw">impl </span>Event {
+    <span class="doccomment">/// Reads an event from `input`.
+    </span><span class="kw">pub fn </span>read&lt;<span class="lifetime">&#39;a</span>, T: Read&gt;(
+        fde: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
+        <span class="kw-2">mut </span>input: T,
+    ) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>binlog_header_len = BinlogEventHeader::LEN;
+        <span class="kw">let </span><span class="kw-2">mut </span>fde = fde.clone().into_owned();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">BinlogEventHeader::LEN</span>];
-        <span class="ident">input</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">header_buf</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">BinlogEventHeader::deserialize</span>((), <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="ident">header_buf</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>header_buf = [<span class="number">0u8</span>; BinlogEventHeader::LEN];
+        input.read_exact(<span class="kw-2">&amp;mut </span>header_buf)<span class="question-mark">?</span>;
+        <span class="kw">let </span>header = BinlogEventHeader::deserialize((), <span class="kw-2">&amp;mut </span>ParseBuf(<span class="kw-2">&amp;</span>header_buf))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0_u8</span>; (<span class="ident">S</span>(<span class="ident">header</span>.<span class="ident">event_size</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> <span class="ident">S</span>(<span class="ident">binlog_header_len</span>)).<span class="number">0</span>];
-        <span class="ident">input</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[<span class="number">0_u8</span>; (S(header.event_size() <span class="kw">as </span>usize) - S(binlog_header_len)).<span class="number">0</span>];
+        input.read_exact(<span class="kw-2">&amp;mut </span>data).unwrap();
 
-        <span class="kw">let</span> <span class="ident">is_fde</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">event_type</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_to_truncate</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checksum</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>];
+        <span class="kw">let </span>is_fde = header.event_type.<span class="number">0 </span>== EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8;
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes_to_truncate = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>checksum = [<span class="number">0_u8</span>; BinlogEventFooter::BINLOG_CHECKSUM_LEN];
 
-        <span class="kw">let</span> <span class="ident">footer</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_fde</span> {
-            <span class="kw">let</span> <span class="ident">footer</span> <span class="op">=</span> <span class="ident">BinlogEventFooter::read</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">footer</span>.<span class="ident">checksum_alg</span>.<span class="ident">is_some</span>() {
-                <span class="comment">// truncate checksum algorithm description</span>
-                <span class="ident">bytes_to_truncate</span> <span class="op">+</span><span class="op">=</span> <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN</span>;
+        <span class="kw">let </span>footer = <span class="kw">if </span>is_fde {
+            <span class="kw">let </span>footer = BinlogEventFooter::read(<span class="kw-2">&amp;</span>data)<span class="question-mark">?</span>;
+            <span class="kw">if </span>footer.checksum_alg.is_some() {
+                <span class="comment">// truncate checksum algorithm description
+                </span>bytes_to_truncate += BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN;
             }
-            <span class="comment">// We&#39;ll update dummy fde footer</span>
-            <span class="ident">fde</span> <span class="op">=</span> <span class="ident">fde</span>.<span class="ident">with_footer</span>(<span class="ident">footer</span>);
-            <span class="ident">footer</span>
-        } <span class="kw">else</span> {
-            <span class="ident">fde</span>.<span class="ident">footer</span>()
+            <span class="comment">// We&#39;ll update dummy fde footer
+            </span>fde = fde.with_footer(footer);
+            footer
+        } <span class="kw">else </span>{
+            fde.footer()
         };
 
-        <span class="comment">// fde will always contain checksum (see WL#2540)</span>
-        <span class="kw">let</span> <span class="ident">contains_checksum</span> <span class="op">=</span> <span class="ident">footer</span>.<span class="ident">checksum_alg</span>.<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> (<span class="ident">is_fde</span> <span class="op">|</span><span class="op">|</span> <span class="ident">footer</span>.<span class="ident">checksum_alg</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">RawConst::new</span>(<span class="number">0</span>)));
+        <span class="comment">// fde will always contain checksum (see WL#2540)
+        </span><span class="kw">let </span>contains_checksum = footer.checksum_alg.is_some()
+            &amp;&amp; (is_fde || footer.checksum_alg != <span class="prelude-val">Some</span>(RawConst::new(<span class="number">0</span>)));
 
-        <span class="kw">if</span> <span class="ident">contains_checksum</span> {
-            <span class="comment">// truncate checksum</span>
-            <span class="ident">bytes_to_truncate</span> <span class="op">+</span><span class="op">=</span> <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>;
-            <span class="ident">checksum</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>..]);
+        <span class="kw">if </span>contains_checksum {
+            <span class="comment">// truncate checksum
+            </span>bytes_to_truncate += BinlogEventFooter::BINLOG_CHECKSUM_LEN;
+            checksum.copy_from_slice(<span class="kw-2">&amp;</span>data[data.len() - BinlogEventFooter::BINLOG_CHECKSUM_LEN..]);
         }
 
-        <span class="ident">data</span>.<span class="ident">truncate</span>(<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">bytes_to_truncate</span>);
+        data.truncate(data.len() - bytes_to_truncate);
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">fde</span>,
-            <span class="ident">header</span>,
-            <span class="ident">data</span>,
-            <span class="ident">footer</span>,
-            <span class="ident">checksum</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            fde,
+            header,
+            data,
+            footer,
+            checksum,
         })
     }
 
-    <span class="doccomment">/// Writes this event into the `output`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">version</span>: <span class="ident">BinlogVersion</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">is_fde</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">event_type</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">limit</span>(<span class="ident">S</span>(<span class="self">self</span>.<span class="ident">len</span>(<span class="ident">version</span>)));
+    <span class="doccomment">/// Writes this event into the `output`.
+    </span><span class="kw">pub fn </span>write&lt;T: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, version: BinlogVersion, <span class="kw-2">mut </span>output: T) -&gt; io::Result&lt;()&gt; {
+        <span class="kw">let </span>is_fde = <span class="self">self</span>.header.event_type.<span class="number">0 </span>== EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8;
+        <span class="kw">let </span><span class="kw-2">mut </span>output = output.limit(S(<span class="self">self</span>.len(version)));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">BinlogEventHeader::LEN</span>);
-        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">header_buf</span>);
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">header_buf</span>)<span class="question-mark">?</span>;
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>header_buf = Vec::with_capacity(BinlogEventHeader::LEN);
+        <span class="self">self</span>.header.serialize(<span class="kw-2">&amp;mut </span>header_buf);
+        output.write_all(<span class="kw-2">&amp;</span>header_buf)<span class="question-mark">?</span>;
+        output.write_all(<span class="kw-2">&amp;</span><span class="self">self</span>.data)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">alg</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">footer</span>.<span class="ident">get_checksum_alg</span>() {
-            <span class="kw">if</span> <span class="ident">is_fde</span> {
-                <span class="ident">output</span>.<span class="ident">write_u8</span>(<span class="ident">alg</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(alg)) = <span class="self">self</span>.footer.get_checksum_alg() {
+            <span class="kw">if </span>is_fde {
+                output.write_u8(alg <span class="kw">as </span>u8)<span class="question-mark">?</span>;
             }
-            <span class="kw">if</span> <span class="ident">alg</span> <span class="op">==</span> <span class="ident">BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_CRC32</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_fde</span> {
-                <span class="ident">output</span>.<span class="ident">write_u32</span>::<span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">calc_checksum</span>(<span class="ident">alg</span>))<span class="question-mark">?</span>;
+            <span class="kw">if </span>alg == BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_CRC32 || is_fde {
+                output.write_u32::&lt;LittleEndian&gt;(<span class="self">self</span>.calc_checksum(alg))<span class="question-mark">?</span>;
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns a length of a serialized represenation of this event.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">is_fde</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">event_type</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">S</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Returns a length of a serialized represenation of this event.
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="kw">let </span>is_fde = <span class="self">self</span>.header.event_type.<span class="number">0 </span>== EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8;
+        <span class="kw">let </span><span class="kw-2">mut </span>len = S(<span class="number">0</span>);
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">BinlogEventHeader::LEN</span>);
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">alg</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">footer</span>.<span class="ident">get_checksum_alg</span>() {
-            <span class="kw">if</span> <span class="ident">is_fde</span> {
-                <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN</span>);
+        len += S(BinlogEventHeader::LEN);
+        len += S(<span class="self">self</span>.data.len());
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(alg)) = <span class="self">self</span>.footer.get_checksum_alg() {
+            <span class="kw">if </span>is_fde {
+                len += S(BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN);
             }
-            <span class="kw">if</span> <span class="ident">is_fde</span> <span class="op">|</span><span class="op">|</span> <span class="ident">alg</span> <span class="op">!</span><span class="op">=</span> <span class="ident">BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_OFF</span> {
-                <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">S</span>(<span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>);
+            <span class="kw">if </span>is_fde || alg != BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_OFF {
+                len += S(BinlogEventFooter::BINLOG_CHECKSUM_LEN);
             }
         }
 
-        <span class="ident">min</span>(<span class="ident">len</span>.<span class="number">0</span>, <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)
+        min(len.<span class="number">0</span>, u32::MAX <span class="kw">as </span>usize - BinlogEventHeader::LEN)
     }
 
-    <span class="doccomment">/// Returns a reference to the corresponding format description event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fde</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fde</span>
+    <span class="doccomment">/// Returns a reference to the corresponding format description event.
+    </span><span class="kw">pub fn </span>fde(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.fde
     }
 
-    <span class="doccomment">/// Returns a reference to the event header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BinlogEventHeader</span> {
-        <span class="self">self</span>.<span class="ident">header</span>
+    <span class="doccomment">/// Returns a reference to the event header.
+    </span><span class="kw">pub fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BinlogEventHeader {
+        <span class="self">self</span>.header
     }
 
-    <span class="doccomment">/// Returns a reference to the event data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
+    <span class="doccomment">/// Returns a reference to the event data.
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Returns a reference to the event footer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BinlogEventFooter</span> {
-        <span class="self">self</span>.<span class="ident">footer</span>
+    <span class="doccomment">/// Returns a reference to the event footer.
+    </span><span class="kw">pub fn </span>footer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BinlogEventFooter {
+        <span class="self">self</span>.footer
     }
 
-    <span class="doccomment">/// Returns the checksum, if it is defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">contains_checksum</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">footer</span>.<span class="ident">checksum_alg</span>.<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">header</span>.<span class="ident">event_type</span>.<span class="number">0</span> <span class="op">==</span> (<span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">footer</span>.<span class="ident">checksum_alg</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">RawConst::new</span>(<span class="number">0</span>)));
-        <span class="ident">contains_checksum</span>.<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">checksum</span>)
+    <span class="doccomment">/// Returns the checksum, if it is defined.
+    </span><span class="kw">pub fn </span>checksum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;[u8; BinlogEventFooter::BINLOG_CHECKSUM_LEN]&gt; {
+        <span class="kw">let </span>contains_checksum = <span class="self">self</span>.footer.checksum_alg.is_some()
+            &amp;&amp; (<span class="self">self</span>.header.event_type.<span class="number">0 </span>== (EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8)
+                || <span class="self">self</span>.footer.checksum_alg != <span class="prelude-val">Some</span>(RawConst::new(<span class="number">0</span>)));
+        contains_checksum.then(|| <span class="self">self</span>.checksum)
     }
 
-    <span class="doccomment">/// Read event-type specific data as a binlog struct.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_event</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="comment">// we&#39;ll use data.len() here because of truncated event footer</span>
-        <span class="kw">let</span> <span class="ident">event_size</span> <span class="op">=</span> <span class="ident">BinlogEventHeader::LEN</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">event_data</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>);
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx::new</span>(<span class="ident">event_size</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fde</span>);
+    <span class="doccomment">/// Read event-type specific data as a binlog struct.
+    </span><span class="kw">pub fn </span>read_event&lt;<span class="lifetime">&#39;a</span>, T: BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; io::Result&lt;T&gt; {
+        <span class="comment">// we&#39;ll use data.len() here because of truncated event footer
+        </span><span class="kw">let </span>event_size = BinlogEventHeader::LEN + <span class="self">self</span>.data.len();
+        <span class="kw">let </span>event_data = <span class="kw-2">&amp;mut </span>ParseBuf(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
+        <span class="kw">let </span>ctx = BinlogCtx::new(event_size, <span class="kw-2">&amp;</span><span class="self">self</span>.fde);
 
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">event_data</span>.<span class="ident">parse</span>(<span class="ident">ctx</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>event = event_data.parse(ctx)<span class="question-mark">?</span>;
 
-        <span class="comment">// it is an error if the `event_data` isn&#39;t fully consumed</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">event_data</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::Other</span>,
+        <span class="comment">// it is an error if the `event_data` isn&#39;t fully consumed
+        </span><span class="kw">if </span>!event_data.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::Other,
                 <span class="macro">format!</span>(
                     <span class="string">&quot;bytes remaining on stream while reading {}&quot;</span>,
-                    <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
+                    type_name::&lt;T&gt;()
                 ),
             ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">event</span>)
+        <span class="prelude-val">Ok</span>(event)
     }
 
-    <span class="doccomment">/// Reads event data. Returns `None` if event type is unknown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EventData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">EventType</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Reads event data. Returns `None` if event type is unknown.
+    </span><span class="kw">pub fn </span>read_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;EventData&lt;<span class="lifetime">&#39;_</span>&gt;&gt;&gt; {
+        <span class="kw">use </span>EventType::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">event_type</span>.<span class="ident">get</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">event_type</span>) =&gt; <span class="ident">event_type</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">let </span>event_type = <span class="kw">match </span><span class="self">self</span>.header.event_type.get() {
+            <span class="prelude-val">Ok</span>(event_type) =&gt; event_type,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">event_data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event_type</span> {
-            <span class="ident">ENUM_END_EVENT</span> <span class="op">|</span> <span class="ident">UNKNOWN_EVENT</span> =&gt; <span class="ident">EventData::UnknownEvent</span>,
-            <span class="ident">START_EVENT_V3</span> =&gt; <span class="ident">EventData::StartEventV3</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">QUERY_EVENT</span> =&gt; <span class="ident">EventData::QueryEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">STOP_EVENT</span> =&gt; <span class="ident">EventData::StopEvent</span>,
-            <span class="ident">ROTATE_EVENT</span> =&gt; <span class="ident">EventData::RotateEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">INTVAR_EVENT</span> =&gt; <span class="ident">EventData::IntvarEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">LOAD_EVENT</span> =&gt; <span class="ident">EventData::LoadEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">SLAVE_EVENT</span> =&gt; <span class="ident">EventData::SlaveEvent</span>,
-            <span class="ident">CREATE_FILE_EVENT</span> =&gt; <span class="ident">EventData::CreateFileEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">APPEND_BLOCK_EVENT</span> =&gt; <span class="ident">EventData::AppendBlockEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">EXEC_LOAD_EVENT</span> =&gt; <span class="ident">EventData::ExecLoadEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">DELETE_FILE_EVENT</span> =&gt; <span class="ident">EventData::DeleteFileEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">NEW_LOAD_EVENT</span> =&gt; <span class="ident">EventData::NewLoadEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">RAND_EVENT</span> =&gt; <span class="ident">EventData::RandEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">USER_VAR_EVENT</span> =&gt; <span class="ident">EventData::UserVarEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">FORMAT_DESCRIPTION_EVENT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">fde</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">read_event</span>::<span class="op">&lt;</span><span class="ident">FormatDescriptionEvent</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-                    .<span class="ident">with_footer</span>(<span class="self">self</span>.<span class="ident">footer</span>);
-                <span class="ident">EventData::FormatDescriptionEvent</span>(<span class="ident">fde</span>)
+        <span class="kw">let </span>event_data = <span class="kw">match </span>event_type {
+            ENUM_END_EVENT | UNKNOWN_EVENT =&gt; EventData::UnknownEvent,
+            START_EVENT_V3 =&gt; EventData::StartEventV3(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            QUERY_EVENT =&gt; EventData::QueryEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            STOP_EVENT =&gt; EventData::StopEvent,
+            ROTATE_EVENT =&gt; EventData::RotateEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            INTVAR_EVENT =&gt; EventData::IntvarEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            LOAD_EVENT =&gt; EventData::LoadEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            SLAVE_EVENT =&gt; EventData::SlaveEvent,
+            CREATE_FILE_EVENT =&gt; EventData::CreateFileEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            APPEND_BLOCK_EVENT =&gt; EventData::AppendBlockEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            EXEC_LOAD_EVENT =&gt; EventData::ExecLoadEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            DELETE_FILE_EVENT =&gt; EventData::DeleteFileEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            NEW_LOAD_EVENT =&gt; EventData::NewLoadEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            RAND_EVENT =&gt; EventData::RandEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            USER_VAR_EVENT =&gt; EventData::UserVarEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            FORMAT_DESCRIPTION_EVENT =&gt; {
+                <span class="kw">let </span>fde = <span class="self">self
+                    </span>.read_event::&lt;FormatDescriptionEvent&gt;()<span class="question-mark">?
+                    </span>.with_footer(<span class="self">self</span>.footer);
+                EventData::FormatDescriptionEvent(fde)
             }
-            <span class="ident">XID_EVENT</span> =&gt; <span class="ident">EventData::XidEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">BEGIN_LOAD_QUERY_EVENT</span> =&gt; <span class="ident">EventData::BeginLoadQueryEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">EXECUTE_LOAD_QUERY_EVENT</span> =&gt; <span class="ident">EventData::ExecuteLoadQueryEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">TABLE_MAP_EVENT</span> =&gt; <span class="ident">EventData::TableMapEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">PRE_GA_WRITE_ROWS_EVENT</span> =&gt; <span class="ident">EventData::PreGaWriteRowsEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">PRE_GA_UPDATE_ROWS_EVENT</span> =&gt; <span class="ident">EventData::PreGaUpdateRowsEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">PRE_GA_DELETE_ROWS_EVENT</span> =&gt; <span class="ident">EventData::PreGaDeleteRowsEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">WRITE_ROWS_EVENT_V1</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            XID_EVENT =&gt; EventData::XidEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            BEGIN_LOAD_QUERY_EVENT =&gt; EventData::BeginLoadQueryEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            EXECUTE_LOAD_QUERY_EVENT =&gt; EventData::ExecuteLoadQueryEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            TABLE_MAP_EVENT =&gt; EventData::TableMapEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            PRE_GA_WRITE_ROWS_EVENT =&gt; EventData::PreGaWriteRowsEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            PRE_GA_UPDATE_ROWS_EVENT =&gt; EventData::PreGaUpdateRowsEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            PRE_GA_DELETE_ROWS_EVENT =&gt; EventData::PreGaDeleteRowsEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            WRITE_ROWS_EVENT_V1 =&gt; {
+                EventData::RowsEvent(RowsEventData::WriteRowsEventV1(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">UPDATE_ROWS_EVENT_V1</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            UPDATE_ROWS_EVENT_V1 =&gt; {
+                EventData::RowsEvent(RowsEventData::UpdateRowsEventV1(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">DELETE_ROWS_EVENT_V1</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            DELETE_ROWS_EVENT_V1 =&gt; {
+                EventData::RowsEvent(RowsEventData::DeleteRowsEventV1(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">INCIDENT_EVENT</span> =&gt; <span class="ident">EventData::IncidentEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">HEARTBEAT_EVENT</span> =&gt; <span class="ident">EventData::HeartbeatEvent</span>,
-            <span class="ident">IGNORABLE_EVENT</span> =&gt; <span class="ident">EventData::IgnorableEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">ROWS_QUERY_EVENT</span> =&gt; <span class="ident">EventData::RowsQueryEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">WRITE_ROWS_EVENT</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            INCIDENT_EVENT =&gt; EventData::IncidentEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            HEARTBEAT_EVENT =&gt; EventData::HeartbeatEvent,
+            IGNORABLE_EVENT =&gt; EventData::IgnorableEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            ROWS_QUERY_EVENT =&gt; EventData::RowsQueryEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            WRITE_ROWS_EVENT =&gt; {
+                EventData::RowsEvent(RowsEventData::WriteRowsEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">UPDATE_ROWS_EVENT</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            UPDATE_ROWS_EVENT =&gt; {
+                EventData::RowsEvent(RowsEventData::UpdateRowsEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">DELETE_ROWS_EVENT</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            DELETE_ROWS_EVENT =&gt; {
+                EventData::RowsEvent(RowsEventData::DeleteRowsEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
-            <span class="ident">GTID_EVENT</span> =&gt; <span class="ident">EventData::GtidEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">ANONYMOUS_GTID_EVENT</span> =&gt; <span class="ident">EventData::AnonymousGtidEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>),
-            <span class="ident">PREVIOUS_GTIDS_EVENT</span> =&gt; <span class="ident">EventData::PreviousGtidsEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">TRANSACTION_CONTEXT_EVENT</span> =&gt; {
-                <span class="ident">EventData::TransactionContextEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>))
+            GTID_EVENT =&gt; EventData::GtidEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            ANONYMOUS_GTID_EVENT =&gt; EventData::AnonymousGtidEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>),
+            PREVIOUS_GTIDS_EVENT =&gt; EventData::PreviousGtidsEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            TRANSACTION_CONTEXT_EVENT =&gt; {
+                EventData::TransactionContextEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data))
             }
-            <span class="ident">VIEW_CHANGE_EVENT</span> =&gt; <span class="ident">EventData::ViewChangeEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">XA_PREPARE_LOG_EVENT</span> =&gt; <span class="ident">EventData::XaPrepareLogEvent</span>(<span class="ident">Cow::Borrowed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>)),
-            <span class="ident">PARTIAL_UPDATE_ROWS_EVENT</span> =&gt; {
-                <span class="ident">EventData::RowsEvent</span>(<span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="self">self</span>.<span class="ident">read_event</span>()<span class="question-mark">?</span>))
+            VIEW_CHANGE_EVENT =&gt; EventData::ViewChangeEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            XA_PREPARE_LOG_EVENT =&gt; EventData::XaPrepareLogEvent(Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.data)),
+            PARTIAL_UPDATE_ROWS_EVENT =&gt; {
+                EventData::RowsEvent(RowsEventData::PartialUpdateRowsEvent(<span class="self">self</span>.read_event()<span class="question-mark">?</span>))
             }
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">event_data</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(event_data))
     }
 
-    <span class="doccomment">/// Calculates checksum for this event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">calc_checksum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">alg</span>: <span class="ident">BinlogChecksumAlg</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">let</span> <span class="ident">is_fde</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">event_type</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="doccomment">/// Calculates checksum for this event.
+    </span><span class="kw">pub fn </span>calc_checksum(<span class="kw-2">&amp;</span><span class="self">self</span>, alg: BinlogChecksumAlg) -&gt; u32 {
+        <span class="kw">let </span>is_fde = <span class="self">self</span>.header.event_type.<span class="number">0 </span>== EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">crc32fast::Hasher::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">BinlogEventHeader::LEN</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_struct</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>;
-        <span class="kw">if</span> <span class="ident">header_struct</span>
-            .<span class="ident">flags</span>
-            .<span class="ident">get</span>()
-            .<span class="ident">contains</span>(<span class="ident">EventFlags::LOG_EVENT_BINLOG_IN_USE_F</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = crc32fast::Hasher::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>header = Vec::with_capacity(BinlogEventHeader::LEN);
+        <span class="kw">let </span><span class="kw-2">mut </span>header_struct = <span class="self">self</span>.header;
+        <span class="kw">if </span>header_struct
+            .flags
+            .get()
+            .contains(EventFlags::LOG_EVENT_BINLOG_IN_USE_F)
         {
-            <span class="comment">// In case this is a Format_description_log_event, we need to clear</span>
-            <span class="comment">// the LOG_EVENT_BINLOG_IN_USE_F flag before computing the checksum,</span>
-            <span class="comment">// since the flag will be cleared when the binlog is closed.</span>
-            <span class="comment">// On verification, the flag is also dropped before computing the checksum.</span>
-            <span class="ident">header_struct</span>.<span class="ident">flags</span>.<span class="number">0</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="ident">EventFlags::LOG_EVENT_BINLOG_IN_USE_F</span>.<span class="ident">bits</span>());
+            <span class="comment">// In case this is a Format_description_log_event, we need to clear
+            // the LOG_EVENT_BINLOG_IN_USE_F flag before computing the checksum,
+            // since the flag will be cleared when the binlog is closed.
+            // On verification, the flag is also dropped before computing the checksum.
+            </span>header_struct.flags.<span class="number">0 </span>&amp;= !(EventFlags::LOG_EVENT_BINLOG_IN_USE_F.bits());
         }
-        <span class="ident">header_struct</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">header</span>);
-        <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>);
-        <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>);
-        <span class="kw">if</span> <span class="ident">is_fde</span> {
-            <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span>[<span class="ident">alg</span> <span class="kw">as</span> <span class="ident">u8</span>][..]);
+        header_struct.serialize(<span class="kw-2">&amp;mut </span>header);
+        hasher.update(<span class="kw-2">&amp;</span>header);
+        hasher.update(<span class="kw-2">&amp;</span><span class="self">self</span>.data);
+        <span class="kw">if </span>is_fde {
+            hasher.update(<span class="kw-2">&amp;</span>[alg <span class="kw">as </span>u8][..]);
         }
-        <span class="ident">hasher</span>.<span class="ident">finalize</span>()
+        hasher.finalize()
     }
 }
 
-<span class="doccomment">/// The binlog event header starts each event and is 19 bytes long assuming binlog version &gt;= 4.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogEventHeader</span> {
-    <span class="doccomment">/// Seconds since unix epoch.</span>
-    <span class="ident">timestamp</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Raw event Type.</span>
-    <span class="ident">event_type</span>: <span class="ident">RawConst</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">EventType</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Server-id of the originating mysql-server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Used to filter out events in circular replication.</span>
-    <span class="ident">server_id</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Size of the event (header, post-header, body).</span>
-    <span class="ident">event_size</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Position of the next event.</span>
-    <span class="ident">log_pos</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Binlog Event Flag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field contains the raw value. Use [`Self::flags()`] to get the actual flags.</span>
-    <span class="ident">flags</span>: <span class="ident">RawFlags</span><span class="op">&lt;</span><span class="ident">EventFlags</span>, <span class="ident">LeU16</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The binlog event header starts each event and is 19 bytes long assuming binlog version &gt;= 4.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>BinlogEventHeader {
+    <span class="doccomment">/// Seconds since unix epoch.
+    </span>timestamp: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Raw event Type.
+    </span>event_type: RawConst&lt;u8, EventType&gt;,
+    <span class="doccomment">/// Server-id of the originating mysql-server.
+    ///
+    /// Used to filter out events in circular replication.
+    </span>server_id: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Size of the event (header, post-header, body).
+    </span>event_size: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Position of the next event.
+    </span>log_pos: RawInt&lt;LeU32&gt;,
+    <span class="doccomment">/// Binlog Event Flag.
+    ///
+    /// This field contains the raw value. Use [`Self::flags()`] to get the actual flags.
+    </span>flags: RawFlags&lt;EventFlags, LeU16&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">BinlogEventHeader</span> {
-    <span class="doccomment">/// Binlog event header length for version &gt;= 4.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">19</span>;
+<span class="kw">impl </span>BinlogEventHeader {
+    <span class="doccomment">/// Binlog event header length for version &gt;= 4.
+    </span><span class="kw">pub const </span>LEN: usize = <span class="number">19</span>;
 
-    <span class="doccomment">/// Creates a new `BinlogEventHeader`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">timestamp</span>: <span class="ident">u32</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
-        <span class="ident">server_id</span>: <span class="ident">u32</span>,
-        <span class="ident">event_size</span>: <span class="ident">u32</span>,
-        <span class="ident">log_pos</span>: <span class="ident">u32</span>,
-        <span class="ident">flags</span>: <span class="ident">EventFlags</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">timestamp</span>: <span class="ident">RawInt::new</span>(<span class="ident">timestamp</span>),
-            <span class="ident">event_type</span>: <span class="ident">RawConst::new</span>(<span class="ident">event_type</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="ident">server_id</span>: <span class="ident">RawInt::new</span>(<span class="ident">server_id</span>),
-            <span class="ident">event_size</span>: <span class="ident">RawInt::new</span>(<span class="ident">event_size</span>),
-            <span class="ident">log_pos</span>: <span class="ident">RawInt::new</span>(<span class="ident">log_pos</span>),
-            <span class="ident">flags</span>: <span class="ident">RawFlags::new</span>(<span class="ident">flags</span>.<span class="ident">bits</span>()),
+    <span class="doccomment">/// Creates a new `BinlogEventHeader`.
+    </span><span class="kw">pub fn </span>new(
+        timestamp: u32,
+        event_type: EventType,
+        server_id: u32,
+        event_size: u32,
+        log_pos: u32,
+        flags: EventFlags,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            timestamp: RawInt::new(timestamp),
+            event_type: RawConst::new(event_type <span class="kw">as </span>u8),
+            server_id: RawInt::new(server_id),
+            event_size: RawInt::new(event_size),
+            log_pos: RawInt::new(log_pos),
+            flags: RawFlags::new(flags.bits()),
         }
     }
 
-    <span class="doccomment">/// Returns the `timestamp` value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `timestamp` is in seconds since unix epoch.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the `timestamp` value.
+    ///
+    /// `timestamp` is in seconds since unix epoch.
+    </span><span class="kw">pub fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.timestamp.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the raw event type.
+    </span><span class="kw">pub fn </span>event_type_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.event_type.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the event type, if it&#39;s valid.
+    </span><span class="kw">pub fn </span>event_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;EventType, UnknownEventType&gt; {
+        <span class="self">self</span>.event_type.get()
     }
 
-    <span class="doccomment">/// Returns the raw event type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">event_type</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the server Id of the originating mysql-server.
+    ///
+    /// Used to filter out events in circular replication.
+    </span><span class="kw">pub fn </span>server_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.server_id.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the event type, if it&#39;s valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EventType</span>, <span class="ident">UnknownEventType</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">event_type</span>.<span class="ident">get</span>()
-    }
+    <span class="doccomment">/// Returns the size of the event (header, post-header, body).
+    </span><span class="kw">pub fn </span>event_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.event_size.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the server Id of the originating mysql-server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Used to filter out events in circular replication.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">server_id</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the position of the next event.
+    </span><span class="kw">pub fn </span>log_pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.log_pos.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the size of the event (header, post-header, body).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">event_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">event_size</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the raw event flags.
+    </span><span class="kw">pub fn </span>flags_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.flags.<span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the position of the next event.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">log_pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">log_pos</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the raw event flags.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="number">0</span>
-    }
-
-    <span class="doccomment">/// Returns the parsed event flags. Unkonwn bits will be truncated.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EventFlags</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">get</span>()
+    <span class="doccomment">/// Returns the parsed event flags. Unkonwn bits will be truncated.
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EventFlags {
+        <span class="self">self</span>.flags.get()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinlogEventHeader</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::LEN</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>BinlogEventHeader {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(<span class="self">Self</span>::LEN);
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(<span class="ident"><span class="self">Self</span>::LEN</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">timestamp</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
-            <span class="ident">event_type</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
-            <span class="ident">server_id</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
-            <span class="ident">event_size</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
-            <span class="ident">log_pos</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
-            <span class="ident">flags</span>: <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>,
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf: ParseBuf = buf.parse_unchecked(<span class="self">Self</span>::LEN)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            timestamp: buf.parse_unchecked(())<span class="question-mark">?</span>,
+            event_type: buf.parse_unchecked(())<span class="question-mark">?</span>,
+            server_id: buf.parse_unchecked(())<span class="question-mark">?</span>,
+            event_size: buf.parse_unchecked(())<span class="question-mark">?</span>,
+            log_pos: buf.parse_unchecked(())<span class="question-mark">?</span>,
+            flags: buf.parse_unchecked(())<span class="question-mark">?</span>,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">BinlogEventHeader</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">event_type</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">server_id</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">event_size</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">log_pos</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
-        <span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">buf</span>);
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>BinlogEventHeader {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.timestamp.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.event_type.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.server_id.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.event_size.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.log_pos.serialize(<span class="kw-2">&amp;mut *</span>buf);
+        <span class="self">self</span>.flags.serialize(<span class="kw-2">&amp;mut *</span>buf);
     }
 }
 
-<span class="doccomment">/// Binlog event footer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogEventFooter</span> {
-    <span class="doccomment">/// Raw checksum algorithm description.</span>
-    <span class="ident">checksum_alg</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawConst</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">BinlogChecksumAlg</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Binlog event footer.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>BinlogEventFooter {
+    <span class="doccomment">/// Raw checksum algorithm description.
+    </span>checksum_alg: <span class="prelude-ty">Option</span>&lt;RawConst&lt;u8, BinlogChecksumAlg&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">BinlogEventFooter</span> {
-    <span class="doccomment">/// Length of the checksum algorithm description.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BINLOG_CHECKSUM_ALG_DESC_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="doccomment">/// Length of the checksum.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BINLOG_CHECKSUM_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="doccomment">/// Minimum MySql version that supports checksums.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHECKSUM_VERSION_PRODUCT</span>: (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>) <span class="op">=</span> (<span class="number">5</span>, <span class="number">6</span>, <span class="number">1</span>);
+<span class="kw">impl </span>BinlogEventFooter {
+    <span class="doccomment">/// Length of the checksum algorithm description.
+    </span><span class="kw">pub const </span>BINLOG_CHECKSUM_ALG_DESC_LEN: usize = <span class="number">1</span>;
+    <span class="doccomment">/// Length of the checksum.
+    </span><span class="kw">pub const </span>BINLOG_CHECKSUM_LEN: usize = <span class="number">4</span>;
+    <span class="doccomment">/// Minimum MySql version that supports checksums.
+    </span><span class="kw">pub const </span>CHECKSUM_VERSION_PRODUCT: (u8, u8, u8) = (<span class="number">5</span>, <span class="number">6</span>, <span class="number">1</span>);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">checksum_alg</span>: <span class="ident">BinlogChecksumAlg</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">checksum_alg</span>: <span class="prelude-val">Some</span>(<span class="ident">RawConst::new</span>(<span class="ident">checksum_alg</span> <span class="kw">as</span> <span class="ident">u8</span>)),
+    <span class="kw">pub fn </span>new(checksum_alg: BinlogChecksumAlg) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            checksum_alg: <span class="prelude-val">Some</span>(RawConst::new(checksum_alg <span class="kw">as </span>u8)),
         }
     }
 
-    <span class="doccomment">/// Returns parsed checksum algorithm, or raw value if algorithm is unknown.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_checksum_alg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinlogChecksumAlg</span><span class="op">&gt;</span>, <span class="ident">UnknownChecksumAlg</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">checksum_alg</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">RawConst::get</span>).<span class="ident">transpose</span>()
+    <span class="doccomment">/// Returns parsed checksum algorithm, or raw value if algorithm is unknown.
+    </span><span class="kw">pub fn </span>get_checksum_alg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;BinlogChecksumAlg&gt;, UnknownChecksumAlg&gt; {
+        <span class="self">self</span>.checksum_alg.as_ref().map(RawConst::get).transpose()
     }
 
-    <span class="doccomment">/// Reads binlog event footer from the given buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires that buf contains `FormatDescriptionEvent` data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">checksum_alg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>()
-            <span class="op">&gt;</span><span class="op">=</span> <span class="ident">FormatDescriptionEvent::SERVER_VER_OFFSET</span> <span class="op">+</span> <span class="ident">FormatDescriptionEvent::SERVER_VER_LEN</span>
+    <span class="doccomment">/// Reads binlog event footer from the given buffer.
+    ///
+    /// Requires that buf contains `FormatDescriptionEvent` data.
+    </span><span class="kw">pub fn </span>read(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>checksum_alg = <span class="kw">if </span>buf.len()
+            &gt;= FormatDescriptionEvent::SERVER_VER_OFFSET + FormatDescriptionEvent::SERVER_VER_LEN
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server_version</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">FormatDescriptionEvent::SERVER_VER_LEN</span>];
-            (<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="ident">FormatDescriptionEvent::SERVER_VER_OFFSET</span>..]).<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">server_version</span>)<span class="question-mark">?</span>;
-            <span class="ident">server_version</span>[<span class="ident">FormatDescriptionEvent::SERVER_VER_LEN</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::misc::split_version</span>(<span class="kw-2">&amp;</span><span class="ident">server_version</span>);
-            <span class="kw">if</span> <span class="ident">version</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CHECKSUM_VERSION_PRODUCT</span> {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>()
-                    <span class="op">-</span> (<span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN</span>
-                        <span class="op">+</span> <span class="ident">BinlogEventFooter::BINLOG_CHECKSUM_LEN</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">buf</span>[<span class="ident">offset</span>])
+            <span class="kw">let </span><span class="kw-2">mut </span>server_version = <span class="macro">vec!</span>[<span class="number">0_u8</span>; FormatDescriptionEvent::SERVER_VER_LEN];
+            (<span class="kw-2">&amp;</span>buf[FormatDescriptionEvent::SERVER_VER_OFFSET..]).read_exact(<span class="kw-2">&amp;mut </span>server_version)<span class="question-mark">?</span>;
+            server_version[FormatDescriptionEvent::SERVER_VER_LEN - <span class="number">1</span>] = <span class="number">0</span>;
+            <span class="kw">let </span>version = <span class="kw">crate</span>::misc::split_version(<span class="kw-2">&amp;</span>server_version);
+            <span class="kw">if </span>version &lt; <span class="self">Self</span>::CHECKSUM_VERSION_PRODUCT {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                <span class="kw">let </span>offset = buf.len()
+                    - (BinlogEventFooter::BINLOG_CHECKSUM_ALG_DESC_LEN
+                        + BinlogEventFooter::BINLOG_CHECKSUM_LEN);
+                <span class="prelude-val">Some</span>(buf[offset])
             }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">checksum_alg</span>: <span class="ident">checksum_alg</span>.<span class="ident">map</span>(<span class="ident">RawConst::new</span>),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            checksum_alg: checksum_alg.map(RawConst::new),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BinlogEventFooter</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">BinlogEventFooter</span> {
-            <span class="ident">checksum_alg</span>: <span class="prelude-val">Some</span>(<span class="ident">RawConst::new</span>(
-                <span class="ident">BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_OFF</span> <span class="kw">as</span> <span class="ident">u8</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>BinlogEventFooter {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        BinlogEventFooter {
+            checksum_alg: <span class="prelude-val">Some</span>(RawConst::new(
+                BinlogChecksumAlg::BINLOG_CHECKSUM_ALG_OFF <span class="kw">as </span>u8,
             )),
         }
     }
 }
 
-<span class="doccomment">/// Parsed event data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">UnknownEvent</span>,
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">StartEventV3</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">QueryEvent</span>(<span class="ident">QueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">StopEvent</span>,
-    <span class="ident">RotateEvent</span>(<span class="ident">RotateEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">IntvarEvent</span>(<span class="ident">IntvarEvent</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">LoadEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">SlaveEvent</span>,
-    <span class="ident">CreateFileEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">AppendBlockEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">ExecLoadEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">DeleteFileEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">NewLoadEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">RandEvent</span>(<span class="ident">RandEvent</span>),
-    <span class="ident">UserVarEvent</span>(<span class="ident">UserVarEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">FormatDescriptionEvent</span>(<span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">XidEvent</span>(<span class="ident">XidEvent</span>),
-    <span class="ident">BeginLoadQueryEvent</span>(<span class="ident">BeginLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">ExecuteLoadQueryEvent</span>(<span class="ident">ExecuteLoadQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">TableMapEvent</span>(<span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">PreGaWriteRowsEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">PreGaUpdateRowsEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Ignored by this implementation</span>
-    <span class="ident">PreGaDeleteRowsEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">IncidentEvent</span>(<span class="ident">IncidentEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">HeartbeatEvent</span>,
-    <span class="ident">IgnorableEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">RowsQueryEvent</span>(<span class="ident">RowsQueryEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">GtidEvent</span>(<span class="ident">GtidEvent</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">AnonymousGtidEvent</span>(<span class="ident">AnonymousGtidEvent</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">PreviousGtidsEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">TransactionContextEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">ViewChangeEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="doccomment">/// Not yet implemented.</span>
-    <span class="ident">XaPrepareLogEvent</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>),
-    <span class="ident">RowsEvent</span>(<span class="ident">RowsEventData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Parsed event data.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>EventData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    UnknownEvent,
+    <span class="doccomment">/// Ignored by this implementation
+    </span>StartEventV3(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    QueryEvent(QueryEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    StopEvent,
+    RotateEvent(RotateEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    IntvarEvent(IntvarEvent),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>LoadEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    SlaveEvent,
+    CreateFileEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>AppendBlockEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>ExecLoadEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>DeleteFileEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>NewLoadEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    RandEvent(RandEvent),
+    UserVarEvent(UserVarEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    FormatDescriptionEvent(FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    XidEvent(XidEvent),
+    BeginLoadQueryEvent(BeginLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    ExecuteLoadQueryEvent(ExecuteLoadQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    TableMapEvent(TableMapEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>PreGaWriteRowsEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>PreGaUpdateRowsEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Ignored by this implementation
+    </span>PreGaDeleteRowsEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    IncidentEvent(IncidentEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    HeartbeatEvent,
+    IgnorableEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    RowsQueryEvent(RowsQueryEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="doccomment">/// Not yet implemented.
+    </span>GtidEvent(GtidEvent),
+    <span class="doccomment">/// Not yet implemented.
+    </span>AnonymousGtidEvent(AnonymousGtidEvent),
+    <span class="doccomment">/// Not yet implemented.
+    </span>PreviousGtidsEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Not yet implemented.
+    </span>TransactionContextEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Not yet implemented.
+    </span>ViewChangeEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    <span class="doccomment">/// Not yet implemented.
+    </span>XaPrepareLogEvent(Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;),
+    RowsEvent(RowsEventData&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EventData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">EventData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">EventData::UnknownEvent</span> =&gt; <span class="ident">EventData::UnknownEvent</span>,
-            <span class="ident">EventData::StartEventV3</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::StartEventV3</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::QueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::QueryEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::StopEvent</span> =&gt; <span class="ident">EventData::StopEvent</span>,
-            <span class="ident"><span class="self">Self</span>::RotateEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::RotateEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::IntvarEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::IntvarEvent</span>(<span class="ident">ev</span>),
-            <span class="ident"><span class="self">Self</span>::LoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::LoadEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::SlaveEvent</span> =&gt; <span class="ident">EventData::SlaveEvent</span>,
-            <span class="ident"><span class="self">Self</span>::CreateFileEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::CreateFileEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::AppendBlockEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::AppendBlockEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::ExecLoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::ExecLoadEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::DeleteFileEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::DeleteFileEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::NewLoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::NewLoadEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::RandEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::RandEvent</span>(<span class="ident">ev</span>),
-            <span class="ident"><span class="self">Self</span>::UserVarEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::UserVarEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::FormatDescriptionEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::FormatDescriptionEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::XidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::XidEvent</span>(<span class="ident">ev</span>),
-            <span class="ident"><span class="self">Self</span>::BeginLoadQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::BeginLoadQueryEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::ExecuteLoadQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::ExecuteLoadQueryEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::TableMapEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::TableMapEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::PreGaWriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::PreGaWriteRowsEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EventData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; EventData&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            EventData::UnknownEvent =&gt; EventData::UnknownEvent,
+            EventData::StartEventV3(ev) =&gt; EventData::StartEventV3(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::QueryEvent(ev) =&gt; EventData::QueryEvent(ev.into_owned()),
+            <span class="self">Self</span>::StopEvent =&gt; EventData::StopEvent,
+            <span class="self">Self</span>::RotateEvent(ev) =&gt; EventData::RotateEvent(ev.into_owned()),
+            <span class="self">Self</span>::IntvarEvent(ev) =&gt; EventData::IntvarEvent(ev),
+            <span class="self">Self</span>::LoadEvent(ev) =&gt; EventData::LoadEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::SlaveEvent =&gt; EventData::SlaveEvent,
+            <span class="self">Self</span>::CreateFileEvent(ev) =&gt; EventData::CreateFileEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::AppendBlockEvent(ev) =&gt; EventData::AppendBlockEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::ExecLoadEvent(ev) =&gt; EventData::ExecLoadEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::DeleteFileEvent(ev) =&gt; EventData::DeleteFileEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::NewLoadEvent(ev) =&gt; EventData::NewLoadEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::RandEvent(ev) =&gt; EventData::RandEvent(ev),
+            <span class="self">Self</span>::UserVarEvent(ev) =&gt; EventData::UserVarEvent(ev.into_owned()),
+            <span class="self">Self</span>::FormatDescriptionEvent(ev) =&gt; EventData::FormatDescriptionEvent(ev.into_owned()),
+            <span class="self">Self</span>::XidEvent(ev) =&gt; EventData::XidEvent(ev),
+            <span class="self">Self</span>::BeginLoadQueryEvent(ev) =&gt; EventData::BeginLoadQueryEvent(ev.into_owned()),
+            <span class="self">Self</span>::ExecuteLoadQueryEvent(ev) =&gt; EventData::ExecuteLoadQueryEvent(ev.into_owned()),
+            <span class="self">Self</span>::TableMapEvent(ev) =&gt; EventData::TableMapEvent(ev.into_owned()),
+            <span class="self">Self</span>::PreGaWriteRowsEvent(ev) =&gt; {
+                EventData::PreGaWriteRowsEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::PreGaUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::PreGaUpdateRowsEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+            <span class="self">Self</span>::PreGaUpdateRowsEvent(ev) =&gt; {
+                EventData::PreGaUpdateRowsEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::PreGaDeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::PreGaDeleteRowsEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+            <span class="self">Self</span>::PreGaDeleteRowsEvent(ev) =&gt; {
+                EventData::PreGaDeleteRowsEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::IncidentEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::IncidentEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::HeartbeatEvent</span> =&gt; <span class="ident">EventData::HeartbeatEvent</span>,
-            <span class="ident"><span class="self">Self</span>::IgnorableEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::IgnorableEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::RowsQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::RowsQueryEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::GtidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::GtidEvent</span>(<span class="ident">ev</span>),
-            <span class="ident"><span class="self">Self</span>::AnonymousGtidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::AnonymousGtidEvent</span>(<span class="ident">ev</span>),
-            <span class="ident"><span class="self">Self</span>::PreviousGtidsEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::PreviousGtidsEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+            <span class="self">Self</span>::IncidentEvent(ev) =&gt; EventData::IncidentEvent(ev.into_owned()),
+            <span class="self">Self</span>::HeartbeatEvent =&gt; EventData::HeartbeatEvent,
+            <span class="self">Self</span>::IgnorableEvent(ev) =&gt; EventData::IgnorableEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::RowsQueryEvent(ev) =&gt; EventData::RowsQueryEvent(ev.into_owned()),
+            <span class="self">Self</span>::GtidEvent(ev) =&gt; EventData::GtidEvent(ev),
+            <span class="self">Self</span>::AnonymousGtidEvent(ev) =&gt; EventData::AnonymousGtidEvent(ev),
+            <span class="self">Self</span>::PreviousGtidsEvent(ev) =&gt; {
+                EventData::PreviousGtidsEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::TransactionContextEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::TransactionContextEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+            <span class="self">Self</span>::TransactionContextEvent(ev) =&gt; {
+                EventData::TransactionContextEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::ViewChangeEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::ViewChangeEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())),
-            <span class="ident"><span class="self">Self</span>::XaPrepareLogEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">EventData::XaPrepareLogEvent</span>(<span class="ident">Cow::Owned</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()))
+            <span class="self">Self</span>::ViewChangeEvent(ev) =&gt; EventData::ViewChangeEvent(Cow::Owned(ev.into_owned())),
+            <span class="self">Self</span>::XaPrepareLogEvent(ev) =&gt; {
+                EventData::XaPrepareLogEvent(Cow::Owned(ev.into_owned()))
             }
-            <span class="ident"><span class="self">Self</span>::RowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">EventData::RowsEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">EventData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">EventData::UnknownEvent</span> =&gt; (),
-            <span class="ident">EventData::StartEventV3</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::QueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::StopEvent</span> =&gt; (),
-            <span class="ident">EventData::RotateEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::IntvarEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::LoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::SlaveEvent</span> =&gt; (),
-            <span class="ident">EventData::CreateFileEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::AppendBlockEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::ExecLoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::DeleteFileEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::NewLoadEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::RandEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::UserVarEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::FormatDescriptionEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::XidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::BeginLoadQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::ExecuteLoadQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::TableMapEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::PreGaWriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::PreGaUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::PreGaDeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::IncidentEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::HeartbeatEvent</span> =&gt; (),
-            <span class="ident">EventData::IgnorableEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::RowsQueryEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::GtidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::AnonymousGtidEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">EventData::PreviousGtidsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::TransactionContextEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::ViewChangeEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::XaPrepareLogEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ev</span>),
-            <span class="ident">EventData::RowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
+            <span class="self">Self</span>::RowsEvent(ev) =&gt; EventData::RowsEvent(ev.into_owned()),
         }
     }
 }
 
-<span class="doccomment">/// Rows events are unified under this enum (see [`EventData`]).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RowsEventData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">WriteRowsEventV1</span>(<span class="ident">WriteRowsEventV1</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">UpdateRowsEventV1</span>(<span class="ident">UpdateRowsEventV1</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">DeleteRowsEventV1</span>(<span class="ident">DeleteRowsEventV1</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">WriteRowsEvent</span>(<span class="ident">WriteRowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">UpdateRowsEvent</span>(<span class="ident">UpdateRowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">DeleteRowsEvent</span>(<span class="ident">DeleteRowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">PartialUpdateRowsEvent</span>(<span class="ident">PartialUpdateRowsEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>EventData&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            EventData::UnknownEvent =&gt; (),
+            EventData::StartEventV3(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::QueryEvent(ev) =&gt; ev.serialize(buf),
+            EventData::StopEvent =&gt; (),
+            EventData::RotateEvent(ev) =&gt; ev.serialize(buf),
+            EventData::IntvarEvent(ev) =&gt; ev.serialize(buf),
+            EventData::LoadEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::SlaveEvent =&gt; (),
+            EventData::CreateFileEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::AppendBlockEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::ExecLoadEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::DeleteFileEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::NewLoadEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::RandEvent(ev) =&gt; ev.serialize(buf),
+            EventData::UserVarEvent(ev) =&gt; ev.serialize(buf),
+            EventData::FormatDescriptionEvent(ev) =&gt; ev.serialize(buf),
+            EventData::XidEvent(ev) =&gt; ev.serialize(buf),
+            EventData::BeginLoadQueryEvent(ev) =&gt; ev.serialize(buf),
+            EventData::ExecuteLoadQueryEvent(ev) =&gt; ev.serialize(buf),
+            EventData::TableMapEvent(ev) =&gt; ev.serialize(buf),
+            EventData::PreGaWriteRowsEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::PreGaUpdateRowsEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::PreGaDeleteRowsEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::IncidentEvent(ev) =&gt; ev.serialize(buf),
+            EventData::HeartbeatEvent =&gt; (),
+            EventData::IgnorableEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::RowsQueryEvent(ev) =&gt; ev.serialize(buf),
+            EventData::GtidEvent(ev) =&gt; ev.serialize(buf),
+            EventData::AnonymousGtidEvent(ev) =&gt; ev.serialize(buf),
+            EventData::PreviousGtidsEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::TransactionContextEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::ViewChangeEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::XaPrepareLogEvent(ev) =&gt; buf.put_slice(<span class="kw-2">&amp;*</span>ev),
+            EventData::RowsEvent(ev) =&gt; ev.serialize(buf),
+        }
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RowsEventData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the number that identifies the table (see `TableMapEvent`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">table_id</span>(),
+<span class="doccomment">/// Rows events are unified under this enum (see [`EventData`]).
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>RowsEventData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    WriteRowsEventV1(WriteRowsEventV1&lt;<span class="lifetime">&#39;a</span>&gt;),
+    UpdateRowsEventV1(UpdateRowsEventV1&lt;<span class="lifetime">&#39;a</span>&gt;),
+    DeleteRowsEventV1(DeleteRowsEventV1&lt;<span class="lifetime">&#39;a</span>&gt;),
+    WriteRowsEvent(WriteRowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    UpdateRowsEvent(UpdateRowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    DeleteRowsEvent(DeleteRowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+    PartialUpdateRowsEvent(PartialUpdateRowsEvent&lt;<span class="lifetime">&#39;a</span>&gt;),
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RowsEventData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns the number that identifies the table (see `TableMapEvent`).
+    </span><span class="kw">pub fn </span>table_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; ev.table_id(),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; ev.table_id(),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; ev.table_id(),
+            RowsEventData::WriteRowsEvent(ev) =&gt; ev.table_id(),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; ev.table_id(),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; ev.table_id(),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; ev.table_id(),
         }
     }
 
-    <span class="doccomment">/// Returns the number of columns in the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_columns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">num_columns</span>(),
+    <span class="doccomment">/// Returns the number of columns in the table.
+    </span><span class="kw">pub fn </span>num_columns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; ev.num_columns(),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; ev.num_columns(),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; ev.num_columns(),
+            RowsEventData::WriteRowsEvent(ev) =&gt; ev.num_columns(),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; ev.num_columns(),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; ev.num_columns(),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; ev.num_columns(),
         }
     }
 
-    <span class="doccomment">/// Returns columns in the before-image (only for DELETE and UPDATE).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each bit indicates whether corresponding column is used in the image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_before_image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_before_image</span>()),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_before_image</span>()),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_before_image</span>()),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_before_image</span>()),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_before_image</span>()),
+    <span class="doccomment">/// Returns columns in the before-image (only for DELETE and UPDATE).
+    ///
+    /// Each bit indicates whether corresponding column is used in the image.
+    </span><span class="kw">pub fn </span>columns_before_image(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BitSlice&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_before_image()),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_before_image()),
+            RowsEventData::WriteRowsEvent(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            RowsEventData::UpdateRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_before_image()),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_before_image()),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_before_image()),
         }
     }
 
-    <span class="doccomment">/// Returns columns in the after-image (only for WRITE and UPDATE).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each bit indicates whether corresponding column is used in the image.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns_after_image</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_after_image</span>()),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_after_image</span>()),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_after_image</span>()),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_after_image</span>()),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ev</span>.<span class="ident">columns_after_image</span>()),
+    <span class="doccomment">/// Returns columns in the after-image (only for WRITE and UPDATE).
+    ///
+    /// Each bit indicates whether corresponding column is used in the image.
+    </span><span class="kw">pub fn </span>columns_after_image(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BitSlice&lt;u8&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_after_image()),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_after_image()),
+            RowsEventData::DeleteRowsEventV1(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            RowsEventData::WriteRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_after_image()),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_after_image()),
+            RowsEventData::DeleteRowsEvent(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; <span class="prelude-val">Some</span>(ev.columns_after_image()),
         }
     }
 
-    <span class="doccomment">/// Returns raw rows data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows_data</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows_data</span>(),
+    <span class="doccomment">/// Returns raw rows data.
+    </span><span class="kw">pub fn </span>rows_data(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; ev.rows_data(),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; ev.rows_data(),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; ev.rows_data(),
+            RowsEventData::WriteRowsEvent(ev) =&gt; ev.rows_data(),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; ev.rows_data(),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; ev.rows_data(),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; ev.rows_data(),
         }
     }
 
-    <span class="doccomment">/// Returns an iterator over event&#39;s rows given the corresponding `TableMapEvent`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rows</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_map_event</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowsEventRows</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>),
+    <span class="doccomment">/// Returns an iterator over event&#39;s rows given the corresponding `TableMapEvent`.
+    </span><span class="kw">pub fn </span>rows(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, table_map_event: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TableMapEvent&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RowsEventRows&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::WriteRowsEvent(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; ev.rows(table_map_event),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; ev.rows(table_map_event),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">RowsEventData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>()),
-            <span class="ident"><span class="self">Self</span>::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; {
-                <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>.<span class="ident">into_owned</span>())
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; RowsEventData&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::WriteRowsEventV1(ev) =&gt; RowsEventData::WriteRowsEventV1(ev.into_owned()),
+            <span class="self">Self</span>::UpdateRowsEventV1(ev) =&gt; RowsEventData::UpdateRowsEventV1(ev.into_owned()),
+            <span class="self">Self</span>::DeleteRowsEventV1(ev) =&gt; RowsEventData::DeleteRowsEventV1(ev.into_owned()),
+            <span class="self">Self</span>::WriteRowsEvent(ev) =&gt; RowsEventData::WriteRowsEvent(ev.into_owned()),
+            <span class="self">Self</span>::UpdateRowsEvent(ev) =&gt; RowsEventData::UpdateRowsEvent(ev.into_owned()),
+            <span class="self">Self</span>::DeleteRowsEvent(ev) =&gt; RowsEventData::DeleteRowsEvent(ev.into_owned()),
+            <span class="self">Self</span>::PartialUpdateRowsEvent(ev) =&gt; {
+                RowsEventData::PartialUpdateRowsEvent(ev.into_owned())
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">RowsEventData</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RowsEventData::WriteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::UpdateRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::DeleteRowsEventV1</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
-            <span class="ident">RowsEventData::PartialUpdateRowsEvent</span>(<span class="ident">ev</span>) =&gt; <span class="ident">ev</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>),
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>RowsEventData&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">match </span><span class="self">self </span>{
+            RowsEventData::WriteRowsEventV1(ev) =&gt; ev.serialize(buf),
+            RowsEventData::UpdateRowsEventV1(ev) =&gt; ev.serialize(buf),
+            RowsEventData::DeleteRowsEventV1(ev) =&gt; ev.serialize(buf),
+            RowsEventData::WriteRowsEvent(ev) =&gt; ev.serialize(buf),
+            RowsEventData::UpdateRowsEvent(ev) =&gt; ev.serialize(buf),
+            RowsEventData::DeleteRowsEvent(ev) =&gt; ev.serialize(buf),
+            RowsEventData::PartialUpdateRowsEvent(ev) =&gt; ev.serialize(buf),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

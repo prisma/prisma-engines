@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/model.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -681,517 +681,513 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
-<span id="684">684</span>
-<span id="685">685</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::default_value::DefaultKind</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::traits</span>::{<span class="ident">Ignorable</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>};
-<span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::default_value::DefaultKind;
+<span class="kw">use </span><span class="kw">crate</span>::field::{Field, FieldType, RelationField, ScalarField};
+<span class="kw">use </span><span class="kw">crate</span>::scalars::ScalarType;
+<span class="kw">use </span><span class="kw">crate</span>::traits::{Ignorable, WithDatabaseName, WithName};
+<span class="kw">use </span>indoc::formatdoc;
+<span class="kw">use </span>std::{borrow::Cow, fmt};
 
-<span class="doccomment">/// Represents a model in a prisma schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Model</span> {
-    <span class="doccomment">/// Name of the model.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// Fields of the model.</span>
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Comments associated with this model.</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The database internal name of this model.</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Describes Composite Indexes</span>
-    <span class="kw">pub</span> <span class="ident">indices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Describes the Primary Keys</span>
-    <span class="kw">pub</span> <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKeyDefinition</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Indicates if this model is generated.</span>
-    <span class="kw">pub</span> <span class="ident">is_generated</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Indicates if this model has to be commented out.</span>
-    <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Indicates if this model has to be ignored by the Client.</span>
-    <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The contents of the `@@schema(&quot;...&quot;)` attribute.</span>
-    <span class="kw">pub</span> <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a model in a prisma schema.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Default)]
+</span><span class="kw">pub struct </span>Model {
+    <span class="doccomment">/// Name of the model.
+    </span><span class="kw">pub </span>name: String,
+    <span class="doccomment">/// Fields of the model.
+    </span><span class="kw">pub </span>fields: Vec&lt;Field&gt;,
+    <span class="doccomment">/// Comments associated with this model.
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// The database internal name of this model.
+    </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Describes Composite Indexes
+    </span><span class="kw">pub </span>indices: Vec&lt;IndexDefinition&gt;,
+    <span class="doccomment">/// Describes the Primary Keys
+    </span><span class="kw">pub </span>primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKeyDefinition&gt;,
+    <span class="doccomment">/// Indicates if this model is generated.
+    </span><span class="kw">pub </span>is_generated: bool,
+    <span class="doccomment">/// Indicates if this model has to be commented out.
+    </span><span class="kw">pub </span>is_commented_out: bool,
+    <span class="doccomment">/// Indicates if this model has to be ignored by the Client.
+    </span><span class="kw">pub </span>is_ignored: bool,
+    <span class="doccomment">/// The contents of the `@@schema(&quot;...&quot;)` attribute.
+    </span><span class="kw">pub </span>schema: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="ident">BTree</span>,
-    <span class="ident">Hash</span>,
-    <span class="ident">Gist</span>,
-    <span class="ident">Gin</span>,
-    <span class="ident">SpGist</span>,
-    <span class="ident">Brin</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>IndexAlgorithm {
+    BTree,
+    Hash,
+    Gist,
+    Gin,
+    SpGist,
+    Brin,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::BTree</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>IndexAlgorithm {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::BTree
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="string">&quot;BTree&quot;</span>,
-            <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="string">&quot;Hash&quot;</span>,
-            <span class="ident">IndexAlgorithm::Gist</span> =&gt; <span class="string">&quot;Gist&quot;</span>,
-            <span class="ident">IndexAlgorithm::Gin</span> =&gt; <span class="string">&quot;Gin&quot;</span>,
-            <span class="ident">IndexAlgorithm::SpGist</span> =&gt; <span class="string">&quot;SpGist&quot;</span>,
-            <span class="ident">IndexAlgorithm::Brin</span> =&gt; <span class="string">&quot;Brin&quot;</span>,
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>IndexAlgorithm {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            IndexAlgorithm::BTree =&gt; <span class="string">&quot;BTree&quot;</span>,
+            IndexAlgorithm::Hash =&gt; <span class="string">&quot;Hash&quot;</span>,
+            IndexAlgorithm::Gist =&gt; <span class="string">&quot;Gist&quot;</span>,
+            IndexAlgorithm::Gin =&gt; <span class="string">&quot;Gin&quot;</span>,
+            IndexAlgorithm::SpGist =&gt; <span class="string">&quot;SpGist&quot;</span>,
+            IndexAlgorithm::Brin =&gt; <span class="string">&quot;Brin&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">IndexAlgorithm</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>IndexAlgorithm {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="self">self</span>.as_ref())
     }
 }
 
-<span class="doccomment">/// Represents an index defined via `@@index`, `@unique` or `@@unique`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexDefinition</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexField</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">tpe</span>: <span class="ident">IndexType</span>,
-    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">algorithm</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">defined_on_field</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Represents an index defined via `@@index`, `@unique` or `@@unique`.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>IndexDefinition {
+    <span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;IndexField&gt;,
+    <span class="kw">pub </span>tpe: IndexType,
+    <span class="kw">pub </span>clustered: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub </span>algorithm: <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt;,
+    <span class="kw">pub </span>defined_on_field: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">IndexDefinition</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Unique</span>)
+<span class="kw">impl </span>IndexDefinition {
+    <span class="kw">pub fn </span>is_unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.tpe, IndexType::Unique)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Fulltext</span>)
+    <span class="kw">pub fn </span>is_fulltext(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.tpe, IndexType::Fulltext)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OperatorClass</span> {
-    <span class="comment">// GiST</span>
-    <span class="ident">InetOps</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>OperatorClass {
+    <span class="comment">// GiST
+    </span>InetOps,
 
-    <span class="comment">// GIN</span>
-    <span class="ident">JsonbOps</span>,
-    <span class="ident">JsonbPathOps</span>,
-    <span class="ident">ArrayOps</span>,
+    <span class="comment">// GIN
+    </span>JsonbOps,
+    JsonbPathOps,
+    ArrayOps,
 
-    <span class="comment">// SP-GiST</span>
-    <span class="ident">TextOps</span>,
+    <span class="comment">// SP-GiST
+    </span>TextOps,
 
-    <span class="comment">// BRIN</span>
-    <span class="ident">BitMinMaxOps</span>,
-    <span class="ident">VarBitMinMaxOps</span>,
-    <span class="ident">BpcharBloomOps</span>,
-    <span class="ident">BpcharMinMaxOps</span>,
-    <span class="ident">ByteaBloomOps</span>,
-    <span class="ident">ByteaMinMaxOps</span>,
-    <span class="ident">DateBloomOps</span>,
-    <span class="ident">DateMinMaxOps</span>,
-    <span class="ident">DateMinMaxMultiOps</span>,
-    <span class="ident">Float4BloomOps</span>,
-    <span class="ident">Float4MinMaxOps</span>,
-    <span class="ident">Float4MinMaxMultiOps</span>,
-    <span class="ident">Float8BloomOps</span>,
-    <span class="ident">Float8MinMaxOps</span>,
-    <span class="ident">Float8MinMaxMultiOps</span>,
-    <span class="ident">InetInclusionOps</span>,
-    <span class="ident">InetBloomOps</span>,
-    <span class="ident">InetMinMaxOps</span>,
-    <span class="ident">InetMinMaxMultiOps</span>,
-    <span class="ident">Int2BloomOps</span>,
-    <span class="ident">Int2MinMaxOps</span>,
-    <span class="ident">Int2MinMaxMultiOps</span>,
-    <span class="ident">Int4BloomOps</span>,
-    <span class="ident">Int4MinMaxOps</span>,
-    <span class="ident">Int4MinMaxMultiOps</span>,
-    <span class="ident">Int8BloomOps</span>,
-    <span class="ident">Int8MinMaxOps</span>,
-    <span class="ident">Int8MinMaxMultiOps</span>,
-    <span class="ident">NumericBloomOps</span>,
-    <span class="ident">NumericMinMaxOps</span>,
-    <span class="ident">NumericMinMaxMultiOps</span>,
-    <span class="ident">OidBloomOps</span>,
-    <span class="ident">OidMinMaxOps</span>,
-    <span class="ident">OidMinMaxMultiOps</span>,
-    <span class="ident">TextBloomOps</span>,
-    <span class="ident">TextMinMaxOps</span>,
-    <span class="ident">TimestampBloomOps</span>,
-    <span class="ident">TimestampMinMaxOps</span>,
-    <span class="ident">TimestampMinMaxMultiOps</span>,
-    <span class="ident">TimestampTzBloomOps</span>,
-    <span class="ident">TimestampTzMinMaxOps</span>,
-    <span class="ident">TimestampTzMinMaxMultiOps</span>,
-    <span class="ident">TimeBloomOps</span>,
-    <span class="ident">TimeMinMaxOps</span>,
-    <span class="ident">TimeMinMaxMultiOps</span>,
-    <span class="ident">TimeTzBloomOps</span>,
-    <span class="ident">TimeTzMinMaxOps</span>,
-    <span class="ident">TimeTzMinMaxMultiOps</span>,
-    <span class="ident">UuidBloomOps</span>,
-    <span class="ident">UuidMinMaxOps</span>,
-    <span class="ident">UuidMinMaxMultiOps</span>,
+    <span class="comment">// BRIN
+    </span>BitMinMaxOps,
+    VarBitMinMaxOps,
+    BpcharBloomOps,
+    BpcharMinMaxOps,
+    ByteaBloomOps,
+    ByteaMinMaxOps,
+    DateBloomOps,
+    DateMinMaxOps,
+    DateMinMaxMultiOps,
+    Float4BloomOps,
+    Float4MinMaxOps,
+    Float4MinMaxMultiOps,
+    Float8BloomOps,
+    Float8MinMaxOps,
+    Float8MinMaxMultiOps,
+    InetInclusionOps,
+    InetBloomOps,
+    InetMinMaxOps,
+    InetMinMaxMultiOps,
+    Int2BloomOps,
+    Int2MinMaxOps,
+    Int2MinMaxMultiOps,
+    Int4BloomOps,
+    Int4MinMaxOps,
+    Int4MinMaxMultiOps,
+    Int8BloomOps,
+    Int8MinMaxOps,
+    Int8MinMaxMultiOps,
+    NumericBloomOps,
+    NumericMinMaxOps,
+    NumericMinMaxMultiOps,
+    OidBloomOps,
+    OidMinMaxOps,
+    OidMinMaxMultiOps,
+    TextBloomOps,
+    TextMinMaxOps,
+    TimestampBloomOps,
+    TimestampMinMaxOps,
+    TimestampMinMaxMultiOps,
+    TimestampTzBloomOps,
+    TimestampTzMinMaxOps,
+    TimestampTzMinMaxMultiOps,
+    TimeBloomOps,
+    TimeMinMaxOps,
+    TimeMinMaxMultiOps,
+    TimeTzBloomOps,
+    TimeTzMinMaxOps,
+    TimeTzMinMaxMultiOps,
+    UuidBloomOps,
+    UuidMinMaxOps,
+    UuidMinMaxMultiOps,
 
-    <span class="ident">Raw</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    Raw(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OperatorClass</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::InetOps</span> =&gt; <span class="string">&quot;InetOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::JsonbOps</span> =&gt; <span class="string">&quot;JsonbOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::JsonbPathOps</span> =&gt; <span class="string">&quot;JsonbPathOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ArrayOps</span> =&gt; <span class="string">&quot;ArrayOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TextOps</span> =&gt; <span class="string">&quot;TextOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::BitMinMaxOps</span> =&gt; <span class="string">&quot;BitMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::VarBitMinMaxOps</span> =&gt; <span class="string">&quot;VarBitMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::BpcharBloomOps</span> =&gt; <span class="string">&quot;BpcharBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::BpcharMinMaxOps</span> =&gt; <span class="string">&quot;BpcharMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ByteaBloomOps</span> =&gt; <span class="string">&quot;ByteaBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::ByteaMinMaxOps</span> =&gt; <span class="string">&quot;ByteaMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DateBloomOps</span> =&gt; <span class="string">&quot;DateBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DateMinMaxOps</span> =&gt; <span class="string">&quot;DateMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::DateMinMaxMultiOps</span> =&gt; <span class="string">&quot;DateMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float4BloomOps</span> =&gt; <span class="string">&quot;Float4BloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float4MinMaxOps</span> =&gt; <span class="string">&quot;Float4MinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float4MinMaxMultiOps</span> =&gt; <span class="string">&quot;Float4MinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float8BloomOps</span> =&gt; <span class="string">&quot;Float8BloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float8MinMaxOps</span> =&gt; <span class="string">&quot;Float8MinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Float8MinMaxMultiOps</span> =&gt; <span class="string">&quot;Float8MinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InetInclusionOps</span> =&gt; <span class="string">&quot;InetInclusionOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InetBloomOps</span> =&gt; <span class="string">&quot;InetBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InetMinMaxOps</span> =&gt; <span class="string">&quot;InetMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InetMinMaxMultiOps</span> =&gt; <span class="string">&quot;InetMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int2BloomOps</span> =&gt; <span class="string">&quot;Int2BloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int2MinMaxOps</span> =&gt; <span class="string">&quot;Int2MinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int2MinMaxMultiOps</span> =&gt; <span class="string">&quot;Int2MinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int4BloomOps</span> =&gt; <span class="string">&quot;Int4BloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int4MinMaxOps</span> =&gt; <span class="string">&quot;Int4MinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int4MinMaxMultiOps</span> =&gt; <span class="string">&quot;Int4MinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int8BloomOps</span> =&gt; <span class="string">&quot;Int8BloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int8MinMaxOps</span> =&gt; <span class="string">&quot;Int8MinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Int8MinMaxMultiOps</span> =&gt; <span class="string">&quot;Int8MinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::NumericBloomOps</span> =&gt; <span class="string">&quot;NumericBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::NumericMinMaxOps</span> =&gt; <span class="string">&quot;NumericMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::NumericMinMaxMultiOps</span> =&gt; <span class="string">&quot;NumericMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::OidBloomOps</span> =&gt; <span class="string">&quot;OidBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::OidMinMaxOps</span> =&gt; <span class="string">&quot;OidMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::OidMinMaxMultiOps</span> =&gt; <span class="string">&quot;OidMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TextBloomOps</span> =&gt; <span class="string">&quot;TextBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TextMinMaxOps</span> =&gt; <span class="string">&quot;TextMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampBloomOps</span> =&gt; <span class="string">&quot;TimestampBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampMinMaxOps</span> =&gt; <span class="string">&quot;TimestampMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampMinMaxMultiOps</span> =&gt; <span class="string">&quot;TimestampMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampTzBloomOps</span> =&gt; <span class="string">&quot;TimestampTzBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampTzMinMaxOps</span> =&gt; <span class="string">&quot;TimestampTzMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimestampTzMinMaxMultiOps</span> =&gt; <span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeBloomOps</span> =&gt; <span class="string">&quot;TimeBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeMinMaxOps</span> =&gt; <span class="string">&quot;TimeMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeMinMaxMultiOps</span> =&gt; <span class="string">&quot;TimeMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeTzBloomOps</span> =&gt; <span class="string">&quot;TimeTzBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeTzMinMaxOps</span> =&gt; <span class="string">&quot;TimeTzMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::TimeTzMinMaxMultiOps</span> =&gt; <span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UuidBloomOps</span> =&gt; <span class="string">&quot;UuidBloomOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UuidMinMaxOps</span> =&gt; <span class="string">&quot;UuidMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::UuidMinMaxMultiOps</span> =&gt; <span class="string">&quot;UuidMinMaxOps&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">as_ref</span>(),
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>OperatorClass {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::InetOps =&gt; <span class="string">&quot;InetOps&quot;</span>,
+            <span class="self">Self</span>::JsonbOps =&gt; <span class="string">&quot;JsonbOps&quot;</span>,
+            <span class="self">Self</span>::JsonbPathOps =&gt; <span class="string">&quot;JsonbPathOps&quot;</span>,
+            <span class="self">Self</span>::ArrayOps =&gt; <span class="string">&quot;ArrayOps&quot;</span>,
+            <span class="self">Self</span>::TextOps =&gt; <span class="string">&quot;TextOps&quot;</span>,
+            <span class="self">Self</span>::BitMinMaxOps =&gt; <span class="string">&quot;BitMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::VarBitMinMaxOps =&gt; <span class="string">&quot;VarBitMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::BpcharBloomOps =&gt; <span class="string">&quot;BpcharBloomOps&quot;</span>,
+            <span class="self">Self</span>::BpcharMinMaxOps =&gt; <span class="string">&quot;BpcharMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::ByteaBloomOps =&gt; <span class="string">&quot;ByteaBloomOps&quot;</span>,
+            <span class="self">Self</span>::ByteaMinMaxOps =&gt; <span class="string">&quot;ByteaMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::DateBloomOps =&gt; <span class="string">&quot;DateBloomOps&quot;</span>,
+            <span class="self">Self</span>::DateMinMaxOps =&gt; <span class="string">&quot;DateMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::DateMinMaxMultiOps =&gt; <span class="string">&quot;DateMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::Float4BloomOps =&gt; <span class="string">&quot;Float4BloomOps&quot;</span>,
+            <span class="self">Self</span>::Float4MinMaxOps =&gt; <span class="string">&quot;Float4MinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Float4MinMaxMultiOps =&gt; <span class="string">&quot;Float4MinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::Float8BloomOps =&gt; <span class="string">&quot;Float8BloomOps&quot;</span>,
+            <span class="self">Self</span>::Float8MinMaxOps =&gt; <span class="string">&quot;Float8MinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Float8MinMaxMultiOps =&gt; <span class="string">&quot;Float8MinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::InetInclusionOps =&gt; <span class="string">&quot;InetInclusionOps&quot;</span>,
+            <span class="self">Self</span>::InetBloomOps =&gt; <span class="string">&quot;InetBloomOps&quot;</span>,
+            <span class="self">Self</span>::InetMinMaxOps =&gt; <span class="string">&quot;InetMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::InetMinMaxMultiOps =&gt; <span class="string">&quot;InetMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::Int2BloomOps =&gt; <span class="string">&quot;Int2BloomOps&quot;</span>,
+            <span class="self">Self</span>::Int2MinMaxOps =&gt; <span class="string">&quot;Int2MinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Int2MinMaxMultiOps =&gt; <span class="string">&quot;Int2MinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::Int4BloomOps =&gt; <span class="string">&quot;Int4BloomOps&quot;</span>,
+            <span class="self">Self</span>::Int4MinMaxOps =&gt; <span class="string">&quot;Int4MinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Int4MinMaxMultiOps =&gt; <span class="string">&quot;Int4MinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::Int8BloomOps =&gt; <span class="string">&quot;Int8BloomOps&quot;</span>,
+            <span class="self">Self</span>::Int8MinMaxOps =&gt; <span class="string">&quot;Int8MinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Int8MinMaxMultiOps =&gt; <span class="string">&quot;Int8MinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::NumericBloomOps =&gt; <span class="string">&quot;NumericBloomOps&quot;</span>,
+            <span class="self">Self</span>::NumericMinMaxOps =&gt; <span class="string">&quot;NumericMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::NumericMinMaxMultiOps =&gt; <span class="string">&quot;NumericMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::OidBloomOps =&gt; <span class="string">&quot;OidBloomOps&quot;</span>,
+            <span class="self">Self</span>::OidMinMaxOps =&gt; <span class="string">&quot;OidMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::OidMinMaxMultiOps =&gt; <span class="string">&quot;OidMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::TextBloomOps =&gt; <span class="string">&quot;TextBloomOps&quot;</span>,
+            <span class="self">Self</span>::TextMinMaxOps =&gt; <span class="string">&quot;TextMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::TimestampBloomOps =&gt; <span class="string">&quot;TimestampBloomOps&quot;</span>,
+            <span class="self">Self</span>::TimestampMinMaxOps =&gt; <span class="string">&quot;TimestampMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::TimestampMinMaxMultiOps =&gt; <span class="string">&quot;TimestampMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::TimestampTzBloomOps =&gt; <span class="string">&quot;TimestampTzBloomOps&quot;</span>,
+            <span class="self">Self</span>::TimestampTzMinMaxOps =&gt; <span class="string">&quot;TimestampTzMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::TimestampTzMinMaxMultiOps =&gt; <span class="string">&quot;TimestampTzMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::TimeBloomOps =&gt; <span class="string">&quot;TimeBloomOps&quot;</span>,
+            <span class="self">Self</span>::TimeMinMaxOps =&gt; <span class="string">&quot;TimeMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::TimeMinMaxMultiOps =&gt; <span class="string">&quot;TimeMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::TimeTzBloomOps =&gt; <span class="string">&quot;TimeTzBloomOps&quot;</span>,
+            <span class="self">Self</span>::TimeTzMinMaxOps =&gt; <span class="string">&quot;TimeTzMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::TimeTzMinMaxMultiOps =&gt; <span class="string">&quot;TimeTzMinMaxMultiOps&quot;</span>,
+            <span class="self">Self</span>::UuidBloomOps =&gt; <span class="string">&quot;UuidBloomOps&quot;</span>,
+            <span class="self">Self</span>::UuidMinMaxOps =&gt; <span class="string">&quot;UuidMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::UuidMinMaxMultiOps =&gt; <span class="string">&quot;UuidMinMaxOps&quot;</span>,
+            <span class="self">Self</span>::Raw(s) =&gt; s.as_ref(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">OperatorClass</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>OperatorClass {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="self">self</span>.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">OperatorClass</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw</span>(<span class="ident">op</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">op</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>OperatorClass {
+    <span class="kw">pub fn </span>raw(op: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Raw(op.into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">s</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>as_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Raw(s) =&gt; <span class="prelude-val">Some</span>(s),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Raw(<span class="kw">_</span>))
     }
 }
 
-<span class="doccomment">///A field in an index that optionally defines a sort order and length limit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexField</span> {
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">operator_class</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span>,
+<span class="doccomment">///A field in an index that optionally defines a sort order and length limit.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>IndexField {
+    <span class="kw">pub </span>path: Vec&lt;(String, <span class="prelude-ty">Option</span>&lt;String&gt;)&gt;,
+    <span class="kw">pub </span>sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
+    <span class="kw">pub </span>length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub </span>operator_class: <span class="prelude-ty">Option</span>&lt;OperatorClass&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">IndexField</span> {
-    <span class="doccomment">/// Tests only</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_in_model</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">IndexField</span> {
-            <span class="ident">path</span>: <span class="macro">vec!</span>[(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="prelude-val">None</span>)],
-            <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
-            <span class="ident">length</span>: <span class="prelude-val">None</span>,
-            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>IndexField {
+    <span class="doccomment">/// Tests only
+    </span><span class="kw">pub fn </span>new_in_model(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        IndexField {
+            path: <span class="macro">vec!</span>[(name.into(), <span class="prelude-val">None</span>)],
+            sort_order: <span class="prelude-val">None</span>,
+            length: <span class="prelude-val">None</span>,
+            operator_class: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_in_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>)]) -&gt; <span class="self">Self</span> {
-        <span class="ident">IndexField</span> {
-            <span class="ident">path</span>: <span class="ident">path</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">v</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>())))
-                .<span class="ident">collect</span>(),
-            <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
-            <span class="ident">length</span>: <span class="prelude-val">None</span>,
-            <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>new_in_path(path: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;)]) -&gt; <span class="self">Self </span>{
+        IndexField {
+            path: path
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.map(|v| v.to_string())))
+                .collect(),
+            sort_order: <span class="prelude-val">None</span>,
+            length: <span class="prelude-val">None</span>,
+            operator_class: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>from_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.path.first().unwrap().<span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// Represents a primary key defined via `@@id` or `@id`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyDefinition</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrimaryKeyField</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">defined_on_field</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">clustered</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a primary key defined via `@@id` or `@id`.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>PrimaryKeyDefinition {
+    <span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>db_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;PrimaryKeyField&gt;,
+    <span class="kw">pub </span>defined_on_field: bool,
+    <span class="kw">pub </span>clustered: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">///A field in a Primary Key that optionally defines a sort order and length limit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyField</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">sort_order</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">length</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="doccomment">///A field in a Primary Key that optionally defines a sort order and length limit.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>PrimaryKeyField {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>sort_order: <span class="prelude-ty">Option</span>&lt;SortOrder&gt;,
+    <span class="kw">pub </span>length: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PrimaryKeyField</span> {
-    <span class="doccomment">/// Tests only</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">PrimaryKeyField</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">sort_order</span>: <span class="prelude-val">None</span>,
-            <span class="ident">length</span>: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexType</span> {
-    <span class="ident">Unique</span>,
-    <span class="ident">Normal</span>,
-    <span class="ident">Fulltext</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">IndexType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fulltext</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">IndexType::Fulltext</span>)
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SortOrder</span> {
-    <span class="ident">Asc</span>,
-    <span class="ident">Desc</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SortOrder</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SortOrder::Asc</span> =&gt; <span class="string">&quot;Asc&quot;</span>,
-            <span class="ident">SortOrder::Desc</span> =&gt; <span class="string">&quot;Desc&quot;</span>,
+<span class="kw">impl </span>PrimaryKeyField {
+    <span class="doccomment">/// Tests only
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        PrimaryKeyField {
+            name: name.to_string(),
+            sort_order: <span class="prelude-val">None</span>,
+            length: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// A unique criteria is a set of fields through which a record can be uniquely identified.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UniqueCriteria</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarField</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>IndexType {
+    Unique,
+    Normal,
+    Fulltext,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UniqueCriteria</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ScalarField</span><span class="op">&gt;</span>) -&gt; <span class="ident">UniqueCriteria</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">UniqueCriteria</span> { <span class="ident">fields</span> }
+<span class="kw">impl </span>IndexType {
+    <span class="kw">pub fn </span>is_fulltext(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, IndexType::Fulltext)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Model</span> {
-    <span class="doccomment">/// Creates a new model with the given name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Model</span> {
-        <span class="ident">Model</span> {
-            <span class="ident">name</span>,
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
-            <span class="ident">indices</span>: <span class="macro">vec!</span>[],
-            <span class="ident">primary_key</span>: <span class="prelude-val">None</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database_name</span>,
-            <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
-            <span class="ident">schema</span>: <span class="prelude-val">None</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>SortOrder {
+    Asc,
+    Desc,
+}
+
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>SortOrder {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            SortOrder::Asc =&gt; <span class="string">&quot;Asc&quot;</span>,
+            SortOrder::Desc =&gt; <span class="string">&quot;Desc&quot;</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// A unique criteria is a set of fields through which a record can be uniquely identified.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>fields: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarField&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(fields: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ScalarField&gt;) -&gt; UniqueCriteria&lt;<span class="lifetime">&#39;a</span>&gt; {
+        UniqueCriteria { fields }
+    }
+}
+
+<span class="kw">impl </span>Model {
+    <span class="doccomment">/// Creates a new model with the given name.
+    </span><span class="kw">pub fn </span>new(name: String, database_name: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Model {
+        Model {
+            name,
+            fields: <span class="macro">vec!</span>[],
+            indices: <span class="macro">vec!</span>[],
+            primary_key: <span class="prelude-val">None</span>,
+            documentation: <span class="prelude-val">None</span>,
+            database_name,
+            is_generated: <span class="bool-val">false</span>,
+            is_commented_out: <span class="bool-val">false</span>,
+            is_ignored: <span class="bool-val">false</span>,
+            schema: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Adds a field to this model.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="ident">Field</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field</span>)
+    <span class="doccomment">/// Adds a field to this model.
+    </span><span class="kw">pub fn </span>add_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: Field) {
+        <span class="self">self</span>.fields.push(field)
     }
 
-    <span class="doccomment">/// Gets an iterator over all fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::slice::Iter</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Gets an iterator over all fields.
+    </span><span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::slice::Iter&lt;Field&gt; {
+        <span class="self">self</span>.fields.iter()
     }
 
-    <span class="doccomment">/// Gets a mutable  iterator over all fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Field</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter_mut</span>()
+    <span class="doccomment">/// Gets a mutable  iterator over all fields.
+    </span><span class="kw">pub fn </span>fields_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;mut </span>Field&gt; {
+        <span class="self">self</span>.fields.iter_mut()
     }
 
-    <span class="doccomment">/// Gets an iterator over all scalar fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_scalar_field</span>())
+    <span class="doccomment">/// Gets an iterator over all scalar fields.
+    </span><span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>ScalarField&gt; {
+        <span class="self">self</span>.fields.iter().filter_map(|f| f.as_scalar_field())
     }
 
-    <span class="doccomment">/// Gets an iterator over all relation fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_relation_field</span>())
+    <span class="doccomment">/// Gets an iterator over all relation fields.
+    </span><span class="kw">pub fn </span>relation_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>RelationField&gt; {
+        <span class="self">self</span>.fields.iter().filter_map(|f| f.as_relation_field())
     }
 
-    <span class="doccomment">/// Gets a mutable iterator over all scalar fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields_mut</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">fw</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">fw</span> {
-            <span class="ident">Field::RelationField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Field::CompositeField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
+    <span class="doccomment">/// Gets a mutable iterator over all scalar fields.
+    </span><span class="kw">pub fn </span>scalar_fields_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;mut </span>ScalarField&gt; {
+        <span class="self">self</span>.fields_mut().filter_map(|fw| <span class="kw">match </span>fw {
+            Field::RelationField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            Field::ScalarField(sf) =&gt; <span class="prelude-val">Some</span>(sf),
         })
     }
 
-    <span class="doccomment">/// Gets a mutable iterator over all relation fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_fields_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields_mut</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">fw</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">fw</span> {
-            <span class="ident">Field::RelationField</span>(<span class="ident">rf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">rf</span>),
-            <span class="ident">Field::CompositeField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Field::ScalarField</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Gets a mutable iterator over all relation fields.
+    </span><span class="kw">pub fn </span>relation_fields_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;mut </span>RelationField&gt; {
+        <span class="self">self</span>.fields_mut().filter_map(|fw| <span class="kw">match </span>fw {
+            Field::RelationField(rf) =&gt; <span class="prelude-val">Some</span>(rf),
+            Field::CompositeField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            Field::ScalarField(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="doccomment">/// Finds a field by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Field</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
+    <span class="doccomment">/// Finds a field by name.
+    </span><span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Field&gt; {
+        <span class="self">self</span>.fields().find(|f| f.name() == name)
     }
 
-    <span class="doccomment">/// Finds a field by name and returns a mutable reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Field</span> {
-        <span class="self">self</span>.<span class="ident">fields_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Finds a field by name and returns a mutable reference.
+    </span><span class="kw">pub fn </span>find_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Field {
+        <span class="self">self</span>.fields_mut().find(|f| f.name() == name).unwrap()
     }
 
-    <span class="doccomment">/// Finds a scalar field by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>)
+    <span class="doccomment">/// Finds a scalar field by name.
+    </span><span class="kw">pub fn </span>find_scalar_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarField&gt; {
+        <span class="self">self</span>.scalar_fields().find(|f| f.name == <span class="kw-2">*</span>name)
     }
 
-    <span class="doccomment">/// Finds a scalar field by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>)
+    <span class="doccomment">/// Finds a scalar field by name.
+    </span><span class="kw">pub fn </span>find_relation_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationField&gt; {
+        <span class="self">self</span>.relation_fields().find(|f| f.name == <span class="kw-2">*</span>name)
     }
 
-    <span class="doccomment">/// Finds a field by database name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field_db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_fields</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">db_name</span>))
+    <span class="doccomment">/// Finds a field by database name.
+    </span><span class="kw">pub fn </span>find_scalar_field_db_name(<span class="kw-2">&amp;</span><span class="self">self</span>, db_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarField&gt; {
+        <span class="self">self</span>.scalar_fields()
+            .find(|f| f.database_name.as_deref() == <span class="prelude-val">Some</span>(db_name))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">find_field</span>(<span class="ident">name</span>).<span class="ident">is_some</span>()
+    <span class="kw">pub fn </span>has_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.find_field(name).is_some()
     }
 
-    <span class="doccomment">/// Finds a field by name and returns a mutable reference.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scalar_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span> {
-        <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="self">self</span>.<span class="ident">scalar_fields_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>).<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(
-            <span class="string">&quot;Could not find scalar field {} on model {}.&quot;</span>,
-            <span class="ident">name</span>, <span class="ident">model_name</span>
-        ))
+    <span class="doccomment">/// Finds a field by name and returns a mutable reference.
+    </span><span class="kw">pub fn </span>find_scalar_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>ScalarField {
+        <span class="kw">let </span>model_name = <span class="kw-2">&amp;</span><span class="self">self</span>.name.clone();
+        <span class="self">self</span>.scalar_fields_mut()
+            .find(|rf| rf.name == <span class="kw-2">*</span>name)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Could not find scalar field {} on model {}.&quot;</span>, name, model_name))
     }
 
-    <span class="doccomment">/// Finds a relation field by name and returns a mutable reference.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_relation_field_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span> {
-        <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="self">self</span>.<span class="ident">relation_fields_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">name</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">name</span>).<span class="ident">expect</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(
-            <span class="string">&quot;Could not find relation field {} on model {}.&quot;</span>,
-            <span class="ident">name</span>, <span class="ident">model_name</span>
-        ))
+    <span class="doccomment">/// Finds a relation field by name and returns a mutable reference.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>find_relation_field_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>RelationField {
+        <span class="kw">let </span>model_name = <span class="kw-2">&amp;</span><span class="self">self</span>.name.clone();
+        <span class="self">self</span>.relation_fields_mut()
+            .find(|rf| rf.name == <span class="kw-2">*</span>name)
+            .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Could not find relation field {} on model {}.&quot;</span>, name, model_name))
     }
 
-    <span class="doccomment">/// This should match the logic in `prisma_models::Model::primary_identifier`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_unique_criterion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">strict_unique_criterias</span>().<span class="ident">first</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">criteria</span>) =&gt; <span class="ident">criteria</span>.<span class="ident">fields</span>.<span class="ident">clone</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not find the first unique criteria on model {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>()),
+    <span class="doccomment">/// This should match the logic in `prisma_models::Model::primary_identifier`.
+    </span><span class="kw">pub fn </span>first_unique_criterion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>ScalarField&gt; {
+        <span class="kw">match </span><span class="self">self</span>.strict_unique_criterias().first() {
+            <span class="prelude-val">Some</span>(criteria) =&gt; criteria.fields.clone(),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not find the first unique criteria on model {}&quot;</span>, <span class="self">self</span>.name()),
         }
     }
 
-    <span class="doccomment">/// optional unique fields are NOT considered a unique criteria</span>
-    <span class="doccomment">/// used for: A Model must have at least one STRICT unique criteria.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strict_unique_criterias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueCriteria</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unique_criterias</span>(<span class="bool-val">false</span>, <span class="bool-val">false</span>)
+    <span class="doccomment">/// optional unique fields are NOT considered a unique criteria
+    /// used for: A Model must have at least one STRICT unique criteria.
+    </span><span class="kw">pub fn </span>strict_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriteria&gt; {
+        <span class="self">self</span>.unique_criterias(<span class="bool-val">false</span>, <span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// optional unique fields are NOT considered a unique criteria</span>
-    <span class="doccomment">/// used for: A Model must have at least one STRICT unique criteria.</span>
-    <span class="doccomment">/// Ignores unsupported, used for introspection to decide when to ignore</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strict_unique_criterias_disregarding_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueCriteria</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unique_criterias</span>(<span class="bool-val">false</span>, <span class="bool-val">true</span>)
+    <span class="doccomment">/// optional unique fields are NOT considered a unique criteria
+    /// used for: A Model must have at least one STRICT unique criteria.
+    /// Ignores unsupported, used for introspection to decide when to ignore
+    </span><span class="kw">pub fn </span>strict_unique_criterias_disregarding_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriteria&gt; {
+        <span class="self">self</span>.unique_criterias(<span class="bool-val">false</span>, <span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// optional unique fields are considered a unique criteria</span>
-    <span class="doccomment">/// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">loose_unique_criterias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueCriteria</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unique_criterias</span>(<span class="bool-val">true</span>, <span class="bool-val">false</span>)
+    <span class="doccomment">/// optional unique fields are considered a unique criteria
+    /// used for: A relation must reference one LOOSE unique criteria. (optional fields are okay in this case)
+    </span><span class="kw">pub fn </span>loose_unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;UniqueCriteria&gt; {
+        <span class="self">self</span>.unique_criterias(<span class="bool-val">true</span>, <span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// returns the order of unique criterias ordered based on their precedence</span>
-    <span class="kw">fn</span> <span class="ident">unique_criterias</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">allow_optional</span>: <span class="ident">bool</span>, <span class="ident">disregard_unsupported</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueCriteria</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="doccomment">/// returns the order of unique criterias ordered based on their precedence
+    </span><span class="kw">fn </span>unique_criterias(<span class="kw-2">&amp;</span><span class="self">self</span>, allow_optional: bool, disregard_unsupported: bool) -&gt; Vec&lt;UniqueCriteria&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">in_eligible</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarField</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">disregard_unsupported</span> {
-                <span class="ident">field</span>.<span class="ident">is_commented_out</span> <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">field_type</span>, <span class="ident">FieldType::Unsupported</span>(<span class="kw">_</span>))
-            } <span class="kw">else</span> {
-                <span class="ident">field</span>.<span class="ident">is_commented_out</span>
+        <span class="kw">let </span>in_eligible = |field: <span class="kw-2">&amp;</span>ScalarField| {
+            <span class="kw">if </span>disregard_unsupported {
+                field.is_commented_out || <span class="macro">matches!</span>(field.field_type, FieldType::Unsupported(<span class="kw">_</span>))
+            } <span class="kw">else </span>{
+                field.is_commented_out
             }
         };
 
-        <span class="comment">// first candidate: primary key</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span> {
-                <span class="kw">let</span> <span class="ident">id_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pk</span>
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">name</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>,
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="macro">formatdoc!</span>(
+        <span class="comment">// first candidate: primary key
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = <span class="kw-2">&amp;</span><span class="self">self</span>.primary_key {
+                <span class="kw">let </span>id_fields: Vec&lt;<span class="kw">_</span>&gt; = pk
+                    .fields
+                    .iter()
+                    .map(|f| <span class="kw">match </span><span class="self">self</span>.find_scalar_field(<span class="kw-2">&amp;</span>f.name) {
+                        <span class="prelude-val">Some</span>(field) =&gt; field,
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">let </span>error = <span class="macro">formatdoc!</span>(
                                 <span class="string">r#&quot;
                                 Hi there! We&#39;ve been seeing this error in our error reporting backend,
                                 but cannot reproduce it in our own tests. The problem is that we have a
@@ -1200,173 +1196,173 @@
                                 could you please file an issue to https://github.com/prisma/prisma so we
                                 can discuss about fixing this. -- Your friendly prisma developers.
                             &quot;#</span>,
-                                <span class="self">self</span>.<span class="ident">name</span>,
-                                <span class="ident">f</span>.<span class="ident">name</span>
+                                <span class="self">self</span>.name,
+                                f.name
                             );
 
-                            <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">error</span>.<span class="ident">replace</span>(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>));
+                            <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, error.replace(<span class="string">&#39;\n&#39;</span>, <span class="string">&quot; &quot;</span>));
                         }
                     })
-                    .<span class="ident">collect</span>();
+                    .collect();
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">id_fields</span>.<span class="ident">is_empty</span>()
-                    <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">id_fields</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">in_eligible</span>(<span class="ident">f</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">f</span>.<span class="ident">is_optional</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">allow_optional</span>))
+                <span class="kw">if </span>!id_fields.is_empty()
+                    &amp;&amp; !id_fields
+                        .iter()
+                        .any(|f| in_eligible(f) || (f.is_optional() &amp;&amp; !allow_optional))
                 {
-                    <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">UniqueCriteria::new</span>(<span class="ident">id_fields</span>));
+                    result.push(UniqueCriteria::new(id_fields));
                 }
             }
         }
 
-        <span class="comment">// second candidate: any unique constraint where all fields are required</span>
-        {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unique_field_combi</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UniqueCriteria</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">indices</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">is_unique</span>())
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">id</span>
-                        .<span class="ident">fields</span>
-                        .<span class="ident">iter</span>()
-                        <span class="comment">// TODO: remove this when supporting composite indices on QE</span>
-                        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">find_scalar_field</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>())
-                        .<span class="ident">collect</span>();
-                    <span class="kw">let</span> <span class="ident">no_fields_are_ineligible</span> <span class="op">=</span> <span class="op">!</span><span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">in_eligible</span>(<span class="ident">f</span>));
-                    <span class="kw">let</span> <span class="ident">all_fields_are_required</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_required</span>());
-                    ((<span class="ident">all_fields_are_required</span> <span class="op">|</span><span class="op">|</span> <span class="ident">allow_optional</span>) <span class="op">&amp;&amp;</span> <span class="ident">no_fields_are_ineligible</span>)
-                        .<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">UniqueCriteria::new</span>(<span class="ident">fields</span>))
+        <span class="comment">// second candidate: any unique constraint where all fields are required
+        </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>unique_field_combi: Vec&lt;UniqueCriteria&gt; = <span class="self">self
+                </span>.indices
+                .iter()
+                .filter(|id| id.is_unique())
+                .filter_map(|id| {
+                    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = id
+                        .fields
+                        .iter()
+                        <span class="comment">// TODO: remove this when supporting composite indices on QE
+                        </span>.filter(|f| f.path.len() == <span class="number">1</span>)
+                        .map(|f| <span class="kw-2">&amp;</span>f.path.first().unwrap().<span class="number">0</span>)
+                        .map(|name| <span class="self">self</span>.find_scalar_field(name).unwrap())
+                        .collect();
+                    <span class="kw">let </span>no_fields_are_ineligible = !fields.iter().any(|f| in_eligible(f));
+                    <span class="kw">let </span>all_fields_are_required = fields.iter().all(|f| f.is_required());
+                    ((all_fields_are_required || allow_optional) &amp;&amp; no_fields_are_ineligible)
+                        .then(|| UniqueCriteria::new(fields))
                 })
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="ident">unique_field_combi</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">fields</span>.<span class="ident">len</span>());
+            unique_field_combi.sort_by_key(|c| c.fields.len());
 
-            <span class="ident">result</span>.<span class="ident">extend</span>(<span class="ident">unique_field_combi</span>)
+            result.extend(unique_field_combi)
         }
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_indexed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_field</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
+    <span class="kw">pub fn </span>field_is_indexed(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">let </span>field = <span class="self">self</span>.find_field(name).unwrap();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">field_is_primary</span>(<span class="ident">field</span>.<span class="ident">name</span>()) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">field_is_unique</span>(<span class="ident">field</span>.<span class="ident">name</span>()) {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span><span class="self">self</span>.field_is_primary(field.name()) || <span class="self">self</span>.field_is_unique(field.name()) {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">is_first_in_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
-            <span class="ident">index</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>)
-                .<span class="ident">last</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field_name</span> <span class="op">==</span> <span class="ident">name</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">let </span>is_first_in_index = <span class="self">self</span>.indices.iter().any(|index| {
+            index
+                .fields
+                .iter()
+                .flat_map(|f| <span class="kw-2">&amp;</span>f.path)
+                .last()
+                .map(|(field_name, <span class="kw">_</span>)| field_name == name)
+                .unwrap_or(<span class="bool-val">false</span>)
         });
 
-        <span class="kw">let</span> <span class="ident">is_first_in_primary_key</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span>, <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span>{ <span class="ident">fields</span>, ..}) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>);
+        <span class="kw">let </span>is_first_in_primary_key = <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_key, <span class="prelude-val">Some</span>(PrimaryKeyDefinition{ fields, ..}) <span class="kw">if </span>fields.first().unwrap().name == name);
 
-        <span class="ident">is_first_in_index</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_first_in_primary_key</span>
+        is_first_in_index || is_first_in_primary_key
     }
 
-    <span class="doccomment">/// Determines whether there is a singular primary key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_single_id_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span>, <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span>{<span class="ident">fields</span>, ..}) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span><span class="number">1</span>)
+    <span class="doccomment">/// Determines whether there is a singular primary key
+    </span><span class="kw">pub fn </span>has_single_id_field(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_key, <span class="prelude-val">Some</span>(PrimaryKeyDefinition{fields, ..}) <span class="kw">if </span>fields.len() ==<span class="number">1</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">IndexDefinition</span>) {
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">push</span>(<span class="ident">index</span>)
+    <span class="kw">pub fn </span>add_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: IndexDefinition) {
+        <span class="self">self</span>.indices.push(index)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_created_at_and_updated_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="doccomment">/// Finds a field by name.</span>
-        <span class="kw">fn</span> <span class="ident">has_field</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-            <span class="kw">match</span> <span class="ident">model</span>
-                .<span class="ident">find_scalar_field</span>(<span class="ident">name</span>)
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">find_scalar_field</span>(<span class="ident">name</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_ref</span>()))
+    <span class="kw">pub fn </span>has_created_at_and_updated_at(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="doccomment">/// Finds a field by name.
+        </span><span class="kw">fn </span>has_field(model: <span class="kw-2">&amp;</span>Model, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+            <span class="kw">match </span>model
+                .find_scalar_field(name)
+                .or_else(|| model.find_scalar_field(name.to_lowercase().as_ref()))
             {
-                <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">field_type</span>.<span class="ident">is_datetime</span>(),
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+                <span class="prelude-val">Some</span>(f) =&gt; f.field_type.is_datetime(),
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
             }
         }
 
-        <span class="ident">has_field</span>(<span class="self">self</span>, <span class="string">&quot;createdAt&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">has_field</span>(<span class="self">self</span>, <span class="string">&quot;updatedAt&quot;</span>)
+        has_field(<span class="self">self</span>, <span class="string">&quot;createdAt&quot;</span>) &amp;&amp; has_field(<span class="self">self</span>, <span class="string">&quot;updatedAt&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> <span class="ident">i</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>)
-                .<span class="ident">last</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field_name</span> <span class="op">==</span> <span class="ident">name</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+    <span class="kw">pub fn </span>field_is_unique(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.indices.iter().any(|i| {
+            <span class="kw">let </span>names_match = i
+                .fields
+                .iter()
+                .flat_map(|f| <span class="kw-2">&amp;</span>f.path)
+                .last()
+                .map(|(field_name, <span class="kw">_</span>)| field_name == name)
+                .unwrap_or(<span class="bool-val">false</span>);
 
-            <span class="ident">i</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">names_match</span>
+            i.is_unique() &amp;&amp; i.fields.len() == <span class="number">1 </span>&amp;&amp; names_match
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_unique_and_defined_on_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> <span class="ident">i</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">path</span>)
-                .<span class="ident">last</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">field_name</span> <span class="op">==</span> <span class="ident">name</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+    <span class="kw">pub fn </span>field_is_unique_and_defined_on_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.indices.iter().any(|i| {
+            <span class="kw">let </span>names_match = i
+                .fields
+                .iter()
+                .flat_map(|f| <span class="kw-2">&amp;</span>f.path)
+                .last()
+                .map(|(field_name, <span class="kw">_</span>)| field_name == name)
+                .unwrap_or(<span class="bool-val">false</span>);
 
-            <span class="ident">i</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">names_match</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">defined_on_field</span>
+            i.is_unique() &amp;&amp; i.fields.len() == <span class="number">1 </span>&amp;&amp; names_match &amp;&amp; i.defined_on_field
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_primary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span>, <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">field_name</span>)
+    <span class="kw">pub fn </span>field_is_primary(<span class="kw-2">&amp;</span><span class="self">self</span>, field_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_key, <span class="prelude-val">Some</span>(pk) <span class="kw">if </span>pk.fields.len() == <span class="number">1 </span>&amp;&amp; pk.fields.first().unwrap().name == field_name)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_primary_and_defined_on_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">primary_key</span>, <span class="prelude-val">Some</span>(<span class="ident">PrimaryKeyDefinition</span>{ <span class="ident">fields</span>, <span class="ident">defined_on_field</span> , ..}) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>()  <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">fields</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">field_name</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">defined_on_field</span>)
+    <span class="kw">pub fn </span>field_is_primary_and_defined_on_field(<span class="kw-2">&amp;</span><span class="self">self</span>, field_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.primary_key, <span class="prelude-val">Some</span>(PrimaryKeyDefinition{ fields, defined_on_field , ..}) <span class="kw">if </span>fields.len()  == <span class="number">1 </span>&amp;&amp; fields.first().unwrap().name == field_name &amp;&amp; <span class="kw-2">*</span>defined_on_field)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_auto_generated_int_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_scalar_field</span>(<span class="ident">name</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">is_autogenerated_id</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">kind</span>()), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Expression</span>(<span class="kw">_</span>)) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">field_is_primary</span>(<span class="ident">name</span>));
-        <span class="kw">let</span> <span class="ident">is_an_int</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">field_type</span>, <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="kw">_</span>));
+    <span class="kw">pub fn </span>field_is_auto_generated_int_id(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">let </span>field = <span class="self">self</span>.find_scalar_field(name).unwrap();
+        <span class="kw">let </span>is_autogenerated_id = <span class="macro">matches!</span>(field.default_value.as_ref().map(|val| val.kind()), <span class="prelude-val">Some</span>(DefaultKind::Expression(<span class="kw">_</span>)) <span class="kw">if </span><span class="self">self</span>.field_is_primary(name));
+        <span class="kw">let </span>is_an_int = <span class="macro">matches!</span>(field.field_type, FieldType::Scalar(ScalarType::Int, <span class="kw">_</span>));
 
-        <span class="ident">is_autogenerated_id</span> <span class="op">&amp;&amp;</span> <span class="ident">is_an_int</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">WithName</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">String</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
-    }
-    <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">name</span>)
+        is_autogenerated_id &amp;&amp; is_an_int
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WithDatabaseName</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">database_name</span>.<span class="ident">as_deref</span>()
+<span class="kw">impl </span>WithName <span class="kw">for </span>Model {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>String {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
-
-    <span class="kw">fn</span> <span class="ident">set_database_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>;
+    <span class="kw">fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.name = String::from(name)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ignorable</span> <span class="kw">for</span> <span class="ident">Model</span> {
-    <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_ignored</span>
+<span class="kw">impl </span>WithDatabaseName <span class="kw">for </span>Model {
+    <span class="kw">fn </span>database_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.database_name.as_deref()
     }
 
-    <span class="kw">fn</span> <span class="ident">ignore</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>set_database_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, database_name: <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="self">self</span>.database_name = database_name;
+    }
+}
+
+<span class="kw">impl </span>Ignorable <span class="kw">for </span>Model {
+    <span class="kw">fn </span>is_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_ignored
+    }
+
+    <span class="kw">fn </span>ignore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.is_ignored = <span class="bool-val">true</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

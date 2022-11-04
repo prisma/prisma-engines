@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/consts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>consts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/consts.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>consts.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -777,784 +777,784 @@
 <span id="777">777</span>
 <span id="778">778</span>
 <span id="779">779</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+</span><span class="kw">use </span>std::convert::TryFrom;
 
-<span class="doccomment">/// Depending on the MySQL Version that created the binlog the format is slightly different.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u16</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BinlogVersion</span> {
-    <span class="doccomment">/// MySQL 3.23 - &lt; 4.0.0</span>
-    <span class="ident">Version1</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// MySQL 4.0.0 - 4.0.1</span>
-    <span class="ident">Version2</span>,
-    <span class="doccomment">/// MySQL 4.0.2 - &lt; 5.0.0</span>
-    <span class="ident">Version3</span>,
-    <span class="doccomment">/// MySQL 5.0.0+</span>
-    <span class="ident">Version4</span>,
+<span class="doccomment">/// Depending on the MySQL Version that created the binlog the format is slightly different.
+</span><span class="attribute">#[repr(u16)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+</span><span class="kw">pub enum </span>BinlogVersion {
+    <span class="doccomment">/// MySQL 3.23 - &lt; 4.0.0
+    </span>Version1 = <span class="number">1</span>,
+    <span class="doccomment">/// MySQL 4.0.0 - 4.0.1
+    </span>Version2,
+    <span class="doccomment">/// MySQL 4.0.2 - &lt; 5.0.0
+    </span>Version3,
+    <span class="doccomment">/// MySQL 5.0.0+
+    </span>Version4,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BinlogVersion</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u16</span>
+<span class="kw">impl </span>From&lt;BinlogVersion&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(x: BinlogVersion) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u16
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown binlog version {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownBinlogVersion</span>(<span class="kw">pub</span> <span class="ident">u16</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown binlog version {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownBinlogVersion(<span class="kw">pub </span>u16);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownBinlogVersion</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownBinlogVersion</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownBinlogVersion&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(x: UnknownBinlogVersion) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinlogVersion</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownBinlogVersion</span>;
+<span class="kw">impl </span>TryFrom&lt;u16&gt; <span class="kw">for </span>BinlogVersion {
+    <span class="kw">type </span>Error = UnknownBinlogVersion;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Version1</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Version2</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Version3</span>),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Version4</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownBinlogVersion</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Version1),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Version2),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Version3),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Version4),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownBinlogVersion(x)),
         }
     }
 }
 
-<span class="doccomment">/// Binlog Event Type</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EventType</span> {
-    <span class="doccomment">/// Ignored event.</span>
-    <span class="ident">UNKNOWN_EVENT</span> <span class="op">=</span> <span class="number">0x00</span>,
-    <span class="doccomment">/// A start event is the first event of a binlog for binlog-version 1 to 3.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Superseded by `FORMAT_DESCRIPTION_EVENT` since mysql v5.0.0.</span>
-    <span class="ident">START_EVENT_V3</span> <span class="op">=</span> <span class="number">0x01</span>,
-    <span class="doccomment">/// A `QUERY_EVENT` is created for each query that modifies the database,</span>
-    <span class="doccomment">/// unless the query is logged row-based.</span>
-    <span class="ident">QUERY_EVENT</span> <span class="op">=</span> <span class="number">0x02</span>,
-    <span class="doccomment">/// A `STOP_EVENT` has no payload or post-header.</span>
-    <span class="ident">STOP_EVENT</span> <span class="op">=</span> <span class="number">0x03</span>,
-    <span class="doccomment">/// The rotate event is added to the binlog as last event</span>
-    <span class="doccomment">/// to tell the reader what binlog to request next.</span>
-    <span class="ident">ROTATE_EVENT</span> <span class="op">=</span> <span class="number">0x04</span>,
-    <span class="ident">INTVAR_EVENT</span> <span class="op">=</span> <span class="number">0x05</span>,
-    <span class="ident">LOAD_EVENT</span> <span class="op">=</span> <span class="number">0x06</span>,
-    <span class="doccomment">/// Ignored event.</span>
-    <span class="ident">SLAVE_EVENT</span> <span class="op">=</span> <span class="number">0x07</span>,
-    <span class="ident">CREATE_FILE_EVENT</span> <span class="op">=</span> <span class="number">0x08</span>,
-    <span class="ident">APPEND_BLOCK_EVENT</span> <span class="op">=</span> <span class="number">0x09</span>,
-    <span class="ident">EXEC_LOAD_EVENT</span> <span class="op">=</span> <span class="number">0x0a</span>,
-    <span class="ident">DELETE_FILE_EVENT</span> <span class="op">=</span> <span class="number">0x0b</span>,
-    <span class="ident">NEW_LOAD_EVENT</span> <span class="op">=</span> <span class="number">0x0c</span>,
-    <span class="ident">RAND_EVENT</span> <span class="op">=</span> <span class="number">0x0d</span>,
-    <span class="ident">USER_VAR_EVENT</span> <span class="op">=</span> <span class="number">0x0e</span>,
-    <span class="doccomment">///  A format description event is the first event of a binlog for binlog-version 4. It describes how the other events are layed out.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Added in MySQL 5.0.0 as replacement for START_EVENT_V3</span>
-    <span class="ident">FORMAT_DESCRIPTION_EVENT</span> <span class="op">=</span> <span class="number">0x0f</span>,
-    <span class="ident">XID_EVENT</span> <span class="op">=</span> <span class="number">0x10</span>,
-    <span class="ident">BEGIN_LOAD_QUERY_EVENT</span> <span class="op">=</span> <span class="number">0x11</span>,
-    <span class="ident">EXECUTE_LOAD_QUERY_EVENT</span> <span class="op">=</span> <span class="number">0x12</span>,
-    <span class="ident">TABLE_MAP_EVENT</span> <span class="op">=</span> <span class="number">0x13</span>,
-    <span class="ident">PRE_GA_WRITE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x14</span>,
-    <span class="ident">PRE_GA_UPDATE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x15</span>,
-    <span class="ident">PRE_GA_DELETE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x16</span>,
-    <span class="ident">WRITE_ROWS_EVENT_V1</span> <span class="op">=</span> <span class="number">0x17</span>,
-    <span class="ident">UPDATE_ROWS_EVENT_V1</span> <span class="op">=</span> <span class="number">0x18</span>,
-    <span class="ident">DELETE_ROWS_EVENT_V1</span> <span class="op">=</span> <span class="number">0x19</span>,
-    <span class="ident">INCIDENT_EVENT</span> <span class="op">=</span> <span class="number">0x1a</span>,
-    <span class="ident">HEARTBEAT_EVENT</span> <span class="op">=</span> <span class="number">0x1b</span>,
-    <span class="ident">IGNORABLE_EVENT</span> <span class="op">=</span> <span class="number">0x1c</span>,
-    <span class="ident">ROWS_QUERY_EVENT</span> <span class="op">=</span> <span class="number">0x1d</span>,
-    <span class="ident">WRITE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x1e</span>,
-    <span class="ident">UPDATE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x1f</span>,
-    <span class="ident">DELETE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x20</span>,
-    <span class="ident">GTID_EVENT</span> <span class="op">=</span> <span class="number">0x21</span>,
-    <span class="ident">ANONYMOUS_GTID_EVENT</span> <span class="op">=</span> <span class="number">0x22</span>,
-    <span class="ident">PREVIOUS_GTIDS_EVENT</span> <span class="op">=</span> <span class="number">0x23</span>,
-    <span class="ident">TRANSACTION_CONTEXT_EVENT</span> <span class="op">=</span> <span class="number">0x24</span>,
-    <span class="ident">VIEW_CHANGE_EVENT</span> <span class="op">=</span> <span class="number">0x25</span>,
-    <span class="doccomment">/// Prepared XA transaction terminal event similar to Xid.</span>
-    <span class="ident">XA_PREPARE_LOG_EVENT</span> <span class="op">=</span> <span class="number">0x26</span>,
-    <span class="doccomment">/// Extension of UPDATE_ROWS_EVENT, allowing partial values according</span>
-    <span class="doccomment">/// to binlog_row_value_options.</span>
-    <span class="ident">PARTIAL_UPDATE_ROWS_EVENT</span> <span class="op">=</span> <span class="number">0x27</span>,
-    <span class="doccomment">/// Total number of known events.</span>
-    <span class="ident">ENUM_END_EVENT</span>,
+<span class="doccomment">/// Binlog Event Type
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[repr(u8)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>EventType {
+    <span class="doccomment">/// Ignored event.
+    </span>UNKNOWN_EVENT = <span class="number">0x00</span>,
+    <span class="doccomment">/// A start event is the first event of a binlog for binlog-version 1 to 3.
+    ///
+    /// Superseded by `FORMAT_DESCRIPTION_EVENT` since mysql v5.0.0.
+    </span>START_EVENT_V3 = <span class="number">0x01</span>,
+    <span class="doccomment">/// A `QUERY_EVENT` is created for each query that modifies the database,
+    /// unless the query is logged row-based.
+    </span>QUERY_EVENT = <span class="number">0x02</span>,
+    <span class="doccomment">/// A `STOP_EVENT` has no payload or post-header.
+    </span>STOP_EVENT = <span class="number">0x03</span>,
+    <span class="doccomment">/// The rotate event is added to the binlog as last event
+    /// to tell the reader what binlog to request next.
+    </span>ROTATE_EVENT = <span class="number">0x04</span>,
+    INTVAR_EVENT = <span class="number">0x05</span>,
+    LOAD_EVENT = <span class="number">0x06</span>,
+    <span class="doccomment">/// Ignored event.
+    </span>SLAVE_EVENT = <span class="number">0x07</span>,
+    CREATE_FILE_EVENT = <span class="number">0x08</span>,
+    APPEND_BLOCK_EVENT = <span class="number">0x09</span>,
+    EXEC_LOAD_EVENT = <span class="number">0x0a</span>,
+    DELETE_FILE_EVENT = <span class="number">0x0b</span>,
+    NEW_LOAD_EVENT = <span class="number">0x0c</span>,
+    RAND_EVENT = <span class="number">0x0d</span>,
+    USER_VAR_EVENT = <span class="number">0x0e</span>,
+    <span class="doccomment">///  A format description event is the first event of a binlog for binlog-version 4. It describes how the other events are layed out.
+    ///
+    /// # Note
+    ///
+    /// Added in MySQL 5.0.0 as replacement for START_EVENT_V3
+    </span>FORMAT_DESCRIPTION_EVENT = <span class="number">0x0f</span>,
+    XID_EVENT = <span class="number">0x10</span>,
+    BEGIN_LOAD_QUERY_EVENT = <span class="number">0x11</span>,
+    EXECUTE_LOAD_QUERY_EVENT = <span class="number">0x12</span>,
+    TABLE_MAP_EVENT = <span class="number">0x13</span>,
+    PRE_GA_WRITE_ROWS_EVENT = <span class="number">0x14</span>,
+    PRE_GA_UPDATE_ROWS_EVENT = <span class="number">0x15</span>,
+    PRE_GA_DELETE_ROWS_EVENT = <span class="number">0x16</span>,
+    WRITE_ROWS_EVENT_V1 = <span class="number">0x17</span>,
+    UPDATE_ROWS_EVENT_V1 = <span class="number">0x18</span>,
+    DELETE_ROWS_EVENT_V1 = <span class="number">0x19</span>,
+    INCIDENT_EVENT = <span class="number">0x1a</span>,
+    HEARTBEAT_EVENT = <span class="number">0x1b</span>,
+    IGNORABLE_EVENT = <span class="number">0x1c</span>,
+    ROWS_QUERY_EVENT = <span class="number">0x1d</span>,
+    WRITE_ROWS_EVENT = <span class="number">0x1e</span>,
+    UPDATE_ROWS_EVENT = <span class="number">0x1f</span>,
+    DELETE_ROWS_EVENT = <span class="number">0x20</span>,
+    GTID_EVENT = <span class="number">0x21</span>,
+    ANONYMOUS_GTID_EVENT = <span class="number">0x22</span>,
+    PREVIOUS_GTIDS_EVENT = <span class="number">0x23</span>,
+    TRANSACTION_CONTEXT_EVENT = <span class="number">0x24</span>,
+    VIEW_CHANGE_EVENT = <span class="number">0x25</span>,
+    <span class="doccomment">/// Prepared XA transaction terminal event similar to Xid.
+    </span>XA_PREPARE_LOG_EVENT = <span class="number">0x26</span>,
+    <span class="doccomment">/// Extension of UPDATE_ROWS_EVENT, allowing partial values according
+    /// to binlog_row_value_options.
+    </span>PARTIAL_UPDATE_ROWS_EVENT = <span class="number">0x27</span>,
+    <span class="doccomment">/// Total number of known events.
+    </span>ENUM_END_EVENT,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown event type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownEventType</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown event type {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownEventType(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownEventType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownEventType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownEventType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownEventType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EventType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownEventType</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>EventType {
+    <span class="kw">type </span>Error = UnknownEventType;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">UnknownEventType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">byte</span> {
-            <span class="number">0x00</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UNKNOWN_EVENT</span>),
-            <span class="number">0x01</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::START_EVENT_V3</span>),
-            <span class="number">0x02</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::QUERY_EVENT</span>),
-            <span class="number">0x03</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::STOP_EVENT</span>),
-            <span class="number">0x04</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ROTATE_EVENT</span>),
-            <span class="number">0x05</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INTVAR_EVENT</span>),
-            <span class="number">0x06</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::LOAD_EVENT</span>),
-            <span class="number">0x07</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SLAVE_EVENT</span>),
-            <span class="number">0x08</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::CREATE_FILE_EVENT</span>),
-            <span class="number">0x09</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::APPEND_BLOCK_EVENT</span>),
-            <span class="number">0x0a</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::EXEC_LOAD_EVENT</span>),
-            <span class="number">0x0b</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DELETE_FILE_EVENT</span>),
-            <span class="number">0x0c</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::NEW_LOAD_EVENT</span>),
-            <span class="number">0x0d</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::RAND_EVENT</span>),
-            <span class="number">0x0e</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::USER_VAR_EVENT</span>),
-            <span class="number">0x0f</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::FORMAT_DESCRIPTION_EVENT</span>),
-            <span class="number">0x10</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::XID_EVENT</span>),
-            <span class="number">0x11</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::BEGIN_LOAD_QUERY_EVENT</span>),
-            <span class="number">0x12</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::EXECUTE_LOAD_QUERY_EVENT</span>),
-            <span class="number">0x13</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TABLE_MAP_EVENT</span>),
-            <span class="number">0x14</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PRE_GA_WRITE_ROWS_EVENT</span>),
-            <span class="number">0x15</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PRE_GA_UPDATE_ROWS_EVENT</span>),
-            <span class="number">0x16</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PRE_GA_DELETE_ROWS_EVENT</span>),
-            <span class="number">0x17</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::WRITE_ROWS_EVENT_V1</span>),
-            <span class="number">0x18</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UPDATE_ROWS_EVENT_V1</span>),
-            <span class="number">0x19</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DELETE_ROWS_EVENT_V1</span>),
-            <span class="number">0x1a</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INCIDENT_EVENT</span>),
-            <span class="number">0x1b</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::HEARTBEAT_EVENT</span>),
-            <span class="number">0x1c</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::IGNORABLE_EVENT</span>),
-            <span class="number">0x1d</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ROWS_QUERY_EVENT</span>),
-            <span class="number">0x1e</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::WRITE_ROWS_EVENT</span>),
-            <span class="number">0x1f</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UPDATE_ROWS_EVENT</span>),
-            <span class="number">0x20</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DELETE_ROWS_EVENT</span>),
-            <span class="number">0x21</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::GTID_EVENT</span>),
-            <span class="number">0x22</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ANONYMOUS_GTID_EVENT</span>),
-            <span class="number">0x23</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PREVIOUS_GTIDS_EVENT</span>),
-            <span class="number">0x24</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TRANSACTION_CONTEXT_EVENT</span>),
-            <span class="number">0x25</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::VIEW_CHANGE_EVENT</span>),
-            <span class="number">0x26</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::XA_PREPARE_LOG_EVENT</span>),
-            <span class="number">0x27</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PARTIAL_UPDATE_ROWS_EVENT</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownEventType</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(byte: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, UnknownEventType&gt; {
+        <span class="kw">match </span>byte {
+            <span class="number">0x00 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::UNKNOWN_EVENT),
+            <span class="number">0x01 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::START_EVENT_V3),
+            <span class="number">0x02 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::QUERY_EVENT),
+            <span class="number">0x03 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::STOP_EVENT),
+            <span class="number">0x04 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ROTATE_EVENT),
+            <span class="number">0x05 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INTVAR_EVENT),
+            <span class="number">0x06 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LOAD_EVENT),
+            <span class="number">0x07 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SLAVE_EVENT),
+            <span class="number">0x08 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::CREATE_FILE_EVENT),
+            <span class="number">0x09 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::APPEND_BLOCK_EVENT),
+            <span class="number">0x0a </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::EXEC_LOAD_EVENT),
+            <span class="number">0x0b </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DELETE_FILE_EVENT),
+            <span class="number">0x0c </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::NEW_LOAD_EVENT),
+            <span class="number">0x0d </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::RAND_EVENT),
+            <span class="number">0x0e </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::USER_VAR_EVENT),
+            <span class="number">0x0f </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::FORMAT_DESCRIPTION_EVENT),
+            <span class="number">0x10 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::XID_EVENT),
+            <span class="number">0x11 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::BEGIN_LOAD_QUERY_EVENT),
+            <span class="number">0x12 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::EXECUTE_LOAD_QUERY_EVENT),
+            <span class="number">0x13 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::TABLE_MAP_EVENT),
+            <span class="number">0x14 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PRE_GA_WRITE_ROWS_EVENT),
+            <span class="number">0x15 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PRE_GA_UPDATE_ROWS_EVENT),
+            <span class="number">0x16 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PRE_GA_DELETE_ROWS_EVENT),
+            <span class="number">0x17 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::WRITE_ROWS_EVENT_V1),
+            <span class="number">0x18 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::UPDATE_ROWS_EVENT_V1),
+            <span class="number">0x19 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DELETE_ROWS_EVENT_V1),
+            <span class="number">0x1a </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INCIDENT_EVENT),
+            <span class="number">0x1b </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::HEARTBEAT_EVENT),
+            <span class="number">0x1c </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::IGNORABLE_EVENT),
+            <span class="number">0x1d </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ROWS_QUERY_EVENT),
+            <span class="number">0x1e </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::WRITE_ROWS_EVENT),
+            <span class="number">0x1f </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::UPDATE_ROWS_EVENT),
+            <span class="number">0x20 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DELETE_ROWS_EVENT),
+            <span class="number">0x21 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::GTID_EVENT),
+            <span class="number">0x22 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ANONYMOUS_GTID_EVENT),
+            <span class="number">0x23 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PREVIOUS_GTIDS_EVENT),
+            <span class="number">0x24 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::TRANSACTION_CONTEXT_EVENT),
+            <span class="number">0x25 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::VIEW_CHANGE_EVENT),
+            <span class="number">0x26 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::XA_PREPARE_LOG_EVENT),
+            <span class="number">0x27 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PARTIAL_UPDATE_ROWS_EVENT),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownEventType(x)),
         }
     }
 }
 
-<span class="macro">my_bitflags!</span> {
-    <span class="ident">EventFlags</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown flags in the raw value of EventFlags (raw={:b})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnknownEventFlags</span>,
-    <span class="ident">u16</span>,
+<span class="macro">my_bitflags! </span>{
+    EventFlags,
+    <span class="attribute">#[error(<span class="string">&quot;Unknown flags in the raw value of EventFlags (raw={:b})&quot;</span>, _0)]
+    </span>UnknownEventFlags,
+    u16,
 
-    <span class="doccomment">/// Binlog Event Flags</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventFlags</span>: <span class="ident">u16</span> {
-        <span class="doccomment">/// Gets unset in the `FORMAT_DESCRIPTION_EVENT`</span>
-        <span class="doccomment">/// when the file gets closed to detect broken binlogs.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_BINLOG_IN_USE_F</span> <span class="op">=</span> <span class="number">0x0001</span>;
+    <span class="doccomment">/// Binlog Event Flags
+    </span><span class="kw">pub struct </span>EventFlags: u16 {
+        <span class="doccomment">/// Gets unset in the `FORMAT_DESCRIPTION_EVENT`
+        /// when the file gets closed to detect broken binlogs.
+        </span><span class="kw">const </span>LOG_EVENT_BINLOG_IN_USE_F = <span class="number">0x0001</span>;
 
-        <span class="doccomment">/// Unused.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_FORCED_ROTATE_F</span> <span class="op">=</span> <span class="number">0x0002</span>;
+        <span class="doccomment">/// Unused.
+        </span><span class="kw">const </span>LOG_EVENT_FORCED_ROTATE_F = <span class="number">0x0002</span>;
 
-        <span class="doccomment">/// event is thread specific (`CREATE TEMPORARY TABLE` ...).</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_THREAD_SPECIFIC_F</span> <span class="op">=</span> <span class="number">0x0004</span>;
+        <span class="doccomment">/// event is thread specific (`CREATE TEMPORARY TABLE` ...).
+        </span><span class="kw">const </span>LOG_EVENT_THREAD_SPECIFIC_F = <span class="number">0x0004</span>;
 
-        <span class="doccomment">/// Event doesn&#39;t need default database to be updated (`CREATE DATABASE`, ...).</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_SUPPRESS_USE_F</span> <span class="op">=</span> <span class="number">0x0008</span>;
+        <span class="doccomment">/// Event doesn&#39;t need default database to be updated (`CREATE DATABASE`, ...).
+        </span><span class="kw">const </span>LOG_EVENT_SUPPRESS_USE_F = <span class="number">0x0008</span>;
 
-        <span class="doccomment">/// Unused.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_UPDATE_TABLE_MAP_VERSION_F</span> <span class="op">=</span> <span class="number">0x0010</span>;
+        <span class="doccomment">/// Unused.
+        </span><span class="kw">const </span>LOG_EVENT_UPDATE_TABLE_MAP_VERSION_F = <span class="number">0x0010</span>;
 
-        <span class="doccomment">/// Event is created by the slaves SQL-thread and shouldn&#39;t update the master-log pos.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_ARTIFICIAL_F</span> <span class="op">=</span> <span class="number">0x0020</span>;
+        <span class="doccomment">/// Event is created by the slaves SQL-thread and shouldn&#39;t update the master-log pos.
+        </span><span class="kw">const </span>LOG_EVENT_ARTIFICIAL_F = <span class="number">0x0020</span>;
 
-        <span class="doccomment">/// Event is created by the slaves IO-thread when written to the relay log.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_RELAY_LOG_F</span> <span class="op">=</span> <span class="number">0x0040</span>;
+        <span class="doccomment">/// Event is created by the slaves IO-thread when written to the relay log.
+        </span><span class="kw">const </span>LOG_EVENT_RELAY_LOG_F = <span class="number">0x0040</span>;
 
-        <span class="doccomment">/// Setting this flag will mark an event as Ignorable.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_IGNORABLE_F</span> <span class="op">=</span> <span class="number">0x0080</span>;
+        <span class="doccomment">/// Setting this flag will mark an event as Ignorable.
+        </span><span class="kw">const </span>LOG_EVENT_IGNORABLE_F = <span class="number">0x0080</span>;
 
-        <span class="doccomment">/// Events with this flag are not filtered (e.g. on the current</span>
-        <span class="doccomment">/// database) and are always written to the binary log regardless of</span>
-        <span class="doccomment">/// filters.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_NO_FILTER_F</span> <span class="op">=</span> <span class="number">0x0100</span>;
+        <span class="doccomment">/// Events with this flag are not filtered (e.g. on the current
+        /// database) and are always written to the binary log regardless of
+        /// filters.
+        </span><span class="kw">const </span>LOG_EVENT_NO_FILTER_F = <span class="number">0x0100</span>;
 
-        <span class="doccomment">/// MTS: group of events can be marked to force its execution in isolation from</span>
-        <span class="doccomment">/// any other Workers.</span>
-        <span class="kw">const</span> <span class="ident">LOG_EVENT_MTS_ISOLATE_F</span> <span class="op">=</span> <span class="number">0x0200</span>;
+        <span class="doccomment">/// MTS: group of events can be marked to force its execution in isolation from
+        /// any other Workers.
+        </span><span class="kw">const </span>LOG_EVENT_MTS_ISOLATE_F = <span class="number">0x0200</span>;
     }
 }
 
-<span class="doccomment">/// Enumeration spcifying checksum algorithm used to encode a binary log event.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BinlogChecksumAlg</span> {
-    <span class="doccomment">/// Events are without checksum though its generator is checksum-capable New Master (NM).</span>
-    <span class="ident">BINLOG_CHECKSUM_ALG_OFF</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// CRC32 of zlib algorithm</span>
-    <span class="ident">BINLOG_CHECKSUM_ALG_CRC32</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="doccomment">/// Enumeration spcifying checksum algorithm used to encode a binary log event.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[allow(non_camel_case_types)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>BinlogChecksumAlg {
+    <span class="doccomment">/// Events are without checksum though its generator is checksum-capable New Master (NM).
+    </span>BINLOG_CHECKSUM_ALG_OFF = <span class="number">0</span>,
+    <span class="doccomment">/// CRC32 of zlib algorithm
+    </span>BINLOG_CHECKSUM_ALG_CRC32 = <span class="number">1</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown checksum algorithm {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownChecksumAlg</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown checksum algorithm {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownChecksumAlg(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownChecksumAlg</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownChecksumAlg</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownChecksumAlg&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownChecksumAlg) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinlogChecksumAlg</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownChecksumAlg</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>BinlogChecksumAlg {
+    <span class="kw">type </span>Error = UnknownChecksumAlg;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::BINLOG_CHECKSUM_ALG_OFF</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::BINLOG_CHECKSUM_ALG_CRC32</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownChecksumAlg</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::BINLOG_CHECKSUM_ALG_OFF),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::BINLOG_CHECKSUM_ALG_CRC32),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownChecksumAlg(x)),
         }
     }
 }
 
-<span class="doccomment">/// Binlog query event status vars keys.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StatusVarKey</span> {
-    <span class="doccomment">/// Contains `Flags2` flags.</span>
-    <span class="ident">Flags2</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// Contains `SqlMode` flags.</span>
-    <span class="ident">SqlMode</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   1 byte `length`,</span>
-    <span class="doccomment">/// *   `length` bytes catalog,</span>
-    <span class="doccomment">/// *   NULL byte.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `length + 2` bytes in total.</span>
-    <span class="ident">Catalog</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   2 bytes unsigned little-endian auto_increment_increment,</span>
-    <span class="doccomment">/// *   2 bytes unsigned little-endian auto_increment_offset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Four bytes in total.</span>
-    <span class="ident">AutoIncrement</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   2 bytes unsigned little-endian character_set_client,</span>
-    <span class="doccomment">/// *   2 bytes unsigned little-endian collation_connection,</span>
-    <span class="doccomment">/// *   2 bytes unsigned little-endian collation_server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Six bytes in total.</span>
-    <span class="ident">Charset</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   1 byte `length`,</span>
-    <span class="doccomment">/// *   `length` bytes timezone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `length + 1` bytes in total.</span>
-    <span class="ident">TimeZone</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   1 byte `length`,</span>
-    <span class="doccomment">/// *   `length` bytes catalog.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `length + 1` bytes in total.</span>
-    <span class="ident">CatalogNz</span>,
-    <span class="doccomment">/// Contains 2 bytes code identifying a table of month and day names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The mapping from codes to languages is defined in sql_locale.cc.</span>
-    <span class="ident">LcTimeNames</span>,
-    <span class="doccomment">/// Contains 2 bytes value of the collation_database system variable.</span>
-    <span class="ident">CharsetDatabase</span>,
-    <span class="doccomment">/// Contains 8 bytes value of the table map that is to be updated</span>
-    <span class="doccomment">/// by the multi-table update query statement.</span>
-    <span class="ident">TableMapForUpdate</span>,
-    <span class="doccomment">/// Contains 4 bytes bitfield.</span>
-    <span class="ident">MasterDataWritten</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   1 byte `user_length`,</span>
-    <span class="doccomment">/// *   `user_length` bytes user,</span>
-    <span class="doccomment">/// *   1 byte `host_length`,</span>
-    <span class="doccomment">/// *   `host_length` bytes host.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `user_length + host_length + 2` bytes in total.</span>
-    <span class="ident">Invoker</span>,
-    <span class="doccomment">/// Contains values in the following order:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   1 byte `count`,</span>
-    <span class="doccomment">/// *   `count` times:</span>
-    <span class="doccomment">///     *   null-terminated db_name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `1 + db_names_lens.sum()` bytes in total.</span>
-    <span class="ident">UpdatedDbNames</span>,
-    <span class="doccomment">/// Contains 3 bytes unsigned little-endian integer.</span>
-    <span class="ident">Microseconds</span>,
-    <span class="ident">CommitTs</span>,
-    <span class="ident">CommitTs2</span>,
-    <span class="doccomment">/// Contains 1 byte boolean.</span>
-    <span class="ident">ExplicitDefaultsForTimestamp</span>,
-    <span class="doccomment">/// Contains 8 bytes unsigned little-endian integer carrying xid info of 2pc-aware</span>
-    <span class="doccomment">/// (recoverable) DDL queries.</span>
-    <span class="ident">DdlLoggedWithXid</span>,
-    <span class="doccomment">/// Contains 2 bytes unsigned little-endian integer carrying</span>
-    <span class="doccomment">/// the default collation for the utf8mb4 character set.</span>
-    <span class="ident">DefaultCollationForUtf8mb4</span>,
-    <span class="doccomment">/// Contains 1 byte value.</span>
-    <span class="ident">SqlRequirePrimaryKey</span>,
-    <span class="doccomment">/// Contains 1 byte value.</span>
-    <span class="ident">DefaultTableEncryption</span>,
+<span class="doccomment">/// Binlog query event status vars keys.
+</span><span class="attribute">#[repr(u8)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>StatusVarKey {
+    <span class="doccomment">/// Contains `Flags2` flags.
+    </span>Flags2 = <span class="number">0</span>,
+    <span class="doccomment">/// Contains `SqlMode` flags.
+    </span>SqlMode,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   1 byte `length`,
+    /// *   `length` bytes catalog,
+    /// *   NULL byte.
+    ///
+    /// `length + 2` bytes in total.
+    </span>Catalog,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   2 bytes unsigned little-endian auto_increment_increment,
+    /// *   2 bytes unsigned little-endian auto_increment_offset.
+    ///
+    /// Four bytes in total.
+    </span>AutoIncrement,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   2 bytes unsigned little-endian character_set_client,
+    /// *   2 bytes unsigned little-endian collation_connection,
+    /// *   2 bytes unsigned little-endian collation_server.
+    ///
+    /// Six bytes in total.
+    </span>Charset,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   1 byte `length`,
+    /// *   `length` bytes timezone.
+    ///
+    /// `length + 1` bytes in total.
+    </span>TimeZone,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   1 byte `length`,
+    /// *   `length` bytes catalog.
+    ///
+    /// `length + 1` bytes in total.
+    </span>CatalogNz,
+    <span class="doccomment">/// Contains 2 bytes code identifying a table of month and day names.
+    ///
+    /// The mapping from codes to languages is defined in sql_locale.cc.
+    </span>LcTimeNames,
+    <span class="doccomment">/// Contains 2 bytes value of the collation_database system variable.
+    </span>CharsetDatabase,
+    <span class="doccomment">/// Contains 8 bytes value of the table map that is to be updated
+    /// by the multi-table update query statement.
+    </span>TableMapForUpdate,
+    <span class="doccomment">/// Contains 4 bytes bitfield.
+    </span>MasterDataWritten,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   1 byte `user_length`,
+    /// *   `user_length` bytes user,
+    /// *   1 byte `host_length`,
+    /// *   `host_length` bytes host.
+    ///
+    /// `user_length + host_length + 2` bytes in total.
+    </span>Invoker,
+    <span class="doccomment">/// Contains values in the following order:
+    ///
+    /// *   1 byte `count`,
+    /// *   `count` times:
+    ///     *   null-terminated db_name.
+    ///
+    /// `1 + db_names_lens.sum()` bytes in total.
+    </span>UpdatedDbNames,
+    <span class="doccomment">/// Contains 3 bytes unsigned little-endian integer.
+    </span>Microseconds,
+    CommitTs,
+    CommitTs2,
+    <span class="doccomment">/// Contains 1 byte boolean.
+    </span>ExplicitDefaultsForTimestamp,
+    <span class="doccomment">/// Contains 8 bytes unsigned little-endian integer carrying xid info of 2pc-aware
+    /// (recoverable) DDL queries.
+    </span>DdlLoggedWithXid,
+    <span class="doccomment">/// Contains 2 bytes unsigned little-endian integer carrying
+    /// the default collation for the utf8mb4 character set.
+    </span>DefaultCollationForUtf8mb4,
+    <span class="doccomment">/// Contains 1 byte value.
+    </span>SqlRequirePrimaryKey,
+    <span class="doccomment">/// Contains 1 byte value.
+    </span>DefaultTableEncryption,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown status var key {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownStatusVarKey</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown status var key {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownStatusVarKey(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StatusVarKey</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownStatusVarKey</span>;
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::Flags2</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::SqlMode</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::Catalog</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::AutoIncrement</span>),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::Charset</span>),
-            <span class="number">5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::TimeZone</span>),
-            <span class="number">6</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::CatalogNz</span>),
-            <span class="number">7</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::LcTimeNames</span>),
-            <span class="number">8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::CharsetDatabase</span>),
-            <span class="number">9</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::TableMapForUpdate</span>),
-            <span class="number">10</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::MasterDataWritten</span>),
-            <span class="number">11</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::Invoker</span>),
-            <span class="number">12</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::UpdatedDbNames</span>),
-            <span class="number">13</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::Microseconds</span>),
-            <span class="number">14</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::CommitTs</span>),
-            <span class="number">15</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::CommitTs2</span>),
-            <span class="number">16</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::ExplicitDefaultsForTimestamp</span>),
-            <span class="number">17</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::DdlLoggedWithXid</span>),
-            <span class="number">18</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::DefaultCollationForUtf8mb4</span>),
-            <span class="number">19</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::SqlRequirePrimaryKey</span>),
-            <span class="number">20</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">StatusVarKey::DefaultTableEncryption</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownStatusVarKey</span>(<span class="ident">x</span>)),
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>StatusVarKey {
+    <span class="kw">type </span>Error = UnknownStatusVarKey;
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::Flags2),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::SqlMode),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::Catalog),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::AutoIncrement),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::Charset),
+            <span class="number">5 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::TimeZone),
+            <span class="number">6 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::CatalogNz),
+            <span class="number">7 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::LcTimeNames),
+            <span class="number">8 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::CharsetDatabase),
+            <span class="number">9 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::TableMapForUpdate),
+            <span class="number">10 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::MasterDataWritten),
+            <span class="number">11 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::Invoker),
+            <span class="number">12 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::UpdatedDbNames),
+            <span class="number">13 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::Microseconds),
+            <span class="number">14 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::CommitTs),
+            <span class="number">15 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::CommitTs2),
+            <span class="number">16 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::ExplicitDefaultsForTimestamp),
+            <span class="number">17 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::DdlLoggedWithXid),
+            <span class="number">18 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::DefaultCollationForUtf8mb4),
+            <span class="number">19 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::SqlRequirePrimaryKey),
+            <span class="number">20 </span>=&gt; <span class="prelude-val">Ok</span>(StatusVarKey::DefaultTableEncryption),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownStatusVarKey(x)),
         }
     }
 }
 
-<span class="macro">my_bitflags!</span> {
-    <span class="ident">SemiSyncFlags</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown flags in the raw value of SemiSyncFlags (raw={:b})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnknownSemiSyncFlags</span>,
-    <span class="ident">u8</span>,
+<span class="macro">my_bitflags! </span>{
+    SemiSyncFlags,
+    <span class="attribute">#[error(<span class="string">&quot;Unknown flags in the raw value of SemiSyncFlags (raw={:b})&quot;</span>, _0)]
+    </span>UnknownSemiSyncFlags,
+    u8,
 
-    <span class="doccomment">/// Semi-sync binlog flags.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemiSyncFlags</span>: <span class="ident">u8</span> {
-        <span class="comment">// If the SEMI_SYNC_ACK_REQ flag is set the master waits for a Semi Sync ACK packet</span>
-        <span class="comment">// from the slave before it sends the next event.</span>
-        <span class="kw">const</span> <span class="ident">SEMI_SYNC_ACK_REQ</span> <span class="op">=</span> <span class="number">0x01</span>;
+    <span class="doccomment">/// Semi-sync binlog flags.
+    </span><span class="kw">pub struct </span>SemiSyncFlags: u8 {
+        <span class="comment">// If the SEMI_SYNC_ACK_REQ flag is set the master waits for a Semi Sync ACK packet
+        // from the slave before it sends the next event.
+        </span><span class="kw">const </span>SEMI_SYNC_ACK_REQ = <span class="number">0x01</span>;
     }
 }
 
-<span class="doccomment">/// Variants of this enum describe how LOAD DATA handles duplicates.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LoadDuplicateHandling</span> {
-    <span class="ident">LOAD_DUP_ERROR</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="ident">LOAD_DUP_IGNORE</span>,
-    <span class="ident">LOAD_DUP_REPLACE</span>,
+<span class="doccomment">/// Variants of this enum describe how LOAD DATA handles duplicates.
+</span><span class="attribute">#[repr(u8)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>LoadDuplicateHandling {
+    LOAD_DUP_ERROR = <span class="number">0</span>,
+    LOAD_DUP_IGNORE,
+    LOAD_DUP_REPLACE,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LoadDuplicateHandling</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">LoadDuplicateHandling</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>
+<span class="kw">impl </span>From&lt;LoadDuplicateHandling&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: LoadDuplicateHandling) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u8
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown duplicate handling variant {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownDuplicateHandling</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown duplicate handling variant {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownDuplicateHandling(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownDuplicateHandling</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownDuplicateHandling</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownDuplicateHandling&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownDuplicateHandling) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LoadDuplicateHandling</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownDuplicateHandling</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>LoadDuplicateHandling {
+    <span class="kw">type </span>Error = UnknownDuplicateHandling;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::LOAD_DUP_ERROR</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::LOAD_DUP_IGNORE</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::LOAD_DUP_REPLACE</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownDuplicateHandling</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LOAD_DUP_ERROR),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LOAD_DUP_IGNORE),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LOAD_DUP_REPLACE),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownDuplicateHandling(x)),
         }
     }
 }
 
-<span class="doccomment">/// Enumerates types of optional metadata fields.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OptionalMetadataFieldType</span> {
-    <span class="doccomment">/// UNSIGNED flag of numeric columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For each numeric column, a bit indicates whether the numeric colunm has unsigned flag.</span>
-    <span class="doccomment">/// `1` means it is unsigned. The number of bytes needed for this</span>
-    <span class="doccomment">/// is `int((column_count + 7) / 8)`.</span>
-    <span class="ident">SIGNEDNESS</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// Character set of string columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `COLUMN_CHARSET`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   default charset as a lenght-encoded integer,</span>
-    <span class="doccomment">/// *   then for every character column which charset isn&#39;t default:</span>
-    <span class="doccomment">///     *   column index as a lenght-encoded integer,</span>
-    <span class="doccomment">///     *   column charset as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">DEFAULT_CHARSET</span>,
-    <span class="doccomment">/// Character set of string columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `DEFAULT_CHARSET`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every character column:</span>
-    <span class="doccomment">///     *   column charset as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">COLUMN_CHARSET</span>,
-    <span class="doccomment">/// Collumn name of columns (included if `binlog_row_metadata=FULL`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every column:</span>
-    <span class="doccomment">///     *   column name as a length-encoded string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">COLUMN_NAME</span>,
-    <span class="doccomment">/// Name of each variant in a SET columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every SET column:</span>
-    <span class="doccomment">///     *   number of variants as a length-encoded integer,</span>
-    <span class="doccomment">///     *   for each variant:</span>
-    <span class="doccomment">///         *   name of a variant as a length-encoded string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">SET_STR_VALUE</span>,
-    <span class="doccomment">/// Name of each variant in an ENUM columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every ENUM column:</span>
-    <span class="doccomment">///     *   number of variants as a length-encoded integer,</span>
-    <span class="doccomment">///     *   for each variant:</span>
-    <span class="doccomment">///         *   name of a variant as a length-encoded string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">ENUM_STR_VALUE</span>,
-    <span class="doccomment">/// Real type of geometry columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every geometry column:</span>
-    <span class="doccomment">///     *   geometry type as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">GEOMETRY_TYPE</span>,
-    <span class="doccomment">/// Primary key without prefix (included if `binlog_row_metadata=FULL`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `PRIMARY_KEY_WITH_PREFIX`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every PK index column:</span>
-    <span class="doccomment">///     *   column index as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">SIMPLE_PRIMARY_KEY</span>,
-    <span class="doccomment">/// Primary key with prefix (included if `binlog_row_metadata=FULL`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `SIMPLE_PRIMARY_KEY`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every PK index column:</span>
-    <span class="doccomment">///     *   column index as a length-encoded integer,</span>
-    <span class="doccomment">///     *   prefix length as a length-encoded integer</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   prefix length is a character length, i.e. prefix byte length divided by the maximum</span>
-    <span class="doccomment">///     length of a character in the correspoding charset;</span>
-    <span class="doccomment">/// *   prefix length `0` means that the whole column value is used.</span>
-    <span class="ident">PRIMARY_KEY_WITH_PREFIX</span>,
-    <span class="doccomment">/// Character set of enum and set columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `ENUM_AND_SET_COLUMN_CHARSET`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   default charset as a lenght-encoded integer,</span>
-    <span class="doccomment">/// *   then for every SET or ENUM column which charset isn&#39;t default:</span>
-    <span class="doccomment">///     *   column index as a lenght-encoded integer,</span>
-    <span class="doccomment">///     *   column charset as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">ENUM_AND_SET_DEFAULT_CHARSET</span>,
-    <span class="doccomment">/// Character set of enum and set columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This field should not appear with `ENUM_AND_SET_DEFAULT_CHARSET`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Value format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   for every SET or ENUM column:</span>
-    <span class="doccomment">///     *   column charset as a length-encoded integer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order is the same as the order of `column_type` field.</span>
-    <span class="ident">ENUM_AND_SET_COLUMN_CHARSET</span>,
-    <span class="doccomment">/// A flag that indicates column visibility attribute.</span>
-    <span class="ident">COLUMN_VISIBILITY</span>,
+<span class="doccomment">/// Enumerates types of optional metadata fields.
+</span><span class="attribute">#[repr(u8)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>OptionalMetadataFieldType {
+    <span class="doccomment">/// UNSIGNED flag of numeric columns.
+    ///
+    /// # Value format
+    ///
+    /// For each numeric column, a bit indicates whether the numeric colunm has unsigned flag.
+    /// `1` means it is unsigned. The number of bytes needed for this
+    /// is `int((column_count + 7) / 8)`.
+    </span>SIGNEDNESS = <span class="number">1</span>,
+    <span class="doccomment">/// Character set of string columns.
+    ///
+    /// This field should not appear with `COLUMN_CHARSET`.
+    ///
+    /// # Value format
+    ///
+    /// *   default charset as a lenght-encoded integer,
+    /// *   then for every character column which charset isn&#39;t default:
+    ///     *   column index as a lenght-encoded integer,
+    ///     *   column charset as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>DEFAULT_CHARSET,
+    <span class="doccomment">/// Character set of string columns.
+    ///
+    /// This field should not appear with `DEFAULT_CHARSET`.
+    ///
+    /// # Value format
+    ///
+    /// *   for every character column:
+    ///     *   column charset as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>COLUMN_CHARSET,
+    <span class="doccomment">/// Collumn name of columns (included if `binlog_row_metadata=FULL`).
+    ///
+    /// # Value format
+    ///
+    /// *   for every column:
+    ///     *   column name as a length-encoded string.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>COLUMN_NAME,
+    <span class="doccomment">/// Name of each variant in a SET columns.
+    ///
+    /// # Value format
+    ///
+    /// *   for every SET column:
+    ///     *   number of variants as a length-encoded integer,
+    ///     *   for each variant:
+    ///         *   name of a variant as a length-encoded string.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>SET_STR_VALUE,
+    <span class="doccomment">/// Name of each variant in an ENUM columns.
+    ///
+    /// # Value format
+    ///
+    /// *   for every ENUM column:
+    ///     *   number of variants as a length-encoded integer,
+    ///     *   for each variant:
+    ///         *   name of a variant as a length-encoded string.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>ENUM_STR_VALUE,
+    <span class="doccomment">/// Real type of geometry columns.
+    ///
+    /// # Value format
+    ///
+    /// *   for every geometry column:
+    ///     *   geometry type as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>GEOMETRY_TYPE,
+    <span class="doccomment">/// Primary key without prefix (included if `binlog_row_metadata=FULL`).
+    ///
+    /// This field should not appear with `PRIMARY_KEY_WITH_PREFIX`.
+    ///
+    /// # Value format
+    ///
+    /// *   for every PK index column:
+    ///     *   column index as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>SIMPLE_PRIMARY_KEY,
+    <span class="doccomment">/// Primary key with prefix (included if `binlog_row_metadata=FULL`).
+    ///
+    /// This field should not appear with `SIMPLE_PRIMARY_KEY`.
+    ///
+    /// # Value format
+    ///
+    /// *   for every PK index column:
+    ///     *   column index as a length-encoded integer,
+    ///     *   prefix length as a length-encoded integer
+    ///
+    /// The order is the same as the order of `column_type` field.
+    ///
+    /// ## Note
+    ///
+    /// *   prefix length is a character length, i.e. prefix byte length divided by the maximum
+    ///     length of a character in the correspoding charset;
+    /// *   prefix length `0` means that the whole column value is used.
+    </span>PRIMARY_KEY_WITH_PREFIX,
+    <span class="doccomment">/// Character set of enum and set columns.
+    ///
+    /// This field should not appear with `ENUM_AND_SET_COLUMN_CHARSET`.
+    ///
+    /// # Value format
+    ///
+    /// *   default charset as a lenght-encoded integer,
+    /// *   then for every SET or ENUM column which charset isn&#39;t default:
+    ///     *   column index as a lenght-encoded integer,
+    ///     *   column charset as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>ENUM_AND_SET_DEFAULT_CHARSET,
+    <span class="doccomment">/// Character set of enum and set columns.
+    ///
+    /// This field should not appear with `ENUM_AND_SET_DEFAULT_CHARSET`.
+    ///
+    /// # Value format
+    ///
+    /// *   for every SET or ENUM column:
+    ///     *   column charset as a length-encoded integer.
+    ///
+    /// The order is the same as the order of `column_type` field.
+    </span>ENUM_AND_SET_COLUMN_CHARSET,
+    <span class="doccomment">/// A flag that indicates column visibility attribute.
+    </span>COLUMN_VISIBILITY,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown optional metadata field type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownOptionalMetadataFieldType</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown optional metadata field type {}&quot;</span>, _0)]
+</span><span class="kw">pub struct </span>UnknownOptionalMetadataFieldType(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownOptionalMetadataFieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownOptionalMetadataFieldType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownOptionalMetadataFieldType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownOptionalMetadataFieldType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptionalMetadataFieldType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownOptionalMetadataFieldType</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>OptionalMetadataFieldType {
+    <span class="kw">type </span>Error = UnknownOptionalMetadataFieldType;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SIGNEDNESS</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DEFAULT_CHARSET</span>),
-            <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::COLUMN_CHARSET</span>),
-            <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::COLUMN_NAME</span>),
-            <span class="number">5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SET_STR_VALUE</span>),
-            <span class="number">6</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ENUM_STR_VALUE</span>),
-            <span class="number">7</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::GEOMETRY_TYPE</span>),
-            <span class="number">8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::SIMPLE_PRIMARY_KEY</span>),
-            <span class="number">9</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::PRIMARY_KEY_WITH_PREFIX</span>),
-            <span class="number">10</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ENUM_AND_SET_DEFAULT_CHARSET</span>),
-            <span class="number">11</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ENUM_AND_SET_COLUMN_CHARSET</span>),
-            <span class="number">12</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::COLUMN_VISIBILITY</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownOptionalMetadataFieldType</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SIGNEDNESS),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::DEFAULT_CHARSET),
+            <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::COLUMN_CHARSET),
+            <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::COLUMN_NAME),
+            <span class="number">5 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SET_STR_VALUE),
+            <span class="number">6 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ENUM_STR_VALUE),
+            <span class="number">7 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::GEOMETRY_TYPE),
+            <span class="number">8 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::SIMPLE_PRIMARY_KEY),
+            <span class="number">9 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::PRIMARY_KEY_WITH_PREFIX),
+            <span class="number">10 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ENUM_AND_SET_DEFAULT_CHARSET),
+            <span class="number">11 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::ENUM_AND_SET_COLUMN_CHARSET),
+            <span class="number">12 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::COLUMN_VISIBILITY),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownOptionalMetadataFieldType(x)),
         }
     }
 }
 
-<span class="doccomment">/// Type of an incident event.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u16</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IncidentType</span> {
-    <span class="doccomment">/// No incident.</span>
-    <span class="ident">INCIDENT_NONE</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// There are possibly lost events in the replication stream.</span>
-    <span class="ident">INCIDENT_LOST_EVENTS</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="doccomment">/// Type of an incident event.
+</span><span class="attribute">#[repr(u16)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>IncidentType {
+    <span class="doccomment">/// No incident.
+    </span>INCIDENT_NONE = <span class="number">0</span>,
+    <span class="doccomment">/// There are possibly lost events in the replication stream.
+    </span>INCIDENT_LOST_EVENTS = <span class="number">1</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IncidentType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">IncidentType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u16</span>
+<span class="kw">impl </span>From&lt;IncidentType&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(x: IncidentType) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u16
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown item incident type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownIncidentType</span>(<span class="kw">pub</span> <span class="ident">u16</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown item incident type {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownIncidentType(<span class="kw">pub </span>u16);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownIncidentType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownIncidentType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownIncidentType&gt; <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>from(x: UnknownIncidentType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IncidentType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownIncidentType</span>;
+<span class="kw">impl </span>TryFrom&lt;u16&gt; <span class="kw">for </span>IncidentType {
+    <span class="kw">type </span>Error = UnknownIncidentType;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u16</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INCIDENT_NONE</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INCIDENT_LOST_EVENTS</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownIncidentType</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u16) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INCIDENT_NONE),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INCIDENT_LOST_EVENTS),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownIncidentType(x)),
         }
     }
 }
 
-<span class="doccomment">/// Type of an `InvarEvent`.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IntvarEventType</span> {
-    <span class="ident">INVALID_INT_EVENT</span>,
-    <span class="doccomment">/// Indicates the value to use for the `LAST_INSERT_ID()` function in the next statement.</span>
-    <span class="ident">LAST_INSERT_ID_EVENT</span>,
-    <span class="doccomment">/// Indicates the value to use for an `AUTO_INCREMENT` column in the next statement.</span>
-    <span class="ident">INSERT_ID_EVENT</span>,
+<span class="doccomment">/// Type of an `InvarEvent`.
+</span><span class="attribute">#[repr(u8)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>IntvarEventType {
+    INVALID_INT_EVENT,
+    <span class="doccomment">/// Indicates the value to use for the `LAST_INSERT_ID()` function in the next statement.
+    </span>LAST_INSERT_ID_EVENT,
+    <span class="doccomment">/// Indicates the value to use for an `AUTO_INCREMENT` column in the next statement.
+    </span>INSERT_ID_EVENT,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IntvarEventType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">IntvarEventType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>
+<span class="kw">impl </span>From&lt;IntvarEventType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: IntvarEventType) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u8
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown intvar event type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownIntvarEventType</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown intvar event type {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownIntvarEventType(<span class="kw">pub </span>u8);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownIntvarEventType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownIntvarEventType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;UnknownIntvarEventType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownIntvarEventType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntvarEventType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownIntvarEventType</span>;
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>IntvarEventType {
+    <span class="kw">type </span>Error = UnknownIntvarEventType;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INVALID_INT_EVENT</span>),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::LAST_INSERT_ID_EVENT</span>),
-            <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::INSERT_ID_EVENT</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownIntvarEventType</span>(<span class="ident">x</span>)),
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INVALID_INT_EVENT),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::LAST_INSERT_ID_EVENT),
+            <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::INSERT_ID_EVENT),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownIntvarEventType(x)),
         }
     }
 }
 
-<span class="macro">my_bitflags!</span> {
-    <span class="ident">GtidFlags</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown flags in the raw value of GtidFlags (raw={:b})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnknownGtidFlags</span>,
-    <span class="ident">u8</span>,
+<span class="macro">my_bitflags! </span>{
+    GtidFlags,
+    <span class="attribute">#[error(<span class="string">&quot;Unknown flags in the raw value of GtidFlags (raw={:b})&quot;</span>, _0)]
+    </span>UnknownGtidFlags,
+    u8,
 
-    <span class="doccomment">/// Gtid event flags.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GtidFlags</span>: <span class="ident">u8</span> {
-        <span class="doccomment">/// Transaction may have changes logged with SBR.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// In 5.6, 5.7.0-5.7.18, and 8.0.0-8.0.1, this flag is always set.</span>
-        <span class="doccomment">/// Starting in 5.7.19 and 8.0.2, this flag is cleared if the transaction</span>
-        <span class="doccomment">/// only contains row events. It is set if any part of the transaction is</span>
-        <span class="doccomment">/// written in statement format.</span>
-        <span class="kw">const</span> <span class="ident">MAY_HAVE_SBR</span> <span class="op">=</span> <span class="number">0x01</span>;
+    <span class="doccomment">/// Gtid event flags.
+    </span><span class="kw">pub struct </span>GtidFlags: u8 {
+        <span class="doccomment">/// Transaction may have changes logged with SBR.
+        ///
+        /// In 5.6, 5.7.0-5.7.18, and 8.0.0-8.0.1, this flag is always set.
+        /// Starting in 5.7.19 and 8.0.2, this flag is cleared if the transaction
+        /// only contains row events. It is set if any part of the transaction is
+        /// written in statement format.
+        </span><span class="kw">const </span>MAY_HAVE_SBR = <span class="number">0x01</span>;
     }
 }
 
-<span class="doccomment">/// Group number of a Gtid event.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Should be between `MIN_GNO` and `MAX_GNO` for GtidEvent and `0` for AnonymousGtidEvent.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gno</span>(<span class="ident">u64</span>);
+<span class="doccomment">/// Group number of a Gtid event.
+///
+/// Should be between `MIN_GNO` and `MAX_GNO` for GtidEvent and `0` for AnonymousGtidEvent.
+</span><span class="attribute">#[repr(transparent)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
+</span><span class="kw">pub struct </span>Gno(u64);
 
-<span class="kw">impl</span> <span class="ident">Gno</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_GNO</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_GNO</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>;
+<span class="kw">impl </span>Gno {
+    <span class="kw">pub const </span>MIN_GNO: u64 = <span class="number">1</span>;
+    <span class="kw">pub const </span>MAX_GNO: u64 = i64::MAX <span class="kw">as </span>u64;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(
     <span class="string">&quot;Group number {} is out of range [{}, {}]&quot;</span>,
-    <span class="ident">_0</span>,
-    <span class="ident">Gno::MIN_GNO</span>,
-    <span class="ident">Gno::MAX_GNO</span>
-)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidGno</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+    _0,
+    Gno::MIN_GNO,
+    Gno::MAX_GNO
+)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>InvalidGno(<span class="kw">pub </span>u64);
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InvalidGno</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">InvalidGno</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>From&lt;InvalidGno&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(x: InvalidGno) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Gno</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidGno</span>;
+<span class="kw">impl </span>TryFrom&lt;u64&gt; <span class="kw">for </span>Gno {
+    <span class="kw">type </span>Error = InvalidGno;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> (<span class="ident"><span class="self">Self</span>::MIN_GNO</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">value</span> <span class="op">&amp;&amp;</span> <span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::MAX_GNO</span>) {
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">value</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">InvalidGno</span>(<span class="ident">value</span>))
+    <span class="kw">fn </span>try_from(value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">if </span>value == <span class="number">0 </span>|| (<span class="self">Self</span>::MIN_GNO &lt;= value &amp;&amp; value &lt;= <span class="self">Self</span>::MAX_GNO) {
+            <span class="prelude-val">Ok</span>(<span class="self">Self</span>(value))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(InvalidGno(value))
         }
     }
 }
 
-<span class="macro">my_bitflags!</span> {
-    <span class="ident">RowsEventFlags</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown flags in the raw value of RowsEventFlags (raw={:b})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnknownRowsEventFlags</span>,
-    <span class="ident">u16</span>,
+<span class="macro">my_bitflags! </span>{
+    RowsEventFlags,
+    <span class="attribute">#[error(<span class="string">&quot;Unknown flags in the raw value of RowsEventFlags (raw={:b})&quot;</span>, _0)]
+    </span>UnknownRowsEventFlags,
+    u16,
 
-    <span class="doccomment">/// Rows event flags.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowsEventFlags</span>: <span class="ident">u16</span> {
-        <span class="doccomment">/// Last event of a statement.</span>
-        <span class="kw">const</span> <span class="ident">STMT_END</span> <span class="op">=</span> <span class="number">0x0001</span>;
-        <span class="doccomment">/// No foreign key checks.</span>
-        <span class="kw">const</span> <span class="ident">NO_FOREIGN_KEY_CHECKS</span>   <span class="op">=</span> <span class="number">0x0002</span>;
-        <span class="doccomment">/// No unique key checks.</span>
-        <span class="kw">const</span> <span class="ident">RELAXED_UNIQUE_CHECKS</span>  <span class="op">=</span> <span class="number">0x0004</span>;
-        <span class="doccomment">/// Indicates that rows in this event are complete,</span>
-        <span class="doccomment">/// that is contain values for all columns of the table.</span>
-        <span class="kw">const</span> <span class="ident">COMPLETE_ROWS</span> <span class="op">=</span> <span class="number">0x0008</span>;
+    <span class="doccomment">/// Rows event flags.
+    </span><span class="kw">pub struct </span>RowsEventFlags: u16 {
+        <span class="doccomment">/// Last event of a statement.
+        </span><span class="kw">const </span>STMT_END = <span class="number">0x0001</span>;
+        <span class="doccomment">/// No foreign key checks.
+        </span><span class="kw">const </span>NO_FOREIGN_KEY_CHECKS   = <span class="number">0x0002</span>;
+        <span class="doccomment">/// No unique key checks.
+        </span><span class="kw">const </span>RELAXED_UNIQUE_CHECKS  = <span class="number">0x0004</span>;
+        <span class="doccomment">/// Indicates that rows in this event are complete,
+        /// that is contain values for all columns of the table.
+        </span><span class="kw">const </span>COMPLETE_ROWS = <span class="number">0x0008</span>;
     }
 }
 
-<span class="macro">my_bitflags!</span> {
-    <span class="ident">UserVarFlags</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown flags in the raw value of UserVarFlags (raw={:b})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">UnknownUserVarFlags</span>,
-    <span class="ident">u8</span>,
+<span class="macro">my_bitflags! </span>{
+    UserVarFlags,
+    <span class="attribute">#[error(<span class="string">&quot;Unknown flags in the raw value of UserVarFlags (raw={:b})&quot;</span>, _0)]
+    </span>UnknownUserVarFlags,
+    u8,
 
-    <span class="doccomment">/// Flags of a user variable.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserVarFlags</span>: <span class="ident">u8</span> {
-        <span class="kw">const</span> <span class="ident">UNSIGNED</span> <span class="op">=</span> <span class="number">0x01</span>;
+    <span class="doccomment">/// Flags of a user variable.
+    </span><span class="kw">pub struct </span>UserVarFlags: u8 {
+        <span class="kw">const </span>UNSIGNED = <span class="number">0x01</span>;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

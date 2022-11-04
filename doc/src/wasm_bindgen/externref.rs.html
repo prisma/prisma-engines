@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/externref.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>externref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/externref.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>externref.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -182,189 +182,189 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::JsValue</span>;
-<span class="kw">use</span> <span class="ident">std::alloc</span>::{<span class="self">self</span>, <span class="ident">Layout</span>};
-<span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::slice</span>;
-<span class="kw">use</span> <span class="ident">std::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::max</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::JsValue;
+<span class="kw">use </span>std::alloc::{<span class="self">self</span>, Layout};
+<span class="kw">use </span>std::cell::Cell;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::slice;
+<span class="kw">use </span>std::vec::Vec;
+<span class="kw">use </span>std::cmp::max;
 
-<span class="macro">externs!</span> {
-    <span class="attribute">#[<span class="ident">link</span>(<span class="ident">wasm_import_module</span> <span class="op">=</span> <span class="string">&quot;__wbindgen_externref_xform__&quot;</span>)]</span>
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">fn</span> <span class="ident">__wbindgen_externref_table_grow</span>(<span class="ident">delta</span>: <span class="ident">usize</span>) -&gt; <span class="ident">i32</span>;
-        <span class="kw">fn</span> <span class="ident">__wbindgen_externref_table_set_null</span>(<span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; ();
+<span class="macro">externs! </span>{
+    <span class="attribute">#[link(wasm_import_module = <span class="string">&quot;__wbindgen_externref_xform__&quot;</span>)]
+    </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+        <span class="kw">fn </span>__wbindgen_externref_table_grow(delta: usize) -&gt; i32;
+        <span class="kw">fn </span>__wbindgen_externref_table_set_null(idx: usize) -&gt; ();
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Slab</span> {
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">head</span>: <span class="ident">usize</span>,
-    <span class="ident">base</span>: <span class="ident">usize</span>,
+<span class="kw">pub struct </span>Slab {
+    data: Vec&lt;usize&gt;,
+    head: usize,
+    base: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Slab</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Slab</span> {
-        <span class="ident">Slab</span> {
-            <span class="ident">data</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">head</span>: <span class="number">0</span>,
-            <span class="ident">base</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Slab {
+    <span class="kw">fn </span>new() -&gt; Slab {
+        Slab {
+            data: Vec::new(),
+            head: <span class="number">0</span>,
+            base: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">alloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>;
-        <span class="kw">if</span> <span class="ident">ret</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">curr_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">curr_len</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">capacity</span>() {
-                <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="ident">max</span>(<span class="number">128</span>, <span class="ident">curr_len</span>);
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">__wbindgen_externref_table_grow</span>(<span class="ident">extra</span>) };
-                <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
-                    <span class="ident">internal_error</span>(<span class="string">&quot;table grow failure&quot;</span>)
+    <span class="kw">fn </span>alloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span>ret = <span class="self">self</span>.head;
+        <span class="kw">if </span>ret == <span class="self">self</span>.data.len() {
+            <span class="kw">let </span>curr_len = <span class="self">self</span>.data.len();
+            <span class="kw">if </span>curr_len == <span class="self">self</span>.data.capacity() {
+                <span class="kw">let </span>extra = max(<span class="number">128</span>, curr_len);
+                <span class="kw">let </span>r = <span class="kw">unsafe </span>{ __wbindgen_externref_table_grow(extra) };
+                <span class="kw">if </span>r == -<span class="number">1 </span>{
+                    internal_error(<span class="string">&quot;table grow failure&quot;</span>)
                 }
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">base</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">base</span> <span class="op">=</span> <span class="ident">r</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">base</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">r</span> <span class="kw">as</span> <span class="ident">usize</span> {
-                    <span class="ident">internal_error</span>(<span class="string">&quot;someone else allocated table entires?&quot;</span>)
+                <span class="kw">if </span><span class="self">self</span>.base == <span class="number">0 </span>{
+                    <span class="self">self</span>.base = r <span class="kw">as </span>usize;
+                } <span class="kw">else if </span><span class="self">self</span>.base + <span class="self">self</span>.data.len() != r <span class="kw">as </span>usize {
+                    internal_error(<span class="string">&quot;someone else allocated table entires?&quot;</span>)
                 }
 
-                <span class="comment">// poor man&#39;s `try_reserve_exact` until that&#39;s stable</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">new_cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">capacity</span>() <span class="op">+</span> <span class="ident">extra</span>;
-                    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">new_cap</span>;
-                    <span class="kw">let</span> <span class="ident">align</span> <span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-                    <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">align</span>) {
-                        <span class="prelude-val">Ok</span>(<span class="ident">l</span>) =&gt; <span class="ident">l</span>,
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">internal_error</span>(<span class="string">&quot;size/align layout failure&quot;</span>),
+                <span class="comment">// poor man&#39;s `try_reserve_exact` until that&#39;s stable
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>new_cap = <span class="self">self</span>.data.capacity() + extra;
+                    <span class="kw">let </span>size = mem::size_of::&lt;usize&gt;() * new_cap;
+                    <span class="kw">let </span>align = mem::align_of::&lt;usize&gt;();
+                    <span class="kw">let </span>layout = <span class="kw">match </span>Layout::from_size_align(size, align) {
+                        <span class="prelude-val">Ok</span>(l) =&gt; l,
+                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; internal_error(<span class="string">&quot;size/align layout failure&quot;</span>),
                     };
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">alloc::alloc</span>(<span class="ident">layout</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>;
-                    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
-                        <span class="ident">internal_error</span>(<span class="string">&quot;allocation failure&quot;</span>);
+                    <span class="kw">let </span>ptr = alloc::alloc(layout) <span class="kw">as </span><span class="kw-2">*mut </span>usize;
+                    <span class="kw">if </span>ptr.is_null() {
+                        internal_error(<span class="string">&quot;allocation failure&quot;</span>);
                     }
-                    <span class="ident">ptr::copy_nonoverlapping</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
-                    <span class="kw">let</span> <span class="ident">new_vec</span> <span class="op">=</span> <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>, <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>(), <span class="ident">new_cap</span>);
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">new_vec</span>);
-                    <span class="ident">old</span>.<span class="ident">set_len</span>(<span class="number">0</span>);
+                    ptr::copy_nonoverlapping(<span class="self">self</span>.data.as_ptr(), ptr, <span class="self">self</span>.data.len());
+                    <span class="kw">let </span>new_vec = Vec::from_raw_parts(ptr, <span class="self">self</span>.data.len(), new_cap);
+                    <span class="kw">let </span><span class="kw-2">mut </span>old = mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, new_vec);
+                    old.set_len(<span class="number">0</span>);
                 }
             }
 
-            <span class="comment">// custom condition to ensure `push` below doesn&#39;t call `reserve` in</span>
-            <span class="comment">// optimized builds which pulls in lots of panic infrastructure</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">capacity</span>() {
-                <span class="ident">internal_error</span>(<span class="string">&quot;push should be infallible now&quot;</span>)
+            <span class="comment">// custom condition to ensure `push` below doesn&#39;t call `reserve` in
+            // optimized builds which pulls in lots of panic infrastructure
+            </span><span class="kw">if </span><span class="self">self</span>.data.len() &gt;= <span class="self">self</span>.data.capacity() {
+                internal_error(<span class="string">&quot;push should be infallible now&quot;</span>)
             }
-            <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">ret</span> <span class="op">+</span> <span class="number">1</span>);
+            <span class="self">self</span>.data.push(ret + <span class="number">1</span>);
         }
 
-        <span class="comment">// usage of `get_mut` thwarts panicking infrastructure in optimized</span>
-        <span class="comment">// builds</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_mut</span>(<span class="ident">ret</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) =&gt; <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">slot</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="ident">internal_error</span>(<span class="string">&quot;ret out of bounds&quot;</span>),
+        <span class="comment">// usage of `get_mut` thwarts panicking infrastructure in optimized
+        // builds
+        </span><span class="kw">match </span><span class="self">self</span>.data.get_mut(ret) {
+            <span class="prelude-val">Some</span>(slot) =&gt; <span class="self">self</span>.head = <span class="kw-2">*</span>slot,
+            <span class="prelude-val">None </span>=&gt; internal_error(<span class="string">&quot;ret out of bounds&quot;</span>),
         }
-        <span class="ident">ret</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">base</span>
+        ret + <span class="self">self</span>.base
     }
 
-    <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">slot</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="ident">slot</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">base</span> {
-            <span class="ident">internal_error</span>(<span class="string">&quot;free reserved slot&quot;</span>);
+    <span class="kw">fn </span>dealloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, slot: usize) {
+        <span class="kw">if </span>slot &lt; <span class="self">self</span>.base {
+            internal_error(<span class="string">&quot;free reserved slot&quot;</span>);
         }
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">slot</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">base</span>;
+        <span class="kw">let </span>slot = slot - <span class="self">self</span>.base;
 
-        <span class="comment">// usage of `get_mut` thwarts panicking infrastructure in optimized</span>
-        <span class="comment">// builds</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_mut</span>(<span class="ident">slot</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">ptr</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>;
-                <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span> <span class="ident">slot</span>;
+        <span class="comment">// usage of `get_mut` thwarts panicking infrastructure in optimized
+        // builds
+        </span><span class="kw">match </span><span class="self">self</span>.data.get_mut(slot) {
+            <span class="prelude-val">Some</span>(ptr) =&gt; {
+                <span class="kw-2">*</span>ptr = <span class="self">self</span>.head;
+                <span class="self">self</span>.head = slot;
             }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">internal_error</span>(<span class="string">&quot;slot out of bounds&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; internal_error(<span class="string">&quot;slot out of bounds&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">live_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">free_count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>;
-        <span class="kw">while</span> <span class="ident">next</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="macro">debug_assert!</span>((<span class="ident">free_count</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>());
-            <span class="ident">free_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>(<span class="ident">next</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">n</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="ident">internal_error</span>(<span class="string">&quot;slot out of bounds&quot;</span>),
+    <span class="kw">fn </span>live_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">let </span><span class="kw-2">mut </span>free_count = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>next = <span class="self">self</span>.head;
+        <span class="kw">while </span>next &lt; <span class="self">self</span>.data.len() {
+            <span class="macro">debug_assert!</span>((free_count <span class="kw">as </span>usize) &lt; <span class="self">self</span>.data.len());
+            free_count += <span class="number">1</span>;
+            <span class="kw">match </span><span class="self">self</span>.data.get(next) {
+                <span class="prelude-val">Some</span>(n) =&gt; next = <span class="kw-2">*</span>n,
+                <span class="prelude-val">None </span>=&gt; internal_error(<span class="string">&quot;slot out of bounds&quot;</span>),
             };
         }
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="ident">free_count</span>
+        <span class="self">self</span>.data.len() <span class="kw">as </span>u32 - free_count
     }
 }
 
-<span class="kw">fn</span> <span class="ident">internal_error</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="op">!</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-        <span class="ident"><span class="kw">super</span>::throw_str</span>(<span class="ident">msg</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">std::process::abort</span>()
+<span class="kw">fn </span>internal_error(msg: <span class="kw-2">&amp;</span>str) -&gt; ! {
+    <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+        <span class="kw">super</span>::throw_str(msg)
+    } <span class="kw">else </span>{
+        std::process::abort()
     }
 }
 
-<span class="comment">// Management of `externref` is always thread local since an `externref` value</span>
-<span class="comment">// can&#39;t cross threads in wasm. Indices as a result are always thread-local.</span>
-<span class="macro">std::thread_local!</span>(<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HEAP_SLAB</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">Slab</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cell::new</span>(<span class="ident">Slab::new</span>()));
+<span class="comment">// Management of `externref` is always thread local since an `externref` value
+// can&#39;t cross threads in wasm. Indices as a result are always thread-local.
+</span><span class="macro">std::thread_local!</span>(<span class="kw">pub static </span>HEAP_SLAB: Cell&lt;Slab&gt; = Cell::new(Slab::new()));
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__externref_table_alloc</span>() -&gt; <span class="ident">usize</span> {
-    <span class="ident">HEAP_SLAB</span>
-        .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">Slab::new</span>());
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">alloc</span>();
-            <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">slab</span>);
-            <span class="ident">ret</span>
+<span class="attribute">#[no_mangle]
+</span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__externref_table_alloc() -&gt; usize {
+    HEAP_SLAB
+        .try_with(|slot| {
+            <span class="kw">let </span><span class="kw-2">mut </span>slab = slot.replace(Slab::new());
+            <span class="kw">let </span>ret = slab.alloc();
+            slot.replace(slab);
+            ret
         })
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">internal_error</span>(<span class="string">&quot;tls access failure&quot;</span>))
+        .unwrap_or_else(|<span class="kw">_</span>| internal_error(<span class="string">&quot;tls access failure&quot;</span>))
 }
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__externref_table_dealloc</span>(<span class="ident">idx</span>: <span class="ident">usize</span>) {
-    <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="ident"><span class="kw">super</span>::JSIDX_RESERVED</span> <span class="kw">as</span> <span class="ident">usize</span> {
+<span class="attribute">#[no_mangle]
+</span><span class="kw">pub extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__externref_table_dealloc(idx: usize) {
+    <span class="kw">if </span>idx &lt; <span class="kw">super</span>::JSIDX_RESERVED <span class="kw">as </span>usize {
         <span class="kw">return</span>;
     }
-    <span class="comment">// clear this value from the table so while the table slot is un-allocated</span>
-    <span class="comment">// we don&#39;t keep around a strong reference to a potentially large object</span>
-    <span class="kw">unsafe</span> {
-        <span class="ident">__wbindgen_externref_table_set_null</span>(<span class="ident">idx</span>);
+    <span class="comment">// clear this value from the table so while the table slot is un-allocated
+    // we don&#39;t keep around a strong reference to a potentially large object
+    </span><span class="kw">unsafe </span>{
+        __wbindgen_externref_table_set_null(idx);
     }
-    <span class="ident">HEAP_SLAB</span>
-        .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">Slab::new</span>());
-            <span class="ident">slab</span>.<span class="ident">dealloc</span>(<span class="ident">idx</span>);
-            <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">slab</span>);
+    HEAP_SLAB
+        .try_with(|slot| {
+            <span class="kw">let </span><span class="kw-2">mut </span>slab = slot.replace(Slab::new());
+            slab.dealloc(idx);
+            slot.replace(slab);
         })
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">internal_error</span>(<span class="string">&quot;tls access failure&quot;</span>))
+        .unwrap_or_else(|<span class="kw">_</span>| internal_error(<span class="string">&quot;tls access failure&quot;</span>))
 }
 
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__externref_drop_slice</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">JsValue</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
-    <span class="kw">for</span> <span class="ident">slot</span> <span class="kw">in</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">ptr</span>, <span class="ident">len</span>) {
-        <span class="ident">__externref_table_dealloc</span>(<span class="ident">slot</span>.<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">usize</span>);
+<span class="attribute">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__externref_drop_slice(ptr: <span class="kw-2">*mut </span>JsValue, len: usize) {
+    <span class="kw">for </span>slot <span class="kw">in </span>slice::from_raw_parts_mut(ptr, len) {
+        __externref_table_dealloc(slot.idx <span class="kw">as </span>usize);
     }
 }
 
-<span class="comment">// Implementation of `__wbindgen_externref_heap_live_count` for when we are using</span>
-<span class="comment">// `externref` instead of the JS `heap`.</span>
-<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__externref_heap_live_count</span>() -&gt; <span class="ident">u32</span> {
-    <span class="ident">HEAP_SLAB</span>
-        .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">Slab::new</span>());
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">live_count</span>();
-            <span class="ident">slot</span>.<span class="ident">replace</span>(<span class="ident">slab</span>);
-            <span class="ident">count</span>
+<span class="comment">// Implementation of `__wbindgen_externref_heap_live_count` for when we are using
+// `externref` instead of the JS `heap`.
+</span><span class="attribute">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__externref_heap_live_count() -&gt; u32 {
+    HEAP_SLAB
+        .try_with(|slot| {
+            <span class="kw">let </span>slab = slot.replace(Slab::new());
+            <span class="kw">let </span>count = slab.live_count();
+            slot.replace(slab);
+            count
         })
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">internal_error</span>(<span class="string">&quot;tls access failure&quot;</span>))
+        .unwrap_or_else(|<span class="kw">_</span>| internal_error(<span class="string">&quot;tls access failure&quot;</span>))
 }
 
-<span class="comment">// see comment in module above this in `link_mem_intrinsics`</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link_intrinsics</span>() {}
+<span class="comment">// see comment in module above this in `link_mem_intrinsics`
+</span><span class="attribute">#[inline(never)]
+</span><span class="kw">pub fn </span>link_intrinsics() {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

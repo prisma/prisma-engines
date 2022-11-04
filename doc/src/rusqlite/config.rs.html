@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -151,158 +151,158 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Configure database connections</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Configure database connections
 
-<span class="kw">use</span> <span class="ident">std::os::raw::c_int</span>;
+</span><span class="kw">use </span>std::os::raw::c_int;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use crate</span>::{Connection, <span class="prelude-ty">Result</span>};
 
-<span class="doccomment">/// Database Connection Configuration Options</span>
-<span class="doccomment">/// See [Database Connection Configuration Options](https://sqlite.org/c3ref/c_dbconfig_enable_fkey.html) for details.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>, <span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DbConfig</span> {
-    <span class="comment">//SQLITE_DBCONFIG_MAINDBNAME = 1000, /* const char* */</span>
-    <span class="comment">//SQLITE_DBCONFIG_LOOKASIDE = 1001,  /* void* int int */</span>
-    <span class="doccomment">/// Enable or disable the enforcement of foreign key constraints.</span>
-    <span class="ident">SQLITE_DBCONFIG_ENABLE_FKEY</span> <span class="op">=</span> <span class="number">1002</span>,
-    <span class="doccomment">/// Enable or disable triggers.</span>
-    <span class="ident">SQLITE_DBCONFIG_ENABLE_TRIGGER</span> <span class="op">=</span> <span class="number">1003</span>,
-    <span class="doccomment">/// Enable or disable the fts3_tokenizer() function which is part of the</span>
-    <span class="doccomment">/// FTS3 full-text search engine extension.</span>
-    <span class="ident">SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER</span> <span class="op">=</span> <span class="number">1004</span>, <span class="comment">// 3.12.0</span>
-    <span class="comment">//SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION = 1005,</span>
-    <span class="doccomment">/// In WAL mode, enable or disable the checkpoint operation before closing</span>
-    <span class="doccomment">/// the connection.</span>
-    <span class="ident">SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE</span> <span class="op">=</span> <span class="number">1006</span>, <span class="comment">// 3.16.2</span>
-    <span class="doccomment">/// Activates or deactivates the query planner stability guarantee (QPSG).</span>
-    <span class="ident">SQLITE_DBCONFIG_ENABLE_QPSG</span> <span class="op">=</span> <span class="number">1007</span>, <span class="comment">// 3.20.0</span>
-    <span class="doccomment">/// Includes or excludes output for any operations performed by trigger</span>
-    <span class="doccomment">/// programs from the output of EXPLAIN QUERY PLAN commands.</span>
-    <span class="ident">SQLITE_DBCONFIG_TRIGGER_EQP</span> <span class="op">=</span> <span class="number">1008</span>, <span class="comment">// 3.22.0</span>
-    <span class="comment">//SQLITE_DBCONFIG_RESET_DATABASE = 1009,</span>
-    <span class="doccomment">/// Activates or deactivates the &quot;defensive&quot; flag for a database connection.</span>
-    <span class="ident">SQLITE_DBCONFIG_DEFENSIVE</span> <span class="op">=</span> <span class="number">1010</span>, <span class="comment">// 3.26.0</span>
-    <span class="doccomment">/// Activates or deactivates the &quot;writable_schema&quot; flag.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_WRITABLE_SCHEMA</span> <span class="op">=</span> <span class="number">1011</span>, <span class="comment">// 3.28.0</span>
-    <span class="doccomment">/// Activates or deactivates the legacy behavior of the ALTER TABLE RENAME</span>
-    <span class="doccomment">/// command.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_LEGACY_ALTER_TABLE</span> <span class="op">=</span> <span class="number">1012</span>, <span class="comment">// 3.29</span>
-    <span class="doccomment">/// Activates or deactivates the legacy double-quoted string literal</span>
-    <span class="doccomment">/// misfeature for DML statements only.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_DQS_DML</span> <span class="op">=</span> <span class="number">1013</span>, <span class="comment">// 3.29.0</span>
-    <span class="doccomment">/// Activates or deactivates the legacy double-quoted string literal</span>
-    <span class="doccomment">/// misfeature for DDL statements.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_DQS_DDL</span> <span class="op">=</span> <span class="number">1014</span>, <span class="comment">// 3.29.0</span>
-    <span class="doccomment">/// Enable or disable views.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_ENABLE_VIEW</span> <span class="op">=</span> <span class="number">1015</span>, <span class="comment">// 3.30.0</span>
-    <span class="doccomment">/// Activates or deactivates the legacy file format flag.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_LEGACY_FILE_FORMAT</span> <span class="op">=</span> <span class="number">1016</span>, <span class="comment">// 3.31.0</span>
-    <span class="doccomment">/// Tells SQLite to assume that database schemas (the contents of the</span>
-    <span class="doccomment">/// sqlite_master tables) are untainted by malicious content.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern_sqlite&quot;</span>)]</span>
-    <span class="ident">SQLITE_DBCONFIG_TRUSTED_SCHEMA</span> <span class="op">=</span> <span class="number">1017</span>, <span class="comment">// 3.31.0</span>
-}
+<span class="doccomment">/// Database Connection Configuration Options
+/// See [Database Connection Configuration Options](https://sqlite.org/c3ref/c_dbconfig_enable_fkey.html) for details.
+</span><span class="attribute">#[repr(i32)]
+#[allow(non_snake_case, non_camel_case_types)]
+#[non_exhaustive]
+#[allow(clippy::upper_case_acronyms)]
+</span><span class="kw">pub enum </span>DbConfig {
+    <span class="comment">//SQLITE_DBCONFIG_MAINDBNAME = 1000, /* const char* */
+    //SQLITE_DBCONFIG_LOOKASIDE = 1001,  /* void* int int */
+    </span><span class="doccomment">/// Enable or disable the enforcement of foreign key constraints.
+    </span>SQLITE_DBCONFIG_ENABLE_FKEY = <span class="number">1002</span>,
+    <span class="doccomment">/// Enable or disable triggers.
+    </span>SQLITE_DBCONFIG_ENABLE_TRIGGER = <span class="number">1003</span>,
+    <span class="doccomment">/// Enable or disable the fts3_tokenizer() function which is part of the
+    /// FTS3 full-text search engine extension.
+    </span>SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER = <span class="number">1004</span>, <span class="comment">// 3.12.0
+    //SQLITE_DBCONFIG_ENABLE_LOAD_EXTENSION = 1005,
+    </span><span class="doccomment">/// In WAL mode, enable or disable the checkpoint operation before closing
+    /// the connection.
+    </span>SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE = <span class="number">1006</span>, <span class="comment">// 3.16.2
+    </span><span class="doccomment">/// Activates or deactivates the query planner stability guarantee (QPSG).
+    </span>SQLITE_DBCONFIG_ENABLE_QPSG = <span class="number">1007</span>, <span class="comment">// 3.20.0
+    </span><span class="doccomment">/// Includes or excludes output for any operations performed by trigger
+    /// programs from the output of EXPLAIN QUERY PLAN commands.
+    </span>SQLITE_DBCONFIG_TRIGGER_EQP = <span class="number">1008</span>, <span class="comment">// 3.22.0
+    //SQLITE_DBCONFIG_RESET_DATABASE = 1009,
+    </span><span class="doccomment">/// Activates or deactivates the &quot;defensive&quot; flag for a database connection.
+    </span>SQLITE_DBCONFIG_DEFENSIVE = <span class="number">1010</span>, <span class="comment">// 3.26.0
+    </span><span class="doccomment">/// Activates or deactivates the &quot;writable_schema&quot; flag.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_WRITABLE_SCHEMA = <span class="number">1011</span>, <span class="comment">// 3.28.0
+    </span><span class="doccomment">/// Activates or deactivates the legacy behavior of the ALTER TABLE RENAME
+    /// command.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_LEGACY_ALTER_TABLE = <span class="number">1012</span>, <span class="comment">// 3.29
+    </span><span class="doccomment">/// Activates or deactivates the legacy double-quoted string literal
+    /// misfeature for DML statements only.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_DQS_DML = <span class="number">1013</span>, <span class="comment">// 3.29.0
+    </span><span class="doccomment">/// Activates or deactivates the legacy double-quoted string literal
+    /// misfeature for DDL statements.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_DQS_DDL = <span class="number">1014</span>, <span class="comment">// 3.29.0
+    </span><span class="doccomment">/// Enable or disable views.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_ENABLE_VIEW = <span class="number">1015</span>, <span class="comment">// 3.30.0
+    </span><span class="doccomment">/// Activates or deactivates the legacy file format flag.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_LEGACY_FILE_FORMAT = <span class="number">1016</span>, <span class="comment">// 3.31.0
+    </span><span class="doccomment">/// Tells SQLite to assume that database schemas (the contents of the
+    /// sqlite_master tables) are untainted by malicious content.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;modern_sqlite&quot;</span>)]
+    </span>SQLITE_DBCONFIG_TRUSTED_SCHEMA = <span class="number">1017</span>, <span class="comment">// 3.31.0
+</span>}
 
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="doccomment">/// Returns the current value of a `config`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_FKEY: return `false` or `true` to indicate</span>
-    <span class="doccomment">///   whether FK enforcement is off or on</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_TRIGGER: return `false` or `true` to indicate</span>
-    <span class="doccomment">///   whether triggers are disabled or enabled</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: return `false` or `true` to</span>
-    <span class="doccomment">///   indicate whether fts3_tokenizer are disabled or enabled</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: return `false` to indicate</span>
-    <span class="doccomment">///   checkpoints-on-close are not disabled or `true` if they are</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_QPSG: return `false` or `true` to indicate</span>
-    <span class="doccomment">///   whether the QPSG is disabled or enabled</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_TRIGGER_EQP: return `false` to indicate</span>
-    <span class="doccomment">///   output-for-trigger are not disabled or `true` if it is</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config</span>: <span class="ident">DbConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="macro">check!</span>(<span class="ident">ffi::sqlite3_db_config</span>(
-                <span class="ident">c</span>.<span class="ident">db</span>(),
-                <span class="ident">config</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">val</span>
+<span class="kw">impl </span>Connection {
+    <span class="doccomment">/// Returns the current value of a `config`.
+    ///
+    /// - SQLITE_DBCONFIG_ENABLE_FKEY: return `false` or `true` to indicate
+    ///   whether FK enforcement is off or on
+    /// - SQLITE_DBCONFIG_ENABLE_TRIGGER: return `false` or `true` to indicate
+    ///   whether triggers are disabled or enabled
+    /// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: return `false` or `true` to
+    ///   indicate whether fts3_tokenizer are disabled or enabled
+    /// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: return `false` to indicate
+    ///   checkpoints-on-close are not disabled or `true` if they are
+    /// - SQLITE_DBCONFIG_ENABLE_QPSG: return `false` or `true` to indicate
+    ///   whether the QPSG is disabled or enabled
+    /// - SQLITE_DBCONFIG_TRIGGER_EQP: return `false` to indicate
+    ///   output-for-trigger are not disabled or `true` if it is
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>db_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: DbConfig) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">let </span>c = <span class="self">self</span>.db.borrow();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="number">0</span>;
+            <span class="macro">check!</span>(ffi::sqlite3_db_config(
+                c.db(),
+                config <span class="kw">as </span>c_int,
+                -<span class="number">1</span>,
+                <span class="kw-2">&amp;mut </span>val
             ));
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+            <span class="prelude-val">Ok</span>(val != <span class="number">0</span>)
         }
     }
 
-    <span class="doccomment">/// Make configuration changes to a database connection</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_FKEY: `false` to disable FK enforcement, `true`</span>
-    <span class="doccomment">///   to enable FK enforcement</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_TRIGGER: `false` to disable triggers, `true` to</span>
-    <span class="doccomment">///   enable triggers</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: `false` to disable</span>
-    <span class="doccomment">///   fts3_tokenizer(), `true` to enable fts3_tokenizer()</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: `false` (the default) to enable</span>
-    <span class="doccomment">///   checkpoints-on-close, `true` to disable them</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_ENABLE_QPSG: `false` to disable the QPSG, `true` to</span>
-    <span class="doccomment">///   enable QPSG</span>
-    <span class="doccomment">/// - SQLITE_DBCONFIG_TRIGGER_EQP: `false` to disable output for trigger</span>
-    <span class="doccomment">///   programs, `true` to enable it</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_db_config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config</span>: <span class="ident">DbConfig</span>, <span class="ident">new_val</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">borrow_mut</span>();
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="macro">check!</span>(<span class="ident">ffi::sqlite3_db_config</span>(
-                <span class="ident">c</span>.<span class="ident">db</span>(),
-                <span class="ident">config</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-                <span class="kw">if</span> <span class="ident">new_val</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> },
-                <span class="kw-2">&amp;mut</span> <span class="ident">val</span>
+    <span class="doccomment">/// Make configuration changes to a database connection
+    ///
+    /// - SQLITE_DBCONFIG_ENABLE_FKEY: `false` to disable FK enforcement, `true`
+    ///   to enable FK enforcement
+    /// - SQLITE_DBCONFIG_ENABLE_TRIGGER: `false` to disable triggers, `true` to
+    ///   enable triggers
+    /// - SQLITE_DBCONFIG_ENABLE_FTS3_TOKENIZER: `false` to disable
+    ///   fts3_tokenizer(), `true` to enable fts3_tokenizer()
+    /// - SQLITE_DBCONFIG_NO_CKPT_ON_CLOSE: `false` (the default) to enable
+    ///   checkpoints-on-close, `true` to disable them
+    /// - SQLITE_DBCONFIG_ENABLE_QPSG: `false` to disable the QPSG, `true` to
+    ///   enable QPSG
+    /// - SQLITE_DBCONFIG_TRIGGER_EQP: `false` to disable output for trigger
+    ///   programs, `true` to enable it
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set_db_config(<span class="kw-2">&amp;</span><span class="self">self</span>, config: DbConfig, new_val: bool) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">let </span>c = <span class="self">self</span>.db.borrow_mut();
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="number">0</span>;
+            <span class="macro">check!</span>(ffi::sqlite3_db_config(
+                c.db(),
+                config <span class="kw">as </span>c_int,
+                <span class="kw">if </span>new_val { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>},
+                <span class="kw-2">&amp;mut </span>val
             ));
-            <span class="prelude-val">Ok</span>(<span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>)
+            <span class="prelude-val">Ok</span>(val != <span class="number">0</span>)
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DbConfig</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="prelude-ty">Result</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::DbConfig;
+    <span class="kw">use crate</span>::{Connection, <span class="prelude-ty">Result</span>};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_db_config</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_db_config() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">opposite</span> <span class="op">=</span> <span class="op">!</span><span class="ident">db</span>.<span class="ident">db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>opposite = !db.db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(
-            <span class="ident">db</span>.<span class="ident">set_db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY</span>, <span class="ident">opposite</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">opposite</span>)
+            db.set_db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY, opposite),
+            <span class="prelude-val">Ok</span>(opposite)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">db</span>.<span class="ident">db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">opposite</span>)
+            db.db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY),
+            <span class="prelude-val">Ok</span>(opposite)
         );
 
-        <span class="kw">let</span> <span class="ident">opposite</span> <span class="op">=</span> <span class="op">!</span><span class="ident">db</span>.<span class="ident">db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>opposite = !db.db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER)<span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(
-            <span class="ident">db</span>.<span class="ident">set_db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER</span>, <span class="ident">opposite</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">opposite</span>)
+            db.set_db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER, opposite),
+            <span class="prelude-val">Ok</span>(opposite)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">db</span>.<span class="ident">db_config</span>(<span class="ident">DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">opposite</span>)
+            db.db_config(DbConfig::SQLITE_DBCONFIG_ENABLE_TRIGGER),
+            <span class="prelude-val">Ok</span>(opposite)
         );
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

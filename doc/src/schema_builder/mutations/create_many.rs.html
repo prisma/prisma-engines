@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/mutations/create_many.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_many.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_builder/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/mutations/create_many.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>create_many.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_builder/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -113,120 +113,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">capitalize</span>,
-    <span class="ident">constants::args</span>,
-    <span class="ident">field</span>, <span class="ident">init_input_object_type</span>, <span class="ident">input_field</span>,
-    <span class="ident">input_types::fields::data_input_mapper</span>::{<span class="ident">CreateDataInputFieldMapper</span>, <span class="ident">DataInputFieldMapper</span>},
-    <span class="ident">output_types::objects</span>,
-    <span class="ident">BuilderContext</span>, <span class="ident">ModelField</span>,
+<span class="kw">use crate</span>::{
+    capitalize,
+    constants::args,
+    field, init_input_object_type, input_field,
+    input_types::fields::data_input_mapper::{CreateDataInputFieldMapper, DataInputFieldMapper},
+    output_types::objects,
+    BuilderContext, ModelField,
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>};
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">schema</span>::{
-    <span class="ident">Identifier</span>, <span class="ident">InputField</span>, <span class="ident">InputObjectTypeWeakRef</span>, <span class="ident">InputType</span>, <span class="ident">OutputField</span>, <span class="ident">OutputType</span>, <span class="ident">QueryInfo</span>, <span class="ident">QueryTag</span>,
-    <span class="ident">PRISMA_NAMESPACE</span>,
+<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>schema::{
+    Identifier, InputField, InputObjectTypeWeakRef, InputType, OutputField, OutputType, QueryInfo, QueryTag,
+    PRISMA_NAMESPACE,
 };
 
-<span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_many</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">create_many_arguments</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
-    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;createMany{}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>);
+<span class="doccomment">/// Builds a create many mutation field (e.g. createManyUsers) for given model.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;OutputField&gt; {
+    <span class="kw">let </span>arguments = create_many_arguments(ctx, model);
+    <span class="kw">let </span>field_name = <span class="macro">format!</span>(<span class="string">&quot;createMany{}&quot;</span>, model.name);
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CreateMany</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">field</span>(
-            <span class="ident">field_name</span>,
-            <span class="ident">arguments</span>,
-            <span class="ident">OutputType::object</span>(<span class="ident">objects::affected_records_object_type</span>(<span class="ident">ctx</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">QueryInfo</span> {
-                <span class="ident">model</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="ident">model</span>)),
-                <span class="ident">tag</span>: <span class="ident">QueryTag::CreateMany</span>,
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateMany) {
+        <span class="prelude-val">Some</span>(field(
+            field_name,
+            arguments,
+            OutputType::object(objects::affected_records_object_type(ctx)),
+            <span class="prelude-val">Some</span>(QueryInfo {
+                model: <span class="prelude-val">Some</span>(Arc::clone(model)),
+                tag: QueryTag::CreateMany,
             }),
         ))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="doccomment">/// Builds &quot;skip_duplicates&quot; and &quot;data&quot; arguments intended for the create many field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>create_many_type = InputType::object(create_many_object_type(ctx, model, <span class="prelude-val">None</span>));
+    <span class="kw">let </span>data_arg = input_field(<span class="string">&quot;data&quot;</span>, InputType::list(create_many_type), <span class="prelude-val">None</span>);
+
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::CreateSkipDuplicates) {
+        <span class="kw">let </span>skip_arg = input_field(args::SKIP_DUPLICATES, InputType::boolean(), <span class="prelude-val">None</span>).optional();
+
+        <span class="macro">vec!</span>[data_arg, skip_arg]
+    } <span class="kw">else </span>{
+        <span class="macro">vec!</span>[data_arg]
     }
 }
 
-<span class="doccomment">/// Builds &quot;skip_duplicates&quot; and &quot;data&quot; arguments intended for the create many field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_many_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">create_many_type</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">create_many_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>));
-    <span class="kw">let</span> <span class="ident">data_arg</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="string">&quot;data&quot;</span>, <span class="ident">InputType::list</span>(<span class="ident">create_many_type</span>), <span class="prelude-val">None</span>);
-
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CreateSkipDuplicates</span>) {
-        <span class="kw">let</span> <span class="ident">skip_arg</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">args::SKIP_DUPLICATES</span>, <span class="ident">InputType::boolean</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>();
-
-        <span class="macro">vec!</span>[<span class="ident">data_arg</span>, <span class="ident">skip_arg</span>]
-    } <span class="kw">else</span> {
-        <span class="macro">vec!</span>[<span class="ident">data_arg</span>]
-    }
-}
-
-<span class="comment">// Create many data input type.</span>
-<span class="doccomment">/// Input type allows to write all scalar fields except if in a nested case,</span>
-<span class="doccomment">/// where we don&#39;t allow the parent scalar to be written (ie. when the relation</span>
-<span class="doccomment">/// is inlined on the child).</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">create_many_object_type</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_field</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>()) {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">f</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateMany{}Input&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">capitalize</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())),
-        <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateManyInput&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>),
+<span class="comment">// Create many data input type.
+</span><span class="doccomment">/// Input type allows to write all scalar fields except if in a nested case,
+/// where we don&#39;t allow the parent scalar to be written (ie. when the relation
+/// is inlined on the child).
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>create_many_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>name = <span class="kw">match </span>parent_field.map(|pf| pf.related_field()) {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>f) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateMany{}Input&quot;</span>, model.name, capitalize(f.name.as_str())),
+        <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}CreateManyInput&quot;</span>, model.name),
     };
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">filtered_fields</span> <span class="op">=</span> <span class="ident">filter_create_many_fields</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
-    <span class="kw">let</span> <span class="ident">field_mapper</span> <span class="op">=</span> <span class="ident">CreateDataInputFieldMapper::new_checked</span>();
-    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">field_mapper</span>.<span class="ident">map_all</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">filtered_fields</span>);
+    <span class="kw">let </span>filtered_fields = filter_create_many_fields(ctx, model, parent_field);
+    <span class="kw">let </span>field_mapper = CreateDataInputFieldMapper::new_checked();
+    <span class="kw">let </span>input_fields = field_mapper.map_all(ctx, <span class="kw-2">&amp;</span>filtered_fields);
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">input_fields</span>);
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    input_object.set_fields(input_fields);
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked create.</span>
-<span class="kw">fn</span> <span class="ident">filter_create_many_fields</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_field</span>) <span class="op">=</span> <span class="ident">parent_field</span> {
-        <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>();
-        <span class="kw">if</span> <span class="ident">child_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="ident">child_field</span>
-                .<span class="ident">linking_fields</span>()
-                .<span class="ident">as_scalar_fields</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
-        } <span class="kw">else</span> {
+<span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked create.
+</span><span class="kw">fn </span>filter_create_many_fields(
+    ctx: <span class="kw-2">&amp;</span>BuilderContext,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    parent_field: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RelationFieldRef&gt;,
+) -&gt; Vec&lt;ModelField&gt; {
+    <span class="kw">let </span>linking_fields = <span class="kw">if let </span><span class="prelude-val">Some</span>(parent_field) = parent_field {
+        <span class="kw">let </span>child_field = parent_field.related_field();
+        <span class="kw">if </span>child_field.is_inlined_on_enclosing_model() {
+            child_field
+                .linking_fields()
+                .as_scalar_fields()
+                .expect(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
+        } <span class="kw">else </span>{
             <span class="macro">vec!</span>[]
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">vec!</span>[]
     };
 
-    <span class="comment">// 1) Filter out parent links.</span>
-    <span class="comment">// 2) Only allow writing autoincrement fields if the connector supports it.</span>
-    <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">filter_all</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-        <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">linking_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>) {
-                <span class="bool-val">false</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">is_autoincrement</span> {
-                <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>)
-            } <span class="kw">else</span> {
-                <span class="bool-val">true</span>
-            }
+    <span class="comment">// 1) Filter out parent links.
+    // 2) Only allow writing autoincrement fields if the connector supports it.
+    </span>model.fields().filter_all(|field| <span class="kw">match </span>field {
+        ModelField::Scalar(sf) =&gt; {
+            <span class="kw">if </span>linking_fields.contains(sf) {
+                <span class="bool-val">false
+            </span>} <span class="kw">else if </span>sf.is_autoincrement {
+                ctx.has_capability(ConnectorCapability::CreateManyWriteableAutoIncId)
+            } <span class="kw">else </span>{
+                <span class="bool-val">true
+            </span>}
         }
-        <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

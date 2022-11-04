@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-hack-0.5.19/src/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_hack/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-hack-0.5.19/src/iter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_hack/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_hack/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -40,47 +40,47 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">token_stream</span>, <span class="ident">Delimiter</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro::{token_stream, Delimiter, TokenStream, TokenTree};
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">IterImpl</span>;
+<span class="kw">pub type </span>Iter&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>IterImpl;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterImpl</span> {
-    <span class="ident">stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>,
-    <span class="ident">peeked</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TokenTree</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>IterImpl {
+    stack: Vec&lt;token_stream::IntoIter&gt;,
+    peeked: <span class="prelude-ty">Option</span>&lt;TokenTree&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tokens</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">IterImpl</span> {
-    <span class="ident">IterImpl</span> {
-        <span class="ident">stack</span>: <span class="macro">vec!</span>[<span class="ident">tokens</span>.<span class="ident">into_iter</span>()],
-        <span class="ident">peeked</span>: <span class="prelude-val">None</span>,
+<span class="kw">pub fn </span>new(tokens: TokenStream) -&gt; IterImpl {
+    IterImpl {
+        stack: <span class="macro">vec!</span>[tokens.into_iter()],
+        peeked: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IterImpl</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TokenTree</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">peeked</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>();
-        <span class="self">self</span>.<span class="ident">peeked</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>IterImpl {
+    <span class="kw">pub fn </span>peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TokenTree&gt; {
+        <span class="self">self</span>.peeked = <span class="self">self</span>.next();
+        <span class="self">self</span>.peeked.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterImpl</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">TokenTree</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>IterImpl {
+    <span class="kw">type </span>Item = TokenTree;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">peeked</span>.<span class="ident">take</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">tt</span>);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(tt) = <span class="self">self</span>.peeked.take() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(tt);
         }
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">top</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">last_mut</span>()<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">top</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">pop</span>()),
-                <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Group</span>(<span class="kw-2">ref</span> <span class="ident">group</span>)) <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">delimiter</span>() <span class="op">==</span> <span class="ident">Delimiter::None</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>());
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>top = <span class="self">self</span>.stack.last_mut()<span class="question-mark">?</span>;
+            <span class="kw">match </span>top.next() {
+                <span class="prelude-val">None </span>=&gt; drop(<span class="self">self</span>.stack.pop()),
+                <span class="prelude-val">Some</span>(TokenTree::Group(<span class="kw-2">ref </span>group)) <span class="kw">if </span>group.delimiter() == Delimiter::None =&gt; {
+                    <span class="self">self</span>.stack.push(group.stream().into_iter());
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">tt</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">tt</span>),
+                <span class="prelude-val">Some</span>(tt) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(tt),
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_hack" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_hack" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/packets/binlog_request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binlog_request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/packets/binlog_request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binlog_request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -141,148 +141,148 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::misc::raw::Either</span>;
+<span class="kw">use </span><span class="kw">crate</span>::misc::raw::Either;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BinlogDumpFlags</span>, <span class="ident">ComBinlogDump</span>, <span class="ident">ComBinlogDumpGtid</span>, <span class="ident">Sid</span>};
+<span class="kw">use super</span>::{BinlogDumpFlags, ComBinlogDump, ComBinlogDumpGtid, Sid};
 
-<span class="doccomment">/// Binlog request representation. Please consult MySql documentation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is a helper builder for [`ComBinlogDump`] and [`ComBinlogDumpGtid`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Server id of a slave.</span>
-    <span class="ident">server_id</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// If true, then `COM_BINLOG_DUMP_GTID` will be used.</span>
-    <span class="ident">use_gtid</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// If `use_gtid` is `false`, then all flags except `BINLOG_DUMP_NON_BLOCK` will be truncated.</span>
-    <span class="ident">flags</span>: <span class="ident">BinlogDumpFlags</span>,
-    <span class="doccomment">/// Filename of the binlog on the master.</span>
-    <span class="ident">filename</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="doccomment">/// Position in the binlog-file to start the stream with.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `use_gtid` is `false`, then the value will be truncated to u32.</span>
-    <span class="ident">pos</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// SID blocks. If `use_gtid` is `false`, then this value is ignored.</span>
-    <span class="ident">sids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sid</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Binlog request representation. Please consult MySql documentation.
+///
+/// This struct is a helper builder for [`ComBinlogDump`] and [`ComBinlogDumpGtid`].
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>BinlogRequest&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Server id of a slave.
+    </span>server_id: u32,
+    <span class="doccomment">/// If true, then `COM_BINLOG_DUMP_GTID` will be used.
+    </span>use_gtid: bool,
+    <span class="doccomment">/// If `use_gtid` is `false`, then all flags except `BINLOG_DUMP_NON_BLOCK` will be truncated.
+    </span>flags: BinlogDumpFlags,
+    <span class="doccomment">/// Filename of the binlog on the master.
+    </span>filename: Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;,
+    <span class="doccomment">/// Position in the binlog-file to start the stream with.
+    ///
+    /// If `use_gtid` is `false`, then the value will be truncated to u32.
+    </span>pos: u64,
+    <span class="doccomment">/// SID blocks. If `use_gtid` is `false`, then this value is ignored.
+    </span>sids: Vec&lt;Sid&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates new request with the given slave server id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">server_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">server_id</span>,
-            <span class="ident">use_gtid</span>: <span class="bool-val">false</span>,
-            <span class="ident">flags</span>: <span class="ident">BinlogDumpFlags::empty</span>(),
-            <span class="ident">filename</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">pos</span>: <span class="number">4</span>,
-            <span class="ident">sids</span>: <span class="macro">vec!</span>[],
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogRequest&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates new request with the given slave server id.
+    </span><span class="kw">pub fn </span>new(server_id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            server_id,
+            use_gtid: <span class="bool-val">false</span>,
+            flags: BinlogDumpFlags::empty(),
+            filename: Default::default(),
+            pos: <span class="number">4</span>,
+            sids: <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="doccomment">/// Server id of a slave.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">server_id</span>
+    <span class="doccomment">/// Server id of a slave.
+    </span><span class="kw">pub fn </span>server_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.server_id
     }
 
-    <span class="doccomment">/// If true, then `COM_BINLOG_DUMP_GTID` will be used (defaults to `false`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">use_gtid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">use_gtid</span>
+    <span class="doccomment">/// If true, then `COM_BINLOG_DUMP_GTID` will be used (defaults to `false`).
+    </span><span class="kw">pub fn </span>use_gtid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.use_gtid
     }
 
-    <span class="doccomment">/// If `use_gtid` is `false`, then all flags except `BINLOG_DUMP_NON_BLOCK` will be truncated</span>
-    <span class="doccomment">/// (defaults to empty).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BinlogDumpFlags</span> {
-        <span class="self">self</span>.<span class="ident">flags</span>
+    <span class="doccomment">/// If `use_gtid` is `false`, then all flags except `BINLOG_DUMP_NON_BLOCK` will be truncated
+    /// (defaults to empty).
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BinlogDumpFlags {
+        <span class="self">self</span>.flags
     }
 
-    <span class="doccomment">/// Filename of the binlog on the master (defaults to an empty string).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filename</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Filename of the binlog on the master (defaults to an empty string).
+    </span><span class="kw">pub fn </span>filename_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.filename.as_ref()
     }
 
-    <span class="doccomment">/// Filename of the binlog on the master as a UTF-8 string (lossy converted)</span>
-    <span class="doccomment">/// (defaults to an empty string).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filename</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filename</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Filename of the binlog on the master as a UTF-8 string (lossy converted)
+    /// (defaults to an empty string).
+    </span><span class="kw">pub fn </span>filename(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.filename.as_ref()
     }
 
-    <span class="doccomment">/// Position in the binlog-file to start the stream with (defaults to `4`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `use_gtid` is `false`, then the value will be truncated to u32.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pos</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">pos</span>
+    <span class="doccomment">/// Position in the binlog-file to start the stream with (defaults to `4`).
+    ///
+    /// If `use_gtid` is `false`, then the value will be truncated to u32.
+    </span><span class="kw">pub fn </span>pos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.pos
     }
 
-    <span class="doccomment">/// If `use_gtid` is `false`, then this value will be ignored (defaults to an empty vector).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Sid</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sids</span>
+    <span class="doccomment">/// If `use_gtid` is `false`, then this value will be ignored (defaults to an empty vector).
+    </span><span class="kw">pub fn </span>sids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Sid&lt;<span class="lifetime">&#39;_</span>&gt;] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.sids
     }
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `server_id` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_server_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">server_id</span> <span class="op">=</span> <span class="ident">server_id</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns modified `self` with the given value of the `server_id` field.
+    </span><span class="kw">pub fn </span>with_server_id(<span class="kw-2">mut </span><span class="self">self</span>, server_id: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.server_id = server_id;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `use_gtid` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_use_gtid</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">use_gtid</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">use_gtid</span> <span class="op">=</span> <span class="ident">use_gtid</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns modified `self` with the given value of the `use_gtid` field.
+    </span><span class="kw">pub fn </span>with_use_gtid(<span class="kw-2">mut </span><span class="self">self</span>, use_gtid: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.use_gtid = use_gtid;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `flags` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_flags</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">BinlogDumpFlags</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="ident">flags</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns modified `self` with the given value of the `flags` field.
+    </span><span class="kw">pub fn </span>with_flags(<span class="kw-2">mut </span><span class="self">self</span>, flags: BinlogDumpFlags) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.flags = flags;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `filename` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_filename</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">filename</span> <span class="op">=</span> <span class="ident">filename</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns modified `self` with the given value of the `filename` field.
+    </span><span class="kw">pub fn </span>with_filename(<span class="kw-2">mut </span><span class="self">self</span>, filename: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.filename = filename.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `pos` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_pos</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Returns modified `self` with the given value of the `pos` field.
+    </span><span class="kw">pub fn </span>with_pos&lt;T: Into&lt;u64&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, pos: T) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.pos = pos.into();
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Returns modified `self` with the given value of the `sid_blocks` field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sids</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sids</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Sid</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Returns modified `self` with the given value of the `sid_blocks` field.
+    </span><span class="kw">pub fn </span>with_sids&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, sids: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: IntoIterator&lt;Item = Sid&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">sids</span> <span class="op">=</span> <span class="ident">sids</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.sids = sids.into_iter().collect();
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">ComBinlogDump</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ComBinlogDumpGtid</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">use_gtid</span>() {
-            <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">ComBinlogDumpGtid::new</span>(<span class="self">self</span>.<span class="ident">server_id</span>)
-                .<span class="ident">with_pos</span>(<span class="self">self</span>.<span class="ident">pos</span>)
-                .<span class="ident">with_flags</span>(<span class="self">self</span>.<span class="ident">flags</span>)
-                .<span class="ident">with_filename</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">filename</span>)
-                .<span class="ident">with_sids</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">sids</span>);
-            <span class="ident">Either::Right</span>(<span class="ident">cmd</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">ComBinlogDump::new</span>(<span class="self">self</span>.<span class="ident">server_id</span>)
-                .<span class="ident">with_pos</span>(<span class="self">self</span>.<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">u32</span>)
-                .<span class="ident">with_filename</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">filename</span>)
-                .<span class="ident">with_flags</span>(<span class="self">self</span>.<span class="ident">flags</span> <span class="op">&amp;</span> <span class="ident">BinlogDumpFlags::BINLOG_DUMP_NON_BLOCK</span>);
-            <span class="ident">Either::Left</span>(<span class="ident">cmd</span>)
+    <span class="kw">pub fn </span>as_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Either&lt;ComBinlogDump&lt;<span class="lifetime">&#39;_</span>&gt;, ComBinlogDumpGtid&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.use_gtid() {
+            <span class="kw">let </span>cmd = ComBinlogDumpGtid::new(<span class="self">self</span>.server_id)
+                .with_pos(<span class="self">self</span>.pos)
+                .with_flags(<span class="self">self</span>.flags)
+                .with_filename(<span class="kw-2">&amp;*</span><span class="self">self</span>.filename)
+                .with_sids(<span class="kw-2">&amp;*</span><span class="self">self</span>.sids);
+            Either::Right(cmd)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>cmd = ComBinlogDump::new(<span class="self">self</span>.server_id)
+                .with_pos(<span class="self">self</span>.pos <span class="kw">as </span>u32)
+                .with_filename(<span class="kw-2">&amp;*</span><span class="self">self</span>.filename)
+                .with_flags(<span class="self">self</span>.flags &amp; BinlogDumpFlags::BINLOG_DUMP_NON_BLOCK);
+            Either::Left(cmd)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

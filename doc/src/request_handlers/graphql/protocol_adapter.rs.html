@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/protocol_adapter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>protocol_adapter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/protocol_adapter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>protocol_adapter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -264,189 +264,189 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::HandlerError</span>;
-<span class="kw">use</span> <span class="ident">bigdecimal</span>::{<span class="ident">BigDecimal</span>, <span class="ident">FromPrimitive</span>};
-<span class="kw">use</span> <span class="ident">graphql_parser::query</span>::{
-    <span class="ident">Definition</span>, <span class="ident">Document</span>, <span class="ident">OperationDefinition</span>, <span class="ident">Selection</span> <span class="kw">as</span> <span class="ident">GqlSelection</span>, <span class="ident">SelectionSet</span>, <span class="ident">Value</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::HandlerError;
+<span class="kw">use </span>bigdecimal::{BigDecimal, FromPrimitive};
+<span class="kw">use </span>graphql_parser::query::{
+    Definition, Document, OperationDefinition, Selection <span class="kw">as </span>GqlSelection, SelectionSet, Value,
 };
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">query_core::query_document</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>query_core::query_document::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Protocol adapter for GraphQL -&gt; Query Document.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// GraphQL is mapped as following:</span>
-<span class="doccomment">/// - Every field of a `query { ... }` or single selection block `{ ... }` is mapped to an `Operation::Read`.</span>
-<span class="doccomment">/// - Every field of a single `mutation { ... }` is mapped to an `Operation::Write`.</span>
-<span class="doccomment">/// - If the JSON payload specifies an operation name, only that specific operation is picked and the rest ignored.</span>
-<span class="doccomment">/// - Fields on the queries are mapped to `Field`s, including arguments.</span>
-<span class="doccomment">/// - Concrete values (e.g. in arguments) are mapped to `QueryValue`s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Currently unsupported features:</span>
-<span class="doccomment">/// - Fragments in any form.</span>
-<span class="doccomment">/// - Variables.</span>
-<span class="doccomment">/// - Subscription queries.</span>
-<span class="doccomment">/// - Query names are ignored</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GraphQLProtocolAdapter</span>;
+<span class="doccomment">/// Protocol adapter for GraphQL -&gt; Query Document.
+///
+/// GraphQL is mapped as following:
+/// - Every field of a `query { ... }` or single selection block `{ ... }` is mapped to an `Operation::Read`.
+/// - Every field of a single `mutation { ... }` is mapped to an `Operation::Write`.
+/// - If the JSON payload specifies an operation name, only that specific operation is picked and the rest ignored.
+/// - Fields on the queries are mapped to `Field`s, including arguments.
+/// - Concrete values (e.g. in arguments) are mapped to `QueryValue`s.
+///
+/// Currently unsupported features:
+/// - Fragments in any form.
+/// - Variables.
+/// - Subscription queries.
+/// - Query names are ignored
+</span><span class="kw">pub struct </span>GraphQLProtocolAdapter;
 
-<span class="kw">impl</span> <span class="ident">GraphQLProtocolAdapter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert_query_to_operation</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">operation_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">gql_doc</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">graphql_parser::parse_query</span>(<span class="ident">query</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">doc</span>) =&gt; <span class="ident">doc</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;number too large to fit in target type&quot;</span>)
-                    <span class="op">|</span> <span class="ident">err</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;number too small to fit in target type&quot;</span>) =&gt;
+<span class="kw">impl </span>GraphQLProtocolAdapter {
+    <span class="kw">pub fn </span>convert_query_to_operation(query: <span class="kw-2">&amp;</span>str, operation_name: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
+        <span class="kw">let </span>gql_doc = <span class="kw">match </span>graphql_parser::parse_query(query) {
+            <span class="prelude-val">Ok</span>(doc) =&gt; doc,
+            <span class="prelude-val">Err</span>(err)
+                <span class="kw">if </span>err.to_string().contains(<span class="string">&quot;number too large to fit in target type&quot;</span>)
+                    | err.to_string().contains(<span class="string">&quot;number too small to fit in target type&quot;</span>) =&gt;
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HandlerError::ValueFitError</span>(<span class="string">&quot;Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you&#39;re trying to store large integers.&quot;</span>.<span class="ident">to_owned</span>()));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(HandlerError::ValueFitError(<span class="string">&quot;Query parsing failure: A number used in the query does not fit into a 64 bit signed integer. Consider using `BigInt` as field type if you&#39;re trying to store large integers.&quot;</span>.to_owned()));
             }
-            <span class="ident">err</span> @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">err</span><span class="question-mark">?</span>,
+            err @ <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; err<span class="question-mark">?</span>,
         };
 
-        <span class="ident"><span class="self">Self</span>::convert</span>(<span class="ident">gql_doc</span>, <span class="ident">operation_name</span>)
+        <span class="self">Self</span>::convert(gql_doc, operation_name)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">convert</span>(<span class="ident">gql_doc</span>: <span class="ident">Document</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">operation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">operations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">operation</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">op</span>) =&gt; <span class="ident">gql_doc</span>
-                .<span class="ident">definitions</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">def</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::matches_operation</span>(<span class="ident">def</span>, <span class="ident">op</span>))
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">HandlerError::query_conversion</span>(<span class="macro">format!</span>(<span class="string">&quot;Operation &#39;{}&#39; does not match any query.&quot;</span>, <span class="ident">op</span>)))
-                .<span class="ident">and_then</span>(<span class="ident"><span class="self">Self</span>::convert_definition</span>),
+    <span class="kw">pub fn </span>convert(gql_doc: Document&lt;String&gt;, operation: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Operation&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>operations: Vec&lt;Operation&gt; = <span class="kw">match </span>operation {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>op) =&gt; gql_doc
+                .definitions
+                .into_iter()
+                .find(|def| <span class="self">Self</span>::matches_operation(def, op))
+                .ok_or_else(|| HandlerError::query_conversion(<span class="macro">format!</span>(<span class="string">&quot;Operation &#39;{}&#39; does not match any query.&quot;</span>, op)))
+                .and_then(<span class="self">Self</span>::convert_definition),
 
-            <span class="prelude-val">None</span> =&gt; <span class="ident">gql_doc</span>
-                .<span class="ident">definitions</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::convert_definition</span>)
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span>()),
+            <span class="prelude-val">None </span>=&gt; gql_doc
+                .definitions
+                .into_iter()
+                .map(<span class="self">Self</span>::convert_definition)
+                .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;Vec&lt;Operation&gt;&gt;&gt;&gt;()
+                .map(|r| r.into_iter().flatten().collect::&lt;Vec&lt;Operation&gt;&gt;()),
         }<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">operations</span>
-            .<span class="ident">pop</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">HandlerError::query_conversion</span>(<span class="string">&quot;Document contained no operations.&quot;</span>))<span class="question-mark">?</span>
-            .<span class="ident">dedup_selections</span>();
+        <span class="kw">let </span>operation = operations
+            .pop()
+            .ok_or_else(|| HandlerError::query_conversion(<span class="string">&quot;Document contained no operations.&quot;</span>))<span class="question-mark">?
+            </span>.dedup_selections();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">operation</span>)
+        <span class="prelude-val">Ok</span>(operation)
     }
 
-    <span class="kw">fn</span> <span class="ident">convert_definition</span>(<span class="ident">def</span>: <span class="ident">Definition</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">def</span> {
-            <span class="ident">Definition::Fragment</span>(<span class="ident">f</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::unsupported_feature</span>(
+    <span class="kw">fn </span>convert_definition(def: Definition&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Operation&gt;&gt; {
+        <span class="kw">match </span>def {
+            Definition::Fragment(f) =&gt; <span class="prelude-val">Err</span>(HandlerError::unsupported_feature(
                 <span class="string">&quot;Fragment definition&quot;</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;Fragment &#39;{}&#39;, at position {}.&quot;</span>, <span class="ident">f</span>.<span class="ident">name</span>, <span class="ident">f</span>.<span class="ident">position</span>),
+                <span class="macro">format!</span>(<span class="string">&quot;Fragment &#39;{}&#39;, at position {}.&quot;</span>, f.name, f.position),
             )),
-            <span class="ident">Definition::Operation</span>(<span class="ident">op</span>) =&gt; <span class="kw">match</span> <span class="ident">op</span> {
-                <span class="ident">OperationDefinition::Subscription</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::unsupported_feature</span>(
+            Definition::Operation(op) =&gt; <span class="kw">match </span>op {
+                OperationDefinition::Subscription(s) =&gt; <span class="prelude-val">Err</span>(HandlerError::unsupported_feature(
                     <span class="string">&quot;Subscription query&quot;</span>,
-                    <span class="macro">format!</span>(<span class="string">&quot;At position {}.&quot;</span>, <span class="ident">s</span>.<span class="ident">position</span>),
+                    <span class="macro">format!</span>(<span class="string">&quot;At position {}.&quot;</span>, s.position),
                 )),
-                <span class="ident">OperationDefinition::SelectionSet</span>(<span class="ident">s</span>) =&gt; <span class="ident"><span class="self">Self</span>::convert_query</span>(<span class="ident">s</span>),
-                <span class="ident">OperationDefinition::Query</span>(<span class="ident">q</span>) =&gt; <span class="ident"><span class="self">Self</span>::convert_query</span>(<span class="ident">q</span>.<span class="ident">selection_set</span>),
-                <span class="ident">OperationDefinition::Mutation</span>(<span class="ident">m</span>) =&gt; <span class="ident"><span class="self">Self</span>::convert_mutation</span>(<span class="ident">m</span>.<span class="ident">selection_set</span>),
+                OperationDefinition::SelectionSet(s) =&gt; <span class="self">Self</span>::convert_query(s),
+                OperationDefinition::Query(q) =&gt; <span class="self">Self</span>::convert_query(q.selection_set),
+                OperationDefinition::Mutation(m) =&gt; <span class="self">Self</span>::convert_mutation(m.selection_set),
             },
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">convert_query</span>(<span class="ident">selection_set</span>: <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::convert_selection_set</span>(<span class="ident">selection_set</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Operation::Read</span>).<span class="ident">collect</span>())
+    <span class="kw">fn </span>convert_query(selection_set: SelectionSet&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Operation&gt;&gt; {
+        <span class="self">Self</span>::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Read).collect())
     }
 
-    <span class="kw">fn</span> <span class="ident">convert_mutation</span>(<span class="ident">selection_set</span>: <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::convert_selection_set</span>(<span class="ident">selection_set</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Operation::Write</span>).<span class="ident">collect</span>())
+    <span class="kw">fn </span>convert_mutation(selection_set: SelectionSet&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Operation&gt;&gt; {
+        <span class="self">Self</span>::convert_selection_set(selection_set).map(|fields| fields.into_iter().map(Operation::Write).collect())
     }
 
-    <span class="kw">fn</span> <span class="ident">convert_selection_set</span>(<span class="ident">selection_set</span>: <span class="ident">SelectionSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Selection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">selection_set</span>
-            .<span class="ident">items</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">item</span> {
-                <span class="ident">GqlSelection::Field</span>(<span class="ident">f</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">QueryValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">f</span>
-                        .<span class="ident">arguments</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident"><span class="self">Self</span>::convert_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)))
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    <span class="kw">fn </span>convert_selection_set(selection_set: SelectionSet&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;Selection&gt;&gt; {
+        selection_set
+            .items
+            .into_iter()
+            .map(|item| <span class="kw">match </span>item {
+                GqlSelection::Field(f) =&gt; {
+                    <span class="kw">let </span>arguments: Vec&lt;(String, QueryValue)&gt; = f
+                        .arguments
+                        .into_iter()
+                        .map(|(k, v)| <span class="prelude-val">Ok</span>((k, <span class="self">Self</span>::convert_value(v)<span class="question-mark">?</span>)))
+                        .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-                    <span class="kw">let</span> <span class="ident">nested_selections</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::convert_selection_set</span>(<span class="ident">f</span>.<span class="ident">selection_set</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>nested_selections = <span class="self">Self</span>::convert_selection_set(f.selection_set)<span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">Selection::new</span>(<span class="ident">f</span>.<span class="ident">name</span>, <span class="ident">f</span>.<span class="ident">alias</span>, <span class="ident">arguments</span>, <span class="ident">nested_selections</span>))
+                    <span class="prelude-val">Ok</span>(Selection::new(f.name, f.alias, arguments, nested_selections))
                 }
 
-                <span class="ident">GqlSelection::FragmentSpread</span>(<span class="ident">fs</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::unsupported_feature</span>(
+                GqlSelection::FragmentSpread(fs) =&gt; <span class="prelude-val">Err</span>(HandlerError::unsupported_feature(
                     <span class="string">&quot;Fragment spread&quot;</span>,
-                    <span class="macro">format!</span>(<span class="string">&quot;Fragment &#39;{}&#39;, at position {}.&quot;</span>, <span class="ident">fs</span>.<span class="ident">fragment_name</span>, <span class="ident">fs</span>.<span class="ident">position</span>),
+                    <span class="macro">format!</span>(<span class="string">&quot;Fragment &#39;{}&#39;, at position {}.&quot;</span>, fs.fragment_name, fs.position),
                 )),
 
-                <span class="ident">GqlSelection::InlineFragment</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::unsupported_feature</span>(
+                GqlSelection::InlineFragment(i) =&gt; <span class="prelude-val">Err</span>(HandlerError::unsupported_feature(
                     <span class="string">&quot;Inline fragment&quot;</span>,
-                    <span class="macro">format!</span>(<span class="string">&quot;At position {}.&quot;</span>, <span class="ident">i</span>.<span class="ident">position</span>),
+                    <span class="macro">format!</span>(<span class="string">&quot;At position {}.&quot;</span>, i.position),
                 )),
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Checks if the given GraphQL definition matches the operation name that should be executed.</span>
-    <span class="kw">fn</span> <span class="ident">matches_operation</span>(<span class="ident">def</span>: <span class="kw-2">&amp;</span><span class="ident">Definition</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="op">|</span><span class="ident">n</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">operation</span>).<span class="ident">is_some</span>();
-        <span class="kw">match</span> <span class="ident">def</span> {
-            <span class="ident">Definition::Fragment</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">Definition::Operation</span>(<span class="ident">op</span>) =&gt; <span class="kw">match</span> <span class="ident">op</span> {
-                <span class="ident">OperationDefinition::Subscription</span>(<span class="ident">s</span>) =&gt; <span class="ident">check</span>(<span class="ident">s</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-                <span class="ident">OperationDefinition::SelectionSet</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-                <span class="ident">OperationDefinition::Query</span>(<span class="ident">q</span>) =&gt; <span class="ident">check</span>(<span class="ident">q</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-                <span class="ident">OperationDefinition::Mutation</span>(<span class="ident">m</span>) =&gt; <span class="ident">check</span>(<span class="ident">m</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>()),
+    <span class="doccomment">/// Checks if the given GraphQL definition matches the operation name that should be executed.
+    </span><span class="kw">fn </span>matches_operation(def: <span class="kw-2">&amp;</span>Definition&lt;String&gt;, operation: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">let </span>check = |n: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt;| n.filter(|name| name.as_str() == operation).is_some();
+        <span class="kw">match </span>def {
+            Definition::Fragment(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+            Definition::Operation(op) =&gt; <span class="kw">match </span>op {
+                OperationDefinition::Subscription(s) =&gt; check(s.name.as_ref()),
+                OperationDefinition::SelectionSet(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                OperationDefinition::Query(q) =&gt; check(q.name.as_ref()),
+                OperationDefinition::Mutation(m) =&gt; check(m.name.as_ref()),
             },
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">convert_value</span>(<span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Variable</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::unsupported_feature</span>(
+    <span class="kw">fn </span>convert_value(value: Value&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;QueryValue&gt; {
+        <span class="kw">match </span>value {
+            Value::Variable(name) =&gt; <span class="prelude-val">Err</span>(HandlerError::unsupported_feature(
                 <span class="string">&quot;Variable usage&quot;</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;Variable &#39;{}&#39;.&quot;</span>, <span class="ident">name</span>),
+                <span class="macro">format!</span>(<span class="string">&quot;Variable &#39;{}&#39;.&quot;</span>, name),
             )),
-            <span class="ident">Value::Int</span>(<span class="ident">i</span>) =&gt; <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">as_i64</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Int</span>(<span class="ident">i</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::query_conversion</span>(<span class="macro">format!</span>(
+            Value::Int(i) =&gt; <span class="kw">match </span>i.as_i64() {
+                <span class="prelude-val">Some</span>(i) =&gt; <span class="prelude-val">Ok</span>(QueryValue::Int(i)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(HandlerError::query_conversion(<span class="macro">format!</span>(
                     <span class="string">&quot;Invalid 64 bit integer: {:?}&quot;</span>,
-                    <span class="ident">i</span>
+                    i
                 ))),
             },
-            <span class="ident">Value::Float</span>(<span class="ident">f</span>) =&gt; <span class="kw">match</span> <span class="ident">BigDecimal::from_f64</span>(<span class="ident">f</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">dec</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Float</span>(<span class="ident">dec</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">HandlerError::query_conversion</span>(<span class="macro">format!</span>(<span class="string">&quot;invalid 64-bit float: {:?}&quot;</span>, <span class="ident">f</span>))),
+            Value::Float(f) =&gt; <span class="kw">match </span>BigDecimal::from_f64(f) {
+                <span class="prelude-val">Some</span>(dec) =&gt; <span class="prelude-val">Ok</span>(QueryValue::Float(dec)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(HandlerError::query_conversion(<span class="macro">format!</span>(<span class="string">&quot;invalid 64-bit float: {:?}&quot;</span>, f))),
             },
-            <span class="ident">Value::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::String</span>(<span class="ident">s</span>)),
-            <span class="ident">Value::Boolean</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Boolean</span>(<span class="ident">b</span>)),
-            <span class="ident">Value::Null</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Null</span>),
-            <span class="ident">Value::Enum</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Enum</span>(<span class="ident">e</span>)),
-            <span class="ident">Value::List</span>(<span class="ident">values</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">values</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::convert_value</span>)
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">QueryValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            Value::String(s) =&gt; <span class="prelude-val">Ok</span>(QueryValue::String(s)),
+            Value::Boolean(b) =&gt; <span class="prelude-val">Ok</span>(QueryValue::Boolean(b)),
+            Value::Null =&gt; <span class="prelude-val">Ok</span>(QueryValue::Null),
+            Value::Enum(e) =&gt; <span class="prelude-val">Ok</span>(QueryValue::Enum(e)),
+            Value::List(values) =&gt; {
+                <span class="kw">let </span>values: Vec&lt;QueryValue&gt; = values
+                    .into_iter()
+                    .map(<span class="self">Self</span>::convert_value)
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;QueryValue&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::List</span>(<span class="ident">values</span>))
+                <span class="prelude-val">Ok</span>(QueryValue::List(values))
             }
-            <span class="ident">Value::Object</span>(<span class="ident">map</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">map</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident"><span class="self">Self</span>::convert_value</span>(<span class="ident">v</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>)))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">QueryValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            Value::Object(map) =&gt; {
+                <span class="kw">let </span>values = map
+                    .into_iter()
+                    .map(|(k, v)| <span class="self">Self</span>::convert_value(v).map(|v| (k, v)))
+                    .collect::&lt;<span class="kw">crate</span>::Result&lt;IndexMap&lt;String, QueryValue&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">QueryValue::Object</span>(<span class="ident">values</span>))
+                <span class="prelude-val">Ok</span>(QueryValue::Object(values))
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">converts_single_query</span>() {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">r#&quot;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>converts_single_query() {
+        <span class="kw">let </span>query = <span class="string">r#&quot;
             query findTheModelOperation {
                 findOneModel(where: {a_number: {gte: 1}}) {
                     id,
@@ -458,32 +458,32 @@
             }
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="ident">query</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(query, <span class="prelude-val">None</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">operation</span>.<span class="ident">name</span>(), <span class="string">&quot;findOneModel&quot;</span>);
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">operation</span>, <span class="ident">Operation::Read</span>(<span class="kw">_</span>)));
+        <span class="macro">assert_eq!</span>(operation.name(), <span class="string">&quot;findOneModel&quot;</span>);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(operation, Operation::Read(<span class="kw">_</span>)));
 
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">into_read</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>read = operation.into_read().unwrap();
 
-        <span class="kw">let</span> <span class="ident">where_args</span> <span class="op">=</span> <span class="ident">QueryValue::Object</span>(<span class="ident">IndexMap::from</span>([(
-            <span class="string">&quot;a_number&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">QueryValue::Object</span>([(<span class="string">&quot;gte&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">QueryValue::Int</span>(<span class="number">1</span>))].<span class="ident">into</span>()),
+        <span class="kw">let </span>where_args = QueryValue::Object(IndexMap::from([(
+            <span class="string">&quot;a_number&quot;</span>.to_string(),
+            QueryValue::Object([(<span class="string">&quot;gte&quot;</span>.to_string(), QueryValue::Int(<span class="number">1</span>))].into()),
         )]));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>.<span class="ident">arguments</span>(), [(<span class="string">&quot;where&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">where_args</span>)]);
+        <span class="macro">assert_eq!</span>(read.arguments(), [(<span class="string">&quot;where&quot;</span>.to_string(), where_args)]);
 
-        <span class="kw">let</span> <span class="ident">selections</span> <span class="op">=</span> <span class="ident">Vec::from</span>([
-            <span class="ident">Selection::new</span>(<span class="string">&quot;id&quot;</span>, <span class="prelude-val">None</span>, [], <span class="ident">Vec::new</span>()),
-            <span class="ident">Selection::new</span>(<span class="string">&quot;large_number&quot;</span>, <span class="prelude-val">None</span>, [], <span class="ident">Vec::new</span>()),
-            <span class="ident">Selection::new</span>(<span class="string">&quot;other&quot;</span>, <span class="prelude-val">None</span>, [], <span class="ident">Vec::from</span>([<span class="ident">Selection::new</span>(<span class="string">&quot;name&quot;</span>, <span class="prelude-val">None</span>, [], [])])),
+        <span class="kw">let </span>selections = Vec::from([
+            Selection::new(<span class="string">&quot;id&quot;</span>, <span class="prelude-val">None</span>, [], Vec::new()),
+            Selection::new(<span class="string">&quot;large_number&quot;</span>, <span class="prelude-val">None</span>, [], Vec::new()),
+            Selection::new(<span class="string">&quot;other&quot;</span>, <span class="prelude-val">None</span>, [], Vec::from([Selection::new(<span class="string">&quot;name&quot;</span>, <span class="prelude-val">None</span>, [], [])])),
         ]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">read</span>.<span class="ident">nested_selections</span>(), <span class="ident">selections</span>);
+        <span class="macro">assert_eq!</span>(read.nested_selections(), selections);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">converts_single_mutation</span>() {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">r#&quot;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>converts_single_mutation() {
+        <span class="kw">let </span>query = <span class="string">r#&quot;
         mutation {
                 createOnePost(data: {
                     id: 1,
@@ -497,38 +497,38 @@
         }
         &quot;#</span>;
 
-        <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="ident">query</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(query, <span class="prelude-val">None</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">operation</span>.<span class="ident">name</span>(), <span class="string">&quot;createOnePost&quot;</span>);
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">operation</span>, <span class="ident">Operation::Write</span>(<span class="kw">_</span>)));
+        <span class="macro">assert_eq!</span>(operation.name(), <span class="string">&quot;createOnePost&quot;</span>);
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(operation, Operation::Write(<span class="kw">_</span>)));
 
-        <span class="kw">let</span> <span class="ident">write</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">into_write</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>write = operation.into_write().unwrap();
 
-        <span class="kw">let</span> <span class="ident">data_args</span> <span class="op">=</span> <span class="ident">QueryValue::Object</span>(
+        <span class="kw">let </span>data_args = QueryValue::Object(
             [
-                (<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">QueryValue::Int</span>(<span class="number">1</span>)),
+                (<span class="string">&quot;id&quot;</span>.to_string(), QueryValue::Int(<span class="number">1</span>)),
                 (
-                    <span class="string">&quot;categories&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">QueryValue::Object</span>(
+                    <span class="string">&quot;categories&quot;</span>.to_string(),
+                    QueryValue::Object(
                         [(
-                            <span class="string">&quot;create&quot;</span>.<span class="ident">to_string</span>(),
-                            <span class="ident">QueryValue::List</span>(
+                            <span class="string">&quot;create&quot;</span>.to_string(),
+                            QueryValue::List(
                                 [
-                                    <span class="ident">QueryValue::Object</span>([(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">QueryValue::Int</span>(<span class="number">1</span>))].<span class="ident">into</span>()),
-                                    <span class="ident">QueryValue::Object</span>([(<span class="string">&quot;id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">QueryValue::Int</span>(<span class="number">2</span>))].<span class="ident">into</span>()),
+                                    QueryValue::Object([(<span class="string">&quot;id&quot;</span>.to_string(), QueryValue::Int(<span class="number">1</span>))].into()),
+                                    QueryValue::Object([(<span class="string">&quot;id&quot;</span>.to_string(), QueryValue::Int(<span class="number">2</span>))].into()),
                                 ]
-                                .<span class="ident">into</span>(),
+                                .into(),
                             ),
                         )]
-                        .<span class="ident">into</span>(),
+                        .into(),
                     ),
                 ),
             ]
-            .<span class="ident">into</span>(),
+            .into(),
         );
-        <span class="macro">println!</span>(<span class="string">&quot;args {:?}&quot;</span>, <span class="ident">write</span>.<span class="ident">arguments</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">write</span>.<span class="ident">arguments</span>(), [(<span class="string">&quot;data&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">data_args</span>)]);
+        <span class="macro">println!</span>(<span class="string">&quot;args {:?}&quot;</span>, write.arguments());
+        <span class="macro">assert_eq!</span>(write.arguments(), [(<span class="string">&quot;data&quot;</span>.to_string(), data_args)]);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

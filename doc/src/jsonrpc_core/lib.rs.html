@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -79,86 +79,86 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
-</pre><pre class="rust"><code><span class="doccomment">//! ### Transport agnostic jsonrpc library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Right now it supports only server side handling requests.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use jsonrpc_core::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//! 	let mut io = IoHandler::new();</span>
-<span class="doccomment">//! 	io.add_sync_method(&quot;say_hello&quot;, |_| {</span>
-<span class="doccomment">//!			Ok(Value::String(&quot;Hello World!&quot;.into()))</span>
-<span class="doccomment">//! 	});</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 	let request = r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#;</span>
-<span class="doccomment">//! 	let response = r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;Hello World!&quot;,&quot;id&quot;:1}&quot;#;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 	assert_eq!(io.handle_request_sync(request), Some(response.to_string()));</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! ### Transport agnostic jsonrpc library.
+//!
+//! Right now it supports only server side handling requests.
+//!
+//! ```rust
+//! use jsonrpc_core::*;
+//!
+//! fn main() {
+//! 	let mut io = IoHandler::new();
+//! 	io.add_sync_method(&quot;say_hello&quot;, |_| {
+//!			Ok(Value::String(&quot;Hello World!&quot;.into()))
+//! 	});
+//!
+//! 	let request = r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;say_hello&quot;, &quot;params&quot;: [42, 23], &quot;id&quot;: 1}&quot;#;
+//! 	let response = r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;result&quot;:&quot;Hello World!&quot;,&quot;id&quot;:1}&quot;#;
+//!
+//! 	assert_eq!(io.handle_request_sync(request), Some(response.to_string()));
+//! }
+//! ```
 
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+</span><span class="attribute">#![deny(missing_docs)]
 
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+</span><span class="kw">use </span>std::pin::Pin;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>log;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>serde_derive;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;futures-executor&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_executor</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">futures_util</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;futures&quot;</span>)]
+</span><span class="kw">pub use </span>futures;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;futures-executor&quot;</span>)]
+</span><span class="kw">pub use </span>futures_executor;
+<span class="kw">pub use </span>futures_util;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_json</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub extern crate </span>serde;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub extern crate </span>serde_json;
 
-<span class="kw">mod</span> <span class="ident">calls</span>;
-<span class="kw">mod</span> <span class="ident">io</span>;
+<span class="kw">mod </span>calls;
+<span class="kw">mod </span>io;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">delegates</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">middleware</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
+<span class="kw">pub mod </span>delegates;
+<span class="kw">pub mod </span>middleware;
+<span class="kw">pub mod </span>types;
 
-<span class="doccomment">/// A Result type.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A Result type.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, Error&gt;;
 
-<span class="doccomment">/// A `Future` trait object.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `Future` trait object.
+</span><span class="kw">pub type </span>BoxFuture&lt;T&gt; = Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = T&gt; + Send&gt;&gt;;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calls</span>::{
-	<span class="ident">Metadata</span>, <span class="ident">RemoteProcedure</span>, <span class="ident">RpcMethod</span>, <span class="ident">RpcMethodSimple</span>, <span class="ident">RpcMethodSync</span>, <span class="ident">RpcNotification</span>, <span class="ident">RpcNotificationSimple</span>,
-	<span class="ident">WrapFuture</span>,
+<span class="kw">pub use </span><span class="kw">crate</span>::calls::{
+	Metadata, RemoteProcedure, RpcMethod, RpcMethodSimple, RpcMethodSync, RpcNotification, RpcNotificationSimple,
+	WrapFuture,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::delegates::IoDelegate</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io</span>::{
-	<span class="ident">Compatibility</span>, <span class="ident">FutureOutput</span>, <span class="ident">FutureResponse</span>, <span class="ident">FutureResult</span>, <span class="ident">FutureRpcResult</span>, <span class="ident">IoHandler</span>, <span class="ident">IoHandlerExtension</span>,
-	<span class="ident">MetaIoHandler</span>,
+<span class="kw">pub use </span><span class="kw">crate</span>::delegates::IoDelegate;
+<span class="kw">pub use </span><span class="kw">crate</span>::io::{
+	Compatibility, FutureOutput, FutureResponse, FutureResult, FutureRpcResult, IoHandler, IoHandlerExtension,
+	MetaIoHandler,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::middleware</span>::{<span class="ident">Middleware</span>, <span class="ident">Noop</span> <span class="kw">as</span> <span class="ident">NoopMiddleware</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::middleware::{Middleware, Noop <span class="kw">as </span>NoopMiddleware};
+<span class="kw">pub use </span><span class="kw">crate</span>::types::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">serde_json::Error</span> <span class="kw">as</span> <span class="ident">SerdeError</span>;
+<span class="kw">use </span>serde_json::Error <span class="kw">as </span>SerdeError;
 
-<span class="doccomment">/// workaround for https://github.com/serde-rs/json/issues/505</span>
-<span class="doccomment">/// Arbitrary precision confuses serde when deserializing into untagged enums,</span>
-<span class="doccomment">/// this is a workaround</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serde_from_str</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SerdeError</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">serde::de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// workaround for https://github.com/serde-rs/json/issues/505
+/// Arbitrary precision confuses serde when deserializing into untagged enums,
+/// this is a workaround
+</span><span class="kw">pub fn </span>serde_from_str&lt;<span class="lifetime">&#39;a</span>, T&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; std::result::Result&lt;T, SerdeError&gt;
+<span class="kw">where
+	</span>T: serde::de::Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-	<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary_precision&quot;</span>) {
-		<span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-		<span class="ident">T::deserialize</span>(<span class="ident">val</span>)
-	} <span class="kw">else</span> {
-		<span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+	<span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;arbitrary_precision&quot;</span>) {
+		<span class="kw">let </span>val = serde_json::from_str::&lt;Value&gt;(input)<span class="question-mark">?</span>;
+		T::deserialize(val)
+	} <span class="kw">else </span>{
+		serde_json::from_str::&lt;T&gt;(input)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

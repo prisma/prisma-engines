@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/type_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>type_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/type_info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>type_info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tiberius/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -397,256 +397,256 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">asynchronous_codec::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>asynchronous_codec::BytesMut;
+<span class="kw">use </span>bytes::BufMut;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">tds::Collation</span>, <span class="ident">xml::XmlSchema</span>, <span class="ident">Error</span>, <span class="ident">SqlReadBytes</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">sync::Arc</span>, <span class="ident">usize</span>};
+<span class="kw">use crate</span>::{tds::Collation, xml::XmlSchema, Error, SqlReadBytes};
+<span class="kw">use </span>std::{convert::TryFrom, sync::Arc, usize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Encode</span>;
+<span class="kw">use </span><span class="kw">super</span>::Encode;
 
-<span class="doccomment">/// A length of a column in bytes or characters.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeLength</span> {
-    <span class="doccomment">/// The number of bytes (or characters) reserved in the column.</span>
-    <span class="ident">Limited</span>(<span class="ident">u16</span>),
-    <span class="doccomment">/// Unlimited, stored in the heap outside of the row.</span>
-    <span class="ident">Max</span>,
+<span class="doccomment">/// A length of a column in bytes or characters.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>TypeLength {
+    <span class="doccomment">/// The number of bytes (or characters) reserved in the column.
+    </span>Limited(u16),
+    <span class="doccomment">/// Unlimited, stored in the heap outside of the row.
+    </span>Max,
 }
 
-<span class="doccomment">/// Describes a type of a column.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeInfo</span> {
-    <span class="ident">FixedLen</span>(<span class="ident">FixedLenType</span>),
-    <span class="ident">VarLenSized</span>(<span class="ident">VarLenContext</span>),
-    <span class="ident">VarLenSizedPrecision</span> {
-        <span class="ident">ty</span>: <span class="ident">VarLenType</span>,
-        <span class="ident">size</span>: <span class="ident">usize</span>,
-        <span class="ident">precision</span>: <span class="ident">u8</span>,
-        <span class="ident">scale</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// Describes a type of a column.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>TypeInfo {
+    FixedLen(FixedLenType),
+    VarLenSized(VarLenContext),
+    VarLenSizedPrecision {
+        ty: VarLenType,
+        size: usize,
+        precision: u8,
+        scale: u8,
     },
-    <span class="ident">Xml</span> {
-        <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">XmlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">size</span>: <span class="ident">usize</span>,
+    Xml {
+        schema: <span class="prelude-ty">Option</span>&lt;Arc&lt;XmlSchema&gt;&gt;,
+        size: usize,
     },
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VarLenContext</span> {
-    <span class="ident">r#type</span>: <span class="ident">VarLenType</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>VarLenContext {
+    r#type: VarLenType,
+    len: usize,
+    collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">VarLenContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">r#type</span>: <span class="ident">VarLenType</span>, <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">r#type</span>,
-            <span class="ident">len</span>,
-            <span class="ident">collation</span>,
+<span class="kw">impl </span>VarLenContext {
+    <span class="kw">pub fn </span>new(r#type: VarLenType, len: usize, collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            r#type,
+            len,
+            collation,
         }
     }
 
-    <span class="doccomment">/// Get the var len context&#39;s r#type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">r#type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">VarLenType</span> {
-        <span class="self">self</span>.<span class="ident">r#type</span>
+    <span class="doccomment">/// Get the var len context&#39;s r#type.
+    </span><span class="kw">pub fn </span>r#type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; VarLenType {
+        <span class="self">self</span>.r#type
     }
 
-    <span class="doccomment">/// Get the var len context&#39;s len.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>
+    <span class="doccomment">/// Get the var len context&#39;s len.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len
     }
 
-    <span class="doccomment">/// Get the var len context&#39;s collation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">collation</span>
+    <span class="doccomment">/// Get the var len context&#39;s collation.
+    </span><span class="kw">pub fn </span>collation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Collation&gt; {
+        <span class="self">self</span>.collation
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">VarLenContext</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">r#type</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+<span class="kw">impl </span>Encode&lt;BytesMut&gt; <span class="kw">for </span>VarLenContext {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        dst.put_u8(<span class="self">self</span>.r#type() <span class="kw">as </span>u8);
 
-        <span class="comment">// length</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">r#type</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-            <span class="ident">VarLenType::Daten</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Timen</span>
-            <span class="op">|</span> <span class="ident">VarLenType::DatetimeOffsetn</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Datetime2</span> =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+        <span class="comment">// length
+        </span><span class="kw">match </span><span class="self">self</span>.r#type {
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tds73&quot;</span>)]
+            </span>VarLenType::Daten
+            | VarLenType::Timen
+            | VarLenType::DatetimeOffsetn
+            | VarLenType::Datetime2 =&gt; {
+                dst.put_u8(<span class="self">self</span>.len() <span class="kw">as </span>u8);
             }
-            <span class="ident">VarLenType::Bitn</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Intn</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Floatn</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Decimaln</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Numericn</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Guid</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Money</span>
-            <span class="op">|</span> <span class="ident">VarLenType::Datetimen</span> =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
+            VarLenType::Bitn
+            | VarLenType::Intn
+            | VarLenType::Floatn
+            | VarLenType::Decimaln
+            | VarLenType::Numericn
+            | VarLenType::Guid
+            | VarLenType::Money
+            | VarLenType::Datetimen =&gt; {
+                dst.put_u8(<span class="self">self</span>.len() <span class="kw">as </span>u8);
             }
-            <span class="ident">VarLenType::NChar</span>
-            <span class="op">|</span> <span class="ident">VarLenType::BigChar</span>
-            <span class="op">|</span> <span class="ident">VarLenType::NVarchar</span>
-            <span class="op">|</span> <span class="ident">VarLenType::BigVarChar</span>
-            <span class="op">|</span> <span class="ident">VarLenType::BigBinary</span>
-            <span class="op">|</span> <span class="ident">VarLenType::BigVarBin</span> =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
+            VarLenType::NChar
+            | VarLenType::BigChar
+            | VarLenType::NVarchar
+            | VarLenType::BigVarChar
+            | VarLenType::BigBinary
+            | VarLenType::BigVarBin =&gt; {
+                dst.put_u16_le(<span class="self">self</span>.len() <span class="kw">as </span>u16);
             }
-            <span class="ident">VarLenType::Image</span> <span class="op">|</span> <span class="ident">VarLenType::Text</span> <span class="op">|</span> <span class="ident">VarLenType::NText</span> =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>);
+            VarLenType::Image | VarLenType::Text | VarLenType::NText =&gt; {
+                dst.put_u32_le(<span class="self">self</span>.len() <span class="kw">as </span>u32);
             }
-            <span class="ident">VarLenType::Xml</span> =&gt; (),
-            <span class="ident">typ</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;encoding {:?} is not supported yet&quot;</span>, <span class="ident">typ</span>),
+            VarLenType::Xml =&gt; (),
+            typ =&gt; <span class="macro">todo!</span>(<span class="string">&quot;encoding {:?} is not supported yet&quot;</span>, typ),
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">collation</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">collation</span>() {
-            <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">collation</span>.<span class="ident">info</span>());
-            <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">collation</span>.<span class="ident">sort_id</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(collation) = <span class="self">self</span>.collation() {
+            dst.put_u32_le(collation.info());
+            dst.put_u8(collation.sort_id());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="macro">uint_enum!</span> {
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FixedLenType</span> {
-        <span class="ident">Null</span> <span class="op">=</span> <span class="number">0x1F</span>,
-        <span class="ident">Int1</span> <span class="op">=</span> <span class="number">0x30</span>,
-        <span class="ident">Bit</span> <span class="op">=</span> <span class="number">0x32</span>,
-        <span class="ident">Int2</span> <span class="op">=</span> <span class="number">0x34</span>,
-        <span class="ident">Int4</span> <span class="op">=</span> <span class="number">0x38</span>,
-        <span class="ident">Datetime4</span> <span class="op">=</span> <span class="number">0x3A</span>,
-        <span class="ident">Float4</span> <span class="op">=</span> <span class="number">0x3B</span>,
-        <span class="ident">Money</span> <span class="op">=</span> <span class="number">0x3C</span>,
-        <span class="ident">Datetime</span> <span class="op">=</span> <span class="number">0x3D</span>,
-        <span class="ident">Float8</span> <span class="op">=</span> <span class="number">0x3E</span>,
-        <span class="ident">Money4</span> <span class="op">=</span> <span class="number">0x7A</span>,
-        <span class="ident">Int8</span> <span class="op">=</span> <span class="number">0x7F</span>,
+<span class="macro">uint_enum! </span>{
+    <span class="attribute">#[repr(u8)]
+    </span><span class="kw">pub enum </span>FixedLenType {
+        Null = <span class="number">0x1F</span>,
+        Int1 = <span class="number">0x30</span>,
+        Bit = <span class="number">0x32</span>,
+        Int2 = <span class="number">0x34</span>,
+        Int4 = <span class="number">0x38</span>,
+        Datetime4 = <span class="number">0x3A</span>,
+        Float4 = <span class="number">0x3B</span>,
+        Money = <span class="number">0x3C</span>,
+        Datetime = <span class="number">0x3D</span>,
+        Float8 = <span class="number">0x3E</span>,
+        Money4 = <span class="number">0x7A</span>,
+        Int8 = <span class="number">0x7F</span>,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>))]</span>
-<span class="macro">uint_enum!</span> {
-    <span class="doccomment">/// 2.2.5.4.2</span>
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VarLenType</span> {
-        <span class="ident">Guid</span> <span class="op">=</span> <span class="number">0x24</span>,
-        <span class="ident">Intn</span> <span class="op">=</span> <span class="number">0x26</span>,
-        <span class="ident">Bitn</span> <span class="op">=</span> <span class="number">0x68</span>,
-        <span class="ident">Decimaln</span> <span class="op">=</span> <span class="number">0x6A</span>,
-        <span class="ident">Numericn</span> <span class="op">=</span> <span class="number">0x6C</span>,
-        <span class="ident">Floatn</span> <span class="op">=</span> <span class="number">0x6D</span>,
-        <span class="ident">Money</span> <span class="op">=</span> <span class="number">0x6E</span>,
-        <span class="ident">Datetimen</span> <span class="op">=</span> <span class="number">0x6F</span>,
-        <span class="ident">BigVarBin</span> <span class="op">=</span> <span class="number">0xA5</span>,
-        <span class="ident">BigVarChar</span> <span class="op">=</span> <span class="number">0xA7</span>,
-        <span class="ident">BigBinary</span> <span class="op">=</span> <span class="number">0xAD</span>,
-        <span class="ident">BigChar</span> <span class="op">=</span> <span class="number">0xAF</span>,
-        <span class="ident">NVarchar</span> <span class="op">=</span> <span class="number">0xE7</span>,
-        <span class="ident">NChar</span> <span class="op">=</span> <span class="number">0xEF</span>,
-        <span class="ident">Xml</span> <span class="op">=</span> <span class="number">0xF1</span>,
-        <span class="comment">// not supported yet</span>
-        <span class="ident">Udt</span> <span class="op">=</span> <span class="number">0xF0</span>,
-        <span class="ident">Text</span> <span class="op">=</span> <span class="number">0x23</span>,
-        <span class="ident">Image</span> <span class="op">=</span> <span class="number">0x22</span>,
-        <span class="ident">NText</span> <span class="op">=</span> <span class="number">0x63</span>,
-        <span class="comment">// not supported yet</span>
-        <span class="ident">SSVariant</span> <span class="op">=</span> <span class="number">0x62</span>, <span class="comment">// legacy types (not supported since post-7.2):</span>
-                          <span class="comment">// Char = 0x2F,</span>
-                          <span class="comment">// Binary = 0x2D,</span>
-                          <span class="comment">// VarBinary = 0x25,</span>
-                          <span class="comment">// VarChar = 0x27,</span>
-                          <span class="comment">// Numeric = 0x3F,</span>
-                          <span class="comment">// Decimal = 0x37</span>
-    }
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;tds73&quot;</span>))]
+</span><span class="macro">uint_enum! </span>{
+    <span class="doccomment">/// 2.2.5.4.2
+    </span><span class="attribute">#[repr(u8)]
+    </span><span class="kw">pub enum </span>VarLenType {
+        Guid = <span class="number">0x24</span>,
+        Intn = <span class="number">0x26</span>,
+        Bitn = <span class="number">0x68</span>,
+        Decimaln = <span class="number">0x6A</span>,
+        Numericn = <span class="number">0x6C</span>,
+        Floatn = <span class="number">0x6D</span>,
+        Money = <span class="number">0x6E</span>,
+        Datetimen = <span class="number">0x6F</span>,
+        BigVarBin = <span class="number">0xA5</span>,
+        BigVarChar = <span class="number">0xA7</span>,
+        BigBinary = <span class="number">0xAD</span>,
+        BigChar = <span class="number">0xAF</span>,
+        NVarchar = <span class="number">0xE7</span>,
+        NChar = <span class="number">0xEF</span>,
+        Xml = <span class="number">0xF1</span>,
+        <span class="comment">// not supported yet
+        </span>Udt = <span class="number">0xF0</span>,
+        Text = <span class="number">0x23</span>,
+        Image = <span class="number">0x22</span>,
+        NText = <span class="number">0x63</span>,
+        <span class="comment">// not supported yet
+        </span>SSVariant = <span class="number">0x62</span>, <span class="comment">// legacy types (not supported since post-7.2):
+                          // Char = 0x2F,
+                          // Binary = 0x2D,
+                          // VarBinary = 0x25,
+                          // VarChar = 0x27,
+                          // Numeric = 0x3F,
+                          // Decimal = 0x37
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-<span class="macro">uint_enum!</span> {
-    <span class="doccomment">/// 2.2.5.4.2</span>
-    <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VarLenType</span> {
-        <span class="ident">Guid</span> <span class="op">=</span> <span class="number">0x24</span>,
-        <span class="ident">Intn</span> <span class="op">=</span> <span class="number">0x26</span>,
-        <span class="ident">Bitn</span> <span class="op">=</span> <span class="number">0x68</span>,
-        <span class="ident">Decimaln</span> <span class="op">=</span> <span class="number">0x6A</span>,
-        <span class="ident">Numericn</span> <span class="op">=</span> <span class="number">0x6C</span>,
-        <span class="ident">Floatn</span> <span class="op">=</span> <span class="number">0x6D</span>,
-        <span class="ident">Money</span> <span class="op">=</span> <span class="number">0x6E</span>,
-        <span class="ident">Datetimen</span> <span class="op">=</span> <span class="number">0x6F</span>,
-        <span class="ident">Daten</span> <span class="op">=</span> <span class="number">0x28</span>,
-        <span class="ident">Timen</span> <span class="op">=</span> <span class="number">0x29</span>,
-        <span class="ident">Datetime2</span> <span class="op">=</span> <span class="number">0x2A</span>,
-        <span class="ident">DatetimeOffsetn</span> <span class="op">=</span> <span class="number">0x2B</span>,
-        <span class="ident">BigVarBin</span> <span class="op">=</span> <span class="number">0xA5</span>,
-        <span class="ident">BigVarChar</span> <span class="op">=</span> <span class="number">0xA7</span>,
-        <span class="ident">BigBinary</span> <span class="op">=</span> <span class="number">0xAD</span>,
-        <span class="ident">BigChar</span> <span class="op">=</span> <span class="number">0xAF</span>,
-        <span class="ident">NVarchar</span> <span class="op">=</span> <span class="number">0xE7</span>,
-        <span class="ident">NChar</span> <span class="op">=</span> <span class="number">0xEF</span>,
-        <span class="ident">Xml</span> <span class="op">=</span> <span class="number">0xF1</span>,
-        <span class="comment">// not supported yet</span>
-        <span class="ident">Udt</span> <span class="op">=</span> <span class="number">0xF0</span>,
-        <span class="ident">Text</span> <span class="op">=</span> <span class="number">0x23</span>,
-        <span class="ident">Image</span> <span class="op">=</span> <span class="number">0x22</span>,
-        <span class="ident">NText</span> <span class="op">=</span> <span class="number">0x63</span>,
-        <span class="comment">// not supported yet</span>
-        <span class="ident">SSVariant</span> <span class="op">=</span> <span class="number">0x62</span>, <span class="comment">// legacy types (not supported since post-7.2):</span>
-                          <span class="comment">// Char = 0x2F,</span>
-                          <span class="comment">// Binary = 0x2D,</span>
-                          <span class="comment">// VarBinary = 0x25,</span>
-                          <span class="comment">// VarChar = 0x27,</span>
-                          <span class="comment">// Numeric = 0x3F,</span>
-                          <span class="comment">// Decimal = 0x37</span>
-    }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tds73&quot;</span>)]
+</span><span class="macro">uint_enum! </span>{
+    <span class="doccomment">/// 2.2.5.4.2
+    </span><span class="attribute">#[repr(u8)]
+    </span><span class="kw">pub enum </span>VarLenType {
+        Guid = <span class="number">0x24</span>,
+        Intn = <span class="number">0x26</span>,
+        Bitn = <span class="number">0x68</span>,
+        Decimaln = <span class="number">0x6A</span>,
+        Numericn = <span class="number">0x6C</span>,
+        Floatn = <span class="number">0x6D</span>,
+        Money = <span class="number">0x6E</span>,
+        Datetimen = <span class="number">0x6F</span>,
+        Daten = <span class="number">0x28</span>,
+        Timen = <span class="number">0x29</span>,
+        Datetime2 = <span class="number">0x2A</span>,
+        DatetimeOffsetn = <span class="number">0x2B</span>,
+        BigVarBin = <span class="number">0xA5</span>,
+        BigVarChar = <span class="number">0xA7</span>,
+        BigBinary = <span class="number">0xAD</span>,
+        BigChar = <span class="number">0xAF</span>,
+        NVarchar = <span class="number">0xE7</span>,
+        NChar = <span class="number">0xEF</span>,
+        Xml = <span class="number">0xF1</span>,
+        <span class="comment">// not supported yet
+        </span>Udt = <span class="number">0xF0</span>,
+        Text = <span class="number">0x23</span>,
+        Image = <span class="number">0x22</span>,
+        NText = <span class="number">0x63</span>,
+        <span class="comment">// not supported yet
+        </span>SSVariant = <span class="number">0x62</span>, <span class="comment">// legacy types (not supported since post-7.2):
+                          // Char = 0x2F,
+                          // Binary = 0x2D,
+                          // VarBinary = 0x25,
+                          // VarChar = 0x27,
+                          // Numeric = 0x3F,
+                          // Decimal = 0x37
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TypeInfo</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">ty</span>) =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">ty</span> <span class="kw">as</span> <span class="ident">u8</span>);
+<span class="kw">impl </span>Encode&lt;BytesMut&gt; <span class="kw">for </span>TypeInfo {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            TypeInfo::FixedLen(ty) =&gt; {
+                dst.put_u8(ty <span class="kw">as </span>u8);
             }
-            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">ctx</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">encode</span>(<span class="ident">dst</span>)<span class="question-mark">?</span>,
-            <span class="ident">TypeInfo::VarLenSizedPrecision</span> {
-                <span class="ident">ty</span>,
-                <span class="ident">size</span>,
-                <span class="ident">precision</span>,
-                <span class="ident">scale</span>,
+            TypeInfo::VarLenSized(ctx) =&gt; ctx.encode(dst)<span class="question-mark">?</span>,
+            TypeInfo::VarLenSizedPrecision {
+                ty,
+                size,
+                precision,
+                scale,
             } =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">ty</span> <span class="kw">as</span> <span class="ident">u8</span>);
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">size</span> <span class="kw">as</span> <span class="ident">u8</span>);
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">precision</span> <span class="kw">as</span> <span class="ident">u8</span>);
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u8</span>);
+                dst.put_u8(ty <span class="kw">as </span>u8);
+                dst.put_u8(size <span class="kw">as </span>u8);
+                dst.put_u8(precision <span class="kw">as </span>u8);
+                dst.put_u8(scale <span class="kw">as </span>u8);
             }
-            <span class="ident">TypeInfo::Xml</span> { <span class="ident">schema</span>, .. } =&gt; {
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">VarLenType::Xml</span> <span class="kw">as</span> <span class="ident">u8</span>);
+            TypeInfo::Xml { schema, .. } =&gt; {
+                dst.put_u8(VarLenType::Xml <span class="kw">as </span>u8);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">xs</span>) <span class="op">=</span> <span class="ident">schema</span> {
-                    <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="number">1</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(xs) = schema {
+                    dst.put_u8(<span class="number">1</span>);
 
-                    <span class="kw">let</span> <span class="ident">db_name_encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">xs</span>.<span class="ident">db_name</span>().<span class="ident">encode_utf16</span>().<span class="ident">collect</span>();
-                    <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">db_name_encoded</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
-                    <span class="kw">for</span> <span class="ident">chr</span> <span class="kw">in</span> <span class="ident">db_name_encoded</span> {
-                        <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">chr</span>);
+                    <span class="kw">let </span>db_name_encoded: Vec&lt;u16&gt; = xs.db_name().encode_utf16().collect();
+                    dst.put_u8(db_name_encoded.len() <span class="kw">as </span>u8);
+                    <span class="kw">for </span>chr <span class="kw">in </span>db_name_encoded {
+                        dst.put_u16_le(chr);
                     }
 
-                    <span class="kw">let</span> <span class="ident">owner_encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">xs</span>.<span class="ident">owner</span>().<span class="ident">encode_utf16</span>().<span class="ident">collect</span>();
-                    <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">owner_encoded</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>);
-                    <span class="kw">for</span> <span class="ident">chr</span> <span class="kw">in</span> <span class="ident">owner_encoded</span> {
-                        <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">chr</span>);
+                    <span class="kw">let </span>owner_encoded: Vec&lt;u16&gt; = xs.owner().encode_utf16().collect();
+                    dst.put_u8(owner_encoded.len() <span class="kw">as </span>u8);
+                    <span class="kw">for </span>chr <span class="kw">in </span>owner_encoded {
+                        dst.put_u16_le(chr);
                     }
 
-                    <span class="kw">let</span> <span class="ident">collection_encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">xs</span>.<span class="ident">collection</span>().<span class="ident">encode_utf16</span>().<span class="ident">collect</span>();
-                    <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">collection_encoded</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>);
-                    <span class="kw">for</span> <span class="ident">chr</span> <span class="kw">in</span> <span class="ident">collection_encoded</span> {
-                        <span class="ident">dst</span>.<span class="ident">put_u16_le</span>(<span class="ident">chr</span>);
+                    <span class="kw">let </span>collection_encoded: Vec&lt;u16&gt; = xs.collection().encode_utf16().collect();
+                    dst.put_u16_le(collection_encoded.len() <span class="kw">as </span>u16);
+                    <span class="kw">for </span>chr <span class="kw">in </span>collection_encoded {
+                        dst.put_u16_le(chr);
                     }
-                } <span class="kw">else</span> {
-                    <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="number">0</span>);
+                } <span class="kw">else </span>{
+                    dst.put_u8(<span class="number">0</span>);
                 }
             }
         }
@@ -655,146 +655,146 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TypeInfo</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl </span>TypeInfo {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode&lt;R&gt;(src: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>R: SqlReadBytes + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>ty = src.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="ident">FixedLenType::try_from</span>(<span class="ident">ty</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">TypeInfo::FixedLen</span>(<span class="ident">ty</span>));
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(ty) = FixedLenType::try_from(ty) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(TypeInfo::FixedLen(ty));
         }
 
-        <span class="kw">match</span> <span class="ident">VarLenType::try_from</span>(<span class="ident">ty</span>) {
-            <span class="prelude-val">Err</span>(()) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(
-                <span class="macro">format!</span>(<span class="string">&quot;invalid or unsupported column type: {:?}&quot;</span>, <span class="ident">ty</span>).<span class="ident">into</span>(),
+        <span class="kw">match </span>VarLenType::try_from(ty) {
+            <span class="prelude-val">Err</span>(()) =&gt; <span class="prelude-val">Err</span>(Error::Protocol(
+                <span class="macro">format!</span>(<span class="string">&quot;invalid or unsupported column type: {:?}&quot;</span>, ty).into(),
             )),
-            <span class="prelude-val">Ok</span>(<span class="ident">ty</span>) <span class="kw">if</span> <span class="ident">ty</span> <span class="op">==</span> <span class="ident">VarLenType::Xml</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">has_schema</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(ty) <span class="kw">if </span>ty == VarLenType::Xml =&gt; {
+                <span class="kw">let </span>has_schema = src.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_schema</span> <span class="op">==</span> <span class="number">1</span> {
-                    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_b_varchar</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_b_varchar</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">collection</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_us_varchar</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>schema = <span class="kw">if </span>has_schema == <span class="number">1 </span>{
+                    <span class="kw">let </span>db_name = src.read_b_varchar().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>owner = src.read_b_varchar().<span class="kw">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let </span>collection = src.read_us_varchar().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">XmlSchema::new</span>(<span class="ident">db_name</span>, <span class="ident">owner</span>, <span class="ident">collection</span>)))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                };
+                    <span class="prelude-val">Some</span>(Arc::new(XmlSchema::new(db_name, owner, collection)))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>};
 
-                <span class="prelude-val">Ok</span>(<span class="ident">TypeInfo::Xml</span> {
-                    <span class="ident">schema</span>,
-                    <span class="ident">size</span>: <span class="number">0xfffffffffffffffe_usize</span>,
+                <span class="prelude-val">Ok</span>(TypeInfo::Xml {
+                    schema,
+                    size: <span class="number">0xfffffffffffffffe_usize</span>,
                 })
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">ty</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                    <span class="ident">VarLenType::Timen</span> <span class="op">|</span> <span class="ident">VarLenType::DatetimeOffsetn</span> <span class="op">|</span> <span class="ident">VarLenType::Datetime2</span> =&gt; {
-                        <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>
+            <span class="prelude-val">Ok</span>(ty) =&gt; {
+                <span class="kw">let </span>len = <span class="kw">match </span>ty {
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;tds73&quot;</span>)]
+                    </span>VarLenType::Timen | VarLenType::DatetimeOffsetn | VarLenType::Datetime2 =&gt; {
+                        src.read_u8().<span class="kw">await</span><span class="question-mark">? </span><span class="kw">as </span>usize
                     }
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tds73&quot;</span>)]</span>
-                    <span class="ident">VarLenType::Daten</span> =&gt; <span class="number">3</span>,
-                    <span class="ident">VarLenType::Bitn</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Intn</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Floatn</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Decimaln</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Numericn</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Guid</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Money</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Datetimen</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">VarLenType::NChar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigChar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::NVarchar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigVarChar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigBinary</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigVarBin</span> =&gt; <span class="ident">src</span>.<span class="ident">read_u16_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">VarLenType::Image</span> <span class="op">|</span> <span class="ident">VarLenType::Text</span> <span class="op">|</span> <span class="ident">VarLenType::NText</span> =&gt; {
-                        <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;tds73&quot;</span>)]
+                    </span>VarLenType::Daten =&gt; <span class="number">3</span>,
+                    VarLenType::Bitn
+                    | VarLenType::Intn
+                    | VarLenType::Floatn
+                    | VarLenType::Decimaln
+                    | VarLenType::Numericn
+                    | VarLenType::Guid
+                    | VarLenType::Money
+                    | VarLenType::Datetimen =&gt; src.read_u8().<span class="kw">await</span><span class="question-mark">? </span><span class="kw">as </span>usize,
+                    VarLenType::NChar
+                    | VarLenType::BigChar
+                    | VarLenType::NVarchar
+                    | VarLenType::BigVarChar
+                    | VarLenType::BigBinary
+                    | VarLenType::BigVarBin =&gt; src.read_u16_le().<span class="kw">await</span><span class="question-mark">? </span><span class="kw">as </span>usize,
+                    VarLenType::Image | VarLenType::Text | VarLenType::NText =&gt; {
+                        src.read_u32_le().<span class="kw">await</span><span class="question-mark">? </span><span class="kw">as </span>usize
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(<span class="string">&quot;not yet implemented for {:?}&quot;</span>, <span class="ident">ty</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">todo!</span>(<span class="string">&quot;not yet implemented for {:?}&quot;</span>, ty),
                 };
 
-                <span class="kw">let</span> <span class="ident">collation</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                    <span class="ident">VarLenType::NText</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::Text</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigChar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::NChar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::NVarchar</span>
-                    <span class="op">|</span> <span class="ident">VarLenType::BigVarChar</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u32_le</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">sort_id</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>collation = <span class="kw">match </span>ty {
+                    VarLenType::NText
+                    | VarLenType::Text
+                    | VarLenType::BigChar
+                    | VarLenType::NChar
+                    | VarLenType::NVarchar
+                    | VarLenType::BigVarChar =&gt; {
+                        <span class="kw">let </span>info = src.read_u32_le().<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>sort_id = src.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="prelude-val">Some</span>(<span class="ident">Collation::new</span>(<span class="ident">info</span>, <span class="ident">sort_id</span>))
+                        <span class="prelude-val">Some</span>(Collation::new(info, sort_id))
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 };
 
-                <span class="kw">let</span> <span class="ident">vty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                    <span class="ident">VarLenType::Decimaln</span> <span class="op">|</span> <span class="ident">VarLenType::Numericn</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                        <span class="kw">let</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">read_u8</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>vty = <span class="kw">match </span>ty {
+                    VarLenType::Decimaln | VarLenType::Numericn =&gt; {
+                        <span class="kw">let </span>precision = src.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>scale = src.read_u8().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                        <span class="ident">TypeInfo::VarLenSizedPrecision</span> {
-                            <span class="ident">size</span>: <span class="ident">len</span>,
-                            <span class="ident">ty</span>,
-                            <span class="ident">precision</span>,
-                            <span class="ident">scale</span>,
+                        TypeInfo::VarLenSizedPrecision {
+                            size: len,
+                            ty,
+                            precision,
+                            scale,
                         }
                     }
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">VarLenContext::new</span>(<span class="ident">ty</span>, <span class="ident">len</span>, <span class="ident">collation</span>);
-                        <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">cx</span>)
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">let </span>cx = VarLenContext::new(ty, len, collation);
+                        TypeInfo::VarLenSized(cx)
                     }
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">vty</span>)
+                <span class="prelude-val">Ok</span>(vty)
             }
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_read_bytes::test_utils::IntoSqlReadBytes</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::sql_read_bytes::test_utils::IntoSqlReadBytes;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">round_trip</span>() {
-        <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">TypeInfo::Xml</span> {
-                <span class="ident">schema</span>: <span class="prelude-val">Some</span>(
-                    <span class="ident">XmlSchema::new</span>(<span class="string">&quot;fake-db-name&quot;</span>, <span class="string">&quot;fake-owner&quot;</span>, <span class="string">&quot;fake-collection&quot;</span>).<span class="ident">into</span>(),
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>round_trip() {
+        <span class="kw">let </span>types = <span class="macro">vec!</span>[
+            TypeInfo::Xml {
+                schema: <span class="prelude-val">Some</span>(
+                    XmlSchema::new(<span class="string">&quot;fake-db-name&quot;</span>, <span class="string">&quot;fake-owner&quot;</span>, <span class="string">&quot;fake-collection&quot;</span>).into(),
                 ),
-                <span class="ident">size</span>: <span class="number">0xfffffffffffffffe_usize</span>,
+                size: <span class="number">0xfffffffffffffffe_usize</span>,
             },
-            <span class="ident">TypeInfo::Xml</span> {
-                <span class="ident">schema</span>: <span class="prelude-val">None</span>,
-                <span class="ident">size</span>: <span class="number">0xfffffffffffffffe_usize</span>,
+            TypeInfo::Xml {
+                schema: <span class="prelude-val">None</span>,
+                size: <span class="number">0xfffffffffffffffe_usize</span>,
             },
-            <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">FixedLenType::Int4</span>),
-            <span class="ident">TypeInfo::VarLenSized</span>(<span class="ident">VarLenContext::new</span>(
-                <span class="ident">VarLenType::NChar</span>,
+            TypeInfo::FixedLen(FixedLenType::Int4),
+            TypeInfo::VarLenSized(VarLenContext::new(
+                VarLenType::NChar,
                 <span class="number">40</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">Collation::new</span>(<span class="number">13632521</span>, <span class="number">52</span>)),
+                <span class="prelude-val">Some</span>(Collation::new(<span class="number">13632521</span>, <span class="number">52</span>)),
             )),
         ];
 
-        <span class="kw">for</span> <span class="ident">ti</span> <span class="kw">in</span> <span class="ident">types</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+        <span class="kw">for </span>ti <span class="kw">in </span>types {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
 
-            <span class="ident">ti</span>.<span class="ident">clone</span>()
-                .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;encode should be successful&quot;</span>);
+            ti.clone()
+                .encode(<span class="kw-2">&amp;mut </span>buf)
+                .expect(<span class="string">&quot;encode should be successful&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">nti</span> <span class="op">=</span> <span class="ident">TypeInfo::decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>.<span class="ident">into_sql_read_bytes</span>())
-                .<span class="kw">await</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;decode must succeed&quot;</span>);
+            <span class="kw">let </span>nti = TypeInfo::decode(<span class="kw-2">&amp;mut </span>buf.into_sql_read_bytes())
+                .<span class="kw">await
+                </span>.expect(<span class="string">&quot;decode must succeed&quot;</span>);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">nti</span>, <span class="ident">ti</span>)
+            <span class="macro">assert_eq!</span>(nti, ti)
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

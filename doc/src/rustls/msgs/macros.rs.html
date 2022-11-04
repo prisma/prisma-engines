@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -86,93 +86,93 @@
 <span id="86">86</span>
 <span id="87">87</span>
 <span id="88">88</span>
-</pre><pre class="rust"><code><span class="doccomment">/// A macro which defines an enum type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">enum_builder</span> {
+</pre><pre class="rust"><code><span class="doccomment">/// A macro which defines an enum type.
+</span><span class="macro">macro_rules! </span>enum_builder {
     (
-    $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-    @<span class="ident">U8</span>
-        <span class="ident">EnumName</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>: <span class="ident">ident</span>;
-        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
+    $(<span class="attribute">#[<span class="macro-nonterminal">$comment</span>:meta]</span>)*
+    @U8
+        EnumName: <span class="macro-nonterminal">$enum_name</span>: ident;
+        EnumVal { $( <span class="macro-nonterminal">$enum_var</span>: ident =&gt; <span class="macro-nonterminal">$enum_val</span>: expr ),* }
     ) =&gt; {
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-            ,<span class="ident">Unknown</span>(<span class="ident">u8</span>)
+        $(<span class="attribute">#[<span class="macro-nonterminal">$comment</span>]</span>)*
+        <span class="attribute">#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+        </span><span class="kw">pub enum </span><span class="macro-nonterminal">$enum_name </span>{
+            $( <span class="macro-nonterminal">$enum_var</span>),*
+            ,Unknown(u8)
         }
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-                <span class="kw">match</span> <span class="ident">x</span> {
-                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
-                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>
+        <span class="kw">impl </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">pub fn </span>get_u8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+                <span class="kw">let </span>x = <span class="self">self</span>.clone();
+                <span class="kw">match </span>x {
+                    $( <span class="macro-nonterminal">$enum_name</span>::<span class="macro-nonterminal">$enum_var </span>=&gt; <span class="macro-nonterminal">$enum_val</span>),*
+                    ,<span class="macro-nonterminal">$enum_name::Unknown</span>(x) =&gt; x
                 }
             }
         }
-        <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-                <span class="self">self</span>.<span class="ident">get_u8</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
+        <span class="kw">impl </span>Codec <span class="kw">for </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+                <span class="self">self</span>.get_u8().encode(bytes);
             }
 
-            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="ident">u8::read</span>(<span class="ident">r</span>).<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::from</span>)
+            <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+                u8::read(r).map(<span class="macro-nonterminal">$enum_name::from</span>)
             }
         }
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">match</span> <span class="ident">x</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-                    , <span class="ident">x</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>),
+        <span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">fn </span>from(x: u8) -&gt; <span class="self">Self </span>{
+                <span class="kw">match </span>x {
+                    $(<span class="macro-nonterminal">$enum_val </span>=&gt; <span class="macro-nonterminal">$enum_name</span>::<span class="macro-nonterminal">$enum_var</span>),*
+                    , x =&gt; <span class="macro-nonterminal">$enum_name::Unknown</span>(x),
                 }
             }
         }
     };
     (
-    $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-    @<span class="ident">U16</span>
-        <span class="ident">EnumName</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>: <span class="ident">ident</span>;
-        <span class="ident">EnumVal</span> { $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>: <span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>: <span class="ident">expr</span> ),<span class="op">*</span> }
+    $(<span class="attribute">#[<span class="macro-nonterminal">$comment</span>:meta]</span>)*
+    @U16
+        EnumName: <span class="macro-nonterminal">$enum_name</span>: ident;
+        EnumVal { $( <span class="macro-nonterminal">$enum_var</span>: ident =&gt; <span class="macro-nonterminal">$enum_val</span>: expr ),* }
     ) =&gt; {
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">comment</span>]</span>)<span class="op">*</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-            ,<span class="ident">Unknown</span>(<span class="ident">u16</span>)
+        $(<span class="attribute">#[<span class="macro-nonterminal">$comment</span>]</span>)*
+        <span class="attribute">#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+        </span><span class="kw">pub enum </span><span class="macro-nonterminal">$enum_name </span>{
+            $( <span class="macro-nonterminal">$enum_var</span>),*
+            ,Unknown(u16)
         }
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-                <span class="kw">match</span> <span class="ident">x</span> {
-                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span>),<span class="op">*</span>
-                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>
+        <span class="kw">impl </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">pub fn </span>get_u16(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+                <span class="kw">let </span>x = <span class="self">self</span>.clone();
+                <span class="kw">match </span>x {
+                    $( <span class="macro-nonterminal">$enum_name</span>::<span class="macro-nonterminal">$enum_var </span>=&gt; <span class="macro-nonterminal">$enum_val</span>),*
+                    ,<span class="macro-nonterminal">$enum_name::Unknown</span>(x) =&gt; x
                 }
             }
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="self">self</span> {
-                    $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>))),<span class="op">*</span>
-                    ,<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; {
+                <span class="kw">match </span><span class="self">self </span>{
+                    $( <span class="macro-nonterminal">$enum_name</span>::<span class="macro-nonterminal">$enum_var </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$enum_var</span>))),*
+                    ,<span class="macro-nonterminal">$enum_name::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 }
             }
         }
-        <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-                <span class="self">self</span>.<span class="ident">get_u16</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
+        <span class="kw">impl </span>Codec <span class="kw">for </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+                <span class="self">self</span>.get_u16().encode(bytes);
             }
 
-            <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="ident">u16::read</span>(<span class="ident">r</span>).<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::from</span>)
+            <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+                u16::read(r).map(<span class="macro-nonterminal">$enum_name::from</span>)
             }
         }
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u16</span>) -&gt; <span class="self">Self</span> {
-                <span class="kw">match</span> <span class="ident">x</span> {
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_val</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_var</span>),<span class="op">*</span>
-                    , <span class="ident">x</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name::Unknown</span>(<span class="ident">x</span>),
+        <span class="kw">impl </span>From&lt;u16&gt; <span class="kw">for </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">fn </span>from(x: u16) -&gt; <span class="self">Self </span>{
+                <span class="kw">match </span>x {
+                    $(<span class="macro-nonterminal">$enum_val </span>=&gt; <span class="macro-nonterminal">$enum_name</span>::<span class="macro-nonterminal">$enum_var</span>),*
+                    , x =&gt; <span class="macro-nonterminal">$enum_name::Unknown</span>(x),
                 }
             }
         }
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/limit/rate/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/limit/rate/service.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>service.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -129,136 +129,136 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Rate</span>;
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Rate;
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tokio::time</span>::{<span class="ident">Instant</span>, <span class="ident">Sleep</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tokio::time::{Instant, Sleep};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="doccomment">/// Enforces a rate limit on the number of requests the underlying</span>
-<span class="doccomment">/// service can handle over a period of time.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RateLimit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">T</span>,
-    <span class="ident">rate</span>: <span class="ident">Rate</span>,
-    <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="ident">sleep</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Enforces a rate limit on the number of requests the underlying
+/// service can handle over a period of time.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RateLimit&lt;T&gt; {
+    inner: T,
+    rate: Rate,
+    state: State,
+    sleep: Pin&lt;Box&lt;Sleep&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="comment">// The service has hit its limit</span>
-    <span class="ident">Limited</span>,
-    <span class="ident">Ready</span> { <span class="ident">until</span>: <span class="ident">Instant</span>, <span class="ident">rem</span>: <span class="ident">u64</span> },
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>State {
+    <span class="comment">// The service has hit its limit
+    </span>Limited,
+    Ready { until: Instant, rem: u64 },
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">RateLimit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new rate limiter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>, <span class="ident">rate</span>: <span class="ident">Rate</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">until</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Ready</span> {
-            <span class="ident">until</span>,
-            <span class="ident">rem</span>: <span class="ident">rate</span>.<span class="ident">num</span>(),
+<span class="kw">impl</span>&lt;T&gt; RateLimit&lt;T&gt; {
+    <span class="doccomment">/// Create a new rate limiter
+    </span><span class="kw">pub fn </span>new(inner: T, rate: Rate) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>until = Instant::now();
+        <span class="kw">let </span>state = State::Ready {
+            until,
+            rem: rate.num(),
         };
 
-        <span class="ident">RateLimit</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">rate</span>,
-            <span class="ident">state</span>,
-            <span class="comment">// The sleep won&#39;t actually be used with this duration, but</span>
-            <span class="comment">// we create it eagerly so that we can reset it in place rather than</span>
-            <span class="comment">// `Box::pin`ning a new `Sleep` every time we need one.</span>
-            <span class="ident">sleep</span>: <span class="ident">Box::pin</span>(<span class="ident">tokio::time::sleep_until</span>(<span class="ident">until</span>)),
+        RateLimit {
+            inner,
+            rate,
+            state,
+            <span class="comment">// The sleep won&#39;t actually be used with this duration, but
+            // we create it eagerly so that we can reset it in place rather than
+            // `Box::pin`ning a new `Sleep` every time we need one.
+            </span>sleep: Box::pin(tokio::time::sleep_until(until)),
         }
     }
 
-    <span class="doccomment">/// Get a reference to the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a reference to the inner service
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Get a mutable reference to the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a mutable reference to the inner service
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Consume `self`, returning the inner service</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Consume `self`, returning the inner service
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RateLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, Request&gt; Service&lt;Request&gt; <span class="kw">for </span>RateLimit&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">S::Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">S::Future</span>;
+    <span class="kw">type </span>Response = S::Response;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>Future = S::Future;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident">State::Ready</span> { .. } =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>))),
-            <span class="ident">State::Limited</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">sleep</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>() {
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.state {
+            State::Ready { .. } =&gt; <span class="kw">return </span>Poll::Ready(<span class="macro">ready!</span>(<span class="self">self</span>.inner.poll_ready(cx))),
+            State::Limited =&gt; {
+                <span class="kw">if </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.sleep).poll(cx).is_pending() {
                     <span class="macro">tracing::trace!</span>(<span class="string">&quot;rate limit exceeded; sleeping.&quot;</span>);
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                    <span class="kw">return </span>Poll::Pending;
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Ready</span> {
-            <span class="ident">until</span>: <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">rate</span>.<span class="ident">per</span>(),
-            <span class="ident">rem</span>: <span class="self">self</span>.<span class="ident">rate</span>.<span class="ident">num</span>(),
+        <span class="self">self</span>.state = State::Ready {
+            until: Instant::now() + <span class="self">self</span>.rate.per(),
+            rem: <span class="self">self</span>.rate.num(),
         };
 
-        <span class="ident">Poll::Ready</span>(<span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)))
+        Poll::Ready(<span class="macro">ready!</span>(<span class="self">self</span>.inner.poll_ready(cx)))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident">State::Ready</span> { <span class="kw-2">mut</span> <span class="ident">until</span>, <span class="kw-2">mut</span> <span class="ident">rem</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: Request) -&gt; <span class="self">Self</span>::Future {
+        <span class="kw">match </span><span class="self">self</span>.state {
+            State::Ready { <span class="kw-2">mut </span>until, <span class="kw-2">mut </span>rem } =&gt; {
+                <span class="kw">let </span>now = Instant::now();
 
-                <span class="comment">// If the period has elapsed, reset it.</span>
-                <span class="kw">if</span> <span class="ident">now</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">until</span> {
-                    <span class="ident">until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">rate</span>.<span class="ident">per</span>();
-                    <span class="ident">rem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rate</span>.<span class="ident">num</span>();
+                <span class="comment">// If the period has elapsed, reset it.
+                </span><span class="kw">if </span>now &gt;= until {
+                    until = now + <span class="self">self</span>.rate.per();
+                    rem = <span class="self">self</span>.rate.num();
                 }
 
-                <span class="kw">if</span> <span class="ident">rem</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                    <span class="ident">rem</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Ready</span> { <span class="ident">until</span>, <span class="ident">rem</span> };
-                } <span class="kw">else</span> {
-                    <span class="comment">// The service is disabled until further notice</span>
-                    <span class="comment">// Reset the sleep future in place, so that we don&#39;t have to</span>
-                    <span class="comment">// deallocate the existing box and allocate a new one.</span>
-                    <span class="self">self</span>.<span class="ident">sleep</span>.<span class="ident">as_mut</span>().<span class="ident">reset</span>(<span class="ident">until</span>);
-                    <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Limited</span>;
+                <span class="kw">if </span>rem &gt; <span class="number">1 </span>{
+                    rem -= <span class="number">1</span>;
+                    <span class="self">self</span>.state = State::Ready { until, rem };
+                } <span class="kw">else </span>{
+                    <span class="comment">// The service is disabled until further notice
+                    // Reset the sleep future in place, so that we don&#39;t have to
+                    // deallocate the existing box and allocate a new one.
+                    </span><span class="self">self</span>.sleep.as_mut().reset(until);
+                    <span class="self">self</span>.state = State::Limited;
                 }
 
-                <span class="comment">// Call the inner future</span>
-                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">request</span>)
+                <span class="comment">// Call the inner future
+                </span><span class="self">self</span>.inner.call(request)
             }
-            <span class="ident">State::Limited</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;service not ready; poll_ready must be called first&quot;</span>),
+            State::Limited =&gt; <span class="macro">panic!</span>(<span class="string">&quot;service not ready; poll_ready must be called first&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::load::Load</span> <span class="kw">for</span> <span class="ident">RateLimit</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident"><span class="kw">crate</span>::load::Load</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;load&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;load&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;S&gt; <span class="kw">crate</span>::load::Load <span class="kw">for </span>RateLimit&lt;S&gt;
+<span class="kw">where
+    </span>S: <span class="kw">crate</span>::load::Load,
 {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">S::Metric</span>;
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">load</span>()
+    <span class="kw">type </span>Metric = S::Metric;
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric {
+        <span class="self">self</span>.inner.load()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

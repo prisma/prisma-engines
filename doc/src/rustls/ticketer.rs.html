@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/ticketer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ticketer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/ticketer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ticketer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -334,341 +334,341 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rand</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ProducesTickets</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::rand;
+<span class="kw">use </span><span class="kw">crate</span>::server::ProducesTickets;
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="kw">use</span> <span class="ident">ring::aead</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>};
-<span class="kw">use</span> <span class="ident">std::time</span>;
+<span class="kw">use </span>ring::aead;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::sync::{Arc, Mutex, MutexGuard};
+<span class="kw">use </span>std::time;
 
-<span class="doccomment">/// The timebase for expiring and rolling tickets and ticketing</span>
-<span class="doccomment">/// keys.  This is UNIX wall time in seconds.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is guaranteed to be on or after the UNIX epoch.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimeBase</span>(<span class="ident">time::Duration</span>);
+<span class="doccomment">/// The timebase for expiring and rolling tickets and ticketing
+/// keys.  This is UNIX wall time in seconds.
+///
+/// This is guaranteed to be on or after the UNIX epoch.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>TimeBase(time::Duration);
 
-<span class="kw">impl</span> <span class="ident">TimeBase</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">time::SystemTimeError</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>TimeBase {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>now() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, time::SystemTimeError&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>(
-            <span class="ident">time::SystemTime::now</span>().<span class="ident">duration_since</span>(<span class="ident">time::UNIX_EPOCH</span>)<span class="question-mark">?</span>,
+            time::SystemTime::now().duration_since(time::UNIX_EPOCH)<span class="question-mark">?</span>,
         ))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_secs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_secs</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_secs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.<span class="number">0</span>.as_secs()
     }
 }
 
-<span class="doccomment">/// This is a `ProducesTickets` implementation which uses</span>
-<span class="doccomment">/// any *ring* `aead::Algorithm` to encrypt and authentication</span>
-<span class="doccomment">/// the ticket payload.  It does not enforce any lifetime</span>
-<span class="doccomment">/// constraint.</span>
-<span class="kw">struct</span> <span class="ident">AeadTicketer</span> {
-    <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">aead::Algorithm</span>,
-    <span class="ident">key</span>: <span class="ident">aead::LessSafeKey</span>,
-    <span class="ident">lifetime</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// This is a `ProducesTickets` implementation which uses
+/// any *ring* `aead::Algorithm` to encrypt and authentication
+/// the ticket payload.  It does not enforce any lifetime
+/// constraint.
+</span><span class="kw">struct </span>AeadTicketer {
+    alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>aead::Algorithm,
+    key: aead::LessSafeKey,
+    lifetime: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">AeadTicketer</span> {
-    <span class="doccomment">/// Make a ticketer with recommended configuration and a random key.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
-        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;mut</span> <span class="ident">key</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>AeadTicketer {
+    <span class="doccomment">/// Make a ticketer with recommended configuration and a random key.
+    </span><span class="kw">fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, rand::GetRandomFailed&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>key = [<span class="number">0u8</span>; <span class="number">32</span>];
+        rand::fill_random(<span class="kw-2">&amp;mut </span>key)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">aead::CHACHA20_POLY1305</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">aead::UnboundKey::new</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>alg = <span class="kw-2">&amp;</span>aead::CHACHA20_POLY1305;
+        <span class="kw">let </span>key = aead::UnboundKey::new(alg, <span class="kw-2">&amp;</span>key).unwrap();
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">alg</span>,
-            <span class="ident">key</span>: <span class="ident">aead::LessSafeKey::new</span>(<span class="ident">key</span>),
-            <span class="ident">lifetime</span>: <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">12</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            alg,
+            key: aead::LessSafeKey::new(key),
+            lifetime: <span class="number">60 </span>* <span class="number">60 </span>* <span class="number">12</span>,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ProducesTickets</span> <span class="kw">for</span> <span class="ident">AeadTicketer</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-    <span class="kw">fn</span> <span class="ident">lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">lifetime</span>
+<span class="kw">impl </span>ProducesTickets <span class="kw">for </span>AeadTicketer {
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+    <span class="kw">fn </span>lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.lifetime
     }
 
-    <span class="doccomment">/// Encrypt `message` and return the ciphertext.</span>
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Random nonce, because a counter is a privacy leak.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nonce_buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">12</span>];
-        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;mut</span> <span class="ident">nonce_buf</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">ring::aead::Nonce::assume_unique_for_key</span>(<span class="ident">nonce_buf</span>);
-        <span class="kw">let</span> <span class="ident">aad</span> <span class="op">=</span> <span class="ident">ring::aead::Aad::empty</span>();
+    <span class="doccomment">/// Encrypt `message` and return the ciphertext.
+    </span><span class="kw">fn </span>encrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="comment">// Random nonce, because a counter is a privacy leak.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>nonce_buf = [<span class="number">0u8</span>; <span class="number">12</span>];
+        rand::fill_random(<span class="kw-2">&amp;mut </span>nonce_buf).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>nonce = ring::aead::Nonce::assume_unique_for_key(nonce_buf);
+        <span class="kw">let </span>aad = ring::aead::Aad::empty();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ciphertext</span> <span class="op">=</span>
-            <span class="ident">Vec::with_capacity</span>(<span class="ident">nonce_buf</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">message</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>().<span class="ident">tag_len</span>());
-        <span class="ident">ciphertext</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">nonce_buf</span>);
-        <span class="ident">ciphertext</span>.<span class="ident">extend</span>(<span class="ident">message</span>);
-        <span class="self">self</span>.<span class="ident">key</span>
-            .<span class="ident">seal_in_place_separate_tag</span>(<span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ciphertext</span>[<span class="ident">nonce_buf</span>.<span class="ident">len</span>()..])
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">tag</span><span class="op">|</span> {
-                <span class="ident">ciphertext</span>.<span class="ident">extend</span>(<span class="ident">tag</span>.<span class="ident">as_ref</span>());
-                <span class="ident">ciphertext</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>ciphertext =
+            Vec::with_capacity(nonce_buf.len() + message.len() + <span class="self">self</span>.key.algorithm().tag_len());
+        ciphertext.extend(<span class="kw-2">&amp;</span>nonce_buf);
+        ciphertext.extend(message);
+        <span class="self">self</span>.key
+            .seal_in_place_separate_tag(nonce, aad, <span class="kw-2">&amp;mut </span>ciphertext[nonce_buf.len()..])
+            .map(|tag| {
+                ciphertext.extend(tag.as_ref());
+                ciphertext
             })
-            .<span class="ident">ok</span>()
+            .ok()
     }
 
-    <span class="doccomment">/// Decrypt `ciphertext` and recover the original message.</span>
-    <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ciphertext</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Non-panicking `let (nonce, ciphertext) = ciphertext.split_at(...)`.</span>
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">ciphertext</span>.<span class="ident">get</span>(..<span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">nonce_len</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="ident">ciphertext</span>.<span class="ident">get</span>(<span class="ident">nonce</span>.<span class="ident">len</span>()..)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Decrypt `ciphertext` and recover the original message.
+    </span><span class="kw">fn </span>decrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, ciphertext: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="comment">// Non-panicking `let (nonce, ciphertext) = ciphertext.split_at(...)`.
+        </span><span class="kw">let </span>nonce = ciphertext.get(..<span class="self">self</span>.alg.nonce_len())<span class="question-mark">?</span>;
+        <span class="kw">let </span>ciphertext = ciphertext.get(nonce.len()..)<span class="question-mark">?</span>;
 
-        <span class="comment">// This won&#39;t fail since `nonce` has the required length.</span>
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">ring::aead::Nonce::try_assume_unique_for_key</span>(<span class="ident">nonce</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="comment">// This won&#39;t fail since `nonce` has the required length.
+        </span><span class="kw">let </span>nonce = ring::aead::Nonce::try_assume_unique_for_key(nonce).ok()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">ciphertext</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::from(ciphertext);
 
-        <span class="kw">let</span> <span class="ident">plain_len</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">key</span>
-            .<span class="ident">open_in_place</span>(<span class="ident">nonce</span>, <span class="ident">aead::Aad::empty</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">out</span>)
-            .<span class="ident">ok</span>()<span class="question-mark">?</span>
-            .<span class="ident">len</span>();
-        <span class="ident">out</span>.<span class="ident">truncate</span>(<span class="ident">plain_len</span>);
+        <span class="kw">let </span>plain_len = <span class="self">self
+            </span>.key
+            .open_in_place(nonce, aead::Aad::empty(), <span class="kw-2">&amp;mut </span>out)
+            .ok()<span class="question-mark">?
+            </span>.len();
+        out.truncate(plain_len);
 
-        <span class="prelude-val">Some</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Some</span>(out)
     }
 }
 
-<span class="kw">struct</span> <span class="ident">TicketSwitcherState</span> {
-    <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">current</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>,
-    <span class="ident">previous</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">next_switch_time</span>: <span class="ident">u64</span>,
+<span class="kw">struct </span>TicketSwitcherState {
+    next: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;&gt;,
+    current: Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;,
+    previous: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;&gt;,
+    next_switch_time: u64,
 }
 
-<span class="doccomment">/// A ticketer that has a &#39;current&#39; sub-ticketer and a single</span>
-<span class="doccomment">/// &#39;previous&#39; ticketer.  It creates a new ticketer every so</span>
-<span class="doccomment">/// often, demoting the current ticketer.</span>
-<span class="kw">struct</span> <span class="ident">TicketSwitcher</span> {
-    <span class="ident">generator</span>: <span class="kw">fn</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>, <span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span>,
-    <span class="ident">lifetime</span>: <span class="ident">u32</span>,
-    <span class="ident">state</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">TicketSwitcherState</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A ticketer that has a &#39;current&#39; sub-ticketer and a single
+/// &#39;previous&#39; ticketer.  It creates a new ticketer every so
+/// often, demoting the current ticketer.
+</span><span class="kw">struct </span>TicketSwitcher {
+    generator: <span class="kw">fn</span>() -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;, rand::GetRandomFailed&gt;,
+    lifetime: u32,
+    state: Mutex&lt;TicketSwitcherState&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TicketSwitcher</span> {
-    <span class="doccomment">/// `lifetime` is in seconds, and is how long the current ticketer</span>
-    <span class="doccomment">/// is used to generate new tickets.  Tickets are accepted for no</span>
-    <span class="doccomment">/// longer than twice this duration.  `generator` produces a new</span>
-    <span class="doccomment">/// `ProducesTickets` implementation.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">lifetime</span>: <span class="ident">u32</span>,
-        <span class="ident">generator</span>: <span class="kw">fn</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>, <span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">TimeBase::now</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">generator</span>,
-            <span class="ident">lifetime</span>,
-            <span class="ident">state</span>: <span class="ident">Mutex::new</span>(<span class="ident">TicketSwitcherState</span> {
-                <span class="ident">next</span>: <span class="prelude-val">Some</span>(<span class="ident">generator</span>()<span class="question-mark">?</span>),
-                <span class="ident">current</span>: <span class="ident">generator</span>()<span class="question-mark">?</span>,
-                <span class="ident">previous</span>: <span class="prelude-val">None</span>,
-                <span class="ident">next_switch_time</span>: <span class="ident">now</span>.<span class="ident">as_secs</span>() <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">lifetime</span>),
+<span class="kw">impl </span>TicketSwitcher {
+    <span class="doccomment">/// `lifetime` is in seconds, and is how long the current ticketer
+    /// is used to generate new tickets.  Tickets are accepted for no
+    /// longer than twice this duration.  `generator` produces a new
+    /// `ProducesTickets` implementation.
+    </span><span class="kw">fn </span>new(
+        lifetime: u32,
+        generator: <span class="kw">fn</span>() -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;, rand::GetRandomFailed&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>now = TimeBase::now()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            generator,
+            lifetime,
+            state: Mutex::new(TicketSwitcherState {
+                next: <span class="prelude-val">Some</span>(generator()<span class="question-mark">?</span>),
+                current: generator()<span class="question-mark">?</span>,
+                previous: <span class="prelude-val">None</span>,
+                next_switch_time: now.as_secs() + u64::from(lifetime),
             }),
         })
     }
 
-    <span class="doccomment">/// If it&#39;s time, demote the `current` ticketer to `previous` (so it</span>
-    <span class="doccomment">/// does no new encryptions but can do decryption) and use next for a</span>
-    <span class="doccomment">/// new `current` ticketer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this regularly will ensure timely key erasure.  Otherwise,</span>
-    <span class="doccomment">/// key erasure will be delayed until the next encrypt/decrypt call.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For efficiency, this is also responsible for locking the state mutex</span>
-    <span class="doccomment">/// and returning the mutexguard.</span>
-    <span class="kw">fn</span> <span class="ident">maybe_roll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">TimeBase</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MutexGuard</span><span class="op">&lt;</span><span class="ident">TicketSwitcherState</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// The code below aims to make switching as efficient as possible</span>
-        <span class="comment">// in the common case that the generator never fails. To achieve this</span>
-        <span class="comment">// we run the following steps:</span>
-        <span class="comment">//  1. If no switch is necessary, just return the mutexguard</span>
-        <span class="comment">//  2. Shift over all of the ticketers (so current becomes previous,</span>
-        <span class="comment">//     and next becomes current). After this, other threads can</span>
-        <span class="comment">//     start using the new current ticketer.</span>
-        <span class="comment">//  3. unlock mutex and generate new ticketer.</span>
-        <span class="comment">//  4. Place new ticketer in next and return current</span>
-        <span class="comment">//</span>
-        <span class="comment">// There are a few things to note here. First, we don&#39;t check whether</span>
-        <span class="comment">// a new switch might be needed in step 4, even though, due to locking</span>
-        <span class="comment">// and entropy collection, significant amounts of time may have passed.</span>
-        <span class="comment">// This is to guarantee that the thread doing the switch will eventually</span>
-        <span class="comment">// make progress.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Second, because next may be None, step 2 can fail. In that case</span>
-        <span class="comment">// we enter a recovery mode where we generate 2 new ticketers, one for</span>
-        <span class="comment">// next and one for the current ticketer. We then take the mutex a</span>
-        <span class="comment">// second time and redo the time check to see if a switch is still</span>
-        <span class="comment">// necessary.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This somewhat convoluted approach ensures good availability of the</span>
-        <span class="comment">// mutex, by ensuring that the state is usable and the mutex not held</span>
-        <span class="comment">// during generation. It also ensures that, so long as the inner</span>
-        <span class="comment">// ticketer never generates panics during encryption/decryption,</span>
-        <span class="comment">// we are guaranteed to never panic when holding the mutex.</span>
+    <span class="doccomment">/// If it&#39;s time, demote the `current` ticketer to `previous` (so it
+    /// does no new encryptions but can do decryption) and use next for a
+    /// new `current` ticketer.
+    ///
+    /// Calling this regularly will ensure timely key erasure.  Otherwise,
+    /// key erasure will be delayed until the next encrypt/decrypt call.
+    ///
+    /// For efficiency, this is also responsible for locking the state mutex
+    /// and returning the mutexguard.
+    </span><span class="kw">fn </span>maybe_roll(<span class="kw-2">&amp;</span><span class="self">self</span>, now: TimeBase) -&gt; <span class="prelude-ty">Option</span>&lt;MutexGuard&lt;TicketSwitcherState&gt;&gt; {
+        <span class="comment">// The code below aims to make switching as efficient as possible
+        // in the common case that the generator never fails. To achieve this
+        // we run the following steps:
+        //  1. If no switch is necessary, just return the mutexguard
+        //  2. Shift over all of the ticketers (so current becomes previous,
+        //     and next becomes current). After this, other threads can
+        //     start using the new current ticketer.
+        //  3. unlock mutex and generate new ticketer.
+        //  4. Place new ticketer in next and return current
+        //
+        // There are a few things to note here. First, we don&#39;t check whether
+        // a new switch might be needed in step 4, even though, due to locking
+        // and entropy collection, significant amounts of time may have passed.
+        // This is to guarantee that the thread doing the switch will eventually
+        // make progress.
+        //
+        // Second, because next may be None, step 2 can fail. In that case
+        // we enter a recovery mode where we generate 2 new ticketers, one for
+        // next and one for the current ticketer. We then take the mutex a
+        // second time and redo the time check to see if a switch is still
+        // necessary.
+        //
+        // This somewhat convoluted approach ensures good availability of the
+        // mutex, by ensuring that the state is usable and the mutex not held
+        // during generation. It also ensures that, so long as the inner
+        // ticketer never generates panics during encryption/decryption,
+        // we are guaranteed to never panic when holding the mutex.
 
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">now</span>.<span class="ident">as_secs</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">are_recovering</span> <span class="op">=</span> <span class="bool-val">false</span>; <span class="comment">// Are we recovering from previous failure?</span>
-        {
-            <span class="comment">// Scope the mutex so we only take it for as long as needed</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">lock</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>now = now.as_secs();
+        <span class="kw">let </span><span class="kw-2">mut </span>are_recovering = <span class="bool-val">false</span>; <span class="comment">// Are we recovering from previous failure?
+        </span>{
+            <span class="comment">// Scope the mutex so we only take it for as long as needed
+            </span><span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock().ok()<span class="question-mark">?</span>;
 
-            <span class="comment">// Fast path in case we do not need to switch to the next ticketer yet</span>
-            <span class="kw">if</span> <span class="ident">now</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">next_switch_time</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">state</span>);
+            <span class="comment">// Fast path in case we do not need to switch to the next ticketer yet
+            </span><span class="kw">if </span>now &lt;= state.next_switch_time {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(state);
             }
 
-            <span class="comment">// Make the switch, or mark for recovery if not possible</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">next</span>.<span class="ident">take</span>() {
-                <span class="ident">state</span>.<span class="ident">previous</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">current</span>, <span class="ident">next</span>));
-                <span class="ident">state</span>.<span class="ident">next_switch_time</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">u64::from</span>(<span class="self">self</span>.<span class="ident">lifetime</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">are_recovering</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            <span class="comment">// Make the switch, or mark for recovery if not possible
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(next) = state.next.take() {
+                state.previous = <span class="prelude-val">Some</span>(mem::replace(<span class="kw-2">&amp;mut </span>state.current, next));
+                state.next_switch_time = now + u64::from(<span class="self">self</span>.lifetime);
+            } <span class="kw">else </span>{
+                are_recovering = <span class="bool-val">true</span>;
             }
         }
 
-        <span class="comment">// We always need a next, so generate it now</span>
-        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">generator</span>)().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">are_recovering</span> {
-            <span class="comment">// Normal path, generate new next and place it in the state</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">lock</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="ident">state</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>);
-            <span class="prelude-val">Some</span>(<span class="ident">state</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Recovering, generate also a new current ticketer, and modify state</span>
-            <span class="comment">// as needed. (we need to redo the time check, otherwise this might</span>
-            <span class="comment">// result in very rapid switching of ticketers)</span>
-            <span class="kw">let</span> <span class="ident">new_current</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">generator</span>)().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">lock</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="ident">state</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>);
-            <span class="kw">if</span> <span class="ident">now</span> <span class="op">&gt;</span> <span class="ident">state</span>.<span class="ident">next_switch_time</span> {
-                <span class="ident">state</span>.<span class="ident">previous</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">current</span>, <span class="ident">new_current</span>));
-                <span class="ident">state</span>.<span class="ident">next_switch_time</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">u64::from</span>(<span class="self">self</span>.<span class="ident">lifetime</span>);
+        <span class="comment">// We always need a next, so generate it now
+        </span><span class="kw">let </span>next = (<span class="self">self</span>.generator)().ok()<span class="question-mark">?</span>;
+        <span class="kw">if </span>!are_recovering {
+            <span class="comment">// Normal path, generate new next and place it in the state
+            </span><span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock().ok()<span class="question-mark">?</span>;
+            state.next = <span class="prelude-val">Some</span>(next);
+            <span class="prelude-val">Some</span>(state)
+        } <span class="kw">else </span>{
+            <span class="comment">// Recovering, generate also a new current ticketer, and modify state
+            // as needed. (we need to redo the time check, otherwise this might
+            // result in very rapid switching of ticketers)
+            </span><span class="kw">let </span>new_current = (<span class="self">self</span>.generator)().ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock().ok()<span class="question-mark">?</span>;
+            state.next = <span class="prelude-val">Some</span>(next);
+            <span class="kw">if </span>now &gt; state.next_switch_time {
+                state.previous = <span class="prelude-val">Some</span>(mem::replace(<span class="kw-2">&amp;mut </span>state.current, new_current));
+                state.next_switch_time = now + u64::from(<span class="self">self</span>.lifetime);
             }
-            <span class="prelude-val">Some</span>(<span class="ident">state</span>)
+            <span class="prelude-val">Some</span>(state)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ProducesTickets</span> <span class="kw">for</span> <span class="ident">TicketSwitcher</span> {
-    <span class="kw">fn</span> <span class="ident">lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">lifetime</span> <span class="op">*</span> <span class="number">2</span>
+<span class="kw">impl </span>ProducesTickets <span class="kw">for </span>TicketSwitcher {
+    <span class="kw">fn </span>lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.lifetime * <span class="number">2
+    </span>}
+
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>encrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, message: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>state = <span class="self">self</span>.maybe_roll(TimeBase::now().ok()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+
+        state.current.encrypt(message)
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>decrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, ciphertext: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>state = <span class="self">self</span>.maybe_roll(TimeBase::now().ok()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase::now</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-
-        <span class="ident">state</span>.<span class="ident">current</span>.<span class="ident">encrypt</span>(<span class="ident">message</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ciphertext</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase::now</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-
-        <span class="comment">// Decrypt with the current key; if that fails, try with the previous.</span>
-        <span class="ident">state</span>
-            .<span class="ident">current</span>
-            .<span class="ident">decrypt</span>(<span class="ident">ciphertext</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">state</span>
-                    .<span class="ident">previous</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">previous</span><span class="op">|</span> <span class="ident">previous</span>.<span class="ident">decrypt</span>(<span class="ident">ciphertext</span>))
+        <span class="comment">// Decrypt with the current key; if that fails, try with the previous.
+        </span>state
+            .current
+            .decrypt(ciphertext)
+            .or_else(|| {
+                state
+                    .previous
+                    .as_ref()
+                    .and_then(|previous| previous.decrypt(ciphertext))
             })
     }
 }
 
-<span class="doccomment">/// A concrete, safe ticket creation mechanism.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ticketer</span> {}
+<span class="doccomment">/// A concrete, safe ticket creation mechanism.
+</span><span class="kw">pub struct </span>Ticketer {}
 
-<span class="kw">fn</span> <span class="ident">generate_inner</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>, <span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">AeadTicketer::new</span>()<span class="question-mark">?</span>))
+<span class="kw">fn </span>generate_inner() -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;, rand::GetRandomFailed&gt; {
+    <span class="prelude-val">Ok</span>(Box::new(AeadTicketer::new()<span class="question-mark">?</span>))
 }
 
-<span class="kw">impl</span> <span class="ident">Ticketer</span> {
-    <span class="doccomment">/// Make the recommended Ticketer.  This produces tickets</span>
-    <span class="doccomment">/// with a 12 hour life and randomly generated keys.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The encryption mechanism used in Chacha20Poly1305.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Arc::new</span>(<span class="ident">TicketSwitcher::new</span>(<span class="number">6</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>, <span class="ident">generate_inner</span>)<span class="question-mark">?</span>))
+<span class="kw">impl </span>Ticketer {
+    <span class="doccomment">/// Make the recommended Ticketer.  This produces tickets
+    /// with a 12 hour life and randomly generated keys.
+    ///
+    /// The encryption mechanism used in Chacha20Poly1305.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;<span class="kw">dyn </span>ProducesTickets&gt;, Error&gt; {
+        <span class="prelude-val">Ok</span>(Arc::new(TicketSwitcher::new(<span class="number">6 </span>* <span class="number">60 </span>* <span class="number">60</span>, generate_inner)<span class="question-mark">?</span>))
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">basic_pairwise_test</span>() {
-    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Ticketer::new</span>().<span class="ident">unwrap</span>();
-    <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">enabled</span>());
-    <span class="kw">let</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;hello world&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">plain</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">plain</span>, <span class="string">b&quot;hello world&quot;</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>basic_pairwise_test() {
+    <span class="kw">let </span>t = Ticketer::new().unwrap();
+    <span class="macro">assert!</span>(t.enabled());
+    <span class="kw">let </span>cipher = t.encrypt(<span class="string">b&quot;hello world&quot;</span>).unwrap();
+    <span class="kw">let </span>plain = t.decrypt(<span class="kw-2">&amp;</span>cipher).unwrap();
+    <span class="macro">assert_eq!</span>(plain, <span class="string">b&quot;hello world&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ticketswitcher_switching_test</span>() {
-    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">TicketSwitcher::new</span>(<span class="number">1</span>, <span class="ident">generate_inner</span>).<span class="ident">unwrap</span>());
-    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">TimeBase::now</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">cipher1</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 1&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 1&quot;</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ticketswitcher_switching_test() {
+    <span class="kw">let </span>t = Arc::new(TicketSwitcher::new(<span class="number">1</span>, generate_inner).unwrap());
+    <span class="kw">let </span>now = TimeBase::now().unwrap();
+    <span class="kw">let </span>cipher1 = t.encrypt(<span class="string">b&quot;ticket 1&quot;</span>).unwrap();
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).unwrap(), <span class="string">b&quot;ticket 1&quot;</span>);
     {
-        <span class="comment">// Trigger new ticketer</span>
-        <span class="ident">t</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase</span>(<span class="ident">now</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_secs</span>(<span class="number">10</span>)));
+        <span class="comment">// Trigger new ticketer
+        </span>t.maybe_roll(TimeBase(now.<span class="number">0 </span>+ std::time::Duration::from_secs(<span class="number">10</span>)));
     }
-    <span class="kw">let</span> <span class="ident">cipher2</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 2&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 1&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher2</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 2&quot;</span>);
+    <span class="kw">let </span>cipher2 = t.encrypt(<span class="string">b&quot;ticket 2&quot;</span>).unwrap();
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).unwrap(), <span class="string">b&quot;ticket 1&quot;</span>);
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher2).unwrap(), <span class="string">b&quot;ticket 2&quot;</span>);
     {
-        <span class="comment">// Trigger new ticketer</span>
-        <span class="ident">t</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase</span>(<span class="ident">now</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_secs</span>(<span class="number">20</span>)));
+        <span class="comment">// Trigger new ticketer
+        </span>t.maybe_roll(TimeBase(now.<span class="number">0 </span>+ std::time::Duration::from_secs(<span class="number">20</span>)));
     }
-    <span class="kw">let</span> <span class="ident">cipher3</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 3&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">is_none</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher2</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 2&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher3</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 3&quot;</span>);
+    <span class="kw">let </span>cipher3 = t.encrypt(<span class="string">b&quot;ticket 3&quot;</span>).unwrap();
+    <span class="macro">assert!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).is_none());
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher2).unwrap(), <span class="string">b&quot;ticket 2&quot;</span>);
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher3).unwrap(), <span class="string">b&quot;ticket 3&quot;</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">fn</span> <span class="ident">fail_generator</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ProducesTickets</span><span class="op">&gt;</span>, <span class="ident">rand::GetRandomFailed</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Err</span>(<span class="ident">rand::GetRandomFailed</span>)
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">fn </span>fail_generator() -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;<span class="kw">dyn </span>ProducesTickets&gt;, rand::GetRandomFailed&gt; {
+    <span class="prelude-val">Err</span>(rand::GetRandomFailed)
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ticketswitcher_recover_test</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">TicketSwitcher::new</span>(<span class="number">1</span>, <span class="ident">generate_inner</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">TimeBase::now</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">cipher1</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 1&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 1&quot;</span>);
-    <span class="ident">t</span>.<span class="ident">generator</span> <span class="op">=</span> <span class="ident">fail_generator</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ticketswitcher_recover_test() {
+    <span class="kw">let </span><span class="kw-2">mut </span>t = TicketSwitcher::new(<span class="number">1</span>, generate_inner).unwrap();
+    <span class="kw">let </span>now = TimeBase::now().unwrap();
+    <span class="kw">let </span>cipher1 = t.encrypt(<span class="string">b&quot;ticket 1&quot;</span>).unwrap();
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).unwrap(), <span class="string">b&quot;ticket 1&quot;</span>);
+    t.generator = fail_generator;
     {
-        <span class="comment">// Failed new ticketer</span>
-        <span class="ident">t</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase</span>(<span class="ident">now</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_secs</span>(<span class="number">10</span>)));
+        <span class="comment">// Failed new ticketer
+        </span>t.maybe_roll(TimeBase(now.<span class="number">0 </span>+ std::time::Duration::from_secs(<span class="number">10</span>)));
     }
-    <span class="ident">t</span>.<span class="ident">generator</span> <span class="op">=</span> <span class="ident">generate_inner</span>;
-    <span class="kw">let</span> <span class="ident">cipher2</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 2&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 1&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher2</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 2&quot;</span>);
+    t.generator = generate_inner;
+    <span class="kw">let </span>cipher2 = t.encrypt(<span class="string">b&quot;ticket 2&quot;</span>).unwrap();
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).unwrap(), <span class="string">b&quot;ticket 1&quot;</span>);
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher2).unwrap(), <span class="string">b&quot;ticket 2&quot;</span>);
     {
-        <span class="comment">// recover</span>
-        <span class="ident">t</span>.<span class="ident">maybe_roll</span>(<span class="ident">TimeBase</span>(<span class="ident">now</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">std::time::Duration::from_secs</span>(<span class="number">20</span>)));
+        <span class="comment">// recover
+        </span>t.maybe_roll(TimeBase(now.<span class="number">0 </span>+ std::time::Duration::from_secs(<span class="number">20</span>)));
     }
-    <span class="kw">let</span> <span class="ident">cipher3</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">encrypt</span>(<span class="string">b&quot;ticket 3&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher1</span>).<span class="ident">is_none</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher2</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 2&quot;</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">t</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">cipher3</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;ticket 3&quot;</span>);
+    <span class="kw">let </span>cipher3 = t.encrypt(<span class="string">b&quot;ticket 3&quot;</span>).unwrap();
+    <span class="macro">assert!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher1).is_none());
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher2).unwrap(), <span class="string">b&quot;ticket 2&quot;</span>);
+    <span class="macro">assert_eq!</span>(t.decrypt(<span class="kw-2">&amp;</span>cipher3).unwrap(), <span class="string">b&quot;ticket 3&quot;</span>);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

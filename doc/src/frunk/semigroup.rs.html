@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/semigroup.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>semigroup.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/semigroup.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>semigroup.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -527,12 +527,12 @@
 <span id="527">527</span>
 <span id="528">528</span>
 <span id="529">529</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for holding the Semigroup typeclass definition and typeclass instances</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can, for example, combine tuples.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">r#&quot;
+</pre><pre class="rust"><code><span class="doccomment">//! Module for holding the Semigroup typeclass definition and typeclass instances
+//!
+//! You can, for example, combine tuples.
+</span><span class="attribute">#![cfg_attr(
+    feature = <span class="string">&quot;std&quot;</span>,
+    doc = <span class="string">r#&quot;
 # Examples
 
 ```
@@ -557,504 +557,504 @@ let h2 = hlist![2, 1.2, 1i64];
 let h3 = hlist![3, 4.5, 54];
 assert_eq!(h1.combine(&amp;h2), h3)
 # }
-```&quot;#</span>
-)]</span>
+```&quot;#
+</span>)]
 
-<span class="kw">use</span> <span class="ident">frunk_core::hlist</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::cell</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections::hash_map::Entry</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">Deref</span>};
+</span><span class="kw">use </span>frunk_core::hlist::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::cell::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::collections::hash_map::Entry;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::collections::{HashMap, HashSet};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::hash::Hash;
+<span class="kw">use </span>std::ops::{BitAnd, BitOr, Deref};
 
-<span class="doccomment">/// Wrapper type for types that are ordered and can have a Max combination</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Max</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Wrapper type for types that are ordered and can have a Max combination
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Max&lt;T: Ord&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Wrapper type for types that are ordered and can have a Min combination</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Min</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Wrapper type for types that are ordered and can have a Min combination
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Min&lt;T: Ord&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Wrapper type for types that can have a Product combination</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Product</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Wrapper type for types that can have a Product combination
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Product&lt;T&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Wrapper type for boolean that acts as a bitwise &amp;&amp; combination</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">All</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Wrapper type for boolean that acts as a bitwise &amp;&amp; combination
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>All&lt;T&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// Wrapper type for boolean that acts as a bitwise || combination</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Wrapper type for boolean that acts as a bitwise || combination
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Any&lt;T&gt;(<span class="kw">pub </span>T);
 
-<span class="doccomment">/// A Semigroup is a class of thing that has a definable combine operation</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Semigroup</span> {
-    <span class="doccomment">/// Associative operation taking which combines two values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use frunk::Semigroup;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(Some(1).combine(&amp;Some(2)), Some(3))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// A Semigroup is a class of thing that has a definable combine operation
+</span><span class="kw">pub trait </span>Semigroup {
+    <span class="doccomment">/// Associative operation taking which combines two values.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use frunk::Semigroup;
+    ///
+    /// assert_eq!(Some(1).combine(&amp;Some(2)), Some(3))
+    /// ```
+    </span><span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Allow the combination of any two HLists having the same structure</span>
-<span class="doccomment">/// if all of the sub-element types are also Semiups</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Semigroup</span>, <span class="ident">T</span>: <span class="ident">HList</span> <span class="op">+</span> <span class="ident">Semigroup</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">tail</span>
-            .<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">tail</span>)
-            .<span class="ident">prepend</span>(<span class="self">self</span>.<span class="ident">head</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">head</span>))
+<span class="doccomment">/// Allow the combination of any two HLists having the same structure
+/// if all of the sub-element types are also Semiups
+</span><span class="kw">impl</span>&lt;H: Semigroup, T: HList + Semigroup&gt; Semigroup <span class="kw">for </span>HCons&lt;H, T&gt; {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.tail
+            .combine(<span class="kw-2">&amp;</span>other.tail)
+            .prepend(<span class="self">self</span>.head.combine(<span class="kw-2">&amp;</span>other.head))
     }
 }
 
-<span class="doccomment">/// Since () + () = (), the same is true for HNil</span>
-<span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">HNil</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw-2">*</span><span class="self">self</span>
-    }
+<span class="doccomment">/// Since () + () = (), the same is true for HNil
+</span><span class="kw">impl </span>Semigroup <span class="kw">for </span>HNil {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
 }
 
-<span class="doccomment">/// Return this combined with itself `n` times.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combine_n</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">o</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">times</span>: <span class="ident">u32</span>) -&gt; <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Semigroup</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="doccomment">/// Return this combined with itself `n` times.
+</span><span class="kw">pub fn </span>combine_n&lt;T&gt;(o: <span class="kw-2">&amp;</span>T, times: u32) -&gt; T
+<span class="kw">where
+    </span>T: Semigroup + Clone,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">o</span>.<span class="ident">clone</span>();
-    <span class="comment">// note: range is non-inclusive in the upper bound</span>
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">times</span> {
-        <span class="ident">x</span> <span class="op">=</span> <span class="ident">o</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>x = o.clone();
+    <span class="comment">// note: range is non-inclusive in the upper bound
+    </span><span class="kw">for _ in </span><span class="number">1</span>..times {
+        x = o.combine(<span class="kw-2">&amp;</span>x);
     }
-    <span class="ident">x</span>
+    x
 }
 
-<span class="doccomment">/// Given a sequence of `xs`, combine them and return the total</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the sequence is empty, returns None. Otherwise, returns Some(total).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use frunk::semigroup::combine_all_option;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let v1 = &amp;vec![1, 2, 3];</span>
-<span class="doccomment">/// assert_eq!(combine_all_option(v1), Some(6));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let v2: Vec&lt;i16&gt; = Vec::new(); // empty!</span>
-<span class="doccomment">/// assert_eq!(combine_all_option(&amp;v2), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">combine_all_option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">xs</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Semigroup</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="doccomment">/// Given a sequence of `xs`, combine them and return the total
+///
+/// If the sequence is empty, returns None. Otherwise, returns Some(total).
+///
+/// # Examples
+///
+/// ```
+/// use frunk::semigroup::combine_all_option;
+///
+/// let v1 = &amp;vec![1, 2, 3];
+/// assert_eq!(combine_all_option(v1), Some(6));
+///
+/// let v2: Vec&lt;i16&gt; = Vec::new(); // empty!
+/// assert_eq!(combine_all_option(&amp;v2), None);
+/// ```
+</span><span class="kw">pub fn </span>combine_all_option&lt;T&gt;(xs: <span class="kw-2">&amp;</span>[T]) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: Semigroup + Clone,
 {
-    <span class="ident">xs</span>.<span class="ident">first</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">head</span><span class="op">|</span> <span class="ident">xs</span>[<span class="number">1</span>..].<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">head</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">combine</span>(<span class="ident">b</span>)))
+    xs.first()
+        .map(|head| xs[<span class="number">1</span>..].iter().fold(head.clone(), |a, b| a.combine(b)))
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">numeric_semigroup_imps</span> {
-  ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>numeric_semigroup_imps {
+  ($(<span class="macro-nonterminal">$tr</span>:ty),<span class="kw-2">*</span>) =&gt; {
     $(
-      <span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span> {
-        <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> { <span class="self">self</span> <span class="op">+</span> <span class="ident">other</span> }
+      <span class="kw">impl </span>Semigroup <span class="kw">for </span><span class="macro-nonterminal">$tr </span>{
+        <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{ <span class="self">self </span>+ other }
       }
-    )<span class="op">*</span>
+    )*
   }
 }
 
-<span class="macro">numeric_semigroup_imps!</span>(<span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">isize</span>, <span class="ident">usize</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
+<span class="macro">numeric_semigroup_imps!</span>(i8, i16, i32, i64, u8, u16, u32, u64, isize, usize, f32, f64);
 
-<span class="macro">macro_rules!</span> <span class="ident">numeric_product_semigroup_imps</span> {
-  ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span>:<span class="ident">ty</span>),<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>numeric_product_semigroup_imps {
+  ($(<span class="macro-nonterminal">$tr</span>:ty),<span class="kw-2">*</span>) =&gt; {
     $(
-      <span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Product</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">Product</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-            <span class="kw">let</span> <span class="ident">Product</span>(<span class="ident">y</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">other</span>;
-            <span class="ident">Product</span>(<span class="ident">x</span> <span class="op">*</span> <span class="ident">y</span>)
+      <span class="kw">impl </span>Semigroup <span class="kw">for </span>Product&lt;<span class="macro-nonterminal">$tr</span>&gt; {
+        <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>Product(x) = <span class="kw-2">*</span><span class="self">self</span>;
+            <span class="kw">let </span>Product(y) = <span class="kw-2">*</span>other;
+            Product(x * y)
          }
       }
-    )<span class="op">*</span>
+    )*
   }
 }
 
-<span class="macro">numeric_product_semigroup_imps!</span>(<span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">isize</span>, <span class="ident">usize</span>, <span class="ident">f32</span>, <span class="ident">f64</span>);
+<span class="macro">numeric_product_semigroup_imps!</span>(i8, i16, i32, i64, u8, u16, u32, u64, isize, usize, f32, f64);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Semigroup</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;T&gt; Semigroup <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt;
+<span class="kw">where
+    </span>T: Semigroup + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">other</span> {
-                <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">v_other</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">combine</span>(<span class="ident">v_other</span>)),
-                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>v) =&gt; <span class="kw">match </span><span class="kw-2">*</span>other {
+                <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>v_other) =&gt; <span class="prelude-val">Some</span>(v.combine(v_other)),
+                <span class="kw">_ </span>=&gt; <span class="self">self</span>.clone(),
             },
-            <span class="kw">_</span> =&gt; <span class="ident">other</span>.<span class="ident">clone</span>(),
+            <span class="kw">_ </span>=&gt; other.clone(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Semigroup</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">deref</span>().<span class="ident">combine</span>(<span class="ident">other</span>.<span class="ident">deref</span>()))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T: Semigroup&gt; Semigroup <span class="kw">for </span>Box&lt;T&gt; {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        Box::new(<span class="self">self</span>.deref().combine(other.deref()))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cloned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="ident">cloned</span>.<span class="ident">push_str</span>(<span class="ident">other</span>);
-        <span class="ident">cloned</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>Semigroup <span class="kw">for </span>String {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>cloned = <span class="self">self</span>.clone();
+        cloned.push_str(other);
+        cloned
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Clone</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="ident">other</span>);
-        <span class="ident">v</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T: Clone&gt; Semigroup <span class="kw">for </span>Vec&lt;T&gt; {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>v = <span class="self">self</span>.clone();
+        v.extend_from_slice(other);
+        v
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Semigroup</span> <span class="op">+</span> <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;T&gt; Semigroup <span class="kw">for </span>Cell&lt;T&gt;
+<span class="kw">where
+    </span>T: Semigroup + Copy,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cell::new</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">combine</span>(<span class="kw-2">&amp;</span>(<span class="ident">other</span>.<span class="ident">get</span>())))
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        Cell::new(<span class="self">self</span>.get().combine(<span class="kw-2">&amp;</span>(other.get())))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Semigroup</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">self_b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">borrow</span>();
-        <span class="kw">let</span> <span class="ident">other_b</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">borrow</span>();
-        <span class="ident">RefCell::new</span>(<span class="ident">self_b</span>.<span class="ident">deref</span>().<span class="ident">combine</span>(<span class="ident">other_b</span>.<span class="ident">deref</span>()))
+<span class="kw">impl</span>&lt;T: Semigroup&gt; Semigroup <span class="kw">for </span>RefCell&lt;T&gt; {
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>self_b = <span class="self">self</span>.borrow();
+        <span class="kw">let </span>other_b = other.borrow();
+        RefCell::new(self_b.deref().combine(other_b.deref()))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; Semigroup <span class="kw">for </span>HashSet&lt;T&gt;
+<span class="kw">where
+    </span>T: Eq + Hash + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="self">self</span> {
-            <span class="ident">h</span>.<span class="ident">insert</span>(<span class="ident">i</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>h = HashSet::new();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="self">self </span>{
+            h.insert(i.clone());
         }
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="ident">h</span>.<span class="ident">insert</span>(<span class="ident">i</span>.<span class="ident">clone</span>());
+        <span class="kw">for </span>i <span class="kw">in </span>other {
+            h.insert(i.clone());
         }
-        <span class="ident">h</span>
+        h
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">V</span>: <span class="ident">Semigroup</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;K, V&gt; Semigroup <span class="kw">for </span>HashMap&lt;K, V&gt;
+<span class="kw">where
+    </span>K: Eq + Hash + Clone,
+    V: Semigroup + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span> {
-            <span class="ident">h</span>.<span class="ident">insert</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>h: HashMap&lt;K, V&gt; = HashMap::new();
+        <span class="kw">for </span>(k, v) <span class="kw">in </span><span class="self">self </span>{
+            h.insert(k.clone(), v.clone());
         }
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">other</span> {
-            <span class="kw">let</span> <span class="ident">k_clone</span> <span class="op">=</span> <span class="ident">k</span>.<span class="ident">clone</span>();
-            <span class="kw">match</span> <span class="ident">h</span>.<span class="ident">entry</span>(<span class="ident">k_clone</span>) {
-                <span class="ident">Entry::Occupied</span>(<span class="ident">o</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">existing</span> <span class="op">=</span> <span class="ident">o</span>.<span class="ident">into_mut</span>();
-                    <span class="kw">let</span> <span class="ident">comb</span> <span class="op">=</span> <span class="ident">existing</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
-                    <span class="kw-2">*</span><span class="ident">existing</span> <span class="op">=</span> <span class="ident">comb</span>;
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>other {
+            <span class="kw">let </span>k_clone = k.clone();
+            <span class="kw">match </span>h.entry(k_clone) {
+                Entry::Occupied(o) =&gt; {
+                    <span class="kw">let </span>existing = o.into_mut();
+                    <span class="kw">let </span>comb = existing.combine(<span class="kw-2">&amp;</span>v);
+                    <span class="kw-2">*</span>existing = comb;
                 }
-                <span class="ident">Entry::Vacant</span>(<span class="ident">o</span>) =&gt; {
-                    <span class="ident">o</span>.<span class="ident">insert</span>(<span class="ident">v</span>.<span class="ident">clone</span>());
+                Entry::Vacant(o) =&gt; {
+                    o.insert(v.clone());
                 }
             }
         }
-        <span class="ident">h</span>
+        h
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Max</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;T&gt; Semigroup <span class="kw">for </span>Max&lt;T&gt;
+<span class="kw">where
+    </span>T: Ord + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>) {
-            <span class="ident">Ordering::Less</span> =&gt; <span class="ident">Max</span>(<span class="ident">y</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">Max</span>(<span class="ident">x</span>),
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.clone();
+        <span class="kw">let </span>y = other.<span class="number">0</span>.clone();
+        <span class="kw">match </span>x.cmp(<span class="kw-2">&amp;</span>y) {
+            Ordering::Less =&gt; Max(y),
+            <span class="kw">_ </span>=&gt; Max(x),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Min</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;T&gt; Semigroup <span class="kw">for </span>Min&lt;T&gt;
+<span class="kw">where
+    </span>T: Ord + Clone,
 {
-    <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>.<span class="ident">clone</span>();
-        <span class="kw">match</span> <span class="ident">x</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">y</span>) {
-            <span class="ident">Ordering::Less</span> =&gt; <span class="ident">Min</span>(<span class="ident">x</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">Min</span>(<span class="ident">y</span>),
+    <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>.clone();
+        <span class="kw">let </span>y = other.<span class="number">0</span>.clone();
+        <span class="kw">match </span>x.cmp(<span class="kw-2">&amp;</span>y) {
+            Ordering::Less =&gt; Min(x),
+            <span class="kw">_ </span>=&gt; Min(y),
         }
     }
 }
 
-<span class="comment">// Deriving for all BitAnds sucks because we are then bound on ::Output, which may not be the same type</span>
-<span class="macro">macro_rules!</span> <span class="ident">simple_all_impls</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="comment">// Deriving for all BitAnds sucks because we are then bound on ::Output, which may not be the same type
+</span><span class="macro">macro_rules! </span>simple_all_impls {
+    ($(<span class="macro-nonterminal">$tr</span>:ty)<span class="kw-2">*</span>) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">All</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-                    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-                    <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>;
-                    <span class="ident">All</span>(<span class="ident">x</span>.<span class="ident">bitand</span>(<span class="ident">y</span>))
+            <span class="kw">impl </span>Semigroup <span class="kw">for </span>All&lt;<span class="macro-nonterminal">$tr</span>&gt; {
+                <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+                    <span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>;
+                    <span class="kw">let </span>y = other.<span class="number">0</span>;
+                    All(x.bitand(y))
                 }
             }
-        )<span class="op">*</span>
+        )*
     }
 }
 
-<span class="macro">simple_all_impls!</span> { <span class="ident">bool</span> <span class="ident">usize</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">isize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> }
+<span class="macro">simple_all_impls! </span>{ bool usize u8 u16 u32 u64 isize i8 i16 i32 i64 }
 
-<span class="macro">macro_rules!</span> <span class="ident">simple_any_impls</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="macro">macro_rules! </span>simple_any_impls {
+    ($(<span class="macro-nonterminal">$tr</span>:ty)<span class="kw-2">*</span>) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">Semigroup</span> <span class="kw">for</span> <span class="ident">Any</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span><span class="op">&gt;</span> {
-                <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-                    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-                    <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>;
-                    <span class="ident">Any</span>(<span class="ident">x</span>.<span class="ident">bitor</span>(<span class="ident">y</span>))
+            <span class="kw">impl </span>Semigroup <span class="kw">for </span>Any&lt;<span class="macro-nonterminal">$tr</span>&gt; {
+                <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+                    <span class="kw">let </span>x = <span class="self">self</span>.<span class="number">0</span>;
+                    <span class="kw">let </span>y = other.<span class="number">0</span>;
+                    Any(x.bitor(y))
                 }
             }
-        )<span class="op">*</span>
+        )*
     }
 }
 
-<span class="macro">simple_any_impls!</span> { <span class="ident">bool</span> <span class="ident">usize</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">isize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> }
+<span class="macro">simple_any_impls! </span>{ bool usize u8 u16 u32 u64 isize i8 i16 i32 i64 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_impls</span> {
-    () =&gt; {}; <span class="comment">// no more</span>
+<span class="macro">macro_rules! </span>tuple_impls {
+    () =&gt; {}; <span class="comment">// no more
 
-    ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">tt</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>:<span class="ident">ident</span>), $( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span>:<span class="ident">tt</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>:<span class="ident">ident</span>), )<span class="kw-2">*</span>) =&gt; {
-<span class="comment">// Invoke recursive reversal of list that ends in the macro expansion implementation</span>
-<span class="comment">// of the reversed list</span>
-<span class="comment">//</span>
-        <span class="macro">tuple_impls!</span>([(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>);] $( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>), )<span class="kw-2">*</span>);
-        <span class="macro">tuple_impls!</span>($( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>), )<span class="kw-2">*</span>); <span class="comment">// invoke macro on tail</span>
+    </span>((<span class="macro-nonterminal">$idx</span>:tt =&gt; <span class="macro-nonterminal">$typ</span>:ident), $( (<span class="macro-nonterminal">$nidx</span>:tt =&gt; <span class="macro-nonterminal">$ntyp</span>:ident), )<span class="kw-2">*</span>) =&gt; {
+<span class="comment">// Invoke recursive reversal of list that ends in the macro expansion implementation
+// of the reversed list
+//
+        </span><span class="macro">tuple_impls!</span>([(<span class="macro-nonterminal">$idx</span>, <span class="macro-nonterminal">$typ</span>);] $( (<span class="macro-nonterminal">$nidx </span>=&gt; <span class="macro-nonterminal">$ntyp</span>), )<span class="kw-2">*</span>);
+        <span class="macro">tuple_impls!</span>($( (<span class="macro-nonterminal">$nidx </span>=&gt; <span class="macro-nonterminal">$ntyp</span>), )<span class="kw-2">*</span>); <span class="comment">// invoke macro on tail
+    </span>};
+
+<span class="comment">// ([accumulatedList], listToReverse); recursively calls tuple_impls until the list to reverse
+// + is empty (see next pattern)
+//
+    </span>([$((<span class="macro-nonterminal">$accIdx</span>: tt, <span class="macro-nonterminal">$accTyp</span>: ident);)+]  (<span class="macro-nonterminal">$idx</span>:tt =&gt; <span class="macro-nonterminal">$typ</span>:ident), $( (<span class="macro-nonterminal">$nidx</span>:tt =&gt; <span class="macro-nonterminal">$ntyp</span>:ident), )<span class="kw-2">*</span>) =&gt; {
+      <span class="macro">tuple_impls!</span>([(<span class="macro-nonterminal">$idx</span>, <span class="macro-nonterminal">$typ</span>); $((<span class="macro-nonterminal">$accIdx</span>, <span class="macro-nonterminal">$accTyp</span>); )<span class="kw-2">*</span>] $( (<span class="macro-nonterminal">$nidx </span>=&gt; <span class="macro-nonterminal">$ntyp</span>), ) <span class="kw-2">*</span>);
     };
 
-<span class="comment">// ([accumulatedList], listToReverse); recursively calls tuple_impls until the list to reverse</span>
-<span class="comment">// + is empty (see next pattern)</span>
-<span class="comment">//</span>
-    ([$((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">accIdx</span>: <span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accTyp</span>: <span class="ident">ident</span>);)<span class="op">+</span>]  (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">tt</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>:<span class="ident">ident</span>), $( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span>:<span class="ident">tt</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>:<span class="ident">ident</span>), )<span class="kw-2">*</span>) =&gt; {
-      <span class="macro">tuple_impls!</span>([(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>); $((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">accIdx</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">accTyp</span>); )<span class="kw-2">*</span>] $( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>), ) <span class="kw-2">*</span>);
-    };
-
-<span class="comment">// Finally expand into our implementation</span>
-    ([(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>:<span class="ident">ident</span>); $( (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span>:<span class="ident">tt</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>:<span class="ident">ident</span>); )<span class="kw-2">*</span>]) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>: <span class="ident">Semigroup</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span>: <span class="ident">Semigroup</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Semigroup</span> <span class="kw">for</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typ</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ntyp</span> ),<span class="kw-2">*</span>) {
-            <span class="kw">fn</span> <span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-                (<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>), $(<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">nidx</span>), )<span class="kw-2">*</span>)
+<span class="comment">// Finally expand into our implementation
+    </span>([(<span class="macro-nonterminal">$idx</span>:tt, <span class="macro-nonterminal">$typ</span>:ident); $( (<span class="macro-nonterminal">$nidx</span>:tt, <span class="macro-nonterminal">$ntyp</span>:ident); )<span class="kw-2">*</span>]) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$typ</span>: Semigroup, $( <span class="macro-nonterminal">$ntyp</span>: Semigroup),<span class="kw-2">*</span>&gt; Semigroup <span class="kw">for </span>(<span class="macro-nonterminal">$typ</span>, $( <span class="macro-nonterminal">$ntyp </span>),<span class="kw-2">*</span>) {
+            <span class="kw">fn </span>combine(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+                (<span class="self">self</span>.<span class="macro-nonterminal">$idx</span>.combine(<span class="kw-2">&amp;</span>other.<span class="macro-nonterminal">$idx</span>), $(<span class="self">self</span>.<span class="macro-nonterminal">$nidx</span>.combine(<span class="kw-2">&amp;</span>other.<span class="macro-nonterminal">$nidx</span>), )<span class="kw-2">*</span>)
             }
         }
     }
 }
 
-<span class="macro">tuple_impls!</span> {
-    (<span class="number">20</span> =&gt; <span class="ident">U</span>),
-    (<span class="number">19</span> =&gt; <span class="ident">T</span>),
-    (<span class="number">18</span> =&gt; <span class="ident">S</span>),
-    (<span class="number">17</span> =&gt; <span class="ident">R</span>),
-    (<span class="number">16</span> =&gt; <span class="ident">Q</span>),
-    (<span class="number">15</span> =&gt; <span class="ident">P</span>),
-    (<span class="number">14</span> =&gt; <span class="ident">O</span>),
-    (<span class="number">13</span> =&gt; <span class="ident">N</span>),
-    (<span class="number">12</span> =&gt; <span class="ident">M</span>),
-    (<span class="number">11</span> =&gt; <span class="ident">L</span>),
-    (<span class="number">10</span> =&gt; <span class="ident">K</span>),
-    (<span class="number">9</span> =&gt; <span class="ident">J</span>),
-    (<span class="number">8</span> =&gt; <span class="ident">I</span>),
-    (<span class="number">7</span> =&gt; <span class="ident">H</span>),
-    (<span class="number">6</span> =&gt; <span class="ident">G</span>),
-    (<span class="number">5</span> =&gt; <span class="ident">F</span>),
-    (<span class="number">4</span> =&gt; <span class="ident">E</span>),
-    (<span class="number">3</span> =&gt; <span class="ident">D</span>),
-    (<span class="number">2</span> =&gt; <span class="ident">C</span>),
-    (<span class="number">1</span> =&gt; <span class="ident">B</span>),
-    (<span class="number">0</span> =&gt; <span class="ident">A</span>),
+<span class="macro">tuple_impls! </span>{
+    (<span class="number">20 </span>=&gt; U),
+    (<span class="number">19 </span>=&gt; T),
+    (<span class="number">18 </span>=&gt; S),
+    (<span class="number">17 </span>=&gt; R),
+    (<span class="number">16 </span>=&gt; Q),
+    (<span class="number">15 </span>=&gt; P),
+    (<span class="number">14 </span>=&gt; O),
+    (<span class="number">13 </span>=&gt; N),
+    (<span class="number">12 </span>=&gt; M),
+    (<span class="number">11 </span>=&gt; L),
+    (<span class="number">10 </span>=&gt; K),
+    (<span class="number">9 </span>=&gt; J),
+    (<span class="number">8 </span>=&gt; I),
+    (<span class="number">7 </span>=&gt; H),
+    (<span class="number">6 </span>=&gt; G),
+    (<span class="number">5 </span>=&gt; F),
+    (<span class="number">4 </span>=&gt; E),
+    (<span class="number">3 </span>=&gt; D),
+    (<span class="number">2 </span>=&gt; C),
+    (<span class="number">1 </span>=&gt; B),
+    (<span class="number">0 </span>=&gt; A),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">semigroup_tests</span> {
-      ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">comb</span>: <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span>:<span class="ident">ty</span>)<span class="op">+</span>) =&gt; {
+    <span class="macro">macro_rules! </span>semigroup_tests {
+      ($(<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$comb</span>: expr =&gt; <span class="macro-nonterminal">$expected</span>: expr, <span class="macro-nonterminal">$tr</span>:ty)+) =&gt; {
         $(
-          <span class="attribute">#[<span class="ident">test</span>]</span>
-          <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-            <span class="kw">let</span> <span class="ident">r</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tr</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">comb</span>;
-            <span class="macro">assert_eq!</span>(<span class="ident">r</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>)
+          <span class="attribute">#[test]
+          </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+            <span class="kw">let </span>r: <span class="macro-nonterminal">$tr </span>= <span class="macro-nonterminal">$comb</span>;
+            <span class="macro">assert_eq!</span>(r, <span class="macro-nonterminal">$expected</span>)
           }
-        )<span class="op">*</span>
+        )*
       }
     }
 
-    <span class="macro">semigroup_tests!</span> {
-        <span class="ident">test_i8</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">i8</span>
-        <span class="ident">test_product_i8</span>, <span class="ident">Product</span>(<span class="number">1</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">Product</span>(<span class="number">2</span>)) =&gt; <span class="ident">Product</span>(<span class="number">2</span>), <span class="ident">Product</span><span class="op">&lt;</span><span class="ident">i8</span><span class="op">&gt;</span>
-        <span class="ident">test_i16</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">i16</span>
-        <span class="ident">test_i32</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">i32</span>
-        <span class="ident">test_u8</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">u8</span>
-        <span class="ident">test_u16</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">u16</span>
-        <span class="ident">test_u32</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">u32</span>
-        <span class="ident">test_usize</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">usize</span>
-        <span class="ident">test_isize</span>, <span class="number">1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, <span class="ident">isize</span>
-        <span class="ident">test_f32</span>, <span class="number">1f32</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2f32</span>) =&gt; <span class="number">3f32</span>, <span class="ident">f32</span>
-        <span class="ident">test_f64</span>, <span class="number">1f64</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="number">2f64</span>) =&gt; <span class="number">3f64</span>, <span class="ident">f64</span>
-        <span class="ident">test_option_i16</span>, <span class="prelude-val">Some</span>(<span class="number">1</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>
-        <span class="ident">test_option_i16_none1</span>, <span class="prelude-val">None</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>
-        <span class="ident">test_option_i16_none2</span>, <span class="prelude-val">Some</span>(<span class="number">2</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i16</span><span class="op">&gt;</span>
+    <span class="macro">semigroup_tests! </span>{
+        test_i8, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, i8
+        test_product_i8, Product(<span class="number">1</span>).combine(<span class="kw-2">&amp;</span>Product(<span class="number">2</span>)) =&gt; Product(<span class="number">2</span>), Product&lt;i8&gt;
+        test_i16, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, i16
+        test_i32, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, i32
+        test_u8, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, u8
+        test_u16, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, u16
+        test_u32, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, u32
+        test_usize, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, usize
+        test_isize, <span class="number">1</span>.combine(<span class="kw-2">&amp;</span><span class="number">2</span>) =&gt; <span class="number">3</span>, isize
+        test_f32, <span class="number">1f32</span>.combine(<span class="kw-2">&amp;</span><span class="number">2f32</span>) =&gt; <span class="number">3f32</span>, f32
+        test_f64, <span class="number">1f64</span>.combine(<span class="kw-2">&amp;</span><span class="number">2f64</span>) =&gt; <span class="number">3f64</span>, f64
+        test_option_i16, <span class="prelude-val">Some</span>(<span class="number">1</span>).combine(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="prelude-ty">Option</span>&lt;i16&gt;
+        test_option_i16_none1, <span class="prelude-val">None</span>.combine(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-ty">Option</span>&lt;i16&gt;
+        test_option_i16_none2, <span class="prelude-val">Some</span>(<span class="number">2</span>).combine(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-ty">Option</span>&lt;i16&gt;
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_string</span>() {
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;Hello&quot;</span>);
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot; world&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="string">&quot;Hello world&quot;</span>)
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_string() {
+        <span class="kw">let </span>v1 = String::from(<span class="string">&quot;Hello&quot;</span>);
+        <span class="kw">let </span>v2 = String::from(<span class="string">&quot; world&quot;</span>);
+        <span class="macro">assert_eq!</span>(v1.combine(<span class="kw-2">&amp;</span>v2), <span class="string">&quot;Hello world&quot;</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_vec_i32</span>() {
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_vec_i32() {
+        <span class="kw">let </span>v1 = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+        <span class="kw">let </span>v2 = <span class="macro">vec!</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>];
+        <span class="macro">assert_eq!</span>(v1.combine(<span class="kw-2">&amp;</span>v2), <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_refcell</span>() {
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">RefCell::new</span>(<span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="ident">RefCell::new</span>(<span class="number">3</span>))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_refcell() {
+        <span class="kw">let </span>v1 = RefCell::new(<span class="number">1</span>);
+        <span class="kw">let </span>v2 = RefCell::new(<span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(v1.combine(<span class="kw-2">&amp;</span>v2), RefCell::new(<span class="number">3</span>))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_hashset</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">v1</span>.<span class="ident">insert</span>(<span class="number">1</span>);
-        <span class="ident">v1</span>.<span class="ident">insert</span>(<span class="number">2</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v1</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="number">3</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">v2</span>.<span class="ident">insert</span>(<span class="number">3</span>);
-        <span class="ident">v2</span>.<span class="ident">insert</span>(<span class="number">4</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">v2</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="number">1</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">1</span>);
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">2</span>);
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">3</span>);
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="ident">expected</span>)
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_hashset() {
+        <span class="kw">let </span><span class="kw-2">mut </span>v1 = HashSet::new();
+        v1.insert(<span class="number">1</span>);
+        v1.insert(<span class="number">2</span>);
+        <span class="macro">assert!</span>(!v1.contains(<span class="kw-2">&amp;</span><span class="number">3</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>v2 = HashSet::new();
+        v2.insert(<span class="number">3</span>);
+        v2.insert(<span class="number">4</span>);
+        <span class="macro">assert!</span>(!v2.contains(<span class="kw-2">&amp;</span><span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = HashSet::new();
+        expected.insert(<span class="number">1</span>);
+        expected.insert(<span class="number">2</span>);
+        expected.insert(<span class="number">3</span>);
+        expected.insert(<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(v1.combine(<span class="kw-2">&amp;</span>v2), expected)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_tuple</span>() {
-        <span class="kw">let</span> <span class="ident">t1</span> <span class="op">=</span> (<span class="number">1</span>, <span class="number">2.5f32</span>, <span class="ident">String::from</span>(<span class="string">&quot;hi&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">t2</span> <span class="op">=</span> (<span class="number">1</span>, <span class="number">2.5f32</span>, <span class="ident">String::from</span>(<span class="string">&quot; world&quot;</span>), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_tuple() {
+        <span class="kw">let </span>t1 = (<span class="number">1</span>, <span class="number">2.5f32</span>, String::from(<span class="string">&quot;hi&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="kw">let </span>t2 = (<span class="number">1</span>, <span class="number">2.5f32</span>, String::from(<span class="string">&quot; world&quot;</span>), <span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="number">2</span>, <span class="number">5.0f32</span>, <span class="ident">String::from</span>(<span class="string">&quot;hi world&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="kw">let </span>expected = (<span class="number">2</span>, <span class="number">5.0f32</span>, String::from(<span class="string">&quot;hi world&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">t1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">t2</span>), <span class="ident">expected</span>)
+        <span class="macro">assert_eq!</span>(t1.combine(<span class="kw-2">&amp;</span>t2), expected)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_max</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Max</span>(<span class="number">1</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">Max</span>(<span class="number">2</span>)), <span class="ident">Max</span>(<span class="number">2</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_max() {
+        <span class="macro">assert_eq!</span>(Max(<span class="number">1</span>).combine(<span class="kw-2">&amp;</span>Max(<span class="number">2</span>)), Max(<span class="number">2</span>));
 
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> [<span class="ident">Max</span>(<span class="number">1</span>), <span class="ident">Max</span>(<span class="number">2</span>), <span class="ident">Max</span>(<span class="number">3</span>)];
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_all_option</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>), <span class="prelude-val">Some</span>(<span class="ident">Max</span>(<span class="number">3</span>)));
+        <span class="kw">let </span>v = [Max(<span class="number">1</span>), Max(<span class="number">2</span>), Max(<span class="number">3</span>)];
+        <span class="macro">assert_eq!</span>(combine_all_option(<span class="kw-2">&amp;</span>v), <span class="prelude-val">Some</span>(Max(<span class="number">3</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_min</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Min</span>(<span class="number">1</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">Min</span>(<span class="number">2</span>)), <span class="ident">Min</span>(<span class="number">1</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_min() {
+        <span class="macro">assert_eq!</span>(Min(<span class="number">1</span>).combine(<span class="kw-2">&amp;</span>Min(<span class="number">2</span>)), Min(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> [<span class="ident">Min</span>(<span class="number">1</span>), <span class="ident">Min</span>(<span class="number">2</span>), <span class="ident">Min</span>(<span class="number">3</span>)];
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_all_option</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>), <span class="prelude-val">Some</span>(<span class="ident">Min</span>(<span class="number">1</span>)));
+        <span class="kw">let </span>v = [Min(<span class="number">1</span>), Min(<span class="number">2</span>), Min(<span class="number">3</span>)];
+        <span class="macro">assert_eq!</span>(combine_all_option(<span class="kw-2">&amp;</span>v), <span class="prelude-val">Some</span>(Min(<span class="number">1</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_all</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">All</span>(<span class="number">3</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">All</span>(<span class="number">5</span>)), <span class="ident">All</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">All</span>(<span class="bool-val">true</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">All</span>(<span class="bool-val">false</span>)), <span class="ident">All</span>(<span class="bool-val">false</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_all() {
+        <span class="macro">assert_eq!</span>(All(<span class="number">3</span>).combine(<span class="kw-2">&amp;</span>All(<span class="number">5</span>)), All(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(All(<span class="bool-val">true</span>).combine(<span class="kw-2">&amp;</span>All(<span class="bool-val">false</span>)), All(<span class="bool-val">false</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_any</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Any</span>(<span class="number">3</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">Any</span>(<span class="number">5</span>)), <span class="ident">Any</span>(<span class="number">7</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Any</span>(<span class="bool-val">true</span>).<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">Any</span>(<span class="bool-val">false</span>)), <span class="ident">Any</span>(<span class="bool-val">true</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_any() {
+        <span class="macro">assert_eq!</span>(Any(<span class="number">3</span>).combine(<span class="kw-2">&amp;</span>Any(<span class="number">5</span>)), Any(<span class="number">7</span>));
+        <span class="macro">assert_eq!</span>(Any(<span class="bool-val">true</span>).combine(<span class="kw-2">&amp;</span>Any(<span class="bool-val">false</span>)), Any(<span class="bool-val">true</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_hashmap</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v1</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">v1</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="ident">v1</span>.<span class="ident">insert</span>(<span class="number">2</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Goodbye&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="ident">v1</span>.<span class="ident">insert</span>(<span class="number">4</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v2</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">v2</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot; World&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="ident">v2</span>.<span class="ident">insert</span>(<span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Nope&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Hello World&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">2</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Goodbye&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="ident">expected</span>.<span class="ident">insert</span>(<span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Nope&quot;</span>.<span class="ident">to_owned</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="ident">expected</span>)
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_hashmap() {
+        <span class="kw">let </span><span class="kw-2">mut </span>v1: HashMap&lt;i32, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; = HashMap::new();
+        v1.insert(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Hello&quot;</span>.to_owned()));
+        v1.insert(<span class="number">2</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Goodbye&quot;</span>.to_owned()));
+        v1.insert(<span class="number">4</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>v2: HashMap&lt;i32, <span class="prelude-ty">Option</span>&lt;String&gt;&gt; = HashMap::new();
+        v2.insert(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot; World&quot;</span>.to_owned()));
+        v2.insert(<span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Nope&quot;</span>.to_owned()));
+        <span class="kw">let </span><span class="kw-2">mut </span>expected = HashMap::new();
+        expected.insert(<span class="number">1</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Hello World&quot;</span>.to_owned()));
+        expected.insert(<span class="number">2</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Goodbye&quot;</span>.to_owned()));
+        expected.insert(<span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;Nope&quot;</span>.to_owned()));
+        <span class="macro">assert_eq!</span>(v1.combine(<span class="kw-2">&amp;</span>v2), expected)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_combine_all_option</span>() {
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_all_option</span>(<span class="kw-2">&amp;</span><span class="ident">v1</span>), <span class="prelude-val">Some</span>(<span class="number">6</span>));
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> [<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>)];
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_all_option</span>(<span class="kw-2">&amp;</span><span class="ident">v2</span>), <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_combine_all_option() {
+        <span class="kw">let </span>v1 = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+        <span class="macro">assert_eq!</span>(combine_all_option(<span class="kw-2">&amp;</span>v1), <span class="prelude-val">Some</span>(<span class="number">6</span>));
+        <span class="kw">let </span>v2 = [<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>)];
+        <span class="macro">assert_eq!</span>(combine_all_option(<span class="kw-2">&amp;</span>v2), <span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="number">6</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_combine_n</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_n</span>(<span class="kw-2">&amp;</span><span class="number">1</span>, <span class="number">3</span>), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_n</span>(<span class="kw-2">&amp;</span><span class="number">2</span>, <span class="number">1</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">combine_n</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="number">8</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_combine_n() {
+        <span class="macro">assert_eq!</span>(combine_n(<span class="kw-2">&amp;</span><span class="number">1</span>, <span class="number">3</span>), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(combine_n(<span class="kw-2">&amp;</span><span class="number">2</span>, <span class="number">1</span>), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(combine_n(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="number">4</span>), <span class="prelude-val">Some</span>(<span class="number">8</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_combine_hlist</span>() {
-        <span class="kw">let</span> <span class="ident">h1</span> <span class="op">=</span> <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="number">3.3</span>, <span class="number">53i64</span>, <span class="string">&quot;hello&quot;</span>.<span class="ident">to_owned</span>()];
-        <span class="kw">let</span> <span class="ident">h2</span> <span class="op">=</span> <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="number">1.2</span>, <span class="number">1i64</span>, <span class="string">&quot; world&quot;</span>.<span class="ident">to_owned</span>()];
-        <span class="kw">let</span> <span class="ident">h3</span> <span class="op">=</span> <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="number">4.5</span>, <span class="number">54</span>, <span class="string">&quot;hello world&quot;</span>.<span class="ident">to_owned</span>()];
-        <span class="macro">assert_eq!</span>(<span class="ident">h1</span>.<span class="ident">combine</span>(<span class="kw-2">&amp;</span><span class="ident">h2</span>), <span class="ident">h3</span>)
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_combine_hlist() {
+        <span class="kw">let </span>h1 = <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="number">3.3</span>, <span class="number">53i64</span>, <span class="string">&quot;hello&quot;</span>.to_owned()];
+        <span class="kw">let </span>h2 = <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="number">1.2</span>, <span class="number">1i64</span>, <span class="string">&quot; world&quot;</span>.to_owned()];
+        <span class="kw">let </span>h3 = <span class="macro">hlist!</span>[<span class="prelude-val">Some</span>(<span class="number">3</span>), <span class="number">4.5</span>, <span class="number">54</span>, <span class="string">&quot;hello world&quot;</span>.to_owned()];
+        <span class="macro">assert_eq!</span>(h1.combine(<span class="kw-2">&amp;</span>h2), h3)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

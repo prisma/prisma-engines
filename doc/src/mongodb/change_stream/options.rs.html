@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/change_stream/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -151,158 +151,158 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains options for ChangeStreams.</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">serde_with::skip_serializing_none</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="kw">use</span> <span class="ident">typed_builder::TypedBuilder</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Contains options for ChangeStreams.
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>serde_with::skip_serializing_none;
+<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>typed_builder::TypedBuilder;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::Timestamp</span>,
-    <span class="ident">change_stream::event::ResumeToken</span>,
-    <span class="ident">collation::Collation</span>,
-    <span class="ident">concern::ReadConcern</span>,
-    <span class="ident">options::AggregateOptions</span>,
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
+<span class="kw">use crate</span>::{
+    bson::Timestamp,
+    change_stream::event::ResumeToken,
+    collation::Collation,
+    concern::ReadConcern,
+    options::AggregateOptions,
+    selection_criteria::SelectionCriteria,
 };
 
-<span class="doccomment">/// These are the valid options that can be passed to the `watch` method for creating a</span>
-<span class="doccomment">/// [`ChangeStream`](crate::change_stream::ChangeStream).</span>
-<span class="attribute">#[<span class="ident">skip_serializing_none</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">TypedBuilder</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeStreamOptions</span> {
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="doccomment">/// Configures how the</span>
-    <span class="doccomment">/// [`ChangeStreamEvent::full_document`](crate::change_stream::event::ChangeStreamEvent::full_document)</span>
-    <span class="doccomment">/// field will be populated. By default, the field will be empty for updates.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">full_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FullDocumentType</span><span class="op">&gt;</span>,
+<span class="doccomment">/// These are the valid options that can be passed to the `watch` method for creating a
+/// [`ChangeStream`](crate::change_stream::ChangeStream).
+</span><span class="attribute">#[skip_serializing_none]
+#[derive(Clone, Debug, Default, Deserialize, Serialize, TypedBuilder)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ChangeStreamOptions {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="doccomment">/// Configures how the
+    /// [`ChangeStreamEvent::full_document`](crate::change_stream::event::ChangeStreamEvent::full_document)
+    /// field will be populated. By default, the field will be empty for updates.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>full_document: <span class="prelude-ty">Option</span>&lt;FullDocumentType&gt;,
 
-    <span class="doccomment">/// Configures how the</span>
-    <span class="doccomment">/// [`ChangeStreamEvent::full_document_before_change`](</span>
-    <span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field will be</span>
-    <span class="doccomment">/// populated.  By default, the field will be empty for updates.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">full_document_before_change</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FullDocumentBeforeChangeType</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Configures how the
+    /// [`ChangeStreamEvent::full_document_before_change`](
+    /// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field will be
+    /// populated.  By default, the field will be empty for updates.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>full_document_before_change: <span class="prelude-ty">Option</span>&lt;FullDocumentBeforeChangeType&gt;,
 
-    <span class="doccomment">/// Specifies the logical starting point for the new change stream. Note that if a watched</span>
-    <span class="doccomment">/// collection is dropped and recreated or newly renamed, `start_after` should be set instead.</span>
-    <span class="doccomment">/// `resume_after` and `start_after` cannot be set simultaneously.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For more information on resuming a change stream see the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-after)</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">resume_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies the logical starting point for the new change stream. Note that if a watched
+    /// collection is dropped and recreated or newly renamed, `start_after` should be set instead.
+    /// `resume_after` and `start_after` cannot be set simultaneously.
+    ///
+    /// For more information on resuming a change stream see the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/#change-stream-resume-after)
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>resume_after: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
 
-    <span class="doccomment">/// The change stream will only provide changes that occurred at or after the specified</span>
-    <span class="doccomment">/// timestamp. Any command run against the server will return an operation time that can be</span>
-    <span class="doccomment">/// used here.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">start_at_operation_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The change stream will only provide changes that occurred at or after the specified
+    /// timestamp. Any command run against the server will return an operation time that can be
+    /// used here.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>start_at_operation_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
 
-    <span class="doccomment">/// Takes a resume token and starts a new change stream returning the first notification after</span>
-    <span class="doccomment">/// the token. This will allow users to watch collections that have been dropped and</span>
-    <span class="doccomment">/// recreated or newly renamed collections without missing any notifications.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This feature is only available on MongoDB 4.2+.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/master/changeStreams/#change-stream-start-after) for more</span>
-    <span class="doccomment">/// information.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">start_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Takes a resume token and starts a new change stream returning the first notification after
+    /// the token. This will allow users to watch collections that have been dropped and
+    /// recreated or newly renamed collections without missing any notifications.
+    ///
+    /// This feature is only available on MongoDB 4.2+.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/master/changeStreams/#change-stream-start-after) for more
+    /// information.
+    </span><span class="attribute">#[builder(default)]
+    </span><span class="kw">pub </span>start_after: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
 
-    <span class="doccomment">/// If `true`, the change stream will monitor all changes for the given cluster.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>, <span class="ident">setter</span>(<span class="ident">skip</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">all_changes_for_cluster</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If `true`, the change stream will monitor all changes for the given cluster.
+    </span><span class="attribute">#[builder(default, setter(skip))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) all_changes_for_cluster: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The maximum amount of time for the server to wait on new documents to satisfy a change</span>
-    <span class="doccomment">/// stream query.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max_await_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum amount of time for the server to wait on new documents to satisfy a change
+    /// stream query.
+    </span><span class="attribute">#[builder(default)]
+    #[serde(skip_serializing)]
+    </span><span class="kw">pub </span>max_await_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// The number of documents to return per batch.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">batch_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The number of documents to return per batch.
+    </span><span class="attribute">#[builder(default)]
+    #[serde(skip_serializing)]
+    </span><span class="kw">pub </span>batch_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// Specifies a collation.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Specifies a collation.
+    </span><span class="attribute">#[builder(default)]
+    #[serde(skip_serializing)]
+    </span><span class="kw">pub </span>collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
 
-    <span class="doccomment">/// The read concern to use for the operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If none is specified, the read concern defined on the object executing this operation will</span>
-    <span class="doccomment">/// be used.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">read_concern</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The read concern to use for the operation.
+    ///
+    /// If none is specified, the read concern defined on the object executing this operation will
+    /// be used.
+    </span><span class="attribute">#[builder(default)]
+    #[serde(skip_serializing)]
+    </span><span class="kw">pub </span>read_concern: <span class="prelude-ty">Option</span>&lt;ReadConcern&gt;,
 
-    <span class="doccomment">/// The criteria used to select a server for this operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If none is specified, the selection criteria defined on the object executing this operation</span>
-    <span class="doccomment">/// will be used.</span>
-    <span class="attribute">#[<span class="ident">builder</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">selection_criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The criteria used to select a server for this operation.
+    ///
+    /// If none is specified, the selection criteria defined on the object executing this operation
+    /// will be used.
+    </span><span class="attribute">#[builder(default)]
+    #[serde(skip_serializing)]
+    </span><span class="kw">pub </span>selection_criteria: <span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ChangeStreamOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">aggregate_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AggregateOptions</span> {
-        <span class="ident">AggregateOptions::builder</span>()
-            .<span class="ident">batch_size</span>(<span class="self">self</span>.<span class="ident">batch_size</span>)
-            .<span class="ident">collation</span>(<span class="self">self</span>.<span class="ident">collation</span>.<span class="ident">clone</span>())
-            .<span class="ident">max_await_time</span>(<span class="self">self</span>.<span class="ident">max_await_time</span>)
-            .<span class="ident">read_concern</span>(<span class="self">self</span>.<span class="ident">read_concern</span>.<span class="ident">clone</span>())
-            .<span class="ident">selection_criteria</span>(<span class="self">self</span>.<span class="ident">selection_criteria</span>.<span class="ident">clone</span>())
-            .<span class="ident">build</span>()
+<span class="kw">impl </span>ChangeStreamOptions {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>aggregate_options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AggregateOptions {
+        AggregateOptions::builder()
+            .batch_size(<span class="self">self</span>.batch_size)
+            .collation(<span class="self">self</span>.collation.clone())
+            .max_await_time(<span class="self">self</span>.max_await_time)
+            .read_concern(<span class="self">self</span>.read_concern.clone())
+            .selection_criteria(<span class="self">self</span>.selection_criteria.clone())
+            .build()
     }
 }
 
-<span class="doccomment">/// Describes the modes for configuring the</span>
-<span class="doccomment">/// [`ChangeStreamEvent::full_document`](</span>
-<span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document) field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FullDocumentType</span> {
-    <span class="doccomment">/// The field will be populated with a copy of the entire document that was updated.</span>
-    <span class="ident">UpdateLookup</span>,
+<span class="doccomment">/// Describes the modes for configuring the
+/// [`ChangeStreamEvent::full_document`](
+/// crate::change_stream::event::ChangeStreamEvent::full_document) field.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>FullDocumentType {
+    <span class="doccomment">/// The field will be populated with a copy of the entire document that was updated.
+    </span>UpdateLookup,
 
-    <span class="doccomment">/// The field will be populated for replace and update change events if the post-image for this</span>
-    <span class="doccomment">/// event is available.</span>
-    <span class="ident">WhenAvailable</span>,
+    <span class="doccomment">/// The field will be populated for replace and update change events if the post-image for this
+    /// event is available.
+    </span>WhenAvailable,
 
-    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the post-image is</span>
-    <span class="doccomment">/// not available.</span>
-    <span class="ident">Required</span>,
+    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the post-image is
+    /// not available.
+    </span>Required,
 
-    <span class="doccomment">/// User-defined other types for forward compatibility.</span>
-    <span class="ident">Other</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// User-defined other types for forward compatibility.
+    </span>Other(String),
 }
 
-<span class="doccomment">/// Describes the modes for configuring the</span>
-<span class="doccomment">/// [`ChangeStreamEvent::full_document_before_change`](</span>
-<span class="doccomment">/// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FullDocumentBeforeChangeType</span> {
-    <span class="doccomment">/// The field will be populated for replace, update, and delete change events if the pre-image</span>
-    <span class="doccomment">/// for this event is available.</span>
-    <span class="ident">WhenAvailable</span>,
+<span class="doccomment">/// Describes the modes for configuring the
+/// [`ChangeStreamEvent::full_document_before_change`](
+/// crate::change_stream::event::ChangeStreamEvent::full_document_before_change) field.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>FullDocumentBeforeChangeType {
+    <span class="doccomment">/// The field will be populated for replace, update, and delete change events if the pre-image
+    /// for this event is available.
+    </span>WhenAvailable,
 
-    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the pre-image is</span>
-    <span class="doccomment">/// not available.</span>
-    <span class="ident">Required</span>,
+    <span class="doccomment">/// The same behavior as `WhenAvailable` except that an error is raised if the pre-image is
+    /// not available.
+    </span>Required,
 
-    <span class="doccomment">/// Do not send a value.</span>
-    <span class="ident">Off</span>,
+    <span class="doccomment">/// Do not send a value.
+    </span>Off,
 
-    <span class="doccomment">/// User-defined other types for forward compatibility.</span>
-    <span class="ident">Other</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// User-defined other types for forward compatibility.
+    </span>Other(String),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

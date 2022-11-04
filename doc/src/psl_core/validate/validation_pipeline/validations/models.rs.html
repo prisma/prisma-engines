@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/models.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>models.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -410,417 +410,417 @@
 <span id="410">410</span>
 <span id="411">411</span>
 <span id="412">412</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>},
-    <span class="ident">diagnostics::DatamodelError</span>,
-    <span class="ident">parser_database::ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">validate::validation_pipeline::context::Context</span>,
-    <span class="ident">PreviewFeature</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::database_name::validate_db_name;
+<span class="kw">use crate</span>::{
+    ast,
+    datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, ConnectorCapability},
+    diagnostics::DatamodelError,
+    parser_database::ast::{WithName, WithSpan},
+    validate::validation_pipeline::context::Context,
+    PreviewFeature,
 };
-<span class="kw">use</span> <span class="ident">parser_database::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">PrimaryKeyWalker</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::HashMap</span>};
+<span class="kw">use </span>parser_database::walkers::{ModelWalker, PrimaryKeyWalker};
+<span class="kw">use </span>std::{borrow::Cow, collections::HashMap};
 
-<span class="doccomment">/// A model must have either a primary key, or a unique criteria</span>
-<span class="doccomment">/// with no optional, commented-out or unsupported fields.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_strict_unique_criteria</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">is_ignored</span>() {
+<span class="doccomment">/// A model must have either a primary key, or a unique criteria
+/// with no optional, commented-out or unsupported fields.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_strict_unique_criteria(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>model.is_ignored() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">strict_criteria</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">unique_criterias</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_strict_criteria</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">has_unsupported_fields</span>());
+    <span class="kw">let </span>strict_criteria = model
+        .unique_criterias()
+        .find(|c| c.is_strict_criteria() &amp;&amp; !c.has_unsupported_fields());
 
-    <span class="kw">if</span> <span class="ident">strict_criteria</span>.<span class="ident">is_some</span>() {
+    <span class="kw">if </span>strict_criteria.is_some() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">loose_criterias</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">unique_criterias</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>());
-            <span class="macro">format!</span>(<span class="string">&quot;- {}&quot;</span>, <span class="ident">field_names</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+    <span class="kw">let </span><span class="kw-2">mut </span>loose_criterias = model
+        .unique_criterias()
+        .map(|c| {
+            <span class="kw">let </span>field_names = c.fields().map(|c| c.name());
+            <span class="macro">format!</span>(<span class="string">&quot;- {}&quot;</span>, field_names.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>))
         })
-        .<span class="ident">peekable</span>();
+        .peekable();
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span>
+    <span class="kw">let </span>msg =
         <span class="string">&quot;Each model must have at least one unique criteria that has only required fields. Either mark a single field with `@id`, `@unique` or add a multi field criterion with `@@id([])` or `@@unique([])` to the model.&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">loose_criterias</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>msg = <span class="kw">if </span>loose_criterias.peek().is_some() {
+        <span class="kw">let </span>suffix = <span class="macro">format!</span>(
             <span class="string">&quot;The following unique criterias were not considered as they contain fields that are not required:\n{}&quot;</span>,
-            <span class="ident">loose_criterias</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
+            loose_criterias.collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;\n&quot;</span>),
         );
 
-        <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="ident">msg</span>, <span class="ident">suffix</span>))
-    } <span class="kw">else</span> {
-        <span class="ident">Cow::from</span>(<span class="ident">msg</span>)
+        Cow::from(<span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, msg, suffix))
+    } <span class="kw">else </span>{
+        Cow::from(msg)
     };
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-        <span class="ident">msg</span>.<span class="ident">as_ref</span>(),
-        <span class="ident">model</span>.<span class="ident">name</span>(),
-        <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
+    ctx.push_error(DatamodelError::new_model_validation_error(
+        msg.as_ref(),
+        model.name(),
+        model.ast_model().span(),
     ))
 }
 
-<span class="doccomment">/// A primary key name can be unique in different namespaces, depending on a database. Validates</span>
-<span class="doccomment">/// model&#39;s primary key against the database requirements.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_primary_key_name</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">pk</span>, <span class="ident">name</span>): (<span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>
-        .<span class="ident">primary_key</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> (<span class="ident">pk</span>, <span class="ident">name</span>)))
+<span class="doccomment">/// A primary key name can be unique in different namespaces, depending on a database. Validates
+/// model&#39;s primary key against the database requirements.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_unique_primary_key_name(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, names: <span class="kw-2">&amp;</span><span class="kw">super</span>::Names&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(pk, name): (PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;, Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;) = <span class="kw">match </span>model
+        .primary_key()
+        .and_then(|pk| pk.constraint_name(ctx.connector).map(|name| (pk, name)))
     {
-        <span class="prelude-val">Some</span>((<span class="ident">pk</span>, <span class="ident">name</span>)) =&gt; (<span class="ident">pk</span>, <span class="ident">name</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        <span class="prelude-val">Some</span>((pk, name)) =&gt; (pk, name),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="ident">validate_db_name</span>(
-        <span class="ident">model</span>.<span class="ident">name</span>(),
-        <span class="ident">pk</span>.<span class="ident">ast_attribute</span>(),
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>),
-        <span class="ident">ctx</span>,
-        <span class="op">!</span><span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
+    validate_db_name(
+        model.name(),
+        pk.ast_attribute(),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>name),
+        ctx,
+        !pk.is_defined_on_field(),
     );
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">constraint_name_scope_violations</span>(
-        <span class="ident">model</span>.<span class="ident">model_id</span>(),
-        <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintName::PrimaryKey</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-        <span class="ident">ctx</span>,
+    <span class="kw">for </span>violation <span class="kw">in </span>names.constraint_namespace.constraint_name_scope_violations(
+        model.model_id(),
+        <span class="kw">super</span>::constraint_namespace::ConstraintName::PrimaryKey(name.as_ref()),
+        ctx,
     ) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">violation</span>.<span class="ident">description</span>(<span class="ident">model</span>.<span class="ident">name</span>())
+            name,
+            violation.description(model.name())
         );
 
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>
-            .<span class="ident">ast_attribute</span>()
-            .<span class="ident">span_for_argument</span>(<span class="string">&quot;map&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>);
+        <span class="kw">let </span>span = pk
+            .ast_attribute()
+            .span_for_argument(<span class="string">&quot;map&quot;</span>)
+            .unwrap_or_else(|| pk.ast_attribute().span);
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-            <span class="ident">span</span>,
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            pk.attribute_name(),
+            span,
         ));
     }
 }
 
-<span class="doccomment">/// The custom name argument makes its way into the generated client API. Therefore the name argument</span>
-<span class="doccomment">/// needs to be unique per model. It can be found on the primary key or unique indexes.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_custom_primary_key_name_per_model</span>(
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The custom name argument makes its way into the generated client API. Therefore the name argument
+/// needs to be unique per model. It can be found on the primary key or unique indexes.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_unique_custom_primary_key_name_per_model(
+    model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    names: <span class="kw-2">&amp;</span><span class="kw">super</span>::Names&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; <span class="ident">pk</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>pk = <span class="kw">match </span>model.primary_key() {
+        <span class="prelude-val">Some</span>(pk) =&gt; pk,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">name</span>() {
-        <span class="kw">if</span> <span class="ident">names</span>
-            .<span class="ident">constraint_namespace</span>
-            .<span class="ident">local_custom_name_scope_violations</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">name</span>.<span class="ident">as_ref</span>())
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = pk.name() {
+        <span class="kw">if </span>names
+            .constraint_namespace
+            .local_custom_name_scope_violations(model.model_id(), name.as_ref())
         {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">let </span>message = <span class="macro">format!</span>(
                 <span class="string">&quot;The given custom name `{}` has to be unique on the model. Please provide a different name for the `name` argument.&quot;</span>,
-                <span class="ident">name</span>,
+                name,
             );
 
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>
-                .<span class="ident">ast_attribute</span>()
-                .<span class="ident">span_for_argument</span>(<span class="string">&quot;name&quot;</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>);
+            <span class="kw">let </span>span = pk
+                .ast_attribute()
+                .span_for_argument(<span class="string">&quot;name&quot;</span>)
+                .unwrap_or_else(|| pk.ast_attribute().span);
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="kw-2">&amp;</span><span class="ident">message</span>,
-                <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-                <span class="ident">span</span>,
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                <span class="kw-2">&amp;</span>message,
+                pk.attribute_name(),
+                span,
             ));
         }
     }
 }
 
-<span class="doccomment">/// The database must support the primary key length prefix for it to be allowed in the data model.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_length_prefix_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
+<span class="doccomment">/// The database must support the primary key length prefix for it to be allowed in the data model.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_length_prefix_supported(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx
+        .connector
+        .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-        <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">length</span>().<span class="ident">is_some</span>()) {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The length argument is not supported in the primary key with the current connector&quot;</span>;
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+        <span class="kw">if </span>pk.scalar_field_attributes().any(|f| f.length().is_some()) {
+            <span class="kw">let </span>message = <span class="string">&quot;The length argument is not supported in the primary key with the current connector&quot;</span>;
+            <span class="kw">let </span>span = pk.ast_attribute().span;
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="ident">message</span>,
-                <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-                <span class="ident">span</span>,
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                pk.attribute_name(),
+                span,
             ));
         }
     }
 }
 
-<span class="doccomment">/// Not every database is allowing sort definition in the primary key.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_sort_order_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>)
+<span class="doccomment">/// Not every database is allowing sort definition in the primary key.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_sort_order_supported(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx
+        .connector
+        .has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-        <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>()) {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The sort argument is not supported in the primary key with the current connector&quot;</span>;
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+        <span class="kw">if </span>pk.scalar_field_attributes().any(|f| f.sort_order().is_some()) {
+            <span class="kw">let </span>message = <span class="string">&quot;The sort argument is not supported in the primary key with the current connector&quot;</span>;
+            <span class="kw">let </span>span = pk.ast_attribute().span;
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="ident">message</span>,
-                <span class="ident">pk</span>.<span class="ident">attribute_name</span>(),
-                <span class="ident">span</span>,
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
+                pk.attribute_name(),
+                span,
             ));
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">only_one_fulltext_attribute_allowed</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>only_one_fulltext_attribute_allowed(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextIndex</span>) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::FullTextIndex) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultipleFullTextAttributesPerModel</span>)
+    <span class="kw">if </span>ctx
+        .connector
+        .has_capability(ConnectorCapability::MultipleFullTextAttributesPerModel)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">indexes</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">is_fulltext</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>)
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>spans = model
+        .indexes()
+        .filter(|i| i.is_fulltext())
+        .map(|i| i.ast_attribute().span)
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">if</span> <span class="ident">spans</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The current connector only allows one fulltext attribute per model&quot;</span>;
+    <span class="kw">if </span>spans.len() &gt; <span class="number">1 </span>{
+        <span class="kw">for </span>span <span class="kw">in </span>spans {
+            <span class="kw">let </span>message = <span class="string">&quot;The current connector only allows one fulltext attribute per model&quot;</span>;
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="ident">message</span>,
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message,
                 <span class="string">&quot;@@fulltext&quot;</span>,
-                <span class="ident">span</span>,
+                span,
             ));
         }
     }
 }
 
-<span class="doccomment">/// Does the connector support named and compound primary keys at all?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_connector_specific</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-        <span class="ident">pk</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Does the connector support named and compound primary keys at all?
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_connector_specific(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>primary_key = <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+        pk
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="ident">primary_key</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_named_primary_keys</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">if </span>primary_key.mapped_name().is_some() &amp;&amp; !ctx.connector.supports_named_primary_keys() {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="string">&quot;You defined a database name for the primary key on the model. This is not supported by the provider.&quot;</span>,
-            <span class="ident">model</span>.<span class="ident">name</span>(),
-            <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
+            model.name(),
+            model.ast_model().span(),
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">primary_key</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_compound_ids</span>() {
-        <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">if </span>primary_key.fields().len() &gt; <span class="number">1 </span>&amp;&amp; !ctx.connector.supports_compound_ids() {
+        <span class="kw">return </span>ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="string">&quot;The current connector does not support compound ids.&quot;</span>,
-            <span class="ident">model</span>.<span class="ident">name</span>(),
-            <span class="ident">primary_key</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+            model.name(),
+            primary_key.ast_attribute().span,
         ));
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">connector_specific</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">validate_model</span>(<span class="ident">model</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>)
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>connector_specific(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    ctx.connector.validate_model(model, ctx.diagnostics)
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id_has_fields</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() { <span class="ident">id</span> } <span class="kw">else</span> { <span class="kw">return</span> };
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>id_has_fields(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>id = <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = model.primary_key() { id } <span class="kw">else </span>{ <span class="kw">return </span>};
 
-    <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+    <span class="kw">if </span>id.fields().len() &gt; <span class="number">0 </span>{
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
         <span class="string">&quot;The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.&quot;</span>,
-        <span class="ident">id</span>.<span class="ident">attribute_name</span>(),
-        <span class="ident">id</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+        id.attribute_name(),
+        id.ast_attribute().span,
     ))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id_client_name_does_not_clash_with_field</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() { <span class="ident">id</span> } <span class="kw">else</span> { <span class="kw">return</span> };
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>id_client_name_does_not_clash_with_field(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>id = <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = model.primary_key() { id } <span class="kw">else </span>{ <span class="kw">return </span>};
 
-    <span class="comment">// Only compound ids clash.</span>
-    <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="comment">// Only compound ids clash.
+    </span><span class="kw">if </span>id.fields().len() &lt;= <span class="number">1 </span>{
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">id_client_name</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
-    <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">id_client_name</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    <span class="kw">let </span>id_client_name = id.fields().map(|f| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;_&quot;</span>);
+    <span class="kw">if </span>model.scalar_fields().any(|f| f.name() == id_client_name) {
+        ctx.push_error(DatamodelError::new_model_validation_error(
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The field `{id_client_name}` clashes with the `@@id` attribute&#39;s name. Please resolve the conflict by providing a custom id name: `@@id([...], name: \&quot;custom_name\&quot;)`&quot;</span>),
-            <span class="ident">model</span>.<span class="ident">name</span>(),
-            <span class="ident">id</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+            model.name(),
+            id.ast_attribute().span,
         ));
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_is_defined_in_the_datasource</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_is_defined_in_the_datasource(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">datasource</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">ds</span>) =&gt; <span class="ident">ds</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>datasource = <span class="kw">match </span>ctx.datasource {
+        <span class="prelude-val">Some</span>(ds) =&gt; ds,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">let</span> (<span class="ident">schema_name</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">schema</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">tuple</span>) =&gt; <span class="ident">tuple</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>(schema_name, span) = <span class="kw">match </span>model.schema() {
+        <span class="prelude-val">Some</span>(tuple) =&gt; tuple,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">datasource</span>.<span class="ident">has_schema</span>(<span class="ident">schema_name</span>) {
+    <span class="kw">if </span>datasource.has_schema(schema_name) {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;This schema is not defined in the datasource. Read more on `@@schema` at https://pris.ly/d/multi-schema&quot;</span>,
-        <span class="ident">span</span>,
+        span,
     ))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_attribute_supported_in_connector</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_attribute_supported_in_connector(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">schema</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">tuple</span>) =&gt; <span class="ident">tuple</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>(<span class="kw">_</span>, span) = <span class="kw">match </span>model.schema() {
+        <span class="prelude-val">Some</span>(tuple) =&gt; tuple,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;@@schema is not supported on the current datasource provider&quot;</span>,
-        <span class="ident">span</span>,
+        span,
     ));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">schema_attribute_missing</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>schema_attribute_missing(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::MultiSchema</span>) {
+    <span class="kw">if </span>!ctx.connector.has_capability(ConnectorCapability::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">db</span>
-        .<span class="ident">schema_flags</span>()
-        .<span class="ident">contains</span>(<span class="ident">parser_database::SchemaFlags::UsesSchemaAttribute</span>)
+    <span class="kw">if </span>!ctx
+        .db
+        .schema_flags()
+        .contains(parser_database::SchemaFlags::UsesSchemaAttribute)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">is_provider</span>(<span class="string">&quot;mysql&quot;</span>) {
+    <span class="kw">if </span>ctx.connector.is_provider(<span class="string">&quot;mysql&quot;</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">schema</span>().<span class="ident">is_some</span>() {
+    <span class="kw">if </span>model.schema().is_some() {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    ctx.push_error(DatamodelError::new_static(
         <span class="string">&quot;This model is missing an `@@schema` attribute.&quot;</span>,
-        <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>(),
+        model.ast_model().span(),
     ))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">database_name_clashes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="comment">// (schema_name, model_database_name) -&gt; ModelId</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">database_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">ast::ModelId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::with_capacity</span>(<span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">models_count</span>());
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>database_name_clashes(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="comment">// (schema_name, model_database_name) -&gt; ModelId
+    </span><span class="kw">let </span><span class="kw-2">mut </span>database_names: HashMap&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="kw-2">&amp;</span>str), ast::ModelId&gt; = HashMap::with_capacity(ctx.db.models_count());
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> (<span class="ident">model</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">name</span>), <span class="ident">model</span>.<span class="ident">database_name</span>());
-        <span class="kw">match</span> <span class="ident">database_names</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">model</span>.<span class="ident">model_id</span>()) {
-            <span class="comment">// Two branches because we want to put the error on the @@map attribute, and it can be</span>
-            <span class="comment">// on either model.</span>
-            <span class="prelude-val">Some</span>(<span class="ident">existing</span>) <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">existing_model_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">existing</span>].<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="ident">model</span>
-                    .<span class="ident">ast_model</span>()
-                    .<span class="ident">attributes</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;map&quot;</span>)
-                    .<span class="ident">unwrap</span>();
+    <span class="kw">for </span>model <span class="kw">in </span>ctx.db.walk_models() {
+        <span class="kw">let </span>key = (model.schema().map(|(name, <span class="kw">_</span>)| name), model.database_name());
+        <span class="kw">match </span>database_names.insert(key, model.model_id()) {
+            <span class="comment">// Two branches because we want to put the error on the @@map attribute, and it can be
+            // on either model.
+            </span><span class="prelude-val">Some</span>(existing) <span class="kw">if </span>model.mapped_name().is_some() =&gt; {
+                <span class="kw">let </span>existing_model_name = <span class="kw-2">&amp;</span>ctx.db.ast()[existing].name();
+                <span class="kw">let </span>attribute = model
+                    .ast_model()
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name() == <span class="string">&quot;map&quot;</span>)
+                    .unwrap();
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_model_database_name_error</span>(
-                    <span class="ident">model</span>.<span class="ident">database_name</span>(),
-                    <span class="ident">existing_model_name</span>,
-                    <span class="ident">attribute</span>.<span class="ident">span</span>(),
+                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                    model.database_name(),
+                    existing_model_name,
+                    attribute.span(),
                 ));
             }
-            <span class="prelude-val">Some</span>(<span class="ident">existing</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">existing_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">existing</span>];
-                <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="ident">existing_model</span>
-                    .<span class="ident">attributes</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;map&quot;</span>)
-                    .<span class="ident">unwrap</span>();
+            <span class="prelude-val">Some</span>(existing) =&gt; {
+                <span class="kw">let </span>existing_model = <span class="kw-2">&amp;</span>ctx.db.ast()[existing];
+                <span class="kw">let </span>attribute = existing_model
+                    .attributes
+                    .iter()
+                    .find(|attr| attr.name() == <span class="string">&quot;map&quot;</span>)
+                    .unwrap();
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_model_database_name_error</span>(
-                    <span class="ident">model</span>.<span class="ident">database_name</span>(),
-                    <span class="ident">model</span>.<span class="ident">name</span>(),
-                    <span class="ident">attribute</span>.<span class="ident">span</span>(),
+                ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
+                    model.database_name(),
+                    model.name(),
+                    attribute.span(),
                 ));
             }
-            <span class="prelude-val">None</span> =&gt; (),
+            <span class="prelude-val">None </span>=&gt; (),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">multischema_feature_flag_needed</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident"><span class="kw">crate</span>::PreviewFeature::MultiSchema</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>multischema_feature_flag_needed(model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx.preview_features.contains(<span class="kw">crate</span>::PreviewFeature::MultiSchema) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">schema</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, span)) = model.schema() {
+        ctx.push_error(DatamodelError::new_static(
             <span class="string">&quot;@@schema is only available with the `multiSchema` preview feature.&quot;</span>,
-            <span class="ident">span</span>,
+            span,
         ));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

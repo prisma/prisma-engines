@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../hyper/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -69,76 +69,76 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Pieces pertaining to the HTTP message protocol.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Pieces pertaining to the HTTP message protocol.
 
-<span class="macro">cfg_feature!</span> {
-    <span class="attribute">#![<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>]</span>
+</span><span class="macro">cfg_feature! </span>{
+    <span class="attribute">#![feature = <span class="string">&quot;http1&quot;</span>]
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">h1</span>;
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>h1;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::h1::Conn</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::h1::Conn;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::h1::dispatch</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::h1::ServerTransaction</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::h1::dispatch;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="self">self</span>::h1::ServerTransaction;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">h2</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http2&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>h2;
 
-<span class="doccomment">/// An Incoming Message head. Includes request/status line, and headers.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// HTTP version of the message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">version</span>: <span class="ident">http::Version</span>,
-    <span class="doccomment">/// Subject (request line or status line) of Incoming message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">subject</span>: <span class="ident">S</span>,
-    <span class="doccomment">/// Headers of the Incoming message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">headers</span>: <span class="ident">http::HeaderMap</span>,
-    <span class="doccomment">/// Extensions.</span>
-    <span class="ident">extensions</span>: <span class="ident">http::Extensions</span>,
+<span class="doccomment">/// An Incoming Message head. Includes request/status line, and headers.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MessageHead&lt;S&gt; {
+    <span class="doccomment">/// HTTP version of the message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) version: http::Version,
+    <span class="doccomment">/// Subject (request line or status line) of Incoming message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) subject: S,
+    <span class="doccomment">/// Headers of the Incoming message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) headers: http::HeaderMap,
+    <span class="doccomment">/// Extensions.
+    </span>extensions: http::Extensions,
 }
 
-<span class="doccomment">/// An incoming request message.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">RequestHead</span> <span class="op">=</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">RequestLine</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An incoming request message.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>RequestHead = MessageHead&lt;RequestLine&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RequestLine</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http::Method</span>, <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http::Uri</span>);
+<span class="attribute">#[derive(Debug, Default, PartialEq)]
+#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RequestLine(<span class="kw">pub</span>(<span class="kw">crate</span>) http::Method, <span class="kw">pub</span>(<span class="kw">crate</span>) http::Uri);
 
-<span class="doccomment">/// An incoming response message.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">ResponseHead</span> <span class="op">=</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">http::StatusCode</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An incoming response message.
+</span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;http1&quot;</span>, feature = <span class="string">&quot;client&quot;</span>))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ResponseHead = MessageHead&lt;http::StatusCode&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">BodyLength</span> {
-    <span class="doccomment">/// Content-Length</span>
-    <span class="ident">Known</span>(<span class="ident">u64</span>),
-    <span class="doccomment">/// Transfer-Encoding: chunked (if h1)</span>
-    <span class="ident">Unknown</span>,
+<span class="attribute">#[derive(Debug)]
+#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>BodyLength {
+    <span class="doccomment">/// Content-Length
+    </span>Known(u64),
+    <span class="doccomment">/// Transfer-Encoding: chunked (if h1)
+    </span>Unknown,
 }
 
-<span class="doccomment">/// Status of when a Disaptcher future completes.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Dispatched</span> {
-    <span class="doccomment">/// Dispatcher completely shutdown connection.</span>
-    <span class="ident">Shutdown</span>,
-    <span class="doccomment">/// Dispatcher has pending upgrade, and so did not shutdown.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
-    <span class="ident">Upgrade</span>(<span class="ident"><span class="kw">crate</span>::upgrade::Pending</span>),
+<span class="doccomment">/// Status of when a Disaptcher future completes.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Dispatched {
+    <span class="doccomment">/// Dispatcher completely shutdown connection.
+    </span>Shutdown,
+    <span class="doccomment">/// Dispatcher has pending upgrade, and so did not shutdown.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http1&quot;</span>)]
+    </span>Upgrade(<span class="kw">crate</span>::upgrade::Pending),
 }
 
-<span class="kw">impl</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">http::StatusCode</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">body</span>: <span class="ident">B</span>) -&gt; <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">http::Response::new</span>(<span class="ident">body</span>);
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">status_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">subject</span>;
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">headers_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">headers</span>;
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">version_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>;
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">extensions_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">extensions</span>;
-        <span class="ident">res</span>
+<span class="kw">impl </span>MessageHead&lt;http::StatusCode&gt; {
+    <span class="kw">fn </span>into_response&lt;B&gt;(<span class="self">self</span>, body: B) -&gt; http::Response&lt;B&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>res = http::Response::new(body);
+        <span class="kw-2">*</span>res.status_mut() = <span class="self">self</span>.subject;
+        <span class="kw-2">*</span>res.headers_mut() = <span class="self">self</span>.headers;
+        <span class="kw-2">*</span>res.version_mut() = <span class="self">self</span>.version;
+        <span class="kw-2">*</span>res.extensions_mut() = <span class="self">self</span>.extensions;
+        res
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

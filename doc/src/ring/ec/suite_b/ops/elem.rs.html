@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ops/elem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ops/elem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>elem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -118,125 +118,125 @@
 <span id="118">118</span>
 <span id="119">119</span>
 <span id="120">120</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2017 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">arithmetic::montgomery</span>::{<span class="ident">Encoding</span>, <span class="ident">ProductEncoding</span>},
-    <span class="ident">limb</span>::{<span class="ident">Limb</span>, <span class="ident">LIMB_BITS</span>},
+</span><span class="kw">use crate</span>::{
+    arithmetic::montgomery::{Encoding, ProductEncoding},
+    limb::{Limb, LIMB_BITS},
 };
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use </span>core::marker::PhantomData;
 
-<span class="doccomment">/// Elements of ℤ/mℤ for some modulus *m*. Elements are always fully reduced</span>
-<span class="doccomment">/// with respect to *m*; i.e. the 0 &lt;= x &lt; m for every value x.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span> {
-    <span class="comment">// XXX: pub</span>
-    <span class="kw">pub</span> <span class="ident">limbs</span>: [<span class="ident">Limb</span>; <span class="ident">MAX_LIMBS</span>],
+<span class="doccomment">/// Elements of ℤ/mℤ for some modulus *m*. Elements are always fully reduced
+/// with respect to *m*; i.e. the 0 &lt;= x &lt; m for every value x.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Elem&lt;M, E: Encoding&gt; {
+    <span class="comment">// XXX: pub
+    </span><span class="kw">pub </span>limbs: [Limb; MAX_LIMBS],
 
-    <span class="doccomment">/// The modulus *m* for the ring ℤ/mℤ for which this element is a value.</span>
-    <span class="kw">pub</span> <span class="ident">m</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The modulus *m* for the ring ℤ/mℤ for which this element is a value.
+    </span><span class="kw">pub </span>m: PhantomData&lt;M&gt;,
 
-    <span class="doccomment">/// The number of Montgomery factors that need to be canceled out from</span>
-    <span class="doccomment">/// `value` to get the actual value.</span>
-    <span class="kw">pub</span> <span class="ident">encoding</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The number of Montgomery factors that need to be canceled out from
+    /// `value` to get the actual value.
+    </span><span class="kw">pub </span>encoding: PhantomData&lt;E&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="comment">// There&#39;s no need to convert `value` to the Montgomery domain since</span>
-    <span class="comment">// 0 * R**2 (mod m) == 0, so neither the modulus nor the encoding are needed</span>
-    <span class="comment">// as inputs for constructing a zero-valued element.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
-            <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-            <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;M, E: Encoding&gt; Elem&lt;M, E&gt; {
+    <span class="comment">// There&#39;s no need to convert `value` to the Montgomery domain since
+    // 0 * R**2 (mod m) == 0, so neither the modulus nor the encoding are needed
+    // as inputs for constructing a zero-valued element.
+    </span><span class="kw">pub fn </span>zero() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            limbs: [<span class="number">0</span>; MAX_LIMBS],
+            m: PhantomData,
+            encoding: PhantomData,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_mont</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span>: <span class="ident">Encoding</span>, <span class="ident">EB</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span><span class="op">&gt;</span>,
-    <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EB</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="op">&lt;</span>(<span class="ident">EA</span>, <span class="ident">EB</span>) <span class="kw">as</span> <span class="ident">ProductEncoding</span><span class="op">&gt;</span><span class="ident">::Output</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    (<span class="ident">EA</span>, <span class="ident">EB</span>): <span class="ident">ProductEncoding</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>mul_mont&lt;M, EA: Encoding, EB: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb, b: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;</span>Elem&lt;M, EA&gt;,
+    b: <span class="kw-2">&amp;</span>Elem&lt;M, EB&gt;,
+) -&gt; Elem&lt;M, &lt;(EA, EB) <span class="kw">as </span>ProductEncoding&gt;::Output&gt;
+<span class="kw">where
+    </span>(EA, EB): ProductEncoding,
 {
-    <span class="ident">binary_op</span>(<span class="ident">f</span>, <span class="ident">a</span>, <span class="ident">b</span>)
+    binary_op(f, a, b)
 }
 
-<span class="comment">// let r = f(a, b); return r;</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binary_op</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span>: <span class="ident">Encoding</span>, <span class="ident">EB</span>: <span class="ident">Encoding</span>, <span class="ident">ER</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span><span class="op">&gt;</span>,
-    <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EB</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">ER</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+<span class="comment">// let r = f(a, b); return r;
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>binary_op&lt;M, EA: Encoding, EB: Encoding, ER: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb, b: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;</span>Elem&lt;M, EA&gt;,
+    b: <span class="kw-2">&amp;</span>Elem&lt;M, EB&gt;,
+) -&gt; Elem&lt;M, ER&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>r = Elem {
+        limbs: [<span class="number">0</span>; MAX_LIMBS],
+        m: PhantomData,
+        encoding: PhantomData,
     };
-    <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">r</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(), <span class="ident">b</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>()) }
-    <span class="ident">r</span>
+    <span class="kw">unsafe </span>{ f(r.limbs.as_mut_ptr(), a.limbs.as_ptr(), b.limbs.as_ptr()) }
+    r
 }
 
-<span class="comment">// a := f(a, b);</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">binary_op_assign</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span>: <span class="ident">Encoding</span>, <span class="ident">EB</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EA</span><span class="op">&gt;</span>,
-    <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">EB</span><span class="op">&gt;</span>,
+<span class="comment">// a := f(a, b);
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>binary_op_assign&lt;M, EA: Encoding, EB: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb, b: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;mut </span>Elem&lt;M, EA&gt;,
+    b: <span class="kw-2">&amp;</span>Elem&lt;M, EB&gt;,
 ) {
-    <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(), <span class="ident">b</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>()) }
+    <span class="kw">unsafe </span>{ f(a.limbs.as_mut_ptr(), a.limbs.as_ptr(), b.limbs.as_ptr()) }
 }
 
-<span class="comment">// let r = f(a); return r;</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unary_op</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Elem</span> {
-        <span class="ident">limbs</span>: [<span class="number">0</span>; <span class="ident">MAX_LIMBS</span>],
-        <span class="ident">m</span>: <span class="ident">PhantomData</span>,
-        <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
+<span class="comment">// let r = f(a); return r;
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>unary_op&lt;M, E: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;</span>Elem&lt;M, E&gt;,
+) -&gt; Elem&lt;M, E&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>r = Elem {
+        limbs: [<span class="number">0</span>; MAX_LIMBS],
+        m: PhantomData,
+        encoding: PhantomData,
     };
-    <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">r</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>()) }
-    <span class="ident">r</span>
+    <span class="kw">unsafe </span>{ f(r.limbs.as_mut_ptr(), a.limbs.as_ptr()) }
+    r
 }
 
-<span class="comment">// a := f(a);</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unary_op_assign</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="comment">// a := f(a);
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>unary_op_assign&lt;M, E: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;mut </span>Elem&lt;M, E&gt;,
 ) {
-    <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>()) }
+    <span class="kw">unsafe </span>{ f(a.limbs.as_mut_ptr(), a.limbs.as_ptr()) }
 }
 
-<span class="comment">// a := f(a, a);</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unary_op_from_binary_op_assign</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span>: <span class="ident">Encoding</span><span class="op">&gt;</span>(
-    <span class="ident">f</span>: <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>),
-    <span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="comment">// a := f(a, a);
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>unary_op_from_binary_op_assign&lt;M, E: Encoding&gt;(
+    f: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(r: <span class="kw-2">*mut </span>Limb, a: <span class="kw-2">*const </span>Limb, b: <span class="kw-2">*const </span>Limb),
+    a: <span class="kw-2">&amp;mut </span>Elem&lt;M, E&gt;,
 ) {
-    <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>(), <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">as_ptr</span>()) }
+    <span class="kw">unsafe </span>{ f(a.limbs.as_mut_ptr(), a.limbs.as_ptr(), a.limbs.as_ptr()) }
 }
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_LIMBS</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="number">384</span> <span class="op">+</span> (<span class="ident">LIMB_BITS</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">/</span> <span class="ident">LIMB_BITS</span>;
+<span class="kw">pub const </span>MAX_LIMBS: usize = (<span class="number">384 </span>+ (LIMB_BITS - <span class="number">1</span>)) / LIMB_BITS;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -555,481 +555,481 @@
 <span id="555">555</span>
 <span id="556">556</span>
 <span id="557">557</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">fallible_streaming_iterator::FallibleStreamingIterator</span>;
-<span class="kw">use</span> <span class="ident">std::convert</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>fallible_streaming_iterator::FallibleStreamingIterator;
+<span class="kw">use </span>std::convert;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>, <span class="ident">Statement</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">FromSql</span>, <span class="ident">FromSqlError</span>, <span class="ident">ValueRef</span>};
+<span class="kw">use super</span>::{Error, <span class="prelude-ty">Result</span>, Statement};
+<span class="kw">use </span><span class="kw">crate</span>::types::{FromSql, FromSqlError, ValueRef};
 
-<span class="doccomment">/// An handle for the resulting rows of a query.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;Rows is lazy and will do nothing unless consumed&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">stmt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">row</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An handle for the resulting rows of a query.
+</span><span class="attribute">#[must_use = <span class="string">&quot;Rows is lazy and will do nothing unless consumed&quot;</span>]
+</span><span class="kw">pub struct </span>Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) stmt: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt </span>Statement&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt;,
+    row: <span class="prelude-ty">Option</span>&lt;Row&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stmt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">take</span>() {
-            <span class="ident">stmt</span>.<span class="ident">reset</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(stmt) = <span class="self">self</span>.stmt.take() {
+            stmt.reset();
         }
     }
 
-    <span class="doccomment">/// Attempt to get the next row from the query. Returns `Ok(Some(Row))` if</span>
-    <span class="doccomment">/// there is another row, `Err(...)` if there was an error</span>
-    <span class="doccomment">/// getting the next row, and `Ok(None)` if all rows have been retrieved.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Note</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This interface is not compatible with Rust&#39;s `Iterator` trait, because</span>
-    <span class="doccomment">/// the lifetime of the returned row is tied to the lifetime of `self`.</span>
-    <span class="doccomment">/// This is a fallible &quot;streaming iterator&quot;. For a more natural interface,</span>
-    <span class="doccomment">/// consider using [`query_map`](crate::Statement::query_map) or</span>
-    <span class="doccomment">/// [`query_and_then`](crate::Statement::query_and_then) instead, which</span>
-    <span class="doccomment">/// return types that implement `Iterator`.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span> <span class="comment">// cannot implement Iterator</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">advance</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">get</span>())
+    <span class="doccomment">/// Attempt to get the next row from the query. Returns `Ok(Some(Row))` if
+    /// there is another row, `Err(...)` if there was an error
+    /// getting the next row, and `Ok(None)` if all rows have been retrieved.
+    ///
+    /// ## Note
+    ///
+    /// This interface is not compatible with Rust&#39;s `Iterator` trait, because
+    /// the lifetime of the returned row is tied to the lifetime of `self`.
+    /// This is a fallible &quot;streaming iterator&quot;. For a more natural interface,
+    /// consider using [`query_map`](crate::Statement::query_map) or
+    /// [`query_and_then`](crate::Statement::query_and_then) instead, which
+    /// return types that implement `Iterator`.
+    </span><span class="attribute">#[allow(clippy::should_implement_trait)] </span><span class="comment">// cannot implement Iterator
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.advance()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((<span class="kw-2">*</span><span class="self">self</span>).get())
     }
 
-    <span class="doccomment">/// Map over this `Rows`, converting it to a [`Map`], which</span>
-    <span class="doccomment">/// implements `FallibleIterator`.</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use fallible_iterator::FallibleIterator;</span>
-    <span class="doccomment">/// # use rusqlite::{Result, Statement};</span>
-    <span class="doccomment">/// fn query(stmt: &amp;mut Statement) -&gt; Result&lt;Vec&lt;i64&gt;&gt; {</span>
-    <span class="doccomment">///     let rows = stmt.query([])?;</span>
-    <span class="doccomment">///     rows.map(|r| r.get(0)).collect()</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="comment">// FIXME Hide FallibleStreamingIterator::map</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Map over this `Rows`, converting it to a [`Map`], which
+    /// implements `FallibleIterator`.
+    /// ```rust,no_run
+    /// use fallible_iterator::FallibleIterator;
+    /// # use rusqlite::{Result, Statement};
+    /// fn query(stmt: &amp;mut Statement) -&gt; Result&lt;Vec&lt;i64&gt;&gt; {
+    ///     let rows = stmt.query([])?;
+    ///     rows.map(|r| r.get(0)).collect()
+    /// }
+    /// ```
+    </span><span class="comment">// FIXME Hide FallibleStreamingIterator::map
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>map&lt;F, B&gt;(<span class="self">self</span>, f: F) -&gt; Map&lt;<span class="lifetime">&#39;stmt</span>, F&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;B&gt;,
     {
-        <span class="ident">Map</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">f</span> }
+        Map { rows: <span class="self">self</span>, f }
     }
 
-    <span class="doccomment">/// Map over this `Rows`, converting it to a [`MappedRows`], which</span>
-    <span class="doccomment">/// implements `Iterator`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Map over this `Rows`, converting it to a [`MappedRows`], which
+    /// implements `Iterator`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>mapped&lt;F, B&gt;(<span class="self">self</span>, f: F) -&gt; MappedRows&lt;<span class="lifetime">&#39;stmt</span>, F&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;B&gt;,
     {
-        <span class="ident">MappedRows</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">map</span>: <span class="ident">f</span> }
+        MappedRows { rows: <span class="self">self</span>, map: f }
     }
 
-    <span class="doccomment">/// Map over this `Rows` with a fallible function, converting it to a</span>
-    <span class="doccomment">/// [`AndThenRows`], which implements `Iterator` (instead of</span>
-    <span class="doccomment">/// `FallibleStreamingIterator`).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and_then</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Map over this `Rows` with a fallible function, converting it to a
+    /// [`AndThenRows`], which implements `Iterator` (instead of
+    /// `FallibleStreamingIterator`).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>and_then&lt;F, T, E&gt;(<span class="self">self</span>, f: F) -&gt; AndThenRows&lt;<span class="lifetime">&#39;stmt</span>, F&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
     {
-        <span class="ident">AndThenRows</span> { <span class="ident">rows</span>: <span class="self">self</span>, <span class="ident">map</span>: <span class="ident">f</span> }
+        AndThenRows { rows: <span class="self">self</span>, map: f }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>) -&gt; <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-        <span class="ident">Rows</span> {
-            <span class="ident">stmt</span>: <span class="prelude-val">Some</span>(<span class="ident">stmt</span>),
-            <span class="ident">row</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(stmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt </span>Statement&lt;<span class="lifetime">&#39;stmt</span>&gt;) -&gt; Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+        Rows {
+            stmt: <span class="prelude-val">Some</span>(stmt),
+            row: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_expected_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">row</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">row</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::QueryReturnedNoRows</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">reset</span>();
-    }
-}
-
-<span class="doccomment">/// `F` is used to transform the _streaming_ iterator into a _fallible_</span>
-<span class="doccomment">/// iterator.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">rows</span>: <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>,
-    <span class="ident">f</span>: <span class="ident">F</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-{
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">f</span>)(<span class="ident">v</span>)<span class="question-mark">?</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_expected_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.next()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(row) =&gt; <span class="prelude-val">Ok</span>(row),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::QueryReturnedNoRows),
         }
     }
 }
 
-<span class="doccomment">/// An iterator over the mapped resulting rows of a query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `F` is used to transform the _streaming_ iterator into a _standard_</span>
-<span class="doccomment">/// iterator.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">rows</span>: <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>,
-    <span class="ident">map</span>: <span class="ident">F</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>;
-        <span class="self">self</span>.<span class="ident">rows</span>
-            .<span class="ident">next</span>()
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row_result</span><span class="op">|</span> <span class="ident">row_result</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> (<span class="ident">map</span>)(<span class="kw-2">&amp;</span><span class="ident">row</span>)))
+<span class="kw">impl </span>Drop <span class="kw">for </span>Rows&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.reset();
     }
 }
 
-<span class="doccomment">/// An iterator over the mapped resulting rows of a query, with an Error type</span>
-<span class="doccomment">/// unifying with Error.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="ident">rows</span>: <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>,
-    <span class="ident">map</span>: <span class="ident">F</span>,
+<span class="doccomment">/// `F` is used to transform the _streaming_ iterator into a _fallible_
+/// iterator.
+</span><span class="attribute">#[must_use = <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]
+</span><span class="kw">pub struct </span>Map&lt;<span class="lifetime">&#39;stmt</span>, F&gt; {
+    rows: Rows&lt;<span class="lifetime">&#39;stmt</span>&gt;,
+    f: F,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">convert::From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, B&gt; FallibleIterator <span class="kw">for </span>Map&lt;<span class="lifetime">&#39;_</span>, F&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;B&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Error = Error;
+    <span class="kw">type </span>Item = B;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">map</span>;
-        <span class="self">self</span>.<span class="ident">rows</span>
-            .<span class="ident">next</span>()
-            .<span class="ident">transpose</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row_result</span><span class="op">|</span> <span class="ident">row_result</span>.<span class="ident">map_err</span>(<span class="ident">E::from</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> (<span class="ident">map</span>)(<span class="kw-2">&amp;</span><span class="ident">row</span>)))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;B&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.rows.next()<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(v) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="self">self</span>.f)(v)<span class="question-mark">?</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        }
     }
 }
 
-<span class="doccomment">/// `FallibleStreamingIterator` differs from the standard library&#39;s `Iterator`</span>
-<span class="doccomment">/// in two ways:</span>
-<span class="doccomment">/// * each call to `next` (sqlite3_step) can fail.</span>
-<span class="doccomment">/// * returned `Row` is valid until `next` is called again or `Statement` is</span>
-<span class="doccomment">///   reset or finalized.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While these iterators cannot be used with Rust `for` loops, `while let`</span>
-<span class="doccomment">/// loops offer a similar level of ergonomics:</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// # use rusqlite::{Result, Statement};</span>
-<span class="doccomment">/// fn query(stmt: &amp;mut Statement) -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">///     let mut rows = stmt.query([])?;</span>
-<span class="doccomment">///     while let Some(row) = rows.next()? {</span>
-<span class="doccomment">///         // scan columns value</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">FallibleStreamingIterator</span> <span class="kw">for</span> <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over the mapped resulting rows of a query.
+///
+/// `F` is used to transform the _streaming_ iterator into a _standard_
+/// iterator.
+</span><span class="attribute">#[must_use = <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]
+</span><span class="kw">pub struct </span>MappedRows&lt;<span class="lifetime">&#39;stmt</span>, F&gt; {
+    rows: Rows&lt;<span class="lifetime">&#39;stmt</span>&gt;,
+    map: F,
+}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">stmt</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">stmt</span>) =&gt; <span class="kw">match</span> <span class="ident">stmt</span>.<span class="ident">step</span>() {
+<span class="kw">impl</span>&lt;T, F&gt; Iterator <span class="kw">for </span>MappedRows&lt;<span class="lifetime">&#39;_</span>, F&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt;,
+{
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T&gt;;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;T&gt;&gt; {
+        <span class="kw">let </span>map = <span class="kw-2">&amp;mut </span><span class="self">self</span>.map;
+        <span class="self">self</span>.rows
+            .next()
+            .transpose()
+            .map(|row_result| row_result.and_then(|row| (map)(<span class="kw-2">&amp;</span>row)))
+    }
+}
+
+<span class="doccomment">/// An iterator over the mapped resulting rows of a query, with an Error type
+/// unifying with Error.
+</span><span class="attribute">#[must_use = <span class="string">&quot;iterators are lazy and do nothing unless consumed&quot;</span>]
+</span><span class="kw">pub struct </span>AndThenRows&lt;<span class="lifetime">&#39;stmt</span>, F&gt; {
+    rows: Rows&lt;<span class="lifetime">&#39;stmt</span>&gt;,
+    map: F,
+}
+
+<span class="kw">impl</span>&lt;T, E, F&gt; Iterator <span class="kw">for </span>AndThenRows&lt;<span class="lifetime">&#39;_</span>, F&gt;
+<span class="kw">where
+    </span>E: convert::From&lt;Error&gt;,
+    F: FnMut(<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;,
+{
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>map = <span class="kw-2">&amp;mut </span><span class="self">self</span>.map;
+        <span class="self">self</span>.rows
+            .next()
+            .transpose()
+            .map(|row_result| row_result.map_err(E::from).and_then(|row| (map)(<span class="kw-2">&amp;</span>row)))
+    }
+}
+
+<span class="doccomment">/// `FallibleStreamingIterator` differs from the standard library&#39;s `Iterator`
+/// in two ways:
+/// * each call to `next` (sqlite3_step) can fail.
+/// * returned `Row` is valid until `next` is called again or `Statement` is
+///   reset or finalized.
+///
+/// While these iterators cannot be used with Rust `for` loops, `while let`
+/// loops offer a similar level of ergonomics:
+/// ```rust,no_run
+/// # use rusqlite::{Result, Statement};
+/// fn query(stmt: &amp;mut Statement) -&gt; Result&lt;()&gt; {
+///     let mut rows = stmt.query([])?;
+///     while let Some(row) = rows.next()? {
+///         // scan columns value
+///     }
+///     Ok(())
+/// }
+/// ```
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; FallibleStreamingIterator <span class="kw">for </span>Rows&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="kw">type </span>Error = Error;
+    <span class="kw">type </span>Item = Row&lt;<span class="lifetime">&#39;stmt</span>&gt;;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self</span>.stmt {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>stmt) =&gt; <span class="kw">match </span>stmt.step() {
                 <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Row</span> { <span class="ident">stmt</span> });
+                    <span class="self">self</span>.row = <span class="prelude-val">Some</span>(Row { stmt });
                     <span class="prelude-val">Ok</span>(())
                 }
                 <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">reset</span>();
-                    <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                    <span class="self">self</span>.reset();
+                    <span class="self">self</span>.row = <span class="prelude-val">None</span>;
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">reset</span>();
-                    <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="self">self</span>.reset();
+                    <span class="self">self</span>.row = <span class="prelude-val">None</span>;
+                    <span class="prelude-val">Err</span>(e)
                 }
             },
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">row</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="self">self</span>.row = <span class="prelude-val">None</span>;
                 <span class="prelude-val">Ok</span>(())
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">row</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt;&gt; {
+        <span class="self">self</span>.row.as_ref()
     }
 }
 
-<span class="doccomment">/// A single result row of a query.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A single result row of a query.
+</span><span class="kw">pub struct </span>Row&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) stmt: <span class="kw-2">&amp;</span><span class="lifetime">&#39;stmt </span>Statement&lt;<span class="lifetime">&#39;stmt</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;stmt</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get the value of a particular column of the result row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if calling [`row.get(idx)`](Row::get) would return an error,</span>
-    <span class="doccomment">/// including:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * If the underlying SQLite column type is not a valid type as a source</span>
-    <span class="doccomment">///   for `T`</span>
-    <span class="doccomment">/// * If the underlying SQLite integral value is outside the range</span>
-    <span class="doccomment">///   representable by `T`</span>
-    <span class="doccomment">/// * If `idx` is outside the range of columns in the returned query</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">idx</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;stmt</span>&gt; Row&lt;<span class="lifetime">&#39;stmt</span>&gt; {
+    <span class="doccomment">/// Get the value of a particular column of the result row.
+    ///
+    /// ## Failure
+    ///
+    /// Panics if calling [`row.get(idx)`](Row::get) would return an error,
+    /// including:
+    ///
+    /// * If the underlying SQLite column type is not a valid type as a source
+    ///   for `T`
+    /// * If the underlying SQLite integral value is outside the range
+    ///   representable by `T`
+    /// * If `idx` is outside the range of columns in the returned query
+    </span><span class="kw">pub fn </span>get_unwrap&lt;I: RowIndex, T: FromSql&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; T {
+        <span class="self">self</span>.get(idx).unwrap()
     }
 
-    <span class="doccomment">/// Get the value of a particular column of the result row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnType` if the underlying SQLite column</span>
-    <span class="doccomment">/// type is not a valid type as a source for `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid</span>
-    <span class="doccomment">/// column range for this row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnName` if `idx` is not a valid column</span>
-    <span class="doccomment">/// name for this row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the result type is i128 (which requires the `i128_blob` feature to be</span>
-    <span class="doccomment">/// enabled), and the underlying SQLite column is a blob whose size is not</span>
-    <span class="doccomment">/// 16 bytes, `Error::InvalidColumnType` will also be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span>, <span class="ident">T</span>: <span class="ident">FromSql</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">idx</span>(<span class="self">self</span>.<span class="ident">stmt</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">value_ref</span>(<span class="ident">idx</span>);
-        <span class="ident">FromSql::column_result</span>(<span class="ident">value</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">FromSqlError::InvalidType</span> =&gt; <span class="ident">Error::InvalidColumnType</span>(
-                <span class="ident">idx</span>,
-                <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
-                <span class="ident">value</span>.<span class="ident">data_type</span>(),
+    <span class="doccomment">/// Get the value of a particular column of the result row.
+    ///
+    /// ## Failure
+    ///
+    /// Returns an `Error::InvalidColumnType` if the underlying SQLite column
+    /// type is not a valid type as a source for `T`.
+    ///
+    /// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid
+    /// column range for this row.
+    ///
+    /// Returns an `Error::InvalidColumnName` if `idx` is not a valid column
+    /// name for this row.
+    ///
+    /// If the result type is i128 (which requires the `i128_blob` feature to be
+    /// enabled), and the underlying SQLite column is a blob whose size is not
+    /// 16 bytes, `Error::InvalidColumnType` will also be returned.
+    </span><span class="kw">pub fn </span>get&lt;I: RowIndex, T: FromSql&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; <span class="prelude-ty">Result</span>&lt;T&gt; {
+        <span class="kw">let </span>idx = idx.idx(<span class="self">self</span>.stmt)<span class="question-mark">?</span>;
+        <span class="kw">let </span>value = <span class="self">self</span>.stmt.value_ref(idx);
+        FromSql::column_result(value).map_err(|err| <span class="kw">match </span>err {
+            FromSqlError::InvalidType =&gt; Error::InvalidColumnType(
+                idx,
+                <span class="self">self</span>.stmt.column_name_unwrap(idx).into(),
+                value.data_type(),
             ),
-            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">i</span>) =&gt; <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">idx</span>, <span class="ident">i</span>),
-            <span class="ident">FromSqlError::Other</span>(<span class="ident">err</span>) =&gt; {
-                <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">value</span>.<span class="ident">data_type</span>(), <span class="ident">err</span>)
+            FromSqlError::OutOfRange(i) =&gt; Error::IntegralValueOutOfRange(idx, i),
+            FromSqlError::Other(err) =&gt; {
+                Error::FromSqlConversionFailure(idx <span class="kw">as </span>usize, value.data_type(), err)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) =&gt; <span class="ident">Error::InvalidColumnType</span>(
-                <span class="ident">idx</span>,
-                <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
-                <span class="ident">value</span>.<span class="ident">data_type</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+            </span>FromSqlError::InvalidI128Size(<span class="kw">_</span>) =&gt; Error::InvalidColumnType(
+                idx,
+                <span class="self">self</span>.stmt.column_name_unwrap(idx).into(),
+                value.data_type(),
             ),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) =&gt; <span class="ident">Error::InvalidColumnType</span>(
-                <span class="ident">idx</span>,
-                <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">column_name_unwrap</span>(<span class="ident">idx</span>).<span class="ident">into</span>(),
-                <span class="ident">value</span>.<span class="ident">data_type</span>(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+            </span>FromSqlError::InvalidUuidSize(<span class="kw">_</span>) =&gt; Error::InvalidColumnType(
+                idx,
+                <span class="self">self</span>.stmt.column_name_unwrap(idx).into(),
+                value.data_type(),
             ),
         })
     }
 
-    <span class="doccomment">/// Get the value of a particular column of the result row as a `ValueRef`,</span>
-    <span class="doccomment">/// allowing data to be read out of a row without copying.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This `ValueRef` is valid only as long as this Row, which is enforced by</span>
-    <span class="doccomment">/// it&#39;s lifetime. This means that while this method is completely safe,</span>
-    <span class="doccomment">/// it can be somewhat difficult to use, and most callers will be better</span>
-    <span class="doccomment">/// served by [`get`](Row::get) or [`get_unwrap`](Row::get_unwrap).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid</span>
-    <span class="doccomment">/// column range for this row.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an `Error::InvalidColumnName` if `idx` is not a valid column</span>
-    <span class="doccomment">/// name for this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">idx</span>(<span class="self">self</span>.<span class="ident">stmt</span>)<span class="question-mark">?</span>;
-        <span class="comment">// Narrowing from `ValueRef&lt;&#39;stmt&gt;` (which `self.stmt.value_ref(idx)`</span>
-        <span class="comment">// returns) to `ValueRef&lt;&#39;a&gt;` is needed because it&#39;s only valid until</span>
-        <span class="comment">// the next call to sqlite3_step.</span>
-        <span class="kw">let</span> <span class="ident">val_ref</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">value_ref</span>(<span class="ident">idx</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">val_ref</span>)
+    <span class="doccomment">/// Get the value of a particular column of the result row as a `ValueRef`,
+    /// allowing data to be read out of a row without copying.
+    ///
+    /// This `ValueRef` is valid only as long as this Row, which is enforced by
+    /// it&#39;s lifetime. This means that while this method is completely safe,
+    /// it can be somewhat difficult to use, and most callers will be better
+    /// served by [`get`](Row::get) or [`get_unwrap`](Row::get_unwrap).
+    ///
+    /// ## Failure
+    ///
+    /// Returns an `Error::InvalidColumnIndex` if `idx` is outside the valid
+    /// column range for this row.
+    ///
+    /// Returns an `Error::InvalidColumnName` if `idx` is not a valid column
+    /// name for this row.
+    </span><span class="kw">pub fn </span>get_ref&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; <span class="prelude-ty">Result</span>&lt;ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>idx = idx.idx(<span class="self">self</span>.stmt)<span class="question-mark">?</span>;
+        <span class="comment">// Narrowing from `ValueRef&lt;&#39;stmt&gt;` (which `self.stmt.value_ref(idx)`
+        // returns) to `ValueRef&lt;&#39;a&gt;` is needed because it&#39;s only valid until
+        // the next call to sqlite3_step.
+        </span><span class="kw">let </span>val_ref = <span class="self">self</span>.stmt.value_ref(idx);
+        <span class="prelude-val">Ok</span>(val_ref)
     }
 
-    <span class="doccomment">/// Get the value of a particular column of the result row as a `ValueRef`,</span>
-    <span class="doccomment">/// allowing data to be read out of a row without copying.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This `ValueRef` is valid only as long as this Row, which is enforced by</span>
-    <span class="doccomment">/// it&#39;s lifetime. This means that while this method is completely safe,</span>
-    <span class="doccomment">/// it can be difficult to use, and most callers will be better served by</span>
-    <span class="doccomment">/// [`get`](Row::get) or [`get_unwrap`](Row::get_unwrap).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Failure</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if calling [`row.get_ref(idx)`](Row::get_ref) would return an</span>
-    <span class="doccomment">/// error, including:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * If `idx` is outside the range of columns in the returned query.</span>
-    <span class="doccomment">/// * If `idx` is not a valid column name for this row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref_unwrap</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_ref</span>(<span class="ident">idx</span>).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Get the value of a particular column of the result row as a `ValueRef`,
+    /// allowing data to be read out of a row without copying.
+    ///
+    /// This `ValueRef` is valid only as long as this Row, which is enforced by
+    /// it&#39;s lifetime. This means that while this method is completely safe,
+    /// it can be difficult to use, and most callers will be better served by
+    /// [`get`](Row::get) or [`get_unwrap`](Row::get_unwrap).
+    ///
+    /// ## Failure
+    ///
+    /// Panics if calling [`row.get_ref(idx)`](Row::get_ref) would return an
+    /// error, including:
+    ///
+    /// * If `idx` is outside the range of columns in the returned query.
+    /// * If `idx` is not a valid column name for this row.
+    </span><span class="kw">pub fn </span>get_ref_unwrap&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.get_ref(idx).unwrap()
     }
 
-    <span class="doccomment">/// Renamed to [`get_ref`](Row::get_ref).</span>
-    <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use [`get_ref`](Row::get_ref) instead.&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw_checked</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_ref</span>(<span class="ident">idx</span>)
+    <span class="doccomment">/// Renamed to [`get_ref`](Row::get_ref).
+    </span><span class="attribute">#[deprecated = <span class="string">&quot;Use [`get_ref`](Row::get_ref) instead.&quot;</span>]
+    #[inline]
+    </span><span class="kw">pub fn </span>get_raw_checked&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; <span class="prelude-ty">Result</span>&lt;ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.get_ref(idx)
     }
 
-    <span class="doccomment">/// Renamed to [`get_ref_unwrap`](Row::get_ref_unwrap).</span>
-    <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Use [`get_ref_unwrap`](Row::get_ref_unwrap) instead.&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_raw</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">RowIndex</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">I</span>) -&gt; <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_ref_unwrap</span>(<span class="ident">idx</span>)
+    <span class="doccomment">/// Renamed to [`get_ref_unwrap`](Row::get_ref_unwrap).
+    </span><span class="attribute">#[deprecated = <span class="string">&quot;Use [`get_ref_unwrap`](Row::get_ref_unwrap) instead.&quot;</span>]
+    #[inline]
+    </span><span class="kw">pub fn </span>get_raw&lt;I: RowIndex&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: I) -&gt; ValueRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.get_ref_unwrap(idx)
     }
 }
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="doccomment">/// This trait exists just to ensure that the only impls of `trait Params`</span>
-    <span class="doccomment">/// that are allowed are ones in this crate.</span>
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="ident">usize</span> {}
-    <span class="kw">impl</span> <span class="ident">Sealed</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {}
+<span class="kw">mod </span>sealed {
+    <span class="doccomment">/// This trait exists just to ensure that the only impls of `trait Params`
+    /// that are allowed are ones in this crate.
+    </span><span class="kw">pub trait </span>Sealed {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span>usize {}
+    <span class="kw">impl </span>Sealed <span class="kw">for </span><span class="kw-2">&amp;</span>str {}
 }
 
-<span class="doccomment">/// A trait implemented by types that can index into columns of a row.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is only implemented for `usize` and `&amp;str`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RowIndex</span>: <span class="ident">sealed::Sealed</span> {
-    <span class="doccomment">/// Returns the index of the appropriate column, or `None` if no such</span>
-    <span class="doccomment">/// column exists.</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A trait implemented by types that can index into columns of a row.
+///
+/// It is only implemented for `usize` and `&amp;str`.
+</span><span class="kw">pub trait </span>RowIndex: sealed::Sealed {
+    <span class="doccomment">/// Returns the index of the appropriate column, or `None` if no such
+    /// column exists.
+    </span><span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, stmt: <span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">RowIndex</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">column_count</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidColumnIndex</span>(<span class="kw-2">*</span><span class="self">self</span>))
-        } <span class="kw">else</span> {
+<span class="kw">impl </span>RowIndex <span class="kw">for </span>usize {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, stmt: <span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self </span>&gt;= stmt.column_count() {
+            <span class="prelude-val">Err</span>(Error::InvalidColumnIndex(<span class="kw-2">*</span><span class="self">self</span>))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="self">self</span>)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RowIndex</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">idx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stmt</span>: <span class="kw-2">&amp;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">stmt</span>.<span class="ident">column_index</span>(<span class="kw-2">*</span><span class="self">self</span>)
+<span class="kw">impl </span>RowIndex <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>idx(<span class="kw-2">&amp;</span><span class="self">self</span>, stmt: <span class="kw-2">&amp;</span>Statement&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+        stmt.column_index(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_try_from_row</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">ident</span>),<span class="kw-2">*</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,)<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">convert::TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,)<span class="kw-2">*</span>) <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="ident">FromSql</span>,)<span class="op">*</span> {
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="macro">macro_rules! </span>tuple_try_from_row {
+    ($(<span class="macro-nonterminal">$field</span>:ident),<span class="kw-2">*</span>) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, $(<span class="macro-nonterminal">$field</span>,)<span class="kw-2">*</span>&gt; convert::TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>($(<span class="macro-nonterminal">$field</span>,)<span class="kw-2">*</span>) <span class="kw">where </span>$(<span class="macro-nonterminal">$field</span>: FromSql,)* {
+            <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
 
-            <span class="comment">// we end with index += 1, which rustc warns about</span>
-            <span class="comment">// unused_variables and unused_mut are allowed for ()</span>
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>, <span class="ident">unused_variables</span>, <span class="ident">unused_mut</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">row</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="comment">// we end with index += 1, which rustc warns about
+            // unused_variables and unused_mut are allowed for ()
+            </span><span class="attribute">#[allow(unused_assignments, unused_variables, unused_mut)]
+            </span><span class="kw">fn </span>try_from(row: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Row&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>index = <span class="number">0</span>;
                 $(
-                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                    <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span><span class="op">&gt;</span>(<span class="ident">index</span>)<span class="question-mark">?</span>;
-                    <span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                )<span class="op">*</span>
-                <span class="prelude-val">Ok</span>(($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>,)<span class="kw-2">*</span>))
+                    <span class="attribute">#[allow(non_snake_case)]
+                    </span><span class="kw">let </span><span class="macro-nonterminal">$field </span>= row.get::&lt;<span class="kw">_</span>, <span class="macro-nonterminal">$field</span>&gt;(index)<span class="question-mark">?</span>;
+                    index += <span class="number">1</span>;
+                )*
+                <span class="prelude-val">Ok</span>(($(<span class="macro-nonterminal">$field</span>,)<span class="kw-2">*</span>))
             }
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuples_try_from_row</span> {
+<span class="macro">macro_rules! </span>tuples_try_from_row {
     () =&gt; {
-        <span class="comment">// not very useful, but maybe some other macro users will find this helpful</span>
-        <span class="macro">tuple_try_from_row!</span>();
+        <span class="comment">// not very useful, but maybe some other macro users will find this helpful
+        </span><span class="macro">tuple_try_from_row!</span>();
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">tuple_try_from_row!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>)<span class="kw-2">*</span>);
-        <span class="macro">tuples_try_from_row!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">remaining</span>),<span class="kw-2">*</span>);
+    (<span class="macro-nonterminal">$first</span>:ident $(, <span class="macro-nonterminal">$remaining</span>:ident)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">tuple_try_from_row!</span>(<span class="macro-nonterminal">$first </span>$(, <span class="macro-nonterminal">$remaining</span>)<span class="kw-2">*</span>);
+        <span class="macro">tuples_try_from_row!</span>($(<span class="macro-nonterminal">$remaining</span>),<span class="kw-2">*</span>);
     };
 }
 
-<span class="macro">tuples_try_from_row!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">D</span>, <span class="ident">E</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">H</span>, <span class="ident">I</span>, <span class="ident">J</span>, <span class="ident">K</span>, <span class="ident">L</span>, <span class="ident">M</span>, <span class="ident">N</span>, <span class="ident">O</span>, <span class="ident">P</span>);
+<span class="macro">tuples_try_from_row!</span>(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span> <span class="comment">// false positives due to lifetime issues; clippy issue #5594</span>
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Connection</span>, <span class="prelude-ty">Result</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::redundant_closure)] </span><span class="comment">// false positives due to lifetime issues; clippy issue #5594
+    </span><span class="kw">use crate</span>::{Connection, <span class="prelude-ty">Result</span>};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_1</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ToSql</span>;
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_try_from_row_for_tuple_1() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span><span class="kw">crate</span>::ToSql;
+        <span class="kw">use </span>std::convert::TryFrom;
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(
+        <span class="kw">let </span>conn = Connection::open_in_memory()<span class="question-mark">?</span>;
+        conn.execute(
             <span class="string">&quot;CREATE TABLE test (a INTEGER)&quot;</span>,
-            <span class="ident"><span class="kw">crate</span>::params_from_iter</span>(<span class="ident">std::iter::empty</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span>()),
+            <span class="kw">crate</span>::params_from_iter(std::iter::empty::&lt;<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql&gt;()),
         )<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO test VALUES (42)&quot;</span>, [])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="op">&lt;</span>(<span class="ident">u32</span>,)<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">row</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>, (<span class="number">42</span>,));
-        <span class="kw">let</span> <span class="ident">fail</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">row</span>));
-        <span class="macro">assert!</span>(<span class="ident">fail</span>.<span class="ident">is_err</span>());
+        conn.execute(<span class="string">&quot;INSERT INTO test VALUES (42)&quot;</span>, [])<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = conn.query_row(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], |row| &lt;(u32,)&gt;::try_from(row))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(val, (<span class="number">42</span>,));
+        <span class="kw">let </span>fail = conn.query_row(<span class="string">&quot;SELECT a FROM test&quot;</span>, [], |row| &lt;(u32, u32)&gt;::try_from(row));
+        <span class="macro">assert!</span>(fail.is_err());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_2</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_try_from_row_for_tuple_2() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span>std::convert::TryFrom;
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="string">&quot;CREATE TABLE test (a INTEGER, b INTEGER)&quot;</span>, [])<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO test VALUES (42, 47)&quot;</span>, [])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT a, b FROM test&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">row</span>)
+        <span class="kw">let </span>conn = Connection::open_in_memory()<span class="question-mark">?</span>;
+        conn.execute(<span class="string">&quot;CREATE TABLE test (a INTEGER, b INTEGER)&quot;</span>, [])<span class="question-mark">?</span>;
+        conn.execute(<span class="string">&quot;INSERT INTO test VALUES (42, 47)&quot;</span>, [])<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = conn.query_row(<span class="string">&quot;SELECT a, b FROM test&quot;</span>, [], |row| {
+            &lt;(u32, u32)&gt;::try_from(row)
         })<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>, (<span class="number">42</span>, <span class="number">47</span>));
-        <span class="kw">let</span> <span class="ident">fail</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT a, b FROM test&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>)<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">row</span>)
+        <span class="macro">assert_eq!</span>(val, (<span class="number">42</span>, <span class="number">47</span>));
+        <span class="kw">let </span>fail = conn.query_row(<span class="string">&quot;SELECT a, b FROM test&quot;</span>, [], |row| {
+            &lt;(u32, u32, u32)&gt;::try_from(row)
         });
-        <span class="macro">assert!</span>(<span class="ident">fail</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(fail.is_err());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_try_from_row_for_tuple_16</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_try_from_row_for_tuple_16() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">use </span>std::convert::TryFrom;
 
-        <span class="kw">let</span> <span class="ident">create_table</span> <span class="op">=</span> <span class="string">&quot;CREATE TABLE test (
+        <span class="kw">let </span>create_table = <span class="string">&quot;CREATE TABLE test (
             a INTEGER,
             b INTEGER,
             c INTEGER,
@@ -1048,7 +1048,7 @@
             p INTEGER
         )&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">insert_values</span> <span class="op">=</span> <span class="string">&quot;INSERT INTO test VALUES (
+        <span class="kw">let </span>insert_values = <span class="string">&quot;INSERT INTO test VALUES (
             0,
             1,
             2,
@@ -1067,50 +1067,50 @@
             15
         )&quot;</span>;
 
-        <span class="kw">type</span> <span class="ident">BigTuple</span> <span class="op">=</span> (
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
-            <span class="ident">u32</span>,
+        <span class="kw">type </span>BigTuple = (
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
+            u32,
         );
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">create_table</span>, [])<span class="question-mark">?</span>;
-        <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">insert_values</span>, [])<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT * FROM test&quot;</span>, [], <span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">BigTuple::try_from</span>(<span class="ident">row</span>))<span class="question-mark">?</span>;
-        <span class="comment">// Debug is not implemented for tuples of 16</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">0</span>, <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">1</span>, <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">2</span>, <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">3</span>, <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">4</span>, <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">5</span>, <span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">6</span>, <span class="number">6</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">7</span>, <span class="number">7</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">8</span>, <span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">9</span>, <span class="number">9</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">10</span>, <span class="number">10</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">11</span>, <span class="number">11</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">12</span>, <span class="number">12</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">13</span>, <span class="number">13</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">14</span>, <span class="number">14</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="number">15</span>, <span class="number">15</span>);
+        <span class="kw">let </span>conn = Connection::open_in_memory()<span class="question-mark">?</span>;
+        conn.execute(create_table, [])<span class="question-mark">?</span>;
+        conn.execute(insert_values, [])<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = conn.query_row(<span class="string">&quot;SELECT * FROM test&quot;</span>, [], |row| BigTuple::try_from(row))<span class="question-mark">?</span>;
+        <span class="comment">// Debug is not implemented for tuples of 16
+        </span><span class="macro">assert_eq!</span>(val.<span class="number">0</span>, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">1</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">2</span>, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">3</span>, <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">4</span>, <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">5</span>, <span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">6</span>, <span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">7</span>, <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">8</span>, <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">9</span>, <span class="number">9</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">10</span>, <span class="number">10</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">11</span>, <span class="number">11</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">12</span>, <span class="number">12</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">13</span>, <span class="number">13</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">14</span>, <span class="number">14</span>);
+        <span class="macro">assert_eq!</span>(val.<span class="number">15</span>, <span class="number">15</span>);
 
-        <span class="comment">// We don&#39;t test one bigger because it&#39;s unimplemented</span>
-        <span class="prelude-val">Ok</span>(())
+        <span class="comment">// We don&#39;t test one bigger because it&#39;s unimplemented
+        </span><span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

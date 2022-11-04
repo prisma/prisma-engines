@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -567,574 +567,574 @@
 <span id="567">567</span>
 <span id="568">568</span>
 <span id="569">569</span>
-</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>many_to_many;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_many;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod </span>one_to_one;
 
-<span class="kw">mod</span> <span class="ident">visited_relation</span>;
+<span class="kw">mod </span>visited_relation;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintName</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">indoc::indoc</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">parser_database::ReferentialAction</span>;
-<span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">ast::WithSpan</span>,
-    <span class="ident">walkers</span>::{<span class="ident">CompleteInlineRelationWalker</span>, <span class="ident">InlineRelationWalker</span>, <span class="ident">RelationFieldWalker</span>},
-    <span class="ident">ScalarFieldType</span>,
+<span class="kw">use </span><span class="kw">super</span>::constraint_namespace::ConstraintName;
+<span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, Connector, ConnectorCapability, RelationMode};
+<span class="kw">use crate</span>::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+<span class="kw">use </span>indoc::indoc;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>parser_database::ReferentialAction;
+<span class="kw">use </span>parser_database::{
+    ast::WithSpan,
+    walkers::{CompleteInlineRelationWalker, InlineRelationWalker, RelationFieldWalker},
+    ScalarFieldType,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">BTreeSet</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">rc::Rc</span>,
+<span class="kw">use </span>std::{
+    collections::{BTreeSet, HashMap, HashSet},
+    rc::Rc,
 };
-<span class="kw">use</span> <span class="ident">visited_relation</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>visited_relation::<span class="kw-2">*</span>;
 
-<span class="kw">const</span> <span class="ident">PRISMA_FORMAT_HINT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;You can run `prisma format` to fix this automatically.&quot;</span>;
-<span class="kw">const</span> <span class="ident">RELATION_ATTRIBUTE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;@relation&quot;</span>;
-<span class="kw">const</span> <span class="ident">STATE_ERROR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.&quot;</span>;
+<span class="kw">const </span>PRISMA_FORMAT_HINT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;You can run `prisma format` to fix this automatically.&quot;</span>;
+<span class="kw">const </span>RELATION_ATTRIBUTE_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;@relation&quot;</span>;
+<span class="kw">const </span>STATE_ERROR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;Failed lookup of model, field or optional property during internal processing. This means that the internal representation was mutated incorrectly.&quot;</span>;
 
-<span class="doccomment">/// Depending on the database, a constraint name might need to be unique in a certain namespace.</span>
-<span class="doccomment">/// Validates per database that we do not use a name that is already in use.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_constraint_name</span>(
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Depending on the database, a constraint name might need to be unique in a certain namespace.
+/// Validates per database that we do not use a name that is already in use.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>has_a_unique_constraint_name(
+    names: <span class="kw-2">&amp;</span><span class="kw">super</span>::Names&lt;<span class="lifetime">&#39;_</span>&gt;,
+    relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>);
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
+    <span class="kw">let </span>name = relation.constraint_name(ctx.connector);
+    <span class="kw">let </span>model = relation.referencing_model();
 
-    <span class="kw">for</span> <span class="ident">violation</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">constraint_namespace</span>.<span class="ident">constraint_name_scope_violations</span>(
-        <span class="ident">model</span>.<span class="ident">model_id</span>(),
-        <span class="ident">ConstraintName::Relation</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()),
-        <span class="ident">ctx</span>,
+    <span class="kw">for </span>violation <span class="kw">in </span>names.constraint_namespace.constraint_name_scope_violations(
+        model.model_id(),
+        ConstraintName::Relation(name.as_ref()),
+        ctx,
     ) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">relation</span>
-            .<span class="ident">forward_relation_field</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> {
-                <span class="ident">rf</span>.<span class="ident">ast_field</span>()
-                    .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;map&quot;</span>)
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>())
+        <span class="kw">let </span>span = relation
+            .forward_relation_field()
+            .map(|rf| {
+                rf.ast_field()
+                    .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;map&quot;</span>)
+                    .unwrap_or_else(|| rf.ast_field().span())
             })
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>());
+            .unwrap_or_else(|| relation.referenced_model().ast_model().span());
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">violation</span>.<span class="ident">description</span>(<span class="ident">model</span>.<span class="ident">name</span>())
+            name,
+            violation.description(model.name())
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">span</span>,
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            span,
         ));
     }
 }
 
-<span class="doccomment">/// Required relational fields should point to required scalar fields.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">field_arity</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">forward_relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="ident">f</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Required relational fields should point to required scalar fields.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>field_arity(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>forward_relation_field = <span class="kw">if let </span><span class="prelude-val">Some</span>(f) = relation.forward_relation_field() {
+        f
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">forward_relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>() {
+    <span class="kw">if </span>!forward_relation_field.ast_field().arity.is_required() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
-        <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">fields</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_optional</span>()) {
+    <span class="kw">match </span>relation.referencing_fields() {
+        <span class="prelude-val">Some</span>(<span class="kw-2">mut </span>fields) =&gt; {
+            <span class="kw">if </span>fields.all(|field| !field.is_optional()) {
                 <span class="kw">return</span>;
             }
         }
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     }
-    <span class="kw">let</span> <span class="ident">scalar_field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>().<span class="ident">unwrap</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span>scalar_field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = relation.referencing_fields().unwrap().map(|f| f.name()).collect();
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+    ctx.push_error(DatamodelError::new_validation_error(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` uses the scalar fields {}. At least one of those fields is optional. Hence the relation field must be optional as well.&quot;</span>,
-            <span class="ident">forward_relation_field</span>.<span class="ident">name</span>(),
-            <span class="ident">scalar_field_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
+            forward_relation_field.name(),
+            scalar_field_names.join(<span class="string">&quot;, &quot;</span>),
         ),
-        <span class="ident">forward_relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()
+        forward_relation_field.ast_field().span()
     ));
 }
 
-<span class="doccomment">/// The `fields` and `references` arguments should hold the same number of fields.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forward</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="ident">forward</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// The `fields` and `references` arguments should hold the same number of fields.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>same_length_in_referencing_and_referenced(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>relation_field = <span class="kw">if let </span><span class="prelude-val">Some</span>(forward) = relation.forward_relation_field() {
+        forward
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">match</span> (<span class="ident">relation_field</span>.<span class="ident">referencing_fields</span>(), <span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">fields</span>), <span class="prelude-val">Some</span>(<span class="ident">references</span>)) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">references</span>.<span class="ident">len</span>() =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+    <span class="kw">match </span>(relation_field.referencing_fields(), relation_field.referenced_fields()) {
+        (<span class="prelude-val">Some</span>(fields), <span class="prelude-val">Some</span>(references)) <span class="kw">if </span>fields.len() != references.len() =&gt; {
+            ctx.push_error(DatamodelError::new_validation_error(
                 <span class="string">&quot;You must specify the same number of fields in `fields` and `references`.&quot;</span>,
-                <span class="ident">relation_field</span>.<span class="ident">relation_attribute</span>().<span class="ident">unwrap</span>().<span class="ident">span</span>,
+                relation_field.relation_attribute().unwrap().span,
             ));
         }
-        <span class="kw">_</span> =&gt; (),
+        <span class="kw">_ </span>=&gt; (),
     }
 }
 
-<span class="doccomment">/// Some connectors expect us to refer only unique fields from the foreign key.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">references_unique_fields</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="ident">rf</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Some connectors expect us to refer only unique fields from the foreign key.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>references_unique_fields(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>relation_field = <span class="kw">if let </span><span class="prelude-val">Some</span>(rf) = relation.forward_relation_field() {
+        rf
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
+    <span class="kw">if </span>relation_field.referenced_fields().map(|f| f.len() == <span class="number">0</span>).unwrap_or(<span class="bool-val">true</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">references_unique_criterion</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">criteria</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">criteria_field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">criteria</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-        <span class="ident">criteria_field_names</span>.<span class="ident">sort_unstable</span>();
+    <span class="kw">let </span>references_unique_criterion = relation.referenced_model().unique_criterias().any(|criteria| {
+        <span class="kw">let </span><span class="kw-2">mut </span>criteria_field_names: Vec&lt;<span class="kw">_</span>&gt; = criteria.fields().map(|f| f.name()).collect();
+        criteria_field_names.sort_unstable();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">references_sorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-        <span class="ident">references_sorted</span>.<span class="ident">sort_unstable</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>references_sorted: Vec&lt;<span class="kw">_</span>&gt; = relation.referenced_fields().map(|f| f.name()).collect();
+        references_sorted.sort_unstable();
 
-        <span class="ident">criteria_field_names</span> <span class="op">==</span> <span class="ident">references_sorted</span>
+        criteria_field_names == references_sorted
     });
 
-    <span class="kw">if</span> <span class="ident">references_unique_criterion</span> {
-        <span class="ident">referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+    <span class="kw">if </span>references_unique_criterion {
+        referencing_fields_in_correct_order(relation, ctx);
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>();
+    <span class="kw">let </span>fields: Vec&lt;<span class="kw">_</span>&gt; = relation.referenced_fields().map(|f| f.name()).collect();
+    <span class="kw">let </span>model = relation.referenced_model().name();
 
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.&quot;</span>, <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>), <span class="ident">model</span>)
-    } <span class="kw">else</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.&quot;</span>, <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>), <span class="ident">model</span>)
+    <span class="kw">let </span>message = <span class="kw">if </span>fields.len() == <span class="number">1 </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@unique` attribute to the field `{}` in the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
+    } <span class="kw">else </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;The argument `references` must refer to a unique criteria in the related model. Consider adding an `@@unique([{}])` attribute to the model `{}`.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>), model)
     };
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-        <span class="kw-2">&amp;</span><span class="ident">message</span>,
-        <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        <span class="kw-2">&amp;</span>message,
+        RELATION_ATTRIBUTE_NAME,
+        relation_field.ast_field().span(),
     ));
 }
 
-<span class="doccomment">/// Most connectors want the fields and references in the same order.</span>
-<span class="kw">fn</span> <span class="ident">referencing_fields_in_correct_order</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="ident">rf</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Most connectors want the fields and references in the same order.
+</span><span class="kw">fn </span>referencing_fields_in_correct_order(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>relation_field = <span class="kw">if let </span><span class="prelude-val">Some</span>(rf) = relation.forward_relation_field() {
+        rf
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">if</span> <span class="ident">relation_field</span>
-        .<span class="ident">referenced_fields</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>)
-        .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+    <span class="kw">if </span>relation_field
+        .referenced_fields()
+        .map(|fields| fields.len() &lt;= <span class="number">1</span>)
+        .unwrap_or(<span class="bool-val">true</span>)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">allows_relation_fields_in_arbitrary_order</span>() {
+    <span class="kw">if </span>ctx.connector.allows_relation_fields_in_arbitrary_order() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">reference_order_correct</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">criteria</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">criteria_fields</span> <span class="op">=</span> <span class="ident">criteria</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>());
+    <span class="kw">let </span>reference_order_correct = relation.referenced_model().unique_criterias().any(|criteria| {
+        <span class="kw">let </span>criteria_fields = criteria.fields().map(|f| f.name());
 
-        <span class="kw">if</span> <span class="ident">criteria_fields</span>.<span class="ident">len</span>()
-            <span class="op">!</span><span class="op">=</span> <span class="ident">relation_field</span>
-                .<span class="ident">referenced_fields</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">len</span>())
-                .<span class="ident">unwrap_or</span>(<span class="number">0</span>)
+        <span class="kw">if </span>criteria_fields.len()
+            != relation_field
+                .referenced_fields()
+                .map(|fields| fields.len())
+                .unwrap_or(<span class="number">0</span>)
         {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">references</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>());
-        <span class="ident">criteria_fields</span>.<span class="ident">zip</span>(<span class="ident">references</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>)
+        <span class="kw">let </span>references = relation.referenced_fields().map(|f| f.name());
+        criteria_fields.zip(references).all(|(a, b)| a == b)
     });
 
-    <span class="kw">if</span> <span class="ident">reference_order_correct</span> {
+    <span class="kw">if </span>reference_order_correct {
         <span class="kw">return</span>;
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+    ctx.push_error(DatamodelError::new_validation_error(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The argument `references` must refer to a unique criteria in the related model `{}` using the same order of fields. Please check the ordering in the following fields: `{}`.&quot;</span>,
-            <span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>(),
-            <span class="ident">relation</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+            relation.referenced_model().name(),
+            relation.referenced_fields().map(|f| f.name()).join(<span class="string">&quot;, &quot;</span>)
         ),
-        <span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>()
+        relation_field.ast_field().span()
     ));
 }
 
-<span class="doccomment">/// Detects cyclical cascading referential actions. Counts as a cycle if and</span>
-<span class="doccomment">/// only if all relations have at least one action triggering a cascading</span>
-<span class="doccomment">/// behavior, which is anything other than `NoAction`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A -&gt; A (self relation)</span>
-<span class="doccomment">/// A -&gt; B -&gt; A (cycle)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We count them from forward-relations, e.g. from the side that defines the</span>
-<span class="doccomment">/// foreign key. Many to many relations we skip. The user must set one of the</span>
-<span class="doccomment">/// relation links to NoAction for both referential actions.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">cycles</span>(<span class="ident">relation</span>: <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ReferenceCycleDetection</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>
-            .<span class="ident">datasource</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">relation_mode</span>().<span class="ident">uses_foreign_keys</span>())
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+<span class="doccomment">/// Detects cyclical cascading referential actions. Counts as a cycle if and
+/// only if all relations have at least one action triggering a cascading
+/// behavior, which is anything other than `NoAction`.
+///
+/// # Examples
+///
+/// A -&gt; A (self relation)
+/// A -&gt; B -&gt; A (cycle)
+///
+/// We count them from forward-relations, e.g. from the side that defines the
+/// foreign key. Many to many relations we skip. The user must set one of the
+/// relation links to NoAction for both referential actions.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>cycles(relation: CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+        &amp;&amp; ctx
+            .datasource
+            .map(|ds| ds.relation_mode().uses_foreign_keys())
+            .unwrap_or(<span class="bool-val">true</span>)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visited</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>visited = HashSet::new();
 
-    <span class="comment">// poor man&#39;s tail-recursion ;)</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_relations</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">relation</span>, <span class="ident">Rc::new</span>(<span class="ident">VisitedRelation::root</span>(<span class="ident">relation</span>)))];
-    <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
+    <span class="comment">// poor man&#39;s tail-recursion ;)
+    </span><span class="kw">let </span><span class="kw-2">mut </span>next_relations = <span class="macro">vec!</span>[(relation, Rc::new(VisitedRelation::root(relation)))];
+    <span class="kw">let </span>parent_model = relation.referencing_model();
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">next_relation</span>, <span class="ident">visited_relations</span>)) <span class="op">=</span> <span class="ident">next_relations</span>.<span class="ident">pop</span>() {
-        <span class="ident">visited</span>.<span class="ident">insert</span>(<span class="ident">next_relation</span>.<span class="ident">referencing_field</span>());
+    <span class="kw">while let </span><span class="prelude-val">Some</span>((next_relation, visited_relations)) = next_relations.pop() {
+        visited.insert(next_relation.referencing_field());
 
-        <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referenced_model</span>();
+        <span class="kw">let </span>related_model = next_relation.referenced_model();
 
-        <span class="kw">let</span> <span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">on_delete</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>, <span class="ident">ctx</span>.<span class="ident">relation_mode</span>);
-        <span class="kw">let</span> <span class="ident">on_update</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">on_update</span>();
+        <span class="kw">let </span>on_delete = next_relation.on_delete(ctx.connector, ctx.relation_mode);
+        <span class="kw">let </span>on_update = next_relation.on_update();
 
-        <span class="comment">// a cycle has a meaning only if every relation in it triggers</span>
-        <span class="comment">// modifications in the children</span>
-        <span class="kw">if</span> <span class="ident">on_update</span>.<span class="ident">triggers_modification</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">on_delete</span>.<span class="ident">triggers_modification</span>() {
-            <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referencing_model</span>();
+        <span class="comment">// a cycle has a meaning only if every relation in it triggers
+        // modifications in the children
+        </span><span class="kw">if </span>on_update.triggers_modification() || on_delete.triggers_modification() {
+            <span class="kw">let </span>model = next_relation.referencing_model();
 
-            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">related_model</span>.<span class="ident">id</span> {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.&quot;</span>;
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(
-                    <span class="ident">relation</span>,
-                    <span class="ident">ctx</span>.<span class="ident">connector</span>,
-                    <span class="ident">ctx</span>.<span class="ident">relation_mode</span>,
-                    <span class="ident">msg</span>,
+            <span class="kw">if </span>model.id == related_model.id {
+                <span class="kw">let </span>msg = <span class="string">&quot;A self-relation must have `onDelete` and `onUpdate` referential actions set to `NoAction` in one of the @relation attributes.&quot;</span>;
+                ctx.push_error(cascade_error_with_default_values(
+                    relation,
+                    ctx.connector,
+                    ctx.relation_mode,
+                    msg,
                 ));
 
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">related_model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">parent_model</span>.<span class="ident">id</span> {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+            <span class="kw">if </span>related_model.id == parent_model.id {
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
                     <span class="string">&quot;Reference causes a cycle. One of the @relation attributes in this cycle must have `onDelete` and `onUpdate` referential actions set to `NoAction`. Cycle path: {}.&quot;</span>,
-                    <span class="ident">visited_relations</span>
+                    visited_relations
                 );
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(
-                    <span class="ident">relation</span>,
-                    <span class="ident">ctx</span>.<span class="ident">connector</span>,
-                    <span class="ident">ctx</span>.<span class="ident">relation_mode</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+                ctx.push_error(cascade_error_with_default_values(
+                    relation,
+                    ctx.connector,
+                    ctx.relation_mode,
+                    <span class="kw-2">&amp;</span>msg,
                 ));
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">related_model</span>
-                .<span class="ident">complete_inline_relations_from</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="op">!</span><span class="ident">visited</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">referencing_field</span>()));
+            <span class="kw">let </span>relations = related_model
+                .complete_inline_relations_from()
+                .filter(|r| !visited.contains(<span class="kw-2">&amp;</span>r.referencing_field()));
 
-            <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">relations</span> {
-                <span class="ident">next_relations</span>.<span class="ident">push</span>((<span class="ident">relation</span>, <span class="ident">Rc::new</span>(<span class="ident">visited_relations</span>.<span class="ident">link_next</span>(<span class="ident">relation</span>))));
+            <span class="kw">for </span>relation <span class="kw">in </span>relations {
+                next_relations.push((relation, Rc::new(visited_relations.link_next(relation))));
             }
         }
     }
 }
 
-<span class="doccomment">/// From the given relation, checks if any other relation fits the criteria:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Triggers a cascading action (anything else but NoAction)</span>
-<span class="doccomment">/// - Refers to the same model as the given relation at some point in the path</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - A -&gt; B -&gt; C</span>
-<span class="doccomment">/// - A -&gt; D -&gt; C</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The user must set one of these relations to use NoAction for onUpdate and</span>
-<span class="doccomment">/// onDelete.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">multiple_cascading_paths</span>(<span class="ident">relation</span>: <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ReferenceCycleDetection</span>)
-        <span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">relation_mode</span>.<span class="ident">is_prisma</span>()
+<span class="doccomment">/// From the given relation, checks if any other relation fits the criteria:
+///
+/// - Triggers a cascading action (anything else but NoAction)
+/// - Refers to the same model as the given relation at some point in the path
+///
+/// # Example
+///
+/// - A -&gt; B -&gt; C
+/// - A -&gt; D -&gt; C
+///
+/// The user must set one of these relations to use NoAction for onUpdate and
+/// onDelete.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>multiple_cascading_paths(relation: CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::ReferenceCycleDetection)
+        || ctx.relation_mode.is_prisma()
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">triggers_modifications</span> <span class="op">=</span> <span class="op">|</span><span class="ident">relation</span>: <span class="kw-2">&amp;</span><span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
-        <span class="ident">relation</span>
-            .<span class="ident">on_delete</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>, <span class="ident">ctx</span>.<span class="ident">relation_mode</span>)
-            .<span class="ident">triggers_modification</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="ident">relation</span>.<span class="ident">on_update</span>().<span class="ident">triggers_modification</span>()
+    <span class="kw">let </span>triggers_modifications = |relation: <span class="kw-2">&amp;</span>CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;| {
+        relation
+            .on_delete(ctx.connector, ctx.relation_mode)
+            .triggers_modification()
+            || relation.on_update().triggers_modification()
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">triggers_modifications</span>(<span class="kw-2">&amp;</span><span class="ident">relation</span>) {
+    <span class="kw">if </span>!triggers_modifications(<span class="kw-2">&amp;</span>relation) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
+    <span class="kw">let </span>parent_model = relation.referencing_model();
 
-    <span class="comment">// Gather all paths from this model to any other model, skipping</span>
-    <span class="comment">// cyclical relations</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">paths</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="comment">// Gather all paths from this model to any other model, skipping
+    // cyclical relations
+    </span><span class="kw">let </span><span class="kw-2">mut </span>paths = Vec::new();
 
-    <span class="comment">// Add all relations from current model to the graph vector. At this point</span>
-    <span class="comment">// we only care about multiple paths from this model to any other model. We</span>
-    <span class="comment">// handle paths that cross, but are not started from here, when calling the</span>
-    <span class="comment">// function from corresponding models.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next_relations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation</span>
-        .<span class="ident">referencing_model</span>()
-        .<span class="ident">complete_inline_relations_from</span>()
-        .<span class="ident">filter</span>(<span class="ident">triggers_modifications</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> {
+    <span class="comment">// Add all relations from current model to the graph vector. At this point
+    // we only care about multiple paths from this model to any other model. We
+    // handle paths that cross, but are not started from here, when calling the
+    // function from corresponding models.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>next_relations: Vec&lt;<span class="kw">_</span>&gt; = relation
+        .referencing_model()
+        .complete_inline_relations_from()
+        .filter(triggers_modifications)
+        .map(|relation| {
             (
-                <span class="ident">relation</span>,
-                <span class="ident">Rc::new</span>(<span class="ident">VisitedRelation::root</span>(<span class="ident">relation</span>)),
-                <span class="ident">HashSet</span>::<span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(),
+                relation,
+                Rc::new(VisitedRelation::root(relation)),
+                HashSet::&lt;RelationFieldWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;::new(),
             )
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">next_relation</span>, <span class="ident">visited_relations</span>, <span class="kw-2">mut</span> <span class="ident">current_path</span>)) <span class="op">=</span> <span class="ident">next_relations</span>.<span class="ident">pop</span>() {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referencing_model</span>();
-        <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">next_relation</span>.<span class="ident">referenced_model</span>();
+    <span class="kw">while let </span><span class="prelude-val">Some</span>((next_relation, visited_relations, <span class="kw-2">mut </span>current_path)) = next_relations.pop() {
+        <span class="kw">let </span>model = next_relation.referencing_model();
+        <span class="kw">let </span>related_model = next_relation.referenced_model();
 
-        <span class="ident">current_path</span>.<span class="ident">insert</span>(<span class="ident">next_relation</span>.<span class="ident">referencing_field</span>());
+        current_path.insert(next_relation.referencing_field());
 
-        <span class="comment">// Self-relations are detected elsewhere.</span>
-        <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">related_model</span>.<span class="ident">id</span> {
+        <span class="comment">// Self-relations are detected elsewhere.
+        </span><span class="kw">if </span>model.id == related_model.id {
             <span class="kw">continue</span>;
         }
 
-        <span class="comment">// Cycles are detected elsewhere.</span>
-        <span class="kw">if</span> <span class="ident">related_model</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">parent_model</span>.<span class="ident">id</span> {
+        <span class="comment">// Cycles are detected elsewhere.
+        </span><span class="kw">if </span>related_model.id == parent_model.id {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">forward_relations</span> <span class="op">=</span> <span class="ident">related_model</span>
-            .<span class="ident">complete_inline_relations_from</span>()
-            .<span class="ident">filter</span>(<span class="ident">triggers_modifications</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> <span class="op">!</span><span class="ident">current_path</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">referencing_field</span>()))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">relation</span><span class="op">|</span> {
+        <span class="kw">let </span><span class="kw-2">mut </span>forward_relations = related_model
+            .complete_inline_relations_from()
+            .filter(triggers_modifications)
+            .filter(|relation| !current_path.contains(<span class="kw-2">&amp;</span>relation.referencing_field()))
+            .map(|relation| {
                 (
-                    <span class="ident">relation</span>,
-                    <span class="ident">Rc::new</span>(<span class="ident">visited_relations</span>.<span class="ident">link_next</span>(<span class="ident">relation</span>)),
-                    <span class="ident">current_path</span>.<span class="ident">clone</span>(),
+                    relation,
+                    Rc::new(visited_relations.link_next(relation)),
+                    current_path.clone(),
                 )
             })
-            .<span class="ident">peekable</span>();
+            .peekable();
 
-        <span class="comment">// If the related model does not have any paths to other models, we</span>
-        <span class="comment">// traversed the whole path, storing it to the collection for later</span>
-        <span class="comment">// inspection.</span>
-        <span class="kw">if</span> <span class="ident">forward_relations</span>.<span class="ident">peek</span>().<span class="ident">is_none</span>() {
-            <span class="ident">paths</span>.<span class="ident">push</span>(<span class="ident">visited_relations</span>.<span class="ident">link_next</span>(<span class="ident">next_relation</span>));
+        <span class="comment">// If the related model does not have any paths to other models, we
+        // traversed the whole path, storing it to the collection for later
+        // inspection.
+        </span><span class="kw">if </span>forward_relations.peek().is_none() {
+            paths.push(visited_relations.link_next(next_relation));
 
             <span class="kw">continue</span>;
         }
 
-        <span class="ident">next_relations</span>.<span class="ident">extend</span>(<span class="ident">forward_relations</span>);
+        next_relations.extend(forward_relations);
     }
 
-    <span class="comment">// Gather all paths from a relation field to all the models seen from that</span>
-    <span class="comment">// field.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">for</span> <span class="ident">path</span> <span class="kw">in</span> <span class="ident">paths</span>.<span class="ident">iter</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">peekable</span>();
+    <span class="comment">// Gather all paths from a relation field to all the models seen from that
+    // field.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>seen: HashMap&lt;<span class="kw-2">&amp;</span>str, HashSet&lt;<span class="kw-2">&amp;</span>str&gt;&gt; = HashMap::new();
+    <span class="kw">for </span>path <span class="kw">in </span>paths.iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = path.iter().peekable();
 
-        <span class="kw">let</span> <span class="ident">seen_models</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">relation</span>) =&gt; <span class="ident">seen</span>.<span class="ident">entry</span>(<span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">name</span>()).<span class="ident">or_default</span>(),
-            <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+        <span class="kw">let </span>seen_models = <span class="kw">match </span>iter.peek() {
+            <span class="prelude-val">Some</span>(relation) =&gt; seen.entry(relation.referencing_field().name()).or_default(),
+            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
         };
 
-        <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="ident">seen_models</span>.<span class="ident">insert</span>(<span class="ident">relation</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>());
+        <span class="kw">for </span>relation <span class="kw">in </span>iter {
+            seen_models.insert(relation.referenced_model().name());
         }
     }
 
-    <span class="comment">// Compact the model nameas that can be reached from the given relation</span>
-    <span class="comment">// field, but also from any other relation field in the same model.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reachable</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeSet::new</span>();
+    <span class="comment">// Compact the model nameas that can be reached from the given relation
+    // field, but also from any other relation field in the same model.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>reachable: BTreeSet&lt;<span class="kw-2">&amp;</span>str&gt; = BTreeSet::new();
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">from_parent</span>) <span class="op">=</span> <span class="ident">seen</span>.<span class="ident">remove</span>(<span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">name</span>()) {
-        <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">from_other</span>) <span class="kw">in</span> <span class="ident">seen</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">reachable</span>.<span class="ident">extend</span>(<span class="ident">from_parent</span>.<span class="ident">intersection</span>(<span class="kw-2">&amp;</span><span class="ident">from_other</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(from_parent) = seen.remove(relation.referencing_field().name()) {
+        <span class="kw">for </span>(<span class="kw">_</span>, from_other) <span class="kw">in </span>seen.into_iter() {
+            reachable.extend(from_parent.intersection(<span class="kw-2">&amp;</span>from_other));
         }
     }
 
-    <span class="kw">let</span> <span class="ident">models</span> <span class="op">=</span> <span class="ident">reachable</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">model_name</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">model_name</span>))
-        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+    <span class="kw">let </span>models = reachable
+        .iter()
+        .map(|model_name| <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, model_name))
+        .join(<span class="string">&quot;, &quot;</span>);
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::comparison_chain</span>)]</span> <span class="comment">// match looks horrible here...</span>
-    <span class="kw">if</span> <span class="ident">reachable</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="attribute">#[allow(clippy::comparison_chain)] </span><span class="comment">// match looks horrible here...
+    </span><span class="kw">if </span>reachable.len() == <span class="number">1 </span>{
+        <span class="kw">let </span>msg = <span class="macro">format!</span>(
             <span class="string">&quot;When any of the records in model {} is updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.&quot;</span>,
-            <span class="ident">models</span>,
-            <span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>()
+            models,
+            relation.referencing_model().name()
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(
-            <span class="ident">relation</span>,
-            <span class="ident">ctx</span>.<span class="ident">connector</span>,
-            <span class="ident">ctx</span>.<span class="ident">relation_mode</span>,
-            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+        ctx.push_error(cascade_error_with_default_values(
+            relation,
+            ctx.connector,
+            ctx.relation_mode,
+            <span class="kw-2">&amp;</span>msg,
         ));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">reachable</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    } <span class="kw">else if </span>reachable.len() &gt; <span class="number">1 </span>{
+        <span class="kw">let </span>msg = <span class="macro">format!</span>(
             <span class="string">&quot;When any of the records in models {} are updated or deleted, the referential actions on the relations cascade to model `{}` through multiple paths. Please break one of these paths by setting the `onUpdate` and `onDelete` to `NoAction`.&quot;</span>,
-            <span class="ident">models</span>,
-            <span class="ident">relation</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>()
+            models,
+            relation.referencing_model().name()
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">cascade_error_with_default_values</span>(
-            <span class="ident">relation</span>,
-            <span class="ident">ctx</span>.<span class="ident">connector</span>,
-            <span class="ident">ctx</span>.<span class="ident">relation_mode</span>,
-            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
+        ctx.push_error(cascade_error_with_default_values(
+            relation,
+            ctx.connector,
+            ctx.relation_mode,
+            <span class="kw-2">&amp;</span>msg,
         ));
     }
 }
 
-<span class="kw">fn</span> <span class="ident">cascade_error_with_default_values</span>(
-    <span class="ident">relation</span>: <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) -&gt; <span class="ident">DatamodelError</span> {
-    <span class="kw">let</span> <span class="ident">on_delete</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">explicit_on_delete</span>() {
-        <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">on_delete</span>(<span class="ident">connector</span>, <span class="ident">relation_mode</span>).<span class="ident">triggers_modification</span>() =&gt; {
-            <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">on_delete</span>(<span class="ident">connector</span>, <span class="ident">relation_mode</span>))
+<span class="kw">fn </span>cascade_error_with_default_values(
+    relation: CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    relation_mode: RelationMode,
+    msg: <span class="kw-2">&amp;</span>str,
+) -&gt; DatamodelError {
+    <span class="kw">let </span>on_delete = <span class="kw">match </span>relation.referencing_field().explicit_on_delete() {
+        <span class="prelude-val">None </span><span class="kw">if </span>relation.on_delete(connector, relation_mode).triggers_modification() =&gt; {
+            <span class="prelude-val">Some</span>(relation.on_delete(connector, relation_mode))
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">on_update</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">explicit_on_update</span>() {
-        <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">on_update</span>().<span class="ident">triggers_modification</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">on_update</span>()),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">let </span>on_update = <span class="kw">match </span>relation.referencing_field().explicit_on_update() {
+        <span class="prelude-val">None </span><span class="kw">if </span>relation.on_update().triggers_modification() =&gt; <span class="prelude-val">Some</span>(relation.on_update()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">on_delete</span>, <span class="ident">on_update</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">on_delete</span>), <span class="prelude-val">Some</span>(<span class="ident">on_update</span>)) =&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>msg = <span class="kw">match </span>(on_delete, on_update) {
+        (<span class="prelude-val">Some</span>(on_delete), <span class="prelude-val">Some</span>(on_update)) =&gt; {
             <span class="macro">format!</span>(
                 <span class="string">&quot;{} (Implicit default `onDelete`: `{}`, and `onUpdate`: `{}`)&quot;</span>,
-                <span class="ident">msg</span>,
-                <span class="ident">on_delete</span>.<span class="ident">as_str</span>(),
-                <span class="ident">on_update</span>.<span class="ident">as_str</span>()
+                msg,
+                on_delete.as_str(),
+                on_update.as_str()
             )
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">on_delete</span>), <span class="prelude-val">None</span>) =&gt; {
-            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onDelete`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_delete</span>.<span class="ident">as_str</span>())
+        (<span class="prelude-val">Some</span>(on_delete), <span class="prelude-val">None</span>) =&gt; {
+            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onDelete`: `{}`)&quot;</span>, msg, on_delete.as_str())
         }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">on_update</span>)) =&gt; {
-            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onUpdate`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_update</span>.<span class="ident">as_str</span>())
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(on_update)) =&gt; {
+            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onUpdate`: `{}`)&quot;</span>, msg, on_update.as_str())
         }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">msg</span>.<span class="ident">to_string</span>(),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; msg.to_string(),
     };
 
-    <span class="ident">msg</span>.<span class="ident">push_str</span>(<span class="string">&quot; Read more at https://pris.ly/d/cyclic-referential-actions&quot;</span>);
+    msg.push_str(<span class="string">&quot; Read more at https://pris.ly/d/cyclic-referential-actions&quot;</span>);
 
-    <span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">relation</span>.<span class="ident">referencing_field</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>())
+    DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, relation.referencing_field().ast_field().span())
 }
 
-<span class="doccomment">/// The types of the referencing and referenced scalar fields in a relation must be compatible.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referencing_scalar_field_types</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">referencing_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
-        <span class="ident">fields</span>
-    } <span class="kw">else</span> {
+<span class="doccomment">/// The types of the referencing and referenced scalar fields in a relation must be compatible.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>referencing_scalar_field_types(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>referencing_fields = <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = relation.referencing_fields() {
+        fields
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">for</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) <span class="kw">in</span> <span class="ident">referencing_fields</span>.<span class="ident">zip</span>(<span class="ident">relation</span>.<span class="ident">referenced_fields</span>()) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">field_types_match</span>(<span class="ident">referencing</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">referenced</span>.<span class="ident">scalar_field_type</span>()) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    <span class="kw">for </span>(referencing, referenced) <span class="kw">in </span>referencing_fields.zip(relation.referenced_fields()) {
+        <span class="kw">if </span>!field_types_match(referencing.scalar_field_type(), referenced.scalar_field_type()) {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;The type of the field `{}` in the model `{}` is not matching the type of the referenced field `{}` in model `{}`.&quot;</span>,
-                    <span class="ident">referencing</span>.<span class="ident">name</span>(),
-                    <span class="ident">referencing</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-                    <span class="ident">referenced</span>.<span class="ident">name</span>(),
-                    <span class="ident">referenced</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                    referencing.name(),
+                    referencing.model().name(),
+                    referenced.name(),
+                    referenced.model().name(),
                 ),
-                <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-                <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">unwrap</span>().<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+                RELATION_ATTRIBUTE_NAME,
+                relation.forward_relation_field().unwrap().ast_field().span(),
             ))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">field_types_match</span>(<span class="ident">referencing</span>: <span class="ident">ScalarFieldType</span>, <span class="ident">referenced</span>: <span class="ident">ScalarFieldType</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) {
-            (<span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">ScalarFieldType::Enum</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">ScalarFieldType::Unsupported</span>(<span class="ident">a</span>), <span class="ident">ScalarFieldType::Unsupported</span>(<span class="ident">b</span>)) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType) -&gt; bool {
+        <span class="kw">match </span>(referencing, referenced) {
+            (ScalarFieldType::CompositeType(a), ScalarFieldType::CompositeType(b)) <span class="kw">if </span>a == b =&gt; <span class="bool-val">true</span>,
+            (ScalarFieldType::Enum(a), ScalarFieldType::Enum(b)) <span class="kw">if </span>a == b =&gt; <span class="bool-val">true</span>,
+            (ScalarFieldType::BuiltInScalar(a), ScalarFieldType::BuiltInScalar(b)) <span class="kw">if </span>a == b =&gt; <span class="bool-val">true</span>,
+            (ScalarFieldType::Unsupported(a), ScalarFieldType::Unsupported(b)) <span class="kw">if </span>a == b =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">is_empty_fields</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">fields</span> {
-        <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>,
+<span class="kw">fn </span>is_empty_fields&lt;T&gt;(fields: <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = T&gt;&gt;) -&gt; bool {
+    <span class="kw">match </span>fields {
+        <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
+        <span class="prelude-val">Some</span>(fields) =&gt; fields.len() == <span class="number">0</span>,
     }
 }
 
-<span class="doccomment">/// There cannot be any required field in a relation where one of the referential actions is SetNull.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">required_relation_cannot_use_set_null</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="comment">// return early if there&#39;s no relation field on the referencing model</span>
-    <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">forward</span>) =&gt; <span class="ident">forward</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// There cannot be any required field in a relation where one of the referential actions is SetNull.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>required_relation_cannot_use_set_null(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="comment">// return early if there&#39;s no relation field on the referencing model
+    </span><span class="kw">let </span>forward = <span class="kw">match </span>relation.forward_relation_field() {
+        <span class="prelude-val">Some</span>(forward) =&gt; forward,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="comment">// return early if no referencing field is required</span>
-    <span class="kw">if</span> <span class="ident">forward</span>
-        .<span class="ident">referencing_fields</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">fields</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="op">!</span><span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()))
-        .<span class="ident">unwrap_or_default</span>()
+    <span class="comment">// return early if no referencing field is required
+    </span><span class="kw">if </span>forward
+        .referencing_fields()
+        .map(|<span class="kw-2">mut </span>fields| fields.all(|f| !f.ast_field().arity.is_required()))
+        .unwrap_or_default()
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_delete</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="macro">indoc!</span> {<span class="string">r#&quot;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_delete() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="macro">indoc! </span>{<span class="string">r#&quot;
                 The `onDelete` referential action of a relation must not be set to `SetNull` when a referenced field is required.
                 Either choose another referential action, or make the referenced fields optional.
             &quot;#</span>},
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ))
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ReferentialAction::SetNull</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">explicit_on_update</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="macro">indoc!</span> {<span class="string">r#&quot;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ReferentialAction::SetNull) = forward.explicit_on_update() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="macro">indoc! </span>{<span class="string">r#&quot;
                 The `onUpdate` referential action of a relation must not be set to `SetNull` when a referenced field is required.
                 Either choose another referential action, or make the referenced fields optional.
             &quot;#</span>},
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

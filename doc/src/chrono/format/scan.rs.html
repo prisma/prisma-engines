@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/scan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scan.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/scan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scan.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -413,113 +413,113 @@
 <span id="413">413</span>
 <span id="414">414</span>
 <span id="415">415</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">/*!
+</span><span class="doccomment">/*!
  * Various scanning routines for the parser.
- */</span>
+ */
 
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+</span><span class="attribute">#![allow(deprecated)]
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ParseResult</span>, <span class="ident">INVALID</span>, <span class="ident">OUT_OF_RANGE</span>, <span class="ident">TOO_SHORT</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Weekday</span>;
+</span><span class="kw">use super</span>::{ParseResult, INVALID, OUT_OF_RANGE, TOO_SHORT};
+<span class="kw">use </span><span class="kw">crate</span>::Weekday;
 
-<span class="doccomment">/// Returns true when two slices are equal case-insensitively (in ASCII).</span>
-<span class="doccomment">/// Assumes that the `pattern` is already converted to lower case.</span>
-<span class="kw">fn</span> <span class="ident">equals</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">pattern</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">xs</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> =&gt; <span class="ident">c</span> <span class="op">+</span> <span class="number">32</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">c</span>,
+<span class="doccomment">/// Returns true when two slices are equal case-insensitively (in ASCII).
+/// Assumes that the `pattern` is already converted to lower case.
+</span><span class="kw">fn </span>equals(s: <span class="kw-2">&amp;</span>str, pattern: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">let </span><span class="kw-2">mut </span>xs = s.as_bytes().iter().map(|<span class="kw-2">&amp;</span>c| <span class="kw">match </span>c {
+        <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39; </span>=&gt; c + <span class="number">32</span>,
+        <span class="kw">_ </span>=&gt; c,
     });
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ys</span> <span class="op">=</span> <span class="ident">pattern</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">cloned</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">match</span> (<span class="ident">xs</span>.<span class="ident">next</span>(), <span class="ident">ys</span>.<span class="ident">next</span>()) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="bool-val">true</span>,
-            (<span class="prelude-val">None</span>, <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
-            (<span class="prelude-val">Some</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">y</span>)) <span class="kw">if</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="ident">y</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; (),
+    <span class="kw">let </span><span class="kw-2">mut </span>ys = pattern.as_bytes().iter().cloned();
+    <span class="kw">loop </span>{
+        <span class="kw">match </span>(xs.next(), ys.next()) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="bool-val">true</span>,
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) | (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+            (<span class="prelude-val">Some</span>(x), <span class="prelude-val">Some</span>(y)) <span class="kw">if </span>x != y =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 }
 
-<span class="doccomment">/// Tries to parse the non-negative number from `min` to `max` digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The absence of digits at all is an unconditional error.</span>
-<span class="doccomment">/// More than `max` digits are consumed up to the first `max` digits.</span>
-<span class="doccomment">/// Any number that does not fit in `i64` is an error.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">number</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">min</span>: <span class="ident">usize</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i64</span>)<span class="op">&gt;</span> {
-    <span class="macro">assert!</span>(<span class="ident">min</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max</span>);
+<span class="doccomment">/// Tries to parse the non-negative number from `min` to `max` digits.
+///
+/// The absence of digits at all is an unconditional error.
+/// More than `max` digits are consumed up to the first `max` digits.
+/// Any number that does not fit in `i64` is an error.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>number(s: <span class="kw-2">&amp;</span>str, min: usize, max: usize) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i64)&gt; {
+    <span class="macro">assert!</span>(min &lt;= max);
 
-    <span class="comment">// We are only interested in ascii numbers, so we can work with the `str` as bytes. We stop on</span>
-    <span class="comment">// the first non-numeric byte, which may be another ascii character or beginning of multi-byte</span>
-    <span class="comment">// UTF-8 character.</span>
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
-    <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">min</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>);
+    <span class="comment">// We are only interested in ascii numbers, so we can work with the `str` as bytes. We stop on
+    // the first non-numeric byte, which may be another ascii character or beginning of multi-byte
+    // UTF-8 character.
+    </span><span class="kw">let </span>bytes = s.as_bytes();
+    <span class="kw">if </span>bytes.len() &lt; min {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0i64</span>;
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="ident">max</span>).<span class="ident">cloned</span>().<span class="ident">enumerate</span>() {
-        <span class="comment">// cloned() = copied()</span>
-        <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="string">b&#39;0&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="string">b&#39;9&#39;</span> <span class="op">&lt;</span> <span class="ident">c</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">min</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..], <span class="ident">n</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>n = <span class="number">0i64</span>;
+    <span class="kw">for </span>(i, c) <span class="kw">in </span>bytes.iter().take(max).cloned().enumerate() {
+        <span class="comment">// cloned() = copied()
+        </span><span class="kw">if </span>c &lt; <span class="string">b&#39;0&#39; </span>|| <span class="string">b&#39;9&#39; </span>&lt; c {
+            <span class="kw">if </span>i &lt; min {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[i..], n));
             }
         }
 
-        <span class="ident">n</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">n</span>.<span class="ident">checked_mul</span>(<span class="number">10</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">checked_add</span>((<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="kw">as</span> <span class="ident">i64</span>)) {
-            <span class="prelude-val">Some</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OUT_OF_RANGE</span>),
+        n = <span class="kw">match </span>n.checked_mul(<span class="number">10</span>).and_then(|n| n.checked_add((c - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>i64)) {
+            <span class="prelude-val">Some</span>(n) =&gt; n,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE),
         };
     }
 
-    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">core::cmp::min</span>(<span class="ident">max</span>, <span class="ident">bytes</span>.<span class="ident">len</span>())..], <span class="ident">n</span>))
+    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[core::cmp::min(max, bytes.len())..], n))
 }
 
-<span class="doccomment">/// Tries to consume at least one digits as a fractional second.</span>
-<span class="doccomment">/// Returns the number of whole nanoseconds (0--999,999,999).</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">nanosecond</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i64</span>)<span class="op">&gt;</span> {
-    <span class="comment">// record the number of digits consumed for later scaling.</span>
-    <span class="kw">let</span> <span class="ident">origlen</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">number</span>(<span class="ident">s</span>, <span class="number">1</span>, <span class="number">9</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">consumed</span> <span class="op">=</span> <span class="ident">origlen</span> <span class="op">-</span> <span class="ident">s</span>.<span class="ident">len</span>();
+<span class="doccomment">/// Tries to consume at least one digits as a fractional second.
+/// Returns the number of whole nanoseconds (0--999,999,999).
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>nanosecond(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i64)&gt; {
+    <span class="comment">// record the number of digits consumed for later scaling.
+    </span><span class="kw">let </span>origlen = s.len();
+    <span class="kw">let </span>(s, v) = number(s, <span class="number">1</span>, <span class="number">9</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>consumed = origlen - s.len();
 
-    <span class="comment">// scale the number accordingly.</span>
-    <span class="kw">static</span> <span class="ident">SCALE</span>: [<span class="ident">i64</span>; <span class="number">10</span>] <span class="op">=</span>
+    <span class="comment">// scale the number accordingly.
+    </span><span class="kw">static </span>SCALE: [i64; <span class="number">10</span>] =
         [<span class="number">0</span>, <span class="number">100_000_000</span>, <span class="number">10_000_000</span>, <span class="number">1_000_000</span>, <span class="number">100_000</span>, <span class="number">10_000</span>, <span class="number">1_000</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="number">1</span>];
-    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">checked_mul</span>(<span class="ident">SCALE</span>[<span class="ident">consumed</span>]).<span class="ident">ok_or</span>(<span class="ident">OUT_OF_RANGE</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>v = v.checked_mul(SCALE[consumed]).ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>;
 
-    <span class="comment">// if there are more than 9 digits, skip next digits.</span>
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trim_left_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="string">&#39;0&#39;</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">c</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">&#39;9&#39;</span>);
+    <span class="comment">// if there are more than 9 digits, skip next digits.
+    </span><span class="kw">let </span>s = s.trim_left_matches(|c: char| <span class="string">&#39;0&#39; </span>&lt;= c &amp;&amp; c &lt;= <span class="string">&#39;9&#39;</span>);
 
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="ident">v</span>))
+    <span class="prelude-val">Ok</span>((s, v))
 }
 
-<span class="doccomment">/// Tries to consume a fixed number of digits as a fractional second.</span>
-<span class="doccomment">/// Returns the number of whole nanoseconds (0--999,999,999).</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">nanosecond_fixed</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">digits</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i64</span>)<span class="op">&gt;</span> {
-    <span class="comment">// record the number of digits consumed for later scaling.</span>
-    <span class="kw">let</span> (<span class="ident">s</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">number</span>(<span class="ident">s</span>, <span class="ident">digits</span>, <span class="ident">digits</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Tries to consume a fixed number of digits as a fractional second.
+/// Returns the number of whole nanoseconds (0--999,999,999).
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>nanosecond_fixed(s: <span class="kw-2">&amp;</span>str, digits: usize) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i64)&gt; {
+    <span class="comment">// record the number of digits consumed for later scaling.
+    </span><span class="kw">let </span>(s, v) = number(s, digits, digits)<span class="question-mark">?</span>;
 
-    <span class="comment">// scale the number accordingly.</span>
-    <span class="kw">static</span> <span class="ident">SCALE</span>: [<span class="ident">i64</span>; <span class="number">10</span>] <span class="op">=</span>
+    <span class="comment">// scale the number accordingly.
+    </span><span class="kw">static </span>SCALE: [i64; <span class="number">10</span>] =
         [<span class="number">0</span>, <span class="number">100_000_000</span>, <span class="number">10_000_000</span>, <span class="number">1_000_000</span>, <span class="number">100_000</span>, <span class="number">10_000</span>, <span class="number">1_000</span>, <span class="number">100</span>, <span class="number">10</span>, <span class="number">1</span>];
-    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">checked_mul</span>(<span class="ident">SCALE</span>[<span class="ident">digits</span>]).<span class="ident">ok_or</span>(<span class="ident">OUT_OF_RANGE</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>v = v.checked_mul(SCALE[digits]).ok_or(OUT_OF_RANGE)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="ident">v</span>))
+    <span class="prelude-val">Ok</span>((s, v))
 }
 
-<span class="doccomment">/// Tries to parse the month index (0 through 11) with the first three ASCII letters.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">short_month0</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>);
+<span class="doccomment">/// Tries to parse the month index (0 through 11) with the first three ASCII letters.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>short_month0(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, u8)&gt; {
+    <span class="kw">if </span>s.len() &lt; <span class="number">3 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT);
     }
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
-    <span class="kw">let</span> <span class="ident">month0</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">buf</span>[<span class="number">0</span>] <span class="op">|</span> <span class="number">32</span>, <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">|</span> <span class="number">32</span>, <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">|</span> <span class="number">32</span>) {
+    <span class="kw">let </span>buf = s.as_bytes();
+    <span class="kw">let </span>month0 = <span class="kw">match </span>(buf[<span class="number">0</span>] | <span class="number">32</span>, buf[<span class="number">1</span>] | <span class="number">32</span>, buf[<span class="number">2</span>] | <span class="number">32</span>) {
         (<span class="string">b&#39;j&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;n&#39;</span>) =&gt; <span class="number">0</span>,
         (<span class="string">b&#39;f&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;b&#39;</span>) =&gt; <span class="number">1</span>,
         (<span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;r&#39;</span>) =&gt; <span class="number">2</span>,
@@ -532,276 +532,276 @@
         (<span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;t&#39;</span>) =&gt; <span class="number">9</span>,
         (<span class="string">b&#39;n&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;v&#39;</span>) =&gt; <span class="number">10</span>,
         (<span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;c&#39;</span>) =&gt; <span class="number">11</span>,
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
     };
-    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">3</span>..], <span class="ident">month0</span>))
+    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[<span class="number">3</span>..], month0))
 }
 
-<span class="doccomment">/// Tries to parse the weekday with the first three ASCII letters.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">short_weekday</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Weekday</span>)<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>);
+<span class="doccomment">/// Tries to parse the weekday with the first three ASCII letters.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>short_weekday(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, Weekday)&gt; {
+    <span class="kw">if </span>s.len() &lt; <span class="number">3 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT);
     }
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
-    <span class="kw">let</span> <span class="ident">weekday</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">buf</span>[<span class="number">0</span>] <span class="op">|</span> <span class="number">32</span>, <span class="ident">buf</span>[<span class="number">1</span>] <span class="op">|</span> <span class="number">32</span>, <span class="ident">buf</span>[<span class="number">2</span>] <span class="op">|</span> <span class="number">32</span>) {
-        (<span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;n&#39;</span>) =&gt; <span class="ident">Weekday::Mon</span>,
-        (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;e&#39;</span>) =&gt; <span class="ident">Weekday::Tue</span>,
-        (<span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;d&#39;</span>) =&gt; <span class="ident">Weekday::Wed</span>,
-        (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;h&#39;</span>, <span class="string">b&#39;u&#39;</span>) =&gt; <span class="ident">Weekday::Thu</span>,
-        (<span class="string">b&#39;f&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; <span class="ident">Weekday::Fri</span>,
-        (<span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;t&#39;</span>) =&gt; <span class="ident">Weekday::Sat</span>,
-        (<span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;n&#39;</span>) =&gt; <span class="ident">Weekday::Sun</span>,
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+    <span class="kw">let </span>buf = s.as_bytes();
+    <span class="kw">let </span>weekday = <span class="kw">match </span>(buf[<span class="number">0</span>] | <span class="number">32</span>, buf[<span class="number">1</span>] | <span class="number">32</span>, buf[<span class="number">2</span>] | <span class="number">32</span>) {
+        (<span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;n&#39;</span>) =&gt; Weekday::Mon,
+        (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;e&#39;</span>) =&gt; Weekday::Tue,
+        (<span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;d&#39;</span>) =&gt; Weekday::Wed,
+        (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;h&#39;</span>, <span class="string">b&#39;u&#39;</span>) =&gt; Weekday::Thu,
+        (<span class="string">b&#39;f&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;i&#39;</span>) =&gt; Weekday::Fri,
+        (<span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;t&#39;</span>) =&gt; Weekday::Sat,
+        (<span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;n&#39;</span>) =&gt; Weekday::Sun,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
     };
-    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">3</span>..], <span class="ident">weekday</span>))
+    <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[<span class="number">3</span>..], weekday))
 }
 
-<span class="doccomment">/// Tries to parse the month index (0 through 11) with short or long month names.</span>
-<span class="doccomment">/// It prefers long month names to short month names when both are possible.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">short_or_long_month0</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> {
-    <span class="comment">// lowercased month names, minus first three chars</span>
-    <span class="kw">static</span> <span class="ident">LONG_MONTH_SUFFIXES</span>: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">12</span>] <span class="op">=</span>
+<span class="doccomment">/// Tries to parse the month index (0 through 11) with short or long month names.
+/// It prefers long month names to short month names when both are possible.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>short_or_long_month0(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, u8)&gt; {
+    <span class="comment">// lowercased month names, minus first three chars
+    </span><span class="kw">static </span>LONG_MONTH_SUFFIXES: [<span class="kw-2">&amp;</span>str; <span class="number">12</span>] =
         [<span class="string">&quot;uary&quot;</span>, <span class="string">&quot;ruary&quot;</span>, <span class="string">&quot;ch&quot;</span>, <span class="string">&quot;il&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;e&quot;</span>, <span class="string">&quot;y&quot;</span>, <span class="string">&quot;ust&quot;</span>, <span class="string">&quot;tember&quot;</span>, <span class="string">&quot;ober&quot;</span>, <span class="string">&quot;ember&quot;</span>, <span class="string">&quot;ember&quot;</span>];
 
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">s</span>, <span class="ident">month0</span>) <span class="op">=</span> <span class="ident">short_month0</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(<span class="kw-2">mut </span>s, month0) = short_month0(s)<span class="question-mark">?</span>;
 
-    <span class="comment">// tries to consume the suffix if possible</span>
-    <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">LONG_MONTH_SUFFIXES</span>[<span class="ident">month0</span> <span class="kw">as</span> <span class="ident">usize</span>];
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">suffix</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">equals</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">suffix</span>.<span class="ident">len</span>()], <span class="ident">suffix</span>) {
-        <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">suffix</span>.<span class="ident">len</span>()..];
+    <span class="comment">// tries to consume the suffix if possible
+    </span><span class="kw">let </span>suffix = LONG_MONTH_SUFFIXES[month0 <span class="kw">as </span>usize];
+    <span class="kw">if </span>s.len() &gt;= suffix.len() &amp;&amp; equals(<span class="kw-2">&amp;</span>s[..suffix.len()], suffix) {
+        s = <span class="kw-2">&amp;</span>s[suffix.len()..];
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="ident">month0</span>))
+    <span class="prelude-val">Ok</span>((s, month0))
 }
 
-<span class="doccomment">/// Tries to parse the weekday with short or long weekday names.</span>
-<span class="doccomment">/// It prefers long weekday names to short weekday names when both are possible.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">short_or_long_weekday</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Weekday</span>)<span class="op">&gt;</span> {
-    <span class="comment">// lowercased weekday names, minus first three chars</span>
-    <span class="kw">static</span> <span class="ident">LONG_WEEKDAY_SUFFIXES</span>: [<span class="kw-2">&amp;</span><span class="ident">str</span>; <span class="number">7</span>] <span class="op">=</span>
+<span class="doccomment">/// Tries to parse the weekday with short or long weekday names.
+/// It prefers long weekday names to short weekday names when both are possible.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>short_or_long_weekday(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, Weekday)&gt; {
+    <span class="comment">// lowercased weekday names, minus first three chars
+    </span><span class="kw">static </span>LONG_WEEKDAY_SUFFIXES: [<span class="kw-2">&amp;</span>str; <span class="number">7</span>] =
         [<span class="string">&quot;day&quot;</span>, <span class="string">&quot;sday&quot;</span>, <span class="string">&quot;nesday&quot;</span>, <span class="string">&quot;rsday&quot;</span>, <span class="string">&quot;day&quot;</span>, <span class="string">&quot;urday&quot;</span>, <span class="string">&quot;day&quot;</span>];
 
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">s</span>, <span class="ident">weekday</span>) <span class="op">=</span> <span class="ident">short_weekday</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(<span class="kw-2">mut </span>s, weekday) = short_weekday(s)<span class="question-mark">?</span>;
 
-    <span class="comment">// tries to consume the suffix if possible</span>
-    <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="ident">LONG_WEEKDAY_SUFFIXES</span>[<span class="ident">weekday</span>.<span class="ident">num_days_from_monday</span>() <span class="kw">as</span> <span class="ident">usize</span>];
-    <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">suffix</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">equals</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">suffix</span>.<span class="ident">len</span>()], <span class="ident">suffix</span>) {
-        <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">suffix</span>.<span class="ident">len</span>()..];
+    <span class="comment">// tries to consume the suffix if possible
+    </span><span class="kw">let </span>suffix = LONG_WEEKDAY_SUFFIXES[weekday.num_days_from_monday() <span class="kw">as </span>usize];
+    <span class="kw">if </span>s.len() &gt;= suffix.len() &amp;&amp; equals(<span class="kw-2">&amp;</span>s[..suffix.len()], suffix) {
+        s = <span class="kw-2">&amp;</span>s[suffix.len()..];
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="ident">weekday</span>))
+    <span class="prelude-val">Ok</span>((s, weekday))
 }
 
-<span class="doccomment">/// Tries to consume exactly one given character.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">char</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">c1</span>: <span class="ident">u8</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">first</span>() {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">c1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..]),
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>),
-    }
-}
-
-<span class="doccomment">/// Tries to consume one or more whitespace.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">space</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">s_</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trim_left</span>();
-    <span class="kw">if</span> <span class="ident">s_</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">s_</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>)
+<span class="doccomment">/// Tries to consume exactly one given character.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>char(s: <span class="kw-2">&amp;</span>str, c1: u8) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">match </span>s.as_bytes().first() {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) <span class="kw">if </span>c == c1 =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span>s[<span class="number">1</span>..]),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(INVALID),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(TOO_SHORT),
     }
 }
 
-<span class="doccomment">/// Consumes any number (including zero) of colon or spaces.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">colon_or_space</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">trim_left_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>()))
+<span class="doccomment">/// Tries to consume one or more whitespace.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>space(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">let </span>s_ = s.trim_left();
+    <span class="kw">if </span>s_.len() &lt; s.len() {
+        <span class="prelude-val">Ok</span>(s_)
+    } <span class="kw">else if </span>s.is_empty() {
+        <span class="prelude-val">Err</span>(TOO_SHORT)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(INVALID)
+    }
 }
 
-<span class="doccomment">/// Tries to parse `[-+]\d\d` continued by `\d\d`. Return an offset in seconds if possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The additional `colon` may be used to parse a mandatory or optional `:`</span>
-<span class="doccomment">/// between hours and minutes, and should return either a new suffix or `Err` when parsing fails.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">timezone_offset</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">consume_colon</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i32</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Consumes any number (including zero) of colon or spaces.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>colon_or_space(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="prelude-val">Ok</span>(s.trim_left_matches(|c: char| c == <span class="string">&#39;:&#39; </span>|| c.is_whitespace()))
+}
+
+<span class="doccomment">/// Tries to parse `[-+]\d\d` continued by `\d\d`. Return an offset in seconds if possible.
+///
+/// The additional `colon` may be used to parse a mandatory or optional `:`
+/// between hours and minutes, and should return either a new suffix or `Err` when parsing fails.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>timezone_offset&lt;F&gt;(s: <span class="kw-2">&amp;</span>str, consume_colon: F) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i32)&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt;,
 {
-    <span class="ident">timezone_offset_internal</span>(<span class="ident">s</span>, <span class="ident">consume_colon</span>, <span class="bool-val">false</span>)
+    timezone_offset_internal(s, consume_colon, <span class="bool-val">false</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">timezone_offset_internal</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="kw-2">mut</span> <span class="ident">consume_colon</span>: <span class="ident">F</span>,
-    <span class="ident">allow_missing_minutes</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i32</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>timezone_offset_internal&lt;F&gt;(
+    <span class="kw-2">mut </span>s: <span class="kw-2">&amp;</span>str,
+    <span class="kw-2">mut </span>consume_colon: F,
+    allow_missing_minutes: bool,
+) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i32)&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">digits</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
-        <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">b</span>[<span class="number">0</span>], <span class="ident">b</span>[<span class="number">1</span>]))
+    <span class="kw">fn </span>digits(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(u8, u8)&gt; {
+        <span class="kw">let </span>b = s.as_bytes();
+        <span class="kw">if </span>b.len() &lt; <span class="number">2 </span>{
+            <span class="prelude-val">Err</span>(TOO_SHORT)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>((b[<span class="number">0</span>], b[<span class="number">1</span>]))
         }
     }
-    <span class="kw">let</span> <span class="ident">negative</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">first</span>() {
+    <span class="kw">let </span>negative = <span class="kw">match </span>s.as_bytes().first() {
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) =&gt; <span class="bool-val">false</span>,
         <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>) =&gt; <span class="bool-val">true</span>,
-        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>),
+        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT),
     };
-    <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..];
+    s = <span class="kw-2">&amp;</span>s[<span class="number">1</span>..];
 
-    <span class="comment">// hours (00--99)</span>
-    <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">digits</span>(<span class="ident">s</span>)<span class="question-mark">?</span> {
-        (<span class="ident">h1</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>, <span class="ident">h2</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>) =&gt; <span class="ident">i32::from</span>((<span class="ident">h1</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="op">*</span> <span class="number">10</span> <span class="op">+</span> (<span class="ident">h2</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>)),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+    <span class="comment">// hours (00--99)
+    </span><span class="kw">let </span>hours = <span class="kw">match </span>digits(s)<span class="question-mark">? </span>{
+        (h1 @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>, h2 @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>) =&gt; i32::from((h1 - <span class="string">b&#39;0&#39;</span>) * <span class="number">10 </span>+ (h2 - <span class="string">b&#39;0&#39;</span>)),
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
     };
-    <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..];
+    s = <span class="kw-2">&amp;</span>s[<span class="number">2</span>..];
 
-    <span class="comment">// colons (and possibly other separators)</span>
-    <span class="ident">s</span> <span class="op">=</span> <span class="ident">consume_colon</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+    <span class="comment">// colons (and possibly other separators)
+    </span>s = consume_colon(s)<span class="question-mark">?</span>;
 
-    <span class="comment">// minutes (00--59)</span>
-    <span class="comment">// if the next two items are digits then we have to add minutes</span>
-    <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ds</span>) <span class="op">=</span> <span class="ident">digits</span>(<span class="ident">s</span>) {
-        <span class="kw">match</span> <span class="ident">ds</span> {
-            (<span class="ident">m1</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;5&#39;</span>, <span class="ident">m2</span> @ <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>) =&gt; <span class="ident">i32::from</span>((<span class="ident">m1</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="op">*</span> <span class="number">10</span> <span class="op">+</span> (<span class="ident">m2</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>)),
-            (<span class="string">b&#39;6&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">OUT_OF_RANGE</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+    <span class="comment">// minutes (00--59)
+    // if the next two items are digits then we have to add minutes
+    </span><span class="kw">let </span>minutes = <span class="kw">if let </span><span class="prelude-val">Ok</span>(ds) = digits(s) {
+        <span class="kw">match </span>ds {
+            (m1 @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;5&#39;</span>, m2 @ <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>) =&gt; i32::from((m1 - <span class="string">b&#39;0&#39;</span>) * <span class="number">10 </span>+ (m2 - <span class="string">b&#39;0&#39;</span>)),
+            (<span class="string">b&#39;6&#39;</span>..=<span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(OUT_OF_RANGE),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">allow_missing_minutes</span> {
-        <span class="number">0</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>);
+    } <span class="kw">else if </span>allow_missing_minutes {
+        <span class="number">0
+    </span>} <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT);
     };
-    <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-        <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..],
-        <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">s</span>,
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>),
+    s = <span class="kw">match </span>s.len() {
+        len <span class="kw">if </span>len &gt;= <span class="number">2 </span>=&gt; <span class="kw-2">&amp;</span>s[<span class="number">2</span>..],
+        len <span class="kw">if </span>len == <span class="number">0 </span>=&gt; s,
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TOO_SHORT),
     };
 
-    <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> <span class="ident">hours</span> <span class="op">*</span> <span class="number">3600</span> <span class="op">+</span> <span class="ident">minutes</span> <span class="op">*</span> <span class="number">60</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="kw">if</span> <span class="ident">negative</span> { <span class="op">-</span><span class="ident">seconds</span> } <span class="kw">else</span> { <span class="ident">seconds</span> }))
+    <span class="kw">let </span>seconds = hours * <span class="number">3600 </span>+ minutes * <span class="number">60</span>;
+    <span class="prelude-val">Ok</span>((s, <span class="kw">if </span>negative { -seconds } <span class="kw">else </span>{ seconds }))
 }
 
-<span class="doccomment">/// Same as `timezone_offset` but also allows for `z`/`Z` which is the same as `+00:00`.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">timezone_offset_zulu</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">colon</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i32</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Same as `timezone_offset` but also allows for `z`/`Z` which is the same as `+00:00`.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>timezone_offset_zulu&lt;F&gt;(s: <span class="kw-2">&amp;</span>str, colon: F) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i32)&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt;,
 {
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>();
-    <span class="kw">match</span> <span class="ident">bytes</span>.<span class="ident">first</span>() {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;z&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;Z&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..], <span class="number">0</span>)),
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;u&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;U&#39;</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span> {
-                <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">c</span>) <span class="op">=</span> (<span class="ident">bytes</span>[<span class="number">1</span>], <span class="ident">bytes</span>[<span class="number">2</span>]);
-                <span class="kw">match</span> (<span class="ident">b</span> <span class="op">|</span> <span class="number">32</span>, <span class="ident">c</span> <span class="op">|</span> <span class="number">32</span>) {
-                    (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;c&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">3</span>..], <span class="number">0</span>)),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+    <span class="kw">let </span>bytes = s.as_bytes();
+    <span class="kw">match </span>bytes.first() {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;z&#39;</span>) | <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;Z&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[<span class="number">1</span>..], <span class="number">0</span>)),
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;u&#39;</span>) | <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;U&#39;</span>) =&gt; {
+            <span class="kw">if </span>bytes.len() &gt;= <span class="number">3 </span>{
+                <span class="kw">let </span>(b, c) = (bytes[<span class="number">1</span>], bytes[<span class="number">2</span>]);
+                <span class="kw">match </span>(b | <span class="number">32</span>, c | <span class="number">32</span>) {
+                    (<span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;c&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[<span class="number">3</span>..], <span class="number">0</span>)),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(INVALID),
                 }
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(INVALID)
             }
         }
-        <span class="kw">_</span> =&gt; <span class="ident">timezone_offset</span>(<span class="ident">s</span>, <span class="ident">colon</span>),
+        <span class="kw">_ </span>=&gt; timezone_offset(s, colon),
     }
 }
 
-<span class="doccomment">/// Same as `timezone_offset` but also allows for `z`/`Z` which is the same as</span>
-<span class="doccomment">/// `+00:00`, and allows missing minutes entirely.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">timezone_offset_permissive</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">colon</span>: <span class="ident">F</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">i32</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Same as `timezone_offset` but also allows for `z`/`Z` which is the same as
+/// `+00:00`, and allows missing minutes entirely.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>timezone_offset_permissive&lt;F&gt;(s: <span class="kw-2">&amp;</span>str, colon: F) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, i32)&gt;
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;<span class="kw-2">&amp;</span>str&gt;,
 {
-    <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">first</span>() {
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;z&#39;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;Z&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..], <span class="number">0</span>)),
-        <span class="kw">_</span> =&gt; <span class="ident">timezone_offset_internal</span>(<span class="ident">s</span>, <span class="ident">colon</span>, <span class="bool-val">true</span>),
+    <span class="kw">match </span>s.as_bytes().first() {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;z&#39;</span>) | <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;Z&#39;</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[<span class="number">1</span>..], <span class="number">0</span>)),
+        <span class="kw">_ </span>=&gt; timezone_offset_internal(s, colon, <span class="bool-val">true</span>),
     }
 }
 
-<span class="doccomment">/// Same as `timezone_offset` but also allows for RFC 2822 legacy timezones.</span>
-<span class="doccomment">/// May return `None` which indicates an insufficient offset data (i.e. `-0000`).</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">timezone_offset_2822</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="comment">// tries to parse legacy time zone names</span>
-    <span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">s</span>
-        .<span class="ident">as_bytes</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+<span class="doccomment">/// Same as `timezone_offset` but also allows for RFC 2822 legacy timezones.
+/// May return `None` which indicates an insufficient offset data (i.e. `-0000`).
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>timezone_offset_2822(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;i32&gt;)&gt; {
+    <span class="comment">// tries to parse legacy time zone names
+    </span><span class="kw">let </span>upto = s
+        .as_bytes()
+        .iter()
+        .position(|<span class="kw-2">&amp;</span>c| <span class="kw">match </span>c {
+            <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39; </span>=&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         })
-        .<span class="ident">unwrap_or</span>(<span class="ident">s</span>.<span class="ident">len</span>());
-    <span class="kw">if</span> <span class="ident">upto</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">upto</span>];
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">upto</span>..];
-        <span class="kw">let</span> <span class="ident">offset_hours</span> <span class="op">=</span> <span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="prelude-val">Some</span>(<span class="ident">o</span> <span class="op">*</span> <span class="number">3600</span>)));
-        <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;gmt&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;ut&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="number">0</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;edt&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="op">-</span><span class="number">4</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;est&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;cdt&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="op">-</span><span class="number">5</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;cst&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;mdt&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="op">-</span><span class="number">6</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;mst&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;pdt&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="op">-</span><span class="number">7</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">equals</span>(<span class="ident">name</span>, <span class="string">&quot;pst&quot;</span>) {
-            <span class="ident">offset_hours</span>(<span class="op">-</span><span class="number">8</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>((<span class="ident">s</span>, <span class="prelude-val">None</span>)) <span class="comment">// recommended by RFC 2822: consume but treat it as -0000</span>
-        }
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> (<span class="ident">s_</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">timezone_offset</span>(<span class="ident">s</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((<span class="ident">s_</span>, <span class="prelude-val">Some</span>(<span class="ident">offset</span>)))
+        .unwrap_or(s.len());
+    <span class="kw">if </span>upto &gt; <span class="number">0 </span>{
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>s[..upto];
+        <span class="kw">let </span>s = <span class="kw-2">&amp;</span>s[upto..];
+        <span class="kw">let </span>offset_hours = |o| <span class="prelude-val">Ok</span>((s, <span class="prelude-val">Some</span>(o * <span class="number">3600</span>)));
+        <span class="kw">if </span>equals(name, <span class="string">&quot;gmt&quot;</span>) || equals(name, <span class="string">&quot;ut&quot;</span>) {
+            offset_hours(<span class="number">0</span>)
+        } <span class="kw">else if </span>equals(name, <span class="string">&quot;edt&quot;</span>) {
+            offset_hours(-<span class="number">4</span>)
+        } <span class="kw">else if </span>equals(name, <span class="string">&quot;est&quot;</span>) || equals(name, <span class="string">&quot;cdt&quot;</span>) {
+            offset_hours(-<span class="number">5</span>)
+        } <span class="kw">else if </span>equals(name, <span class="string">&quot;cst&quot;</span>) || equals(name, <span class="string">&quot;mdt&quot;</span>) {
+            offset_hours(-<span class="number">6</span>)
+        } <span class="kw">else if </span>equals(name, <span class="string">&quot;mst&quot;</span>) || equals(name, <span class="string">&quot;pdt&quot;</span>) {
+            offset_hours(-<span class="number">7</span>)
+        } <span class="kw">else if </span>equals(name, <span class="string">&quot;pst&quot;</span>) {
+            offset_hours(-<span class="number">8</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>((s, <span class="prelude-val">None</span>)) <span class="comment">// recommended by RFC 2822: consume but treat it as -0000
+        </span>}
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>(s_, offset) = timezone_offset(s, |s| <span class="prelude-val">Ok</span>(s))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((s_, <span class="prelude-val">Some</span>(offset)))
     }
 }
 
-<span class="doccomment">/// Tries to consume everything until next whitespace-like symbol.</span>
-<span class="doccomment">/// Does not provide any offset information from the consumed data.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">timezone_name_skip</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, ())<span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>((<span class="ident">s</span>.<span class="ident">trim_left_matches</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_whitespace</span>()), ()))
+<span class="doccomment">/// Tries to consume everything until next whitespace-like symbol.
+/// Does not provide any offset information from the consumed data.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>timezone_name_skip(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, ())&gt; {
+    <span class="prelude-val">Ok</span>((s.trim_left_matches(|c: char| !c.is_whitespace()), ()))
 }
 
-<span class="doccomment">/// Tries to consume an RFC2822 comment including preceding ` `.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the remaining string after the closing parenthesis.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">comment_2822</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, ())<span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">CommentState</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Tries to consume an RFC2822 comment including preceding ` `.
+///
+/// Returns the remaining string after the closing parenthesis.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>comment_2822(s: <span class="kw-2">&amp;</span>str) -&gt; ParseResult&lt;(<span class="kw-2">&amp;</span>str, ())&gt; {
+    <span class="kw">use </span>CommentState::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trim_start</span>();
+    <span class="kw">let </span>s = s.trim_start();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Start</span>;
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">c</span>) <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">bytes</span>().<span class="ident">enumerate</span>() {
-        <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">state</span>, <span class="ident">c</span>) {
-            (<span class="ident">Start</span>, <span class="string">b&#39;(&#39;</span>) =&gt; <span class="ident">Next</span>(<span class="number">1</span>),
-            (<span class="ident">Next</span>(<span class="number">1</span>), <span class="string">b&#39;)&#39;</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..], ())),
-            (<span class="ident">Next</span>(<span class="ident">depth</span>), <span class="string">b&#39;\\&#39;</span>) =&gt; <span class="ident">Escape</span>(<span class="ident">depth</span>),
-            (<span class="ident">Next</span>(<span class="ident">depth</span>), <span class="string">b&#39;(&#39;</span>) =&gt; <span class="ident">Next</span>(<span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>),
-            (<span class="ident">Next</span>(<span class="ident">depth</span>), <span class="string">b&#39;)&#39;</span>) =&gt; <span class="ident">Next</span>(<span class="ident">depth</span> <span class="op">-</span> <span class="number">1</span>),
-            (<span class="ident">Next</span>(<span class="ident">depth</span>), <span class="kw">_</span>) <span class="op">|</span> (<span class="ident">Escape</span>(<span class="ident">depth</span>), <span class="kw">_</span>) =&gt; <span class="ident">Next</span>(<span class="ident">depth</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>),
+    <span class="kw">let </span><span class="kw-2">mut </span>state = Start;
+    <span class="kw">for </span>(i, c) <span class="kw">in </span>s.bytes().enumerate() {
+        state = <span class="kw">match </span>(state, c) {
+            (Start, <span class="string">b&#39;(&#39;</span>) =&gt; Next(<span class="number">1</span>),
+            (Next(<span class="number">1</span>), <span class="string">b&#39;)&#39;</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span>s[i + <span class="number">1</span>..], ())),
+            (Next(depth), <span class="string">b&#39;\\&#39;</span>) =&gt; Escape(depth),
+            (Next(depth), <span class="string">b&#39;(&#39;</span>) =&gt; Next(depth + <span class="number">1</span>),
+            (Next(depth), <span class="string">b&#39;)&#39;</span>) =&gt; Next(depth - <span class="number">1</span>),
+            (Next(depth), <span class="kw">_</span>) | (Escape(depth), <span class="kw">_</span>) =&gt; Next(depth),
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(INVALID),
         };
     }
 
-    <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)
+    <span class="prelude-val">Err</span>(TOO_SHORT)
 }
 
-<span class="kw">enum</span> <span class="ident">CommentState</span> {
-    <span class="ident">Start</span>,
-    <span class="ident">Next</span>(<span class="ident">usize</span>),
-    <span class="ident">Escape</span>(<span class="ident">usize</span>),
+<span class="kw">enum </span>CommentState {
+    Start,
+    Next(usize),
+    Escape(usize),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_rfc2822_comments</span>() {
-    <span class="kw">let</span> <span class="ident">testdata</span> <span class="op">=</span> [
-        (<span class="string">&quot;&quot;</span>, <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)),
-        (<span class="string">&quot; &quot;</span>, <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)),
-        (<span class="string">&quot;x&quot;</span>, <span class="prelude-val">Err</span>(<span class="ident">INVALID</span>)),
-        (<span class="string">&quot;(&quot;</span>, <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)),
+<span class="attribute">#[cfg(test)]
+#[test]
+</span><span class="kw">fn </span>test_rfc2822_comments() {
+    <span class="kw">let </span>testdata = [
+        (<span class="string">&quot;&quot;</span>, <span class="prelude-val">Err</span>(TOO_SHORT)),
+        (<span class="string">&quot; &quot;</span>, <span class="prelude-val">Err</span>(TOO_SHORT)),
+        (<span class="string">&quot;x&quot;</span>, <span class="prelude-val">Err</span>(INVALID)),
+        (<span class="string">&quot;(&quot;</span>, <span class="prelude-val">Err</span>(TOO_SHORT)),
         (<span class="string">&quot;()&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">&quot; \r\n\t()&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">&quot;() &quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot; &quot;</span>)),
@@ -811,7 +811,7 @@
         (<span class="string">&quot;((()))&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">&quot;(x(x(x)x)x)&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">&quot;( x ( x ( x ) x ) x )&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
-        (<span class="string">r&quot;(\)&quot;</span>, <span class="prelude-val">Err</span>(<span class="ident">TOO_SHORT</span>)),
+        (<span class="string">r&quot;(\)&quot;</span>, <span class="prelude-val">Err</span>(TOO_SHORT)),
         (<span class="string">r&quot;(\()&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">r&quot;(\))&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
         (<span class="string">r&quot;(\\)&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
@@ -819,14 +819,14 @@
         (<span class="string">&quot;( x ( x ) x ( x ) x )&quot;</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)),
     ];
 
-    <span class="kw">for</span> (<span class="ident">test_in</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">testdata</span> {
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">comment_2822</span>(<span class="ident">test_in</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">s</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">s</span>);
+    <span class="kw">for </span>(test_in, expected) <span class="kw">in </span>testdata {
+        <span class="kw">let </span>actual = comment_2822(test_in).map(|(s, <span class="kw">_</span>)| s);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">expected</span>, <span class="ident">actual</span>,
+            expected, actual,
             <span class="string">&quot;{:?} expected to produce {:?}, but produced {:?}.&quot;</span>,
-            <span class="ident">test_in</span>, <span class="ident">expected</span>, <span class="ident">actual</span>
+            test_in, expected, actual
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

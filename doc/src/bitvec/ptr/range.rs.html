@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/ptr/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/ptr/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -401,408 +401,408 @@
 <span id="401">401</span>
 <span id="402">402</span>
 <span id="403">403</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/range.md&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/range.md&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">fmt</span>::{
+</span><span class="kw">use </span>core::{
+	fmt::{
 		<span class="self">self</span>,
-		<span class="ident">Debug</span>,
-		<span class="ident">Formatter</span>,
+		Debug,
+		Formatter,
 	},
-	<span class="ident">hash</span>::{
-		<span class="ident">Hash</span>,
-		<span class="ident">Hasher</span>,
+	hash::{
+		Hash,
+		Hasher,
 	},
-	<span class="ident">iter::FusedIterator</span>,
-	<span class="ident">ops</span>::{
-		<span class="ident">Bound</span>,
-		<span class="ident">Range</span>,
-		<span class="ident">RangeBounds</span>,
+	iter::FusedIterator,
+	ops::{
+		Bound,
+		Range,
+		RangeBounds,
 	},
 };
 
-<span class="kw">use</span> <span class="ident">wyz::comu</span>::{
-	<span class="ident">Const</span>,
-	<span class="ident">Mutability</span>,
+<span class="kw">use </span>wyz::comu::{
+	Const,
+	Mutability,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-	<span class="ident">BitPtr</span>,
-	<span class="ident">BitSpan</span>,
+<span class="kw">use super</span>::{
+	BitPtr,
+	BitSpan,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">devel</span> <span class="kw">as</span> <span class="ident">dvl</span>,
-	<span class="ident">order</span>::{
-		<span class="ident">BitOrder</span>,
-		<span class="ident">Lsb0</span>,
+<span class="kw">use crate</span>::{
+	devel <span class="kw">as </span>dvl,
+	order::{
+		BitOrder,
+		Lsb0,
 	},
-	<span class="ident">store::BitStore</span>,
+	store::BitStore,
 };
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/BitPtrRange.md&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span> <span class="op">=</span> <span class="ident">Const</span>, <span class="ident">T</span> <span class="op">=</span> <span class="ident">usize</span>, <span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[repr(C)]
+#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/BitPtrRange.md&quot;</span>)]
+</span><span class="kw">pub struct </span>BitPtrRange&lt;M = Const, T = usize, O = Lsb0&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="doccomment">/// The lower, inclusive, bound of the range. The bit to which this points</span>
-	<span class="doccomment">/// is considered live.</span>
-	<span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// The higher, exclusive, bound of the range. The bit to which this points</span>
-	<span class="doccomment">/// is considered dead, and the pointer may be one bit beyond the bounds of</span>
-	<span class="doccomment">/// an allocation region.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Because Rust and LLVM both define the address of `base + (len * width)`</span>
-	<span class="doccomment">/// as being within the provenance of `base`, even though that address may</span>
-	<span class="doccomment">/// itself be the base address of another region in a different provenance,</span>
-	<span class="doccomment">/// and bit-pointers are always composed of an ordinary memory address and a</span>
-	<span class="doccomment">/// bit-counter, the ending bit-pointer is always valid.</span>
-	<span class="kw">pub</span> <span class="ident">end</span>:   <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The lower, inclusive, bound of the range. The bit to which this points
+	/// is considered live.
+	</span><span class="kw">pub </span>start: BitPtr&lt;M, T, O&gt;,
+	<span class="doccomment">/// The higher, exclusive, bound of the range. The bit to which this points
+	/// is considered dead, and the pointer may be one bit beyond the bounds of
+	/// an allocation region.
+	///
+	/// Because Rust and LLVM both define the address of `base + (len * width)`
+	/// as being within the provenance of `base`, even though that address may
+	/// itself be the base address of another region in a different provenance,
+	/// and bit-pointers are always composed of an ordinary memory address and a
+	/// bit-counter, the ending bit-pointer is always valid.
+	</span><span class="kw">pub </span>end:   BitPtr&lt;M, T, O&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;M, T, O&gt; BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="doccomment">/// The canonical empty range. All ranges with zero length (equal `.start`</span>
-	<span class="doccomment">/// and `.end`) are equally empty.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMPTY</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-		<span class="ident">start</span>: <span class="ident">BitPtr::DANGLING</span>,
-		<span class="ident">end</span>:   <span class="ident">BitPtr::DANGLING</span>,
+	<span class="doccomment">/// The canonical empty range. All ranges with zero length (equal `.start`
+	/// and `.end`) are equally empty.
+	</span><span class="kw">pub const </span>EMPTY: <span class="self">Self </span>= <span class="self">Self </span>{
+		start: BitPtr::DANGLING,
+		end:   BitPtr::DANGLING,
 	};
 
-	<span class="doccomment">/// Explicitly converts a `Range&lt;BitPtr&gt;` into a `BitPtrRange`.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_range</span>(<span class="ident">Range</span> { <span class="ident">start</span>, <span class="ident">end</span> }: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">end</span> }
+	<span class="doccomment">/// Explicitly converts a `Range&lt;BitPtr&gt;` into a `BitPtrRange`.
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">pub fn </span>from_range(Range { start, end }: Range&lt;BitPtr&lt;M, T, O&gt;&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ start, end }
 	}
 
-	<span class="doccomment">/// Explicitly converts a `BitPtrRange` into a `Range&lt;BitPtr&gt;`.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_range</span>(<span class="self">self</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span> <span class="self">self</span>;
-		<span class="ident">start</span> .. <span class="ident">end</span>
+	<span class="doccomment">/// Explicitly converts a `BitPtrRange` into a `Range&lt;BitPtr&gt;`.
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">pub fn </span>into_range(<span class="self">self</span>) -&gt; Range&lt;BitPtr&lt;M, T, O&gt;&gt; {
+		<span class="kw">let </span><span class="self">Self </span>{ start, end } = <span class="self">self</span>;
+		start .. end
 	}
 
-	<span class="doccomment">/// Tests if the range is empty (the distance between bit-pointers is `0`).</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Range::is_empty`](core::ops::Range::is_empty)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">/// use bitvec::ptr::BitPtrRange;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let data = 0u8;</span>
-	<span class="doccomment">/// let bp = BitPtr::&lt;_, _, Lsb0&gt;::from_ref(&amp;data);</span>
-	<span class="doccomment">/// let mut range = BitPtrRange::from_range(bp .. bp.wrapping_add(1));</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert!(!range.is_empty());</span>
-	<span class="doccomment">/// assert_ne!(range.start, range.end);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// range.next();</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert!(range.is_empty());</span>
-	<span class="doccomment">/// assert_eq!(range.start, range.end);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">end</span>
+	<span class="doccomment">/// Tests if the range is empty (the distance between bit-pointers is `0`).
+	///
+	/// ## Original
+	///
+	/// [`Range::is_empty`](core::ops::Range::is_empty)
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// use bitvec::prelude::*;
+	/// use bitvec::ptr::BitPtrRange;
+	///
+	/// let data = 0u8;
+	/// let bp = BitPtr::&lt;_, _, Lsb0&gt;::from_ref(&amp;data);
+	/// let mut range = BitPtrRange::from_range(bp .. bp.wrapping_add(1));
+	///
+	/// assert!(!range.is_empty());
+	/// assert_ne!(range.start, range.end);
+	///
+	/// range.next();
+	///
+	/// assert!(range.is_empty());
+	/// assert_eq!(range.start, range.end);
+	/// ```
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+		<span class="self">self</span>.start == <span class="self">self</span>.end
 	}
 
-	<span class="doccomment">/// Tests if a given bit-pointer is contained within the range.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Bit-pointer ordering is defined when the types have the same exact</span>
-	<span class="doccomment">/// `BitOrder` type parameter and the same `BitStore::Mem` associated type</span>
-	<span class="doccomment">/// (but are free to differ in alias condition!). Inclusion in a range</span>
-	<span class="doccomment">/// occurs when the bit-pointer is not strictly less than the range start,</span>
-	<span class="doccomment">/// and is strictly less than the range end.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Range::contains`](core::ops::Range::contains)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">/// use bitvec::ptr::BitPtrRange;</span>
-	<span class="doccomment">/// use core::cell::Cell;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let data = 0u16;</span>
-	<span class="doccomment">/// let bp = BitPtr::&lt;_, _, Lsb0&gt;::from_ref(&amp;data);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut range = BitPtrRange::from_range(bp .. bp.wrapping_add(16));</span>
-	<span class="doccomment">/// range.nth(2);</span>
-	<span class="doccomment">/// range.nth_back(2);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert!(bp &lt; range.start);</span>
-	<span class="doccomment">/// assert!(!range.contains(&amp;bp));</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mid = bp.wrapping_add(8);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let same_mem = mid.cast::&lt;Cell&lt;u16&gt;&gt;();</span>
-	<span class="doccomment">/// assert!(range.contains(&amp;mid));</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Casting to a different `BitStore` type whose `Mem` parameter differs</span>
-	<span class="doccomment">/// from the range always results in a `false` response, even if the pointer</span>
-	<span class="doccomment">/// being tested is numerically within the range.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">pointer</span>: <span class="kw-2">&amp;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
-	<span class="kw">where</span>
-		<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-		<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	<span class="doccomment">/// Tests if a given bit-pointer is contained within the range.
+	///
+	/// Bit-pointer ordering is defined when the types have the same exact
+	/// `BitOrder` type parameter and the same `BitStore::Mem` associated type
+	/// (but are free to differ in alias condition!). Inclusion in a range
+	/// occurs when the bit-pointer is not strictly less than the range start,
+	/// and is strictly less than the range end.
+	///
+	/// ## Original
+	///
+	/// [`Range::contains`](core::ops::Range::contains)
+	///
+	/// ## Examples
+	///
+	/// ```rust
+	/// use bitvec::prelude::*;
+	/// use bitvec::ptr::BitPtrRange;
+	/// use core::cell::Cell;
+	///
+	/// let data = 0u16;
+	/// let bp = BitPtr::&lt;_, _, Lsb0&gt;::from_ref(&amp;data);
+	///
+	/// let mut range = BitPtrRange::from_range(bp .. bp.wrapping_add(16));
+	/// range.nth(2);
+	/// range.nth_back(2);
+	///
+	/// assert!(bp &lt; range.start);
+	/// assert!(!range.contains(&amp;bp));
+	///
+	/// let mid = bp.wrapping_add(8);
+	///
+	/// let same_mem = mid.cast::&lt;Cell&lt;u16&gt;&gt;();
+	/// assert!(range.contains(&amp;mid));
+	/// ```
+	///
+	/// Casting to a different `BitStore` type whose `Mem` parameter differs
+	/// from the range always results in a `false` response, even if the pointer
+	/// being tested is numerically within the range.
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">pub fn </span>contains&lt;M2, T2&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, pointer: <span class="kw-2">&amp;</span>BitPtr&lt;M2, T2, O&gt;) -&gt; bool
+	<span class="kw">where
+		</span>M2: Mutability,
+		T2: BitStore,
 	{
-		<span class="ident">dvl::match_store</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">T2::Mem</span><span class="op">&gt;</span>()
-			<span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">pointer</span>
-			<span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">pointer</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">end</span>
+		dvl::match_store::&lt;T::Mem, T2::Mem&gt;()
+			&amp;&amp; <span class="self">self</span>.start &lt;= <span class="kw-2">*</span>pointer
+			&amp;&amp; <span class="kw-2">*</span>pointer &lt; <span class="self">self</span>.end
 	}
 
-	<span class="doccomment">/// Converts the range into a span descriptor over all live bits.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The produced bit-span does *not* include the bit addressed by `.end`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The `.start` and `.end` bit-pointers must both be derived from the same</span>
-	<span class="doccomment">/// provenance region. `BitSpan` draws its provenance from the `.start`</span>
-	<span class="doccomment">/// element pointer, and incorrectly extending it beyond the source</span>
-	<span class="doccomment">/// provenance is undefined behavior.</span>
-	<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_bitspan</span>(<span class="self">self</span>) -&gt; <span class="ident">BitSpan</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">start</span>.<span class="ident">span_unchecked</span>(<span class="self">self</span>.<span class="ident">len</span>())
+	<span class="doccomment">/// Converts the range into a span descriptor over all live bits.
+	///
+	/// The produced bit-span does *not* include the bit addressed by `.end`.
+	///
+	/// ## Safety
+	///
+	/// The `.start` and `.end` bit-pointers must both be derived from the same
+	/// provenance region. `BitSpan` draws its provenance from the `.start`
+	/// element pointer, and incorrectly extending it beyond the source
+	/// provenance is undefined behavior.
+	</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>into_bitspan(<span class="self">self</span>) -&gt; BitSpan&lt;M, T, O&gt; {
+		<span class="self">self</span>.start.span_unchecked(<span class="self">self</span>.len())
 	}
 
-	<span class="doccomment">/// Snapshots `.start`, then increments it.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method is only safe to call when the range is non-empty.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">take_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>;
-		<span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-		<span class="ident">start</span>
+	<span class="doccomment">/// Snapshots `.start`, then increments it.
+	///
+	/// This method is only safe to call when the range is non-empty.
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">fn </span>take_front(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BitPtr&lt;M, T, O&gt; {
+		<span class="kw">let </span>start = <span class="self">self</span>.start;
+		<span class="self">self</span>.start = start.wrapping_add(<span class="number">1</span>);
+		start
 	}
 
-	<span class="doccomment">/// Decrements `.end`, then returns it.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The bit-pointer returned by this method is always to an alive bit.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method is only safe to call when the range is non-empty.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">take_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-		<span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="ident">prev</span>;
-		<span class="ident">prev</span>
-	}
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> { ..<span class="kw-2">*</span><span class="self">self</span> }
+	<span class="doccomment">/// Decrements `.end`, then returns it.
+	///
+	/// The bit-pointer returned by this method is always to an alive bit.
+	///
+	/// This method is only safe to call when the range is non-empty.
+	</span><span class="attribute">#[inline]
+	</span><span class="kw">fn </span>take_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BitPtr&lt;M, T, O&gt; {
+		<span class="kw">let </span>prev = <span class="self">self</span>.end.wrapping_sub(<span class="number">1</span>);
+		<span class="self">self</span>.end = prev;
+		prev
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; Clone <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">O</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>
-	<span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">T1</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M1</span>: <span class="ident">Mutability</span>,
-	<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="comment">//  Pointers over different element types are never equal</span>
-		<span class="ident">dvl::match_store</span>::<span class="op">&lt;</span><span class="ident">T1::Mem</span>, <span class="ident">T2::Mem</span><span class="op">&gt;</span>()
-			<span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">start</span>
-			<span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">end</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{ ..<span class="kw-2">*</span><span class="self">self </span>}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;M, T, O&gt; Eq <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::EMPTY</span>
+}
+
+<span class="kw">impl</span>&lt;M1, M2, O, T1, T2&gt; PartialEq&lt;BitPtrRange&lt;M2, T2, O&gt;&gt;
+	<span class="kw">for </span>BitPtrRange&lt;M1, T1, O&gt;
+<span class="kw">where
+	</span>M1: Mutability,
+	M2: Mutability,
+	O: BitOrder,
+	T1: BitStore,
+	T2: BitStore,
+{
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BitPtrRange&lt;M2, T2, O&gt;) -&gt; bool {
+		<span class="comment">//  Pointers over different element types are never equal
+		</span>dvl::match_store::&lt;T1::Mem, T2::Mem&gt;()
+			&amp;&amp; <span class="self">self</span>.start == other.start
+			&amp;&amp; <span class="self">self</span>.end == other.end
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; Default <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::from_range</span>(<span class="ident">range</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::EMPTY
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; From&lt;Range&lt;BitPtr&lt;M, T, O&gt;&gt;&gt; <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">range</span>: <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">range</span>.<span class="ident">into_range</span>()
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>from(range: Range&lt;BitPtr&lt;M, T, O&gt;&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::from_range(range)
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; From&lt;BitPtrRange&lt;M, T, O&gt;&gt; <span class="kw">for </span>Range&lt;BitPtr&lt;M, T, O&gt;&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="kw">let</span> <span class="ident">Range</span> { <span class="ident">start</span>, <span class="ident">end</span> } <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into_range</span>();
-		<span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">start</span>, <span class="ident">fmt</span>)<span class="question-mark">?</span>;
-		<span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{0}..{0}&quot;</span>, <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">alternate</span>() { <span class="string">&quot; &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> })<span class="question-mark">?</span>;
-		<span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">end</span>, <span class="ident">fmt</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>from(range: BitPtrRange&lt;M, T, O&gt;) -&gt; <span class="self">Self </span>{
+		range.into_range()
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; Debug <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-	<span class="kw">where</span> <span class="ident">H</span>: <span class="ident">Hasher</span> {
-		<span class="self">self</span>.<span class="ident">start</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-		<span class="self">self</span>.<span class="ident">end</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		<span class="kw">let </span>Range { start, end } = <span class="self">self</span>.clone().into_range();
+		Debug::fmt(<span class="kw-2">&amp;</span>start, fmt)<span class="question-mark">?</span>;
+		<span class="macro">write!</span>(fmt, <span class="string">&quot;{0}..{0}&quot;</span>, <span class="kw">if </span>fmt.alternate() { <span class="string">&quot; &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>})<span class="question-mark">?</span>;
+		Debug::fmt(<span class="kw-2">&amp;</span>end, fmt)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; Hash <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>;
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
+	<span class="kw">where </span>H: Hasher {
+		<span class="self">self</span>.start.hash(state);
+		<span class="self">self</span>.end.hash(state);
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T, O&gt; Iterator <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
+{
+	<span class="kw">type </span>Item = BitPtr&lt;M, T, O&gt;;
 
 	<span class="macro">easy_iter!</span>();
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident"><span class="self">Self</span>::is_empty</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>) {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">Self</span>::is_empty(<span class="kw-2">&amp;*</span><span class="self">self</span>) {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
-		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">take_front</span>())
+		<span class="prelude-val">Some</span>(<span class="self">self</span>.take_front())
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-			<span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span>;
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>nth(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span>n &gt;= <span class="self">self</span>.len() {
+			<span class="self">self</span>.start = <span class="self">self</span>.end;
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
-		<span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">start</span>.<span class="ident">add</span>(<span class="ident">n</span>) };
-		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">take_front</span>())
+		<span class="self">self</span>.start = <span class="kw">unsafe </span>{ <span class="self">self</span>.start.add(n) };
+		<span class="prelude-val">Some</span>(<span class="self">self</span>.take_front())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;M, T, O&gt; DoubleEndedIterator <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident"><span class="self">Self</span>::is_empty</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>) {
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span><span class="self">Self</span>::is_empty(<span class="kw-2">&amp;*</span><span class="self">self</span>) {
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
-		<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">take_back</span>())
+		<span class="prelude-val">Some</span>(<span class="self">self</span>.take_back())
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">nth_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-			<span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>;
-			<span class="kw">return</span> <span class="prelude-val">None</span>;
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>nth_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+		<span class="kw">if </span>n &gt;= <span class="self">self</span>.len() {
+			<span class="self">self</span>.end = <span class="self">self</span>.start;
+			<span class="kw">return </span><span class="prelude-val">None</span>;
 		}
-		<span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">end</span>.<span class="ident">sub</span>(<span class="ident">n</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>)) };
-		<span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="ident">out</span>;
-		<span class="prelude-val">Some</span>(<span class="ident">out</span>)
+		<span class="kw">let </span>out = <span class="kw">unsafe </span>{ <span class="self">self</span>.end.sub(n.wrapping_add(<span class="number">1</span>)) };
+		<span class="self">self</span>.end = out;
+		<span class="prelude-val">Some</span>(out)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;M, T, O&gt; ExactSizeIterator <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-		(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">end</span>.<span class="ident">offset_from</span>(<span class="self">self</span>.<span class="ident">start</span>) }) <span class="kw">as</span> <span class="ident">usize</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+		(<span class="kw">unsafe </span>{ <span class="self">self</span>.end.offset_from(<span class="self">self</span>.start) }) <span class="kw">as </span>usize
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">FusedIterator</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;M, T, O&gt; FusedIterator <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitPtrRange</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;M, T, O&gt; RangeBounds&lt;BitPtr&lt;M, T, O&gt;&gt; <span class="kw">for </span>BitPtrRange&lt;M, T, O&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">start_bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="ident">Bound::Included</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">start</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>start_bound(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bound&lt;<span class="kw-2">&amp;</span>BitPtr&lt;M, T, O&gt;&gt; {
+		Bound::Included(<span class="kw-2">&amp;</span><span class="self">self</span>.start)
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">end_bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bound</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-		<span class="ident">Bound::Excluded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>end_bound(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bound&lt;<span class="kw-2">&amp;</span>BitPtr&lt;M, T, O&gt;&gt; {
+		Bound::Excluded(<span class="kw-2">&amp;</span><span class="self">self</span>.end)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

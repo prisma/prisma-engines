@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/de/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/de/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -141,148 +141,148 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for [`DeserializeAs`][] implementations</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The module contains the [`DeserializeAs`][] trait and helper code.</span>
-<span class="doccomment">//! Additionally, it contains implementations of [`DeserializeAs`][] for types defined in the Rust Standard Library or this crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can find more details on how to implement this trait for your types in the documentation of the [`DeserializeAs`][] trait and details about the usage in the [user guide][].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [user guide]: crate::guide</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for [`DeserializeAs`][] implementations
+//!
+//! The module contains the [`DeserializeAs`][] trait and helper code.
+//! Additionally, it contains implementations of [`DeserializeAs`][] for types defined in the Rust Standard Library or this crate.
+//!
+//! You can find more details on how to implement this trait for your types in the documentation of the [`DeserializeAs`][] trait and details about the usage in the [user guide][].
+//!
+//! [user guide]: crate::guide
 
-<span class="kw">mod</span> <span class="ident">const_arrays</span>;
-<span class="kw">mod</span> <span class="ident">impls</span>;
+</span><span class="kw">mod </span>const_arrays;
+<span class="kw">mod </span>impls;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A **data structure** that can be deserialized from any data format supported by Serde, analogue to [`Deserialize`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The trait is analogue to the [`serde::Deserialize`][`Deserialize`] trait, with the same meaning of input and output arguments.</span>
-<span class="doccomment">/// It can and should the implemented using the same code structure as the [`Deserialize`] trait.</span>
-<span class="doccomment">/// As such, the same advice for [implementing `Deserialize`][impl-deserialize] applies here.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Differences to [`Deserialize`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The trait is only required for container-like types or types implementing specific conversion functions.</span>
-<span class="doccomment">/// Container-like types are [`Vec`], [`BTreeMap`], but also [`Option`] and [`Box`].</span>
-<span class="doccomment">/// Conversion types deserialize into a different Rust type.</span>
-<span class="doccomment">/// For example, [`DisplayFromStr`] uses the [`FromStr`] trait after deserializing a string and [`DurationSeconds`] creates a [`Duration`] from either String or integer values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This code shows how to implement [`Deserialize`] for [`Box`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// impl&lt;&#39;de, T: Deserialize&lt;&#39;de&gt;&gt; Deserialize&lt;&#39;de&gt; for Box&lt;T&gt; {</span>
-<span class="doccomment">///     fn deserialize&lt;D&gt;(deserializer: D) -&gt; Result&lt;Self, D::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         D: Deserializer&lt;&#39;de&gt;,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         Ok(Box::new(Deserialize::deserialize(deserializer)?))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// and this code shows how to do the same using [`DeserializeAs`][]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// impl&lt;&#39;de, T, U&gt; DeserializeAs&lt;&#39;de, Box&lt;T&gt;&gt; for Box&lt;U&gt;</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     U: DeserializeAs&lt;&#39;de, T&gt;,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn deserialize_as&lt;D&gt;(deserializer: D) -&gt; Result&lt;Box&lt;T&gt;, D::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         D: Deserializer&lt;&#39;de&gt;,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         Ok(Box::new(</span>
-<span class="doccomment">///             DeserializeAsWrap::&lt;T, U&gt;::deserialize(deserializer)?.into_inner(),</span>
-<span class="doccomment">///         ))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It uses two type parameters, `T` and `U` instead of only one and performs the deserialization step using the `DeserializeAsWrap` type.</span>
-<span class="doccomment">/// The `T` type is the on the Rust side after deserialization, whereas the `U` type determines how the value will be deserialized.</span>
-<span class="doccomment">/// These two changes are usually enough to make a container type implement [`DeserializeAs`][].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`DeserializeAsWrap`] is a piece of glue code which turns [`DeserializeAs`] into a serde compatible datatype, by converting all calls to `deserialize` into `deserialize_as`.</span>
-<span class="doccomment">/// This allows us to implement [`DeserializeAs`] such that it can be applied recursively throughout the whole data structure.</span>
-<span class="doccomment">/// This is mostly important for container types, such as `Vec` or `BTreeMap`.</span>
-<span class="doccomment">/// In a `BTreeMap` this allows us to specify two different serialization behaviors, one for key and one for value, using the [`DeserializeAs`] trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Implementing a converter Type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This shows a simplified implementation for [`DisplayFromStr`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;))] {</span>
-<span class="doccomment">/// # use serde::Deserialize;</span>
-<span class="doccomment">/// # use serde::de::Error;</span>
-<span class="doccomment">/// # use serde_with::DeserializeAs;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">/// # use std::fmt::Display;</span>
-<span class="doccomment">/// struct DisplayFromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;&#39;de, T&gt; DeserializeAs&lt;&#39;de, T&gt; for DisplayFromStr</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     T: FromStr,</span>
-<span class="doccomment">///     T::Err: Display,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn deserialize_as&lt;D&gt;(deserializer: D) -&gt; Result&lt;T, D::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         D: serde::Deserializer&lt;&#39;de&gt;,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         let s = String::deserialize(deserializer).map_err(Error::custom)?;</span>
-<span class="doccomment">///         s.parse().map_err(Error::custom)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[serde_with::serde_as]</span>
-<span class="doccomment">/// # #[derive(serde::Deserialize)]</span>
-<span class="doccomment">/// # struct S (#[serde_as(as = &quot;DisplayFromStr&quot;)] bool);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # assert_eq!(false, serde_json::from_str::&lt;S&gt;(r#&quot;&quot;false&quot;&quot;#).unwrap().0);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`Box`]: std::boxed::Box</span>
-<span class="doccomment">/// [`BTreeMap`]: std::collections::BTreeMap</span>
-<span class="doccomment">/// [`Duration`]: std::time::Duration</span>
-<span class="doccomment">/// [`FromStr`]: std::str::FromStr</span>
-<span class="doccomment">/// [`Vec`]: std::vec::Vec</span>
-<span class="doccomment">/// [impl-deserialize]: https://serde.rs/impl-deserialize.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// Deserialize this value from the given Serde deserializer.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A **data structure** that can be deserialized from any data format supported by Serde, analogue to [`Deserialize`].
+///
+/// The trait is analogue to the [`serde::Deserialize`][`Deserialize`] trait, with the same meaning of input and output arguments.
+/// It can and should the implemented using the same code structure as the [`Deserialize`] trait.
+/// As such, the same advice for [implementing `Deserialize`][impl-deserialize] applies here.
+///
+/// # Differences to [`Deserialize`]
+///
+/// The trait is only required for container-like types or types implementing specific conversion functions.
+/// Container-like types are [`Vec`], [`BTreeMap`], but also [`Option`] and [`Box`].
+/// Conversion types deserialize into a different Rust type.
+/// For example, [`DisplayFromStr`] uses the [`FromStr`] trait after deserializing a string and [`DurationSeconds`] creates a [`Duration`] from either String or integer values.
+///
+/// This code shows how to implement [`Deserialize`] for [`Box`]:
+///
+/// ```rust,ignore
+/// impl&lt;&#39;de, T: Deserialize&lt;&#39;de&gt;&gt; Deserialize&lt;&#39;de&gt; for Box&lt;T&gt; {
+///     fn deserialize&lt;D&gt;(deserializer: D) -&gt; Result&lt;Self, D::Error&gt;
+///     where
+///         D: Deserializer&lt;&#39;de&gt;,
+///     {
+///         Ok(Box::new(Deserialize::deserialize(deserializer)?))
+///     }
+/// }
+/// ```
+///
+/// and this code shows how to do the same using [`DeserializeAs`][]:
+///
+/// ```rust,ignore
+/// impl&lt;&#39;de, T, U&gt; DeserializeAs&lt;&#39;de, Box&lt;T&gt;&gt; for Box&lt;U&gt;
+/// where
+///     U: DeserializeAs&lt;&#39;de, T&gt;,
+/// {
+///     fn deserialize_as&lt;D&gt;(deserializer: D) -&gt; Result&lt;Box&lt;T&gt;, D::Error&gt;
+///     where
+///         D: Deserializer&lt;&#39;de&gt;,
+///     {
+///         Ok(Box::new(
+///             DeserializeAsWrap::&lt;T, U&gt;::deserialize(deserializer)?.into_inner(),
+///         ))
+///     }
+/// }
+/// ```
+///
+/// It uses two type parameters, `T` and `U` instead of only one and performs the deserialization step using the `DeserializeAsWrap` type.
+/// The `T` type is the on the Rust side after deserialization, whereas the `U` type determines how the value will be deserialized.
+/// These two changes are usually enough to make a container type implement [`DeserializeAs`][].
+///
+///
+/// [`DeserializeAsWrap`] is a piece of glue code which turns [`DeserializeAs`] into a serde compatible datatype, by converting all calls to `deserialize` into `deserialize_as`.
+/// This allows us to implement [`DeserializeAs`] such that it can be applied recursively throughout the whole data structure.
+/// This is mostly important for container types, such as `Vec` or `BTreeMap`.
+/// In a `BTreeMap` this allows us to specify two different serialization behaviors, one for key and one for value, using the [`DeserializeAs`] trait.
+///
+/// ## Implementing a converter Type
+///
+/// This shows a simplified implementation for [`DisplayFromStr`].
+///
+/// ```rust
+/// # #[cfg(all(feature = &quot;macros&quot;))] {
+/// # use serde::Deserialize;
+/// # use serde::de::Error;
+/// # use serde_with::DeserializeAs;
+/// # use std::str::FromStr;
+/// # use std::fmt::Display;
+/// struct DisplayFromStr;
+///
+/// impl&lt;&#39;de, T&gt; DeserializeAs&lt;&#39;de, T&gt; for DisplayFromStr
+/// where
+///     T: FromStr,
+///     T::Err: Display,
+/// {
+///     fn deserialize_as&lt;D&gt;(deserializer: D) -&gt; Result&lt;T, D::Error&gt;
+///     where
+///         D: serde::Deserializer&lt;&#39;de&gt;,
+///     {
+///         let s = String::deserialize(deserializer).map_err(Error::custom)?;
+///         s.parse().map_err(Error::custom)
+///     }
+/// }
+/// #
+/// # #[serde_with::serde_as]
+/// # #[derive(serde::Deserialize)]
+/// # struct S (#[serde_as(as = &quot;DisplayFromStr&quot;)] bool);
+/// #
+/// # assert_eq!(false, serde_json::from_str::&lt;S&gt;(r#&quot;&quot;false&quot;&quot;#).unwrap().0);
+/// # }
+/// ```
+/// [`Box`]: std::boxed::Box
+/// [`BTreeMap`]: std::collections::BTreeMap
+/// [`Duration`]: std::time::Duration
+/// [`FromStr`]: std::str::FromStr
+/// [`Vec`]: std::vec::Vec
+/// [impl-deserialize]: https://serde.rs/impl-deserialize.html
+</span><span class="kw">pub trait </span>DeserializeAs&lt;<span class="lifetime">&#39;de</span>, T&gt;: Sized {
+    <span class="doccomment">/// Deserialize this value from the given Serde deserializer.
+    </span><span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;T, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;;
 }
 
-<span class="doccomment">/// Helper type to implement [`DeserializeAs`] for container-like types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Helper type to implement [`DeserializeAs`] for container-like types.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>DeserializeAsWrap&lt;T, U&gt; {
+    value: T,
+    marker: PhantomData&lt;U&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Return the inner value of type `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
+<span class="kw">impl</span>&lt;T, U&gt; DeserializeAsWrap&lt;T, U&gt; {
+    <span class="doccomment">/// Return the inner value of type `T`.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T, U&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>DeserializeAsWrap&lt;T, U&gt;
+<span class="kw">where
+    </span>U: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">U::deserialize_as</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="self">Self</span> {
-            <span class="ident">value</span>,
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+        U::deserialize_as(deserializer).map(|value| <span class="self">Self </span>{
+            value,
+            marker: PhantomData,
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

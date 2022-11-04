@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/codec/korean.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>korean.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../encoding/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/codec/korean.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>korean.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../encoding/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -278,17 +278,17 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">// Copyright (c) 2013-2015, Kang Seonghoon.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+// Copyright (c) 2013-2015, Kang Seonghoon.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! Legacy Korean encodings based on KS X 1001.</span>
+</span><span class="doccomment">//! Legacy Korean encodings based on KS X 1001.
 
-<span class="kw">use</span> <span class="ident">std::convert::Into</span>;
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
-<span class="kw">use</span> <span class="ident">util::StrCharIndex</span>;
-<span class="kw">use</span> <span class="ident">index_korean</span> <span class="kw">as</span> <span class="ident">index</span>;
-<span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span>std::convert::Into;
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>util::StrCharIndex;
+<span class="kw">use </span>index_korean <span class="kw">as </span>index;
+<span class="kw">use </span>types::<span class="kw-2">*</span>;
 
 <span class="doccomment">/**
  * Windows code page 949.
@@ -300,263 +300,263 @@
  * which second byte have its MSB unset (i.e. `[81-C6] [41-5A 61-7A 81-FE]`).
  * Its design strongly resembles that of Shift_JIS but less prone to errors
  * since the set of MSB-unset second bytes is much limited compared to Shift_JIS.
- */</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows949Encoding</span>;
+ */
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Windows949Encoding;
 
-<span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">Windows949Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;windows-949&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-kr&quot;</span>) } <span class="comment">// WHATWG compatibility</span>
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
+<span class="kw">impl </span>Encoding <span class="kw">for </span>Windows949Encoding {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str { <span class="string">&quot;windows-949&quot; </span>}
+    <span class="kw">fn </span>whatwg_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; { <span class="prelude-val">Some</span>(<span class="string">&quot;euc-kr&quot;</span>) } <span class="comment">// WHATWG compatibility
+    </span><span class="kw">fn </span>raw_encoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawEncoder&gt; { Windows949Encoder::new() }
+    <span class="kw">fn </span>raw_decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawDecoder&gt; { Windows949Decoder::new() }
 }
 
-<span class="doccomment">/// An encoder for Windows code page 949.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Windows949Encoder</span>;
+<span class="doccomment">/// An encoder for Windows code page 949.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Windows949Encoder;
 
-<span class="kw">impl</span> <span class="ident">Windows949Encoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">Windows949Encoder</span>) }
+<span class="kw">impl </span>Windows949Encoder {
+    <span class="kw">pub fn </span>new() -&gt; Box&lt;RawEncoder&gt; { Box::new(Windows949Encoder) }
 }
 
-<span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">Windows949Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
+<span class="kw">impl </span>RawEncoder <span class="kw">for </span>Windows949Encoder {
+    <span class="kw">fn </span>from_self(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawEncoder&gt; { Windows949Encoder::new() }
+    <span class="kw">fn </span>is_ascii_compatible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="bool-val">true </span>}
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
-        <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>raw_feed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>str, output: <span class="kw-2">&amp;mut </span>ByteWriter) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;CodecError&gt;) {
+        output.writer_hint(input.len());
 
-        <span class="kw">for</span> ((<span class="ident">i</span>,<span class="ident">j</span>), <span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>.<span class="ident">index_iter</span>() {
-            <span class="kw">if</span> <span class="ident">ch</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">&#39;\u{7f}&#39;</span> {
-                <span class="ident">output</span>.<span class="ident">write_byte</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u8</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">index::euc_kr::backward</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                <span class="kw">if</span> <span class="ident">ptr</span> <span class="op">==</span> <span class="number">0xffff</span> {
-                    <span class="kw">return</span> (<span class="ident">i</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
-                        <span class="ident">upto</span>: <span class="ident">j</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;unrepresentable character&quot;</span>.<span class="ident">into</span>()
+        <span class="kw">for </span>((i,j), ch) <span class="kw">in </span>input.index_iter() {
+            <span class="kw">if </span>ch &lt;= <span class="string">&#39;\u{7f}&#39; </span>{
+                output.write_byte(ch <span class="kw">as </span>u8);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>ptr = index::euc_kr::backward(ch <span class="kw">as </span>u32);
+                <span class="kw">if </span>ptr == <span class="number">0xffff </span>{
+                    <span class="kw">return </span>(i, <span class="prelude-val">Some</span>(CodecError {
+                        upto: j <span class="kw">as </span>isize, cause: <span class="string">&quot;unrepresentable character&quot;</span>.into()
                     }));
-                } <span class="kw">else</span> {
-                    <span class="ident">output</span>.<span class="ident">write_byte</span>((<span class="ident">ptr</span> <span class="op">/</span> <span class="number">190</span> <span class="op">+</span> <span class="number">0x81</span>) <span class="kw">as</span> <span class="ident">u8</span>);
-                    <span class="ident">output</span>.<span class="ident">write_byte</span>((<span class="ident">ptr</span> <span class="op">%</span> <span class="number">190</span> <span class="op">+</span> <span class="number">0x41</span>) <span class="kw">as</span> <span class="ident">u8</span>);
+                } <span class="kw">else </span>{
+                    output.write_byte((ptr / <span class="number">190 </span>+ <span class="number">0x81</span>) <span class="kw">as </span>u8);
+                    output.write_byte((ptr % <span class="number">190 </span>+ <span class="number">0x41</span>) <span class="kw">as </span>u8);
                 }
             }
         }
-        (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
+        (input.len(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>raw_finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _output: <span class="kw-2">&amp;mut </span>ByteWriter) -&gt; <span class="prelude-ty">Option</span>&lt;CodecError&gt; {
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="doccomment">/// A decoder for Windows code page 949.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">struct </span>Windows949Decoder {
+    st: windows949::State,
+}
+
+<span class="kw">impl </span>Windows949Decoder {
+    <span class="kw">pub fn </span>new() -&gt; Box&lt;RawDecoder&gt; {
+        Box::new(Windows949Decoder { st: Default::default() })
     }
 }
 
-<span class="doccomment">/// A decoder for Windows code page 949.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Windows949Decoder</span> {
-    <span class="ident">st</span>: <span class="ident">windows949::State</span>,
-}
+<span class="kw">impl </span>RawDecoder <span class="kw">for </span>Windows949Decoder {
+    <span class="kw">fn </span>from_self(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawDecoder&gt; { Windows949Decoder::new() }
+    <span class="kw">fn </span>is_ascii_compatible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="bool-val">true </span>}
 
-<span class="kw">impl</span> <span class="ident">Windows949Decoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">Windows949Decoder</span> { <span class="ident">st</span>: <span class="ident">Default::default</span>() })
+    <span class="kw">fn </span>raw_feed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8], output: <span class="kw-2">&amp;mut </span>StringWriter) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;CodecError&gt;) {
+        <span class="kw">let </span>(st, processed, err) = windows949::raw_feed(<span class="self">self</span>.st, input, output, <span class="kw-2">&amp;</span>());
+        <span class="self">self</span>.st = st;
+        (processed, err)
+    }
+
+    <span class="kw">fn </span>raw_finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>, output: <span class="kw-2">&amp;mut </span>StringWriter) -&gt; <span class="prelude-ty">Option</span>&lt;CodecError&gt; {
+        <span class="kw">let </span>(st, err) = windows949::raw_finish(<span class="self">self</span>.st, output, <span class="kw-2">&amp;</span>());
+        <span class="self">self</span>.st = st;
+        err
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">Windows949Decoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">Windows949Decoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
+<span class="macro">stateful_decoder! </span>{
+    module windows949;
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">processed</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows949::raw_feed</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">input</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
-        <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
-        (<span class="ident">processed</span>, <span class="ident">err</span>)
-    }
+    internal <span class="kw">pub fn </span>map_two_bytes(lead: u8, trail: u8) -&gt; u32 {
+        <span class="kw">use </span>index_korean <span class="kw">as </span>index;
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">st</span>, <span class="ident">err</span>) <span class="op">=</span> <span class="ident">windows949::raw_finish</span>(<span class="self">self</span>.<span class="ident">st</span>, <span class="ident">output</span>, <span class="kw-2">&amp;</span>());
-        <span class="self">self</span>.<span class="ident">st</span> <span class="op">=</span> <span class="ident">st</span>;
-        <span class="ident">err</span>
-    }
-}
-
-<span class="macro">stateful_decoder!</span> {
-    <span class="ident">module</span> <span class="ident">windows949</span>;
-
-    <span class="ident">internal</span> <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>: <span class="ident">u8</span>, <span class="ident">trail</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">use</span> <span class="ident">index_korean</span> <span class="kw">as</span> <span class="ident">index</span>;
-
-        <span class="kw">let</span> <span class="ident">lead</span> <span class="op">=</span> <span class="ident">lead</span> <span class="kw">as</span> <span class="ident">u16</span>;
-        <span class="kw">let</span> <span class="ident">trail</span> <span class="op">=</span> <span class="ident">trail</span> <span class="kw">as</span> <span class="ident">u16</span>;
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">lead</span>, <span class="ident">trail</span>) {
-            (<span class="number">0x81</span>...<span class="number">0xfe</span>, <span class="number">0x41</span>...<span class="number">0xfe</span>) =&gt; (<span class="ident">lead</span> <span class="op">-</span> <span class="number">0x81</span>) <span class="op">*</span> <span class="number">190</span> <span class="op">+</span> (<span class="ident">trail</span> <span class="op">-</span> <span class="number">0x41</span>),
+        <span class="kw">let </span>lead = lead <span class="kw">as </span>u16;
+        <span class="kw">let </span>trail = trail <span class="kw">as </span>u16;
+        <span class="kw">let </span>index = <span class="kw">match </span>(lead, trail) {
+            (<span class="number">0x81</span>...<span class="number">0xfe</span>, <span class="number">0x41</span>...<span class="number">0xfe</span>) =&gt; (lead - <span class="number">0x81</span>) * <span class="number">190 </span>+ (trail - <span class="number">0x41</span>),
             (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="number">0xffff</span>,
         };
-        <span class="ident">index::euc_kr::forward</span>(<span class="ident">index</span>)
+        index::euc_kr::forward(index)
     }
 
-<span class="ident">initial</span>:
-    <span class="comment">// euc-kr lead = 0x00</span>
-    <span class="ident">state</span> <span class="ident">S0</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x00</span>...<span class="number">0x7f</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">case</span> <span class="ident">b</span> @ <span class="number">0x81</span>...<span class="number">0xfe</span> =&gt; <span class="ident">S1</span>(<span class="ident">ctx</span>, <span class="ident">b</span>);
-        <span class="ident">case</span> <span class="kw">_</span> =&gt; <span class="ident">ctx</span>.<span class="ident">err</span>(<span class="string">&quot;invalid sequence&quot;</span>);
+initial:
+    <span class="comment">// euc-kr lead = 0x00
+    </span>state S0(ctx: Context) {
+        case b @ <span class="number">0x00</span>...<span class="number">0x7f </span>=&gt; ctx.emit(b <span class="kw">as </span>u32);
+        case b @ <span class="number">0x81</span>...<span class="number">0xfe </span>=&gt; S1(ctx, b);
+        case <span class="kw">_ </span>=&gt; ctx.err(<span class="string">&quot;invalid sequence&quot;</span>);
     }
 
-<span class="ident">transient</span>:
-    <span class="comment">// euc-kr lead != 0x00</span>
-    <span class="ident">state</span> <span class="ident">S1</span>(<span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">lead</span>: <span class="ident">u8</span>) {
-        <span class="ident">case</span> <span class="ident">b</span> =&gt; <span class="kw">match</span> <span class="ident">map_two_bytes</span>(<span class="ident">lead</span>, <span class="ident">b</span>) {
-            <span class="number">0xffff</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">backup</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="number">0x80</span> {<span class="number">1</span>} <span class="kw">else</span> {<span class="number">0</span>};
-                <span class="ident">ctx</span>.<span class="ident">backup_and_err</span>(<span class="ident">backup</span>, <span class="string">&quot;invalid sequence&quot;</span>)
+transient:
+    <span class="comment">// euc-kr lead != 0x00
+    </span>state S1(ctx: Context, lead: u8) {
+        case b =&gt; <span class="kw">match </span>map_two_bytes(lead, b) {
+            <span class="number">0xffff </span>=&gt; {
+                <span class="kw">let </span>backup = <span class="kw">if </span>b &lt; <span class="number">0x80 </span>{<span class="number">1</span>} <span class="kw">else </span>{<span class="number">0</span>};
+                ctx.backup_and_err(backup, <span class="string">&quot;invalid sequence&quot;</span>)
             },
-            <span class="ident">ch</span> =&gt; <span class="ident">ctx</span>.<span class="ident">emit</span>(<span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>)
+            ch =&gt; ctx.emit(ch <span class="kw">as </span>u32)
         };
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">windows949_tests</span> {
-    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Windows949Encoding</span>;
-    <span class="kw">use</span> <span class="ident">testutils</span>;
-    <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>windows949_tests {
+    <span class="kw">extern crate </span>test;
+    <span class="kw">use </span><span class="kw">super</span>::Windows949Encoding;
+    <span class="kw">use </span>testutils;
+    <span class="kw">use </span>types::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encoder_valid</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_encoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x41</span>]);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;BC&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x42</span>, <span class="number">0x43</span>]);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, []);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;\u{ac00}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0xb0</span>, <span class="number">0xa1</span>]);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;\u{b098}\u{b2e4}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0xb3</span>, <span class="number">0xaa</span>, <span class="number">0xb4</span>, <span class="number">0xd9</span>]);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">e</span>, <span class="string">&quot;\u{bdc1}\u{314b}\u{d7a3}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x94</span>, <span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>, <span class="number">0xc6</span>, <span class="number">0x52</span>]);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">e</span>, []);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encoder_valid() {
+        <span class="kw">let </span><span class="kw-2">mut </span>e = Windows949Encoding.raw_encoder();
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;A&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x41</span>]);
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;BC&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x42</span>, <span class="number">0x43</span>]);
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, []);
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;\u{ac00}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0xb0</span>, <span class="number">0xa1</span>]);
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;\u{b098}\u{b2e4}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0xb3</span>, <span class="number">0xaa</span>, <span class="number">0xb4</span>, <span class="number">0xd9</span>]);
+        <span class="macro">assert_feed_ok!</span>(e, <span class="string">&quot;\u{bdc1}\u{314b}\u{d7a3}&quot;</span>, <span class="string">&quot;&quot;</span>, [<span class="number">0x94</span>, <span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>, <span class="number">0xc6</span>, <span class="number">0x52</span>]);
+        <span class="macro">assert_finish_ok!</span>(e, []);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encoder_invalid</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_encoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">e</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;\u{ffff}&quot;</span>, <span class="string">&quot;&quot;</span>, []);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">e</span>, <span class="string">&quot;?&quot;</span>, <span class="string">&quot;\u{ffff}&quot;</span>, <span class="string">&quot;!&quot;</span>, [<span class="number">0x3f</span>]);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">e</span>, <span class="string">&quot;?&quot;</span>, <span class="string">&quot;\u{fffd}&quot;</span>, <span class="string">&quot;!&quot;</span>, [<span class="number">0x3f</span>]); <span class="comment">// for invalid table entries</span>
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">e</span>, []);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encoder_invalid() {
+        <span class="kw">let </span><span class="kw-2">mut </span>e = Windows949Encoding.raw_encoder();
+        <span class="macro">assert_feed_err!</span>(e, <span class="string">&quot;&quot;</span>, <span class="string">&quot;\u{ffff}&quot;</span>, <span class="string">&quot;&quot;</span>, []);
+        <span class="macro">assert_feed_err!</span>(e, <span class="string">&quot;?&quot;</span>, <span class="string">&quot;\u{ffff}&quot;</span>, <span class="string">&quot;!&quot;</span>, [<span class="number">0x3f</span>]);
+        <span class="macro">assert_feed_err!</span>(e, <span class="string">&quot;?&quot;</span>, <span class="string">&quot;\u{fffd}&quot;</span>, <span class="string">&quot;!&quot;</span>, [<span class="number">0x3f</span>]); <span class="comment">// for invalid table entries
+        </span><span class="macro">assert_finish_ok!</span>(e, []);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_valid</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x41</span>], [], <span class="string">&quot;A&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x42</span>, <span class="number">0x43</span>], [], <span class="string">&quot;BC&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xb3</span>, <span class="number">0xaa</span>, <span class="number">0xb4</span>, <span class="number">0xd9</span>], [], <span class="string">&quot;\u{b098}\u{b2e4}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x94</span>, <span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>, <span class="number">0xc6</span>, <span class="number">0x52</span>, <span class="number">0xc1</span>, <span class="number">0x64</span>], [],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_valid() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x41</span>], [], <span class="string">&quot;A&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x42</span>, <span class="number">0x43</span>], [], <span class="string">&quot;BC&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xb3</span>, <span class="number">0xaa</span>, <span class="number">0xb4</span>, <span class="number">0xd9</span>], [], <span class="string">&quot;\u{b098}\u{b2e4}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x94</span>, <span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>, <span class="number">0xc6</span>, <span class="number">0x52</span>, <span class="number">0xc1</span>, <span class="number">0x64</span>], [],
                         <span class="string">&quot;\u{bdc1}\u{314b}\u{d7a3}\u{d58f}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_valid_partial</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xb0</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xb3</span>, <span class="number">0xaa</span>], [<span class="number">0xb4</span>], <span class="string">&quot;\u{b098}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xd9</span>], [<span class="number">0x94</span>], <span class="string">&quot;\u{b2e4}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>], [<span class="number">0xc6</span>], <span class="string">&quot;\u{bdc1}\u{314b}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x52</span>, <span class="number">0xc1</span>, <span class="number">0x64</span>], [], <span class="string">&quot;\u{d7a3}\u{d58f}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_valid_partial() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xb0</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xb3</span>, <span class="number">0xaa</span>], [<span class="number">0xb4</span>], <span class="string">&quot;\u{b098}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xd9</span>], [<span class="number">0x94</span>], <span class="string">&quot;\u{b2e4}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xee</span>, <span class="number">0xa4</span>, <span class="number">0xbb</span>], [<span class="number">0xc6</span>], <span class="string">&quot;\u{bdc1}\u{314b}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x52</span>, <span class="number">0xc1</span>, <span class="number">0x64</span>], [], <span class="string">&quot;\u{d7a3}\u{d58f}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_invalid_lone_lead_immediate_test_finish</span>() {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0x81</span>..<span class="number">0xff</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for a trail</span>
-            <span class="macro">assert_finish_err!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_invalid_lone_lead_immediate_test_finish() {
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0x81</span>..<span class="number">0xff </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [i], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for a trail
+            </span><span class="macro">assert_finish_err!</span>(d, <span class="string">&quot;&quot;</span>);
         }
 
-        <span class="comment">// 80/FF: immediate failure</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// 80/FF: immediate failure
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_invalid_lone_lead_followed_by_space</span>() {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0x80</span>..<span class="number">0x100</span> {
-            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_invalid_lone_lead_followed_by_space() {
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0x80</span>..<span class="number">0x100 </span>{
+            <span class="kw">let </span>i = i <span class="kw">as </span>u8;
+            <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [i], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_invalid_lead_followed_by_invalid_trail</span>() {
-        <span class="comment">// should behave similarly to Big5.</span>
-        <span class="comment">// https://www.w3.org/Bugs/Public/show_bug.cgi?id=16691</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0x81</span>..<span class="number">0xff</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>, <span class="number">0x80</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>, <span class="number">0xff</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_invalid_lead_followed_by_invalid_trail() {
+        <span class="comment">// should behave similarly to Big5.
+        // https://www.w3.org/Bugs/Public/show_bug.cgi?id=16691
+        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0x81</span>..<span class="number">0xff </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [i, <span class="number">0x80</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_feed_err!</span>(d, [], [i, <span class="number">0xff</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">i</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [i], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_feed_ok!</span>(d, [], [i], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [<span class="number">0xff</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [<span class="number">0xff</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [<span class="number">0xff</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [<span class="number">0xff</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_invalid_boundary</span>() {
-        <span class="comment">// U+D7A3 (C6 52) is the last Hangul syllable not in KS X 1001, C6 53 is invalid.</span>
-        <span class="comment">// note that since the trail byte may coincide with ASCII, the trail byte 53 is</span>
-        <span class="comment">// not considered to be in the problem. this is compatible to WHATWG Encoding standard.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xc6</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x53</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_invalid_boundary() {
+        <span class="comment">// U+D7A3 (C6 52) is the last Hangul syllable not in KS X 1001, C6 53 is invalid.
+        // note that since the trail byte may coincide with ASCII, the trail byte 53 is
+        // not considered to be in the problem. this is compatible to WHATWG Encoding standard.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xc6</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x53</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decoder_feed_after_finish</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [<span class="number">0xb0</span>], <span class="string">&quot;\u{ac00}&quot;</span>);
-        <span class="macro">assert_finish_err!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decoder_feed_after_finish() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = Windows949Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [<span class="number">0xb0</span>], <span class="string">&quot;\u{ac00}&quot;</span>);
+        <span class="macro">assert_finish_err!</span>(d, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xb0</span>, <span class="number">0xa1</span>], [], <span class="string">&quot;\u{ac00}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_encode_short_text</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>;
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-            <span class="ident">Windows949Encoding</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="ident">EncoderTrap::Strict</span>)
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>bench_encode_short_text(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>s = testutils::KOREAN_TEXT;
+        bencher.bytes = s.len() <span class="kw">as </span>u64;
+        bencher.iter(|| test::black_box({
+            Windows949Encoding.encode(<span class="kw-2">&amp;</span>s, EncoderTrap::Strict)
         }))
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_decode_short_text</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Windows949Encoding</span>.<span class="ident">encode</span>(<span class="ident">testutils::KOREAN_TEXT</span>,
-                                          <span class="ident">EncoderTrap::Strict</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
-        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-            <span class="ident">Windows949Encoding</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="ident">DecoderTrap::Strict</span>)
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>bench_decode_short_text(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        <span class="kw">let </span>s = Windows949Encoding.encode(testutils::KOREAN_TEXT,
+                                          EncoderTrap::Strict).ok().unwrap();
+        bencher.bytes = s.len() <span class="kw">as </span>u64;
+        bencher.iter(|| test::black_box({
+            Windows949Encoding.decode(<span class="kw-2">&amp;</span>s, DecoderTrap::Strict)
         }))
     }
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

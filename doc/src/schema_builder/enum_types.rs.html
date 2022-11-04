@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/enum_types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/enum_types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_types.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -165,172 +165,172 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="ident">filters</span>, <span class="ident">itx</span>, <span class="ident">json_null</span>, <span class="ident">ordering</span>};
-<span class="kw">use</span> <span class="ident">schema::EnumType</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::constants::{filters, itx, json_null, ordering};
+<span class="kw">use </span>schema::EnumType;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">ordering::SORT_ORDER</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sort_order_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(ordering::SORT_ORDER, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(
-        <span class="ident">ident</span>.<span class="ident">clone</span>(),
-        <span class="macro">vec!</span>[<span class="ident">ordering::ASC</span>.<span class="ident">to_owned</span>(), <span class="ident">ordering::DESC</span>.<span class="ident">to_owned</span>()],
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(
+        ident.clone(),
+        <span class="macro">vec!</span>[ordering::ASC.to_owned(), ordering::DESC.to_owned()],
     ));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nulls_order_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">ordering::NULLS_ORDER</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nulls_order_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(ordering::NULLS_ORDER, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(
-        <span class="ident">ident</span>.<span class="ident">clone</span>(),
-        <span class="macro">vec!</span>[<span class="ident">ordering::FIRST</span>.<span class="ident">to_owned</span>(), <span class="ident">ordering::LAST</span>.<span class="ident">to_owned</span>()],
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(
+        ident.clone(),
+        <span class="macro">vec!</span>[ordering::FIRST.to_owned(), ordering::LAST.to_owned()],
     ));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">map_schema_enum_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">enum_name</span>, <span class="ident">MODEL_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_schema_enum_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, enum_name: <span class="kw-2">&amp;</span>str) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(enum_name, MODEL_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">schema_enum</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">internal_data_model</span>
-        .<span class="ident">find_enum</span>(<span class="ident">enum_name</span>)
-        .<span class="ident">expect</span>(<span class="string">&quot;Enum references must always be valid.&quot;</span>);
+    <span class="kw">let </span>schema_enum = ctx
+        .internal_data_model
+        .find_enum(enum_name)
+        .expect(<span class="string">&quot;Enum references must always be valid.&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::database</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">schema_enum</span>));
+    <span class="kw">let </span>typ = Arc::new(EnumType::database(ident.clone(), schema_enum));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_field_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}ScalarFieldEnum&quot;</span>, <span class="ident">capitalize</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>));
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_field_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}ScalarFieldEnum&quot;</span>, capitalize(<span class="kw-2">&amp;</span>model.name));
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">scalar</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>values = model
+        .fields()
+        .scalar()
+        .into_iter()
+        .map(|field| (field.name.clone(), field))
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::field_ref</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">values</span>));
+    <span class="kw">let </span>typ = Arc::new(EnumType::field_ref(ident.clone(), values));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">json_null_filter_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">json_null::FILTER_ENUM_NAME</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_null_filter_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(json_null::FILTER_ENUM_NAME, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(
-        <span class="ident">ident</span>.<span class="ident">clone</span>(),
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(
+        ident.clone(),
         <span class="macro">vec!</span>[
-            <span class="ident">json_null::DB_NULL</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">json_null::ANY_NULL</span>.<span class="ident">to_owned</span>(),
+            json_null::DB_NULL.to_owned(),
+            json_null::JSON_NULL.to_owned(),
+            json_null::ANY_NULL.to_owned(),
         ],
     ));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">json_null_input_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">nullable</span>: <span class="ident">bool</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nullable</span> {
-        <span class="ident">Identifier::new</span>(<span class="ident">json_null::NULLABLE_INPUT_ENUM_NAME</span>, <span class="ident">PRISMA_NAMESPACE</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">Identifier::new</span>(<span class="ident">json_null::INPUT_ENUM_NAME</span>, <span class="ident">PRISMA_NAMESPACE</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>json_null_input_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, nullable: bool) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = <span class="kw">if </span>nullable {
+        Identifier::new(json_null::NULLABLE_INPUT_ENUM_NAME, PRISMA_NAMESPACE)
+    } <span class="kw">else </span>{
+        Identifier::new(json_null::INPUT_ENUM_NAME, PRISMA_NAMESPACE)
     };
 
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nullable</span> {
-        <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(
-            <span class="ident">ident</span>.<span class="ident">clone</span>(),
-            <span class="macro">vec!</span>[<span class="ident">json_null::DB_NULL</span>.<span class="ident">to_owned</span>(), <span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>()],
+    <span class="kw">let </span>typ = <span class="kw">if </span>nullable {
+        Arc::new(EnumType::string(
+            ident.clone(),
+            <span class="macro">vec!</span>[json_null::DB_NULL.to_owned(), json_null::JSON_NULL.to_owned()],
         ))
-    } <span class="kw">else</span> {
-        <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[<span class="ident">json_null::JSON_NULL</span>.<span class="ident">to_owned</span>()]))
+    } <span class="kw">else </span>{
+        Arc::new(EnumType::string(ident.clone(), <span class="macro">vec!</span>[json_null::JSON_NULL.to_owned()]))
     };
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">order_by_relevance_enum</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}OrderByRelevanceFieldEnum&quot;</span>, <span class="ident">container</span>);
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">name</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>order_by_relevance_enum(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>str,
+    values: Vec&lt;String&gt;,
+) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}OrderByRelevanceFieldEnum&quot;</span>, container);
+    <span class="kw">let </span>ident = Identifier::new(name, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">values</span>));
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(ident.clone(), values));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">query_mode_enum</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="ident">EnumTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="string">&quot;QueryMode&quot;</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_enum!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>query_mode_enum(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; EnumTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;QueryMode&quot;</span>, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_enum!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(
-        <span class="ident">ident</span>.<span class="ident">clone</span>(),
-        <span class="macro">vec!</span>[<span class="ident">filters::DEFAULT</span>.<span class="ident">to_owned</span>(), <span class="ident">filters::INSENSITIVE</span>.<span class="ident">to_owned</span>()],
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(
+        ident.clone(),
+        <span class="macro">vec!</span>[filters::DEFAULT.to_owned(), filters::INSENSITIVE.to_owned()],
     ));
 
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>)
+    ctx.cache_enum_type(ident, typ.clone());
+    Arc::downgrade(<span class="kw-2">&amp;</span>typ)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">itx_isolation_levels</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumTypeWeakRef</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="string">&quot;TransactionIsolationLevel&quot;</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">e</span> @ <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">get_enum_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>) {
-        <span class="kw">return</span> <span class="ident">e</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>itx_isolation_levels(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; <span class="prelude-ty">Option</span>&lt;EnumTypeWeakRef&gt; {
+    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;TransactionIsolationLevel&quot;</span>, PRISMA_NAMESPACE);
+    <span class="kw">if let </span>e @ <span class="prelude-val">Some</span>(<span class="kw">_</span>) = ctx.get_enum_type(<span class="kw-2">&amp;</span>ident) {
+        <span class="kw">return </span>e;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>values = <span class="macro">vec!</span>[];
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::SupportsTxIsolationReadUncommitted</span>) {
-        <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">itx::READ_UNCOMMITTED</span>.<span class="ident">to_owned</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::SupportsTxIsolationReadUncommitted) {
+        values.push(itx::READ_UNCOMMITTED.to_owned());
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::SupportsTxIsolationReadCommitted</span>) {
-        <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">itx::READ_COMMITTED</span>.<span class="ident">to_owned</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::SupportsTxIsolationReadCommitted) {
+        values.push(itx::READ_COMMITTED.to_owned());
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::SupportsTxIsolationRepeatableRead</span>) {
-        <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">itx::REPEATABLE_READ</span>.<span class="ident">to_owned</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::SupportsTxIsolationRepeatableRead) {
+        values.push(itx::REPEATABLE_READ.to_owned());
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::SupportsTxIsolationSerializable</span>) {
-        <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">itx::SERIALIZABLE</span>.<span class="ident">to_owned</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::SupportsTxIsolationSerializable) {
+        values.push(itx::SERIALIZABLE.to_owned());
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::SupportsTxIsolationSnapshot</span>) {
-        <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">itx::SNAPSHOT</span>.<span class="ident">to_owned</span>());
+    <span class="kw">if </span>ctx.has_capability(ConnectorCapability::SupportsTxIsolationSnapshot) {
+        values.push(itx::SNAPSHOT.to_owned());
     }
 
-    <span class="kw">if</span> <span class="ident">values</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>values.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">EnumType::string</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">values</span>));
-    <span class="ident">ctx</span>.<span class="ident">cache_enum_type</span>(<span class="ident">ident</span>, <span class="ident">typ</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>typ = Arc::new(EnumType::string(ident.clone(), values));
+    ctx.cache_enum_type(ident, typ.clone());
 
-    <span class="prelude-val">Some</span>(<span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>))
+    <span class="prelude-val">Some</span>(Arc::downgrade(<span class="kw-2">&amp;</span>typ))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

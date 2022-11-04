@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/renderer/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/renderer/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -115,122 +115,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::LineWriteable</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::max</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::LineWriteable;
+<span class="kw">use </span>std::cmp::max;
 
-<span class="kw">const</span> <span class="ident">COLUMN_SPACING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="kw">const </span>COLUMN_SPACING: usize = <span class="number">1</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Row</span> {
-    <span class="comment">// the 2nd String is an arbitrary String that does not influence the table layout. We use it for end of line comments.</span>
-    <span class="doccomment">/// A row with columns aligned by the table format.</span>
-    <span class="ident">Regular</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">String</span>),
-    <span class="doccomment">/// A row without columns.</span>
-    <span class="ident">Interleaved</span>(<span class="ident">String</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Row {
+    <span class="comment">// the 2nd String is an arbitrary String that does not influence the table layout. We use it for end of line comments.
+    </span><span class="doccomment">/// A row with columns aligned by the table format.
+    </span>Regular(Vec&lt;String&gt;, String),
+    <span class="doccomment">/// A row without columns.
+    </span>Interleaved(String),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TableFormat</span> {
-    <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableFormat {
+    <span class="kw">pub </span>table: Vec&lt;Row&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TableFormat</span> {
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">std::mem::take</span>(<span class="self">self</span>);
+<span class="kw">impl </span>TableFormat {
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        std::mem::take(<span class="self">self</span>);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_locked_writer_for</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>() {
-            <span class="ident">Row::Interleaved</span>(<span class="ident">row</span>) =&gt; <span class="ident">row</span>,
-            <span class="ident">Row::Regular</span>(<span class="ident">columns</span>, <span class="kw">_</span>) =&gt; {
-                <span class="ident">columns</span>.<span class="ident">resize</span>(<span class="ident">index</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">String::new</span>());
-                <span class="kw-2">&amp;mut</span> <span class="ident">columns</span>[<span class="ident">index</span>]
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_locked_writer_for(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;mut </span>String {
+        <span class="kw">match </span><span class="self">self</span>.table.last_mut().unwrap() {
+            Row::Interleaved(row) =&gt; row,
+            Row::Regular(columns, <span class="kw">_</span>) =&gt; {
+                columns.resize(index + <span class="number">1</span>, String::new());
+                <span class="kw-2">&amp;mut </span>columns[index]
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">interleave</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">push</span>(<span class="ident">Row::Interleaved</span>(<span class="ident">String::from</span>(<span class="ident">text</span>)));
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>interleave(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.table.push(Row::Interleaved(String::from(text)));
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append_suffix_to_current_row</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Row::Regular</span>(<span class="kw">_</span>, <span class="ident">suffix</span>)) =&gt; <span class="ident">suffix</span>.<span class="ident">push_str</span>(<span class="ident">text</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append_suffix_to_current_row(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">match </span><span class="self">self</span>.table.last_mut() {
+            <span class="prelude-val">Some</span>(Row::Regular(<span class="kw">_</span>, suffix)) =&gt; suffix.push_str(text),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start_new_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">push</span>(<span class="ident">Row::Regular</span>(<span class="ident">Vec::new</span>(), <span class="ident">String::new</span>()))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>start_new_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.table.push(Row::Regular(Vec::new(), String::new()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::Renderer</span>) {
-        <span class="comment">// First, measure cols</span>
-        <span class="kw">let</span> <span class="ident">max_number_of_columns</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">table</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">row</span> {
-                <span class="ident">Row::Regular</span>(<span class="ident">cols</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">cols</span>.<span class="ident">len</span>()),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>render(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::Renderer) {
+        <span class="comment">// First, measure cols
+        </span><span class="kw">let </span>max_number_of_columns = <span class="self">self
+            </span>.table
+            .iter()
+            .filter_map(|row| <span class="kw">match </span>row {
+                Row::Regular(cols, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(cols.len()),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">max</span>();
+            .max();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_widths_for_each_column</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">max_number_of_columns</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>)];
+        <span class="kw">let </span><span class="kw-2">mut </span>max_widths_for_each_column = <span class="macro">vec!</span>[<span class="number">0</span>; max_number_of_columns.unwrap_or(<span class="number">0</span>)];
 
-        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">table</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">row</span> {
-                <span class="kw">while</span> <span class="ident">row</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
-                    <span class="ident">row</span>.<span class="ident">pop</span>();
+        <span class="kw">for </span>row <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.table {
+            <span class="kw">if let </span>Row::Regular(row, <span class="kw">_</span>) = row {
+                <span class="kw">while </span>row.last().map(|s| s.as_str()) == <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) {
+                    row.pop();
                 }
-                <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">col</span>) <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                    <span class="ident">max_widths_for_each_column</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">max</span>(<span class="ident">max_widths_for_each_column</span>[<span class="ident">i</span>], <span class="ident">col</span>.<span class="ident">len</span>());
+                <span class="kw">for </span>(i, col) <span class="kw">in </span>row.iter().enumerate() {
+                    max_widths_for_each_column[i] = max(max_widths_for_each_column[i], col.len());
                 }
             }
         }
 
-        <span class="comment">// Then, render</span>
-        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">table</span> {
-            <span class="kw">match</span> <span class="ident">row</span> {
-                <span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="ident">suffix</span>) =&gt; {
-                    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">col</span>) <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                        <span class="kw">let</span> <span class="ident">spacing</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span> {
-                            <span class="number">0</span> <span class="comment">// Do not space last column.</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">max_widths_for_each_column</span>[<span class="ident">i</span>] <span class="op">-</span> <span class="ident">col</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">COLUMN_SPACING</span>
+        <span class="comment">// Then, render
+        </span><span class="kw">for </span>row <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.table {
+            <span class="kw">match </span>row {
+                Row::Regular(row, suffix) =&gt; {
+                    <span class="kw">for </span>(i, col) <span class="kw">in </span>row.iter().enumerate() {
+                        <span class="kw">let </span>spacing = <span class="kw">if </span>i == row.len() - <span class="number">1 </span>{
+                            <span class="number">0 </span><span class="comment">// Do not space last column.
+                        </span>} <span class="kw">else </span>{
+                            max_widths_for_each_column[i] - col.len() + COLUMN_SPACING
                         };
-                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">col</span>);
-                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">spacing</span>));
+                        target.write(col);
+                        target.write(<span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.repeat(spacing));
                     }
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">suffix</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">row</span>.<span class="ident">is_empty</span>() {
-                            <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot; &quot;</span>);
+                    <span class="kw">if </span>!suffix.is_empty() {
+                        <span class="kw">if </span>!row.is_empty() {
+                            target.write(<span class="string">&quot; &quot;</span>);
                         }
-                        <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">suffix</span>);
+                        target.write(suffix);
                     }
                 }
-                <span class="ident">Row::Interleaved</span>(<span class="ident">text</span>) =&gt; {
-                    <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">text</span>);
+                Row::Interleaved(text) =&gt; {
+                    target.write(text);
                 }
             }
 
-            <span class="ident">target</span>.<span class="ident">end_line</span>();
+            target.end_line();
         }
 
-        <span class="self">self</span>.<span class="ident">reset</span>()
+        <span class="self">self</span>.reset()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">LineWriteable</span> <span class="kw">for</span> <span class="ident">TableFormat</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">text</span>.<span class="ident">trim</span>();
+<span class="kw">impl </span>LineWriteable <span class="kw">for </span>TableFormat {
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, text: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">let </span>trimmed = text.trim();
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">last_mut</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Row::Regular</span>(<span class="ident">row</span>, <span class="kw">_</span>)) =&gt; <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">String::from</span>(<span class="ident">trimmed</span>)),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
+        <span class="kw">match </span><span class="self">self</span>.table.last_mut() {
+            <span class="prelude-val">Some</span>(Row::Regular(row, <span class="kw">_</span>)) =&gt; row.push(String::from(trimmed)),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;State error: Not inside a regular table row.&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">end_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+    <span class="kw">fn </span>end_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

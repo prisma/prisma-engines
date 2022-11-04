@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/de/const_arrays.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>const_arrays.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/de/const_arrays.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>const_arrays.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -336,343 +336,343 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">MapIter</span>, <span class="ident">SeqIter</span>};
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">boxed::Box</span>, <span class="ident">collections::BTreeMap</span>, <span class="ident">string::String</span>, <span class="ident">vec::Vec</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">fmt</span>, <span class="ident">mem::MaybeUninit</span>};
-<span class="kw">use</span> <span class="ident">serde::de</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::utils::{MapIter, SeqIter};
+<span class="kw">use </span>alloc::{borrow::Cow, boxed::Box, collections::BTreeMap, string::String, vec::Vec};
+<span class="kw">use </span>core::{convert::TryInto, fmt, mem::MaybeUninit};
+<span class="kw">use </span>serde::de::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="comment">// TODO this should probably be moved into the utils module when const generics are available for MSRV</span>
+<span class="comment">// TODO this should probably be moved into the utils module when const generics are available for MSRV
 
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// The code follow exactly the pattern of initializing an array element-by-element from the standard library.</span>
-<span class="doccomment">/// &lt;https://doc.rust-lang.org/nightly/std/mem/union.MaybeUninit.html#initializing-an-array-element-by-element&gt;</span>
-<span class="kw">fn</span> <span class="ident">array_from_iterator</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span>, <span class="ident">E</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">I</span>,
-    <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Expected</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">T</span>; <span class="ident">N</span>], <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">Error</span>,
+</span><span class="doccomment">/// # Safety
+/// The code follow exactly the pattern of initializing an array element-by-element from the standard library.
+/// &lt;https://doc.rust-lang.org/nightly/std/mem/union.MaybeUninit.html#initializing-an-array-element-by-element&gt;
+</span><span class="kw">fn </span>array_from_iterator&lt;I, T, E, <span class="kw">const </span>N: usize&gt;(
+    <span class="kw-2">mut </span>iter: I,
+    expected: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Expected,
+) -&gt; <span class="prelude-ty">Result</span>&lt;[T; N], E&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
+    E: Error,
 {
-    <span class="kw">fn</span> <span class="ident">drop_array_elems</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">num</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">arr</span>: [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>; <span class="ident">N</span>]) {
-        <span class="ident">arr</span>[..<span class="ident">num</span>].<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> {
-            <span class="comment">// TODO This would be better with assume_init_drop nightly function</span>
-            <span class="comment">// https://github.com/rust-lang/rust/issues/63567</span>
-            <span class="kw">unsafe</span> { <span class="ident">core::ptr::drop_in_place</span>(<span class="ident">elem</span>.<span class="ident">as_mut_ptr</span>()) };
+    <span class="kw">fn </span>drop_array_elems&lt;T, <span class="kw">const </span>N: usize&gt;(num: usize, <span class="kw-2">mut </span>arr: [MaybeUninit&lt;T&gt;; N]) {
+        arr[..num].iter_mut().for_each(|elem| {
+            <span class="comment">// TODO This would be better with assume_init_drop nightly function
+            // https://github.com/rust-lang/rust/issues/63567
+            </span><span class="kw">unsafe </span>{ core::ptr::drop_in_place(elem.as_mut_ptr()) };
         });
     }
 
-    <span class="comment">// Create an uninitialized array of `MaybeUninit`. The `assume_init` is</span>
-    <span class="comment">// safe because the type we are claiming to have initialized here is a</span>
-    <span class="comment">// bunch of `MaybeUninit`s, which do not require initialization.</span>
-    <span class="comment">//</span>
-    <span class="comment">// TODO could be simplified with nightly maybe_uninit_uninit_array feature</span>
-    <span class="comment">// https://doc.rust-lang.org/nightly/std/mem/union.MaybeUninit.html#method.uninit_array</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arr</span>: [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>; <span class="ident">N</span>] <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">MaybeUninit::uninit</span>().<span class="ident">assume_init</span>() };
+    <span class="comment">// Create an uninitialized array of `MaybeUninit`. The `assume_init` is
+    // safe because the type we are claiming to have initialized here is a
+    // bunch of `MaybeUninit`s, which do not require initialization.
+    //
+    // TODO could be simplified with nightly maybe_uninit_uninit_array feature
+    // https://doc.rust-lang.org/nightly/std/mem/union.MaybeUninit.html#method.uninit_array
+    </span><span class="kw">let </span><span class="kw-2">mut </span>arr: [MaybeUninit&lt;T&gt;; N] = <span class="kw">unsafe </span>{ MaybeUninit::uninit().assume_init() };
 
-    <span class="comment">// Dropping a `MaybeUninit` does nothing. Thus using raw pointer</span>
-    <span class="comment">// assignment instead of `ptr::write` does not cause the old</span>
-    <span class="comment">// uninitialized value to be dropped. Also if there is a panic during</span>
-    <span class="comment">// this loop, we have a memory leak, but there is no memory safety</span>
-    <span class="comment">// issue.</span>
-    <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">elem</span>) <span class="kw">in</span> <span class="ident">arr</span>[..].<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-        <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)) =&gt; <span class="ident">MaybeUninit::new</span>(<span class="ident">value</span>),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="ident">drop_array_elems</span>(<span class="ident">idx</span>, <span class="ident">arr</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+    <span class="comment">// Dropping a `MaybeUninit` does nothing. Thus using raw pointer
+    // assignment instead of `ptr::write` does not cause the old
+    // uninitialized value to be dropped. Also if there is a panic during
+    // this loop, we have a memory leak, but there is no memory safety
+    // issue.
+    </span><span class="kw">for </span>(idx, elem) <span class="kw">in </span>arr[..].iter_mut().enumerate() {
+        <span class="kw-2">*</span>elem = <span class="kw">match </span>iter.next() {
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(value)) =&gt; MaybeUninit::new(value),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)) =&gt; {
+                drop_array_elems(idx, arr);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(err);
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">drop_array_elems</span>(<span class="ident">idx</span>, <span class="ident">arr</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(<span class="ident">idx</span>, <span class="ident">expected</span>));
+            <span class="prelude-val">None </span>=&gt; {
+                drop_array_elems(idx, arr);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_length(idx, expected));
             }
         };
     }
 
-    <span class="comment">// Everything is initialized. Transmute the array to the</span>
-    <span class="comment">// initialized type.</span>
-    <span class="comment">// A normal transmute is not possible because of:</span>
-    <span class="comment">// https://github.com/rust-lang/rust/issues/61956</span>
-    <span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="ident">core::mem::transmute_copy</span>::<span class="op">&lt;</span><span class="kw">_</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">arr</span>) })
+    <span class="comment">// Everything is initialized. Transmute the array to the
+    // initialized type.
+    // A normal transmute is not possible because of:
+    // https://github.com/rust-lang/rust/issues/61956
+    </span><span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ core::mem::transmute_copy::&lt;<span class="kw">_</span>, [T; N]&gt;(<span class="kw-2">&amp;</span>arr) })
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">As</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">As</span>; <span class="ident">N</span>]
-<span class="kw">where</span>
-    <span class="ident">As</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T, As, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, [T; N]&gt; <span class="kw">for </span>[As; N]
+<span class="kw">where
+    </span>As: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">T</span>; <span class="ident">N</span>], <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;[T; N], D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+        <span class="kw">struct </span>ArrayVisitor&lt;T, <span class="kw">const </span>M: usize&gt;(PhantomData&lt;T&gt;);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">As</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">As</span><span class="op">&gt;</span>, <span class="ident">M</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">As</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T, As, <span class="kw">const </span>M: usize&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ArrayVisitor&lt;DeserializeAsWrap&lt;T, As&gt;, M&gt;
+        <span class="kw">where
+            </span>As: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, T&gt;,
         {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> [<span class="ident">T</span>; <span class="ident">M</span>];
+            <span class="kw">type </span>Value = [T; M];
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;an array of size {}&quot;</span>, <span class="ident">M</span>))
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                formatter.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;an array of size {}&quot;</span>, M))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seq</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">A</span>: <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+            <span class="kw">fn </span>visit_seq&lt;A&gt;(<span class="self">self</span>, seq: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+            <span class="kw">where
+                </span>A: SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="ident">array_from_iterator</span>(
-                    <span class="ident">SeqIter::new</span>(<span class="ident">seq</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">As</span><span class="op">&gt;</span>, <span class="ident">A::Error</span><span class="op">&gt;</span><span class="op">|</span> {
-                        <span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">into_inner</span>())
+                array_from_iterator(
+                    SeqIter::new(seq).map(|res: <span class="prelude-ty">Result</span>&lt;DeserializeAsWrap&lt;T, As&gt;, A::Error&gt;| {
+                        res.map(|t| t.into_inner())
                     }),
                     <span class="kw-2">&amp;</span><span class="self">self</span>,
                 )
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_tuple</span>(<span class="ident">N</span>, <span class="ident">ArrayVisitor</span>::<span class="op">&lt;</span><span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">As</span><span class="op">&gt;</span>, <span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span>))
+        deserializer.deserialize_tuple(N, ArrayVisitor::&lt;DeserializeAsWrap&lt;T, As&gt;, N&gt;(PhantomData))
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tuple_seq_as_map_impl_intern</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span> <span class="op">&lt;</span><span class="ident">KAs</span>, <span class="ident">VAs</span><span class="op">&gt;</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::implicit_hasher</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&lt;</span><span class="ident">KAs</span>, <span class="ident">VAs</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">KAs</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">K</span><span class="op">&gt;</span>,
-            <span class="ident">VAs</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+<span class="macro">macro_rules! </span>tuple_seq_as_map_impl_intern {
+    (<span class="macro-nonterminal">$tyorig</span>:ty, <span class="macro-nonterminal">$ty</span>:ident &lt;KAs, VAs&gt;) =&gt; {
+        <span class="attribute">#[allow(clippy::implicit_hasher)]
+        </span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, K, KAs, V, VAs, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, <span class="macro-nonterminal">$tyorig</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$ty</span>&lt;KAs, VAs&gt;
+        <span class="kw">where
+            </span>KAs: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, K&gt;,
+            VAs: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, V&gt;,
         {
-            <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">tyorig</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+            <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="macro-nonterminal">$tyorig</span>, D::Error&gt;
+            <span class="kw">where
+                </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="kw">struct</span> <span class="ident">MapVisitor</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> {
-                    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>)<span class="op">&gt;</span>,
+                <span class="kw">struct </span>MapVisitor&lt;K, KAs, V, VAs, <span class="kw">const </span>M: usize&gt; {
+                    marker: PhantomData&lt;(K, KAs, V, VAs)&gt;,
                 }
 
-                <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MapVisitor</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>, <span class="ident">M</span><span class="op">&gt;</span>
-                <span class="kw">where</span>
-                    <span class="ident">KAs</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">K</span><span class="op">&gt;</span>,
-                    <span class="ident">VAs</span>: <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+                <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, K, KAs, V, VAs, <span class="kw">const </span>M: usize&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>MapVisitor&lt;K, KAs, V, VAs, M&gt;
+                <span class="kw">where
+                    </span>KAs: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, K&gt;,
+                    VAs: DeserializeAs&lt;<span class="lifetime">&#39;de</span>, V&gt;,
                 {
-                    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> [(<span class="ident">K</span>, <span class="ident">V</span>); <span class="ident">M</span>];
+                    <span class="kw">type </span>Value = [(K, V); M];
 
-                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                        <span class="ident">formatter</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;a map of length {}&quot;</span>, <span class="ident">M</span>))
+                    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                        formatter.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;a map of length {}&quot;</span>, M))
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">access</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-                    <span class="kw">where</span>
-                        <span class="ident">A</span>: <span class="ident">MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+                    <span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, access: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+                    <span class="kw">where
+                        </span>A: MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
                     {
-                        <span class="ident">array_from_iterator</span>(<span class="ident">MapIter::new</span>(<span class="ident">access</span>).<span class="ident">map</span>(
-                            <span class="op">|</span><span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span><span class="op">&gt;</span>, <span class="ident">DeserializeAsWrap</span><span class="op">&lt;</span><span class="ident">V</span>, <span class="ident">VAs</span><span class="op">&gt;</span>), <span class="ident">A::Error</span><span class="op">&gt;</span><span class="op">|</span> {
-                                <span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">into_inner</span>(), <span class="ident">v</span>.<span class="ident">into_inner</span>()))
+                        array_from_iterator(MapIter::new(access).map(
+                            |res: <span class="prelude-ty">Result</span>&lt;(DeserializeAsWrap&lt;K, KAs&gt;, DeserializeAsWrap&lt;V, VAs&gt;), A::Error&gt;| {
+                                res.map(|(k, v)| (k.into_inner(), v.into_inner()))
                             }
                         ), <span class="kw-2">&amp;</span><span class="self">self</span>)
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">MapVisitor</span>::<span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">KAs</span>, <span class="ident">V</span>, <span class="ident">VAs</span>, <span class="ident">N</span><span class="op">&gt;</span> {
-                    <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+                <span class="kw">let </span>visitor = MapVisitor::&lt;K, KAs, V, VAs, N&gt; {
+                    marker: PhantomData,
                 };
-                <span class="ident">deserializer</span>.<span class="ident">deserialize_map</span>(<span class="ident">visitor</span>)
+                deserializer.deserialize_map(visitor)
             }
         }
     }
 }
-<span class="macro">tuple_seq_as_map_impl_intern!</span>([(<span class="ident">K</span>, <span class="ident">V</span>); <span class="ident">N</span>], <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">KAs</span>, <span class="ident">VAs</span><span class="op">&gt;</span>);
-<span class="macro">tuple_seq_as_map_impl_intern!</span>([(<span class="ident">K</span>, <span class="ident">V</span>); <span class="ident">N</span>], <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">KAs</span>, <span class="ident">VAs</span><span class="op">&gt;</span>);
+<span class="macro">tuple_seq_as_map_impl_intern!</span>([(K, V); N], BTreeMap&lt;KAs, VAs&gt;);
+<span class="macro">tuple_seq_as_map_impl_intern!</span>([(K, V); N], HashMap&lt;KAs, VAs&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">N</span>], <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, [u8; N]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; N], D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
+        <span class="kw">struct </span>ArrayVisitor&lt;<span class="kw">const </span>M: usize&gt;;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">M</span>];
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>M: usize&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ArrayVisitor&lt;M&gt; {
+            <span class="kw">type </span>Value = [u8; M];
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;an byte array of size {}&quot;</span>, <span class="ident">M</span>))
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                formatter.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;an byte array of size {}&quot;</span>, M))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seq</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">A</span>: <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+            <span class="kw">fn </span>visit_seq&lt;A&gt;(<span class="self">self</span>, seq: A) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, A::Error&gt;
+            <span class="kw">where
+                </span>A: SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="ident">array_from_iterator</span>(<span class="ident">SeqIter::new</span>(<span class="ident">seq</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)
+                array_from_iterator(SeqIter::new(seq), <span class="kw-2">&amp;</span><span class="self">self</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_bytes&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="ident">v</span>.<span class="ident">try_into</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))
+                v.try_into()
+                    .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="ident">v</span>.<span class="ident">as_bytes</span>()
-                    .<span class="ident">try_into</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))
+                v.as_bytes()
+                    .try_into()
+                    .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_bytes</span>(<span class="ident">ArrayVisitor</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>)
+        deserializer.deserialize_bytes(ArrayVisitor::&lt;N&gt;)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>; <span class="ident">N</span>], <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8; N]&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8; N], D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
+        <span class="kw">struct </span>ArrayVisitor&lt;<span class="kw">const </span>M: usize&gt;;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ArrayVisitor</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>; <span class="ident">M</span>];
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>M: usize&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ArrayVisitor&lt;M&gt; {
+            <span class="kw">type </span>Value = <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8; M];
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;a borrowed byte array of size {}&quot;</span>, <span class="ident">M</span>))
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                formatter.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;a borrowed byte array of size {}&quot;</span>, M))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_borrowed_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_borrowed_bytes&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="ident">v</span>.<span class="ident">try_into</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))
+                v.try_into()
+                    .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_borrowed_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_borrowed_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="ident">v</span>.<span class="ident">as_bytes</span>()
-                    .<span class="ident">try_into</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))
+                v.as_bytes()
+                    .try_into()
+                    .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_bytes</span>(<span class="ident">ArrayVisitor</span>::<span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>)
+        deserializer.deserialize_bytes(ArrayVisitor::&lt;N&gt;)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, Cow&lt;<span class="lifetime">&#39;de</span>, [u8; N]&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8; N]&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">CowVisitor</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
+        <span class="kw">struct </span>CowVisitor&lt;<span class="kw">const </span>M: usize&gt;;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CowVisitor</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">M</span>]<span class="op">&gt;</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>M: usize&gt; Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>CowVisitor&lt;M&gt; {
+            <span class="kw">type </span>Value = Cow&lt;<span class="lifetime">&#39;de</span>, [u8; M]&gt;;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a byte array&quot;</span>)
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                formatter.write_str(<span class="string">&quot;a byte array&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_borrowed_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_borrowed_bytes&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Borrowed</span>(
-                    <span class="ident">v</span>.<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(Cow::Borrowed(
+                    v.try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_borrowed_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_borrowed_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span><span class="lifetime">&#39;de </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Borrowed</span>(
-                    <span class="ident">v</span>.<span class="ident">as_bytes</span>()
-                        .<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(Cow::Borrowed(
+                    v.as_bytes()
+                        .try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_bytes&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Owned</span>(
-                    <span class="ident">v</span>.<span class="ident">to_vec</span>()
-                        .<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(Cow::Owned(
+                    v.to_vec()
+                        .try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Owned</span>(
-                    <span class="ident">v</span>.<span class="ident">as_bytes</span>()
-                        .<span class="ident">to_vec</span>()
-                        .<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">v</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="prelude-val">Ok</span>(Cow::Owned(
+                    v.as_bytes()
+                        .to_vec()
+                        .try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(v.len(), <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_byte_buf</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_byte_buf&lt;E&gt;(<span class="self">self</span>, v: Vec&lt;u8&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">len</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Owned</span>(
-                    <span class="ident">v</span>.<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">len</span>, <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="kw">let </span>len = v.len();
+                <span class="prelude-val">Ok</span>(Cow::Owned(
+                    v.try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(len, <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_string</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">Error</span>,
+            <span class="kw">fn </span>visit_string&lt;E&gt;(<span class="self">self</span>, v: String) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, E&gt;
+            <span class="kw">where
+                </span>E: Error,
             {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">len</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Owned</span>(
-                    <span class="ident">v</span>.<span class="ident">into_bytes</span>()
-                        .<span class="ident">try_into</span>()
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_length</span>(<span class="ident">len</span>, <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
+                <span class="kw">let </span>len = v.len();
+                <span class="prelude-val">Ok</span>(Cow::Owned(
+                    v.into_bytes()
+                        .try_into()
+                        .map_err(|<span class="kw">_</span>| Error::invalid_length(len, <span class="kw-2">&amp;</span><span class="self">self</span>))<span class="question-mark">?</span>,
                 ))
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_seq</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">seq</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">V::Error</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">V</span>: <span class="ident">SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+            <span class="kw">fn </span>visit_seq&lt;V&gt;(<span class="self">self</span>, seq: V) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Value, V::Error&gt;
+            <span class="kw">where
+                </span>V: SeqAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
             {
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Owned</span>(<span class="ident">array_from_iterator</span>(<span class="ident">SeqIter::new</span>(<span class="ident">seq</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)<span class="question-mark">?</span>))
+                <span class="prelude-val">Ok</span>(Cow::Owned(array_from_iterator(SeqIter::new(seq), <span class="kw-2">&amp;</span><span class="self">self</span>)<span class="question-mark">?</span>))
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_bytes</span>(<span class="ident">CowVisitor</span>)
+        deserializer.deserialize_bytes(CowVisitor)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bytes</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, Box&lt;[u8; N]&gt;&gt; <span class="kw">for </span>Bytes {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Box&lt;[u8; N]&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">Bytes::deserialize_as</span>(<span class="ident">deserializer</span>).<span class="ident">map</span>(<span class="ident">Box::new</span>)
+        Bytes::deserialize_as(deserializer).map(Box::new)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">DeserializeAs</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BorrowCow</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_as</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>; <span class="ident">N</span>]<span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="kw">const </span>N: usize&gt; DeserializeAs&lt;<span class="lifetime">&#39;de</span>, Cow&lt;<span class="lifetime">&#39;de</span>, [u8; N]&gt;&gt; <span class="kw">for </span>BorrowCow {
+    <span class="kw">fn </span>deserialize_as&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8; N]&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">Bytes::deserialize_as</span>(<span class="ident">deserializer</span>)
+        Bytes::deserialize_as(deserializer)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

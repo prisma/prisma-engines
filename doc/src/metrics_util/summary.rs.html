@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/summary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>summary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/summary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>summary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -378,385 +378,385 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sketches_ddsketch</span>::{<span class="ident">Config</span>, <span class="ident">DDSketch</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>sketches_ddsketch::{Config, DDSketch};
 
-<span class="doccomment">/// A quantile sketch with relative-error guarantees.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Based on [DDSketch][ddsketch], `Summary` provides quantiles over an arbitrary distribution of</span>
-<span class="doccomment">/// floating-point numbers, including for negative numbers, using a space-efficient sketch that</span>
-<span class="doccomment">/// provides relative-error guarantees, regardless of the absolute range between the smallest and</span>
-<span class="doccomment">/// larger values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Summary` is similiar to [HDRHistogram][hdrhistogram] in practice, but supports an arbitrary</span>
-<span class="doccomment">/// range of values, and supports floating-point numbers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Numbers with an absolute value smaller than given `min_value` will be recognized as zeroes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Memory usage for `Summary` should be nearly identical to `DDSketch`.</span>
-<span class="doccomment">/// [`Summary::estimated_size`] provides a rough estimate of summary size based on the current</span>
-<span class="doccomment">/// values that have been added to it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As mentioned above, this sketch provides relative-error guarantees across quantiles falling</span>
-<span class="doccomment">/// within 0 &lt;= q &lt;= 1, but trades some accuracy at the lowest quantiles as part of the collapsing</span>
-<span class="doccomment">/// scheme that allows for automatically handling arbitrary ranges of values, even when the</span>
-<span class="doccomment">/// maximum number of bins has been allocated.  Typically, q=0.05 and below is where this error will</span>
-<span class="doccomment">/// be noticed, if present.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For cases when all values are positive, you can simply use [`Summary::min`] in lieu of checking</span>
-<span class="doccomment">/// these quantiles, as the minimum value will be closer to the true value.  For cases when values</span>
-<span class="doccomment">/// range from negative to positive, the aforementioned collapsing will perturb the estimated true</span>
-<span class="doccomment">/// value for quantiles that conceptually fall within this collapsed band.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, for a distribution that spans from -25 to 75, we would intuitively expect q=0 to be</span>
-<span class="doccomment">/// -25, q=0.25 to be 0, q=0.5 to be 25, and so on.  Internally, negative numbers and positive</span>
-<span class="doccomment">/// numbers are handled in two separate containers.  Based on this example, one container would</span>
-<span class="doccomment">/// handle -25 to 0, and another would handle the 0 to 75 range.  As the containers are mapped &quot;back</span>
-<span class="doccomment">/// to back&quot;, q=0.25 for this hypothetical summary would actually be q=0 within the negative</span>
-<span class="doccomment">/// container, which may return an estimated true value that exceeds the relative error guarantees.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Of course, as these problems are related to the estimation aspect of this data structure, users</span>
-<span class="doccomment">/// can allow the summary to allocate more bins to compensate for these edge cases, if desired.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [ddsketch]: https://arxiv.org/abs/1908.10693</span>
-<span class="doccomment">/// [hdrhistogram]: https://docs.rs/hdrhistogram</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Summary</span> {
-    <span class="ident">negative</span>: <span class="ident">DDSketch</span>,
-    <span class="ident">positive</span>: <span class="ident">DDSketch</span>,
-    <span class="ident">min_value</span>: <span class="ident">f64</span>,
-    <span class="ident">zeroes</span>: <span class="ident">usize</span>,
-    <span class="ident">min</span>: <span class="ident">f64</span>,
-    <span class="ident">max</span>: <span class="ident">f64</span>,
+<span class="doccomment">/// A quantile sketch with relative-error guarantees.
+///
+/// Based on [DDSketch][ddsketch], `Summary` provides quantiles over an arbitrary distribution of
+/// floating-point numbers, including for negative numbers, using a space-efficient sketch that
+/// provides relative-error guarantees, regardless of the absolute range between the smallest and
+/// larger values.
+///
+/// `Summary` is similiar to [HDRHistogram][hdrhistogram] in practice, but supports an arbitrary
+/// range of values, and supports floating-point numbers.
+///
+/// Numbers with an absolute value smaller than given `min_value` will be recognized as zeroes.
+///
+/// Memory usage for `Summary` should be nearly identical to `DDSketch`.
+/// [`Summary::estimated_size`] provides a rough estimate of summary size based on the current
+/// values that have been added to it.
+///
+/// As mentioned above, this sketch provides relative-error guarantees across quantiles falling
+/// within 0 &lt;= q &lt;= 1, but trades some accuracy at the lowest quantiles as part of the collapsing
+/// scheme that allows for automatically handling arbitrary ranges of values, even when the
+/// maximum number of bins has been allocated.  Typically, q=0.05 and below is where this error will
+/// be noticed, if present.
+///
+/// For cases when all values are positive, you can simply use [`Summary::min`] in lieu of checking
+/// these quantiles, as the minimum value will be closer to the true value.  For cases when values
+/// range from negative to positive, the aforementioned collapsing will perturb the estimated true
+/// value for quantiles that conceptually fall within this collapsed band.
+///
+/// For example, for a distribution that spans from -25 to 75, we would intuitively expect q=0 to be
+/// -25, q=0.25 to be 0, q=0.5 to be 25, and so on.  Internally, negative numbers and positive
+/// numbers are handled in two separate containers.  Based on this example, one container would
+/// handle -25 to 0, and another would handle the 0 to 75 range.  As the containers are mapped &quot;back
+/// to back&quot;, q=0.25 for this hypothetical summary would actually be q=0 within the negative
+/// container, which may return an estimated true value that exceeds the relative error guarantees.
+///
+/// Of course, as these problems are related to the estimation aspect of this data structure, users
+/// can allow the summary to allocate more bins to compensate for these edge cases, if desired.
+///
+/// [ddsketch]: https://arxiv.org/abs/1908.10693
+/// [hdrhistogram]: https://docs.rs/hdrhistogram
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Summary {
+    negative: DDSketch,
+    positive: DDSketch,
+    min_value: f64,
+    zeroes: usize,
+    min: f64,
+    max: f64,
 }
 
-<span class="kw">impl</span> <span class="ident">Summary</span> {
-    <span class="doccomment">/// Creates a new [`Summary`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `alpha` represents the desired relative error for this summary.  If `alpha` was 0.0001, that</span>
-    <span class="doccomment">/// would represent a desired relative error of 0.01%.  For example, if the true value at</span>
-    <span class="doccomment">/// quantile q0 was 1, the estimated value at that quantile would be a value within 0.01% of the</span>
-    <span class="doccomment">/// true value, or a value between 0.9999 and 1.0001.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `max_buckets` controls how many subbuckets are created, which directly influences memory usage.</span>
-    <span class="doccomment">/// Each bucket &quot;costs&quot; eight bytes, so a summary with 2048 buckets would consume a maximum of</span>
-    <span class="doccomment">/// around 16 KiB.  Depending on how many samples have been added to the summary, the number of</span>
-    <span class="doccomment">/// subbuckets allocated may be far below `max_buckets`, and the summary will allocate more as</span>
-    <span class="doccomment">/// needed to fulfill the relative error guarantee.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `min_value` controls the smallest value that will be recognized distinctly from zero.  Said</span>
-    <span class="doccomment">/// another way, any value between `-min_value` and `min_value` will be counted as zero.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">alpha</span>: <span class="ident">f64</span>, <span class="ident">max_buckets</span>: <span class="ident">u32</span>, <span class="ident">min_value</span>: <span class="ident">f64</span>) -&gt; <span class="ident">Summary</span> {
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::new</span>(<span class="ident">alpha</span>, <span class="ident">max_buckets</span>, <span class="ident">min_value</span>.<span class="ident">abs</span>());
+<span class="kw">impl </span>Summary {
+    <span class="doccomment">/// Creates a new [`Summary`].
+    ///
+    /// `alpha` represents the desired relative error for this summary.  If `alpha` was 0.0001, that
+    /// would represent a desired relative error of 0.01%.  For example, if the true value at
+    /// quantile q0 was 1, the estimated value at that quantile would be a value within 0.01% of the
+    /// true value, or a value between 0.9999 and 1.0001.
+    ///
+    /// `max_buckets` controls how many subbuckets are created, which directly influences memory usage.
+    /// Each bucket &quot;costs&quot; eight bytes, so a summary with 2048 buckets would consume a maximum of
+    /// around 16 KiB.  Depending on how many samples have been added to the summary, the number of
+    /// subbuckets allocated may be far below `max_buckets`, and the summary will allocate more as
+    /// needed to fulfill the relative error guarantee.
+    ///
+    /// `min_value` controls the smallest value that will be recognized distinctly from zero.  Said
+    /// another way, any value between `-min_value` and `min_value` will be counted as zero.
+    </span><span class="kw">pub fn </span>new(alpha: f64, max_buckets: u32, min_value: f64) -&gt; Summary {
+        <span class="kw">let </span>config = Config::new(alpha, max_buckets, min_value.abs());
 
-        <span class="ident">Summary</span> {
-            <span class="ident">negative</span>: <span class="ident">DDSketch::new</span>(<span class="ident">config</span>),
-            <span class="ident">positive</span>: <span class="ident">DDSketch::new</span>(<span class="ident">config</span>),
-            <span class="ident">min_value</span>: <span class="ident">min_value</span>.<span class="ident">abs</span>(),
-            <span class="ident">zeroes</span>: <span class="number">0</span>,
-            <span class="ident">min</span>: <span class="ident">f64::INFINITY</span>,
-            <span class="ident">max</span>: <span class="ident">f64::NEG_INFINITY</span>,
+        Summary {
+            negative: DDSketch::new(config),
+            positive: DDSketch::new(config),
+            min_value: min_value.abs(),
+            zeroes: <span class="number">0</span>,
+            min: f64::INFINITY,
+            max: f64::NEG_INFINITY,
         }
     }
 
-    <span class="doccomment">/// Creates a new [`Summary`] with default values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `alpha` is 0.0001, `max_buckets` is 32,768, and `min_value` is 1.0e-9.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will yield a summary that is roughly equivalent in memory usage to an HDRHistogram with</span>
-    <span class="doccomment">/// 3 significant digits, and will support values down to a single nanosecond.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In practice, when using only positive values, maximum memory usage can be expected to hover</span>
-    <span class="doccomment">/// around 200KiB, while usage of negative values can lead to an average maximum size of around</span>
-    <span class="doccomment">/// 400KiB.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_defaults</span>() -&gt; <span class="ident">Summary</span> {
-        <span class="ident">Summary::new</span>(<span class="number">0.0001</span>, <span class="number">32_768</span>, <span class="number">1.0e-9</span>)
+    <span class="doccomment">/// Creates a new [`Summary`] with default values.
+    ///
+    /// `alpha` is 0.0001, `max_buckets` is 32,768, and `min_value` is 1.0e-9.
+    ///
+    /// This will yield a summary that is roughly equivalent in memory usage to an HDRHistogram with
+    /// 3 significant digits, and will support values down to a single nanosecond.
+    ///
+    /// In practice, when using only positive values, maximum memory usage can be expected to hover
+    /// around 200KiB, while usage of negative values can lead to an average maximum size of around
+    /// 400KiB.
+    </span><span class="kw">pub fn </span>with_defaults() -&gt; Summary {
+        Summary::new(<span class="number">0.0001</span>, <span class="number">32_768</span>, <span class="number">1.0e-9</span>)
     }
 
-    <span class="doccomment">/// Adds a sample to the summary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the absolute value of `value` is smaller than given `min_value`, it will be added as a zero.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_infinite</span>() {
+    <span class="doccomment">/// Adds a sample to the summary.
+    ///
+    /// If the absolute value of `value` is smaller than given `min_value`, it will be added as a zero.
+    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: f64) {
+        <span class="kw">if </span>value.is_infinite() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">min</span> {
-            <span class="self">self</span>.<span class="ident">min</span> <span class="op">=</span> <span class="ident">value</span>;
+        <span class="kw">if </span>value &lt; <span class="self">self</span>.min {
+            <span class="self">self</span>.min = value;
         }
 
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">max</span> {
-            <span class="self">self</span>.<span class="ident">max</span> <span class="op">=</span> <span class="ident">value</span>;
+        <span class="kw">if </span>value &gt; <span class="self">self</span>.max {
+            <span class="self">self</span>.max = value;
         }
 
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">min_value</span> {
-            <span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">add</span>(<span class="ident">value</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">min_value</span> {
-            <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">add</span>(<span class="op">-</span><span class="ident">value</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">zeroes</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        }
-    }
-
-    <span class="doccomment">/// Gets the estimated value at the given quantile.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the sketch is empty, or if the quantile is less than 0.0 or greater than 1.0, then the</span>
-    <span class="doccomment">/// result will be `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the 0.0 or 1.0 quantile is requested, this function will return self.min() or self.max()</span>
-    <span class="doccomment">/// instead of the estimated value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quantile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span>(<span class="number">0.0</span>..<span class="op">=</span><span class="number">1.0</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">q</span>) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">count</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">q</span> <span class="op">==</span> <span class="number">0.0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">min</span>());
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">q</span> <span class="op">==</span> <span class="number">1.0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">max</span>());
-        }
-
-        <span class="kw">let</span> <span class="ident">ncount</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">count</span>() <span class="kw">as</span> <span class="ident">f64</span>;
-        <span class="kw">let</span> <span class="ident">pcount</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">count</span>() <span class="kw">as</span> <span class="ident">f64</span>;
-        <span class="kw">let</span> <span class="ident">zcount</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">zeroes</span> <span class="kw">as</span> <span class="ident">f64</span>;
-        <span class="comment">// Defer rounding to the underlying sketch</span>
-        <span class="kw">let</span> <span class="ident">rank</span> <span class="op">=</span> <span class="ident">q</span> <span class="op">*</span> (<span class="ident">ncount</span> <span class="op">+</span> <span class="ident">pcount</span> <span class="op">+</span> <span class="ident">zcount</span>);
-
-        <span class="kw">if</span> <span class="ident">rank</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">ncount</span> {
-            <span class="comment">// Quantile lands in the negative side.</span>
-            <span class="kw">let</span> <span class="ident">nq</span> <span class="op">=</span> <span class="number">1.0</span> <span class="op">-</span> (<span class="ident">rank</span> <span class="op">/</span> <span class="ident">ncount</span> <span class="kw">as</span> <span class="ident">f64</span>);
-            <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">quantile</span>(<span class="ident">nq</span>).<span class="ident">expect</span>(<span class="string">&quot;quantile should be valid at this point&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="op">-</span><span class="ident">v</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">rank</span> <span class="op">&lt;</span><span class="op">=</span> (<span class="ident">ncount</span> <span class="op">+</span> <span class="ident">zcount</span>) {
-            <span class="comment">// Quantile lands in the zero band.</span>
-            <span class="prelude-val">Some</span>(<span class="number">0.0</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Quantile lands in the positive side.</span>
-            <span class="kw">let</span> <span class="ident">pq</span> <span class="op">=</span> (<span class="ident">rank</span> <span class="op">-</span> (<span class="ident">ncount</span> <span class="op">+</span> <span class="ident">zcount</span>)) <span class="op">/</span> <span class="ident">pcount</span>;
-            <span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">quantile</span>(<span class="ident">pq</span>).<span class="ident">expect</span>(<span class="string">&quot;quantile should be valid at this point&quot;</span>)
+        <span class="kw">if </span>value &gt; <span class="self">self</span>.min_value {
+            <span class="self">self</span>.positive.add(value);
+        } <span class="kw">else if </span>value &lt; -<span class="self">self</span>.min_value {
+            <span class="self">self</span>.negative.add(-value);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.zeroes += <span class="number">1</span>;
         }
     }
 
-    <span class="doccomment">/// Gets the minimum value this summary has seen so far.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="self">self</span>.<span class="ident">min</span>
+    <span class="doccomment">/// Gets the estimated value at the given quantile.
+    ///
+    /// If the sketch is empty, or if the quantile is less than 0.0 or greater than 1.0, then the
+    /// result will be `None`.
+    ///
+    /// If the 0.0 or 1.0 quantile is requested, this function will return self.min() or self.max()
+    /// instead of the estimated value.
+    </span><span class="kw">pub fn </span>quantile(<span class="kw-2">&amp;</span><span class="self">self</span>, q: f64) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+        <span class="kw">if </span>!(<span class="number">0.0</span>..=<span class="number">1.0</span>).contains(<span class="kw-2">&amp;</span>q) || <span class="self">self</span>.count() == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        } <span class="kw">else if </span>q == <span class="number">0.0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.min());
+        } <span class="kw">else if </span>q == <span class="number">1.0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.max());
+        }
+
+        <span class="kw">let </span>ncount = <span class="self">self</span>.negative.count() <span class="kw">as </span>f64;
+        <span class="kw">let </span>pcount = <span class="self">self</span>.positive.count() <span class="kw">as </span>f64;
+        <span class="kw">let </span>zcount = <span class="self">self</span>.zeroes <span class="kw">as </span>f64;
+        <span class="comment">// Defer rounding to the underlying sketch
+        </span><span class="kw">let </span>rank = q * (ncount + pcount + zcount);
+
+        <span class="kw">if </span>rank &lt;= ncount {
+            <span class="comment">// Quantile lands in the negative side.
+            </span><span class="kw">let </span>nq = <span class="number">1.0 </span>- (rank / ncount <span class="kw">as </span>f64);
+            <span class="self">self</span>.negative.quantile(nq).expect(<span class="string">&quot;quantile should be valid at this point&quot;</span>).map(|v| -v)
+        } <span class="kw">else if </span>rank &lt;= (ncount + zcount) {
+            <span class="comment">// Quantile lands in the zero band.
+            </span><span class="prelude-val">Some</span>(<span class="number">0.0</span>)
+        } <span class="kw">else </span>{
+            <span class="comment">// Quantile lands in the positive side.
+            </span><span class="kw">let </span>pq = (rank - (ncount + zcount)) / pcount;
+            <span class="self">self</span>.positive.quantile(pq).expect(<span class="string">&quot;quantile should be valid at this point&quot;</span>)
+        }
     }
 
-    <span class="doccomment">/// Gets the maximum value this summary has seen so far.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="self">self</span>.<span class="ident">max</span>
+    <span class="doccomment">/// Gets the minimum value this summary has seen so far.
+    </span><span class="kw">pub fn </span>min(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="self">self</span>.min
     }
 
-    <span class="doccomment">/// Whether or not this summary is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">count</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Gets the maximum value this summary has seen so far.
+    </span><span class="kw">pub fn </span>max(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="self">self</span>.max
     }
 
-    <span class="doccomment">/// Gets the number of samples in this summary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">count</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">count</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">zeroes</span>
+    <span class="doccomment">/// Whether or not this summary is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.count() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Gets the number of samples in this summary.
+    </span><span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.negative.count() + <span class="self">self</span>.positive.count() + <span class="self">self</span>.zeroes
     }
 
-    <span class="doccomment">/// Gets the number of samples in this summary by zeroes, negative, and positive counts.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detailed_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>, <span class="ident">usize</span>) {
-        (<span class="self">self</span>.<span class="ident">zeroes</span>, <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">count</span>(), <span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">count</span>())
+    <span class="doccomment">/// Gets the number of samples in this summary by zeroes, negative, and positive counts.
+    </span><span class="kw">pub fn </span>detailed_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize, usize) {
+        (<span class="self">self</span>.zeroes, <span class="self">self</span>.negative.count(), <span class="self">self</span>.positive.count())
     }
 
-    <span class="doccomment">/// Gets the estimized size of this summary, in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In practice, this value should be very close to the actual size, but will not be entirely</span>
-    <span class="doccomment">/// precise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">estimated_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">+</span> ((<span class="self">self</span>.<span class="ident">positive</span>.<span class="ident">length</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">negative</span>.<span class="ident">length</span>()) <span class="op">*</span> <span class="number">8</span>)
+    <span class="doccomment">/// Gets the estimized size of this summary, in bytes.
+    ///
+    /// In practice, this value should be very close to the actual size, but will not be entirely
+    /// precise.
+    </span><span class="kw">pub fn </span>estimated_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        std::mem::size_of::&lt;<span class="self">Self</span>&gt;() + ((<span class="self">self</span>.positive.length() + <span class="self">self</span>.negative.length()) * <span class="number">8</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Summary</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Summary;
 
-    <span class="kw">use</span> <span class="ident">quickcheck_macros::quickcheck</span>;
+    <span class="kw">use </span>quickcheck_macros::quickcheck;
 
-    <span class="comment">// Need this, because without the relative_eq/abs_diff_eq imports, we get weird IDE errors.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-    <span class="kw">use</span> <span class="ident">approx</span>::{<span class="ident">abs_diff_eq</span>, <span class="ident">assert_abs_diff_eq</span>, <span class="ident">assert_relative_eq</span>, <span class="ident">relative_eq</span>};
+    <span class="comment">// Need this, because without the relative_eq/abs_diff_eq imports, we get weird IDE errors.
+    </span><span class="attribute">#[allow(unused_imports)]
+    </span><span class="kw">use </span>approx::{abs_diff_eq, assert_abs_diff_eq, assert_relative_eq, relative_eq};
 
-    <span class="kw">use</span> <span class="ident">ndarray</span>::{<span class="ident">Array1</span>, <span class="ident">Axis</span>};
-    <span class="kw">use</span> <span class="ident">ndarray_stats</span>::{<span class="ident">interpolate::Linear</span>, <span class="ident">QuantileExt</span>};
-    <span class="kw">use</span> <span class="ident">noisy_float::types::n64</span>;
-    <span class="kw">use</span> <span class="ident">ordered_float::NotNan</span>;
-    <span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">distributions::Distribution</span>, <span class="ident">thread_rng</span>};
-    <span class="kw">use</span> <span class="ident">rand_distr::Uniform</span>;
+    <span class="kw">use </span>ndarray::{Array1, Axis};
+    <span class="kw">use </span>ndarray_stats::{interpolate::Linear, QuantileExt};
+    <span class="kw">use </span>noisy_float::types::n64;
+    <span class="kw">use </span>ordered_float::NotNan;
+    <span class="kw">use </span>rand::{distributions::Distribution, thread_rng};
+    <span class="kw">use </span>rand_distr::Uniform;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_basics</span>() {
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="number">0.0001</span>;
-        <span class="kw">let</span> <span class="ident">max_bins</span> <span class="op">=</span> <span class="number">32_768</span>;
-        <span class="kw">let</span> <span class="ident">min_value</span> <span class="op">=</span> <span class="number">1.0e-9</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::new</span>(<span class="ident">alpha</span>, <span class="ident">max_bins</span>, <span class="ident">min_value</span>);
-        <span class="macro">assert!</span>(<span class="ident">summary</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_basics() {
+        <span class="kw">let </span>alpha = <span class="number">0.0001</span>;
+        <span class="kw">let </span>max_bins = <span class="number">32_768</span>;
+        <span class="kw">let </span>min_value = <span class="number">1.0e-9</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::new(alpha, max_bins, min_value);
+        <span class="macro">assert!</span>(summary.is_empty());
 
-        <span class="comment">// Stretch the legs with a single value.</span>
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="op">-</span><span class="number">420.42</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">count</span>(), <span class="number">1</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">min</span>(), <span class="op">-</span><span class="number">420.42</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">max</span>(), <span class="op">-</span><span class="number">420.42</span>);
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="number">0.001</span>;
+        <span class="comment">// Stretch the legs with a single value.
+        </span>summary.add(-<span class="number">420.42</span>);
+        <span class="macro">assert_eq!</span>(summary.count(), <span class="number">1</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.min(), -<span class="number">420.42</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.max(), -<span class="number">420.42</span>);
+        <span class="kw">let </span>alpha = <span class="number">0.001</span>;
 
-        <span class="kw">let</span> <span class="ident">test_cases</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="number">0.1</span>, <span class="op">-</span><span class="number">420.42</span>), (<span class="number">0.5</span>, <span class="op">-</span><span class="number">420.42</span>), (<span class="number">0.9</span>, <span class="op">-</span><span class="number">420.42</span>)];
-        <span class="kw">for</span> (<span class="ident">q</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">test_cases</span> {
+        <span class="kw">let </span>test_cases = <span class="macro">vec!</span>[(<span class="number">0.1</span>, -<span class="number">420.42</span>), (<span class="number">0.5</span>, -<span class="number">420.42</span>), (<span class="number">0.9</span>, -<span class="number">420.42</span>)];
+        <span class="kw">for </span>(q, val) <span class="kw">in </span>test_cases {
             <span class="macro">assert_relative_eq!</span>(
-                <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="ident">q</span>).<span class="ident">expect</span>(<span class="string">&quot;value should exist&quot;</span>),
-                <span class="ident">val</span>,
-                <span class="ident">max_relative</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">val</span>
+                summary.quantile(q).expect(<span class="string">&quot;value should exist&quot;</span>),
+                val,
+                max_relative = <span class="number">2.0 </span>* alpha * val
             );
         }
 
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="number">420.42</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">count</span>(), <span class="number">2</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">min</span>(), <span class="op">-</span><span class="number">420.42</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">max</span>(), <span class="number">420.42</span>);
+        summary.add(<span class="number">420.42</span>);
+        <span class="macro">assert_eq!</span>(summary.count(), <span class="number">2</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.min(), -<span class="number">420.42</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.max(), <span class="number">420.42</span>);
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="number">0.5</span>).<span class="ident">expect</span>(<span class="string">&quot;value should exist&quot;</span>),
-            <span class="op">-</span><span class="number">420.42</span>,
-            <span class="ident">max_relative</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="number">420.42</span>
-        );
+            summary.quantile(<span class="number">0.5</span>).expect(<span class="string">&quot;value should exist&quot;</span>),
+            -<span class="number">420.42</span>,
+            max_relative = <span class="number">2.0 </span>* alpha * <span class="number">420.42
+        </span>);
         <span class="macro">assert_relative_eq!</span>(
-            <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="number">0.51</span>).<span class="ident">expect</span>(<span class="string">&quot;value should exist&quot;</span>),
+            summary.quantile(<span class="number">0.51</span>).expect(<span class="string">&quot;value should exist&quot;</span>),
             <span class="number">420.42</span>,
-            <span class="ident">max_relative</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="number">420.42</span>
-        );
+            max_relative = <span class="number">2.0 </span>* alpha * <span class="number">420.42
+        </span>);
 
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="number">42.42</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">count</span>(), <span class="number">3</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">min</span>(), <span class="op">-</span><span class="number">420.42</span>);
-        <span class="macro">assert_relative_eq!</span>(<span class="ident">summary</span>.<span class="ident">max</span>(), <span class="number">420.42</span>);
+        summary.add(<span class="number">42.42</span>);
+        <span class="macro">assert_eq!</span>(summary.count(), <span class="number">3</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.min(), -<span class="number">420.42</span>);
+        <span class="macro">assert_relative_eq!</span>(summary.max(), <span class="number">420.42</span>);
 
-        <span class="kw">let</span> <span class="ident">test_cases</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            (<span class="number">0.333333</span>, <span class="op">-</span><span class="number">420.42</span>),
+        <span class="kw">let </span>test_cases = <span class="macro">vec!</span>[
+            (<span class="number">0.333333</span>, -<span class="number">420.42</span>),
             (<span class="number">0.333334</span>, <span class="number">42.42</span>),
             (<span class="number">0.666666</span>, <span class="number">42.42</span>),
             (<span class="number">0.666667</span>, <span class="number">420.42</span>),
             (<span class="number">0.999999</span>, <span class="number">420.42</span>),
         ];
-        <span class="kw">for</span> (<span class="ident">q</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">test_cases</span> {
+        <span class="kw">for </span>(q, val) <span class="kw">in </span>test_cases {
             <span class="macro">assert_relative_eq!</span>(
-                <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="ident">q</span>).<span class="ident">expect</span>(<span class="string">&quot;value should exist&quot;</span>),
-                <span class="ident">val</span>,
-                <span class="ident">max_relative</span> <span class="op">=</span> <span class="number">2.0</span> <span class="op">*</span> <span class="ident">alpha</span> <span class="op">*</span> <span class="ident">val</span>
+                summary.quantile(q).expect(<span class="string">&quot;value should exist&quot;</span>),
+                val,
+                max_relative = <span class="number">2.0 </span>* alpha * val
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_positive_uniform</span>() {
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="number">0.0001</span>;
-        <span class="kw">let</span> <span class="ident">max_bins</span> <span class="op">=</span> <span class="number">32_768</span>;
-        <span class="kw">let</span> <span class="ident">min_value</span> <span class="op">=</span> <span class="number">1.0e-9</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_positive_uniform() {
+        <span class="kw">let </span>alpha = <span class="number">0.0001</span>;
+        <span class="kw">let </span>max_bins = <span class="number">32_768</span>;
+        <span class="kw">let </span>min_value = <span class="number">1.0e-9</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">thread_rng</span>();
-        <span class="kw">let</span> <span class="ident">dist</span> <span class="op">=</span> <span class="ident">Uniform::new</span>(<span class="number">0.0</span>, <span class="number">100.0</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = thread_rng();
+        <span class="kw">let </span>dist = Uniform::new(<span class="number">0.0</span>, <span class="number">100.0</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::new</span>(<span class="ident">alpha</span>, <span class="ident">max_bins</span>, <span class="ident">min_value</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uniform</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100_000</span> {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">dist</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>);
-            <span class="ident">uniform</span>.<span class="ident">push</span>(<span class="ident">NotNan::new</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>());
-            <span class="ident">summary</span>.<span class="ident">add</span>(<span class="ident">value</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::new(alpha, max_bins, min_value);
+        <span class="kw">let </span><span class="kw-2">mut </span>uniform = Vec::new();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100_000 </span>{
+            <span class="kw">let </span>value = dist.sample(<span class="kw-2">&amp;mut </span>rng);
+            uniform.push(NotNan::new(value).unwrap());
+            summary.add(value);
         }
 
-        <span class="ident">uniform</span>.<span class="ident">sort</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">true_histogram</span> <span class="op">=</span> <span class="ident">Array1::from</span>(<span class="ident">uniform</span>);
+        uniform.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>true_histogram = Array1::from(uniform);
 
-        <span class="kw">let</span> <span class="ident">quantiles</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0.25</span>, <span class="number">0.5</span>, <span class="number">0.75</span>, <span class="number">0.99</span>];
-        <span class="kw">for</span> <span class="ident">quantile</span> <span class="kw">in</span> <span class="ident">quantiles</span> {
-            <span class="kw">let</span> <span class="ident">aval_raw</span> <span class="op">=</span> <span class="ident">true_histogram</span>
-                .<span class="ident">quantile_axis_mut</span>(<span class="ident">Axis</span>(<span class="number">0</span>), <span class="ident">n64</span>(<span class="kw-2">*</span><span class="ident">quantile</span>), <span class="kw-2">&amp;</span><span class="ident">Linear</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;quantile should be in range&quot;</span>);
-            <span class="kw">let</span> <span class="ident">aval</span> <span class="op">=</span> <span class="ident">aval_raw</span>.<span class="ident">get</span>(()).<span class="ident">expect</span>(<span class="string">&quot;quantile value should be present&quot;</span>).<span class="ident">into_inner</span>();
-            <span class="kw">let</span> <span class="ident">sval</span> <span class="op">=</span> <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="kw-2">*</span><span class="ident">quantile</span>).<span class="ident">expect</span>(<span class="string">&quot;quantile value should be present&quot;</span>);
+        <span class="kw">let </span>quantiles = <span class="kw-2">&amp;</span>[<span class="number">0.25</span>, <span class="number">0.5</span>, <span class="number">0.75</span>, <span class="number">0.99</span>];
+        <span class="kw">for </span>quantile <span class="kw">in </span>quantiles {
+            <span class="kw">let </span>aval_raw = true_histogram
+                .quantile_axis_mut(Axis(<span class="number">0</span>), n64(<span class="kw-2">*</span>quantile), <span class="kw-2">&amp;</span>Linear)
+                .expect(<span class="string">&quot;quantile should be in range&quot;</span>);
+            <span class="kw">let </span>aval = aval_raw.get(()).expect(<span class="string">&quot;quantile value should be present&quot;</span>).into_inner();
+            <span class="kw">let </span>sval = summary.quantile(<span class="kw-2">*</span>quantile).expect(<span class="string">&quot;quantile value should be present&quot;</span>);
 
-            <span class="comment">// Multiply the true value by α, and double it to account from the -α/α swing.</span>
-            <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> (<span class="ident">aval</span> <span class="op">*</span> <span class="ident">alpha</span>) <span class="op">*</span> <span class="number">2.0</span>;
+            <span class="comment">// Multiply the true value by α, and double it to account from the -α/α swing.
+            </span><span class="kw">let </span>distance = (aval * alpha) * <span class="number">2.0</span>;
 
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">aval</span>, <span class="ident">sval</span>, <span class="ident">max_relative</span> <span class="op">=</span> <span class="ident">distance</span>);
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_negative_positive_uniform</span>() {
-        <span class="kw">let</span> <span class="ident">alpha</span> <span class="op">=</span> <span class="number">0.0001</span>;
-        <span class="kw">let</span> <span class="ident">max_bins</span> <span class="op">=</span> <span class="number">65_536</span>;
-        <span class="kw">let</span> <span class="ident">min_value</span> <span class="op">=</span> <span class="number">1.0e-9</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">thread_rng</span>();
-        <span class="kw">let</span> <span class="ident">dist</span> <span class="op">=</span> <span class="ident">Uniform::new</span>(<span class="op">-</span><span class="number">100.0</span>, <span class="number">100.0</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::new</span>(<span class="ident">alpha</span>, <span class="ident">max_bins</span>, <span class="ident">min_value</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uniform</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100_000</span> {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">dist</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rng</span>);
-            <span class="ident">uniform</span>.<span class="ident">push</span>(<span class="ident">NotNan::new</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>());
-            <span class="ident">summary</span>.<span class="ident">add</span>(<span class="ident">value</span>);
-        }
-
-        <span class="ident">uniform</span>.<span class="ident">sort</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">true_histogram</span> <span class="op">=</span> <span class="ident">Array1::from</span>(<span class="ident">uniform</span>);
-
-        <span class="comment">// We explicitly skirt q=0.5 here to avoid the edge case quantiles as best as possible</span>
-        <span class="comment">// while asserting tightly to our relative error bound for everything else.</span>
-        <span class="kw">let</span> <span class="ident">quantiles</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0.25</span>, <span class="number">0.47</span>, <span class="number">0.75</span>, <span class="number">0.99</span>];
-        <span class="kw">for</span> <span class="ident">quantile</span> <span class="kw">in</span> <span class="ident">quantiles</span> {
-            <span class="kw">let</span> <span class="ident">aval_raw</span> <span class="op">=</span> <span class="ident">true_histogram</span>
-                .<span class="ident">quantile_axis_mut</span>(<span class="ident">Axis</span>(<span class="number">0</span>), <span class="ident">n64</span>(<span class="kw-2">*</span><span class="ident">quantile</span>), <span class="kw-2">&amp;</span><span class="ident">Linear</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;quantile should be in range&quot;</span>);
-            <span class="kw">let</span> <span class="ident">aval</span> <span class="op">=</span> <span class="ident">aval_raw</span>.<span class="ident">get</span>(()).<span class="ident">expect</span>(<span class="string">&quot;quantile value should be present&quot;</span>).<span class="ident">into_inner</span>();
-            <span class="kw">let</span> <span class="ident">sval</span> <span class="op">=</span> <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="kw-2">*</span><span class="ident">quantile</span>).<span class="ident">expect</span>(<span class="string">&quot;quantile value should be present&quot;</span>);
-
-            <span class="comment">// Multiply the true value by α, and quadruple it to account from the -α/α swing,</span>
-            <span class="comment">// but also to account for the values sitting at the edge case quantiles.</span>
-            <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> (<span class="ident">aval</span>.<span class="ident">abs</span>() <span class="op">*</span> <span class="ident">alpha</span>) <span class="op">*</span> <span class="number">2.0</span>;
-
-            <span class="macro">assert_relative_eq!</span>(<span class="ident">aval</span>, <span class="ident">sval</span>, <span class="ident">max_relative</span> <span class="op">=</span> <span class="ident">distance</span>);
+            <span class="macro">assert_relative_eq!</span>(aval, sval, max_relative = distance);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_zeroes</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::with_defaults</span>();
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="number">0.0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="number">0.5</span>), <span class="prelude-val">Some</span>(<span class="number">0.0</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_negative_positive_uniform() {
+        <span class="kw">let </span>alpha = <span class="number">0.0001</span>;
+        <span class="kw">let </span>max_bins = <span class="number">65_536</span>;
+        <span class="kw">let </span>min_value = <span class="number">1.0e-9</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>rng = thread_rng();
+        <span class="kw">let </span>dist = Uniform::new(-<span class="number">100.0</span>, <span class="number">100.0</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::new(alpha, max_bins, min_value);
+        <span class="kw">let </span><span class="kw-2">mut </span>uniform = Vec::new();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100_000 </span>{
+            <span class="kw">let </span>value = dist.sample(<span class="kw-2">&amp;mut </span>rng);
+            uniform.push(NotNan::new(value).unwrap());
+            summary.add(value);
+        }
+
+        uniform.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>true_histogram = Array1::from(uniform);
+
+        <span class="comment">// We explicitly skirt q=0.5 here to avoid the edge case quantiles as best as possible
+        // while asserting tightly to our relative error bound for everything else.
+        </span><span class="kw">let </span>quantiles = <span class="kw-2">&amp;</span>[<span class="number">0.25</span>, <span class="number">0.47</span>, <span class="number">0.75</span>, <span class="number">0.99</span>];
+        <span class="kw">for </span>quantile <span class="kw">in </span>quantiles {
+            <span class="kw">let </span>aval_raw = true_histogram
+                .quantile_axis_mut(Axis(<span class="number">0</span>), n64(<span class="kw-2">*</span>quantile), <span class="kw-2">&amp;</span>Linear)
+                .expect(<span class="string">&quot;quantile should be in range&quot;</span>);
+            <span class="kw">let </span>aval = aval_raw.get(()).expect(<span class="string">&quot;quantile value should be present&quot;</span>).into_inner();
+            <span class="kw">let </span>sval = summary.quantile(<span class="kw-2">*</span>quantile).expect(<span class="string">&quot;quantile value should be present&quot;</span>);
+
+            <span class="comment">// Multiply the true value by α, and quadruple it to account from the -α/α swing,
+            // but also to account for the values sitting at the edge case quantiles.
+            </span><span class="kw">let </span>distance = (aval.abs() * alpha) * <span class="number">2.0</span>;
+
+            <span class="macro">assert_relative_eq!</span>(aval, sval, max_relative = distance);
+        }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_infinities</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::with_defaults</span>();
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="ident">f64::INFINITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="number">0.5</span>), <span class="prelude-val">None</span>);
-        <span class="ident">summary</span>.<span class="ident">add</span>(<span class="ident">f64::NEG_INFINITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="number">0.5</span>), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_zeroes() {
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::with_defaults();
+        summary.add(<span class="number">0.0</span>);
+        <span class="macro">assert_eq!</span>(summary.quantile(<span class="number">0.5</span>), <span class="prelude-val">Some</span>(<span class="number">0.0</span>));
     }
 
-    <span class="attribute">#[<span class="ident">quickcheck</span>]</span>
-    <span class="kw">fn</span> <span class="ident">quantile_validity</span>(<span class="ident">inputs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">had_non_inf</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_infinities() {
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::with_defaults();
+        summary.add(f64::INFINITY);
+        <span class="macro">assert_eq!</span>(summary.quantile(<span class="number">0.5</span>), <span class="prelude-val">None</span>);
+        summary.add(f64::NEG_INFINITY);
+        <span class="macro">assert_eq!</span>(summary.quantile(<span class="number">0.5</span>), <span class="prelude-val">None</span>);
+    }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">Summary::with_defaults</span>();
-        <span class="kw">for</span> <span class="ident">input</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">inputs</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_infinite</span>() {
-                <span class="ident">had_non_inf</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="attribute">#[quickcheck]
+    </span><span class="kw">fn </span>quantile_validity(inputs: Vec&lt;f64&gt;) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>had_non_inf = <span class="bool-val">false</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = Summary::with_defaults();
+        <span class="kw">for </span>input <span class="kw">in </span><span class="kw-2">&amp;</span>inputs {
+            <span class="kw">if </span>!input.is_infinite() {
+                had_non_inf = <span class="bool-val">true</span>;
             }
-            <span class="ident">summary</span>.<span class="ident">add</span>(<span class="kw-2">*</span><span class="ident">input</span>);
+            summary.add(<span class="kw-2">*</span>input);
         }
 
-        <span class="kw">let</span> <span class="ident">qs</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">0.95</span>, <span class="number">0.99</span>, <span class="number">0.999</span>, <span class="number">1.0</span>];
-        <span class="kw">for</span> <span class="ident">q</span> <span class="kw">in</span> <span class="ident">qs</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">summary</span>.<span class="ident">quantile</span>(<span class="kw-2">*</span><span class="ident">q</span>);
-            <span class="kw">if</span> <span class="ident">had_non_inf</span> {
-                <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_some</span>());
-            } <span class="kw">else</span> {
-                <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>qs = <span class="kw-2">&amp;</span>[<span class="number">0.0</span>, <span class="number">0.5</span>, <span class="number">0.9</span>, <span class="number">0.95</span>, <span class="number">0.99</span>, <span class="number">0.999</span>, <span class="number">1.0</span>];
+        <span class="kw">for </span>q <span class="kw">in </span>qs {
+            <span class="kw">let </span>result = summary.quantile(<span class="kw-2">*</span>q);
+            <span class="kw">if </span>had_non_inf {
+                <span class="macro">assert!</span>(result.is_some());
+            } <span class="kw">else </span>{
+                <span class="macro">assert!</span>(result.is_none());
             }
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

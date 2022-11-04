@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ipnet-2.5.0/src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ipnet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ipnet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ipnet/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ipnet-2.5.0/src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ipnet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ipnet/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ipnet/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -343,350 +343,350 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A private parser implementation of IPv4 and IPv6 network addresses.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The existing `std::net::parser` module cannot be extended because it</span>
-<span class="doccomment">//! is private. It is copied and extended here with methods for parsing</span>
-<span class="doccomment">//! IP network addresses.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A private parser implementation of IPv4 and IPv6 network addresses.
+//!
+//! The existing `std::net::parser` module cannot be extended because it
+//! is private. It is copied and extended here with methods for parsing
+//! IP network addresses.
 
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</span><span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::net::{Ipv4Addr, Ipv6Addr};
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ipnet</span>::{<span class="ident">IpNet</span>, <span class="ident">Ipv4Net</span>, <span class="ident">Ipv6Net</span>};
+<span class="kw">use </span><span class="kw">crate</span>::ipnet::{IpNet, Ipv4Net, Ipv6Net};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// parsing as ASCII, so can use byte array</span>
-    <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">pos</span>: <span class="ident">usize</span>,
+<span class="kw">pub struct </span>Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// parsing as ASCII, so can use byte array
+    </span>s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    pos: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Parser</span> {
-            <span class="ident">s</span>: <span class="ident">s</span>.<span class="ident">as_bytes</span>(),
-            <span class="ident">pos</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Parser {
+            s: s.as_bytes(),
+            pos: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">s</span>.<span class="ident">len</span>()
+    <span class="kw">fn </span>is_eof(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.pos == <span class="self">self</span>.s.len()
     }
 
-    <span class="comment">// Commit only if parser returns Some</span>
-    <span class="kw">fn</span> <span class="ident">read_atomically</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="comment">// Commit only if parser returns Some
+    </span><span class="kw">fn </span>read_atomically&lt;T, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cb: F) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;,
     {
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pos</span>;
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">cb</span>(<span class="self">self</span>);
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_none</span>() {
-            <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="ident">pos</span>;
+        <span class="kw">let </span>pos = <span class="self">self</span>.pos;
+        <span class="kw">let </span>r = cb(<span class="self">self</span>);
+        <span class="kw">if </span>r.is_none() {
+            <span class="self">self</span>.pos = pos;
         }
-        <span class="ident">r</span>
+        r
     }
 
-    <span class="comment">// Commit only if parser read till EOF</span>
-    <span class="kw">fn</span> <span class="ident">read_till_eof</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cb</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="comment">// Commit only if parser read till EOF
+    </span><span class="kw">fn </span>read_till_eof&lt;T, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cb: F) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;,
     {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">cb</span>(<span class="ident">p</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">is_eof</span>() {<span class="prelude-val">Some</span>(<span class="ident">x</span>)} <span class="kw">else</span> {<span class="prelude-val">None</span>},
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="self">self</span>.read_atomically(<span class="kw">move </span>|p| {
+            <span class="kw">match </span>cb(p) {
+                <span class="prelude-val">Some</span>(x) =&gt; <span class="kw">if </span>p.is_eof() {<span class="prelude-val">Some</span>(x)} <span class="kw">else </span>{<span class="prelude-val">None</span>},
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             }
         })
     }
 
-    <span class="comment">// Return result of first successful parser</span>
-    <span class="kw">fn</span> <span class="ident">read_or</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">parsers</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>])
-               -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">pf</span> <span class="kw">in</span> <span class="ident">parsers</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">pf</span>(<span class="ident">p</span>)) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>);
+    <span class="comment">// Return result of first successful parser
+    </span><span class="kw">fn </span>read_or&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, parsers: <span class="kw-2">&amp;mut </span>[Box&lt;<span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; + <span class="lifetime">&#39;static</span>&gt;])
+               -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="kw">for </span>pf <span class="kw">in </span>parsers {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(r) = <span class="self">self</span>.read_atomically(|p: <span class="kw-2">&amp;mut </span>Parser| pf(p)) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(r);
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="comment">// Apply 3 parsers sequentially</span>
-    <span class="kw">fn</span> <span class="ident">read_seq_3</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">PA</span>, <span class="ident">PB</span>, <span class="ident">PC</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-                                       <span class="ident">pa</span>: <span class="ident">PA</span>,
-                                       <span class="ident">pb</span>: <span class="ident">PB</span>,
-                                       <span class="ident">pc</span>: <span class="ident">PC</span>)
-                                       -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>)<span class="op">&gt;</span> <span class="kw">where</span>
-        <span class="ident">PA</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">PB</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">PC</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
+    <span class="comment">// Apply 3 parsers sequentially
+    </span><span class="kw">fn </span>read_seq_3&lt;A, B, C, PA, PB, PC&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>,
+                                       pa: PA,
+                                       pb: PB,
+                                       pc: PC)
+                                       -&gt; <span class="prelude-ty">Option</span>&lt;(A, B, C)&gt; <span class="kw">where
+        </span>PA: FnOnce(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt;,
+        PB: FnOnce(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;B&gt;,
+        PC: FnOnce(<span class="kw-2">&amp;mut </span>Parser) -&gt; <span class="prelude-ty">Option</span>&lt;C&gt;,
     {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">pa</span>(<span class="ident">p</span>);
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_some</span>() { <span class="ident">pb</span>(<span class="ident">p</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">is_some</span>() { <span class="ident">pc</span>(<span class="ident">p</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
-            <span class="kw">match</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">Some</span>(<span class="ident">b</span>), <span class="prelude-val">Some</span>(<span class="ident">c</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>)),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            }
+        <span class="self">self</span>.read_atomically(<span class="kw">move </span>|p| {
+            <span class="kw">let </span>a = pa(p);
+            <span class="kw">let </span>b = <span class="kw">if </span>a.is_some() { pb(p) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
+            <span class="kw">let </span>c = <span class="kw">if </span>b.is_some() { pc(p) } <span class="kw">else </span>{ <span class="prelude-val">None </span>};
+            <span class="kw">match </span>(a, b, c) {
+                (<span class="prelude-val">Some</span>(a), <span class="prelude-val">Some</span>(b), <span class="prelude-val">Some</span>(c)) =&gt; <span class="prelude-val">Some</span>((a, b, c)),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>}
         })
     }
 
-    <span class="comment">// Read next char</span>
-    <span class="kw">fn</span> <span class="ident">read_char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_eof</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">s</span>[<span class="self">self</span>.<span class="ident">pos</span>] <span class="kw">as</span> <span class="ident">char</span>;
-            <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+    <span class="comment">// Read next char
+    </span><span class="kw">fn </span>read_char(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_eof() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span>r = <span class="self">self</span>.s[<span class="self">self</span>.pos] <span class="kw">as </span>char;
+            <span class="self">self</span>.pos += <span class="number">1</span>;
+            <span class="prelude-val">Some</span>(r)
         }
     }
 
-    <span class="comment">// Return char and advance iff next char is equal to requested</span>
-    <span class="kw">fn</span> <span class="ident">read_given_char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">read_char</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="kw">if</span> <span class="ident">next</span> <span class="op">==</span> <span class="ident">c</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">next</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="comment">// Return char and advance iff next char is equal to requested
+    </span><span class="kw">fn </span>read_given_char(<span class="kw-2">&amp;mut </span><span class="self">self</span>, c: char) -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+        <span class="self">self</span>.read_atomically(|p| {
+            <span class="kw">match </span>p.read_char() {
+                <span class="prelude-val">Some</span>(next) <span class="kw">if </span>next == c =&gt; <span class="prelude-val">Some</span>(next),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             }
         })
     }
 
-    <span class="comment">// Read digit</span>
-    <span class="kw">fn</span> <span class="ident">read_digit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">parse_digit</span>(<span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">radix</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>;
-            <span class="comment">// assuming radix is either 10 or 16</span>
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">b&#39;9&#39;</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">&gt;</span> <span class="number">10</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="string">b&#39;a&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="string">b&#39;a&#39;</span> <span class="op">+</span> (<span class="ident">radix</span> <span class="op">-</span> <span class="number">10</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span> <span class="op">+</span> <span class="number">10</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">&gt;</span> <span class="number">10</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="string">b&#39;A&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="string">b&#39;A&#39;</span> <span class="op">+</span> (<span class="ident">radix</span> <span class="op">-</span> <span class="number">10</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span> <span class="op">+</span> <span class="number">10</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+    <span class="comment">// Read digit
+    </span><span class="kw">fn </span>read_digit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, radix: u8) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+        <span class="kw">fn </span>parse_digit(c: char, radix: u8) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+            <span class="kw">let </span>c = c <span class="kw">as </span>u8;
+            <span class="comment">// assuming radix is either 10 or 16
+            </span><span class="kw">if </span>c &gt;= <span class="string">b&#39;0&#39; </span>&amp;&amp; c &lt;= <span class="string">b&#39;9&#39; </span>{
+                <span class="prelude-val">Some</span>(c - <span class="string">b&#39;0&#39;</span>)
+            } <span class="kw">else if </span>radix &gt; <span class="number">10 </span>&amp;&amp; c &gt;= <span class="string">b&#39;a&#39; </span>&amp;&amp; c &lt; <span class="string">b&#39;a&#39; </span>+ (radix - <span class="number">10</span>) {
+                <span class="prelude-val">Some</span>(c - <span class="string">b&#39;a&#39; </span>+ <span class="number">10</span>)
+            } <span class="kw">else if </span>radix &gt; <span class="number">10 </span>&amp;&amp; c &gt;= <span class="string">b&#39;A&#39; </span>&amp;&amp; c &lt; <span class="string">b&#39;A&#39; </span>+ (radix - <span class="number">10</span>) {
+                <span class="prelude-val">Some</span>(c - <span class="string">b&#39;A&#39; </span>+ <span class="number">10</span>)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         }
 
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-            <span class="ident">p</span>.<span class="ident">read_char</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">parse_digit</span>(<span class="ident">c</span>, <span class="ident">radix</span>))
+        <span class="self">self</span>.read_atomically(|p| {
+            p.read_char().and_then(|c| parse_digit(c, radix))
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">read_number_impl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u8</span>, <span class="ident">max_digits</span>: <span class="ident">u32</span>, <span class="ident">upto</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digit_count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_digit</span>(<span class="ident">radix</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; {
-                    <span class="ident">r</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">*</span> (<span class="ident">radix</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">+</span> (<span class="ident">d</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                    <span class="ident">digit_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">digit_count</span> <span class="op">&gt;</span> <span class="ident">max_digits</span> <span class="op">|</span><span class="op">|</span> <span class="ident">r</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">upto</span> {
-                        <span class="kw">return</span> <span class="prelude-val">None</span>
-                    }
+    <span class="kw">fn </span>read_number_impl(<span class="kw-2">&amp;mut </span><span class="self">self</span>, radix: u8, max_digits: u32, upto: u32) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>digit_count = <span class="number">0</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.read_digit(radix) {
+                <span class="prelude-val">Some</span>(d) =&gt; {
+                    r = r * (radix <span class="kw">as </span>u32) + (d <span class="kw">as </span>u32);
+                    digit_count += <span class="number">1</span>;
+                    <span class="kw">if </span>digit_count &gt; max_digits || r &gt;= upto {
+                        <span class="kw">return </span><span class="prelude-val">None
+                    </span>}
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">if</span> <span class="ident">digit_count</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="kw">return</span> <span class="prelude-val">None</span>
-                    } <span class="kw">else</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>)
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">if </span>digit_count == <span class="number">0 </span>{
+                        <span class="kw">return </span><span class="prelude-val">None
+                    </span>} <span class="kw">else </span>{
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(r)
                     }
                 }
             };
         }
     }
 
-    <span class="comment">// Read number, failing if max_digits of number value exceeded</span>
-    <span class="kw">fn</span> <span class="ident">read_number</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u8</span>, <span class="ident">max_digits</span>: <span class="ident">u32</span>, <span class="ident">upto</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_number_impl</span>(<span class="ident">radix</span>, <span class="ident">max_digits</span>, <span class="ident">upto</span>))
+    <span class="comment">// Read number, failing if max_digits of number value exceeded
+    </span><span class="kw">fn </span>read_number(<span class="kw-2">&amp;mut </span><span class="self">self</span>, radix: u8, max_digits: u32, upto: u32) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.read_atomically(|p| p.read_number_impl(radix, max_digits, upto))
     }
 
-    <span class="kw">fn</span> <span class="ident">read_ipv4_addr_impl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bs</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="number">4</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">is_none</span>() {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>read_ipv4_addr_impl(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv4Addr&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>bs = [<span class="number">0</span>; <span class="number">4</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+        <span class="kw">while </span>i &lt; <span class="number">4 </span>{
+            <span class="kw">if </span>i != <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.read_given_char(<span class="string">&#39;.&#39;</span>).is_none() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">octet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_number</span>(<span class="number">10</span>, <span class="number">3</span>, <span class="number">0x100</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u8</span>);
-            <span class="kw">match</span> <span class="ident">octet</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">d</span>) =&gt; <span class="ident">bs</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">d</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="kw">let </span>octet = <span class="self">self</span>.read_number(<span class="number">10</span>, <span class="number">3</span>, <span class="number">0x100</span>).map(|n| n <span class="kw">as </span>u8);
+            <span class="kw">match </span>octet {
+                <span class="prelude-val">Some</span>(d) =&gt; bs[i] = d,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
             };
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            i += <span class="number">1</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">Ipv4Addr::new</span>(<span class="ident">bs</span>[<span class="number">0</span>], <span class="ident">bs</span>[<span class="number">1</span>], <span class="ident">bs</span>[<span class="number">2</span>], <span class="ident">bs</span>[<span class="number">3</span>]))
+        <span class="prelude-val">Some</span>(Ipv4Addr::new(bs[<span class="number">0</span>], bs[<span class="number">1</span>], bs[<span class="number">2</span>], bs[<span class="number">3</span>]))
     }
 
-    <span class="comment">// Read IPv4 address</span>
-    <span class="kw">fn</span> <span class="ident">read_ipv4_addr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv4Addr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv4_addr_impl</span>())
+    <span class="comment">// Read IPv4 address
+    </span><span class="kw">fn </span>read_ipv4_addr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv4Addr&gt; {
+        <span class="self">self</span>.read_atomically(|p| p.read_ipv4_addr_impl())
     }
 
-    <span class="kw">fn</span> <span class="ident">read_ipv6_addr_impl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">ipv6_addr_from_head_tail</span>(<span class="ident">head</span>: <span class="kw-2">&amp;</span>[<span class="ident">u16</span>], <span class="ident">tail</span>: <span class="kw-2">&amp;</span>[<span class="ident">u16</span>]) -&gt; <span class="ident">Ipv6Addr</span> {
-            <span class="macro">assert!</span>(<span class="ident">head</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tail</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gs</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-            <span class="ident">gs</span>[..<span class="ident">head</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="ident">head</span>);
-            <span class="ident">gs</span>[(<span class="number">8</span> <span class="op">-</span> <span class="ident">tail</span>.<span class="ident">len</span>()) .. <span class="number">8</span>].<span class="ident">copy_from_slice</span>(<span class="ident">tail</span>);
-            <span class="ident">Ipv6Addr::new</span>(<span class="ident">gs</span>[<span class="number">0</span>], <span class="ident">gs</span>[<span class="number">1</span>], <span class="ident">gs</span>[<span class="number">2</span>], <span class="ident">gs</span>[<span class="number">3</span>], <span class="ident">gs</span>[<span class="number">4</span>], <span class="ident">gs</span>[<span class="number">5</span>], <span class="ident">gs</span>[<span class="number">6</span>], <span class="ident">gs</span>[<span class="number">7</span>])
+    <span class="kw">fn </span>read_ipv6_addr_impl(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv6Addr&gt; {
+        <span class="kw">fn </span>ipv6_addr_from_head_tail(head: <span class="kw-2">&amp;</span>[u16], tail: <span class="kw-2">&amp;</span>[u16]) -&gt; Ipv6Addr {
+            <span class="macro">assert!</span>(head.len() + tail.len() &lt;= <span class="number">8</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>gs = [<span class="number">0</span>; <span class="number">8</span>];
+            gs[..head.len()].copy_from_slice(head);
+            gs[(<span class="number">8 </span>- tail.len()) .. <span class="number">8</span>].copy_from_slice(tail);
+            Ipv6Addr::new(gs[<span class="number">0</span>], gs[<span class="number">1</span>], gs[<span class="number">2</span>], gs[<span class="number">3</span>], gs[<span class="number">4</span>], gs[<span class="number">5</span>], gs[<span class="number">6</span>], gs[<span class="number">7</span>])
         }
 
-        <span class="kw">fn</span> <span class="ident">read_groups</span>(<span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>, <span class="ident">groups</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u16</span>; <span class="number">8</span>], <span class="ident">limit</span>: <span class="ident">usize</span>)
-                       -&gt; (<span class="ident">usize</span>, <span class="ident">bool</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">limit</span> {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">1</span> {
-                    <span class="kw">let</span> <span class="ident">ipv4</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">is_some</span>() {
-                            <span class="ident">p</span>.<span class="ident">read_ipv4_addr</span>()
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        }
+        <span class="kw">fn </span>read_groups(p: <span class="kw-2">&amp;mut </span>Parser, groups: <span class="kw-2">&amp;mut </span>[u16; <span class="number">8</span>], limit: usize)
+                       -&gt; (usize, bool) {
+            <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+            <span class="kw">while </span>i &lt; limit {
+                <span class="kw">if </span>i &lt; limit - <span class="number">1 </span>{
+                    <span class="kw">let </span>ipv4 = p.read_atomically(|p| {
+                        <span class="kw">if </span>i == <span class="number">0 </span>|| p.read_given_char(<span class="string">&#39;:&#39;</span>).is_some() {
+                            p.read_ipv4_addr()
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">None
+                        </span>}
                     });
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v4_addr</span>) <span class="op">=</span> <span class="ident">ipv4</span> {
-                        <span class="kw">let</span> <span class="ident">octets</span> <span class="op">=</span> <span class="ident">v4_addr</span>.<span class="ident">octets</span>();
-                        <span class="ident">groups</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">0</span>] <span class="op">=</span> ((<span class="ident">octets</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">octets</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>);
-                        <span class="ident">groups</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> ((<span class="ident">octets</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">octets</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u16</span>);
-                        <span class="kw">return</span> (<span class="ident">i</span> <span class="op">+</span> <span class="number">2</span>, <span class="bool-val">true</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(v4_addr) = ipv4 {
+                        <span class="kw">let </span>octets = v4_addr.octets();
+                        groups[i + <span class="number">0</span>] = ((octets[<span class="number">0</span>] <span class="kw">as </span>u16) &lt;&lt; <span class="number">8</span>) | (octets[<span class="number">1</span>] <span class="kw">as </span>u16);
+                        groups[i + <span class="number">1</span>] = ((octets[<span class="number">2</span>] <span class="kw">as </span>u16) &lt;&lt; <span class="number">8</span>) | (octets[<span class="number">3</span>] <span class="kw">as </span>u16);
+                        <span class="kw">return </span>(i + <span class="number">2</span>, <span class="bool-val">true</span>);
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">is_some</span>() {
-                        <span class="ident">p</span>.<span class="ident">read_number</span>(<span class="number">16</span>, <span class="number">4</span>, <span class="number">0x10000</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u16</span>)
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
+                <span class="kw">let </span>group = p.read_atomically(|p| {
+                    <span class="kw">if </span>i == <span class="number">0 </span>|| p.read_given_char(<span class="string">&#39;:&#39;</span>).is_some() {
+                        p.read_number(<span class="number">16</span>, <span class="number">4</span>, <span class="number">0x10000</span>).map(|n| n <span class="kw">as </span>u16)
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">None
+                    </span>}
                 });
-                <span class="kw">match</span> <span class="ident">group</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">g</span>) =&gt; <span class="ident">groups</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">g</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> (<span class="ident">i</span>, <span class="bool-val">false</span>)
+                <span class="kw">match </span>group {
+                    <span class="prelude-val">Some</span>(g) =&gt; groups[i] = g,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>(i, <span class="bool-val">false</span>)
                 }
-                <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                i += <span class="number">1</span>;
             }
-            (<span class="ident">i</span>, <span class="bool-val">false</span>)
+            (i, <span class="bool-val">false</span>)
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-        <span class="kw">let</span> (<span class="ident">head_size</span>, <span class="ident">head_ipv4</span>) <span class="op">=</span> <span class="ident">read_groups</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">head</span>, <span class="number">8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>head = [<span class="number">0</span>; <span class="number">8</span>];
+        <span class="kw">let </span>(head_size, head_ipv4) = read_groups(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>head, <span class="number">8</span>);
 
-        <span class="kw">if</span> <span class="ident">head_size</span> <span class="op">==</span> <span class="number">8</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Ipv6Addr::new</span>(
-                <span class="ident">head</span>[<span class="number">0</span>], <span class="ident">head</span>[<span class="number">1</span>], <span class="ident">head</span>[<span class="number">2</span>], <span class="ident">head</span>[<span class="number">3</span>],
-                <span class="ident">head</span>[<span class="number">4</span>], <span class="ident">head</span>[<span class="number">5</span>], <span class="ident">head</span>[<span class="number">6</span>], <span class="ident">head</span>[<span class="number">7</span>]))
+        <span class="kw">if </span>head_size == <span class="number">8 </span>{
+            <span class="kw">return </span><span class="prelude-val">Some</span>(Ipv6Addr::new(
+                head[<span class="number">0</span>], head[<span class="number">1</span>], head[<span class="number">2</span>], head[<span class="number">3</span>],
+                head[<span class="number">4</span>], head[<span class="number">5</span>], head[<span class="number">6</span>], head[<span class="number">7</span>]))
         }
 
-        <span class="comment">// IPv4 part is not allowed before `::`</span>
-        <span class="kw">if</span> <span class="ident">head_ipv4</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>
+        <span class="comment">// IPv4 part is not allowed before `::`
+        </span><span class="kw">if </span>head_ipv4 {
+            <span class="kw">return </span><span class="prelude-val">None
+        </span>}
+
+        <span class="comment">// read `::` if previous code parsed less than 8 groups
+        </span><span class="kw">if </span>!<span class="self">self</span>.read_given_char(<span class="string">&#39;:&#39;</span>).is_some() || !<span class="self">self</span>.read_given_char(<span class="string">&#39;:&#39;</span>).is_some() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// read `::` if previous code parsed less than 8 groups</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-        <span class="kw">let</span> (<span class="ident">tail_size</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">read_groups</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tail</span>, <span class="number">8</span> <span class="op">-</span> <span class="ident">head_size</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">ipv6_addr_from_head_tail</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>[..<span class="ident">head_size</span>], <span class="kw-2">&amp;</span><span class="ident">tail</span>[..<span class="ident">tail_size</span>]))
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = [<span class="number">0</span>; <span class="number">8</span>];
+        <span class="kw">let </span>(tail_size, <span class="kw">_</span>) = read_groups(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>tail, <span class="number">8 </span>- head_size);
+        <span class="prelude-val">Some</span>(ipv6_addr_from_head_tail(<span class="kw-2">&amp;</span>head[..head_size], <span class="kw-2">&amp;</span>tail[..tail_size]))
     }
 
-    <span class="kw">fn</span> <span class="ident">read_ipv6_addr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv6Addr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_atomically</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv6_addr_impl</span>())
+    <span class="kw">fn </span>read_ipv6_addr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv6Addr&gt; {
+        <span class="self">self</span>.read_atomically(|p| p.read_ipv6_addr_impl())
     }
     
-    <span class="comment">/* Additions for IpNet below. */</span>
+    <span class="comment">/* Additions for IpNet below. */
 
-    <span class="comment">// Read IPv4 network</span>
-    <span class="kw">fn</span> <span class="ident">read_ipv4_net</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv4Net</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ip_addr</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv4_addr</span>();
-        <span class="kw">let</span> <span class="ident">slash</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;/&#39;</span>);
-        <span class="kw">let</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> {
-            <span class="ident">p</span>.<span class="ident">read_number</span>(<span class="number">10</span>, <span class="number">2</span>, <span class="number">33</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u8</span>)
+    // Read IPv4 network
+    </span><span class="kw">fn </span>read_ipv4_net(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv4Net&gt; {
+        <span class="kw">let </span>ip_addr = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_ipv4_addr();
+        <span class="kw">let </span>slash = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_given_char(<span class="string">&#39;/&#39;</span>);
+        <span class="kw">let </span>prefix_len = |p: <span class="kw-2">&amp;mut </span>Parser| {
+            p.read_number(<span class="number">10</span>, <span class="number">2</span>, <span class="number">33</span>).map(|n| n <span class="kw">as </span>u8)
         };
 
-        <span class="self">self</span>.<span class="ident">read_seq_3</span>(<span class="ident">ip_addr</span>, <span class="ident">slash</span>, <span class="ident">prefix_len</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">ip</span>, <span class="kw">_</span>, <span class="ident">prefix_len</span>): (<span class="ident">Ipv4Addr</span>, <span class="ident">char</span>, <span class="ident">u8</span>) <span class="op">=</span> <span class="ident">t</span>;
-            <span class="ident">Ipv4Net::new</span>(<span class="ident">ip</span>, <span class="ident">prefix_len</span>).<span class="ident">unwrap</span>()
+        <span class="self">self</span>.read_seq_3(ip_addr, slash, prefix_len).map(|t| {
+            <span class="kw">let </span>(ip, <span class="kw">_</span>, prefix_len): (Ipv4Addr, char, u8) = t;
+            Ipv4Net::new(ip, prefix_len).unwrap()
         })
     }
 
-    <span class="comment">// Read Ipv6 network</span>
-    <span class="kw">fn</span> <span class="ident">read_ipv6_net</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ipv6Net</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ip_addr</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv6_addr</span>();
-        <span class="kw">let</span> <span class="ident">slash</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_given_char</span>(<span class="string">&#39;/&#39;</span>);
-        <span class="kw">let</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> {
-            <span class="ident">p</span>.<span class="ident">read_number</span>(<span class="number">10</span>, <span class="number">3</span>, <span class="number">129</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span> <span class="kw">as</span> <span class="ident">u8</span>)
+    <span class="comment">// Read Ipv6 network
+    </span><span class="kw">fn </span>read_ipv6_net(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ipv6Net&gt; {
+        <span class="kw">let </span>ip_addr = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_ipv6_addr();
+        <span class="kw">let </span>slash = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_given_char(<span class="string">&#39;/&#39;</span>);
+        <span class="kw">let </span>prefix_len = |p: <span class="kw-2">&amp;mut </span>Parser| {
+            p.read_number(<span class="number">10</span>, <span class="number">3</span>, <span class="number">129</span>).map(|n| n <span class="kw">as </span>u8)
         };
 
-        <span class="self">self</span>.<span class="ident">read_seq_3</span>(<span class="ident">ip_addr</span>, <span class="ident">slash</span>, <span class="ident">prefix_len</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">ip</span>, <span class="kw">_</span>, <span class="ident">prefix_len</span>): (<span class="ident">Ipv6Addr</span>, <span class="ident">char</span>, <span class="ident">u8</span>) <span class="op">=</span> <span class="ident">t</span>;
-            <span class="ident">Ipv6Net::new</span>(<span class="ident">ip</span>, <span class="ident">prefix_len</span>).<span class="ident">unwrap</span>()
+        <span class="self">self</span>.read_seq_3(ip_addr, slash, prefix_len).map(|t| {
+            <span class="kw">let </span>(ip, <span class="kw">_</span>, prefix_len): (Ipv6Addr, char, u8) = t;
+            Ipv6Net::new(ip, prefix_len).unwrap()
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">read_ip_net</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpNet</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ipv4_net</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv4_net</span>().<span class="ident">map</span>(<span class="ident">IpNet::V4</span>);
-        <span class="kw">let</span> <span class="ident">ipv6_net</span> <span class="op">=</span> <span class="op">|</span><span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv6_net</span>().<span class="ident">map</span>(<span class="ident">IpNet::V6</span>);
-        <span class="self">self</span>.<span class="ident">read_or</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">Box::new</span>(<span class="ident">ipv4_net</span>), <span class="ident">Box::new</span>(<span class="ident">ipv6_net</span>)])
+    <span class="kw">fn </span>read_ip_net(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IpNet&gt; {
+        <span class="kw">let </span>ipv4_net = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_ipv4_net().map(IpNet::V4);
+        <span class="kw">let </span>ipv6_net = |p: <span class="kw-2">&amp;mut </span>Parser| p.read_ipv6_net().map(IpNet::V6);
+        <span class="self">self</span>.read_or(<span class="kw-2">&amp;mut </span>[Box::new(ipv4_net), Box::new(ipv6_net)])
     }
 
-    <span class="comment">/* Additions for IpNet above. */</span>
-}
+    <span class="comment">/* Additions for IpNet above. */
+</span>}
 
-<span class="comment">/* Additions for IpNet below. */</span>
+<span class="comment">/* Additions for IpNet below. */
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">IpNet</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">AddrParseError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IpNet</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">Parser::new</span>(<span class="ident">s</span>).<span class="ident">read_till_eof</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ip_net</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>(()))
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>IpNet {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= AddrParseError;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;IpNet, AddrParseError&gt; {
+        <span class="kw">match </span>Parser::new(s).read_till_eof(|p| p.read_ip_net()) {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(AddrParseError(()))
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Ipv4Net</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">AddrParseError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ipv4Net</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">Parser::new</span>(<span class="ident">s</span>).<span class="ident">read_till_eof</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv4_net</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>(()))
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Ipv4Net {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= AddrParseError;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv4Net, AddrParseError&gt; {
+        <span class="kw">match </span>Parser::new(s).read_till_eof(|p| p.read_ipv4_net()) {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(AddrParseError(()))
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Ipv6Net</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">AddrParseError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ipv6Net</span>, <span class="ident">AddrParseError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">Parser::new</span>(<span class="ident">s</span>).<span class="ident">read_till_eof</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">read_ipv6_net</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AddrParseError</span>(()))
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Ipv6Net {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= AddrParseError;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Ipv6Net, AddrParseError&gt; {
+        <span class="kw">match </span>Parser::new(s).read_till_eof(|p| p.read_ipv6_net()) {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(AddrParseError(()))
         }
     }
 }
 
-<span class="comment">/* Additions for IpNet above. */</span>
+<span class="comment">/* Additions for IpNet above. */
 
-<span class="doccomment">/// An error which can be returned when parsing an IP network address.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This error is used as the error type for the [`FromStr`] implementation for</span>
-<span class="doccomment">/// [`IpNet`], [`Ipv4Net`], and [`Ipv6Net`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`FromStr`]: https://doc.rust-lang.org/std/str/trait.FromStr.html</span>
-<span class="doccomment">/// [`IpNet`]: enum.IpNet.html</span>
-<span class="doccomment">/// [`Ipv4Net`]: struct.Ipv4Net.html</span>
-<span class="doccomment">/// [`Ipv6Net`]: struct.Ipv6Net.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddrParseError</span>(());
+</span><span class="doccomment">/// An error which can be returned when parsing an IP network address.
+///
+/// This error is used as the error type for the [`FromStr`] implementation for
+/// [`IpNet`], [`Ipv4Net`], and [`Ipv6Net`].
+///
+/// [`FromStr`]: https://doc.rust-lang.org/std/str/trait.FromStr.html
+/// [`IpNet`]: enum.IpNet.html
+/// [`Ipv4Net`]: struct.Ipv4Net.html
+/// [`Ipv6Net`]: struct.Ipv6Net.html
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>AddrParseError(());
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AddrParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid IP address syntax&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>AddrParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt.write_str(<span class="string">&quot;invalid IP address syntax&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">AddrParseError</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>AddrParseError {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ipnet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ipnet" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

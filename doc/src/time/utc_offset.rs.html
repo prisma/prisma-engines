@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/utc_offset.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utc_offset.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/utc_offset.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utc_offset.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -337,342 +337,342 @@
 <span id="335">335</span>
 <span id="336">336</span>
 <span id="337">337</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The [`UtcOffset`] struct and its associated `impl`s.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The [`UtcOffset`] struct and its associated `impl`s.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::ops::Neg</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::io</span>;
+</span><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::ops::Neg;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">use </span>std::io;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting::Formattable</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::Parsable</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sys::local_offset_at</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::OffsetDateTime</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::formatting::Formattable;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::parsing::Parsable;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;local-offset&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::sys::local_offset_at;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;local-offset&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::OffsetDateTime;
 
-<span class="doccomment">/// An offset from UTC.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct can store values up to ±23:59:59. If you need support outside this range, please</span>
-<span class="doccomment">/// file an issue with your use case.</span>
-<span class="comment">// All three components _must_ have the same sign.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UtcOffset</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-    <span class="ident">hours</span>: <span class="ident">i8</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-    <span class="ident">minutes</span>: <span class="ident">i8</span>,
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-    <span class="ident">seconds</span>: <span class="ident">i8</span>,
+<span class="doccomment">/// An offset from UTC.
+///
+/// This struct can store values up to ±23:59:59. If you need support outside this range, please
+/// file an issue with your use case.
+</span><span class="comment">// All three components _must_ have the same sign.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>UtcOffset {
+    <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+    </span>hours: i8,
+    <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+    </span>minutes: i8,
+    <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+    </span>seconds: i8,
 }
 
-<span class="kw">impl</span> <span class="ident">UtcOffset</span> {
-    <span class="doccomment">/// A `UtcOffset` that is UTC.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{UtcOffset, macros::offset};</span>
-    <span class="doccomment">/// assert_eq!(UtcOffset::UTC, offset!(UTC));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UTC</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::__from_hms_unchecked</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
+<span class="kw">impl </span>UtcOffset {
+    <span class="doccomment">/// A `UtcOffset` that is UTC.
+    ///
+    /// ```rust
+    /// # use time::{UtcOffset, macros::offset};
+    /// assert_eq!(UtcOffset::UTC, offset!(UTC));
+    /// ```
+    </span><span class="kw">pub const </span>UTC: <span class="self">Self </span>= <span class="self">Self</span>::__from_hms_unchecked(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-    <span class="comment">// region: constructors</span>
-    <span class="doccomment">/// Create a `UtcOffset` representing an offset of the hours, minutes, and seconds provided, the</span>
-    <span class="doccomment">/// validity of which must be guaranteed by the caller. All three parameters must have the same</span>
-    <span class="doccomment">/// sign.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">__from_hms_unchecked</span>(<span class="ident">hours</span>: <span class="ident">i8</span>, <span class="ident">minutes</span>: <span class="ident">i8</span>, <span class="ident">seconds</span>: <span class="ident">i8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">hours</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">minutes</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span>);
-            <span class="macro">debug_assert!</span>(<span class="ident">seconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hours</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">minutes</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
-            <span class="macro">debug_assert!</span>(<span class="ident">seconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
+    <span class="comment">// region: constructors
+    </span><span class="doccomment">/// Create a `UtcOffset` representing an offset of the hours, minutes, and seconds provided, the
+    /// validity of which must be guaranteed by the caller. All three parameters must have the same
+    /// sign.
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub const fn </span>__from_hms_unchecked(hours: i8, minutes: i8, seconds: i8) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>hours &lt; <span class="number">0 </span>{
+            <span class="macro">debug_assert!</span>(minutes &lt;= <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(seconds &lt;= <span class="number">0</span>);
+        } <span class="kw">else if </span>hours &gt; <span class="number">0 </span>{
+            <span class="macro">debug_assert!</span>(minutes &gt;= <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(seconds &gt;= <span class="number">0</span>);
         }
-        <span class="kw">if</span> <span class="ident">minutes</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">seconds</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">minutes</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">seconds</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span>);
+        <span class="kw">if </span>minutes &lt; <span class="number">0 </span>{
+            <span class="macro">debug_assert!</span>(seconds &lt;= <span class="number">0</span>);
+        } <span class="kw">else if </span>minutes &gt; <span class="number">0 </span>{
+            <span class="macro">debug_assert!</span>(seconds &gt;= <span class="number">0</span>);
         }
-        <span class="macro">debug_assert!</span>(<span class="ident">hours</span>.<span class="ident">unsigned_abs</span>() <span class="op">&lt;</span> <span class="number">24</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">minutes</span>.<span class="ident">unsigned_abs</span>() <span class="op">&lt;</span> <span class="number">60</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">seconds</span>.<span class="ident">unsigned_abs</span>() <span class="op">&lt;</span> <span class="number">60</span>);
+        <span class="macro">debug_assert!</span>(hours.unsigned_abs() &lt; <span class="number">24</span>);
+        <span class="macro">debug_assert!</span>(minutes.unsigned_abs() &lt; <span class="number">60</span>);
+        <span class="macro">debug_assert!</span>(seconds.unsigned_abs() &lt; <span class="number">60</span>);
 
-        <span class="self">Self</span> {
-            <span class="ident">hours</span>,
-            <span class="ident">minutes</span>,
-            <span class="ident">seconds</span>,
+        <span class="self">Self </span>{
+            hours,
+            minutes,
+            seconds,
         }
     }
 
-    <span class="doccomment">/// Create a `UtcOffset` representing an offset by the number of hours, minutes, and seconds</span>
-    <span class="doccomment">/// provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The sign of all three components should match. If they do not, all smaller components will</span>
-    <span class="doccomment">/// have their signs flipped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::UtcOffset;</span>
-    <span class="doccomment">/// assert_eq!(UtcOffset::from_hms(1, 2, 3)?.as_hms(), (1, 2, 3));</span>
-    <span class="doccomment">/// assert_eq!(UtcOffset::from_hms(1, -2, -3)?.as_hms(), (1, 2, 3));</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_hms</span>(
-        <span class="ident">hours</span>: <span class="ident">i8</span>,
-        <span class="kw-2">mut</span> <span class="ident">minutes</span>: <span class="ident">i8</span>,
-        <span class="kw-2">mut</span> <span class="ident">seconds</span>: <span class="ident">i8</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">hours</span> <span class="kw">in</span> <span class="op">-</span><span class="number">23</span> =&gt; <span class="number">23</span>);
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">minutes</span> <span class="kw">in</span> <span class="op">-</span><span class="number">59</span> =&gt; <span class="number">59</span>);
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">seconds</span> <span class="kw">in</span> <span class="op">-</span><span class="number">59</span> =&gt; <span class="number">59</span>);
+    <span class="doccomment">/// Create a `UtcOffset` representing an offset by the number of hours, minutes, and seconds
+    /// provided.
+    ///
+    /// The sign of all three components should match. If they do not, all smaller components will
+    /// have their signs flipped.
+    ///
+    /// ```rust
+    /// # use time::UtcOffset;
+    /// assert_eq!(UtcOffset::from_hms(1, 2, 3)?.as_hms(), (1, 2, 3));
+    /// assert_eq!(UtcOffset::from_hms(1, -2, -3)?.as_hms(), (1, 2, 3));
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub const fn </span>from_hms(
+        hours: i8,
+        <span class="kw-2">mut </span>minutes: i8,
+        <span class="kw-2">mut </span>seconds: i8,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="macro">ensure_value_in_range!</span>(hours <span class="kw">in </span>-<span class="number">23 </span>=&gt; <span class="number">23</span>);
+        <span class="macro">ensure_value_in_range!</span>(minutes <span class="kw">in </span>-<span class="number">59 </span>=&gt; <span class="number">59</span>);
+        <span class="macro">ensure_value_in_range!</span>(seconds <span class="kw">in </span>-<span class="number">59 </span>=&gt; <span class="number">59</span>);
 
-        <span class="kw">if</span> (<span class="ident">hours</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">minutes</span> <span class="op">&lt;</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">hours</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">minutes</span> <span class="op">&gt;</span> <span class="number">0</span>) {
-            <span class="ident">minutes</span> <span class="kw-2">*</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
+        <span class="kw">if </span>(hours &gt; <span class="number">0 </span>&amp;&amp; minutes &lt; <span class="number">0</span>) || (hours &lt; <span class="number">0 </span>&amp;&amp; minutes &gt; <span class="number">0</span>) {
+            minutes <span class="kw-2">*</span>= -<span class="number">1</span>;
         }
-        <span class="kw">if</span> (<span class="ident">hours</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">hours</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">minutes</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">minutes</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span>)
+        <span class="kw">if </span>(hours &gt; <span class="number">0 </span>&amp;&amp; seconds &lt; <span class="number">0</span>)
+            || (hours &lt; <span class="number">0 </span>&amp;&amp; seconds &gt; <span class="number">0</span>)
+            || (minutes &gt; <span class="number">0 </span>&amp;&amp; seconds &lt; <span class="number">0</span>)
+            || (minutes &lt; <span class="number">0 </span>&amp;&amp; seconds &gt; <span class="number">0</span>)
         {
-            <span class="ident">seconds</span> <span class="kw-2">*</span><span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
+            seconds <span class="kw-2">*</span>= -<span class="number">1</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_hms_unchecked</span>(<span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_hms_unchecked(hours, minutes, seconds))
     }
 
-    <span class="doccomment">/// Create a `UtcOffset` representing an offset by the number of seconds provided.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::UtcOffset;</span>
-    <span class="doccomment">/// assert_eq!(UtcOffset::from_whole_seconds(3_723)?.as_hms(), (1, 2, 3));</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_whole_seconds</span>(<span class="ident">seconds</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::ComponentRange</span><span class="op">&gt;</span> {
-        <span class="macro">ensure_value_in_range!</span>(<span class="ident">seconds</span> <span class="kw">in</span> <span class="op">-</span><span class="number">86_399</span> =&gt; <span class="number">86_399</span>);
+    <span class="doccomment">/// Create a `UtcOffset` representing an offset by the number of seconds provided.
+    ///
+    /// ```rust
+    /// # use time::UtcOffset;
+    /// assert_eq!(UtcOffset::from_whole_seconds(3_723)?.as_hms(), (1, 2, 3));
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub const fn </span>from_whole_seconds(seconds: i32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::ComponentRange&gt; {
+        <span class="macro">ensure_value_in_range!</span>(seconds <span class="kw">in </span>-<span class="number">86_399 </span>=&gt; <span class="number">86_399</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::__from_hms_unchecked</span>(
-            (<span class="ident">seconds</span> <span class="op">/</span> <span class="number">3_600</span>) <span class="kw">as</span> <span class="kw">_</span>,
-            ((<span class="ident">seconds</span> <span class="op">/</span> <span class="number">60</span>) <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>,
-            (<span class="ident">seconds</span> <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::__from_hms_unchecked(
+            (seconds / <span class="number">3_600</span>) <span class="kw">as _</span>,
+            ((seconds / <span class="number">60</span>) % <span class="number">60</span>) <span class="kw">as _</span>,
+            (seconds % <span class="number">60</span>) <span class="kw">as _</span>,
         ))
     }
-    <span class="comment">// endregion constructors</span>
+    <span class="comment">// endregion constructors
 
-    <span class="comment">// region: getters</span>
-    <span class="doccomment">/// Obtain the UTC offset as its hours, minutes, and seconds. The sign of all three components</span>
-    <span class="doccomment">/// will always match. A positive value indicates an offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).as_hms(), (1, 2, 3));</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).as_hms(), (-1, -2, -3));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">as_hms</span>(<span class="self">self</span>) -&gt; (<span class="ident">i8</span>, <span class="ident">i8</span>, <span class="ident">i8</span>) {
-        (<span class="self">self</span>.<span class="ident">hours</span>, <span class="self">self</span>.<span class="ident">minutes</span>, <span class="self">self</span>.<span class="ident">seconds</span>)
+    // region: getters
+    </span><span class="doccomment">/// Obtain the UTC offset as its hours, minutes, and seconds. The sign of all three components
+    /// will always match. A positive value indicates an offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).as_hms(), (1, 2, 3));
+    /// assert_eq!(offset!(-1:02:03).as_hms(), (-1, -2, -3));
+    /// ```
+    </span><span class="kw">pub const fn </span>as_hms(<span class="self">self</span>) -&gt; (i8, i8, i8) {
+        (<span class="self">self</span>.hours, <span class="self">self</span>.minutes, <span class="self">self</span>.seconds)
     }
 
-    <span class="doccomment">/// Obtain the number of whole hours the offset is from UTC. A positive value indicates an</span>
-    <span class="doccomment">/// offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).whole_hours(), 1);</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).whole_hours(), -1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_hours</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span> {
-        <span class="self">self</span>.<span class="ident">hours</span>
+    <span class="doccomment">/// Obtain the number of whole hours the offset is from UTC. A positive value indicates an
+    /// offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).whole_hours(), 1);
+    /// assert_eq!(offset!(-1:02:03).whole_hours(), -1);
+    /// ```
+    </span><span class="kw">pub const fn </span>whole_hours(<span class="self">self</span>) -&gt; i8 {
+        <span class="self">self</span>.hours
     }
 
-    <span class="doccomment">/// Obtain the number of whole minutes the offset is from UTC. A positive value indicates an</span>
-    <span class="doccomment">/// offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).whole_minutes(), 62);</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).whole_minutes(), -62);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_minutes</span>(<span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-        <span class="self">self</span>.<span class="ident">hours</span> <span class="kw">as</span> <span class="ident">i16</span> <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">minutes</span> <span class="kw">as</span> <span class="ident">i16</span>
+    <span class="doccomment">/// Obtain the number of whole minutes the offset is from UTC. A positive value indicates an
+    /// offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).whole_minutes(), 62);
+    /// assert_eq!(offset!(-1:02:03).whole_minutes(), -62);
+    /// ```
+    </span><span class="kw">pub const fn </span>whole_minutes(<span class="self">self</span>) -&gt; i16 {
+        <span class="self">self</span>.hours <span class="kw">as </span>i16 * <span class="number">60 </span>+ <span class="self">self</span>.minutes <span class="kw">as </span>i16
     }
 
-    <span class="doccomment">/// Obtain the number of minutes past the hour the offset is from UTC. A positive value</span>
-    <span class="doccomment">/// indicates an offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).minutes_past_hour(), 2);</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).minutes_past_hour(), -2);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">minutes_past_hour</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span> {
-        <span class="self">self</span>.<span class="ident">minutes</span>
+    <span class="doccomment">/// Obtain the number of minutes past the hour the offset is from UTC. A positive value
+    /// indicates an offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).minutes_past_hour(), 2);
+    /// assert_eq!(offset!(-1:02:03).minutes_past_hour(), -2);
+    /// ```
+    </span><span class="kw">pub const fn </span>minutes_past_hour(<span class="self">self</span>) -&gt; i8 {
+        <span class="self">self</span>.minutes
     }
 
-    <span class="doccomment">/// Obtain the number of whole seconds the offset is from UTC. A positive value indicates an</span>
-    <span class="doccomment">/// offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).whole_seconds(), 3723);</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).whole_seconds(), -3723);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="comment">// This may be useful for anyone manually implementing arithmetic, as it</span>
-    <span class="comment">// would let them construct a `Duration` directly.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">whole_seconds</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">hours</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">3_600</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">minutes</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">i32</span>
+    <span class="doccomment">/// Obtain the number of whole seconds the offset is from UTC. A positive value indicates an
+    /// offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).whole_seconds(), 3723);
+    /// assert_eq!(offset!(-1:02:03).whole_seconds(), -3723);
+    /// ```
+    </span><span class="comment">// This may be useful for anyone manually implementing arithmetic, as it
+    // would let them construct a `Duration` directly.
+    </span><span class="kw">pub const fn </span>whole_seconds(<span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.hours <span class="kw">as </span>i32 * <span class="number">3_600 </span>+ <span class="self">self</span>.minutes <span class="kw">as </span>i32 * <span class="number">60 </span>+ <span class="self">self</span>.seconds <span class="kw">as </span>i32
     }
 
-    <span class="doccomment">/// Obtain the number of seconds past the minute the offset is from UTC. A positive value</span>
-    <span class="doccomment">/// indicates an offset to the east; a negative to the west.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1:02:03).seconds_past_minute(), 3);</span>
-    <span class="doccomment">/// assert_eq!(offset!(-1:02:03).seconds_past_minute(), -3);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">seconds_past_minute</span>(<span class="self">self</span>) -&gt; <span class="ident">i8</span> {
-        <span class="self">self</span>.<span class="ident">seconds</span>
+    <span class="doccomment">/// Obtain the number of seconds past the minute the offset is from UTC. A positive value
+    /// indicates an offset to the east; a negative to the west.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert_eq!(offset!(+1:02:03).seconds_past_minute(), 3);
+    /// assert_eq!(offset!(-1:02:03).seconds_past_minute(), -3);
+    /// ```
+    </span><span class="kw">pub const fn </span>seconds_past_minute(<span class="self">self</span>) -&gt; i8 {
+        <span class="self">self</span>.seconds
     }
-    <span class="comment">// endregion getters</span>
+    <span class="comment">// endregion getters
 
-    <span class="comment">// region: is_{sign}</span>
-    <span class="doccomment">/// Check if the offset is exactly UTC.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert!(!offset!(+1:02:03).is_utc());</span>
-    <span class="doccomment">/// assert!(!offset!(-1:02:03).is_utc());</span>
-    <span class="doccomment">/// assert!(offset!(UTC).is_utc());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_utc</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">hours</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">minutes</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">==</span> <span class="number">0</span>
+    // region: is_{sign}
+    </span><span class="doccomment">/// Check if the offset is exactly UTC.
+    ///
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert!(!offset!(+1:02:03).is_utc());
+    /// assert!(!offset!(-1:02:03).is_utc());
+    /// assert!(offset!(UTC).is_utc());
+    /// ```
+    </span><span class="kw">pub const fn </span>is_utc(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.hours == <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.minutes == <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.seconds == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Check if the offset is positive, or east of UTC.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert!(offset!(+1:02:03).is_positive());
+    /// assert!(!offset!(-1:02:03).is_positive());
+    /// assert!(!offset!(UTC).is_positive());
+    /// ```
+    </span><span class="kw">pub const fn </span>is_positive(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.hours &gt; <span class="number">0 </span>|| <span class="self">self</span>.minutes &gt; <span class="number">0 </span>|| <span class="self">self</span>.seconds &gt; <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Check if the offset is negative, or west of UTC.
+    ///
+    /// ```rust
+    /// # use time::macros::offset;
+    /// assert!(!offset!(+1:02:03).is_negative());
+    /// assert!(offset!(-1:02:03).is_negative());
+    /// assert!(!offset!(UTC).is_negative());
+    /// ```
+    </span><span class="kw">pub const fn </span>is_negative(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.hours &lt; <span class="number">0 </span>|| <span class="self">self</span>.minutes &lt; <span class="number">0 </span>|| <span class="self">self</span>.seconds &lt; <span class="number">0
+    </span>}
+    <span class="comment">// endregion is_{sign}
+
+    // region: local offset
+    </span><span class="doccomment">/// Attempt to obtain the system&#39;s UTC offset at a known moment in time. If the offset cannot be
+    /// determined, an error is returned.
+    ///
+    /// ```rust
+    /// # use time::{UtcOffset, OffsetDateTime};
+    /// let local_offset = UtcOffset::local_offset_at(OffsetDateTime::UNIX_EPOCH);
+    /// # if false {
+    /// assert!(local_offset.is_ok());
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;local-offset&quot;</span>)]
+    </span><span class="kw">pub fn </span>local_offset_at(datetime: OffsetDateTime) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::IndeterminateOffset&gt; {
+        local_offset_at(datetime).ok_or(error::IndeterminateOffset)
     }
 
-    <span class="doccomment">/// Check if the offset is positive, or east of UTC.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert!(offset!(+1:02:03).is_positive());</span>
-    <span class="doccomment">/// assert!(!offset!(-1:02:03).is_positive());</span>
-    <span class="doccomment">/// assert!(!offset!(UTC).is_positive());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_positive</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">hours</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">minutes</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&gt;</span> <span class="number">0</span>
+    <span class="doccomment">/// Attempt to obtain the system&#39;s current UTC offset. If the offset cannot be determined, an
+    /// error is returned.
+    ///
+    /// ```rust
+    /// # use time::UtcOffset;
+    /// let local_offset = UtcOffset::current_local_offset();
+    /// # if false {
+    /// assert!(local_offset.is_ok());
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;local-offset&quot;</span>)]
+    </span><span class="kw">pub fn </span>current_local_offset() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::IndeterminateOffset&gt; {
+        <span class="kw">let </span>now = OffsetDateTime::now_utc();
+        local_offset_at(now).ok_or(error::IndeterminateOffset)
     }
+    <span class="comment">// endregion: local offset
+</span>}
 
-    <span class="doccomment">/// Check if the offset is negative, or west of UTC.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::macros::offset;</span>
-    <span class="doccomment">/// assert!(!offset!(+1:02:03).is_negative());</span>
-    <span class="doccomment">/// assert!(offset!(-1:02:03).is_negative());</span>
-    <span class="doccomment">/// assert!(!offset!(UTC).is_negative());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_negative</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">hours</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">minutes</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">seconds</span> <span class="op">&lt;</span> <span class="number">0</span>
-    }
-    <span class="comment">// endregion is_{sign}</span>
-
-    <span class="comment">// region: local offset</span>
-    <span class="doccomment">/// Attempt to obtain the system&#39;s UTC offset at a known moment in time. If the offset cannot be</span>
-    <span class="doccomment">/// determined, an error is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{UtcOffset, OffsetDateTime};</span>
-    <span class="doccomment">/// let local_offset = UtcOffset::local_offset_at(OffsetDateTime::UNIX_EPOCH);</span>
-    <span class="doccomment">/// # if false {</span>
-    <span class="doccomment">/// assert!(local_offset.is_ok());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_offset_at</span>(<span class="ident">datetime</span>: <span class="ident">OffsetDateTime</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::IndeterminateOffset</span><span class="op">&gt;</span> {
-        <span class="ident">local_offset_at</span>(<span class="ident">datetime</span>).<span class="ident">ok_or</span>(<span class="ident">error::IndeterminateOffset</span>)
-    }
-
-    <span class="doccomment">/// Attempt to obtain the system&#39;s current UTC offset. If the offset cannot be determined, an</span>
-    <span class="doccomment">/// error is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::UtcOffset;</span>
-    <span class="doccomment">/// let local_offset = UtcOffset::current_local_offset();</span>
-    <span class="doccomment">/// # if false {</span>
-    <span class="doccomment">/// assert!(local_offset.is_ok());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;local-offset&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_local_offset</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::IndeterminateOffset</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">OffsetDateTime::now_utc</span>();
-        <span class="ident">local_offset_at</span>(<span class="ident">now</span>).<span class="ident">ok_or</span>(<span class="ident">error::IndeterminateOffset</span>)
-    }
-    <span class="comment">// endregion: local offset</span>
-}
-
-<span class="comment">// region: formatting &amp; parsing</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">UtcOffset</span> {
-    <span class="doccomment">/// Format the `UtcOffset` using the provided [format description](crate::format_description).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_into</span>(
+<span class="comment">// region: formatting &amp; parsing
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">impl </span>UtcOffset {
+    <span class="doccomment">/// Format the `UtcOffset` using the provided [format description](crate::format_description).
+    </span><span class="kw">pub fn </span>format_into(
         <span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">io::Write</span>,
-        <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-        <span class="ident">format</span>.<span class="ident">format_into</span>(<span class="ident">output</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>))
+        output: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>io::Write,
+        format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized),
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
+        format.format_into(output, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>))
     }
 
-    <span class="doccomment">/// Format the `UtcOffset` using the provided [format description](crate::format_description).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{format_description, macros::offset};</span>
-    <span class="doccomment">/// let format = format_description::parse(&quot;[offset_hour sign:mandatory]:[offset_minute]&quot;)?;</span>
-    <span class="doccomment">/// assert_eq!(offset!(+1).format(&amp;format)?, &quot;+01:00&quot;);</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="self">self</span>, <span class="ident">format</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Formattable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-        <span class="ident">format</span>.<span class="ident">format</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>))
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">UtcOffset</span> {
-    <span class="doccomment">/// Parse a `UtcOffset` from the input using the provided [format</span>
-    <span class="doccomment">/// description](crate::format_description).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{format_description, macros::offset, UtcOffset};</span>
-    <span class="doccomment">/// let format = format_description::parse(&quot;[offset_hour]:[offset_minute]&quot;)?;</span>
-    <span class="doccomment">/// assert_eq!(UtcOffset::parse(&quot;-03:42&quot;, &amp;format)?, offset!(-3:42));</span>
-    <span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">description</span>: <span class="kw-2">&amp;</span>(<span class="kw">impl</span> <span class="ident">Parsable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>),
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Parse</span><span class="op">&gt;</span> {
-        <span class="ident">description</span>.<span class="ident">parse_offset</span>(<span class="ident">input</span>.<span class="ident">as_bytes</span>())
+    <span class="doccomment">/// Format the `UtcOffset` using the provided [format description](crate::format_description).
+    ///
+    /// ```rust
+    /// # use time::{format_description, macros::offset};
+    /// let format = format_description::parse(&quot;[offset_hour sign:mandatory]:[offset_minute]&quot;)?;
+    /// assert_eq!(offset!(+1).format(&amp;format)?, &quot;+01:00&quot;);
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>format(<span class="self">self</span>, format: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Formattable + <span class="question-mark">?</span>Sized)) -&gt; <span class="prelude-ty">Result</span>&lt;String, error::Format&gt; {
+        format.format(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">UtcOffset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
+</span><span class="kw">impl </span>UtcOffset {
+    <span class="doccomment">/// Parse a `UtcOffset` from the input using the provided [format
+    /// description](crate::format_description).
+    ///
+    /// ```rust
+    /// # use time::{format_description, macros::offset, UtcOffset};
+    /// let format = format_description::parse(&quot;[offset_hour]:[offset_minute]&quot;)?;
+    /// assert_eq!(UtcOffset::parse(&quot;-03:42&quot;, &amp;format)?, offset!(-3:42));
+    /// # Ok::&lt;_, time::Error&gt;(())
+    /// ```
+    </span><span class="kw">pub fn </span>parse(
+        input: <span class="kw-2">&amp;</span>str,
+        description: <span class="kw-2">&amp;</span>(<span class="kw">impl </span>Parsable + <span class="question-mark">?</span>Sized),
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Parse&gt; {
+        description.parse_offset(input.as_bytes())
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>UtcOffset {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{}{:02}:{:02}:{:02}&quot;</span>,
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_negative</span>() { <span class="string">&#39;-&#39;</span> } <span class="kw">else</span> { <span class="string">&#39;+&#39;</span> },
-            <span class="self">self</span>.<span class="ident">hours</span>.<span class="ident">abs</span>(),
-            <span class="self">self</span>.<span class="ident">minutes</span>.<span class="ident">abs</span>(),
-            <span class="self">self</span>.<span class="ident">seconds</span>.<span class="ident">abs</span>()
+            <span class="kw">if </span><span class="self">self</span>.is_negative() { <span class="string">&#39;-&#39; </span>} <span class="kw">else </span>{ <span class="string">&#39;+&#39; </span>},
+            <span class="self">self</span>.hours.abs(),
+            <span class="self">self</span>.minutes.abs(),
+            <span class="self">self</span>.seconds.abs()
         )
     }
 }
-<span class="comment">// endregion formatting &amp; parsing</span>
+<span class="comment">// endregion formatting &amp; parsing
 
-<span class="kw">impl</span> <span class="ident">Neg</span> <span class="kw">for</span> <span class="ident">UtcOffset</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+</span><span class="kw">impl </span>Neg <span class="kw">for </span>UtcOffset {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident"><span class="self">Self</span>::__from_hms_unchecked</span>(<span class="op">-</span><span class="self">self</span>.<span class="ident">hours</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">minutes</span>, <span class="op">-</span><span class="self">self</span>.<span class="ident">seconds</span>)
+    <span class="kw">fn </span>neg(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>::__from_hms_unchecked(-<span class="self">self</span>.hours, -<span class="self">self</span>.minutes, -<span class="self">self</span>.seconds)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

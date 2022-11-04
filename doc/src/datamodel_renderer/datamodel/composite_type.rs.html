@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/composite_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/composite_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -138,130 +138,130 @@
 <span id="138">138</span>
 <span id="139">139</span>
 <span id="140">140</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">field</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>field;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value</span>::{<span class="ident">Constant</span>, <span class="ident">Documentation</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field::CompositeTypeField</span>;
-<span class="kw">use</span> <span class="ident">psl::dml</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span><span class="kw">crate</span>::value::{Constant, Documentation};
+<span class="kw">pub use </span>field::CompositeTypeField;
+<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// A type block in a PSL file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="ident">Constant</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A type block in a PSL file.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>CompositeType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: Constant&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    fields: Vec&lt;CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new type declaration block. Will not be valid without</span>
-    <span class="doccomment">/// adding at least one field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">/// //   ^^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Constant::new_no_validate</span>(<span class="ident">name</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CompositeType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create a new type declaration block. Will not be valid without
+    /// adding at least one field.
+    ///
+    /// ```ignore
+    /// type Address {
+    /// //   ^^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = Constant::new_no_validate(name);
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fields</span>: <span class="ident">Vec::new</span>(),
+        <span class="self">Self </span>{
+            name,
+            documentation: <span class="prelude-val">None</span>,
+            fields: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Documentation of the type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// /// This is the documentation.</span>
-    <span class="doccomment">/// type Foo {</span>
-    <span class="doccomment">///   ....</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Documentation</span>(<span class="ident">documentation</span>));
+    <span class="doccomment">/// Documentation of the type.
+    ///
+    /// ```ignore
+    /// /// This is the documentation.
+    /// type Foo {
+    ///   ....
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
     }
 
-    <span class="doccomment">/// Add a new field to the type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Foo {</span>
-    <span class="doccomment">///     bar String</span>
-    <span class="doccomment">/// //  ^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_field</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field</span>);
+    <span class="doccomment">/// Add a new field to the type.
+    ///
+    /// ```ignore
+    /// type Foo {
+    ///     bar String
+    /// //  ^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>push_field(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.fields.push(field);
     }
 
-    <span class="doccomment">/// Generate a composite type rendering from the deprecated DML structure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Remove when destroying the DML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dml</span>(<span class="ident">datasource</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>, <span class="ident">dml_ct</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">dml::CompositeType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">composite_type</span> <span class="op">=</span> <span class="ident">CompositeType::new</span>(<span class="kw-2">&amp;</span><span class="ident">dml_ct</span>.<span class="ident">name</span>);
+    <span class="doccomment">/// Generate a composite type rendering from the deprecated DML structure.
+    ///
+    /// Remove when destroying the DML.
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_ct: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::CompositeType) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>composite_type = CompositeType::new(<span class="kw-2">&amp;</span>dml_ct.name);
 
-        <span class="kw">for</span> <span class="ident">dml_field</span> <span class="kw">in</span> <span class="ident">dml_ct</span>.<span class="ident">fields</span>.<span class="ident">iter</span>() {
-            <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">CompositeTypeField::from_dml</span>(<span class="ident">datasource</span>, <span class="ident">dml_field</span>));
+        <span class="kw">for </span>dml_field <span class="kw">in </span>dml_ct.fields.iter() {
+            composite_type.push_field(CompositeTypeField::from_dml(datasource, dml_field));
         }
 
-        <span class="ident">composite_type</span>
+        composite_type
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CompositeType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">docs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">documentation</span> {
-            <span class="ident">docs</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>CompositeType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = <span class="self">self</span>.documentation {
+            docs.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;type {} {{&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;type {} {{&quot;</span>, <span class="self">self</span>.name)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{field}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>field <span class="kw">in </span><span class="self">self</span>.fields.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{field}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;}\n&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;}\n&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>expect_test::expect;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::datamodel::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">kitchen_sink</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">composite_type</span> <span class="op">=</span> <span class="ident">CompositeType::new</span>(<span class="string">&quot;Address&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">documentation</span>(<span class="string">&quot;...so many tears 🎵&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>kitchen_sink() {
+        <span class="kw">let </span><span class="kw-2">mut </span>composite_type = CompositeType::new(<span class="string">&quot;Address&quot;</span>);
+        composite_type.documentation(<span class="string">&quot;...so many tears 🎵&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;Street&quot;</span>, <span class="string">&quot;String&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">native_type</span>(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;255&quot;</span>.<span class="ident">into</span>()]);
-        <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::text</span>(<span class="string">&quot;Prenzlauer Allee 193&quot;</span>));
-        <span class="ident">field</span>.<span class="ident">map</span>(<span class="string">&quot;Shield&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_required(<span class="string">&quot;Street&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        field.native_type(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;VarChar&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;255&quot;</span>.into()]);
+        field.default(DefaultValue::text(<span class="string">&quot;Prenzlauer Allee 193&quot;</span>));
+        field.map(<span class="string">&quot;Shield&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;Number&quot;</span>, <span class="string">&quot;Int&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;Number&quot;</span>, <span class="string">&quot;Int&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_optional</span>(<span class="string">&quot;City&quot;</span>, <span class="string">&quot;String&quot;</span>);
-        <span class="ident">field</span>.<span class="ident">documentation</span>(<span class="string">&quot;...soooooooo many tears 🎵&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>field = CompositeTypeField::new_optional(<span class="string">&quot;City&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        field.documentation(<span class="string">&quot;...soooooooo many tears 🎵&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_array</span>(<span class="string">&quot;Other&quot;</span>, <span class="string">&quot;String&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new_array(<span class="string">&quot;Other&quot;</span>, <span class="string">&quot;String&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;1Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;1Invalid&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField::new_required</span>(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
-        <span class="ident">composite_type</span>.<span class="ident">push_field</span>(<span class="ident">field</span>);
+        <span class="kw">let </span>field = CompositeTypeField::new_required(<span class="string">&quot;11111&quot;</span>, <span class="string">&quot;Float&quot;</span>);
+        composite_type.push_field(field);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             /// ...so many tears 🎵
             type Address {
               Street  String   @default(&quot;Prenzlauer Allee 193&quot;) @map(&quot;Shield&quot;) @db.VarChar(255)
@@ -274,9 +274,9 @@
             }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{composite_type}&quot;</span>), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{composite_type}&quot;</span>), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

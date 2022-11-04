@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/subtraction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>subtraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/subtraction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>subtraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -310,317 +310,317 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::u32_from_u128</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BigUint</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(not(u64_digit))]
+</span><span class="kw">use </span><span class="kw">super</span>::u32_from_u128;
+<span class="kw">use </span><span class="kw">super</span>::BigUint;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>::{<span class="self">self</span>, <span class="ident">BigDigit</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UsizePromotion</span>;
+<span class="kw">use </span><span class="kw">crate</span>::big_digit::{<span class="self">self</span>, BigDigit};
+<span class="kw">use </span><span class="kw">crate</span>::UsizePromotion;
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>::{<span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Sub</span>, <span class="ident">SubAssign</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">CheckedSub</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::cmp::Ordering::{Equal, Greater, Less};
+<span class="kw">use </span>core::ops::{Sub, SubAssign};
+<span class="kw">use </span>num_traits::{CheckedSub, Zero};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">use_addcarry</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86_64</span> <span class="kw">as</span> <span class="ident">arch</span>;
+<span class="attribute">#[cfg(all(use_addcarry, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+</span><span class="kw">use </span>core::arch::x86_64 <span class="kw">as </span>arch;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">use_addcarry</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86</span> <span class="kw">as</span> <span class="ident">arch</span>;
+<span class="attribute">#[cfg(all(use_addcarry, target_arch = <span class="string">&quot;x86&quot;</span>))]
+</span><span class="kw">use </span>core::arch::x86 <span class="kw">as </span>arch;
 
-<span class="comment">// Subtract with borrow:</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">use_addcarry</span>, <span class="ident">u64_digit</span>))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>: <span class="ident">u8</span>, <span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u64</span>) -&gt; <span class="ident">u8</span> {
-    <span class="comment">// Safety: There are absolutely no safety concerns with calling `_subborrow_u64`.</span>
-    <span class="comment">// It&#39;s just unsafe for API consistency with other intrinsics.</span>
-    <span class="kw">unsafe</span> { <span class="ident">arch::_subborrow_u64</span>(<span class="ident">borrow</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">out</span>) }
+<span class="comment">// Subtract with borrow:
+</span><span class="attribute">#[cfg(all(use_addcarry, u64_digit))]
+#[inline]
+</span><span class="kw">fn </span>sbb(borrow: u8, a: u64, b: u64, out: <span class="kw-2">&amp;mut </span>u64) -&gt; u8 {
+    <span class="comment">// Safety: There are absolutely no safety concerns with calling `_subborrow_u64`.
+    // It&#39;s just unsafe for API consistency with other intrinsics.
+    </span><span class="kw">unsafe </span>{ arch::_subborrow_u64(borrow, a, b, out) }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">use_addcarry</span>, <span class="ident">not</span>(<span class="ident">u64_digit</span>)))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>: <span class="ident">u8</span>, <span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">u8</span> {
-    <span class="comment">// Safety: There are absolutely no safety concerns with calling `_subborrow_u32`.</span>
-    <span class="comment">// It&#39;s just unsafe for API consistency with other intrinsics.</span>
-    <span class="kw">unsafe</span> { <span class="ident">arch::_subborrow_u32</span>(<span class="ident">borrow</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">out</span>) }
+<span class="attribute">#[cfg(all(use_addcarry, not(u64_digit)))]
+#[inline]
+</span><span class="kw">fn </span>sbb(borrow: u8, a: u32, b: u32, out: <span class="kw-2">&amp;mut </span>u32) -&gt; u8 {
+    <span class="comment">// Safety: There are absolutely no safety concerns with calling `_subborrow_u32`.
+    // It&#39;s just unsafe for API consistency with other intrinsics.
+    </span><span class="kw">unsafe </span>{ arch::_subborrow_u32(borrow, a, b, out) }
 }
 
-<span class="comment">// fallback for environments where we don&#39;t have a subborrow intrinsic</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">use_addcarry</span>))]</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>: <span class="ident">u8</span>, <span class="ident">a</span>: <span class="ident">BigDigit</span>, <span class="ident">b</span>: <span class="ident">BigDigit</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigDigit</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit::SignedDoubleBigDigit</span>;
+<span class="comment">// fallback for environments where we don&#39;t have a subborrow intrinsic
+</span><span class="attribute">#[cfg(not(use_addcarry))]
+#[inline]
+</span><span class="kw">fn </span>sbb(borrow: u8, a: BigDigit, b: BigDigit, out: <span class="kw-2">&amp;mut </span>BigDigit) -&gt; u8 {
+    <span class="kw">use </span><span class="kw">crate</span>::big_digit::SignedDoubleBigDigit;
 
-    <span class="kw">let</span> <span class="ident">difference</span> <span class="op">=</span> <span class="ident">SignedDoubleBigDigit::from</span>(<span class="ident">a</span>)
-        <span class="op">-</span> <span class="ident">SignedDoubleBigDigit::from</span>(<span class="ident">b</span>)
-        <span class="op">-</span> <span class="ident">SignedDoubleBigDigit::from</span>(<span class="ident">borrow</span>);
-    <span class="kw-2">*</span><span class="ident">out</span> <span class="op">=</span> <span class="ident">difference</span> <span class="kw">as</span> <span class="ident">BigDigit</span>;
-    <span class="ident">u8::from</span>(<span class="ident">difference</span> <span class="op">&lt;</span> <span class="number">0</span>)
+    <span class="kw">let </span>difference = SignedDoubleBigDigit::from(a)
+        - SignedDoubleBigDigit::from(b)
+        - SignedDoubleBigDigit::from(borrow);
+    <span class="kw-2">*</span>out = difference <span class="kw">as </span>BigDigit;
+    u8::from(difference &lt; <span class="number">0</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">sub2</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>sub2(a: <span class="kw-2">&amp;mut </span>[BigDigit], b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>borrow = <span class="number">0</span>;
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">Ord::min</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">b</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> (<span class="ident">a_lo</span>, <span class="ident">a_hi</span>) <span class="op">=</span> <span class="ident">a</span>.<span class="ident">split_at_mut</span>(<span class="ident">len</span>);
-    <span class="kw">let</span> (<span class="ident">b_lo</span>, <span class="ident">b_hi</span>) <span class="op">=</span> <span class="ident">b</span>.<span class="ident">split_at</span>(<span class="ident">len</span>);
+    <span class="kw">let </span>len = Ord::min(a.len(), b.len());
+    <span class="kw">let </span>(a_lo, a_hi) = a.split_at_mut(len);
+    <span class="kw">let </span>(b_lo, b_hi) = b.split_at(len);
 
-    <span class="kw">for</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">a_lo</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b_lo</span>) {
-        <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>, <span class="kw-2">*</span><span class="ident">a</span>, <span class="kw-2">*</span><span class="ident">b</span>, <span class="ident">a</span>);
+    <span class="kw">for </span>(a, b) <span class="kw">in </span>a_lo.iter_mut().zip(b_lo) {
+        borrow = sbb(borrow, <span class="kw-2">*</span>a, <span class="kw-2">*</span>b, a);
     }
 
-    <span class="kw">if</span> <span class="ident">borrow</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="ident">a_hi</span> {
-            <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>, <span class="kw-2">*</span><span class="ident">a</span>, <span class="number">0</span>, <span class="ident">a</span>);
-            <span class="kw">if</span> <span class="ident">borrow</span> <span class="op">==</span> <span class="number">0</span> {
+    <span class="kw">if </span>borrow != <span class="number">0 </span>{
+        <span class="kw">for </span>a <span class="kw">in </span>a_hi {
+            borrow = sbb(borrow, <span class="kw-2">*</span>a, <span class="number">0</span>, a);
+            <span class="kw">if </span>borrow == <span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="comment">// note: we&#39;re _required_ to fail on underflow</span>
-    <span class="macro">assert!</span>(
-        <span class="ident">borrow</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">b_hi</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>),
-        <span class="string">&quot;Cannot subtract b from a because b is larger than a.&quot;</span>
-    );
+    <span class="comment">// note: we&#39;re _required_ to fail on underflow
+    </span><span class="macro">assert!</span>(
+        borrow == <span class="number">0 </span>&amp;&amp; b_hi.iter().all(|x| <span class="kw-2">*</span>x == <span class="number">0</span>),
+        <span class="string">&quot;Cannot subtract b from a because b is larger than a.&quot;
+    </span>);
 }
 
-<span class="comment">// Only for the Sub impl. `a` and `b` must have same length.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">__sub2rev</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>]) -&gt; <span class="ident">u8</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">a</span>.<span class="ident">len</span>());
+<span class="comment">// Only for the Sub impl. `a` and `b` must have same length.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>__sub2rev(a: <span class="kw-2">&amp;</span>[BigDigit], b: <span class="kw-2">&amp;mut </span>[BigDigit]) -&gt; u8 {
+    <span class="macro">debug_assert!</span>(b.len() == a.len());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>borrow = <span class="number">0</span>;
 
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">b</span>) {
-        <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">sbb</span>(<span class="ident">borrow</span>, <span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">*</span><span class="ident">bi</span>, <span class="ident">bi</span>);
+    <span class="kw">for </span>(ai, bi) <span class="kw">in </span>a.iter().zip(b) {
+        borrow = sbb(borrow, <span class="kw-2">*</span>ai, <span class="kw-2">*</span>bi, bi);
     }
 
-    <span class="ident">borrow</span>
+    borrow
 }
 
-<span class="kw">fn</span> <span class="ident">sub2rev</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>]) {
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">a</span>.<span class="ident">len</span>());
+<span class="kw">fn </span>sub2rev(a: <span class="kw-2">&amp;</span>[BigDigit], b: <span class="kw-2">&amp;mut </span>[BigDigit]) {
+    <span class="macro">debug_assert!</span>(b.len() &gt;= a.len());
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">Ord::min</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">b</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> (<span class="ident">a_lo</span>, <span class="ident">a_hi</span>) <span class="op">=</span> <span class="ident">a</span>.<span class="ident">split_at</span>(<span class="ident">len</span>);
-    <span class="kw">let</span> (<span class="ident">b_lo</span>, <span class="ident">b_hi</span>) <span class="op">=</span> <span class="ident">b</span>.<span class="ident">split_at_mut</span>(<span class="ident">len</span>);
+    <span class="kw">let </span>len = Ord::min(a.len(), b.len());
+    <span class="kw">let </span>(a_lo, a_hi) = a.split_at(len);
+    <span class="kw">let </span>(b_lo, b_hi) = b.split_at_mut(len);
 
-    <span class="kw">let</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">__sub2rev</span>(<span class="ident">a_lo</span>, <span class="ident">b_lo</span>);
+    <span class="kw">let </span>borrow = __sub2rev(a_lo, b_lo);
 
-    <span class="macro">assert!</span>(<span class="ident">a_hi</span>.<span class="ident">is_empty</span>());
+    <span class="macro">assert!</span>(a_hi.is_empty());
 
-    <span class="comment">// note: we&#39;re _required_ to fail on underflow</span>
-    <span class="macro">assert!</span>(
-        <span class="ident">borrow</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">b_hi</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>),
-        <span class="string">&quot;Cannot subtract b from a because b is larger than a.&quot;</span>
-    );
+    <span class="comment">// note: we&#39;re _required_ to fail on underflow
+    </span><span class="macro">assert!</span>(
+        borrow == <span class="number">0 </span>&amp;&amp; b_hi.iter().all(|x| <span class="kw-2">*</span>x == <span class="number">0</span>),
+        <span class="string">&quot;Cannot subtract b from a because b is larger than a.&quot;
+    </span>);
 }
 
-<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
-<span class="macro">forward_ref_ref_binop!</span>(<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub_assign</span>);
+<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl </span>Sub <span class="kw">for </span>BigUint, sub);
+<span class="macro">forward_ref_ref_binop!</span>(<span class="kw">impl </span>Sub <span class="kw">for </span>BigUint, sub);
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>SubAssign <span class="kw">for </span>BigUint, sub_assign);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sub&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
+    <span class="kw">fn </span>sub(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigUint) -&gt; BigUint {
+        <span class="self">self </span>-= other;
+        <span class="self">self
+    </span>}
+}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SubAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint) {
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>other.data[..]);
+        <span class="self">self</span>.normalize();
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span>) {
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>[..]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
-}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sub&lt;BigUint&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> <span class="ident">other_len</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">other_len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">lo_borrow</span> <span class="op">=</span> <span class="ident">__sub2rev</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..<span class="ident">other_len</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>);
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">other_len</span>..]);
-            <span class="kw">if</span> <span class="ident">lo_borrow</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[<span class="ident">other_len</span>..], <span class="kw-2">&amp;</span>[<span class="number">1</span>])
+    <span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">let </span>other_len = other.data.len();
+        <span class="kw">if </span>other_len &lt; <span class="self">self</span>.data.len() {
+            <span class="kw">let </span>lo_borrow = __sub2rev(<span class="kw-2">&amp;</span><span class="self">self</span>.data[..other_len], <span class="kw-2">&amp;mut </span>other.data);
+            other.data.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.data[other_len..]);
+            <span class="kw">if </span>lo_borrow != <span class="number">0 </span>{
+                sub2(<span class="kw-2">&amp;mut </span>other.data[other_len..], <span class="kw-2">&amp;</span>[<span class="number">1</span>])
             }
-        } <span class="kw">else</span> {
-            <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
+        } <span class="kw">else </span>{
+            sub2rev(<span class="kw-2">&amp;</span><span class="self">self</span>.data[..], <span class="kw-2">&amp;mut </span>other.data[..]);
         }
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
+        other.normalized()
     }
 }
 
-<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
-<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub_assign</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">sub</span>);
+<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl </span>Sub <span class="kw">for </span>BigUint, sub);
+<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl </span>SubAssign <span class="kw">for </span>BigUint, sub_assign);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u32&gt; <span class="kw">for </span>BigUint, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u64&gt; <span class="kw">for </span>BigUint, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u128&gt; <span class="kw">for </span>BigUint, sub);
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Sub&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="kw-2">mut </span><span class="self">self</span>, other: u32) -&gt; BigUint {
+        <span class="self">self </span>-= other;
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>SubAssign&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u32) {
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>[other <span class="kw">as </span>BigDigit]);
+        <span class="self">self</span>.normalize();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) {
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span>[<span class="ident">other</span> <span class="kw">as</span> <span class="ident">BigDigit</span>]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
-}
+<span class="kw">impl </span>Sub&lt;BigUint&gt; <span class="kw">for </span>u32 {
+    <span class="kw">type </span>Output = BigUint;
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="self">self</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">if </span>other.data.len() == <span class="number">0 </span>{
+            other.data.push(<span class="self">self</span>);
+        } <span class="kw">else </span>{
+            sub2rev(<span class="kw-2">&amp;</span>[<span class="self">self</span>], <span class="kw-2">&amp;mut </span>other.data[..]);
         }
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
+        other.normalized()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="self">self</span> <span class="kw">as</span> <span class="ident">BigDigit</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span> <span class="kw">as</span> <span class="ident">BigDigit</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">if </span>other.data.is_empty() {
+            other.data.push(<span class="self">self </span><span class="kw">as </span>BigDigit);
+        } <span class="kw">else </span>{
+            sub2rev(<span class="kw-2">&amp;</span>[<span class="self">self </span><span class="kw">as </span>BigDigit], <span class="kw-2">&amp;mut </span>other.data[..]);
         }
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
+        other.normalized()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Sub&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="kw-2">mut </span><span class="self">self</span>, other: u64) -&gt; BigUint {
+        <span class="self">self </span>-= other;
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>SubAssign&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(other);
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>[lo, hi]);
+        <span class="self">self</span>.normalize();
+    }
+
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>[other <span class="kw">as </span>BigDigit]);
+        <span class="self">self</span>.normalize();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">other</span>);
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
+<span class="kw">impl </span>Sub&lt;BigUint&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span>[<span class="ident">other</span> <span class="kw">as</span> <span class="ident">BigDigit</span>]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">while</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
-        }
-
-        <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="self">self</span>);
-        <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">if</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="self">self</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="self">self</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
-        }
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) <span class="op">=</span> <span class="ident">u32_from_u128</span>(<span class="ident">other</span>);
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span>[<span class="ident">d</span>, <span class="ident">c</span>, <span class="ident">b</span>, <span class="ident">a</span>]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">other</span>);
-        <span class="ident">sub2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..], <span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>]);
-        <span class="self">self</span>.<span class="ident">normalize</span>();
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u128</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">while</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">while </span>other.data.len() &lt; <span class="number">2 </span>{
+            other.data.push(<span class="number">0</span>);
         }
 
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) <span class="op">=</span> <span class="ident">u32_from_u128</span>(<span class="self">self</span>);
-        <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="ident">d</span>, <span class="ident">c</span>, <span class="ident">b</span>, <span class="ident">a</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
+        <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(<span class="self">self</span>);
+        sub2rev(<span class="kw-2">&amp;</span>[lo, hi], <span class="kw-2">&amp;mut </span>other.data[..]);
+        other.normalized()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">while</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
-            <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="number">0</span>);
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">if </span>other.data.is_empty() {
+            other.data.push(<span class="self">self</span>);
+        } <span class="kw">else </span>{
+            sub2rev(<span class="kw-2">&amp;</span>[<span class="self">self</span>], <span class="kw-2">&amp;mut </span>other.data[..]);
         }
-
-        <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="self">self</span>);
-        <span class="ident">sub2rev</span>(<span class="kw-2">&amp;</span>[<span class="ident">lo</span>, <span class="ident">hi</span>], <span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">data</span>[..]);
-        <span class="ident">other</span>.<span class="ident">normalized</span>()
+        other.normalized()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedSub</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">v</span>) {
-            <span class="ident">Less</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Equal</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Zero::zero</span>()),
-            <span class="ident">Greater</span> =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">sub</span>(<span class="ident">v</span>)),
+<span class="kw">impl </span>Sub&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="kw-2">mut </span><span class="self">self</span>, other: u128) -&gt; BigUint {
+        <span class="self">self </span>-= other;
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>SubAssign&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw">let </span>(a, b, c, d) = u32_from_u128(other);
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>[d, c, b, a]);
+        <span class="self">self</span>.normalize();
+    }
+
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(other);
+        sub2(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..], <span class="kw-2">&amp;</span>[lo, hi]);
+        <span class="self">self</span>.normalize();
+    }
+}
+
+<span class="kw">impl </span>Sub&lt;BigUint&gt; <span class="kw">for </span>u128 {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">while </span>other.data.len() &lt; <span class="number">4 </span>{
+            other.data.push(<span class="number">0</span>);
+        }
+
+        <span class="kw">let </span>(a, b, c, d) = u32_from_u128(<span class="self">self</span>);
+        sub2rev(<span class="kw-2">&amp;</span>[d, c, b, a], <span class="kw-2">&amp;mut </span>other.data[..]);
+        other.normalized()
+    }
+
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, <span class="kw-2">mut </span>other: BigUint) -&gt; BigUint {
+        <span class="kw">while </span>other.data.len() &lt; <span class="number">2 </span>{
+            other.data.push(<span class="number">0</span>);
+        }
+
+        <span class="kw">let </span>(hi, lo) = big_digit::from_doublebigdigit(<span class="self">self</span>);
+        sub2rev(<span class="kw-2">&amp;</span>[lo, hi], <span class="kw-2">&amp;mut </span>other.data[..]);
+        other.normalized()
+    }
+}
+
+<span class="kw">impl </span>CheckedSub <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>BigUint) -&gt; <span class="prelude-ty">Option</span>&lt;BigUint&gt; {
+        <span class="kw">match </span><span class="self">self</span>.cmp(v) {
+            Less =&gt; <span class="prelude-val">None</span>,
+            Equal =&gt; <span class="prelude-val">Some</span>(Zero::zero()),
+            Greater =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.sub(v)),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

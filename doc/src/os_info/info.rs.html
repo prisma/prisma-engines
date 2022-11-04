@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/info.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>info.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -309,316 +309,316 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><pre class="rust"><code><span class="comment">// spell-checker:ignore itertools, iproduct, bitnesses</span>
+</pre><pre class="rust"><code><span class="comment">// spell-checker:ignore itertools, iproduct, bitnesses
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display, Formatter};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Bitness</span>, <span class="ident">Type</span>, <span class="ident">Version</span>};
+<span class="kw">use super</span>::{Bitness, Type, Version};
 
-<span class="doccomment">/// Holds information about operating system (type, version, etc.).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The best way to get string representation of the operation system information is to use its</span>
-<span class="doccomment">/// `Display` implementation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use os_info;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let info = os_info::get();</span>
-<span class="doccomment">/// println!(&quot;OS information: {}&quot;, info);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Info</span> {
-    <span class="doccomment">/// Operating system type. See `Type` for details.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">os_type</span>: <span class="ident">Type</span>,
-    <span class="doccomment">/// Operating system version. See `Version` for details.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">version</span>: <span class="ident">Version</span>,
-    <span class="doccomment">/// Operating system edition.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">edition</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Operating system edition.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">codename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Operating system architecture in terms of how many bits compose the basic values it can deal</span>
-    <span class="doccomment">/// with. See `Bitness` for details.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">bitness</span>: <span class="ident">Bitness</span>,
+<span class="doccomment">/// Holds information about operating system (type, version, etc.).
+///
+/// The best way to get string representation of the operation system information is to use its
+/// `Display` implementation.
+///
+/// # Examples
+///
+/// ```
+/// use os_info;
+///
+/// let info = os_info::get();
+/// println!(&quot;OS information: {}&quot;, info);
+/// ```
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+</span><span class="kw">pub struct </span>Info {
+    <span class="doccomment">/// Operating system type. See `Type` for details.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) os_type: Type,
+    <span class="doccomment">/// Operating system version. See `Version` for details.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) version: Version,
+    <span class="doccomment">/// Operating system edition.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) edition: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Operating system edition.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) codename: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// Operating system architecture in terms of how many bits compose the basic values it can deal
+    /// with. See `Bitness` for details.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) bitness: Bitness,
 }
 
-<span class="kw">impl</span> <span class="ident">Info</span> {
-    <span class="doccomment">/// Constructs a new `Info` instance with unknown type, version and bitness.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::{Info, Type, Version, Bitness};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(Type::Unknown, info.os_type());</span>
-    <span class="doccomment">/// assert_eq!(&amp;Version::Unknown, info.version());</span>
-    <span class="doccomment">/// assert_eq!(None, info.edition());</span>
-    <span class="doccomment">/// assert_eq!(None, info.codename());</span>
-    <span class="doccomment">/// assert_eq!(Bitness::Unknown, info.bitness());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unknown</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">os_type</span>: <span class="ident">Type::Unknown</span>,
-            <span class="ident">version</span>: <span class="ident">Version::Unknown</span>,
-            <span class="ident">edition</span>: <span class="prelude-val">None</span>,
-            <span class="ident">codename</span>: <span class="prelude-val">None</span>,
-            <span class="ident">bitness</span>: <span class="ident">Bitness::Unknown</span>,
+<span class="kw">impl </span>Info {
+    <span class="doccomment">/// Constructs a new `Info` instance with unknown type, version and bitness.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::{Info, Type, Version, Bitness};
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(Type::Unknown, info.os_type());
+    /// assert_eq!(&amp;Version::Unknown, info.version());
+    /// assert_eq!(None, info.edition());
+    /// assert_eq!(None, info.codename());
+    /// assert_eq!(Bitness::Unknown, info.bitness());
+    /// ```
+    </span><span class="kw">pub fn </span>unknown() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            os_type: Type::Unknown,
+            version: Version::Unknown,
+            edition: <span class="prelude-val">None</span>,
+            codename: <span class="prelude-val">None</span>,
+            bitness: Bitness::Unknown,
         }
     }
 
-    <span class="doccomment">/// Constructs a new `Info` instance with the specified operating system type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::{Info, Type, Version, Bitness};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let os_type = Type::Linux;</span>
-    <span class="doccomment">/// let info = Info::with_type(os_type);</span>
-    <span class="doccomment">/// assert_eq!(os_type, info.os_type());</span>
-    <span class="doccomment">/// assert_eq!(&amp;Version::Unknown, info.version());</span>
-    <span class="doccomment">/// assert_eq!(None, info.edition());</span>
-    <span class="doccomment">/// assert_eq!(None, info.codename());</span>
-    <span class="doccomment">/// assert_eq!(Bitness::Unknown, info.bitness());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_type</span>(<span class="ident">os_type</span>: <span class="ident">Type</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">os_type</span>,
-            ..<span class="ident">Default::default</span>()
+    <span class="doccomment">/// Constructs a new `Info` instance with the specified operating system type.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::{Info, Type, Version, Bitness};
+    ///
+    /// let os_type = Type::Linux;
+    /// let info = Info::with_type(os_type);
+    /// assert_eq!(os_type, info.os_type());
+    /// assert_eq!(&amp;Version::Unknown, info.version());
+    /// assert_eq!(None, info.edition());
+    /// assert_eq!(None, info.codename());
+    /// assert_eq!(Bitness::Unknown, info.bitness());
+    /// ```
+    </span><span class="kw">pub fn </span>with_type(os_type: Type) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            os_type,
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// Returns operating system type. See `Type` for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::{Info, Type};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(Type::Unknown, info.os_type());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">os_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span> {
-        <span class="self">self</span>.<span class="ident">os_type</span>
+    <span class="doccomment">/// Returns operating system type. See `Type` for details.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::{Info, Type};
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(Type::Unknown, info.os_type());
+    /// ```
+    </span><span class="kw">pub fn </span>os_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type {
+        <span class="self">self</span>.os_type
     }
 
-    <span class="doccomment">/// Returns operating system version. See `Version` for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::{Info, Version};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(&amp;Version::Unknown, info.version());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Version</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">version</span>
+    <span class="doccomment">/// Returns operating system version. See `Version` for details.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::{Info, Version};
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(&amp;Version::Unknown, info.version());
+    /// ```
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Version {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.version
     }
 
-    <span class="doccomment">/// Returns optional operation system edition.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::Info;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(None, info.edition());</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edition</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_ref</span>)
+    <span class="doccomment">/// Returns optional operation system edition.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::Info;
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(None, info.edition());
+    </span><span class="kw">pub fn </span>edition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.edition.as_ref().map(String::as_ref)
     }
 
-    <span class="doccomment">/// Returns optional operation system &#39;codename&#39;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::Info;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(None, info.codename());</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">codename</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">codename</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">String::as_ref</span>)
+    <span class="doccomment">/// Returns optional operation system &#39;codename&#39;.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::Info;
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(None, info.codename());
+    </span><span class="kw">pub fn </span>codename(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.codename.as_ref().map(String::as_ref)
     }
 
-    <span class="doccomment">/// Returns operating system bitness. See `Bitness` for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use os_info::{Info, Bitness};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let info = Info::unknown();</span>
-    <span class="doccomment">/// assert_eq!(Bitness::Unknown, info.bitness());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitness</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Bitness</span> {
-        <span class="self">self</span>.<span class="ident">bitness</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Info</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::unknown</span>()
+    <span class="doccomment">/// Returns operating system bitness. See `Bitness` for details.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use os_info::{Info, Bitness};
+    ///
+    /// let info = Info::unknown();
+    /// assert_eq!(Bitness::Unknown, info.bitness());
+    /// ```
+    </span><span class="kw">pub fn </span>bitness(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Bitness {
+        <span class="self">self</span>.bitness
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Info</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">os_type</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Version::Unknown</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {}&quot;</span>, <span class="self">self</span>.<span class="ident">version</span>)<span class="question-mark">?</span>;
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">edition</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">edition</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; ({})&quot;</span>, <span class="ident">edition</span>)<span class="question-mark">?</span>;
-        }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">codename</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codename</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; ({})&quot;</span>, <span class="ident">codename</span>)<span class="question-mark">?</span>;
-        }
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; [{}]&quot;</span>, <span class="self">self</span>.<span class="ident">bitness</span>)
+<span class="kw">impl </span>Default <span class="kw">for </span>Info {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::unknown()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+<span class="kw">impl </span>Display <span class="kw">for </span>Info {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.os_type)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.version != Version::Unknown {
+            <span class="macro">write!</span>(f, <span class="string">&quot; {}&quot;</span>, <span class="self">self</span>.version)<span class="question-mark">?</span>;
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>edition) = <span class="self">self</span>.edition {
+            <span class="macro">write!</span>(f, <span class="string">&quot; ({})&quot;</span>, edition)<span class="question-mark">?</span>;
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>codename) = <span class="self">self</span>.codename {
+            <span class="macro">write!</span>(f, <span class="string">&quot; ({})&quot;</span>, codename)<span class="question-mark">?</span>;
+        }
+        <span class="macro">write!</span>(f, <span class="string">&quot; [{}]&quot;</span>, <span class="self">self</span>.bitness)
+    }
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">unknown</span>() {
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">Info::unknown</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">Type::Unknown</span>, <span class="ident">info</span>.<span class="ident">os_type</span>());
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">Version::Unknown</span>, <span class="ident">info</span>.<span class="ident">version</span>());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">info</span>.<span class="ident">edition</span>());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">info</span>.<span class="ident">codename</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Bitness::Unknown</span>, <span class="ident">info</span>.<span class="ident">bitness</span>());
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>pretty_assertions::assert_eq;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>unknown() {
+        <span class="kw">let </span>info = Info::unknown();
+        <span class="macro">assert_eq!</span>(Type::Unknown, info.os_type());
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Version::Unknown, info.version());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, info.edition());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, info.codename());
+        <span class="macro">assert_eq!</span>(Bitness::Unknown, info.bitness());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_type</span>() {
-        <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> [
-            <span class="ident">Type::Redox</span>,
-            <span class="ident">Type::Alpine</span>,
-            <span class="ident">Type::Amazon</span>,
-            <span class="ident">Type::Android</span>,
-            <span class="ident">Type::Arch</span>,
-            <span class="ident">Type::CentOS</span>,
-            <span class="ident">Type::Debian</span>,
-            <span class="ident">Type::Emscripten</span>,
-            <span class="ident">Type::EndeavourOS</span>,
-            <span class="ident">Type::Fedora</span>,
-            <span class="ident">Type::Gentoo</span>,
-            <span class="ident">Type::Linux</span>,
-            <span class="ident">Type::Macos</span>,
-            <span class="ident">Type::Manjaro</span>,
-            <span class="ident">Type::Mariner</span>,
-            <span class="ident">Type::NixOS</span>,
-            <span class="ident">Type::openSUSE</span>,
-            <span class="ident">Type::OracleLinux</span>,
-            <span class="ident">Type::Pop</span>,
-            <span class="ident">Type::Redhat</span>,
-            <span class="ident">Type::RedHatEnterprise</span>,
-            <span class="ident">Type::Redox</span>,
-            <span class="ident">Type::Solus</span>,
-            <span class="ident">Type::SUSE</span>,
-            <span class="ident">Type::Ubuntu</span>,
-            <span class="ident">Type::Mint</span>,
-            <span class="ident">Type::Unknown</span>,
-            <span class="ident">Type::Windows</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>with_type() {
+        <span class="kw">let </span>types = [
+            Type::Redox,
+            Type::Alpine,
+            Type::Amazon,
+            Type::Android,
+            Type::Arch,
+            Type::CentOS,
+            Type::Debian,
+            Type::Emscripten,
+            Type::EndeavourOS,
+            Type::Fedora,
+            Type::Gentoo,
+            Type::Linux,
+            Type::Macos,
+            Type::Manjaro,
+            Type::Mariner,
+            Type::NixOS,
+            Type::openSUSE,
+            Type::OracleLinux,
+            Type::Pop,
+            Type::Redhat,
+            Type::RedHatEnterprise,
+            Type::Redox,
+            Type::Solus,
+            Type::SUSE,
+            Type::Ubuntu,
+            Type::Mint,
+            Type::Unknown,
+            Type::Windows,
         ];
 
-        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">types</span> {
-            <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">Info::with_type</span>(<span class="kw-2">*</span><span class="ident">t</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">t</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">os_type</span>());
+        <span class="kw">for </span>t <span class="kw">in </span><span class="kw-2">&amp;</span>types {
+            <span class="kw">let </span>info = Info::with_type(<span class="kw-2">*</span>t);
+            <span class="macro">assert_eq!</span>(t, <span class="kw-2">&amp;</span>info.os_type());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Info::default</span>(), <span class="ident">Info::unknown</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default() {
+        <span class="macro">assert_eq!</span>(Info::default(), Info::unknown());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">display</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
-            <span class="comment">// All unknown.</span>
-            (<span class="ident">Info::unknown</span>(), <span class="string">&quot;Unknown [unknown bitness]&quot;</span>),
-            <span class="comment">// Type.</span>
-            (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Redox</span>,
-                    ..<span class="ident">Default::default</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>display() {
+        <span class="kw">let </span>data = [
+            <span class="comment">// All unknown.
+            </span>(Info::unknown(), <span class="string">&quot;Unknown [unknown bitness]&quot;</span>),
+            <span class="comment">// Type.
+            </span>(
+                Info {
+                    os_type: Type::Redox,
+                    ..Default::default()
                 },
                 <span class="string">&quot;Redox [unknown bitness]&quot;</span>,
             ),
-            <span class="comment">// Type and version.</span>
-            (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Linux</span>,
-                    <span class="ident">version</span>: <span class="ident">Version::Semantic</span>(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>),
-                    ..<span class="ident">Default::default</span>()
+            <span class="comment">// Type and version.
+            </span>(
+                Info {
+                    os_type: Type::Linux,
+                    version: Version::Semantic(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>),
+                    ..Default::default()
                 },
                 <span class="string">&quot;Linux 2.3.4 [unknown bitness]&quot;</span>,
             ),
             (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Arch</span>,
-                    <span class="ident">version</span>: <span class="ident">Version::Rolling</span>(<span class="prelude-val">None</span>),
-                    ..<span class="ident">Default::default</span>()
+                Info {
+                    os_type: Type::Arch,
+                    version: Version::Rolling(<span class="prelude-val">None</span>),
+                    ..Default::default()
                 },
                 <span class="string">&quot;Arch Linux Rolling Release [unknown bitness]&quot;</span>,
             ),
             (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Manjaro</span>,
-                    <span class="ident">version</span>: <span class="ident">Version::Rolling</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;2020.05.24&quot;</span>.<span class="ident">to_owned</span>())),
-                    ..<span class="ident">Default::default</span>()
+                Info {
+                    os_type: Type::Manjaro,
+                    version: Version::Rolling(<span class="prelude-val">Some</span>(<span class="string">&quot;2020.05.24&quot;</span>.to_owned())),
+                    ..Default::default()
                 },
                 <span class="string">&quot;Manjaro Rolling Release (2020.05.24) [unknown bitness]&quot;</span>,
             ),
             (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Windows</span>,
-                    <span class="ident">version</span>: <span class="ident">Version::Custom</span>(<span class="string">&quot;Special Version&quot;</span>.<span class="ident">to_owned</span>()),
-                    ..<span class="ident">Default::default</span>()
+                Info {
+                    os_type: Type::Windows,
+                    version: Version::Custom(<span class="string">&quot;Special Version&quot;</span>.to_owned()),
+                    ..Default::default()
                 },
                 <span class="string">&quot;Windows Special Version [unknown bitness]&quot;</span>,
             ),
-            <span class="comment">// Bitness.</span>
-            (
-                <span class="ident">Info</span> {
-                    <span class="ident">bitness</span>: <span class="ident">Bitness::X32</span>,
-                    ..<span class="ident">Default::default</span>()
+            <span class="comment">// Bitness.
+            </span>(
+                Info {
+                    bitness: Bitness::X32,
+                    ..Default::default()
                 },
                 <span class="string">&quot;Unknown [32-bit]&quot;</span>,
             ),
             (
-                <span class="ident">Info</span> {
-                    <span class="ident">bitness</span>: <span class="ident">Bitness::X64</span>,
-                    ..<span class="ident">Default::default</span>()
+                Info {
+                    bitness: Bitness::X64,
+                    ..Default::default()
                 },
                 <span class="string">&quot;Unknown [64-bit]&quot;</span>,
             ),
-            <span class="comment">// All info.</span>
-            (
-                <span class="ident">Info</span> {
-                    <span class="ident">os_type</span>: <span class="ident">Type::Macos</span>,
-                    <span class="ident">version</span>: <span class="ident">Version::Semantic</span>(<span class="number">10</span>, <span class="number">2</span>, <span class="number">0</span>),
-                    <span class="ident">edition</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;edition&quot;</span>.<span class="ident">to_owned</span>()),
-                    <span class="ident">codename</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;codename&quot;</span>.<span class="ident">to_owned</span>()),
-                    <span class="ident">bitness</span>: <span class="ident">Bitness::X64</span>,
+            <span class="comment">// All info.
+            </span>(
+                Info {
+                    os_type: Type::Macos,
+                    version: Version::Semantic(<span class="number">10</span>, <span class="number">2</span>, <span class="number">0</span>),
+                    edition: <span class="prelude-val">Some</span>(<span class="string">&quot;edition&quot;</span>.to_owned()),
+                    codename: <span class="prelude-val">Some</span>(<span class="string">&quot;codename&quot;</span>.to_owned()),
+                    bitness: Bitness::X64,
                 },
                 <span class="string">&quot;Mac OS 10.2.0 (edition) (codename) [64-bit]&quot;</span>,
             ),
         ];
 
-        <span class="kw">for</span> (<span class="ident">info</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="kw-2">&amp;</span><span class="ident">info</span>.<span class="ident">to_string</span>());
+        <span class="kw">for </span>(info, expected) <span class="kw">in </span><span class="kw-2">&amp;</span>data {
+            <span class="macro">assert_eq!</span>(expected, <span class="kw-2">&amp;</span>info.to_string());
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

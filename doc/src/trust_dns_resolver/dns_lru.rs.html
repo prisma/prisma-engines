@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/dns_lru.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_lru.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/dns_lru.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_lru.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -668,675 +668,675 @@
 <span id="668">668</span>
 <span id="669">669</span>
 <span id="670">670</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! An LRU cache designed for work with DNS lookups</span>
+</span><span class="doccomment">//! An LRU cache designed for work with DNS lookups
 
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+</span><span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="kw">use</span> <span class="ident">lru_cache::LruCache</span>;
-<span class="kw">use</span> <span class="ident">parking_lot::Mutex</span>;
+<span class="kw">use </span>lru_cache::LruCache;
+<span class="kw">use </span>parking_lot::Mutex;
 
-<span class="kw">use</span> <span class="ident">proto::op::Query</span>;
-<span class="kw">use</span> <span class="ident">proto::rr::Record</span>;
+<span class="kw">use </span>proto::op::Query;
+<span class="kw">use </span>proto::rr::Record;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup::Lookup</span>;
+<span class="kw">use </span><span class="kw">crate</span>::config;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::lookup::Lookup;
 
-<span class="doccomment">/// Maximum TTL as defined in https://tools.ietf.org/html/rfc2181, 2147483647</span>
-<span class="doccomment">///   Setting this to a value of 1 day, in seconds</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_TTL</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">86400_u32</span>;
+<span class="doccomment">/// Maximum TTL as defined in https://tools.ietf.org/html/rfc2181, 2147483647
+///   Setting this to a value of 1 day, in seconds
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_TTL: u32 = <span class="number">86400_u32</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">LruValue</span> {
-    <span class="comment">// In the None case, this represents an NXDomain</span>
-    <span class="ident">lookup</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>,
-    <span class="ident">valid_until</span>: <span class="ident">Instant</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>LruValue {
+    <span class="comment">// In the None case, this represents an NXDomain
+    </span>lookup: <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;,
+    valid_until: Instant,
 }
 
-<span class="kw">impl</span> <span class="ident">LruValue</span> {
-    <span class="doccomment">/// Returns true if this set of ips is still valid</span>
-    <span class="kw">fn</span> <span class="ident">is_current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">now</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">valid_until</span>
+<span class="kw">impl </span>LruValue {
+    <span class="doccomment">/// Returns true if this set of ips is still valid
+    </span><span class="kw">fn </span>is_current(<span class="kw-2">&amp;</span><span class="self">self</span>, now: Instant) -&gt; bool {
+        now &lt;= <span class="self">self</span>.valid_until
     }
 
-    <span class="doccomment">/// Returns the ttl as a Duration of time remaining.</span>
-    <span class="kw">fn</span> <span class="ident">ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">valid_until</span>.<span class="ident">saturating_duration_since</span>(<span class="ident">now</span>)
+    <span class="doccomment">/// Returns the ttl as a Duration of time remaining.
+    </span><span class="kw">fn </span>ttl(<span class="kw-2">&amp;</span><span class="self">self</span>, now: Instant) -&gt; Duration {
+        <span class="self">self</span>.valid_until.saturating_duration_since(now)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DnsLru</span> {
-    <span class="ident">cache</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">Query</span>, <span class="ident">LruValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A minimum TTL value for positive responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Positive responses with TTLs under `positive_max_ttl` will use</span>
-    <span class="doccomment">/// `positive_max_ttl` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this value is not set on the `TtlConfig` used to construct this</span>
-    <span class="doccomment">/// `DnsLru`, it will default to 0.</span>
-    <span class="ident">positive_min_ttl</span>: <span class="ident">Duration</span>,
-    <span class="doccomment">/// A minimum TTL value for negative (`NXDOMAIN`) responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `NXDOMAIN` responses with TTLs under `negative_min_ttl` will use</span>
-    <span class="doccomment">/// `negative_min_ttl` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this value is not set on the `TtlConfig` used to construct this</span>
-    <span class="doccomment">/// `DnsLru`, it will default to 0.</span>
-    <span class="ident">negative_min_ttl</span>: <span class="ident">Duration</span>,
-    <span class="doccomment">/// A maximum TTL value for positive responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Positive responses with TTLs over `positive_max_ttl` will use</span>
-    <span class="doccomment">/// `positive_max_ttl` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  If this value is not set on the `TtlConfig` used to construct this</span>
-    <span class="doccomment">/// `DnsLru`, it will default to [`MAX_TTL`] seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MAX_TTL`]: const.MAX_TTL.html</span>
-    <span class="ident">positive_max_ttl</span>: <span class="ident">Duration</span>,
-    <span class="doccomment">/// A maximum TTL value for negative (`NXDOMAIN`) responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `NXDOMAIN` responses with TTLs over `negative_max_ttl` will use</span>
-    <span class="doccomment">/// `negative_max_ttl` instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  If this value is not set on the `TtlConfig` used to construct this</span>
-    <span class="doccomment">/// `DnsLru`, it will default to [`MAX_TTL`] seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MAX_TTL`]: const.MAX_TTL.html</span>
-    <span class="ident">negative_max_ttl</span>: <span class="ident">Duration</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DnsLru {
+    cache: Arc&lt;Mutex&lt;LruCache&lt;Query, LruValue&gt;&gt;&gt;,
+    <span class="doccomment">/// A minimum TTL value for positive responses.
+    ///
+    /// Positive responses with TTLs under `positive_max_ttl` will use
+    /// `positive_max_ttl` instead.
+    ///
+    /// If this value is not set on the `TtlConfig` used to construct this
+    /// `DnsLru`, it will default to 0.
+    </span>positive_min_ttl: Duration,
+    <span class="doccomment">/// A minimum TTL value for negative (`NXDOMAIN`) responses.
+    ///
+    /// `NXDOMAIN` responses with TTLs under `negative_min_ttl` will use
+    /// `negative_min_ttl` instead.
+    ///
+    /// If this value is not set on the `TtlConfig` used to construct this
+    /// `DnsLru`, it will default to 0.
+    </span>negative_min_ttl: Duration,
+    <span class="doccomment">/// A maximum TTL value for positive responses.
+    ///
+    /// Positive responses with TTLs over `positive_max_ttl` will use
+    /// `positive_max_ttl` instead.
+    ///
+    ///  If this value is not set on the `TtlConfig` used to construct this
+    /// `DnsLru`, it will default to [`MAX_TTL`] seconds.
+    ///
+    /// [`MAX_TTL`]: const.MAX_TTL.html
+    </span>positive_max_ttl: Duration,
+    <span class="doccomment">/// A maximum TTL value for negative (`NXDOMAIN`) responses.
+    ///
+    /// `NXDOMAIN` responses with TTLs over `negative_max_ttl` will use
+    /// `negative_max_ttl` instead.
+    ///
+    ///  If this value is not set on the `TtlConfig` used to construct this
+    /// `DnsLru`, it will default to [`MAX_TTL`] seconds.
+    ///
+    /// [`MAX_TTL`]: const.MAX_TTL.html
+    </span>negative_max_ttl: Duration,
 }
 
-<span class="doccomment">/// The time-to-live, TTL, configuration for use by the cache.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It should be understood that the TTL in DNS is expressed with a u32.</span>
-<span class="doccomment">///   We use Duration here for tracking this which can express larger values</span>
-<span class="doccomment">///   than the DNS standard. Generally a Duration greater than u32::MAX_VALUE</span>
-<span class="doccomment">///   shouldn&#39;t cause any issue as this will never be used in serialization,</span>
-<span class="doccomment">///   but understand that this would be outside the standard range.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TtlConfig</span> {
-    <span class="doccomment">/// An optional minimum TTL value for positive responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Positive responses with TTLs under `positive_min_ttl` will use</span>
-    <span class="doccomment">/// `positive_min_ttl` instead.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">positive_min_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An optional minimum TTL value for negative (`NXDOMAIN`) responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `NXDOMAIN` responses with TTLs under `negative_min_ttl will use</span>
-    <span class="doccomment">/// `negative_min_ttl` instead.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">negative_min_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An optional maximum TTL value for positive responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Positive responses with TTLs positive `positive_max_ttl` will use</span>
-    <span class="doccomment">/// `positive_max_ttl` instead.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">positive_max_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// An optional maximum TTL value for negative (`NXDOMAIN`) responses.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `NXDOMAIN` responses with TTLs over `negative_max_ttl` will use</span>
-    <span class="doccomment">/// `negative_max_ttl` instead.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">negative_max_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The time-to-live, TTL, configuration for use by the cache.
+///
+/// It should be understood that the TTL in DNS is expressed with a u32.
+///   We use Duration here for tracking this which can express larger values
+///   than the DNS standard. Generally a Duration greater than u32::MAX_VALUE
+///   shouldn&#39;t cause any issue as this will never be used in serialization,
+///   but understand that this would be outside the standard range.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TtlConfig {
+    <span class="doccomment">/// An optional minimum TTL value for positive responses.
+    ///
+    /// Positive responses with TTLs under `positive_min_ttl` will use
+    /// `positive_min_ttl` instead.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) positive_min_ttl: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="doccomment">/// An optional minimum TTL value for negative (`NXDOMAIN`) responses.
+    ///
+    /// `NXDOMAIN` responses with TTLs under `negative_min_ttl will use
+    /// `negative_min_ttl` instead.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) negative_min_ttl: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="doccomment">/// An optional maximum TTL value for positive responses.
+    ///
+    /// Positive responses with TTLs positive `positive_max_ttl` will use
+    /// `positive_max_ttl` instead.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) positive_max_ttl: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="doccomment">/// An optional maximum TTL value for negative (`NXDOMAIN`) responses.
+    ///
+    /// `NXDOMAIN` responses with TTLs over `negative_max_ttl` will use
+    /// `negative_max_ttl` instead.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) negative_max_ttl: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TtlConfig</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_opts</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">config::ResolverOpts</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">positive_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">positive_min_ttl</span>,
-            <span class="ident">negative_min_ttl</span>: <span class="ident">opts</span>.<span class="ident">negative_min_ttl</span>,
-            <span class="ident">positive_max_ttl</span>: <span class="ident">opts</span>.<span class="ident">positive_max_ttl</span>,
-            <span class="ident">negative_max_ttl</span>: <span class="ident">opts</span>.<span class="ident">negative_max_ttl</span>,
+<span class="kw">impl </span>TtlConfig {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_opts(opts: <span class="kw-2">&amp;</span>config::ResolverOpts) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            positive_min_ttl: opts.positive_min_ttl,
+            negative_min_ttl: opts.negative_min_ttl,
+            positive_max_ttl: opts.positive_max_ttl,
+            negative_max_ttl: opts.negative_max_ttl,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DnsLru</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">ttl_cfg</span>: <span class="ident">TtlConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">positive_min_ttl</span>,
-            <span class="ident">negative_min_ttl</span>,
-            <span class="ident">positive_max_ttl</span>,
-            <span class="ident">negative_max_ttl</span>,
-        } <span class="op">=</span> <span class="ident">ttl_cfg</span>;
-        <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">LruCache::new</span>(<span class="ident">capacity</span>)));
-        <span class="self">Self</span> {
-            <span class="ident">cache</span>,
-            <span class="ident">positive_min_ttl</span>: <span class="ident">positive_min_ttl</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="ident">negative_min_ttl</span>: <span class="ident">negative_min_ttl</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="ident">positive_max_ttl</span>: <span class="ident">positive_max_ttl</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">MAX_TTL</span>))),
-            <span class="ident">negative_max_ttl</span>: <span class="ident">negative_max_ttl</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">MAX_TTL</span>))),
+<span class="kw">impl </span>DnsLru {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(capacity: usize, ttl_cfg: TtlConfig) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>TtlConfig {
+            positive_min_ttl,
+            negative_min_ttl,
+            positive_max_ttl,
+            negative_max_ttl,
+        } = ttl_cfg;
+        <span class="kw">let </span>cache = Arc::new(Mutex::new(LruCache::new(capacity)));
+        <span class="self">Self </span>{
+            cache,
+            positive_min_ttl: positive_min_ttl.unwrap_or_else(|| Duration::from_secs(<span class="number">0</span>)),
+            negative_min_ttl: negative_min_ttl.unwrap_or_else(|| Duration::from_secs(<span class="number">0</span>)),
+            positive_max_ttl: positive_max_ttl
+                .unwrap_or_else(|| Duration::from_secs(u64::from(MAX_TTL))),
+            negative_max_ttl: negative_max_ttl
+                .unwrap_or_else(|| Duration::from_secs(u64::from(MAX_TTL))),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">clear</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.cache.lock().clear();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Query</span>,
-        <span class="ident">records_and_ttl</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Record</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>,
-        <span class="ident">now</span>: <span class="ident">Instant</span>,
-    ) -&gt; <span class="ident">Lookup</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">records_and_ttl</span>.<span class="ident">len</span>();
-        <span class="comment">// collapse the values, we&#39;re going to take the Minimum TTL as the correct one</span>
-        <span class="kw">let</span> (<span class="ident">records</span>, <span class="ident">ttl</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>, <span class="ident">Duration</span>) <span class="op">=</span> <span class="ident">records_and_ttl</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(
-            (<span class="ident">Vec::with_capacity</span>(<span class="ident">len</span>), <span class="self">self</span>.<span class="ident">positive_max_ttl</span>),
-            <span class="op">|</span>(<span class="kw-2">mut</span> <span class="ident">records</span>, <span class="kw-2">mut</span> <span class="ident">min_ttl</span>), (<span class="ident">record</span>, <span class="ident">ttl</span>)<span class="op">|</span> {
-                <span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">record</span>);
-                <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">ttl</span>));
-                <span class="ident">min_ttl</span> <span class="op">=</span> <span class="ident">min_ttl</span>.<span class="ident">min</span>(<span class="ident">ttl</span>);
-                (<span class="ident">records</span>, <span class="ident">min_ttl</span>)
+        query: Query,
+        records_and_ttl: Vec&lt;(Record, u32)&gt;,
+        now: Instant,
+    ) -&gt; Lookup {
+        <span class="kw">let </span>len = records_and_ttl.len();
+        <span class="comment">// collapse the values, we&#39;re going to take the Minimum TTL as the correct one
+        </span><span class="kw">let </span>(records, ttl): (Vec&lt;Record&gt;, Duration) = records_and_ttl.into_iter().fold(
+            (Vec::with_capacity(len), <span class="self">self</span>.positive_max_ttl),
+            |(<span class="kw-2">mut </span>records, <span class="kw-2">mut </span>min_ttl), (record, ttl)| {
+                records.push(record);
+                <span class="kw">let </span>ttl = Duration::from_secs(u64::from(ttl));
+                min_ttl = min_ttl.min(ttl);
+                (records, min_ttl)
             },
         );
 
-        <span class="comment">// If the cache was configured with a minimum TTL, and that value is higher</span>
-        <span class="comment">// than the minimum TTL in the values, use it instead.</span>
-        <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">positive_min_ttl</span>.<span class="ident">max</span>(<span class="ident">ttl</span>);
-        <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">ttl</span>;
+        <span class="comment">// If the cache was configured with a minimum TTL, and that value is higher
+        // than the minimum TTL in the values, use it instead.
+        </span><span class="kw">let </span>ttl = <span class="self">self</span>.positive_min_ttl.max(ttl);
+        <span class="kw">let </span>valid_until = now + ttl;
 
-        <span class="comment">// insert into the LRU</span>
-        <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">Lookup::new_with_deadline</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">Arc::from</span>(<span class="ident">records</span>), <span class="ident">valid_until</span>);
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">insert</span>(
-            <span class="ident">query</span>,
-            <span class="ident">LruValue</span> {
-                <span class="ident">lookup</span>: <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>.<span class="ident">clone</span>()),
-                <span class="ident">valid_until</span>,
+        <span class="comment">// insert into the LRU
+        </span><span class="kw">let </span>lookup = Lookup::new_with_deadline(query.clone(), Arc::from(records), valid_until);
+        <span class="self">self</span>.cache.lock().insert(
+            query,
+            LruValue {
+                lookup: <span class="prelude-val">Ok</span>(lookup.clone()),
+                valid_until,
             },
         );
 
-        <span class="ident">lookup</span>
+        lookup
     }
 
-    <span class="doccomment">/// Generally for inserting a set of records that have already been cached, but with a different Query.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">duplicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">lookup</span>: <span class="ident">Lookup</span>, <span class="ident">ttl</span>: <span class="ident">u32</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="ident">Lookup</span> {
-        <span class="kw">let</span> <span class="ident">ttl</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">ttl</span>));
-        <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">ttl</span>;
+    <span class="doccomment">/// Generally for inserting a set of records that have already been cached, but with a different Query.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>duplicate(<span class="kw-2">&amp;</span><span class="self">self</span>, query: Query, lookup: Lookup, ttl: u32, now: Instant) -&gt; Lookup {
+        <span class="kw">let </span>ttl = Duration::from_secs(u64::from(ttl));
+        <span class="kw">let </span>valid_until = now + ttl;
 
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">insert</span>(
-            <span class="ident">query</span>,
-            <span class="ident">LruValue</span> {
-                <span class="ident">lookup</span>: <span class="prelude-val">Ok</span>(<span class="ident">lookup</span>.<span class="ident">clone</span>()),
-                <span class="ident">valid_until</span>,
+        <span class="self">self</span>.cache.lock().insert(
+            query,
+            LruValue {
+                lookup: <span class="prelude-val">Ok</span>(lookup.clone()),
+                valid_until,
             },
         );
 
-        <span class="ident">lookup</span>
+        lookup
     }
 
-    <span class="doccomment">/// This converts the ResolveError to set the inner negative_ttl value to be the</span>
-    <span class="doccomment">///  current expiration ttl.</span>
-    <span class="kw">fn</span> <span class="ident">nx_error_with_ttl</span>(<span class="ident">error</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ResolveError</span>, <span class="ident">new_ttl</span>: <span class="ident">Duration</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ResolveError</span> {
-            <span class="ident">kind</span>:
-                <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-                    <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">negative_ttl</span>,
+    <span class="doccomment">/// This converts the ResolveError to set the inner negative_ttl value to be the
+    ///  current expiration ttl.
+    </span><span class="kw">fn </span>nx_error_with_ttl(error: <span class="kw-2">&amp;mut </span>ResolveError, new_ttl: Duration) {
+        <span class="kw">if let </span>ResolveError {
+            kind:
+                ResolveErrorKind::NoRecordsFound {
+                    <span class="kw-2">ref mut </span>negative_ttl,
                     ..
                 },
             ..
-        } <span class="op">=</span> <span class="ident">error</span>
+        } = error
         {
-            <span class="kw-2">*</span><span class="ident">negative_ttl</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">u32::try_from</span>(<span class="ident">new_ttl</span>.<span class="ident">as_secs</span>()).<span class="ident">unwrap_or</span>(<span class="ident">MAX_TTL</span>));
+            <span class="kw-2">*</span>negative_ttl = <span class="prelude-val">Some</span>(u32::try_from(new_ttl.as_secs()).unwrap_or(MAX_TTL));
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">negative</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>negative(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Query</span>,
-        <span class="kw-2">mut</span> <span class="ident">error</span>: <span class="ident">ResolveError</span>,
-        <span class="ident">now</span>: <span class="ident">Instant</span>,
-    ) -&gt; <span class="ident">ResolveError</span> {
-        <span class="comment">// TODO: if we are getting a negative response, should we instead fallback to cache?</span>
-        <span class="comment">//   this would cache indefinitely, probably not correct</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ResolveError</span> {
-            <span class="ident">kind</span>:
-                <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-                    <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">ttl</span>),
+        query: Query,
+        <span class="kw-2">mut </span>error: ResolveError,
+        now: Instant,
+    ) -&gt; ResolveError {
+        <span class="comment">// TODO: if we are getting a negative response, should we instead fallback to cache?
+        //   this would cache indefinitely, probably not correct
+        </span><span class="kw">if let </span>ResolveError {
+            kind:
+                ResolveErrorKind::NoRecordsFound {
+                    negative_ttl: <span class="prelude-val">Some</span>(ttl),
                     ..
                 },
             ..
-        } <span class="op">=</span> <span class="ident">error</span>
+        } = error
         {
-            <span class="kw">let</span> <span class="ident">ttl_duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">ttl</span>))
-                <span class="comment">// Clamp the TTL so that it&#39;s between the cache&#39;s configured</span>
-                <span class="comment">// minimum and maximum TTLs for negative responses.</span>
-                .<span class="ident">clamp</span>(<span class="self">self</span>.<span class="ident">negative_min_ttl</span>, <span class="self">self</span>.<span class="ident">negative_max_ttl</span>);
-            <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">ttl_duration</span>;
+            <span class="kw">let </span>ttl_duration = Duration::from_secs(u64::from(ttl))
+                <span class="comment">// Clamp the TTL so that it&#39;s between the cache&#39;s configured
+                // minimum and maximum TTLs for negative responses.
+                </span>.clamp(<span class="self">self</span>.negative_min_ttl, <span class="self">self</span>.negative_max_ttl);
+            <span class="kw">let </span>valid_until = now + ttl_duration;
 
             {
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">error</span>.<span class="ident">clone</span>();
+                <span class="kw">let </span>error = error.clone();
 
-                <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">insert</span>(
-                    <span class="ident">query</span>,
-                    <span class="ident">LruValue</span> {
-                        <span class="ident">lookup</span>: <span class="prelude-val">Err</span>(<span class="ident">error</span>),
-                        <span class="ident">valid_until</span>,
+                <span class="self">self</span>.cache.lock().insert(
+                    query,
+                    LruValue {
+                        lookup: <span class="prelude-val">Err</span>(error),
+                        valid_until,
                     },
                 );
             }
 
-            <span class="ident"><span class="self">Self</span>::nx_error_with_ttl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">error</span>, <span class="ident">ttl_duration</span>);
+            <span class="self">Self</span>::nx_error_with_ttl(<span class="kw-2">&amp;mut </span>error, ttl_duration);
         }
 
-        <span class="ident">error</span>
+        error
     }
 
-    <span class="doccomment">/// This needs to be mut b/c it&#39;s an LRU, meaning the ordering of elements will potentially change on retrieval...</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">Query</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_of_date</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">get_mut</span>(<span class="ident">query</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_current</span>(<span class="ident">now</span>) {
-                <span class="ident">out_of_date</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">lookup</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// This needs to be mut b/c it&#39;s an LRU, meaning the ordering of elements will potentially change on retrieval...
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>Query, now: Instant) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>out_of_date = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>cache = <span class="self">self</span>.cache.lock();
+        <span class="kw">let </span>lookup = cache.get_mut(query).and_then(|value| {
+            <span class="kw">if </span>value.is_current(now) {
+                out_of_date = <span class="bool-val">false</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>result = value.lookup.clone();
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">err</span>) <span class="op">=</span> <span class="ident">result</span> {
-                    <span class="ident"><span class="self">Self</span>::nx_error_with_ttl</span>(<span class="ident">err</span>, <span class="ident">value</span>.<span class="ident">ttl</span>(<span class="ident">now</span>));
+                <span class="kw">if let </span><span class="prelude-val">Err</span>(<span class="kw-2">ref mut </span>err) = result {
+                    <span class="self">Self</span>::nx_error_with_ttl(err, value.ttl(now));
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">result</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">out_of_date</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="prelude-val">None</span>
-            }
+                <span class="prelude-val">Some</span>(result)
+            } <span class="kw">else </span>{
+                out_of_date = <span class="bool-val">true</span>;
+                <span class="prelude-val">None
+            </span>}
         });
 
-        <span class="comment">// in this case, we can preemptively remove out of data elements</span>
-        <span class="comment">// this assumes time is always moving forward, this would only not be true in contrived situations where now</span>
-        <span class="comment">//  is not current time, like tests...</span>
-        <span class="kw">if</span> <span class="ident">out_of_date</span> {
-            <span class="ident">cache</span>.<span class="ident">remove</span>(<span class="ident">query</span>);
+        <span class="comment">// in this case, we can preemptively remove out of data elements
+        // this assumes time is always moving forward, this would only not be true in contrived situations where now
+        //  is not current time, like tests...
+        </span><span class="kw">if </span>out_of_date {
+            cache.remove(query);
         }
 
-        <span class="ident">lookup</span>
+        lookup
     }
 }
 
-<span class="comment">// see also the lookup_tests.rs in integration-tests crate</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::net</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-    <span class="kw">use</span> <span class="ident">std::time</span>::<span class="kw-2">*</span>;
+<span class="comment">// see also the lookup_tests.rs in integration-tests crate
+</span><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::net::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::str::FromStr;
+    <span class="kw">use </span>std::time::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">proto::op</span>::{<span class="ident">Query</span>, <span class="ident">ResponseCode</span>};
-    <span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">RecordType</span>};
+    <span class="kw">use </span>proto::op::{Query, ResponseCode};
+    <span class="kw">use </span>proto::rr::{Name, RData, RecordType};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_current</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">not_the_future</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">5</span>);
-        <span class="kw">let</span> <span class="ident">past_the_future</span> <span class="op">=</span> <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">6</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_is_current() {
+        <span class="kw">let </span>now = Instant::now();
+        <span class="kw">let </span>not_the_future = now + Duration::from_secs(<span class="number">4</span>);
+        <span class="kw">let </span>future = now + Duration::from_secs(<span class="number">5</span>);
+        <span class="kw">let </span>past_the_future = now + Duration::from_secs(<span class="number">6</span>);
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">LruValue</span> {
-            <span class="ident">lookup</span>: <span class="prelude-val">Err</span>(<span class="ident">ResolveErrorKind::Message</span>(<span class="string">&quot;test error&quot;</span>).<span class="ident">into</span>()),
-            <span class="ident">valid_until</span>: <span class="ident">future</span>,
+        <span class="kw">let </span>value = LruValue {
+            lookup: <span class="prelude-val">Err</span>(ResolveErrorKind::Message(<span class="string">&quot;test error&quot;</span>).into()),
+            valid_until: future,
         };
 
-        <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">is_current</span>(<span class="ident">now</span>));
-        <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">is_current</span>(<span class="ident">not_the_future</span>));
-        <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">is_current</span>(<span class="ident">future</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">value</span>.<span class="ident">is_current</span>(<span class="ident">past_the_future</span>));
+        <span class="macro">assert!</span>(value.is_current(now));
+        <span class="macro">assert!</span>(value.is_current(not_the_future));
+        <span class="macro">assert!</span>(value.is_current(future));
+        <span class="macro">assert!</span>(!value.is_current(past_the_future));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup_uses_positive_min_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup_uses_positive_min_ttl() {
+        <span class="kw">let </span>now = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="comment">// record should have TTL of 1 second.</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[(
-            <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="number">1</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="comment">// record should have TTL of 1 second.
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[(
+            Record::from_rdata(name.clone(), <span class="number">1</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             <span class="number">1</span>,
         )];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
 
-        <span class="comment">// configure the cache with a minimum TTL of 2 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">positive_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// configure the cache with a minimum TTL of 2 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            positive_min_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">2</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
-        <span class="comment">// the returned lookup should use the cache&#39;s min TTL, since the</span>
-        <span class="comment">// query&#39;s TTL was below the minimum.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">rc_ips</span>.<span class="ident">valid_until</span>(), <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
+        <span class="kw">let </span>rc_ips = lru.insert(query.clone(), ips_ttl, now);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
+        <span class="comment">// the returned lookup should use the cache&#39;s min TTL, since the
+        // query&#39;s TTL was below the minimum.
+        </span><span class="macro">assert_eq!</span>(rc_ips.valid_until(), now + Duration::from_secs(<span class="number">2</span>));
 
-        <span class="comment">// record should have TTL of 3 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[(
-            <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">3</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+        <span class="comment">// record should have TTL of 3 seconds.
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[(
+            Record::from_rdata(name, <span class="number">3</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             <span class="number">3</span>,
         )];
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>, <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
-        <span class="comment">// the returned lookup should use the record&#39;s TTL, since it&#39;s</span>
-        <span class="comment">// greater than the cache&#39;s minimum.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">rc_ips</span>.<span class="ident">valid_until</span>(), <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">3</span>));
+        <span class="kw">let </span>rc_ips = lru.insert(query, ips_ttl, now);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
+        <span class="comment">// the returned lookup should use the record&#39;s TTL, since it&#39;s
+        // greater than the cache&#39;s minimum.
+        </span><span class="macro">assert_eq!</span>(rc_ips.valid_until(), now + Duration::from_secs(<span class="number">3</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_error_uses_negative_min_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_error_uses_negative_min_ttl() {
+        <span class="kw">let </span>now = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>(), <span class="ident">RecordType::A</span>);
+        <span class="kw">let </span>name = Query::query(Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap(), RecordType::A);
 
-        <span class="comment">// configure the cache with a maximum TTL of 2 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">negative_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// configure the cache with a maximum TTL of 2 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            negative_min_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">2</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
 
-        <span class="comment">// neg response should have TTL of 1 seconds.</span>
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">soa</span>: <span class="prelude-val">None</span>,
-            <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
-            <span class="ident">trusted</span>: <span class="bool-val">false</span>,
+        <span class="comment">// neg response should have TTL of 1 seconds.
+        </span><span class="kw">let </span>err = ResolveErrorKind::NoRecordsFound {
+            query: Box::new(name.clone()),
+            soa: <span class="prelude-val">None</span>,
+            negative_ttl: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+            response_code: ResponseCode::NoError,
+            trusted: <span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
-        <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
-                <span class="comment">// the error&#39;s `valid_until` field should have been limited to 2 seconds.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">valid_until</span>, <span class="number">2</span>);
+        <span class="kw">let </span>nx_error = lru.negative(name.clone(), err.into(), now);
+        <span class="kw">match </span>nx_error.kind() {
+            <span class="kw-2">&amp;</span>ResolveErrorKind::NoRecordsFound { negative_ttl, .. } =&gt; {
+                <span class="kw">let </span>valid_until = negative_ttl.expect(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
+                <span class="comment">// the error&#39;s `valid_until` field should have been limited to 2 seconds.
+                </span><span class="macro">assert_eq!</span>(valid_until, <span class="number">2</span>);
             }
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, other),
         }
 
-        <span class="comment">// neg response should have TTL of 3 seconds.</span>
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">soa</span>: <span class="prelude-val">None</span>,
-            <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>),
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
-            <span class="ident">trusted</span>: <span class="bool-val">false</span>,
+        <span class="comment">// neg response should have TTL of 3 seconds.
+        </span><span class="kw">let </span>err = ResolveErrorKind::NoRecordsFound {
+            query: Box::new(name.clone()),
+            soa: <span class="prelude-val">None</span>,
+            negative_ttl: <span class="prelude-val">Some</span>(<span class="number">3</span>),
+            response_code: ResponseCode::NoError,
+            trusted: <span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>, <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
-        <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;ResolveError should have a deadline&quot;</span>);
-                <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was</span>
-                <span class="comment">// over the min TTL.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">3</span>);
+        <span class="kw">let </span>nx_error = lru.negative(name, err.into(), now);
+        <span class="kw">match </span>nx_error.kind() {
+            <span class="kw-2">&amp;</span>ResolveErrorKind::NoRecordsFound { negative_ttl, .. } =&gt; {
+                <span class="kw">let </span>negative_ttl = negative_ttl.expect(<span class="string">&quot;ResolveError should have a deadline&quot;</span>);
+                <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was
+                // over the min TTL.
+                </span><span class="macro">assert_eq!</span>(negative_ttl, <span class="number">3</span>);
             }
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, other),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup_uses_positive_max_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup_uses_positive_max_ttl() {
+        <span class="kw">let </span>now = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="comment">// record should have TTL of 62 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[(
-            <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="number">62</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="comment">// record should have TTL of 62 seconds.
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[(
+            Record::from_rdata(name.clone(), <span class="number">62</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             <span class="number">62</span>,
         )];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
 
-        <span class="comment">// configure the cache with a maximum TTL of 60 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">positive_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// configure the cache with a maximum TTL of 60 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            positive_max_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">60</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
-        <span class="comment">// the returned lookup should use the cache&#39;s min TTL, since the</span>
-        <span class="comment">// query&#39;s TTL was above the maximum.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">rc_ips</span>.<span class="ident">valid_until</span>(), <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span>));
+        <span class="kw">let </span>rc_ips = lru.insert(query.clone(), ips_ttl, now);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
+        <span class="comment">// the returned lookup should use the cache&#39;s min TTL, since the
+        // query&#39;s TTL was above the maximum.
+        </span><span class="macro">assert_eq!</span>(rc_ips.valid_until(), now + Duration::from_secs(<span class="number">60</span>));
 
-        <span class="comment">// record should have TTL of 59 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[(
-            <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">59</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+        <span class="comment">// record should have TTL of 59 seconds.
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[(
+            Record::from_rdata(name, <span class="number">59</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             <span class="number">59</span>,
         )];
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>, <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
-        <span class="comment">// the returned lookup should use the record&#39;s TTL, since it&#39;s</span>
-        <span class="comment">// below than the cache&#39;s maximum.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">rc_ips</span>.<span class="ident">valid_until</span>(), <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">59</span>));
+        <span class="kw">let </span>rc_ips = lru.insert(query, ips_ttl, now);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
+        <span class="comment">// the returned lookup should use the record&#39;s TTL, since it&#39;s
+        // below than the cache&#39;s maximum.
+        </span><span class="macro">assert_eq!</span>(rc_ips.valid_until(), now + Duration::from_secs(<span class="number">59</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_error_uses_negative_max_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_error_uses_negative_max_ttl() {
+        <span class="kw">let </span>now = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>(), <span class="ident">RecordType::A</span>);
+        <span class="kw">let </span>name = Query::query(Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap(), RecordType::A);
 
-        <span class="comment">// configure the cache with a maximum TTL of 60 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">negative_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">60</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// configure the cache with a maximum TTL of 60 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            negative_max_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">60</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
 
-        <span class="comment">// neg response should have TTL of 62 seconds.</span>
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">soa</span>: <span class="prelude-val">None</span>,
-            <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">62</span>),
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
-            <span class="ident">trusted</span>: <span class="bool-val">false</span>,
+        <span class="comment">// neg response should have TTL of 62 seconds.
+        </span><span class="kw">let </span>err = ResolveErrorKind::NoRecordsFound {
+            query: Box::new(name.clone()),
+            soa: <span class="prelude-val">None</span>,
+            negative_ttl: <span class="prelude-val">Some</span>(<span class="number">62</span>),
+            response_code: ResponseCode::NoError,
+            trusted: <span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
-        <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
-                <span class="comment">// the error&#39;s `valid_until` field should have been limited to 60 seconds.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">60</span>);
+        <span class="kw">let </span>nx_error = lru.negative(name.clone(), err.into(), now);
+        <span class="kw">match </span>nx_error.kind() {
+            <span class="kw-2">&amp;</span>ResolveErrorKind::NoRecordsFound { negative_ttl, .. } =&gt; {
+                <span class="kw">let </span>negative_ttl = negative_ttl.expect(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
+                <span class="comment">// the error&#39;s `valid_until` field should have been limited to 60 seconds.
+                </span><span class="macro">assert_eq!</span>(negative_ttl, <span class="number">60</span>);
             }
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, other),
         }
 
-        <span class="comment">// neg response should have TTL of 59 seconds.</span>
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">name</span>.<span class="ident">clone</span>()),
-            <span class="ident">soa</span>: <span class="prelude-val">None</span>,
-            <span class="ident">negative_ttl</span>: <span class="prelude-val">Some</span>(<span class="number">59</span>),
-            <span class="ident">response_code</span>: <span class="ident">ResponseCode::NoError</span>,
-            <span class="ident">trusted</span>: <span class="bool-val">false</span>,
+        <span class="comment">// neg response should have TTL of 59 seconds.
+        </span><span class="kw">let </span>err = ResolveErrorKind::NoRecordsFound {
+            query: Box::new(name.clone()),
+            soa: <span class="prelude-val">None</span>,
+            negative_ttl: <span class="prelude-val">Some</span>(<span class="number">59</span>),
+            response_code: ResponseCode::NoError,
+            trusted: <span class="bool-val">false</span>,
         };
-        <span class="kw">let</span> <span class="ident">nx_error</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">negative</span>(<span class="ident">name</span>, <span class="ident">err</span>.<span class="ident">into</span>(), <span class="ident">now</span>);
-        <span class="kw">match</span> <span class="ident">nx_error</span>.<span class="ident">kind</span>() {
-            <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind::NoRecordsFound</span> { <span class="ident">negative_ttl</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">negative_ttl</span>.<span class="ident">expect</span>(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
-                <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was</span>
-                <span class="comment">// under the max TTL.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">negative_ttl</span>, <span class="number">59</span>);
+        <span class="kw">let </span>nx_error = lru.negative(name, err.into(), now);
+        <span class="kw">match </span>nx_error.kind() {
+            <span class="kw-2">&amp;</span>ResolveErrorKind::NoRecordsFound { negative_ttl, .. } =&gt; {
+                <span class="kw">let </span>negative_ttl = negative_ttl.expect(<span class="string">&quot;resolve error should have a deadline&quot;</span>);
+                <span class="comment">// the error&#39;s `valid_until` field should not have been limited, as it was
+                // under the max TTL.
+                </span><span class="macro">assert_eq!</span>(negative_ttl, <span class="number">59</span>);
             }
-            <span class="ident">other</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, <span class="ident">other</span>),
+            other =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected ResolveErrorKind::NoRecordsFound, got {:?}&quot;</span>, other),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_insert</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_insert() {
+        <span class="kw">let </span>now = Instant::now();
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[(
-            <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">1</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[(
+            Record::from_rdata(name, <span class="number">1</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
             <span class="number">1</span>,
         )];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">TtlConfig::default</span>());
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))];
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, TtlConfig::default());
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
+        <span class="kw">let </span>rc_ips = lru.insert(query.clone(), ips_ttl, now);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span>).<span class="ident">unwrap</span>().<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
+        <span class="kw">let </span>rc_ips = lru.get(<span class="kw-2">&amp;</span>query, now).unwrap().expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_insert_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="comment">// TTL should be 1</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_insert_ttl() {
+        <span class="kw">let </span>now = Instant::now();
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="comment">// TTL should be 1
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="number">1</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+                Record::from_rdata(name.clone(), <span class="number">1</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
                 <span class="number">1</span>,
             ),
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">2</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
+                Record::from_rdata(name, <span class="number">2</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
                 <span class="number">2</span>,
             ),
         ];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
         ];
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">TtlConfig::default</span>());
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, TtlConfig::default());
 
-        <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
+        lru.insert(query.clone(), ips_ttl, now);
 
-        <span class="comment">// still valid</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">ips</span>[<span class="number">0</span>]);
+        <span class="comment">// still valid
+        </span><span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">1</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>rc_ips.iter().next().unwrap(), ips[<span class="number">0</span>]);
 
-        <span class="comment">// 2 should be one too far</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>));
-        <span class="macro">assert!</span>(<span class="ident">rc_ips</span>.<span class="ident">is_none</span>());
+        <span class="comment">// 2 should be one too far
+        </span><span class="kw">let </span>rc_ips = lru.get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">2</span>));
+        <span class="macro">assert!</span>(rc_ips.is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_insert_positive_min_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="comment">// TTL should be 1</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_insert_positive_min_ttl() {
+        <span class="kw">let </span>now = Instant::now();
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="comment">// TTL should be 1
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="number">1</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+                Record::from_rdata(name.clone(), <span class="number">1</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
                 <span class="number">1</span>,
             ),
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">2</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
+                Record::from_rdata(name, <span class="number">2</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
                 <span class="number">2</span>,
             ),
         ];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
         ];
 
-        <span class="comment">// this cache should override the TTL of 1 seconds with the configured</span>
-        <span class="comment">// minimum TTL of 3 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">positive_min_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">3</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// this cache should override the TTL of 1 seconds with the configured
+        // minimum TTL of 3 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            positive_min_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">3</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
-        <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
+        lru.insert(query.clone(), ips_ttl, now);
 
-        <span class="comment">// still valid</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">rc_ip</span>, <span class="ident">ip</span>) <span class="kw">in</span> <span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">ips</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">rc_ip</span>, <span class="ident">ip</span>, <span class="string">&quot;after 1 second&quot;</span>);
+        <span class="comment">// still valid
+        </span><span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">1</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="kw">for </span>(rc_ip, ip) <span class="kw">in </span>rc_ips.iter().zip(ips.iter()) {
+            <span class="macro">assert_eq!</span>(rc_ip, ip, <span class="string">&quot;after 1 second&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">rc_ip</span>, <span class="ident">ip</span>) <span class="kw">in</span> <span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">ips</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">rc_ip</span>, <span class="ident">ip</span>, <span class="string">&quot;after 2 seconds&quot;</span>);
+        <span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">2</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="kw">for </span>(rc_ip, ip) <span class="kw">in </span>rc_ips.iter().zip(ips.iter()) {
+            <span class="macro">assert_eq!</span>(rc_ip, ip, <span class="string">&quot;after 2 seconds&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">3</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">rc_ip</span>, <span class="ident">ip</span>) <span class="kw">in</span> <span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">ips</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">rc_ip</span>, <span class="ident">ip</span>, <span class="string">&quot;after 3 seconds&quot;</span>);
+        <span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">3</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="kw">for </span>(rc_ip, ip) <span class="kw">in </span>rc_ips.iter().zip(ips.iter()) {
+            <span class="macro">assert_eq!</span>(rc_ip, ip, <span class="string">&quot;after 3 seconds&quot;</span>);
         }
 
-        <span class="comment">// after 4 seconds, the records should be invalid.</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">4</span>));
-        <span class="macro">assert!</span>(<span class="ident">rc_ips</span>.<span class="ident">is_none</span>());
+        <span class="comment">// after 4 seconds, the records should be invalid.
+        </span><span class="kw">let </span>rc_ips = lru.get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">4</span>));
+        <span class="macro">assert!</span>(rc_ips.is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_insert_positive_max_ttl</span>() {
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::query</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">RecordType::A</span>);
-        <span class="comment">// TTL should be 500</span>
-        <span class="kw">let</span> <span class="ident">ips_ttl</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_insert_positive_max_ttl() {
+        <span class="kw">let </span>now = Instant::now();
+        <span class="kw">let </span>name = Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="kw">let </span>query = Query::query(name.clone(), RecordType::A);
+        <span class="comment">// TTL should be 500
+        </span><span class="kw">let </span>ips_ttl = <span class="macro">vec!</span>[
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="number">400</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
+                Record::from_rdata(name.clone(), <span class="number">400</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))),
                 <span class="number">400</span>,
             ),
             (
-                <span class="ident">Record::from_rdata</span>(<span class="ident">name</span>, <span class="number">500</span>, <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
+                Record::from_rdata(name, <span class="number">500</span>, RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))),
                 <span class="number">500</span>,
             ),
         ];
-        <span class="kw">let</span> <span class="ident">ips</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
+        <span class="kw">let </span>ips = <span class="macro">vec!</span>[
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
         ];
 
-        <span class="comment">// this cache should override the TTL of 500 seconds with the configured</span>
-        <span class="comment">// minimum TTL of 2 seconds.</span>
-        <span class="kw">let</span> <span class="ident">ttls</span> <span class="op">=</span> <span class="ident">TtlConfig</span> {
-            <span class="ident">positive_max_ttl</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">2</span>)),
-            ..<span class="ident">TtlConfig::default</span>()
+        <span class="comment">// this cache should override the TTL of 500 seconds with the configured
+        // minimum TTL of 2 seconds.
+        </span><span class="kw">let </span>ttls = TtlConfig {
+            positive_max_ttl: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">2</span>)),
+            ..TtlConfig::default()
         };
-        <span class="kw">let</span> <span class="ident">lru</span> <span class="op">=</span> <span class="ident">DnsLru::new</span>(<span class="number">1</span>, <span class="ident">ttls</span>);
-        <span class="ident">lru</span>.<span class="ident">insert</span>(<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">ips_ttl</span>, <span class="ident">now</span>);
+        <span class="kw">let </span>lru = DnsLru::new(<span class="number">1</span>, ttls);
+        lru.insert(query.clone(), ips_ttl, now);
 
-        <span class="comment">// still valid</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">rc_ip</span>, <span class="ident">ip</span>) <span class="kw">in</span> <span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">ips</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">rc_ip</span>, <span class="ident">ip</span>, <span class="string">&quot;after 1 second&quot;</span>);
+        <span class="comment">// still valid
+        </span><span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">1</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="kw">for </span>(rc_ip, ip) <span class="kw">in </span>rc_ips.iter().zip(ips.iter()) {
+            <span class="macro">assert_eq!</span>(rc_ip, ip, <span class="string">&quot;after 1 second&quot;</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">2</span>))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;records should exist&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">rc_ip</span>, <span class="ident">ip</span>) <span class="kw">in</span> <span class="ident">rc_ips</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">ips</span>.<span class="ident">iter</span>()) {
-            <span class="macro">assert_eq!</span>(<span class="ident">rc_ip</span>, <span class="ident">ip</span>, <span class="string">&quot;after 2 seconds&quot;</span>);
+        <span class="kw">let </span>rc_ips = lru
+            .get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">2</span>))
+            .unwrap()
+            .expect(<span class="string">&quot;records should exist&quot;</span>);
+        <span class="kw">for </span>(rc_ip, ip) <span class="kw">in </span>rc_ips.iter().zip(ips.iter()) {
+            <span class="macro">assert_eq!</span>(rc_ip, ip, <span class="string">&quot;after 2 seconds&quot;</span>);
         }
 
-        <span class="comment">// after 3 seconds, the records should be invalid.</span>
-        <span class="kw">let</span> <span class="ident">rc_ips</span> <span class="op">=</span> <span class="ident">lru</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>, <span class="ident">now</span> <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">3</span>));
-        <span class="macro">assert!</span>(<span class="ident">rc_ips</span>.<span class="ident">is_none</span>());
+        <span class="comment">// after 3 seconds, the records should be invalid.
+        </span><span class="kw">let </span>rc_ips = lru.get(<span class="kw-2">&amp;</span>query, now + Duration::from_secs(<span class="number">3</span>));
+        <span class="macro">assert!</span>(rc_ips.is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

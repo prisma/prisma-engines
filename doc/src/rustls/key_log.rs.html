@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/key_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>key_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/key_log.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>key_log.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -53,60 +53,60 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-</pre><pre class="rust"><code><span class="doccomment">/// This trait represents the ability to do something useful</span>
-<span class="doccomment">/// with key material, such as logging it to a file for debugging.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Naturally, secrets passed over the interface are *extremely*</span>
-<span class="doccomment">/// sensitive and can break the security of past, present and</span>
-<span class="doccomment">/// future sessions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You&#39;ll likely want some interior mutability in your</span>
-<span class="doccomment">/// implementation to make this useful.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`KeyLogFile`](crate::KeyLogFile) that implements the standard</span>
-<span class="doccomment">/// `SSLKEYLOGFILE` environment variable behaviour.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KeyLog</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// Log the given `secret`.  `client_random` is provided for</span>
-    <span class="doccomment">/// session identification.  `label` describes precisely what</span>
-    <span class="doccomment">/// `secret` means:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `CLIENT_RANDOM`: `secret` is the master secret for a TLSv1.2 session.</span>
-    <span class="doccomment">/// - `CLIENT_EARLY_TRAFFIC_SECRET`: `secret` encrypts early data</span>
-    <span class="doccomment">///   transmitted by a client</span>
-    <span class="doccomment">/// - `SERVER_HANDSHAKE_TRAFFIC_SECRET`: `secret` encrypts</span>
-    <span class="doccomment">///   handshake messages from the server during a TLSv1.3 handshake.</span>
-    <span class="doccomment">/// - `CLIENT_HANDSHAKE_TRAFFIC_SECRET`: `secret` encrypts</span>
-    <span class="doccomment">///   handshake messages from the client during a TLSv1.3 handshake.</span>
-    <span class="doccomment">/// - `SERVER_TRAFFIC_SECRET_0`: `secret` encrypts post-handshake data</span>
-    <span class="doccomment">///   from the server in a TLSv1.3 session.</span>
-    <span class="doccomment">/// - `CLIENT_TRAFFIC_SECRET_0`: `secret` encrypts post-handshake data</span>
-    <span class="doccomment">///   from the client in a TLSv1.3 session.</span>
-    <span class="doccomment">/// - `EXPORTER_SECRET`: `secret` is the post-handshake exporter secret</span>
-    <span class="doccomment">///   in a TLSv1.3 session.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These strings are selected to match the NSS key log format:</span>
-    <span class="doccomment">/// &lt;https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Key_Log_Format&gt;</span>
-    <span class="kw">fn</span> <span class="ident">log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]);
+</pre><pre class="rust"><code><span class="doccomment">/// This trait represents the ability to do something useful
+/// with key material, such as logging it to a file for debugging.
+///
+/// Naturally, secrets passed over the interface are *extremely*
+/// sensitive and can break the security of past, present and
+/// future sessions.
+///
+/// You&#39;ll likely want some interior mutability in your
+/// implementation to make this useful.
+///
+/// See [`KeyLogFile`](crate::KeyLogFile) that implements the standard
+/// `SSLKEYLOGFILE` environment variable behaviour.
+</span><span class="kw">pub trait </span>KeyLog: Send + Sync {
+    <span class="doccomment">/// Log the given `secret`.  `client_random` is provided for
+    /// session identification.  `label` describes precisely what
+    /// `secret` means:
+    ///
+    /// - `CLIENT_RANDOM`: `secret` is the master secret for a TLSv1.2 session.
+    /// - `CLIENT_EARLY_TRAFFIC_SECRET`: `secret` encrypts early data
+    ///   transmitted by a client
+    /// - `SERVER_HANDSHAKE_TRAFFIC_SECRET`: `secret` encrypts
+    ///   handshake messages from the server during a TLSv1.3 handshake.
+    /// - `CLIENT_HANDSHAKE_TRAFFIC_SECRET`: `secret` encrypts
+    ///   handshake messages from the client during a TLSv1.3 handshake.
+    /// - `SERVER_TRAFFIC_SECRET_0`: `secret` encrypts post-handshake data
+    ///   from the server in a TLSv1.3 session.
+    /// - `CLIENT_TRAFFIC_SECRET_0`: `secret` encrypts post-handshake data
+    ///   from the client in a TLSv1.3 session.
+    /// - `EXPORTER_SECRET`: `secret` is the post-handshake exporter secret
+    ///   in a TLSv1.3 session.
+    ///
+    /// These strings are selected to match the NSS key log format:
+    /// &lt;https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS/Key_Log_Format&gt;
+    </span><span class="kw">fn </span>log(<span class="kw-2">&amp;</span><span class="self">self</span>, label: <span class="kw-2">&amp;</span>str, client_random: <span class="kw-2">&amp;</span>[u8], secret: <span class="kw-2">&amp;</span>[u8]);
 
-    <span class="doccomment">/// Indicates whether the secret with label `label` will be logged.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `will_log` returns true then `log` will be called with the secret.</span>
-    <span class="doccomment">/// Otherwise, `log` will not be called for the secret. This is a</span>
-    <span class="doccomment">/// performance optimization.</span>
-    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Indicates whether the secret with label `label` will be logged.
+    ///
+    /// If `will_log` returns true then `log` will be called with the secret.
+    /// Otherwise, `log` will not be called for the secret. This is a
+    /// performance optimization.
+    </span><span class="kw">fn </span>will_log(<span class="kw-2">&amp;</span><span class="self">self</span>, _label: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="doccomment">/// KeyLog that does exactly nothing.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoKeyLog</span>;
+<span class="doccomment">/// KeyLog that does exactly nothing.
+</span><span class="kw">pub struct </span>NoKeyLog;
 
-<span class="kw">impl</span> <span class="ident">KeyLog</span> <span class="kw">for</span> <span class="ident">NoKeyLog</span> {
-    <span class="kw">fn</span> <span class="ident">log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {}
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">will_log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_label</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+<span class="kw">impl </span>KeyLog <span class="kw">for </span>NoKeyLog {
+    <span class="kw">fn </span>log(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>str, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[u8], <span class="kw">_</span>: <span class="kw-2">&amp;</span>[u8]) {}
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>will_log(<span class="kw-2">&amp;</span><span class="self">self</span>, _label: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

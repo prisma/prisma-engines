@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/select_macro.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select_macro.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_channel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/select_macro.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>select_macro.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_channel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1114,1121 +1114,1121 @@
 <span id="1114">1114</span>
 <span id="1115">1115</span>
 <span id="1116">1116</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The `select!` macro.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The `select!` macro.
 
-<span class="doccomment">/// A helper macro for `select!` to hide the long list of macro patterns from the documentation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro consists of two stages:</span>
-<span class="doccomment">/// 1. Parsing</span>
-<span class="doccomment">/// 2. Code generation</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parsing stage consists of these subparts:</span>
-<span class="doccomment">/// 1. `@list`: Turns a list of tokens into a list of cases.</span>
-<span class="doccomment">/// 2. `@list_errorN`: Diagnoses the syntax error.</span>
-<span class="doccomment">/// 3. `@case`: Parses a single case and verifies its argument list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The codegen stage consists of these subparts:</span>
-<span class="doccomment">/// 1. `@init`: Attempts to optimize `select!` away and initializes the list of handles.</span>
-<span class="doccomment">/// 1. `@count`: Counts the listed cases.</span>
-<span class="doccomment">/// 3. `@add`: Adds send/receive operations to the list of handles and starts selection.</span>
-<span class="doccomment">/// 4. `@complete`: Completes the selected send/receive operation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the parsing stage encounters a syntax error or the codegen stage ends up with too many</span>
-<span class="doccomment">/// cases to process, the macro fails with a compile-time error.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">crossbeam_channel_internal</span> {
-    <span class="comment">// The list is empty. Now check the arguments of each processed case.</span>
-    (@<span class="ident">list</span>
+/// A helper macro for `select!` to hide the long list of macro patterns from the documentation.
+///
+/// The macro consists of two stages:
+/// 1. Parsing
+/// 2. Code generation
+///
+/// The parsing stage consists of these subparts:
+/// 1. `@list`: Turns a list of tokens into a list of cases.
+/// 2. `@list_errorN`: Diagnoses the syntax error.
+/// 3. `@case`: Parses a single case and verifies its argument list.
+///
+/// The codegen stage consists of these subparts:
+/// 1. `@init`: Attempts to optimize `select!` away and initializes the list of handles.
+/// 1. `@count`: Counts the listed cases.
+/// 3. `@add`: Adds send/receive operations to the list of handles and starts selection.
+/// 4. `@complete`: Completes the selected send/receive operation.
+///
+/// If the parsing stage encounters a syntax error or the codegen stage ends up with too many
+/// cases to process, the macro fails with a compile-time error.
+</span><span class="attribute">#[doc(hidden)]
+#[macro_export]
+</span><span class="macro">macro_rules! </span>crossbeam_channel_internal {
+    <span class="comment">// The list is empty. Now check the arguments of each processed case.
+    </span>(@list
         ()
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">case</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>)<span class="kw-2">*</span>)
+            @<span class="macro-nonterminal">case
+            </span>($(<span class="macro-nonterminal">$head</span>)<span class="kw-2">*</span>)
             ()
             ()
         )
     };
-    <span class="comment">// If necessary, insert an empty argument list after `default`.</span>
-    (@<span class="ident">list</span>
-        (<span class="ident">default</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// If necessary, insert an empty argument list after `default`.
+    </span>(@list
+        (default =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            (<span class="ident">default</span>() =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>)<span class="kw-2">*</span>)
+            @<span class="macro-nonterminal">list
+            </span>(default() =&gt; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            ($(<span class="macro-nonterminal">$head</span>)<span class="kw-2">*</span>)
         )
     };
-    <span class="comment">// But print an error if `default` is followed by a `-&gt;`.</span>
-    (@<span class="ident">list</span>
-        (<span class="ident">default</span> -&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// But print an error if `default` is followed by a `-&gt;`.
+    </span>(@list
+        (default -&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected `=&gt;` after `default` case, found `-&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected `=&gt;` after `default` case, found `-&gt;`&quot;
+        </span>)
     };
-    <span class="comment">// Print an error if there&#39;s an `-&gt;` after the argument list in the default case.</span>
-    (@<span class="ident">list</span>
-        (<span class="ident">default</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> -&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Print an error if there&#39;s an `-&gt;` after the argument list in the default case.
+    </span>(@list
+        (default <span class="macro-nonterminal">$args</span>:tt -&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected `=&gt;` after `default` case, found `-&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected `=&gt;` after `default` case, found `-&gt;`&quot;
+        </span>)
     };
-    <span class="comment">// Print an error if there is a missing result in a recv case.</span>
-    (@<span class="ident">list</span>
-        (<span class="ident">recv</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Print an error if there is a missing result in a recv case.
+    </span>(@list
+        (recv($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected `-&gt;` after `recv` case, found `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected `-&gt;` after `recv` case, found `=&gt;`&quot;
+        </span>)
     };
-    <span class="comment">// Print an error if there is a missing result in a send case.</span>
-    (@<span class="ident">list</span>
-        (<span class="ident">send</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Print an error if there is a missing result in a send case.
+    </span>(@list
+        (send($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected `-&gt;` after `send` operation, found `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected `-&gt;` after `send` operation, found `=&gt;`&quot;
+        </span>)
     };
-    <span class="comment">// Make sure the arrow and the result are not repeated.</span>
-    (@<span class="ident">list</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">tt</span> -&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Make sure the arrow and the result are not repeated.
+    </span>(@list
+        (<span class="macro-nonterminal">$case</span>:ident <span class="macro-nonterminal">$args</span>:tt -&gt; <span class="macro-nonterminal">$res</span>:tt -&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;expected `=&gt;`, found `-&gt;`&quot;</span>)
     };
-    <span class="comment">// Print an error if there is a semicolon after the block.</span>
-    (@<span class="ident">list</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">block</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Print an error if there is a semicolon after the block.
+    </span>(@list
+        (<span class="macro-nonterminal">$case</span>:ident <span class="macro-nonterminal">$args</span>:tt $(-&gt; <span class="macro-nonterminal">$res</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:block; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;did you mean to put a comma instead of the semicolon after `}`?&quot;</span>
-        )
+            <span class="string">&quot;did you mean to put a comma instead of the semicolon after `}`?&quot;
+        </span>)
     };
-    <span class="comment">// The first case is separated by a comma.</span>
-    (@<span class="ident">list</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// The first case is separated by a comma.
+    </span>(@list
+        (<span class="macro-nonterminal">$case</span>:ident ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:expr, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>)<span class="op">*</span> =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> },)
+            @<span class="macro-nonterminal">list
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            ($(<span class="macro-nonterminal">$head</span>)* <span class="macro-nonterminal">$case </span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>)* =&gt; { <span class="macro-nonterminal">$body </span>},)
         )
     };
-    <span class="comment">// Don&#39;t require a comma after the case if it has a proper block.</span>
-    (@<span class="ident">list</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Don&#39;t require a comma after the case if it has a proper block.
+    </span>(@list
+        (<span class="macro-nonterminal">$case</span>:ident ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:block $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>)<span class="op">*</span> =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> },)
+            @<span class="macro-nonterminal">list
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            ($(<span class="macro-nonterminal">$head</span>)* <span class="macro-nonterminal">$case </span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>)* =&gt; { <span class="macro-nonterminal">$body </span>},)
         )
     };
-    <span class="comment">// Only one case remains.</span>
-    (@<span class="ident">list</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Only one case remains.
+    </span>(@list
+        (<span class="macro-nonterminal">$case</span>:ident ($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:expr $(,)<span class="question-mark">?</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            ()
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>)<span class="op">*</span> =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> },)
+            @<span class="macro-nonterminal">list
+            </span>()
+            ($(<span class="macro-nonterminal">$head</span>)* <span class="macro-nonterminal">$case </span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$res</span>)* =&gt; { <span class="macro-nonterminal">$body </span>},)
         )
     };
-    <span class="comment">// Diagnose and print an error.</span>
-    (@<span class="ident">list</span>
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Diagnose and print an error.
+    </span>(@list
+        ($(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$head</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error1</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error1 </span>$(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    <span class="comment">// Stage 1: check the case type.</span>
-    (@<span class="ident">list_error1</span> <span class="ident">recv</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2</span> <span class="ident">recv</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Stage 1: check the case type.
+    </span>(@list_error1 recv $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2 </span>recv $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    (@<span class="ident">list_error1</span> <span class="ident">send</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2</span> <span class="ident">send</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+    (@list_error1 send $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2 </span>send $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    (@<span class="ident">list_error1</span> <span class="ident">default</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2</span> <span class="ident">default</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+    (@list_error1 default $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2 </span>default $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    (@<span class="ident">list_error1</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error1 <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected one of `recv`, `send`, or `default`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error1</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    (@list_error1 $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error2 </span>$(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
-    <span class="comment">// Stage 2: check the argument list.</span>
-    (@<span class="ident">list_error2</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>) =&gt; {
+    <span class="comment">// Stage 2: check the argument list.
+    </span>(@list_error2 <span class="macro-nonterminal">$case</span>:ident) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;missing argument list after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error2</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error2 <span class="macro-nonterminal">$case</span>:ident =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;missing argument list after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error2</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error3</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+    (@list_error2 $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error3 </span>$(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    <span class="comment">// Stage 3: check the `=&gt;` and what comes after it.</span>
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="kw-2">*</span>) =&gt; {
+    <span class="comment">// Stage 3: check the `=&gt;` and what comes after it.
+    </span>(@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;missing `=&gt;` after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>),
                 <span class="string">&quot;` case&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt;) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt;) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected expression after `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected expression after `=&gt;`&quot;
+        </span>)
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:expr; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma instead of the semicolon after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$body</span>),
                 <span class="string">&quot;`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="ident">recv</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; recv($(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected an expression after `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected an expression after `=&gt;`&quot;
+        </span>)
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="ident">send</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; send($(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected an expression after `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected an expression after `=&gt;`&quot;
+        </span>)
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="ident">default</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; default($(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;expected an expression after `=&gt;`&quot;</span>
-        )
+            <span class="string">&quot;expected an expression after `=&gt;`&quot;
+        </span>)
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$f</span>:ident($(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>),
                 <span class="string">&quot;(&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$a</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;)`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="macro">ident!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$f</span>:<span class="macro">ident!</span>($(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>) $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>),
                 <span class="string">&quot;!(&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$a</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;)`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="macro">ident!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$f</span>:<span class="macro">ident!</span>[$(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>] $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>),
                 <span class="string">&quot;![&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$a</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;]`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="macro">ident!</span>{$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>} $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$f</span>:<span class="macro">ident!</span>{$(<span class="macro-nonterminal">$a</span>:tt)<span class="kw-2">*</span>} $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>),
                 <span class="string">&quot;!{&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$a</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;}`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; <span class="macro-nonterminal">$body</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;did you mean to put a comma after `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$body</span>),
                 <span class="string">&quot;`?&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) -&gt; =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) -&gt; =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;missing pattern after `-&gt;`&quot;</span>)
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">pat</span>)<span class="op">*</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) <span class="macro-nonterminal">$t</span>:tt $(-&gt; <span class="macro-nonterminal">$r</span>:pat)* =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected `-&gt;`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 <span class="macro-nonterminal">$case</span>:ident($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected a pattern, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="ident">recv</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 recv($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected `-&gt;`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="ident">send</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 send($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected `-&gt;`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="ident">recv</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 recv <span class="macro-nonterminal">$args</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list after `recv`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$args</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="ident">send</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 send <span class="macro-nonterminal">$args</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list after `send`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$args</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> <span class="ident">default</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (@list_error3 default <span class="macro-nonterminal">$args</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list or `=&gt;` after `default`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$args</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
-    (@<span class="ident">list_error3</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error4</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+    (@list_error3 $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">list_error4 </span>$(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
     };
-    <span class="comment">// Stage 4: fail with a generic error message.</span>
-    (@<span class="ident">list_error4</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    <span class="comment">// Stage 4: fail with a generic error message.
+    </span>(@list_error4 $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;invalid syntax&quot;</span>)
     };
 
-    <span class="comment">// Success! All cases were parsed.</span>
-    (@<span class="ident">case</span>
+    <span class="comment">// Success! All cases were parsed.
+    </span>(@case
         ()
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+        <span class="macro-nonterminal">$cases</span>:tt
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">init</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-        )
+            @<span class="macro-nonterminal">init
+            $cases
+            $default
+        </span>)
     };
 
-    <span class="comment">// Check the format of a recv case.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Check the format of a recv case.
+    </span>(@case
+        (recv(<span class="macro-nonterminal">$r</span>:expr $(,)<span class="question-mark">?</span>) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">case</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="op">*</span> <span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-        )
+            @<span class="macro-nonterminal">case
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            ($(<span class="macro-nonterminal">$cases</span>)* recv(<span class="macro-nonterminal">$r</span>) -&gt; <span class="macro-nonterminal">$res </span>=&gt; <span class="macro-nonterminal">$body</span>,)
+            <span class="macro-nonterminal">$default
+        </span>)
     };
-    <span class="comment">// Print an error if the argument list is invalid.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">recv</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if the argument list is invalid.
+    </span>(@case
+        (recv($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;invalid argument list in `recv(&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;)`&quot;</span>,
             )
         )
     };
-    <span class="comment">// Print an error if there is no argument list.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">recv</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if there is no argument list.
+    </span>(@case
+        (recv <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list after `recv`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
 
-    <span class="comment">// Check the format of a send case.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Check the format of a send case.
+    </span>(@case
+        (send(<span class="macro-nonterminal">$s</span>:expr, <span class="macro-nonterminal">$m</span>:expr $(,)<span class="question-mark">?</span>) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">case</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="op">*</span> <span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-        )
+            @<span class="macro-nonterminal">case
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            ($(<span class="macro-nonterminal">$cases</span>)* send(<span class="macro-nonterminal">$s</span>, <span class="macro-nonterminal">$m</span>) -&gt; <span class="macro-nonterminal">$res </span>=&gt; <span class="macro-nonterminal">$body</span>,)
+            <span class="macro-nonterminal">$default
+        </span>)
     };
-    <span class="comment">// Print an error if the argument list is invalid.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">send</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if the argument list is invalid.
+    </span>(@case
+        (send($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;invalid argument list in `send(&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;)`&quot;</span>,
             )
         )
     };
-    <span class="comment">// Print an error if there is no argument list.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">send</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if there is no argument list.
+    </span>(@case
+        (send <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list after `send`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
 
-    <span class="comment">// Check the format of a default case.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">default</span>() =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+    <span class="comment">// Check the format of a default case.
+    </span>(@case
+        (default() =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
         ()
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">case</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-            (<span class="ident">default</span>() =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
+            @<span class="macro-nonterminal">case
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            <span class="macro-nonterminal">$cases
+            </span>(default() =&gt; <span class="macro-nonterminal">$body</span>,)
         )
     };
-    <span class="comment">// Check the format of a default case with timeout.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">default</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>:<span class="ident">expr</span> $(,)<span class="question-mark">?</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+    <span class="comment">// Check the format of a default case with timeout.
+    </span>(@case
+        (default(<span class="macro-nonterminal">$timeout</span>:expr $(,)<span class="question-mark">?</span>) =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
         ()
     ) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">case</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-            (<span class="ident">default</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
+            @<span class="macro-nonterminal">case
+            </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+            <span class="macro-nonterminal">$cases
+            </span>(default(<span class="macro-nonterminal">$timeout</span>) =&gt; <span class="macro-nonterminal">$body</span>,)
         )
     };
-    <span class="comment">// Check for duplicate default cases...</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">default</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">def</span>:<span class="ident">tt</span>)<span class="op">+</span>)
+    <span class="comment">// Check for duplicate default cases...
+    </span>(@case
+        (default $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
+        ($(<span class="macro-nonterminal">$def</span>:tt)+)
     ) =&gt; {
         <span class="macro">compile_error!</span>(
-            <span class="string">&quot;there can be only one `default` case in a `select!` block&quot;</span>
-        )
+            <span class="string">&quot;there can be only one `default` case in a `select!` block&quot;
+        </span>)
     };
-    <span class="comment">// Print an error if the argument list is invalid.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">default</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if the argument list is invalid.
+    </span>(@case
+        (default($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>) =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;invalid argument list in `default(&quot;</span>,
-                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>),
                 <span class="string">&quot;)`&quot;</span>,
             )
         )
     };
-    <span class="comment">// Print an error if there is an unexpected token after `default`.</span>
-    (@<span class="ident">case</span>
-        (<span class="ident">default</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Print an error if there is an unexpected token after `default`.
+    </span>(@case
+        (default <span class="macro-nonterminal">$t</span>:tt $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected an argument list or `=&gt;` after `default`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$t</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
 
-    <span class="comment">// The case was not consumed, therefore it must be invalid.</span>
-    (@<span class="ident">case</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// The case was not consumed, therefore it must be invalid.
+    </span>(@case
+        (<span class="macro-nonterminal">$case</span>:ident $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$cases</span>:tt
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;expected one of `recv`, `send`, or `default`, found `&quot;</span>,
-                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>),
+                <span class="macro">stringify!</span>(<span class="macro-nonterminal">$case</span>),
                 <span class="string">&quot;`&quot;</span>,
             )
         )
     };
 
-    <span class="comment">// Optimize `select!` into `try_recv()`.</span>
-    (@<span class="ident">init</span>
-        (<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recv_body</span>:<span class="ident">tt</span>,)
-        (<span class="ident">default</span>() =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default_body</span>:<span class="ident">tt</span>,)
+    <span class="comment">// Optimize `select!` into `try_recv()`.
+    </span>(@init
+        (recv(<span class="macro-nonterminal">$r</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$recv_body</span>:tt,)
+        (default() =&gt; <span class="macro-nonterminal">$default_body</span>:tt,)
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
-            <span class="kw-2">ref</span> <span class="ident">_r</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">_r</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">_r</span>;
-                <span class="kw">match</span> <span class="ident">_r</span>.<span class="ident">try_recv</span>() {
-                    <span class="ident">::std::result::Result::Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::TryRecvError::Empty</span>) =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default_body</span>
-                    }
-                    <span class="ident">_res</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="ident">_res</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RecvError</span>);
-                        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> <span class="op">=</span> <span class="ident">_res</span>;
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recv_body</span>
-                    }
+        <span class="kw">match </span><span class="macro-nonterminal">$r </span>{
+            <span class="kw-2">ref </span>_r =&gt; {
+                <span class="kw">let </span>_r: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; = _r;
+                <span class="kw">match </span>_r.try_recv() {
+                    ::std::result::Result::Err(<span class="macro-nonterminal">$crate::TryRecvError::Empty</span>) =&gt; {
+                        <span class="macro-nonterminal">$default_body
+                    </span>}
+                    _res =&gt; {
+                        <span class="kw">let </span>_res = _res.map_err(|<span class="kw">_</span>| <span class="macro-nonterminal">$crate::RecvError</span>);
+                        <span class="kw">let </span><span class="macro-nonterminal">$res </span>= _res;
+                        <span class="macro-nonterminal">$recv_body
+                    </span>}
                 }
             }
         }
     }};
-    <span class="comment">// Optimize `select!` into `recv()`.</span>
-    (@<span class="ident">init</span>
-        (<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>,)
+    <span class="comment">// Optimize `select!` into `recv()`.
+    </span>(@init
+        (recv(<span class="macro-nonterminal">$r</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt,)
         ()
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
-            <span class="kw-2">ref</span> <span class="ident">_r</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">_r</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">_r</span>;
-                <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="ident">_r</span>.<span class="ident">recv</span>();
-                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> <span class="op">=</span> <span class="ident">_res</span>;
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
-            }
+        <span class="kw">match </span><span class="macro-nonterminal">$r </span>{
+            <span class="kw-2">ref </span>_r =&gt; {
+                <span class="kw">let </span>_r: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; = _r;
+                <span class="kw">let </span>_res = _r.recv();
+                <span class="kw">let </span><span class="macro-nonterminal">$res </span>= _res;
+                <span class="macro-nonterminal">$body
+            </span>}
         }
     }};
-    <span class="comment">// Optimize `select!` into `recv_timeout()`.</span>
-    (@<span class="ident">init</span>
-        (<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recv_body</span>:<span class="ident">tt</span>,)
-        (<span class="ident">default</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>:<span class="ident">expr</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default_body</span>:<span class="ident">tt</span>,)
+    <span class="comment">// Optimize `select!` into `recv_timeout()`.
+    </span>(@init
+        (recv(<span class="macro-nonterminal">$r</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$recv_body</span>:tt,)
+        (default(<span class="macro-nonterminal">$timeout</span>:expr) =&gt; <span class="macro-nonterminal">$default_body</span>:tt,)
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
-            <span class="kw-2">ref</span> <span class="ident">_r</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">_r</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">_r</span>;
-                <span class="kw">match</span> <span class="ident">_r</span>.<span class="ident">recv_timeout</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>) {
-                    <span class="ident">::std::result::Result::Err</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RecvTimeoutError::Timeout</span>) =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default_body</span>
-                    }
-                    <span class="ident">_res</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="ident">_res</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RecvError</span>);
-                        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> <span class="op">=</span> <span class="ident">_res</span>;
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recv_body</span>
-                    }
+        <span class="kw">match </span><span class="macro-nonterminal">$r </span>{
+            <span class="kw-2">ref </span>_r =&gt; {
+                <span class="kw">let </span>_r: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; = _r;
+                <span class="kw">match </span>_r.recv_timeout(<span class="macro-nonterminal">$timeout</span>) {
+                    ::std::result::Result::Err(<span class="macro-nonterminal">$crate::RecvTimeoutError::Timeout</span>) =&gt; {
+                        <span class="macro-nonterminal">$default_body
+                    </span>}
+                    _res =&gt; {
+                        <span class="kw">let </span>_res = _res.map_err(|<span class="kw">_</span>| <span class="macro-nonterminal">$crate::RecvError</span>);
+                        <span class="kw">let </span><span class="macro-nonterminal">$res </span>= _res;
+                        <span class="macro-nonterminal">$recv_body
+                    </span>}
                 }
             }
         }
     }};
 
-    <span class="comment">// // Optimize the non-blocking case with two receive operations.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (recv($r1:expr) -&gt; $res1:pat =&gt; $recv_body1:tt,)</span>
-    <span class="comment">//     (recv($r2:expr) -&gt; $res2:pat =&gt; $recv_body2:tt,)</span>
-    <span class="comment">//     (default() =&gt; $default_body:tt,)</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $r1 {</span>
-    <span class="comment">//         ref _r1 =&gt; {</span>
-    <span class="comment">//             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;</span>
-    <span class="comment">//</span>
-    <span class="comment">//             match $r2 {</span>
-    <span class="comment">//                 ref _r2 =&gt; {</span>
-    <span class="comment">//                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;</span>
-    <span class="comment">//</span>
-    <span class="comment">//                     // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//                 }</span>
-    <span class="comment">//             }</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
-    <span class="comment">// // Optimize the blocking case with two receive operations.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (recv($r1:expr) -&gt; $res1:pat =&gt; $body1:tt,)</span>
-    <span class="comment">//     (recv($r2:expr) -&gt; $res2:pat =&gt; $body2:tt,)</span>
-    <span class="comment">//     ()</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $r1 {</span>
-    <span class="comment">//         ref _r1 =&gt; {</span>
-    <span class="comment">//             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;</span>
-    <span class="comment">//</span>
-    <span class="comment">//             match $r2 {</span>
-    <span class="comment">//                 ref _r2 =&gt; {</span>
-    <span class="comment">//                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;</span>
-    <span class="comment">//</span>
-    <span class="comment">//                     // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//                 }</span>
-    <span class="comment">//             }</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
-    <span class="comment">// // Optimize the case with two receive operations and a timeout.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (recv($r1:expr) -&gt; $res1:pat =&gt; $recv_body1:tt,)</span>
-    <span class="comment">//     (recv($r2:expr) -&gt; $res2:pat =&gt; $recv_body2:tt,)</span>
-    <span class="comment">//     (default($timeout:expr) =&gt; $default_body:tt,)</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $r1 {</span>
-    <span class="comment">//         ref _r1 =&gt; {</span>
-    <span class="comment">//             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;</span>
-    <span class="comment">//</span>
-    <span class="comment">//             match $r2 {</span>
-    <span class="comment">//                 ref _r2 =&gt; {</span>
-    <span class="comment">//                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;</span>
-    <span class="comment">//</span>
-    <span class="comment">//                     // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//                 }</span>
-    <span class="comment">//             }</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
+    <span class="comment">// // Optimize the non-blocking case with two receive operations.
+    // (@init
+    //     (recv($r1:expr) -&gt; $res1:pat =&gt; $recv_body1:tt,)
+    //     (recv($r2:expr) -&gt; $res2:pat =&gt; $recv_body2:tt,)
+    //     (default() =&gt; $default_body:tt,)
+    // ) =&gt; {{
+    //     match $r1 {
+    //         ref _r1 =&gt; {
+    //             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;
+    //
+    //             match $r2 {
+    //                 ref _r2 =&gt; {
+    //                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;
+    //
+    //                     // TODO(stjepang): Implement this optimization.
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }};
+    // // Optimize the blocking case with two receive operations.
+    // (@init
+    //     (recv($r1:expr) -&gt; $res1:pat =&gt; $body1:tt,)
+    //     (recv($r2:expr) -&gt; $res2:pat =&gt; $body2:tt,)
+    //     ()
+    // ) =&gt; {{
+    //     match $r1 {
+    //         ref _r1 =&gt; {
+    //             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;
+    //
+    //             match $r2 {
+    //                 ref _r2 =&gt; {
+    //                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;
+    //
+    //                     // TODO(stjepang): Implement this optimization.
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }};
+    // // Optimize the case with two receive operations and a timeout.
+    // (@init
+    //     (recv($r1:expr) -&gt; $res1:pat =&gt; $recv_body1:tt,)
+    //     (recv($r2:expr) -&gt; $res2:pat =&gt; $recv_body2:tt,)
+    //     (default($timeout:expr) =&gt; $default_body:tt,)
+    // ) =&gt; {{
+    //     match $r1 {
+    //         ref _r1 =&gt; {
+    //             let _r1: &amp;$crate::Receiver&lt;_&gt; = _r1;
+    //
+    //             match $r2 {
+    //                 ref _r2 =&gt; {
+    //                     let _r2: &amp;$crate::Receiver&lt;_&gt; = _r2;
+    //
+    //                     // TODO(stjepang): Implement this optimization.
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }};
 
-    <span class="comment">// // Optimize `select!` into `try_send()`.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $send_body:tt,)</span>
-    <span class="comment">//     (default() =&gt; $default_body:tt,)</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $s {</span>
-    <span class="comment">//         ref _s =&gt; {</span>
-    <span class="comment">//             let _s: &amp;$crate::Sender&lt;_&gt; = _s;</span>
-    <span class="comment">//             // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
-    <span class="comment">// // Optimize `select!` into `send()`.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $body:tt,)</span>
-    <span class="comment">//     ()</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $s {</span>
-    <span class="comment">//         ref _s =&gt; {</span>
-    <span class="comment">//             let _s: &amp;$crate::Sender&lt;_&gt; = _s;</span>
-    <span class="comment">//             // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
-    <span class="comment">// // Optimize `select!` into `send_timeout()`.</span>
-    <span class="comment">// (@init</span>
-    <span class="comment">//     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $body:tt,)</span>
-    <span class="comment">//     (default($timeout:expr) =&gt; $body:tt,)</span>
-    <span class="comment">// ) =&gt; {{</span>
-    <span class="comment">//     match $s {</span>
-    <span class="comment">//         ref _s =&gt; {</span>
-    <span class="comment">//             let _s: &amp;$crate::Sender&lt;_&gt; = _s;</span>
-    <span class="comment">//             // TODO(stjepang): Implement this optimization.</span>
-    <span class="comment">//         }</span>
-    <span class="comment">//     }</span>
-    <span class="comment">// }};</span>
+    // // Optimize `select!` into `try_send()`.
+    // (@init
+    //     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $send_body:tt,)
+    //     (default() =&gt; $default_body:tt,)
+    // ) =&gt; {{
+    //     match $s {
+    //         ref _s =&gt; {
+    //             let _s: &amp;$crate::Sender&lt;_&gt; = _s;
+    //             // TODO(stjepang): Implement this optimization.
+    //         }
+    //     }
+    // }};
+    // // Optimize `select!` into `send()`.
+    // (@init
+    //     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $body:tt,)
+    //     ()
+    // ) =&gt; {{
+    //     match $s {
+    //         ref _s =&gt; {
+    //             let _s: &amp;$crate::Sender&lt;_&gt; = _s;
+    //             // TODO(stjepang): Implement this optimization.
+    //         }
+    //     }
+    // }};
+    // // Optimize `select!` into `send_timeout()`.
+    // (@init
+    //     (send($s:expr, $m:expr) -&gt; $res:pat =&gt; $body:tt,)
+    //     (default($timeout:expr) =&gt; $body:tt,)
+    // ) =&gt; {{
+    //     match $s {
+    //         ref _s =&gt; {
+    //             let _s: &amp;$crate::Sender&lt;_&gt; = _s;
+    //             // TODO(stjepang): Implement this optimization.
+    //         }
+    //     }
+    // }};
 
-    <span class="comment">// Create the list of handles and add operations to it.</span>
-    (@<span class="ident">init</span>
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    // Create the list of handles and add operations to it.
+    </span>(@init
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
     ) =&gt; {{
-        <span class="kw">const</span> <span class="ident">_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">count</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="kw-2">*</span>));
-        <span class="kw">let</span> <span class="ident">_handle</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::internal::SelectHandle</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::never</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>();
+        <span class="kw">const </span>_LEN: usize = <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">count </span>($(<span class="macro-nonterminal">$cases</span>)<span class="kw-2">*</span>));
+        <span class="kw">let </span>_handle: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::internal::SelectHandle </span>= <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::never</span>::&lt;()&gt;();
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_sel</span> <span class="op">=</span> [(<span class="ident">_handle</span>, <span class="number">0</span>, <span class="ident">::std::ptr::null</span>()); <span class="ident">_LEN</span>];
+        <span class="attribute">#[allow(unused_mut)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>_sel = [(_handle, <span class="number">0</span>, ::std::ptr::null()); _LEN];
 
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">add</span>
-            <span class="ident">_sel</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="kw-2">*</span>)
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-            (
-                (<span class="number">0usize</span> <span class="ident">_oper0</span>)
-                (<span class="number">1usize</span> <span class="ident">_oper1</span>)
-                (<span class="number">2usize</span> <span class="ident">_oper2</span>)
-                (<span class="number">3usize</span> <span class="ident">_oper3</span>)
-                (<span class="number">4usize</span> <span class="ident">_oper4</span>)
-                (<span class="number">5usize</span> <span class="ident">_oper5</span>)
-                (<span class="number">6usize</span> <span class="ident">_oper6</span>)
-                (<span class="number">7usize</span> <span class="ident">_oper7</span>)
-                (<span class="number">8usize</span> <span class="ident">_oper8</span>)
-                (<span class="number">9usize</span> <span class="ident">_oper9</span>)
-                (<span class="number">10usize</span> <span class="ident">_oper10</span>)
-                (<span class="number">11usize</span> <span class="ident">_oper11</span>)
-                (<span class="number">12usize</span> <span class="ident">_oper12</span>)
-                (<span class="number">13usize</span> <span class="ident">_oper13</span>)
-                (<span class="number">14usize</span> <span class="ident">_oper14</span>)
-                (<span class="number">15usize</span> <span class="ident">_oper15</span>)
-                (<span class="number">16usize</span> <span class="ident">_oper16</span>)
-                (<span class="number">17usize</span> <span class="ident">_oper17</span>)
-                (<span class="number">18usize</span> <span class="ident">_oper18</span>)
-                (<span class="number">19usize</span> <span class="ident">_oper19</span>)
-                (<span class="number">20usize</span> <span class="ident">_oper20</span>)
-                (<span class="number">21usize</span> <span class="ident">_oper21</span>)
-                (<span class="number">22usize</span> <span class="ident">_oper22</span>)
-                (<span class="number">23usize</span> <span class="ident">_oper23</span>)
-                (<span class="number">24usize</span> <span class="ident">_oper24</span>)
-                (<span class="number">25usize</span> <span class="ident">_oper25</span>)
-                (<span class="number">26usize</span> <span class="ident">_oper26</span>)
-                (<span class="number">27usize</span> <span class="ident">_oper27</span>)
-                (<span class="number">28usize</span> <span class="ident">_oper28</span>)
-                (<span class="number">29usize</span> <span class="ident">_oper29</span>)
-                (<span class="number">30usize</span> <span class="ident">_oper30</span>)
-                (<span class="number">31usize</span> <span class="ident">_oper31</span>)
+            @<span class="macro-nonterminal">add
+            </span>_sel
+            ($(<span class="macro-nonterminal">$cases</span>)<span class="kw-2">*</span>)
+            <span class="macro-nonterminal">$default
+            </span>(
+                (<span class="number">0usize </span>_oper0)
+                (<span class="number">1usize </span>_oper1)
+                (<span class="number">2usize </span>_oper2)
+                (<span class="number">3usize </span>_oper3)
+                (<span class="number">4usize </span>_oper4)
+                (<span class="number">5usize </span>_oper5)
+                (<span class="number">6usize </span>_oper6)
+                (<span class="number">7usize </span>_oper7)
+                (<span class="number">8usize </span>_oper8)
+                (<span class="number">9usize </span>_oper9)
+                (<span class="number">10usize </span>_oper10)
+                (<span class="number">11usize </span>_oper11)
+                (<span class="number">12usize </span>_oper12)
+                (<span class="number">13usize </span>_oper13)
+                (<span class="number">14usize </span>_oper14)
+                (<span class="number">15usize </span>_oper15)
+                (<span class="number">16usize </span>_oper16)
+                (<span class="number">17usize </span>_oper17)
+                (<span class="number">18usize </span>_oper18)
+                (<span class="number">19usize </span>_oper19)
+                (<span class="number">20usize </span>_oper20)
+                (<span class="number">21usize </span>_oper21)
+                (<span class="number">22usize </span>_oper22)
+                (<span class="number">23usize </span>_oper23)
+                (<span class="number">24usize </span>_oper24)
+                (<span class="number">25usize </span>_oper25)
+                (<span class="number">26usize </span>_oper26)
+                (<span class="number">27usize </span>_oper27)
+                (<span class="number">28usize </span>_oper28)
+                (<span class="number">29usize </span>_oper29)
+                (<span class="number">30usize </span>_oper30)
+                (<span class="number">31usize </span>_oper31)
             )
             ()
         )
     }};
 
-    <span class="comment">// Count the listed cases.</span>
-    (@<span class="ident">count</span> ()) =&gt; {
-        <span class="number">0</span>
+    <span class="comment">// Count the listed cases.
+    </span>(@count ()) =&gt; {
+        <span class="number">0
+    </span>};
+    (@count (<span class="macro-nonterminal">$oper</span>:ident <span class="macro-nonterminal">$args</span>:tt -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)) =&gt; {
+        <span class="number">1 </span>+ <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">count </span>($(<span class="macro-nonterminal">$cases</span>)<span class="kw-2">*</span>))
     };
-    (@<span class="ident">count</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span> -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)) =&gt; {
-        <span class="number">1</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(@<span class="macro-nonterminal">count</span> ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="kw-2">*</span>))
-    };
 
-    <span class="comment">// Run blocking selection.</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
+    <span class="comment">// Run blocking selection.
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
         ()
         ()
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+        <span class="macro-nonterminal">$labels</span>:tt
+        <span class="macro-nonterminal">$cases</span>:tt
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_oper</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::SelectedOperation</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">_oper</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::internal::select</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>);
+        <span class="kw">let </span>_oper: <span class="macro-nonterminal">$crate::SelectedOperation</span>&lt;<span class="lifetime">&#39;_</span>&gt; = {
+            <span class="kw">let </span>_oper = <span class="macro-nonterminal">$crate::internal::select</span>(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$sel</span>);
 
-            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.</span>
-            <span class="kw">unsafe</span> { <span class="ident">::std::mem::transmute</span>(<span class="ident">_oper</span>) }
+            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.
+            </span><span class="kw">unsafe </span>{ ::std::mem::transmute(_oper) }
         };
 
-        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span> {
-            @<span class="macro-nonterminal">complete</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-            <span class="ident">_oper</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-        }
+        <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal! </span>{
+            @<span class="macro-nonterminal">complete
+            $sel
+            </span>_oper
+            <span class="macro-nonterminal">$cases
+        </span>}
     }};
-    <span class="comment">// Run non-blocking selection.</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
+    <span class="comment">// Run non-blocking selection.
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
         ()
-        (<span class="ident">default</span>() =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>,)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+        (default() =&gt; <span class="macro-nonterminal">$body</span>:tt,)
+        <span class="macro-nonterminal">$labels</span>:tt
+        <span class="macro-nonterminal">$cases</span>:tt
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_oper</span>: <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::SelectedOperation</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">_oper</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::internal::try_select</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>);
+        <span class="kw">let </span>_oper: ::std::option::Option&lt;<span class="macro-nonterminal">$crate::SelectedOperation</span>&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = {
+            <span class="kw">let </span>_oper = <span class="macro-nonterminal">$crate::internal::try_select</span>(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$sel</span>);
 
-            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.</span>
-            <span class="kw">unsafe</span> { <span class="ident">::std::mem::transmute</span>(<span class="ident">_oper</span>) }
+            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.
+            </span><span class="kw">unsafe </span>{ ::std::mem::transmute(_oper) }
         };
 
-        <span class="kw">match</span> <span class="ident">_oper</span> {
-            <span class="prelude-val">None</span> =&gt; {
-                { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span> };
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">_oper</span>) =&gt; {
-                <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span> {
-                    @<span class="macro-nonterminal">complete</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                    <span class="ident">_oper</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-                }
+        <span class="kw">match </span>_oper {
+            <span class="prelude-val">None </span>=&gt; {
+                { <span class="macro-nonterminal">$sel </span>};
+                <span class="macro-nonterminal">$body
+            </span>}
+            <span class="prelude-val">Some</span>(_oper) =&gt; {
+                <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal! </span>{
+                    @<span class="macro-nonterminal">complete
+                    $sel
+                    </span>_oper
+                    <span class="macro-nonterminal">$cases
+                </span>}
             }
         }
     }};
-    <span class="comment">// Run selection with a timeout.</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
+    <span class="comment">// Run selection with a timeout.
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
         ()
-        (<span class="ident">default</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>:<span class="ident">expr</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>,)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+        (default(<span class="macro-nonterminal">$timeout</span>:expr) =&gt; <span class="macro-nonterminal">$body</span>:tt,)
+        <span class="macro-nonterminal">$labels</span>:tt
+        <span class="macro-nonterminal">$cases</span>:tt
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_oper</span>: <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::SelectedOperation</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">_oper</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::internal::select_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">timeout</span>);
+        <span class="kw">let </span>_oper: ::std::option::Option&lt;<span class="macro-nonterminal">$crate::SelectedOperation</span>&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = {
+            <span class="kw">let </span>_oper = <span class="macro-nonterminal">$crate::internal::select_timeout</span>(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$sel</span>, <span class="macro-nonterminal">$timeout</span>);
 
-            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.</span>
-            <span class="kw">unsafe</span> { <span class="ident">::std::mem::transmute</span>(<span class="ident">_oper</span>) }
+            <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.
+            </span><span class="kw">unsafe </span>{ ::std::mem::transmute(_oper) }
         };
 
-        <span class="kw">match</span> <span class="ident">_oper</span> {
-            <span class="ident">::std::option::Option::None</span> =&gt; {
-                { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span> };
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
-            }
-            <span class="ident">::std::option::Option::Some</span>(<span class="ident">_oper</span>) =&gt; {
-                <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span> {
-                    @<span class="macro-nonterminal">complete</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                    <span class="ident">_oper</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>
-                }
+        <span class="kw">match </span>_oper {
+            ::std::option::Option::None =&gt; {
+                { <span class="macro-nonterminal">$sel </span>};
+                <span class="macro-nonterminal">$body
+            </span>}
+            ::std::option::Option::Some(_oper) =&gt; {
+                <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal! </span>{
+                    @<span class="macro-nonterminal">complete
+                    $sel
+                    </span>_oper
+                    <span class="macro-nonterminal">$cases
+                </span>}
             }
         }
     }};
-    <span class="comment">// Have we used up all labels?</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>:<span class="ident">tt</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
+    <span class="comment">// Have we used up all labels?
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
+        <span class="macro-nonterminal">$input</span>:tt
+        <span class="macro-nonterminal">$default</span>:tt
         ()
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>
+        <span class="macro-nonterminal">$cases</span>:tt
     ) =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;too many operations in a `select!` block&quot;</span>)
     };
-    <span class="comment">// Add a receive operation to `sel`.</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        (<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
-        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Add a receive operation to `sel`.
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
+        (recv(<span class="macro-nonterminal">$r</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
+        ((<span class="macro-nonterminal">$i</span>:tt <span class="macro-nonterminal">$var</span>:ident) $(<span class="macro-nonterminal">$labels</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> {
-            <span class="kw-2">ref</span> <span class="ident">_r</span> =&gt; {
-                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">_r</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">_r</span>;
+        <span class="kw">match </span><span class="macro-nonterminal">$r </span>{
+            <span class="kw-2">ref </span>_r =&gt; {
+                <span class="kw">let </span><span class="macro-nonterminal">$var</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; = <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>_r: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; = _r;
 
-                    <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.</span>
-                    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unbind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
-                        <span class="ident">::std::mem::transmute</span>(<span class="ident">x</span>)
+                    <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.
+                    </span><span class="kw">unsafe fn </span>unbind&lt;<span class="lifetime">&#39;a</span>, T&gt;(x: <span class="kw-2">&amp;</span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T {
+                        ::std::mem::transmute(x)
                     }
-                    <span class="ident">unbind</span>(<span class="ident">_r</span>)
+                    unbind(_r)
                 };
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Receiver</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>);
+                <span class="macro-nonterminal">$sel</span>[<span class="macro-nonterminal">$i</span>] = (<span class="macro-nonterminal">$var</span>, <span class="macro-nonterminal">$i</span>, <span class="macro-nonterminal">$var </span><span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::Receiver</span>&lt;<span class="kw">_</span>&gt; <span class="kw">as </span><span class="kw-2">*const </span>u8);
 
                 <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-                    @<span class="macro-nonterminal">add</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>)<span class="kw-2">*</span>)
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="op">*</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
+                    @<span class="macro-nonterminal">add
+                    $sel
+                    </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+                    <span class="macro-nonterminal">$default
+                    </span>($(<span class="macro-nonterminal">$labels</span>)<span class="kw-2">*</span>)
+                    ($(<span class="macro-nonterminal">$cases</span>)* [<span class="macro-nonterminal">$i</span>] recv(<span class="macro-nonterminal">$var</span>) -&gt; <span class="macro-nonterminal">$res </span>=&gt; <span class="macro-nonterminal">$body</span>,)
                 )
             }
         }
     }};
-    <span class="comment">// Add a send operation to `sel`.</span>
-    (@<span class="ident">add</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        (<span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">tt</span>
-        ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Add a send operation to `sel`.
+    </span>(@add
+        <span class="macro-nonterminal">$sel</span>:ident
+        (send(<span class="macro-nonterminal">$s</span>:expr, <span class="macro-nonterminal">$m</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
+        <span class="macro-nonterminal">$default</span>:tt
+        ((<span class="macro-nonterminal">$i</span>:tt <span class="macro-nonterminal">$var</span>:ident) $(<span class="macro-nonterminal">$labels</span>:tt)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$cases</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span> {
-            <span class="kw-2">ref</span> <span class="ident">_s</span> =&gt; {
-                <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Sender</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">_s</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Sender</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">_s</span>;
+        <span class="kw">match </span><span class="macro-nonterminal">$s </span>{
+            <span class="kw-2">ref </span>_s =&gt; {
+                <span class="kw">let </span><span class="macro-nonterminal">$var</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Sender</span>&lt;<span class="kw">_</span>&gt; = <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>_s: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$crate::Sender</span>&lt;<span class="kw">_</span>&gt; = _s;
 
-                    <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.</span>
-                    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unbind</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
-                        <span class="ident">::std::mem::transmute</span>(<span class="ident">x</span>)
+                    <span class="comment">// Erase the lifetime so that `sel` can be dropped early even without NLL.
+                    </span><span class="kw">unsafe fn </span>unbind&lt;<span class="lifetime">&#39;a</span>, T&gt;(x: <span class="kw-2">&amp;</span>T) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T {
+                        ::std::mem::transmute(x)
                     }
-                    <span class="ident">unbind</span>(<span class="ident">_s</span>)
+                    unbind(_s)
                 };
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Sender</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>);
+                <span class="macro-nonterminal">$sel</span>[<span class="macro-nonterminal">$i</span>] = (<span class="macro-nonterminal">$var</span>, <span class="macro-nonterminal">$i</span>, <span class="macro-nonterminal">$var </span><span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$crate::Sender</span>&lt;<span class="kw">_</span>&gt; <span class="kw">as </span><span class="kw-2">*const </span>u8);
 
                 <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-                    @<span class="macro-nonterminal">add</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">labels</span>)<span class="kw-2">*</span>)
-                    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cases</span>)<span class="op">*</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,)
+                    @<span class="macro-nonterminal">add
+                    $sel
+                    </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
+                    <span class="macro-nonterminal">$default
+                    </span>($(<span class="macro-nonterminal">$labels</span>)<span class="kw-2">*</span>)
+                    ($(<span class="macro-nonterminal">$cases</span>)* [<span class="macro-nonterminal">$i</span>] send(<span class="macro-nonterminal">$var</span>, <span class="macro-nonterminal">$m</span>) -&gt; <span class="macro-nonterminal">$res </span>=&gt; <span class="macro-nonterminal">$body</span>,)
                 )
             }
         }
     }};
 
-    <span class="comment">// Complete a receive operation.</span>
-    (@<span class="ident">complete</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>:<span class="ident">ident</span>
-        ([<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">tt</span>] <span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">ident</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Complete a receive operation.
+    </span>(@complete
+        <span class="macro-nonterminal">$sel</span>:ident
+        <span class="macro-nonterminal">$oper</span>:ident
+        ([<span class="macro-nonterminal">$i</span>:tt] recv(<span class="macro-nonterminal">$r</span>:ident) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {{
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>.<span class="ident">index</span>() <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> {
-            <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>.<span class="ident">recv</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>);
-            { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span> };
+        <span class="kw">if </span><span class="macro-nonterminal">$oper</span>.index() == <span class="macro-nonterminal">$i </span>{
+            <span class="kw">let </span>_res = <span class="macro-nonterminal">$oper</span>.recv(<span class="macro-nonterminal">$r</span>);
+            { <span class="macro-nonterminal">$sel </span>};
 
-            <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> <span class="op">=</span> <span class="ident">_res</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
-        } <span class="kw">else</span> {
-            <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span> {
-                @<span class="macro-nonterminal">complete</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>
-                ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+            <span class="kw">let </span><span class="macro-nonterminal">$res </span>= _res;
+            <span class="macro-nonterminal">$body
+        </span>} <span class="kw">else </span>{
+            <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal! </span>{
+                @<span class="macro-nonterminal">complete
+                $sel
+                $oper
+                </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
             }
         }
     }};
-    <span class="comment">// Complete a send operation.</span>
-    (@<span class="ident">complete</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>:<span class="ident">ident</span>
-        ([<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">tt</span>] <span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">expr</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">pat</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">tt</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Complete a send operation.
+    </span>(@complete
+        <span class="macro-nonterminal">$sel</span>:ident
+        <span class="macro-nonterminal">$oper</span>:ident
+        ([<span class="macro-nonterminal">$i</span>:tt] send(<span class="macro-nonterminal">$s</span>:ident, <span class="macro-nonterminal">$m</span>:expr) -&gt; <span class="macro-nonterminal">$res</span>:pat =&gt; <span class="macro-nonterminal">$body</span>:tt, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>)
     ) =&gt; {{
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>.<span class="ident">index</span>() <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> {
-            <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>.<span class="ident">send</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>);
-            { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span> };
+        <span class="kw">if </span><span class="macro-nonterminal">$oper</span>.index() == <span class="macro-nonterminal">$i </span>{
+            <span class="kw">let </span>_res = <span class="macro-nonterminal">$oper</span>.send(<span class="macro-nonterminal">$s</span>, <span class="macro-nonterminal">$m</span>);
+            { <span class="macro-nonterminal">$sel </span>};
 
-            <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> <span class="op">=</span> <span class="ident">_res</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>
-        } <span class="kw">else</span> {
-            <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span> {
-                @<span class="macro-nonterminal">complete</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>
-                ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>)
+            <span class="kw">let </span><span class="macro-nonterminal">$res </span>= _res;
+            <span class="macro-nonterminal">$body
+        </span>} <span class="kw">else </span>{
+            <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal! </span>{
+                @<span class="macro-nonterminal">complete
+                $sel
+                $oper
+                </span>($(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>)
             }
         }
     }};
-    <span class="comment">// Panic if we don&#39;t identify the selected case, but this should never happen.</span>
-    (@<span class="ident">complete</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sel</span>:<span class="ident">ident</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">oper</span>:<span class="ident">ident</span>
+    <span class="comment">// Panic if we don&#39;t identify the selected case, but this should never happen.
+    </span>(@complete
+        <span class="macro-nonterminal">$sel</span>:ident
+        <span class="macro-nonterminal">$oper</span>:ident
         ()
     ) =&gt; {{
         <span class="macro">unreachable!</span>(
-            <span class="string">&quot;internal error in crossbeam-channel: invalid case&quot;</span>
-        )
+            <span class="string">&quot;internal error in crossbeam-channel: invalid case&quot;
+        </span>)
     }};
 
-    <span class="comment">// Catches a bug within this macro (should not happen).</span>
-    (@$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    <span class="comment">// Catches a bug within this macro (should not happen).
+    </span>(@$(<span class="macro-nonterminal">$tokens</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro">compile_error!</span>(
             <span class="macro">concat!</span>(
                 <span class="string">&quot;internal error in crossbeam-channel: &quot;</span>,
-                <span class="macro">stringify!</span>(@$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>)<span class="kw-2">*</span>),
+                <span class="macro">stringify!</span>(@$(<span class="macro-nonterminal">$tokens</span>)<span class="kw-2">*</span>),
             )
         )
     };
 
-    <span class="comment">// The entry points.</span>
-    () =&gt; {
+    <span class="comment">// The entry points.
+    </span>() =&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;empty `select!` block&quot;</span>)
     };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span>:<span class="ident">ident</span> $(($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>))<span class="op">*</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">expr</span> $(,)<span class="kw-2">*</span>)<span class="kw-2">*</span>) =&gt; {
+    ($(<span class="macro-nonterminal">$case</span>:ident $(($(<span class="macro-nonterminal">$args</span>:tt)<span class="kw-2">*</span>))* =&gt; <span class="macro-nonterminal">$body</span>:expr $(,)<span class="kw-2">*</span>)<span class="kw-2">*</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">case</span> $(($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>)<span class="kw-2">*</span>))<span class="op">*</span> =&gt; { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span> },)<span class="kw-2">*</span>)
+            @<span class="macro-nonterminal">list
+            </span>($(<span class="macro-nonterminal">$case </span>$(($(<span class="macro-nonterminal">$args</span>)<span class="kw-2">*</span>))* =&gt; { <span class="macro-nonterminal">$body </span>},)<span class="kw-2">*</span>)
             ()
         )
     };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    ($(<span class="macro-nonterminal">$tokens</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            @<span class="macro-nonterminal">list</span>
-            ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>)<span class="kw-2">*</span>)
+            @<span class="macro-nonterminal">list
+            </span>($(<span class="macro-nonterminal">$tokens</span>)<span class="kw-2">*</span>)
             ()
         )
     };
 }
 
-<span class="doccomment">/// Selects from a set of channel operations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro allows you to define a set of channel operations, wait until any one of them becomes</span>
-<span class="doccomment">/// ready, and finally execute it. If multiple operations are ready at the same time, a random one</span>
-<span class="doccomment">/// among them is selected.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is also possible to define a `default` case that gets executed if none of the operations are</span>
-<span class="doccomment">/// ready, either right away or for a certain duration of time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An operation is considered to be ready if it doesn&#39;t have to block. Note that it is ready even</span>
-<span class="doccomment">/// when it will simply return an error because the channel is disconnected.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `select!` macro is a convenience wrapper around [`Select`]. However, it cannot select over a</span>
-<span class="doccomment">/// dynamically created list of channel operations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Select`]: super::Select</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Block until a send or a receive operation is selected:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use crossbeam_channel::{select, unbounded};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s1, r1) = unbounded();</span>
-<span class="doccomment">/// let (s2, r2) = unbounded();</span>
-<span class="doccomment">/// s1.send(10).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Since both operations are initially ready, a random one will be executed.</span>
-<span class="doccomment">/// select! {</span>
-<span class="doccomment">///     recv(r1) -&gt; msg =&gt; assert_eq!(msg, Ok(10)),</span>
-<span class="doccomment">///     send(s2, 20) -&gt; res =&gt; {</span>
-<span class="doccomment">///         assert_eq!(res, Ok(()));</span>
-<span class="doccomment">///         assert_eq!(r2.recv(), Ok(20));</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Select from a set of operations without blocking:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::thread;</span>
-<span class="doccomment">/// use std::time::Duration;</span>
-<span class="doccomment">/// use crossbeam_channel::{select, unbounded};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s1, r1) = unbounded();</span>
-<span class="doccomment">/// let (s2, r2) = unbounded();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_secs(1));</span>
-<span class="doccomment">///     s1.send(10).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_millis(500));</span>
-<span class="doccomment">///     s2.send(20).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // None of the operations are initially ready.</span>
-<span class="doccomment">/// select! {</span>
-<span class="doccomment">///     recv(r1) -&gt; msg =&gt; panic!(),</span>
-<span class="doccomment">///     recv(r2) -&gt; msg =&gt; panic!(),</span>
-<span class="doccomment">///     default =&gt; println!(&quot;not ready&quot;),</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Select over a set of operations with a timeout:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::thread;</span>
-<span class="doccomment">/// use std::time::Duration;</span>
-<span class="doccomment">/// use crossbeam_channel::{select, unbounded};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s1, r1) = unbounded();</span>
-<span class="doccomment">/// let (s2, r2) = unbounded();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_secs(1));</span>
-<span class="doccomment">///     s1.send(10).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_millis(500));</span>
-<span class="doccomment">///     s2.send(20).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // None of the two operations will become ready within 100 milliseconds.</span>
-<span class="doccomment">/// select! {</span>
-<span class="doccomment">///     recv(r1) -&gt; msg =&gt; panic!(),</span>
-<span class="doccomment">///     recv(r2) -&gt; msg =&gt; panic!(),</span>
-<span class="doccomment">///     default(Duration::from_millis(100)) =&gt; println!(&quot;timed out&quot;),</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Optionally add a receive operation to `select!` using [`never`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::thread;</span>
-<span class="doccomment">/// use std::time::Duration;</span>
-<span class="doccomment">/// use crossbeam_channel::{select, never, unbounded};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (s1, r1) = unbounded();</span>
-<span class="doccomment">/// let (s2, r2) = unbounded();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_secs(1));</span>
-<span class="doccomment">///     s1.send(10).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     thread::sleep(Duration::from_millis(500));</span>
-<span class="doccomment">///     s2.send(20).unwrap();</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This receiver can be a `Some` or a `None`.</span>
-<span class="doccomment">/// let r2 = Some(&amp;r2);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // None of the two operations will become ready within 100 milliseconds.</span>
-<span class="doccomment">/// select! {</span>
-<span class="doccomment">///     recv(r1) -&gt; msg =&gt; panic!(),</span>
-<span class="doccomment">///     recv(r2.unwrap_or(&amp;never())) -&gt; msg =&gt; assert_eq!(msg, Ok(20)),</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To optionally add a timeout to `select!`, see the [example] for [`never`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`never`]: super::never</span>
-<span class="doccomment">/// [example]: super::never#examples</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">select</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+<span class="doccomment">/// Selects from a set of channel operations.
+///
+/// This macro allows you to define a set of channel operations, wait until any one of them becomes
+/// ready, and finally execute it. If multiple operations are ready at the same time, a random one
+/// among them is selected.
+///
+/// It is also possible to define a `default` case that gets executed if none of the operations are
+/// ready, either right away or for a certain duration of time.
+///
+/// An operation is considered to be ready if it doesn&#39;t have to block. Note that it is ready even
+/// when it will simply return an error because the channel is disconnected.
+///
+/// The `select!` macro is a convenience wrapper around [`Select`]. However, it cannot select over a
+/// dynamically created list of channel operations.
+///
+/// [`Select`]: super::Select
+///
+/// # Examples
+///
+/// Block until a send or a receive operation is selected:
+///
+/// ```
+/// use crossbeam_channel::{select, unbounded};
+///
+/// let (s1, r1) = unbounded();
+/// let (s2, r2) = unbounded();
+/// s1.send(10).unwrap();
+///
+/// // Since both operations are initially ready, a random one will be executed.
+/// select! {
+///     recv(r1) -&gt; msg =&gt; assert_eq!(msg, Ok(10)),
+///     send(s2, 20) -&gt; res =&gt; {
+///         assert_eq!(res, Ok(()));
+///         assert_eq!(r2.recv(), Ok(20));
+///     }
+/// }
+/// ```
+///
+/// Select from a set of operations without blocking:
+///
+/// ```
+/// use std::thread;
+/// use std::time::Duration;
+/// use crossbeam_channel::{select, unbounded};
+///
+/// let (s1, r1) = unbounded();
+/// let (s2, r2) = unbounded();
+///
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_secs(1));
+///     s1.send(10).unwrap();
+/// });
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_millis(500));
+///     s2.send(20).unwrap();
+/// });
+///
+/// // None of the operations are initially ready.
+/// select! {
+///     recv(r1) -&gt; msg =&gt; panic!(),
+///     recv(r2) -&gt; msg =&gt; panic!(),
+///     default =&gt; println!(&quot;not ready&quot;),
+/// }
+/// ```
+///
+/// Select over a set of operations with a timeout:
+///
+/// ```
+/// use std::thread;
+/// use std::time::Duration;
+/// use crossbeam_channel::{select, unbounded};
+///
+/// let (s1, r1) = unbounded();
+/// let (s2, r2) = unbounded();
+///
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_secs(1));
+///     s1.send(10).unwrap();
+/// });
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_millis(500));
+///     s2.send(20).unwrap();
+/// });
+///
+/// // None of the two operations will become ready within 100 milliseconds.
+/// select! {
+///     recv(r1) -&gt; msg =&gt; panic!(),
+///     recv(r2) -&gt; msg =&gt; panic!(),
+///     default(Duration::from_millis(100)) =&gt; println!(&quot;timed out&quot;),
+/// }
+/// ```
+///
+/// Optionally add a receive operation to `select!` using [`never`]:
+///
+/// ```
+/// use std::thread;
+/// use std::time::Duration;
+/// use crossbeam_channel::{select, never, unbounded};
+///
+/// let (s1, r1) = unbounded();
+/// let (s2, r2) = unbounded();
+///
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_secs(1));
+///     s1.send(10).unwrap();
+/// });
+/// thread::spawn(move || {
+///     thread::sleep(Duration::from_millis(500));
+///     s2.send(20).unwrap();
+/// });
+///
+/// // This receiver can be a `Some` or a `None`.
+/// let r2 = Some(&amp;r2);
+///
+/// // None of the two operations will become ready within 100 milliseconds.
+/// select! {
+///     recv(r1) -&gt; msg =&gt; panic!(),
+///     recv(r2.unwrap_or(&amp;never())) -&gt; msg =&gt; assert_eq!(msg, Ok(20)),
+/// }
+/// ```
+///
+/// To optionally add a timeout to `select!`, see the [example] for [`never`].
+///
+/// [`never`]: super::never
+/// [example]: super::never#examples
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>select {
+    ($(<span class="macro-nonterminal">$tokens</span>:tt)<span class="kw-2">*</span>) =&gt; {
         <span class="macro-nonterminal">$</span><span class="macro">crate::crossbeam_channel_internal!</span>(
-            $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tokens</span>)<span class="op">*</span>
+            $(<span class="macro-nonterminal">$tokens</span>)*
         )
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -350,222 +350,222 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! Query struct for looking up resource records</span>
+</span><span class="doccomment">//! Query struct for looking up resource records
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>};
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::fmt::{Display, Formatter};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::dns_class::DNSClass</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::record_type::RecordType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::dns_class::DNSClass;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::rr::record_type::RecordType;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-<span class="doccomment">/// From [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)</span>
-<span class="doccomment">/// ```text</span>
-<span class="comment">// To avoid large floods of potentially unnecessary responses in these</span>
-<span class="comment">// cases, Multicast DNS defines the top bit in the class field of a DNS</span>
-<span class="comment">// question as the unicast-response bit.</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">const</span> <span class="ident">MDNS_UNICAST_RESPONSE</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+</span><span class="doccomment">/// From [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)
+/// ```text
+</span><span class="comment">// To avoid large floods of potentially unnecessary responses in these
+// cases, Multicast DNS defines the top bit in the class field of a DNS
+// question as the unicast-response bit.
+</span><span class="doccomment">/// ```
+</span><span class="kw">const </span>MDNS_UNICAST_RESPONSE: u16 = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
 
-<span class="doccomment">/// Query struct for looking up resource records, basically a resource record without RDATA.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 4.1.2. Question section format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The question section is used to carry the &quot;question&quot; in most queries,</span>
-<span class="doccomment">/// i.e., the parameters that define what is being asked.  The section</span>
-<span class="doccomment">/// contains QDCOUNT (usually 1) entries, each of the following format:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                                     1  1  1  1  1  1</span>
-<span class="doccomment">///       0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                                               |</span>
-<span class="doccomment">///     /                     QNAME / ZNAME             /</span>
-<span class="doccomment">///     /                                               /</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                     QTYPE / ZTYPE             |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///     |                     QCLASS / ZCLASS           |</span>
-<span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Query</span> {
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">query_type</span>: <span class="ident">RecordType</span>,
-    <span class="ident">query_class</span>: <span class="ident">DNSClass</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-    <span class="ident">mdns_unicast_response</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Query struct for looking up resource records, basically a resource record without RDATA.
+///
+/// [RFC 1035, DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987](https://tools.ietf.org/html/rfc1035)
+///
+/// ```text
+/// 4.1.2. Question section format
+///
+/// The question section is used to carry the &quot;question&quot; in most queries,
+/// i.e., the parameters that define what is being asked.  The section
+/// contains QDCOUNT (usually 1) entries, each of the following format:
+///
+///                                     1  1  1  1  1  1
+///       0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                                               |
+///     /                     QNAME / ZNAME             /
+///     /                                               /
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                     QTYPE / ZTYPE             |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///     |                     QCLASS / ZCLASS           |
+///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>Query {
+    name: Name,
+    query_type: RecordType,
+    query_class: DNSClass,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+    </span>mdns_unicast_response: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="doccomment">/// Return a default query with an empty name and A, IN for the query_type and query_class</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">Name::new</span>(),
-            <span class="ident">query_type</span>: <span class="ident">RecordType::A</span>,
-            <span class="ident">query_class</span>: <span class="ident">DNSClass::IN</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">mdns_unicast_response</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Query {
+    <span class="doccomment">/// Return a default query with an empty name and A, IN for the query_type and query_class
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: Name::new(),
+            query_type: RecordType::A,
+            query_class: DNSClass::IN,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+            </span>mdns_unicast_response: <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Query</span> {
-    <span class="doccomment">/// Return a default query with an empty name and A, IN for the query_type and query_class</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Query {
+    <span class="doccomment">/// Return a default query with an empty name and A, IN for the query_type and query_class
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Create a new query from name and type, class defaults to IN</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::self_named_constructors</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">name</span>: <span class="ident">Name</span>, <span class="ident">query_type</span>: <span class="ident">RecordType</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">query_type</span>,
-            <span class="ident">query_class</span>: <span class="ident">DNSClass::IN</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">mdns_unicast_response</span>: <span class="bool-val">false</span>,
+    <span class="doccomment">/// Create a new query from name and type, class defaults to IN
+    </span><span class="attribute">#[allow(clippy::self_named_constructors)]
+    </span><span class="kw">pub fn </span>query(name: Name, query_type: RecordType) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            query_type,
+            query_class: DNSClass::IN,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+            </span>mdns_unicast_response: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// replaces name with the new name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Name</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// replaces name with the new name
+    </span><span class="kw">pub fn </span>set_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: Name) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.name = name;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Specify the RecordType being queried
+    </span><span class="kw">pub fn </span>set_query_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query_type: RecordType) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.query_type = query_type;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Specify÷ the DNS class of the Query, almost always IN
+    </span><span class="kw">pub fn </span>set_query_class(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query_class: DNSClass) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.query_class = query_class;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Changes mDNS unicast-response bit
+    /// See [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;mdns&quot;</span>)))]
+    </span><span class="kw">pub fn </span>set_mdns_unicast_response(<span class="kw-2">&amp;mut </span><span class="self">self</span>, flag: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.mdns_unicast_response = flag;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// ```text
+    /// QNAME           a domain name represented as a sequence of labels, where
+    ///                 each label consists of a length octet followed by that
+    ///                 number of octets.  The domain name terminates with the
+    ///                 zero length octet for the null label of the root.  Note
+    ///                 that this field may be an odd number of octets; no
+    ///                 padding is used.
+    /// ```
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.name
     }
 
-    <span class="doccomment">/// Specify the RecordType being queried</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_query_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">query_type</span>: <span class="ident">RecordType</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">query_type</span> <span class="op">=</span> <span class="ident">query_type</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// QTYPE           a two octet code which specifies the type of the query.
+    ///                 The values for this field include all codes valid for a
+    ///                 TYPE field, together with some more general codes which
+    ///                 can match more than one type of RR.
+    /// ```
+    </span><span class="kw">pub fn </span>query_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RecordType {
+        <span class="self">self</span>.query_type
     }
 
-    <span class="doccomment">/// Specify÷ the DNS class of the Query, almost always IN</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_query_class</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">query_class</span>: <span class="ident">DNSClass</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">query_class</span> <span class="op">=</span> <span class="ident">query_class</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// ```text
+    /// QCLASS          a two octet code that specifies the class of the query.
+    ///                 For example, the QCLASS field is IN for the Internet.
+    /// ```
+    </span><span class="kw">pub fn </span>query_class(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DNSClass {
+        <span class="self">self</span>.query_class
     }
 
-    <span class="doccomment">/// Changes mDNS unicast-response bit</span>
-    <span class="doccomment">/// See [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mdns_unicast_response</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flag</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">mdns_unicast_response</span> <span class="op">=</span> <span class="ident">flag</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Returns if the mDNS unicast-response bit is set or not
+    /// See [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;mdns&quot;</span>)))]
+    </span><span class="kw">pub fn </span>mdns_unicast_response(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.mdns_unicast_response
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// QNAME           a domain name represented as a sequence of labels, where</span>
-    <span class="doccomment">///                 each label consists of a length octet followed by that</span>
-    <span class="doccomment">///                 number of octets.  The domain name terminates with the</span>
-    <span class="doccomment">///                 zero length octet for the null label of the root.  Note</span>
-    <span class="doccomment">///                 that this field may be an odd number of octets; no</span>
-    <span class="doccomment">///                 padding is used.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// QTYPE           a two octet code which specifies the type of the query.</span>
-    <span class="doccomment">///                 The values for this field include all codes valid for a</span>
-    <span class="doccomment">///                 TYPE field, together with some more general codes which</span>
-    <span class="doccomment">///                 can match more than one type of RR.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RecordType</span> {
-        <span class="self">self</span>.<span class="ident">query_type</span>
-    }
-
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// QCLASS          a two octet code that specifies the class of the query.</span>
-    <span class="doccomment">///                 For example, the QCLASS field is IN for the Internet.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_class</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DNSClass</span> {
-        <span class="self">self</span>.<span class="ident">query_class</span>
-    }
-
-    <span class="doccomment">/// Returns if the mDNS unicast-response bit is set or not</span>
-    <span class="doccomment">/// See [RFC 6762](https://tools.ietf.org/html/rfc6762#section-5.4)</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mdns_unicast_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">mdns_unicast_response</span>
-    }
-
-    <span class="doccomment">/// Consumes `Query` and returns it&#39;s components</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; <span class="ident">QueryParts</span> {
-        <span class="self">self</span>.<span class="ident">into</span>()
+    <span class="doccomment">/// Consumes `Query` and returns it&#39;s components
+    </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; QueryParts {
+        <span class="self">self</span>.into()
     }
 }
 
-<span class="doccomment">/// Consumes `Query` giving public access to fields of `Query` so they can</span>
-<span class="doccomment">/// be destructured and taken by value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryParts</span> {
-    <span class="doccomment">/// QNAME</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="doccomment">/// QTYPE</span>
-    <span class="kw">pub</span> <span class="ident">query_type</span>: <span class="ident">RecordType</span>,
-    <span class="doccomment">/// QCLASS</span>
-    <span class="kw">pub</span> <span class="ident">query_class</span>: <span class="ident">DNSClass</span>,
-    <span class="doccomment">/// mDNS unicast-response bit set or not</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="ident">mdns_unicast_response</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Consumes `Query` giving public access to fields of `Query` so they can
+/// be destructured and taken by value.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>QueryParts {
+    <span class="doccomment">/// QNAME
+    </span><span class="kw">pub </span>name: Name,
+    <span class="doccomment">/// QTYPE
+    </span><span class="kw">pub </span>query_type: RecordType,
+    <span class="doccomment">/// QCLASS
+    </span><span class="kw">pub </span>query_class: DNSClass,
+    <span class="doccomment">/// mDNS unicast-response bit set or not
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;mdns&quot;</span>)))]
+    </span><span class="kw">pub </span>mdns_unicast_response: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryParts</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">q</span>: <span class="ident">Query</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">cfg_if::cfg_if!</span> {
-            <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span> {
-                <span class="kw">let</span> <span class="ident">Query</span> {
-                    <span class="ident">name</span>,
-                    <span class="ident">query_type</span>,
-                    <span class="ident">query_class</span>,
-                    <span class="ident">mdns_unicast_response</span>,
-                } <span class="op">=</span> <span class="ident">q</span>;
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">Query</span> {
-                    <span class="ident">name</span>,
-                    <span class="ident">query_type</span>,
-                    <span class="ident">query_class</span>,
-                } <span class="op">=</span> <span class="ident">q</span>;
+<span class="kw">impl </span>From&lt;Query&gt; <span class="kw">for </span>QueryParts {
+    <span class="kw">fn </span>from(q: Query) -&gt; <span class="self">Self </span>{
+        <span class="macro">cfg_if::cfg_if! </span>{
+            <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)] </span>{
+                <span class="kw">let </span>Query {
+                    name,
+                    query_type,
+                    query_class,
+                    mdns_unicast_response,
+                } = q;
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>Query {
+                    name,
+                    query_type,
+                    query_class,
+                } = q;
             }
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">query_type</span>,
-            <span class="ident">query_class</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">mdns_unicast_response</span>,
+        <span class="self">Self </span>{
+            name,
+            query_type,
+            query_class,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+            </span>mdns_unicast_response,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">query_type</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>BinEncodable <span class="kw">for </span>Query {
+    <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        <span class="self">self</span>.name.emit(encoder)<span class="question-mark">?</span>;
+        <span class="self">self</span>.query_type.emit(encoder)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>))]</span>
-        <span class="self">self</span>.<span class="ident">query_class</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;mdns&quot;</span>))]
+        </span><span class="self">self</span>.query_class.emit(encoder)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">mdns_unicast_response</span> {
-                <span class="ident">encoder</span>.<span class="ident">emit_u16</span>(<span class="ident">u16::from</span>(<span class="self">self</span>.<span class="ident">query_class</span>()) <span class="op">|</span> <span class="ident">MDNS_UNICAST_RESPONSE</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">query_class</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+        </span>{
+            <span class="kw">if </span><span class="self">self</span>.mdns_unicast_response {
+                encoder.emit_u16(u16::from(<span class="self">self</span>.query_class()) | MDNS_UNICAST_RESPONSE)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.query_class.emit(encoder)<span class="question-mark">?</span>;
             }
         }
 
@@ -573,106 +573,106 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="ident">BinDecodable</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">query_type</span> <span class="op">=</span> <span class="ident">RecordType::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;r</span>&gt; BinDecodable&lt;<span class="lifetime">&#39;r</span>&gt; <span class="kw">for </span>Query {
+    <span class="kw">fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;r</span>&gt;) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>name = Name::read(decoder)<span class="question-mark">?</span>;
+        <span class="kw">let </span>query_type = RecordType::read(decoder)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mdns_unicast_response</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>mdns_unicast_response = <span class="bool-val">false</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">query_class</span> <span class="op">=</span> <span class="ident">DNSClass::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;mdns&quot;</span>))]
+        </span><span class="kw">let </span>query_class = DNSClass::read(decoder)<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">query_class</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">query_class_value</span> <span class="op">=</span>
-                <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*DNSClass::from_u16 will verify the value*/</span>);
-            <span class="kw">if</span> <span class="ident">query_class_value</span> <span class="op">&amp;</span> <span class="ident">MDNS_UNICAST_RESPONSE</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">mdns_unicast_response</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">DNSClass::from_u16</span>(<span class="ident">query_class_value</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">MDNS_UNICAST_RESPONSE</span>)<span class="question-mark">?</span>
-            } <span class="kw">else</span> {
-                <span class="ident">DNSClass::from_u16</span>(<span class="ident">query_class_value</span>)<span class="question-mark">?</span>
-            }
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+        </span><span class="kw">let </span>query_class = {
+            <span class="kw">let </span>query_class_value =
+                decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*DNSClass::from_u16 will verify the value*/</span>);
+            <span class="kw">if </span>query_class_value &amp; MDNS_UNICAST_RESPONSE &gt; <span class="number">0 </span>{
+                mdns_unicast_response = <span class="bool-val">true</span>;
+                DNSClass::from_u16(query_class_value &amp; !MDNS_UNICAST_RESPONSE)<span class="question-mark">?
+            </span>} <span class="kw">else </span>{
+                DNSClass::from_u16(query_class_value)<span class="question-mark">?
+            </span>}
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">query_type</span>,
-            <span class="ident">query_class</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-            <span class="ident">mdns_unicast_response</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            name,
+            query_type,
+            query_class,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+            </span>mdns_unicast_response,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Query</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>))]</span>
-        {
+<span class="kw">impl </span>Display <span class="kw">for </span>Query {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;mdns&quot;</span>))]
+        </span>{
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;name: {} type: {} class: {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">query_type</span>, <span class="self">self</span>.<span class="ident">query_class</span>
+                <span class="self">self</span>.name, <span class="self">self</span>.query_type, <span class="self">self</span>.query_class
             )
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-        {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+        </span>{
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;name: {} type: {} class: {} mdns_unicast_response: {}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">query_type</span>, <span class="self">self</span>.<span class="ident">query_class</span>, <span class="self">self</span>.<span class="ident">mdns_unicast_response</span>
+                <span class="self">self</span>.name, <span class="self">self</span>.query_type, <span class="self">self</span>.query_class, <span class="self">self</span>.mdns_unicast_response
             )
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_update</span>)]</span>
-<span class="kw">fn</span> <span class="ident">test_read_and_emit</span>() {
-    <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="ident">Query</span> {
-        <span class="ident">name</span>: <span class="ident">Name::from_ascii</span>(<span class="string">&quot;WWW.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-        <span class="ident">query_type</span>: <span class="ident">RecordType::AAAA</span>,
-        <span class="ident">query_class</span>: <span class="ident">DNSClass::IN</span>,
-        ..<span class="ident">Query::default</span>()
+<span class="attribute">#[test]
+#[allow(clippy::needless_update)]
+</span><span class="kw">fn </span>test_read_and_emit() {
+    <span class="kw">let </span>expect = Query {
+        name: Name::from_ascii(<span class="string">&quot;WWW.example.com&quot;</span>).unwrap(),
+        query_type: RecordType::AAAA,
+        query_class: DNSClass::IN,
+        ..Query::default()
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">512</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>byte_vec: Vec&lt;u8&gt; = Vec::with_capacity(<span class="number">512</span>);
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">byte_vec</span>);
-        <span class="ident">expect</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = BinEncoder::new(<span class="kw-2">&amp;mut </span>byte_vec);
+        expect.emit(<span class="kw-2">&amp;mut </span>encoder).unwrap();
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">byte_vec</span>);
-    <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="ident">Query::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">got</span>, <span class="ident">expect</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(<span class="kw-2">&amp;</span>byte_vec);
+    <span class="kw">let </span>got = Query::read(<span class="kw-2">&amp;mut </span>decoder).unwrap();
+    <span class="macro">assert_eq!</span>(got, expect);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_mdns_unicast_response_bit_handling</span>() {
-    <span class="kw">const</span> <span class="ident">QCLASS_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="comment">/* empty name */</span> <span class="op">+</span>
-        <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>() <span class="comment">/* query_type */</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+#[test]
+</span><span class="kw">fn </span>test_mdns_unicast_response_bit_handling() {
+    <span class="kw">const </span>QCLASS_OFFSET: usize = <span class="number">1 </span><span class="comment">/* empty name */ </span>+
+        std::mem::size_of::&lt;u16&gt;() <span class="comment">/* query_type */</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Query::new</span>();
-    <span class="ident">query</span>.<span class="ident">set_mdns_unicast_response</span>(<span class="bool-val">true</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>query = Query::new();
+    query.set_mdns_unicast_response(<span class="bool-val">true</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec_bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">512</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>vec_bytes: Vec&lt;u8&gt; = Vec::with_capacity(<span class="number">512</span>);
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">vec_bytes</span>);
-        <span class="ident">query</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = BinEncoder::new(<span class="kw-2">&amp;mut </span>vec_bytes);
+        query.emit(<span class="kw-2">&amp;mut </span>encoder).unwrap();
 
-        <span class="kw">let</span> <span class="ident">query_class_slice</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">slice_of</span>(<span class="ident">QCLASS_OFFSET</span>, <span class="ident">QCLASS_OFFSET</span> <span class="op">+</span> <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">query_class_slice</span>, <span class="kw-2">&amp;</span>[<span class="number">0x80</span>, <span class="number">0x01</span>]);
+        <span class="kw">let </span>query_class_slice = encoder.slice_of(QCLASS_OFFSET, QCLASS_OFFSET + <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(query_class_slice, <span class="kw-2">&amp;</span>[<span class="number">0x80</span>, <span class="number">0x01</span>]);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">vec_bytes</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(<span class="kw-2">&amp;</span>vec_bytes);
 
-    <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="ident">Query::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let </span>got = Query::read(<span class="kw-2">&amp;mut </span>decoder).unwrap();
 
-    <span class="macro">assert_eq!</span>(<span class="ident">got</span>.<span class="ident">query_class</span>(), <span class="ident">DNSClass::IN</span>);
-    <span class="macro">assert!</span>(<span class="ident">got</span>.<span class="ident">mdns_unicast_response</span>());
+    <span class="macro">assert_eq!</span>(got.query_class(), DNSClass::IN);
+    <span class="macro">assert!</span>(got.mdns_unicast_response());
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

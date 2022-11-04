@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/signature_help.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signature_help.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/signature_help.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signature_help.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -205,212 +205,212 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">Documentation</span>, <span class="ident">MarkupKind</span>, <span class="ident">TextDocumentPositionParams</span>, <span class="ident">TextDocumentRegistrationOptions</span>,
-    <span class="ident">WorkDoneProgressOptions</span>, <span class="ident">WorkDoneProgressParams</span>,
+<span class="kw">use crate</span>::{
+    Documentation, MarkupKind, TextDocumentPositionParams, TextDocumentRegistrationOptions,
+    WorkDoneProgressOptions, WorkDoneProgressParams,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureInformationSettings</span> {
-    <span class="doccomment">/// Client supports the follow content formats for the documentation</span>
-    <span class="doccomment">/// property. The order describes the preferred format of the client.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">documentation_format</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MarkupKind</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureInformationSettings {
+    <span class="doccomment">/// Client supports the follow content formats for the documentation
+    /// property. The order describes the preferred format of the client.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>documentation_format: <span class="prelude-ty">Option</span>&lt;Vec&lt;MarkupKind&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">parameter_information</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParameterInformationSettings</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>parameter_information: <span class="prelude-ty">Option</span>&lt;ParameterInformationSettings&gt;,
 
-    <span class="doccomment">/// The client support the `activeParameter` property on `SignatureInformation`</span>
-    <span class="doccomment">///  literal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  @since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">active_parameter_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client support the `activeParameter` property on `SignatureInformation`
+    ///  literal.
+    ///
+    ///  @since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>active_parameter_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParameterInformationSettings</span> {
-    <span class="doccomment">/// The client supports processing label offsets instead of a</span>
-    <span class="doccomment">/// simple label string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.14.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">label_offset_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ParameterInformationSettings {
+    <span class="doccomment">/// The client supports processing label offsets instead of a
+    /// simple label string.
+    ///
+    /// @since 3.14.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>label_offset_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpClientCapabilities</span> {
-    <span class="doccomment">/// Whether completion supports dynamic registration.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureHelpClientCapabilities {
+    <span class="doccomment">/// Whether completion supports dynamic registration.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The client supports the following `SignatureInformation`</span>
-    <span class="doccomment">/// specific properties.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">signature_information</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SignatureInformationSettings</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client supports the following `SignatureInformation`
+    /// specific properties.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>signature_information: <span class="prelude-ty">Option</span>&lt;SignatureInformationSettings&gt;,
 
-    <span class="doccomment">/// The client supports to send additional context information for a</span>
-    <span class="doccomment">/// `textDocument/signatureHelp` request. A client that opts into</span>
-    <span class="doccomment">/// contextSupport will also support the `retriggerCharacters` on</span>
-    <span class="doccomment">/// `SignatureHelpOptions`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.15.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">context_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client supports to send additional context information for a
+    /// `textDocument/signatureHelp` request. A client that opts into
+    /// contextSupport will also support the `retriggerCharacters` on
+    /// `SignatureHelpOptions`.
+    ///
+    /// @since 3.15.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>context_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// Signature help options.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpOptions</span> {
-    <span class="doccomment">/// The characters that trigger signature help automatically.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">trigger_characters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Signature help options.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureHelpOptions {
+    <span class="doccomment">/// The characters that trigger signature help automatically.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>trigger_characters: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="doccomment">///  List of characters that re-trigger signature help.</span>
-    <span class="doccomment">/// These trigger characters are only active when signature help is already showing. All trigger characters</span>
-    <span class="doccomment">/// are also counted as re-trigger characters.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">retrigger_characters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">///  List of characters that re-trigger signature help.
+    /// These trigger characters are only active when signature help is already showing. All trigger characters
+    /// are also counted as re-trigger characters.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>retrigger_characters: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_options</span>: <span class="ident">WorkDoneProgressOptions</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_options: WorkDoneProgressOptions,
 }
 
-<span class="doccomment">/// Signature help options.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpRegistrationOptions</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">text_document_registration_options</span>: <span class="ident">TextDocumentRegistrationOptions</span>,
+<span class="doccomment">/// Signature help options.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>SignatureHelpRegistrationOptions {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>text_document_registration_options: TextDocumentRegistrationOptions,
 }
 
-<span class="doccomment">/// Signature help options.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpTriggerKind</span>(<span class="ident">i32</span>);
-<span class="macro">lsp_enum!</span> {
-<span class="kw">impl</span> <span class="ident">SignatureHelpTriggerKind</span> {
-    <span class="doccomment">/// Signature help was invoked manually by the user or by a command.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INVOKED</span>: <span class="ident">SignatureHelpTriggerKind</span> <span class="op">=</span> <span class="ident">SignatureHelpTriggerKind</span>(<span class="number">1</span>);
-    <span class="doccomment">///  Signature help was triggered by a trigger character.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TRIGGER_CHARACTER</span>: <span class="ident">SignatureHelpTriggerKind</span> <span class="op">=</span> <span class="ident">SignatureHelpTriggerKind</span>(<span class="number">2</span>);
-    <span class="doccomment">/// Signature help was triggered by the cursor moving or by the document content changing.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CONTENT_CHANGE</span>: <span class="ident">SignatureHelpTriggerKind</span> <span class="op">=</span> <span class="ident">SignatureHelpTriggerKind</span>(<span class="number">3</span>);
+<span class="doccomment">/// Signature help options.
+</span><span class="attribute">#[derive(Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(transparent)]
+</span><span class="kw">pub struct </span>SignatureHelpTriggerKind(i32);
+<span class="macro">lsp_enum! </span>{
+<span class="kw">impl </span>SignatureHelpTriggerKind {
+    <span class="doccomment">/// Signature help was invoked manually by the user or by a command.
+    </span><span class="kw">pub const </span>INVOKED: SignatureHelpTriggerKind = SignatureHelpTriggerKind(<span class="number">1</span>);
+    <span class="doccomment">///  Signature help was triggered by a trigger character.
+    </span><span class="kw">pub const </span>TRIGGER_CHARACTER: SignatureHelpTriggerKind = SignatureHelpTriggerKind(<span class="number">2</span>);
+    <span class="doccomment">/// Signature help was triggered by the cursor moving or by the document content changing.
+    </span><span class="kw">pub const </span>CONTENT_CHANGE: SignatureHelpTriggerKind = SignatureHelpTriggerKind(<span class="number">3</span>);
 }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpParams</span> {
-    <span class="doccomment">/// The signature help context. This is only available if the client specifies</span>
-    <span class="doccomment">/// to send this using the client capability  `textDocument.signatureHelp.contextSupport === true`</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SignatureHelpContext</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureHelpParams {
+    <span class="doccomment">/// The signature help context. This is only available if the client specifies
+    /// to send this using the client capability  `textDocument.signatureHelp.contextSupport === true`
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>context: <span class="prelude-ty">Option</span>&lt;SignatureHelpContext&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">text_document_position_params</span>: <span class="ident">TextDocumentPositionParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>text_document_position_params: TextDocumentPositionParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelpContext</span> {
-    <span class="doccomment">///  Action that caused signature help to be triggered.</span>
-    <span class="kw">pub</span> <span class="ident">trigger_kind</span>: <span class="ident">SignatureHelpTriggerKind</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureHelpContext {
+    <span class="doccomment">///  Action that caused signature help to be triggered.
+    </span><span class="kw">pub </span>trigger_kind: SignatureHelpTriggerKind,
 
-    <span class="doccomment">/// Character that caused signature help to be triggered.</span>
-    <span class="doccomment">/// This is undefined when `triggerKind !== SignatureHelpTriggerKind.TriggerCharacter`</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">trigger_character</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Character that caused signature help to be triggered.
+    /// This is undefined when `triggerKind !== SignatureHelpTriggerKind.TriggerCharacter`
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>trigger_character: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// `true` if signature help was already showing when it was triggered.</span>
-    <span class="doccomment">/// Retriggers occur when the signature help is already active and can be caused by actions such as</span>
-    <span class="doccomment">/// typing a trigger character, a cursor move, or document content changes.</span>
-    <span class="kw">pub</span> <span class="ident">is_retrigger</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// `true` if signature help was already showing when it was triggered.
+    /// Retriggers occur when the signature help is already active and can be caused by actions such as
+    /// typing a trigger character, a cursor move, or document content changes.
+    </span><span class="kw">pub </span>is_retrigger: bool,
 
-    <span class="doccomment">/// The currently active `SignatureHelp`.</span>
-    <span class="doccomment">/// The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field updated based on</span>
-    <span class="doccomment">/// the user navigating through available signatures.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">active_signature_help</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SignatureHelp</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The currently active `SignatureHelp`.
+    /// The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field updated based on
+    /// the user navigating through available signatures.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>active_signature_help: <span class="prelude-ty">Option</span>&lt;SignatureHelp&gt;,
 }
 
-<span class="doccomment">/// Signature help represents the signature of something</span>
-<span class="doccomment">/// callable. There can be multiple signature but only one</span>
-<span class="doccomment">/// active and only one active parameter.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureHelp</span> {
-    <span class="doccomment">/// One or more signatures.</span>
-    <span class="kw">pub</span> <span class="ident">signatures</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SignatureInformation</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Signature help represents the signature of something
+/// callable. There can be multiple signature but only one
+/// active and only one active parameter.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureHelp {
+    <span class="doccomment">/// One or more signatures.
+    </span><span class="kw">pub </span>signatures: Vec&lt;SignatureInformation&gt;,
 
-    <span class="doccomment">/// The active signature.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">active_signature</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The active signature.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>active_signature: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// The active parameter of the active signature.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">active_parameter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The active parameter of the active signature.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>active_parameter: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="doccomment">/// Represents the signature of something callable. A signature</span>
-<span class="doccomment">/// can have a label, like a function-name, a doc-comment, and</span>
-<span class="doccomment">/// a set of parameters.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignatureInformation</span> {
-    <span class="doccomment">/// The label of this signature. Will be shown in</span>
-    <span class="doccomment">/// the UI.</span>
-    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Represents the signature of something callable. A signature
+/// can have a label, like a function-name, a doc-comment, and
+/// a set of parameters.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SignatureInformation {
+    <span class="doccomment">/// The label of this signature. Will be shown in
+    /// the UI.
+    </span><span class="kw">pub </span>label: String,
 
-    <span class="doccomment">/// The human-readable doc-comment of this signature. Will be shown</span>
-    <span class="doccomment">/// in the UI but can be omitted.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The human-readable doc-comment of this signature. Will be shown
+    /// in the UI but can be omitted.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;Documentation&gt;,
 
-    <span class="doccomment">/// The parameters of this signature.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">parameters</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ParameterInformation</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The parameters of this signature.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>parameters: <span class="prelude-ty">Option</span>&lt;Vec&lt;ParameterInformation&gt;&gt;,
 
-    <span class="doccomment">/// The index of the active parameter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If provided, this is used in place of `SignatureHelp.activeParameter`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.16.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">active_parameter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The index of the active parameter.
+    ///
+    /// If provided, this is used in place of `SignatureHelp.activeParameter`.
+    ///
+    /// @since 3.16.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>active_parameter: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="doccomment">/// Represents a parameter of a callable-signature. A parameter can</span>
-<span class="doccomment">/// have a label and a doc-comment.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParameterInformation</span> {
-    <span class="doccomment">/// The label of this parameter information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Either a string or an inclusive start and exclusive end offsets within its containing</span>
-    <span class="doccomment">/// signature label. (see SignatureInformation.label). *Note*: A label of type string must be</span>
-    <span class="doccomment">/// a substring of its containing signature label.</span>
-    <span class="kw">pub</span> <span class="ident">label</span>: <span class="ident">ParameterLabel</span>,
+<span class="doccomment">/// Represents a parameter of a callable-signature. A parameter can
+/// have a label and a doc-comment.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ParameterInformation {
+    <span class="doccomment">/// The label of this parameter information.
+    ///
+    /// Either a string or an inclusive start and exclusive end offsets within its containing
+    /// signature label. (see SignatureInformation.label). *Note*: A label of type string must be
+    /// a substring of its containing signature label.
+    </span><span class="kw">pub </span>label: ParameterLabel,
 
-    <span class="doccomment">/// The human-readable doc-comment of this parameter. Will be shown</span>
-    <span class="doccomment">/// in the UI but can be omitted.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The human-readable doc-comment of this parameter. Will be shown
+    /// in the UI but can be omitted.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;Documentation&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ParameterLabel</span> {
-    <span class="ident">Simple</span>(<span class="ident">String</span>),
-    <span class="ident">LabelOffsets</span>([<span class="ident">u32</span>; <span class="number">2</span>]),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>ParameterLabel {
+    Simple(String),
+    LabelOffsets([u32; <span class="number">2</span>]),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

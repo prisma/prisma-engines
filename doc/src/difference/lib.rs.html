@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/difference-2.0.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../difference/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../difference/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../difference/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/difference-2.0.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../difference/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../difference/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../difference/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -332,339 +332,339 @@
 <span id="332">332</span>
 <span id="333">333</span>
 <span id="334">334</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Functions to find the difference between two texts (strings).</span>
-<span class="doccomment">//! Usage</span>
-<span class="doccomment">//! ----------</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Add the following to your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! difference = &quot;2.0&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Now you can use the crate in your code</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! extern crate difference;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [Examples.md](Examples.md) for more examples.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use difference::{Difference, Changeset};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let changeset = Changeset::new(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(changeset.diffs, vec![</span>
-<span class="doccomment">//!   Difference::Same(&quot;te&quot;.to_string()),</span>
-<span class="doccomment">//!   Difference::Rem(&quot;s&quot;.to_string()),</span>
-<span class="doccomment">//!   Difference::Add(&quot;n&quot;.to_string()),</span>
-<span class="doccomment">//!   Difference::Same(&quot;t&quot;.to_string())</span>
-<span class="doccomment">//! ]);</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions to find the difference between two texts (strings).
+//! Usage
+//! ----------
+//!
+//! Add the following to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! difference = &quot;2.0&quot;
+//! ```
+//!
+//! Now you can use the crate in your code
+//! ```ignore
+//! extern crate difference;
+//! ```
+//!
+//! ## Examples
+//!
+//! See [Examples.md](Examples.md) for more examples.
+//!
+//! ```rust
+//! use difference::{Difference, Changeset};
+//!
+//! let changeset = Changeset::new(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);
+//!
+//! assert_eq!(changeset.diffs, vec![
+//!   Difference::Same(&quot;te&quot;.to_string()),
+//!   Difference::Rem(&quot;s&quot;.to_string()),
+//!   Difference::Add(&quot;n&quot;.to_string()),
+//!   Difference::Same(&quot;t&quot;.to_string())
+//! ]);
+//! ```
 
-<span class="attribute">#![<span class="ident">crate_name</span> <span class="op">=</span> <span class="string">&quot;difference&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;http://docs.rs/difference&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
+</span><span class="attribute">#![crate_name = <span class="string">&quot;difference&quot;</span>]
+#![doc(html_root_url = <span class="string">&quot;http://docs.rs/difference&quot;</span>)]
+#![deny(missing_docs)]
+#![deny(warnings)]
 
-<span class="kw">mod</span> <span class="ident">lcs</span>;
-<span class="kw">mod</span> <span class="ident">merge</span>;
-<span class="kw">mod</span> <span class="ident">display</span>;
+</span><span class="kw">mod </span>lcs;
+<span class="kw">mod </span>merge;
+<span class="kw">mod </span>display;
 
-<span class="kw">use</span> <span class="ident">lcs::lcs</span>;
-<span class="kw">use</span> <span class="ident">merge::merge</span>;
+<span class="kw">use </span>lcs::lcs;
+<span class="kw">use </span>merge::merge;
 
-<span class="doccomment">/// Defines the contents of a changeset</span>
-<span class="doccomment">/// Changesets will be delivered in order of appearance in the original string</span>
-<span class="doccomment">/// Sequences of the same kind will be grouped into one Difference</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Difference</span> {
-    <span class="doccomment">/// Sequences that are the same</span>
-    <span class="ident">Same</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Sequences that are an addition (don&#39;t appear in the first string)</span>
-    <span class="ident">Add</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// Sequences that are a removal (don&#39;t appear in the second string)</span>
-    <span class="ident">Rem</span>(<span class="ident">String</span>),
+<span class="doccomment">/// Defines the contents of a changeset
+/// Changesets will be delivered in order of appearance in the original string
+/// Sequences of the same kind will be grouped into one Difference
+</span><span class="attribute">#[derive(PartialEq, Debug)]
+</span><span class="kw">pub enum </span>Difference {
+    <span class="doccomment">/// Sequences that are the same
+    </span>Same(String),
+    <span class="doccomment">/// Sequences that are an addition (don&#39;t appear in the first string)
+    </span>Add(String),
+    <span class="doccomment">/// Sequences that are a removal (don&#39;t appear in the second string)
+    </span>Rem(String),
 }
 
-<span class="doccomment">/// The information about a full changeset</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Changeset</span> {
-    <span class="doccomment">/// An ordered vector of `Difference` objects, coresponding</span>
-    <span class="doccomment">/// to the differences within the text</span>
-    <span class="kw">pub</span> <span class="ident">diffs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Difference</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The split used when creating the `Changeset`</span>
-    <span class="doccomment">/// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.</span>
-    <span class="kw">pub</span> <span class="ident">split</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// The edit distance of the `Changeset`</span>
-    <span class="kw">pub</span> <span class="ident">distance</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// The information about a full changeset
+</span><span class="kw">pub struct </span>Changeset {
+    <span class="doccomment">/// An ordered vector of `Difference` objects, coresponding
+    /// to the differences within the text
+    </span><span class="kw">pub </span>diffs: Vec&lt;Difference&gt;,
+    <span class="doccomment">/// The split used when creating the `Changeset`
+    /// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.
+    </span><span class="kw">pub </span>split: String,
+    <span class="doccomment">/// The edit distance of the `Changeset`
+    </span><span class="kw">pub </span>distance: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">Changeset</span> {
-    <span class="doccomment">/// Calculates the edit distance and the changeset for two given strings.</span>
-    <span class="doccomment">/// The first string is assumed to be the &quot;original&quot;, the second to be an</span>
-    <span class="doccomment">/// edited version of the first. The third parameter specifies how to split</span>
-    <span class="doccomment">/// the input strings, leading to a more or less exact comparison.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Outputs the edit distance (how much the two strings differ) and a &quot;changeset&quot;, that is</span>
-    <span class="doccomment">/// a `Vec` containing `Difference`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use difference::{Changeset, Difference};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let changeset = Changeset::new(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(changeset.diffs, vec![</span>
-    <span class="doccomment">///     Difference::Same(&quot;te&quot;.to_string()),</span>
-    <span class="doccomment">///     Difference::Rem(&quot;s&quot;.to_string()),</span>
-    <span class="doccomment">///     Difference::Add(&quot;n&quot;.to_string()),</span>
-    <span class="doccomment">///     Difference::Same(&quot;t&quot;.to_string())</span>
-    <span class="doccomment">/// ]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Changeset</span> {
-        <span class="kw">let</span> (<span class="ident">dist</span>, <span class="ident">common</span>) <span class="op">=</span> <span class="ident">lcs</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="ident">split</span>);
-        <span class="ident">Changeset</span> {
-            <span class="ident">diffs</span>: <span class="ident">merge</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="kw-2">&amp;</span><span class="ident">common</span>, <span class="ident">split</span>),
-            <span class="ident">split</span>: <span class="ident">split</span>.<span class="ident">to_string</span>(),
-            <span class="ident">distance</span>: <span class="ident">dist</span>,
+<span class="kw">impl </span>Changeset {
+    <span class="doccomment">/// Calculates the edit distance and the changeset for two given strings.
+    /// The first string is assumed to be the &quot;original&quot;, the second to be an
+    /// edited version of the first. The third parameter specifies how to split
+    /// the input strings, leading to a more or less exact comparison.
+    ///
+    /// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.
+    ///
+    /// Outputs the edit distance (how much the two strings differ) and a &quot;changeset&quot;, that is
+    /// a `Vec` containing `Difference`s.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use difference::{Changeset, Difference};
+    ///
+    /// let changeset = Changeset::new(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);
+    ///
+    /// assert_eq!(changeset.diffs, vec![
+    ///     Difference::Same(&quot;te&quot;.to_string()),
+    ///     Difference::Rem(&quot;s&quot;.to_string()),
+    ///     Difference::Add(&quot;n&quot;.to_string()),
+    ///     Difference::Same(&quot;t&quot;.to_string())
+    /// ]);
+    /// ```
+    </span><span class="kw">pub fn </span>new(orig: <span class="kw-2">&amp;</span>str, edit: <span class="kw-2">&amp;</span>str, split: <span class="kw-2">&amp;</span>str) -&gt; Changeset {
+        <span class="kw">let </span>(dist, common) = lcs(orig, edit, split);
+        Changeset {
+            diffs: merge(orig, edit, <span class="kw-2">&amp;</span>common, split),
+            split: split.to_string(),
+            distance: dist,
         }
     }
 }
 
-<span class="doccomment">/// **This function is deprecated, please use `Changeset::new` instead**</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Calculates the edit distance and the changeset for two given strings.</span>
-<span class="doccomment">/// The first string is assumed to be the &quot;original&quot;, the second to be an</span>
-<span class="doccomment">/// edited version of the first. The third parameter specifies how to split</span>
-<span class="doccomment">/// the input strings, leading to a more or less exact comparison.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Outputs the edit distance (how much the two strings differ) and a &quot;changeset&quot;, that is</span>
-<span class="doccomment">/// a `Vec` containing `Difference`s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use difference::diff;</span>
-<span class="doccomment">/// use difference::Difference;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let (dist, changeset) = diff(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(changeset, vec![</span>
-<span class="doccomment">///     Difference::Same(&quot;te&quot;.to_string()),</span>
-<span class="doccomment">///     Difference::Rem(&quot;s&quot;.to_string()),</span>
-<span class="doccomment">///     Difference::Add(&quot;n&quot;.to_string()),</span>
-<span class="doccomment">///     Difference::Same(&quot;t&quot;.to_string())</span>
-<span class="doccomment">/// ]);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;1.0.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;please use `Changeset::new` instead&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="ident">i32</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Difference</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="ident">split</span>);
-    (<span class="ident">ch</span>.<span class="ident">distance</span>, <span class="ident">ch</span>.<span class="ident">diffs</span>)
+<span class="doccomment">/// **This function is deprecated, please use `Changeset::new` instead**
+///
+/// Calculates the edit distance and the changeset for two given strings.
+/// The first string is assumed to be the &quot;original&quot;, the second to be an
+/// edited version of the first. The third parameter specifies how to split
+/// the input strings, leading to a more or less exact comparison.
+///
+/// Common splits are `&quot;&quot;` for char-level, `&quot; &quot;` for word-level and `&quot;\n&quot;` for line-level.
+///
+/// Outputs the edit distance (how much the two strings differ) and a &quot;changeset&quot;, that is
+/// a `Vec` containing `Difference`s.
+///
+/// # Examples
+///
+/// ```
+/// use difference::diff;
+/// use difference::Difference;
+///
+/// let (dist, changeset) = diff(&quot;test&quot;, &quot;tent&quot;, &quot;&quot;);
+///
+/// assert_eq!(changeset, vec![
+///     Difference::Same(&quot;te&quot;.to_string()),
+///     Difference::Rem(&quot;s&quot;.to_string()),
+///     Difference::Add(&quot;n&quot;.to_string()),
+///     Difference::Same(&quot;t&quot;.to_string())
+/// ]);
+/// ```
+</span><span class="attribute">#[deprecated(since = <span class="string">&quot;1.0.0&quot;</span>, note = <span class="string">&quot;please use `Changeset::new` instead&quot;</span>)]
+</span><span class="kw">pub fn </span>diff(orig: <span class="kw-2">&amp;</span>str, edit: <span class="kw-2">&amp;</span>str, split: <span class="kw-2">&amp;</span>str) -&gt; (i32, Vec&lt;Difference&gt;) {
+    <span class="kw">let </span>ch = Changeset::new(orig, edit, split);
+    (ch.distance, ch.diffs)
 }
 
-<span class="doccomment">/// Assert the difference between two strings. Works like diff, but takes</span>
-<span class="doccomment">/// a fourth parameter that is the expected edit distance (e.g. 0 if you want to</span>
-<span class="doccomment">/// test for equality).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To include this macro use:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// #[macro_use(assert_diff)]</span>
-<span class="doccomment">/// extern crate difference;</span>
-<span class="doccomment">/// # fn main() { }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Remember that edit distance might not be equal to your understanding of difference,</span>
-<span class="doccomment">/// for example the words &quot;Rust&quot; and &quot;Dust&quot; have an edit distance of 2 because two changes (a</span>
-<span class="doccomment">/// removal and an addition) are required to make them look the same.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Will print an error with a colorful diff in case of failure.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">assert_diff</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">orig</span>:<span class="ident">expr</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">edit</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">split</span>: <span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>: <span class="ident">expr</span>) =&gt; ({
-        <span class="kw">let</span> <span class="ident">orig</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">orig</span>;
-        <span class="kw">let</span> <span class="ident">edit</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">edit</span>;
+<span class="doccomment">/// Assert the difference between two strings. Works like diff, but takes
+/// a fourth parameter that is the expected edit distance (e.g. 0 if you want to
+/// test for equality).
+///
+/// To include this macro use:
+///
+/// ```
+/// #[macro_use(assert_diff)]
+/// extern crate difference;
+/// # fn main() { }
+/// ```
+///
+/// Remember that edit distance might not be equal to your understanding of difference,
+/// for example the words &quot;Rust&quot; and &quot;Dust&quot; have an edit distance of 2 because two changes (a
+/// removal and an addition) are required to make them look the same.
+///
+/// Will print an error with a colorful diff in case of failure.
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>assert_diff {
+    (<span class="macro-nonterminal">$orig</span>:expr , <span class="macro-nonterminal">$edit</span>:expr, <span class="macro-nonterminal">$split</span>: expr, <span class="macro-nonterminal">$expected</span>: expr) =&gt; ({
+        <span class="kw">let </span>orig = <span class="macro-nonterminal">$orig</span>;
+        <span class="kw">let </span>edit = <span class="macro-nonterminal">$edit</span>;
 
-        <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::Changeset::new</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">split</span>));
-        <span class="kw">if</span> <span class="ident">changeset</span>.<span class="ident">distance</span> <span class="op">!</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span> {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">changeset</span>);
+        <span class="kw">let </span>changeset = <span class="macro-nonterminal">$crate::Changeset::new</span>(orig, edit, <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$split</span>));
+        <span class="kw">if </span>changeset.distance != <span class="macro-nonterminal">$expected </span>{
+            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, changeset);
             <span class="macro">panic!</span>(<span class="string">&quot;assertion failed: edit distance between {:?} and {:?} is {} and not {}, see \
                     diffset above&quot;</span>,
-                   <span class="ident">orig</span>,
-                   <span class="ident">edit</span>,
-                   <span class="ident">changeset</span>.<span class="ident">distance</span>,
-                   <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">expected</span>))
+                   orig,
+                   edit,
+                   changeset.distance,
+                   <span class="kw-2">&amp;</span>(<span class="macro-nonterminal">$expected</span>))
         }
     })
 }
 
-<span class="doccomment">/// **This function is deprecated, `Changeset` now implements the `Display` trait instead**</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prints a colorful visual representation of the diff.</span>
-<span class="doccomment">/// This is just a convenience function for those who want quick results.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// I recommend checking out the examples on how to build your</span>
-<span class="doccomment">/// own diff output.</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use difference::print_diff;</span>
-<span class="doccomment">/// print_diff(&quot;Diffs are awesome&quot;, &quot;Diffs are cool&quot;, &quot; &quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;1.0.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;`Changeset` now implements the `Display` trait instead&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_diff</span>(<span class="ident">orig</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">edit</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">split</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">orig</span>, <span class="ident">edit</span>, <span class="ident">split</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">ch</span>);
+<span class="doccomment">/// **This function is deprecated, `Changeset` now implements the `Display` trait instead**
+///
+/// Prints a colorful visual representation of the diff.
+/// This is just a convenience function for those who want quick results.
+///
+/// I recommend checking out the examples on how to build your
+/// own diff output.
+/// # Examples
+///
+/// ```
+/// use difference::print_diff;
+/// print_diff(&quot;Diffs are awesome&quot;, &quot;Diffs are cool&quot;, &quot; &quot;);
+/// ```
+</span><span class="attribute">#[deprecated(since = <span class="string">&quot;1.0.0&quot;</span>, note = <span class="string">&quot;`Changeset` now implements the `Display` trait instead&quot;</span>)]
+</span><span class="kw">pub fn </span>print_diff(orig: <span class="kw-2">&amp;</span>str, edit: <span class="kw-2">&amp;</span>str, split: <span class="kw-2">&amp;</span>str) {
+    <span class="kw">let </span>ch = Changeset::new(orig, edit, split);
+    <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, ch);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Roses are red, violets are blue,\n\
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Roses are red, violets are blue,\n\
                  I wrote this library,\n\
                  just for you.\n\
                  (It&#39;s true).&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Roses are red, violets are blue,\n\
+    <span class="kw">let </span>text2 = <span class="string">&quot;Roses are red, violets are blue,\n\
                  I wrote this documentation,\n\
                  just for you.\n\
                  (It&#39;s quite true).&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
-    <span class="macro">assert_eq!</span>(<span class="ident">changeset</span>.<span class="ident">distance</span>, <span class="number">4</span>);
+    <span class="macro">assert_eq!</span>(changeset.distance, <span class="number">4</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;Roses are red, violets are blue,&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;I wrote this library,&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;I wrote this documentation,&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;just for you.&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;(It&#39;s true).&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;(It&#39;s quite true).&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Same(<span class="string">&quot;Roses are red, violets are blue,&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;I wrote this library,&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;I wrote this documentation,&quot;</span>.to_string()),
+            Difference::Same(<span class="string">&quot;just for you.&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;(It&#39;s true).&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;(It&#39;s quite true).&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff_brief</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Hello\nworld&quot;</span>;
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Ola\nmundo&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff_brief() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Hello\nworld&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Ola\nmundo&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;Hello\nworld&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;Ola\nmundo&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Rem(<span class="string">&quot;Hello\nworld&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;Ola\nmundo&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff_smaller_line_count_on_left</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Hello\nworld&quot;</span>;
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Ola\nworld\nHow is it\ngoing?&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff_smaller_line_count_on_left() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Hello\nworld&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Ola\nworld\nHow is it\ngoing?&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;Ola&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;world&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;How is it\ngoing?&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Rem(<span class="string">&quot;Hello&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;Ola&quot;</span>.to_string()),
+            Difference::Same(<span class="string">&quot;world&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;How is it\ngoing?&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff_smaller_line_count_on_right</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Ola\nworld&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff_smaller_line_count_on_right() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Ola\nworld&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;Ola&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;world&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;What a \nbeautiful\nday!&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Rem(<span class="string">&quot;Hello&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;Ola&quot;</span>.to_string()),
+            Difference::Same(<span class="string">&quot;world&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;What a \nbeautiful\nday!&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff_similar_text_with_smaller_line_count_on_right</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Hello\nwoRLd&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff_similar_text_with_smaller_line_count_on_right() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Hello\nwoRLd&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;world\nWhat a \nbeautiful\nday!&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;woRLd&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Same(<span class="string">&quot;Hello&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;world\nWhat a \nbeautiful\nday!&quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;woRLd&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_diff_similar_text_with_similar_line_count</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Hello\nwoRLd\nbeautiful&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_diff_similar_text_with_similar_line_count() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Hello\nworld\nWhat a \nbeautiful\nday!&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Hello\nwoRLd\nbeautiful&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">changeset</span> <span class="op">=</span> <span class="ident">Changeset::new</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">let </span>changeset = Changeset::new(text1, text2, <span class="string">&quot;\n&quot;</span>);
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">changeset</span>.<span class="ident">diffs</span>,
+        changeset.diffs,
         <span class="macro">vec!</span>[
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;world\nWhat a &quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Add</span>(<span class="string">&quot;woRLd&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Same</span>(<span class="string">&quot;beautiful&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Difference::Rem</span>(<span class="string">&quot;day!&quot;</span>.<span class="ident">to_string</span>()),
+            Difference::Same(<span class="string">&quot;Hello&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;world\nWhat a &quot;</span>.to_string()),
+            Difference::Add(<span class="string">&quot;woRLd&quot;</span>.to_string()),
+            Difference::Same(<span class="string">&quot;beautiful&quot;</span>.to_string()),
+            Difference::Rem(<span class="string">&quot;day!&quot;</span>.to_string()),
         ]
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="attribute">#[<span class="ident">should_panic</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_assert_diff_panic</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Roses are red, violets are blue,\n\
+<span class="attribute">#[test]
+#[should_panic]
+</span><span class="kw">fn </span>test_assert_diff_panic() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Roses are red, violets are blue,\n\
                  I wrote this library,\n\
                  just for you.\n\
                  (It&#39;s true).&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Roses are red, violets are blue,\n\
+    <span class="kw">let </span>text2 = <span class="string">&quot;Roses are red, violets are blue,\n\
                  I wrote this documentation,\n\
                  just for you.\n\
                  (It&#39;s quite true).&quot;</span>;
 
-    <span class="macro">assert_diff!</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot;\n&#39;&quot;</span>, <span class="number">0</span>);
+    <span class="macro">assert_diff!</span>(text1, text2, <span class="string">&quot;\n&#39;&quot;</span>, <span class="number">0</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_assert_diff</span>() {
-    <span class="kw">let</span> <span class="ident">text1</span> <span class="op">=</span> <span class="string">&quot;Roses are red, violets are blue&quot;</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_assert_diff() {
+    <span class="kw">let </span>text1 = <span class="string">&quot;Roses are red, violets are blue&quot;</span>;
 
-    <span class="kw">let</span> <span class="ident">text2</span> <span class="op">=</span> <span class="string">&quot;Roses are green, violets are blue&quot;</span>;
+    <span class="kw">let </span>text2 = <span class="string">&quot;Roses are green, violets are blue&quot;</span>;
 
-    <span class="macro">assert_diff!</span>(<span class="ident">text1</span>, <span class="ident">text2</span>, <span class="string">&quot; &quot;</span>, <span class="number">2</span>);
+    <span class="macro">assert_diff!</span>(text1, text2, <span class="string">&quot; &quot;</span>, <span class="number">2</span>);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="difference" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="difference" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

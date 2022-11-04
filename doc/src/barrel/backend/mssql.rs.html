@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/backend/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/backend/mssql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mssql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -306,313 +306,313 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Microsoft SQL Server implementation of a generator</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module generates strings that are specific to SQL Server</span>
-<span class="doccomment">//! databases. They should be thoroughly tested via unit testing</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Microsoft SQL Server implementation of a generator
+//!
+//! This module generates strings that are specific to SQL Server
+//! databases. They should be thoroughly tested via unit testing
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlGenerator</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">functions::AutogenFunction</span>,
-    <span class="ident">types</span>::{<span class="ident">BaseType</span>, <span class="ident">Constraint</span>, <span class="ident">Type</span>, <span class="ident">WrappedDefault</span>},
+</span><span class="kw">use </span><span class="kw">super</span>::SqlGenerator;
+<span class="kw">use crate</span>::{
+    functions::AutogenFunction,
+    types::{BaseType, Constraint, Type, WrappedDefault},
 };
 
-<span class="doccomment">/// A simple macro that will generate a quoted schema prefix if it exists</span>
-<span class="macro">macro_rules!</span> <span class="ident">quoted_prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}].&quot;</span>, <span class="ident">s</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::new</span>())
+<span class="doccomment">/// A simple macro that will generate a quoted schema prefix if it exists
+</span><span class="macro">macro_rules! </span>quoted_prefix {
+    (<span class="macro-nonterminal">$schema</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$schema
+            </span>.map(|s| <span class="macro">format!</span>(<span class="string">&quot;[{}].&quot;</span>, s))
+            .unwrap_or_else(|| String::new())
     };
 }
 
-<span class="doccomment">/// A simple macro that will generate a schema prefix if it exists</span>
-<span class="macro">macro_rules!</span> <span class="ident">prefix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">schema</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}.&quot;</span>, <span class="ident">s</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::new</span>())
+<span class="doccomment">/// A simple macro that will generate a schema prefix if it exists
+</span><span class="macro">macro_rules! </span>prefix {
+    (<span class="macro-nonterminal">$schema</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$schema
+            </span>.map(|s| <span class="macro">format!</span>(<span class="string">&quot;{}.&quot;</span>, s))
+            .unwrap_or_else(|| String::new())
     };
 }
 
-<span class="doccomment">/// SQL Server generator backend</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MsSql</span>;
+<span class="doccomment">/// SQL Server generator backend
+</span><span class="kw">pub struct </span>MsSql;
 
-<span class="kw">impl</span> <span class="ident">MsSql</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>(<span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">default</span> {
-            <span class="ident">WrappedDefault::Function</span>(<span class="kw-2">ref</span> <span class="ident">fun</span>) =&gt; <span class="kw">match</span> <span class="ident">fun</span> {
-                <span class="ident">AutogenFunction::CurrentTimestamp</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT CURRENT_TIMESTAMP&quot;</span>),
+<span class="kw">impl </span>MsSql {
+    <span class="kw">fn </span>default(default: <span class="kw-2">&amp;</span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; String {
+        <span class="kw">match </span>default {
+            WrappedDefault::Function(<span class="kw-2">ref </span>fun) =&gt; <span class="kw">match </span>fun {
+                AutogenFunction::CurrentTimestamp =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT CURRENT_TIMESTAMP&quot;</span>),
             },
-            <span class="ident">WrappedDefault::Null</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT NULL&quot;</span>),
-            <span class="ident">WrappedDefault::AnyText</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">WrappedDefault::UUID</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">WrappedDefault::Date</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{:?}&#39;&quot;</span>, <span class="ident">val</span>),
-            <span class="ident">WrappedDefault::Boolean</span>(<span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> }),
-            <span class="ident">WrappedDefault::Custom</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, <span class="ident">val</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="ident">default</span>),
+            WrappedDefault::Null =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT NULL&quot;</span>),
+            WrappedDefault::AnyText(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, val),
+            WrappedDefault::UUID(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, val),
+            WrappedDefault::Date(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{:?}&#39;&quot;</span>, val),
+            WrappedDefault::Boolean(val) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, <span class="kw">if </span><span class="kw-2">*</span>val { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>}),
+            WrappedDefault::Custom(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT &#39;{}&#39;&quot;</span>, val),
+            <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot; DEFAULT {}&quot;</span>, default),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SqlGenerator</span> <span class="kw">for</span> <span class="ident">MsSql</span> {
-    <span class="kw">fn</span> <span class="ident">create_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;CREATE TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
+<span class="kw">impl </span>SqlGenerator <span class="kw">for </span>MsSql {
+    <span class="kw">fn </span>create_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;CREATE TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(schema), name)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_table_if_not_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>);
+    <span class="kw">fn </span>create_table_if_not_exists(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="kw">let </span>table = <span class="macro">format!</span>(<span class="string">&quot;{}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(schema), name);
 
-        <span class="kw">match</span> <span class="ident">schema</span> {
-            <span class="prelude-val">None</span> =&gt; {
+        <span class="kw">match </span>schema {
+            <span class="prelude-val">None </span>=&gt; {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;IF NOT EXISTS (SELECT * FROM sys.tables WHERE name=&#39;{table}&#39;) CREATE TABLE {quoted}&quot;</span>,
-                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">name</span>,
-                    <span class="ident">quoted</span> <span class="op">=</span> <span class="ident">table</span>,
+                    table = name,
+                    quoted = table,
                 )
             }
-            <span class="prelude-val">Some</span>(<span class="ident">schema</span>) =&gt; {
+            <span class="prelude-val">Some</span>(schema) =&gt; {
                 <span class="macro">format!</span>(
                     <span class="string">&quot;IF NOT EXISTS (SELECT * FROM sys.tables WHERE name=&#39;{table}&#39; AND SCHEMA_NAME(schema_id) = &#39;{schema}&#39;) CREATE TABLE {quoted}&quot;</span>,
-                    <span class="ident">table</span> <span class="op">=</span> <span class="ident">name</span>,
-                    <span class="ident">quoted</span> <span class="op">=</span> <span class="ident">table</span>,
-                    <span class="ident">schema</span> <span class="op">=</span> <span class="ident">schema</span>,
+                    table = name,
+                    quoted = table,
+                    schema = schema,
                 )
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
+    <span class="kw">fn </span>drop_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(schema), name)
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_table_if_exists</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE IF EXISTS {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
+    <span class="kw">fn </span>drop_table_if_exists(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE IF EXISTS {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(schema), name)
     }
 
-    <span class="kw">fn</span> <span class="ident">rename_table</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="macro">prefix!</span>(<span class="ident">schema</span>);
-        <span class="macro">format!</span>(<span class="string">r#&quot;EXEC sp_rename &#39;{}{}&#39;, &#39;{}&#39;&quot;#</span>, <span class="ident">prefix</span>, <span class="ident">old</span>, <span class="ident">new</span>)
+    <span class="kw">fn </span>rename_table(old: <span class="kw-2">&amp;</span>str, new: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="kw">let </span>prefix = <span class="macro">prefix!</span>(schema);
+        <span class="macro">format!</span>(<span class="string">r#&quot;EXEC sp_rename &#39;{}{}&#39;, &#39;{}&#39;&quot;#</span>, prefix, old, new)
     }
 
-    <span class="kw">fn</span> <span class="ident">alter_table</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(<span class="ident">schema</span>), <span class="ident">name</span>)
+    <span class="kw">fn </span>alter_table(name: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;ALTER TABLE {}[{}]&quot;</span>, <span class="macro">quoted_prefix!</span>(schema), name)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_column</span>(<span class="ident">ex</span>: <span class="ident">bool</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">tt</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">bt</span>: <span class="ident">BaseType</span> <span class="op">=</span> <span class="ident">tt</span>.<span class="ident">get_inner</span>();
+    <span class="kw">fn </span>add_column(ex: bool, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, tt: <span class="kw-2">&amp;</span>Type) -&gt; String {
+        <span class="kw">let </span>bt: BaseType = tt.get_inner();
 
-        <span class="kw">let</span> <span class="ident">name_and_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bt</span> {
-            <span class="ident">BaseType::Array</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported with SQL Server&quot;</span>),
-            <span class="ident">BaseType::Index</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">format!</span>(
+        <span class="kw">let </span>name_and_type = <span class="kw">match </span>bt {
+            BaseType::Array(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Arrays are not supported with SQL Server&quot;</span>),
+            BaseType::Index(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;{}[{}] {}&quot;</span>,
-                <span class="ident">MsSql::prefix</span>(<span class="ident">ex</span>),
-                <span class="ident">name</span>,
-                <span class="ident">MsSql::print_type</span>(<span class="ident">bt</span>, <span class="ident">schema</span>)
+                MsSql::prefix(ex),
+                name,
+                MsSql::print_type(bt, schema)
             ),
         };
 
-        <span class="kw">let</span> <span class="ident">increment</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">increments</span> {
-            <span class="bool-val">true</span> =&gt; <span class="string">&quot; IDENTITY(1,1)&quot;</span>,
-            <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
+        <span class="kw">let </span>increment = <span class="kw">match </span>tt.increments {
+            <span class="bool-val">true </span>=&gt; <span class="string">&quot; IDENTITY(1,1)&quot;</span>,
+            <span class="bool-val">false </span>=&gt; <span class="string">&quot;&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">primary_key_indicator</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">primary</span> {
-            <span class="bool-val">true</span> =&gt; <span class="string">&quot; PRIMARY KEY&quot;</span>,
-            <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
+        <span class="kw">let </span>primary_key_indicator = <span class="kw">match </span>tt.primary {
+            <span class="bool-val">true </span>=&gt; <span class="string">&quot; PRIMARY KEY&quot;</span>,
+            <span class="bool-val">false </span>=&gt; <span class="string">&quot;&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">default_indicator</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">tt</span>.<span class="ident">default</span>).<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">m</span>) =&gt; <span class="ident"><span class="self">Self</span>::default</span>(<span class="ident">m</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
+        <span class="kw">let </span>default_indicator = <span class="kw">match </span>(<span class="kw-2">&amp;</span>tt.default).as_ref() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>m) =&gt; <span class="self">Self</span>::default(m),
+            <span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">nullable_indicator</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">nullable</span> {
-            <span class="bool-val">true</span> =&gt; <span class="string">&quot;&quot;</span>,
-            <span class="bool-val">false</span> =&gt; <span class="string">&quot; NOT NULL&quot;</span>,
+        <span class="kw">let </span>nullable_indicator = <span class="kw">match </span>tt.nullable {
+            <span class="bool-val">true </span>=&gt; <span class="string">&quot;&quot;</span>,
+            <span class="bool-val">false </span>=&gt; <span class="string">&quot; NOT NULL&quot;</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">unique_indicator</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tt</span>.<span class="ident">unique</span> {
-            <span class="bool-val">true</span> =&gt; <span class="string">&quot; UNIQUE&quot;</span>,
-            <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
+        <span class="kw">let </span>unique_indicator = <span class="kw">match </span>tt.unique {
+            <span class="bool-val">true </span>=&gt; <span class="string">&quot; UNIQUE&quot;</span>,
+            <span class="bool-val">false </span>=&gt; <span class="string">&quot;&quot;</span>,
         };
 
         <span class="macro">format!</span>(
             <span class="string">&quot;{}{}{}{}{}{}&quot;</span>,
-            <span class="comment">// `ADD name VARCHAR(max)` or `name VARCHAR(max)`</span>
-            <span class="ident">name_and_type</span>,
-            <span class="comment">// `IDENTITY(1,1)` or nothing</span>
-            <span class="ident">increment</span>,
-            <span class="comment">// `PRIMARY KEY` or nothing</span>
-            <span class="ident">primary_key_indicator</span>,
-            <span class="comment">// `DEFAULT &#39;foo&#39;` or nothing</span>
-            <span class="ident">default_indicator</span>,
-            <span class="comment">// `NOT NULL` or nothing</span>
-            <span class="ident">nullable_indicator</span>,
-            <span class="comment">// `UNIQUE or nothing`</span>
-            <span class="ident">unique_indicator</span>
+            <span class="comment">// `ADD name VARCHAR(max)` or `name VARCHAR(max)`
+            </span>name_and_type,
+            <span class="comment">// `IDENTITY(1,1)` or nothing
+            </span>increment,
+            <span class="comment">// `PRIMARY KEY` or nothing
+            </span>primary_key_indicator,
+            <span class="comment">// `DEFAULT &#39;foo&#39;` or nothing
+            </span>default_indicator,
+            <span class="comment">// `NOT NULL` or nothing
+            </span>nullable_indicator,
+            <span class="comment">// `UNIQUE or nothing`
+            </span>unique_indicator
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_column</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN [{}]&quot;</span>, <span class="ident">name</span>)
+    <span class="kw">fn </span>drop_column(name: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP COLUMN [{}]&quot;</span>, name)
     }
 
-    <span class="kw">fn</span> <span class="ident">rename_column</span>(<span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">r#&quot;EXEC sp_rename &#39;{}&#39;, &#39;{}&#39;&quot;#</span>, <span class="ident">old</span>, <span class="ident">new</span>)
+    <span class="kw">fn </span>rename_column(old: <span class="kw-2">&amp;</span>str, new: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">r#&quot;EXEC sp_rename &#39;{}&#39;, &#39;{}&#39;&quot;#</span>, old, new)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_index</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">// FIXME: Implement PG specific index builder here</span>
-        <span class="macro">format!</span>(
+    <span class="kw">fn </span>create_index(table: <span class="kw-2">&amp;</span>str, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, name: <span class="kw-2">&amp;</span>str, _type: <span class="kw-2">&amp;</span>Type) -&gt; String {
+        <span class="comment">// FIXME: Implement PG specific index builder here
+        </span><span class="macro">format!</span>(
             <span class="string">&quot;CREATE {} INDEX [{}] ON {}[{}] ({})&quot;</span>,
-            <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">unique</span> {
-                <span class="bool-val">true</span> =&gt; <span class="string">&quot;UNIQUE&quot;</span>,
-                <span class="bool-val">false</span> =&gt; <span class="string">&quot;&quot;</span>,
+            <span class="kw">match </span>_type.unique {
+                <span class="bool-val">true </span>=&gt; <span class="string">&quot;UNIQUE&quot;</span>,
+                <span class="bool-val">false </span>=&gt; <span class="string">&quot;&quot;</span>,
             },
-            <span class="ident">name</span>,
-            <span class="macro">prefix!</span>(<span class="ident">schema</span>),
-            <span class="ident">table</span>,
-            <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">inner</span> {
-                <span class="ident">BaseType::Index</span>(<span class="kw-2">ref</span> <span class="ident">cols</span>) =&gt; <span class="ident">cols</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">col</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            name,
+            <span class="macro">prefix!</span>(schema),
+            table,
+            <span class="kw">match </span>_type.inner {
+                BaseType::Index(<span class="kw-2">ref </span>cols) =&gt; cols
+                    .iter()
+                    .map(|col| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, col))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot;, &quot;</span>),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">create_constraint</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_type</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> (<span class="ident">r#type</span>, <span class="ident">columns</span>, <span class="ident">suffix</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">_type</span>.<span class="ident">inner</span> {
-            <span class="ident">BaseType::Constraint</span>(<span class="kw-2">ref</span> <span class="ident">r#type</span>, <span class="kw-2">ref</span> <span class="ident">columns</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">r#type</span> {
-                    <span class="ident">Constraint::ForeignKey</span> {
-                        <span class="ident">table</span>,
-                        <span class="ident">foreign_columns</span>,
-                        <span class="ident">on_delete</span>,
-                        <span class="ident">on_update</span>,
+    <span class="kw">fn </span>create_constraint(name: <span class="kw-2">&amp;</span>str, _type: <span class="kw-2">&amp;</span>Type, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="kw">let </span>(r#type, columns, suffix) = <span class="kw">match </span>_type.inner {
+            BaseType::Constraint(<span class="kw-2">ref </span>r#type, <span class="kw-2">ref </span>columns) =&gt; {
+                <span class="kw">let </span>suffix = <span class="kw">match </span>r#type {
+                    Constraint::ForeignKey {
+                        table,
+                        foreign_columns,
+                        on_delete,
+                        on_update,
                     } =&gt; {
-                        <span class="kw">let</span> <span class="ident">foreign_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">foreign_columns</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">col</span>))
-                            .<span class="ident">collect</span>();
+                        <span class="kw">let </span>foreign_columns: Vec&lt;<span class="kw">_</span>&gt; = foreign_columns
+                            .iter()
+                            .map(|col| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, col))
+                            .collect();
 
 
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suffix</span> <span class="op">=</span>
-                            <span class="macro">format!</span>(<span class="string">&quot; REFERENCES {}[{}]({})&quot;</span>,<span class="macro">prefix!</span>(<span class="ident">schema</span>), <span class="ident">table</span>, <span class="ident">foreign_columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),);
+                        <span class="kw">let </span><span class="kw-2">mut </span>suffix =
+                            <span class="macro">format!</span>(<span class="string">&quot; REFERENCES {}[{}]({})&quot;</span>,<span class="macro">prefix!</span>(schema), table, foreign_columns.join(<span class="string">&quot;, &quot;</span>),);
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="ident">on_delete</span> {
-                            <span class="ident">suffix</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; ON DELETE {}&quot;</span>, <span class="ident">on_delete</span>));
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = on_delete {
+                            suffix.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; ON DELETE {}&quot;</span>, on_delete));
                         }
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="ident">on_update</span> {
-                            <span class="ident">suffix</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; ON UPDATE {}&quot;</span>, <span class="ident">on_update</span>));
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = on_update {
+                            suffix.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot; ON UPDATE {}&quot;</span>, on_update));
                         }
 
-                        <span class="prelude-val">Some</span>(<span class="ident">suffix</span>)
+                        <span class="prelude-val">Some</span>(suffix)
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 };
 
-                <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">col</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                <span class="kw">let </span>columns = columns
+                    .iter()
+                    .map(|col| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, col))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-                (<span class="ident">r#type</span>.<span class="ident">clone</span>(), <span class="ident">columns</span>, <span class="ident">suffix</span>)
+                (r#type.clone(), columns, suffix)
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CONSTRAINT [{}] {} ({})&quot;</span>, <span class="ident">name</span>, <span class="ident">r#type</span>, <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),);
+        <span class="kw">let </span><span class="kw-2">mut </span>sql = <span class="macro">format!</span>(<span class="string">&quot;CONSTRAINT [{}] {} ({})&quot;</span>, name, r#type, columns.join(<span class="string">&quot;, &quot;</span>),);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">suffix</span>) <span class="op">=</span> <span class="ident">suffix</span> {
-            <span class="ident">sql</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">suffix</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(suffix) = suffix {
+            sql.push_str(<span class="kw-2">&amp;</span>suffix);
         }
 
-        <span class="ident">sql</span>
+        sql
     }
 
-    <span class="kw">fn</span> <span class="ident">drop_index</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX [{}]&quot;</span>, <span class="ident">name</span>)
+    <span class="kw">fn </span>drop_index(name: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;DROP INDEX [{}]&quot;</span>, name)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_foreign_key</span>(
-        <span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">relation_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">c</span>)).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">relation_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">relation_columns</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">c</span>))
-            .<span class="ident">collect</span>();
+    <span class="kw">fn </span>add_foreign_key(
+        columns: <span class="kw-2">&amp;</span>[String],
+        table: <span class="kw-2">&amp;</span>str,
+        relation_columns: <span class="kw-2">&amp;</span>[String],
+        schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; String {
+        <span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = columns.into_iter().map(|c| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, c)).collect();
+        <span class="kw">let </span>relation_columns: Vec&lt;<span class="kw">_</span>&gt; = relation_columns
+            .into_iter()
+            .map(|c| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, c))
+            .collect();
 
         <span class="macro">format!</span>(
             <span class="string">&quot;FOREIGN KEY({}) REFERENCES {}[{}]({})&quot;</span>,
-            <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
-            <span class="macro">prefix!</span>(<span class="ident">schema</span>),
-            <span class="ident">table</span>,
-            <span class="ident">relation_columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
+            columns.join(<span class="string">&quot;,&quot;</span>),
+            <span class="macro">prefix!</span>(schema),
+            table,
+            relation_columns.join(<span class="string">&quot;,&quot;</span>),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">add_primary_key</span>(<span class="ident">columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>]) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">c</span>)).<span class="ident">collect</span>();
-        <span class="macro">format!</span>(<span class="string">&quot;PRIMARY KEY ({})&quot;</span>, <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
+    <span class="kw">fn </span>add_primary_key(columns: <span class="kw-2">&amp;</span>[String]) -&gt; String {
+        <span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = columns.into_iter().map(|c| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, c)).collect();
+        <span class="macro">format!</span>(<span class="string">&quot;PRIMARY KEY ({})&quot;</span>, columns.join(<span class="string">&quot;,&quot;</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MsSql</span> {
-    <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="ident">ex</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="ident">ex</span> {
-            <span class="bool-val">true</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;ADD &quot;</span>),
-            <span class="bool-val">false</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
+<span class="kw">impl </span>MsSql {
+    <span class="kw">fn </span>prefix(ex: bool) -&gt; String {
+        <span class="kw">match </span>ex {
+            <span class="bool-val">true </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;ADD &quot;</span>),
+            <span class="bool-val">false </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">print_type</span>(<span class="ident">t</span>: <span class="ident">BaseType</span>, <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::BaseType</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">Text</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;TEXT&quot;</span>),
-            <span class="ident">Varchar</span>(<span class="ident">l</span>) =&gt; <span class="kw">match</span> <span class="ident">l</span> {
-                <span class="number">0</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR(MAX)&quot;</span>), <span class="comment">// For &quot;0&quot; remove the limit</span>
-                <span class="kw">_</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({})&quot;</span>, <span class="ident">l</span>),
+    <span class="kw">fn </span>print_type(t: BaseType, schema: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; String {
+        <span class="kw">use </span><span class="self">self</span>::BaseType::<span class="kw-2">*</span>;
+        <span class="kw">match </span>t {
+            Text =&gt; <span class="macro">format!</span>(<span class="string">&quot;TEXT&quot;</span>),
+            Varchar(l) =&gt; <span class="kw">match </span>l {
+                <span class="number">0 </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR(MAX)&quot;</span>), <span class="comment">// For &quot;0&quot; remove the limit
+                </span><span class="kw">_ </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;VARCHAR({})&quot;</span>, l),
             },
-            <span class="ident">Char</span>(<span class="ident">l</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR({})&quot;</span>, <span class="ident">l</span>),
-            <span class="comment">/* &quot;NOT NULL&quot; is added here because normally primary keys are implicitly not-null */</span>
-            <span class="ident">Primary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT IDENTITY(1,1) PRIMARY KEY NOT NULL&quot;</span>),
-            <span class="ident">Integer</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT&quot;</span>),
-            <span class="ident">Serial</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT IDENTITY(1,1)&quot;</span>),
-            <span class="ident">Float</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;FLOAT(24)&quot;</span>),
-            <span class="ident">Double</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;FLOAT(53)&quot;</span>),
-            <span class="ident">UUID</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;UNIQUEIDENTIFIER&quot;</span>),
-            <span class="ident">Boolean</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT&quot;</span>),
-            <span class="ident">Date</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATE&quot;</span>),
-            <span class="ident">Time</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME&quot;</span>),
-            <span class="ident">DateTime</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME2&quot;</span>),
-            <span class="ident">Json</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;JSON&quot;</span>),
-            <span class="ident">Binary</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBINARY(MAX)&quot;</span>),
-            <span class="ident">Foreign</span>(<span class="ident">s</span>, <span class="ident">t</span>, <span class="ident">refs</span>) =&gt; <span class="macro">format!</span>(
+            Char(l) =&gt; <span class="macro">format!</span>(<span class="string">&quot;CHAR({})&quot;</span>, l),
+            <span class="comment">/* &quot;NOT NULL&quot; is added here because normally primary keys are implicitly not-null */
+            </span>Primary =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT IDENTITY(1,1) PRIMARY KEY NOT NULL&quot;</span>),
+            Integer =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT&quot;</span>),
+            Serial =&gt; <span class="macro">format!</span>(<span class="string">&quot;INT IDENTITY(1,1)&quot;</span>),
+            Float =&gt; <span class="macro">format!</span>(<span class="string">&quot;FLOAT(24)&quot;</span>),
+            Double =&gt; <span class="macro">format!</span>(<span class="string">&quot;FLOAT(53)&quot;</span>),
+            UUID =&gt; <span class="macro">format!</span>(<span class="string">&quot;UNIQUEIDENTIFIER&quot;</span>),
+            Boolean =&gt; <span class="macro">format!</span>(<span class="string">&quot;BIT&quot;</span>),
+            Date =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATE&quot;</span>),
+            Time =&gt; <span class="macro">format!</span>(<span class="string">&quot;TIME&quot;</span>),
+            DateTime =&gt; <span class="macro">format!</span>(<span class="string">&quot;DATETIME2&quot;</span>),
+            Json =&gt; <span class="macro">format!</span>(<span class="string">&quot;JSON&quot;</span>),
+            Binary =&gt; <span class="macro">format!</span>(<span class="string">&quot;VARBINARY(MAX)&quot;</span>),
+            Foreign(s, t, refs) =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;INT REFERENCES {}[{}]({})&quot;</span>,
-                <span class="macro">quoted_prefix!</span>(<span class="ident">s</span>.<span class="ident">or</span>(<span class="ident">schema</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>()))),
-                <span class="ident">t</span>,
-                <span class="ident">refs</span>.<span class="number">0</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, <span class="ident">r</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>)
+                <span class="macro">quoted_prefix!</span>(s.or(schema.map(|s| s.into()))),
+                t,
+                refs.<span class="number">0
+                    </span>.iter()
+                    .map(|r| <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, r))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                    .join(<span class="string">&quot;,&quot;</span>)
             ),
-            <span class="ident">Custom</span>(<span class="ident">t</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>),
-            <span class="ident">Array</span>(<span class="ident">meh</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, <span class="ident">MsSql::print_type</span>(<span class="kw-2">*</span><span class="ident">meh</span>, <span class="ident">schema</span>)),
-            <span class="ident">Index</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
-            <span class="ident">Constraint</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Constraints are handled via custom builder&quot;</span>),
+            Custom(t) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, t),
+            Array(meh) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}[]&quot;</span>, MsSql::print_type(<span class="kw-2">*</span>meh, schema)),
+            Index(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Indices are handled via custom builder&quot;</span>),
+            Constraint(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Constraints are handled via custom builder&quot;</span>),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

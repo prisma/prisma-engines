@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/table_decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table_decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/table_decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table_decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -196,115 +196,115 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Pre-computed tables for writing decimal strings.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Pre-computed tables for writing decimal strings.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
+</span><span class="attribute">#![doc(hidden)]
+#![cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bigint::Limb</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::limits</span>::{<span class="ident">f32_exponent_limit</span>, <span class="ident">f64_exponent_limit</span>, <span class="ident">f64_mantissa_limit</span>, <span class="ident">u64_power_limit</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::assert::debug_assert_radix</span>;
-<span class="kw">use</span> <span class="ident">static_assertions::const_assert</span>;
+#[cfg(not(feature = <span class="string">&quot;radix&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::bigint::Limb;
+<span class="kw">use </span><span class="kw">crate</span>::limits::{f32_exponent_limit, f64_exponent_limit, f64_mantissa_limit, u64_power_limit};
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">use </span>lexical_util::assert::debug_assert_radix;
+<span class="kw">use </span>static_assertions::const_assert;
 
-<span class="comment">// HELPERS</span>
-<span class="comment">// -------</span>
+<span class="comment">// HELPERS
+// -------
 
-<span class="doccomment">/// Get lookup table for small int powers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the radix provided is valid, and exponent is smaller</span>
-<span class="doccomment">/// than the table for the radix.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_int_power</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">// NOTE: don&#39;t check the radix since we also use it for half radix, or 5.</span>
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">5</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">get_small_int_power5</span>(<span class="ident">exponent</span>) },
-        <span class="number">10</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">get_small_int_power10</span>(<span class="ident">exponent</span>) },
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+</span><span class="doccomment">/// Get lookup table for small int powers.
+///
+/// # Safety
+///
+/// Safe as long as the radix provided is valid, and exponent is smaller
+/// than the table for the radix.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">pub unsafe fn </span>get_small_int_power(exponent: usize, radix: u32) -&gt; u64 {
+    <span class="comment">// NOTE: don&#39;t check the radix since we also use it for half radix, or 5.
+    </span><span class="kw">match </span>radix {
+        <span class="number">5 </span>=&gt; <span class="kw">unsafe </span>{ get_small_int_power5(exponent) },
+        <span class="number">10 </span>=&gt; <span class="kw">unsafe </span>{ get_small_int_power10(exponent) },
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="doccomment">/// Get lookup table for small f32 powers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the radix provided is valid, and exponent is smaller</span>
-<span class="doccomment">/// than the table for the radix.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_f32_power</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">f32</span> {
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-    <span class="kw">unsafe</span> { <span class="ident">get_small_f32_power10</span>(<span class="ident">exponent</span>) }
+<span class="doccomment">/// Get lookup table for small f32 powers.
+///
+/// # Safety
+///
+/// Safe as long as the radix provided is valid, and exponent is smaller
+/// than the table for the radix.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">pub unsafe fn </span>get_small_f32_power(exponent: usize, radix: u32) -&gt; f32 {
+    debug_assert_radix(radix);
+    <span class="kw">unsafe </span>{ get_small_f32_power10(exponent) }
 }
 
-<span class="doccomment">/// Get lookup table for small f64 powers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the radix provided is valid, and exponent is smaller</span>
-<span class="doccomment">/// than the table for the radix.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_f64_power</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">f64</span> {
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
-    <span class="kw">unsafe</span> { <span class="ident">get_small_f64_power10</span>(<span class="ident">exponent</span>) }
+<span class="doccomment">/// Get lookup table for small f64 powers.
+///
+/// # Safety
+///
+/// Safe as long as the radix provided is valid, and exponent is smaller
+/// than the table for the radix.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">pub unsafe fn </span>get_small_f64_power(exponent: usize, radix: u32) -&gt; f64 {
+    debug_assert_radix(radix);
+    <span class="kw">unsafe </span>{ get_small_f64_power10(exponent) }
 }
 
-<span class="doccomment">/// Get pre-computed power for a large power of radix.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">get_large_int_power</span>(<span class="kw">_</span>: <span class="ident">u32</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Limb</span>], <span class="ident">u32</span>) {
-    (<span class="kw-2">&amp;</span><span class="ident">LARGE_POW5</span>, <span class="ident">LARGE_POW5_STEP</span>)
+<span class="doccomment">/// Get pre-computed power for a large power of radix.
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;radix&quot;</span>))]
+</span><span class="kw">pub const fn </span>get_large_int_power(<span class="kw">_</span>: u32) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Limb], u32) {
+    (<span class="kw-2">&amp;</span>LARGE_POW5, LARGE_POW5_STEP)
 }
 
-<span class="doccomment">/// Get pre-computed int power of 5.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the `exponent &lt; SMALL_INT_POW5.len()`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_int_power5</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">SMALL_INT_POW5</span>[<span class="ident">exponent</span>]) }
+<span class="doccomment">/// Get pre-computed int power of 5.
+///
+/// # Safety
+///
+/// Safe as long as the `exponent &lt; SMALL_INT_POW5.len()`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub unsafe fn </span>get_small_int_power5(exponent: usize) -&gt; u64 {
+    <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(SMALL_INT_POW5[exponent]) }
 }
 
-<span class="doccomment">/// Get pre-computed int power of 10.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the `exponent &lt; SMALL_INT_POW10.len()`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_int_power10</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">SMALL_INT_POW10</span>[<span class="ident">exponent</span>]) }
+<span class="doccomment">/// Get pre-computed int power of 10.
+///
+/// # Safety
+///
+/// Safe as long as the `exponent &lt; SMALL_INT_POW10.len()`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub unsafe fn </span>get_small_int_power10(exponent: usize) -&gt; u64 {
+    <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(SMALL_INT_POW10[exponent]) }
 }
 
-<span class="doccomment">/// Get pre-computed f32 power of 10.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the `exponent &lt; SMALL_F32_POW10.len()`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_f32_power10</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>) -&gt; <span class="ident">f32</span> {
-    <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">SMALL_F32_POW10</span>[<span class="ident">exponent</span>]) }
+<span class="doccomment">/// Get pre-computed f32 power of 10.
+///
+/// # Safety
+///
+/// Safe as long as the `exponent &lt; SMALL_F32_POW10.len()`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub unsafe fn </span>get_small_f32_power10(exponent: usize) -&gt; f32 {
+    <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(SMALL_F32_POW10[exponent]) }
 }
 
-<span class="doccomment">/// Get pre-computed f64 power of 10.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the `exponent &lt; SMALL_F64_POW10.len()`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_small_f64_power10</span>(<span class="ident">exponent</span>: <span class="ident">usize</span>) -&gt; <span class="ident">f64</span> {
-    <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">SMALL_F64_POW10</span>[<span class="ident">exponent</span>]) }
+<span class="doccomment">/// Get pre-computed f64 power of 10.
+///
+/// # Safety
+///
+/// Safe as long as the `exponent &lt; SMALL_F64_POW10.len()`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub unsafe fn </span>get_small_f64_power10(exponent: usize) -&gt; f64 {
+    <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(SMALL_F64_POW10[exponent]) }
 }
 
-<span class="comment">// TABLES</span>
-<span class="comment">// ------</span>
+<span class="comment">// TABLES
+// ------
 
-<span class="doccomment">/// Pre-computed, small powers-of-5.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SMALL_INT_POW5</span>: [<span class="ident">u64</span>; <span class="number">28</span>] <span class="op">=</span> [
+</span><span class="doccomment">/// Pre-computed, small powers-of-5.
+</span><span class="kw">pub const </span>SMALL_INT_POW5: [u64; <span class="number">28</span>] = [
     <span class="number">1</span>,
     <span class="number">5</span>,
     <span class="number">25</span>,
@@ -334,11 +334,11 @@
     <span class="number">1490116119384765625</span>,
     <span class="number">7450580596923828125</span>,
 ];
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_INT_POW5</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">f64_mantissa_limit</span>(<span class="number">5</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_INT_POW5</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">u64_power_limit</span>(<span class="number">5</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
+<span class="macro">const_assert!</span>(SMALL_INT_POW5.len() &gt; f64_mantissa_limit(<span class="number">5</span>) <span class="kw">as </span>usize);
+<span class="macro">const_assert!</span>(SMALL_INT_POW5.len() == u64_power_limit(<span class="number">5</span>) <span class="kw">as </span>usize + <span class="number">1</span>);
 
-<span class="doccomment">/// Pre-computed, small powers-of-10.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SMALL_INT_POW10</span>: [<span class="ident">u64</span>; <span class="number">20</span>] <span class="op">=</span> [
+<span class="doccomment">/// Pre-computed, small powers-of-10.
+</span><span class="kw">pub const </span>SMALL_INT_POW10: [u64; <span class="number">20</span>] = [
     <span class="number">1</span>,
     <span class="number">10</span>,
     <span class="number">100</span>,
@@ -360,31 +360,31 @@
     <span class="number">1000000000000000000</span>,
     <span class="number">10000000000000000000</span>,
 ];
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_INT_POW10</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">f64_mantissa_limit</span>(<span class="number">10</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_INT_POW10</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">u64_power_limit</span>(<span class="number">10</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>);
+<span class="macro">const_assert!</span>(SMALL_INT_POW10.len() &gt; f64_mantissa_limit(<span class="number">10</span>) <span class="kw">as </span>usize);
+<span class="macro">const_assert!</span>(SMALL_INT_POW10.len() == u64_power_limit(<span class="number">10</span>) <span class="kw">as </span>usize + <span class="number">1</span>);
 
-<span class="doccomment">/// Pre-computed, small powers-of-10.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SMALL_F32_POW10</span>: [<span class="ident">f32</span>; <span class="number">16</span>] <span class="op">=</span>
+<span class="doccomment">/// Pre-computed, small powers-of-10.
+</span><span class="kw">pub const </span>SMALL_F32_POW10: [f32; <span class="number">16</span>] =
     [<span class="number">1e0</span>, <span class="number">1e1</span>, <span class="number">1e2</span>, <span class="number">1e3</span>, <span class="number">1e4</span>, <span class="number">1e5</span>, <span class="number">1e6</span>, <span class="number">1e7</span>, <span class="number">1e8</span>, <span class="number">1e9</span>, <span class="number">1e10</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>];
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_F32_POW10</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">f32_exponent_limit</span>(<span class="number">10</span>).<span class="number">1</span> <span class="kw">as</span> <span class="ident">usize</span>);
+<span class="macro">const_assert!</span>(SMALL_F32_POW10.len() &gt; f32_exponent_limit(<span class="number">10</span>).<span class="number">1 </span><span class="kw">as </span>usize);
 
-<span class="doccomment">/// Pre-computed, small powers-of-10.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SMALL_F64_POW10</span>: [<span class="ident">f64</span>; <span class="number">32</span>] <span class="op">=</span> [
+<span class="doccomment">/// Pre-computed, small powers-of-10.
+</span><span class="kw">pub const </span>SMALL_F64_POW10: [f64; <span class="number">32</span>] = [
     <span class="number">1e0</span>, <span class="number">1e1</span>, <span class="number">1e2</span>, <span class="number">1e3</span>, <span class="number">1e4</span>, <span class="number">1e5</span>, <span class="number">1e6</span>, <span class="number">1e7</span>, <span class="number">1e8</span>, <span class="number">1e9</span>, <span class="number">1e10</span>, <span class="number">1e11</span>, <span class="number">1e12</span>, <span class="number">1e13</span>, <span class="number">1e14</span>, <span class="number">1e15</span>, <span class="number">1e16</span>,
     <span class="number">1e17</span>, <span class="number">1e18</span>, <span class="number">1e19</span>, <span class="number">1e20</span>, <span class="number">1e21</span>, <span class="number">1e22</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>,
 ];
-<span class="macro">const_assert!</span>(<span class="ident">SMALL_F64_POW10</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">f64_exponent_limit</span>(<span class="number">10</span>).<span class="number">1</span> <span class="kw">as</span> <span class="ident">usize</span>);
+<span class="macro">const_assert!</span>(SMALL_F64_POW10.len() &gt; f64_exponent_limit(<span class="number">10</span>).<span class="number">1 </span><span class="kw">as </span>usize);
 
-<span class="doccomment">/// Pre-computed large power-of-5 for 32-bit limbs.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;sparc&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LARGE_POW5</span>: [<span class="ident">u32</span>; <span class="number">10</span>] <span class="op">=</span> [
+<span class="doccomment">/// Pre-computed large power-of-5 for 32-bit limbs.
+</span><span class="attribute">#[cfg(not(all(target_pointer_width = <span class="string">&quot;64&quot;</span>, not(target_arch = <span class="string">&quot;sparc&quot;</span>))))]
+</span><span class="kw">pub const </span>LARGE_POW5: [u32; <span class="number">10</span>] = [
     <span class="number">4279965485</span>, <span class="number">329373468</span>, <span class="number">4020270615</span>, <span class="number">2137533757</span>, <span class="number">4287402176</span>, <span class="number">1057042919</span>, <span class="number">1071430142</span>, <span class="number">2440757623</span>,
     <span class="number">381945767</span>, <span class="number">46164893</span>,
 ];
 
-<span class="doccomment">/// Pre-computed large power-of-5 for 64-bit limbs.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>, <span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;sparc&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LARGE_POW5</span>: [<span class="ident">u64</span>; <span class="number">5</span>] <span class="op">=</span> [
+<span class="doccomment">/// Pre-computed large power-of-5 for 64-bit limbs.
+</span><span class="attribute">#[cfg(all(target_pointer_width = <span class="string">&quot;64&quot;</span>, not(target_arch = <span class="string">&quot;sparc&quot;</span>)))]
+</span><span class="kw">pub const </span>LARGE_POW5: [u64; <span class="number">5</span>] = [
     <span class="number">1414648277510068013</span>,
     <span class="number">9180637584431281687</span>,
     <span class="number">4539964771860779200</span>,
@@ -392,7 +392,7 @@
     <span class="number">198276706040285095</span>,
 ];
 
-<span class="doccomment">/// Step for large power-of-5 for 32-bit limbs.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LARGE_POW5_STEP</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">135</span>;
+<span class="doccomment">/// Step for large power-of-5 for 32-bit limbs.
+</span><span class="kw">pub const </span>LARGE_POW5_STEP: u32 = <span class="number">135</span>;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

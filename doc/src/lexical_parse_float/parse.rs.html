@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -951,958 +951,958 @@
 <span id="951">951</span>
 <span id="952">952</span>
 <span id="953">953</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared trait and methods for parsing floats.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is adapted from [fast-float-rust](https://github.com/aldanor/fast-float-rust),</span>
-<span class="doccomment">//! a port of [fast_float](https://github.com/fastfloat/fast_float) to Rust.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared trait and methods for parsing floats.
+//!
+//! This is adapted from [fast-float-rust](https://github.com/aldanor/fast-float-rust),
+//! a port of [fast_float](https://github.com/fastfloat/fast_float) to Rust.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bellerophon::bellerophon</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::binary</span>::{<span class="ident">binary</span>, <span class="ident">slow_binary</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::float</span>::{<span class="ident">extended_to_float</span>, <span class="ident">ExtendedFloat80</span>, <span class="ident">LemireFloat</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lemire::lemire</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::number::Number</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::Options</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shared</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::slow::slow_radix</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">lexical_parse_integer::algorithm</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::bf16::bf16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::digit</span>::{<span class="ident">char_to_digit_const</span>, <span class="ident">char_to_valid_digit_const</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::error::Error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::iterator</span>::{<span class="ident">AsBytes</span>, <span class="ident">Bytes</span>, <span class="ident">BytesIter</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::result::Result</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::step::u64_step</span>;
+#[cfg(any(feature = <span class="string">&quot;compact&quot;</span>, feature = <span class="string">&quot;radix&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::bellerophon::bellerophon;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::binary::{binary, slow_binary};
+<span class="kw">use </span><span class="kw">crate</span>::float::{extended_to_float, ExtendedFloat80, LemireFloat};
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::lemire::lemire;
+<span class="kw">use </span><span class="kw">crate</span>::number::Number;
+<span class="kw">use </span><span class="kw">crate</span>::options::Options;
+<span class="kw">use </span><span class="kw">crate</span>::shared;
+<span class="kw">use </span><span class="kw">crate</span>::slow::slow_radix;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span>lexical_parse_integer::algorithm;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::bf16::bf16;
+<span class="kw">use </span>lexical_util::digit::{char_to_digit_const, char_to_valid_digit_const};
+<span class="kw">use </span>lexical_util::error::Error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::f16::f16;
+<span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_util::iterator::{AsBytes, Bytes, BytesIter};
+<span class="kw">use </span>lexical_util::result::Result;
+<span class="kw">use </span>lexical_util::step::u64_step;
 
-<span class="comment">// API</span>
-<span class="comment">// ---</span>
+<span class="comment">// API
+// ---
 
-<span class="doccomment">/// Check f radix is a power-of-2.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">is_power_two</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro">matches!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>, <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">16</span> <span class="op">|</span> <span class="number">32</span>)
+</span><span class="doccomment">/// Check f radix is a power-of-2.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="macro">macro_rules! </span>is_power_two {
+    (<span class="macro-nonterminal">$radix</span>:expr) =&gt; {
+        <span class="macro">matches!</span>(<span class="macro-nonterminal">$radix</span>, <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">8 </span>| <span class="number">16 </span>| <span class="number">32</span>)
     };
 }
 
-<span class="doccomment">/// Check if the radix is valid and error otherwise</span>
-<span class="macro">macro_rules!</span> <span class="ident">check_radix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span> {};
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>() {
-                <span class="kw">let</span> <span class="ident">valid_radix</span> <span class="op">=</span> <span class="macro">matches!</span>(
-                    (<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="ident">format</span>.<span class="ident">exponent_base</span>()),
-                    (<span class="number">4</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">8</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">16</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">32</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">16</span>, <span class="number">4</span>)
+<span class="doccomment">/// Check if the radix is valid and error otherwise
+</span><span class="macro">macro_rules! </span>check_radix {
+    (<span class="macro-nonterminal">$format</span>:ident) =&gt; {{
+        <span class="kw">let </span>format = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt; {};
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+        </span>{
+            <span class="kw">if </span>format.radix() != format.exponent_base() {
+                <span class="kw">let </span>valid_radix = <span class="macro">matches!</span>(
+                    (format.radix(), format.exponent_base()),
+                    (<span class="number">4</span>, <span class="number">2</span>) | (<span class="number">8</span>, <span class="number">2</span>) | (<span class="number">16</span>, <span class="number">2</span>) | (<span class="number">32</span>, <span class="number">2</span>) | (<span class="number">16</span>, <span class="number">4</span>)
                 );
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">valid_radix</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidRadix</span>);
+                <span class="kw">if </span>!valid_radix {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidRadix);
                 }
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-        {
-            <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidRadix</span>);
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+        </span>{
+            <span class="kw">if </span>format.radix() != format.exponent_base() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidRadix);
             }
         }
     }};
 }
 
-<span class="doccomment">/// Parse integer trait, implemented in terms of the optimized back-end.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseFloat</span>: <span class="ident">LemireFloat</span> {
-    <span class="doccomment">/// Forward complete parser parameters to the backend.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">parse_complete</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="macro">check_radix!</span>(<span class="ident">FORMAT</span>);
-        <span class="ident">parse_complete</span>::<span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+<span class="doccomment">/// Parse integer trait, implemented in terms of the optimized back-end.
+</span><span class="kw">pub trait </span>ParseFloat: LemireFloat {
+    <span class="doccomment">/// Forward complete parser parameters to the backend.
+    </span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+    </span><span class="kw">fn </span>parse_complete&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="macro">check_radix!</span>(FORMAT);
+        parse_complete::&lt;<span class="self">Self</span>, FORMAT&gt;(bytes, options)
     }
 
-    <span class="doccomment">/// Forward partial parser parameters to the backend.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="macro">check_radix!</span>(<span class="ident">FORMAT</span>);
-        <span class="ident">parse_partial</span>::<span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Forward partial parser parameters to the backend.
+    </span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+    </span><span class="kw">fn </span>parse_partial&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt; {
+        <span class="macro">check_radix!</span>(FORMAT);
+        parse_partial::&lt;<span class="self">Self</span>, FORMAT&gt;(bytes, options)
     }
 
-    <span class="doccomment">/// Forward complete parser parameters to the backend, using only the fast path.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">fast_path_complete</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="macro">check_radix!</span>(<span class="ident">FORMAT</span>);
-        <span class="ident">fast_path_complete</span>::<span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Forward complete parser parameters to the backend, using only the fast path.
+    </span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+    </span><span class="kw">fn </span>fast_path_complete&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="macro">check_radix!</span>(FORMAT);
+        fast_path_complete::&lt;<span class="self">Self</span>, FORMAT&gt;(bytes, options)
     }
 
-    <span class="doccomment">/// Forward partial parser parameters to the backend, using only the fast path.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">fast_path_partial</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-        <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="macro">check_radix!</span>(<span class="ident">FORMAT</span>);
-        <span class="ident">fast_path_partial</span>::<span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Forward partial parser parameters to the backend, using only the fast path.
+    </span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+    </span><span class="kw">fn </span>fast_path_partial&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+        bytes: <span class="kw-2">&amp;</span>[u8],
+        options: <span class="kw-2">&amp;</span>Options,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt; {
+        <span class="macro">check_radix!</span>(FORMAT);
+        fast_path_partial::&lt;<span class="self">Self</span>, FORMAT&gt;(bytes, options)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">parse_float_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">ParseFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {}
+<span class="macro">macro_rules! </span>parse_float_impl {
+    ($(<span class="macro-nonterminal">$t</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>ParseFloat <span class="kw">for </span><span class="macro-nonterminal">$t </span>{}
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">parse_float_impl!</span> { <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="macro">parse_float_impl! </span>{ f32 f64 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">parse_float_as_f32</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">ParseFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-            <span class="kw">fn</span> <span class="ident">parse_complete</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>)
-                -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="macro">macro_rules! </span>parse_float_as_f32 {
+    ($(<span class="macro-nonterminal">$t</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>ParseFloat <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+            </span><span class="kw">fn </span>parse_complete&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options)
+                -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt;
             {
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_f32</span>(<span class="ident">parse_complete</span>::<span class="op">&lt;</span><span class="ident">f32</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)<span class="question-mark">?</span>))
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_f32(parse_complete::&lt;f32, FORMAT&gt;(bytes, options)<span class="question-mark">?</span>))
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-            <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>)
-                -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+            </span><span class="kw">fn </span>parse_partial&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options)
+                -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt;
             {
-                <span class="kw">let</span> (<span class="ident">float</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="ident">parse_partial</span>::<span class="op">&lt;</span><span class="ident">f32</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>((<span class="ident"><span class="self">Self</span>::from_f32</span>(<span class="ident">float</span>), <span class="ident">count</span>))
+                <span class="kw">let </span>(float, count) = parse_partial::&lt;f32, FORMAT&gt;(bytes, options)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((<span class="self">Self</span>::from_f32(float), count))
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-            <span class="kw">fn</span> <span class="ident">fast_path_complete</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>)
-                -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+            </span><span class="kw">fn </span>fast_path_complete&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options)
+                -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt;
             {
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from_f32</span>(<span class="ident">fast_path_complete</span>::<span class="op">&lt;</span><span class="ident">f32</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)<span class="question-mark">?</span>))
+                <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from_f32(fast_path_complete::&lt;f32, FORMAT&gt;(bytes, options)<span class="question-mark">?</span>))
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-            <span class="kw">fn</span> <span class="ident">fast_path_partial</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>)
-                -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline(always))]
+            </span><span class="kw">fn </span>fast_path_partial&lt;<span class="kw">const </span>FORMAT: u128&gt;(bytes: <span class="kw-2">&amp;</span>[u8], options: <span class="kw-2">&amp;</span>Options)
+                -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt;
             {
-                <span class="kw">let</span> (<span class="ident">float</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="ident">fast_path_partial</span>::<span class="op">&lt;</span><span class="ident">f32</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>((<span class="ident"><span class="self">Self</span>::from_f32</span>(<span class="ident">float</span>), <span class="ident">count</span>))
+                <span class="kw">let </span>(float, count) = fast_path_partial::&lt;f32, FORMAT&gt;(bytes, options)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((<span class="self">Self</span>::from_f32(float), count))
             }
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="macro">parse_float_as_f32!</span> { <span class="ident">bf16</span> <span class="ident">f16</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="macro">parse_float_as_f32! </span>{ bf16 f16 }
 
-<span class="comment">// PARSE</span>
-<span class="comment">// -----</span>
+<span class="comment">// PARSE
+// -----
 
-<span class="comment">// NOTE:</span>
-<span class="comment">//  The partial and complete parsers are done separately because it provides</span>
-<span class="comment">//  minor optimizations when parsing invalid input, and the logic is slightly</span>
-<span class="comment">//  different internally. Most of the code is reshared, so the duplicated</span>
-<span class="comment">//  code is only like 30 lines.</span>
+// NOTE:
+//  The partial and complete parsers are done separately because it provides
+//  minor optimizations when parsing invalid input, and the logic is slightly
+//  different internally. Most of the code is reshared, so the duplicated
+//  code is only like 30 lines.
 
-<span class="macro">macro_rules!</span> <span class="ident">parse_mantissa_sign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_mantissa_sign</span>() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_mantissa_sign</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidPositiveSign</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">cursor</span>()));
+</span><span class="macro">macro_rules! </span>parse_mantissa_sign {
+    (<span class="macro-nonterminal">$byte</span>:ident, <span class="macro-nonterminal">$format</span>:ident) =&gt; {{
+        <span class="kw">match </span><span class="macro-nonterminal">$byte</span>.integer_iter().peek() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span>!<span class="macro-nonterminal">$format</span>.no_positive_mantissa_sign() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.no_positive_mantissa_sign() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidPositiveSign(<span class="macro-nonterminal">$byte</span>.cursor()));
             },
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>) =&gt; (<span class="bool-val">true</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">required_mantissa_sign</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MissingSign</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">cursor</span>()));
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.required_mantissa_sign() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::MissingSign(<span class="macro-nonterminal">$byte</span>.cursor()));
             },
-            <span class="kw">_</span> =&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
+            <span class="kw">_ </span>=&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
         }
     }};
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">parse_exponent_sign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_exponent_sign</span>() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">no_positive_exponent_sign</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidPositiveExponentSign</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">cursor</span>()));
+<span class="macro">macro_rules! </span>parse_exponent_sign {
+    (<span class="macro-nonterminal">$byte</span>:ident, <span class="macro-nonterminal">$format</span>:ident) =&gt; {{
+        <span class="kw">match </span><span class="macro-nonterminal">$byte</span>.integer_iter().peek() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span>!<span class="macro-nonterminal">$format</span>.no_positive_exponent_sign() =&gt; (<span class="bool-val">false</span>, <span class="number">1</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;+&#39;</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.no_positive_exponent_sign() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidPositiveExponentSign(<span class="macro-nonterminal">$byte</span>.cursor()));
             },
             <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;-&#39;</span>) =&gt; (<span class="bool-val">true</span>, <span class="number">1</span>),
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">required_mantissa_sign</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MissingExponentSign</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">cursor</span>()));
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="kw">if </span><span class="macro-nonterminal">$format</span>.required_mantissa_sign() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::MissingExponentSign(<span class="macro-nonterminal">$byte</span>.cursor()));
             },
-            <span class="kw">_</span> =&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
+            <span class="kw">_ </span>=&gt; (<span class="bool-val">false</span>, <span class="number">0</span>),
         }
     }};
 }
 
-<span class="doccomment">/// Utility to extract the result and handle any errors from parsing a `Number`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">parse_number</span> {
+<span class="doccomment">/// Utility to extract the result and handle any errors from parsing a `Number`.
+</span><span class="macro">macro_rules! </span>parse_number {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_normal</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_special</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$byte</span>:ident,
+        <span class="macro-nonterminal">$is_negative</span>:ident,
+        <span class="macro-nonterminal">$options</span>:ident,
+        <span class="macro-nonterminal">$parse_normal</span>:ident,
+        <span class="macro-nonterminal">$parse_special</span>:ident
     ) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_normal</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">clone</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span>
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parse_special</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">byte</span>.<span class="ident">clone</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>)
+        <span class="kw">match </span><span class="macro-nonterminal">$parse_normal</span>::&lt;<span class="macro-nonterminal">$format</span>&gt;(<span class="macro-nonterminal">$byte</span>.clone(), <span class="macro-nonterminal">$is_negative</span>, <span class="macro-nonterminal">$options</span>) {
+            <span class="prelude-val">Ok</span>(n) =&gt; n,
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(value) =
+                    <span class="macro-nonterminal">$parse_special</span>::&lt;<span class="kw">_</span>, <span class="macro-nonterminal">$format</span>&gt;(<span class="macro-nonterminal">$byte</span>.clone(), <span class="macro-nonterminal">$is_negative</span>, <span class="macro-nonterminal">$options</span>)
                 {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
-                } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(value);
+                } <span class="kw">else </span>{
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(e);
                 }
             },
         }
     }};
 }
 
-<span class="doccomment">/// Convert extended float to native.</span>
-<span class="macro">macro_rules!</span> <span class="ident">to_native</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fp</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">float</span> <span class="op">=</span> <span class="ident">extended_to_float</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">fp</span>);
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">is_negative</span> {
-            <span class="ident">float</span> <span class="op">=</span> <span class="op">-</span><span class="ident">float</span>;
+<span class="doccomment">/// Convert extended float to native.
+</span><span class="macro">macro_rules! </span>to_native {
+    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$fp</span>:ident, <span class="macro-nonterminal">$is_negative</span>:ident) =&gt; {{
+        <span class="kw">let </span><span class="kw-2">mut </span>float = extended_to_float::&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;(<span class="macro-nonterminal">$fp</span>);
+        <span class="kw">if </span><span class="macro-nonterminal">$is_negative </span>{
+            float = -float;
         }
-        <span class="ident">float</span>
+        float
     }};
 }
 
-<span class="doccomment">/// Parse a float from bytes using a complete parser.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_complete</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-    <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_mantissa_sign!</span>(<span class="ident">byte</span>, <span class="ident">format</span>);
-    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-    <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-    <span class="kw">if</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">is_consumed</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Empty</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+<span class="doccomment">/// Parse a float from bytes using a complete parser.
+</span><span class="kw">pub fn </span>parse_complete&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;F&gt; {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span><span class="kw-2">mut </span>byte = bytes.bytes::&lt;{ FORMAT }&gt;();
+    <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_mantissa_sign!</span>(byte, format);
+    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+    </span><span class="kw">unsafe </span>{ byte.step_by_unchecked(shift) };
+    <span class="kw">if </span>byte.integer_iter().is_consumed() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Empty(byte.cursor()));
     }
 
-    <span class="comment">// Parse our a small representation of our number.</span>
-    <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="macro">parse_number!</span>(<span class="ident">FORMAT</span>, <span class="ident">byte</span>, <span class="ident">is_negative</span>, <span class="ident">options</span>, <span class="ident">parse_number</span>, <span class="ident">parse_special</span>);
-    <span class="comment">// Try the fast-path algorithm.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">num</span>.<span class="ident">try_fast_path</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
+    <span class="comment">// Parse our a small representation of our number.
+    </span><span class="kw">let </span>num = <span class="macro">parse_number!</span>(FORMAT, byte, is_negative, options, parse_number, parse_special);
+    <span class="comment">// Try the fast-path algorithm.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(value) = num.try_fast_path::&lt;<span class="kw">_</span>, FORMAT&gt;() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(value);
     }
-    <span class="comment">// Now try the moderate path algorithm.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fp</span> <span class="op">=</span> <span class="ident">moderate_path</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>, <span class="ident">options</span>.<span class="ident">lossy</span>());
+    <span class="comment">// Now try the moderate path algorithm.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>fp = moderate_path::&lt;F, FORMAT&gt;(<span class="kw-2">&amp;</span>num, options.lossy());
 
-    <span class="comment">// Unable to correctly round the float using the fast or moderate algorithms.</span>
-    <span class="comment">// Fallback to a slower, but always correct algorithm. If we have</span>
-    <span class="comment">// lossy, we can&#39;t be here.</span>
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">options</span>.<span class="ident">lossy</span>());
-        <span class="comment">// Undo the invalid extended float biasing.</span>
-        <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">shared::INVALID_FP</span>;
-        <span class="ident">fp</span> <span class="op">=</span> <span class="ident">slow_path</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>);
+    <span class="comment">// Unable to correctly round the float using the fast or moderate algorithms.
+    // Fallback to a slower, but always correct algorithm. If we have
+    // lossy, we can&#39;t be here.
+    </span><span class="kw">if </span>fp.exp &lt; <span class="number">0 </span>{
+        <span class="macro">debug_assert!</span>(!options.lossy());
+        <span class="comment">// Undo the invalid extended float biasing.
+        </span>fp.exp -= shared::INVALID_FP;
+        fp = slow_path::&lt;F, FORMAT&gt;(num, fp);
     }
 
-    <span class="comment">// Convert to native float and return result.</span>
-    <span class="prelude-val">Ok</span>(<span class="macro">to_native!</span>(<span class="ident">F</span>, <span class="ident">fp</span>, <span class="ident">is_negative</span>))
+    <span class="comment">// Convert to native float and return result.
+    </span><span class="prelude-val">Ok</span>(<span class="macro">to_native!</span>(F, fp, is_negative))
 }
 
-<span class="doccomment">/// Parse a float using only the fast path as a complete parser.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fast_path_complete</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-    <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_mantissa_sign!</span>(<span class="ident">byte</span>, <span class="ident">format</span>);
-    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-    <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-    <span class="kw">if</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">is_consumed</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Empty</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+<span class="doccomment">/// Parse a float using only the fast path as a complete parser.
+</span><span class="kw">pub fn </span>fast_path_complete&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;F&gt; {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span><span class="kw-2">mut </span>byte = bytes.bytes::&lt;{ FORMAT }&gt;();
+    <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_mantissa_sign!</span>(byte, format);
+    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+    </span><span class="kw">unsafe </span>{ byte.step_by_unchecked(shift) };
+    <span class="kw">if </span>byte.integer_iter().is_consumed() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Empty(byte.cursor()));
     }
 
-    <span class="comment">// Parse our a small representation of our number.</span>
-    <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="macro">parse_number!</span>(<span class="ident">FORMAT</span>, <span class="ident">byte</span>, <span class="ident">is_negative</span>, <span class="ident">options</span>, <span class="ident">parse_number</span>, <span class="ident">parse_special</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">num</span>.<span class="ident">force_fast_path</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>())
+    <span class="comment">// Parse our a small representation of our number.
+    </span><span class="kw">let </span>num = <span class="macro">parse_number!</span>(FORMAT, byte, is_negative, options, parse_number, parse_special);
+    <span class="prelude-val">Ok</span>(num.force_fast_path::&lt;<span class="kw">_</span>, FORMAT&gt;())
 }
 
-<span class="doccomment">/// Parse a float from bytes using a partial parser.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-    <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_mantissa_sign!</span>(<span class="ident">byte</span>, <span class="ident">format</span>);
-    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-    <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-    <span class="kw">if</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">is_consumed</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Empty</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+<span class="doccomment">/// Parse a float from bytes using a partial parser.
+</span><span class="kw">pub fn </span>parse_partial&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(F, usize)&gt; {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span><span class="kw-2">mut </span>byte = bytes.bytes::&lt;{ FORMAT }&gt;();
+    <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_mantissa_sign!</span>(byte, format);
+    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+    </span><span class="kw">unsafe </span>{ byte.step_by_unchecked(shift) };
+    <span class="kw">if </span>byte.integer_iter().is_consumed() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Empty(byte.cursor()));
     }
 
-    <span class="comment">// Parse our a small representation of our number.</span>
-    <span class="kw">let</span> (<span class="ident">num</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="macro">parse_number!</span>(
-        <span class="ident">FORMAT</span>,
-        <span class="ident">byte</span>,
-        <span class="ident">is_negative</span>,
-        <span class="ident">options</span>,
-        <span class="ident">parse_partial_number</span>,
-        <span class="ident">parse_partial_special</span>
+    <span class="comment">// Parse our a small representation of our number.
+    </span><span class="kw">let </span>(num, count) = <span class="macro">parse_number!</span>(
+        FORMAT,
+        byte,
+        is_negative,
+        options,
+        parse_partial_number,
+        parse_partial_special
     );
-    <span class="comment">// Try the fast-path algorithm.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">num</span>.<span class="ident">try_fast_path</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">value</span>, <span class="ident">count</span>));
+    <span class="comment">// Try the fast-path algorithm.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(value) = num.try_fast_path::&lt;<span class="kw">_</span>, FORMAT&gt;() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((value, count));
     }
-    <span class="comment">// Now try the moderate path algorithm.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fp</span> <span class="op">=</span> <span class="ident">moderate_path</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>, <span class="ident">options</span>.<span class="ident">lossy</span>());
+    <span class="comment">// Now try the moderate path algorithm.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>fp = moderate_path::&lt;F, FORMAT&gt;(<span class="kw-2">&amp;</span>num, options.lossy());
 
-    <span class="comment">// Unable to correctly round the float using the fast or moderate algorithms.</span>
-    <span class="comment">// Fallback to a slower, but always correct algorithm. If we have</span>
-    <span class="comment">// lossy, we can&#39;t be here.</span>
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">options</span>.<span class="ident">lossy</span>());
-        <span class="comment">// Undo the invalid extended float biasing.</span>
-        <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">shared::INVALID_FP</span>;
-        <span class="ident">fp</span> <span class="op">=</span> <span class="ident">slow_path</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>);
+    <span class="comment">// Unable to correctly round the float using the fast or moderate algorithms.
+    // Fallback to a slower, but always correct algorithm. If we have
+    // lossy, we can&#39;t be here.
+    </span><span class="kw">if </span>fp.exp &lt; <span class="number">0 </span>{
+        <span class="macro">debug_assert!</span>(!options.lossy());
+        <span class="comment">// Undo the invalid extended float biasing.
+        </span>fp.exp -= shared::INVALID_FP;
+        fp = slow_path::&lt;F, FORMAT&gt;(num, fp);
     }
 
-    <span class="comment">// Convert to native float and return result.</span>
-    <span class="prelude-val">Ok</span>((<span class="macro">to_native!</span>(<span class="ident">F</span>, <span class="ident">fp</span>, <span class="ident">is_negative</span>), <span class="ident">count</span>))
+    <span class="comment">// Convert to native float and return result.
+    </span><span class="prelude-val">Ok</span>((<span class="macro">to_native!</span>(F, fp, is_negative), count))
 }
 
-<span class="doccomment">/// Parse a float using only the fast path as a partial parser.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fast_path_partial</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-    <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_mantissa_sign!</span>(<span class="ident">byte</span>, <span class="ident">format</span>);
-    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-    <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-    <span class="kw">if</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>().<span class="ident">is_consumed</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Empty</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+<span class="doccomment">/// Parse a float using only the fast path as a partial parser.
+</span><span class="kw">pub fn </span>fast_path_partial&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(F, usize)&gt; {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span><span class="kw-2">mut </span>byte = bytes.bytes::&lt;{ FORMAT }&gt;();
+    <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_mantissa_sign!</span>(byte, format);
+    <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+    </span><span class="kw">unsafe </span>{ byte.step_by_unchecked(shift) };
+    <span class="kw">if </span>byte.integer_iter().is_consumed() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Empty(byte.cursor()));
     }
 
-    <span class="comment">// Parse our a small representation of our number.</span>
-    <span class="kw">let</span> (<span class="ident">num</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="macro">parse_number!</span>(
-        <span class="ident">FORMAT</span>,
-        <span class="ident">byte</span>,
-        <span class="ident">is_negative</span>,
-        <span class="ident">options</span>,
-        <span class="ident">parse_partial_number</span>,
-        <span class="ident">parse_partial_special</span>
+    <span class="comment">// Parse our a small representation of our number.
+    </span><span class="kw">let </span>(num, count) = <span class="macro">parse_number!</span>(
+        FORMAT,
+        byte,
+        is_negative,
+        options,
+        parse_partial_number,
+        parse_partial_special
     );
-    <span class="prelude-val">Ok</span>((<span class="ident">num</span>.<span class="ident">force_fast_path</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(), <span class="ident">count</span>))
+    <span class="prelude-val">Ok</span>((num.force_fast_path::&lt;<span class="kw">_</span>, FORMAT&gt;(), count))
 }
 
-<span class="comment">// PATHS</span>
-<span class="comment">// -----</span>
+<span class="comment">// PATHS
+// -----
 
-<span class="doccomment">/// Wrapper for different moderate-path algorithms.</span>
-<span class="doccomment">/// A return exponent of `-1` indicates an invalid value.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">moderate_path</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">num</span>: <span class="kw-2">&amp;</span><span class="ident">Number</span>,
-    <span class="ident">lossy</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>)]</span>
-    {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-        {
-            <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-            <span class="kw">if</span> <span class="macro">is_power_two!</span>(<span class="ident">format</span>.<span class="ident">mantissa_radix</span>()) {
-                <span class="comment">// Implement the power-of-two backends.</span>
-                <span class="ident">binary</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">bellerophon</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
+</span><span class="doccomment">/// Wrapper for different moderate-path algorithms.
+/// A return exponent of `-1` indicates an invalid value.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>moderate_path&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    num: <span class="kw-2">&amp;</span>Number,
+    lossy: bool,
+) -&gt; ExtendedFloat80 {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;compact&quot;</span>)]
+    </span>{
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+        </span>{
+            <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+            <span class="kw">if </span><span class="macro">is_power_two!</span>(format.mantissa_radix()) {
+                <span class="comment">// Implement the power-of-two backends.
+                </span>binary::&lt;F, FORMAT&gt;(num, lossy)
+            } <span class="kw">else </span>{
+                bellerophon::&lt;F, FORMAT&gt;(num, lossy)
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-        {
-            <span class="ident">bellerophon</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+        </span>{
+            bellerophon::&lt;F, FORMAT&gt;(num, lossy)
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-    {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-        {
-            <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-            <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">mantissa_radix</span>();
-            <span class="kw">if</span> <span class="ident">radix</span> <span class="op">==</span> <span class="number">10</span> {
-                <span class="ident">lemire</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">is_power_two!</span>(<span class="ident">radix</span>) {
-                <span class="comment">// Implement the power-of-two backends.</span>
-                <span class="ident">binary</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">bellerophon</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+    </span>{
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+        </span>{
+            <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+            <span class="kw">let </span>radix = format.mantissa_radix();
+            <span class="kw">if </span>radix == <span class="number">10 </span>{
+                lemire::&lt;F&gt;(num, lossy)
+            } <span class="kw">else if </span><span class="macro">is_power_two!</span>(radix) {
+                <span class="comment">// Implement the power-of-two backends.
+                </span>binary::&lt;F, FORMAT&gt;(num, lossy)
+            } <span class="kw">else </span>{
+                bellerophon::&lt;F, FORMAT&gt;(num, lossy)
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)))]</span>
-        {
-            <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-            <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">mantissa_radix</span>();
-            <span class="macro">debug_assert!</span>(<span class="macro">matches!</span>(<span class="ident">radix</span>, <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">16</span> <span class="op">|</span> <span class="number">32</span>));
-            <span class="kw">if</span> <span class="ident">radix</span> <span class="op">==</span> <span class="number">10</span> {
-                <span class="ident">lemire</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
-            } <span class="kw">else</span> {
-                <span class="comment">// Implement the power-of-two backends.</span>
-                <span class="ident">binary</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, not(feature = <span class="string">&quot;radix&quot;</span>)))]
+        </span>{
+            <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+            <span class="kw">let </span>radix = format.mantissa_radix();
+            <span class="macro">debug_assert!</span>(<span class="macro">matches!</span>(radix, <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">16 </span>| <span class="number">32</span>));
+            <span class="kw">if </span>radix == <span class="number">10 </span>{
+                lemire::&lt;F&gt;(num, lossy)
+            } <span class="kw">else </span>{
+                <span class="comment">// Implement the power-of-two backends.
+                </span>binary::&lt;F, FORMAT&gt;(num, lossy)
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-        {
-            <span class="ident">lemire</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">lossy</span>)
-        }
-    }
-}
-
-<span class="doccomment">/// Invoke the slow path.</span>
-<span class="doccomment">/// At this point, the float string has already been validated.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_path</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">LemireFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">num</span>: <span class="ident">Number</span>,
-    <span class="ident">fp</span>: <span class="ident">ExtendedFloat80</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-    {
-        <span class="ident">slow_radix</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-    {
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-        <span class="kw">if</span> <span class="macro">is_power_two!</span>(<span class="ident">format</span>.<span class="ident">mantissa_radix</span>()) {
-            <span class="ident">slow_binary</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">slow_radix</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>)
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+        </span>{
+            lemire::&lt;F&gt;(num, lossy)
         }
     }
 }
 
-<span class="comment">// NUMBER</span>
-<span class="comment">// ------</span>
+<span class="doccomment">/// Invoke the slow path.
+/// At this point, the float string has already been validated.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>slow_path&lt;F: LemireFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    num: Number,
+    fp: ExtendedFloat80,
+) -&gt; ExtendedFloat80 {
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+    </span>{
+        slow_radix::&lt;F, FORMAT&gt;(num, fp)
+    }
 
-<span class="doccomment">/// Parse a partial, non-special floating point number.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This creates a representation of the float as the</span>
-<span class="doccomment">/// significant digits and the decimal exponent.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::collapsible_if</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_number</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>,
-    <span class="ident">is_negative</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Number</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="comment">//  NOTE:</span>
-    <span class="comment">//      There are no satisfactory optimizations to reduce the number</span>
-    <span class="comment">//      of multiplications for very long input strings, but this will</span>
-    <span class="comment">//      be a small fraction of the performance penalty anyway.</span>
-    <span class="comment">//</span>
-    <span class="comment">//      We&#39;ve tried:</span>
-    <span class="comment">//          - checking for explicit overflow, via `overflowing_mul`.</span>
-    <span class="comment">//          - counting the max number of steps.</span>
-    <span class="comment">//          - subslicing the string, and only processing the first `step` digits.</span>
-    <span class="comment">//          - pre-computing the maximum power, and only adding until then.</span>
-    <span class="comment">//</span>
-    <span class="comment">//      All of these lead to substantial performance penalty.</span>
-    <span class="comment">//      If we pre-parse the string, then only process it then, we</span>
-    <span class="comment">//      get a performance penalty of ~2.5x (20ns to 50ns) for common</span>
-    <span class="comment">//      floats, an unacceptable cost, while only improving performance</span>
-    <span class="comment">//      for rare floats 5-25% (9.3µs to 7.5µs for denormal with 6400</span>
-    <span class="comment">//      digits, and 7.8µs to 7.4µs for large floats with 6400 digits).</span>
-    <span class="comment">//</span>
-    <span class="comment">//      The performance cost is **almost** entirely in this function,</span>
-    <span class="comment">//      but additional branching **does** not improve performance,</span>
-    <span class="comment">//      and pre-tokenization is a recipe for failure. For halfway</span>
-    <span class="comment">//      cases with smaller numbers of digits, the majority of the</span>
-    <span class="comment">//      performance cost is in the big integer arithmetic (`pow` and</span>
-    <span class="comment">//      `parse_mantissa`), which suggests few optimizations can or should</span>
-    <span class="comment">//      be made.</span>
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+    </span>{
+        <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+        <span class="kw">if </span><span class="macro">is_power_two!</span>(format.mantissa_radix()) {
+            slow_binary::&lt;F, FORMAT&gt;(num)
+        } <span class="kw">else </span>{
+            slow_radix::&lt;F, FORMAT&gt;(num, fp)
+        }
+    }
+}
 
-    <span class="comment">// Config options</span>
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">decimal_point</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">decimal_point</span>();
-    <span class="kw">let</span> <span class="ident">exponent_character</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">exponent</span>();
-    <span class="macro">debug_assert!</span>(<span class="ident">format</span>.<span class="ident">is_valid</span>());
-    <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">byte</span>.<span class="ident">is_done</span>());
-    <span class="kw">let</span> <span class="ident">bits_per_digit</span> <span class="op">=</span> <span class="ident">shared::log2</span>(<span class="ident">format</span>.<span class="ident">mantissa_radix</span>()) <span class="kw">as</span> <span class="ident">i64</span>;
-    <span class="kw">let</span> <span class="ident">bits_per_base</span> <span class="op">=</span> <span class="ident">shared::log2</span>(<span class="ident">format</span>.<span class="ident">exponent_base</span>()) <span class="kw">as</span> <span class="ident">i64</span>;
+<span class="comment">// NUMBER
+// ------
 
-    <span class="comment">// INTEGER</span>
+</span><span class="doccomment">/// Parse a partial, non-special floating point number.
+///
+/// This creates a representation of the float as the
+/// significant digits and the decimal exponent.
+</span><span class="attribute">#[inline]
+#[allow(clippy::collapsible_if)]
+</span><span class="kw">pub fn </span>parse_partial_number&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
+    <span class="kw-2">mut </span>byte: Bytes&lt;<span class="lifetime">&#39;a</span>, FORMAT&gt;,
+    is_negative: bool,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(Number&lt;<span class="lifetime">&#39;a</span>&gt;, usize)&gt; {
+    <span class="comment">//  NOTE:
+    //      There are no satisfactory optimizations to reduce the number
+    //      of multiplications for very long input strings, but this will
+    //      be a small fraction of the performance penalty anyway.
+    //
+    //      We&#39;ve tried:
+    //          - checking for explicit overflow, via `overflowing_mul`.
+    //          - counting the max number of steps.
+    //          - subslicing the string, and only processing the first `step` digits.
+    //          - pre-computing the maximum power, and only adding until then.
+    //
+    //      All of these lead to substantial performance penalty.
+    //      If we pre-parse the string, then only process it then, we
+    //      get a performance penalty of ~2.5x (20ns to 50ns) for common
+    //      floats, an unacceptable cost, while only improving performance
+    //      for rare floats 5-25% (9.3µs to 7.5µs for denormal with 6400
+    //      digits, and 7.8µs to 7.4µs for large floats with 6400 digits).
+    //
+    //      The performance cost is **almost** entirely in this function,
+    //      but additional branching **does** not improve performance,
+    //      and pre-tokenization is a recipe for failure. For halfway
+    //      cases with smaller numbers of digits, the majority of the
+    //      performance cost is in the big integer arithmetic (`pow` and
+    //      `parse_mantissa`), which suggests few optimizations can or should
+    //      be made.
 
-    <span class="comment">// Check to see if we have a valid base prefix.</span>
-    <span class="kw">let</span> <span class="ident">base_prefix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">base_prefix</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_prefix</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">integer_iter</span>();
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">base_prefix</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">iter</span>.<span class="ident">peek</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) {
-        <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.</span>
-        <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_unchecked</span>() };
-        <span class="comment">// Check to see if the next character is the base prefix.</span>
-        <span class="comment">// We must have a format like `0x`, `0d`, `0o`. Note:</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-            <span class="ident">is_prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">case_sensitive_base_prefix</span>() {
-                <span class="ident">c</span> <span class="op">==</span> <span class="ident">base_prefix</span>
-            } <span class="kw">else</span> {
-                <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">base_prefix</span>.<span class="ident">to_ascii_lowercase</span>()
+    // Config options
+    </span><span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span>decimal_point = options.decimal_point();
+    <span class="kw">let </span>exponent_character = options.exponent();
+    <span class="macro">debug_assert!</span>(format.is_valid());
+    <span class="macro">debug_assert!</span>(!byte.is_done());
+    <span class="kw">let </span>bits_per_digit = shared::log2(format.mantissa_radix()) <span class="kw">as </span>i64;
+    <span class="kw">let </span>bits_per_base = shared::log2(format.exponent_base()) <span class="kw">as </span>i64;
+
+    <span class="comment">// INTEGER
+
+    // Check to see if we have a valid base prefix.
+    </span><span class="kw">let </span>base_prefix = format.base_prefix();
+    <span class="kw">let </span><span class="kw-2">mut </span>is_prefix = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = byte.integer_iter();
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; base_prefix != <span class="number">0 </span>&amp;&amp; iter.peek() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) {
+        <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.
+        </span><span class="kw">unsafe </span>{ iter.step_unchecked() };
+        <span class="comment">// Check to see if the next character is the base prefix.
+        // We must have a format like `0x`, `0d`, `0o`. Note:
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = iter.peek() {
+            is_prefix = <span class="kw">if </span>format.case_sensitive_base_prefix() {
+                c == base_prefix
+            } <span class="kw">else </span>{
+                c.to_ascii_lowercase() == base_prefix.to_ascii_lowercase()
             };
-            <span class="kw">if</span> <span class="ident">is_prefix</span> {
-                <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.</span>
-                <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_unchecked</span>() };
-                <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">is_done</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Empty</span>(<span class="ident">iter</span>.<span class="ident">cursor</span>()));
+            <span class="kw">if </span>is_prefix {
+                <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.
+                </span><span class="kw">unsafe </span>{ iter.step_unchecked() };
+                <span class="kw">if </span>iter.is_done() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Empty(iter.cursor()));
                 }
             }
         }
     }
 
-    <span class="comment">// Parse our integral digits.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mantissa</span> <span class="op">=</span> <span class="number">0_u64</span>;
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">clone</span>();
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-    <span class="ident">parse_8digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">integer_iter</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">mantissa</span>);
-    <span class="ident">parse_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">integer_iter</span>(), <span class="op">|</span><span class="ident">digit</span><span class="op">|</span> {
-        <span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">mantissa</span>.<span class="ident">wrapping_mul</span>(<span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">wrapping_add</span>(<span class="ident">digit</span> <span class="kw">as</span> <span class="kw">_</span>);
+    <span class="comment">// Parse our integral digits.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>mantissa = <span class="number">0_u64</span>;
+    <span class="kw">let </span>start = byte.clone();
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+    </span>parse_8digits::&lt;<span class="kw">_</span>, FORMAT&gt;(byte.integer_iter(), <span class="kw-2">&amp;mut </span>mantissa);
+    parse_digits::&lt;<span class="kw">_</span>, <span class="kw">_</span>, FORMAT&gt;(byte.integer_iter(), |digit| {
+        mantissa = mantissa.wrapping_mul(format.radix() <span class="kw">as _</span>).wrapping_add(digit <span class="kw">as _</span>);
     });
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_digits</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">current_count</span>() <span class="op">-</span> <span class="ident">start</span>.<span class="ident">current_count</span>();
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_integer_digits</span>() <span class="op">&amp;&amp;</span> <span class="ident">n_digits</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::EmptyInteger</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+    <span class="kw">let </span><span class="kw-2">mut </span>n_digits = byte.current_count() - start.current_count();
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_integer_digits() &amp;&amp; n_digits == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::EmptyInteger(byte.cursor()));
     }
 
-    <span class="comment">// Store the integer digits for slow-path algorithms.</span>
-    <span class="comment">// SAFETY: safe, since `n_digits &lt;= start.as_slice().len()`.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">n_digits</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">start</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="ident">integer_digits</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">start</span>.<span class="ident">as_slice</span>().<span class="ident">get_unchecked</span>(..<span class="ident">n_digits</span>) };
+    <span class="comment">// Store the integer digits for slow-path algorithms.
+    // SAFETY: safe, since `n_digits &lt;= start.as_slice().len()`.
+    </span><span class="macro">debug_assert!</span>(n_digits &lt;= start.as_slice().len());
+    <span class="kw">let </span>integer_digits = <span class="kw">unsafe </span>{ start.as_slice().get_unchecked(..n_digits) };
 
-    <span class="comment">// Check if integer leading zeros are disabled.</span>
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_prefix</span> <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">no_float_leading_zeros</span>() {
-        <span class="kw">if</span> <span class="ident">integer_digits</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">integer_digits</span>.<span class="ident">get</span>(<span class="number">0</span>) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidLeadingZeros</span>(<span class="ident">start</span>.<span class="ident">cursor</span>()));
+    <span class="comment">// Check if integer leading zeros are disabled.
+    </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; !is_prefix &amp;&amp; format.no_float_leading_zeros() {
+        <span class="kw">if </span>integer_digits.len() &gt; <span class="number">1 </span>&amp;&amp; integer_digits.get(<span class="number">0</span>) == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;0&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidLeadingZeros(start.cursor()));
         }
     }
 
-    <span class="comment">// FRACTION</span>
+    <span class="comment">// FRACTION
 
-    <span class="comment">// Handle decimal point and digits afterwards.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n_after_dot</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="number">0_i64</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">implicit_exponent</span>: <span class="ident">i64</span>;
-    <span class="kw">let</span> <span class="ident">int_end</span> <span class="op">=</span> <span class="ident">n_digits</span> <span class="kw">as</span> <span class="ident">i64</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction_digits</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">if</span> <span class="ident">byte</span>.<span class="ident">first_is</span>(<span class="ident">decimal_point</span>) {
-        <span class="comment">// SAFETY: s cannot be empty due to first_is</span>
-        <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_unchecked</span>() };
-        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">clone</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-        <span class="ident">parse_8digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">fraction_iter</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">mantissa</span>);
-        <span class="ident">parse_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">fraction_iter</span>(), <span class="op">|</span><span class="ident">digit</span><span class="op">|</span> {
-            <span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">mantissa</span>.<span class="ident">wrapping_mul</span>(<span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="kw">_</span>).<span class="ident">wrapping_add</span>(<span class="ident">digit</span> <span class="kw">as</span> <span class="kw">_</span>);
+    // Handle decimal point and digits afterwards.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>n_after_dot = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>exponent = <span class="number">0_i64</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>implicit_exponent: i64;
+    <span class="kw">let </span>int_end = n_digits <span class="kw">as </span>i64;
+    <span class="kw">let </span><span class="kw-2">mut </span>fraction_digits = <span class="prelude-val">None</span>;
+    <span class="kw">if </span>byte.first_is(decimal_point) {
+        <span class="comment">// SAFETY: s cannot be empty due to first_is
+        </span><span class="kw">unsafe </span>{ byte.step_unchecked() };
+        <span class="kw">let </span>before = byte.clone();
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+        </span>parse_8digits::&lt;<span class="kw">_</span>, FORMAT&gt;(byte.fraction_iter(), <span class="kw-2">&amp;mut </span>mantissa);
+        parse_digits::&lt;<span class="kw">_</span>, <span class="kw">_</span>, FORMAT&gt;(byte.fraction_iter(), |digit| {
+            mantissa = mantissa.wrapping_mul(format.radix() <span class="kw">as _</span>).wrapping_add(digit <span class="kw">as _</span>);
         });
-        <span class="ident">n_after_dot</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">current_count</span>() <span class="op">-</span> <span class="ident">before</span>.<span class="ident">current_count</span>();
+        n_after_dot = byte.current_count() - before.current_count();
 
-        <span class="comment">// Store the fraction digits for slow-path algorithms.</span>
-        <span class="comment">// SAFETY: safe, since `n_after_dot &lt;= before.as_slice().len()`.</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">n_after_dot</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">before</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>());
-        <span class="ident">fraction_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">before</span>.<span class="ident">as_slice</span>().<span class="ident">get_unchecked</span>(..<span class="ident">n_after_dot</span>) });
+        <span class="comment">// Store the fraction digits for slow-path algorithms.
+        // SAFETY: safe, since `n_after_dot &lt;= before.as_slice().len()`.
+        </span><span class="macro">debug_assert!</span>(n_after_dot &lt;= before.as_slice().len());
+        fraction_digits = <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ before.as_slice().get_unchecked(..n_after_dot) });
 
-        <span class="comment">// Calculate the implicit exponent: the number of digits after the dot.</span>
-        <span class="ident">implicit_exponent</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">n_after_dot</span> <span class="kw">as</span> <span class="ident">i64</span>);
-        <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">mantissa_radix</span>() <span class="op">==</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>() {
-            <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">implicit_exponent</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">bits_per_digit</span> <span class="op">%</span> <span class="ident">bits_per_base</span> <span class="op">==</span> <span class="number">0</span>);
-            <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">implicit_exponent</span> <span class="op">*</span> <span class="ident">bits_per_digit</span> <span class="op">/</span> <span class="ident">bits_per_base</span>;
+        <span class="comment">// Calculate the implicit exponent: the number of digits after the dot.
+        </span>implicit_exponent = -(n_after_dot <span class="kw">as </span>i64);
+        <span class="kw">if </span>format.mantissa_radix() == format.exponent_base() {
+            exponent = implicit_exponent;
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(bits_per_digit % bits_per_base == <span class="number">0</span>);
+            exponent = implicit_exponent * bits_per_digit / bits_per_base;
         };
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_fraction_digits</span>() <span class="op">&amp;&amp;</span> <span class="ident">n_after_dot</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::EmptyFraction</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_fraction_digits() &amp;&amp; n_after_dot == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::EmptyFraction(byte.cursor()));
         }
     }
 
-    <span class="ident">n_digits</span> <span class="op">+</span><span class="op">=</span> <span class="ident">n_after_dot</span>;
-    <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">required_mantissa_digits</span>() <span class="op">&amp;&amp;</span> <span class="ident">n_digits</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::EmptyMantissa</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+    n_digits += n_after_dot;
+    <span class="kw">if </span>format.required_mantissa_digits() &amp;&amp; n_digits == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::EmptyMantissa(byte.cursor()));
     }
 
-    <span class="comment">// EXPONENT</span>
+    <span class="comment">// EXPONENT
 
-    <span class="comment">// Handle scientific notation.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">explicit_exponent</span> <span class="op">=</span> <span class="number">0_i64</span>;
-    <span class="kw">let</span> <span class="ident">is_exponent</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">case_sensitive_exponent</span>() {
-        <span class="ident">byte</span>.<span class="ident">first_is</span>(<span class="ident">exponent_character</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">byte</span>.<span class="ident">case_insensitive_first_is</span>(<span class="ident">exponent_character</span>)
+    // Handle scientific notation.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>explicit_exponent = <span class="number">0_i64</span>;
+    <span class="kw">let </span>is_exponent = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.case_sensitive_exponent() {
+        byte.first_is(exponent_character)
+    } <span class="kw">else </span>{
+        byte.case_insensitive_first_is(exponent_character)
     };
-    <span class="kw">if</span> <span class="ident">is_exponent</span> {
-        <span class="comment">// Check float format syntax checks.</span>
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) {
-            <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">no_exponent_notation</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidExponent</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+    <span class="kw">if </span>is_exponent {
+        <span class="comment">// Check float format syntax checks.
+        </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) {
+            <span class="kw">if </span>format.no_exponent_notation() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidExponent(byte.cursor()));
             }
-            <span class="comment">// Check if we have no fraction but we required exponent notation.</span>
-            <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">no_exponent_without_fraction</span>() <span class="op">&amp;&amp;</span> <span class="ident">fraction_digits</span>.<span class="ident">is_none</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExponentWithoutFraction</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+            <span class="comment">// Check if we have no fraction but we required exponent notation.
+            </span><span class="kw">if </span>format.no_exponent_without_fraction() &amp;&amp; fraction_digits.is_none() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::ExponentWithoutFraction(byte.cursor()));
             }
         }
 
-        <span class="comment">// SAFETY: byte cannot be empty due to first_is</span>
-        <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_unchecked</span>() };
-        <span class="kw">let</span> (<span class="ident">is_negative</span>, <span class="ident">shift</span>) <span class="op">=</span> <span class="macro">parse_exponent_sign!</span>(<span class="ident">byte</span>, <span class="ident">format</span>);
-        <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.</span>
-        <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">shift</span>) };
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_exponent_sign</span>() <span class="op">&amp;&amp;</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MissingExponentSign</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+        <span class="comment">// SAFETY: byte cannot be empty due to first_is
+        </span><span class="kw">unsafe </span>{ byte.step_unchecked() };
+        <span class="kw">let </span>(is_negative, shift) = <span class="macro">parse_exponent_sign!</span>(byte, format);
+        <span class="comment">// SAFETY: safe since we shift at most one for a parsed sign byte.
+        </span><span class="kw">unsafe </span>{ byte.step_by_unchecked(shift) };
+        <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_exponent_sign() &amp;&amp; shift == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::MissingExponentSign(byte.cursor()));
         }
 
-        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">current_count</span>();
-        <span class="ident">parse_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">exponent_iter</span>(), <span class="op">|</span><span class="ident">digit</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">explicit_exponent</span> <span class="op">&lt;</span> <span class="number">0x10000000</span> {
-                <span class="ident">explicit_exponent</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">i64</span>;
-                <span class="ident">explicit_exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">digit</span> <span class="kw">as</span> <span class="ident">i64</span>;
+        <span class="kw">let </span>before = byte.current_count();
+        parse_digits::&lt;<span class="kw">_</span>, <span class="kw">_</span>, FORMAT&gt;(byte.exponent_iter(), |digit| {
+            <span class="kw">if </span>explicit_exponent &lt; <span class="number">0x10000000 </span>{
+                explicit_exponent <span class="kw-2">*</span>= format.radix() <span class="kw">as </span>i64;
+                explicit_exponent += digit <span class="kw">as </span>i64;
             }
         });
-        <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">required_exponent_digits</span>() <span class="op">&amp;&amp;</span> <span class="ident">byte</span>.<span class="ident">current_count</span>() <span class="op">-</span> <span class="ident">before</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::EmptyExponent</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+        <span class="kw">if </span>format.required_exponent_digits() &amp;&amp; byte.current_count() - before == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::EmptyExponent(byte.cursor()));
         }
-        <span class="comment">// Handle our sign, and get the explicit part of the exponent.</span>
-        <span class="ident">explicit_exponent</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_negative</span> {
-            <span class="op">-</span><span class="ident">explicit_exponent</span>
-        } <span class="kw">else</span> {
-            <span class="ident">explicit_exponent</span>
+        <span class="comment">// Handle our sign, and get the explicit part of the exponent.
+        </span>explicit_exponent = <span class="kw">if </span>is_negative {
+            -explicit_exponent
+        } <span class="kw">else </span>{
+            explicit_exponent
         };
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">explicit_exponent</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_exponent_notation</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::MissingExponent</span>(<span class="ident">byte</span>.<span class="ident">cursor</span>()));
+        exponent += explicit_exponent;
+    } <span class="kw">else if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_exponent_notation() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::MissingExponent(byte.cursor()));
     }
 
-    <span class="comment">// Check to see if we have a valid base suffix.</span>
-    <span class="comment">// We&#39;ve already trimmed any leading digit separators here, so we can be safe</span>
-    <span class="comment">// that the first character **is not** a digit separator.</span>
-    <span class="kw">let</span> <span class="ident">base_suffix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">base_suffix</span>();
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">base_suffix</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">is_suffix</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">case_sensitive_base_suffix</span>() {
-            <span class="ident">byte</span>.<span class="ident">first_is</span>(<span class="ident">base_suffix</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">byte</span>.<span class="ident">case_insensitive_first_is</span>(<span class="ident">base_suffix</span>)
+    <span class="comment">// Check to see if we have a valid base suffix.
+    // We&#39;ve already trimmed any leading digit separators here, so we can be safe
+    // that the first character **is not** a digit separator.
+    </span><span class="kw">let </span>base_suffix = format.base_suffix();
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; base_suffix != <span class="number">0 </span>{
+        <span class="kw">let </span>is_suffix = <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.case_sensitive_base_suffix() {
+            byte.first_is(base_suffix)
+        } <span class="kw">else </span>{
+            byte.case_insensitive_first_is(base_suffix)
         };
-        <span class="kw">if</span> <span class="ident">is_suffix</span> {
-            <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.</span>
-            <span class="kw">unsafe</span> { <span class="ident">byte</span>.<span class="ident">step_unchecked</span>() };
+        <span class="kw">if </span>is_suffix {
+            <span class="comment">// SAFETY: safe since `byte.len() &gt;= 1`.
+            </span><span class="kw">unsafe </span>{ byte.step_unchecked() };
         }
     }
 
-    <span class="comment">// CHECK OVERFLOW</span>
+    <span class="comment">// CHECK OVERFLOW
 
-    <span class="comment">// Get the number of parsed digits (total), and redo if we had overflow.</span>
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">cursor</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">step</span> <span class="op">=</span> <span class="ident">u64_step</span>(<span class="ident">format</span>.<span class="ident">radix</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">many_digits</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">format</span>.<span class="ident">required_mantissa_digits</span>() <span class="op">&amp;&amp;</span> <span class="ident">n_digits</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="ident">exponent</span> <span class="op">=</span> <span class="number">0</span>;
+    // Get the number of parsed digits (total), and redo if we had overflow.
+    </span><span class="kw">let </span>end = byte.cursor();
+    <span class="kw">let </span><span class="kw-2">mut </span>step = u64_step(format.radix());
+    <span class="kw">let </span><span class="kw-2">mut </span>many_digits = <span class="bool-val">false</span>;
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; !format.required_mantissa_digits() &amp;&amp; n_digits == <span class="number">0 </span>{
+        exponent = <span class="number">0</span>;
     }
-    <span class="kw">if</span> <span class="ident">n_digits</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">step</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((
-            <span class="ident">Number</span> {
-                <span class="ident">exponent</span>,
-                <span class="ident">mantissa</span>,
-                <span class="ident">is_negative</span>,
-                <span class="ident">many_digits</span>: <span class="bool-val">false</span>,
-                <span class="ident">integer</span>: <span class="ident">integer_digits</span>,
-                <span class="ident">fraction</span>: <span class="ident">fraction_digits</span>,
+    <span class="kw">if </span>n_digits &lt;= step {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((
+            Number {
+                exponent,
+                mantissa,
+                is_negative,
+                many_digits: <span class="bool-val">false</span>,
+                integer: integer_digits,
+                fraction: fraction_digits,
             },
-            <span class="ident">end</span>,
+            end,
         ));
     }
 
-    <span class="comment">// Check for leading zeros, and to see if we had a false overflow.</span>
-    <span class="ident">n_digits</span> <span class="op">-</span><span class="op">=</span> <span class="ident">step</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">clone</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">zeros_integer</span> <span class="op">=</span> <span class="ident">zeros</span>.<span class="ident">integer_iter</span>();
-    <span class="kw">while</span> <span class="ident">zeros_integer</span>.<span class="ident">peek_is</span>(<span class="string">b&#39;0&#39;</span>) {
-        <span class="ident">n_digits</span> <span class="op">=</span> <span class="ident">n_digits</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
-        <span class="comment">// SAFETY: safe since zeros cannot be empty due to peek_is</span>
-        <span class="kw">unsafe</span> { <span class="ident">zeros_integer</span>.<span class="ident">step_unchecked</span>() };
+    <span class="comment">// Check for leading zeros, and to see if we had a false overflow.
+    </span>n_digits -= step;
+    <span class="kw">let </span><span class="kw-2">mut </span>zeros = start.clone();
+    <span class="kw">let </span><span class="kw-2">mut </span>zeros_integer = zeros.integer_iter();
+    <span class="kw">while </span>zeros_integer.peek_is(<span class="string">b&#39;0&#39;</span>) {
+        n_digits = n_digits.saturating_sub(<span class="number">1</span>);
+        <span class="comment">// SAFETY: safe since zeros cannot be empty due to peek_is
+        </span><span class="kw">unsafe </span>{ zeros_integer.step_unchecked() };
     }
-    <span class="kw">if</span> <span class="ident">zeros</span>.<span class="ident">first_is</span>(<span class="ident">decimal_point</span>) {
-        <span class="comment">// SAFETY: safe since zeros cannot be empty due to first_is</span>
-        <span class="kw">unsafe</span> { <span class="ident">zeros</span>.<span class="ident">step_unchecked</span>() };
+    <span class="kw">if </span>zeros.first_is(decimal_point) {
+        <span class="comment">// SAFETY: safe since zeros cannot be empty due to first_is
+        </span><span class="kw">unsafe </span>{ zeros.step_unchecked() };
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">zeros_fraction</span> <span class="op">=</span> <span class="ident">zeros</span>.<span class="ident">fraction_iter</span>();
-    <span class="kw">while</span> <span class="ident">zeros_fraction</span>.<span class="ident">peek_is</span>(<span class="string">b&#39;0&#39;</span>) {
-        <span class="ident">n_digits</span> <span class="op">=</span> <span class="ident">n_digits</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
-        <span class="comment">// SAFETY: safe since zeros cannot be empty due to peek_is</span>
-        <span class="kw">unsafe</span> { <span class="ident">zeros_fraction</span>.<span class="ident">step_unchecked</span>() };
+    <span class="kw">let </span><span class="kw-2">mut </span>zeros_fraction = zeros.fraction_iter();
+    <span class="kw">while </span>zeros_fraction.peek_is(<span class="string">b&#39;0&#39;</span>) {
+        n_digits = n_digits.saturating_sub(<span class="number">1</span>);
+        <span class="comment">// SAFETY: safe since zeros cannot be empty due to peek_is
+        </span><span class="kw">unsafe </span>{ zeros_fraction.step_unchecked() };
     }
 
-    <span class="comment">// OVERFLOW</span>
+    <span class="comment">// OVERFLOW
 
-    <span class="comment">// Now, check if we explicitly overflowed.</span>
-    <span class="kw">if</span> <span class="ident">n_digits</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="comment">// Have more than 19 significant digits, so we overflowed.</span>
-        <span class="ident">many_digits</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">mantissa</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer</span> <span class="op">=</span> <span class="ident">integer_digits</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-        <span class="comment">// Skip leading zeros, so we can use the step properly.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer_iter</span> <span class="op">=</span> <span class="ident">integer</span>.<span class="ident">integer_iter</span>();
-        <span class="ident">integer_iter</span>.<span class="ident">skip_zeros</span>();
-        <span class="ident">parse_u64_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">integer_iter</span>, <span class="kw-2">&amp;mut</span> <span class="ident">mantissa</span>, <span class="kw-2">&amp;mut</span> <span class="ident">step</span>);
-        <span class="ident">implicit_exponent</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">step</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// Filled our mantissa with just the integer.</span>
-            <span class="ident">int_end</span> <span class="op">-</span> <span class="ident">integer</span>.<span class="ident">current_count</span>() <span class="kw">as</span> <span class="ident">i64</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// We know this can&#39;t be a None since we had more than 19</span>
-            <span class="comment">// digits previously, so we overflowed a 64-bit integer,</span>
-            <span class="comment">// but parsing only the integral digits produced less</span>
-            <span class="comment">// than 19 digits. That means we must have a decimal</span>
-            <span class="comment">// point, and at least 1 fractional digit.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction</span> <span class="op">=</span> <span class="ident">fraction_digits</span>.<span class="ident">unwrap</span>().<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction_iter</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">fraction_iter</span>();
-            <span class="comment">// Skip leading zeros, so we can use the step properly.</span>
-            <span class="kw">if</span> <span class="ident">mantissa</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">fraction_iter</span>.<span class="ident">skip_zeros</span>();
+    // Now, check if we explicitly overflowed.
+    </span><span class="kw">if </span>n_digits &gt; <span class="number">0 </span>{
+        <span class="comment">// Have more than 19 significant digits, so we overflowed.
+        </span>many_digits = <span class="bool-val">true</span>;
+        mantissa = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>integer = integer_digits.bytes::&lt;{ FORMAT }&gt;();
+        <span class="comment">// Skip leading zeros, so we can use the step properly.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>integer_iter = integer.integer_iter();
+        integer_iter.skip_zeros();
+        parse_u64_digits::&lt;<span class="kw">_</span>, FORMAT&gt;(integer_iter, <span class="kw-2">&amp;mut </span>mantissa, <span class="kw-2">&amp;mut </span>step);
+        implicit_exponent = <span class="kw">if </span>step == <span class="number">0 </span>{
+            <span class="comment">// Filled our mantissa with just the integer.
+            </span>int_end - integer.current_count() <span class="kw">as </span>i64
+        } <span class="kw">else </span>{
+            <span class="comment">// We know this can&#39;t be a None since we had more than 19
+            // digits previously, so we overflowed a 64-bit integer,
+            // but parsing only the integral digits produced less
+            // than 19 digits. That means we must have a decimal
+            // point, and at least 1 fractional digit.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>fraction = fraction_digits.unwrap().bytes::&lt;{ FORMAT }&gt;();
+            <span class="kw">let </span><span class="kw-2">mut </span>fraction_iter = fraction.fraction_iter();
+            <span class="comment">// Skip leading zeros, so we can use the step properly.
+            </span><span class="kw">if </span>mantissa == <span class="number">0 </span>{
+                fraction_iter.skip_zeros();
             }
-            <span class="ident">parse_u64_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">fraction_iter</span>, <span class="kw-2">&amp;mut</span> <span class="ident">mantissa</span>, <span class="kw-2">&amp;mut</span> <span class="ident">step</span>);
-            <span class="op">-</span>(<span class="ident">fraction</span>.<span class="ident">current_count</span>() <span class="kw">as</span> <span class="ident">i64</span>)
+            parse_u64_digits::&lt;<span class="kw">_</span>, FORMAT&gt;(fraction_iter, <span class="kw-2">&amp;mut </span>mantissa, <span class="kw-2">&amp;mut </span>step);
+            -(fraction.current_count() <span class="kw">as </span>i64)
         };
-        <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">mantissa_radix</span>() <span class="op">==</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>() {
-            <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">implicit_exponent</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">bits_per_digit</span> <span class="op">%</span> <span class="ident">bits_per_base</span> <span class="op">==</span> <span class="number">0</span>);
-            <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">implicit_exponent</span> <span class="op">*</span> <span class="ident">bits_per_digit</span> <span class="op">/</span> <span class="ident">bits_per_base</span>;
+        <span class="kw">if </span>format.mantissa_radix() == format.exponent_base() {
+            exponent = implicit_exponent;
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(bits_per_digit % bits_per_base == <span class="number">0</span>);
+            exponent = implicit_exponent * bits_per_digit / bits_per_base;
         };
-        <span class="comment">// Add back the explicit exponent.</span>
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="ident">explicit_exponent</span>;
+        <span class="comment">// Add back the explicit exponent.
+        </span>exponent += explicit_exponent;
     }
 
     <span class="prelude-val">Ok</span>((
-        <span class="ident">Number</span> {
-            <span class="ident">exponent</span>,
-            <span class="ident">mantissa</span>,
-            <span class="ident">is_negative</span>,
-            <span class="ident">many_digits</span>,
-            <span class="ident">integer</span>: <span class="ident">integer_digits</span>,
-            <span class="ident">fraction</span>: <span class="ident">fraction_digits</span>,
+        Number {
+            exponent,
+            mantissa,
+            is_negative,
+            many_digits,
+            integer: integer_digits,
+            fraction: fraction_digits,
         },
-        <span class="ident">end</span>,
+        end,
     ))
 }
 
-<span class="doccomment">/// Try to parse a non-special floating point number.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_number</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>,
-    <span class="ident">is_negative</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Number</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">length</span>();
-    <span class="kw">let</span> (<span class="ident">float</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="ident">parse_partial_number</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>, <span class="ident">is_negative</span>, <span class="ident">options</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="ident">length</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">float</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidDigit</span>(<span class="ident">count</span>))
+<span class="doccomment">/// Try to parse a non-special floating point number.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_number&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
+    byte: Bytes&lt;<span class="lifetime">&#39;a</span>, FORMAT&gt;,
+    is_negative: bool,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Number&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">let </span>length = byte.length();
+    <span class="kw">let </span>(float, count) = parse_partial_number::&lt;FORMAT&gt;(byte, is_negative, options)<span class="question-mark">?</span>;
+    <span class="kw">if </span>count == length {
+        <span class="prelude-val">Ok</span>(float)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Error::InvalidDigit(count))
     }
 }
 
-<span class="comment">// DIGITS</span>
-<span class="comment">// ------</span>
+<span class="comment">// DIGITS
+// ------
 
-<span class="doccomment">/// Iteratively parse and consume digits from bytes.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_digits</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Iter</span>, <span class="ident">Cb</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">Iter</span>, <span class="kw-2">mut</span> <span class="ident">cb</span>: <span class="ident">Cb</span>)
-<span class="kw">where</span>
-    <span class="ident">Iter</span>: <span class="ident">BytesIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">Cb</span>: <span class="ident">FnMut</span>(<span class="ident">u32</span>),
+</span><span class="doccomment">/// Iteratively parse and consume digits from bytes.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_digits&lt;<span class="lifetime">&#39;a</span>, Iter, Cb, <span class="kw">const </span>FORMAT: u128&gt;(<span class="kw-2">mut </span>iter: Iter, <span class="kw-2">mut </span>cb: Cb)
+<span class="kw">where
+    </span>Iter: BytesIter&lt;<span class="lifetime">&#39;a</span>&gt;,
+    Cb: FnMut(u32),
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-        <span class="kw">match</span> <span class="ident">char_to_digit_const</span>(<span class="ident">c</span>, <span class="ident">radix</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">cb</span>(<span class="ident">v</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span>radix = format.radix();
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = iter.peek() {
+        <span class="kw">match </span>char_to_digit_const(c, radix) {
+            <span class="prelude-val">Some</span>(v) =&gt; cb(v),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
         }
-        <span class="comment">// SAFETY: iter cannot be empty due to `iter.peek()`.</span>
-        <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_unchecked</span>() };
+        <span class="comment">// SAFETY: iter cannot be empty due to `iter.peek()`.
+        </span><span class="kw">unsafe </span>{ iter.step_unchecked() };
     }
 }
 
-<span class="doccomment">/// Iteratively parse and consume digits in intervals of 8.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_8digits</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Iter</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">Iter</span>, <span class="ident">mantissa</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u64</span>)
-<span class="kw">where</span>
-    <span class="ident">Iter</span>: <span class="ident">BytesIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Iteratively parse and consume digits in intervals of 8.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">pub fn </span>parse_8digits&lt;<span class="lifetime">&#39;a</span>, Iter, <span class="kw">const </span>FORMAT: u128&gt;(<span class="kw-2">mut </span>iter: Iter, mantissa: <span class="kw-2">&amp;mut </span>u64)
+<span class="kw">where
+    </span>Iter: BytesIter&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-    <span class="kw">if</span> <span class="macro">can_try_parse_8digits!</span>(<span class="ident">iter</span>, <span class="ident">radix</span>) {
-        <span class="kw">let</span> <span class="ident">radix2</span> <span class="op">=</span> <span class="ident">radix</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix</span>);
-        <span class="kw">let</span> <span class="ident">radix4</span> <span class="op">=</span> <span class="ident">radix2</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix2</span>);
-        <span class="kw">let</span> <span class="ident">radix8</span> <span class="op">=</span> <span class="ident">radix4</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix4</span>);
-        <span class="comment">// Can do up to 2 iterations without overflowing, however, for large</span>
-        <span class="comment">// inputs, this is much faster than any other alternative.</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">algorithm::try_parse_8digits</span>::<span class="op">&lt;</span><span class="ident">u64</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">iter</span>) {
-            <span class="kw-2">*</span><span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">mantissa</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix8</span>).<span class="ident">wrapping_add</span>(<span class="ident">v</span>);
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span>radix: u64 = format.radix() <span class="kw">as </span>u64;
+    <span class="kw">if </span><span class="macro">can_try_parse_8digits!</span>(iter, radix) {
+        <span class="kw">let </span>radix2 = radix.wrapping_mul(radix);
+        <span class="kw">let </span>radix4 = radix2.wrapping_mul(radix2);
+        <span class="kw">let </span>radix8 = radix4.wrapping_mul(radix4);
+        <span class="comment">// Can do up to 2 iterations without overflowing, however, for large
+        // inputs, this is much faster than any other alternative.
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(v) = algorithm::try_parse_8digits::&lt;u64, <span class="kw">_</span>, FORMAT&gt;(<span class="kw-2">&amp;mut </span>iter) {
+            <span class="kw-2">*</span>mantissa = mantissa.wrapping_mul(radix8).wrapping_add(v);
         }
     }
 }
 
-<span class="doccomment">/// Iteratively parse and consume digits without overflowing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Preconditions</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There must be at least `step` digits left in iterator.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_u64_digits</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Iter</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">iter</span>: <span class="ident">Iter</span>,
-    <span class="ident">mantissa</span>: <span class="kw-2">&amp;mut</span> <span class="ident">u64</span>,
-    <span class="ident">step</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
-) <span class="kw">where</span>
-    <span class="ident">Iter</span>: <span class="ident">BytesIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Iteratively parse and consume digits without overflowing.
+///
+/// # Preconditions
+///
+/// There must be at least `step` digits left in iterator.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_u64_digits&lt;<span class="lifetime">&#39;a</span>, Iter, <span class="kw">const </span>FORMAT: u128&gt;(
+    <span class="kw-2">mut </span>iter: Iter,
+    mantissa: <span class="kw-2">&amp;mut </span>u64,
+    step: <span class="kw-2">&amp;mut </span>usize,
+) <span class="kw">where
+    </span>Iter: BytesIter&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">let </span>radix = format.radix() <span class="kw">as </span>u64;
 
-    <span class="comment">// Try to parse 8 digits at a time, if we can.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-    <span class="kw">if</span> <span class="macro">can_try_parse_8digits!</span>(<span class="ident">iter</span>, <span class="ident">radix</span>) {
-        <span class="kw">let</span> <span class="ident">radix2</span> <span class="op">=</span> <span class="ident">radix</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix</span>);
-        <span class="kw">let</span> <span class="ident">radix4</span> <span class="op">=</span> <span class="ident">radix2</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix2</span>);
-        <span class="kw">let</span> <span class="ident">radix8</span> <span class="op">=</span> <span class="ident">radix4</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix4</span>);
-        <span class="kw">while</span> <span class="kw-2">*</span><span class="ident">step</span> <span class="op">&gt;</span> <span class="number">8</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">algorithm::try_parse_8digits</span>::<span class="op">&lt;</span><span class="ident">u64</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">iter</span>) {
-                <span class="kw-2">*</span><span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">mantissa</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix8</span>).<span class="ident">wrapping_add</span>(<span class="ident">v</span>);
-                <span class="kw-2">*</span><span class="ident">step</span> <span class="op">-</span><span class="op">=</span> <span class="number">8</span>;
-            } <span class="kw">else</span> {
+    <span class="comment">// Try to parse 8 digits at a time, if we can.
+    </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+    </span><span class="kw">if </span><span class="macro">can_try_parse_8digits!</span>(iter, radix) {
+        <span class="kw">let </span>radix2 = radix.wrapping_mul(radix);
+        <span class="kw">let </span>radix4 = radix2.wrapping_mul(radix2);
+        <span class="kw">let </span>radix8 = radix4.wrapping_mul(radix4);
+        <span class="kw">while </span><span class="kw-2">*</span>step &gt; <span class="number">8 </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = algorithm::try_parse_8digits::&lt;u64, <span class="kw">_</span>, FORMAT&gt;(<span class="kw-2">&amp;mut </span>iter) {
+                <span class="kw-2">*</span>mantissa = mantissa.wrapping_mul(radix8).wrapping_add(v);
+                <span class="kw-2">*</span>step -= <span class="number">8</span>;
+            } <span class="kw">else </span>{
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="comment">// Parse single digits at a time.</span>
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">step</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="ident">char_to_valid_digit_const</span>(<span class="ident">c</span>, <span class="ident">radix</span> <span class="kw">as</span> <span class="ident">u32</span>);
-            <span class="kw-2">*</span><span class="ident">mantissa</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">mantissa</span> <span class="op">*</span> <span class="ident">radix</span> <span class="op">+</span> <span class="ident">digit</span> <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="kw-2">*</span><span class="ident">step</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="comment">// SAFETY: safe, since `iter` cannot be empty due to `iter.peek()`.</span>
-            <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_unchecked</span>() };
-        } <span class="kw">else</span> {
+    <span class="comment">// Parse single digits at a time.
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = iter.peek() {
+        <span class="kw">if </span><span class="kw-2">*</span>step &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>digit = char_to_valid_digit_const(c, radix <span class="kw">as </span>u32);
+            <span class="kw-2">*</span>mantissa = <span class="kw-2">*</span>mantissa * radix + digit <span class="kw">as </span>u64;
+            <span class="kw-2">*</span>step -= <span class="number">1</span>;
+            <span class="comment">// SAFETY: safe, since `iter` cannot be empty due to `iter.peek()`.
+            </span><span class="kw">unsafe </span>{ iter.step_unchecked() };
+        } <span class="kw">else </span>{
             <span class="kw">break</span>;
         }
     }
 }
 
-<span class="comment">// SPECIAL</span>
-<span class="comment">// -------</span>
+<span class="comment">// SPECIAL
+// -------
 
-<span class="doccomment">/// Determine if the input data matches the special string.</span>
-<span class="doccomment">/// If there&#39;s no match, returns 0. Otherwise, returns the byte&#39;s cursor.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_special_eq</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">case_sensitive_special</span>() {
-        <span class="kw">if</span> <span class="ident">shared::starts_with</span>(<span class="ident">byte</span>.<span class="ident">special_iter</span>(), <span class="ident">string</span>.<span class="ident">iter</span>()) {
-            <span class="comment">// Trim the iterator afterwards.</span>
-            <span class="ident">byte</span>.<span class="ident">special_iter</span>().<span class="ident">peek</span>();
-            <span class="kw">return</span> <span class="ident">byte</span>.<span class="ident">cursor</span>();
+</span><span class="doccomment">/// Determine if the input data matches the special string.
+/// If there&#39;s no match, returns 0. Otherwise, returns the byte&#39;s cursor.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_special_eq&lt;<span class="kw">const </span>FORMAT: u128&gt;(<span class="kw-2">mut </span>byte: Bytes&lt;FORMAT&gt;, string: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]) -&gt; usize {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.case_sensitive_special() {
+        <span class="kw">if </span>shared::starts_with(byte.special_iter(), string.iter()) {
+            <span class="comment">// Trim the iterator afterwards.
+            </span>byte.special_iter().peek();
+            <span class="kw">return </span>byte.cursor();
         }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">shared::case_insensitive_starts_with</span>(<span class="ident">byte</span>.<span class="ident">special_iter</span>(), <span class="ident">string</span>.<span class="ident">iter</span>()) {
-        <span class="comment">// Trim the iterator afterwards.</span>
-        <span class="ident">byte</span>.<span class="ident">special_iter</span>().<span class="ident">peek</span>();
-        <span class="kw">return</span> <span class="ident">byte</span>.<span class="ident">cursor</span>();
+    } <span class="kw">else if </span>shared::case_insensitive_starts_with(byte.special_iter(), string.iter()) {
+        <span class="comment">// Trim the iterator afterwards.
+        </span>byte.special_iter().peek();
+        <span class="kw">return </span>byte.cursor();
     }
-    <span class="number">0</span>
-}
+    <span class="number">0
+</span>}
 
-<span class="doccomment">/// Parse a positive representation of a special, non-finite float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_positive_special</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">LemireFloat</span>,
+<span class="doccomment">/// Parse a positive representation of a special, non-finite float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_positive_special&lt;F, <span class="kw">const </span>FORMAT: u128&gt;(
+    byte: Bytes&lt;FORMAT&gt;,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Option</span>&lt;(F, usize)&gt;
+<span class="kw">where
+    </span>F: LemireFloat,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">no_special</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.no_special() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">cursor</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">length</span>() <span class="op">-</span> <span class="ident">cursor</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nan_string</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">nan_string</span>() {
-        <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">nan_string</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">is_special_eq</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">clone</span>(), <span class="ident">nan_string</span>);
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">F::NAN</span>, <span class="ident">count</span>));
+    <span class="kw">let </span>cursor = byte.cursor();
+    <span class="kw">let </span>length = byte.length() - cursor;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(nan_string) = options.nan_string() {
+        <span class="kw">if </span>length &gt;= nan_string.len() {
+            <span class="kw">let </span>count = is_special_eq::&lt;FORMAT&gt;(byte.clone(), nan_string);
+            <span class="kw">if </span>count != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Some</span>((F::NAN, count));
             }
         }
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">infinity_string</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">infinity_string</span>() {
-        <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">infinity_string</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">is_special_eq</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">clone</span>(), <span class="ident">infinity_string</span>);
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">F::INFINITY</span>, <span class="ident">count</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(infinity_string) = options.infinity_string() {
+        <span class="kw">if </span>length &gt;= infinity_string.len() {
+            <span class="kw">let </span>count = is_special_eq::&lt;FORMAT&gt;(byte.clone(), infinity_string);
+            <span class="kw">if </span>count != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Some</span>((F::INFINITY, count));
             }
         }
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inf_string</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">inf_string</span>() {
-        <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">inf_string</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">is_special_eq</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>.<span class="ident">clone</span>(), <span class="ident">inf_string</span>);
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">F::INFINITY</span>, <span class="ident">count</span>));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(inf_string) = options.inf_string() {
+        <span class="kw">if </span>length &gt;= inf_string.len() {
+            <span class="kw">let </span>count = is_special_eq::&lt;FORMAT&gt;(byte.clone(), inf_string);
+            <span class="kw">if </span>count != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Some</span>((F::INFINITY, count));
             }
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="doccomment">/// Parse a partial representation of a special, non-finite float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_special</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>,
-    <span class="ident">is_negative</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">F</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">LemireFloat</span>,
+<span class="doccomment">/// Parse a partial representation of a special, non-finite float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_partial_special&lt;F, <span class="kw">const </span>FORMAT: u128&gt;(
+    byte: Bytes&lt;FORMAT&gt;,
+    is_negative: bool,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Option</span>&lt;(F, usize)&gt;
+<span class="kw">where
+    </span>F: LemireFloat,
 {
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">float</span>, <span class="ident">count</span>) <span class="op">=</span> <span class="ident">parse_positive_special</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>, <span class="ident">options</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">is_negative</span> {
-        <span class="ident">float</span> <span class="op">=</span> <span class="op">-</span><span class="ident">float</span>;
+    <span class="kw">let </span>(<span class="kw-2">mut </span>float, count) = parse_positive_special::&lt;F, FORMAT&gt;(byte, options)<span class="question-mark">?</span>;
+    <span class="kw">if </span>is_negative {
+        float = -float;
     }
-    <span class="prelude-val">Some</span>((<span class="ident">float</span>, <span class="ident">count</span>))
+    <span class="prelude-val">Some</span>((float, count))
 }
 
-<span class="doccomment">/// Try to parse a special, non-finite float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_special</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">byte</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>,
-    <span class="ident">is_negative</span>: <span class="ident">bool</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">LemireFloat</span>,
+<span class="doccomment">/// Try to parse a special, non-finite float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>parse_special&lt;F, <span class="kw">const </span>FORMAT: u128&gt;(
+    byte: Bytes&lt;FORMAT&gt;,
+    is_negative: bool,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; <span class="prelude-ty">Option</span>&lt;F&gt;
+<span class="kw">where
+    </span>F: LemireFloat,
 {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">byte</span>.<span class="ident">length</span>();
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">float</span>, <span class="ident">count</span>)) <span class="op">=</span> <span class="ident">parse_partial_special</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">byte</span>, <span class="ident">is_negative</span>, <span class="ident">options</span>) {
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="ident">length</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">float</span>);
+    <span class="kw">let </span>length = byte.length();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((float, count)) = parse_partial_special::&lt;F, FORMAT&gt;(byte, is_negative, options) {
+        <span class="kw">if </span>count == length {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(float);
         }
     }
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

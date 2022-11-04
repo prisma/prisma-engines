@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/model/primary_key.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>primary_key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/model/primary_key.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>primary_key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../parser_database/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -102,109 +102,109 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">types::IdAttribute</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldAttributeWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">ParserDatabase</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast,
+    types::IdAttribute,
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    ParserDatabase,
 };
 
-<span class="doccomment">/// An `@(@)id` attribute in the schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IdAttribute</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+<span class="doccomment">/// An `@(@)id` attribute in the schema.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>PrimaryKeyWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) attribute: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>IdAttribute,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The `@(@)id` AST node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">source_attribute</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PrimaryKeyWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The `@(@)id` AST node.
+    </span><span class="kw">pub fn </span>ast_attribute(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.attribute.source_attribute]
     }
 
-    <span class="doccomment">/// The mapped name of the id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@id([a, b], map: &quot;theName&quot;)</span>
-    <span class="doccomment">///                   ^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The mapped name of the id.
+    ///
+    /// ```ignore
+    /// @@id([a, b], map: &quot;theName&quot;)
+    ///                   ^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.attribute.mapped_name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// Is this an `@id` on a specific field, rather than on the model?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_defined_on_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">source_field</span>.<span class="ident">is_some</span>()
+    <span class="doccomment">/// Is this an `@id` on a specific field, rather than on the model?
+    </span><span class="kw">pub fn </span>is_defined_on_field(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.attribute.source_field.is_some()
     }
 
-    <span class="doccomment">/// If defined on a specific field, returns `@id`. Otherwise `@@id`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_defined_on_field</span>() {
-            <span class="string">&quot;@id&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;@@id&quot;</span>
-        }
+    <span class="doccomment">/// If defined on a specific field, returns `@id`. Otherwise `@@id`.
+    </span><span class="kw">pub fn </span>attribute_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">if </span><span class="self">self</span>.is_defined_on_field() {
+            <span class="string">&quot;@id&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;@@id&quot;
+        </span>}
     }
 
-    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly</span>
-    <span class="doccomment">/// matters on SQL Server where one can change the clustering.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clustered</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">clustered</span>
+    <span class="doccomment">/// If true, the index defines the storage and ordering of the row. Mostly
+    /// matters on SQL Server where one can change the clustering.
+    </span><span class="kw">pub fn </span>clustered(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+        <span class="self">self</span>.attribute.clustered
     }
 
-    <span class="doccomment">/// The model the id is deined on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+    <span class="doccomment">/// The model the id is deined on.
+    </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
     }
 
-    <span class="doccomment">/// The `name` argument of the id attribute. The client name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@id([a, b], name: &quot;theName&quot;)</span>
-    <span class="doccomment">///                    ^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The `name` argument of the id attribute. The client name.
+    ///
+    /// ```ignore
+    /// @@id([a, b], name: &quot;theName&quot;)
+    ///                    ^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.attribute.name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// The scalar fields constrained by the id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>();
-            <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">scalar_field</span>(<span class="ident">field_id</span>)
+    <span class="doccomment">/// The scalar fields constrained by the id.
+    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.attribute.fields.iter().map(<span class="kw">move </span>|field| {
+            <span class="kw">let </span>field_id = field.path.field_in_index();
+            <span class="self">self</span>.model().scalar_field(field_id)
         })
     }
 
-    <span class="doccomment">/// The scalar fields covered by the id, and their arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">field_arg_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">ScalarFieldAttributeWalker</span> {
-                <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-                <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">fields</span>,
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-                <span class="ident">field_arg_id</span>,
+    <span class="doccomment">/// The scalar fields covered by the id, and their arguments.
+    </span><span class="kw">pub fn </span>scalar_field_attributes(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; + <span class="lifetime">&#39;db </span>{
+        <span class="self">self</span>.attribute
+            .fields
+            .iter()
+            .enumerate()
+            .map(<span class="kw">move </span>|(field_arg_id, <span class="kw">_</span>)| ScalarFieldAttributeWalker {
+                model_id: <span class="self">self</span>.model_id,
+                fields: <span class="kw-2">&amp;</span><span class="self">self</span>.attribute.fields,
+                db: <span class="self">self</span>.db,
+                field_arg_id,
             })
     }
 
-    <span class="doccomment">/// Do the constrained fields match exactly these?</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">contains_exactly_fields_by_id</span>(<span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::FieldId</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">fields</span>.<span class="ident">len</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">attribute</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">zip</span>(<span class="ident">fields</span>)
-                .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">path</span>.<span class="ident">field_in_index</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">b</span>)
+    <span class="doccomment">/// Do the constrained fields match exactly these?
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>contains_exactly_fields_by_id(<span class="self">self</span>, fields: <span class="kw-2">&amp;</span>[ast::FieldId]) -&gt; bool {
+        <span class="self">self</span>.attribute.fields.len() == fields.len()
+            &amp;&amp; <span class="self">self
+                </span>.attribute
+                .fields
+                .iter()
+                .zip(fields)
+                .all(|(a, b)| a.path.field_in_index() == <span class="kw-2">*</span>b)
     }
 
-    <span class="doccomment">/// Do the constrained fields match exactly these?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_exactly_fields</span>(<span class="self">self</span>, <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attribute</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">zip</span>(<span class="ident">fields</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>)
+    <span class="doccomment">/// Do the constrained fields match exactly these?
+    </span><span class="kw">pub fn </span>contains_exactly_fields(<span class="self">self</span>, fields: <span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;) -&gt; bool {
+        <span class="self">self</span>.attribute.fields.len() == fields.len() &amp;&amp; <span class="self">self</span>.fields().zip(fields).all(|(a, b)| a == b)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/x509.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x509.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/x509.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x509.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -91,98 +91,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="comment">// Additional x509/asn1 functions to those provided in webpki/ring.</span>
+</pre><pre class="rust"><code><span class="comment">// Additional x509/asn1 functions to those provided in webpki/ring.
 
-<span class="kw">use</span> <span class="ident">ring::io::der</span>;
+</span><span class="kw">use </span>ring::io::der;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_in_asn1_len</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrap_in_asn1_len(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+    <span class="kw">let </span>len = bytes.len();
 
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0x7f</span> {
-        <span class="ident">bytes</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">bytes</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">0x80u8</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">len</span>;
-        <span class="kw">while</span> <span class="ident">left</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> (<span class="ident">left</span> <span class="op">&amp;</span> <span class="number">0xff</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-            <span class="ident">bytes</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="ident">byte</span>);
-            <span class="ident">bytes</span>[<span class="number">0</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">left</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span>;
+    <span class="kw">if </span>len &lt;= <span class="number">0x7f </span>{
+        bytes.insert(<span class="number">0</span>, len <span class="kw">as </span>u8);
+    } <span class="kw">else </span>{
+        bytes.insert(<span class="number">0</span>, <span class="number">0x80u8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>left = len;
+        <span class="kw">while </span>left &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>byte = (left &amp; <span class="number">0xff</span>) <span class="kw">as </span>u8;
+            bytes.insert(<span class="number">1</span>, byte);
+            bytes[<span class="number">0</span>] += <span class="number">1</span>;
+            left &gt;&gt;= <span class="number">8</span>;
         }
     }
 }
 
-<span class="doccomment">/// Prepend stuff to `bytes` to put it in a DER SEQUENCE.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wrap_in_sequence</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-    <span class="ident">wrap_in_asn1_len</span>(<span class="ident">bytes</span>);
-    <span class="ident">bytes</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">der::Tag::Sequence</span> <span class="kw">as</span> <span class="ident">u8</span>);
+<span class="doccomment">/// Prepend stuff to `bytes` to put it in a DER SEQUENCE.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wrap_in_sequence(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+    wrap_in_asn1_len(bytes);
+    bytes.insert(<span class="number">0</span>, der::Tag::Sequence <span class="kw">as </span>u8);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_empty</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x00</span>], <span class="ident">val</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_empty() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x00</span>], val);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_small</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">0x00</span>);
-    <span class="ident">val</span>.<span class="ident">insert</span>(<span class="number">1</span>, <span class="number">0x11</span>);
-    <span class="ident">val</span>.<span class="ident">insert</span>(<span class="number">2</span>, <span class="number">0x22</span>);
-    <span class="ident">val</span>.<span class="ident">insert</span>(<span class="number">3</span>, <span class="number">0x33</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x11</span>, <span class="number">0x22</span>, <span class="number">0x33</span>], <span class="ident">val</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_small() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.insert(<span class="number">0</span>, <span class="number">0x00</span>);
+    val.insert(<span class="number">1</span>, <span class="number">0x11</span>);
+    val.insert(<span class="number">2</span>, <span class="number">0x22</span>);
+    val.insert(<span class="number">3</span>, <span class="number">0x33</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x11</span>, <span class="number">0x22</span>, <span class="number">0x33</span>], val);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_medium</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">resize</span>(<span class="number">255</span>, <span class="number">0x12</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x81</span>, <span class="number">0xff</span>, <span class="number">0x12</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], <span class="ident">val</span>[..<span class="number">6</span>].<span class="ident">to_vec</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_medium() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.resize(<span class="number">255</span>, <span class="number">0x12</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x81</span>, <span class="number">0xff</span>, <span class="number">0x12</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], val[..<span class="number">6</span>].to_vec());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_large</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">resize</span>(<span class="number">4660</span>, <span class="number">0x12</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x82</span>, <span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], <span class="ident">val</span>[..<span class="number">6</span>].<span class="ident">to_vec</span>());
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_large() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.resize(<span class="number">4660</span>, <span class="number">0x12</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x82</span>, <span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], val[..<span class="number">6</span>].to_vec());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_huge</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">resize</span>(<span class="number">0xffff</span>, <span class="number">0x12</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x82</span>, <span class="number">0xff</span>, <span class="number">0xff</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], <span class="ident">val</span>[..<span class="number">6</span>].<span class="ident">to_vec</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="ident">len</span>(), <span class="number">0xffff</span> <span class="op">+</span> <span class="number">4</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_huge() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.resize(<span class="number">0xffff</span>, <span class="number">0x12</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x82</span>, <span class="number">0xff</span>, <span class="number">0xff</span>, <span class="number">0x12</span>, <span class="number">0x12</span>], val[..<span class="number">6</span>].to_vec());
+    <span class="macro">assert_eq!</span>(val.len(), <span class="number">0xffff </span>+ <span class="number">4</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_gigantic</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">resize</span>(<span class="number">0x100000</span>, <span class="number">0x12</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_gigantic() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.resize(<span class="number">0x100000</span>, <span class="number">0x12</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
     <span class="macro">assert_eq!</span>(
         <span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x83</span>, <span class="number">0x10</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x12</span>, <span class="number">0x12</span>],
-        <span class="ident">val</span>[..<span class="number">7</span>].<span class="ident">to_vec</span>()
+        val[..<span class="number">7</span>].to_vec()
     );
-    <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="ident">len</span>(), <span class="number">0x100000</span> <span class="op">+</span> <span class="number">5</span>);
+    <span class="macro">assert_eq!</span>(val.len(), <span class="number">0x100000 </span>+ <span class="number">5</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_ludicrous</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">val</span>.<span class="ident">resize</span>(<span class="number">0x1000000</span>, <span class="number">0x12</span>);
-    <span class="ident">wrap_in_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="ident">val</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_ludicrous() {
+    <span class="kw">let </span><span class="kw-2">mut </span>val = Vec::new();
+    val.resize(<span class="number">0x1000000</span>, <span class="number">0x12</span>);
+    wrap_in_sequence(<span class="kw-2">&amp;mut </span>val);
     <span class="macro">assert_eq!</span>(
         <span class="macro">vec!</span>[<span class="number">0x30</span>, <span class="number">0x84</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x12</span>, <span class="number">0x12</span>],
-        <span class="ident">val</span>[..<span class="number">8</span>].<span class="ident">to_vec</span>()
+        val[..<span class="number">8</span>].to_vec()
     );
-    <span class="macro">assert_eq!</span>(<span class="ident">val</span>.<span class="ident">len</span>(), <span class="number">0x1000000</span> <span class="op">+</span> <span class="number">6</span>);
+    <span class="macro">assert_eq!</span>(val.len(), <span class="number">0x1000000 </span>+ <span class="number">6</span>);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

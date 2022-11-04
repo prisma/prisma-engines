@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/linux/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../os_info/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/linux/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../os_info/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -54,61 +54,61 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">file_release</span>;
-<span class="kw">mod</span> <span class="ident">lsb_release</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>file_release;
+<span class="kw">mod </span>lsb_release;
 
-<span class="kw">use</span> <span class="ident">log::trace</span>;
+<span class="kw">use </span>log::trace;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bitness</span>, <span class="ident">Info</span>, <span class="ident">Type</span>};
+<span class="kw">use crate</span>::{bitness, Info, Type};
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_platform</span>() -&gt; <span class="ident">Info</span> {
+<span class="kw">pub fn </span>current_platform() -&gt; Info {
     <span class="macro">trace!</span>(<span class="string">&quot;linux::current_platform is called&quot;</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">lsb_release::get</span>()
-        .<span class="ident">or_else</span>(<span class="ident">file_release::get</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Info::with_type</span>(<span class="ident">Type::Linux</span>));
-    <span class="ident">info</span>.<span class="ident">bitness</span> <span class="op">=</span> <span class="ident">bitness::get</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>info = lsb_release::get()
+        .or_else(file_release::get)
+        .unwrap_or_else(|| Info::with_type(Type::Linux));
+    info.bitness = bitness::get();
 
-    <span class="macro">trace!</span>(<span class="string">&quot;Returning {:?}&quot;</span>, <span class="ident">info</span>);
-    <span class="ident">info</span>
+    <span class="macro">trace!</span>(<span class="string">&quot;Returning {:?}&quot;</span>, info);
+    info
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">os_type</span>() {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">current_platform</span>();
-        <span class="kw">match</span> <span class="ident">version</span>.<span class="ident">os_type</span>() {
-            <span class="ident">Type::Alpine</span>
-            <span class="op">|</span> <span class="ident">Type::Amazon</span>
-            <span class="op">|</span> <span class="ident">Type::Arch</span>
-            <span class="op">|</span> <span class="ident">Type::CentOS</span>
-            <span class="op">|</span> <span class="ident">Type::Debian</span>
-            <span class="op">|</span> <span class="ident">Type::EndeavourOS</span>
-            <span class="op">|</span> <span class="ident">Type::Fedora</span>
-            <span class="op">|</span> <span class="ident">Type::Garuda</span>
-            <span class="op">|</span> <span class="ident">Type::Gentoo</span>
-            <span class="op">|</span> <span class="ident">Type::Linux</span>
-            <span class="op">|</span> <span class="ident">Type::Manjaro</span>
-            <span class="op">|</span> <span class="ident">Type::Mariner</span>
-            <span class="op">|</span> <span class="ident">Type::NixOS</span>
-            <span class="op">|</span> <span class="ident">Type::openSUSE</span>
-            <span class="op">|</span> <span class="ident">Type::OracleLinux</span>
-            <span class="op">|</span> <span class="ident">Type::Pop</span>
-            <span class="op">|</span> <span class="ident">Type::Raspbian</span>
-            <span class="op">|</span> <span class="ident">Type::Redhat</span>
-            <span class="op">|</span> <span class="ident">Type::RedHatEnterprise</span>
-            <span class="op">|</span> <span class="ident">Type::Solus</span>
-            <span class="op">|</span> <span class="ident">Type::SUSE</span>
-            <span class="op">|</span> <span class="ident">Type::Ubuntu</span>
-            <span class="op">|</span> <span class="ident">Type::Mint</span> =&gt; (),
-            <span class="ident">os_type</span> =&gt; {
-                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected OS type: {}&quot;</span>, <span class="ident">os_type</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>os_type() {
+        <span class="kw">let </span>version = current_platform();
+        <span class="kw">match </span>version.os_type() {
+            Type::Alpine
+            | Type::Amazon
+            | Type::Arch
+            | Type::CentOS
+            | Type::Debian
+            | Type::EndeavourOS
+            | Type::Fedora
+            | Type::Garuda
+            | Type::Gentoo
+            | Type::Linux
+            | Type::Manjaro
+            | Type::Mariner
+            | Type::NixOS
+            | Type::openSUSE
+            | Type::OracleLinux
+            | Type::Pop
+            | Type::Raspbian
+            | Type::Redhat
+            | Type::RedHatEnterprise
+            | Type::Solus
+            | Type::SUSE
+            | Type::Ubuntu
+            | Type::Mint =&gt; (),
+            os_type =&gt; {
+                <span class="macro">panic!</span>(<span class="string">&quot;Unexpected OS type: {}&quot;</span>, os_type);
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/user-facing-errors/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../user_facing_errors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/user-facing-errors/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../user_facing_errors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -276,48 +276,48 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span>;
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
-<span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::UserFacingError;
+<span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>std::fmt::Display;
+<span class="kw">use </span>user_facing_error_macros::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1000&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;\
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1000&quot;</span>,
+    message = <span class="string">&quot;\
 Authentication failed against database server at `{database_host}`, the provided database credentials for `{database_user}` are not valid.
 
-Please make sure to provide valid database credentials for the database server at `{database_host}`.&quot;</span>
-)]</span>
-<span class="comment">// **Notes**: Might vary for different data source, For example, SQLite has no concept of user accounts, and instead relies on the file system for all database permissions. This makes enforcing storage quotas difficult and enforcing user permissions impossible.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IncorrectDatabaseCredentials</span> {
-    <span class="doccomment">/// Database host URI</span>
-    <span class="kw">pub</span> <span class="ident">database_user</span>: <span class="ident">String</span>,
+Please make sure to provide valid database credentials for the database server at `{database_host}`.&quot;
+</span>)]
+</span><span class="comment">// **Notes**: Might vary for different data source, For example, SQLite has no concept of user accounts, and instead relies on the file system for all database permissions. This makes enforcing storage quotas difficult and enforcing user permissions impossible.
+</span><span class="kw">pub struct </span>IncorrectDatabaseCredentials {
+    <span class="doccomment">/// Database host URI
+    </span><span class="kw">pub </span>database_user: String,
 
-    <span class="doccomment">/// Database user name</span>
-    <span class="kw">pub</span> <span class="ident">database_host</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Database user name
+    </span><span class="kw">pub </span>database_host: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1001&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;\
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1001&quot;</span>,
+    message = <span class="string">&quot;\
 Can&#39;t reach database server at `{database_host}`:`{database_port}`
 
-Please make sure your database server is running at `{database_host}`:`{database_port}`.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseNotReachable</span> {
-    <span class="doccomment">/// Database host URI</span>
-    <span class="kw">pub</span> <span class="ident">database_host</span>: <span class="ident">String</span>,
+Please make sure your database server is running at `{database_host}`:`{database_port}`.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>DatabaseNotReachable {
+    <span class="doccomment">/// Database host URI
+    </span><span class="kw">pub </span>database_host: String,
 
-    <span class="doccomment">/// Database port</span>
-    <span class="kw">pub</span> <span class="ident">database_port</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// Database port
+    </span><span class="kw">pub </span>database_port: u16,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1002&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;\
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1002&quot;</span>,
+    message = <span class="string">&quot;\
 The database server at `{database_host}`:`{database_port}` was reached but timed out.
 
 Please try again.
@@ -325,234 +325,234 @@ Please try again.
 Please make sure your database server is running at `{database_host}`:`{database_port}`.
 
 Context: {context}
-&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseTimeout</span> {
-    <span class="doccomment">/// Database host URI</span>
-    <span class="kw">pub</span> <span class="ident">database_host</span>: <span class="ident">String</span>,
+&quot;
+</span>)]
+</span><span class="kw">pub struct </span>DatabaseTimeout {
+    <span class="doccomment">/// Database host URI
+    </span><span class="kw">pub </span>database_host: String,
 
-    <span class="doccomment">/// Database port</span>
-    <span class="kw">pub</span> <span class="ident">database_port</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Database port
+    </span><span class="kw">pub </span>database_port: String,
 
-    <span class="doccomment">/// Extra context</span>
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Extra context
+    </span><span class="kw">pub </span>context: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DatabaseDoesNotExist</span> {
-    <span class="ident">Sqlite</span> {
-        <span class="ident">database_file_name</span>: <span class="ident">String</span>,
-        <span class="ident">database_file_path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>DatabaseDoesNotExist {
+    Sqlite {
+        database_file_name: String,
+        database_file_path: String,
     },
-    <span class="ident">Postgres</span> {
-        <span class="ident">database_name</span>: <span class="ident">String</span>,
-        <span class="ident">database_host</span>: <span class="ident">String</span>,
-        <span class="ident">database_port</span>: <span class="ident">u16</span>,
+    Postgres {
+        database_name: String,
+        database_host: String,
+        database_port: u16,
     },
-    <span class="ident">Mysql</span> {
-        <span class="ident">database_name</span>: <span class="ident">String</span>,
-        <span class="ident">database_host</span>: <span class="ident">String</span>,
-        <span class="ident">database_port</span>: <span class="ident">u16</span>,
+    Mysql {
+        database_name: String,
+        database_host: String,
+        database_port: u16,
     },
 
-    <span class="ident">Mssql</span> {
-        <span class="ident">database_name</span>: <span class="ident">String</span>,
-        <span class="ident">database_host</span>: <span class="ident">String</span>,
-        <span class="ident">database_port</span>: <span class="ident">u16</span>,
+    Mssql {
+        database_name: String,
+        database_host: String,
+        database_port: u16,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">UserFacingError</span> <span class="kw">for</span> <span class="ident">DatabaseDoesNotExist</span> {
-    <span class="kw">const</span> <span class="ident">ERROR_CODE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;P1003&quot;</span>;
+<span class="kw">impl </span>UserFacingError <span class="kw">for </span>DatabaseDoesNotExist {
+    <span class="kw">const </span>ERROR_CODE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;P1003&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">DatabaseDoesNotExist::Sqlite</span> {
-                <span class="ident">database_file_name</span>,
-                <span class="ident">database_file_path</span>,
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            DatabaseDoesNotExist::Sqlite {
+                database_file_name,
+                database_file_path,
             } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database {database_file_name} does not exist at {database_file_path}&quot;</span>,
-                <span class="ident">database_file_name</span> <span class="op">=</span> <span class="ident">database_file_name</span>,
-                <span class="ident">database_file_path</span> <span class="op">=</span> <span class="ident">database_file_path</span>
+                database_file_name = database_file_name,
+                database_file_path = database_file_path
             ),
-            <span class="ident">DatabaseDoesNotExist::Postgres</span> {
-                <span class="ident">database_name</span>,
-                <span class="ident">database_host</span>,
-                <span class="ident">database_port</span>,
+            DatabaseDoesNotExist::Postgres {
+                database_name,
+                database_host,
+                database_port,
             } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
-                <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
-                <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
-                <span class="ident">database_port</span> <span class="op">=</span> <span class="ident">database_port</span>,
+                database_name = database_name,
+                database_host = database_host,
+                database_port = database_port,
             ),
-            <span class="ident">DatabaseDoesNotExist::Mysql</span> {
-                <span class="ident">database_name</span>,
-                <span class="ident">database_host</span>,
-                <span class="ident">database_port</span>,
+            DatabaseDoesNotExist::Mysql {
+                database_name,
+                database_host,
+                database_port,
             } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
-                <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
-                <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
-                <span class="ident">database_port</span> <span class="op">=</span> <span class="ident">database_port</span>,
+                database_name = database_name,
+                database_host = database_host,
+                database_port = database_port,
             ),
-            <span class="ident">DatabaseDoesNotExist::Mssql</span> {
-                <span class="ident">database_name</span>,
-                <span class="ident">database_host</span>,
-                <span class="ident">database_port</span>,
+            DatabaseDoesNotExist::Mssql {
+                database_name,
+                database_host,
+                database_port,
             } =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;Database `{database_name}` does not exist on the database server at `{database_host}:{database_port}`.&quot;</span>,
-                <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">database_name</span>,
-                <span class="ident">database_host</span> <span class="op">=</span> <span class="ident">database_host</span>,
-                <span class="ident">database_port</span> <span class="op">=</span> <span class="ident">database_port</span>,
+                database_name = database_name,
+                database_host = database_host,
+                database_port = database_port,
             ),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1008&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Operations timed out after `{time}`. Context: {context}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseOperationTimeout</span> {
-    <span class="doccomment">/// Operation time in s or ms (if &lt;1000ms)</span>
-    <span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1008&quot;</span>, message = <span class="string">&quot;Operations timed out after `{time}`. Context: {context}&quot;</span>)]
+</span><span class="kw">pub struct </span>DatabaseOperationTimeout {
+    <span class="doccomment">/// Operation time in s or ms (if &lt;1000ms)
+    </span><span class="kw">pub </span>time: String,
 
-    <span class="doccomment">/// Extra context</span>
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Extra context
+    </span><span class="kw">pub </span>context: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1009&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Database `{database_name}` already exists on the database server at `{database_host}:{database_port}`&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseAlreadyExists</span> {
-    <span class="doccomment">/// Database name, append `database_schema_name` when applicable</span>
-    <span class="doccomment">/// `database_schema_name`: Database schema name (For Postgres for example)</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1009&quot;</span>,
+    message = <span class="string">&quot;Database `{database_name}` already exists on the database server at `{database_host}:{database_port}`&quot;
+</span>)]
+</span><span class="kw">pub struct </span>DatabaseAlreadyExists {
+    <span class="doccomment">/// Database name, append `database_schema_name` when applicable
+    /// `database_schema_name`: Database schema name (For Postgres for example)
+    </span><span class="kw">pub </span>database_name: String,
 
-    <span class="doccomment">/// Database host URI</span>
-    <span class="kw">pub</span> <span class="ident">database_host</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Database host URI
+    </span><span class="kw">pub </span>database_host: String,
 
-    <span class="doccomment">/// Database port</span>
-    <span class="kw">pub</span> <span class="ident">database_port</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// Database port
+    </span><span class="kw">pub </span>database_port: u16,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1010&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;User `{database_user}` was denied access on the database `{database_name}`&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseAccessDenied</span> {
-    <span class="doccomment">/// Database user name</span>
-    <span class="kw">pub</span> <span class="ident">database_user</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1010&quot;</span>,
+    message = <span class="string">&quot;User `{database_user}` was denied access on the database `{database_name}`&quot;
+</span>)]
+</span><span class="kw">pub struct </span>DatabaseAccessDenied {
+    <span class="doccomment">/// Database user name
+    </span><span class="kw">pub </span>database_user: String,
 
-    <span class="doccomment">/// Database name, append `database_schema_name` when applicable</span>
-    <span class="doccomment">/// `database_schema_name`: Database schema name (For Postgres for example)</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Database name, append `database_schema_name` when applicable
+    /// `database_schema_name`: Database schema name (For Postgres for example)
+    </span><span class="kw">pub </span>database_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1011&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Error opening a TLS connection: {message}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsConnectionError</span> {
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1011&quot;</span>, message = <span class="string">&quot;Error opening a TLS connection: {message}&quot;</span>)]
+</span><span class="kw">pub struct </span>TlsConnectionError {
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1012&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;{full_error}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaParserError</span> {
-    <span class="kw">pub</span> <span class="ident">full_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1012&quot;</span>, message = <span class="string">&quot;{full_error}&quot;</span>)]
+</span><span class="kw">pub struct </span>SchemaParserError {
+    <span class="kw">pub </span>full_error: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1013&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The provided database string is invalid. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidConnectionString</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1013&quot;</span>, message = <span class="string">&quot;The provided database string is invalid. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>InvalidConnectionString {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ModelKind</span> {
-    <span class="ident">Table</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+</span><span class="kw">pub enum </span>ModelKind {
+    Table,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ModelKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Table</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;table&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>ModelKind {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Table =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;table&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1014&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The underlying {kind} for model `{model}` does not exist.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidModel</span> {
-    <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ModelKind</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1014&quot;</span>,
+    message = <span class="string">&quot;The underlying {kind} for model `{model}` does not exist.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>InvalidModel {
+    <span class="kw">pub </span>model: String,
+    <span class="kw">pub </span>kind: ModelKind,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1015&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Your Prisma schema is using features that are not supported for the version of the database.\nDatabase version: {database_version}\nErrors:\n{errors}&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseVersionIncompatibility</span> {
-    <span class="kw">pub</span> <span class="ident">database_version</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1015&quot;</span>,
+    message = <span class="string">&quot;Your Prisma schema is using features that are not supported for the version of the database.\nDatabase version: {database_version}\nErrors:\n{errors}&quot;
+</span>)]
+</span><span class="kw">pub struct </span>DatabaseVersionIncompatibility {
+    <span class="kw">pub </span>database_version: String,
+    <span class="kw">pub </span>errors: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1016&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Your raw query had an incorrect number of parameters. Expected: `{expected}`, actual: `{actual}`.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IncorrectNumberOfParameters</span> {
-    <span class="kw">pub</span> <span class="ident">expected</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">actual</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P1016&quot;</span>,
+    message = <span class="string">&quot;Your raw query had an incorrect number of parameters. Expected: `{expected}`, actual: `{actual}`.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>IncorrectNumberOfParameters {
+    <span class="kw">pub </span>expected: usize,
+    <span class="kw">pub </span>actual: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">SimpleUserFacingError</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1017&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Server has closed the connection.&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionClosed</span>;
+<span class="attribute">#[derive(Debug, SimpleUserFacingError)]
+#[user_facing(code = <span class="string">&quot;P1017&quot;</span>, message = <span class="string">&quot;Server has closed the connection.&quot;</span>)]
+</span><span class="kw">pub struct </span>ConnectionClosed;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1018&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;{message}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransactionAlreadyClosed</span> {
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1018&quot;</span>, message = <span class="string">&quot;{message}&quot;</span>)]
+</span><span class="kw">pub struct </span>TransactionAlreadyClosed {
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P1019&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;{message}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnsupportedFeatureError</span> {
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P1019&quot;</span>, message = <span class="string">&quot;{message}&quot;</span>)]
+</span><span class="kw">pub struct </span>UnsupportedFeatureError {
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UserFacingError</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::UserFacingError;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">database_does_not_exist_formats_properly</span>() {
-        <span class="kw">let</span> <span class="ident">sqlite_err</span> <span class="op">=</span> <span class="ident">DatabaseDoesNotExist::Sqlite</span> {
-            <span class="ident">database_file_path</span>: <span class="string">&quot;/tmp/dev.db&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">database_file_name</span>: <span class="string">&quot;dev.db&quot;</span>.<span class="ident">into</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>database_does_not_exist_formats_properly() {
+        <span class="kw">let </span>sqlite_err = DatabaseDoesNotExist::Sqlite {
+            database_file_path: <span class="string">&quot;/tmp/dev.db&quot;</span>.into(),
+            database_file_name: <span class="string">&quot;dev.db&quot;</span>.into(),
         };
 
-        <span class="macro">assert_eq!</span>(<span class="ident">sqlite_err</span>.<span class="ident">message</span>(), <span class="string">&quot;Database dev.db does not exist at /tmp/dev.db&quot;</span>);
+        <span class="macro">assert_eq!</span>(sqlite_err.message(), <span class="string">&quot;Database dev.db does not exist at /tmp/dev.db&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">mysql_err</span> <span class="op">=</span> <span class="ident">DatabaseDoesNotExist::Mysql</span> {
-            <span class="ident">database_name</span>: <span class="string">&quot;root&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">database_host</span>: <span class="string">&quot;localhost&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">database_port</span>: <span class="number">8888</span>,
+        <span class="kw">let </span>mysql_err = DatabaseDoesNotExist::Mysql {
+            database_name: <span class="string">&quot;root&quot;</span>.into(),
+            database_host: <span class="string">&quot;localhost&quot;</span>.into(),
+            database_port: <span class="number">8888</span>,
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">mysql_err</span>.<span class="ident">message</span>(),
-            <span class="string">&quot;Database `root` does not exist on the database server at `localhost:8888`.&quot;</span>
-        );
+            mysql_err.message(),
+            <span class="string">&quot;Database `root` does not exist on the database server at `localhost:8888`.&quot;
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

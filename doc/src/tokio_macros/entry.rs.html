@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.8.0/src/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-macros-1.8.0/src/entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -459,466 +459,466 @@
 <span id="459">459</span>
 <span id="460">460</span>
 <span id="461">461</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn::parse::Parser</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro::TokenStream;
+<span class="kw">use </span>proc_macro2::{Ident, Span};
+<span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
+<span class="kw">use </span>syn::parse::Parser;
 
-<span class="comment">// syn::AttributeArgs does not implement syn::Parse</span>
-<span class="kw">type</span> <span class="ident">AttributeArgs</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::NestedMeta</span>, <span class="macro">syn::Token!</span>[,]<span class="op">&gt;</span>;
+<span class="comment">// syn::AttributeArgs does not implement syn::Parse
+</span><span class="kw">type </span>AttributeArgs = syn::punctuated::Punctuated&lt;syn::NestedMeta, <span class="macro">syn::Token!</span>[,]&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">RuntimeFlavor</span> {
-    <span class="ident">CurrentThread</span>,
-    <span class="ident">Threaded</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">enum </span>RuntimeFlavor {
+    CurrentThread,
+    Threaded,
 }
 
-<span class="kw">impl</span> <span class="ident">RuntimeFlavor</span> {
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RuntimeFlavor</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;current_thread&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RuntimeFlavor::CurrentThread</span>),
-            <span class="string">&quot;multi_thread&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RuntimeFlavor::Threaded</span>),
-            <span class="string">&quot;single_thread&quot;</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The single threaded runtime flavor is called `current_thread`.&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="string">&quot;basic_scheduler&quot;</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The `basic_scheduler` runtime flavor has been renamed to `current_thread`.&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="string">&quot;threaded_scheduler&quot;</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The `threaded_scheduler` runtime flavor has been renamed to `multi_thread`.&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;No such runtime flavor `{}`. The runtime flavors are `current_thread` and `multi_thread`.&quot;</span>, <span class="ident">s</span>)),
+<span class="kw">impl </span>RuntimeFlavor {
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeFlavor, String&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;current_thread&quot; </span>=&gt; <span class="prelude-val">Ok</span>(RuntimeFlavor::CurrentThread),
+            <span class="string">&quot;multi_thread&quot; </span>=&gt; <span class="prelude-val">Ok</span>(RuntimeFlavor::Threaded),
+            <span class="string">&quot;single_thread&quot; </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The single threaded runtime flavor is called `current_thread`.&quot;</span>.to_string()),
+            <span class="string">&quot;basic_scheduler&quot; </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The `basic_scheduler` runtime flavor has been renamed to `current_thread`.&quot;</span>.to_string()),
+            <span class="string">&quot;threaded_scheduler&quot; </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;The `threaded_scheduler` runtime flavor has been renamed to `multi_thread`.&quot;</span>.to_string()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;No such runtime flavor `{}`. The runtime flavors are `current_thread` and `multi_thread`.&quot;</span>, s)),
         }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">FinalConfig</span> {
-    <span class="ident">flavor</span>: <span class="ident">RuntimeFlavor</span>,
-    <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">start_paused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>FinalConfig {
+    flavor: RuntimeFlavor,
+    worker_threads: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    start_paused: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    crate_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="doccomment">/// Config used in case of the attribute not being able to build a valid config</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_ERROR_CONFIG</span>: <span class="ident">FinalConfig</span> <span class="op">=</span> <span class="ident">FinalConfig</span> {
-    <span class="ident">flavor</span>: <span class="ident">RuntimeFlavor::CurrentThread</span>,
-    <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
-    <span class="ident">start_paused</span>: <span class="prelude-val">None</span>,
-    <span class="ident">crate_name</span>: <span class="prelude-val">None</span>,
+<span class="doccomment">/// Config used in case of the attribute not being able to build a valid config
+</span><span class="kw">const </span>DEFAULT_ERROR_CONFIG: FinalConfig = FinalConfig {
+    flavor: RuntimeFlavor::CurrentThread,
+    worker_threads: <span class="prelude-val">None</span>,
+    start_paused: <span class="prelude-val">None</span>,
+    crate_name: <span class="prelude-val">None</span>,
 };
 
-<span class="kw">struct</span> <span class="ident">Configuration</span> {
-    <span class="ident">rt_multi_thread_available</span>: <span class="ident">bool</span>,
-    <span class="ident">default_flavor</span>: <span class="ident">RuntimeFlavor</span>,
-    <span class="ident">flavor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RuntimeFlavor</span><span class="op">&gt;</span>,
-    <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
-    <span class="ident">start_paused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">bool</span>, <span class="ident">Span</span>)<span class="op">&gt;</span>,
-    <span class="ident">is_test</span>: <span class="ident">bool</span>,
-    <span class="ident">crate_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Configuration {
+    rt_multi_thread_available: bool,
+    default_flavor: RuntimeFlavor,
+    flavor: <span class="prelude-ty">Option</span>&lt;RuntimeFlavor&gt;,
+    worker_threads: <span class="prelude-ty">Option</span>&lt;(usize, Span)&gt;,
+    start_paused: <span class="prelude-ty">Option</span>&lt;(bool, Span)&gt;,
+    is_test: bool,
+    crate_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Configuration</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">is_test</span>: <span class="ident">bool</span>, <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Configuration</span> {
-            <span class="ident">rt_multi_thread_available</span>: <span class="ident">rt_multi_thread</span>,
-            <span class="ident">default_flavor</span>: <span class="kw">match</span> <span class="ident">is_test</span> {
-                <span class="bool-val">true</span> =&gt; <span class="ident">RuntimeFlavor::CurrentThread</span>,
-                <span class="bool-val">false</span> =&gt; <span class="ident">RuntimeFlavor::Threaded</span>,
+<span class="kw">impl </span>Configuration {
+    <span class="kw">fn </span>new(is_test: bool, rt_multi_thread: bool) -&gt; <span class="self">Self </span>{
+        Configuration {
+            rt_multi_thread_available: rt_multi_thread,
+            default_flavor: <span class="kw">match </span>is_test {
+                <span class="bool-val">true </span>=&gt; RuntimeFlavor::CurrentThread,
+                <span class="bool-val">false </span>=&gt; RuntimeFlavor::Threaded,
             },
-            <span class="ident">flavor</span>: <span class="prelude-val">None</span>,
-            <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
-            <span class="ident">start_paused</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_test</span>,
-            <span class="ident">crate_name</span>: <span class="prelude-val">None</span>,
+            flavor: <span class="prelude-val">None</span>,
+            worker_threads: <span class="prelude-val">None</span>,
+            start_paused: <span class="prelude-val">None</span>,
+            is_test,
+            crate_name: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">set_flavor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">runtime</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flavor</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;`flavor` set multiple times.&quot;</span>));
+    <span class="kw">fn </span>set_flavor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, runtime: syn::Lit, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;(), syn::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.flavor.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, <span class="string">&quot;`flavor` set multiple times.&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">runtime_str</span> <span class="op">=</span> <span class="ident">parse_string</span>(<span class="ident">runtime</span>, <span class="ident">span</span>, <span class="string">&quot;flavor&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span>
-            <span class="ident">RuntimeFlavor::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">runtime_str</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="ident">err</span>))<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">flavor</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">runtime</span>);
+        <span class="kw">let </span>runtime_str = parse_string(runtime, span, <span class="string">&quot;flavor&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>runtime =
+            RuntimeFlavor::from_str(<span class="kw-2">&amp;</span>runtime_str).map_err(|err| syn::Error::new(span, err))<span class="question-mark">?</span>;
+        <span class="self">self</span>.flavor = <span class="prelude-val">Some</span>(runtime);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">set_worker_threads</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">worker_threads</span>: <span class="ident">syn::Lit</span>,
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">worker_threads</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-                <span class="ident">span</span>,
+    <span class="kw">fn </span>set_worker_threads(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        worker_threads: syn::Lit,
+        span: Span,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), syn::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.worker_threads.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(
+                span,
                 <span class="string">&quot;`worker_threads` set multiple times.&quot;</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">worker_threads</span> <span class="op">=</span> <span class="ident">parse_int</span>(<span class="ident">worker_threads</span>, <span class="ident">span</span>, <span class="string">&quot;worker_threads&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">worker_threads</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;`worker_threads` may not be 0.&quot;</span>));
+        <span class="kw">let </span>worker_threads = parse_int(worker_threads, span, <span class="string">&quot;worker_threads&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>worker_threads == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, <span class="string">&quot;`worker_threads` may not be 0.&quot;</span>));
         }
-        <span class="self">self</span>.<span class="ident">worker_threads</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">worker_threads</span>, <span class="ident">span</span>));
+        <span class="self">self</span>.worker_threads = <span class="prelude-val">Some</span>((worker_threads, span));
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">set_start_paused</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start_paused</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_paused</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;`start_paused` set multiple times.&quot;</span>));
+    <span class="kw">fn </span>set_start_paused(<span class="kw-2">&amp;mut </span><span class="self">self</span>, start_paused: syn::Lit, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;(), syn::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.start_paused.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, <span class="string">&quot;`start_paused` set multiple times.&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">start_paused</span> <span class="op">=</span> <span class="ident">parse_bool</span>(<span class="ident">start_paused</span>, <span class="ident">span</span>, <span class="string">&quot;start_paused&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">start_paused</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">start_paused</span>, <span class="ident">span</span>));
+        <span class="kw">let </span>start_paused = parse_bool(start_paused, span, <span class="string">&quot;start_paused&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.start_paused = <span class="prelude-val">Some</span>((start_paused, span));
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">set_crate_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">crate_name</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;`crate` set multiple times.&quot;</span>));
+    <span class="kw">fn </span>set_crate_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: syn::Lit, span: Span) -&gt; <span class="prelude-ty">Result</span>&lt;(), syn::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.crate_name.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, <span class="string">&quot;`crate` set multiple times.&quot;</span>));
         }
-        <span class="kw">let</span> <span class="ident">name_ident</span> <span class="op">=</span> <span class="ident">parse_ident</span>(<span class="ident">name</span>, <span class="ident">span</span>, <span class="string">&quot;crate&quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">crate_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name_ident</span>.<span class="ident">to_string</span>());
+        <span class="kw">let </span>name_ident = parse_ident(name, span, <span class="string">&quot;crate&quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.crate_name = <span class="prelude-val">Some</span>(name_ident.to_string());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">macro_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_test</span> {
-            <span class="string">&quot;tokio::test&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;tokio::main&quot;</span>
-        }
+    <span class="kw">fn </span>macro_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">if </span><span class="self">self</span>.is_test {
+            <span class="string">&quot;tokio::test&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;tokio::main&quot;
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FinalConfig</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">flavor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flavor</span>.<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_flavor</span>);
-        <span class="kw">use</span> <span class="ident">RuntimeFlavor</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;FinalConfig, syn::Error&gt; {
+        <span class="kw">let </span>flavor = <span class="self">self</span>.flavor.unwrap_or(<span class="self">self</span>.default_flavor);
+        <span class="kw">use </span>RuntimeFlavor::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">worker_threads</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">flavor</span>, <span class="self">self</span>.<span class="ident">worker_threads</span>) {
-            (<span class="ident">CurrentThread</span>, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">worker_threads_span</span>))) =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>worker_threads = <span class="kw">match </span>(flavor, <span class="self">self</span>.worker_threads) {
+            (CurrentThread, <span class="prelude-val">Some</span>((<span class="kw">_</span>, worker_threads_span))) =&gt; {
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
                     <span class="string">&quot;The `worker_threads` option requires the `multi_thread` runtime flavor. Use `#[{}(flavor = \&quot;multi_thread\&quot;)]`&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">macro_name</span>(),
+                    <span class="self">self</span>.macro_name(),
                 );
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">worker_threads_span</span>, <span class="ident">msg</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(worker_threads_span, msg));
             }
-            (<span class="ident">CurrentThread</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-            (<span class="ident">Threaded</span>, <span class="ident">worker_threads</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">rt_multi_thread_available</span> =&gt; {
-                <span class="ident">worker_threads</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="ident">_span</span>)<span class="op">|</span> <span class="ident">val</span>)
+            (CurrentThread, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+            (Threaded, worker_threads) <span class="kw">if </span><span class="self">self</span>.rt_multi_thread_available =&gt; {
+                worker_threads.map(|(val, _span)| val)
             }
-            (<span class="ident">Threaded</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flavor</span>.<span class="ident">is_none</span>() {
-                    <span class="string">&quot;The default runtime flavor is `multi_thread`, but the `rt-multi-thread` feature is disabled.&quot;</span>
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;The runtime flavor `multi_thread` requires the `rt-multi-thread` feature.&quot;</span>
-                };
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">Span::call_site</span>(), <span class="ident">msg</span>));
+            (Threaded, <span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>msg = <span class="kw">if </span><span class="self">self</span>.flavor.is_none() {
+                    <span class="string">&quot;The default runtime flavor is `multi_thread`, but the `rt-multi-thread` feature is disabled.&quot;
+                </span>} <span class="kw">else </span>{
+                    <span class="string">&quot;The runtime flavor `multi_thread` requires the `rt-multi-thread` feature.&quot;
+                </span>};
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(Span::call_site(), msg));
             }
         };
 
-        <span class="kw">let</span> <span class="ident">start_paused</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">flavor</span>, <span class="self">self</span>.<span class="ident">start_paused</span>) {
-            (<span class="ident">Threaded</span>, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">start_paused_span</span>))) =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>start_paused = <span class="kw">match </span>(flavor, <span class="self">self</span>.start_paused) {
+            (Threaded, <span class="prelude-val">Some</span>((<span class="kw">_</span>, start_paused_span))) =&gt; {
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
                     <span class="string">&quot;The `start_paused` option requires the `current_thread` runtime flavor. Use `#[{}(flavor = \&quot;current_thread\&quot;)]`&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">macro_name</span>(),
+                    <span class="self">self</span>.macro_name(),
                 );
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">start_paused_span</span>, <span class="ident">msg</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(start_paused_span, msg));
             }
-            (<span class="ident">CurrentThread</span>, <span class="prelude-val">Some</span>((<span class="ident">start_paused</span>, <span class="kw">_</span>))) =&gt; <span class="prelude-val">Some</span>(<span class="ident">start_paused</span>),
+            (CurrentThread, <span class="prelude-val">Some</span>((start_paused, <span class="kw">_</span>))) =&gt; <span class="prelude-val">Some</span>(start_paused),
             (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">FinalConfig</span> {
-            <span class="ident">crate_name</span>: <span class="self">self</span>.<span class="ident">crate_name</span>.<span class="ident">clone</span>(),
-            <span class="ident">flavor</span>,
-            <span class="ident">worker_threads</span>,
-            <span class="ident">start_paused</span>,
+        <span class="prelude-val">Ok</span>(FinalConfig {
+            crate_name: <span class="self">self</span>.crate_name.clone(),
+            flavor,
+            worker_threads,
+            start_paused,
         })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_int</span>(<span class="ident">int</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">int</span> {
-        <span class="ident">syn::Lit::Int</span>(<span class="ident">lit</span>) =&gt; <span class="kw">match</span> <span class="ident">lit</span>.<span class="ident">base10_parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">value</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-                <span class="ident">span</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as integer: {}&quot;</span>, <span class="ident">field</span>, <span class="ident">e</span>),
+<span class="kw">fn </span>parse_int(int: syn::Lit, span: Span, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;usize, syn::Error&gt; {
+    <span class="kw">match </span>int {
+        syn::Lit::Int(lit) =&gt; <span class="kw">match </span>lit.base10_parse::&lt;usize&gt;() {
+            <span class="prelude-val">Ok</span>(value) =&gt; <span class="prelude-val">Ok</span>(value),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(syn::Error::new(
+                span,
+                <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as integer: {}&quot;</span>, field, e),
             )),
         },
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-            <span class="ident">span</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as integer.&quot;</span>, <span class="ident">field</span>),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new(
+            span,
+            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as integer.&quot;</span>, field),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_string</span>(<span class="ident">int</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">int</span> {
-        <span class="ident">syn::Lit::Str</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">value</span>()),
-        <span class="ident">syn::Lit::Verbatim</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">to_string</span>()),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-            <span class="ident">span</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as string.&quot;</span>, <span class="ident">field</span>),
+<span class="kw">fn </span>parse_string(int: syn::Lit, span: Span, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, syn::Error&gt; {
+    <span class="kw">match </span>int {
+        syn::Lit::Str(s) =&gt; <span class="prelude-val">Ok</span>(s.value()),
+        syn::Lit::Verbatim(s) =&gt; <span class="prelude-val">Ok</span>(s.to_string()),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new(
+            span,
+            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as string.&quot;</span>, field),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_ident</span>(<span class="ident">lit</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">lit</span> {
-        <span class="ident">syn::Lit::Str</span>(<span class="ident">s</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">syn::Error::new</span>(
-                <span class="ident">span</span>,
+<span class="kw">fn </span>parse_ident(lit: syn::Lit, span: Span, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Ident, syn::Error&gt; {
+    <span class="kw">match </span>lit {
+        syn::Lit::Str(s) =&gt; {
+            <span class="kw">let </span>err = syn::Error::new(
+                span,
                 <span class="macro">format!</span>(
                     <span class="string">&quot;Failed to parse value of `{}` as ident: \&quot;{}\&quot;&quot;</span>,
-                    <span class="ident">field</span>,
-                    <span class="ident">s</span>.<span class="ident">value</span>()
+                    field,
+                    s.value()
                 ),
             );
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">syn::Path</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-            <span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">cloned</span>().<span class="ident">ok_or</span>(<span class="ident">err</span>)
+            <span class="kw">let </span>path = s.parse::&lt;syn::Path&gt;().map_err(|<span class="kw">_</span>| err.clone())<span class="question-mark">?</span>;
+            path.get_ident().cloned().ok_or(err)
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-            <span class="ident">span</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as ident.&quot;</span>, <span class="ident">field</span>),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new(
+            span,
+            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as ident.&quot;</span>, field),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_bool</span>(<span class="ident">bool</span>: <span class="ident">syn::Lit</span>, <span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">bool</span> {
-        <span class="ident">syn::Lit::Bool</span>(<span class="ident">b</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">b</span>.<span class="ident">value</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(
-            <span class="ident">span</span>,
-            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as bool.&quot;</span>, <span class="ident">field</span>),
+<span class="kw">fn </span>parse_bool(bool: syn::Lit, span: Span, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;bool, syn::Error&gt; {
+    <span class="kw">match </span>bool {
+        syn::Lit::Bool(b) =&gt; <span class="prelude-val">Ok</span>(b.value),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(syn::Error::new(
+            span,
+            <span class="macro">format!</span>(<span class="string">&quot;Failed to parse value of `{}` as bool.&quot;</span>, field),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">build_config</span>(
-    <span class="ident">input</span>: <span class="ident">syn::ItemFn</span>,
-    <span class="ident">args</span>: <span class="ident">AttributeArgs</span>,
-    <span class="ident">is_test</span>: <span class="ident">bool</span>,
-    <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FinalConfig</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_none</span>() {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;the `async` keyword is missing from the function declaration&quot;</span>;
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">fn_token</span>, <span class="ident">msg</span>));
+<span class="kw">fn </span>build_config(
+    input: syn::ItemFn,
+    args: AttributeArgs,
+    is_test: bool,
+    rt_multi_thread: bool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;FinalConfig, syn::Error&gt; {
+    <span class="kw">if </span>input.sig.asyncness.is_none() {
+        <span class="kw">let </span>msg = <span class="string">&quot;the `async` keyword is missing from the function declaration&quot;</span>;
+        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(input.sig.fn_token, msg));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Configuration::new</span>(<span class="ident">is_test</span>, <span class="ident">rt_multi_thread</span>);
-    <span class="kw">let</span> <span class="ident">macro_name</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">macro_name</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>config = Configuration::new(is_test, rt_multi_thread);
+    <span class="kw">let </span>macro_name = config.macro_name();
 
-    <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span> {
-        <span class="kw">match</span> <span class="ident">arg</span> {
-            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">syn::Meta::NameValue</span>(<span class="ident">namevalue</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">namevalue</span>
-                    .<span class="ident">path</span>
-                    .<span class="ident">get_ident</span>()
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>, <span class="string">&quot;Must have specified ident&quot;</span>)
-                    })<span class="question-mark">?</span>
-                    .<span class="ident">to_string</span>()
-                    .<span class="ident">to_lowercase</span>();
-                <span class="kw">match</span> <span class="ident">ident</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;worker_threads&quot;</span> =&gt; {
-                        <span class="ident">config</span>.<span class="ident">set_worker_threads</span>(
-                            <span class="ident">namevalue</span>.<span class="ident">lit</span>.<span class="ident">clone</span>(),
-                            <span class="ident">syn::spanned::Spanned::span</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>.<span class="ident">lit</span>),
+    <span class="kw">for </span>arg <span class="kw">in </span>args {
+        <span class="kw">match </span>arg {
+            syn::NestedMeta::Meta(syn::Meta::NameValue(namevalue)) =&gt; {
+                <span class="kw">let </span>ident = namevalue
+                    .path
+                    .get_ident()
+                    .ok_or_else(|| {
+                        syn::Error::new_spanned(<span class="kw-2">&amp;</span>namevalue, <span class="string">&quot;Must have specified ident&quot;</span>)
+                    })<span class="question-mark">?
+                    </span>.to_string()
+                    .to_lowercase();
+                <span class="kw">match </span>ident.as_str() {
+                    <span class="string">&quot;worker_threads&quot; </span>=&gt; {
+                        config.set_worker_threads(
+                            namevalue.lit.clone(),
+                            syn::spanned::Spanned::span(<span class="kw-2">&amp;</span>namevalue.lit),
                         )<span class="question-mark">?</span>;
                     }
-                    <span class="string">&quot;flavor&quot;</span> =&gt; {
-                        <span class="ident">config</span>.<span class="ident">set_flavor</span>(
-                            <span class="ident">namevalue</span>.<span class="ident">lit</span>.<span class="ident">clone</span>(),
-                            <span class="ident">syn::spanned::Spanned::span</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>.<span class="ident">lit</span>),
+                    <span class="string">&quot;flavor&quot; </span>=&gt; {
+                        config.set_flavor(
+                            namevalue.lit.clone(),
+                            syn::spanned::Spanned::span(<span class="kw-2">&amp;</span>namevalue.lit),
                         )<span class="question-mark">?</span>;
                     }
-                    <span class="string">&quot;start_paused&quot;</span> =&gt; {
-                        <span class="ident">config</span>.<span class="ident">set_start_paused</span>(
-                            <span class="ident">namevalue</span>.<span class="ident">lit</span>.<span class="ident">clone</span>(),
-                            <span class="ident">syn::spanned::Spanned::span</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>.<span class="ident">lit</span>),
+                    <span class="string">&quot;start_paused&quot; </span>=&gt; {
+                        config.set_start_paused(
+                            namevalue.lit.clone(),
+                            syn::spanned::Spanned::span(<span class="kw-2">&amp;</span>namevalue.lit),
                         )<span class="question-mark">?</span>;
                     }
-                    <span class="string">&quot;core_threads&quot;</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Attribute `core_threads` is renamed to `worker_threads`&quot;</span>;
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">namevalue</span>, <span class="ident">msg</span>));
+                    <span class="string">&quot;core_threads&quot; </span>=&gt; {
+                        <span class="kw">let </span>msg = <span class="string">&quot;Attribute `core_threads` is renamed to `worker_threads`&quot;</span>;
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(namevalue, msg));
                     }
-                    <span class="string">&quot;crate&quot;</span> =&gt; {
-                        <span class="ident">config</span>.<span class="ident">set_crate_name</span>(
-                            <span class="ident">namevalue</span>.<span class="ident">lit</span>.<span class="ident">clone</span>(),
-                            <span class="ident">syn::spanned::Spanned::span</span>(<span class="kw-2">&amp;</span><span class="ident">namevalue</span>.<span class="ident">lit</span>),
+                    <span class="string">&quot;crate&quot; </span>=&gt; {
+                        config.set_crate_name(
+                            namevalue.lit.clone(),
+                            syn::spanned::Spanned::span(<span class="kw-2">&amp;</span>namevalue.lit),
                         )<span class="question-mark">?</span>;
                     }
-                    <span class="ident">name</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+                    name =&gt; {
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
                             <span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`, `crate`&quot;</span>,
-                            <span class="ident">name</span>,
+                            name,
                         );
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">namevalue</span>, <span class="ident">msg</span>));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(namevalue, msg));
                     }
                 }
             }
-            <span class="ident">syn::NestedMeta::Meta</span>(<span class="ident">syn::Meta::Path</span>(<span class="ident">path</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">path</span>
-                    .<span class="ident">get_ident</span>()
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>, <span class="string">&quot;Must have specified ident&quot;</span>))<span class="question-mark">?</span>
-                    .<span class="ident">to_string</span>()
-                    .<span class="ident">to_lowercase</span>();
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;threaded_scheduler&quot;</span> <span class="op">|</span> <span class="string">&quot;multi_thread&quot;</span> =&gt; {
+            syn::NestedMeta::Meta(syn::Meta::Path(path)) =&gt; {
+                <span class="kw">let </span>name = path
+                    .get_ident()
+                    .ok_or_else(|| syn::Error::new_spanned(<span class="kw-2">&amp;</span>path, <span class="string">&quot;Must have specified ident&quot;</span>))<span class="question-mark">?
+                    </span>.to_string()
+                    .to_lowercase();
+                <span class="kw">let </span>msg = <span class="kw">match </span>name.as_str() {
+                    <span class="string">&quot;threaded_scheduler&quot; </span>| <span class="string">&quot;multi_thread&quot; </span>=&gt; {
                         <span class="macro">format!</span>(
                             <span class="string">&quot;Set the runtime flavor with #[{}(flavor = \&quot;multi_thread\&quot;)].&quot;</span>,
-                            <span class="ident">macro_name</span>
+                            macro_name
                         )
                     }
-                    <span class="string">&quot;basic_scheduler&quot;</span> <span class="op">|</span> <span class="string">&quot;current_thread&quot;</span> <span class="op">|</span> <span class="string">&quot;single_threaded&quot;</span> =&gt; {
+                    <span class="string">&quot;basic_scheduler&quot; </span>| <span class="string">&quot;current_thread&quot; </span>| <span class="string">&quot;single_threaded&quot; </span>=&gt; {
                         <span class="macro">format!</span>(
                             <span class="string">&quot;Set the runtime flavor with #[{}(flavor = \&quot;current_thread\&quot;)].&quot;</span>,
-                            <span class="ident">macro_name</span>
+                            macro_name
                         )
                     }
-                    <span class="string">&quot;flavor&quot;</span> <span class="op">|</span> <span class="string">&quot;worker_threads&quot;</span> <span class="op">|</span> <span class="string">&quot;start_paused&quot;</span> =&gt; {
-                        <span class="macro">format!</span>(<span class="string">&quot;The `{}` attribute requires an argument.&quot;</span>, <span class="ident">name</span>)
+                    <span class="string">&quot;flavor&quot; </span>| <span class="string">&quot;worker_threads&quot; </span>| <span class="string">&quot;start_paused&quot; </span>=&gt; {
+                        <span class="macro">format!</span>(<span class="string">&quot;The `{}` attribute requires an argument.&quot;</span>, name)
                     }
-                    <span class="ident">name</span> =&gt; {
-                        <span class="macro">format!</span>(<span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`, `crate`&quot;</span>, <span class="ident">name</span>)
+                    name =&gt; {
+                        <span class="macro">format!</span>(<span class="string">&quot;Unknown attribute {} is specified; expected one of: `flavor`, `worker_threads`, `start_paused`, `crate`&quot;</span>, name)
                     }
                 };
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">path</span>, <span class="ident">msg</span>));
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(path, msg));
             }
-            <span class="ident">other</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(
-                    <span class="ident">other</span>,
+            other =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new_spanned(
+                    other,
                     <span class="string">&quot;Unknown attribute inside the macro&quot;</span>,
                 ));
             }
         }
     }
 
-    <span class="ident">config</span>.<span class="ident">build</span>()
+    config.build()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_knobs</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span>, <span class="ident">is_test</span>: <span class="ident">bool</span>, <span class="ident">config</span>: <span class="ident">FinalConfig</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">fn </span>parse_knobs(<span class="kw-2">mut </span>input: syn::ItemFn, is_test: bool, config: FinalConfig) -&gt; TokenStream {
+    input.sig.asyncness = <span class="prelude-val">None</span>;
 
-    <span class="comment">// If type mismatch occurs, the current rustc points to the last statement.</span>
-    <span class="kw">let</span> (<span class="ident">last_stmt_start_span</span>, <span class="ident">last_stmt_end_span</span>) <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_stmt</span> <span class="op">=</span> <span class="ident">input</span>
-            .<span class="ident">block</span>
-            .<span class="ident">stmts</span>
-            .<span class="ident">last</span>()
-            .<span class="ident">map</span>(<span class="ident">ToTokens::into_token_stream</span>)
-            .<span class="ident">unwrap_or_default</span>()
-            .<span class="ident">into_iter</span>();
-        <span class="comment">// `Span` on stable Rust has a limitation that only points to the first</span>
-        <span class="comment">// token, not the whole tokens. We can work around this limitation by</span>
-        <span class="comment">// using the first/last span of the tokens like</span>
-        <span class="comment">// `syn::Error::new_spanned` does.</span>
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">last_stmt</span>.<span class="ident">next</span>().<span class="ident">map_or_else</span>(<span class="ident">Span::call_site</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">span</span>());
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">last_stmt</span>.<span class="ident">last</span>().<span class="ident">map_or</span>(<span class="ident">start</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">span</span>());
-        (<span class="ident">start</span>, <span class="ident">end</span>)
+    <span class="comment">// If type mismatch occurs, the current rustc points to the last statement.
+    </span><span class="kw">let </span>(last_stmt_start_span, last_stmt_end_span) = {
+        <span class="kw">let </span><span class="kw-2">mut </span>last_stmt = input
+            .block
+            .stmts
+            .last()
+            .map(ToTokens::into_token_stream)
+            .unwrap_or_default()
+            .into_iter();
+        <span class="comment">// `Span` on stable Rust has a limitation that only points to the first
+        // token, not the whole tokens. We can work around this limitation by
+        // using the first/last span of the tokens like
+        // `syn::Error::new_spanned` does.
+        </span><span class="kw">let </span>start = last_stmt.next().map_or_else(Span::call_site, |t| t.span());
+        <span class="kw">let </span>end = last_stmt.last().map_or(start, |t| t.span());
+        (start, end)
     };
 
-    <span class="kw">let</span> <span class="ident">crate_name</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">crate_name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;tokio&quot;</span>);
+    <span class="kw">let </span>crate_name = config.crate_name.as_deref().unwrap_or(<span class="string">&quot;tokio&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">crate_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="ident">crate_name</span>, <span class="ident">last_stmt_start_span</span>);
+    <span class="kw">let </span>crate_ident = Ident::new(crate_name, last_stmt_start_span);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">flavor</span> {
-        <span class="ident">RuntimeFlavor::CurrentThread</span> =&gt; <span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_start_span</span>=&gt;
-            #<span class="ident">crate_ident::runtime::Builder::new_current_thread</span>()
+    <span class="kw">let </span><span class="kw-2">mut </span>rt = <span class="kw">match </span>config.flavor {
+        RuntimeFlavor::CurrentThread =&gt; <span class="macro">quote_spanned! </span>{last_stmt_start_span=&gt;
+            #crate_ident::runtime::Builder::new_current_thread()
         },
-        <span class="ident">RuntimeFlavor::Threaded</span> =&gt; <span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_start_span</span>=&gt;
-            #<span class="ident">crate_ident::runtime::Builder::new_multi_thread</span>()
+        RuntimeFlavor::Threaded =&gt; <span class="macro">quote_spanned! </span>{last_stmt_start_span=&gt;
+            #crate_ident::runtime::Builder::new_multi_thread()
         },
     };
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">worker_threads</span> {
-        <span class="ident">rt</span> <span class="op">=</span> <span class="macro">quote!</span> { #<span class="ident">rt</span>.<span class="ident">worker_threads</span>(#<span class="ident">v</span>) };
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = config.worker_threads {
+        rt = <span class="macro">quote! </span>{ #rt.worker_threads(#v) };
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">config</span>.<span class="ident">start_paused</span> {
-        <span class="ident">rt</span> <span class="op">=</span> <span class="macro">quote!</span> { #<span class="ident">rt</span>.<span class="ident">start_paused</span>(#<span class="ident">v</span>) };
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = config.start_paused {
+        rt = <span class="macro">quote! </span>{ #rt.start_paused(#v) };
     }
 
-    <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_test</span> {
-        <span class="macro">quote!</span> {
-            <span class="attribute">#[<span class="ident">::core::prelude::v1::test</span>]</span>
-        }
-    } <span class="kw">else</span> {
-        <span class="macro">quote!</span> {}
+    <span class="kw">let </span>header = <span class="kw">if </span>is_test {
+        <span class="macro">quote! </span>{
+            <span class="attribute">#[::core::prelude::v1::test]
+        </span>}
+    } <span class="kw">else </span>{
+        <span class="macro">quote! </span>{}
     };
 
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">block</span>;
-    <span class="kw">let</span> <span class="ident">brace_token</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">block</span>.<span class="ident">brace_token</span>;
-    <span class="ident">input</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_end_span</span>=&gt;
+    <span class="kw">let </span>body = <span class="kw-2">&amp;</span>input.block;
+    <span class="kw">let </span>brace_token = input.block.brace_token;
+    input.block = syn::parse2(<span class="macro">quote_spanned! </span>{last_stmt_end_span=&gt;
         {
-            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">async</span> #<span class="ident">body</span>;
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::expect_used</span>, <span class="ident">clippy::diverging_sub_expression</span>)]</span>
-            {
-                <span class="kw">return</span> #<span class="ident">rt</span>
-                    .<span class="ident">enable_all</span>()
-                    .<span class="ident">build</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;Failed building the Runtime&quot;</span>)
-                    .<span class="ident">block_on</span>(<span class="ident">body</span>);
+            <span class="kw">let </span>body = <span class="kw">async </span>#body;
+            <span class="attribute">#[allow(clippy::expect_used, clippy::diverging_sub_expression)]
+            </span>{
+                <span class="kw">return </span>#rt
+                    .enable_all()
+                    .build()
+                    .expect(<span class="string">&quot;Failed building the Runtime&quot;</span>)
+                    .block_on(body);
             }
         }
     })
-    .<span class="ident">expect</span>(<span class="string">&quot;Parsing failure&quot;</span>);
-    <span class="ident">input</span>.<span class="ident">block</span>.<span class="ident">brace_token</span> <span class="op">=</span> <span class="ident">brace_token</span>;
+    .expect(<span class="string">&quot;Parsing failure&quot;</span>);
+    input.block.brace_token = brace_token;
 
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        #<span class="ident">header</span>
-        #<span class="ident">input</span>
+    <span class="kw">let </span>result = <span class="macro">quote! </span>{
+        #header
+        #input
     };
 
-    <span class="ident">result</span>.<span class="ident">into</span>()
+    result.into()
 }
 
-<span class="kw">fn</span> <span class="ident">token_stream_with_error</span>(<span class="kw-2">mut</span> <span class="ident">tokens</span>: <span class="ident">TokenStream</span>, <span class="ident">error</span>: <span class="ident">syn::Error</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="ident">TokenStream::from</span>(<span class="ident">error</span>.<span class="ident">into_compile_error</span>()));
-    <span class="ident">tokens</span>
+<span class="kw">fn </span>token_stream_with_error(<span class="kw-2">mut </span>tokens: TokenStream, error: syn::Error) -&gt; TokenStream {
+    tokens.extend(TokenStream::from(error.into_compile_error()));
+    tokens
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">main</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>, <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close</span>
-    <span class="comment">// to the expected output as possible. This helps out IDEs such that completions and other</span>
-    <span class="comment">// related features keep working.</span>
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>.<span class="ident">clone</span>()) {
-        <span class="prelude-val">Ok</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">token_stream_with_error</span>(<span class="ident">item</span>, <span class="ident">e</span>),
+<span class="attribute">#[cfg(not(test))] </span><span class="comment">// Work around for rust-lang/rust#62127
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>main(args: TokenStream, item: TokenStream, rt_multi_thread: bool) -&gt; TokenStream {
+    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close
+    // to the expected output as possible. This helps out IDEs such that completions and other
+    // related features keep working.
+    </span><span class="kw">let </span>input: syn::ItemFn = <span class="kw">match </span>syn::parse(item.clone()) {
+        <span class="prelude-val">Ok</span>(it) =&gt; it,
+        <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span>token_stream_with_error(item, e),
     };
 
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;main&quot;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;the main function cannot accept arguments&quot;</span>;
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>, <span class="ident">msg</span>))
-    } <span class="kw">else</span> {
-        <span class="ident">AttributeArgs::parse_terminated</span>
-            .<span class="ident">parse</span>(<span class="ident">args</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> <span class="ident">build_config</span>(<span class="ident">input</span>.<span class="ident">clone</span>(), <span class="ident">args</span>, <span class="bool-val">false</span>, <span class="ident">rt_multi_thread</span>))
+    <span class="kw">let </span>config = <span class="kw">if </span>input.sig.ident == <span class="string">&quot;main&quot; </span>&amp;&amp; !input.sig.inputs.is_empty() {
+        <span class="kw">let </span>msg = <span class="string">&quot;the main function cannot accept arguments&quot;</span>;
+        <span class="prelude-val">Err</span>(syn::Error::new_spanned(<span class="kw-2">&amp;</span>input.sig.ident, msg))
+    } <span class="kw">else </span>{
+        AttributeArgs::parse_terminated
+            .parse(args)
+            .and_then(|args| build_config(input.clone(), args, <span class="bool-val">false</span>, rt_multi_thread))
     };
 
-    <span class="kw">match</span> <span class="ident">config</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">config</span>) =&gt; <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="ident">config</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">token_stream_with_error</span>(<span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="ident">DEFAULT_ERROR_CONFIG</span>), <span class="ident">e</span>),
+    <span class="kw">match </span>config {
+        <span class="prelude-val">Ok</span>(config) =&gt; parse_knobs(input, <span class="bool-val">false</span>, config),
+        <span class="prelude-val">Err</span>(e) =&gt; token_stream_with_error(parse_knobs(input, <span class="bool-val">false</span>, DEFAULT_ERROR_CONFIG), e),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>, <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close</span>
-    <span class="comment">// to the expected output as possible. This helps out IDEs such that completions and other</span>
-    <span class="comment">// related features keep working.</span>
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>.<span class="ident">clone</span>()) {
-        <span class="prelude-val">Ok</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">token_stream_with_error</span>(<span class="ident">item</span>, <span class="ident">e</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>test(args: TokenStream, item: TokenStream, rt_multi_thread: bool) -&gt; TokenStream {
+    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close
+    // to the expected output as possible. This helps out IDEs such that completions and other
+    // related features keep working.
+    </span><span class="kw">let </span>input: syn::ItemFn = <span class="kw">match </span>syn::parse(item.clone()) {
+        <span class="prelude-val">Ok</span>(it) =&gt; it,
+        <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">return </span>token_stream_with_error(item, e),
     };
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;test&quot;</span>)) {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;second test attribute is supplied&quot;</span>;
-        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>, <span class="ident">msg</span>))
-    } <span class="kw">else</span> {
-        <span class="ident">AttributeArgs::parse_terminated</span>
-            .<span class="ident">parse</span>(<span class="ident">args</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> <span class="ident">build_config</span>(<span class="ident">input</span>.<span class="ident">clone</span>(), <span class="ident">args</span>, <span class="bool-val">true</span>, <span class="ident">rt_multi_thread</span>))
+    <span class="kw">let </span>config = <span class="kw">if let </span><span class="prelude-val">Some</span>(attr) = input.attrs.iter().find(|attr| attr.path.is_ident(<span class="string">&quot;test&quot;</span>)) {
+        <span class="kw">let </span>msg = <span class="string">&quot;second test attribute is supplied&quot;</span>;
+        <span class="prelude-val">Err</span>(syn::Error::new_spanned(<span class="kw-2">&amp;</span>attr, msg))
+    } <span class="kw">else </span>{
+        AttributeArgs::parse_terminated
+            .parse(args)
+            .and_then(|args| build_config(input.clone(), args, <span class="bool-val">true</span>, rt_multi_thread))
     };
 
-    <span class="kw">match</span> <span class="ident">config</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">config</span>) =&gt; <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">true</span>, <span class="ident">config</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">token_stream_with_error</span>(<span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">true</span>, <span class="ident">DEFAULT_ERROR_CONFIG</span>), <span class="ident">e</span>),
+    <span class="kw">match </span>config {
+        <span class="prelude-val">Ok</span>(config) =&gt; parse_knobs(input, <span class="bool-val">true</span>, config),
+        <span class="prelude-val">Err</span>(e) =&gt; token_stream_with_error(parse_knobs(input, <span class="bool-val">true</span>, DEFAULT_ERROR_CONFIG), e),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

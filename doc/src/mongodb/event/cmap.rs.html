@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/cmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/cmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -327,334 +327,334 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality for monitoring behavior of the connection pooling of a</span>
-<span class="doccomment">//! `Client`.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality for monitoring behavior of the connection pooling of a
+//! `Client`.
 
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</span><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bson::oid::ObjectId</span>, <span class="ident">bson_util</span>, <span class="ident">options::ServerAddress</span>};
+<span class="kw">use crate</span>::{bson::oid::ObjectId, bson_util, options::ServerAddress};
 
-<span class="doccomment">/// We implement `Deserialize` for all of the event types so that we can more easily parse the CMAP</span>
-<span class="doccomment">/// spec tests. However, we have no need to parse the address field from the JSON files (if it&#39;s</span>
-<span class="doccomment">/// even present). To facilitate populating the address field with an empty value when</span>
-<span class="doccomment">/// deserializing, we define a private `empty_address` function that the events can specify as the</span>
-<span class="doccomment">/// custom deserialization value for each address field.</span>
-<span class="kw">fn</span> <span class="ident">empty_address</span>() -&gt; <span class="ident">ServerAddress</span> {
-    <span class="ident">ServerAddress::Tcp</span> {
-        <span class="ident">host</span>: <span class="ident">Default::default</span>(),
-        <span class="ident">port</span>: <span class="prelude-val">None</span>,
+<span class="doccomment">/// We implement `Deserialize` for all of the event types so that we can more easily parse the CMAP
+/// spec tests. However, we have no need to parse the address field from the JSON files (if it&#39;s
+/// even present). To facilitate populating the address field with an empty value when
+/// deserializing, we define a private `empty_address` function that the events can specify as the
+/// custom deserialization value for each address field.
+</span><span class="kw">fn </span>empty_address() -&gt; ServerAddress {
+    ServerAddress::Tcp {
+        host: Default::default(),
+        port: <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Event emitted when a connection pool is created.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolCreatedEvent</span> {
-    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection pool is created.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>PoolCreatedEvent {
+    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The options used for the pool.</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The options used for the pool.
+    </span><span class="kw">pub </span>options: <span class="prelude-ty">Option</span>&lt;ConnectionPoolOptions&gt;,
 }
 
-<span class="doccomment">/// Contains the options for creating a connection pool. While these options are specified at the</span>
-<span class="doccomment">/// client-level, `ConnectionPoolOptions` is exposed for the purpose of CMAP event handling.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionPoolOptions</span> {
-    <span class="doccomment">/// Connections that have been ready for usage in the pool for longer than `max_idle_time` will</span>
-    <span class="doccomment">/// not be used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default is that connections will not be closed due to being idle.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;maxIdleTimeMS&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_millis&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">max_idle_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Contains the options for creating a connection pool. While these options are specified at the
+/// client-level, `ConnectionPoolOptions` is exposed for the purpose of CMAP event handling.
+</span><span class="attribute">#[derive(Clone, Default, Deserialize, Debug, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionPoolOptions {
+    <span class="doccomment">/// Connections that have been ready for usage in the pool for longer than `max_idle_time` will
+    /// not be used.
+    ///
+    /// The default is that connections will not be closed due to being idle.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;maxIdleTimeMS&quot;</span>)]
+    #[serde(default)]
+    #[serde(deserialize_with = <span class="string">&quot;bson_util::deserialize_duration_option_from_u64_millis&quot;</span>)]
+    </span><span class="kw">pub </span>max_idle_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 
-    <span class="doccomment">/// The maximum number of connections that the pool can have at a given time. This includes</span>
-    <span class="doccomment">/// connections which are currently checked out of the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default is 100.</span>
-    <span class="kw">pub</span> <span class="ident">max_pool_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The maximum number of connections that the pool can have at a given time. This includes
+    /// connections which are currently checked out of the pool.
+    ///
+    /// The default is 100.
+    </span><span class="kw">pub </span>max_pool_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 
-    <span class="doccomment">/// The minimum number of connections that the pool can have at a given time. This includes</span>
-    <span class="doccomment">/// connections which are currently checked out of the pool. If fewer than `min_pool_size`</span>
-    <span class="doccomment">/// connections are in the pool, connections will be added to the pool in the background.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default is that no minimum is enforced</span>
-    <span class="kw">pub</span> <span class="ident">min_pool_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The minimum number of connections that the pool can have at a given time. This includes
+    /// connections which are currently checked out of the pool. If fewer than `min_pool_size`
+    /// connections are in the pool, connections will be added to the pool in the background.
+    ///
+    /// The default is that no minimum is enforced
+    </span><span class="kw">pub </span>min_pool_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
-<span class="doccomment">/// Event emitted when a connection pool becomes ready.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolReadyEvent</span> {
-    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection pool becomes ready.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>PoolReadyEvent {
+    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 }
 
-<span class="doccomment">/// Event emitted when a connection pool is cleared.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolClearedEvent</span> {
-    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection pool is cleared.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>PoolClearedEvent {
+    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// If the connection is to a load balancer, the id of the selected backend.</span>
-    <span class="kw">pub</span> <span class="ident">service_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If the connection is to a load balancer, the id of the selected backend.
+    </span><span class="kw">pub </span>service_id: <span class="prelude-ty">Option</span>&lt;ObjectId&gt;,
 }
 
-<span class="doccomment">/// Event emitted when a connection pool is cleared.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolClosedEvent</span> {
-    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection pool is cleared.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>PoolClosedEvent {
+    <span class="doccomment">/// The address of the server that the pool&#39;s connections will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 }
 
-<span class="doccomment">/// Event emitted when a connection is created.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionCreatedEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection is created.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionCreatedEvent {
+    <span class="doccomment">/// The address of the server that the connection will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used</span>
-    <span class="doccomment">/// to identify other events related to this connection.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_connection_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used
+    /// to identify other events related to this connection.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;default_connection_id&quot;</span>)]
+    </span><span class="kw">pub </span>connection_id: u32,
 }
 
-<span class="doccomment">/// Event emitted when a connection is ready to be used. This indicates that all the necessary</span>
-<span class="doccomment">/// prerequisites for using a connection (handshake, authentication, etc.) have been completed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionReadyEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection is connected to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection is ready to be used. This indicates that all the necessary
+/// prerequisites for using a connection (handshake, authentication, etc.) have been completed.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionReadyEvent {
+    <span class="doccomment">/// The address of the server that the connection is connected to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used</span>
-    <span class="doccomment">/// to identify other events related to this connection.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_connection_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used
+    /// to identify other events related to this connection.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;default_connection_id&quot;</span>)]
+    </span><span class="kw">pub </span>connection_id: u32,
 }
 
-<span class="doccomment">/// Event emitted when a connection is closed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionClosedEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection was connected to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection is closed.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionClosedEvent {
+    <span class="doccomment">/// The address of the server that the connection was connected to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used</span>
-    <span class="doccomment">/// to identify other events related to this connection.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used
+    /// to identify other events related to this connection.
+    </span><span class="attribute">#[serde(default)]
+    </span><span class="kw">pub </span>connection_id: u32,
 
-    <span class="doccomment">/// The reason that the connection was closed.</span>
-    <span class="kw">pub</span> <span class="ident">reason</span>: <span class="ident">ConnectionClosedReason</span>,
+    <span class="doccomment">/// The reason that the connection was closed.
+    </span><span class="kw">pub </span>reason: ConnectionClosedReason,
 }
 
-<span class="doccomment">/// The reasons that a connection may be closed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionClosedReason</span> {
-    <span class="doccomment">/// The connection pool has been cleared since the connection was created.</span>
-    <span class="ident">Stale</span>,
+<span class="doccomment">/// The reasons that a connection may be closed.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ConnectionClosedReason {
+    <span class="doccomment">/// The connection pool has been cleared since the connection was created.
+    </span>Stale,
 
-    <span class="doccomment">/// The connection has been available for longer than `max_idle_time` without being used.</span>
-    <span class="ident">Idle</span>,
+    <span class="doccomment">/// The connection has been available for longer than `max_idle_time` without being used.
+    </span>Idle,
 
-    <span class="doccomment">/// An error occurred while using the connection.</span>
-    <span class="ident">Error</span>,
+    <span class="doccomment">/// An error occurred while using the connection.
+    </span>Error,
 
-    <span class="doccomment">/// The connection was dropped during read or write.</span>
-    <span class="ident">Dropped</span>,
+    <span class="doccomment">/// The connection was dropped during read or write.
+    </span>Dropped,
 
-    <span class="doccomment">/// The pool that the connection belongs to has been closed.</span>
-    <span class="ident">PoolClosed</span>,
+    <span class="doccomment">/// The pool that the connection belongs to has been closed.
+    </span>PoolClosed,
 }
 
-<span class="doccomment">/// Event emitted when a thread begins checking out a connection to use for an operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionCheckoutStartedEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a thread begins checking out a connection to use for an operation.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionCheckoutStartedEvent {
+    <span class="doccomment">/// The address of the server that the connection will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 }
 
-<span class="doccomment">/// Event emitted when a thread is unable to check out a connection.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionCheckoutFailedEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection would have connected to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a thread is unable to check out a connection.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionCheckoutFailedEvent {
+    <span class="doccomment">/// The address of the server that the connection would have connected to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The reason a connection was unable to be checked out.</span>
-    <span class="kw">pub</span> <span class="ident">reason</span>: <span class="ident">ConnectionCheckoutFailedReason</span>,
+    <span class="doccomment">/// The reason a connection was unable to be checked out.
+    </span><span class="kw">pub </span>reason: ConnectionCheckoutFailedReason,
 }
 
-<span class="doccomment">/// The reasons a connection may not be able to be checked out.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionCheckoutFailedReason</span> {
-    <span class="doccomment">/// The `wait_queue_timeout` has elapsed while waiting for a connection to be available.</span>
-    <span class="ident">Timeout</span>,
+<span class="doccomment">/// The reasons a connection may not be able to be checked out.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ConnectionCheckoutFailedReason {
+    <span class="doccomment">/// The `wait_queue_timeout` has elapsed while waiting for a connection to be available.
+    </span>Timeout,
 
-    <span class="doccomment">/// An error occurred while trying to establish a connection (e.g. during the handshake or</span>
-    <span class="doccomment">/// authentication).</span>
-    <span class="ident">ConnectionError</span>,
+    <span class="doccomment">/// An error occurred while trying to establish a connection (e.g. during the handshake or
+    /// authentication).
+    </span>ConnectionError,
 }
 
-<span class="doccomment">/// Event emitted when a connection is successfully checked out.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionCheckedOutEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection will connect to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection is successfully checked out.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionCheckedOutEvent {
+    <span class="doccomment">/// The address of the server that the connection will connect to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used</span>
-    <span class="doccomment">/// to identify other events related to this connection.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_connection_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used
+    /// to identify other events related to this connection.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;default_connection_id&quot;</span>)]
+    </span><span class="kw">pub </span>connection_id: u32,
 }
 
-<span class="doccomment">/// Event emitted when a connection is checked back into a connection pool.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionCheckedInEvent</span> {
-    <span class="doccomment">/// The address of the server that the connection was connected to.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;self::empty_address&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_deserializing</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Event emitted when a connection is checked back into a connection pool.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ConnectionCheckedInEvent {
+    <span class="doccomment">/// The address of the server that the connection was connected to.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;self::empty_address&quot;</span>)]
+    #[serde(skip_deserializing)]
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used</span>
-    <span class="doccomment">/// to identify other events related to this connection.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_connection_id&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">connection_id</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The unique ID of the connection. This is not used for anything internally, but can be used
+    /// to identify other events related to this connection.
+    </span><span class="attribute">#[serde(default = <span class="string">&quot;default_connection_id&quot;</span>)]
+    </span><span class="kw">pub </span>connection_id: u32,
 }
 
-<span class="doccomment">/// The default connection ID to use for deserialization of events from test files.</span>
-<span class="doccomment">/// This value will &quot;match&quot; any connection ID.</span>
-<span class="kw">fn</span> <span class="ident">default_connection_id</span>() -&gt; <span class="ident">u32</span> {
-    <span class="number">42</span>
-}
+<span class="doccomment">/// The default connection ID to use for deserialization of events from test files.
+/// This value will &quot;match&quot; any connection ID.
+</span><span class="kw">fn </span>default_connection_id() -&gt; u32 {
+    <span class="number">42
+</span>}
 
-<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each CMAP event sent</span>
-<span class="doccomment">/// by the driver.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # use mongodb::{</span>
-<span class="doccomment">/// #     error::Result,</span>
-<span class="doccomment">/// #     event::cmap::{</span>
-<span class="doccomment">/// #         CmapEventHandler,</span>
-<span class="doccomment">/// #         ConnectionCheckoutFailedEvent</span>
-<span class="doccomment">/// #     },</span>
-<span class="doccomment">/// #     options::ClientOptions,</span>
-<span class="doccomment">/// # };</span>
-<span class="doccomment">/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]</span>
-<span class="doccomment">/// # use mongodb::sync::Client;</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use mongodb::Client;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// struct FailedCheckoutLogger;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl CmapEventHandler for FailedCheckoutLogger {</span>
-<span class="doccomment">///     fn handle_connection_checkout_failed_event(&amp;self, event: ConnectionCheckoutFailedEvent) {</span>
-<span class="doccomment">///         eprintln!(&quot;Failed connection checkout: {:?}&quot;, event);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// let handler: Arc&lt;dyn CmapEventHandler&gt; = Arc::new(FailedCheckoutLogger);</span>
-<span class="doccomment">/// let options = ClientOptions::builder()</span>
-<span class="doccomment">///                   .cmap_event_handler(handler)</span>
-<span class="doccomment">///                   .build();</span>
-<span class="doccomment">/// let client = Client::with_options(options)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Do things with the client, and failed connection pool checkouts will be logged to stderr.</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CmapEventHandler</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection pool is created.</span>
-    <span class="kw">fn</span> <span class="ident">handle_pool_created_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">PoolCreatedEvent</span>) {}
+<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each CMAP event sent
+/// by the driver.
+///
+/// ```rust
+/// # use std::sync::Arc;
+/// #
+/// # use mongodb::{
+/// #     error::Result,
+/// #     event::cmap::{
+/// #         CmapEventHandler,
+/// #         ConnectionCheckoutFailedEvent
+/// #     },
+/// #     options::ClientOptions,
+/// # };
+/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]
+/// # use mongodb::sync::Client;
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use mongodb::Client;
+/// #
+/// struct FailedCheckoutLogger;
+///
+/// impl CmapEventHandler for FailedCheckoutLogger {
+///     fn handle_connection_checkout_failed_event(&amp;self, event: ConnectionCheckoutFailedEvent) {
+///         eprintln!(&quot;Failed connection checkout: {:?}&quot;, event);
+///     }
+/// }
+///
+/// # fn do_stuff() -&gt; Result&lt;()&gt; {
+/// let handler: Arc&lt;dyn CmapEventHandler&gt; = Arc::new(FailedCheckoutLogger);
+/// let options = ClientOptions::builder()
+///                   .cmap_event_handler(handler)
+///                   .build();
+/// let client = Client::with_options(options)?;
+///
+/// // Do things with the client, and failed connection pool checkouts will be logged to stderr.
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="kw">pub trait </span>CmapEventHandler: Send + Sync {
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection pool is created.
+    </span><span class="kw">fn </span>handle_pool_created_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: PoolCreatedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection pool marked as ready for use.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Connections may not be created by or checked out from the pool until it has been marked as</span>
-    <span class="doccomment">/// ready.</span>
-    <span class="kw">fn</span> <span class="ident">handle_pool_ready_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">PoolReadyEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection pool marked as ready for use.
+    ///
+    /// Connections may not be created by or checked out from the pool until it has been marked as
+    /// ready.
+    </span><span class="kw">fn </span>handle_pool_ready_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: PoolReadyEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection pool is cleared.</span>
-    <span class="kw">fn</span> <span class="ident">handle_pool_cleared_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">PoolClearedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection pool is cleared.
+    </span><span class="kw">fn </span>handle_pool_cleared_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: PoolClearedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection pool is cleared.</span>
-    <span class="kw">fn</span> <span class="ident">handle_pool_closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">PoolClosedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection pool is cleared.
+    </span><span class="kw">fn </span>handle_pool_closed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: PoolClosedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection is created.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_created_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionCreatedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection is created.
+    </span><span class="kw">fn </span>handle_connection_created_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionCreatedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection is ready to be used.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_ready_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionReadyEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection is ready to be used.
+    </span><span class="kw">fn </span>handle_connection_ready_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionReadyEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection is closed.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionClosedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection is closed.
+    </span><span class="kw">fn </span>handle_connection_closed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionClosedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a thread begins checking out a connection to use for an operation.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_checkout_started_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionCheckoutStartedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a thread begins checking out a connection to use for an operation.
+    </span><span class="kw">fn </span>handle_connection_checkout_started_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionCheckoutStartedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a thread is unable to check out a connection.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_checkout_failed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionCheckoutFailedEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a thread is unable to check out a connection.
+    </span><span class="kw">fn </span>handle_connection_checkout_failed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionCheckoutFailedEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection is successfully checked out.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_checked_out_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionCheckedOutEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection is successfully checked out.
+    </span><span class="kw">fn </span>handle_connection_checked_out_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionCheckedOutEvent) {}
 
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler</span>
-    <span class="doccomment">/// whenever a connection is checked back into a connection pool.</span>
-    <span class="kw">fn</span> <span class="ident">handle_connection_checked_in_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ConnectionCheckedInEvent</span>) {}
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler
+    /// whenever a connection is checked back into a connection pool.
+    </span><span class="kw">fn </span>handle_connection_checked_in_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ConnectionCheckedInEvent) {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

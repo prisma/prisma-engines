@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/datetime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/datetime/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -185,192 +185,192 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">time::Date</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>time::Date;
 
-<span class="doccomment">/// Builder for constructing a BSON [`DateTime`]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span> <span class="op">=</span> <span class="ident">NoYear</span>, <span class="ident">M</span> <span class="op">=</span> <span class="ident">NoMonth</span>, <span class="ident">D</span> <span class="op">=</span> <span class="ident">NoDay</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">year</span>: <span class="ident">Y</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">month</span>: <span class="ident">M</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">day</span>: <span class="ident">D</span>,
+<span class="doccomment">/// Builder for constructing a BSON [`DateTime`]
+</span><span class="kw">pub struct </span>DateTimeBuilder&lt;Y = NoYear, M = NoMonth, D = NoDay&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) year: Y,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) month: M,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) day: D,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hour</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">minute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">second</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">millisecond</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) hour: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) minute: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) second: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) millisecond: <span class="prelude-ty">Option</span>&lt;u16&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DateTimeBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">year</span>: <span class="ident">NoYear</span>,
-            <span class="ident">month</span>: <span class="ident">NoMonth</span>,
-            <span class="ident">day</span>: <span class="ident">NoDay</span>,
-            <span class="ident">hour</span>: <span class="prelude-val">None</span>,
-            <span class="ident">minute</span>: <span class="prelude-val">None</span>,
-            <span class="ident">second</span>: <span class="prelude-val">None</span>,
-            <span class="ident">millisecond</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>DateTimeBuilder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            year: NoYear,
+            month: NoMonth,
+            day: NoDay,
+            hour: <span class="prelude-val">None</span>,
+            minute: <span class="prelude-val">None</span>,
+            second: <span class="prelude-val">None</span>,
+            millisecond: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Year</span>(<span class="ident">i32</span>);
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoYear</span>;
+<span class="kw">pub struct </span>Year(i32);
+<span class="kw">pub struct </span>NoYear;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Month</span>(<span class="ident">u8</span>);
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoMonth</span>;
+<span class="kw">pub struct </span>Month(u8);
+<span class="kw">pub struct </span>NoMonth;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Day</span>(<span class="ident">u8</span>);
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoDay</span>;
+<span class="kw">pub struct </span>Day(u8);
+<span class="kw">pub struct </span>NoDay;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">NoYear</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets the year for the builder instance. Years between ±9999 inclusive are valid.</span>
-    <span class="doccomment">/// If the specified value is out of range, calling the `build()` method will return</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is a required method. You will not be able to call `build()` before calling</span>
-    <span class="doccomment">/// this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">year</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="ident">i32</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Year</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">year</span>: <span class="kw">_</span>,
-            <span class="ident">month</span>,
-            <span class="ident">day</span>,
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
-        } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">DateTimeBuilder</span> {
-            <span class="ident">year</span>: <span class="ident">Year</span>(<span class="ident">y</span>),
-            <span class="ident">month</span>,
-            <span class="ident">day</span>,
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
+<span class="kw">impl</span>&lt;M, D&gt; DateTimeBuilder&lt;NoYear, M, D&gt; {
+    <span class="doccomment">/// Sets the year for the builder instance. Years between ±9999 inclusive are valid.
+    /// If the specified value is out of range, calling the `build()` method will return
+    /// an error.
+    ///
+    /// Note: This is a required method. You will not be able to call `build()` before calling
+    /// this method.
+    </span><span class="kw">pub fn </span>year(<span class="self">self</span>, y: i32) -&gt; DateTimeBuilder&lt;Year, M, D&gt; {
+        <span class="kw">let </span><span class="self">Self </span>{
+            year: <span class="kw">_</span>,
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            millisecond,
+        } = <span class="self">self</span>;
+        DateTimeBuilder {
+            year: Year(y),
+            month,
+            day,
+            hour,
+            minute,
+            second,
+            millisecond,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">NoMonth</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets the month for the builder instance. Maps months as 1-January to 12-December.</span>
-    <span class="doccomment">/// If the specified value is out of range, calling the `build()` method will return</span>
-    <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is a required method. You will not be able to call `build()` before calling</span>
-    <span class="doccomment">/// this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">month</span>(<span class="self">self</span>, <span class="ident">m</span>: <span class="ident">u8</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">Month</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">year</span>,
-            <span class="ident">month</span>: <span class="kw">_</span>,
-            <span class="ident">day</span>,
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
-        } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">DateTimeBuilder</span> {
-            <span class="ident">year</span>,
-            <span class="ident">month</span>: <span class="ident">Month</span>(<span class="ident">m</span>),
-            <span class="ident">day</span>,
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
+<span class="kw">impl</span>&lt;Y, D&gt; DateTimeBuilder&lt;Y, NoMonth, D&gt; {
+    <span class="doccomment">/// Sets the month for the builder instance. Maps months as 1-January to 12-December.
+    /// If the specified value is out of range, calling the `build()` method will return
+    /// an error.
+    ///
+    /// Note: This is a required method. You will not be able to call `build()` before calling
+    /// this method.
+    </span><span class="kw">pub fn </span>month(<span class="self">self</span>, m: u8) -&gt; DateTimeBuilder&lt;Y, Month, D&gt; {
+        <span class="kw">let </span><span class="self">Self </span>{
+            year,
+            month: <span class="kw">_</span>,
+            day,
+            hour,
+            minute,
+            second,
+            millisecond,
+        } = <span class="self">self</span>;
+        DateTimeBuilder {
+            year,
+            month: Month(m),
+            day,
+            hour,
+            minute,
+            second,
+            millisecond,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span><span class="op">&gt;</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">NoDay</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets the day for the builder instance. Values in the range `1..=31` are valid.</span>
-    <span class="doccomment">/// If the specified value does not exist for the provided month/year or is out of range,</span>
-    <span class="doccomment">/// calling the `build()` method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is a required method. You will not be able to call `build()` before calling</span>
-    <span class="doccomment">/// this method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">day</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">u8</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">Day</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="self">Self</span> {
-            <span class="ident">year</span>,
-            <span class="ident">month</span>,
-            <span class="ident">day</span>: <span class="kw">_</span>,
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
-        } <span class="op">=</span> <span class="self">self</span>;
-        <span class="ident">DateTimeBuilder</span> {
-            <span class="ident">year</span>,
-            <span class="ident">month</span>,
-            <span class="ident">day</span>: <span class="ident">Day</span>(<span class="ident">d</span>),
-            <span class="ident">hour</span>,
-            <span class="ident">minute</span>,
-            <span class="ident">second</span>,
-            <span class="ident">millisecond</span>,
+<span class="kw">impl</span>&lt;Y, M&gt; DateTimeBuilder&lt;Y, M, NoDay&gt; {
+    <span class="doccomment">/// Sets the day for the builder instance. Values in the range `1..=31` are valid.
+    /// If the specified value does not exist for the provided month/year or is out of range,
+    /// calling the `build()` method will return an error.
+    ///
+    /// Note: This is a required method. You will not be able to call `build()` before calling
+    /// this method.
+    </span><span class="kw">pub fn </span>day(<span class="self">self</span>, d: u8) -&gt; DateTimeBuilder&lt;Y, M, Day&gt; {
+        <span class="kw">let </span><span class="self">Self </span>{
+            year,
+            month,
+            day: <span class="kw">_</span>,
+            hour,
+            minute,
+            second,
+            millisecond,
+        } = <span class="self">self</span>;
+        DateTimeBuilder {
+            year,
+            month,
+            day: Day(d),
+            hour,
+            minute,
+            second,
+            millisecond,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets the hour (24-hour format) for the builder instance. Values must be in the range</span>
-    <span class="doccomment">/// `0..=23`. If the specified value is out of range, calling the `build()` method will</span>
-    <span class="doccomment">/// return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is an optional method. The hour will default to 0 if not explicitly set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hour</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u8</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">hour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">hour</span>);
-        <span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;Y, M, D&gt; DateTimeBuilder&lt;Y, M, D&gt; {
+    <span class="doccomment">/// Sets the hour (24-hour format) for the builder instance. Values must be in the range
+    /// `0..=23`. If the specified value is out of range, calling the `build()` method will
+    /// return an error.
+    ///
+    /// Note: This is an optional method. The hour will default to 0 if not explicitly set.
+    </span><span class="kw">pub fn </span>hour(<span class="kw-2">mut </span><span class="self">self</span>, hour: u8) -&gt; DateTimeBuilder&lt;Y, M, D&gt; {
+        <span class="self">self</span>.hour = <span class="prelude-val">Some</span>(hour);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the minute for the builder instance. Values must be in the range `0..=59`.</span>
-    <span class="doccomment">/// If the specified value is out of range, calling the `build()` method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is an optional method. The minute will default to 0 if not explicitly set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">minute</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">minute</span>: <span class="ident">u8</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">minute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">minute</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the minute for the builder instance. Values must be in the range `0..=59`.
+    /// If the specified value is out of range, calling the `build()` method will return an error.
+    ///
+    /// Note: This is an optional method. The minute will default to 0 if not explicitly set.
+    </span><span class="kw">pub fn </span>minute(<span class="kw-2">mut </span><span class="self">self</span>, minute: u8) -&gt; DateTimeBuilder&lt;Y, M, D&gt; {
+        <span class="self">self</span>.minute = <span class="prelude-val">Some</span>(minute);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the second for the builder instance. Values must be in range `0..=59`.</span>
-    <span class="doccomment">/// If the specified value is out of range, calling the `build()` method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is an optional method. The second will default to 0 if not explicitly set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">second</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">second</span>: <span class="ident">u8</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">second</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">second</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the second for the builder instance. Values must be in range `0..=59`.
+    /// If the specified value is out of range, calling the `build()` method will return an error.
+    ///
+    /// Note: This is an optional method. The second will default to 0 if not explicitly set.
+    </span><span class="kw">pub fn </span>second(<span class="kw-2">mut </span><span class="self">self</span>, second: u8) -&gt; DateTimeBuilder&lt;Y, M, D&gt; {
+        <span class="self">self</span>.second = <span class="prelude-val">Some</span>(second);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the millisecond for the builder instance. Values must be in the range `0..=999`.</span>
-    <span class="doccomment">/// If the specified value is out of range, calling the `build()` method will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: This is an optional method. The millisecond will default to 0 if not explicitly set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">millisecond</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">millisecond</span>: <span class="ident">u16</span>) -&gt; <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Y</span>, <span class="ident">M</span>, <span class="ident">D</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">millisecond</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">millisecond</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the millisecond for the builder instance. Values must be in the range `0..=999`.
+    /// If the specified value is out of range, calling the `build()` method will return an error.
+    ///
+    /// Note: This is an optional method. The millisecond will default to 0 if not explicitly set.
+    </span><span class="kw">pub fn </span>millisecond(<span class="kw-2">mut </span><span class="self">self</span>, millisecond: u16) -&gt; DateTimeBuilder&lt;Y, M, D&gt; {
+        <span class="self">self</span>.millisecond = <span class="prelude-val">Some</span>(millisecond);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">DateTimeBuilder</span><span class="op">&lt;</span><span class="ident">Year</span>, <span class="ident">Month</span>, <span class="ident">Day</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert a builder with a specified year, month, day, and optionally, an hour, minute, second</span>
-    <span class="doccomment">/// and millisecond to a [`DateTime`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: You cannot call `build()` before setting at least the year, month and day.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="op">|</span><span class="ident">e</span>: <span class="ident">time::error::ComponentRange</span><span class="op">|</span> <span class="ident">Error::InvalidTimestamp</span> {
-            <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+<span class="kw">impl </span>DateTimeBuilder&lt;Year, Month, Day&gt; {
+    <span class="doccomment">/// Convert a builder with a specified year, month, day, and optionally, an hour, minute, second
+    /// and millisecond to a [`DateTime`].
+    ///
+    /// Note: You cannot call `build()` before setting at least the year, month and day.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime&gt; {
+        <span class="kw">let </span>err = |e: time::error::ComponentRange| Error::InvalidTimestamp {
+            message: e.to_string(),
         };
-        <span class="kw">let</span> <span class="ident">month</span> <span class="op">=</span> <span class="ident">time::Month::try_from</span>(<span class="self">self</span>.<span class="ident">month</span>.<span class="number">0</span>).<span class="ident">map_err</span>(<span class="ident">err</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">Date::from_calendar_date</span>(<span class="self">self</span>.<span class="ident">year</span>.<span class="number">0</span>, <span class="ident">month</span>, <span class="self">self</span>.<span class="ident">day</span>.<span class="number">0</span>)
-            .<span class="ident">map_err</span>(<span class="ident">err</span>)<span class="question-mark">?</span>
-            .<span class="ident">with_hms_milli</span>(
-                <span class="self">self</span>.<span class="ident">hour</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                <span class="self">self</span>.<span class="ident">minute</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                <span class="self">self</span>.<span class="ident">second</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                <span class="self">self</span>.<span class="ident">millisecond</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+        <span class="kw">let </span>month = time::Month::try_from(<span class="self">self</span>.month.<span class="number">0</span>).map_err(err)<span class="question-mark">?</span>;
+        <span class="kw">let </span>dt = Date::from_calendar_date(<span class="self">self</span>.year.<span class="number">0</span>, month, <span class="self">self</span>.day.<span class="number">0</span>)
+            .map_err(err)<span class="question-mark">?
+            </span>.with_hms_milli(
+                <span class="self">self</span>.hour.unwrap_or(<span class="number">0</span>),
+                <span class="self">self</span>.minute.unwrap_or(<span class="number">0</span>),
+                <span class="self">self</span>.second.unwrap_or(<span class="number">0</span>),
+                <span class="self">self</span>.millisecond.unwrap_or(<span class="number">0</span>),
             )
-            .<span class="ident">map_err</span>(<span class="ident">err</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">DateTime::from_time_private</span>(<span class="ident">dt</span>.<span class="ident">assume_utc</span>()))
+            .map_err(err)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(DateTime::from_time_private(dt.assume_utc()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

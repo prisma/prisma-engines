@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -365,372 +365,372 @@
 <span id="365">365</span>
 <span id="366">366</span>
 <span id="367">367</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This crate contains the officially supported MongoDB Rust driver, a</span>
-<span class="doccomment">//! client side library that can be used to interact with MongoDB deployments</span>
-<span class="doccomment">//! in Rust applications. It uses the [`bson`] crate for BSON support.</span>
-<span class="doccomment">//! The driver contains a fully async API that supports either [`tokio`] (default)</span>
-<span class="doccomment">//! or [`async-std`](https://docs.rs/async_std), depending on the feature flags set. The driver also has</span>
-<span class="doccomment">//! a sync API that may be enabled via the `&quot;sync&quot;` feature flag.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Installation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Requirements</span>
-<span class="doccomment">//! - Rust 1.53+</span>
-<span class="doccomment">//! - MongoDB 3.6+</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Importing</span>
-<span class="doccomment">//! The driver is available on [crates.io](https://crates.io/crates/mongodb). To use the driver in</span>
-<span class="doccomment">//! your application, simply add it to your project&#39;s `Cargo.toml`.</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! mongodb = &quot;2.3.0&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Configuring the async runtime</span>
-<span class="doccomment">//! The driver supports both of the most popular async runtime crates, namely</span>
-<span class="doccomment">//! [`tokio`](https://crates.io/crates/tokio) and [`async-std`](https://crates.io/crates/async-std). By</span>
-<span class="doccomment">//! default, the driver will use [`tokio`](https://crates.io/crates/tokio), but you can explicitly choose</span>
-<span class="doccomment">//! a runtime by specifying one of `&quot;tokio-runtime&quot;` or `&quot;async-std-runtime&quot;` feature flags in your</span>
-<span class="doccomment">//! `Cargo.toml`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, to instruct the driver to work with [`async-std`](https://crates.io/crates/async-std),</span>
-<span class="doccomment">//! add the following to your `Cargo.toml`:</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.mongodb]</span>
-<span class="doccomment">//! version = &quot;2.3.0&quot;</span>
-<span class="doccomment">//! default-features = false</span>
-<span class="doccomment">//! features = [&quot;async-std-runtime&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Enabling the sync API</span>
-<span class="doccomment">//! The driver also provides a blocking sync API. To enable this, add the `&quot;sync&quot;` or `&quot;tokio-sync&quot;`</span>
-<span class="doccomment">//! feature to your `Cargo.toml`:</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies.mongodb]</span>
-<span class="doccomment">//! version = &quot;2.3.0&quot;</span>
-<span class="doccomment">//! features = [&quot;tokio-sync&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! Using the `&quot;sync&quot;` feature also requires using `default-features = false`.</span>
-<span class="doccomment">//! **Note:** The sync-specific types can be imported from `mongodb::sync` (e.g.</span>
-<span class="doccomment">//! `mongodb::sync::Client`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### All Feature flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature              | Description                                                                                                                           | Extra dependencies                  | Default |</span>
-<span class="doccomment">//! |:---------------------|:--------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------|:--------|</span>
-<span class="doccomment">//! | `tokio-runtime`      | Enable support for the `tokio` async runtime                                                                                          | `tokio` 1.0 with the `full` feature | yes     |</span>
-<span class="doccomment">//! | `async-std-runtime`  | Enable support for the `async-std` runtime                                                                                            | `async-std` 1.0                     | no      |</span>
-<span class="doccomment">//! | `sync`               | Expose the synchronous API (`mongodb::sync`), using an async-std backend. Cannot be used with the `tokio-runtime` feature flag.       | `async-std` 1.0                     | no      |</span>
-<span class="doccomment">//! | `tokio-sync`         | Expose the synchronous API (`mongodb::sync`), using a tokio backend. Cannot be used with the `async-std-runtime` feature flag.        | `tokio` 1.0 with the `full` feature | no      |</span>
-<span class="doccomment">//! | `aws-auth`           | Enable support for the MONGODB-AWS authentication mechanism.                                                                          | `reqwest` 0.11                      | no      |</span>
-<span class="doccomment">//! | `bson-uuid-0_8`      | Enable support for v0.8 of the [`uuid`](docs.rs/uuid/0.8) crate in the public API of the re-exported `bson` crate.                    | n/a                                 | no      |</span>
-<span class="doccomment">//! | `bson-chrono-0_4`    | Enable support for v0.4 of the [`chrono`](docs.rs/chrono/0.4) crate in the public API of the re-exported `bson` crate.                | n/a                                 | no      |</span>
-<span class="doccomment">//! | `bson-serde_with`    | Enable support for the [`serde_with`](docs.rs/serde_with/latest) crate in the public API of the re-exported `bson` crate.             | `serde_with` 1.0                    | no      |</span>
-<span class="doccomment">//! | `zlib-compression`   | Enable support for compressing messages with [`zlib`](https://zlib.net/)                                                              | `flate2` 1.0                        | no      |</span>
-<span class="doccomment">//! | `zstd-compression`   | Enable support for compressing messages with [`zstd`](http://facebook.github.io/zstd/).  This flag requires Rust version 1.54.        | `zstd` 0.9.0                        | no      |</span>
-<span class="doccomment">//! | `snappy-compression` | Enable support for compressing messages with [`snappy`](http://google.github.io/snappy/)                                              | `snap` 1.0.5                        | no      |</span>
-<span class="doccomment">//! | `openssl-tls`        | Switch TLS connection handling to use [&#39;openssl&#39;](https://docs.rs/openssl/0.10.38/).                                                  | `openssl` 0.10.38                   | no      |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Using the async API</span>
-<span class="doccomment">//! ### Connecting to a MongoDB deployment</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {</span>
-<span class="doccomment">//! use mongodb::{Client, options::ClientOptions};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Parse a connection string into an options struct.</span>
-<span class="doccomment">//! let mut client_options = ClientOptions::parse(&quot;mongodb://localhost:27017&quot;).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Manually set an option.</span>
-<span class="doccomment">//! client_options.app_name = Some(&quot;My App&quot;.to_string());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a handle to the deployment.</span>
-<span class="doccomment">//! let client = Client::with_options(client_options)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // List the names of the databases in that deployment.</span>
-<span class="doccomment">//! for db_name in client.list_database_names(None, None).await? {</span>
-<span class="doccomment">//!     println!(&quot;{}&quot;, db_name);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! ### Getting a handle to a database</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {</span>
-<span class="doccomment">//! # let client = mongodb::Client::with_uri_str(&quot;&quot;).await?;</span>
-<span class="doccomment">//! // Get a handle to a database.</span>
-<span class="doccomment">//! let db = client.database(&quot;mydb&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // List the names of the collections in that database.</span>
-<span class="doccomment">//! for collection_name in db.list_collection_names(None).await? {</span>
-<span class="doccomment">//!     println!(&quot;{}&quot;, collection_name);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! ### Inserting documents into a collection</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {</span>
-<span class="doccomment">//! # let db = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;);</span>
-<span class="doccomment">//! use mongodb::bson::{doc, Document};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a handle to a collection in the database.</span>
-<span class="doccomment">//! let collection = db.collection::&lt;Document&gt;(&quot;books&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let docs = vec![</span>
-<span class="doccomment">//!     doc! { &quot;title&quot;: &quot;1984&quot;, &quot;author&quot;: &quot;George Orwell&quot; },</span>
-<span class="doccomment">//!     doc! { &quot;title&quot;: &quot;Animal Farm&quot;, &quot;author&quot;: &quot;George Orwell&quot; },</span>
-<span class="doccomment">//!     doc! { &quot;title&quot;: &quot;The Great Gatsby&quot;, &quot;author&quot;: &quot;F. Scott Fitzgerald&quot; },</span>
-<span class="doccomment">//! ];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Insert some documents into the &quot;mydb.books&quot; collection.</span>
-<span class="doccomment">//! collection.insert_many(docs, None).await?;</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A [`Collection`](struct.Collection.html) can be parameterized with any type that implements the</span>
-<span class="doccomment">//! `Serialize` and `Deserialize` traits from the [`serde`](https://serde.rs/) crate,</span>
-<span class="doccomment">//! not just `Document`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! # In Cargo.toml, add the following dependency.</span>
-<span class="doccomment">//! serde = { version = &quot;1.0&quot;, features = [&quot;derive&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {</span>
-<span class="doccomment">//! # let db = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;);</span>
-<span class="doccomment">//! use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, Serialize, Deserialize)]</span>
-<span class="doccomment">//! struct Book {</span>
-<span class="doccomment">//!     title: String,</span>
-<span class="doccomment">//!     author: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a handle to a collection of `Book`.</span>
-<span class="doccomment">//! let typed_collection = db.collection::&lt;Book&gt;(&quot;books&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let books = vec![</span>
-<span class="doccomment">//!     Book {</span>
-<span class="doccomment">//!         title: &quot;The Grapes of Wrath&quot;.to_string(),</span>
-<span class="doccomment">//!         author: &quot;John Steinbeck&quot;.to_string(),</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Book {</span>
-<span class="doccomment">//!         title: &quot;To Kill a Mockingbird&quot;.to_string(),</span>
-<span class="doccomment">//!         author: &quot;Harper Lee&quot;.to_string(),</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//! ];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Insert the books into &quot;mydb.books&quot; collection, no manual conversion to BSON necessary.</span>
-<span class="doccomment">//! typed_collection.insert_many(books, None).await?;</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Finding documents in a collection</span>
-<span class="doccomment">//! Results from queries are generally returned via [`Cursor`](struct.Cursor.html), a struct which streams</span>
-<span class="doccomment">//! the results back from the server as requested. The [`Cursor`](struct.Cursor.html) type implements the</span>
-<span class="doccomment">//! [`Stream`](https://docs.rs/futures/latest/futures/stream/trait.Stream.html) trait from</span>
-<span class="doccomment">//! the [`futures`](https://crates.io/crates/futures) crate, and in order to access its streaming</span>
-<span class="doccomment">//! functionality you need to import at least one of the</span>
-<span class="doccomment">//! [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html) or</span>
-<span class="doccomment">//! [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html) traits.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! # In Cargo.toml, add the following dependency.</span>
-<span class="doccomment">//! futures = &quot;0.3&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # use serde::Deserialize;</span>
-<span class="doccomment">//! # #[derive(Deserialize)]</span>
-<span class="doccomment">//! # struct Book { title: String }</span>
-<span class="doccomment">//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {</span>
-<span class="doccomment">//! # let typed_collection = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;).collection::&lt;Book&gt;(&quot;&quot;);</span>
-<span class="doccomment">//! // This trait is required to use `try_next()` on the cursor</span>
-<span class="doccomment">//! use futures::stream::TryStreamExt;</span>
-<span class="doccomment">//! use mongodb::{bson::doc, options::FindOptions};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Query the books in the collection with a filter and an option.</span>
-<span class="doccomment">//! let filter = doc! { &quot;author&quot;: &quot;George Orwell&quot; };</span>
-<span class="doccomment">//! let find_options = FindOptions::builder().sort(doc! { &quot;title&quot;: 1 }).build();</span>
-<span class="doccomment">//! let mut cursor = typed_collection.find(filter, find_options).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Iterate over the results of the cursor.</span>
-<span class="doccomment">//! while let Some(book) = cursor.try_next().await? {</span>
-<span class="doccomment">//!     println!(&quot;title: {}&quot;, book.title);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # Ok(()) }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Using the sync API</span>
-<span class="doccomment">//! The driver also provides a blocking sync API. See the [Installation](#enabling-the-sync-api)</span>
-<span class="doccomment">//! section for instructions on how to enable it.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The various sync-specific types are found in the `mongodb::sync` submodule rather than in the</span>
-<span class="doccomment">//! crate&#39;s top level like in the async API. The sync API calls through to the async API internally</span>
-<span class="doccomment">//! though, so it looks and behaves similarly to it.</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use mongodb::{</span>
-<span class="doccomment">//!     bson::doc,</span>
-<span class="doccomment">//!     sync::Client,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//! use serde::{Deserialize, Serialize};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, Serialize, Deserialize)]</span>
-<span class="doccomment">//! struct Book {</span>
-<span class="doccomment">//!     title: String,</span>
-<span class="doccomment">//!     author: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;)?;</span>
-<span class="doccomment">//! let database = client.database(&quot;mydb&quot;);</span>
-<span class="doccomment">//! let collection = database.collection::&lt;Book&gt;(&quot;books&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let docs = vec![</span>
-<span class="doccomment">//!     Book {</span>
-<span class="doccomment">//!         title: &quot;1984&quot;.to_string(),</span>
-<span class="doccomment">//!         author: &quot;George Orwell&quot;.to_string(),</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Book {</span>
-<span class="doccomment">//!         title: &quot;Animal Farm&quot;.to_string(),</span>
-<span class="doccomment">//!         author: &quot;George Orwell&quot;.to_string(),</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//!     Book {</span>
-<span class="doccomment">//!         title: &quot;The Great Gatsby&quot;.to_string(),</span>
-<span class="doccomment">//!         author: &quot;F. Scott Fitzgerald&quot;.to_string(),</span>
-<span class="doccomment">//!     },</span>
-<span class="doccomment">//! ];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Insert some books into the &quot;mydb.books&quot; collection.</span>
-<span class="doccomment">//! collection.insert_many(docs, None)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let cursor = collection.find(doc! { &quot;author&quot;: &quot;George Orwell&quot; }, None)?;</span>
-<span class="doccomment">//! for result in cursor {</span>
-<span class="doccomment">//!     println!(&quot;title: {}&quot;, result?.title);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Warning about timeouts / cancellation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In async Rust, it is common to implement cancellation and timeouts by dropping a future after a</span>
-<span class="doccomment">//! certain period of time instead of polling it to completion. This is how</span>
-<span class="doccomment">//! [`tokio::time::timeout`](https://docs.rs/tokio/1.10.1/tokio/time/fn.timeout.html) works, for</span>
-<span class="doccomment">//! example. However, doing this with futures returned by the driver can leave the driver&#39;s internals in</span>
-<span class="doccomment">//! an inconsistent state, which may lead to unpredictable or incorrect behavior (see RUST-937 for more</span>
-<span class="doccomment">//! details). As such, it is **_highly_** recommended to poll all futures returned from the driver to</span>
-<span class="doccomment">//! completion. In order to still use timeout mechanisms like `tokio::time::timeout` with the driver,</span>
-<span class="doccomment">//! one option is to spawn tasks and time out on their</span>
-<span class="doccomment">//! [`JoinHandle`](https://docs.rs/tokio/1.10.1/tokio/task/struct.JoinHandle.html) futures instead of on</span>
-<span class="doccomment">//! the driver&#39;s futures directly. This will ensure the driver&#39;s futures will always be completely polled</span>
-<span class="doccomment">//! while also allowing the application to continue in the event of a timeout.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! e.g.</span>
-<span class="doccomment">//! ``` rust</span>
-<span class="doccomment">//! # use std::time::Duration;</span>
-<span class="doccomment">//! # use mongodb::{</span>
-<span class="doccomment">//! #     Client,</span>
-<span class="doccomment">//! #     bson::doc,</span>
-<span class="doccomment">//! # };</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;), feature = &quot;tokio-runtime&quot;))]</span>
-<span class="doccomment">//! # async fn foo() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">//! let collection = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);</span>
-<span class="doccomment">//! let handle = tokio::task::spawn(async move {</span>
-<span class="doccomment">//!     collection.insert_one(doc! { &quot;x&quot;: 1 }, None).await</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! tokio::time::timeout(Duration::from_secs(5), handle).await???;</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Minimum supported Rust version (MSRV)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The MSRV for this crate is currently 1.53.0. This will be rarely be increased, and if it ever is,</span>
-<span class="doccomment">//! it will only happen in a minor or major version release.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This crate contains the officially supported MongoDB Rust driver, a
+//! client side library that can be used to interact with MongoDB deployments
+//! in Rust applications. It uses the [`bson`] crate for BSON support.
+//! The driver contains a fully async API that supports either [`tokio`] (default)
+//! or [`async-std`](https://docs.rs/async_std), depending on the feature flags set. The driver also has
+//! a sync API that may be enabled via the `&quot;sync&quot;` feature flag.
+//!
+//! # Installation
+//!
+//! ## Requirements
+//! - Rust 1.53+
+//! - MongoDB 3.6+
+//!
+//! ## Importing
+//! The driver is available on [crates.io](https://crates.io/crates/mongodb). To use the driver in
+//! your application, simply add it to your project&#39;s `Cargo.toml`.
+//! ```toml
+//! [dependencies]
+//! mongodb = &quot;2.3.0&quot;
+//! ```
+//!
+//! ### Configuring the async runtime
+//! The driver supports both of the most popular async runtime crates, namely
+//! [`tokio`](https://crates.io/crates/tokio) and [`async-std`](https://crates.io/crates/async-std). By
+//! default, the driver will use [`tokio`](https://crates.io/crates/tokio), but you can explicitly choose
+//! a runtime by specifying one of `&quot;tokio-runtime&quot;` or `&quot;async-std-runtime&quot;` feature flags in your
+//! `Cargo.toml`.
+//!
+//! For example, to instruct the driver to work with [`async-std`](https://crates.io/crates/async-std),
+//! add the following to your `Cargo.toml`:
+//! ```toml
+//! [dependencies.mongodb]
+//! version = &quot;2.3.0&quot;
+//! default-features = false
+//! features = [&quot;async-std-runtime&quot;]
+//! ```
+//!
+//! ### Enabling the sync API
+//! The driver also provides a blocking sync API. To enable this, add the `&quot;sync&quot;` or `&quot;tokio-sync&quot;`
+//! feature to your `Cargo.toml`:
+//! ```toml
+//! [dependencies.mongodb]
+//! version = &quot;2.3.0&quot;
+//! features = [&quot;tokio-sync&quot;]
+//! ```
+//! Using the `&quot;sync&quot;` feature also requires using `default-features = false`.
+//! **Note:** The sync-specific types can be imported from `mongodb::sync` (e.g.
+//! `mongodb::sync::Client`).
+//!
+//! ### All Feature flags
+//!
+//! | Feature              | Description                                                                                                                           | Extra dependencies                  | Default |
+//! |:---------------------|:--------------------------------------------------------------------------------------------------------------------------------------|:------------------------------------|:--------|
+//! | `tokio-runtime`      | Enable support for the `tokio` async runtime                                                                                          | `tokio` 1.0 with the `full` feature | yes     |
+//! | `async-std-runtime`  | Enable support for the `async-std` runtime                                                                                            | `async-std` 1.0                     | no      |
+//! | `sync`               | Expose the synchronous API (`mongodb::sync`), using an async-std backend. Cannot be used with the `tokio-runtime` feature flag.       | `async-std` 1.0                     | no      |
+//! | `tokio-sync`         | Expose the synchronous API (`mongodb::sync`), using a tokio backend. Cannot be used with the `async-std-runtime` feature flag.        | `tokio` 1.0 with the `full` feature | no      |
+//! | `aws-auth`           | Enable support for the MONGODB-AWS authentication mechanism.                                                                          | `reqwest` 0.11                      | no      |
+//! | `bson-uuid-0_8`      | Enable support for v0.8 of the [`uuid`](docs.rs/uuid/0.8) crate in the public API of the re-exported `bson` crate.                    | n/a                                 | no      |
+//! | `bson-chrono-0_4`    | Enable support for v0.4 of the [`chrono`](docs.rs/chrono/0.4) crate in the public API of the re-exported `bson` crate.                | n/a                                 | no      |
+//! | `bson-serde_with`    | Enable support for the [`serde_with`](docs.rs/serde_with/latest) crate in the public API of the re-exported `bson` crate.             | `serde_with` 1.0                    | no      |
+//! | `zlib-compression`   | Enable support for compressing messages with [`zlib`](https://zlib.net/)                                                              | `flate2` 1.0                        | no      |
+//! | `zstd-compression`   | Enable support for compressing messages with [`zstd`](http://facebook.github.io/zstd/).  This flag requires Rust version 1.54.        | `zstd` 0.9.0                        | no      |
+//! | `snappy-compression` | Enable support for compressing messages with [`snappy`](http://google.github.io/snappy/)                                              | `snap` 1.0.5                        | no      |
+//! | `openssl-tls`        | Switch TLS connection handling to use [&#39;openssl&#39;](https://docs.rs/openssl/0.10.38/).                                                  | `openssl` 0.10.38                   | no      |
+//!
+//! # Example Usage
+//!
+//! ## Using the async API
+//! ### Connecting to a MongoDB deployment
+//! ```no_run
+//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {
+//! use mongodb::{Client, options::ClientOptions};
+//!
+//! // Parse a connection string into an options struct.
+//! let mut client_options = ClientOptions::parse(&quot;mongodb://localhost:27017&quot;).await?;
+//!
+//! // Manually set an option.
+//! client_options.app_name = Some(&quot;My App&quot;.to_string());
+//!
+//! // Get a handle to the deployment.
+//! let client = Client::with_options(client_options)?;
+//!
+//! // List the names of the databases in that deployment.
+//! for db_name in client.list_database_names(None, None).await? {
+//!     println!(&quot;{}&quot;, db_name);
+//! }
+//! # Ok(()) }
+//! ```
+//! ### Getting a handle to a database
+//! ```no_run
+//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {
+//! # let client = mongodb::Client::with_uri_str(&quot;&quot;).await?;
+//! // Get a handle to a database.
+//! let db = client.database(&quot;mydb&quot;);
+//!
+//! // List the names of the collections in that database.
+//! for collection_name in db.list_collection_names(None).await? {
+//!     println!(&quot;{}&quot;, collection_name);
+//! }
+//! # Ok(()) }
+//! ```
+//! ### Inserting documents into a collection
+//! ```no_run
+//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {
+//! # let db = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;);
+//! use mongodb::bson::{doc, Document};
+//!
+//! // Get a handle to a collection in the database.
+//! let collection = db.collection::&lt;Document&gt;(&quot;books&quot;);
+//!
+//! let docs = vec![
+//!     doc! { &quot;title&quot;: &quot;1984&quot;, &quot;author&quot;: &quot;George Orwell&quot; },
+//!     doc! { &quot;title&quot;: &quot;Animal Farm&quot;, &quot;author&quot;: &quot;George Orwell&quot; },
+//!     doc! { &quot;title&quot;: &quot;The Great Gatsby&quot;, &quot;author&quot;: &quot;F. Scott Fitzgerald&quot; },
+//! ];
+//!
+//! // Insert some documents into the &quot;mydb.books&quot; collection.
+//! collection.insert_many(docs, None).await?;
+//! # Ok(()) }
+//! ```
+//!
+//! A [`Collection`](struct.Collection.html) can be parameterized with any type that implements the
+//! `Serialize` and `Deserialize` traits from the [`serde`](https://serde.rs/) crate,
+//! not just `Document`:
+//!
+//! ```toml
+//! # In Cargo.toml, add the following dependency.
+//! serde = { version = &quot;1.0&quot;, features = [&quot;derive&quot;] }
+//! ```
+//!
+//! ```no_run
+//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {
+//! # let db = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;);
+//! use serde::{Deserialize, Serialize};
+//!
+//! #[derive(Debug, Serialize, Deserialize)]
+//! struct Book {
+//!     title: String,
+//!     author: String,
+//! }
+//!
+//! // Get a handle to a collection of `Book`.
+//! let typed_collection = db.collection::&lt;Book&gt;(&quot;books&quot;);
+//!
+//! let books = vec![
+//!     Book {
+//!         title: &quot;The Grapes of Wrath&quot;.to_string(),
+//!         author: &quot;John Steinbeck&quot;.to_string(),
+//!     },
+//!     Book {
+//!         title: &quot;To Kill a Mockingbird&quot;.to_string(),
+//!         author: &quot;Harper Lee&quot;.to_string(),
+//!     },
+//! ];
+//!
+//! // Insert the books into &quot;mydb.books&quot; collection, no manual conversion to BSON necessary.
+//! typed_collection.insert_many(books, None).await?;
+//! # Ok(()) }
+//! ```
+//!
+//! ### Finding documents in a collection
+//! Results from queries are generally returned via [`Cursor`](struct.Cursor.html), a struct which streams
+//! the results back from the server as requested. The [`Cursor`](struct.Cursor.html) type implements the
+//! [`Stream`](https://docs.rs/futures/latest/futures/stream/trait.Stream.html) trait from
+//! the [`futures`](https://crates.io/crates/futures) crate, and in order to access its streaming
+//! functionality you need to import at least one of the
+//! [`StreamExt`](https://docs.rs/futures/latest/futures/stream/trait.StreamExt.html) or
+//! [`TryStreamExt`](https://docs.rs/futures/latest/futures/stream/trait.TryStreamExt.html) traits.
+//!
+//! ```toml
+//! # In Cargo.toml, add the following dependency.
+//! futures = &quot;0.3&quot;
+//! ```
+//! ```no_run
+//! # use serde::Deserialize;
+//! # #[derive(Deserialize)]
+//! # struct Book { title: String }
+//! # async fn foo() -&gt; mongodb::error::Result&lt;()&gt; {
+//! # let typed_collection = mongodb::Client::with_uri_str(&quot;&quot;).await?.database(&quot;&quot;).collection::&lt;Book&gt;(&quot;&quot;);
+//! // This trait is required to use `try_next()` on the cursor
+//! use futures::stream::TryStreamExt;
+//! use mongodb::{bson::doc, options::FindOptions};
+//!
+//! // Query the books in the collection with a filter and an option.
+//! let filter = doc! { &quot;author&quot;: &quot;George Orwell&quot; };
+//! let find_options = FindOptions::builder().sort(doc! { &quot;title&quot;: 1 }).build();
+//! let mut cursor = typed_collection.find(filter, find_options).await?;
+//!
+//! // Iterate over the results of the cursor.
+//! while let Some(book) = cursor.try_next().await? {
+//!     println!(&quot;title: {}&quot;, book.title);
+//! }
+//! # Ok(()) }
+//! ```
+//!
+//! ### Using the sync API
+//! The driver also provides a blocking sync API. See the [Installation](#enabling-the-sync-api)
+//! section for instructions on how to enable it.
+//!
+//! The various sync-specific types are found in the `mongodb::sync` submodule rather than in the
+//! crate&#39;s top level like in the async API. The sync API calls through to the async API internally
+//! though, so it looks and behaves similarly to it.
+//! ```no_run
+//! # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]
+//! # {
+//! use mongodb::{
+//!     bson::doc,
+//!     sync::Client,
+//! };
+//! use serde::{Deserialize, Serialize};
+//!
+//! #[derive(Debug, Serialize, Deserialize)]
+//! struct Book {
+//!     title: String,
+//!     author: String,
+//! }
+//!
+//! let client = Client::with_uri_str(&quot;mongodb://localhost:27017&quot;)?;
+//! let database = client.database(&quot;mydb&quot;);
+//! let collection = database.collection::&lt;Book&gt;(&quot;books&quot;);
+//!
+//! let docs = vec![
+//!     Book {
+//!         title: &quot;1984&quot;.to_string(),
+//!         author: &quot;George Orwell&quot;.to_string(),
+//!     },
+//!     Book {
+//!         title: &quot;Animal Farm&quot;.to_string(),
+//!         author: &quot;George Orwell&quot;.to_string(),
+//!     },
+//!     Book {
+//!         title: &quot;The Great Gatsby&quot;.to_string(),
+//!         author: &quot;F. Scott Fitzgerald&quot;.to_string(),
+//!     },
+//! ];
+//!
+//! // Insert some books into the &quot;mydb.books&quot; collection.
+//! collection.insert_many(docs, None)?;
+//!
+//! let cursor = collection.find(doc! { &quot;author&quot;: &quot;George Orwell&quot; }, None)?;
+//! for result in cursor {
+//!     println!(&quot;title: {}&quot;, result?.title);
+//! }
+//! # }
+//! ```
+//!
+//! ## Warning about timeouts / cancellation
+//!
+//! In async Rust, it is common to implement cancellation and timeouts by dropping a future after a
+//! certain period of time instead of polling it to completion. This is how
+//! [`tokio::time::timeout`](https://docs.rs/tokio/1.10.1/tokio/time/fn.timeout.html) works, for
+//! example. However, doing this with futures returned by the driver can leave the driver&#39;s internals in
+//! an inconsistent state, which may lead to unpredictable or incorrect behavior (see RUST-937 for more
+//! details). As such, it is **_highly_** recommended to poll all futures returned from the driver to
+//! completion. In order to still use timeout mechanisms like `tokio::time::timeout` with the driver,
+//! one option is to spawn tasks and time out on their
+//! [`JoinHandle`](https://docs.rs/tokio/1.10.1/tokio/task/struct.JoinHandle.html) futures instead of on
+//! the driver&#39;s futures directly. This will ensure the driver&#39;s futures will always be completely polled
+//! while also allowing the application to continue in the event of a timeout.
+//!
+//! e.g.
+//! ``` rust
+//! # use std::time::Duration;
+//! # use mongodb::{
+//! #     Client,
+//! #     bson::doc,
+//! # };
+//! #
+//! # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;), feature = &quot;tokio-runtime&quot;))]
+//! # async fn foo() -&gt; std::result::Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! #
+//! # let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+//! let collection = client.database(&quot;foo&quot;).collection(&quot;bar&quot;);
+//! let handle = tokio::task::spawn(async move {
+//!     collection.insert_one(doc! { &quot;x&quot;: 1 }, None).await
+//! });
+//!
+//! tokio::time::timeout(Duration::from_secs(5), handle).await???;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Minimum supported Rust version (MSRV)
+//!
+//! The MSRV for this crate is currently 1.53.0. This will be rarely be increased, and if it ever is,
+//! it will only happen in a minor or major version release.
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="comment">// `missing_crate_level_docs` was renamed with a `rustdoc::` prefix in rustc 1.55, but isn&#39;t</span>
-<span class="comment">// supported in the MSRV.</span>
-<span class="comment">// TODO: remove the wrapping cfg_attr if/when the MSRV is 1.55+.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">warn</span>(<span class="ident">rustdoc::missing_crate_level_docs</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>,
-    <span class="ident">allow</span>(
-        <span class="ident">clippy::unreadable_literal</span>,
-        <span class="ident">clippy::cognitive_complexity</span>,
-        <span class="ident">clippy::float_cmp</span>
+</span><span class="attribute">#![warn(missing_docs)]
+</span><span class="comment">// `missing_crate_level_docs` was renamed with a `rustdoc::` prefix in rustc 1.55, but isn&#39;t
+// supported in the MSRV.
+// TODO: remove the wrapping cfg_attr if/when the MSRV is 1.55+.
+</span><span class="attribute">#![cfg_attr(docsrs, warn(rustdoc::missing_crate_level_docs))]
+#![cfg_attr(
+    feature = <span class="string">&quot;cargo-clippy&quot;</span>,
+    allow(
+        clippy::unreadable_literal,
+        clippy::cognitive_complexity,
+        clippy::float_cmp
     )
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;80000000&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/mongodb/2.3.0&quot;</span>)]</span>
+)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(test, type_length_limit = <span class="string">&quot;80000000&quot;</span>)]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/mongodb/2.3.0&quot;</span>)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;aws-auth&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>))]</span>
-<span class="macro">compile_error!</span>(<span class="string">&quot;The `aws-auth` feature flag is only supported on the tokio runtime.&quot;</span>);
+#[cfg(all(feature = <span class="string">&quot;aws-auth&quot;</span>, feature = <span class="string">&quot;async-std-runtime&quot;</span>))]
+</span><span class="macro">compile_error!</span>(<span class="string">&quot;The `aws-auth` feature flag is only supported on the tokio runtime.&quot;</span>);
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">options</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">pub mod </span>options;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">::bson</span>;
+<span class="kw">pub use </span>::bson;
 
-<span class="kw">mod</span> <span class="ident">bson_util</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">change_stream</span>;
-<span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">mod</span> <span class="ident">cmap</span>;
-<span class="kw">mod</span> <span class="ident">coll</span>;
-<span class="kw">mod</span> <span class="ident">collation</span>;
-<span class="kw">mod</span> <span class="ident">compression</span>;
-<span class="kw">mod</span> <span class="ident">concern</span>;
-<span class="kw">mod</span> <span class="ident">cursor</span>;
-<span class="kw">mod</span> <span class="ident">db</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event</span>;
-<span class="kw">mod</span> <span class="ident">index</span>;
-<span class="kw">mod</span> <span class="ident">hello</span>;
-<span class="kw">mod</span> <span class="ident">operation</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">results</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">runtime</span>;
-<span class="kw">mod</span> <span class="ident">sdam</span>;
-<span class="kw">mod</span> <span class="ident">selection_criteria</span>;
-<span class="kw">mod</span> <span class="ident">srv</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>, <span class="ident">docsrs</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sync</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+<span class="kw">mod </span>bson_util;
+<span class="kw">pub mod </span>change_stream;
+<span class="kw">mod </span>client;
+<span class="kw">mod </span>cmap;
+<span class="kw">mod </span>coll;
+<span class="kw">mod </span>collation;
+<span class="kw">mod </span>compression;
+<span class="kw">mod </span>concern;
+<span class="kw">mod </span>cursor;
+<span class="kw">mod </span>db;
+<span class="kw">pub mod </span>error;
+<span class="kw">pub mod </span>event;
+<span class="kw">mod </span>index;
+<span class="kw">mod </span>hello;
+<span class="kw">mod </span>operation;
+<span class="kw">pub mod </span>results;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>runtime;
+<span class="kw">mod </span>sdam;
+<span class="kw">mod </span>selection_criteria;
+<span class="kw">mod </span>srv;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;sync&quot;</span>, feature = <span class="string">&quot;tokio-sync&quot;</span>, docsrs))]
+#[cfg_attr(docsrs, doc(cfg(any(feature = <span class="string">&quot;sync&quot;</span>, feature = <span class="string">&quot;tokio-sync&quot;</span>))))]
+</span><span class="kw">pub mod </span>sync;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">derive_more</span>;
+<span class="attribute">#[cfg(test)]
+#[macro_use]
+</span><span class="kw">extern crate </span>derive_more;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client</span>::{<span class="ident">Client</span>, <span class="ident">session::ClientSession</span>},
-    <span class="ident">coll::Collection</span>,
-    <span class="ident">cursor</span>::{<span class="ident">Cursor</span>, <span class="ident">session</span>::{<span class="ident">SessionCursor</span>, <span class="ident">SessionCursorStream</span>}},
-    <span class="ident">db::Database</span>,
+<span class="kw">pub use crate</span>::{
+    client::{Client, session::ClientSession},
+    coll::Collection,
+    cursor::{Cursor, session::{SessionCursor, SessionCursorStream}},
+    db::Database,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> {<span class="ident">coll::Namespace</span>, <span class="ident">index::IndexModel</span>, <span class="ident">client::session::ClusterTime</span>, <span class="ident">sdam::public</span>::<span class="kw-2">*</span>};
+<span class="kw">pub use </span>{coll::Namespace, index::IndexModel, client::session::ClusterTime, sdam::public::<span class="kw-2">*</span>};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>,
-))]</span>
-<span class="macro">compile_error!</span>(
+<span class="attribute">#[cfg(all(
+    feature = <span class="string">&quot;tokio-runtime&quot;</span>,
+    feature = <span class="string">&quot;async-std-runtime&quot;</span>,
+))]
+</span><span class="macro">compile_error!</span>(
     <span class="string">&quot;`tokio-runtime` and `async-std-runtime` can&#39;t both be enabled; either disable \
-     `async-std-runtime` or set `default-features = false` in your Cargo.toml&quot;</span>
-);
+     `async-std-runtime` or set `default-features = false` in your Cargo.toml&quot;
+</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>)))]</span>
-<span class="macro">compile_error!</span>(
+<span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;tokio-runtime&quot;</span>), not(feature = <span class="string">&quot;async-std-runtime&quot;</span>)))]
+</span><span class="macro">compile_error!</span>(
     <span class="string">&quot;one of `tokio-runtime`, `async-std-runtime`, `sync`, or `tokio-sync` must be enabled; \
      either enable `default-features`, or enable one of those features specifically in your \
-     Cargo.toml&quot;</span>
-);
+     Cargo.toml&quot;
+</span>);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

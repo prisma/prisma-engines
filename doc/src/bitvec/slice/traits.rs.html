@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/slice/traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/slice/traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -580,90 +580,90 @@
 <span id="580">580</span>
 <span id="581">581</span>
 <span id="582">582</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/traits.md&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/traits.md&quot;</span>)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::borrow::ToOwned</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">cmp</span>,
-	<span class="ident">convert::TryFrom</span>,
-	<span class="ident">fmt</span>::{
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::borrow::ToOwned;
+<span class="kw">use </span>core::{
+	cmp,
+	convert::TryFrom,
+	fmt::{
 		<span class="self">self</span>,
-		<span class="ident">Binary</span>,
-		<span class="ident">Debug</span>,
-		<span class="ident">Display</span>,
-		<span class="ident">Formatter</span>,
-		<span class="ident">LowerHex</span>,
-		<span class="ident">Octal</span>,
-		<span class="ident">Pointer</span>,
-		<span class="ident">UpperHex</span>,
+		Binary,
+		Debug,
+		Display,
+		Formatter,
+		LowerHex,
+		Octal,
+		Pointer,
+		UpperHex,
 	},
-	<span class="ident">hash</span>::{
-		<span class="ident">Hash</span>,
-		<span class="ident">Hasher</span>,
+	hash::{
+		Hash,
+		Hasher,
 	},
-	<span class="ident">str</span>,
+	str,
 };
 
-<span class="kw">use</span> <span class="ident">wyz::fmt::FmtForward</span>;
+<span class="kw">use </span>wyz::fmt::FmtForward;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BitSlice</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vec::BitVec</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">domain::Domain</span>,
-	<span class="ident">mem</span>,
-	<span class="ident">order</span>::{
-		<span class="ident">BitOrder</span>,
-		<span class="ident">Lsb0</span>,
-		<span class="ident">Msb0</span>,
+<span class="kw">use </span><span class="kw">super</span>::BitSlice;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::vec::BitVec;
+<span class="kw">use crate</span>::{
+	domain::Domain,
+	mem,
+	order::{
+		BitOrder,
+		Lsb0,
+		Msb0,
 	},
-	<span class="ident">store::BitStore</span>,
-	<span class="ident">view::BitView</span>,
+	store::BitStore,
+	view::BitView,
 };
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-AsRef%3C%5BT%5D%3E)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-AsRef%3C%5BT%5D%3E)
+</span><span class="kw">impl</span>&lt;T, O&gt; AsRef&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
-		<span class="self">self</span>
-	}
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
+		<span class="self">self
+	</span>}
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-AsMut%3C%5BT%5D%3E)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-AsMut%3C%5BT%5D%3E)
+</span><span class="kw">impl</span>&lt;T, O&gt; AsMut&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-		<span class="self">self</span>
-	}
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+		<span class="self">self
+	</span>}
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Eq)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Eq)
+</span><span class="kw">impl</span>&lt;T, O&gt; Eq <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Ord)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Ord)
+</span><span class="kw">impl</span>&lt;T, O&gt; Ord <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-		<span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="ident">rhs</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;BitSlice has a total ordering&quot;</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; cmp::Ordering {
+		<span class="self">self</span>.partial_cmp(rhs)
+			.expect(<span class="string">&quot;BitSlice has a total ordering&quot;</span>)
 	}
 }
 
@@ -675,90 +675,90 @@ The equality condition requires that they have the same length and that at each
 index, the two slices have the same bit value.
 
 [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-PartialEq%3C%5BB%5D%3E)
-**/</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+**/
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialEq&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
-			(<span class="self">self</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>())
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; bool {
+		<span class="kw">if let </span>(<span class="prelude-val">Some</span>(this), <span class="prelude-val">Some</span>(that)) =
+			(<span class="self">self</span>.coerce::&lt;T1, Lsb0&gt;(), rhs.coerce::&lt;T1, Lsb0&gt;())
 		{
-			<span class="ident">this</span>.<span class="ident">sp_eq</span>(<span class="ident">that</span>)
+			this.sp_eq(that)
 		}
-		<span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">this</span>), <span class="prelude-val">Some</span>(<span class="ident">that</span>)) <span class="op">=</span>
-			(<span class="self">self</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>(), <span class="ident">rhs</span>.<span class="ident">coerce</span>::<span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>())
+		<span class="kw">else if let </span>(<span class="prelude-val">Some</span>(this), <span class="prelude-val">Some</span>(that)) =
+			(<span class="self">self</span>.coerce::&lt;T1, Msb0&gt;(), rhs.coerce::&lt;T1, Msb0&gt;())
 		{
-			<span class="ident">this</span>.<span class="ident">sp_eq</span>(<span class="ident">that</span>)
+			this.sp_eq(that)
 		}
-		<span class="kw">else</span> {
-			<span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">rhs</span>.<span class="ident">len</span>()
-				<span class="op">&amp;&amp;</span> <span class="self">self</span>
-					.<span class="ident">iter</span>()
-					.<span class="ident">by_vals</span>()
-					.<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>())
-					.<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">r</span>)<span class="op">|</span> <span class="ident">l</span> <span class="op">==</span> <span class="ident">r</span>)
+		<span class="kw">else </span>{
+			<span class="self">self</span>.len() == rhs.len()
+				&amp;&amp; <span class="self">self
+					</span>.iter()
+					.by_vals()
+					.zip(rhs.iter().by_vals())
+					.all(|(l, r)| l == r)
 		}
 	}
 }
 
-<span class="comment">//  ref-to-val equality</span>
+<span class="comment">//  ref-to-val equality
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialEq&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">rhs</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; bool {
+		<span class="kw-2">**</span><span class="self">self </span>== rhs
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialEq&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;mut </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">rhs</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; bool {
+		<span class="kw-2">**</span><span class="self">self </span>== rhs
 	}
 }
 
-<span class="comment">//  val-to-ref equality</span>
+<span class="comment">//  val-to-ref equality
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialEq&lt;<span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;BitSlice&lt;T2, O2&gt;) -&gt; bool {
+		<span class="kw-2">*</span><span class="self">self </span>== <span class="kw-2">**</span>rhs
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialEq&lt;<span class="kw-2">&amp;mut </span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;<span class="kw-2">mut </span>BitSlice&lt;T2, O2&gt;) -&gt; bool {
+		<span class="kw-2">*</span><span class="self">self </span>== <span class="kw-2">**</span>rhs
 	}
 }
 
@@ -770,108 +770,108 @@ the high bit is greater. If the slices are equal until at least one terminates,
 then they are compared by length.
 
 [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-PartialOrd%3C%5BT%5D%3E)
-**/</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+**/
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		<span class="kw">for</span> (<span class="ident">l</span>, <span class="ident">r</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>().<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>()) {
-			<span class="kw">match</span> (<span class="ident">l</span>, <span class="ident">r</span>) {
-				(<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cmp::Ordering::Greater</span>),
-				(<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cmp::Ordering::Less</span>),
-				<span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		<span class="kw">for </span>(l, r) <span class="kw">in </span><span class="self">self</span>.iter().by_vals().zip(rhs.iter().by_vals()) {
+			<span class="kw">match </span>(l, r) {
+				(<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(cmp::Ordering::Greater),
+				(<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(cmp::Ordering::Less),
+				<span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
 			}
 		}
-		<span class="self">self</span>.<span class="ident">len</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">len</span>())
+		<span class="self">self</span>.len().partial_cmp(<span class="kw-2">&amp;</span>rhs.len())
 	}
 }
 
-<span class="comment">//  ref-to-val ordering</span>
+<span class="comment">//  ref-to-val ordering
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">*</span><span class="self">self</span>).partial_cmp(rhs)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;mut </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">**</span><span class="self">self</span>).partial_cmp(rhs)
 	}
 }
 
-<span class="comment">//  val-to-ref ordering</span>
+<span class="comment">//  val-to-ref ordering
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;<span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">*</span><span class="self">self</span>).partial_cmp(<span class="kw-2">&amp;**</span>rhs)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;<span class="kw-2">&amp;mut </span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;<span class="kw-2">mut </span>BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">*</span><span class="self">self</span>).partial_cmp(<span class="kw-2">&amp;**</span>rhs)
 	}
 }
 
-<span class="comment">//  &amp;mut-to-&amp; ordering</span>
+<span class="comment">//  &amp;mut-to-&amp; ordering
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+</span><span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;<span class="kw-2">&amp;mut </span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;<span class="kw-2">mut </span>BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">**</span><span class="self">self</span>).partial_cmp(<span class="kw-2">&amp;**</span>rhs)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">O1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T1</span>: <span class="ident">BitStore</span>,
-	<span class="ident">T2</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T1, T2, O1, O2&gt; PartialOrd&lt;<span class="kw-2">&amp;</span>BitSlice&lt;T2, O2&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;mut </span>BitSlice&lt;T1, O1&gt;
+<span class="kw">where
+	</span>T1: BitStore,
+	T2: BitStore,
+	O1: BitOrder,
+	O2: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="op">&amp;&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">O2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">rhs</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: &amp;&amp;BitSlice&lt;T2, O2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="kw-2">**</span><span class="self">self</span>).partial_cmp(<span class="kw-2">&amp;**</span>rhs)
 	}
 }
 
@@ -881,17 +881,17 @@ error instead of the failure event.
 This only fails if `slice.len()` exceeds `BitSlice::MAX_ELTS`.
 
 [`BitSlice::try_from_slice`]: crate::slice::BitSlice::try_from_slice
-**/</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+**/
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, O&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T]&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>];
+	<span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T];
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="ident">BitSlice::try_from_slice</span>(<span class="ident">slice</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">slice</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>try_from(slice: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+		BitSlice::try_from_slice(slice).map_err(|<span class="kw">_</span>| slice)
 	}
 }
 
@@ -901,102 +901,102 @@ on error instead of the failure event.
 This only fails if `slice.len()` exceeds `BitSlice::MAX_ELTS`.
 
 [`BitSlice::try_from_slice_mut`]: crate::slice::BitSlice::try_from_slice_mut
-**/</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">T</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+**/
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, O&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T]&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">T</span>];
+	<span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T];
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">T</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">slice_ptr</span> <span class="op">=</span> <span class="ident">slice</span> <span class="kw">as</span> <span class="kw-2">*mut</span> [<span class="ident">T</span>];
-		<span class="ident">BitSlice::try_from_slice_mut</span>(<span class="ident">slice</span>)
-			.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slice_ptr</span> })
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>try_from(slice: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[T]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+		<span class="kw">let </span>slice_ptr = slice <span class="kw">as </span><span class="kw-2">*mut </span>[T];
+		BitSlice::try_from_slice_mut(slice)
+			.map_err(|<span class="kw">_</span>| <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>slice_ptr })
 	}
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Default-1)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Default-1)
+</span><span class="kw">impl</span>&lt;T, O&gt; Default <span class="kw">for </span><span class="kw-2">&amp;</span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident">BitSlice::empty</span>()
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		BitSlice::empty()
 	}
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Default)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Default)
+</span><span class="kw">impl</span>&lt;T, O&gt; Default <span class="kw">for </span><span class="kw-2">&amp;mut </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-		<span class="ident">BitSlice::empty_mut</span>()
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+		BitSlice::empty_mut()
 	}
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Debug)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Debug)
+</span><span class="kw">impl</span>&lt;T, O&gt; Debug <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="self">self</span>.<span class="ident">as_bitspan</span>().<span class="ident">render</span>(<span class="ident">fmt</span>, <span class="string">&quot;Slice&quot;</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-		<span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-		<span class="ident">Display::fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		<span class="self">self</span>.as_bitspan().render(fmt, <span class="string">&quot;Slice&quot;</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+		fmt.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+		Display::fmt(<span class="self">self</span>, fmt)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T, O&gt; Display <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_list</span>()
-			.<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">b</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> }))
-			.<span class="ident">finish</span>()
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_list()
+			.entries(<span class="self">self</span>.iter().by_vals().map(|b| <span class="kw">if </span>b { <span class="number">1 </span>} <span class="kw">else </span>{ <span class="number">0 </span>}))
+			.finish()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="kw">impl</span>&lt;T, O&gt; Pointer <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bitspan</span>(), <span class="ident">fmt</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		Pointer::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bitspan(), fmt)
 	}
 }
 
-<span class="doccomment">/// Encodes a short bit-slice into an ASCII b36 value.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">bits_to_ascii</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">bits</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">alpha</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// Encodes a short bit-slice into an ASCII b36 value.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>bits_to_ascii&lt;T, O&gt;(bits: <span class="kw-2">&amp;</span>BitSlice&lt;T, O&gt;, alpha: u8) -&gt; u8
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="number">0u8</span>;
-	<span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="ident">bits</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>() {
-		<span class="ident">val</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
-		<span class="ident">val</span> <span class="op">|</span><span class="op">=</span> <span class="ident">bit</span> <span class="kw">as</span> <span class="ident">u8</span>;
+	<span class="kw">let </span><span class="kw-2">mut </span>val = <span class="number">0u8</span>;
+	<span class="kw">for </span>bit <span class="kw">in </span>bits.iter().by_vals() {
+		val &lt;&lt;= <span class="number">1</span>;
+		val |= bit <span class="kw">as </span>u8;
 	}
-	<span class="kw">match</span> <span class="ident">val</span> {
-		<span class="ident">v</span> @ <span class="number">0</span> ..<span class="op">=</span> <span class="number">9</span> =&gt; <span class="string">b&#39;0&#39;</span> <span class="op">+</span> <span class="ident">v</span>,
-		<span class="ident">v</span> @ <span class="number">10</span> ..<span class="op">=</span> <span class="number">35</span> =&gt; <span class="ident">alpha</span> <span class="op">-</span> <span class="number">10</span> <span class="op">+</span> <span class="ident">v</span>,
-		<span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(
-			<span class="string">&quot;bit-slices wider than five bits cannot be rendered to ASCII b36&quot;</span>
-		),
+	<span class="kw">match </span>val {
+		v @ <span class="number">0 </span>..= <span class="number">9 </span>=&gt; <span class="string">b&#39;0&#39; </span>+ v,
+		v @ <span class="number">10 </span>..= <span class="number">35 </span>=&gt; alpha - <span class="number">10 </span>+ v,
+		<span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
+			<span class="string">&quot;bit-slices wider than five bits cannot be rendered to ASCII b36&quot;
+		</span>),
 	}
 }
 
@@ -1013,154 +1013,154 @@ This only fails if `slice.len()` exceeds `BitSlice::MAX_ELTS`.
 ## Returns
 
 A subset of `into` that is now initialized to the ASCII encoding.
-**/</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">encode_ascii</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>(
-	<span class="ident">bits</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>,
-	<span class="ident">into</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-	<span class="ident">radix</span>: <span class="ident">usize</span>,
-	<span class="kw-2">mut</span> <span class="ident">skip</span>: <span class="ident">usize</span>,
-	<span class="ident">alpha</span>: <span class="ident">u8</span>,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+**/
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>encode_ascii&lt;<span class="lifetime">&#39;a</span>, T, O&gt;(
+	bits: <span class="kw-2">&amp;</span>BitSlice&lt;T, O&gt;,
+	into: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+	radix: usize,
+	<span class="kw-2">mut </span>skip: usize,
+	alpha: u8,
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">for</span> (<span class="ident">chunk</span>, <span class="ident">slot</span>) <span class="kw">in</span>
-		<span class="ident">bits</span>.<span class="ident">rchunks</span>(<span class="ident">radix</span>).<span class="ident">rev</span>().<span class="ident">zip</span>(<span class="ident">into</span>.<span class="ident">iter_mut</span>().<span class="ident">skip</span>(<span class="ident">skip</span>))
+	<span class="kw">for </span>(chunk, slot) <span class="kw">in
+		</span>bits.rchunks(radix).rev().zip(into.iter_mut().skip(skip))
 	{
-		<span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="ident">bits_to_ascii</span>(<span class="ident">chunk</span>, <span class="ident">alpha</span>);
-		<span class="ident">skip</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+		<span class="kw-2">*</span>slot = bits_to_ascii(chunk, alpha);
+		skip += <span class="number">1</span>;
 	}
-	<span class="kw">unsafe</span> { <span class="ident">str::from_utf8_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">into</span>[.. <span class="ident">skip</span>]) }
+	<span class="kw">unsafe </span>{ str::from_utf8_unchecked(<span class="kw-2">&amp;</span>into[.. skip]) }
 }
 
-<span class="doccomment">/// Constructs the numeric formatting implementations.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fmt</span> {
-	($(<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">alpha</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">pfx</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">expr</span>;)<span class="op">+</span>) =&gt; { $(
-		<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/format.md&quot;</span>)]</span>
-		<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">trait</span> <span class="kw">for</span> <span class="macro-nonterminal">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-		<span class="kw">where</span>
-			<span class="ident">T</span>: <span class="ident">BitStore</span>,
-			<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// Constructs the numeric formatting implementations.
+</span><span class="macro">macro_rules! </span>fmt {
+	($(<span class="macro-nonterminal">$</span><span class="kw">trait</span>:<span class="macro-nonterminal">ident</span>: <span class="macro-nonterminal">$alpha</span>:expr, <span class="macro-nonterminal">$pfx</span>:expr, <span class="macro-nonterminal">$radix</span>:expr;)+) =&gt; { $(
+		<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/format.md&quot;</span>)]
+		</span><span class="kw">impl</span>&lt;T, O&gt; <span class="macro-nonterminal">$</span><span class="kw">trait for </span><span class="macro-nonterminal">BitSlice</span>&lt;T, O&gt;
+		<span class="kw">where
+			</span>T: BitStore,
+			O: BitOrder,
 		{
-			<span class="attribute">#[<span class="ident">inline</span>]</span>
-			<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::modulo_one</span>)]</span> <span class="comment">// I know what I’m doing.</span>
-			<span class="comment">//  TODO(myrrlyn): See if Binary codegen ditches the loops.</span>
-			<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-				<span class="kw">const</span> <span class="ident">D</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::bits_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>;
-				<span class="kw">const</span> <span class="ident">M</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::bits_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">%</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>;
-				<span class="kw">const</span> <span class="ident">W</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">D</span> <span class="op">+</span> (<span class="ident">M</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">txt</span>: [<span class="ident">u8</span>; <span class="ident">W</span> <span class="op">+</span> <span class="number">2</span>] <span class="op">=</span> [<span class="string">b&#39;0&#39;</span>; <span class="ident">W</span> <span class="op">+</span> <span class="number">2</span>];
-				<span class="ident">txt</span>[<span class="number">1</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">pfx</span>;
+			<span class="attribute">#[inline]
+			#[allow(clippy::modulo_one)] </span><span class="comment">// I know what I’m doing.
+			//  TODO(myrrlyn): See if Binary codegen ditches the loops.
+			</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+				<span class="kw">const </span>D: usize = mem::bits_of::&lt;usize&gt;() / <span class="macro-nonterminal">$radix</span>;
+				<span class="kw">const </span>M: usize = mem::bits_of::&lt;usize&gt;() % <span class="macro-nonterminal">$radix</span>;
+				<span class="kw">const </span>W: usize = D + (M != <span class="number">0</span>) <span class="kw">as </span>usize;
+				<span class="kw">let </span><span class="kw-2">mut </span>txt: [u8; W + <span class="number">2</span>] = [<span class="string">b&#39;0&#39;</span>; W + <span class="number">2</span>];
+				txt[<span class="number">1</span>] = <span class="macro-nonterminal">$pfx</span>;
 
-				<span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">alternate</span>() { <span class="number">0</span> } <span class="kw">else</span> { <span class="number">2</span> };
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">fmt</span>.<span class="ident">debug_list</span>();
-				<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-					<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-						<span class="ident">seq</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">encode_ascii</span>(
-							<span class="ident">elem</span>.<span class="ident">into_bitslice</span>(),
-							<span class="kw-2">&amp;mut</span> <span class="ident">txt</span>[<span class="ident">start</span> ..],
-							<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>,
-							<span class="number">2</span> <span class="op">-</span> <span class="ident">start</span>,
-							<span class="macro-nonterminal">$</span><span class="macro-nonterminal">alpha</span>,
-						).<span class="ident">fmt_display</span>());
+				<span class="kw">let </span>start = <span class="kw">if </span>fmt.alternate() { <span class="number">0 </span>} <span class="kw">else </span>{ <span class="number">2 </span>};
+				<span class="kw">let </span><span class="kw-2">mut </span>seq = fmt.debug_list();
+				<span class="kw">match </span><span class="self">self</span>.domain() {
+					Domain::Enclave(elem) =&gt; {
+						seq.entry(<span class="kw-2">&amp;</span>encode_ascii(
+							elem.into_bitslice(),
+							<span class="kw-2">&amp;mut </span>txt[start ..],
+							<span class="macro-nonterminal">$radix</span>,
+							<span class="number">2 </span>- start,
+							<span class="macro-nonterminal">$alpha</span>,
+						).fmt_display());
 					},
-					<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-							<span class="ident">seq</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">encode_ascii</span>(
-								<span class="ident">elem</span>.<span class="ident">into_bitslice</span>(),
-								<span class="kw-2">&amp;mut</span> <span class="ident">txt</span>[<span class="ident">start</span> ..],
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>,
-								<span class="number">2</span> <span class="op">-</span> <span class="ident">start</span>,
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">alpha</span>,
-							).<span class="ident">fmt_display</span>());
+					Domain::Region { head, body, tail } =&gt; {
+						<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+							seq.entry(<span class="kw-2">&amp;</span>encode_ascii(
+								elem.into_bitslice(),
+								<span class="kw-2">&amp;mut </span>txt[start ..],
+								<span class="macro-nonterminal">$radix</span>,
+								<span class="number">2 </span>- start,
+								<span class="macro-nonterminal">$alpha</span>,
+							).fmt_display());
 						}
-						<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-							<span class="ident">seq</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">encode_ascii</span>(
-								<span class="ident">elem</span>.<span class="ident">view_bits</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(),
-								<span class="kw-2">&amp;mut</span> <span class="ident">txt</span>[<span class="ident">start</span> ..],
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>,
-								<span class="number">2</span> <span class="op">-</span> <span class="ident">start</span>,
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">alpha</span>,
-							).<span class="ident">fmt_display</span>());
+						<span class="kw">for </span>elem <span class="kw">in </span>body.iter().map(BitStore::load_value) {
+							seq.entry(<span class="kw-2">&amp;</span>encode_ascii(
+								elem.view_bits::&lt;O&gt;(),
+								<span class="kw-2">&amp;mut </span>txt[start ..],
+								<span class="macro-nonterminal">$radix</span>,
+								<span class="number">2 </span>- start,
+								<span class="macro-nonterminal">$alpha</span>,
+							).fmt_display());
 						}
-						<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-							<span class="ident">seq</span>.<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">encode_ascii</span>(
-								<span class="ident">elem</span>.<span class="ident">into_bitslice</span>(),
-								<span class="kw-2">&amp;mut</span> <span class="ident">txt</span>[<span class="ident">start</span> ..],
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>,
-								<span class="number">2</span> <span class="op">-</span> <span class="ident">start</span>,
-								<span class="macro-nonterminal">$</span><span class="macro-nonterminal">alpha</span>,
-							).<span class="ident">fmt_display</span>());
+						<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+							seq.entry(<span class="kw-2">&amp;</span>encode_ascii(
+								elem.into_bitslice(),
+								<span class="kw-2">&amp;mut </span>txt[start ..],
+								<span class="macro-nonterminal">$radix</span>,
+								<span class="number">2 </span>- start,
+								<span class="macro-nonterminal">$alpha</span>,
+							).fmt_display());
 						}
 					},
 				}
-				<span class="ident">seq</span>.<span class="ident">finish</span>()
+				seq.finish()
 			}
 		}
-	)<span class="op">+</span> };
+	)+ };
 }
 
-<span class="macro">fmt!</span> {
-	<span class="ident">Binary</span>: <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;b&#39;</span>, <span class="number">1</span>;
-	<span class="ident">Octal</span>: <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="number">3</span>;
-	<span class="ident">LowerHex</span>: <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="number">4</span>;
-	<span class="ident">UpperHex</span>: <span class="string">b&#39;A&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="number">4</span>;
+<span class="macro">fmt! </span>{
+	Binary: <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;b&#39;</span>, <span class="number">1</span>;
+	Octal: <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="number">3</span>;
+	LowerHex: <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="number">4</span>;
+	UpperHex: <span class="string">b&#39;A&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="number">4</span>;
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Hash)</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Hash)
+</span><span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T, O&gt; Hash <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hasher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-	<span class="kw">where</span> <span class="ident">H</span>: <span class="ident">Hasher</span> {
-		<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">by_vals</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">bit</span><span class="op">|</span> <span class="ident">bit</span>.<span class="ident">hash</span>(<span class="ident">hasher</span>));
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, hasher: <span class="kw-2">&amp;mut </span>H)
+	<span class="kw">where </span>H: Hasher {
+		<span class="self">self</span>.iter().by_vals().for_each(|bit| bit.hash(hasher));
 	}
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/threadsafe.md&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">Sync</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/threadsafe.md&quot;</span>)]
+</span><span class="kw">unsafe impl</span>&lt;T, O&gt; Send <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore + Sync,
+	O: BitOrder,
 {
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/threadsafe.md&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span> <span class="op">+</span> <span class="ident">Sync</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/slice/threadsafe.md&quot;</span>)]
+</span><span class="kw">unsafe impl</span>&lt;T, O&gt; Sync <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore + Sync,
+	O: BitOrder,
 {
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Unpin)</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-Unpin)
+</span><span class="kw">impl</span>&lt;T, O&gt; Unpin <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
 }
 
-<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-ToOwned)</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">ToOwned</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+<span class="doccomment">/// [Original](https://doc.rust-lang.org/std/primitive.slice.html#impl-ToOwned)
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T, O&gt; ToOwned <span class="kw">for </span>BitSlice&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
 {
-	<span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>;
+	<span class="kw">type </span>Owned = BitVec&lt;T, O&gt;;
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span> {
-		<span class="ident">BitVec::from_bitslice</span>(<span class="self">self</span>)
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>to_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Owned {
+		BitVec::from_bitslice(<span class="self">self</span>)
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-1.1.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../uuid/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../uuid/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/uuid-1.1.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../uuid/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../uuid/index.html"><div class="logo-container">
                     <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../uuid/index.html">
                         <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -172,177 +172,177 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::std::fmt;
 
-<span class="doccomment">/// A general error that can occur when working with UUIDs.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ErrorKind</span>);
+<span class="doccomment">/// A general error that can occur when working with UUIDs.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>Error(<span class="kw">pub</span>(<span class="kw">crate</span>) ErrorKind);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="doccomment">/// Invalid character in the [`Uuid`] string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Uuid`]: ../struct.Uuid.html</span>
-    <span class="ident">Char</span> { <span class="ident">character</span>: <span class="ident">char</span>, <span class="ident">index</span>: <span class="ident">usize</span> },
-    <span class="doccomment">/// A simple [`Uuid`] didn&#39;t contain 32 characters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Uuid`]: ../struct.Uuid.html</span>
-    <span class="ident">SimpleLength</span> { <span class="ident">len</span>: <span class="ident">usize</span> },
-    <span class="doccomment">/// A byte array didn&#39;t contain 16 bytes</span>
-    <span class="ident">ByteLength</span> { <span class="ident">len</span>: <span class="ident">usize</span> },
-    <span class="doccomment">/// A hyphenated [`Uuid`] didn&#39;t contain 5 groups</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Uuid`]: ../struct.Uuid.html</span>
-    <span class="ident">GroupCount</span> { <span class="ident">count</span>: <span class="ident">usize</span> },
-    <span class="doccomment">/// A hyphenated [`Uuid`] had a group that wasn&#39;t the right length</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Uuid`]: ../struct.Uuid.html</span>
-    <span class="ident">GroupLength</span> {
-        <span class="ident">group</span>: <span class="ident">usize</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-        <span class="ident">index</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ErrorKind {
+    <span class="doccomment">/// Invalid character in the [`Uuid`] string.
+    ///
+    /// [`Uuid`]: ../struct.Uuid.html
+    </span>Char { character: char, index: usize },
+    <span class="doccomment">/// A simple [`Uuid`] didn&#39;t contain 32 characters.
+    ///
+    /// [`Uuid`]: ../struct.Uuid.html
+    </span>SimpleLength { len: usize },
+    <span class="doccomment">/// A byte array didn&#39;t contain 16 bytes
+    </span>ByteLength { len: usize },
+    <span class="doccomment">/// A hyphenated [`Uuid`] didn&#39;t contain 5 groups
+    ///
+    /// [`Uuid`]: ../struct.Uuid.html
+    </span>GroupCount { count: usize },
+    <span class="doccomment">/// A hyphenated [`Uuid`] had a group that wasn&#39;t the right length
+    ///
+    /// [`Uuid`]: ../struct.Uuid.html
+    </span>GroupLength {
+        group: usize,
+        len: usize,
+        index: usize,
     },
-    <span class="doccomment">/// The input was not a valid UTF8 string</span>
-    <span class="ident">InvalidUTF8</span>,
-    <span class="doccomment">/// Some other error occurred.</span>
-    <span class="ident">Other</span>,
+    <span class="doccomment">/// The input was not a valid UTF8 string
+    </span>InvalidUTF8,
+    <span class="doccomment">/// Some other error occurred.
+    </span>Other,
 }
 
-<span class="doccomment">/// A string that is guaranteed to fail to parse to a [`Uuid`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type acts as a lightweight error indicator, suggesting</span>
-<span class="doccomment">/// that the string cannot be parsed but offering no error</span>
-<span class="doccomment">/// details. To get details, use `InvalidUuid::into_err`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Uuid`]: ../struct.Uuid.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidUuid</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]);
+<span class="doccomment">/// A string that is guaranteed to fail to parse to a [`Uuid`].
+///
+/// This type acts as a lightweight error indicator, suggesting
+/// that the string cannot be parsed but offering no error
+/// details. To get details, use `InvalidUuid::into_err`.
+///
+/// [`Uuid`]: ../struct.Uuid.html
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>InvalidUuid&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">InvalidUuid</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Converts the lightweight error type into detailed diagnostics.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_err</span>(<span class="self">self</span>) -&gt; <span class="ident">Error</span> {
-        <span class="comment">// Check whether or not the input was ever actually a valid UTF8 string</span>
-        <span class="kw">let</span> <span class="ident">input_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">std::str::from_utf8</span>(<span class="self">self</span>.<span class="number">0</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Error</span>(<span class="ident">ErrorKind::InvalidUTF8</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; InvalidUuid&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Converts the lightweight error type into detailed diagnostics.
+    </span><span class="kw">pub fn </span>into_err(<span class="self">self</span>) -&gt; Error {
+        <span class="comment">// Check whether or not the input was ever actually a valid UTF8 string
+        </span><span class="kw">let </span>input_str = <span class="kw">match </span>std::str::from_utf8(<span class="self">self</span>.<span class="number">0</span>) {
+            <span class="prelude-val">Ok</span>(s) =&gt; s,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span>Error(ErrorKind::InvalidUTF8),
         };
 
-        <span class="kw">let</span> (<span class="ident">uuid_str</span>, <span class="ident">offset</span>, <span class="ident">simple</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">input_str</span>.<span class="ident">as_bytes</span>() {
-            [<span class="string">b&#39;{&#39;</span>, <span class="ident">s</span> @ .., <span class="string">b&#39;}&#39;</span>] =&gt; (<span class="ident">s</span>, <span class="number">1</span>, <span class="bool-val">false</span>),
-            [<span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;n&#39;</span>, <span class="string">b&#39;:&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;:&#39;</span>, <span class="ident">s</span> @ ..] =&gt; {
-                (<span class="ident">s</span>, <span class="string">&quot;urn:uuid:&quot;</span>.<span class="ident">len</span>(), <span class="bool-val">false</span>)
+        <span class="kw">let </span>(uuid_str, offset, simple) = <span class="kw">match </span>input_str.as_bytes() {
+            [<span class="string">b&#39;{&#39;</span>, s @ .., <span class="string">b&#39;}&#39;</span>] =&gt; (s, <span class="number">1</span>, <span class="bool-val">false</span>),
+            [<span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;n&#39;</span>, <span class="string">b&#39;:&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;:&#39;</span>, s @ ..] =&gt; {
+                (s, <span class="string">&quot;urn:uuid:&quot;</span>.len(), <span class="bool-val">false</span>)
             }
-            <span class="ident">s</span> =&gt; (<span class="ident">s</span>, <span class="number">0</span>, <span class="bool-val">true</span>),
+            s =&gt; (s, <span class="number">0</span>, <span class="bool-val">true</span>),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hyphen_count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_bounds</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>hyphen_count = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>group_bounds = [<span class="number">0</span>; <span class="number">4</span>];
 
-        <span class="comment">// SAFETY: the byte array came from a valid utf8 string,</span>
-        <span class="comment">// and is aligned along char boundaries.</span>
-        <span class="kw">let</span> <span class="ident">uuid_str</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">std::str::from_utf8_unchecked</span>(<span class="ident">uuid_str</span>) };
+        <span class="comment">// SAFETY: the byte array came from a valid utf8 string,
+        // and is aligned along char boundaries.
+        </span><span class="kw">let </span>uuid_str = <span class="kw">unsafe </span>{ std::str::from_utf8_unchecked(uuid_str) };
 
-        <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">character</span>) <span class="kw">in</span> <span class="ident">uuid_str</span>.<span class="ident">char_indices</span>() {
-            <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">character</span> <span class="kw">as</span> <span class="ident">u8</span>;
-            <span class="kw">if</span> <span class="ident">character</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">-</span> <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="comment">// Multibyte char</span>
-                <span class="kw">return</span> <span class="ident">Error</span>(<span class="ident">ErrorKind::Char</span> {
-                    <span class="ident">character</span>,
-                    <span class="ident">index</span>: <span class="ident">index</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>,
+        <span class="kw">for </span>(index, character) <span class="kw">in </span>uuid_str.char_indices() {
+            <span class="kw">let </span>byte = character <span class="kw">as </span>u8;
+            <span class="kw">if </span>character <span class="kw">as </span>u32 - byte <span class="kw">as </span>u32 &gt; <span class="number">0 </span>{
+                <span class="comment">// Multibyte char
+                </span><span class="kw">return </span>Error(ErrorKind::Char {
+                    character,
+                    index: index + offset + <span class="number">1</span>,
                 });
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
-                <span class="comment">// While we search, also count group breaks</span>
-                <span class="kw">if</span> <span class="ident">hyphen_count</span> <span class="op">&lt;</span> <span class="number">4</span> {
-                    <span class="ident">group_bounds</span>[<span class="ident">hyphen_count</span>] <span class="op">=</span> <span class="ident">index</span>;
+            } <span class="kw">else if </span>byte == <span class="string">b&#39;-&#39; </span>{
+                <span class="comment">// While we search, also count group breaks
+                </span><span class="kw">if </span>hyphen_count &lt; <span class="number">4 </span>{
+                    group_bounds[hyphen_count] = index;
                 }
-                <span class="ident">hyphen_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">byte</span>, <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">|</span> <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span>) {
-                <span class="comment">// Non-hex char</span>
-                <span class="kw">return</span> <span class="ident">Error</span>(<span class="ident">ErrorKind::Char</span> {
-                    <span class="ident">character</span>: <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">char</span>,
-                    <span class="ident">index</span>: <span class="ident">index</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>,
+                hyphen_count += <span class="number">1</span>;
+            } <span class="kw">else if </span>!<span class="macro">matches!</span>(byte, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>| <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;F&#39;</span>) {
+                <span class="comment">// Non-hex char
+                </span><span class="kw">return </span>Error(ErrorKind::Char {
+                    character: byte <span class="kw">as </span>char,
+                    index: index + offset + <span class="number">1</span>,
                 });
             }
         }
 
-        <span class="kw">if</span> <span class="ident">hyphen_count</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">simple</span> {
-            <span class="comment">// This means that we tried and failed to parse a simple uuid.</span>
-            <span class="comment">// Since we verified that all the characters are valid, this means</span>
-            <span class="comment">// that it MUST have an invalid length.</span>
-            <span class="ident">Error</span>(<span class="ident">ErrorKind::SimpleLength</span> {
-                <span class="ident">len</span>: <span class="ident">input_str</span>.<span class="ident">len</span>(),
+        <span class="kw">if </span>hyphen_count == <span class="number">0 </span>&amp;&amp; simple {
+            <span class="comment">// This means that we tried and failed to parse a simple uuid.
+            // Since we verified that all the characters are valid, this means
+            // that it MUST have an invalid length.
+            </span>Error(ErrorKind::SimpleLength {
+                len: input_str.len(),
             })
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hyphen_count</span> <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
-            <span class="comment">// We tried to parse a hyphenated variant, but there weren&#39;t</span>
-            <span class="comment">// 5 groups (4 hyphen splits).</span>
-            <span class="ident">Error</span>(<span class="ident">ErrorKind::GroupCount</span> {
-                <span class="ident">count</span>: <span class="ident">hyphen_count</span> <span class="op">+</span> <span class="number">1</span>,
+        } <span class="kw">else if </span>hyphen_count != <span class="number">4 </span>{
+            <span class="comment">// We tried to parse a hyphenated variant, but there weren&#39;t
+            // 5 groups (4 hyphen splits).
+            </span>Error(ErrorKind::GroupCount {
+                count: hyphen_count + <span class="number">1</span>,
             })
-        } <span class="kw">else</span> {
-            <span class="comment">// There are 5 groups, one of them has an incorrect length</span>
-            <span class="kw">const</span> <span class="ident">BLOCK_STARTS</span>: [<span class="ident">usize</span>; <span class="number">5</span>] <span class="op">=</span> [<span class="number">0</span>, <span class="number">9</span>, <span class="number">14</span>, <span class="number">19</span>, <span class="number">24</span>];
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> {
-                <span class="kw">if</span> <span class="ident">group_bounds</span>[<span class="ident">i</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">BLOCK_STARTS</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">-</span> <span class="number">1</span> {
-                    <span class="kw">return</span> <span class="ident">Error</span>(<span class="ident">ErrorKind::GroupLength</span> {
-                        <span class="ident">group</span>: <span class="ident">i</span>,
-                        <span class="ident">len</span>: <span class="ident">group_bounds</span>[<span class="ident">i</span>] <span class="op">-</span> <span class="ident">BLOCK_STARTS</span>[<span class="ident">i</span>],
-                        <span class="ident">index</span>: <span class="ident">offset</span> <span class="op">+</span> <span class="ident">BLOCK_STARTS</span>[<span class="ident">i</span>] <span class="op">+</span> <span class="number">1</span>,
+        } <span class="kw">else </span>{
+            <span class="comment">// There are 5 groups, one of them has an incorrect length
+            </span><span class="kw">const </span>BLOCK_STARTS: [usize; <span class="number">5</span>] = [<span class="number">0</span>, <span class="number">9</span>, <span class="number">14</span>, <span class="number">19</span>, <span class="number">24</span>];
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">4 </span>{
+                <span class="kw">if </span>group_bounds[i] != BLOCK_STARTS[i + <span class="number">1</span>] - <span class="number">1 </span>{
+                    <span class="kw">return </span>Error(ErrorKind::GroupLength {
+                        group: i,
+                        len: group_bounds[i] - BLOCK_STARTS[i],
+                        index: offset + BLOCK_STARTS[i] + <span class="number">1</span>,
                     });
                 }
             }
 
-            <span class="comment">// The last group must be too long</span>
-            <span class="ident">Error</span>(<span class="ident">ErrorKind::GroupLength</span> {
-                <span class="ident">group</span>: <span class="number">4</span>,
-                <span class="ident">len</span>: <span class="ident">input_str</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">BLOCK_STARTS</span>[<span class="number">4</span>],
-                <span class="ident">index</span>: <span class="ident">offset</span> <span class="op">+</span> <span class="ident">BLOCK_STARTS</span>[<span class="number">4</span>] <span class="op">+</span> <span class="number">1</span>,
+            <span class="comment">// The last group must be too long
+            </span>Error(ErrorKind::GroupLength {
+                group: <span class="number">4</span>,
+                len: input_str.len() - BLOCK_STARTS[<span class="number">4</span>],
+                index: offset + BLOCK_STARTS[<span class="number">4</span>] + <span class="number">1</span>,
             })
         }
     }
 }
 
-<span class="comment">// NOTE: This impl is part of the public API. Breaking changes to it should be carefully considered</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ErrorKind::Char</span> {
-                <span class="ident">character</span>, <span class="ident">index</span>, ..
+<span class="comment">// NOTE: This impl is part of the public API. Breaking changes to it should be carefully considered
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            ErrorKind::Char {
+                character, index, ..
             } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-zA-Z], found `{}` at {}&quot;</span>, <span class="ident">character</span>, <span class="ident">index</span>)
+                <span class="macro">write!</span>(f, <span class="string">&quot;invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-zA-Z], found `{}` at {}&quot;</span>, character, index)
             }
-            <span class="ident">ErrorKind::SimpleLength</span> { <span class="ident">len</span> } =&gt; {
+            ErrorKind::SimpleLength { len } =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">f</span>,
+                    f,
                     <span class="string">&quot;invalid length: expected length 32 for simple format, found {}&quot;</span>,
-                    <span class="ident">len</span>
+                    len
                 )
             }
-            <span class="ident">ErrorKind::ByteLength</span> { <span class="ident">len</span> } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid length: expected 16 bytes, found {}&quot;</span>, <span class="ident">len</span>)
+            ErrorKind::ByteLength { len } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;invalid length: expected 16 bytes, found {}&quot;</span>, len)
             }
-            <span class="ident">ErrorKind::GroupCount</span> { <span class="ident">count</span> } =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid group count: expected 5, found {}&quot;</span>, <span class="ident">count</span>)
+            ErrorKind::GroupCount { count } =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;invalid group count: expected 5, found {}&quot;</span>, count)
             }
-            <span class="ident">ErrorKind::GroupLength</span> { <span class="ident">group</span>, <span class="ident">len</span>, .. } =&gt; {
-                <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> [<span class="number">8</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">12</span>][<span class="ident">group</span>];
+            ErrorKind::GroupLength { group, len, .. } =&gt; {
+                <span class="kw">let </span>expected = [<span class="number">8</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">12</span>][group];
                 <span class="macro">write!</span>(
-                    <span class="ident">f</span>,
+                    f,
                     <span class="string">&quot;invalid group length in group {}: expected {}, found {}&quot;</span>,
-                    <span class="ident">group</span>, <span class="ident">expected</span>, <span class="ident">len</span>
+                    group, expected, len
                 )
             }
-            <span class="ident">ErrorKind::InvalidUTF8</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;non-UTF8 input&quot;</span>),
-            <span class="ident">ErrorKind::Other</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;failed to parse a UUID&quot;</span>),
+            ErrorKind::InvalidUTF8 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;non-UTF8 input&quot;</span>),
+            ErrorKind::Other =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;failed to parse a UUID&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">std_support</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std::error</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">mod </span>std_support {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::std::error;
 
-    <span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+    <span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="uuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="uuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

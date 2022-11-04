@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/tls_rustls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls_rustls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/runtime/tls_rustls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls_rustls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -185,192 +185,192 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert::TryFrom</span>,
-    <span class="ident">fs::File</span>,
-    <span class="ident">io</span>::{<span class="ident">BufReader</span>, <span class="ident">Seek</span>, <span class="ident">SeekFrom</span>},
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::SystemTime</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    convert::TryFrom,
+    fs::File,
+    io::{BufReader, Seek, SeekFrom},
+    pin::Pin,
+    sync::Arc,
+    task::{Context, Poll},
+    time::SystemTime,
 };
 
-<span class="kw">use</span> <span class="ident">rustls</span>::{
-    <span class="ident">client</span>::{<span class="ident">ClientConfig</span>, <span class="ident">ServerCertVerified</span>, <span class="ident">ServerCertVerifier</span>, <span class="ident">ServerName</span>},
-    <span class="ident">Certificate</span>,
-    <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">TlsError</span>,
-    <span class="ident">OwnedTrustAnchor</span>,
-    <span class="ident">RootCertStore</span>,
+<span class="kw">use </span>rustls::{
+    client::{ClientConfig, ServerCertVerified, ServerCertVerifier, ServerName},
+    Certificate,
+    Error <span class="kw">as </span>TlsError,
+    OwnedTrustAnchor,
+    RootCertStore,
 };
-<span class="kw">use</span> <span class="ident">rustls_pemfile</span>::{<span class="ident">certs</span>, <span class="ident">read_one</span>, <span class="ident">Item</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tokio_rustls::TlsConnector</span>;
-<span class="kw">use</span> <span class="ident">webpki_roots::TLS_SERVER_ROOTS</span>;
+<span class="kw">use </span>rustls_pemfile::{certs, read_one, Item};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tokio_rustls::TlsConnector;
+<span class="kw">use </span>webpki_roots::TLS_SERVER_ROOTS;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client::options::TlsOptions</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
+<span class="kw">use crate</span>::{
+    client::options::TlsOptions,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::stream::AsyncTcpStream</span>;
+<span class="kw">use </span><span class="kw">super</span>::stream::AsyncTcpStream;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AsyncTlsStream</span> {
-    <span class="ident">inner</span>: <span class="ident">tokio_rustls::client::TlsStream</span><span class="op">&lt;</span><span class="ident">AsyncTcpStream</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AsyncTlsStream {
+    inner: tokio_rustls::client::TlsStream&lt;AsyncTcpStream&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncTlsStream</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(
-        <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">tcp_stream</span>: <span class="ident">AsyncTcpStream</span>,
-        <span class="ident">cfg</span>: <span class="ident">TlsOptions</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ServerName::try_from</span>(<span class="ident">host</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ErrorKind::DnsResolve</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;could not resolve {:?}: {}&quot;</span>, <span class="ident">host</span>, <span class="ident">e</span>),
+<span class="kw">impl </span>AsyncTlsStream {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect(
+        host: <span class="kw-2">&amp;</span>str,
+        tcp_stream: AsyncTcpStream,
+        cfg: TlsOptions,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>name = ServerName::try_from(host).map_err(|e| ErrorKind::DnsResolve {
+            message: <span class="macro">format!</span>(<span class="string">&quot;could not resolve {:?}: {}&quot;</span>, host, e),
         })<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tls_config</span> <span class="op">=</span> <span class="ident">make_rustls_config</span>(<span class="ident">cfg</span>)<span class="question-mark">?</span>;
-        <span class="ident">tls_config</span>.<span class="ident">enable_sni</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tls_config = make_rustls_config(cfg)<span class="question-mark">?</span>;
+        tls_config.enable_sni = <span class="bool-val">true</span>;
 
-        <span class="kw">let</span> <span class="ident">connector</span>: <span class="ident">TlsConnector</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">tls_config</span>).<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connector</span>
-            .<span class="ident">connect_with</span>(<span class="ident">name</span>, <span class="ident">tcp_stream</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="ident">c</span>.<span class="ident">set_buffer_limit</span>(<span class="prelude-val">None</span>);
+        <span class="kw">let </span>connector: TlsConnector = Arc::new(tls_config).into();
+        <span class="kw">let </span>conn = connector
+            .connect_with(name, tcp_stream, |c| {
+                c.set_buffer_limit(<span class="prelude-val">None</span>);
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">conn</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ inner: conn })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">AsyncTlsStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">tokio::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>AsyncTlsStream {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>tokio::io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_read(cx, buf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">AsyncTlsStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>AsyncTlsStream {
+    <span class="kw">fn </span>poll_write(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_write(cx, buf)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_flush(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_shutdown(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_shutdown(cx)
     }
 }
 
-<span class="doccomment">/// Converts `TlsOptions` into a rustls::ClientConfig.</span>
-<span class="kw">fn</span> <span class="ident">make_rustls_config</span>(<span class="ident">cfg</span>: <span class="ident">TlsOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">rustls::ClientConfig</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">store</span> <span class="op">=</span> <span class="ident">RootCertStore::empty</span>();
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">ca_file_path</span> {
-        <span class="kw">let</span> <span class="ident">ders</span> <span class="op">=</span> <span class="ident">certs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BufReader::new</span>(<span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>)).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+<span class="doccomment">/// Converts `TlsOptions` into a rustls::ClientConfig.
+</span><span class="kw">fn </span>make_rustls_config(cfg: TlsOptions) -&gt; <span class="prelude-ty">Result</span>&lt;rustls::ClientConfig&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>store = RootCertStore::empty();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = cfg.ca_file_path {
+        <span class="kw">let </span>ders = certs(<span class="kw-2">&amp;mut </span>BufReader::new(File::open(<span class="kw-2">&amp;</span>path)<span class="question-mark">?</span>)).map_err(|<span class="kw">_</span>| {
+            ErrorKind::InvalidTlsConfig {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;Unable to parse PEM-encoded root certificate from {}&quot;</span>,
-                    <span class="ident">path</span>.<span class="ident">display</span>()
+                    path.display()
                 ),
             }
         })<span class="question-mark">?</span>;
-        <span class="ident">store</span>.<span class="ident">add_parsable_certificates</span>(<span class="kw-2">&amp;</span><span class="ident">ders</span>);
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">trust_anchors</span> <span class="op">=</span> <span class="ident">TLS_SERVER_ROOTS</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ta</span><span class="op">|</span> {
-            <span class="ident">OwnedTrustAnchor::from_subject_spki_name_constraints</span>(
-                <span class="ident">ta</span>.<span class="ident">subject</span>,
-                <span class="ident">ta</span>.<span class="ident">spki</span>,
-                <span class="ident">ta</span>.<span class="ident">name_constraints</span>,
+        store.add_parsable_certificates(<span class="kw-2">&amp;</span>ders);
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>trust_anchors = TLS_SERVER_ROOTS.<span class="number">0</span>.iter().map(|ta| {
+            OwnedTrustAnchor::from_subject_spki_name_constraints(
+                ta.subject,
+                ta.spki,
+                ta.name_constraints,
             )
         });
-        <span class="ident">store</span>.<span class="ident">add_server_trust_anchors</span>(<span class="ident">trust_anchors</span>);
+        store.add_server_trust_anchors(trust_anchors);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">cert_key_file_path</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>)<span class="question-mark">?</span>);
-        <span class="kw">let</span> <span class="ident">certs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">certs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) =&gt; <span class="ident">certs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Certificate</span>).<span class="ident">collect</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">let </span><span class="kw-2">mut </span>config = <span class="kw">if let </span><span class="prelude-val">Some</span>(path) = cfg.cert_key_file_path {
+        <span class="kw">let </span><span class="kw-2">mut </span>file = BufReader::new(File::open(<span class="kw-2">&amp;</span>path)<span class="question-mark">?</span>);
+        <span class="kw">let </span>certs = <span class="kw">match </span>certs(<span class="kw-2">&amp;mut </span>file) {
+            <span class="prelude-val">Ok</span>(certs) =&gt; certs.into_iter().map(Certificate).collect(),
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidTlsConfig {
+                    message: <span class="macro">format!</span>(
                         <span class="string">&quot;Unable to parse PEM-encoded client certificate from {}: {}&quot;</span>,
-                        <span class="ident">path</span>.<span class="ident">display</span>(),
-                        <span class="ident">error</span>,
+                        path.display(),
+                        error,
                     ),
                 }
-                .<span class="ident">into</span>())
+                .into())
             }
         };
 
-        <span class="ident">file</span>.<span class="ident">seek</span>(<span class="ident">SeekFrom::Start</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">read_one</span>(<span class="kw-2">&amp;mut</span> <span class="ident">file</span>) {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item::PKCS8Key</span>(<span class="ident">bytes</span>))) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Item::RSAKey</span>(<span class="ident">bytes</span>))) =&gt; {
-                    <span class="kw">break</span> <span class="ident">rustls::PrivateKey</span>(<span class="ident">bytes</span>)
+        file.seek(SeekFrom::Start(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>key = <span class="kw">loop </span>{
+            <span class="kw">match </span>read_one(<span class="kw-2">&amp;mut </span>file) {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Item::PKCS8Key(bytes))) | <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Item::RSAKey(bytes))) =&gt; {
+                    <span class="kw">break </span>rustls::PrivateKey(bytes)
                 }
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">continue</span>,
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;No PEM-encoded keys in {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>()),
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidTlsConfig {
+                        message: <span class="macro">format!</span>(<span class="string">&quot;No PEM-encoded keys in {}&quot;</span>, path.display()),
                     }
-                    .<span class="ident">into</span>())
+                    .into())
                 }
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                        <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidTlsConfig {
+                        message: <span class="macro">format!</span>(
                             <span class="string">&quot;Unable to parse PEM-encoded item from {}&quot;</span>,
-                            <span class="ident">path</span>.<span class="ident">display</span>()
+                            path.display()
                         ),
                     }
-                    .<span class="ident">into</span>())
+                    .into())
                 }
             }
         };
 
-        <span class="ident">ClientConfig::builder</span>()
-            .<span class="ident">with_safe_defaults</span>()
-            .<span class="ident">with_root_certificates</span>(<span class="ident">store</span>)
-            .<span class="ident">with_single_cert</span>(<span class="ident">certs</span>, <span class="ident">key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">ErrorKind::InvalidTlsConfig</span> {
-                <span class="ident">message</span>: <span class="ident">error</span>.<span class="ident">to_string</span>(),
-            })<span class="question-mark">?</span>
-    } <span class="kw">else</span> {
-        <span class="ident">ClientConfig::builder</span>()
-            .<span class="ident">with_safe_defaults</span>()
-            .<span class="ident">with_root_certificates</span>(<span class="ident">store</span>)
-            .<span class="ident">with_no_client_auth</span>()
+        ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(store)
+            .with_single_cert(certs, key)
+            .map_err(|error| ErrorKind::InvalidTlsConfig {
+                message: error.to_string(),
+            })<span class="question-mark">?
+    </span>} <span class="kw">else </span>{
+        ClientConfig::builder()
+            .with_safe_defaults()
+            .with_root_certificates(store)
+            .with_no_client_auth()
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">allow_invalid_certificates</span> {
-        <span class="ident">config</span>
-            .<span class="ident">dangerous</span>()
-            .<span class="ident">set_certificate_verifier</span>(<span class="ident">Arc::new</span>(<span class="ident">NoCertVerifier</span> {}));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>) = cfg.allow_invalid_certificates {
+        config
+            .dangerous()
+            .set_certificate_verifier(Arc::new(NoCertVerifier {}));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
+    <span class="prelude-val">Ok</span>(config)
 }
 
-<span class="kw">struct</span> <span class="ident">NoCertVerifier</span> {}
+<span class="kw">struct </span>NoCertVerifier {}
 
-<span class="kw">impl</span> <span class="ident">ServerCertVerifier</span> <span class="kw">for</span> <span class="ident">NoCertVerifier</span> {
-    <span class="kw">fn</span> <span class="ident">verify_server_cert</span>(
+<span class="kw">impl </span>ServerCertVerifier <span class="kw">for </span>NoCertVerifier {
+    <span class="kw">fn </span>verify_server_cert(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Certificate</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">Certificate</span>],
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">ServerName</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="kw">_</span>: <span class="ident">SystemTime</span>,
-    ) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">ServerCertVerified</span>, <span class="ident">TlsError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ServerCertVerified::assertion</span>())
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>Certificate,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[Certificate],
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>ServerName,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>[u8]&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[u8],
+        <span class="kw">_</span>: SystemTime,
+    ) -&gt; std::result::Result&lt;ServerCertVerified, TlsError&gt; {
+        <span class="prelude-val">Ok</span>(ServerCertVerified::assertion())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -633,640 +633,640 @@
 <span id="633">633</span>
 <span id="634">634</span>
 <span id="635">635</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Bounded channel based on a preallocated array.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This flavor has a fixed, positive capacity.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The implementation is based on Dmitry Vyukov&#39;s bounded MPMC queue.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Source:</span>
-<span class="doccomment">//!   - &lt;http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue&gt;</span>
-<span class="doccomment">//!   - &lt;https://docs.google.com/document/d/1yIAYmbvL3JxOKOjuCyon7JhW4cSv1wy5hC0ApeGMV9s/pub&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Bounded channel based on a preallocated array.
+//!
+//! This flavor has a fixed, positive capacity.
+//!
+//! The implementation is based on Dmitry Vyukov&#39;s bounded MPMC queue.
+//!
+//! Source:
+//!   - &lt;http://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue&gt;
+//!   - &lt;https://docs.google.com/document/d/1yIAYmbvL3JxOKOjuCyon7JhW4cSv1wy5hC0ApeGMV9s/pub&gt;
 
-<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</span><span class="kw">use </span>std::cell::UnsafeCell;
+<span class="kw">use </span>std::mem::MaybeUninit;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::sync::atomic::{<span class="self">self</span>, AtomicUsize, Ordering};
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils</span>::{<span class="ident">Backoff</span>, <span class="ident">CachePadded</span>};
+<span class="kw">use </span>crossbeam_utils::{Backoff, CachePadded};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">SendTimeoutError</span>, <span class="ident">TryRecvError</span>, <span class="ident">TrySendError</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::select</span>::{<span class="ident">Operation</span>, <span class="ident">SelectHandle</span>, <span class="ident">Selected</span>, <span class="ident">Token</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::waker::SyncWaker</span>;
+<span class="kw">use </span><span class="kw">crate</span>::context::Context;
+<span class="kw">use </span><span class="kw">crate</span>::err::{RecvTimeoutError, SendTimeoutError, TryRecvError, TrySendError};
+<span class="kw">use </span><span class="kw">crate</span>::select::{Operation, SelectHandle, Selected, Token};
+<span class="kw">use </span><span class="kw">crate</span>::waker::SyncWaker;
 
-<span class="doccomment">/// A slot in a channel.</span>
-<span class="kw">struct</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The current stamp.</span>
-    <span class="ident">stamp</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// A slot in a channel.
+</span><span class="kw">struct </span>Slot&lt;T&gt; {
+    <span class="doccomment">/// The current stamp.
+    </span>stamp: AtomicUsize,
 
-    <span class="doccomment">/// The message in this slot.</span>
-    <span class="ident">msg</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message in this slot.
+    </span>msg: UnsafeCell&lt;MaybeUninit&lt;T&gt;&gt;,
 }
 
-<span class="doccomment">/// The token type for the array flavor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ArrayToken</span> {
-    <span class="doccomment">/// Slot to read from or write to.</span>
-    <span class="ident">slot</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
+<span class="doccomment">/// The token type for the array flavor.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ArrayToken {
+    <span class="doccomment">/// Slot to read from or write to.
+    </span>slot: <span class="kw-2">*const </span>u8,
 
-    <span class="doccomment">/// Stamp to store into the slot after reading or writing.</span>
-    <span class="ident">stamp</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Stamp to store into the slot after reading or writing.
+    </span>stamp: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ArrayToken</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ArrayToken</span> {
-            <span class="ident">slot</span>: <span class="ident">ptr::null</span>(),
-            <span class="ident">stamp</span>: <span class="number">0</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>ArrayToken {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ArrayToken {
+            slot: ptr::null(),
+            stamp: <span class="number">0</span>,
         }
     }
 }
 
-<span class="doccomment">/// Bounded channel based on a preallocated array.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
-    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
-    <span class="doccomment">/// represent the lap. The mark bit in the head is always zero.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages are popped from the head of the channel.</span>
-    <span class="ident">head</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Bounded channel based on a preallocated array.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Channel&lt;T&gt; {
+    <span class="doccomment">/// The head of the channel.
+    ///
+    /// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but
+    /// packed into a single `usize`. The lower bits represent the index, while the upper bits
+    /// represent the lap. The mark bit in the head is always zero.
+    ///
+    /// Messages are popped from the head of the channel.
+    </span>head: CachePadded&lt;AtomicUsize&gt;,
 
-    <span class="doccomment">/// The tail of the channel.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but</span>
-    <span class="doccomment">/// packed into a single `usize`. The lower bits represent the index, while the upper bits</span>
-    <span class="doccomment">/// represent the lap. The mark bit indicates that the channel is disconnected.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Messages are pushed into the tail of the channel.</span>
-    <span class="ident">tail</span>: <span class="ident">CachePadded</span><span class="op">&lt;</span><span class="ident">AtomicUsize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The tail of the channel.
+    ///
+    /// This value is a &quot;stamp&quot; consisting of an index into the buffer, a mark bit, and a lap, but
+    /// packed into a single `usize`. The lower bits represent the index, while the upper bits
+    /// represent the lap. The mark bit indicates that the channel is disconnected.
+    ///
+    /// Messages are pushed into the tail of the channel.
+    </span>tail: CachePadded&lt;AtomicUsize&gt;,
 
-    <span class="doccomment">/// The buffer holding slots.</span>
-    <span class="ident">buffer</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// The buffer holding slots.
+    </span>buffer: Box&lt;[Slot&lt;T&gt;]&gt;,
 
-    <span class="doccomment">/// The channel capacity.</span>
-    <span class="ident">cap</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The channel capacity.
+    </span>cap: usize,
 
-    <span class="doccomment">/// A stamp with the value of `{ lap: 1, mark: 0, index: 0 }`.</span>
-    <span class="ident">one_lap</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// A stamp with the value of `{ lap: 1, mark: 0, index: 0 }`.
+    </span>one_lap: usize,
 
-    <span class="doccomment">/// If this bit is set in the tail, that means the channel is disconnected.</span>
-    <span class="ident">mark_bit</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// If this bit is set in the tail, that means the channel is disconnected.
+    </span>mark_bit: usize,
 
-    <span class="doccomment">/// Senders waiting while the channel is full.</span>
-    <span class="ident">senders</span>: <span class="ident">SyncWaker</span>,
+    <span class="doccomment">/// Senders waiting while the channel is full.
+    </span>senders: SyncWaker,
 
-    <span class="doccomment">/// Receivers waiting while the channel is empty and not disconnected.</span>
-    <span class="ident">receivers</span>: <span class="ident">SyncWaker</span>,
+    <span class="doccomment">/// Receivers waiting while the channel is empty and not disconnected.
+    </span>receivers: SyncWaker,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a bounded channel of capacity `cap`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">cap</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">cap</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;capacity must be positive&quot;</span>);
+<span class="kw">impl</span>&lt;T&gt; Channel&lt;T&gt; {
+    <span class="doccomment">/// Creates a bounded channel of capacity `cap`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_capacity(cap: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(cap &gt; <span class="number">0</span>, <span class="string">&quot;capacity must be positive&quot;</span>);
 
-        <span class="comment">// Compute constants `mark_bit` and `one_lap`.</span>
-        <span class="kw">let</span> <span class="ident">mark_bit</span> <span class="op">=</span> (<span class="ident">cap</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">next_power_of_two</span>();
-        <span class="kw">let</span> <span class="ident">one_lap</span> <span class="op">=</span> <span class="ident">mark_bit</span> <span class="op">*</span> <span class="number">2</span>;
+        <span class="comment">// Compute constants `mark_bit` and `one_lap`.
+        </span><span class="kw">let </span>mark_bit = (cap + <span class="number">1</span>).next_power_of_two();
+        <span class="kw">let </span>one_lap = mark_bit * <span class="number">2</span>;
 
-        <span class="comment">// Head is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="comment">// Tail is initialized to `{ lap: 0, mark: 0, index: 0 }`.</span>
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// Head is initialized to `{ lap: 0, mark: 0, index: 0 }`.
+        </span><span class="kw">let </span>head = <span class="number">0</span>;
+        <span class="comment">// Tail is initialized to `{ lap: 0, mark: 0, index: 0 }`.
+        </span><span class="kw">let </span>tail = <span class="number">0</span>;
 
-        <span class="comment">// Allocate a buffer of `cap` slots initialized</span>
-        <span class="comment">// with stamps.</span>
-        <span class="kw">let</span> <span class="ident">buffer</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]<span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">cap</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-                <span class="comment">// Set the stamp to `{ lap: 0, mark: 0, index: i }`.</span>
-                <span class="ident">Slot</span> {
-                    <span class="ident">stamp</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">i</span>),
-                    <span class="ident">msg</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">MaybeUninit::uninit</span>()),
+        <span class="comment">// Allocate a buffer of `cap` slots initialized
+        // with stamps.
+        </span><span class="kw">let </span>buffer: Box&lt;[Slot&lt;T&gt;]&gt; = (<span class="number">0</span>..cap)
+            .map(|i| {
+                <span class="comment">// Set the stamp to `{ lap: 0, mark: 0, index: i }`.
+                </span>Slot {
+                    stamp: AtomicUsize::new(i),
+                    msg: UnsafeCell::new(MaybeUninit::uninit()),
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="ident">Channel</span> {
-            <span class="ident">buffer</span>,
-            <span class="ident">cap</span>,
-            <span class="ident">one_lap</span>,
-            <span class="ident">mark_bit</span>,
-            <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="ident">head</span>)),
-            <span class="ident">tail</span>: <span class="ident">CachePadded::new</span>(<span class="ident">AtomicUsize::new</span>(<span class="ident">tail</span>)),
-            <span class="ident">senders</span>: <span class="ident">SyncWaker::new</span>(),
-            <span class="ident">receivers</span>: <span class="ident">SyncWaker::new</span>(),
+        Channel {
+            buffer,
+            cap,
+            one_lap,
+            mark_bit,
+            head: CachePadded::new(AtomicUsize::new(head)),
+            tail: CachePadded::new(AtomicUsize::new(tail)),
+            senders: SyncWaker::new(),
+            receivers: SyncWaker::new(),
         }
     }
 
-    <span class="doccomment">/// Returns a receiver handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">receiver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Receiver</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a receiver handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>receiver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Receiver(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns a sender handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Sender</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a sender handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Sender(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Attempts to reserve a slot for sending a message.</span>
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+    <span class="doccomment">/// Attempts to reserve a slot for sending a message.
+    </span><span class="kw">fn </span>start_send(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Check if the channel is disconnected.</span>
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-                <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Check if the channel is disconnected.
+            </span><span class="kw">if </span>tail &amp; <span class="self">self</span>.mark_bit != <span class="number">0 </span>{
+                token.array.slot = ptr::null();
+                token.array.stamp = <span class="number">0</span>;
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
 
-            <span class="comment">// Deconstruct the tail.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+            <span class="comment">// Deconstruct the tail.
+            </span><span class="kw">let </span>index = tail &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
+            <span class="kw">let </span>lap = tail &amp; !(<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-            <span class="comment">// Inspect the corresponding slot.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) };
-            <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// Inspect the corresponding slot.
+            </span><span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+            <span class="kw">let </span>slot = <span class="kw">unsafe </span>{ <span class="self">self</span>.buffer.get_unchecked(index) };
+            <span class="kw">let </span>stamp = slot.stamp.load(Ordering::Acquire);
 
-            <span class="comment">// If the tail and the stamp match, we may attempt to push.</span>
-            <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">stamp</span> {
-                <span class="kw">let</span> <span class="ident">new_tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
-                    <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
-                    <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
+            <span class="comment">// If the tail and the stamp match, we may attempt to push.
+            </span><span class="kw">if </span>tail == stamp {
+                <span class="kw">let </span>new_tail = <span class="kw">if </span>index + <span class="number">1 </span>&lt; <span class="self">self</span>.cap {
+                    <span class="comment">// Same lap, incremented index.
+                    // Set to `{ lap: lap, mark: 0, index: index + 1 }`.
+                    </span>tail + <span class="number">1
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// One lap forward, index wraps around to zero.
+                    // Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.
+                    </span>lap.wrapping_add(<span class="self">self</span>.one_lap)
                 };
 
-                <span class="comment">// Try moving the tail.</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">tail</span>,
-                    <span class="ident">new_tail</span>,
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+                <span class="comment">// Try moving the tail.
+                </span><span class="kw">match </span><span class="self">self</span>.tail.compare_exchange_weak(
+                    tail,
+                    new_tail,
+                    Ordering::SeqCst,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Prepare the token for the follow-up call to `write`.</span>
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span> <span class="op">=</span> <span class="ident">slot</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span>;
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
+                        <span class="comment">// Prepare the token for the follow-up call to `write`.
+                        </span>token.array.slot = slot <span class="kw">as </span><span class="kw-2">*const </span>Slot&lt;T&gt; <span class="kw">as </span><span class="kw-2">*const </span>u8;
+                        token.array.stamp = tail + <span class="number">1</span>;
+                        <span class="kw">return </span><span class="bool-val">true</span>;
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">t</span>) =&gt; {
-                        <span class="ident">tail</span> <span class="op">=</span> <span class="ident">t</span>;
-                        <span class="ident">backoff</span>.<span class="ident">spin</span>();
+                    <span class="prelude-val">Err</span>(t) =&gt; {
+                        tail = t;
+                        backoff.spin();
                     }
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">+</span> <span class="number">1</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+            } <span class="kw">else if </span>stamp.wrapping_add(<span class="self">self</span>.one_lap) == tail + <span class="number">1 </span>{
+                atomic::fence(Ordering::SeqCst);
+                <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::Relaxed);
 
-                <span class="comment">// If the head lags one lap behind the tail as well...</span>
-                <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                    <span class="comment">// ...then the channel is full.</span>
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="comment">// If the head lags one lap behind the tail as well...
+                </span><span class="kw">if </span>head.wrapping_add(<span class="self">self</span>.one_lap) == tail {
+                    <span class="comment">// ...then the channel is full.
+                    </span><span class="kw">return </span><span class="bool-val">false</span>;
                 }
 
-                <span class="ident">backoff</span>.<span class="ident">spin</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+                backoff.spin();
+                tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
+            } <span class="kw">else </span>{
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.
+                </span>backoff.snooze();
+                tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
             }
         }
     }
 
-    <span class="doccomment">/// Writes a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="comment">// If there is no slot, the channel is disconnected.</span>
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
+    <span class="doccomment">/// Writes a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt; {
+        <span class="comment">// If there is no slot, the channel is disconnected.
+        </span><span class="kw">if </span>token.array.slot.is_null() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
 
-        <span class="kw">let</span> <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>slot: <span class="kw-2">&amp;</span>Slot&lt;T&gt; = <span class="kw-2">&amp;*</span>token.array.slot.cast::&lt;Slot&lt;T&gt;&gt;();
 
-        <span class="comment">// Write the message into the slot and update the stamp.</span>
-        <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="ident">MaybeUninit::new</span>(<span class="ident">msg</span>));
-        <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span>, <span class="ident">Ordering::Release</span>);
+        <span class="comment">// Write the message into the slot and update the stamp.
+        </span>slot.msg.get().write(MaybeUninit::new(msg));
+        slot.stamp.store(token.array.stamp, Ordering::Release);
 
-        <span class="comment">// Wake a sleeping receiver.</span>
-        <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">notify</span>();
+        <span class="comment">// Wake a sleeping receiver.
+        </span><span class="self">self</span>.receivers.notify();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Attempts to reserve a slot for receiving a message.</span>
-    <span class="kw">fn</span> <span class="ident">start_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+    <span class="doccomment">/// Attempts to reserve a slot for receiving a message.
+    </span><span class="kw">fn </span>start_recv(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>head = <span class="self">self</span>.head.load(Ordering::Relaxed);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Deconstruct the head.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">one_lap</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">loop </span>{
+            <span class="comment">// Deconstruct the head.
+            </span><span class="kw">let </span>index = head &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
+            <span class="kw">let </span>lap = head &amp; !(<span class="self">self</span>.one_lap - <span class="number">1</span>);
 
-            <span class="comment">// Inspect the corresponding slot.</span>
-            <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked</span>(<span class="ident">index</span>) };
-            <span class="kw">let</span> <span class="ident">stamp</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
+            <span class="comment">// Inspect the corresponding slot.
+            </span><span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+            <span class="kw">let </span>slot = <span class="kw">unsafe </span>{ <span class="self">self</span>.buffer.get_unchecked(index) };
+            <span class="kw">let </span>stamp = slot.stamp.load(Ordering::Acquire);
 
-            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.</span>
-            <span class="kw">if</span> <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">stamp</span> {
-                <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                    <span class="comment">// Same lap, incremented index.</span>
-                    <span class="comment">// Set to `{ lap: lap, mark: 0, index: index + 1 }`.</span>
-                    <span class="ident">head</span> <span class="op">+</span> <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// One lap forward, index wraps around to zero.</span>
-                    <span class="comment">// Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.</span>
-                    <span class="ident">lap</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>)
+            <span class="comment">// If the the stamp is ahead of the head by 1, we may attempt to pop.
+            </span><span class="kw">if </span>head + <span class="number">1 </span>== stamp {
+                <span class="kw">let </span>new = <span class="kw">if </span>index + <span class="number">1 </span>&lt; <span class="self">self</span>.cap {
+                    <span class="comment">// Same lap, incremented index.
+                    // Set to `{ lap: lap, mark: 0, index: index + 1 }`.
+                    </span>head + <span class="number">1
+                </span>} <span class="kw">else </span>{
+                    <span class="comment">// One lap forward, index wraps around to zero.
+                    // Set to `{ lap: lap.wrapping_add(1), mark: 0, index: 0 }`.
+                    </span>lap.wrapping_add(<span class="self">self</span>.one_lap)
                 };
 
-                <span class="comment">// Try moving the head.</span>
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">compare_exchange_weak</span>(
-                    <span class="ident">head</span>,
-                    <span class="ident">new</span>,
-                    <span class="ident">Ordering::SeqCst</span>,
-                    <span class="ident">Ordering::Relaxed</span>,
+                <span class="comment">// Try moving the head.
+                </span><span class="kw">match </span><span class="self">self</span>.head.compare_exchange_weak(
+                    head,
+                    new,
+                    Ordering::SeqCst,
+                    Ordering::Relaxed,
                 ) {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// Prepare the token for the follow-up call to `read`.</span>
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span> <span class="op">=</span> <span class="ident">slot</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>);
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
+                        <span class="comment">// Prepare the token for the follow-up call to `read`.
+                        </span>token.array.slot = slot <span class="kw">as </span><span class="kw-2">*const </span>Slot&lt;T&gt; <span class="kw">as </span><span class="kw-2">*const </span>u8;
+                        token.array.stamp = head.wrapping_add(<span class="self">self</span>.one_lap);
+                        <span class="kw">return </span><span class="bool-val">true</span>;
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
-                        <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
-                        <span class="ident">backoff</span>.<span class="ident">spin</span>();
-                    }
-                }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">stamp</span> <span class="op">==</span> <span class="ident">head</span> {
-                <span class="ident">atomic::fence</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-
-                <span class="comment">// If the tail equals the head, that means the channel is empty.</span>
-                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span> {
-                    <span class="comment">// If the channel is disconnected...</span>
-                    <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="comment">// ...then receive an error.</span>
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
-                        <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="kw">return</span> <span class="bool-val">true</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Otherwise, the receive operation is not ready.</span>
-                        <span class="kw">return</span> <span class="bool-val">false</span>;
+                    <span class="prelude-val">Err</span>(h) =&gt; {
+                        head = h;
+                        backoff.spin();
                     }
                 }
+            } <span class="kw">else if </span>stamp == head {
+                atomic::fence(Ordering::SeqCst);
+                <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::Relaxed);
 
-                <span class="ident">backoff</span>.<span class="ident">spin</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// Snooze because we need to wait for the stamp to get updated.</span>
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
-                <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
+                <span class="comment">// If the tail equals the head, that means the channel is empty.
+                </span><span class="kw">if </span>(tail &amp; !<span class="self">self</span>.mark_bit) == head {
+                    <span class="comment">// If the channel is disconnected...
+                    </span><span class="kw">if </span>tail &amp; <span class="self">self</span>.mark_bit != <span class="number">0 </span>{
+                        <span class="comment">// ...then receive an error.
+                        </span>token.array.slot = ptr::null();
+                        token.array.stamp = <span class="number">0</span>;
+                        <span class="kw">return </span><span class="bool-val">true</span>;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Otherwise, the receive operation is not ready.
+                        </span><span class="kw">return </span><span class="bool-val">false</span>;
+                    }
+                }
+
+                backoff.spin();
+                head = <span class="self">self</span>.head.load(Ordering::Relaxed);
+            } <span class="kw">else </span>{
+                <span class="comment">// Snooze because we need to wait for the stamp to get updated.
+                </span>backoff.snooze();
+                head = <span class="self">self</span>.head.load(Ordering::Relaxed);
             }
         }
     }
 
-    <span class="doccomment">/// Reads a message from the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span>.<span class="ident">is_null</span>() {
-            <span class="comment">// The channel is disconnected.</span>
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+    <span class="doccomment">/// Reads a message from the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; <span class="prelude-ty">Result</span>&lt;T, ()&gt; {
+        <span class="kw">if </span>token.array.slot.is_null() {
+            <span class="comment">// The channel is disconnected.
+            </span><span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="kw">let</span> <span class="ident">slot</span>: <span class="kw-2">&amp;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">slot</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>slot: <span class="kw-2">&amp;</span>Slot&lt;T&gt; = <span class="kw-2">&amp;*</span>token.array.slot.cast::&lt;Slot&lt;T&gt;&gt;();
 
-        <span class="comment">// Read the message from the slot and update the stamp.</span>
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">read</span>().<span class="ident">assume_init</span>();
-        <span class="ident">slot</span>.<span class="ident">stamp</span>.<span class="ident">store</span>(<span class="ident">token</span>.<span class="ident">array</span>.<span class="ident">stamp</span>, <span class="ident">Ordering::Release</span>);
+        <span class="comment">// Read the message from the slot and update the stamp.
+        </span><span class="kw">let </span>msg = slot.msg.get().read().assume_init();
+        slot.stamp.store(token.array.stamp, Ordering::Release);
 
-        <span class="comment">// Wake a sleeping sender.</span>
-        <span class="self">self</span>.<span class="ident">senders</span>.<span class="ident">notify</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">msg</span>)
+        <span class="comment">// Wake a sleeping sender.
+        </span><span class="self">self</span>.senders.notify();
+        <span class="prelude-val">Ok</span>(msg)
     }
 
-    <span class="doccomment">/// Attempts to send a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_send</span>(<span class="ident">token</span>) {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">token</span>, <span class="ident">msg</span>).<span class="ident">map_err</span>(<span class="ident">TrySendError::Disconnected</span>) }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">msg</span>))
+    <span class="doccomment">/// Attempts to send a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">if </span><span class="self">self</span>.start_send(token) {
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.write(token, msg).map_err(TrySendError::Disconnected) }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(TrySendError::Full(msg))
         }
     }
 
-    <span class="doccomment">/// Sends a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(
+    <span class="doccomment">/// Sends a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>send(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">msg</span>: <span class="ident">T</span>,
-        <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SendTimeoutError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">loop</span> {
-            <span class="comment">// Try sending a message several times.</span>
-            <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_send</span>(<span class="ident">token</span>) {
-                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">token</span>, <span class="ident">msg</span>) };
-                    <span class="kw">return</span> <span class="ident">res</span>.<span class="ident">map_err</span>(<span class="ident">SendTimeoutError::Disconnected</span>);
+        msg: T,
+        deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), SendTimeoutError&lt;T&gt;&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">loop </span>{
+            <span class="comment">// Try sending a message several times.
+            </span><span class="kw">let </span>backoff = Backoff::new();
+            <span class="kw">loop </span>{
+                <span class="kw">if </span><span class="self">self</span>.start_send(token) {
+                    <span class="kw">let </span>res = <span class="kw">unsafe </span>{ <span class="self">self</span>.write(token, msg) };
+                    <span class="kw">return </span>res.map_err(SendTimeoutError::Disconnected);
                 }
 
-                <span class="kw">if</span> <span class="ident">backoff</span>.<span class="ident">is_completed</span>() {
+                <span class="kw">if </span>backoff.is_completed() {
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+                } <span class="kw">else </span>{
+                    backoff.snooze();
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">deadline</span> {
-                <span class="kw">if</span> <span class="ident">Instant::now</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">d</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SendTimeoutError::Timeout</span>(<span class="ident">msg</span>));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(d) = deadline {
+                <span class="kw">if </span>Instant::now() &gt;= d {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SendTimeoutError::Timeout(msg));
                 }
             }
 
-            <span class="ident">Context::with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-                <span class="comment">// Prepare for blocking until a receiver wakes us up.</span>
-                <span class="kw">let</span> <span class="ident">oper</span> <span class="op">=</span> <span class="ident">Operation::hook</span>(<span class="ident">token</span>);
-                <span class="self">self</span>.<span class="ident">senders</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
+            Context::with(|cx| {
+                <span class="comment">// Prepare for blocking until a receiver wakes us up.
+                </span><span class="kw">let </span>oper = Operation::hook(token);
+                <span class="self">self</span>.senders.register(oper, cx);
 
-                <span class="comment">// Has the channel become ready just now?</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_full</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_disconnected</span>() {
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">try_select</span>(<span class="ident">Selected::Aborted</span>);
+                <span class="comment">// Has the channel become ready just now?
+                </span><span class="kw">if </span>!<span class="self">self</span>.is_full() || <span class="self">self</span>.is_disconnected() {
+                    <span class="kw">let _ </span>= cx.try_select(Selected::Aborted);
                 }
 
-                <span class="comment">// Block the current thread.</span>
-                <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_until</span>(<span class="ident">deadline</span>);
+                <span class="comment">// Block the current thread.
+                </span><span class="kw">let </span>sel = cx.wait_until(deadline);
 
-                <span class="kw">match</span> <span class="ident">sel</span> {
-                    <span class="ident">Selected::Waiting</span> =&gt; <span class="macro">unreachable!</span>(),
-                    <span class="ident">Selected::Aborted</span> <span class="op">|</span> <span class="ident">Selected::Disconnected</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">senders</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>).<span class="ident">unwrap</span>();
+                <span class="kw">match </span>sel {
+                    Selected::Waiting =&gt; <span class="macro">unreachable!</span>(),
+                    Selected::Aborted | Selected::Disconnected =&gt; {
+                        <span class="self">self</span>.senders.unregister(oper).unwrap();
                     }
-                    <span class="ident">Selected::Operation</span>(<span class="kw">_</span>) =&gt; {}
+                    Selected::Operation(<span class="kw">_</span>) =&gt; {}
                 }
             });
         }
     }
 
-    <span class="doccomment">/// Attempts to receive a message without blocking.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
+    <span class="doccomment">/// Attempts to receive a message without blocking.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryRecvError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>) {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TryRecvError::Disconnected</span>) }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>)
+        <span class="kw">if </span><span class="self">self</span>.start_recv(token) {
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.read(token).map_err(|<span class="kw">_</span>| TryRecvError::Disconnected) }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(TryRecvError::Empty)
         }
     }
 
-    <span class="doccomment">/// Receives a message from the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvTimeoutError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">loop</span> {
-            <span class="comment">// Try receiving a message several times.</span>
-            <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>) {
-                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>) };
-                    <span class="kw">return</span> <span class="ident">res</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RecvTimeoutError::Disconnected</span>);
+    <span class="doccomment">/// Receives a message from the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recv(<span class="kw-2">&amp;</span><span class="self">self</span>, deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, RecvTimeoutError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">loop </span>{
+            <span class="comment">// Try receiving a message several times.
+            </span><span class="kw">let </span>backoff = Backoff::new();
+            <span class="kw">loop </span>{
+                <span class="kw">if </span><span class="self">self</span>.start_recv(token) {
+                    <span class="kw">let </span>res = <span class="kw">unsafe </span>{ <span class="self">self</span>.read(token) };
+                    <span class="kw">return </span>res.map_err(|<span class="kw">_</span>| RecvTimeoutError::Disconnected);
                 }
 
-                <span class="kw">if</span> <span class="ident">backoff</span>.<span class="ident">is_completed</span>() {
+                <span class="kw">if </span>backoff.is_completed() {
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+                } <span class="kw">else </span>{
+                    backoff.snooze();
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">deadline</span> {
-                <span class="kw">if</span> <span class="ident">Instant::now</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">d</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RecvTimeoutError::Timeout</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(d) = deadline {
+                <span class="kw">if </span>Instant::now() &gt;= d {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(RecvTimeoutError::Timeout);
                 }
             }
 
-            <span class="ident">Context::with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-                <span class="comment">// Prepare for blocking until a sender wakes us up.</span>
-                <span class="kw">let</span> <span class="ident">oper</span> <span class="op">=</span> <span class="ident">Operation::hook</span>(<span class="ident">token</span>);
-                <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
+            Context::with(|cx| {
+                <span class="comment">// Prepare for blocking until a sender wakes us up.
+                </span><span class="kw">let </span>oper = Operation::hook(token);
+                <span class="self">self</span>.receivers.register(oper, cx);
 
-                <span class="comment">// Has the channel become ready just now?</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_disconnected</span>() {
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">try_select</span>(<span class="ident">Selected::Aborted</span>);
+                <span class="comment">// Has the channel become ready just now?
+                </span><span class="kw">if </span>!<span class="self">self</span>.is_empty() || <span class="self">self</span>.is_disconnected() {
+                    <span class="kw">let _ </span>= cx.try_select(Selected::Aborted);
                 }
 
-                <span class="comment">// Block the current thread.</span>
-                <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_until</span>(<span class="ident">deadline</span>);
+                <span class="comment">// Block the current thread.
+                </span><span class="kw">let </span>sel = cx.wait_until(deadline);
 
-                <span class="kw">match</span> <span class="ident">sel</span> {
-                    <span class="ident">Selected::Waiting</span> =&gt; <span class="macro">unreachable!</span>(),
-                    <span class="ident">Selected::Aborted</span> <span class="op">|</span> <span class="ident">Selected::Disconnected</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>).<span class="ident">unwrap</span>();
-                        <span class="comment">// If the channel was disconnected, we still have to check for remaining</span>
-                        <span class="comment">// messages.</span>
-                    }
-                    <span class="ident">Selected::Operation</span>(<span class="kw">_</span>) =&gt; {}
+                <span class="kw">match </span>sel {
+                    Selected::Waiting =&gt; <span class="macro">unreachable!</span>(),
+                    Selected::Aborted | Selected::Disconnected =&gt; {
+                        <span class="self">self</span>.receivers.unregister(oper).unwrap();
+                        <span class="comment">// If the channel was disconnected, we still have to check for remaining
+                        // messages.
+                    </span>}
+                    Selected::Operation(<span class="kw">_</span>) =&gt; {}
                 }
             });
         }
     }
 
-    <span class="doccomment">/// Returns the current number of messages inside the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Load the tail, then load the head.</span>
-            <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns the current number of messages inside the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">loop </span>{
+            <span class="comment">// Load the tail, then load the head.
+            </span><span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+            <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
 
-            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">tail</span> {
-                <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
-                <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
+            <span class="comment">// If the tail didn&#39;t change, we&#39;ve got consistent values to work with.
+            </span><span class="kw">if </span><span class="self">self</span>.tail.load(Ordering::SeqCst) == tail {
+                <span class="kw">let </span>hix = head &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
+                <span class="kw">let </span>tix = tail &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
 
-                <span class="kw">return</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&lt;</span> <span class="ident">tix</span> {
-                    <span class="ident">tix</span> <span class="op">-</span> <span class="ident">hix</span>
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&gt;</span> <span class="ident">tix</span> {
-                    <span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">tix</span>
-                } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span> {
-                    <span class="number">0</span>
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">cap</span>
+                <span class="kw">return if </span>hix &lt; tix {
+                    tix - hix
+                } <span class="kw">else if </span>hix &gt; tix {
+                    <span class="self">self</span>.cap - hix + tix
+                } <span class="kw">else if </span>(tail &amp; !<span class="self">self</span>.mark_bit) == head {
+                    <span class="number">0
+                </span>} <span class="kw">else </span>{
+                    <span class="self">self</span>.cap
                 };
             }
         }
     }
 
-    <span class="doccomment">/// Returns the capacity of the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cap</span>)
+    <span class="doccomment">/// Returns the capacity of the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cap)
     }
 
-    <span class="doccomment">/// Disconnects the channel and wakes up all blocked senders and receivers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if this call disconnected the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">fetch_or</span>(<span class="self">self</span>.<span class="ident">mark_bit</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Disconnects the channel and wakes up all blocked senders and receivers.
+    ///
+    /// Returns `true` if this call disconnected the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.fetch_or(<span class="self">self</span>.mark_bit, Ordering::SeqCst);
 
-        <span class="kw">if</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">senders</span>.<span class="ident">disconnect</span>();
-            <span class="self">self</span>.<span class="ident">receivers</span>.<span class="ident">disconnect</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+        <span class="kw">if </span>tail &amp; <span class="self">self</span>.mark_bit == <span class="number">0 </span>{
+            <span class="self">self</span>.senders.disconnect();
+            <span class="self">self</span>.receivers.disconnect();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is disconnected.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_disconnected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if the channel is disconnected.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_disconnected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tail.load(Ordering::SeqCst) &amp; <span class="self">self</span>.mark_bit != <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns `true` if the channel is empty.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+
+        <span class="comment">// Is the tail equal to the head?
+        //
+        // Note: If the head changes just before we load the tail, that means there was a moment
+        // when the channel was not empty, so it is safe to just return `false`.
+        </span>(tail &amp; !<span class="self">self</span>.mark_bit) == head
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Returns `true` if the channel is full.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>tail = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+        <span class="kw">let </span>head = <span class="self">self</span>.head.load(Ordering::SeqCst);
 
-        <span class="comment">// Is the tail equal to the head?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the head changes just before we load the tail, that means there was a moment</span>
-        <span class="comment">// when the channel was not empty, so it is safe to just return `false`.</span>
-        (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span>
-    }
-
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-
-        <span class="comment">// Is the head lagging one lap behind tail?</span>
-        <span class="comment">//</span>
-        <span class="comment">// Note: If the tail changes just before we load the head, that means there was a moment</span>
-        <span class="comment">// when the channel was not full, so it is safe to just return `false`.</span>
-        <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">one_lap</span>) <span class="op">==</span> <span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>
+        <span class="comment">// Is the head lagging one lap behind tail?
+        //
+        // Note: If the tail changes just before we load the head, that means there was a moment
+        // when the channel was not full, so it is safe to just return `false`.
+        </span>head.wrapping_add(<span class="self">self</span>.one_lap) == tail &amp; !<span class="self">self</span>.mark_bit
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Get the index of the head.</span>
-        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">get_mut</span>();
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Channel&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Get the index of the head.
+        </span><span class="kw">let </span>head = <span class="kw-2">*</span><span class="self">self</span>.head.get_mut();
+        <span class="kw">let </span>tail = <span class="kw-2">*</span><span class="self">self</span>.tail.get_mut();
 
-        <span class="kw">let</span> <span class="ident">hix</span> <span class="op">=</span> <span class="ident">head</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">tix</span> <span class="op">=</span> <span class="ident">tail</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">mark_bit</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let </span>hix = head &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
+        <span class="kw">let </span>tix = tail &amp; (<span class="self">self</span>.mark_bit - <span class="number">1</span>);
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&lt;</span> <span class="ident">tix</span> {
-            <span class="ident">tix</span> <span class="op">-</span> <span class="ident">hix</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">&gt;</span> <span class="ident">tix</span> {
-            <span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">tix</span>
-        } <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">mark_bit</span>) <span class="op">==</span> <span class="ident">head</span> {
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">cap</span>
+        <span class="kw">let </span>len = <span class="kw">if </span>hix &lt; tix {
+            tix - hix
+        } <span class="kw">else if </span>hix &gt; tix {
+            <span class="self">self</span>.cap - hix + tix
+        } <span class="kw">else if </span>(tail &amp; !<span class="self">self</span>.mark_bit) == head {
+            <span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="self">self</span>.cap
         };
 
-        <span class="comment">// Loop over all slots that hold a message and drop them.</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
-            <span class="comment">// Compute the index of the next slot holding a message.</span>
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">cap</span> {
-                <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span>
-            } <span class="kw">else</span> {
-                <span class="ident">hix</span> <span class="op">+</span> <span class="ident">i</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">cap</span>
+        <span class="comment">// Loop over all slots that hold a message and drop them.
+        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
+            <span class="comment">// Compute the index of the next slot holding a message.
+            </span><span class="kw">let </span>index = <span class="kw">if </span>hix + i &lt; <span class="self">self</span>.cap {
+                hix + i
+            } <span class="kw">else </span>{
+                hix + i - <span class="self">self</span>.cap
             };
 
-            <span class="kw">unsafe</span> {
-                <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>());
-                <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span>);
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">msg</span>.<span class="ident">get</span>();
-                <span class="ident">msg</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">drop_in_place</span>();
+            <span class="kw">unsafe </span>{
+                <span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.buffer.len());
+                <span class="kw">let </span>slot = <span class="self">self</span>.buffer.get_unchecked_mut(index);
+                <span class="kw">let </span>msg = <span class="kw-2">&amp;mut *</span>slot.msg.get();
+                msg.as_mut_ptr().drop_in_place();
             }
         }
     }
 }
 
-<span class="doccomment">/// Receiver handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Receiver handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Receiver&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="doccomment">/// Sender handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Sender handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Sender&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_recv(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.register(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.unregister(oper);
     }
 
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.try_select(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">try_select</span>(<span class="ident">token</span>)
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.<span class="number">0</span>.is_empty() || <span class="self">self</span>.<span class="number">0</span>.is_disconnected()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_disconnected</span>()
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.watch(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">watch</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">receivers</span>.<span class="ident">unwatch</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.receivers.unwatch(oper);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_send</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_send(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.senders.register(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">senders</span>.<span class="ident">register</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.senders.unregister(oper);
     }
 
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">senders</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, _cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.try_select(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">try_select</span>(<span class="ident">token</span>)
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.<span class="number">0</span>.is_full() || <span class="self">self</span>.<span class="number">0</span>.is_disconnected()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_full</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_disconnected</span>()
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.senders.watch(oper, cx);
+        <span class="self">self</span>.is_ready()
     }
 
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">senders</span>.<span class="ident">watch</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="self">self</span>.<span class="ident">is_ready</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">senders</span>.<span class="ident">unwatch</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="self">self</span>.<span class="number">0</span>.senders.unwatch(oper);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

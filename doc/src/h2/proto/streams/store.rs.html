@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/store.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>store.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/streams/store.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>store.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../h2/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -424,177 +424,177 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">slab</span>;
+<span class="kw">use </span>slab;
 
-<span class="kw">use</span> <span class="ident">indexmap</span>::{<span class="self">self</span>, <span class="ident">IndexMap</span>};
+<span class="kw">use </span>indexmap::{<span class="self">self</span>, IndexMap};
 
-<span class="kw">use</span> <span class="ident">std::convert::Infallible</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>;
+<span class="kw">use </span>std::convert::Infallible;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::ops;
 
-<span class="doccomment">/// Storage for streams</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Store</span> {
-    <span class="ident">slab</span>: <span class="ident">slab::Slab</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&gt;</span>,
-    <span class="ident">ids</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">StreamId</span>, <span class="ident">SlabIndex</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Storage for streams
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Store {
+    slab: slab::Slab&lt;Stream&gt;,
+    ids: IndexMap&lt;StreamId, SlabIndex&gt;,
 }
 
-<span class="doccomment">/// &quot;Pointer&quot; to an entry in the store</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">key</span>: <span class="ident">Key</span>,
-    <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Store</span>,
+<span class="doccomment">/// &quot;Pointer&quot; to an entry in the store
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    key: Key,
+    store: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Store,
 }
 
-<span class="doccomment">/// References an entry in the store.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">index</span>: <span class="ident">SlabIndex</span>,
-    <span class="doccomment">/// Keep the stream ID in the key as an ABA guard, since slab indices</span>
-    <span class="doccomment">/// could be re-used with a new stream.</span>
-    <span class="ident">stream_id</span>: <span class="ident">StreamId</span>,
+<span class="doccomment">/// References an entry in the store.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Key {
+    index: SlabIndex,
+    <span class="doccomment">/// Keep the stream ID in the key as an ABA guard, since slab indices
+    /// could be re-used with a new stream.
+    </span>stream_id: StreamId,
 }
 
-<span class="comment">// We can never have more than `StreamId::MAX` streams in the store,</span>
-<span class="comment">// so we can save a smaller index (u32 vs usize).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SlabIndex</span>(<span class="ident">u32</span>);
+<span class="comment">// We can never have more than `StreamId::MAX` streams in the store,
+// so we can save a smaller index (u32 vs usize).
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">struct </span>SlabIndex(u32);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="ident">indices</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Indices</span><span class="op">&gt;</span>,
-    <span class="ident">_p</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Queue&lt;N&gt; {
+    indices: <span class="prelude-ty">Option</span>&lt;store::Indices&gt;,
+    _p: PhantomData&lt;N&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Next</span> {
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait </span>Next {
+    <span class="kw">fn </span>next(stream: <span class="kw-2">&amp;</span>Stream) -&gt; <span class="prelude-ty">Option</span>&lt;Key&gt;;
 
-    <span class="kw">fn</span> <span class="ident">set_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>, <span class="ident">key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>);
+    <span class="kw">fn </span>set_next(stream: <span class="kw-2">&amp;mut </span>Stream, key: <span class="prelude-ty">Option</span>&lt;Key&gt;);
 
-    <span class="kw">fn</span> <span class="ident">take_next</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>take_next(stream: <span class="kw-2">&amp;mut </span>Stream) -&gt; <span class="prelude-ty">Option</span>&lt;Key&gt;;
 
-    <span class="kw">fn</span> <span class="ident">is_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn </span>is_queued(stream: <span class="kw-2">&amp;</span>Stream) -&gt; bool;
 
-    <span class="kw">fn</span> <span class="ident">set_queued</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span>, <span class="ident">val</span>: <span class="ident">bool</span>);
+    <span class="kw">fn </span>set_queued(stream: <span class="kw-2">&amp;mut </span>Stream, val: bool);
 }
 
-<span class="doccomment">/// A linked list</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Indices</span> {
-    <span class="kw">pub</span> <span class="ident">head</span>: <span class="ident">Key</span>,
-    <span class="kw">pub</span> <span class="ident">tail</span>: <span class="ident">Key</span>,
+<span class="doccomment">/// A linked list
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">struct </span>Indices {
+    <span class="kw">pub </span>head: Key,
+    <span class="kw">pub </span>tail: Key,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Occupied</span>(<span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">Vacant</span>(<span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>Entry&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Occupied(OccupiedEntry&lt;<span class="lifetime">&#39;a</span>&gt;),
+    Vacant(VacantEntry&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ids</span>: <span class="ident">indexmap::map::OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">StreamId</span>, <span class="ident">SlabIndex</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>OccupiedEntry&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ids: indexmap::map::OccupiedEntry&lt;<span class="lifetime">&#39;a</span>, StreamId, SlabIndex&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">ids</span>: <span class="ident">indexmap::map::VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">StreamId</span>, <span class="ident">SlabIndex</span><span class="op">&gt;</span>,
-    <span class="ident">slab</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">slab::Slab</span><span class="op">&lt;</span><span class="ident">Stream</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>VacantEntry&lt;<span class="lifetime">&#39;a</span>&gt; {
+    ids: indexmap::map::VacantEntry&lt;<span class="lifetime">&#39;a</span>, StreamId, SlabIndex&gt;,
+    slab: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>slab::Slab&lt;Stream&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">Resolve</span> {
-    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="ident">Ptr</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait </span>Resolve {
+    <span class="kw">fn </span>resolve(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key) -&gt; Ptr;
 }
 
-<span class="comment">// ===== impl Store =====</span>
+<span class="comment">// ===== impl Store =====
 
-<span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Store</span> {
-            <span class="ident">slab</span>: <span class="ident">slab::Slab::new</span>(),
-            <span class="ident">ids</span>: <span class="ident">IndexMap::new</span>(),
+</span><span class="kw">impl </span>Store {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Store {
+            slab: slab::Slab::new(),
+            ids: IndexMap::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">StreamId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ptr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">get</span>(<span class="ident">id</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">key</span>) =&gt; <span class="kw-2">*</span><span class="ident">key</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>find_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>StreamId) -&gt; <span class="prelude-ty">Option</span>&lt;Ptr&gt; {
+        <span class="kw">let </span>index = <span class="kw">match </span><span class="self">self</span>.ids.get(id) {
+            <span class="prelude-val">Some</span>(key) =&gt; <span class="kw-2">*</span>key,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Some</span>(<span class="ident">Ptr</span> {
-            <span class="ident">key</span>: <span class="ident">Key</span> {
-                <span class="ident">index</span>,
-                <span class="ident">stream_id</span>: <span class="kw-2">*</span><span class="ident">id</span>,
+        <span class="prelude-val">Some</span>(Ptr {
+            key: Key {
+                index,
+                stream_id: <span class="kw-2">*</span>id,
             },
-            <span class="ident">store</span>: <span class="self">self</span>,
+            store: <span class="self">self</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>, <span class="ident">val</span>: <span class="ident">Stream</span>) -&gt; <span class="ident">Ptr</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">SlabIndex</span>(<span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">insert</span>(<span class="ident">val</span>) <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">index</span>).<span class="ident">is_none</span>());
+    <span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: StreamId, val: Stream) -&gt; Ptr {
+        <span class="kw">let </span>index = SlabIndex(<span class="self">self</span>.slab.insert(val) <span class="kw">as </span>u32);
+        <span class="macro">assert!</span>(<span class="self">self</span>.ids.insert(id, index).is_none());
 
-        <span class="ident">Ptr</span> {
-            <span class="ident">key</span>: <span class="ident">Key</span> {
-                <span class="ident">index</span>,
-                <span class="ident">stream_id</span>: <span class="ident">id</span>,
+        Ptr {
+            key: Key {
+                index,
+                stream_id: id,
             },
-            <span class="ident">store</span>: <span class="self">self</span>,
+            store: <span class="self">self</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_entry</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StreamId</span>) -&gt; <span class="ident">Entry</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::indexmap::map::Entry</span>::<span class="kw-2">*</span>;
+    <span class="kw">pub fn </span>find_entry(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: StreamId) -&gt; Entry {
+        <span class="kw">use </span><span class="self">self</span>::indexmap::map::Entry::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">entry</span>(<span class="ident">id</span>) {
-            <span class="ident">Occupied</span>(<span class="ident">e</span>) =&gt; <span class="ident">Entry::Occupied</span>(<span class="ident">OccupiedEntry</span> { <span class="ident">ids</span>: <span class="ident">e</span> }),
-            <span class="ident">Vacant</span>(<span class="ident">e</span>) =&gt; <span class="ident">Entry::Vacant</span>(<span class="ident">VacantEntry</span> {
-                <span class="ident">ids</span>: <span class="ident">e</span>,
-                <span class="ident">slab</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">slab</span>,
+        <span class="kw">match </span><span class="self">self</span>.ids.entry(id) {
+            Occupied(e) =&gt; Entry::Occupied(OccupiedEntry { ids: e }),
+            Vacant(e) =&gt; Entry::Vacant(VacantEntry {
+                ids: e,
+                slab: <span class="kw-2">&amp;mut </span><span class="self">self</span>.slab,
             }),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Ptr</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_each&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>f: F)
+    <span class="kw">where
+        </span>F: FnMut(Ptr),
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_for_each</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> {
-            <span class="ident">f</span>(<span class="ident">ptr</span>);
-            <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Infallible</span><span class="op">&gt;</span>(())
+        <span class="kw">match </span><span class="self">self</span>.try_for_each(|ptr| {
+            f(ptr);
+            <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, Infallible&gt;(())
         }) {
             <span class="prelude-val">Ok</span>(()) =&gt; (),
-            <span class="prelude-val">Err</span>(<span class="ident">infallible</span>) =&gt; <span class="kw">match</span> <span class="ident">infallible</span> {},
+            <span class="prelude-val">Err</span>(infallible) =&gt; <span class="kw">match </span>infallible {},
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_for_each</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Ptr</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>try_for_each&lt;F, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>f: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;
+    <span class="kw">where
+        </span>F: FnMut(Ptr) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>len = <span class="self">self</span>.ids.len();
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
 
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">len</span> {
-            <span class="comment">// Get the key by index, this makes the borrow checker happy</span>
-            <span class="kw">let</span> (<span class="ident">stream_id</span>, <span class="ident">index</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">get_index</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>();
-                (<span class="kw-2">*</span><span class="ident">entry</span>.<span class="number">0</span>, <span class="kw-2">*</span><span class="ident">entry</span>.<span class="number">1</span>)
+        <span class="kw">while </span>i &lt; len {
+            <span class="comment">// Get the key by index, this makes the borrow checker happy
+            </span><span class="kw">let </span>(stream_id, index) = {
+                <span class="kw">let </span>entry = <span class="self">self</span>.ids.get_index(i).unwrap();
+                (<span class="kw-2">*</span>entry.<span class="number">0</span>, <span class="kw-2">*</span>entry.<span class="number">1</span>)
             };
 
-            <span class="ident">f</span>(<span class="ident">Ptr</span> {
-                <span class="ident">key</span>: <span class="ident">Key</span> { <span class="ident">index</span>, <span class="ident">stream_id</span> },
-                <span class="ident">store</span>: <span class="self">self</span>,
+            f(Ptr {
+                key: Key { index, stream_id },
+                store: <span class="self">self</span>,
             })<span class="question-mark">?</span>;
 
-            <span class="comment">// TODO: This logic probably could be better...</span>
-            <span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">len</span>();
+            <span class="comment">// TODO: This logic probably could be better...
+            </span><span class="kw">let </span>new_len = <span class="self">self</span>.ids.len();
 
-            <span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&lt;</span> <span class="ident">len</span> {
-                <span class="macro">debug_assert!</span>(<span class="ident">new_len</span> <span class="op">==</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>);
-                <span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">if </span>new_len &lt; len {
+                <span class="macro">debug_assert!</span>(new_len == len - <span class="number">1</span>);
+                len -= <span class="number">1</span>;
+            } <span class="kw">else </span>{
+                i += <span class="number">1</span>;
             }
         }
 
@@ -602,253 +602,253 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Resolve</span> <span class="kw">for</span> <span class="ident">Store</span> {
-    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="ident">Ptr</span> {
-        <span class="ident">Ptr</span> { <span class="ident">key</span>, <span class="ident">store</span>: <span class="self">self</span> }
+<span class="kw">impl </span>Resolve <span class="kw">for </span>Store {
+    <span class="kw">fn </span>resolve(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key) -&gt; Ptr {
+        Ptr { key, store: <span class="self">self </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ops::Index</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Store</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Stream</span>;
+<span class="kw">impl </span>ops::Index&lt;Key&gt; <span class="kw">for </span>Store {
+    <span class="kw">type </span>Output = Stream;
 
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">slab</span>
-            .<span class="ident">get</span>(<span class="ident">key</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">key</span>.<span class="ident">stream_id</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="macro">panic!</span>(<span class="string">&quot;dangling store key for stream_id={:?}&quot;</span>, <span class="ident">key</span>.<span class="ident">stream_id</span>);
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, key: Key) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.slab
+            .get(key.index.<span class="number">0 </span><span class="kw">as </span>usize)
+            .filter(|s| s.id == key.stream_id)
+            .unwrap_or_else(|| {
+                <span class="macro">panic!</span>(<span class="string">&quot;dangling store key for stream_id={:?}&quot;</span>, key.stream_id);
             })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ops::IndexMut</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Store</span> {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span>.<span class="ident">slab</span>
-            .<span class="ident">get_mut</span>(<span class="ident">key</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">key</span>.<span class="ident">stream_id</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="macro">panic!</span>(<span class="string">&quot;dangling store key for stream_id={:?}&quot;</span>, <span class="ident">key</span>.<span class="ident">stream_id</span>);
+<span class="kw">impl </span>ops::IndexMut&lt;Key&gt; <span class="kw">for </span>Store {
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Output {
+        <span class="self">self</span>.slab
+            .get_mut(key.index.<span class="number">0 </span><span class="kw">as </span>usize)
+            .filter(|s| s.id == key.stream_id)
+            .unwrap_or_else(|| {
+                <span class="macro">panic!</span>(<span class="string">&quot;dangling store key for stream_id={:?}&quot;</span>, key.stream_id);
             })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Store</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_active_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">len</span>()
+<span class="kw">impl </span>Store {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+    </span><span class="kw">pub fn </span>num_active_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.ids.len()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_wired_streams</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">len</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+    </span><span class="kw">pub fn </span>num_wired_streams(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.slab.len()
     }
 }
 
-<span class="comment">// While running h2 unit/integration tests, enable this debug assertion.</span>
-<span class="comment">//</span>
-<span class="comment">// In practice, we don&#39;t need to ensure this. But the integration tests</span>
-<span class="comment">// help to make sure we&#39;ve cleaned up in cases where we could (like, the</span>
-<span class="comment">// runtime isn&#39;t suddenly dropping the task for unknown reasons).</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Store</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident">std::thread</span>;
+<span class="comment">// While running h2 unit/integration tests, enable this debug assertion.
+//
+// In practice, we don&#39;t need to ensure this. But the integration tests
+// help to make sure we&#39;ve cleaned up in cases where we could (like, the
+// runtime isn&#39;t suddenly dropping the task for unknown reasons).
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+</span><span class="kw">impl </span>Drop <span class="kw">for </span>Store {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span>std::thread;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">thread::panicking</span>() {
-            <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">is_empty</span>());
+        <span class="kw">if </span>!thread::panicking() {
+            <span class="macro">debug_assert!</span>(<span class="self">self</span>.slab.is_empty());
         }
     }
 }
 
-<span class="comment">// ===== impl Queue =====</span>
+<span class="comment">// ===== impl Queue =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">N</span>: <span class="ident">Next</span>,
+</span><span class="kw">impl</span>&lt;N&gt; Queue&lt;N&gt;
+<span class="kw">where
+    </span>N: Next,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Queue</span> {
-            <span class="ident">indices</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Queue {
+            indices: <span class="prelude-val">None</span>,
+            _p: PhantomData,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Queue</span> {
-            <span class="ident">indices</span>: <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">take</span>(),
-            <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Queue {
+            indices: <span class="self">self</span>.indices.take(),
+            _p: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Queue the stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the stream is already contained by the list, return `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">store::Ptr</span>) -&gt; <span class="ident">bool</span> {
+    <span class="doccomment">/// Queue the stream.
+    ///
+    /// If the stream is already contained by the list, return `false`.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>store::Ptr) -&gt; bool {
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;Queue::push&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">N::is_queued</span>(<span class="ident">stream</span>) {
+        <span class="kw">if </span>N::is_queued(stream) {
             <span class="macro">tracing::trace!</span>(<span class="string">&quot; -&gt; already queued&quot;</span>);
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="ident">N::set_queued</span>(<span class="ident">stream</span>, <span class="bool-val">true</span>);
+        N::set_queued(stream, <span class="bool-val">true</span>);
 
-        <span class="comment">// The next pointer shouldn&#39;t be set</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">N::next</span>(<span class="ident">stream</span>).<span class="ident">is_none</span>());
+        <span class="comment">// The next pointer shouldn&#39;t be set
+        </span><span class="macro">debug_assert!</span>(N::next(stream).is_none());
 
-        <span class="comment">// Queue the stream</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">indices</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">idxs</span>) =&gt; {
+        <span class="comment">// Queue the stream
+        </span><span class="kw">match </span><span class="self">self</span>.indices {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>idxs) =&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot; -&gt; existing entries&quot;</span>);
 
-                <span class="comment">// Update the current tail node to point to `stream`</span>
-                <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">key</span>();
-                <span class="ident">N::set_next</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stream</span>.<span class="ident">resolve</span>(<span class="ident">idxs</span>.<span class="ident">tail</span>), <span class="prelude-val">Some</span>(<span class="ident">key</span>));
+                <span class="comment">// Update the current tail node to point to `stream`
+                </span><span class="kw">let </span>key = stream.key();
+                N::set_next(<span class="kw-2">&amp;mut </span>stream.resolve(idxs.tail), <span class="prelude-val">Some</span>(key));
 
-                <span class="comment">// Update the tail pointer</span>
-                <span class="ident">idxs</span>.<span class="ident">tail</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">key</span>();
+                <span class="comment">// Update the tail pointer
+                </span>idxs.tail = stream.key();
             }
-            <span class="prelude-val">None</span> =&gt; {
+            <span class="prelude-val">None </span>=&gt; {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot; -&gt; first entry&quot;</span>);
-                <span class="self">self</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">store::Indices</span> {
-                    <span class="ident">head</span>: <span class="ident">stream</span>.<span class="ident">key</span>(),
-                    <span class="ident">tail</span>: <span class="ident">stream</span>.<span class="ident">key</span>(),
+                <span class="self">self</span>.indices = <span class="prelude-val">Some</span>(store::Indices {
+                    head: stream.key(),
+                    tail: stream.key(),
                 });
             }
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">Resolve</span>,
+    <span class="kw">pub fn </span>pop&lt;<span class="lifetime">&#39;a</span>, R&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>R) -&gt; <span class="prelude-ty">Option</span>&lt;store::Ptr&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where
+        </span>R: Resolve,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">idxs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indices</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">store</span>.<span class="ident">resolve</span>(<span class="ident">idxs</span>.<span class="ident">head</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>idxs) = <span class="self">self</span>.indices {
+            <span class="kw">let </span><span class="kw-2">mut </span>stream = store.resolve(idxs.head);
 
-            <span class="kw">if</span> <span class="ident">idxs</span>.<span class="ident">head</span> <span class="op">==</span> <span class="ident">idxs</span>.<span class="ident">tail</span> {
-                <span class="macro">assert!</span>(<span class="ident">N::next</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">stream</span>).<span class="ident">is_none</span>());
-                <span class="self">self</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">idxs</span>.<span class="ident">head</span> <span class="op">=</span> <span class="ident">N::take_next</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">stream</span>).<span class="ident">unwrap</span>();
-                <span class="self">self</span>.<span class="ident">indices</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">idxs</span>);
+            <span class="kw">if </span>idxs.head == idxs.tail {
+                <span class="macro">assert!</span>(N::next(<span class="kw-2">&amp;*</span>stream).is_none());
+                <span class="self">self</span>.indices = <span class="prelude-val">None</span>;
+            } <span class="kw">else </span>{
+                idxs.head = N::take_next(<span class="kw-2">&amp;mut *</span>stream).unwrap();
+                <span class="self">self</span>.indices = <span class="prelude-val">Some</span>(idxs);
             }
 
-            <span class="macro">debug_assert!</span>(<span class="ident">N::is_queued</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">stream</span>));
-            <span class="ident">N::set_queued</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">stream</span>, <span class="bool-val">false</span>);
+            <span class="macro">debug_assert!</span>(N::is_queued(<span class="kw-2">&amp;*</span>stream));
+            N::set_queued(<span class="kw-2">&amp;mut *</span>stream, <span class="bool-val">false</span>);
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(stream);
         }
 
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.indices.is_none()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">indices</span>.<span class="ident">is_none</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_if</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">store</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">store::Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">Resolve</span>,
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">Stream</span>) -&gt; <span class="ident">bool</span>,
+    <span class="kw">pub fn </span>pop_if&lt;<span class="lifetime">&#39;a</span>, R, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, store: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>R, f: F) -&gt; <span class="prelude-ty">Option</span>&lt;store::Ptr&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where
+        </span>R: Resolve,
+        F: Fn(<span class="kw-2">&amp;</span>Stream) -&gt; bool,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">idxs</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">indices</span> {
-            <span class="kw">let</span> <span class="ident">should_pop</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">store</span>.<span class="ident">resolve</span>(<span class="ident">idxs</span>.<span class="ident">head</span>));
-            <span class="kw">if</span> <span class="ident">should_pop</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">pop</span>(<span class="ident">store</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(idxs) = <span class="self">self</span>.indices {
+            <span class="kw">let </span>should_pop = f(<span class="kw-2">&amp;</span>store.resolve(idxs.head));
+            <span class="kw">if </span>should_pop {
+                <span class="kw">return </span><span class="self">self</span>.pop(store);
             }
         }
 
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="comment">// ===== impl Ptr =====
+
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns the Key associated with the stream
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Key {
+        <span class="self">self</span>.key
+    }
+
+    <span class="kw">pub fn </span>store_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Store {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.store
+    }
+
+    <span class="doccomment">/// Remove the stream from the store
+    </span><span class="kw">pub fn </span>remove(<span class="self">self</span>) -&gt; StreamId {
+        <span class="comment">// The stream must have been unlinked before this point
+        </span><span class="macro">debug_assert!</span>(!<span class="self">self</span>.store.ids.contains_key(<span class="kw-2">&amp;</span><span class="self">self</span>.key.stream_id));
+
+        <span class="comment">// Remove the stream state
+        </span><span class="kw">let </span>stream = <span class="self">self</span>.store.slab.remove(<span class="self">self</span>.key.index.<span class="number">0 </span><span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(stream.id, <span class="self">self</span>.key.stream_id);
+        stream.id
+    }
+
+    <span class="doccomment">/// Remove the StreamId -&gt; stream state association.
+    ///
+    /// This will effectively remove the stream as far as the H2 protocol is
+    /// concerned.
+    </span><span class="kw">pub fn </span>unlink(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>id = <span class="self">self</span>.key.stream_id;
+        <span class="self">self</span>.store.ids.swap_remove(<span class="kw-2">&amp;</span>id);
     }
 }
 
-<span class="comment">// ===== impl Ptr =====</span>
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns the Key associated with the stream</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Key</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Store</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">store</span>
-    }
-
-    <span class="doccomment">/// Remove the stream from the store</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="self">self</span>) -&gt; <span class="ident">StreamId</span> {
-        <span class="comment">// The stream must have been unlinked before this point</span>
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">store</span>.<span class="ident">ids</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>.<span class="ident">stream_id</span>));
-
-        <span class="comment">// Remove the stream state</span>
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">slab</span>.<span class="ident">remove</span>(<span class="self">self</span>.<span class="ident">key</span>.<span class="ident">index</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">stream</span>.<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">stream_id</span>);
-        <span class="ident">stream</span>.<span class="ident">id</span>
-    }
-
-    <span class="doccomment">/// Remove the StreamId -&gt; stream state association.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will effectively remove the stream as far as the H2 protocol is</span>
-    <span class="doccomment">/// concerned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unlink</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">stream_id</span>;
-        <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">ids</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Resolve</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="ident">Ptr</span> {
-        <span class="ident">Ptr</span> {
-            <span class="ident">key</span>,
-            <span class="ident">store</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">store</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Resolve <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>resolve(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key) -&gt; Ptr {
+        Ptr {
+            key,
+            store: <span class="kw-2">&amp;mut *</span><span class="self">self</span>.store,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ops::Deref</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Stream</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ops::Deref <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = Stream;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Stream</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">store</span>[<span class="self">self</span>.<span class="ident">key</span>]
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Stream {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.store[<span class="self">self</span>.key]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ops::DerefMut</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Stream</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">store</span>[<span class="self">self</span>.<span class="ident">key</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ops::DerefMut <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Stream {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.store[<span class="self">self</span>.key]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">fmt</span>(<span class="ident">fmt</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        (<span class="kw-2">**</span><span class="self">self</span>).fmt(fmt)
     }
 }
 
-<span class="comment">// ===== impl OccupiedEntry =====</span>
+<span class="comment">// ===== impl OccupiedEntry =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OccupiedEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Key</span> {
-        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">key</span>();
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">get</span>();
-        <span class="ident">Key</span> { <span class="ident">index</span>, <span class="ident">stream_id</span> }
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OccupiedEntry&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Key {
+        <span class="kw">let </span>stream_id = <span class="kw-2">*</span><span class="self">self</span>.ids.key();
+        <span class="kw">let </span>index = <span class="kw-2">*</span><span class="self">self</span>.ids.get();
+        Key { index, stream_id }
     }
 }
 
-<span class="comment">// ===== impl VacantEntry =====</span>
+<span class="comment">// ===== impl VacantEntry =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Stream</span>) -&gt; <span class="ident">Key</span> {
-        <span class="comment">// Insert the value in the slab</span>
-        <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">id</span>;
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">SlabIndex</span>(<span class="self">self</span>.<span class="ident">slab</span>.<span class="ident">insert</span>(<span class="ident">value</span>) <span class="kw">as</span> <span class="ident">u32</span>);
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; VacantEntry&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>insert(<span class="self">self</span>, value: Stream) -&gt; Key {
+        <span class="comment">// Insert the value in the slab
+        </span><span class="kw">let </span>stream_id = value.id;
+        <span class="kw">let </span>index = SlabIndex(<span class="self">self</span>.slab.insert(value) <span class="kw">as </span>u32);
 
-        <span class="comment">// Insert the handle in the ID map</span>
-        <span class="self">self</span>.<span class="ident">ids</span>.<span class="ident">insert</span>(<span class="ident">index</span>);
+        <span class="comment">// Insert the handle in the ID map
+        </span><span class="self">self</span>.ids.insert(index);
 
-        <span class="ident">Key</span> { <span class="ident">index</span>, <span class="ident">stream_id</span> }
+        Key { index, stream_id }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

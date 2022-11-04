@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/textwrap-0.11.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../textwrap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/textwrap-0.11.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../textwrap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../textwrap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -985,992 +985,992 @@
 <span id="985">985</span>
 <span id="986">986</span>
 <span id="987">987</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `textwrap` provides functions for word wrapping and filling text.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Wrapping text can be very useful in commandline programs where you</span>
-<span class="doccomment">//! want to format dynamic output nicely so it looks good in a</span>
-<span class="doccomment">//! terminal. A quick example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! extern crate textwrap;</span>
-<span class="doccomment">//! use textwrap::fill;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let text = &quot;textwrap: a small library for wrapping text.&quot;;</span>
-<span class="doccomment">//!     println!(&quot;{}&quot;, fill(text, 18));</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This will display the following output:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! textwrap: a small</span>
-<span class="doccomment">//! library for</span>
-<span class="doccomment">//! wrapping text.</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Displayed Width vs Byte Size</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To word wrap text, one must know the width of each word so one can</span>
-<span class="doccomment">//! know when to break lines. This library measures the width of text</span>
-<span class="doccomment">//! using the [displayed width][unicode-width], not the size in bytes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is important for non-ASCII text. ASCII characters such as `a`</span>
-<span class="doccomment">//! and `!` are simple and take up one column each. This means that</span>
-<span class="doccomment">//! the displayed width is equal to the string length in bytes.</span>
-<span class="doccomment">//! However, non-ASCII characters and symbols take up more than one</span>
-<span class="doccomment">//! byte when UTF-8 encoded: `é` is `0xc3 0xa9` (two bytes) and `⚙` is</span>
-<span class="doccomment">//! `0xe2 0x9a 0x99` (three bytes) in UTF-8, respectively.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This is why we take care to use the displayed width instead of the</span>
-<span class="doccomment">//! byte count when computing line lengths. All functions in this</span>
-<span class="doccomment">//! library handle Unicode characters like this.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [unicode-width]: https://docs.rs/unicode-width/</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `textwrap` provides functions for word wrapping and filling text.
+//!
+//! Wrapping text can be very useful in commandline programs where you
+//! want to format dynamic output nicely so it looks good in a
+//! terminal. A quick example:
+//!
+//! ```no_run
+//! extern crate textwrap;
+//! use textwrap::fill;
+//!
+//! fn main() {
+//!     let text = &quot;textwrap: a small library for wrapping text.&quot;;
+//!     println!(&quot;{}&quot;, fill(text, 18));
+//! }
+//! ```
+//!
+//! This will display the following output:
+//!
+//! ```text
+//! textwrap: a small
+//! library for
+//! wrapping text.
+//! ```
+//!
+//! # Displayed Width vs Byte Size
+//!
+//! To word wrap text, one must know the width of each word so one can
+//! know when to break lines. This library measures the width of text
+//! using the [displayed width][unicode-width], not the size in bytes.
+//!
+//! This is important for non-ASCII text. ASCII characters such as `a`
+//! and `!` are simple and take up one column each. This means that
+//! the displayed width is equal to the string length in bytes.
+//! However, non-ASCII characters and symbols take up more than one
+//! byte when UTF-8 encoded: `é` is `0xc3 0xa9` (two bytes) and `⚙` is
+//! `0xe2 0x9a 0x99` (three bytes) in UTF-8, respectively.
+//!
+//! This is why we take care to use the displayed width instead of the
+//! byte count when computing line lengths. All functions in this
+//! library handle Unicode characters like this.
+//!
+//! [unicode-width]: https://docs.rs/unicode-width/
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/textwrap/0.11.0&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_debug_implementations</span>)]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/textwrap/0.11.0&quot;</span>)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hyphenation</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;term_size&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">term_size</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">unicode_width</span>;
+#[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+</span><span class="kw">extern crate </span>hyphenation;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;term_size&quot;</span>)]
+</span><span class="kw">extern crate </span>term_size;
+<span class="kw">extern crate </span>unicode_width;
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::str::CharIndices</span>;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::str::CharIndices;
 
-<span class="kw">use</span> <span class="ident">unicode_width::UnicodeWidthChar</span>;
-<span class="kw">use</span> <span class="ident">unicode_width::UnicodeWidthStr</span>;
+<span class="kw">use </span>unicode_width::UnicodeWidthChar;
+<span class="kw">use </span>unicode_width::UnicodeWidthStr;
 
-<span class="doccomment">/// A non-breaking space.</span>
-<span class="kw">const</span> <span class="ident">NBSP</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;\u{a0}&#39;</span>;
+<span class="doccomment">/// A non-breaking space.
+</span><span class="kw">const </span>NBSP: char = <span class="string">&#39;\u{a0}&#39;</span>;
 
-<span class="kw">mod</span> <span class="ident">indentation</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indentation::dedent</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">indentation::indent</span>;
+<span class="kw">mod </span>indentation;
+<span class="kw">pub use </span>indentation::dedent;
+<span class="kw">pub use </span>indentation::indent;
 
-<span class="kw">mod</span> <span class="ident">splitting</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">splitting</span>::{<span class="ident">HyphenSplitter</span>, <span class="ident">NoHyphenation</span>, <span class="ident">WordSplitter</span>};
+<span class="kw">mod </span>splitting;
+<span class="kw">pub use </span>splitting::{HyphenSplitter, NoHyphenation, WordSplitter};
 
-<span class="doccomment">/// A Wrapper holds settings for wrapping and filling text. Use it</span>
-<span class="doccomment">/// when the convenience [`wrap_iter`], [`wrap`] and [`fill`] functions</span>
-<span class="doccomment">/// are not flexible enough.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap_iter`]: fn.wrap_iter.html</span>
-<span class="doccomment">/// [`wrap`]: fn.wrap.html</span>
-<span class="doccomment">/// [`fill`]: fn.fill.html</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The algorithm used by the `WrapIter` iterator (returned from the</span>
-<span class="doccomment">/// `wrap_iter` method)  works by doing successive partial scans over</span>
-<span class="doccomment">/// words in the input string (where each single scan yields a single</span>
-<span class="doccomment">/// line) so that the overall time and memory complexity is O(*n*) where</span>
-<span class="doccomment">/// *n* is the length of the input string.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The width in columns at which the text will be wrapped.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Indentation used for the first line of output.</span>
-    <span class="kw">pub</span> <span class="ident">initial_indent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Indentation used for subsequent lines of output.</span>
-    <span class="kw">pub</span> <span class="ident">subsequent_indent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="doccomment">/// Allow long words to be broken if they cannot fit on a line.</span>
-    <span class="doccomment">/// When set to `false`, some lines may be longer than</span>
-    <span class="doccomment">/// `self.width`.</span>
-    <span class="kw">pub</span> <span class="ident">break_words</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The method for splitting words. If the `hyphenation` feature</span>
-    <span class="doccomment">/// is enabled, you can use a `hyphenation::Standard` dictionary</span>
-    <span class="doccomment">/// here to get language-aware hyphenation.</span>
-    <span class="kw">pub</span> <span class="ident">splitter</span>: <span class="ident">S</span>,
+<span class="doccomment">/// A Wrapper holds settings for wrapping and filling text. Use it
+/// when the convenience [`wrap_iter`], [`wrap`] and [`fill`] functions
+/// are not flexible enough.
+///
+/// [`wrap_iter`]: fn.wrap_iter.html
+/// [`wrap`]: fn.wrap.html
+/// [`fill`]: fn.fill.html
+///
+/// The algorithm used by the `WrapIter` iterator (returned from the
+/// `wrap_iter` method)  works by doing successive partial scans over
+/// words in the input string (where each single scan yields a single
+/// line) so that the overall time and memory complexity is O(*n*) where
+/// *n* is the length of the input string.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Wrapper&lt;<span class="lifetime">&#39;a</span>, S: WordSplitter&gt; {
+    <span class="doccomment">/// The width in columns at which the text will be wrapped.
+    </span><span class="kw">pub </span>width: usize,
+    <span class="doccomment">/// Indentation used for the first line of output.
+    </span><span class="kw">pub </span>initial_indent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="doccomment">/// Indentation used for subsequent lines of output.
+    </span><span class="kw">pub </span>subsequent_indent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="doccomment">/// Allow long words to be broken if they cannot fit on a line.
+    /// When set to `false`, some lines may be longer than
+    /// `self.width`.
+    </span><span class="kw">pub </span>break_words: bool,
+    <span class="doccomment">/// The method for splitting words. If the `hyphenation` feature
+    /// is enabled, you can use a `hyphenation::Standard` dictionary
+    /// here to get language-aware hyphenation.
+    </span><span class="kw">pub </span>splitter: S,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">HyphenSplitter</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new Wrapper for wrapping at the specified width. By</span>
-    <span class="doccomment">/// default, we allow words longer than `width` to be broken. A</span>
-    <span class="doccomment">/// [`HyphenSplitter`] will be used by default for splitting</span>
-    <span class="doccomment">/// words. See the [`WordSplitter`] trait for other options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`HyphenSplitter`]: struct.HyphenSplitter.html</span>
-    <span class="doccomment">/// [`WordSplitter`]: trait.WordSplitter.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">HyphenSplitter</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper::with_splitter</span>(<span class="ident">width</span>, <span class="ident">HyphenSplitter</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, HyphenSplitter&gt; {
+    <span class="doccomment">/// Create a new Wrapper for wrapping at the specified width. By
+    /// default, we allow words longer than `width` to be broken. A
+    /// [`HyphenSplitter`] will be used by default for splitting
+    /// words. See the [`WordSplitter`] trait for other options.
+    ///
+    /// [`HyphenSplitter`]: struct.HyphenSplitter.html
+    /// [`WordSplitter`]: trait.WordSplitter.html
+    </span><span class="kw">pub fn </span>new(width: usize) -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, HyphenSplitter&gt; {
+        Wrapper::with_splitter(width, HyphenSplitter)
     }
 
-    <span class="doccomment">/// Create a new Wrapper for wrapping text at the current terminal</span>
-    <span class="doccomment">/// width. If the terminal width cannot be determined (typically</span>
-    <span class="doccomment">/// because the standard input and output is not connected to a</span>
-    <span class="doccomment">/// terminal), a width of 80 characters will be used. Other</span>
-    <span class="doccomment">/// settings use the same defaults as `Wrapper::new`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Equivalent to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_variables)]</span>
-    <span class="doccomment">/// use textwrap::{Wrapper, termwidth};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrapper = Wrapper::new(termwidth());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;term_size&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_termwidth</span>() -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">HyphenSplitter</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper::new</span>(<span class="ident">termwidth</span>())
+    <span class="doccomment">/// Create a new Wrapper for wrapping text at the current terminal
+    /// width. If the terminal width cannot be determined (typically
+    /// because the standard input and output is not connected to a
+    /// terminal), a width of 80 characters will be used. Other
+    /// settings use the same defaults as `Wrapper::new`.
+    ///
+    /// Equivalent to:
+    ///
+    /// ```no_run
+    /// # #![allow(unused_variables)]
+    /// use textwrap::{Wrapper, termwidth};
+    ///
+    /// let wrapper = Wrapper::new(termwidth());
+    /// ```
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;term_size&quot;</span>)]
+    </span><span class="kw">pub fn </span>with_termwidth() -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, HyphenSplitter&gt; {
+        Wrapper::new(termwidth())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Use the given [`WordSplitter`] to create a new Wrapper for</span>
-    <span class="doccomment">/// wrapping at the specified width. By default, we allow words</span>
-    <span class="doccomment">/// longer than `width` to be broken.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`WordSplitter`]: trait.WordSplitter.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_splitter</span>(<span class="ident">width</span>: <span class="ident">usize</span>, <span class="ident">splitter</span>: <span class="ident">S</span>) -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper</span> {
-            <span class="ident">width</span>: <span class="ident">width</span>,
-            <span class="ident">initial_indent</span>: <span class="string">&quot;&quot;</span>,
-            <span class="ident">subsequent_indent</span>: <span class="string">&quot;&quot;</span>,
-            <span class="ident">break_words</span>: <span class="bool-val">true</span>,
-            <span class="ident">splitter</span>: <span class="ident">splitter</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: WordSplitter&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+    <span class="doccomment">/// Use the given [`WordSplitter`] to create a new Wrapper for
+    /// wrapping at the specified width. By default, we allow words
+    /// longer than `width` to be broken.
+    ///
+    /// [`WordSplitter`]: trait.WordSplitter.html
+    </span><span class="kw">pub fn </span>with_splitter(width: usize, splitter: S) -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        Wrapper {
+            width: width,
+            initial_indent: <span class="string">&quot;&quot;</span>,
+            subsequent_indent: <span class="string">&quot;&quot;</span>,
+            break_words: <span class="bool-val">true</span>,
+            splitter: splitter,
         }
     }
 
-    <span class="doccomment">/// Change [`self.initial_indent`]. The initial indentation is</span>
-    <span class="doccomment">/// used on the very first line of output.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Classic paragraph indentation can be achieved by specifying an</span>
-    <span class="doccomment">/// initial indentation and wrapping each paragraph by itself:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_variables)]</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrapper = Wrapper::new(15).initial_indent(&quot;    &quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`self.initial_indent`]: #structfield.initial_indent</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_indent</span>(<span class="self">self</span>, <span class="ident">indent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper</span> {
-            <span class="ident">initial_indent</span>: <span class="ident">indent</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Change [`self.initial_indent`]. The initial indentation is
+    /// used on the very first line of output.
+    ///
+    /// # Examples
+    ///
+    /// Classic paragraph indentation can be achieved by specifying an
+    /// initial indentation and wrapping each paragraph by itself:
+    ///
+    /// ```no_run
+    /// # #![allow(unused_variables)]
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrapper = Wrapper::new(15).initial_indent(&quot;    &quot;);
+    /// ```
+    ///
+    /// [`self.initial_indent`]: #structfield.initial_indent
+    </span><span class="kw">pub fn </span>initial_indent(<span class="self">self</span>, indent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        Wrapper {
+            initial_indent: indent,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Change [`self.subsequent_indent`]. The subsequent indentation</span>
-    <span class="doccomment">/// is used on lines following the first line of output.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Combining initial and subsequent indentation lets you format a</span>
-    <span class="doccomment">/// single paragraph as a bullet list:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # #![allow(unused_variables)]</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrapper = Wrapper::new(15)</span>
-    <span class="doccomment">///     .initial_indent(&quot;* &quot;)</span>
-    <span class="doccomment">///     .subsequent_indent(&quot;  &quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`self.subsequent_indent`]: #structfield.subsequent_indent</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subsequent_indent</span>(<span class="self">self</span>, <span class="ident">indent</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper</span> {
-            <span class="ident">subsequent_indent</span>: <span class="ident">indent</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Change [`self.subsequent_indent`]. The subsequent indentation
+    /// is used on lines following the first line of output.
+    ///
+    /// # Examples
+    ///
+    /// Combining initial and subsequent indentation lets you format a
+    /// single paragraph as a bullet list:
+    ///
+    /// ```no_run
+    /// # #![allow(unused_variables)]
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrapper = Wrapper::new(15)
+    ///     .initial_indent(&quot;* &quot;)
+    ///     .subsequent_indent(&quot;  &quot;);
+    /// ```
+    ///
+    /// [`self.subsequent_indent`]: #structfield.subsequent_indent
+    </span><span class="kw">pub fn </span>subsequent_indent(<span class="self">self</span>, indent: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        Wrapper {
+            subsequent_indent: indent,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Change [`self.break_words`]. This controls if words longer</span>
-    <span class="doccomment">/// than `self.width` can be broken, or if they will be left</span>
-    <span class="doccomment">/// sticking out into the right margin.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`self.break_words`]: #structfield.break_words</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">break_words</span>(<span class="self">self</span>, <span class="ident">setting</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Wrapper</span> {
-            <span class="ident">break_words</span>: <span class="ident">setting</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Change [`self.break_words`]. This controls if words longer
+    /// than `self.width` can be broken, or if they will be left
+    /// sticking out into the right margin.
+    ///
+    /// [`self.break_words`]: #structfield.break_words
+    </span><span class="kw">pub fn </span>break_words(<span class="self">self</span>, setting: bool) -&gt; Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        Wrapper {
+            break_words: setting,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Fill a line of text at `self.width` characters. Strings are</span>
-    <span class="doccomment">/// wrapped based on their displayed width, not their size in</span>
-    <span class="doccomment">/// bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The result is a string with newlines between each line. Use</span>
-    <span class="doccomment">/// the `wrap` method if you need access to the individual lines.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Complexities</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method simply joins the lines produced by `wrap_iter`. As</span>
-    <span class="doccomment">/// such, it inherits the O(*n*) time and memory complexity where</span>
-    <span class="doccomment">/// *n* is the input string length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrapper = Wrapper::new(15);</span>
-    <span class="doccomment">/// assert_eq!(wrapper.fill(&quot;Memory safety without garbage collection.&quot;),</span>
-    <span class="doccomment">///            &quot;Memory safety\nwithout garbage\ncollection.&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">// This will avoid reallocation in simple cases (no</span>
-        <span class="comment">// indentation, no hyphenation).</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
+    <span class="doccomment">/// Fill a line of text at `self.width` characters. Strings are
+    /// wrapped based on their displayed width, not their size in
+    /// bytes.
+    ///
+    /// The result is a string with newlines between each line. Use
+    /// the `wrap` method if you need access to the individual lines.
+    ///
+    /// # Complexities
+    ///
+    /// This method simply joins the lines produced by `wrap_iter`. As
+    /// such, it inherits the O(*n*) time and memory complexity where
+    /// *n* is the input string length.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrapper = Wrapper::new(15);
+    /// assert_eq!(wrapper.fill(&quot;Memory safety without garbage collection.&quot;),
+    ///            &quot;Memory safety\nwithout garbage\ncollection.&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>fill(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="comment">// This will avoid reallocation in simple cases (no
+        // indentation, no hyphenation).
+        </span><span class="kw">let </span><span class="kw-2">mut </span>result = String::with_capacity(s.len());
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">wrap_iter</span>(<span class="ident">s</span>).<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        <span class="kw">for </span>(i, line) <span class="kw">in </span><span class="self">self</span>.wrap_iter(s).enumerate() {
+            <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+                result.push(<span class="string">&#39;\n&#39;</span>);
             }
-            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">line</span>);
+            result.push_str(<span class="kw-2">&amp;</span>line);
         }
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="doccomment">/// Wrap a line of text at `self.width` characters. Strings are</span>
-    <span class="doccomment">/// wrapped based on their displayed width, not their size in</span>
-    <span class="doccomment">/// bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Complexities</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method simply collects the lines produced by `wrap_iter`.</span>
-    <span class="doccomment">/// As such, it inherits the O(*n*) overall time and memory</span>
-    <span class="doccomment">/// complexity where *n* is the input string length.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrap15 = Wrapper::new(15);</span>
-    <span class="doccomment">/// assert_eq!(wrap15.wrap(&quot;Concurrency without data races.&quot;),</span>
-    <span class="doccomment">///            vec![&quot;Concurrency&quot;,</span>
-    <span class="doccomment">///                 &quot;without data&quot;,</span>
-    <span class="doccomment">///                 &quot;races.&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrap20 = Wrapper::new(20);</span>
-    <span class="doccomment">/// assert_eq!(wrap20.wrap(&quot;Concurrency without data races.&quot;),</span>
-    <span class="doccomment">///            vec![&quot;Concurrency without&quot;,</span>
-    <span class="doccomment">///                 &quot;data races.&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Notice that newlines in the input are preserved. This means</span>
-    <span class="doccomment">/// that they force a line break, regardless of how long the</span>
-    <span class="doccomment">/// current line is:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrapper = Wrapper::new(40);</span>
-    <span class="doccomment">/// assert_eq!(wrapper.wrap(&quot;First line.\nSecond line.&quot;),</span>
-    <span class="doccomment">///            vec![&quot;First line.&quot;, &quot;Second line.&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">wrap_iter</span>(<span class="ident">s</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="doccomment">/// Wrap a line of text at `self.width` characters. Strings are
+    /// wrapped based on their displayed width, not their size in
+    /// bytes.
+    ///
+    /// # Complexities
+    ///
+    /// This method simply collects the lines produced by `wrap_iter`.
+    /// As such, it inherits the O(*n*) overall time and memory
+    /// complexity where *n* is the input string length.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrap15 = Wrapper::new(15);
+    /// assert_eq!(wrap15.wrap(&quot;Concurrency without data races.&quot;),
+    ///            vec![&quot;Concurrency&quot;,
+    ///                 &quot;without data&quot;,
+    ///                 &quot;races.&quot;]);
+    ///
+    /// let wrap20 = Wrapper::new(20);
+    /// assert_eq!(wrap20.wrap(&quot;Concurrency without data races.&quot;),
+    ///            vec![&quot;Concurrency without&quot;,
+    ///                 &quot;data races.&quot;]);
+    /// ```
+    ///
+    /// Notice that newlines in the input are preserved. This means
+    /// that they force a line break, regardless of how long the
+    /// current line is:
+    ///
+    /// ```
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrapper = Wrapper::new(40);
+    /// assert_eq!(wrapper.wrap(&quot;First line.\nSecond line.&quot;),
+    ///            vec![&quot;First line.&quot;, &quot;Second line.&quot;]);
+    /// ```
+    ///
+    </span><span class="kw">pub fn </span>wrap(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        <span class="self">self</span>.wrap_iter(s).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
     }
 
-    <span class="doccomment">/// Lazily wrap a line of text at `self.width` characters. Strings</span>
-    <span class="doccomment">/// are wrapped based on their displayed width, not their size in</span>
-    <span class="doccomment">/// bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`WordSplitter`] stored in [`self.splitter`] is used</span>
-    <span class="doccomment">/// whenever when a word is too large to fit on the current line.</span>
-    <span class="doccomment">/// By changing the field, different hyphenation strategies can be</span>
-    <span class="doccomment">/// implemented.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Complexities</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method returns a [`WrapIter`] iterator which borrows this</span>
-    <span class="doccomment">/// `Wrapper`. The algorithm used has a linear complexity, so</span>
-    <span class="doccomment">/// getting the next line from the iterator will take O(*w*) time,</span>
-    <span class="doccomment">/// where *w* is the wrapping width. Fully processing the iterator</span>
-    <span class="doccomment">/// will take O(*n*) time for an input string of length *n*.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When no indentation is used, each line returned is a slice of</span>
-    <span class="doccomment">/// the input string and the memory overhead is thus constant.</span>
-    <span class="doccomment">/// Otherwise new memory is allocated for each line returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::borrow::Cow;</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrap20 = Wrapper::new(20);</span>
-    <span class="doccomment">/// let mut wrap20_iter = wrap20.wrap_iter(&quot;Zero-cost abstractions.&quot;);</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), None);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrap25 = Wrapper::new(25);</span>
-    <span class="doccomment">/// let mut wrap25_iter = wrap25.wrap_iter(&quot;Zero-cost abstractions.&quot;);</span>
-    <span class="doccomment">/// assert_eq!(wrap25_iter.next(), Some(Cow::from(&quot;Zero-cost abstractions.&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(wrap25_iter.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`self.splitter`]: #structfield.splitter</span>
-    <span class="doccomment">/// [`WordSplitter`]: trait.WordSplitter.html</span>
-    <span class="doccomment">/// [`WrapIter`]: struct.WrapIter.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">WrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">WrapIter</span> {
-            <span class="ident">wrapper</span>: <span class="self">self</span>,
-            <span class="ident">inner</span>: <span class="ident">WrapIterImpl::new</span>(<span class="self">self</span>, <span class="ident">s</span>),
-        }
-    }
-
-    <span class="doccomment">/// Lazily wrap a line of text at `self.width` characters. Strings</span>
-    <span class="doccomment">/// are wrapped based on their displayed width, not their size in</span>
-    <span class="doccomment">/// bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`WordSplitter`] stored in [`self.splitter`] is used</span>
-    <span class="doccomment">/// whenever when a word is too large to fit on the current line.</span>
-    <span class="doccomment">/// By changing the field, different hyphenation strategies can be</span>
-    <span class="doccomment">/// implemented.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Complexities</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method consumes the `Wrapper` and returns a</span>
-    <span class="doccomment">/// [`IntoWrapIter`] iterator. Fully processing the iterator has</span>
-    <span class="doccomment">/// the same O(*n*) time complexity as [`wrap_iter`], where *n* is</span>
-    <span class="doccomment">/// the length of the input string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use std::borrow::Cow;</span>
-    <span class="doccomment">/// use textwrap::Wrapper;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let wrap20 = Wrapper::new(20);</span>
-    <span class="doccomment">/// let mut wrap20_iter = wrap20.into_wrap_iter(&quot;Zero-cost abstractions.&quot;);</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(wrap20_iter.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`self.splitter`]: #structfield.splitter</span>
-    <span class="doccomment">/// [`WordSplitter`]: trait.WordSplitter.html</span>
-    <span class="doccomment">/// [`IntoWrapIter`]: struct.IntoWrapIter.html</span>
-    <span class="doccomment">/// [`wrap_iter`]: #method.wrap_iter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_wrap_iter</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">IntoWrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">WrapIterImpl::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>);
-
-        <span class="ident">IntoWrapIter</span> {
-            <span class="ident">wrapper</span>: <span class="self">self</span>,
-            <span class="ident">inner</span>: <span class="ident">inner</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// An iterator over the lines of the input string which owns a</span>
-<span class="doccomment">/// `Wrapper`. An instance of `IntoWrapIter` is typically obtained</span>
-<span class="doccomment">/// through either [`wrap_iter`] or [`Wrapper::into_wrap_iter`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each call of `.next()` method yields a line wrapped in `Some` if the</span>
-<span class="doccomment">/// input hasn&#39;t been fully processed yet. Otherwise it returns `None`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap_iter`]: fn.wrap_iter.html</span>
-<span class="doccomment">/// [`Wrapper::into_wrap_iter`]: struct.Wrapper.html#method.into_wrap_iter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoWrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span> {
-    <span class="ident">wrapper</span>: <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">inner</span>: <span class="ident">WrapIterImpl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoWrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">wrapper</span>)
-    }
-}
-
-<span class="doccomment">/// An iterator over the lines of the input string which borrows a</span>
-<span class="doccomment">/// `Wrapper`. An instance of `WrapIter` is typically obtained</span>
-<span class="doccomment">/// through the [`Wrapper::wrap_iter`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Each call of `.next()` method yields a line wrapped in `Some` if the</span>
-<span class="doccomment">/// input hasn&#39;t been fully processed yet. Otherwise it returns `None`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Wrapper::wrap_iter`]: struct.Wrapper.html#method.wrap_iter</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;w</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span> <span class="op">+</span> <span class="lifetime">&#39;w</span><span class="op">&gt;</span> {
-    <span class="ident">wrapper</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w</span> <span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">inner</span>: <span class="ident">WrapIterImpl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;w</span>, <span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">WrapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>(<span class="self">self</span>.<span class="ident">wrapper</span>)
-    }
-}
-
-<span class="doccomment">/// Like `char::is_whitespace`, but non-breaking spaces don&#39;t count.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">is_whitespace</span>(<span class="ident">ch</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">ch</span>.<span class="ident">is_whitespace</span>() <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="ident">NBSP</span>
-}
-
-<span class="doccomment">/// Common implementation details for `WrapIter` and `IntoWrapIter`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">WrapIterImpl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// String to wrap.</span>
-    <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="comment">// CharIndices iterator over self.source.</span>
-    <span class="ident">char_indices</span>: <span class="ident">CharIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="comment">// Byte index where the current line starts.</span>
-    <span class="ident">start</span>: <span class="ident">usize</span>,
-    <span class="comment">// Byte index of the last place where the string can be split.</span>
-    <span class="ident">split</span>: <span class="ident">usize</span>,
-    <span class="comment">// Size in bytes of the character at self.source[self.split].</span>
-    <span class="ident">split_len</span>: <span class="ident">usize</span>,
-    <span class="comment">// Width of self.source[self.start..idx].</span>
-    <span class="ident">line_width</span>: <span class="ident">usize</span>,
-    <span class="comment">// Width of self.source[self.start..self.split].</span>
-    <span class="ident">line_width_at_split</span>: <span class="ident">usize</span>,
-    <span class="comment">// Tracking runs of whitespace characters.</span>
-    <span class="ident">in_whitespace</span>: <span class="ident">bool</span>,
-    <span class="comment">// Has iterator finished producing elements?</span>
-    <span class="ident">finished</span>: <span class="ident">bool</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">WrapIterImpl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span>(<span class="ident">wrapper</span>: <span class="kw-2">&amp;</span><span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">WrapIterImpl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">WrapIterImpl</span> {
-            <span class="ident">source</span>: <span class="ident">s</span>,
-            <span class="ident">char_indices</span>: <span class="ident">s</span>.<span class="ident">char_indices</span>(),
-            <span class="ident">start</span>: <span class="number">0</span>,
-            <span class="ident">split</span>: <span class="number">0</span>,
-            <span class="ident">split_len</span>: <span class="number">0</span>,
-            <span class="ident">line_width</span>: <span class="ident">wrapper</span>.<span class="ident">initial_indent</span>.<span class="ident">width</span>(),
-            <span class="ident">line_width_at_split</span>: <span class="ident">wrapper</span>.<span class="ident">initial_indent</span>.<span class="ident">width</span>(),
-            <span class="ident">in_whitespace</span>: <span class="bool-val">false</span>,
-            <span class="ident">finished</span>: <span class="bool-val">false</span>,
+    <span class="doccomment">/// Lazily wrap a line of text at `self.width` characters. Strings
+    /// are wrapped based on their displayed width, not their size in
+    /// bytes.
+    ///
+    /// The [`WordSplitter`] stored in [`self.splitter`] is used
+    /// whenever when a word is too large to fit on the current line.
+    /// By changing the field, different hyphenation strategies can be
+    /// implemented.
+    ///
+    /// # Complexities
+    ///
+    /// This method returns a [`WrapIter`] iterator which borrows this
+    /// `Wrapper`. The algorithm used has a linear complexity, so
+    /// getting the next line from the iterator will take O(*w*) time,
+    /// where *w* is the wrapping width. Fully processing the iterator
+    /// will take O(*n*) time for an input string of length *n*.
+    ///
+    /// When no indentation is used, each line returned is a slice of
+    /// the input string and the memory overhead is thus constant.
+    /// Otherwise new memory is allocated for each line returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::borrow::Cow;
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrap20 = Wrapper::new(20);
+    /// let mut wrap20_iter = wrap20.wrap_iter(&quot;Zero-cost abstractions.&quot;);
+    /// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));
+    /// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));
+    /// assert_eq!(wrap20_iter.next(), None);
+    ///
+    /// let wrap25 = Wrapper::new(25);
+    /// let mut wrap25_iter = wrap25.wrap_iter(&quot;Zero-cost abstractions.&quot;);
+    /// assert_eq!(wrap25_iter.next(), Some(Cow::from(&quot;Zero-cost abstractions.&quot;)));
+    /// assert_eq!(wrap25_iter.next(), None);
+    /// ```
+    ///
+    /// [`self.splitter`]: #structfield.splitter
+    /// [`WordSplitter`]: trait.WordSplitter.html
+    /// [`WrapIter`]: struct.WrapIter.html
+    </span><span class="kw">pub fn </span>wrap_iter&lt;<span class="lifetime">&#39;w</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; WrapIter&lt;<span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>, S&gt; {
+        WrapIter {
+            wrapper: <span class="self">self</span>,
+            inner: WrapIterImpl::new(<span class="self">self</span>, s),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">create_result_line</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">wrapper</span>: <span class="kw-2">&amp;</span><span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">Cow::from</span>(<span class="ident">wrapper</span>.<span class="ident">initial_indent</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Cow::from</span>(<span class="ident">wrapper</span>.<span class="ident">subsequent_indent</span>)
+    <span class="doccomment">/// Lazily wrap a line of text at `self.width` characters. Strings
+    /// are wrapped based on their displayed width, not their size in
+    /// bytes.
+    ///
+    /// The [`WordSplitter`] stored in [`self.splitter`] is used
+    /// whenever when a word is too large to fit on the current line.
+    /// By changing the field, different hyphenation strategies can be
+    /// implemented.
+    ///
+    /// # Complexities
+    ///
+    /// This method consumes the `Wrapper` and returns a
+    /// [`IntoWrapIter`] iterator. Fully processing the iterator has
+    /// the same O(*n*) time complexity as [`wrap_iter`], where *n* is
+    /// the length of the input string.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::borrow::Cow;
+    /// use textwrap::Wrapper;
+    ///
+    /// let wrap20 = Wrapper::new(20);
+    /// let mut wrap20_iter = wrap20.into_wrap_iter(&quot;Zero-cost abstractions.&quot;);
+    /// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));
+    /// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));
+    /// assert_eq!(wrap20_iter.next(), None);
+    /// ```
+    ///
+    /// [`self.splitter`]: #structfield.splitter
+    /// [`WordSplitter`]: trait.WordSplitter.html
+    /// [`IntoWrapIter`]: struct.IntoWrapIter.html
+    /// [`wrap_iter`]: #method.wrap_iter
+    </span><span class="kw">pub fn </span>into_wrap_iter(<span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; IntoWrapIter&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        <span class="kw">let </span>inner = WrapIterImpl::new(<span class="kw-2">&amp;</span><span class="self">self</span>, s);
+
+        IntoWrapIter {
+            wrapper: <span class="self">self</span>,
+            inner: inner,
+        }
+    }
+}
+
+<span class="doccomment">/// An iterator over the lines of the input string which owns a
+/// `Wrapper`. An instance of `IntoWrapIter` is typically obtained
+/// through either [`wrap_iter`] or [`Wrapper::into_wrap_iter`].
+///
+/// Each call of `.next()` method yields a line wrapped in `Some` if the
+/// input hasn&#39;t been fully processed yet. Otherwise it returns `None`.
+///
+/// [`wrap_iter`]: fn.wrap_iter.html
+/// [`Wrapper::into_wrap_iter`]: struct.Wrapper.html#method.into_wrap_iter
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>IntoWrapIter&lt;<span class="lifetime">&#39;a</span>, S: WordSplitter&gt; {
+    wrapper: Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt;,
+    inner: WrapIterImpl&lt;<span class="lifetime">&#39;a</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: WordSplitter&gt; Iterator <span class="kw">for </span>IntoWrapIter&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+    <span class="kw">type </span>Item = Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        <span class="self">self</span>.inner.next(<span class="kw-2">&amp;</span><span class="self">self</span>.wrapper)
+    }
+}
+
+<span class="doccomment">/// An iterator over the lines of the input string which borrows a
+/// `Wrapper`. An instance of `WrapIter` is typically obtained
+/// through the [`Wrapper::wrap_iter`] method.
+///
+/// Each call of `.next()` method yields a line wrapped in `Some` if the
+/// input hasn&#39;t been fully processed yet. Otherwise it returns `None`.
+///
+/// [`Wrapper::wrap_iter`]: struct.Wrapper.html#method.wrap_iter
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>WrapIter&lt;<span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;w</span>, S: WordSplitter + <span class="lifetime">&#39;w</span>&gt; {
+    wrapper: <span class="kw-2">&amp;</span><span class="lifetime">&#39;w </span>Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt;,
+    inner: WrapIterImpl&lt;<span class="lifetime">&#39;a</span>&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;w</span>, S: WordSplitter&gt; Iterator <span class="kw">for </span>WrapIter&lt;<span class="lifetime">&#39;w</span>, <span class="lifetime">&#39;a</span>, S&gt; {
+    <span class="kw">type </span>Item = Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        <span class="self">self</span>.inner.next(<span class="self">self</span>.wrapper)
+    }
+}
+
+<span class="doccomment">/// Like `char::is_whitespace`, but non-breaking spaces don&#39;t count.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>is_whitespace(ch: char) -&gt; bool {
+    ch.is_whitespace() &amp;&amp; ch != NBSP
+}
+
+<span class="doccomment">/// Common implementation details for `WrapIter` and `IntoWrapIter`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>WrapIterImpl&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// String to wrap.
+    </span>source: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="comment">// CharIndices iterator over self.source.
+    </span>char_indices: CharIndices&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="comment">// Byte index where the current line starts.
+    </span>start: usize,
+    <span class="comment">// Byte index of the last place where the string can be split.
+    </span>split: usize,
+    <span class="comment">// Size in bytes of the character at self.source[self.split].
+    </span>split_len: usize,
+    <span class="comment">// Width of self.source[self.start..idx].
+    </span>line_width: usize,
+    <span class="comment">// Width of self.source[self.start..self.split].
+    </span>line_width_at_split: usize,
+    <span class="comment">// Tracking runs of whitespace characters.
+    </span>in_whitespace: bool,
+    <span class="comment">// Has iterator finished producing elements?
+    </span>finished: bool,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; WrapIterImpl&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new&lt;S: WordSplitter&gt;(wrapper: <span class="kw-2">&amp;</span>Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt;, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; WrapIterImpl&lt;<span class="lifetime">&#39;a</span>&gt; {
+        WrapIterImpl {
+            source: s,
+            char_indices: s.char_indices(),
+            start: <span class="number">0</span>,
+            split: <span class="number">0</span>,
+            split_len: <span class="number">0</span>,
+            line_width: wrapper.initial_indent.width(),
+            line_width_at_split: wrapper.initial_indent.width(),
+            in_whitespace: <span class="bool-val">false</span>,
+            finished: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">WordSplitter</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">wrapper</span>: <span class="kw-2">&amp;</span><span class="ident">Wrapper</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>create_result_line&lt;S: WordSplitter&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, wrapper: <span class="kw-2">&amp;</span>Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">if </span><span class="self">self</span>.start == <span class="number">0 </span>{
+            Cow::from(wrapper.initial_indent)
+        } <span class="kw">else </span>{
+            Cow::from(wrapper.subsequent_indent)
+        }
+    }
+
+    <span class="kw">fn </span>next&lt;S: WordSplitter&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, wrapper: <span class="kw-2">&amp;</span>Wrapper&lt;<span class="lifetime">&#39;a</span>, S&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.finished {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">idx</span>, <span class="ident">ch</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">char_indices</span>.<span class="ident">next</span>() {
-            <span class="kw">let</span> <span class="ident">char_width</span> <span class="op">=</span> <span class="ident">ch</span>.<span class="ident">width</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-            <span class="kw">let</span> <span class="ident">char_len</span> <span class="op">=</span> <span class="ident">ch</span>.<span class="ident">len_utf8</span>();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>((idx, ch)) = <span class="self">self</span>.char_indices.next() {
+            <span class="kw">let </span>char_width = ch.width().unwrap_or(<span class="number">0</span>);
+            <span class="kw">let </span>char_len = ch.len_utf8();
 
-            <span class="kw">if</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> {
-                <span class="self">self</span>.<span class="ident">split</span> <span class="op">=</span> <span class="ident">idx</span>;
-                <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">=</span> <span class="ident">char_len</span>;
-                <span class="self">self</span>.<span class="ident">line_width_at_split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_width</span>;
-                <span class="self">self</span>.<span class="ident">in_whitespace</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="kw">if </span>ch == <span class="string">&#39;\n&#39; </span>{
+                <span class="self">self</span>.split = idx;
+                <span class="self">self</span>.split_len = char_len;
+                <span class="self">self</span>.line_width_at_split = <span class="self">self</span>.line_width;
+                <span class="self">self</span>.in_whitespace = <span class="bool-val">false</span>;
 
-                <span class="comment">// If this is not the final line, return the current line. Otherwise,</span>
-                <span class="comment">// we will return the line with its line break after exiting the loop</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">split</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">len</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_result_line</span>(<span class="ident">wrapper</span>);
-                    <span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">source</span>[<span class="self">self</span>.<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">split</span>];
+                <span class="comment">// If this is not the final line, return the current line. Otherwise,
+                // we will return the line with its line break after exiting the loop
+                </span><span class="kw">if </span><span class="self">self</span>.split + <span class="self">self</span>.split_len &lt; <span class="self">self</span>.source.len() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>line = <span class="self">self</span>.create_result_line(wrapper);
+                    line += <span class="kw-2">&amp;</span><span class="self">self</span>.source[<span class="self">self</span>.start..<span class="self">self</span>.split];
 
-                    <span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">split_len</span>;
-                    <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">=</span> <span class="ident">wrapper</span>.<span class="ident">subsequent_indent</span>.<span class="ident">width</span>();
+                    <span class="self">self</span>.start = <span class="self">self</span>.split + <span class="self">self</span>.split_len;
+                    <span class="self">self</span>.line_width = wrapper.subsequent_indent.width();
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(line);
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_whitespace</span>(<span class="ident">ch</span>) {
-                <span class="comment">// Extend the previous split or create a new one.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_whitespace</span> {
-                    <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">char_len</span>;
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">split</span> <span class="op">=</span> <span class="ident">idx</span>;
-                    <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">=</span> <span class="ident">char_len</span>;
+            } <span class="kw">else if </span>is_whitespace(ch) {
+                <span class="comment">// Extend the previous split or create a new one.
+                </span><span class="kw">if </span><span class="self">self</span>.in_whitespace {
+                    <span class="self">self</span>.split_len += char_len;
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.split = idx;
+                    <span class="self">self</span>.split_len = char_len;
                 }
-                <span class="self">self</span>.<span class="ident">line_width_at_split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">+</span> <span class="ident">char_width</span>;
-                <span class="self">self</span>.<span class="ident">in_whitespace</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">+</span> <span class="ident">char_width</span> <span class="op">&gt;</span> <span class="ident">wrapper</span>.<span class="ident">width</span> {
-                <span class="comment">// There is no room for this character on the current</span>
-                <span class="comment">// line. Try to split the final word.</span>
-                <span class="self">self</span>.<span class="ident">in_whitespace</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="kw">let</span> <span class="ident">remaining_text</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">source</span>[<span class="self">self</span>.<span class="ident">split</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">split_len</span>..];
-                <span class="kw">let</span> <span class="ident">final_word</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">remaining_text</span>.<span class="ident">find</span>(<span class="ident">is_whitespace</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">remaining_text</span>[..<span class="ident">i</span>],
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">remaining_text</span>,
+                <span class="self">self</span>.line_width_at_split = <span class="self">self</span>.line_width + char_width;
+                <span class="self">self</span>.in_whitespace = <span class="bool-val">true</span>;
+            } <span class="kw">else if </span><span class="self">self</span>.line_width + char_width &gt; wrapper.width {
+                <span class="comment">// There is no room for this character on the current
+                // line. Try to split the final word.
+                </span><span class="self">self</span>.in_whitespace = <span class="bool-val">false</span>;
+                <span class="kw">let </span>remaining_text = <span class="kw-2">&amp;</span><span class="self">self</span>.source[<span class="self">self</span>.split + <span class="self">self</span>.split_len..];
+                <span class="kw">let </span>final_word = <span class="kw">match </span>remaining_text.find(is_whitespace) {
+                    <span class="prelude-val">Some</span>(i) =&gt; <span class="kw-2">&amp;</span>remaining_text[..i],
+                    <span class="prelude-val">None </span>=&gt; remaining_text,
                 };
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hyphen</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>;
-                <span class="kw">let</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">wrapper</span>.<span class="ident">splitter</span>.<span class="ident">split</span>(<span class="ident">final_word</span>);
-                <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">head</span>, <span class="ident">hyp</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">splits</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">line_width_at_split</span> <span class="op">+</span> <span class="ident">head</span>.<span class="ident">width</span>() <span class="op">+</span> <span class="ident">hyp</span>.<span class="ident">width</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">wrapper</span>.<span class="ident">width</span> {
-                        <span class="comment">// We can fit head into the current line.</span>
-                        <span class="comment">// Advance the split point by the width of the</span>
-                        <span class="comment">// whitespace and the head length.</span>
-                        <span class="self">self</span>.<span class="ident">split</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">+</span> <span class="ident">head</span>.<span class="ident">len</span>();
-                        <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="ident">hyphen</span> <span class="op">=</span> <span class="ident">hyp</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>hyphen = <span class="string">&quot;&quot;</span>;
+                <span class="kw">let </span>splits = wrapper.splitter.split(final_word);
+                <span class="kw">for </span><span class="kw-2">&amp;</span>(head, hyp, <span class="kw">_</span>) <span class="kw">in </span>splits.iter().rev() {
+                    <span class="kw">if </span><span class="self">self</span>.line_width_at_split + head.width() + hyp.width() &lt;= wrapper.width {
+                        <span class="comment">// We can fit head into the current line.
+                        // Advance the split point by the width of the
+                        // whitespace and the head length.
+                        </span><span class="self">self</span>.split += <span class="self">self</span>.split_len + head.len();
+                        <span class="self">self</span>.split_len = <span class="number">0</span>;
+                        hyphen = hyp;
                         <span class="kw">break</span>;
                     }
                 }
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span> {
-                    <span class="comment">// The word is too big to fit on a single line, so we</span>
-                    <span class="comment">// need to split it at the current index.</span>
-                    <span class="kw">if</span> <span class="ident">wrapper</span>.<span class="ident">break_words</span> {
-                        <span class="comment">// Break work at current index.</span>
-                        <span class="self">self</span>.<span class="ident">split</span> <span class="op">=</span> <span class="ident">idx</span>;
-                        <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="self">self</span>.<span class="ident">line_width_at_split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_width</span>;
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Add smallest split.</span>
-                        <span class="self">self</span>.<span class="ident">split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">splits</span>[<span class="number">0</span>].<span class="number">0</span>.<span class="ident">len</span>();
-                        <span class="self">self</span>.<span class="ident">split_len</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="self">self</span>.<span class="ident">line_width_at_split</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">line_width</span>;
+                <span class="kw">if </span><span class="self">self</span>.start &gt;= <span class="self">self</span>.split {
+                    <span class="comment">// The word is too big to fit on a single line, so we
+                    // need to split it at the current index.
+                    </span><span class="kw">if </span>wrapper.break_words {
+                        <span class="comment">// Break work at current index.
+                        </span><span class="self">self</span>.split = idx;
+                        <span class="self">self</span>.split_len = <span class="number">0</span>;
+                        <span class="self">self</span>.line_width_at_split = <span class="self">self</span>.line_width;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Add smallest split.
+                        </span><span class="self">self</span>.split = <span class="self">self</span>.start + splits[<span class="number">0</span>].<span class="number">0</span>.len();
+                        <span class="self">self</span>.split_len = <span class="number">0</span>;
+                        <span class="self">self</span>.line_width_at_split = <span class="self">self</span>.line_width;
                     }
                 }
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">split</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_result_line</span>(<span class="ident">wrapper</span>);
-                    <span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">source</span>[<span class="self">self</span>.<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">split</span>];
-                    <span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="ident">hyphen</span>;
+                <span class="kw">if </span><span class="self">self</span>.start &lt; <span class="self">self</span>.split {
+                    <span class="kw">let </span><span class="kw-2">mut </span>line = <span class="self">self</span>.create_result_line(wrapper);
+                    line += <span class="kw-2">&amp;</span><span class="self">self</span>.source[<span class="self">self</span>.start..<span class="self">self</span>.split];
+                    line += hyphen;
 
-                    <span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">split_len</span>;
-                    <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">wrapper</span>.<span class="ident">subsequent_indent</span>.<span class="ident">width</span>();
-                    <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">-</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">line_width_at_split</span>;
-                    <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">char_width</span>;
+                    <span class="self">self</span>.start = <span class="self">self</span>.split + <span class="self">self</span>.split_len;
+                    <span class="self">self</span>.line_width += wrapper.subsequent_indent.width();
+                    <span class="self">self</span>.line_width -= <span class="self">self</span>.line_width_at_split;
+                    <span class="self">self</span>.line_width += char_width;
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(line);
                 }
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">in_whitespace</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.in_whitespace = <span class="bool-val">false</span>;
             }
-            <span class="self">self</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">char_width</span>;
+            <span class="self">self</span>.line_width += char_width;
         }
 
-        <span class="self">self</span>.<span class="ident">finished</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="self">self</span>.finished = <span class="bool-val">true</span>;
 
-        <span class="comment">// Add final line.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create_result_line</span>(<span class="ident">wrapper</span>);
-            <span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">source</span>[<span class="self">self</span>.<span class="ident">start</span>..];
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>);
+        <span class="comment">// Add final line.
+        </span><span class="kw">if </span><span class="self">self</span>.start &lt; <span class="self">self</span>.source.len() {
+            <span class="kw">let </span><span class="kw-2">mut </span>line = <span class="self">self</span>.create_result_line(wrapper);
+            line += <span class="kw-2">&amp;</span><span class="self">self</span>.source[<span class="self">self</span>.start..];
+            <span class="kw">return </span><span class="prelude-val">Some</span>(line);
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Return the current terminal width. If the terminal width cannot be</span>
-<span class="doccomment">/// determined (typically because the standard output is not connected</span>
-<span class="doccomment">/// to a terminal), a default width of 80 characters will be used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Create a `Wrapper` for the current terminal with a two column</span>
-<span class="doccomment">/// margin:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # #![allow(unused_variables)]</span>
-<span class="doccomment">/// use textwrap::{Wrapper, NoHyphenation, termwidth};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let width = termwidth() - 4; // Two columns on each side.</span>
-<span class="doccomment">/// let wrapper = Wrapper::with_splitter(width, NoHyphenation)</span>
-<span class="doccomment">///     .initial_indent(&quot;  &quot;)</span>
-<span class="doccomment">///     .subsequent_indent(&quot;  &quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;term_size&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">termwidth</span>() -&gt; <span class="ident">usize</span> {
-    <span class="ident">term_size::dimensions_stdout</span>().<span class="ident">map_or</span>(<span class="number">80</span>, <span class="op">|</span>(<span class="ident">w</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">w</span>)
+<span class="doccomment">/// Return the current terminal width. If the terminal width cannot be
+/// determined (typically because the standard output is not connected
+/// to a terminal), a default width of 80 characters will be used.
+///
+/// # Examples
+///
+/// Create a `Wrapper` for the current terminal with a two column
+/// margin:
+///
+/// ```no_run
+/// # #![allow(unused_variables)]
+/// use textwrap::{Wrapper, NoHyphenation, termwidth};
+///
+/// let width = termwidth() - 4; // Two columns on each side.
+/// let wrapper = Wrapper::with_splitter(width, NoHyphenation)
+///     .initial_indent(&quot;  &quot;)
+///     .subsequent_indent(&quot;  &quot;);
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;term_size&quot;</span>)]
+</span><span class="kw">pub fn </span>termwidth() -&gt; usize {
+    term_size::dimensions_stdout().map_or(<span class="number">80</span>, |(w, <span class="kw">_</span>)| w)
 }
 
-<span class="doccomment">/// Fill a line of text at `width` characters. Strings are wrapped</span>
-<span class="doccomment">/// based on their displayed width, not their size in bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The result is a string with newlines between each line. Use</span>
-<span class="doccomment">/// [`wrap`] if you need access to the individual lines or</span>
-<span class="doccomment">/// [`wrap_iter`] for its iterator counterpart.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use textwrap::fill;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(fill(&quot;Memory safety without garbage collection.&quot;, 15),</span>
-<span class="doccomment">///            &quot;Memory safety\nwithout garbage\ncollection.&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function creates a Wrapper on the fly with default settings.</span>
-<span class="doccomment">/// If you need to set a language corpus for automatic hyphenation, or</span>
-<span class="doccomment">/// need to fill many strings, then it is suggested to create a Wrapper</span>
-<span class="doccomment">/// and call its [`fill` method].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap`]: fn.wrap.html</span>
-<span class="doccomment">/// [`wrap_iter`]: fn.wrap_iter.html</span>
-<span class="doccomment">/// [`fill` method]: struct.Wrapper.html#method.fill</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">Wrapper::new</span>(<span class="ident">width</span>).<span class="ident">fill</span>(<span class="ident">s</span>)
+<span class="doccomment">/// Fill a line of text at `width` characters. Strings are wrapped
+/// based on their displayed width, not their size in bytes.
+///
+/// The result is a string with newlines between each line. Use
+/// [`wrap`] if you need access to the individual lines or
+/// [`wrap_iter`] for its iterator counterpart.
+///
+/// ```
+/// use textwrap::fill;
+///
+/// assert_eq!(fill(&quot;Memory safety without garbage collection.&quot;, 15),
+///            &quot;Memory safety\nwithout garbage\ncollection.&quot;);
+/// ```
+///
+/// This function creates a Wrapper on the fly with default settings.
+/// If you need to set a language corpus for automatic hyphenation, or
+/// need to fill many strings, then it is suggested to create a Wrapper
+/// and call its [`fill` method].
+///
+/// [`wrap`]: fn.wrap.html
+/// [`wrap_iter`]: fn.wrap_iter.html
+/// [`fill` method]: struct.Wrapper.html#method.fill
+</span><span class="kw">pub fn </span>fill(s: <span class="kw-2">&amp;</span>str, width: usize) -&gt; String {
+    Wrapper::new(width).fill(s)
 }
 
-<span class="doccomment">/// Wrap a line of text at `width` characters. Strings are wrapped</span>
-<span class="doccomment">/// based on their displayed width, not their size in bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function creates a Wrapper on the fly with default settings.</span>
-<span class="doccomment">/// If you need to set a language corpus for automatic hyphenation, or</span>
-<span class="doccomment">/// need to wrap many strings, then it is suggested to create a Wrapper</span>
-<span class="doccomment">/// and call its [`wrap` method].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The result is a vector of strings. Use [`wrap_iter`] if you need an</span>
-<span class="doccomment">/// iterator version.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use textwrap::wrap;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(wrap(&quot;Concurrency without data races.&quot;, 15),</span>
-<span class="doccomment">///            vec![&quot;Concurrency&quot;,</span>
-<span class="doccomment">///                 &quot;without data&quot;,</span>
-<span class="doccomment">///                 &quot;races.&quot;]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(wrap(&quot;Concurrency without data races.&quot;, 20),</span>
-<span class="doccomment">///            vec![&quot;Concurrency without&quot;,</span>
-<span class="doccomment">///                 &quot;data races.&quot;]);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap_iter`]: fn.wrap_iter.html</span>
-<span class="doccomment">/// [`wrap` method]: struct.Wrapper.html#method.wrap</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Wrapper::new</span>(<span class="ident">width</span>).<span class="ident">wrap</span>(<span class="ident">s</span>)
+<span class="doccomment">/// Wrap a line of text at `width` characters. Strings are wrapped
+/// based on their displayed width, not their size in bytes.
+///
+/// This function creates a Wrapper on the fly with default settings.
+/// If you need to set a language corpus for automatic hyphenation, or
+/// need to wrap many strings, then it is suggested to create a Wrapper
+/// and call its [`wrap` method].
+///
+/// The result is a vector of strings. Use [`wrap_iter`] if you need an
+/// iterator version.
+///
+/// # Examples
+///
+/// ```
+/// use textwrap::wrap;
+///
+/// assert_eq!(wrap(&quot;Concurrency without data races.&quot;, 15),
+///            vec![&quot;Concurrency&quot;,
+///                 &quot;without data&quot;,
+///                 &quot;races.&quot;]);
+///
+/// assert_eq!(wrap(&quot;Concurrency without data races.&quot;, 20),
+///            vec![&quot;Concurrency without&quot;,
+///                 &quot;data races.&quot;]);
+/// ```
+///
+/// [`wrap_iter`]: fn.wrap_iter.html
+/// [`wrap` method]: struct.Wrapper.html#method.wrap
+</span><span class="kw">pub fn </span>wrap(s: <span class="kw-2">&amp;</span>str, width: usize) -&gt; Vec&lt;Cow&lt;str&gt;&gt; {
+    Wrapper::new(width).wrap(s)
 }
 
-<span class="doccomment">/// Lazily wrap a line of text at `width` characters. Strings are</span>
-<span class="doccomment">/// wrapped based on their displayed width, not their size in bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function creates a Wrapper on the fly with default settings.</span>
-<span class="doccomment">/// It then calls the [`into_wrap_iter`] method. Hence, the return</span>
-<span class="doccomment">/// value is an [`IntoWrapIter`], not a [`WrapIter`] as the function</span>
-<span class="doccomment">/// name would otherwise suggest.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you need to set a language corpus for automatic hyphenation, or</span>
-<span class="doccomment">/// need to wrap many strings, then it is suggested to create a Wrapper</span>
-<span class="doccomment">/// and call its [`wrap_iter`] or [`into_wrap_iter`] methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">/// use textwrap::wrap_iter;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut wrap20_iter = wrap_iter(&quot;Zero-cost abstractions.&quot;, 20);</span>
-<span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));</span>
-<span class="doccomment">/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));</span>
-<span class="doccomment">/// assert_eq!(wrap20_iter.next(), None);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut wrap25_iter = wrap_iter(&quot;Zero-cost abstractions.&quot;, 25);</span>
-<span class="doccomment">/// assert_eq!(wrap25_iter.next(), Some(Cow::from(&quot;Zero-cost abstractions.&quot;)));</span>
-<span class="doccomment">/// assert_eq!(wrap25_iter.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`wrap_iter`]: struct.Wrapper.html#method.wrap_iter</span>
-<span class="doccomment">/// [`into_wrap_iter`]: struct.Wrapper.html#method.into_wrap_iter</span>
-<span class="doccomment">/// [`IntoWrapIter`]: struct.IntoWrapIter.html</span>
-<span class="doccomment">/// [`WrapIter`]: struct.WrapIter.html</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap_iter</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">IntoWrapIter</span><span class="op">&lt;</span><span class="ident">HyphenSplitter</span><span class="op">&gt;</span> {
-    <span class="ident">Wrapper::new</span>(<span class="ident">width</span>).<span class="ident">into_wrap_iter</span>(<span class="ident">s</span>)
+<span class="doccomment">/// Lazily wrap a line of text at `width` characters. Strings are
+/// wrapped based on their displayed width, not their size in bytes.
+///
+/// This function creates a Wrapper on the fly with default settings.
+/// It then calls the [`into_wrap_iter`] method. Hence, the return
+/// value is an [`IntoWrapIter`], not a [`WrapIter`] as the function
+/// name would otherwise suggest.
+///
+/// If you need to set a language corpus for automatic hyphenation, or
+/// need to wrap many strings, then it is suggested to create a Wrapper
+/// and call its [`wrap_iter`] or [`into_wrap_iter`] methods.
+///
+/// # Examples
+///
+/// ```
+/// use std::borrow::Cow;
+/// use textwrap::wrap_iter;
+///
+/// let mut wrap20_iter = wrap_iter(&quot;Zero-cost abstractions.&quot;, 20);
+/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;Zero-cost&quot;)));
+/// assert_eq!(wrap20_iter.next(), Some(Cow::from(&quot;abstractions.&quot;)));
+/// assert_eq!(wrap20_iter.next(), None);
+///
+/// let mut wrap25_iter = wrap_iter(&quot;Zero-cost abstractions.&quot;, 25);
+/// assert_eq!(wrap25_iter.next(), Some(Cow::from(&quot;Zero-cost abstractions.&quot;)));
+/// assert_eq!(wrap25_iter.next(), None);
+/// ```
+///
+/// [`wrap_iter`]: struct.Wrapper.html#method.wrap_iter
+/// [`into_wrap_iter`]: struct.Wrapper.html#method.into_wrap_iter
+/// [`IntoWrapIter`]: struct.IntoWrapIter.html
+/// [`WrapIter`]: struct.WrapIter.html
+</span><span class="kw">pub fn </span>wrap_iter(s: <span class="kw-2">&amp;</span>str, width: usize) -&gt; IntoWrapIter&lt;HyphenSplitter&gt; {
+    Wrapper::new(width).into_wrap_iter(s)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">hyphenation</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">extern crate </span>hyphenation;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">hyphenation</span>::{<span class="ident">Language</span>, <span class="ident">Load</span>, <span class="ident">Standard</span>};
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">use </span>hyphenation::{Language, Load, Standard};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_wrap</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_wrap() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">simple</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>simple() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">multi_word_on_line</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>multi_word_on_line() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">long_word</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>long_word() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">long_words</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo bar&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;r&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>long_words() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo bar&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;r&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">max_width</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo bar&quot;</span>, <span class="ident">usize::max_value</span>()), <span class="macro">vec!</span>[<span class="string">&quot;foo bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>max_width() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo bar&quot;</span>, usize::max_value()), <span class="macro">vec!</span>[<span class="string">&quot;foo bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">leading_whitespace</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;  foo bar&quot;</span>, <span class="number">6</span>), <span class="macro">vec!</span>[<span class="string">&quot;  foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>leading_whitespace() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;  foo bar&quot;</span>, <span class="number">6</span>), <span class="macro">vec!</span>[<span class="string">&quot;  foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trailing_whitespace</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo bar  &quot;</span>, <span class="number">6</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar  &quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>trailing_whitespace() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo bar  &quot;</span>, <span class="number">6</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar  &quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">interior_whitespace</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo:   bar baz&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo:   bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>interior_whitespace() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo:   bar baz&quot;</span>, <span class="number">10</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo:   bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extra_whitespace_start_of_line</span>() {
-        <span class="comment">// Whitespace is only significant inside a line. After a line</span>
-        <span class="comment">// gets too long and is broken, the first word starts in</span>
-        <span class="comment">// column zero and is not indented. The line before might end</span>
-        <span class="comment">// up with trailing whitespace.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo               bar&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extra_whitespace_start_of_line() {
+        <span class="comment">// Whitespace is only significant inside a line. After a line
+        // gets too long and is broken, the first word starts in
+        // column zero and is not indented. The line before might end
+        // up with trailing whitespace.
+        </span><span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo               bar&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">issue_99</span>() {
-        <span class="comment">// We did not reset the in_whitespace flag correctly and did</span>
-        <span class="comment">// not handle single-character words after a line break.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">wrap</span>(<span class="string">&quot;aaabbbccc x yyyzzzwww&quot;</span>, <span class="number">9</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>issue_99() {
+        <span class="comment">// We did not reset the in_whitespace flag correctly and did
+        // not handle single-character words after a line break.
+        </span><span class="macro">assert_eq!</span>(
+            wrap(<span class="string">&quot;aaabbbccc x yyyzzzwww&quot;</span>, <span class="number">9</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;aaabbbccc&quot;</span>, <span class="string">&quot;x&quot;</span>, <span class="string">&quot;yyyzzzwww&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">issue_129</span>() {
-        <span class="comment">// The dash is an em-dash which takes up four bytes. We used</span>
-        <span class="comment">// to panic since we tried to index into the character.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;x – x&quot;</span>, <span class="number">1</span>), <span class="macro">vec!</span>[<span class="string">&quot;x&quot;</span>, <span class="string">&quot;–&quot;</span>, <span class="string">&quot;x&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>issue_129() {
+        <span class="comment">// The dash is an em-dash which takes up four bytes. We used
+        // to panic since we tried to index into the character.
+        </span><span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;x – x&quot;</span>, <span class="number">1</span>), <span class="macro">vec!</span>[<span class="string">&quot;x&quot;</span>, <span class="string">&quot;–&quot;</span>, <span class="string">&quot;x&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wide_character_handling</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;Hello, World!&quot;</span>, <span class="number">15</span>), <span class="macro">vec!</span>[<span class="string">&quot;Hello, World!&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wide_character_handling() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;Hello, World!&quot;</span>, <span class="number">15</span>), <span class="macro">vec!</span>[<span class="string">&quot;Hello, World!&quot;</span>]);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrap</span>(<span class="string">&quot;Ｈｅｌｌｏ, Ｗｏｒｌｄ!&quot;</span>, <span class="number">15</span>),
+            wrap(<span class="string">&quot;Ｈｅｌｌｏ, Ｗｏｒｌｄ!&quot;</span>, <span class="number">15</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;Ｈｅｌｌｏ,&quot;</span>, <span class="string">&quot;Ｗｏｒｌｄ!&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty_input_not_indented</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">10</span>).<span class="ident">initial_indent</span>(<span class="string">&quot;!!!&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">fill</span>(<span class="string">&quot;&quot;</span>), <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>empty_input_not_indented() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">10</span>).initial_indent(<span class="string">&quot;!!!&quot;</span>);
+        <span class="macro">assert_eq!</span>(wrapper.fill(<span class="string">&quot;&quot;</span>), <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">indent_single_line</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">10</span>).<span class="ident">initial_indent</span>(<span class="string">&quot;&gt;&gt;&gt;&quot;</span>); <span class="comment">// No trailing space</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">fill</span>(<span class="string">&quot;foo&quot;</span>), <span class="string">&quot;&gt;&gt;&gt;foo&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>indent_single_line() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">10</span>).initial_indent(<span class="string">&quot;&gt;&gt;&gt;&quot;</span>); <span class="comment">// No trailing space
+        </span><span class="macro">assert_eq!</span>(wrapper.fill(<span class="string">&quot;foo&quot;</span>), <span class="string">&quot;&gt;&gt;&gt;foo&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">indent_multiple_lines</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">6</span>).<span class="ident">initial_indent</span>(<span class="string">&quot;* &quot;</span>).<span class="ident">subsequent_indent</span>(<span class="string">&quot;  &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foo bar baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;* foo&quot;</span>, <span class="string">&quot;  bar&quot;</span>, <span class="string">&quot;  baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>indent_multiple_lines() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">6</span>).initial_indent(<span class="string">&quot;* &quot;</span>).subsequent_indent(<span class="string">&quot;  &quot;</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foo bar baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;* foo&quot;</span>, <span class="string">&quot;  bar&quot;</span>, <span class="string">&quot;  baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">indent_break_words</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">initial_indent</span>(<span class="string">&quot;* &quot;</span>).<span class="ident">subsequent_indent</span>(<span class="string">&quot;  &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foobarbaz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;* foo&quot;</span>, <span class="string">&quot;  bar&quot;</span>, <span class="string">&quot;  baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>indent_break_words() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).initial_indent(<span class="string">&quot;* &quot;</span>).subsequent_indent(<span class="string">&quot;  &quot;</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foobarbaz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;* foo&quot;</span>, <span class="string">&quot;  bar&quot;</span>, <span class="string">&quot;  baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hyphens</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo-bar&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hyphens() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo-bar&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-&quot;</span>, <span class="string">&quot;bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trailing_hyphen</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foobar-&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foobar-&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>trailing_hyphen() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foobar-&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foobar-&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">multiple_hyphens</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo-bar-baz&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-&quot;</span>, <span class="string">&quot;bar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>multiple_hyphens() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo-bar-baz&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-&quot;</span>, <span class="string">&quot;bar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hyphens_flag</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hyphens_flag() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;The --foo-bar flag.&quot;</span>),
+            wrapper.wrap(<span class="string">&quot;The --foo-bar flag.&quot;</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;The&quot;</span>, <span class="string">&quot;--foo-&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;flag.&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">repeated_hyphens</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">4</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foo--bar&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo--bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>repeated_hyphens() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">4</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foo--bar&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo--bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hyphens_alphanumeric</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;Na2-CH4&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;Na2-&quot;</span>, <span class="string">&quot;CH4&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hyphens_alphanumeric() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;Na2-CH4&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;Na2-&quot;</span>, <span class="string">&quot;CH4&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hyphens_non_alphanumeric</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foo(-)bar&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo(-)bar&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hyphens_non_alphanumeric() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foo(-)bar&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo(-)bar&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">multiple_splits</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foo-bar-baz&quot;</span>, <span class="number">9</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-bar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>multiple_splits() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foo-bar-baz&quot;</span>, <span class="number">9</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo-bar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">forced_split</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foobar-baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foobar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>forced_split() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foobar-baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foobar-&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_hyphenation</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::with_splitter</span>(<span class="number">8</span>, <span class="ident">NoHyphenation</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;foo bar-baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar-baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_hyphenation() {
+        <span class="kw">let </span>wrapper = Wrapper::with_splitter(<span class="number">8</span>, NoHyphenation);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;foo bar-baz&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar-baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">auto_hyphenation</span>() {
-        <span class="kw">let</span> <span class="ident">dictionary</span> <span class="op">=</span> <span class="ident">Standard::from_embedded</span>(<span class="ident">Language::EnglishUS</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">10</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">fn </span>auto_hyphenation() {
+        <span class="kw">let </span>dictionary = Standard::from_embedded(Language::EnglishUS).unwrap();
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;Internationalization&quot;</span>),
+            wrapper.wrap(<span class="string">&quot;Internationalization&quot;</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;Internatio&quot;</span>, <span class="string">&quot;nalization&quot;</span>]
         );
 
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::with_splitter</span>(<span class="number">10</span>, <span class="ident">dictionary</span>);
+        <span class="kw">let </span>wrapper = Wrapper::with_splitter(<span class="number">10</span>, dictionary);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;Internationalization&quot;</span>),
+            wrapper.wrap(<span class="string">&quot;Internationalization&quot;</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;Interna-&quot;</span>, <span class="string">&quot;tionaliza-&quot;</span>, <span class="string">&quot;tion&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">split_len_hyphenation</span>() {
-        <span class="comment">// Test that hyphenation takes the width of the wihtespace</span>
-        <span class="comment">// into account.</span>
-        <span class="kw">let</span> <span class="ident">dictionary</span> <span class="op">=</span> <span class="ident">Standard::from_embedded</span>(<span class="ident">Language::EnglishUS</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::with_splitter</span>(<span class="number">15</span>, <span class="ident">dictionary</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">fn </span>split_len_hyphenation() {
+        <span class="comment">// Test that hyphenation takes the width of the wihtespace
+        // into account.
+        </span><span class="kw">let </span>dictionary = Standard::from_embedded(Language::EnglishUS).unwrap();
+        <span class="kw">let </span>wrapper = Wrapper::with_splitter(<span class="number">15</span>, dictionary);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;garbage   collection&quot;</span>),
+            wrapper.wrap(<span class="string">&quot;garbage   collection&quot;</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;garbage   col-&quot;</span>, <span class="string">&quot;lection&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">borrowed_lines</span>() {
-        <span class="comment">// Lines that end with an extra hyphen are owned, the final</span>
-        <span class="comment">// line is borrowed.</span>
-        <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>::{<span class="ident">Borrowed</span>, <span class="ident">Owned</span>};
-        <span class="kw">let</span> <span class="ident">dictionary</span> <span class="op">=</span> <span class="ident">Standard::from_embedded</span>(<span class="ident">Language::EnglishUS</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::with_splitter</span>(<span class="number">10</span>, <span class="ident">dictionary</span>);
-        <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;Internationalization&quot;</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Borrowed</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">lines</span>[<span class="number">0</span>] {
-            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been borrowed: {:?}&quot;</span>, <span class="ident">s</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">fn </span>borrowed_lines() {
+        <span class="comment">// Lines that end with an extra hyphen are owned, the final
+        // line is borrowed.
+        </span><span class="kw">use </span>std::borrow::Cow::{Borrowed, Owned};
+        <span class="kw">let </span>dictionary = Standard::from_embedded(Language::EnglishUS).unwrap();
+        <span class="kw">let </span>wrapper = Wrapper::with_splitter(<span class="number">10</span>, dictionary);
+        <span class="kw">let </span>lines = wrapper.wrap(<span class="string">&quot;Internationalization&quot;</span>);
+        <span class="kw">if let </span>Borrowed(s) = lines[<span class="number">0</span>] {
+            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been borrowed: {:?}&quot;</span>, s);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Borrowed</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">lines</span>[<span class="number">1</span>] {
-            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been borrowed: {:?}&quot;</span>, <span class="ident">s</span>);
+        <span class="kw">if let </span>Borrowed(s) = lines[<span class="number">1</span>] {
+            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been borrowed: {:?}&quot;</span>, s);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Owned</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span> <span class="ident">lines</span>[<span class="number">2</span>] {
-            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been owned: {:?}&quot;</span>, <span class="ident">s</span>);
+        <span class="kw">if let </span>Owned(<span class="kw-2">ref </span>s) = lines[<span class="number">2</span>] {
+            <span class="macro">assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;should not have been owned: {:?}&quot;</span>, s);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hyphenation&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">auto_hyphenation_with_hyphen</span>() {
-        <span class="kw">let</span> <span class="ident">dictionary</span> <span class="op">=</span> <span class="ident">Standard::from_embedded</span>(<span class="ident">Language::EnglishUS</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">8</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;over-caffinated&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;over-&quot;</span>, <span class="string">&quot;caffinated&quot;</span>]);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;hyphenation&quot;</span>)]
+    </span><span class="kw">fn </span>auto_hyphenation_with_hyphen() {
+        <span class="kw">let </span>dictionary = Standard::from_embedded(Language::EnglishUS).unwrap();
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">8</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.wrap(<span class="string">&quot;over-caffinated&quot;</span>), <span class="macro">vec!</span>[<span class="string">&quot;over-&quot;</span>, <span class="string">&quot;caffinated&quot;</span>]);
 
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::with_splitter</span>(<span class="number">8</span>, <span class="ident">dictionary</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
+        <span class="kw">let </span>wrapper = Wrapper::with_splitter(<span class="number">8</span>, dictionary).break_words(<span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">wrapper</span>.<span class="ident">wrap</span>(<span class="string">&quot;over-caffinated&quot;</span>),
+            wrapper.wrap(<span class="string">&quot;over-caffinated&quot;</span>),
             <span class="macro">vec!</span>[<span class="string">&quot;over-&quot;</span>, <span class="string">&quot;caffi-&quot;</span>, <span class="string">&quot;nated&quot;</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">break_words</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foobarbaz&quot;</span>, <span class="number">3</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>break_words() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foobarbaz&quot;</span>, <span class="number">3</span>), <span class="macro">vec!</span>[<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;baz&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">break_words_wide_characters</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;Ｈｅｌｌｏ&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;Ｈｅ&quot;</span>, <span class="string">&quot;ｌｌ&quot;</span>, <span class="string">&quot;ｏ&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>break_words_wide_characters() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;Ｈｅｌｌｏ&quot;</span>, <span class="number">5</span>), <span class="macro">vec!</span>[<span class="string">&quot;Ｈｅ&quot;</span>, <span class="string">&quot;ｌｌ&quot;</span>, <span class="string">&quot;ｏ&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">break_words_zero_width</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap</span>(<span class="string">&quot;foobar&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;r&quot;</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>break_words_zero_width() {
+        <span class="macro">assert_eq!</span>(wrap(<span class="string">&quot;foobar&quot;</span>, <span class="number">0</span>), <span class="macro">vec!</span>[<span class="string">&quot;f&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;o&quot;</span>, <span class="string">&quot;b&quot;</span>, <span class="string">&quot;a&quot;</span>, <span class="string">&quot;r&quot;</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">break_words_line_breaks</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;ab\ncdefghijkl&quot;</span>, <span class="number">5</span>), <span class="string">&quot;ab\ncdefg\nhijkl&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;abcdefgh\nijkl&quot;</span>, <span class="number">5</span>), <span class="string">&quot;abcde\nfgh\nijkl&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>break_words_line_breaks() {
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;ab\ncdefghijkl&quot;</span>, <span class="number">5</span>), <span class="string">&quot;ab\ncdefg\nhijkl&quot;</span>);
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;abcdefgh\nijkl&quot;</span>, <span class="number">5</span>), <span class="string">&quot;abcde\nfgh\nijkl&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">preserve_line_breaks</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;test\n&quot;</span>, <span class="number">11</span>), <span class="string">&quot;test\n&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;test\n\na\n\n&quot;</span>, <span class="number">11</span>), <span class="string">&quot;test\n\na\n\n&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>, <span class="number">7</span>), <span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>preserve_line_breaks() {
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;test\n&quot;</span>, <span class="number">11</span>), <span class="string">&quot;test\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;test\n\na\n\n&quot;</span>, <span class="number">11</span>), <span class="string">&quot;test\n\na\n\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>, <span class="number">7</span>), <span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wrap_preserve_line_breaks</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>, <span class="number">5</span>), <span class="string">&quot;1 3 5\n7\n1 3 5\n7&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wrap_preserve_line_breaks() {
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;1 3 5 7\n1 3 5 7&quot;</span>, <span class="number">5</span>), <span class="string">&quot;1 3 5\n7\n1 3 5\n7&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">non_breaking_space</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">fill</span>(<span class="string">&quot;foo bar baz&quot;</span>), <span class="string">&quot;foo bar baz&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>non_breaking_space() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.fill(<span class="string">&quot;foo bar baz&quot;</span>), <span class="string">&quot;foo bar baz&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">non_breaking_hyphen</span>() {
-        <span class="kw">let</span> <span class="ident">wrapper</span> <span class="op">=</span> <span class="ident">Wrapper::new</span>(<span class="number">5</span>).<span class="ident">break_words</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">wrapper</span>.<span class="ident">fill</span>(<span class="string">&quot;foo‑bar‑baz&quot;</span>), <span class="string">&quot;foo‑bar‑baz&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>non_breaking_hyphen() {
+        <span class="kw">let </span>wrapper = Wrapper::new(<span class="number">5</span>).break_words(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(wrapper.fill(<span class="string">&quot;foo‑bar‑baz&quot;</span>), <span class="string">&quot;foo‑bar‑baz&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fill_simple</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">fill</span>(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">10</span>), <span class="string">&quot;foo bar\nbaz&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>fill_simple() {
+        <span class="macro">assert_eq!</span>(fill(<span class="string">&quot;foo bar baz&quot;</span>, <span class="number">10</span>), <span class="string">&quot;foo bar\nbaz&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="textwrap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="textwrap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

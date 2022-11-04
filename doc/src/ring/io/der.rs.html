@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/io/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/io/der.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>der.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -309,316 +309,316 @@
 <span id="309">309</span>
 <span id="310">310</span>
 <span id="311">311</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Building blocks for parsing DER-encoded ASN.1 structures.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module contains the foundational parts of an ASN.1 DER parser.</span>
+</span><span class="doccomment">//! Building blocks for parsing DER-encoded ASN.1 structures.
+//!
+//! This module contains the foundational parts of an ASN.1 DER parser.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Positive</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::Positive;
+<span class="kw">use </span><span class="kw">crate</span>::error;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CONSTRUCTED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CONTEXT_SPECIFIC</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
+<span class="kw">pub const </span>CONSTRUCTED: u8 = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+<span class="kw">pub const </span>CONTEXT_SPECIFIC: u8 = <span class="number">2 </span>&lt;&lt; <span class="number">6</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Tag</span> {
-    <span class="ident">Boolean</span> <span class="op">=</span> <span class="number">0x01</span>,
-    <span class="ident">Integer</span> <span class="op">=</span> <span class="number">0x02</span>,
-    <span class="ident">BitString</span> <span class="op">=</span> <span class="number">0x03</span>,
-    <span class="ident">OctetString</span> <span class="op">=</span> <span class="number">0x04</span>,
-    <span class="ident">Null</span> <span class="op">=</span> <span class="number">0x05</span>,
-    <span class="ident">OID</span> <span class="op">=</span> <span class="number">0x06</span>,
-    <span class="ident">Sequence</span> <span class="op">=</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">0x10</span>, <span class="comment">// 0x30</span>
-    <span class="ident">UTCTime</span> <span class="op">=</span> <span class="number">0x17</span>,
-    <span class="ident">GeneralizedTime</span> <span class="op">=</span> <span class="number">0x18</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>Tag {
+    Boolean = <span class="number">0x01</span>,
+    Integer = <span class="number">0x02</span>,
+    BitString = <span class="number">0x03</span>,
+    OctetString = <span class="number">0x04</span>,
+    Null = <span class="number">0x05</span>,
+    OID = <span class="number">0x06</span>,
+    Sequence = CONSTRUCTED | <span class="number">0x10</span>, <span class="comment">// 0x30
+    </span>UTCTime = <span class="number">0x17</span>,
+    GeneralizedTime = <span class="number">0x18</span>,
 
-    <span class="ident">ContextSpecificConstructed0</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">0</span>,
-    <span class="ident">ContextSpecificConstructed1</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">1</span>,
-    <span class="ident">ContextSpecificConstructed3</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">3</span>,
+    ContextSpecificConstructed0 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">0</span>,
+    ContextSpecificConstructed1 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">1</span>,
+    ContextSpecificConstructed3 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">3</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Tag</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">Tag</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">tag</span> <span class="kw">as</span> <span class="self">Self</span>
+<span class="kw">impl </span>From&lt;Tag&gt; <span class="kw">for </span>usize {
+    <span class="kw">fn </span>from(tag: Tag) -&gt; <span class="self">Self </span>{
+        tag <span class="kw">as </span><span class="self">Self
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;Tag&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(tag: Tag) -&gt; <span class="self">Self </span>{
+        tag <span class="kw">as </span><span class="self">Self
+    </span>} <span class="comment">// XXX: narrowing conversion.
+</span>}
+
+<span class="kw">pub fn </span>expect_tag_and_get_value&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tag: Tag,
+) -&gt; <span class="prelude-ty">Result</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, error::Unspecified&gt; {
+    <span class="kw">let </span>(actual_tag, inner) = read_tag_and_get_value(input)<span class="question-mark">?</span>;
+    <span class="kw">if </span>usize::from(tag) != usize::from(actual_tag) {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
+    <span class="prelude-val">Ok</span>(inner)
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Tag</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">Tag</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">tag</span> <span class="kw">as</span> <span class="self">Self</span>
-    } <span class="comment">// XXX: narrowing conversion.</span>
-}
+<span class="kw">pub fn </span>read_tag_and_get_value&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(u8, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), error::Unspecified&gt; {
+    <span class="kw">let </span>tag = input.read_byte()<span class="question-mark">?</span>;
+    <span class="kw">if </span>(tag &amp; <span class="number">0x1F</span>) == <span class="number">0x1F </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified); <span class="comment">// High tag number form is not allowed.
+    </span>}
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_tag_and_get_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tag</span>: <span class="ident">Tag</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">actual_tag</span>, <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">read_tag_and_get_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">usize::from</span>(<span class="ident">tag</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">actual_tag</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
-    }
-    <span class="prelude-val">Ok</span>(<span class="ident">inner</span>)
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tag_and_get_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-    <span class="kw">if</span> (<span class="ident">tag</span> <span class="op">&amp;</span> <span class="number">0x1F</span>) <span class="op">==</span> <span class="number">0x1F</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>); <span class="comment">// High tag number form is not allowed.</span>
-    }
-
-    <span class="comment">// If the high order bit of the first byte is set to zero then the length</span>
-    <span class="comment">// is encoded in the seven remaining bits of that byte. Otherwise, those</span>
-    <span class="comment">// seven bits represent the number of bytes used to encode the length.</span>
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span> {
-        <span class="ident">n</span> <span class="kw">if</span> (<span class="ident">n</span> <span class="op">&amp;</span> <span class="number">0x80</span>) <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">usize::from</span>(<span class="ident">n</span>),
-        <span class="number">0x81</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">second_byte</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">second_byte</span> <span class="op">&lt;</span> <span class="number">128</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>); <span class="comment">// Not the canonical encoding.</span>
-            }
-            <span class="ident">usize::from</span>(<span class="ident">second_byte</span>)
+    <span class="comment">// If the high order bit of the first byte is set to zero then the length
+    // is encoded in the seven remaining bits of that byte. Otherwise, those
+    // seven bits represent the number of bytes used to encode the length.
+    </span><span class="kw">let </span>length = <span class="kw">match </span>input.read_byte()<span class="question-mark">? </span>{
+        n <span class="kw">if </span>(n &amp; <span class="number">0x80</span>) == <span class="number">0 </span>=&gt; usize::from(n),
+        <span class="number">0x81 </span>=&gt; {
+            <span class="kw">let </span>second_byte = input.read_byte()<span class="question-mark">?</span>;
+            <span class="kw">if </span>second_byte &lt; <span class="number">128 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified); <span class="comment">// Not the canonical encoding.
+            </span>}
+            usize::from(second_byte)
         }
-        <span class="number">0x82</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">second_byte</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>);
-            <span class="kw">let</span> <span class="ident">third_byte</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>);
-            <span class="kw">let</span> <span class="ident">combined</span> <span class="op">=</span> (<span class="ident">second_byte</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">third_byte</span>;
-            <span class="kw">if</span> <span class="ident">combined</span> <span class="op">&lt;</span> <span class="number">256</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>); <span class="comment">// Not the canonical encoding.</span>
-            }
-            <span class="ident">combined</span>
+        <span class="number">0x82 </span>=&gt; {
+            <span class="kw">let </span>second_byte = usize::from(input.read_byte()<span class="question-mark">?</span>);
+            <span class="kw">let </span>third_byte = usize::from(input.read_byte()<span class="question-mark">?</span>);
+            <span class="kw">let </span>combined = (second_byte &lt;&lt; <span class="number">8</span>) | third_byte;
+            <span class="kw">if </span>combined &lt; <span class="number">256 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified); <span class="comment">// Not the canonical encoding.
+            </span>}
+            combined
         }
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>); <span class="comment">// We don&#39;t support longer lengths.</span>
-        }
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified); <span class="comment">// We don&#39;t support longer lengths.
+        </span>}
     };
 
-    <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes</span>(<span class="ident">length</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">tag</span>, <span class="ident">inner</span>))
+    <span class="kw">let </span>inner = input.read_bytes(length)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((tag, inner))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_string_with_no_unused_bits</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">nested</span>(<span class="ident">input</span>, <span class="ident">Tag::BitString</span>, <span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">unused_bits_at_end</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_byte</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">unused_bits_at_end</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+<span class="kw">pub fn </span>bit_string_with_no_unused_bits&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, error::Unspecified&gt; {
+    nested(input, Tag::BitString, error::Unspecified, |value| {
+        <span class="kw">let </span>unused_bits_at_end = value.read_byte().map_err(|<span class="kw">_</span>| error::Unspecified)<span class="question-mark">?</span>;
+        <span class="kw">if </span>unused_bits_at_end != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">read_bytes_to_end</span>())
+        <span class="prelude-val">Ok</span>(value.read_bytes_to_end())
     })
 }
 
-<span class="comment">// TODO: investigate taking decoder as a reference to reduce generated code</span>
-<span class="comment">// size.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">E</span>: <span class="ident">Copy</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">tag</span>: <span class="ident">Tag</span>,
-    <span class="ident">error</span>: <span class="ident">E</span>,
-    <span class="ident">decoder</span>: <span class="ident">F</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="comment">// TODO: investigate taking decoder as a reference to reduce generated code
+// size.
+</span><span class="kw">pub fn </span>nested&lt;<span class="lifetime">&#39;a</span>, F, R, E: Copy&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+    tag: Tag,
+    error: E,
+    decoder: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;
+<span class="kw">where
+    </span>F: FnOnce(<span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;R, E&gt;,
 {
-    <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">tag</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">error</span>)<span class="question-mark">?</span>;
-    <span class="ident">inner</span>.<span class="ident">read_all</span>(<span class="ident">error</span>, <span class="ident">decoder</span>)
+    <span class="kw">let </span>inner = expect_tag_and_get_value(input, tag).map_err(|<span class="kw">_</span>| error)<span class="question-mark">?</span>;
+    inner.read_all(error, decoder)
 }
 
-<span class="kw">fn</span> <span class="ident">nonnegative_integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">min_value</span>: <span class="ident">u8</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="comment">// Verify that |input|, which has had any leading zero stripped off, is the</span>
-    <span class="comment">// encoding of a value of at least |min_value|.</span>
-    <span class="kw">fn</span> <span class="ident">check_minimum</span>(<span class="ident">input</span>: <span class="ident">untrusted::Input</span>, <span class="ident">min_value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="ident">input</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">first_byte</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() <span class="op">&amp;&amp;</span> <span class="ident">first_byte</span> <span class="op">&lt;</span> <span class="ident">min_value</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+<span class="kw">fn </span>nonnegative_integer&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+    min_value: u8,
+) -&gt; <span class="prelude-ty">Result</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, error::Unspecified&gt; {
+    <span class="comment">// Verify that |input|, which has had any leading zero stripped off, is the
+    // encoding of a value of at least |min_value|.
+    </span><span class="kw">fn </span>check_minimum(input: untrusted::Input, min_value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        input.read_all(error::Unspecified, |input| {
+            <span class="kw">let </span>first_byte = input.read_byte()<span class="question-mark">?</span>;
+            <span class="kw">if </span>input.at_end() &amp;&amp; first_byte &lt; min_value {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
             }
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes_to_end</span>();
+            <span class="kw">let _ </span>= input.read_bytes_to_end();
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">Tag::Integer</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>value = expect_tag_and_get_value(input, Tag::Integer)<span class="question-mark">?</span>;
 
-    <span class="ident">value</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="comment">// Empty encodings are not allowed.</span>
-        <span class="kw">let</span> <span class="ident">first_byte</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
+    value.read_all(error::Unspecified, |input| {
+        <span class="comment">// Empty encodings are not allowed.
+        </span><span class="kw">let </span>first_byte = input.read_byte()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">first_byte</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-                <span class="comment">// |value| is the legal encoding of zero.</span>
-                <span class="kw">if</span> <span class="ident">min_value</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="kw">if </span>first_byte == <span class="number">0 </span>{
+            <span class="kw">if </span>input.at_end() {
+                <span class="comment">// |value| is the legal encoding of zero.
+                </span><span class="kw">if </span>min_value &gt; <span class="number">0 </span>{
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
                 }
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(value);
             }
 
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes_to_end</span>();
-            <span class="ident">r</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">second_byte</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-                <span class="kw">if</span> (<span class="ident">second_byte</span> <span class="op">&amp;</span> <span class="number">0x80</span>) <span class="op">==</span> <span class="number">0</span> {
-                    <span class="comment">// A leading zero is only allowed when the value&#39;s high bit</span>
-                    <span class="comment">// is set.</span>
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+            <span class="kw">let </span>r = input.read_bytes_to_end();
+            r.read_all(error::Unspecified, |input| {
+                <span class="kw">let </span>second_byte = input.read_byte()<span class="question-mark">?</span>;
+                <span class="kw">if </span>(second_byte &amp; <span class="number">0x80</span>) == <span class="number">0 </span>{
+                    <span class="comment">// A leading zero is only allowed when the value&#39;s high bit
+                    // is set.
+                    </span><span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
                 }
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes_to_end</span>();
+                <span class="kw">let _ </span>= input.read_bytes_to_end();
                 <span class="prelude-val">Ok</span>(())
             })<span class="question-mark">?</span>;
-            <span class="ident">check_minimum</span>(<span class="ident">r</span>, <span class="ident">min_value</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">r</span>);
+            check_minimum(r, min_value)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(r);
         }
 
-        <span class="comment">// Negative values are not allowed.</span>
-        <span class="kw">if</span> (<span class="ident">first_byte</span> <span class="op">&amp;</span> <span class="number">0x80</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="comment">// Negative values are not allowed.
+        </span><span class="kw">if </span>(first_byte &amp; <span class="number">0x80</span>) != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes_to_end</span>();
-        <span class="ident">check_minimum</span>(<span class="ident">value</span>, <span class="ident">min_value</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+        <span class="kw">let _ </span>= input.read_bytes_to_end();
+        check_minimum(value, min_value)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(value)
     })
 }
 
-<span class="doccomment">/// Parse as integer with a value in the in the range [0, 255], returning its</span>
-<span class="doccomment">/// numeric value. This is typically used for parsing version numbers.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">small_nonnegative_integer</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">nonnegative_integer</span>(<span class="ident">input</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-    <span class="ident">value</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
+<span class="doccomment">/// Parse as integer with a value in the in the range [0, 255], returning its
+/// numeric value. This is typically used for parsing version numbers.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>small_nonnegative_integer(input: <span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;u8, error::Unspecified&gt; {
+    <span class="kw">let </span>value = nonnegative_integer(input, <span class="number">0</span>)<span class="question-mark">?</span>;
+    value.read_all(error::Unspecified, |input| {
+        <span class="kw">let </span>r = input.read_byte()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(r)
     })
 }
 
-<span class="doccomment">/// Parses a positive DER integer, returning the big-endian-encoded value,</span>
-<span class="doccomment">/// sans any leading zero byte.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">positive_integer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Positive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">Positive::new_non_empty_without_leading_zeros</span>(
-        <span class="ident">nonnegative_integer</span>(<span class="ident">input</span>, <span class="number">1</span>)<span class="question-mark">?</span>,
+<span class="doccomment">/// Parses a positive DER integer, returning the big-endian-encoded value,
+/// sans any leading zero byte.
+</span><span class="kw">pub fn </span>positive_integer&lt;<span class="lifetime">&#39;a</span>&gt;(
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Positive&lt;<span class="lifetime">&#39;a</span>&gt;, error::Unspecified&gt; {
+    <span class="prelude-val">Ok</span>(Positive::new_non_empty_without_leading_zeros(
+        nonnegative_integer(input, <span class="number">1</span>)<span class="question-mark">?</span>,
     ))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::error;
 
-    <span class="kw">fn</span> <span class="ident">with_good_i</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>with_good_i&lt;F, R&gt;(value: <span class="kw-2">&amp;</span>[u8], f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;R, error::Unspecified&gt;,
     {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">value</span>).<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="ident">f</span>);
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let </span>r = untrusted::Input::from(value).read_all(error::Unspecified, f);
+        <span class="macro">assert!</span>(r.is_ok());
     }
 
-    <span class="kw">fn</span> <span class="ident">with_bad_i</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">f</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>with_bad_i&lt;F, R&gt;(value: <span class="kw-2">&amp;</span>[u8], f: F)
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>untrusted::Reader) -&gt; <span class="prelude-ty">Result</span>&lt;R, error::Unspecified&gt;,
     {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">value</span>).<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="ident">f</span>);
-        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>r = untrusted::Input::from(value).read_all(error::Unspecified, f);
+        <span class="macro">assert!</span>(r.is_err());
     }
 
-    <span class="kw">static</span> <span class="ident">ZERO_INTEGER</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x00</span>];
+    <span class="kw">static </span>ZERO_INTEGER: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x00</span>];
 
-    <span class="kw">static</span> <span class="ident">GOOD_POSITIVE_INTEGERS</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">u8</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">static </span>GOOD_POSITIVE_INTEGERS: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>[u8], u8)] = <span class="kw-2">&amp;</span>[
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x01</span>], <span class="number">0x01</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x02</span>], <span class="number">0x02</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x7e</span>], <span class="number">0x7e</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x7f</span>], <span class="number">0x7f</span>),
-        <span class="comment">// Values that need to have an 0x00 prefix to disambiguate them from</span>
-        <span class="comment">// them from negative values.</span>
-        (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x80</span>], <span class="number">0x80</span>),
+        <span class="comment">// Values that need to have an 0x00 prefix to disambiguate them from
+        // them from negative values.
+        </span>(<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x80</span>], <span class="number">0x80</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x81</span>], <span class="number">0x81</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0xfe</span>], <span class="number">0xfe</span>),
         (<span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0xff</span>], <span class="number">0xff</span>),
     ];
 
-    <span class="kw">static</span> <span class="ident">BAD_NONNEGATIVE_INTEGERS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-        <span class="kw-2">&amp;</span>[],           <span class="comment">// At end of input</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>],       <span class="comment">// Tag only</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x00</span>], <span class="comment">// Empty value</span>
-        <span class="comment">// Length mismatch</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x01</span>],
+    <span class="kw">static </span>BAD_NONNEGATIVE_INTEGERS: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]] = <span class="kw-2">&amp;</span>[
+        <span class="kw-2">&amp;</span>[],           <span class="comment">// At end of input
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>],       <span class="comment">// Tag only
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x00</span>], <span class="comment">// Empty value
+        // Length mismatch
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x01</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x01</span>],
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x01</span>, <span class="number">0x00</span>], <span class="comment">// Would be valid if last byte is ignored.</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x01</span>],
-        <span class="comment">// Negative values</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x80</span>],
+        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x01</span>, <span class="number">0x00</span>], <span class="comment">// Would be valid if last byte is ignored.
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x01</span>],
+        <span class="comment">// Negative values
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0x80</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0xfe</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x01</span>, <span class="number">0xff</span>],
-        <span class="comment">// Values that have an unnecessary leading 0x00</span>
-        <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x00</span>],
+        <span class="comment">// Values that have an unnecessary leading 0x00
+        </span><span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x00</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x01</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x02</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x7e</span>],
         <span class="kw-2">&amp;</span>[<span class="number">0x02</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x7f</span>],
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_small_nonnegative_integer</span>() {
-        <span class="ident">with_good_i</span>(<span class="ident">ZERO_INTEGER</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">small_nonnegative_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="number">0x00</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_small_nonnegative_integer() {
+        with_good_i(ZERO_INTEGER, |input| {
+            <span class="macro">assert_eq!</span>(small_nonnegative_integer(input)<span class="question-mark">?</span>, <span class="number">0x00</span>);
             <span class="prelude-val">Ok</span>(())
         });
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">test_in</span>, <span class="ident">test_out</span>) <span class="kw">in</span> <span class="ident">GOOD_POSITIVE_INTEGERS</span>.<span class="ident">iter</span>() {
-            <span class="ident">with_good_i</span>(<span class="ident">test_in</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">small_nonnegative_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>, <span class="ident">test_out</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(test_in, test_out) <span class="kw">in </span>GOOD_POSITIVE_INTEGERS.iter() {
+            with_good_i(test_in, |input| {
+                <span class="macro">assert_eq!</span>(small_nonnegative_integer(input)<span class="question-mark">?</span>, test_out);
                 <span class="prelude-val">Ok</span>(())
             });
         }
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">test_in</span> <span class="kw">in</span> <span class="ident">BAD_NONNEGATIVE_INTEGERS</span>.<span class="ident">iter</span>() {
-            <span class="ident">with_bad_i</span>(<span class="ident">test_in</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">small_nonnegative_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span><span class="kw-2">&amp;</span>test_in <span class="kw">in </span>BAD_NONNEGATIVE_INTEGERS.iter() {
+            with_bad_i(test_in, |input| {
+                <span class="kw">let _ </span>= small_nonnegative_integer(input)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             });
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_positive_integer</span>() {
-        <span class="ident">with_bad_i</span>(<span class="ident">ZERO_INTEGER</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_positive_integer() {
+        with_bad_i(ZERO_INTEGER, |input| {
+            <span class="kw">let _ </span>= positive_integer(input)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         });
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">test_in</span>, <span class="ident">test_out</span>) <span class="kw">in</span> <span class="ident">GOOD_POSITIVE_INTEGERS</span>.<span class="ident">iter</span>() {
-            <span class="ident">with_good_i</span>(<span class="ident">test_in</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">test_out</span> <span class="op">=</span> [<span class="ident">test_out</span>];
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(test_in, test_out) <span class="kw">in </span>GOOD_POSITIVE_INTEGERS.iter() {
+            with_good_i(test_in, |input| {
+                <span class="kw">let </span>test_out = [test_out];
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">big_endian_without_leading_zero_as_input</span>(),
-                    <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">test_out</span>[..])
+                    positive_integer(input)<span class="question-mark">?</span>.big_endian_without_leading_zero_as_input(),
+                    untrusted::Input::from(<span class="kw-2">&amp;</span>test_out[..])
                 );
                 <span class="prelude-val">Ok</span>(())
             });
         }
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">test_in</span> <span class="kw">in</span> <span class="ident">BAD_NONNEGATIVE_INTEGERS</span>.<span class="ident">iter</span>() {
-            <span class="ident">with_bad_i</span>(<span class="ident">test_in</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span><span class="kw-2">&amp;</span>test_in <span class="kw">in </span>BAD_NONNEGATIVE_INTEGERS.iter() {
+            with_bad_i(test_in, |input| {
+                <span class="kw">let _ </span>= positive_integer(input)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             });
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -87,94 +87,94 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Service load measurement</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the [`Load`] trait, which allows measuring how loaded a service is.</span>
-<span class="doccomment">//! It also provides several wrapper types that measure load in different ways:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`Constant`] — Always returns the same constant load value for a service.</span>
-<span class="doccomment">//! - [`PendingRequests`] — Measures load by tracking the number of in-flight requests.</span>
-<span class="doccomment">//! - [`PeakEwma`] — Measures load using a moving average of the peak latency for the service.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In general, you will want to use one of these when using the types in [`tower::balance`] which</span>
-<span class="doccomment">//! balance services depending on their load. Which load metric to use depends on your exact</span>
-<span class="doccomment">//! use-case, but the ones above should get you quite far!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When the `discover` feature is enabled, wrapper types for [`Discover`] that</span>
-<span class="doccomment">//! wrap the discovered services with the given load estimator are also provided.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # When does a request complete?</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For many applications, the request life-cycle is relatively simple: when a service responds to</span>
-<span class="doccomment">//! a request, that request is done, and the system can forget about it. However, for some</span>
-<span class="doccomment">//! applications, the service may respond to the initial request while other parts of the system</span>
-<span class="doccomment">//! are still acting on that request. In such an application, the system load must take these</span>
-<span class="doccomment">//! requests into account as well, or risk the system underestimating its own load.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To support these use-cases, the load estimators in this module are parameterized by the</span>
-<span class="doccomment">//! [`TrackCompletion`] trait, with [`CompleteOnResponse`] as the default type. The behavior of</span>
-<span class="doccomment">//! [`CompleteOnResponse`] is what you would normally expect for a request-response cycle: when the</span>
-<span class="doccomment">//! response is produced, the request is considered &quot;finished&quot;, and load goes down. This can be</span>
-<span class="doccomment">//! overriden by your own user-defined type to track more complex request completion semantics. See</span>
-<span class="doccomment">//! the documentation for [`completion`] for more details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;util&quot;)]</span>
-<span class="doccomment">//! use tower::util::ServiceExt;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;util&quot;)]</span>
-<span class="doccomment">//! use tower::{load::Load, Service};</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;util&quot;)]</span>
-<span class="doccomment">//! async fn simple_balance&lt;S1, S2, R&gt;(</span>
-<span class="doccomment">//!     svc1: &amp;mut S1,</span>
-<span class="doccomment">//!     svc2: &amp;mut S2,</span>
-<span class="doccomment">//!     request: R</span>
-<span class="doccomment">//! ) -&gt; Result&lt;S1::Response, S1::Error&gt;</span>
-<span class="doccomment">//! where</span>
-<span class="doccomment">//!     S1: Load + Service&lt;R&gt;,</span>
-<span class="doccomment">//!     S2: Load&lt;Metric = S1::Metric&gt; + Service&lt;R, Response = S1::Response, Error = S1::Error&gt;</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     if svc1.load() &lt; svc2.load() {</span>
-<span class="doccomment">//!         svc1.ready().await?.call(request).await</span>
-<span class="doccomment">//!     } else {</span>
-<span class="doccomment">//!         svc2.ready().await?.call(request).await</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tower::balance`]: crate::balance</span>
-<span class="doccomment">//! [`Discover`]: crate::discover::Discover</span>
-<span class="doccomment">//! [`CompleteOnResponse`]: crate::load::completion::CompleteOnResponse</span>
-<span class="comment">// TODO: a custom completion example would be good here</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Service load measurement
+//!
+//! This module provides the [`Load`] trait, which allows measuring how loaded a service is.
+//! It also provides several wrapper types that measure load in different ways:
+//!
+//! - [`Constant`] — Always returns the same constant load value for a service.
+//! - [`PendingRequests`] — Measures load by tracking the number of in-flight requests.
+//! - [`PeakEwma`] — Measures load using a moving average of the peak latency for the service.
+//!
+//! In general, you will want to use one of these when using the types in [`tower::balance`] which
+//! balance services depending on their load. Which load metric to use depends on your exact
+//! use-case, but the ones above should get you quite far!
+//!
+//! When the `discover` feature is enabled, wrapper types for [`Discover`] that
+//! wrap the discovered services with the given load estimator are also provided.
+//!
+//! # When does a request complete?
+//!
+//! For many applications, the request life-cycle is relatively simple: when a service responds to
+//! a request, that request is done, and the system can forget about it. However, for some
+//! applications, the service may respond to the initial request while other parts of the system
+//! are still acting on that request. In such an application, the system load must take these
+//! requests into account as well, or risk the system underestimating its own load.
+//!
+//! To support these use-cases, the load estimators in this module are parameterized by the
+//! [`TrackCompletion`] trait, with [`CompleteOnResponse`] as the default type. The behavior of
+//! [`CompleteOnResponse`] is what you would normally expect for a request-response cycle: when the
+//! response is produced, the request is considered &quot;finished&quot;, and load goes down. This can be
+//! overriden by your own user-defined type to track more complex request completion semantics. See
+//! the documentation for [`completion`] for more details.
+//!
+//! # Examples
+//!
+//! ```rust
+//! # #[cfg(feature = &quot;util&quot;)]
+//! use tower::util::ServiceExt;
+//! # #[cfg(feature = &quot;util&quot;)]
+//! use tower::{load::Load, Service};
+//! # #[cfg(feature = &quot;util&quot;)]
+//! async fn simple_balance&lt;S1, S2, R&gt;(
+//!     svc1: &amp;mut S1,
+//!     svc2: &amp;mut S2,
+//!     request: R
+//! ) -&gt; Result&lt;S1::Response, S1::Error&gt;
+//! where
+//!     S1: Load + Service&lt;R&gt;,
+//!     S2: Load&lt;Metric = S1::Metric&gt; + Service&lt;R, Response = S1::Response, Error = S1::Error&gt;
+//! {
+//!     if svc1.load() &lt; svc2.load() {
+//!         svc1.ready().await?.call(request).await
+//!     } else {
+//!         svc2.ready().await?.call(request).await
+//!     }
+//! }
+//! ```
+//!
+//! [`tower::balance`]: crate::balance
+//! [`Discover`]: crate::discover::Discover
+//! [`CompleteOnResponse`]: crate::load::completion::CompleteOnResponse
+</span><span class="comment">// TODO: a custom completion example would be good here
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">completion</span>;
-<span class="kw">mod</span> <span class="ident">constant</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">peak_ewma</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pending_requests</span>;
+</span><span class="kw">pub mod </span>completion;
+<span class="kw">mod </span>constant;
+<span class="kw">pub mod </span>peak_ewma;
+<span class="kw">pub mod </span>pending_requests;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">completion</span>::{<span class="ident">CompleteOnResponse</span>, <span class="ident">TrackCompletion</span>},
-    <span class="ident">constant::Constant</span>,
-    <span class="ident">peak_ewma::PeakEwma</span>,
-    <span class="ident">pending_requests::PendingRequests</span>,
+<span class="kw">pub use </span><span class="self">self</span>::{
+    completion::{CompleteOnResponse, TrackCompletion},
+    constant::Constant,
+    peak_ewma::PeakEwma,
+    pending_requests::PendingRequests,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">peak_ewma::PeakEwmaDiscover</span>, <span class="ident">pending_requests::PendingRequestsDiscover</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">pub use </span><span class="self">self</span>::{peak_ewma::PeakEwmaDiscover, pending_requests::PendingRequestsDiscover};
 
-<span class="doccomment">/// Types that implement this trait can give an estimate of how loaded they are.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the module documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Load</span> {
-    <span class="doccomment">/// A comparable load metric.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Lesser values indicate that the service is less loaded, and should be preferred for new</span>
-    <span class="doccomment">/// requests over another service with a higher value.</span>
-    <span class="kw">type</span> <span class="ident">Metric</span>: <span class="ident">PartialOrd</span>;
+<span class="doccomment">/// Types that implement this trait can give an estimate of how loaded they are.
+///
+/// See the module documentation for more details.
+</span><span class="kw">pub trait </span>Load {
+    <span class="doccomment">/// A comparable load metric.
+    ///
+    /// Lesser values indicate that the service is less loaded, and should be preferred for new
+    /// requests over another service with a higher value.
+    </span><span class="kw">type </span>Metric: PartialOrd;
 
-    <span class="doccomment">/// Estimate the service&#39;s current load.</span>
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span>;
+    <span class="doccomment">/// Estimate the service&#39;s current load.
+    </span><span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

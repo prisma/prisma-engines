@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/serde.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/serde.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -827,620 +827,620 @@
 <span id="827">827</span>
 <span id="828">828</span>
 <span id="829">829</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Decimal</span>;
-<span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
-<span class="kw">use</span> <span class="ident">num_traits::FromPrimitive</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="self">self</span>, <span class="ident">de::Unexpected</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::Decimal;
+<span class="kw">use </span>alloc::string::ToString;
+<span class="kw">use </span>core::{fmt, str::FromStr};
+<span class="kw">use </span>num_traits::FromPrimitive;
+<span class="kw">use </span>serde::{<span class="self">self</span>, de::Unexpected};
 
-<span class="doccomment">/// Serialize/deserialize Decimals as arbitrary precision numbers in JSON using the `arbitrary_precision` feature within `serde_json`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct ArbitraryExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::arbitrary_precision&quot;)]</span>
-<span class="doccomment">///     value: Decimal,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = ArbitraryExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:123.400}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arbitrary_precision</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="doccomment">/// Serialize/deserialize Decimals as arbitrary precision numbers in JSON using the `arbitrary_precision` feature within `serde_json`.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct ArbitraryExample {
+///     #[serde(with = &quot;rust_decimal::serde::arbitrary_precision&quot;)]
+///     value: Decimal,
+/// }
+///
+/// let value = ArbitraryExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:123.400}&quot;#
+/// );
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">pub mod </span>arbitrary_precision {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>serde::Serialize;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_any(DecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>Decimal, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="ident">serde_json::Number::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">to_string</span>())
-            .<span class="ident">map_err</span>(<span class="ident">serde::ser::Error::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        serde_json::Number::from_str(<span class="kw-2">&amp;</span>value.to_string())
+            .map_err(serde::ser::Error::custom)<span class="question-mark">?
+            </span>.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Serialize/deserialize optional Decimals as arbitrary precision numbers in JSON using the `arbitrary_precision` feature within `serde_json`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct ArbitraryExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::arbitrary_precision_option&quot;)]</span>
-<span class="doccomment">///     value: Option&lt;Decimal&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = ArbitraryExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:123.400}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = ArbitraryExample { value: None };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:null}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arbitrary_precision_option</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="doccomment">/// Serialize/deserialize optional Decimals as arbitrary precision numbers in JSON using the `arbitrary_precision` feature within `serde_json`.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct ArbitraryExample {
+///     #[serde(with = &quot;rust_decimal::serde::arbitrary_precision_option&quot;)]
+///     value: Option&lt;Decimal&gt;,
+/// }
+///
+/// let value = ArbitraryExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:123.400}&quot;#
+/// );
+///
+/// let value = ArbitraryExample { value: None };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:null}&quot;#
+/// );
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">pub mod </span>arbitrary_precision_option {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>serde::Serialize;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Decimal&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptionDecimalVisitor</span>)
+        deserializer.deserialize_option(OptionDecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">decimal</span>) =&gt; <span class="ident">serde_json::Number::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">decimal</span>.<span class="ident">to_string</span>())
-                .<span class="ident">map_err</span>(<span class="ident">serde::ser::Error::custom</span>)<span class="question-mark">?</span>
-                .<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>decimal) =&gt; serde_json::Number::from_str(<span class="kw-2">&amp;</span>decimal.to_string())
+                .map_err(serde::ser::Error::custom)<span class="question-mark">?
+                </span>.serialize(serializer),
+            <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
         }
     }
 }
 
-<span class="doccomment">/// Serialize/deserialize Decimals as floats.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct FloatExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::float&quot;)]</span>
-<span class="doccomment">///     value: Decimal,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = FloatExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:123.4}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-float&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">float</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="doccomment">/// Serialize/deserialize Decimals as floats.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct FloatExample {
+///     #[serde(with = &quot;rust_decimal::serde::float&quot;)]
+///     value: Decimal,
+/// }
+///
+/// let value = FloatExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:123.4}&quot;#
+/// );
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-float&quot;</span>)]
+</span><span class="kw">pub mod </span>float {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>serde::Serialize;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_any(DecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>Decimal, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">use</span> <span class="ident">num_traits::ToPrimitive</span>;
-        <span class="ident">value</span>.<span class="ident">to_f64</span>().<span class="ident">unwrap</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">use </span>num_traits::ToPrimitive;
+        value.to_f64().unwrap().serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Serialize/deserialize optional Decimals as floats.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct FloatExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::float_option&quot;)]</span>
-<span class="doccomment">///     value: Option&lt;Decimal&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = FloatExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:123.4}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = FloatExample { value: None };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:null}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-float&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">float_option</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="doccomment">/// Serialize/deserialize optional Decimals as floats.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct FloatExample {
+///     #[serde(with = &quot;rust_decimal::serde::float_option&quot;)]
+///     value: Option&lt;Decimal&gt;,
+/// }
+///
+/// let value = FloatExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:123.4}&quot;#
+/// );
+///
+/// let value = FloatExample { value: None };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:null}&quot;#
+/// );
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-float&quot;</span>)]
+</span><span class="kw">pub mod </span>float_option {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>serde::Serialize;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Decimal&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptionDecimalVisitor</span>)
+        deserializer.deserialize_option(OptionDecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">decimal</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">num_traits::ToPrimitive</span>;
-                <span class="ident">decimal</span>.<span class="ident">to_f64</span>().<span class="ident">unwrap</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>decimal) =&gt; {
+                <span class="kw">use </span>num_traits::ToPrimitive;
+                decimal.to_f64().unwrap().serialize(serializer)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+            <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
         }
     }
 }
 
-<span class="doccomment">/// Serialize/deserialize Decimals as strings. This is particularly useful when using binary encoding formats.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct StringExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::str&quot;)]</span>
-<span class="doccomment">///     value: Decimal,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = StringExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-str&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">str</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Serialize/deserialize Decimals as strings. This is particularly useful when using binary encoding formats.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct StringExample {
+///     #[serde(with = &quot;rust_decimal::serde::str&quot;)]
+///     value: Decimal,
+/// }
+///
+/// let value = StringExample { value: Decimal::from_str(&quot;123.400&quot;).unwrap() };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#
+/// );
+///
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-str&quot;</span>)]
+</span><span class="kw">pub mod </span>str {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_str(DecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span>Decimal, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::str::to_str_internal</span>(<span class="ident">value</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">as_ref</span>())
+        <span class="kw">let </span>value = <span class="kw">crate</span>::str::to_str_internal(value, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
+        serializer.serialize_str(value.<span class="number">0</span>.as_ref())
     }
 }
 
-<span class="doccomment">/// Serialize/deserialize optional Decimals as strings. This is particularly useful when using binary encoding formats.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use rust_decimal::Decimal;</span>
-<span class="doccomment">/// # use std::str::FromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// pub struct StringExample {</span>
-<span class="doccomment">///     #[serde(with = &quot;rust_decimal::serde::str_option&quot;)]</span>
-<span class="doccomment">///     value: Option&lt;Decimal&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = StringExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let value = StringExample { value: None };</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &amp;serde_json::to_string(&amp;value).unwrap(),</span>
-<span class="doccomment">///     r#&quot;{&quot;value&quot;:null}&quot;#</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-str&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">str_option</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="doccomment">/// Serialize/deserialize optional Decimals as strings. This is particularly useful when using binary encoding formats.
+///
+/// ```
+/// # use serde::{Serialize, Deserialize};
+/// # use rust_decimal::Decimal;
+/// # use std::str::FromStr;
+///
+/// #[derive(Serialize, Deserialize)]
+/// pub struct StringExample {
+///     #[serde(with = &quot;rust_decimal::serde::str_option&quot;)]
+///     value: Option&lt;Decimal&gt;,
+/// }
+///
+/// let value = StringExample { value: Some(Decimal::from_str(&quot;123.400&quot;).unwrap()) };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#
+/// );
+///
+/// let value = StringExample { value: None };
+/// assert_eq!(
+///     &amp;serde_json::to_string(&amp;value).unwrap(),
+///     r#&quot;{&quot;value&quot;:null}&quot;#
+/// );
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-str&quot;</span>)]
+</span><span class="kw">pub mod </span>str_option {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Decimal&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_option</span>(<span class="ident">OptionDecimalVisitor</span>)
+        deserializer.deserialize_option(OptionDecimalVisitor)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">pub fn </span>serialize&lt;S&gt;(value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Decimal&gt;, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">decimal</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">decimal</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::str::to_str_internal</span>(<span class="ident">decimal</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
-                <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">decimal</span>.<span class="number">0</span>.<span class="ident">as_ref</span>())
+        <span class="kw">match </span><span class="kw-2">*</span>value {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>decimal) =&gt; {
+                <span class="kw">let </span>decimal = <span class="kw">crate</span>::str::to_str_internal(decimal, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
+                serializer.serialize_str(decimal.<span class="number">0</span>.as_ref())
             }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_none</span>(),
+            <span class="prelude-val">None </span>=&gt; serializer.serialize_none(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;serde-str&quot;</span>))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_any(DecimalVisitor)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, not(feature = <span class="string">&quot;serde-float&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_str(DecimalVisitor)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, feature = <span class="string">&quot;serde-float&quot;</span>))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_f64</span>(<span class="ident">DecimalVisitor</span>)
+        deserializer.deserialize_f64(DecimalVisitor)
     }
 }
 
-<span class="comment">// It&#39;s a shame this needs to be redefined for this feature and not able to be referenced directly</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">DECIMAL_KEY_TOKEN</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$serde_json::private::Number&quot;</span>;
+<span class="comment">// It&#39;s a shame this needs to be redefined for this feature and not able to be referenced directly
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">const </span>DECIMAL_KEY_TOKEN: <span class="kw-2">&amp;</span>str = <span class="string">&quot;$serde_json::private::Number&quot;</span>;
 
-<span class="kw">struct</span> <span class="ident">DecimalVisitor</span>;
+<span class="kw">struct </span>DecimalVisitor;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecimalVisitor</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>DecimalVisitor {
+    <span class="kw">type </span>Value = Decimal;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;a Decimal type representing a fixed-point number&quot;</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(formatter, <span class="string">&quot;a Decimal type representing a fixed-point number&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_i64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_i64&lt;E&gt;(<span class="self">self</span>, value: i64) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="kw">match</span> <span class="ident">Decimal::from_i64</span>(<span class="ident">value</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">E::invalid_value</span>(<span class="ident">Unexpected::Signed</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)),
+        <span class="kw">match </span>Decimal::from_i64(value) {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(E::invalid_value(Unexpected::Signed(value), <span class="kw-2">&amp;</span><span class="self">self</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_u64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_u64&lt;E&gt;(<span class="self">self</span>, value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="kw">match</span> <span class="ident">Decimal::from_u64</span>(<span class="ident">value</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">s</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">E::invalid_value</span>(<span class="ident">Unexpected::Unsigned</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="self">self</span>)),
+        <span class="kw">match </span>Decimal::from_u64(value) {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="prelude-val">Ok</span>(s),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(E::invalid_value(Unexpected::Unsigned(value), <span class="kw-2">&amp;</span><span class="self">self</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_f64</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_f64&lt;E&gt;(<span class="self">self</span>, value: f64) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="ident">Decimal::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">to_string</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">E::invalid_value</span>(<span class="ident">Unexpected::Float</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="self">self</span>))
+        Decimal::from_str(<span class="kw-2">&amp;</span>value.to_string()).map_err(|<span class="kw">_</span>| E::invalid_value(Unexpected::Float(value), <span class="kw-2">&amp;</span><span class="self">self</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
-        <span class="ident">Decimal::from_str</span>(<span class="ident">value</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Decimal::from_scientific</span>(<span class="ident">value</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">E::invalid_value</span>(<span class="ident">Unexpected::Str</span>(<span class="ident">value</span>), <span class="kw-2">&amp;</span><span class="self">self</span>))
+        Decimal::from_str(value)
+            .or_else(|<span class="kw">_</span>| Decimal::from_scientific(value))
+            .map_err(|<span class="kw">_</span>| E::invalid_value(Unexpected::Str(value), <span class="kw-2">&amp;</span><span class="self">self</span>))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">visit_map</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">map</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Decimal</span>, <span class="ident">A::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+    </span><span class="kw">fn </span>visit_map&lt;A&gt;(<span class="self">self</span>, map: A) -&gt; <span class="prelude-ty">Result</span>&lt;Decimal, A::Error&gt;
+    <span class="kw">where
+        </span>A: serde::de::MapAccess&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">map</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_key</span>::<span class="op">&lt;</span><span class="ident">DecimalKey</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::invalid_type</span>(<span class="ident">Unexpected::Map</span>, <span class="kw-2">&amp;</span><span class="self">self</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>map = map;
+        <span class="kw">let </span>value = map.next_key::&lt;DecimalKey&gt;()<span class="question-mark">?</span>;
+        <span class="kw">if </span>value.is_none() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(serde::de::Error::invalid_type(Unexpected::Map, <span class="kw-2">&amp;</span><span class="self">self</span>));
         }
-        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">DecimalFromString</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">next_value</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">v</span>.<span class="ident">value</span>)
+        <span class="kw">let </span>v: DecimalFromString = map.next_value()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(v.value)
     }
 }
 
-<span class="kw">struct</span> <span class="ident">OptionDecimalVisitor</span>;
+<span class="kw">struct </span>OptionDecimalVisitor;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OptionDecimalVisitor</span> {
-    <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>OptionDecimalVisitor {
+    <span class="kw">type </span>Value = <span class="prelude-ty">Option</span>&lt;Decimal&gt;;
 
-    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a Decimal type representing a fixed-point number&quot;</span>)
+    <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        formatter.write_str(<span class="string">&quot;a Decimal type representing a fixed-point number&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_none</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+    <span class="kw">fn </span>visit_none&lt;E&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Decimal&gt;, E&gt;
+    <span class="kw">where
+        </span>E: serde::de::Error,
     {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>visit_some&lt;D&gt;(<span class="self">self</span>, d: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Decimal&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="ident">d</span>.<span class="ident">deserialize_any</span>(<span class="ident">DecimalVisitor</span>).<span class="ident">map</span>(<span class="prelude-val">Some</span>)
+        d.deserialize_any(DecimalVisitor).map(<span class="prelude-val">Some</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DecimalKey</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">struct </span>DecimalKey;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecimalKey</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalKey</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>DecimalKey {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;DecimalKey, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">FieldVisitor</span>;
+        <span class="kw">struct </span>FieldVisitor;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FieldVisitor</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> ();
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>FieldVisitor {
+            <span class="kw">type </span>Value = ();
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;a valid decimal field&quot;</span>)
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+                formatter.write_str(<span class="string">&quot;a valid decimal field&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+            <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), E&gt;
+            <span class="kw">where
+                </span>E: serde::de::Error,
             {
-                <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">DECIMAL_KEY_TOKEN</span> {
+                <span class="kw">if </span>s == DECIMAL_KEY_TOKEN {
                     <span class="prelude-val">Ok</span>(())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="string">&quot;expected field with custom name&quot;</span>))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(serde::de::Error::custom(<span class="string">&quot;expected field with custom name&quot;</span>))
                 }
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_identifier</span>(<span class="ident">FieldVisitor</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">DecimalKey</span>)
+        deserializer.deserialize_identifier(FieldVisitor)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(DecimalKey)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DecimalFromString</span> {
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Decimal</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">pub struct </span>DecimalFromString {
+    <span class="kw">pub </span>value: Decimal,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DecimalFromString</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalFromString</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::de::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>DecimalFromString {
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;DecimalFromString, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">struct</span> <span class="ident">Visitor</span>;
+        <span class="kw">struct </span>Visitor;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Visitor</span> {
-            <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="ident">DecimalFromString</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; serde::de::Visitor&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Visitor {
+            <span class="kw">type </span>Value = DecimalFromString;
 
-            <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;string containing a decimal&quot;</span>)
+            <span class="kw">fn </span>expecting(<span class="kw-2">&amp;</span><span class="self">self</span>, formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+                formatter.write_str(<span class="string">&quot;string containing a decimal&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DecimalFromString</span>, <span class="ident">E</span><span class="op">&gt;</span>
-            <span class="kw">where</span>
-                <span class="ident">E</span>: <span class="ident">serde::de::Error</span>,
+            <span class="kw">fn </span>visit_str&lt;E&gt;(<span class="self">self</span>, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;DecimalFromString, E&gt;
+            <span class="kw">where
+                </span>E: serde::de::Error,
             {
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">value</span>)
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Decimal::from_scientific</span>(<span class="ident">value</span>))
-                    .<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">DecimalFromString</span> { <span class="ident">value</span>: <span class="ident">d</span> })
+                <span class="kw">let </span>d = Decimal::from_str(value)
+                    .or_else(|<span class="kw">_</span>| Decimal::from_scientific(value))
+                    .map_err(serde::de::Error::custom)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(DecimalFromString { value: d })
             }
         }
 
-        <span class="ident">deserializer</span>.<span class="ident">deserialize_str</span>(<span class="ident">Visitor</span>)
+        deserializer.deserialize_str(Visitor)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;serde-float&quot;</span>))]
+</span><span class="kw">impl </span>serde::Serialize <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::str::to_str_internal</span>(<span class="self">self</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="ident">value</span>.<span class="number">0</span>.<span class="ident">as_ref</span>())
+        <span class="kw">let </span>value = <span class="kw">crate</span>::str::to_str_internal(<span class="self">self</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>);
+        serializer.serialize_str(value.<span class="number">0</span>.as_ref())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-arbitrary-precision&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;serde-float&quot;</span>, not(feature = <span class="string">&quot;serde-arbitrary-precision&quot;</span>)))]
+</span><span class="kw">impl </span>serde::Serialize <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">use</span> <span class="ident">num_traits::ToPrimitive</span>;
-        <span class="ident">serializer</span>.<span class="ident">serialize_f64</span>(<span class="self">self</span>.<span class="ident">to_f64</span>().<span class="ident">unwrap</span>())
+        <span class="kw">use </span>num_traits::ToPrimitive;
+        serializer.serialize_f64(<span class="self">self</span>.to_f64().unwrap())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-arbitrary-precision&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">serde::Serialize</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;serde-float&quot;</span>, feature = <span class="string">&quot;serde-arbitrary-precision&quot;</span>))]
+</span><span class="kw">impl </span>serde::Serialize <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="ident">serde_json::Number::from_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_string</span>())
-            .<span class="ident">map_err</span>(<span class="ident">serde::ser::Error::custom</span>)<span class="question-mark">?</span>
-            .<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        serde_json::Number::from_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_string())
+            .map_err(serde::ser::Error::custom)<span class="question-mark">?
+            </span>.serialize(serializer)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Record</span> {
-        <span class="ident">amount</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[derive(Serialize, Deserialize, Debug)]
+    </span><span class="kw">struct </span>Record {
+        amount: Decimal,
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_valid_decimal</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
+    <span class="attribute">#[test]
+    #[cfg(not(feature = <span class="string">&quot;serde-str&quot;</span>))]
+    </span><span class="kw">fn </span>deserialize_valid_decimal() {
+        <span class="kw">let </span>data = [
             (<span class="string">&quot;{\&quot;amount\&quot;:\&quot;1.234\&quot;}&quot;</span>, <span class="string">&quot;1.234&quot;</span>),
             (<span class="string">&quot;{\&quot;amount\&quot;:1234}&quot;</span>, <span class="string">&quot;1234&quot;</span>),
             (<span class="string">&quot;{\&quot;amount\&quot;:1234.56}&quot;</span>, <span class="string">&quot;1234.56&quot;</span>),
             (<span class="string">&quot;{\&quot;amount\&quot;:\&quot;1.23456e3\&quot;}&quot;</span>, <span class="string">&quot;1234.56&quot;</span>),
         ];
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">serialized</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">serialized</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(serialized, value) <span class="kw">in </span>data.iter() {
+            <span class="kw">let </span>result = serde_json::from_str(serialized);
             <span class="macro">assert_eq!</span>(
                 <span class="bool-val">true</span>,
-                <span class="ident">result</span>.<span class="ident">is_ok</span>(),
+                result.is_ok(),
                 <span class="string">&quot;expected successful deserialization for {}. Error: {:?}&quot;</span>,
-                <span class="ident">serialized</span>,
-                <span class="ident">result</span>.<span class="ident">err</span>().<span class="ident">unwrap</span>()
+                serialized,
+                result.err().unwrap()
             );
-            <span class="kw">let</span> <span class="ident">record</span>: <span class="ident">Record</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let </span>record: Record = result.unwrap();
             <span class="macro">assert_eq!</span>(
-                <span class="ident">value</span>,
-                <span class="ident">record</span>.<span class="ident">amount</span>.<span class="ident">to_string</span>(),
+                value,
+                record.amount.to_string(),
                 <span class="string">&quot;expected: {}, actual: {}&quot;</span>,
-                <span class="ident">value</span>,
-                <span class="ident">record</span>.<span class="ident">amount</span>.<span class="ident">to_string</span>()
+                value,
+                record.amount.to_string()
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-arbitrary-precision&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_basic_decimal</span>() {
-        <span class="kw">let</span> <span class="ident">d</span>: <span class="ident">Decimal</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">&quot;1.1234127836128763&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="comment">// Typically, this would not work without this feature enabled due to rounding</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">to_string</span>(), <span class="string">&quot;1.1234127836128763&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-arbitrary-precision&quot;</span>)]
+    </span><span class="kw">fn </span>deserialize_basic_decimal() {
+        <span class="kw">let </span>d: Decimal = serde_json::from_str(<span class="string">&quot;1.1234127836128763&quot;</span>).unwrap();
+        <span class="comment">// Typically, this would not work without this feature enabled due to rounding
+        </span><span class="macro">assert_eq!</span>(d.to_string(), <span class="string">&quot;1.1234127836128763&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_invalid_decimal</span>() {
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="string">&quot;{\&quot;amount\&quot;:\&quot;foo\&quot;}&quot;</span>;
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">Record</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">serialized</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>deserialize_invalid_decimal() {
+        <span class="kw">let </span>serialized = <span class="string">&quot;{\&quot;amount\&quot;:\&quot;foo\&quot;}&quot;</span>;
+        <span class="kw">let _</span>: Record = serde_json::from_str(serialized).unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_decimal</span>() {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record</span> {
-            <span class="ident">amount</span>: <span class="ident">Decimal::new</span>(<span class="number">1234</span>, <span class="number">3</span>),
+    <span class="attribute">#[test]
+    #[cfg(not(feature = <span class="string">&quot;serde-float&quot;</span>))]
+    </span><span class="kw">fn </span>serialize_decimal() {
+        <span class="kw">let </span>record = Record {
+            amount: Decimal::new(<span class="number">1234</span>, <span class="number">3</span>),
         };
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;1.234\&quot;}&quot;</span>, <span class="ident">serialized</span>);
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>record).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;1.234\&quot;}&quot;</span>, serialized);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_negative_zero</span>() {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record</span> { <span class="ident">amount</span>: <span class="op">-</span><span class="ident">Decimal::ZERO</span> };
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;-0\&quot;}&quot;</span>, <span class="ident">serialized</span>);
+    <span class="attribute">#[test]
+    #[cfg(not(feature = <span class="string">&quot;serde-float&quot;</span>))]
+    </span><span class="kw">fn </span>serialize_negative_zero() {
+        <span class="kw">let </span>record = Record { amount: -Decimal::ZERO };
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>record).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;-0\&quot;}&quot;</span>, serialized);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_decimal</span>() {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record</span> {
-            <span class="ident">amount</span>: <span class="ident">Decimal::new</span>(<span class="number">1234</span>, <span class="number">3</span>),
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-float&quot;</span>)]
+    </span><span class="kw">fn </span>serialize_decimal() {
+        <span class="kw">let </span>record = Record {
+            amount: Decimal::new(<span class="number">1234</span>, <span class="number">3</span>),
         };
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:1.234}&quot;</span>, <span class="ident">serialized</span>);
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>record).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:1.234}&quot;</span>, serialized);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-arbitrary-precision&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_decimal_roundtrip</span>() {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record</span> {
-            <span class="comment">// 4.81 is intentionally chosen as it is unrepresentable as a floating point number, meaning this test</span>
-            <span class="comment">// would fail if the `serde-arbitrary-precision` was not activated.</span>
-            <span class="ident">amount</span>: <span class="ident">Decimal::new</span>(<span class="number">481</span>, <span class="number">2</span>),
+    <span class="attribute">#[test]
+    #[cfg(all(feature = <span class="string">&quot;serde-float&quot;</span>, feature = <span class="string">&quot;serde-arbitrary-precision&quot;</span>))]
+    </span><span class="kw">fn </span>serialize_decimal_roundtrip() {
+        <span class="kw">let </span>record = Record {
+            <span class="comment">// 4.81 is intentionally chosen as it is unrepresentable as a floating point number, meaning this test
+            // would fail if the `serde-arbitrary-precision` was not activated.
+            </span>amount: Decimal::new(<span class="number">481</span>, <span class="number">2</span>),
         };
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:4.81}&quot;</span>, <span class="ident">serialized</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Record</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">serialized</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">record</span>.<span class="ident">amount</span>, <span class="ident">deserialized</span>.<span class="ident">amount</span>);
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>record).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:4.81}&quot;</span>, serialized);
+        <span class="kw">let </span>deserialized: Record = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
+        <span class="macro">assert_eq!</span>(record.amount, deserialized.amount);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">serialize_decimal_roundtrip</span>() {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record</span> {
-            <span class="ident">amount</span>: <span class="ident">Decimal::new</span>(<span class="number">481</span>, <span class="number">2</span>),
+    <span class="attribute">#[test]
+    #[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, not(feature = <span class="string">&quot;serde-float&quot;</span>)))]
+    </span><span class="kw">fn </span>serialize_decimal_roundtrip() {
+        <span class="kw">let </span>record = Record {
+            amount: Decimal::new(<span class="number">481</span>, <span class="number">2</span>),
         };
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;4.81\&quot;}&quot;</span>, <span class="ident">serialized</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Record</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">serialized</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">record</span>.<span class="ident">amount</span>, <span class="ident">deserialized</span>.<span class="ident">amount</span>);
+        <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>record).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;{\&quot;amount\&quot;:\&quot;4.81\&quot;}&quot;</span>, serialized);
+        <span class="kw">let </span>deserialized: Record = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
+        <span class="macro">assert_eq!</span>(record.amount, deserialized.amount);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">bincode_serialization</span>() {
-        <span class="kw">use</span> <span class="ident">bincode</span>::{<span class="ident">deserialize</span>, <span class="ident">serialize</span>};
+    <span class="attribute">#[test]
+    #[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, not(feature = <span class="string">&quot;serde-float&quot;</span>)))]
+    </span><span class="kw">fn </span>bincode_serialization() {
+        <span class="kw">use </span>bincode::{deserialize, serialize};
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
+        <span class="kw">let </span>data = [
             <span class="string">&quot;0&quot;</span>,
             <span class="string">&quot;0.00&quot;</span>,
             <span class="string">&quot;3.14159&quot;</span>,
@@ -1450,21 +1450,21 @@
             <span class="string">&quot;5233.9008808150288439427720175&quot;</span>,
             <span class="string">&quot;-5233.9008808150288439427720175&quot;</span>,
         ];
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">raw</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">raw</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">Decimal</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="ident">decoded</span>);
-            <span class="macro">assert_eq!</span>(<span class="number">8usize</span> <span class="op">+</span> <span class="ident">raw</span>.<span class="ident">len</span>(), <span class="ident">encoded</span>.<span class="ident">len</span>());
+        <span class="kw">for </span><span class="kw-2">&amp;</span>raw <span class="kw">in </span>data.iter() {
+            <span class="kw">let </span>value = Decimal::from_str(raw).unwrap();
+            <span class="kw">let </span>encoded = serialize(<span class="kw-2">&amp;</span>value).unwrap();
+            <span class="kw">let </span>decoded: Decimal = deserialize(<span class="kw-2">&amp;</span>encoded[..]).unwrap();
+            <span class="macro">assert_eq!</span>(value, decoded);
+            <span class="macro">assert_eq!</span>(<span class="number">8usize </span>+ raw.len(), encoded.len());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">bincode_serialization</span>() {
-        <span class="kw">use</span> <span class="ident">bincode</span>::{<span class="ident">deserialize</span>, <span class="ident">serialize</span>};
+    <span class="attribute">#[test]
+    #[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, feature = <span class="string">&quot;serde-float&quot;</span>))]
+    </span><span class="kw">fn </span>bincode_serialization() {
+        <span class="kw">use </span>bincode::{deserialize, serialize};
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
+        <span class="kw">let </span>data = [
             (<span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>),
             (<span class="string">&quot;0.00&quot;</span>, <span class="string">&quot;0.00&quot;</span>),
             (<span class="string">&quot;3.14159&quot;</span>, <span class="string">&quot;3.14159&quot;</span>),
@@ -1472,103 +1472,103 @@
             (<span class="string">&quot;1234567890123.4567890&quot;</span>, <span class="string">&quot;1234567890123.4568&quot;</span>),
             (<span class="string">&quot;-1234567890123.4567890&quot;</span>, <span class="string">&quot;-1234567890123.4568&quot;</span>),
         ];
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">value</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">expected</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">Decimal</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">decoded</span>);
-            <span class="macro">assert_eq!</span>(<span class="number">8usize</span>, <span class="ident">encoded</span>.<span class="ident">len</span>());
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(value, expected) <span class="kw">in </span>data.iter() {
+            <span class="kw">let </span>value = Decimal::from_str(value).unwrap();
+            <span class="kw">let </span>expected = Decimal::from_str(expected).unwrap();
+            <span class="kw">let </span>encoded = serialize(<span class="kw-2">&amp;</span>value).unwrap();
+            <span class="kw">let </span>decoded: Decimal = deserialize(<span class="kw-2">&amp;</span>encoded[..]).unwrap();
+            <span class="macro">assert_eq!</span>(expected, decoded);
+            <span class="macro">assert_eq!</span>(<span class="number">8usize</span>, encoded.len());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-str&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-float&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">bincode_nested_serialization</span>() {
-        <span class="comment">// Issue #361</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[test]
+    #[cfg(all(feature = <span class="string">&quot;serde-str&quot;</span>, not(feature = <span class="string">&quot;serde-float&quot;</span>)))]
+    </span><span class="kw">fn </span>bincode_nested_serialization() {
+        <span class="comment">// Issue #361
+        </span><span class="attribute">#[derive(Deserialize, Serialize, Debug)]
+        </span><span class="kw">pub struct </span>Foo {
+            value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">Foo</span> {
-            <span class="ident">value</span>: <span class="ident">Decimal::new</span>(<span class="op">-</span><span class="number">1</span>, <span class="number">3</span>).<span class="ident">round_dp</span>(<span class="number">0</span>),
+        <span class="kw">let </span>s = Foo {
+            value: Decimal::new(-<span class="number">1</span>, <span class="number">3</span>).round_dp(<span class="number">0</span>),
         };
-        <span class="kw">let</span> <span class="ident">ser</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">des</span>: <span class="ident">Foo</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">ser</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">des</span>.<span class="ident">value</span>, <span class="ident">s</span>.<span class="ident">value</span>);
+        <span class="kw">let </span>ser = bincode::serialize(<span class="kw-2">&amp;</span>s).unwrap();
+        <span class="kw">let </span>des: Foo = bincode::deserialize(<span class="kw-2">&amp;</span>ser).unwrap();
+        <span class="macro">assert_eq!</span>(des.value, s.value);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_arbitrary_precision</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArbitraryExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::arbitrary_precision&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+    </span><span class="kw">fn </span>with_arbitrary_precision() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>ArbitraryExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::arbitrary_precision&quot;</span>)]
+            </span>value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">ArbitraryExample</span> {
-            <span class="ident">value</span>: <span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>(),
+        <span class="kw">let </span>value = ArbitraryExample {
+            value: Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap(),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>value).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_arbitrary_precision_from_string</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArbitraryExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::arbitrary_precision&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+    </span><span class="kw">fn </span>with_arbitrary_precision_from_string() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>ArbitraryExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::arbitrary_precision&quot;</span>)]
+            </span>value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">ArbitraryExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:&quot;1.1234127836128763&quot;}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">value</span>.<span class="ident">value</span>.<span class="ident">to_string</span>(), <span class="string">&quot;1.1234127836128763&quot;</span>);
+        <span class="kw">let </span>value: ArbitraryExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:&quot;1.1234127836128763&quot;}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(value.value.to_string(), <span class="string">&quot;1.1234127836128763&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-float&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_float</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FloatExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::float&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-float&quot;</span>)]
+    </span><span class="kw">fn </span>with_float() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>FloatExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::float&quot;</span>)]
+            </span>value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">FloatExample</span> {
-            <span class="ident">value</span>: <span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>(),
+        <span class="kw">let </span>value = FloatExample {
+            value: Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap(),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>value).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-str&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_str</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::str&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-str&quot;</span>)]
+    </span><span class="kw">fn </span>with_str() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>StringExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::str&quot;</span>)]
+            </span>value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">StringExample</span> {
-            <span class="ident">value</span>: <span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>(),
+        <span class="kw">let </span>value = StringExample {
+            value: Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap(),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>value).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-str&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_str_bincode</span>() {
-        <span class="kw">use</span> <span class="ident">bincode</span>::{<span class="ident">deserialize</span>, <span class="ident">serialize</span>};
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-str&quot;</span>)]
+    </span><span class="kw">fn </span>with_str_bincode() {
+        <span class="kw">use </span>bincode::{deserialize, serialize};
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BincodeExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::str&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="ident">Decimal</span>,
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>BincodeExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::str&quot;</span>)]
+            </span>value: Decimal,
         }
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
+        <span class="kw">let </span>data = [
             (<span class="string">&quot;0&quot;</span>, <span class="string">&quot;0&quot;</span>),
             (<span class="string">&quot;0.00&quot;</span>, <span class="string">&quot;0.00&quot;</span>),
             (<span class="string">&quot;3.14159&quot;</span>, <span class="string">&quot;3.14159&quot;</span>),
@@ -1576,85 +1576,85 @@
             (<span class="string">&quot;1234567890123.4567890&quot;</span>, <span class="string">&quot;1234567890123.4567890&quot;</span>),
             (<span class="string">&quot;-1234567890123.4567890&quot;</span>, <span class="string">&quot;-1234567890123.4567890&quot;</span>),
         ];
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">value</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">Decimal::from_str</span>(<span class="ident">expected</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">BincodeExample</span> { <span class="ident">value</span> };
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(value, expected) <span class="kw">in </span>data.iter() {
+            <span class="kw">let </span>value = Decimal::from_str(value).unwrap();
+            <span class="kw">let </span>expected = Decimal::from_str(expected).unwrap();
+            <span class="kw">let </span>input = BincodeExample { value };
 
-            <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">BincodeExample</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">decoded</span>.<span class="ident">value</span>);
+            <span class="kw">let </span>encoded = serialize(<span class="kw-2">&amp;</span>input).unwrap();
+            <span class="kw">let </span>decoded: BincodeExample = deserialize(<span class="kw-2">&amp;</span>encoded[..]).unwrap();
+            <span class="macro">assert_eq!</span>(expected, decoded.value);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-str&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_str_optional</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::str_option&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-str&quot;</span>)]
+    </span><span class="kw">fn </span>with_str_optional() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>StringExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::str_option&quot;</span>)]
+            </span>value: <span class="prelude-ty">Option</span>&lt;Decimal&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> {
-            <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>()),
+        <span class="kw">let </span>original = StringExample {
+            value: <span class="prelude-val">Some</span>(Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap()),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:&quot;123.400&quot;}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
 
-        <span class="comment">// Null tests</span>
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> { <span class="ident">value</span>: <span class="prelude-val">None</span> };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="comment">// Null tests
+        </span><span class="kw">let </span>original = StringExample { value: <span class="prelude-val">None </span>};
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-float&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_float_optional</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::float_option&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-float&quot;</span>)]
+    </span><span class="kw">fn </span>with_float_optional() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>StringExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::float_option&quot;</span>)]
+            </span>value: <span class="prelude-ty">Option</span>&lt;Decimal&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> {
-            <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>()),
+        <span class="kw">let </span>original = StringExample {
+            value: <span class="prelude-val">Some</span>(Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap()),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:123.4}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
 
-        <span class="comment">// Null tests</span>
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> { <span class="ident">value</span>: <span class="prelude-val">None</span> };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="comment">// Null tests
+        </span><span class="kw">let </span>original = StringExample { value: <span class="prelude-val">None </span>};
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">with_arbitrary_precision_optional</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringExample</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;crate::serde::arbitrary_precision_option&quot;</span>)]</span>
-            <span class="ident">value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span>,
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;serde-with-arbitrary-precision&quot;</span>)]
+    </span><span class="kw">fn </span>with_arbitrary_precision_optional() {
+        <span class="attribute">#[derive(Serialize, Deserialize)]
+        </span><span class="kw">pub struct </span>StringExample {
+            <span class="attribute">#[serde(with = <span class="string">&quot;crate::serde::arbitrary_precision_option&quot;</span>)]
+            </span>value: <span class="prelude-ty">Option</span>&lt;Decimal&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> {
-            <span class="ident">value</span>: <span class="prelude-val">Some</span>(<span class="ident">Decimal::from_str</span>(<span class="string">&quot;123.400&quot;</span>).<span class="ident">unwrap</span>()),
+        <span class="kw">let </span>original = StringExample {
+            value: <span class="prelude-val">Some</span>(Decimal::from_str(<span class="string">&quot;123.400&quot;</span>).unwrap()),
         };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:123.400}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
 
-        <span class="comment">// Null tests</span>
-        <span class="kw">let</span> <span class="ident">original</span> <span class="op">=</span> <span class="ident">StringExample</span> { <span class="ident">value</span>: <span class="prelude-val">None</span> };
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">original</span>).<span class="ident">unwrap</span>(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
-        <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">StringExample</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">deserialized</span>.<span class="ident">value</span>, <span class="ident">original</span>.<span class="ident">value</span>);
+        <span class="comment">// Null tests
+        </span><span class="kw">let </span>original = StringExample { value: <span class="prelude-val">None </span>};
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>serde_json::to_string(<span class="kw-2">&amp;</span>original).unwrap(), <span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>);
+        <span class="kw">let </span>deserialized: StringExample = serde_json::from_str(<span class="string">r#&quot;{&quot;value&quot;:null}&quot;#</span>).unwrap();
+        <span class="macro">assert_eq!</span>(deserialized.value, original.value);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

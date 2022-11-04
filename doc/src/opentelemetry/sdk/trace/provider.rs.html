@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -324,329 +324,329 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # Trace Provider SDK</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Tracer Creation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! New `Tracer` instances are always created through a `TracerProvider`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All configuration objects and extension points (span processors,</span>
-<span class="doccomment">//! propagators) are provided by the `TracerProvider`. `Tracer` instances do</span>
-<span class="doccomment">//! not duplicate this data to avoid that different `Tracer` instances</span>
-<span class="doccomment">//! of the `TracerProvider` have different versions of these data.</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::resource</span>::{<span class="ident">EnvResourceDetector</span>, <span class="ident">SdkProvidedResourceDetector</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::runtime::TraceRuntime</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::Resource</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace::TraceResult</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">global</span>,
-    <span class="ident">sdk</span>::{<span class="self">self</span>, <span class="ident">export::trace::SpanExporter</span>, <span class="ident">trace::SpanProcessor</span>},
+</pre><pre class="rust"><code><span class="doccomment">//! # Trace Provider SDK
+//!
+//! ## Tracer Creation
+//!
+//! New `Tracer` instances are always created through a `TracerProvider`.
+//!
+//! All configuration objects and extension points (span processors,
+//! propagators) are provided by the `TracerProvider`. `Tracer` instances do
+//! not duplicate this data to avoid that different `Tracer` instances
+//! of the `TracerProvider` have different versions of these data.
+</span><span class="kw">use </span><span class="kw">crate</span>::sdk::resource::{EnvResourceDetector, SdkProvidedResourceDetector};
+<span class="kw">use </span><span class="kw">crate</span>::sdk::trace::runtime::TraceRuntime;
+<span class="kw">use </span><span class="kw">crate</span>::sdk::Resource;
+<span class="kw">use </span><span class="kw">crate</span>::trace::TraceResult;
+<span class="kw">use crate</span>::{
+    global,
+    sdk::{<span class="self">self</span>, export::trace::SpanExporter, trace::SpanProcessor},
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="doccomment">/// Default tracer name if empty string is provided.</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_COMPONENT_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;rust.opentelemetry.io/sdk/tracer&quot;</span>;
+<span class="doccomment">/// Default tracer name if empty string is provided.
+</span><span class="kw">const </span>DEFAULT_COMPONENT_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;rust.opentelemetry.io/sdk/tracer&quot;</span>;
 
-<span class="doccomment">/// TracerProvider inner type</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TracerProviderInner</span> {
-    <span class="ident">processors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SpanProcessor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>,
+<span class="doccomment">/// TracerProvider inner type
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TracerProviderInner {
+    processors: Vec&lt;Box&lt;<span class="kw">dyn </span>SpanProcessor&gt;&gt;,
+    config: sdk::trace::Config,
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">TracerProviderInner</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">for</span> <span class="ident">processor</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">processors</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">processor</span>.<span class="ident">shutdown</span>() {
-                <span class="ident">global::handle_error</span>(<span class="ident">err</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>TracerProviderInner {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">for </span>processor <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.processors {
+            <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = processor.shutdown() {
+                global::handle_error(err);
             }
         }
     }
 }
 
-<span class="doccomment">/// Creator and registry of named `Tracer` instances.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TracerProvider</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TracerProviderInner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Creator and registry of named `Tracer` instances.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>TracerProvider {
+    inner: Arc&lt;TracerProviderInner&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TracerProvider</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TracerProvider::builder</span>().<span class="ident">build</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">TracerProvider</span> {
-    <span class="doccomment">/// Build a new tracer provider</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">TracerProviderInner</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TracerProvider</span> { <span class="ident">inner</span> }
-    }
-
-    <span class="doccomment">/// Create a new `TracerProvider` builder.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder::default</span>()
-    }
-
-    <span class="doccomment">/// Span processors associated with this provider</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_processors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SpanProcessor</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">processors</span>
-    }
-
-    <span class="doccomment">/// Config associated with this tracer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">sdk::trace::Config</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">config</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>TracerProvider {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        TracerProvider::builder().build()
     }
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::trace::TracerProvider</span> <span class="kw">for</span> <span class="ident">TracerProvider</span> {
-    <span class="doccomment">/// This implementation of `TracerProvider` produces `Tracer` instances.</span>
-    <span class="kw">type</span> <span class="ident">Tracer</span> <span class="op">=</span> <span class="ident">sdk::trace::Tracer</span>;
+<span class="kw">impl </span>TracerProvider {
+    <span class="doccomment">/// Build a new tracer provider
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(inner: Arc&lt;TracerProviderInner&gt;) -&gt; <span class="self">Self </span>{
+        TracerProvider { inner }
+    }
 
-    <span class="doccomment">/// Create a new versioned `Tracer` instance.</span>
-    <span class="kw">fn</span> <span class="ident">versioned_tracer</span>(
+    <span class="doccomment">/// Create a new `TracerProvider` builder.
+    </span><span class="kw">pub fn </span>builder() -&gt; Builder {
+        Builder::default()
+    }
+
+    <span class="doccomment">/// Span processors associated with this provider
+    </span><span class="kw">pub fn </span>span_processors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Vec&lt;Box&lt;<span class="kw">dyn </span>SpanProcessor&gt;&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.processors
+    }
+
+    <span class="doccomment">/// Config associated with this tracer
+    </span><span class="kw">pub fn </span>config(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>sdk::trace::Config {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.config
+    }
+}
+
+<span class="kw">impl </span><span class="kw">crate</span>::trace::TracerProvider <span class="kw">for </span>TracerProvider {
+    <span class="doccomment">/// This implementation of `TracerProvider` produces `Tracer` instances.
+    </span><span class="kw">type </span>Tracer = sdk::trace::Tracer;
+
+    <span class="doccomment">/// Create a new versioned `Tracer` instance.
+    </span><span class="kw">fn </span>versioned_tracer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">_schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="comment">// Use default value if name is invalid empty string</span>
-        <span class="kw">let</span> <span class="ident">component_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">DEFAULT_COMPONENT_NAME</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">name</span>
+        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
+        version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+        _schema_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; <span class="self">Self</span>::Tracer {
+        <span class="kw">let </span>name = name.into();
+        <span class="comment">// Use default value if name is invalid empty string
+        </span><span class="kw">let </span>component_name = <span class="kw">if </span>name.is_empty() {
+            Cow::Borrowed(DEFAULT_COMPONENT_NAME)
+        } <span class="kw">else </span>{
+            name
         };
-        <span class="kw">let</span> <span class="ident">instrumentation_lib</span> <span class="op">=</span>
-            <span class="ident">sdk::InstrumentationLibrary::new</span>(<span class="ident">component_name</span>, <span class="ident">version</span>.<span class="ident">map</span>(<span class="ident">Into::into</span>));
+        <span class="kw">let </span>instrumentation_lib =
+            sdk::InstrumentationLibrary::new(component_name, version.map(Into::into));
 
-        <span class="ident">sdk::trace::Tracer::new</span>(<span class="ident">instrumentation_lib</span>, <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>))
+        sdk::trace::Tracer::new(instrumentation_lib, Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.inner))
     }
 
-    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.</span>
-    <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">span_processors</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">processor</span><span class="op">|</span> <span class="ident">processor</span>.<span class="ident">force_flush</span>())
-            .<span class="ident">collect</span>()
+    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.
+    </span><span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TraceResult&lt;()&gt;&gt; {
+        <span class="self">self</span>.span_processors()
+            .iter()
+            .map(|processor| processor.force_flush())
+            .collect()
     }
 }
 
-<span class="doccomment">/// Builder for provider attributes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="ident">processors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SpanProcessor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>,
-    <span class="ident">sdk_provided_resource</span>: <span class="ident">Resource</span>,
+<span class="doccomment">/// Builder for provider attributes.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Builder {
+    processors: Vec&lt;Box&lt;<span class="kw">dyn </span>SpanProcessor&gt;&gt;,
+    config: sdk::trace::Config,
+    sdk_provided_resource: Resource,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Builder</span> {
-            <span class="ident">processors</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">config</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">sdk_provided_resource</span>: <span class="ident">Resource::from_detectors</span>(
-                <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
+<span class="kw">impl </span>Default <span class="kw">for </span>Builder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Builder {
+            processors: Default::default(),
+            config: Default::default(),
+            sdk_provided_resource: Resource::from_detectors(
+                Duration::from_secs(<span class="number">0</span>),
                 <span class="macro">vec!</span>[
-                    <span class="ident">Box::new</span>(<span class="ident">SdkProvidedResourceDetector</span>),
-                    <span class="ident">Box::new</span>(<span class="ident">EnvResourceDetector::new</span>()),
+                    Box::new(SdkProvidedResourceDetector),
+                    Box::new(EnvResourceDetector::new()),
                 ],
             ),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// The `SpanExporter` that this provider should use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_simple_exporter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SpanExporter</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">exporter</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processors</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">processors</span>;
-        <span class="ident">processors</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(<span class="ident">sdk::trace::SimpleSpanProcessor::new</span>(<span class="ident">Box::new</span>(
-            <span class="ident">exporter</span>,
+<span class="kw">impl </span>Builder {
+    <span class="doccomment">/// The `SpanExporter` that this provider should use.
+    </span><span class="kw">pub fn </span>with_simple_exporter&lt;T: SpanExporter + <span class="lifetime">&#39;static</span>&gt;(<span class="self">self</span>, exporter: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>processors = <span class="self">self</span>.processors;
+        processors.push(Box::new(sdk::trace::SimpleSpanProcessor::new(Box::new(
+            exporter,
         ))));
 
-        <span class="ident">Builder</span> { <span class="ident">processors</span>, ..<span class="self">self</span> }
+        Builder { processors, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// The `SpanExporter` setup using a default `BatchSpanProcessor` that this provider should use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_batch_exporter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SpanExporter</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">TraceRuntime</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// The `SpanExporter` setup using a default `BatchSpanProcessor` that this provider should use.
+    </span><span class="kw">pub fn </span>with_batch_exporter&lt;T: SpanExporter + <span class="lifetime">&#39;static</span>, R: TraceRuntime&gt;(
         <span class="self">self</span>,
-        <span class="ident">exporter</span>: <span class="ident">T</span>,
-        <span class="ident">runtime</span>: <span class="ident">R</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">batch</span> <span class="op">=</span> <span class="ident">sdk::trace::BatchSpanProcessor::builder</span>(<span class="ident">exporter</span>, <span class="ident">runtime</span>).<span class="ident">build</span>();
-        <span class="self">self</span>.<span class="ident">with_span_processor</span>(<span class="ident">batch</span>)
+        exporter: T,
+        runtime: R,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>batch = sdk::trace::BatchSpanProcessor::builder(exporter, runtime).build();
+        <span class="self">self</span>.with_span_processor(batch)
     }
 
-    <span class="doccomment">/// The `SpanProcessor` that this provider should use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_processor</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SpanProcessor</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">processor</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processors</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">processors</span>;
-        <span class="ident">processors</span>.<span class="ident">push</span>(<span class="ident">Box::new</span>(<span class="ident">processor</span>));
+    <span class="doccomment">/// The `SpanProcessor` that this provider should use.
+    </span><span class="kw">pub fn </span>with_span_processor&lt;T: SpanProcessor + <span class="lifetime">&#39;static</span>&gt;(<span class="self">self</span>, processor: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>processors = <span class="self">self</span>.processors;
+        processors.push(Box::new(processor));
 
-        <span class="ident">Builder</span> { <span class="ident">processors</span>, ..<span class="self">self</span> }
+        Builder { processors, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// The sdk `Config` that this provider will use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_config</span>(<span class="self">self</span>, <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Builder</span> { <span class="ident">config</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// The sdk `Config` that this provider will use.
+    </span><span class="kw">pub fn </span>with_config(<span class="self">self</span>, config: sdk::trace::Config) -&gt; <span class="self">Self </span>{
+        Builder { config, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Return the clone of sdk provided resource.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See &lt;https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/sdk.md#sdk-provided-resource-attributes&gt;</span>
-    <span class="doccomment">/// for details.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sdk_provided_resource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Resource</span> {
-        <span class="self">self</span>.<span class="ident">sdk_provided_resource</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Return the clone of sdk provided resource.
+    ///
+    /// See &lt;https://github.com/open-telemetry/opentelemetry-specification/blob/v1.8.0/specification/resource/sdk.md#sdk-provided-resource-attributes&gt;
+    /// for details.
+    </span><span class="kw">pub fn </span>sdk_provided_resource(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Resource {
+        <span class="self">self</span>.sdk_provided_resource.clone()
     }
 
-    <span class="doccomment">/// Create a new provider from this configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">TracerProvider</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>;
-        <span class="ident">config</span>.<span class="ident">resource</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">config</span>.<span class="ident">resource</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="self">self</span>.<span class="ident">sdk_provided_resource</span>)),
-            <span class="comment">// User provided resource information has higher priority.</span>
-            <span class="prelude-val">Some</span>(<span class="ident">resource</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">resource</span>.<span class="ident">is_empty</span>() {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="self">self</span>.<span class="ident">sdk_provided_resource</span>.<span class="ident">merge</span>(<span class="ident">resource</span>)))
+    <span class="doccomment">/// Create a new provider from this configuration.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; TracerProvider {
+        <span class="kw">let </span><span class="kw-2">mut </span>config = <span class="self">self</span>.config;
+        config.resource = <span class="kw">match </span>config.resource {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(Arc::new(<span class="self">self</span>.sdk_provided_resource)),
+            <span class="comment">// User provided resource information has higher priority.
+            </span><span class="prelude-val">Some</span>(resource) =&gt; {
+                <span class="kw">if </span>resource.is_empty() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(Arc::new(<span class="self">self</span>.sdk_provided_resource.merge(resource)))
                 }
             }
         };
-        <span class="ident">TracerProvider</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">TracerProviderInner</span> {
-                <span class="ident">processors</span>: <span class="self">self</span>.<span class="ident">processors</span>,
-                <span class="ident">config</span>,
+        TracerProvider {
+            inner: Arc::new(TracerProviderInner {
+                processors: <span class="self">self</span>.processors,
+                config,
             }),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::export::trace::SpanData</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::provider::TracerProviderInner</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace</span>::{<span class="ident">Config</span>, <span class="ident">Span</span>, <span class="ident">SpanProcessor</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::Resource</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">TraceError</span>, <span class="ident">TraceResult</span>, <span class="ident">TracerProvider</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Context</span>, <span class="ident">Key</span>, <span class="ident">KeyValue</span>};
-    <span class="kw">use</span> <span class="ident">std::env</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::export::trace::SpanData;
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::trace::provider::TracerProviderInner;
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::trace::{Config, Span, SpanProcessor};
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::Resource;
+    <span class="kw">use </span><span class="kw">crate</span>::trace::{TraceError, TraceResult, TracerProvider};
+    <span class="kw">use crate</span>::{Context, Key, KeyValue};
+    <span class="kw">use </span>std::env;
+    <span class="kw">use </span>std::sync::Arc;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">TestSpanProcessor</span> {
-        <span class="ident">success</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">struct </span>TestSpanProcessor {
+        success: bool,
     }
 
-    <span class="kw">impl</span> <span class="ident">SpanProcessor</span> <span class="kw">for</span> <span class="ident">TestSpanProcessor</span> {
-        <span class="kw">fn</span> <span class="ident">on_start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Span</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) {
+    <span class="kw">impl </span>SpanProcessor <span class="kw">for </span>TestSpanProcessor {
+        <span class="kw">fn </span>on_start(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: <span class="kw-2">&amp;mut </span>Span, _cx: <span class="kw-2">&amp;</span>Context) {
             <span class="macro">unimplemented!</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">on_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_span</span>: <span class="ident">SpanData</span>) {
+        <span class="kw">fn </span>on_end(<span class="kw-2">&amp;</span><span class="self">self</span>, _span: SpanData) {
             <span class="macro">unimplemented!</span>()
         }
 
-        <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">success</span> {
+        <span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceResult&lt;()&gt; {
+            <span class="kw">if </span><span class="self">self</span>.success {
                 <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">TraceError::from</span>(<span class="string">&quot;cannot export&quot;</span>))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(TraceError::from(<span class="string">&quot;cannot export&quot;</span>))
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">force_flush</span>()
+        <span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; TraceResult&lt;()&gt; {
+            <span class="self">self</span>.force_flush()
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_force_flush</span>() {
-        <span class="kw">let</span> <span class="ident">tracer_provider</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::new</span>(<span class="ident">Arc::from</span>(<span class="ident">TracerProviderInner</span> {
-            <span class="ident">processors</span>: <span class="macro">vec!</span>[
-                <span class="ident">Box::from</span>(<span class="ident">TestSpanProcessor</span> { <span class="ident">success</span>: <span class="bool-val">true</span> }),
-                <span class="ident">Box::from</span>(<span class="ident">TestSpanProcessor</span> { <span class="ident">success</span>: <span class="bool-val">false</span> }),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_force_flush() {
+        <span class="kw">let </span>tracer_provider = <span class="kw">super</span>::TracerProvider::new(Arc::from(TracerProviderInner {
+            processors: <span class="macro">vec!</span>[
+                Box::from(TestSpanProcessor { success: <span class="bool-val">true </span>}),
+                Box::from(TestSpanProcessor { success: <span class="bool-val">false </span>}),
             ],
-            <span class="ident">config</span>: <span class="ident">Default::default</span>(),
+            config: Default::default(),
         }));
 
-        <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">tracer_provider</span>.<span class="ident">force_flush</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">results</span>.<span class="ident">len</span>(), <span class="number">2</span>);
+        <span class="kw">let </span>results = tracer_provider.force_flush();
+        <span class="macro">assert_eq!</span>(results.len(), <span class="number">2</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tracer_provider_default_resource</span>() {
-        <span class="comment">// If users didn&#39;t provided a resource and there isn&#39;t a env var set. Use default one</span>
-        <span class="kw">let</span> <span class="ident">assert_service_name</span> <span class="op">=</span> <span class="op">|</span><span class="ident">provider</span>: <span class="ident"><span class="kw">super</span>::TracerProvider</span>,
-                                   <span class="ident">expect</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">|</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tracer_provider_default_resource() {
+        <span class="comment">// If users didn&#39;t provided a resource and there isn&#39;t a env var set. Use default one
+        </span><span class="kw">let </span>assert_service_name = |provider: <span class="kw">super</span>::TracerProvider,
+                                   expect: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;| {
             <span class="macro">assert_eq!</span>(
-                <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>
-                    .<span class="ident">get</span>(<span class="ident">Key::from_static_str</span>(<span class="string">&quot;service.name&quot;</span>))
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>())),
-                <span class="ident">expect</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>())
+                provider.config().resource.as_ref().and_then(|r| r
+                    .get(Key::from_static_str(<span class="string">&quot;service.name&quot;</span>))
+                    .map(|v| v.to_string())),
+                expect.map(|s| s.to_string())
             );
         };
-        <span class="kw">let</span> <span class="ident">default_config_provider</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::builder</span>().<span class="ident">build</span>();
-        <span class="ident">assert_service_name</span>(<span class="ident">default_config_provider</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;unknown_service&quot;</span>));
+        <span class="kw">let </span>default_config_provider = <span class="kw">super</span>::TracerProvider::builder().build();
+        assert_service_name(default_config_provider, <span class="prelude-val">Some</span>(<span class="string">&quot;unknown_service&quot;</span>));
 
-        <span class="comment">// If user didn&#39;t provided a resource, try to get a default from env var</span>
-        <span class="kw">let</span> <span class="ident">custom_config_provider</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::builder</span>()
-            .<span class="ident">with_config</span>(<span class="ident">Config</span> {
-                <span class="ident">resource</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Resource::new</span>(<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(
+        <span class="comment">// If user didn&#39;t provided a resource, try to get a default from env var
+        </span><span class="kw">let </span>custom_config_provider = <span class="kw">super</span>::TracerProvider::builder()
+            .with_config(Config {
+                resource: <span class="prelude-val">Some</span>(Arc::new(Resource::new(<span class="macro">vec!</span>[KeyValue::new(
                     <span class="string">&quot;service.name&quot;</span>,
                     <span class="string">&quot;test_service&quot;</span>,
                 )]))),
-                ..<span class="ident">Default::default</span>()
+                ..Default::default()
             })
-            .<span class="ident">build</span>();
-        <span class="ident">assert_service_name</span>(<span class="ident">custom_config_provider</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;test_service&quot;</span>));
+            .build();
+        assert_service_name(custom_config_provider, <span class="prelude-val">Some</span>(<span class="string">&quot;test_service&quot;</span>));
 
-        <span class="comment">// If `OTEL_RESOURCE_ATTRIBUTES` is set, read them automatically</span>
-        <span class="ident">env::set_var</span>(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>, <span class="string">&quot;key1=value1, k2, k3=value2&quot;</span>);
-        <span class="kw">let</span> <span class="ident">env_resource_provider</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::builder</span>().<span class="ident">build</span>();
+        <span class="comment">// If `OTEL_RESOURCE_ATTRIBUTES` is set, read them automatically
+        </span>env::set_var(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>, <span class="string">&quot;key1=value1, k2, k3=value2&quot;</span>);
+        <span class="kw">let </span>env_resource_provider = <span class="kw">super</span>::TracerProvider::builder().build();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">env_resource_provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Resource::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;value1&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;k3&quot;</span>, <span class="string">&quot;value2&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;service.name&quot;</span>, <span class="string">&quot;unknown_service&quot;</span>),
+            env_resource_provider.config().resource,
+            <span class="prelude-val">Some</span>(Arc::new(Resource::new(<span class="macro">vec!</span>[
+                KeyValue::new(<span class="string">&quot;key1&quot;</span>, <span class="string">&quot;value1&quot;</span>),
+                KeyValue::new(<span class="string">&quot;k3&quot;</span>, <span class="string">&quot;value2&quot;</span>),
+                KeyValue::new(<span class="string">&quot;service.name&quot;</span>, <span class="string">&quot;unknown_service&quot;</span>),
             ])))
         );
 
-        <span class="comment">// When `OTEL_RESOURCE_ATTRIBUTES` is set and also user provided config</span>
-        <span class="ident">env::set_var</span>(
+        <span class="comment">// When `OTEL_RESOURCE_ATTRIBUTES` is set and also user provided config
+        </span>env::set_var(
             <span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>,
             <span class="string">&quot;my-custom-key=env-val,k2=value2&quot;</span>,
         );
-        <span class="kw">let</span> <span class="ident">user_provided_resource_config_provider</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::builder</span>()
-            .<span class="ident">with_config</span>(<span class="ident">Config</span> {
-                <span class="ident">resource</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Resource::new</span>(<span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(
+        <span class="kw">let </span>user_provided_resource_config_provider = <span class="kw">super</span>::TracerProvider::builder()
+            .with_config(Config {
+                resource: <span class="prelude-val">Some</span>(Arc::new(Resource::new(<span class="macro">vec!</span>[KeyValue::new(
                     <span class="string">&quot;my-custom-key&quot;</span>,
                     <span class="string">&quot;my-custom-value&quot;</span>,
                 )]))),
-                ..<span class="ident">Default::default</span>()
+                ..Default::default()
             })
-            .<span class="ident">build</span>();
+            .build();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">user_provided_resource_config_provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Resource::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;my-custom-key&quot;</span>, <span class="string">&quot;my-custom-value&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;k2&quot;</span>, <span class="string">&quot;value2&quot;</span>),
-                <span class="ident">KeyValue::new</span>(<span class="string">&quot;service.name&quot;</span>, <span class="string">&quot;unknown_service&quot;</span>),
+            user_provided_resource_config_provider.config().resource,
+            <span class="prelude-val">Some</span>(Arc::new(Resource::new(<span class="macro">vec!</span>[
+                KeyValue::new(<span class="string">&quot;my-custom-key&quot;</span>, <span class="string">&quot;my-custom-value&quot;</span>),
+                KeyValue::new(<span class="string">&quot;k2&quot;</span>, <span class="string">&quot;value2&quot;</span>),
+                KeyValue::new(<span class="string">&quot;service.name&quot;</span>, <span class="string">&quot;unknown_service&quot;</span>),
             ])))
         );
-        <span class="ident">env::remove_var</span>(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>);
+        env::remove_var(<span class="string">&quot;OTEL_RESOURCE_ATTRIBUTES&quot;</span>);
 
-        <span class="comment">// If user provided a resource, it takes priority during collision.</span>
-        <span class="kw">let</span> <span class="ident">no_service_name</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TracerProvider::builder</span>()
-            .<span class="ident">with_config</span>(<span class="ident">Config</span> {
-                <span class="ident">resource</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Resource::empty</span>())),
-                ..<span class="ident">Default::default</span>()
+        <span class="comment">// If user provided a resource, it takes priority during collision.
+        </span><span class="kw">let </span>no_service_name = <span class="kw">super</span>::TracerProvider::builder()
+            .with_config(Config {
+                resource: <span class="prelude-val">Some</span>(Arc::new(Resource::empty())),
+                ..Default::default()
             })
-            .<span class="ident">build</span>();
+            .build();
 
-        <span class="ident">assert_service_name</span>(<span class="ident">no_service_name</span>, <span class="prelude-val">None</span>);
+        assert_service_name(no_service_name, <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

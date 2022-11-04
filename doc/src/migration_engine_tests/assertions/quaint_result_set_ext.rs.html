@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/assertions/quaint_result_set_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quaint_result_set_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_engine_tests/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/assertions/quaint_result_set_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quaint_result_set_ext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_engine_tests/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -125,132 +125,132 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::ResultRowRef</span>, <span class="ident">prelude::ResultSet</span>, <span class="ident">Value</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>quaint::{connector::ResultRowRef, prelude::ResultSet, Value};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ResultSetExt</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">assert_row_count</span>(<span class="self">self</span>, <span class="ident">expected_count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>;
+<span class="kw">pub trait </span>ResultSetExt: Sized {
+    <span class="kw">fn </span>assert_row_count(<span class="self">self</span>, expected_count: usize) -&gt; <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">assert_row</span>(<span class="self">self</span>, <span class="ident">rowidx</span>: <span class="ident">usize</span>, <span class="ident">assertions</span>: <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
+    <span class="kw">fn </span>assert_row(<span class="self">self</span>, rowidx: usize, assertions: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">assert_first_row</span>(<span class="self">self</span>, <span class="ident">assertions</span>: <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_row</span>(<span class="number">0</span>, <span class="ident">assertions</span>)
+    <span class="kw">fn </span>assert_first_row(<span class="self">self</span>, assertions: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.assert_row(<span class="number">0</span>, assertions)
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_single_row</span>(<span class="self">self</span>, <span class="ident">assertions</span>: <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">assert_row_count</span>(<span class="number">1</span>).<span class="ident">assert_first_row</span>(<span class="ident">assertions</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ResultSetExt</span> <span class="kw">for</span> <span class="ident">ResultSet</span> {
-    <span class="kw">fn</span> <span class="ident">assert_row_count</span>(<span class="self">self</span>, <span class="ident">expected_count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">len</span>(), <span class="ident">expected_count</span>);
-
-        <span class="self">self</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">assert_row</span>(<span class="self">self</span>, <span class="ident">rowidx</span>: <span class="ident">usize</span>, <span class="ident">assertions</span>: <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FnOnce</span>(<span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">assertion</span> <span class="op">=</span> <span class="ident">RowAssertion</span>(<span class="self">self</span>.<span class="ident">get</span>(<span class="ident">rowidx</span>).<span class="ident">unwrap</span>());
-
-        <span class="ident">assertions</span>(<span class="ident">assertion</span>);
-        <span class="self">self</span>
+    <span class="kw">fn </span>assert_single_row(<span class="self">self</span>, assertions: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.assert_row_count(<span class="number">1</span>).assert_first_row(assertions)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ResultRowRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>);
+<span class="kw">impl </span>ResultSetExt <span class="kw">for </span>ResultSet {
+    <span class="kw">fn </span>assert_row_count(<span class="self">self</span>, expected_count: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.len(), expected_count);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RowAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_array_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_value</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_value</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">column_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">col</span> {
-            <span class="ident">Value::Array</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">as_ref</span>(),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;as_array&quot;</span>),
+        <span class="self">self
+    </span>}
+
+    <span class="kw">fn </span>assert_row(<span class="self">self</span>, rowidx: usize, assertions: <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; FnOnce(RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>assertion = RowAssertion(<span class="self">self</span>.get(rowidx).unwrap());
+
+        assertions(assertion);
+        <span class="self">self
+    </span>}
+}
+
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt;(ResultRowRef&lt;<span class="lifetime">&#39;a</span>&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RowAssertion&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>assert_array_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| <span class="kw">match </span>col {
+            Value::Array(x) =&gt; x.as_ref(),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;as_array&quot;</span>),
         });
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">actual_value</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_ref</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">expected_value</span>),
+            actual_value.map(|v| v.as_ref()),
+            <span class="prelude-val">Some</span>(expected_value),
             <span class="string">&quot;Value assertion failed for {}. Expected: {:?}, got: {:?}&quot;</span>,
-            <span class="ident">column_name</span>,
-            <span class="ident">expected_value</span>,
-            <span class="ident">actual_value</span>,
+            column_name,
+            expected_value,
+            actual_value,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_datetime_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_value</span>: <span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">chrono::Utc</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_value</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">column_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">as_datetime</span>());
+    <span class="kw">pub fn </span>assert_datetime_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: chrono::DateTime&lt;chrono::Utc&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| col.as_datetime());
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">actual_value</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">expected_value</span>),
+            actual_value,
+            <span class="prelude-val">Some</span>(expected_value),
             <span class="string">&quot;Value assertion failed for {}. Expected: {:?}, got: {:?}&quot;</span>,
-            <span class="ident">column_name</span>,
-            <span class="ident">expected_value</span>,
-            <span class="ident">actual_value</span>,
+            column_name,
+            expected_value,
+            actual_value,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::float_cmp</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_float_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_value</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_value</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="number">0</span>
-            .<span class="ident">get</span>(<span class="ident">column_name</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">as_f64</span>())
-            .<span class="ident">expect</span>(<span class="string">&quot;Failed to extract f64&quot;</span>);
+    <span class="attribute">#[allow(clippy::float_cmp)]
+    </span><span class="kw">pub fn </span>assert_float_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: f64) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_value = <span class="self">self
+            </span>.<span class="number">0
+            </span>.get(column_name)
+            .and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| col.as_f64())
+            .expect(<span class="string">&quot;Failed to extract f64&quot;</span>);
 
         <span class="macro">assert!</span>(
-            <span class="ident">actual_value</span> <span class="op">==</span> <span class="ident">expected_value</span>,
+            actual_value == expected_value,
             <span class="string">&quot;Value assertion failed for {}. Expected: {:?}, got: {:?}&quot;</span>,
-            <span class="ident">column_name</span>,
-            <span class="ident">expected_value</span>,
-            <span class="ident">actual_value</span>,
+            column_name,
+            expected_value,
+            actual_value,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_null_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">column_name</span>).<span class="ident">expect</span>(<span class="string">&quot;not in result set&quot;</span>).<span class="ident">is_null</span>() {
-            <span class="macro">panic!</span>(<span class="string">&quot;Expected a null value for {}, but got something else.&quot;</span>, <span class="ident">column_name</span>)
+    <span class="kw">pub fn </span>assert_null_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>!<span class="self">self</span>.<span class="number">0</span>.get(column_name).expect(<span class="string">&quot;not in result set&quot;</span>).is_null() {
+            <span class="macro">panic!</span>(<span class="string">&quot;Expected a null value for {}, but got something else.&quot;</span>, column_name)
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_text_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">column_name</span>).<span class="ident">expect</span>(<span class="string">&quot;Expected a value, found none&quot;</span>);
-        <span class="kw">let</span> <span class="ident">value_text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Text</span>(<span class="ident">val</span>) <span class="op">|</span> <span class="ident">Value::Enum</span>(<span class="ident">val</span>) =&gt; <span class="ident">val</span>.<span class="ident">as_deref</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>assert_text_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).expect(<span class="string">&quot;Expected a value, found none&quot;</span>);
+        <span class="kw">let </span>value_text: <span class="kw-2">&amp;</span>str = <span class="kw">match </span>value {
+            Value::Text(val) | Value::Enum(val) =&gt; val.as_deref(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
-        .<span class="ident">expect</span>(<span class="string">&quot;Expected a string value&quot;</span>);
+        .expect(<span class="string">&quot;Expected a string value&quot;</span>);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">value_text</span>, <span class="ident">expected_value</span>,
+            value_text, expected_value,
             <span class="string">&quot;Value assertion failed for {}. Expected: {:?}, got: {:?}&quot;</span>,
-            <span class="ident">column_name</span>, <span class="ident">expected_value</span>, <span class="ident">value_text</span>,
+            column_name, expected_value, value_text,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_int_value</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_value</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">actual_value</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">column_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">col</span>).<span class="ident">as_integer</span>());
+    <span class="kw">pub fn </span>assert_int_value(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str, expected_value: i64) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>actual_value = <span class="self">self</span>.<span class="number">0</span>.get(column_name).and_then(|col: <span class="kw-2">&amp;</span>Value&lt;<span class="lifetime">&#39;_</span>&gt;| (<span class="kw-2">*</span>col).as_integer());
 
         <span class="macro">assert!</span>(
-            <span class="ident">actual_value</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">expected_value</span>),
+            actual_value == <span class="prelude-val">Some</span>(expected_value),
             <span class="string">&quot;Value assertion failed for {}. Expected: {:?}, got: {:?}&quot;</span>,
-            <span class="ident">column_name</span>,
-            <span class="ident">expected_value</span>,
-            <span class="ident">actual_value</span>,
+            column_name,
+            expected_value,
+            actual_value,
         );
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_async/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/query.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_async/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -498,505 +498,505 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
+<span class="kw">use </span>futures_util::FutureExt;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">connection_like::ToConnectionResult</span>,
-    <span class="ident">from_row</span>,
-    <span class="ident">prelude</span>::{<span class="ident">FromRow</span>, <span class="ident">StatementLike</span>, <span class="ident">ToConnection</span>},
-    <span class="ident">BinaryProtocol</span>, <span class="ident">BoxFuture</span>, <span class="ident">Params</span>, <span class="ident">QueryResult</span>, <span class="ident">ResultSetStream</span>, <span class="ident">TextProtocol</span>,
+<span class="kw">use crate</span>::{
+    connection_like::ToConnectionResult,
+    from_row,
+    prelude::{FromRow, StatementLike, ToConnection},
+    BinaryProtocol, BoxFuture, Params, QueryResult, ResultSetStream, TextProtocol,
 };
 
-<span class="doccomment">/// Types that can be treated as a MySQL query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is implemented by all &quot;string-ish&quot; standard library types, like `String`, `&amp;str`,</span>
-<span class="doccomment">/// `Cow&lt;str&gt;`, but also all types that can be treated as a slice of bytes (such as `Vec&lt;u8&gt;` and</span>
-<span class="doccomment">/// `&amp;[u8]`), since MySQL does not require queries to be valid UTF-8.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsQuery</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="kw">fn</span> <span class="ident">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>;
+<span class="doccomment">/// Types that can be treated as a MySQL query.
+///
+/// This trait is implemented by all &quot;string-ish&quot; standard library types, like `String`, `&amp;str`,
+/// `Cow&lt;str&gt;`, but also all types that can be treated as a slice of bytes (such as `Vec&lt;u8&gt;` and
+/// `&amp;[u8]`), since MySQL does not require queries to be valid UTF-8.
+</span><span class="kw">pub trait </span>AsQuery: Send + Sync {
+    <span class="kw">fn </span>as_query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">AsQuery</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> [<span class="ident">u8</span>] {
-    <span class="kw">fn</span> <span class="ident">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="self">self</span>)
+<span class="kw">impl </span>AsQuery <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>[u8] {
+    <span class="kw">fn </span>as_query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt; {
+        Cow::Borrowed(<span class="self">self</span>)
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_as_query_as_ref</span> {
+<span class="macro">macro_rules! </span>impl_as_query_as_ref {
     (<span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">AsQuery</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+        <span class="kw">impl </span>AsQuery <span class="kw">for </span><span class="macro-nonterminal">$</span><span class="kw">type </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt; {
+                Cow::Borrowed(<span class="self">self</span>.as_ref())
             }
         }
     };
 }
 
-<span class="macro">impl_as_query_as_ref!</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_ref!</span>(<span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_ref!</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_ref!</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_ref!</span>(<span class="ident">std::sync::Arc</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>);
+<span class="macro">impl_as_query_as_ref!</span>(Vec&lt;u8&gt;);
+<span class="macro">impl_as_query_as_ref!</span>(<span class="kw-2">&amp;</span>Vec&lt;u8&gt;);
+<span class="macro">impl_as_query_as_ref!</span>(Box&lt;[u8]&gt;);
+<span class="macro">impl_as_query_as_ref!</span>(Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt;);
+<span class="macro">impl_as_query_as_ref!</span>(std::sync::Arc&lt;[u8]&gt;);
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_as_query_as_bytes</span> {
+<span class="macro">macro_rules! </span>impl_as_query_as_bytes {
     (<span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">AsQuery</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-                <span class="ident">Cow::Borrowed</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>())
+        <span class="kw">impl </span>AsQuery <span class="kw">for </span><span class="macro-nonterminal">$</span><span class="kw">type </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">as_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, [u8]&gt; {
+                Cow::Borrowed(<span class="self">self</span>.as_bytes())
             }
         }
     };
 }
 
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="ident">String</span>);
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="kw-2">&amp;</span><span class="ident">String</span>);
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>);
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span>);
-<span class="macro">impl_as_query_as_bytes!</span>(<span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>);
+<span class="macro">impl_as_query_as_bytes!</span>(String);
+<span class="macro">impl_as_query_as_bytes!</span>(<span class="kw-2">&amp;</span>String);
+<span class="macro">impl_as_query_as_bytes!</span>(<span class="kw-2">&amp;</span>str);
+<span class="macro">impl_as_query_as_bytes!</span>(Box&lt;str&gt;);
+<span class="macro">impl_as_query_as_bytes!</span>(Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;);
+<span class="macro">impl_as_query_as_bytes!</span>(std::sync::Arc&lt;str&gt;);
 
-<span class="doccomment">/// MySql text query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait covers the set of `query*` methods on the `Queryable` trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {</span>
-<span class="doccomment">/// use mysql_async::*;</span>
-<span class="doccomment">/// use mysql_async::prelude::*;</span>
-<span class="doccomment">/// let pool = Pool::new(get_opts());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // text protocol query</span>
-<span class="doccomment">/// let num: Option&lt;u32&gt; = &quot;SELECT 42&quot;.first(&amp;pool).await?;</span>
-<span class="doccomment">/// assert_eq!(num, Some(42));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // binary protocol query (prepared statement)</span>
-<span class="doccomment">/// let row: Option&lt;(u32, String)&gt; = &quot;SELECT ?, ?&quot;.with((42, &quot;foo&quot;)).first(&amp;pool).await?;</span>
-<span class="doccomment">/// assert_eq!(row.unwrap(), (42, &quot;foo&quot;.into()));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Ok(()) }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Query</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="doccomment">/// Query protocol.</span>
-    <span class="kw">type</span> <span class="ident">Protocol</span>: <span class="ident"><span class="kw">crate</span>::prelude::Protocol</span>;
+<span class="doccomment">/// MySql text query.
+///
+/// This trait covers the set of `query*` methods on the `Queryable` trait.
+///
+/// Example:
+///
+/// ```rust
+/// # use mysql_async::test_misc::get_opts;
+/// # #[tokio::main]
+/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {
+/// use mysql_async::*;
+/// use mysql_async::prelude::*;
+/// let pool = Pool::new(get_opts());
+///
+/// // text protocol query
+/// let num: Option&lt;u32&gt; = &quot;SELECT 42&quot;.first(&amp;pool).await?;
+/// assert_eq!(num, Some(42));
+///
+/// // binary protocol query (prepared statement)
+/// let row: Option&lt;(u32, String)&gt; = &quot;SELECT ?, ?&quot;.with((42, &quot;foo&quot;)).first(&amp;pool).await?;
+/// assert_eq!(row.unwrap(), (42, &quot;foo&quot;.into()));
+///
+/// # Ok(()) }
+/// ```
+</span><span class="kw">pub trait </span>Query: Send + Sized {
+    <span class="doccomment">/// Query protocol.
+    </span><span class="kw">type </span>Protocol: <span class="kw">crate</span>::prelude::Protocol;
 
-    <span class="doccomment">/// This method corresponds to [`Queryable::query_iter`][query_iter].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query_iter]: crate::prelude::Queryable::query_iter</span>
-    <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident"><span class="self">Self</span>::Protocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+    <span class="doccomment">/// This method corresponds to [`Queryable::query_iter`][query_iter].
+    ///
+    /// [query_iter]: crate::prelude::Queryable::query_iter
+    </span><span class="kw">fn </span>run&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="self">Self</span>::Protocol&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>;
 
-    <span class="doccomment">/// This methods corresponds to [`Queryable::query_first`][query_first].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query_first]: crate::prelude::Queryable::query_first</span>
-    <span class="kw">fn</span> <span class="ident">first</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// This methods corresponds to [`Queryable::query_first`][query_first].
+    ///
+    /// [query_first]: crate::prelude::Queryable::query_first
+    </span><span class="kw">fn </span>first&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_empty</span>() {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="ident">result</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="ident">from_row</span>)
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.run(conn).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>output = <span class="kw">if </span>result.is_empty() {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                result.next().<span class="kw">await</span><span class="question-mark">?</span>.map(from_row)
             };
-            <span class="ident">result</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
+            result.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(output)
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="doccomment">/// This methods corresponds to [`Queryable::query`][query].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query]: crate::prelude::Queryable::query</span>
-    <span class="kw">fn</span> <span class="ident">fetch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// This methods corresponds to [`Queryable::query`][query].
+    ///
+    /// [query]: crate::prelude::Queryable::query
+    </span><span class="kw">fn </span>fetch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Vec&lt;T&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">collect_and_drop</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="kw">await</span> }.<span class="ident">boxed</span>()
+        <span class="kw">async move </span>{ <span class="self">self</span>.run(conn).<span class="kw">await</span><span class="question-mark">?</span>.collect_and_drop::&lt;T&gt;().<span class="kw">await </span>}.boxed()
     }
 
-    <span class="doccomment">/// This methods corresponds to [`Queryable::query_fold`][query_fold].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query_fold]: crate::prelude::Queryable::query_fold</span>
-    <span class="kw">fn</span> <span class="ident">reduce</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>, <span class="ident">init</span>: <span class="ident">U</span>, <span class="ident">next</span>: <span class="ident">F</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">U</span>, <span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="doccomment">/// This methods corresponds to [`Queryable::query_fold`][query_fold].
+    ///
+    /// [query_fold]: crate::prelude::Queryable::query_fold
+    </span><span class="kw">fn </span>reduce&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, U, F, C&gt;(<span class="self">self</span>, conn: C, init: U, next: F) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, U&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
+        F: FnMut(U, T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        U: Send + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">reduce_and_drop</span>(<span class="ident">init</span>, <span class="ident">next</span>).<span class="kw">await</span> }.<span class="ident">boxed</span>()
+        <span class="kw">async move </span>{ <span class="self">self</span>.run(conn).<span class="kw">await</span><span class="question-mark">?</span>.reduce_and_drop(init, next).<span class="kw">await </span>}.boxed()
     }
 
-    <span class="doccomment">/// This methods corresponds to [`Queryable::query_map`][query_map].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query_map]: crate::prelude::Queryable::query_map</span>
-    <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>, <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">F</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="doccomment">/// This methods corresponds to [`Queryable::query_map`][query_map].
+    ///
+    /// [query_map]: crate::prelude::Queryable::query_map
+    </span><span class="kw">fn </span>map&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, U, F, C&gt;(<span class="self">self</span>, conn: C, <span class="kw-2">mut </span>map: F) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Vec&lt;U&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
+        F: FnMut(T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        U: Send + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">map_and_drop</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">map</span>(<span class="ident">from_row</span>(<span class="ident">row</span>)))
-                .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.run(conn)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.map_and_drop(|row| map(from_row(row)))
+                .<span class="kw">await
+        </span>}
+        .boxed()
     }
 
-    <span class="doccomment">/// Returns a stream over the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method corresponds to [`QueryResult::stream_and_drop`][stream_and_drop].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [stream_and_drop]: crate::QueryResult::stream_and_drop</span>
-    <span class="kw">fn</span> <span class="ident">stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns a stream over the first result set.
+    ///
+    /// This method corresponds to [`QueryResult::stream_and_drop`][stream_and_drop].
+    ///
+    /// [stream_and_drop]: crate::QueryResult::stream_and_drop
+    </span><span class="kw">fn </span>stream&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, T, C&gt;(
         <span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="ident">C</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Protocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident"><span class="self">Self</span>::Protocol</span>: <span class="ident">Unpin</span>,
-        <span class="ident">T</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+        conn: C,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ResultSetStream&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, T, <span class="self">Self</span>::Protocol&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        <span class="self">Self</span>::Protocol: Unpin,
+        T: Unpin + FromRow + Send + <span class="lifetime">&#39;static</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">stream_and_drop</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">transpose</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;At least one result set is expected&quot;</span>)
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.run(conn)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.stream_and_drop()
+                .<span class="kw">await
+                </span>.transpose()
+                .expect(<span class="string">&quot;At least one result set is expected&quot;</span>)
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="doccomment">/// This method corresponds to [`Queryable::query_drop`][query_drop].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [query_drop]: crate::prelude::Queryable::query_drop</span>
-    <span class="kw">fn</span> <span class="ident">ignore</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="doccomment">/// This method corresponds to [`Queryable::query_drop`][query_drop].
+    ///
+    /// [query_drop]: crate::prelude::Queryable::query_drop
+    </span><span class="kw">fn </span>ignore&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ()&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">run</span>(<span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_result</span>().<span class="kw">await</span> }.<span class="ident">boxed</span>()
+        <span class="kw">async move </span>{ <span class="self">self</span>.run(conn).<span class="kw">await</span><span class="question-mark">?</span>.drop_result().<span class="kw">await </span>}.boxed()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Q</span>: <span class="ident">AsQuery</span><span class="op">&gt;</span> <span class="ident">Query</span> <span class="kw">for</span> <span class="ident">Q</span> {
-    <span class="kw">type</span> <span class="ident">Protocol</span> <span class="op">=</span> <span class="ident">TextProtocol</span>;
+<span class="kw">impl</span>&lt;Q: AsQuery&gt; Query <span class="kw">for </span>Q {
+    <span class="kw">type </span>Protocol = TextProtocol;
 
-    <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>run&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, TextProtocol&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">to_connection</span>() {
-                <span class="ident">ToConnectionResult::Immediate</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>,
-                <span class="ident">ToConnectionResult::Mediate</span>(<span class="ident">fut</span>) =&gt; <span class="ident">fut</span>.<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span>conn.to_connection() {
+                ToConnectionResult::Immediate(conn) =&gt; conn,
+                ToConnectionResult::Mediate(fut) =&gt; fut.<span class="kw">await</span><span class="question-mark">?</span>,
             };
-            <span class="ident">conn</span>.<span class="ident">raw_query</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::new</span>(<span class="ident">conn</span>))
+            conn.raw_query(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(QueryResult::new(conn))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 }
 
-<span class="doccomment">/// Representation of a prepared statement query.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See `BinQuery` for details.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryWithParams</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">Q</span>,
-    <span class="kw">pub</span> <span class="ident">params</span>: <span class="ident">P</span>,
+<span class="doccomment">/// Representation of a prepared statement query.
+///
+/// See `BinQuery` for details.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>QueryWithParams&lt;Q, P&gt; {
+    <span class="kw">pub </span>query: Q,
+    <span class="kw">pub </span>params: P,
 }
 
-<span class="doccomment">/// Helper, that constructs [`QueryWithParams`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WithParams</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">QueryWithParams</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Helper, that constructs [`QueryWithParams`].
+</span><span class="kw">pub trait </span>WithParams: Sized {
+    <span class="kw">fn </span>with&lt;P&gt;(<span class="self">self</span>, params: P) -&gt; QueryWithParams&lt;<span class="self">Self</span>, P&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StatementLike</span><span class="op">&gt;</span> <span class="ident">WithParams</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">QueryWithParams</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-        <span class="ident">QueryWithParams</span> {
-            <span class="ident">query</span>: <span class="self">self</span>,
-            <span class="ident">params</span>,
+<span class="kw">impl</span>&lt;T: StatementLike&gt; WithParams <span class="kw">for </span>T {
+    <span class="kw">fn </span>with&lt;P&gt;(<span class="self">self</span>, params: P) -&gt; QueryWithParams&lt;<span class="self">Self</span>, P&gt; {
+        QueryWithParams {
+            query: <span class="self">self</span>,
+            params,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Query</span> <span class="kw">for</span> <span class="ident">QueryWithParams</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Q</span>: <span class="ident">StatementLike</span>,
-    <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;Q, P&gt; Query <span class="kw">for </span>QueryWithParams&lt;Q, P&gt;
+<span class="kw">where
+    </span>Q: StatementLike,
+    P: Into&lt;Params&gt; + Send,
 {
-    <span class="kw">type</span> <span class="ident">Protocol</span> <span class="op">=</span> <span class="ident">BinaryProtocol</span>;
+    <span class="kw">type </span>Protocol = BinaryProtocol;
 
-    <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, <span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>run&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>, BinaryProtocol&gt;&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">to_connection</span>() {
-                <span class="ident">ToConnectionResult::Immediate</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>,
-                <span class="ident">ToConnectionResult::Mediate</span>(<span class="ident">fut</span>) =&gt; <span class="ident">fut</span>.<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span>conn.to_connection() {
+                ToConnectionResult::Immediate(conn) =&gt; conn,
+                ToConnectionResult::Mediate(fut) =&gt; fut.<span class="kw">await</span><span class="question-mark">?</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">get_statement</span>(<span class="self">self</span>.<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>statement = conn.get_statement(<span class="self">self</span>.query).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="ident">conn</span>.<span class="ident">execute_statement</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">into</span>())
+            conn.execute_statement(<span class="kw-2">&amp;</span>statement, <span class="self">self</span>.params.into())
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::new</span>(<span class="ident">conn</span>))
+            <span class="prelude-val">Ok</span>(QueryResult::new(conn))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 }
 
-<span class="doccomment">/// Helper trait for batch statement execution.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait covers the [`Queryable::exec_batch`][exec_batch] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use mysql_async::test_misc::get_opts;</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {</span>
-<span class="doccomment">/// use mysql_async::*;</span>
-<span class="doccomment">/// use mysql_async::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool = Pool::new(get_opts());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This will prepare `DO ?` and execute `DO 0`, `DO 1`, `DO 2` and so on.</span>
-<span class="doccomment">/// &quot;DO ?&quot;</span>
-<span class="doccomment">///     .with((0..10).map(|x| (x,)))</span>
-<span class="doccomment">///     .batch(&amp;pool)</span>
-<span class="doccomment">///     .await?;</span>
-<span class="doccomment">/// # Ok(()) }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [exec_batch]: crate::prelude::Queryable::exec_batch</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BatchQuery</span> {
-    <span class="kw">fn</span> <span class="ident">batch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+<span class="doccomment">/// Helper trait for batch statement execution.
+///
+/// This trait covers the [`Queryable::exec_batch`][exec_batch] method.
+///
+/// Example:
+///
+/// ```rust
+/// # use mysql_async::test_misc::get_opts;
+/// # #[tokio::main]
+/// # async fn main() -&gt; mysql_async::Result&lt;()&gt; {
+/// use mysql_async::*;
+/// use mysql_async::prelude::*;
+///
+/// let pool = Pool::new(get_opts());
+///
+/// // This will prepare `DO ?` and execute `DO 0`, `DO 1`, `DO 2` and so on.
+/// &quot;DO ?&quot;
+///     .with((0..10).map(|x| (x,)))
+///     .batch(&amp;pool)
+///     .await?;
+/// # Ok(()) }
+/// ```
+///
+/// [exec_batch]: crate::prelude::Queryable::exec_batch
+</span><span class="kw">pub trait </span>BatchQuery {
+    <span class="kw">fn </span>batch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ()&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">I</span>, <span class="ident">P</span><span class="op">&gt;</span> <span class="ident">BatchQuery</span> <span class="kw">for</span> <span class="ident">QueryWithParams</span><span class="op">&lt;</span><span class="ident">Q</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Q</span>: <span class="ident">StatementLike</span>,
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-    <span class="ident">I::IntoIter</span>: <span class="ident">Send</span>,
-    <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="kw">impl</span>&lt;Q, I, P&gt; BatchQuery <span class="kw">for </span>QueryWithParams&lt;Q, I&gt;
+<span class="kw">where
+    </span>Q: StatementLike,
+    I: IntoIterator&lt;Item = P&gt; + Send,
+    I::IntoIter: Send,
+    P: Into&lt;Params&gt; + Send,
 {
-    <span class="kw">fn</span> <span class="ident">batch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
-        <span class="ident">C</span>: <span class="ident">ToConnection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>batch&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>: <span class="lifetime">&#39;a</span>, C&gt;(<span class="self">self</span>, conn: C) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ()&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: <span class="lifetime">&#39;a</span>,
+        C: ToConnection&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;t</span>&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">to_connection</span>() {
-                <span class="ident">ToConnectionResult::Immediate</span>(<span class="ident">conn</span>) =&gt; <span class="ident">conn</span>,
-                <span class="ident">ToConnectionResult::Mediate</span>(<span class="ident">fut</span>) =&gt; <span class="ident">fut</span>.<span class="kw">await</span><span class="question-mark">?</span>,
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span>conn.to_connection() {
+                ToConnectionResult::Immediate(conn) =&gt; conn,
+                ToConnectionResult::Mediate(fut) =&gt; fut.<span class="kw">await</span><span class="question-mark">?</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">get_statement</span>(<span class="self">self</span>.<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>statement = conn.get_statement(<span class="self">self</span>.query).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">for</span> <span class="ident">params</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">params</span> {
-                <span class="ident">conn</span>.<span class="ident">execute_statement</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">for </span>params <span class="kw">in </span><span class="self">self</span>.params {
+                conn.execute_statement(<span class="kw-2">&amp;</span>statement, params).<span class="kw">await</span><span class="question-mark">?</span>;
             }
 
             <span class="prelude-val">Ok</span>(())
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">test_misc::get_opts</span>, <span class="kw-2">*</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{prelude::<span class="kw-2">*</span>, test_misc::get_opts, <span class="kw-2">*</span>};
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_run_text_query</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query_static</span> <span class="op">=</span> <span class="string">&quot;SELECT 1, 2 UNION ALL SELECT 3, 4; SELECT 5, 6;&quot;</span>;
-        <span class="kw">let</span> <span class="ident">query_string</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="ident">query_static</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_run_text_query() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>query_static = <span class="string">&quot;SELECT 1, 2 UNION ALL SELECT 3, 4; SELECT 5, 6;&quot;</span>;
+        <span class="kw">let </span>query_string = String::from(query_static);
 
-        <span class="macro">macro_rules!</span> <span class="ident">test</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">run</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">result1</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">collect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">result2</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">collect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result1</span>, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
-                <span class="macro">assert_eq!</span>(<span class="ident">result2</span>, <span class="macro">vec!</span>[(<span class="number">5</span>, <span class="number">6</span>)]);
+        <span class="macro">macro_rules! </span>test {
+            (<span class="macro-nonterminal">$query</span>:expr, <span class="macro-nonterminal">$conn</span>:expr) =&gt; {{
+                <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro-nonterminal">$query</span>.run(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>result1: Vec&lt;(u8, u8)&gt; = result.collect().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>result2: Vec&lt;(u8, u8)&gt; = result.collect().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result1, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
+                <span class="macro">assert_eq!</span>(result2, <span class="macro">vec!</span>[(<span class="number">5</span>, <span class="number">6</span>)]);
 
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">ignore</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro-nonterminal">$query</span>.ignore(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">first</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Some</span>((<span class="number">1</span>, <span class="number">2</span>)));
+                <span class="kw">let </span>result: <span class="prelude-ty">Option</span>&lt;(u8, u8)&gt; = <span class="macro-nonterminal">$query</span>.first(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Some</span>((<span class="number">1</span>, <span class="number">2</span>)));
 
-                <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">fetch</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
+                <span class="kw">let </span>result: Vec&lt;(u8, u8)&gt; = <span class="macro-nonterminal">$query</span>.fetch(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
 
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>
-                    .<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>, <span class="op">|</span><span class="ident">row</span>: (<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">row</span>))
+                <span class="kw">let </span>result = <span class="macro-nonterminal">$query
+                    </span>.map(<span class="macro-nonterminal">$conn</span>, |row: (u8, u8)| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, row))
                     .<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;(1, 2)&quot;</span>), <span class="ident">String::from</span>(<span class="string">&quot;(3, 4)&quot;</span>)]);
+                <span class="macro">assert_eq!</span>(result, <span class="macro">vec!</span>[String::from(<span class="string">&quot;(1, 2)&quot;</span>), String::from(<span class="string">&quot;(3, 4)&quot;</span>)]);
 
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>
-                    .<span class="ident">reduce</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>, <span class="number">0_u8</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">row</span>: (<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">row</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">row</span>.<span class="number">1</span>)
+                <span class="kw">let </span>result = <span class="macro-nonterminal">$query
+                    </span>.reduce(<span class="macro-nonterminal">$conn</span>, <span class="number">0_u8</span>, |acc, row: (u8, u8)| acc + row.<span class="number">0 </span>+ row.<span class="number">1</span>)
                     .<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="number">10</span>);
+                <span class="macro">assert_eq!</span>(result, <span class="number">10</span>);
             }};
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="ident">query_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="ident">query_string</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = Conn::new(get_opts()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(query_static, <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(query_string.as_str(), <span class="kw-2">&amp;mut </span>conn);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>(<span class="ident">Default::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="ident">query_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="ident">query_string</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="ident">tx</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(Default::default()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(query_static, <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(query_string.as_str(), <span class="kw-2">&amp;mut </span>tx);
+        tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">conn</span>.<span class="ident">disconnect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        conn.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="ident">get_opts</span>());
-        <span class="macro">test!</span>(<span class="ident">query_static</span>, <span class="kw-2">&amp;</span><span class="ident">pool</span>);
-        <span class="macro">test!</span>(<span class="ident">query_string</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">pool</span>);
+        <span class="kw">let </span>pool = Pool::new(get_opts());
+        <span class="macro">test!</span>(query_static, <span class="kw-2">&amp;</span>pool);
+        <span class="macro">test!</span>(query_string.as_str(), <span class="kw-2">&amp;</span>pool);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">start_transaction</span>(<span class="ident">Default::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="ident">query_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="ident">query_string</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="ident">tx</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tx = pool.start_transaction(Default::default()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(query_static, <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(query_string.as_str(), <span class="kw-2">&amp;mut </span>tx);
+        tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">pool</span>.<span class="ident">disconnect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        pool.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_run_bin_query</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">macro_rules!</span> <span class="ident">query</span> {
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_run_bin_query() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="macro">macro_rules! </span>query {
             (@<span class="kw">static</span>) =&gt; {
-                <span class="string">&quot;SELECT ?, ? UNION ALL SELECT ?, ?&quot;</span>
+                <span class="string">&quot;SELECT ?, ? UNION ALL SELECT ?, ?&quot;
+            </span>};
+            (@string) =&gt; {
+                String::from(<span class="string">&quot;SELECT ?, ? UNION ALL SELECT ?, ?&quot;</span>)
             };
-            (@<span class="ident">string</span>) =&gt; {
-                <span class="ident">String::from</span>(<span class="string">&quot;SELECT ?, ? UNION ALL SELECT ?, ?&quot;</span>)
+            (@boxed) =&gt; {
+                <span class="macro">query!</span>(@string).into_boxed_str()
             };
-            (@<span class="ident">boxed</span>) =&gt; {
-                <span class="macro">query!</span>(@<span class="ident">string</span>).<span class="ident">into_boxed_str</span>()
-            };
-            (@<span class="ident">arc</span>) =&gt; {
-                <span class="ident">std::sync::Arc</span>::<span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="macro">query!</span>(@<span class="ident">boxed</span>))
+            (@arc) =&gt; {
+                std::sync::Arc::&lt;str&gt;::from(<span class="macro">query!</span>(@boxed))
             };
         }
 
-        <span class="kw">let</span> <span class="ident">query_string</span> <span class="op">=</span> <span class="macro">query!</span>(@<span class="ident">string</span>);
-        <span class="kw">let</span> <span class="ident">params_static</span> <span class="op">=</span> (<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>, <span class="string">&quot;4&quot;</span>);
-        <span class="kw">let</span> <span class="ident">params_string</span> <span class="op">=</span> (
-            <span class="string">&quot;1&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="string">&quot;2&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="string">&quot;3&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="string">&quot;4&quot;</span>.<span class="ident">to_owned</span>(),
+        <span class="kw">let </span>query_string = <span class="macro">query!</span>(@string);
+        <span class="kw">let </span>params_static = (<span class="string">&quot;1&quot;</span>, <span class="string">&quot;2&quot;</span>, <span class="string">&quot;3&quot;</span>, <span class="string">&quot;4&quot;</span>);
+        <span class="kw">let </span>params_string = (
+            <span class="string">&quot;1&quot;</span>.to_owned(),
+            <span class="string">&quot;2&quot;</span>.to_owned(),
+            <span class="string">&quot;3&quot;</span>.to_owned(),
+            <span class="string">&quot;4&quot;</span>.to_owned(),
         );
 
-        <span class="macro">macro_rules!</span> <span class="ident">test</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>) };
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">run</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">result1</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">collect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result1</span>, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
+        <span class="macro">macro_rules! </span>test {
+            (<span class="macro-nonterminal">$query</span>:expr, <span class="macro-nonterminal">$params</span>:expr, <span class="macro-nonterminal">$conn</span>:expr) =&gt; {{
+                <span class="kw">let </span>query = { <span class="macro-nonterminal">$query</span>.with(<span class="macro-nonterminal">$params</span>) };
+                <span class="kw">let </span><span class="kw-2">mut </span>result = query.run(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>result1: Vec&lt;(u8, u8)&gt; = result.collect().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result1, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
 
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>).<span class="ident">ignore</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro-nonterminal">$query</span>.with(<span class="macro-nonterminal">$params</span>).ignore(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>).<span class="ident">first</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Some</span>((<span class="number">1</span>, <span class="number">2</span>)));
+                <span class="kw">let </span>result: <span class="prelude-ty">Option</span>&lt;(u8, u8)&gt; = <span class="macro-nonterminal">$query</span>.with(<span class="macro-nonterminal">$params</span>).first(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Some</span>((<span class="number">1</span>, <span class="number">2</span>)));
 
-                <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>.<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>).<span class="ident">fetch</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
+                <span class="kw">let </span>result: Vec&lt;(u8, u8)&gt; = <span class="macro-nonterminal">$query</span>.with(<span class="macro-nonterminal">$params</span>).fetch(<span class="macro-nonterminal">$conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert_eq!</span>(result, <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">2</span>), (<span class="number">3</span>, <span class="number">4</span>)]);
 
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>
-                    .<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>)
-                    .<span class="ident">map</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>, <span class="op">|</span><span class="ident">row</span>: (<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">row</span>))
+                <span class="kw">let </span>result = <span class="macro-nonterminal">$query
+                    </span>.with(<span class="macro-nonterminal">$params</span>)
+                    .map(<span class="macro-nonterminal">$conn</span>, |row: (u8, u8)| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, row))
                     .<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="macro">vec!</span>[<span class="ident">String::from</span>(<span class="string">&quot;(1, 2)&quot;</span>), <span class="ident">String::from</span>(<span class="string">&quot;(3, 4)&quot;</span>)]);
+                <span class="macro">assert_eq!</span>(result, <span class="macro">vec!</span>[String::from(<span class="string">&quot;(1, 2)&quot;</span>), String::from(<span class="string">&quot;(3, 4)&quot;</span>)]);
 
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>
-                    .<span class="ident">with</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>)
-                    .<span class="ident">reduce</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>, <span class="number">0_u8</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">row</span>: (<span class="ident">u8</span>, <span class="ident">u8</span>)<span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">row</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">row</span>.<span class="number">1</span>)
+                <span class="kw">let </span>result = <span class="macro-nonterminal">$query
+                    </span>.with(<span class="macro-nonterminal">$params</span>)
+                    .reduce(<span class="macro-nonterminal">$conn</span>, <span class="number">0_u8</span>, |acc, row: (u8, u8)| acc + row.<span class="number">0 </span>+ row.<span class="number">1</span>)
                     .<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="number">10</span>);
+                <span class="macro">assert_eq!</span>(result, <span class="number">10</span>);
 
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">query</span>
-                    .<span class="ident">with</span>(<span class="macro">vec!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">params</span>])
-                    .<span class="ident">batch</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conn</span>)
+                <span class="macro-nonterminal">$query
+                    </span>.with(<span class="macro">vec!</span>[<span class="macro-nonterminal">$params</span>, <span class="macro-nonterminal">$params</span>, <span class="macro-nonterminal">$params</span>, <span class="macro-nonterminal">$params</span>])
+                    .batch(<span class="macro-nonterminal">$conn</span>)
                     .<span class="kw">await</span><span class="question-mark">?</span>;
             }};
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">prep</span>(<span class="macro">query!</span>(@<span class="kw">static</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), <span class="ident">params_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">string</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">boxed</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">arc</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">query_string</span>, <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
-        <span class="macro">test!</span>(<span class="ident">statement</span>.<span class="ident">clone</span>(), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = Conn::new(get_opts()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>statement = conn.prep(<span class="macro">query!</span>(@<span class="kw">static</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), params_static, <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@string), params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@boxed), params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@arc), params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>query_string, params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>statement, params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
+        <span class="macro">test!</span>(statement.clone(), params_string.clone(), <span class="kw-2">&amp;mut </span>conn);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>(<span class="ident">Default::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">string</span>), <span class="ident">params_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">query_string</span>, <span class="ident">params_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="ident">statement</span>.<span class="ident">clone</span>(), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="ident">tx</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tx = conn.start_transaction(Default::default()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), params_string.clone(), <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@string), params_static, <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>query_string, params_static, <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>statement, params_string.clone(), <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(statement.clone(), params_string.clone(), <span class="kw-2">&amp;mut </span>tx);
+        tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">conn</span>.<span class="ident">disconnect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        conn.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="ident">get_opts</span>());
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), <span class="ident">params_static</span>, <span class="kw-2">&amp;</span><span class="ident">pool</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">string</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">pool</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">query_string</span>, <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">pool</span>);
+        <span class="kw">let </span>pool = Pool::new(get_opts());
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), params_static, <span class="kw-2">&amp;</span>pool);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@string), params_string.clone(), <span class="kw-2">&amp;</span>pool);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>query_string, params_string.clone(), <span class="kw-2">&amp;</span>pool);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">start_transaction</span>(<span class="ident">Default::default</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), <span class="ident">params_string</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="ident">string</span>), <span class="ident">params_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="macro">test!</span>(<span class="kw-2">&amp;</span><span class="ident">query_string</span>, <span class="ident">params_static</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tx</span>);
-        <span class="ident">tx</span>.<span class="ident">rollback</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tx = pool.start_transaction(Default::default()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@<span class="kw">static</span>), params_string.clone(), <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(<span class="macro">query!</span>(@string), params_static, <span class="kw-2">&amp;mut </span>tx);
+        <span class="macro">test!</span>(<span class="kw-2">&amp;</span>query_string, params_static, <span class="kw-2">&amp;mut </span>tx);
+        tx.rollback().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">pool</span>.<span class="ident">disconnect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        pool.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

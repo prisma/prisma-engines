@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/builders/model_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/builders/model_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>model_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -48,55 +48,55 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FieldBuilder</span>, <span class="ident">IndexBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CompositeTypeRef</span>, <span class="ident">Fields</span>, <span class="ident">InternalDataModelWeakRef</span>, <span class="ident">Model</span>, <span class="ident">ModelRef</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::{FieldBuilder, IndexBuilder, PrimaryKeyBuilder};
+<span class="kw">use crate</span>::{CompositeTypeRef, Fields, InternalDataModelWeakRef, Model, ModelRef};
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModelBuilder</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldBuilder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">manifestation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKeyBuilder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">indexes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexBuilder</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">supports_create_operation</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">dml_model</span>: <span class="ident">psl::dml::Model</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ModelBuilder {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>fields: Vec&lt;FieldBuilder&gt;,
+    <span class="kw">pub </span>manifestation: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>primary_key: <span class="prelude-ty">Option</span>&lt;PrimaryKeyBuilder&gt;,
+    <span class="kw">pub </span>indexes: Vec&lt;IndexBuilder&gt;,
+    <span class="kw">pub </span>supports_create_operation: bool,
+    <span class="kw">pub </span>dml_model: psl::dml::Model,
 }
 
-<span class="kw">impl</span> <span class="ident">ModelBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
+<span class="kw">impl </span>ModelBuilder {
+    <span class="kw">pub fn </span>build(
         <span class="self">self</span>,
-        <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>,
-        <span class="ident">composite_types</span>: <span class="kw-2">&amp;</span>[<span class="ident">CompositeTypeRef</span>],
-    ) -&gt; <span class="ident">ModelRef</span> {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Model</span> {
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>,
-            <span class="ident">manifestation</span>: <span class="self">self</span>.<span class="ident">manifestation</span>,
-            <span class="ident">fields</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">indexes</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">primary_identifier</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">dml_model</span>: <span class="self">self</span>.<span class="ident">dml_model</span>,
-            <span class="ident">internal_data_model</span>,
-            <span class="ident">supports_create_operation</span>: <span class="self">self</span>.<span class="ident">supports_create_operation</span>,
+        internal_data_model: InternalDataModelWeakRef,
+        composite_types: <span class="kw-2">&amp;</span>[CompositeTypeRef],
+    ) -&gt; ModelRef {
+        <span class="kw">let </span>model = Arc::new(Model {
+            name: <span class="self">self</span>.name,
+            manifestation: <span class="self">self</span>.manifestation,
+            fields: OnceCell::new(),
+            indexes: OnceCell::new(),
+            primary_identifier: OnceCell::new(),
+            dml_model: <span class="self">self</span>.dml_model,
+            internal_data_model,
+            supports_create_operation: <span class="self">self</span>.supports_create_operation,
         });
 
-        <span class="kw">let</span> <span class="ident">all_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ft</span><span class="op">|</span> <span class="ident">ft</span>.<span class="ident">build</span>(<span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>).<span class="ident">into</span>(), <span class="ident">composite_types</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>all_fields: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+            </span>.fields
+            .into_iter()
+            .map(|ft| ft.build(Arc::downgrade(<span class="kw-2">&amp;</span>model).into(), composite_types))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">primary_key</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">all_fields</span>));
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Fields::new</span>(<span class="ident">all_fields</span>, <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">pk</span>);
+        <span class="kw">let </span>pk = <span class="self">self</span>.primary_key.map(|pk| pk.build(<span class="kw-2">&amp;</span>all_fields));
+        <span class="kw">let </span>fields = Fields::new(all_fields, Arc::downgrade(<span class="kw-2">&amp;</span>model), pk);
 
-        <span class="kw">let</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indexes</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="ident">fields</span>.<span class="ident">scalar</span>())).<span class="ident">collect</span>();
+        <span class="kw">let </span>indexes = <span class="self">self</span>.indexes.into_iter().map(|i| i.build(<span class="kw-2">&amp;</span>fields.scalar())).collect();
 
-        <span class="comment">// The model is created here and fields WILL BE UNSET before now!</span>
-        <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">set</span>(<span class="ident">fields</span>).<span class="ident">unwrap</span>();
-        <span class="ident">model</span>.<span class="ident">indexes</span>.<span class="ident">set</span>(<span class="ident">indexes</span>).<span class="ident">unwrap</span>();
-        <span class="ident">model</span>
+        <span class="comment">// The model is created here and fields WILL BE UNSET before now!
+        </span>model.fields.set(fields).unwrap();
+        model.indexes.set(indexes).unwrap();
+        model
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

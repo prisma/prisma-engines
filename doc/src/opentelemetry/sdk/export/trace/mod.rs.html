@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/export/trace/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/export/trace/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -148,153 +148,153 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Trace exporters</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">sdk</span>,
-    <span class="ident">trace</span>::{<span class="ident">Event</span>, <span class="ident">Link</span>, <span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>, <span class="ident">TraceError</span>},
+</pre><pre class="rust"><code><span class="doccomment">//! Trace exporters
+</span><span class="kw">use crate</span>::{
+    sdk,
+    trace::{Event, Link, SpanContext, SpanId, SpanKind, StatusCode, TraceError},
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+<span class="kw">use </span>async_trait::async_trait;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stdout</span>;
+<span class="kw">pub mod </span>stdout;
 
-<span class="doccomment">/// Describes the result of an export.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ExportResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TraceError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Describes the result of an export.
+</span><span class="kw">pub type </span>ExportResult = <span class="prelude-ty">Result</span>&lt;(), TraceError&gt;;
 
-<span class="doccomment">/// `SpanExporter` defines the interface that protocol-specific exporters must</span>
-<span class="doccomment">/// implement so that they can be plugged into OpenTelemetry SDK and support</span>
-<span class="doccomment">/// sending of telemetry data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The goal of the interface is to minimize burden of implementation for</span>
-<span class="doccomment">/// protocol-dependent telemetry exporters. The protocol exporter is expected to</span>
-<span class="doccomment">/// be primarily a simple telemetry data encoder and transmitter.</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SpanExporter</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Debug</span> {
-    <span class="doccomment">/// Exports a batch of readable spans. Protocol exporters that will</span>
-    <span class="doccomment">/// implement this function are typically expected to serialize and transmit</span>
-    <span class="doccomment">/// the data to the destination.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will never be called concurrently for the same exporter</span>
-    <span class="doccomment">/// instance. It can be called again only after the current call returns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function must not block indefinitely, there must be a reasonable</span>
-    <span class="doccomment">/// upper limit after which the call must time out with an error result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Any retry logic that is required by the exporter is the responsibility</span>
-    <span class="doccomment">/// of the exporter.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) -&gt; <span class="ident">ExportResult</span>;
+<span class="doccomment">/// `SpanExporter` defines the interface that protocol-specific exporters must
+/// implement so that they can be plugged into OpenTelemetry SDK and support
+/// sending of telemetry data.
+///
+/// The goal of the interface is to minimize burden of implementation for
+/// protocol-dependent telemetry exporters. The protocol exporter is expected to
+/// be primarily a simple telemetry data encoder and transmitter.
+</span><span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>SpanExporter: Send + Debug {
+    <span class="doccomment">/// Exports a batch of readable spans. Protocol exporters that will
+    /// implement this function are typically expected to serialize and transmit
+    /// the data to the destination.
+    ///
+    /// This function will never be called concurrently for the same exporter
+    /// instance. It can be called again only after the current call returns.
+    ///
+    /// This function must not block indefinitely, there must be a reasonable
+    /// upper limit after which the call must time out with an error result.
+    ///
+    /// Any retry logic that is required by the exporter is the responsibility
+    /// of the exporter.
+    </span><span class="kw">async fn </span>export(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: Vec&lt;SpanData&gt;) -&gt; ExportResult;
 
-    <span class="doccomment">/// Shuts down the exporter. Called when SDK is shut down. This is an</span>
-    <span class="doccomment">/// opportunity for exporter to do any cleanup required.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should be called only once for each `SpanExporter`</span>
-    <span class="doccomment">/// instance. After the call to `shutdown`, subsequent calls to `export` are</span>
-    <span class="doccomment">/// not allowed and should return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function should not block indefinitely (e.g. if it attempts to</span>
-    <span class="doccomment">/// flush the data and the destination is unavailable). SDK authors</span>
-    <span class="doccomment">/// can decide if they want to make the shutdown timeout</span>
-    <span class="doccomment">/// configurable.</span>
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+    <span class="doccomment">/// Shuts down the exporter. Called when SDK is shut down. This is an
+    /// opportunity for exporter to do any cleanup required.
+    ///
+    /// This function should be called only once for each `SpanExporter`
+    /// instance. After the call to `shutdown`, subsequent calls to `export` are
+    /// not allowed and should return an error.
+    ///
+    /// This function should not block indefinitely (e.g. if it attempts to
+    /// flush the data and the destination is unavailable). SDK authors
+    /// can decide if they want to make the shutdown timeout
+    /// configurable.
+    </span><span class="kw">fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 }
 
-<span class="doccomment">/// `SpanData` contains all the information collected by a `Span` and can be used</span>
-<span class="doccomment">/// by exporters as a standard input.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanData</span> {
-    <span class="doccomment">/// Exportable `SpanContext`</span>
-    <span class="kw">pub</span> <span class="ident">span_context</span>: <span class="ident">SpanContext</span>,
-    <span class="doccomment">/// Span parent id</span>
-    <span class="kw">pub</span> <span class="ident">parent_span_id</span>: <span class="ident">SpanId</span>,
-    <span class="doccomment">/// Span kind</span>
-    <span class="kw">pub</span> <span class="ident">span_kind</span>: <span class="ident">SpanKind</span>,
-    <span class="doccomment">/// Span name</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span start time</span>
-    <span class="kw">pub</span> <span class="ident">start_time</span>: <span class="ident">SystemTime</span>,
-    <span class="doccomment">/// Span end time</span>
-    <span class="kw">pub</span> <span class="ident">end_time</span>: <span class="ident">SystemTime</span>,
-    <span class="doccomment">/// Span attributes</span>
-    <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">sdk::trace::EvictedHashMap</span>,
-    <span class="doccomment">/// Span events</span>
-    <span class="kw">pub</span> <span class="ident">events</span>: <span class="ident">sdk::trace::EvictedQueue</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span Links</span>
-    <span class="kw">pub</span> <span class="ident">links</span>: <span class="ident">sdk::trace::EvictedQueue</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span status code</span>
-    <span class="kw">pub</span> <span class="ident">status_code</span>: <span class="ident">StatusCode</span>,
-    <span class="doccomment">/// Span status message</span>
-    <span class="kw">pub</span> <span class="ident">status_message</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Resource contains attributes representing an entity that produced this span.</span>
-    <span class="kw">pub</span> <span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sdk::Resource</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Instrumentation library that produced this span</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">serde</span>(<span class="ident">skip</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">instrumentation_lib</span>: <span class="ident">sdk::InstrumentationLibrary</span>,
+<span class="doccomment">/// `SpanData` contains all the information collected by a `Span` and can be used
+/// by exporters as a standard input.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>SpanData {
+    <span class="doccomment">/// Exportable `SpanContext`
+    </span><span class="kw">pub </span>span_context: SpanContext,
+    <span class="doccomment">/// Span parent id
+    </span><span class="kw">pub </span>parent_span_id: SpanId,
+    <span class="doccomment">/// Span kind
+    </span><span class="kw">pub </span>span_kind: SpanKind,
+    <span class="doccomment">/// Span name
+    </span><span class="kw">pub </span>name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+    <span class="doccomment">/// Span start time
+    </span><span class="kw">pub </span>start_time: SystemTime,
+    <span class="doccomment">/// Span end time
+    </span><span class="kw">pub </span>end_time: SystemTime,
+    <span class="doccomment">/// Span attributes
+    </span><span class="kw">pub </span>attributes: sdk::trace::EvictedHashMap,
+    <span class="doccomment">/// Span events
+    </span><span class="kw">pub </span>events: sdk::trace::EvictedQueue&lt;Event&gt;,
+    <span class="doccomment">/// Span Links
+    </span><span class="kw">pub </span>links: sdk::trace::EvictedQueue&lt;Link&gt;,
+    <span class="doccomment">/// Span status code
+    </span><span class="kw">pub </span>status_code: StatusCode,
+    <span class="doccomment">/// Span status message
+    </span><span class="kw">pub </span>status_message: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+    <span class="doccomment">/// Resource contains attributes representing an entity that produced this span.
+    </span><span class="kw">pub </span>resource: <span class="prelude-ty">Option</span>&lt;Arc&lt;sdk::Resource&gt;&gt;,
+    <span class="doccomment">/// Instrumentation library that produced this span
+    </span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, serde(skip))]
+    </span><span class="kw">pub </span>instrumentation_lib: sdk::InstrumentationLibrary,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">TraceFlags</span>, <span class="ident">TraceId</span>, <span class="ident">TraceState</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::trace::{TraceFlags, TraceId, TraceState};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serialise</span>() {
-        <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="number">7</span>;
-        <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="number">99</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serialise() {
+        <span class="kw">let </span>trace_id = <span class="number">7</span>;
+        <span class="kw">let </span>span_id = <span class="number">99</span>;
 
-        <span class="kw">let</span> <span class="ident">trace_flags</span> <span class="op">=</span> <span class="ident">TraceFlags::default</span>();
-        <span class="kw">let</span> <span class="ident">remote</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">span_context</span> <span class="op">=</span> <span class="ident">SpanContext::new</span>(
-            <span class="ident">TraceId::from_u128</span>(<span class="ident">trace_id</span>),
-            <span class="ident">SpanId::from_u64</span>(<span class="ident">span_id</span>),
-            <span class="ident">trace_flags</span>,
-            <span class="ident">remote</span>,
-            <span class="ident">TraceState::default</span>(),
+        <span class="kw">let </span>trace_flags = TraceFlags::default();
+        <span class="kw">let </span>remote = <span class="bool-val">false</span>;
+        <span class="kw">let </span>span_context = SpanContext::new(
+            TraceId::from_u128(trace_id),
+            SpanId::from_u64(span_id),
+            trace_flags,
+            remote,
+            TraceState::default(),
         );
 
-        <span class="kw">let</span> <span class="ident">parent_span_id</span> <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">span_kind</span> <span class="op">=</span> <span class="ident">SpanKind::Client</span>;
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;foo/bar baz 人?!&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
-        <span class="kw">let</span> <span class="ident">end_time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
+        <span class="kw">let </span>parent_span_id = <span class="number">1</span>;
+        <span class="kw">let </span>span_kind = SpanKind::Client;
+        <span class="kw">let </span>name = <span class="string">&quot;foo/bar baz 人?!&quot;</span>.into();
+        <span class="kw">let </span>start_time = <span class="kw">crate</span>::time::now();
+        <span class="kw">let </span>end_time = <span class="kw">crate</span>::time::now();
 
-        <span class="kw">let</span> <span class="ident">capacity</span> <span class="op">=</span> <span class="number">3</span>;
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">sdk::trace::EvictedHashMap::new</span>(<span class="ident">capacity</span>, <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">events</span> <span class="op">=</span> <span class="ident">sdk::trace::EvictedQueue::new</span>(<span class="ident">capacity</span>);
-        <span class="kw">let</span> <span class="ident">links</span> <span class="op">=</span> <span class="ident">sdk::trace::EvictedQueue::new</span>(<span class="ident">capacity</span>);
+        <span class="kw">let </span>capacity = <span class="number">3</span>;
+        <span class="kw">let </span>attributes = sdk::trace::EvictedHashMap::new(capacity, <span class="number">0</span>);
+        <span class="kw">let </span>events = sdk::trace::EvictedQueue::new(capacity);
+        <span class="kw">let </span>links = sdk::trace::EvictedQueue::new(capacity);
 
-        <span class="kw">let</span> <span class="ident">status_code</span> <span class="op">=</span> <span class="ident">StatusCode::Ok</span>;
-        <span class="kw">let</span> <span class="ident">status_message</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">resource</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>status_code = StatusCode::Ok;
+        <span class="kw">let </span>status_message = <span class="string">&quot;&quot;</span>.into();
+        <span class="kw">let </span>resource = <span class="prelude-val">None</span>;
 
-        <span class="kw">let</span> <span class="ident">span_data</span> <span class="op">=</span> <span class="ident">SpanData</span> {
-            <span class="ident">span_context</span>,
-            <span class="ident">parent_span_id</span>: <span class="ident">SpanId::from_u64</span>(<span class="ident">parent_span_id</span>),
-            <span class="ident">span_kind</span>,
-            <span class="ident">name</span>,
-            <span class="ident">start_time</span>,
-            <span class="ident">end_time</span>,
-            <span class="ident">attributes</span>,
-            <span class="ident">events</span>,
-            <span class="ident">links</span>,
-            <span class="ident">status_code</span>,
-            <span class="ident">status_message</span>,
-            <span class="ident">resource</span>,
-            <span class="ident">instrumentation_lib</span>: <span class="ident">sdk::InstrumentationLibrary::new</span>(<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="kw">let </span>span_data = SpanData {
+            span_context,
+            parent_span_id: SpanId::from_u64(parent_span_id),
+            span_kind,
+            name,
+            start_time,
+            end_time,
+            attributes,
+            events,
+            links,
+            status_code,
+            status_message,
+            resource,
+            instrumentation_lib: sdk::InstrumentationLibrary::new(<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">span_data</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>encoded: Vec&lt;u8&gt; = bincode::serialize(<span class="kw-2">&amp;</span>span_data).unwrap();
 
-        <span class="kw">let</span> <span class="ident">decoded</span>: <span class="ident">SpanData</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>[..]).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>decoded: SpanData = bincode::deserialize(<span class="kw-2">&amp;</span>encoded[..]).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">span_data</span>, <span class="ident">decoded</span>);
+        <span class="macro">assert_eq!</span>(span_data, decoded);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

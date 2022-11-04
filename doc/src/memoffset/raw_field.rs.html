@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/raw_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/raw_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -115,122 +115,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Gilad Naaman, Ralf Jung</span>
-<span class="comment">//</span>
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
-<span class="comment">// in the Software without restriction, including without limitation the rights</span>
-<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
-<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span>
-<span class="comment">// furnished to do so, subject to the following conditions:</span>
-<span class="comment">//</span>
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
-<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
-<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
-<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
-<span class="comment">// SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Gilad Naaman, Ralf Jung
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the &quot;Software&quot;), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-<span class="doccomment">/// `addr_of!`, or just ref-then-cast when that is not available.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">raw_ref_macros</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__addr_of</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__priv::ptr::addr_of!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>)
+</span><span class="doccomment">/// `addr_of!`, or just ref-then-cast when that is not available.
+</span><span class="attribute">#[cfg(raw_ref_macros)]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__addr_of {
+    (<span class="macro-nonterminal">$path</span>:expr) =&gt; {{
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__priv::ptr::addr_of!</span>(<span class="macro-nonterminal">$path</span>)
     }};
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">raw_ref_macros</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__addr_of</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="comment">// This is UB because we create an intermediate reference to uninitialized memory.</span>
-        <span class="comment">// Nothing we can do about that without `addr_of!` though.</span>
-        <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">path</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
-    }};
+<span class="attribute">#[cfg(not(raw_ref_macros))]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__addr_of {
+    (<span class="macro-nonterminal">$path</span>:expr) =&gt; {{
+        <span class="comment">// This is UB because we create an intermediate reference to uninitialized memory.
+        // Nothing we can do about that without `addr_of!` though.
+        </span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$path </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_
+    </span>}};
 }
 
-<span class="doccomment">/// Deref-coercion protection macro.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">allow_clippy</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__field_check</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="comment">// Make sure the field actually exists. This line ensures that a</span>
-        <span class="comment">// compile-time error is generated if $field is accessed through a</span>
-        <span class="comment">// Deref impl.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unneeded_field_pattern</span>)]</span>
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="kw">_</span>, .. };
+<span class="doccomment">/// Deref-coercion protection macro.
+</span><span class="attribute">#[cfg(allow_clippy)]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__field_check {
+    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">path</span>, <span class="macro-nonterminal">$field</span>:tt) =&gt; {
+        <span class="comment">// Make sure the field actually exists. This line ensures that a
+        // compile-time error is generated if $field is accessed through a
+        // Deref impl.
+        </span><span class="attribute">#[allow(clippy::unneeded_field_pattern)]
+        </span><span class="kw">let </span><span class="macro-nonterminal">$</span><span class="kw">type </span>{ <span class="macro-nonterminal">$field</span>: <span class="kw">_</span>, .. };
     };
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">allow_clippy</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__field_check</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="comment">// Make sure the field actually exists. This line ensures that a</span>
-        <span class="comment">// compile-time error is generated if $field is accessed through a</span>
-        <span class="comment">// Deref impl.</span>
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>: <span class="kw">_</span>, .. };
-    };
-}
-
-<span class="doccomment">/// Deref-coercion protection macro.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__field_check_tuple</span> {
-    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="comment">// Make sure the type argument is a tuple</span>
-        <span class="kw">let</span> (<span class="kw">_</span>, ..): <span class="macro-nonterminal">$</span><span class="kw">type</span>;
+<span class="attribute">#[cfg(not(allow_clippy))]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__field_check {
+    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">path</span>, <span class="macro-nonterminal">$field</span>:tt) =&gt; {
+        <span class="comment">// Make sure the field actually exists. This line ensures that a
+        // compile-time error is generated if $field is accessed through a
+        // Deref impl.
+        </span><span class="kw">let </span><span class="macro-nonterminal">$</span><span class="kw">type </span>{ <span class="macro-nonterminal">$field</span>: <span class="kw">_</span>, .. };
     };
 }
 
-<span class="doccomment">/// Computes a const raw pointer to the given field of the given base pointer</span>
-<span class="doccomment">/// to the given parent type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `base` pointer *must not* be dangling, but it *may* point to</span>
-<span class="doccomment">/// uninitialized memory.</span>
-<span class="attribute">#[<span class="macro-nonterminal">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">raw_field</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="macro">_memoffset__field_check!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>; <span class="comment">// evaluate $base outside the `unsafe` block</span>
+<span class="doccomment">/// Deref-coercion protection macro.
+</span><span class="attribute">#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__field_check_tuple {
+    (<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>, <span class="macro-nonterminal">$field</span>:tt) =&gt; {
+        <span class="comment">// Make sure the type argument is a tuple
+        </span><span class="kw">let </span>(<span class="kw">_</span>, ..): <span class="macro-nonterminal">$</span><span class="kw">type</span>;
+    };
+}
 
-        <span class="comment">// Get the field address.</span>
-        <span class="comment">// Crucially, we know that this will not trigger a deref coercion because</span>
-        <span class="comment">// of the field check we did above.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span> <span class="comment">// for when the macro is used in an unsafe block</span>
-        <span class="kw">unsafe</span> {
-            <span class="macro">_memoffset__addr_of!</span>((<span class="kw-2">*</span>(<span class="ident">base</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)
+<span class="doccomment">/// Computes a const raw pointer to the given field of the given base pointer
+/// to the given parent type.
+///
+/// The `base` pointer *must not* be dangling, but it *may* point to
+/// uninitialized memory.
+</span><span class="attribute">#[<span class="macro-nonterminal">macro_export</span>(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>raw_field {
+    (<span class="macro-nonterminal">$base</span>:expr, <span class="macro-nonterminal">$parent</span>:path, <span class="macro-nonterminal">$field</span>:tt) =&gt; {{
+        <span class="macro">_memoffset__field_check!</span>(<span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$field</span>);
+        <span class="kw">let </span>base = <span class="macro-nonterminal">$base</span>; <span class="comment">// evaluate $base outside the `unsafe` block
+
+        // Get the field address.
+        // Crucially, we know that this will not trigger a deref coercion because
+        // of the field check we did above.
+        </span><span class="attribute">#[allow(unused_unsafe)] </span><span class="comment">// for when the macro is used in an unsafe block
+        </span><span class="kw">unsafe </span>{
+            <span class="macro">_memoffset__addr_of!</span>((<span class="kw-2">*</span>(base <span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$parent</span>)).<span class="macro-nonterminal">$field</span>)
         }
     }};
 }
 
-<span class="doccomment">/// Computes a const raw pointer to the given field of the given base pointer</span>
-<span class="doccomment">/// to the given parent tuple typle.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `base` pointer *must not* be dangling, but it *may* point to</span>
-<span class="doccomment">/// uninitialized memory.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tuple_ty</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">raw_field_tuple</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="macro">_memoffset__field_check_tuple!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>; <span class="comment">// evaluate $base outside the `unsafe` block</span>
+<span class="doccomment">/// Computes a const raw pointer to the given field of the given base pointer
+/// to the given parent tuple typle.
+///
+/// The `base` pointer *must not* be dangling, but it *may* point to
+/// uninitialized memory.
+</span><span class="attribute">#[cfg(tuple_ty)]
+#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>raw_field_tuple {
+    (<span class="macro-nonterminal">$base</span>:expr, <span class="macro-nonterminal">$parent</span>:ty, <span class="macro-nonterminal">$field</span>:tt) =&gt; {{
+        <span class="macro">_memoffset__field_check_tuple!</span>(<span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$field</span>);
+        <span class="kw">let </span>base = <span class="macro-nonterminal">$base</span>; <span class="comment">// evaluate $base outside the `unsafe` block
 
-        <span class="comment">// Get the field address.</span>
-        <span class="comment">// Crucially, we know that this will not trigger a deref coercion because</span>
-        <span class="comment">// of the field check we did above.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span> <span class="comment">// for when the macro is used in an unsafe block</span>
-        <span class="kw">unsafe</span> {
-            <span class="macro">_memoffset__addr_of!</span>((<span class="kw-2">*</span>(<span class="ident">base</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>)).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>)
+        // Get the field address.
+        // Crucially, we know that this will not trigger a deref coercion because
+        // of the field check we did above.
+        </span><span class="attribute">#[allow(unused_unsafe)] </span><span class="comment">// for when the macro is used in an unsafe block
+        </span><span class="kw">unsafe </span>{
+            <span class="macro">_memoffset__addr_of!</span>((<span class="kw-2">*</span>(base <span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$parent</span>)).<span class="macro-nonterminal">$field</span>)
         }
     }};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

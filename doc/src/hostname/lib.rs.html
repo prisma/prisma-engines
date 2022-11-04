@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hostname-0.3.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hostname/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hostname-0.3.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hostname/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -146,12 +146,12 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A crate with utilities to get and set the system&#39;s host name.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Examples</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">r#&quot;
+</pre><pre class="rust"><code><span class="doccomment">//! A crate with utilities to get and set the system&#39;s host name.
+//!
+//! ## Examples
+</span><span class="attribute">#![cfg_attr(
+    feature = <span class="string">&quot;set&quot;</span>,
+    doc = <span class="string">r#&quot;
 Set and get the host name:
 ```rust,no_run
 # use std::io;
@@ -166,11 +166,11 @@ assert_eq!(new_name, OsStr::new(&quot;potato&quot;));
 #    try_main().unwrap();
 # }
 ```
-&quot;#</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">r#&quot;
+&quot;#
+</span>)]
+#![cfg_attr(
+    not(feature = <span class="string">&quot;set&quot;</span>),
+    doc = <span class="string">r#&quot;
 Get the host name:
 ```rust,no_run
 # use std::io;
@@ -184,82 +184,82 @@ println!(&quot;{:?}&quot;, name);
 #    try_main().unwrap();
 # }
 ```
-&quot;#</span>
-)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/hostname/0.3.1&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(
-    <span class="ident">unused</span>,
-    <span class="ident">unused_imports</span>,
-    <span class="ident">unused_features</span>,
-    <span class="ident">bare_trait_objects</span>,
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">nonstandard_style</span>,
-    <span class="ident">dead_code</span>,
-    <span class="ident">deprecated</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">trivial_casts</span>,
-    <span class="ident">unused_import_braces</span>,
-    <span class="ident">unused_results</span>
-)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unknown_lints</span>, <span class="ident">unused_extern_crates</span>)]</span>
+&quot;#
+</span>)]
+#![doc(html_root_url = <span class="string">&quot;https://docs.rs/hostname/0.3.1&quot;</span>)]
+#![deny(
+    unused,
+    unused_imports,
+    unused_features,
+    bare_trait_objects,
+    missing_debug_implementations,
+    missing_docs,
+    nonstandard_style,
+    dead_code,
+    deprecated,
+    rust_2018_idioms,
+    trivial_casts,
+    unused_import_braces,
+    unused_results
+)]
+#![allow(unknown_lints, unused_extern_crates)]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">match_cfg</span>;
+#[macro_use]
+</span><span class="kw">extern crate </span>match_cfg;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
-<span class="kw">use</span> <span class="ident">std::ffi::OsString</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;set&quot;</span>)]
+</span><span class="kw">use </span>std::ffi::OsStr;
+<span class="kw">use </span>std::ffi::OsString;
+<span class="kw">use </span>std::io;
 
-<span class="macro">match_cfg!</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;redox&quot;</span>))]</span> =&gt; {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libc</span>;
+<span class="macro">match_cfg! </span>{
+    <span class="attribute">#[cfg(any(unix, target_os = <span class="string">&quot;redox&quot;</span>))] </span>=&gt; {
+        <span class="kw">extern crate </span>libc;
 
-        <span class="kw">mod</span> <span class="ident">nix</span>;
-        <span class="kw">use</span> <span class="ident">::nix</span> <span class="kw">as</span> <span class="ident">sys</span>;
+        <span class="kw">mod </span>nix;
+        <span class="kw">use </span>::nix <span class="kw">as </span>sys;
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span> =&gt; {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">winapi</span>;
+    <span class="attribute">#[cfg(target_os = <span class="string">&quot;windows&quot;</span>)] </span>=&gt; {
+        <span class="kw">extern crate </span>winapi;
 
-        <span class="kw">mod</span> <span class="ident">windows</span>;
-        <span class="kw">use</span> <span class="ident">::windows</span> <span class="kw">as</span> <span class="ident">sys</span>;
+        <span class="kw">mod </span>windows;
+        <span class="kw">use </span>::windows <span class="kw">as </span>sys;
     }
-    <span class="kw">_</span> =&gt; {
+    <span class="kw">_ </span>=&gt; {
         <span class="macro">compile_error!</span>(<span class="string">&quot;Unsupported target OS! Create an issue: https://github.com/svartalf/hostname/issues/new&quot;</span>);
     }
 }
 
-<span class="doccomment">/// Return the system hostname.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use std::io;</span>
-<span class="doccomment">/// # fn try_main() -&gt; io::Result&lt;()&gt; {</span>
-<span class="doccomment">/// let name = hostname::get()?;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// #    try_main().unwrap();</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Errors</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If this function encounters any form of error, an error</span>
-<span class="doccomment">/// variant will be returned; in practice it is rare to be happen.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
-    <span class="ident">sys::get</span>()
+<span class="doccomment">/// Return the system hostname.
+///
+/// ## Example
+///
+/// ```rust
+/// # use std::io;
+/// # fn try_main() -&gt; io::Result&lt;()&gt; {
+/// let name = hostname::get()?;
+/// # Ok(())
+/// # }
+/// # fn main() {
+/// #    try_main().unwrap();
+/// # }
+/// ```
+///
+/// ## Errors
+///
+/// If this function encounters any form of error, an error
+/// variant will be returned; in practice it is rare to be happen.
+</span><span class="kw">pub fn </span>get() -&gt; io::Result&lt;OsString&gt; {
+    sys::get()
 }
 
-<span class="doccomment">/// Set the system hostname.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function is available only with `set` feature enabled (**disabled** by</span>
-<span class="doccomment">/// default).</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">r#&quot;
+<span class="doccomment">/// Set the system hostname.
+///
+/// This function is available only with `set` feature enabled (**disabled** by
+/// default).
+</span><span class="attribute">#[cfg_attr(
+    feature = <span class="string">&quot;set&quot;</span>,
+    doc = <span class="string">r#&quot;
 ## Example
 
 ```rust,no_run
@@ -272,27 +272,27 @@ hostname::set(&quot;potato&quot;)?;
 #    try_main().unwrap();
 # }
 ```
-&quot;#</span>
-)]</span>
-<span class="doccomment">/// ## Errors</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In order to set new hostname, caller might need</span>
-<span class="doccomment">/// to have the corresponding privilege</span>
-<span class="doccomment">/// (`CAP_SYS_ADMIN` capability for Linux, administrator privileges for Windows,</span>
-<span class="doccomment">/// and so on).\</span>
-<span class="doccomment">/// An error variant will be returned if this function</span>
-<span class="doccomment">/// will encounter a permission error or any other form of error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Compatibility</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Will fail with a linkage error for Android API &lt; 23 (see [#9](https://github.com/svartalf/hostname/issues/9#issuecomment-563991112))</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">hostname</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">OsStr</span><span class="op">&gt;</span>,
+&quot;#
+</span>)]
+</span><span class="doccomment">/// ## Errors
+///
+/// In order to set new hostname, caller might need
+/// to have the corresponding privilege
+/// (`CAP_SYS_ADMIN` capability for Linux, administrator privileges for Windows,
+/// and so on).\
+/// An error variant will be returned if this function
+/// will encounter a permission error or any other form of error.
+///
+/// ## Compatibility
+///
+/// * Will fail with a linkage error for Android API &lt; 23 (see [#9](https://github.com/svartalf/hostname/issues/9#issuecomment-563991112))
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;set&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;set&quot;</span>)))]
+</span><span class="kw">pub fn </span>set&lt;T&gt;(hostname: T) -&gt; io::Result&lt;()&gt;
+<span class="kw">where
+    </span>T: AsRef&lt;OsStr&gt;,
 {
-    <span class="ident">sys::set</span>(<span class="ident">hostname</span>.<span class="ident">as_ref</span>())
+    sys::set(hostname.as_ref())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hostname" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hostname" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

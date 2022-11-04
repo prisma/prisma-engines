@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/loom/std/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/loom/std/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -106,113 +106,113 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;full&quot;</span>), <span class="ident">loom</span>), <span class="ident">allow</span>(<span class="ident">unused_imports</span>, <span class="ident">dead_code</span>))]</span>
+</pre><pre class="rust"><code><span class="attribute">#![cfg_attr(any(not(feature = <span class="string">&quot;full&quot;</span>), loom), allow(unused_imports, dead_code))]
 
-<span class="kw">mod</span> <span class="ident">atomic_ptr</span>;
-<span class="kw">mod</span> <span class="ident">atomic_u16</span>;
-<span class="kw">mod</span> <span class="ident">atomic_u32</span>;
-<span class="kw">mod</span> <span class="ident">atomic_u64</span>;
-<span class="kw">mod</span> <span class="ident">atomic_u8</span>;
-<span class="kw">mod</span> <span class="ident">atomic_usize</span>;
-<span class="kw">mod</span> <span class="ident">mutex</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parking_lot&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">parking_lot</span>;
-<span class="kw">mod</span> <span class="ident">unsafe_cell</span>;
+</span><span class="kw">mod </span>atomic_ptr;
+<span class="kw">mod </span>atomic_u16;
+<span class="kw">mod </span>atomic_u32;
+<span class="kw">mod </span>atomic_u64;
+<span class="kw">mod </span>atomic_u8;
+<span class="kw">mod </span>atomic_usize;
+<span class="kw">mod </span>mutex;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parking_lot&quot;</span>)]
+</span><span class="kw">mod </span>parking_lot;
+<span class="kw">mod </span>unsafe_cell;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">cell</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::unsafe_cell::UnsafeCell</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>cell {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">super</span>::unsafe_cell::UnsafeCell;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;net&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;process&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;signal&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>,
-))]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">future</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::AtomicWaker</span>;
+<span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;net&quot;</span>,
+    feature = <span class="string">&quot;process&quot;</span>,
+    feature = <span class="string">&quot;signal&quot;</span>,
+    feature = <span class="string">&quot;sync&quot;</span>,
+))]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>future {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::sync::AtomicWaker;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">hint</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std::hint::spin_loop</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>hint {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::hint::spin_loop;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">rand</span> {
-    <span class="kw">use</span> <span class="ident">std::collections::hash_map::RandomState</span>;
-    <span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">BuildHasher</span>, <span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-    <span class="kw">use</span> <span class="ident">std::sync::atomic::AtomicU32</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::Relaxed</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>rand {
+    <span class="kw">use </span>std::collections::hash_map::RandomState;
+    <span class="kw">use </span>std::hash::{BuildHasher, Hash, Hasher};
+    <span class="kw">use </span>std::sync::atomic::AtomicU32;
+    <span class="kw">use </span>std::sync::atomic::Ordering::Relaxed;
 
-    <span class="kw">static</span> <span class="ident">COUNTER</span>: <span class="ident">AtomicU32</span> <span class="op">=</span> <span class="ident">AtomicU32::new</span>(<span class="number">1</span>);
+    <span class="kw">static </span>COUNTER: AtomicU32 = AtomicU32::new(<span class="number">1</span>);
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">seed</span>() -&gt; <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="ident">rand_state</span> <span class="op">=</span> <span class="ident">RandomState::new</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>seed() -&gt; u64 {
+        <span class="kw">let </span>rand_state = RandomState::new();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">rand_state</span>.<span class="ident">build_hasher</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = rand_state.build_hasher();
 
-        <span class="comment">// Hash some unique-ish data to generate some new state</span>
-        <span class="ident">COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>).<span class="ident">hash</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>);
+        <span class="comment">// Hash some unique-ish data to generate some new state
+        </span>COUNTER.fetch_add(<span class="number">1</span>, Relaxed).hash(<span class="kw-2">&amp;mut </span>hasher);
 
-        <span class="comment">// Get the seed</span>
-        <span class="ident">hasher</span>.<span class="ident">finish</span>()
+        <span class="comment">// Get the seed
+        </span>hasher.finish()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">sync</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>sync {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::sync::{Arc, Weak};
 
-    <span class="comment">// Below, make sure all the feature-influenced types are exported for</span>
-    <span class="comment">// internal use. Note however that some are not _currently_ named by</span>
-    <span class="comment">// consuming code.</span>
+    <span class="comment">// Below, make sure all the feature-influenced types are exported for
+    // internal use. Note however that some are not _currently_ named by
+    // consuming code.
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parking_lot&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::parking_lot</span>::{
-        <span class="ident">Condvar</span>, <span class="ident">Mutex</span>, <span class="ident">MutexGuard</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>, <span class="ident">WaitTimeoutResult</span>,
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;parking_lot&quot;</span>)]
+    #[allow(unused_imports)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::parking_lot::{
+        Condvar, Mutex, MutexGuard, RwLock, RwLockReadGuard, WaitTimeoutResult,
     };
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parking_lot&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Condvar</span>, <span class="ident">MutexGuard</span>, <span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>, <span class="ident">WaitTimeoutResult</span>};
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;parking_lot&quot;</span>))]
+    #[allow(unused_imports)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::sync::{Condvar, MutexGuard, RwLock, RwLockReadGuard, WaitTimeoutResult};
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parking_lot&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::mutex::Mutex</span>;
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;parking_lot&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::mutex::Mutex;
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">atomic</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_ptr::AtomicPtr</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_u16::AtomicU16</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_u32::AtomicU32</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_u64::AtomicU64</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_u8::AtomicU8</span>;
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::std::atomic_usize::AtomicUsize</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>atomic {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_ptr::AtomicPtr;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_u16::AtomicU16;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_u32::AtomicU32;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_u64::AtomicU64;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_u8::AtomicU8;
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span><span class="kw">crate</span>::loom::std::atomic_usize::AtomicUsize;
 
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">fence</span>, <span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
+        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::sync::atomic::{fence, AtomicBool, Ordering};
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">sys</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() -&gt; <span class="ident">usize</span> {
-        <span class="ident">usize::max</span>(<span class="number">1</span>, <span class="ident">num_cpus::get</span>())
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>sys {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;rt-multi-thread&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>num_cpus() -&gt; usize {
+        usize::max(<span class="number">1</span>, num_cpus::get())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">num_cpus</span>() -&gt; <span class="ident">usize</span> {
-        <span class="number">1</span>
-    }
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;rt-multi-thread&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>num_cpus() -&gt; usize {
+        <span class="number">1
+    </span>}
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">thread</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">yield_now</span>() {
-        <span class="ident">std::hint::spin_loop</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>thread {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>yield_now() {
+        std::hint::spin_loop();
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">std::thread</span>::{
-        <span class="ident">current</span>, <span class="ident">panicking</span>, <span class="ident">park</span>, <span class="ident">park_timeout</span>, <span class="ident">sleep</span>, <span class="ident">spawn</span>, <span class="ident">Builder</span>, <span class="ident">JoinHandle</span>, <span class="ident">LocalKey</span>,
-        <span class="prelude-ty">Result</span>, <span class="ident">Thread</span>, <span class="ident">ThreadId</span>,
+    <span class="attribute">#[allow(unused_imports)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>std::thread::{
+        current, panicking, park, park_timeout, sleep, spawn, Builder, JoinHandle, LocalKey,
+        <span class="prelude-ty">Result</span>, Thread, ThreadId,
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

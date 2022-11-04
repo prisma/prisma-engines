@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/ptr/addr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>addr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/ptr/addr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>addr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bitvec/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/addr.md&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../../doc/ptr/addr.md&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">any</span>,
-	<span class="ident">fmt</span>::{
+</span><span class="kw">use </span>core::{
+	any,
+	fmt::{
 		<span class="self">self</span>,
-		<span class="ident">Debug</span>,
-		<span class="ident">Display</span>,
-		<span class="ident">Formatter</span>,
-		<span class="ident">Pointer</span>,
+		Debug,
+		Display,
+		Formatter,
+		Pointer,
 	},
-	<span class="ident">mem</span>,
-	<span class="ident">ptr::NonNull</span>,
+	mem,
+	ptr::NonNull,
 };
 
-<span class="kw">use</span> <span class="ident">tap</span>::{
-	<span class="ident">Pipe</span>,
-	<span class="ident">TryConv</span>,
+<span class="kw">use </span>tap::{
+	Pipe,
+	TryConv,
 };
-<span class="kw">use</span> <span class="ident">wyz</span>::{
-	<span class="ident">comu</span>::{
-		<span class="ident">Address</span>,
-		<span class="ident">Const</span>,
-		<span class="ident">Mut</span>,
-		<span class="ident">Mutability</span>,
+<span class="kw">use </span>wyz::{
+	comu::{
+		Address,
+		Const,
+		Mut,
+		Mutability,
 	},
-	<span class="ident">fmt::FmtForward</span>,
+	fmt::FmtForward,
 };
 
-<span class="doccomment">/// Ensures that an address is well-aligned to its referent type width.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_alignment</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-	<span class="ident">addr</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Mutability</span> {
-	<span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">addr</span>.<span class="ident">to_const</span>();
-	<span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="number">1</span>;
-	<span class="kw">if</span> <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&amp;</span> <span class="ident">mask</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-		<span class="prelude-val">Err</span>(<span class="ident">MisalignError</span> { <span class="ident">ptr</span> })
+<span class="doccomment">/// Ensures that an address is well-aligned to its referent type width.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>check_alignment&lt;M, T&gt;(
+	addr: Address&lt;M, T&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Address&lt;M, T&gt;, MisalignError&lt;T&gt;&gt;
+<span class="kw">where </span>M: Mutability {
+	<span class="kw">let </span>ptr = addr.to_const();
+	<span class="kw">let </span>mask = mem::align_of::&lt;T&gt;() - <span class="number">1</span>;
+	<span class="kw">if </span>ptr <span class="kw">as </span>usize &amp; mask != <span class="number">0 </span>{
+		<span class="prelude-val">Err</span>(MisalignError { ptr })
 	}
-	<span class="kw">else</span> {
-		<span class="prelude-val">Ok</span>(<span class="ident">addr</span>)
-	}
-}
-
-<span class="doccomment">/// Extension methods for raw pointers.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">AddressExt</span> {
-	<span class="doccomment">/// Tracks the original mutation capability of the source pointer.</span>
-	<span class="kw">type</span> <span class="ident">Permission</span>: <span class="ident">Mutability</span>;
-	<span class="doccomment">/// The type to which the pointer points.</span>
-	<span class="kw">type</span> <span class="ident">Referent</span>: <span class="ident">Sized</span>;
-
-	<span class="doccomment">/// Forcibly wraps a raw pointer as an `Address`, without handling errors.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// In debug builds, this panics on null or misaligned pointers. In release</span>
-	<span class="doccomment">/// builds, it is permitted to remove the error-handling codepaths and</span>
-	<span class="doccomment">/// assume these invariants are upheld by the caller.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The caller must ensure that this is only called on non-null,</span>
-	<span class="doccomment">/// well-aligned pointers. Pointers derived from Rust references or calls to</span>
-	<span class="doccomment">/// the Rust allocator API will always satisfy this.</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_address</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Permission</span>, <span class="ident"><span class="self">Self</span>::Referent</span><span class="op">&gt;</span>;
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AddressExt</span> <span class="kw">for</span> <span class="kw-2">*const</span> <span class="ident">T</span> {
-	<span class="kw">type</span> <span class="ident">Permission</span> <span class="op">=</span> <span class="ident">Const</span>;
-	<span class="kw">type</span> <span class="ident">Referent</span> <span class="op">=</span> <span class="ident">T</span>;
-
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_address</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">try_conv</span>::<span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
-				.<span class="ident">pipe</span>(<span class="ident">check_alignment</span>)
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
-		}
-		<span class="kw">else</span> {
-			<span class="ident">Address::new</span>(<span class="ident">NonNull::new_unchecked</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>))
-		}
+	<span class="kw">else </span>{
+		<span class="prelude-val">Ok</span>(addr)
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AddressExt</span> <span class="kw">for</span> <span class="kw-2">*mut</span> <span class="ident">T</span> {
-	<span class="kw">type</span> <span class="ident">Permission</span> <span class="op">=</span> <span class="ident">Mut</span>;
-	<span class="kw">type</span> <span class="ident">Referent</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="doccomment">/// Extension methods for raw pointers.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>AddressExt {
+	<span class="doccomment">/// Tracks the original mutation capability of the source pointer.
+	</span><span class="kw">type </span>Permission: Mutability;
+	<span class="doccomment">/// The type to which the pointer points.
+	</span><span class="kw">type </span>Referent: Sized;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_address</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) {
-			<span class="self">self</span>.<span class="ident">try_conv</span>::<span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
-				.<span class="ident">pipe</span>(<span class="ident">check_alignment</span>)
-				.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
+	<span class="doccomment">/// Forcibly wraps a raw pointer as an `Address`, without handling errors.
+	///
+	/// In debug builds, this panics on null or misaligned pointers. In release
+	/// builds, it is permitted to remove the error-handling codepaths and
+	/// assume these invariants are upheld by the caller.
+	///
+	/// ## Safety
+	///
+	/// The caller must ensure that this is only called on non-null,
+	/// well-aligned pointers. Pointers derived from Rust references or calls to
+	/// the Rust allocator API will always satisfy this.
+	</span><span class="kw">unsafe fn </span>into_address(<span class="self">self</span>) -&gt; Address&lt;<span class="self">Self</span>::Permission, <span class="self">Self</span>::Referent&gt;;
+}
+
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AddressExt <span class="kw">for </span><span class="kw-2">*const </span>T {
+	<span class="kw">type </span>Permission = Const;
+	<span class="kw">type </span>Referent = T;
+
+	<span class="kw">unsafe fn </span>into_address(<span class="self">self</span>) -&gt; Address&lt;Const, T&gt; {
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.try_conv::&lt;Address&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
+				.unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, err))
+				.pipe(check_alignment)
+				.unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, err))
 		}
-		<span class="kw">else</span> {
-			<span class="ident">Address::new</span>(<span class="ident">NonNull::new_unchecked</span>(<span class="self">self</span>))
+		<span class="kw">else </span>{
+			Address::new(NonNull::new_unchecked(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*mut </span>T))
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AddressExt</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {
-	<span class="kw">type</span> <span class="ident">Permission</span> <span class="op">=</span> <span class="ident">Const</span>;
-	<span class="kw">type</span> <span class="ident">Referent</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AddressExt <span class="kw">for </span><span class="kw-2">*mut </span>T {
+	<span class="kw">type </span>Permission = Mut;
+	<span class="kw">type </span>Referent = T;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_address</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Permission</span>, <span class="ident"><span class="self">Self</span>::Referent</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">into</span>()
+	<span class="kw">unsafe fn </span>into_address(<span class="self">self</span>) -&gt; Address&lt;Mut, T&gt; {
+		<span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) {
+			<span class="self">self</span>.try_conv::&lt;Address&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;&gt;()
+				.unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, err))
+				.pipe(check_alignment)
+				.unwrap_or_else(|err| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, err))
+		}
+		<span class="kw">else </span>{
+			Address::new(NonNull::new_unchecked(<span class="self">self</span>))
+		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AddressExt</span> <span class="kw">for</span> <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-	<span class="kw">type</span> <span class="ident">Permission</span> <span class="op">=</span> <span class="ident">Mut</span>;
-	<span class="kw">type</span> <span class="ident">Referent</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AddressExt <span class="kw">for </span><span class="kw-2">&amp;</span>T {
+	<span class="kw">type </span>Permission = Const;
+	<span class="kw">type </span>Referent = T;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_address</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Permission</span>, <span class="ident"><span class="self">Self</span>::Referent</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">into</span>()
+	<span class="kw">unsafe fn </span>into_address(<span class="self">self</span>) -&gt; Address&lt;<span class="self">Self</span>::Permission, <span class="self">Self</span>::Referent&gt; {
+		<span class="self">self</span>.into()
 	}
 }
 
-<span class="doccomment">/// The error produced when an address is insufficiently aligned to the width of</span>
-<span class="doccomment">/// its type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// The misaligned pointer.</span>
-	<span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">T</span>,
-}
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; AddressExt <span class="kw">for </span><span class="kw-2">&amp;mut </span>T {
+	<span class="kw">type </span>Permission = Mut;
+	<span class="kw">type </span>Referent = T;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// The minimum address alignment of `T` values.</span>
-	<span class="kw">const</span> <span class="ident">ALIGN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-	<span class="doccomment">/// The number of least-significant-bits of an address that must be `0` in</span>
-	<span class="doccomment">/// order for it to be validly aligned for `T`.</span>
-	<span class="kw">const</span> <span class="ident">CTTZ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::ALIGN</span>.<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;MisalignError&quot;</span>)
-			.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">fmt_pointer</span>())
-			.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::ALIGN</span>)
-			.<span class="ident">finish</span>()
+	<span class="kw">unsafe fn </span>into_address(<span class="self">self</span>) -&gt; Address&lt;<span class="self">Self</span>::Permission, <span class="self">Self</span>::Referent&gt; {
+		<span class="self">self</span>.into()
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="doccomment">/// The error produced when an address is insufficiently aligned to the width of
+/// its type.
+</span><span class="attribute">#[derive(Clone, Copy, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>MisalignError&lt;T&gt; {
+	<span class="doccomment">/// The misaligned pointer.
+	</span>ptr: <span class="kw-2">*const </span>T,
+}
+
+<span class="kw">impl</span>&lt;T&gt; MisalignError&lt;T&gt; {
+	<span class="doccomment">/// The minimum address alignment of `T` values.
+	</span><span class="kw">const </span>ALIGN: usize = mem::align_of::&lt;T&gt;();
+	<span class="doccomment">/// The number of least-significant-bits of an address that must be `0` in
+	/// order for it to be validly aligned for `T`.
+	</span><span class="kw">const </span>CTTZ: usize = <span class="self">Self</span>::ALIGN.trailing_zeros() <span class="kw">as </span>usize;
+}
+
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; Debug <span class="kw">for </span>MisalignError&lt;T&gt; {
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		fmt.debug_tuple(<span class="string">&quot;MisalignError&quot;</span>)
+			.field(<span class="kw-2">&amp;</span><span class="self">self</span>.ptr.fmt_pointer())
+			.field(<span class="kw-2">&amp;</span><span class="self">Self</span>::ALIGN)
+			.finish()
+	}
+}
+
+<span class="attribute">#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T&gt; Display <span class="kw">for </span>MisalignError&lt;T&gt; {
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
 		<span class="macro">write!</span>(
-			<span class="ident">fmt</span>,
+			fmt,
 			<span class="string">&quot;Type {} requires {}-byte alignment: address &quot;</span>,
-			<span class="ident">any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
-			<span class="ident"><span class="self">Self</span>::ALIGN</span>,
+			any::type_name::&lt;T&gt;(),
+			<span class="self">Self</span>::ALIGN,
 		)<span class="question-mark">?</span>;
-		<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ptr</span>, <span class="ident">fmt</span>)<span class="question-mark">?</span>;
-		<span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot; must clear its least {} bits&quot;</span>, <span class="ident"><span class="self">Self</span>::CTTZ</span>)
+		Pointer::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.ptr, fmt)<span class="question-mark">?</span>;
+		<span class="macro">write!</span>(fmt, <span class="string">&quot; must clear its least {} bits&quot;</span>, <span class="self">Self</span>::CTTZ)
 	}
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T&gt; Send <span class="kw">for </span>MisalignError&lt;T&gt; {}
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T&gt; Sync <span class="kw">for </span>MisalignError&lt;T&gt; {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">MisalignError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; std::error::Error <span class="kw">for </span>MisalignError&lt;T&gt; {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

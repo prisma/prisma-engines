@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/algorithm.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>algorithm.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -232,239 +232,239 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Radix-generic, optimized, integer-to-string conversion routines.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These routines are highly optimized: they unroll 4 loops at a time,</span>
-<span class="doccomment">//! using pre-computed base^2 tables.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [Algorithm.md](/docs/Algorithm.md) for a more detailed description of</span>
-<span class="doccomment">//! the algorithm choice here. See [Benchmarks.md](/docs/Benchmarks.md) for</span>
-<span class="doccomment">//! recent benchmark data.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Radix-generic, optimized, integer-to-string conversion routines.
+//!
+//! These routines are highly optimized: they unroll 4 loops at a time,
+//! using pre-computed base^2 tables.
+//!
+//! See [Algorithm.md](/docs/Algorithm.md) for a more detailed description of
+//! the algorithm choice here. See [Benchmarks.md](/docs/Benchmarks.md) for
+//! recent benchmark data.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+#![doc(hidden)]
 
-<span class="kw">use</span> <span class="ident">lexical_util::assert::debug_assert_radix</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::digit::digit_to_char</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::div128::u128_divrem</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::format</span>::{<span class="ident">radix_from_flags</span>, <span class="ident">NumberFormat</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">AsCast</span>, <span class="ident">UnsignedInteger</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::step::u64_step</span>;
+</span><span class="kw">use </span>lexical_util::assert::debug_assert_radix;
+<span class="kw">use </span>lexical_util::digit::digit_to_char;
+<span class="kw">use </span>lexical_util::div128::u128_divrem;
+<span class="kw">use </span>lexical_util::format::{radix_from_flags, NumberFormat};
+<span class="kw">use </span>lexical_util::num::{AsCast, UnsignedInteger};
+<span class="kw">use </span>lexical_util::step::u64_step;
 
-<span class="doccomment">/// Write 2 digits to buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe if `bytes` is large enough to hold 2 characters, `index &gt;= 2`,</span>
-<span class="doccomment">/// and if the 2 * remainder, or `r`, has it so `r + 1 &lt; table.len()`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">write_digits</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>);
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>);
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>.<span class="ident">len</span>());
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> <span class="op">+</span> <span class="number">1</span>]) };
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">table</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>]) };
+<span class="doccomment">/// Write 2 digits to buffer.
+///
+/// # Safety
+///
+/// Safe if `bytes` is large enough to hold 2 characters, `index &gt;= 2`,
+/// and if the 2 * remainder, or `r`, has it so `r + 1 &lt; table.len()`.
+</span><span class="macro">macro_rules! </span>write_digits {
+    (<span class="macro-nonterminal">$bytes</span>:ident, <span class="macro-nonterminal">$index</span>:ident, <span class="macro-nonterminal">$table</span>:ident, <span class="macro-nonterminal">$r</span>:ident) =&gt; {{
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$index </span>&gt;= <span class="number">2</span>);
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$bytes</span>.len() &gt;= <span class="number">2</span>);
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$r </span>+ <span class="number">1 </span>&lt; <span class="macro-nonterminal">$table</span>.len());
+        <span class="macro-nonterminal">$index </span>-= <span class="number">1</span>;
+        <span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$bytes</span>[<span class="macro-nonterminal">$index</span>] = <span class="macro-nonterminal">$table</span>[<span class="macro-nonterminal">$r </span>+ <span class="number">1</span>]) };
+        <span class="macro-nonterminal">$index </span>-= <span class="number">1</span>;
+        <span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$bytes</span>[<span class="macro-nonterminal">$index</span>] = <span class="macro-nonterminal">$table</span>[<span class="macro-nonterminal">$r</span>]) };
     }};
 }
 
-<span class="doccomment">/// Write 1 digit to buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe if `bytes` is large enough to hold 1 characters, and `r &lt; 36`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">write_digit</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span> <span class="op">&lt;</span> <span class="number">36</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bytes</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>]) <span class="op">=</span> <span class="ident">digit_to_char</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>) };
+<span class="doccomment">/// Write 1 digit to buffer.
+///
+/// # Safety
+///
+/// Safe if `bytes` is large enough to hold 1 characters, and `r &lt; 36`.
+</span><span class="macro">macro_rules! </span>write_digit {
+    (<span class="macro-nonterminal">$bytes</span>:ident, <span class="macro-nonterminal">$index</span>:ident, <span class="macro-nonterminal">$r</span>:ident) =&gt; {{
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$index </span>&gt;= <span class="number">1</span>);
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$bytes</span>.len() &gt;= <span class="number">1</span>);
+        <span class="macro">debug_assert!</span>(<span class="macro-nonterminal">$r </span>&lt; <span class="number">36</span>);
+        <span class="macro-nonterminal">$index </span>-= <span class="number">1</span>;
+        <span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(<span class="macro-nonterminal">$bytes</span>[<span class="macro-nonterminal">$index</span>]) = digit_to_char(<span class="macro-nonterminal">$r</span>) };
     }};
 }
 
-<span class="comment">// NOTE: Don&#39;t use too many generics:</span>
-<span class="comment">//  We don&#39;t need generics for most of the internal algorithms,</span>
-<span class="comment">//  and doing so kills performance. Why? I don&#39;t know, but assuming</span>
-<span class="comment">//  it messed with the compiler&#39;s code generation.</span>
+<span class="comment">// NOTE: Don&#39;t use too many generics:
+//  We don&#39;t need generics for most of the internal algorithms,
+//  and doing so kills performance. Why? I don&#39;t know, but assuming
+//  it messed with the compiler&#39;s code generation.
 
-<span class="doccomment">/// Write integral digits to buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This algorithm first writes 4, then 2 digits at a time, finally</span>
-<span class="doccomment">/// the last 1 or 2 digits, using power reduction to speed up the</span>
-<span class="doccomment">/// algorithm a lot.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is safe as long as the buffer is large enough to hold `T::MAX`</span>
-<span class="doccomment">/// digits in radix `N`.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_digits</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UnsignedInteger</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">radix</span>: <span class="ident">u32</span>,
-    <span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="kw-2">mut</span> <span class="ident">index</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">usize</span> {
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
+</span><span class="doccomment">/// Write integral digits to buffer.
+///
+/// This algorithm first writes 4, then 2 digits at a time, finally
+/// the last 1 or 2 digits, using power reduction to speed up the
+/// algorithm a lot.
+///
+/// # Safety
+///
+/// This is safe as long as the buffer is large enough to hold `T::MAX`
+/// digits in radix `N`.
+</span><span class="kw">unsafe fn </span>write_digits&lt;T: UnsignedInteger&gt;(
+    <span class="kw-2">mut </span>value: T,
+    radix: u32,
+    table: <span class="kw-2">&amp;</span>[u8],
+    buffer: <span class="kw-2">&amp;mut </span>[u8],
+    <span class="kw-2">mut </span>index: usize,
+) -&gt; usize {
+    debug_assert_radix(radix);
 
-    <span class="comment">// Pre-compute our powers of radix.</span>
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">T::from_u32</span>(<span class="ident">radix</span>);
-    <span class="kw">let</span> <span class="ident">radix2</span> <span class="op">=</span> <span class="ident">radix</span> <span class="op">*</span> <span class="ident">radix</span>;
-    <span class="kw">let</span> <span class="ident">radix4</span> <span class="op">=</span> <span class="ident">radix2</span> <span class="op">*</span> <span class="ident">radix2</span>;
+    <span class="comment">// Pre-compute our powers of radix.
+    </span><span class="kw">let </span>radix = T::from_u32(radix);
+    <span class="kw">let </span>radix2 = radix * radix;
+    <span class="kw">let </span>radix4 = radix2 * radix2;
 
-    <span class="comment">// SAFETY: All of these are safe for the buffer writes as long as</span>
-    <span class="comment">// the buffer is large enough to hold `T::MAX` digits in radix `N`.</span>
+    <span class="comment">// SAFETY: All of these are safe for the buffer writes as long as
+    // the buffer is large enough to hold `T::MAX` digits in radix `N`.
 
-    <span class="comment">// Decode 4 digits at a time.</span>
-    <span class="kw">while</span> <span class="ident">value</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">radix4</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">%</span> <span class="ident">radix4</span>;
-        <span class="ident">value</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix4</span>;
-        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> <span class="ident">usize::as_cast</span>(<span class="ident">T::TWO</span> <span class="op">*</span> (<span class="ident">r</span> <span class="op">/</span> <span class="ident">radix2</span>));
-        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">usize::as_cast</span>(<span class="ident">T::TWO</span> <span class="op">*</span> (<span class="ident">r</span> <span class="op">%</span> <span class="ident">radix2</span>));
+    // Decode 4 digits at a time.
+    </span><span class="kw">while </span>value &gt;= radix4 {
+        <span class="kw">let </span>r = value % radix4;
+        value /= radix4;
+        <span class="kw">let </span>r1 = usize::as_cast(T::TWO * (r / radix2));
+        <span class="kw">let </span>r2 = usize::as_cast(T::TWO * (r % radix2));
 
-        <span class="comment">// SAFETY: This is always safe, since the table is 2*radix^2, and</span>
-        <span class="comment">// r1 and r2 must be in the range [0, 2*radix^2-1), since the maximum</span>
-        <span class="comment">// value of r is `radix4-1`, which must have a div and r</span>
-        <span class="comment">// in the range [0, radix^2-1).</span>
-        <span class="macro">write_digits!</span>(<span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">table</span>, <span class="ident">r2</span>);
-        <span class="macro">write_digits!</span>(<span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">table</span>, <span class="ident">r1</span>);
+        <span class="comment">// SAFETY: This is always safe, since the table is 2*radix^2, and
+        // r1 and r2 must be in the range [0, 2*radix^2-1), since the maximum
+        // value of r is `radix4-1`, which must have a div and r
+        // in the range [0, radix^2-1).
+        </span><span class="macro">write_digits!</span>(buffer, index, table, r2);
+        <span class="macro">write_digits!</span>(buffer, index, table, r1);
     }
 
-    <span class="comment">// Decode 2 digits at a time.</span>
-    <span class="kw">while</span> <span class="ident">value</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">radix2</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">usize::as_cast</span>(<span class="ident">T::TWO</span> <span class="op">*</span> (<span class="ident">value</span> <span class="op">%</span> <span class="ident">radix2</span>));
-        <span class="ident">value</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix2</span>;
+    <span class="comment">// Decode 2 digits at a time.
+    </span><span class="kw">while </span>value &gt;= radix2 {
+        <span class="kw">let </span>r = usize::as_cast(T::TWO * (value % radix2));
+        value /= radix2;
 
-        <span class="comment">// SAFETY: this is always safe, since the table is 2*radix^2, and</span>
-        <span class="comment">// r must be in the range [0, 2*radix^2-1).</span>
-        <span class="macro">write_digits!</span>(<span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">table</span>, <span class="ident">r</span>);
+        <span class="comment">// SAFETY: this is always safe, since the table is 2*radix^2, and
+        // r must be in the range [0, 2*radix^2-1).
+        </span><span class="macro">write_digits!</span>(buffer, index, table, r);
     }
 
-    <span class="comment">// Decode last 2 digits.</span>
-    <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">radix</span> {
-        <span class="comment">// SAFETY: this is always safe, since value &lt; radix, so it must be &lt; 36.</span>
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">u32::as_cast</span>(<span class="ident">value</span>);
-        <span class="macro">write_digit!</span>(<span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">r</span>);
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">usize::as_cast</span>(<span class="ident">T::TWO</span> <span class="op">*</span> <span class="ident">value</span>);
-        <span class="comment">// SAFETY: this is always safe, since the table is 2*radix^2, and</span>
-        <span class="comment">// the value must &lt;= radix^2, so rem must be in the range</span>
-        <span class="comment">// [0, 2*radix^2-1).</span>
-        <span class="macro">write_digits!</span>(<span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">table</span>, <span class="ident">r</span>);
+    <span class="comment">// Decode last 2 digits.
+    </span><span class="kw">if </span>value &lt; radix {
+        <span class="comment">// SAFETY: this is always safe, since value &lt; radix, so it must be &lt; 36.
+        </span><span class="kw">let </span>r = u32::as_cast(value);
+        <span class="macro">write_digit!</span>(buffer, index, r);
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>r = usize::as_cast(T::TWO * value);
+        <span class="comment">// SAFETY: this is always safe, since the table is 2*radix^2, and
+        // the value must &lt;= radix^2, so rem must be in the range
+        // [0, 2*radix^2-1).
+        </span><span class="macro">write_digits!</span>(buffer, index, table, r);
     }
 
-    <span class="ident">index</span>
+    index
 }
 
-<span class="doccomment">/// Specialized digits writer for u128, since it writes at least step digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is safe as long as the buffer is large enough to hold `T::MAX`</span>
-<span class="doccomment">/// digits in radix `N`.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_step_digits</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UnsignedInteger</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">radix</span>: <span class="ident">u32</span>,
-    <span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">step</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">usize</span> {
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
+<span class="doccomment">/// Specialized digits writer for u128, since it writes at least step digits.
+///
+/// # Safety
+///
+/// This is safe as long as the buffer is large enough to hold `T::MAX`
+/// digits in radix `N`.
+</span><span class="kw">unsafe fn </span>write_step_digits&lt;T: UnsignedInteger&gt;(
+    value: T,
+    radix: u32,
+    table: <span class="kw-2">&amp;</span>[u8],
+    buffer: <span class="kw-2">&amp;mut </span>[u8],
+    index: usize,
+    step: usize,
+) -&gt; usize {
+    debug_assert_radix(radix);
 
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">index</span>;
-    <span class="comment">// SAFETY: safe as long as the call to write_step_digits is safe.</span>
-    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">write_digits</span>(<span class="ident">value</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">index</span>) };
-    <span class="comment">// Write the remaining 0 bytes.</span>
-    <span class="comment">// SAFETY: this is always safe since `end &lt; index &amp;&amp; index &lt; start`.</span>
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">saturating_sub</span>(<span class="ident">step</span>);
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="ident">end</span>..<span class="ident">index</span>]);
-        <span class="macro">slice_fill_unchecked!</span>(<span class="ident">zeros</span>, <span class="string">b&#39;0&#39;</span>);
+    <span class="kw">let </span>start = index;
+    <span class="comment">// SAFETY: safe as long as the call to write_step_digits is safe.
+    </span><span class="kw">let </span>index = <span class="kw">unsafe </span>{ write_digits(value, radix, table, buffer, index) };
+    <span class="comment">// Write the remaining 0 bytes.
+    // SAFETY: this is always safe since `end &lt; index &amp;&amp; index &lt; start`.
+    </span><span class="kw">let </span>end = start.saturating_sub(step);
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>zeros = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(buffer[end..index]);
+        <span class="macro">slice_fill_unchecked!</span>(zeros, <span class="string">b&#39;0&#39;</span>);
     }
 
-    <span class="ident">end</span>
+    end
 }
 
-<span class="doccomment">/// Optimized implementation for radix-N numbers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the buffer is large enough to hold as many digits</span>
-<span class="doccomment">/// that can be in the largest value of `T`, in radix `N`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">algorithm</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">UnsignedInteger</span>,
+<span class="doccomment">/// Optimized implementation for radix-N numbers.
+///
+/// # Safety
+///
+/// Safe as long as the buffer is large enough to hold as many digits
+/// that can be in the largest value of `T`, in radix `N`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub unsafe fn </span>algorithm&lt;T&gt;(value: T, radix: u32, table: <span class="kw-2">&amp;</span>[u8], buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize
+<span class="kw">where
+    </span>T: UnsignedInteger,
 {
-    <span class="comment">// This is so that radix^4 does not overflow, since 36^4 overflows a u16.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">T::BITS</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span>, <span class="string">&quot;Must have at least 32 bits in the input.&quot;</span>);
-    <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>);
+    <span class="comment">// This is so that radix^4 does not overflow, since 36^4 overflows a u16.
+    </span><span class="macro">debug_assert!</span>(T::BITS &gt;= <span class="number">32</span>, <span class="string">&quot;Must have at least 32 bits in the input.&quot;</span>);
+    debug_assert_radix(radix);
 
-    <span class="comment">// SAFETY: Both forms of unchecked indexing cannot overflow.</span>
-    <span class="comment">// The table always has 2*radix^2 elements, so it must be a legal index.</span>
-    <span class="comment">// The buffer is ensured to have at least `FORMATTED_SIZE` or</span>
-    <span class="comment">// `FORMATTED_SIZE_DECIMAL` characters, which is the maximum number of</span>
-    <span class="comment">// digits an integer of that size may write.</span>
-    <span class="kw">unsafe</span> { <span class="ident">write_digits</span>(<span class="ident">value</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">buffer</span>.<span class="ident">len</span>()) }
+    <span class="comment">// SAFETY: Both forms of unchecked indexing cannot overflow.
+    // The table always has 2*radix^2 elements, so it must be a legal index.
+    // The buffer is ensured to have at least `FORMATTED_SIZE` or
+    // `FORMATTED_SIZE_DECIMAL` characters, which is the maximum number of
+    // digits an integer of that size may write.
+    </span><span class="kw">unsafe </span>{ write_digits(value, radix, table, buffer, buffer.len()) }
 }
 
-<span class="doccomment">/// Optimized implementation for radix-N 128-bit numbers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the buffer is large enough to hold as many digits</span>
-<span class="doccomment">/// that can be in the largest value of `T`, in radix `N`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">algorithm_u128</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span>, <span class="kw">const</span> <span class="ident">MASK</span>: <span class="ident">u128</span>, <span class="kw">const</span> <span class="ident">SHIFT</span>: <span class="ident">i32</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="ident">u128</span>,
-    <span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-) -&gt; <span class="ident">usize</span> {
-    <span class="comment">//  NOTE:</span>
-    <span class="comment">//      Use the const version of radix for u64_step and u128_divrem</span>
-    <span class="comment">//      to ensure they&#39;re evaluated at compile time.</span>
-    <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
+<span class="doccomment">/// Optimized implementation for radix-N 128-bit numbers.
+///
+/// # Safety
+///
+/// Safe as long as the buffer is large enough to hold as many digits
+/// that can be in the largest value of `T`, in radix `N`.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub unsafe fn </span>algorithm_u128&lt;<span class="kw">const </span>FORMAT: u128, <span class="kw">const </span>MASK: u128, <span class="kw">const </span>SHIFT: i32&gt;(
+    value: u128,
+    table: <span class="kw-2">&amp;</span>[u8],
+    buffer: <span class="kw-2">&amp;mut </span>[u8],
+) -&gt; usize {
+    <span class="comment">//  NOTE:
+    //      Use the const version of radix for u64_step and u128_divrem
+    //      to ensure they&#39;re evaluated at compile time.
+    </span><span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt; {}.is_valid());
 
-    <span class="comment">// Quick approximations to make the algorithm **a lot** faster.</span>
-    <span class="comment">// If the value can be represented in a 64-bit integer, we can</span>
-    <span class="comment">// do this as a native integer.</span>
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">radix_from_flags</span>(<span class="ident">FORMAT</span>, <span class="ident">MASK</span>, <span class="ident">SHIFT</span>);
-    <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u64::MAX</span> <span class="kw">as</span> <span class="kw">_</span> {
-        <span class="comment">// SAFETY: safe if the buffer is large enough to hold the significant digits.</span>
-        <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">algorithm</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>) };
+    <span class="comment">// Quick approximations to make the algorithm **a lot** faster.
+    // If the value can be represented in a 64-bit integer, we can
+    // do this as a native integer.
+    </span><span class="kw">let </span>radix = radix_from_flags(FORMAT, MASK, SHIFT);
+    <span class="kw">if </span>value &lt;= u64::MAX <span class="kw">as _ </span>{
+        <span class="comment">// SAFETY: safe if the buffer is large enough to hold the significant digits.
+        </span><span class="kw">return unsafe </span>{ algorithm(value <span class="kw">as </span>u64, radix, table, buffer) };
     }
 
-    <span class="comment">// SAFETY: Both forms of unchecked indexing cannot overflow.</span>
-    <span class="comment">// The table always has 2*radix^2 elements, so it must be a legal index.</span>
-    <span class="comment">// The buffer is ensured to have at least `FORMATTED_SIZE` or</span>
-    <span class="comment">// `FORMATTED_SIZE_DECIMAL` characters, which is the maximum number of</span>
-    <span class="comment">// digits an integer of that size may write.</span>
+    <span class="comment">// SAFETY: Both forms of unchecked indexing cannot overflow.
+    // The table always has 2*radix^2 elements, so it must be a legal index.
+    // The buffer is ensured to have at least `FORMATTED_SIZE` or
+    // `FORMATTED_SIZE_DECIMAL` characters, which is the maximum number of
+    // digits an integer of that size may write.
 
-    <span class="comment">// We use a fast 128-bit division algorithm, described in depth</span>
-    <span class="comment">// in lexical_util/div128.</span>
+    // We use a fast 128-bit division algorithm, described in depth
+    // in lexical_util/div128.
 
-    <span class="comment">// Decode 4-digits at a time.</span>
-    <span class="comment">// To deal with internal 0 values or values with internal 0 digits set,</span>
-    <span class="comment">// we store the starting index, and if not all digits are written,</span>
-    <span class="comment">// we just skip down `digits` digits for the next value.</span>
-    <span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="ident">u64_step</span>(<span class="ident">radix_from_flags</span>(<span class="ident">FORMAT</span>, <span class="ident">MASK</span>, <span class="ident">SHIFT</span>));
-    <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">low</span>) <span class="op">=</span> <span class="ident">u128_divrem</span>(<span class="ident">value</span>, <span class="ident">radix_from_flags</span>(<span class="ident">FORMAT</span>, <span class="ident">MASK</span>, <span class="ident">SHIFT</span>));
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">len</span>();
-    <span class="ident">index</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">write_step_digits</span>(<span class="ident">low</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">step</span>) };
-    <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u64::MAX</span> <span class="kw">as</span> <span class="kw">_</span> {
-        <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="ident">write_digits</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">index</span>) };
+    // Decode 4-digits at a time.
+    // To deal with internal 0 values or values with internal 0 digits set,
+    // we store the starting index, and if not all digits are written,
+    // we just skip down `digits` digits for the next value.
+    </span><span class="kw">let </span>step = u64_step(radix_from_flags(FORMAT, MASK, SHIFT));
+    <span class="kw">let </span>(value, low) = u128_divrem(value, radix_from_flags(FORMAT, MASK, SHIFT));
+    <span class="kw">let </span><span class="kw-2">mut </span>index = buffer.len();
+    index = <span class="kw">unsafe </span>{ write_step_digits(low, radix, table, buffer, index, step) };
+    <span class="kw">if </span>value &lt;= u64::MAX <span class="kw">as _ </span>{
+        <span class="kw">return unsafe </span>{ write_digits(value <span class="kw">as </span>u64, radix, table, buffer, index) };
     }
 
-    <span class="comment">// Value has to be greater than 1.8e38</span>
-    <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">mid</span>) <span class="op">=</span> <span class="ident">u128_divrem</span>(<span class="ident">value</span>, <span class="ident">radix_from_flags</span>(<span class="ident">FORMAT</span>, <span class="ident">MASK</span>, <span class="ident">SHIFT</span>));
-    <span class="ident">index</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">write_step_digits</span>(<span class="ident">mid</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">index</span>, <span class="ident">step</span>) };
-    <span class="kw">if</span> <span class="ident">index</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">index</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">write_digits</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">radix</span>, <span class="ident">table</span>, <span class="ident">buffer</span>, <span class="ident">index</span>) };
+    <span class="comment">// Value has to be greater than 1.8e38
+    </span><span class="kw">let </span>(value, mid) = u128_divrem(value, radix_from_flags(FORMAT, MASK, SHIFT));
+    index = <span class="kw">unsafe </span>{ write_step_digits(mid, radix, table, buffer, index, step) };
+    <span class="kw">if </span>index != <span class="number">0 </span>{
+        index = <span class="kw">unsafe </span>{ write_digits(value <span class="kw">as </span>u64, radix, table, buffer, index) };
     }
 
-    <span class="ident">index</span>
+    index
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

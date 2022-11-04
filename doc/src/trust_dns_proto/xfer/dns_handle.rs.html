@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/dns_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/xfer/dns_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -91,98 +91,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! `DnsHandle` types perform conversions of the raw DNS messages before sending the messages on the specified streams.</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+</span><span class="doccomment">//! `DnsHandle` types perform conversions of the raw DNS messages before sending the messages on the specified streams.
+</span><span class="kw">use </span>std::error::Error;
 
-<span class="kw">use</span> <span class="ident">futures_util::stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">log::debug</span>;
-<span class="kw">use</span> <span class="ident">rand</span>;
+<span class="kw">use </span>futures_util::stream::Stream;
+<span class="kw">use </span>log::debug;
+<span class="kw">use </span>rand;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::op</span>::{<span class="ident">Message</span>, <span class="ident">MessageType</span>, <span class="ident">OpCode</span>, <span class="ident">Query</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsRequestOptions</span>, <span class="ident">DnsResponse</span>, <span class="ident">SerialMessage</span>};
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::op::{Message, MessageType, OpCode, Query};
+<span class="kw">use </span><span class="kw">crate</span>::xfer::{DnsRequest, DnsRequestOptions, DnsResponse, SerialMessage};
 
-<span class="comment">// TODO: this should be configurable</span>
-<span class="comment">// &gt; An EDNS buffer size of 1232 bytes will avoid fragmentation on nearly all current networks.</span>
-<span class="comment">// https://dnsflagday.net/2020/</span>
-<span class="kw">const</span> <span class="ident">MAX_PAYLOAD_LEN</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">1232</span>;
+<span class="comment">// TODO: this should be configurable
+// &gt; An EDNS buffer size of 1232 bytes will avoid fragmentation on nearly all current networks.
+// https://dnsflagday.net/2020/
+</span><span class="kw">const </span>MAX_PAYLOAD_LEN: u16 = <span class="number">1232</span>;
 
-<span class="doccomment">/// Implementations of Sinks for sending DNS messages</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DnsStreamHandle</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Send</span> {
-    <span class="doccomment">/// Sends a message to the Handle for delivery to the server.</span>
-    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="ident">SerialMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Implementations of Sinks for sending DNS messages
+</span><span class="kw">pub trait </span>DnsStreamHandle: <span class="lifetime">&#39;static </span>+ Send {
+    <span class="doccomment">/// Sends a message to the Handle for delivery to the server.
+    </span><span class="kw">fn </span>send(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buffer: SerialMessage) -&gt; <span class="prelude-ty">Result</span>&lt;(), ProtoError&gt;;
 }
 
-<span class="doccomment">/// A trait for implementing high level functions of DNS.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DnsHandle</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Unpin</span> {
-    <span class="doccomment">/// The associated response from the response stream, this should resolve to the Response messages</span>
-    <span class="kw">type</span> <span class="ident">Response</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
-    <span class="doccomment">/// Error of the response, generally this will be `ProtoError`</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="doccomment">/// A trait for implementing high level functions of DNS.
+</span><span class="kw">pub trait </span>DnsHandle: <span class="lifetime">&#39;static </span>+ Clone + Send + Sync + Unpin {
+    <span class="doccomment">/// The associated response from the response stream, this should resolve to the Response messages
+    </span><span class="kw">type </span>Response: Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, <span class="self">Self</span>::Error&gt;&gt; + Send + Unpin + <span class="lifetime">&#39;static</span>;
+    <span class="doccomment">/// Error of the response, generally this will be `ProtoError`
+    </span><span class="kw">type </span>Error: From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>;
 
-    <span class="doccomment">/// Only returns true if and only if this DNS handle is validating DNSSec.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the DnsHandle impl is wrapping other clients, then the correct option is to delegate the question to the wrapped client.</span>
-    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="doccomment">/// Only returns true if and only if this DNS handle is validating DNSSec.
+    ///
+    /// If the DnsHandle impl is wrapping other clients, then the correct option is to delegate the question to the wrapped client.
+    </span><span class="kw">fn </span>is_verifying_dnssec(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Allow for disabling EDNS</span>
-    <span class="kw">fn</span> <span class="ident">is_using_edns</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Allow for disabling EDNS
+    </span><span class="kw">fn </span>is_using_edns(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Send a message via the channel in the client</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `request` - the fully constructed Message to send, note that most implementations of</span>
-    <span class="doccomment">///               will most likely be required to rewrite the QueryId, do no rely on that as</span>
-    <span class="doccomment">///               being stable.</span>
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span>;
+    <span class="doccomment">/// Send a message via the channel in the client
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - the fully constructed Message to send, note that most implementations of
+    ///               will most likely be required to rewrite the QueryId, do no rely on that as
+    ///               being stable.
+    </span><span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt; + Unpin + Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: R) -&gt; <span class="self">Self</span>::Response;
 
-    <span class="doccomment">/// A *classic* DNS query</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is identical to `query`, but instead takes a `Query` object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `query` - the query to lookup</span>
-    <span class="doccomment">/// * `options` - options to use when constructing the message</span>
-    <span class="kw">fn</span> <span class="ident">lookup</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-        <span class="macro">debug!</span>(<span class="string">&quot;querying: {} {:?}&quot;</span>, <span class="ident">query</span>.<span class="ident">name</span>(), <span class="ident">query</span>.<span class="ident">query_type</span>());
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">DnsRequest::new</span>(<span class="ident">build_message</span>(<span class="ident">query</span>, <span class="ident">options</span>), <span class="ident">options</span>))
+    <span class="doccomment">/// A *classic* DNS query
+    ///
+    /// This is identical to `query`, but instead takes a `Query` object.
+    ///
+    /// # Arguments
+    ///
+    /// * `query` - the query to lookup
+    /// * `options` - options to use when constructing the message
+    </span><span class="kw">fn </span>lookup(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: Query, options: DnsRequestOptions) -&gt; <span class="self">Self</span>::Response {
+        <span class="macro">debug!</span>(<span class="string">&quot;querying: {} {:?}&quot;</span>, query.name(), query.query_type());
+        <span class="self">self</span>.send(DnsRequest::new(build_message(query, options), options))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">build_message</span>(<span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>) -&gt; <span class="ident">Message</span> {
-    <span class="comment">// build the message</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-    <span class="comment">// TODO: This is not the final ID, it&#39;s actually set in the poll method of DNS future</span>
-    <span class="comment">//  should we just remove this?</span>
-    <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">rand::random</span>();
-    <span class="ident">message</span>
-        .<span class="ident">add_query</span>(<span class="ident">query</span>)
-        .<span class="ident">set_id</span>(<span class="ident">id</span>)
-        .<span class="ident">set_message_type</span>(<span class="ident">MessageType::Query</span>)
-        .<span class="ident">set_op_code</span>(<span class="ident">OpCode::Query</span>)
-        .<span class="ident">set_recursion_desired</span>(<span class="bool-val">true</span>);
+<span class="kw">fn </span>build_message(query: Query, options: DnsRequestOptions) -&gt; Message {
+    <span class="comment">// build the message
+    </span><span class="kw">let </span><span class="kw-2">mut </span>message: Message = Message::new();
+    <span class="comment">// TODO: This is not the final ID, it&#39;s actually set in the poll method of DNS future
+    //  should we just remove this?
+    </span><span class="kw">let </span>id: u16 = rand::random();
+    message
+        .add_query(query)
+        .set_id(id)
+        .set_message_type(MessageType::Query)
+        .set_op_code(OpCode::Query)
+        .set_recursion_desired(<span class="bool-val">true</span>);
 
-    <span class="comment">// Extended dns</span>
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">use_edns</span> {
-        <span class="ident">message</span>
-            .<span class="ident">edns_mut</span>()
-            .<span class="ident">set_max_payload</span>(<span class="ident">MAX_PAYLOAD_LEN</span>)
-            .<span class="ident">set_version</span>(<span class="number">0</span>);
+    <span class="comment">// Extended dns
+    </span><span class="kw">if </span>options.use_edns {
+        message
+            .edns_mut()
+            .set_max_payload(MAX_PAYLOAD_LEN)
+            .set_version(<span class="number">0</span>);
     }
-    <span class="ident">message</span>
+    message
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

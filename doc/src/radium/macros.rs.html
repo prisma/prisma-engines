@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/radium-0.7.0/src/macros.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>macros.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../radium/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../radium/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -176,183 +176,183 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">radium_atomic_8</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_8</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> }
+</pre><pre class="rust"><code><span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(radium_atomic_8)]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_8 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$a</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">radium_atomic_8</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_8</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(not(radium_atomic_8))]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_8 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$b</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">radium_atomic_16</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_16</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(radium_atomic_16)]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_16 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$a</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">radium_atomic_16</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_16</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(not(radium_atomic_16))]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_16 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$b</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">radium_atomic_32</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_32</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(radium_atomic_32)]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_32 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$a</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">radium_atomic_32</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_32</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(not(radium_atomic_32))]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_32 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$b</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">radium_atomic_64</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_64</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(radium_atomic_64)]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_64 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$a</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">radium_atomic_64</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_64</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(not(radium_atomic_64))]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_64 {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$b</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">radium_atomic_ptr</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_ptr</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(radium_atomic_ptr)]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_ptr {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$a</span>)* }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">radium_atomic_ptr</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">__radium_if_atomic_ptr</span> {
-    ( [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span> )<span class="op">*</span> ] [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span> )<span class="op">*</span> ] ) =&gt; { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> }
+<span class="attribute">#[doc(hidden)]
+#[macro_export]
+#[cfg(not(radium_atomic_ptr))]
+</span><span class="macro">macro_rules! </span>__radium_if_atomic_ptr {
+    ( [ $( <span class="macro-nonterminal">$a</span>:tt )* ] [ $( <span class="macro-nonterminal">$b</span>:tt )* ] ) =&gt; { $(<span class="macro-nonterminal">$b</span>)* }
 }
 
-<span class="doccomment">/// Conditional compilation based on the presence of atomic instructions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro allows you to write `if`/`else` clauses, evaluated at</span>
-<span class="doccomment">/// compile-time, that test the presence of atomic instructions and preserve or</span>
-<span class="doccomment">/// destroy their guarded code accordingly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `if atomic(WIDTH)` test preserves the contents of its block when the</span>
-<span class="doccomment">/// target architecture has atomic instructions for the requested `WIDTH`, and</span>
-<span class="doccomment">/// removes them from the syntax tree when the target does not. If an `else`</span>
-<span class="doccomment">/// clause is provided, the contents of the `else` block are used as a</span>
-<span class="doccomment">/// substitute when the `if` is destroyed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro can be used in any position. When it is used in item or statement</span>
-<span class="doccomment">/// position, it can contain multiple `if` clauses, and each will be evaluated</span>
-<span class="doccomment">/// in turn. Expression and type positions can only accept exactly one code</span>
-<span class="doccomment">/// span, and so may only have exactly one `if`/`else` clause. An `else` clause</span>
-<span class="doccomment">/// is required here so that the macro will always expand to something; an empty</span>
-<span class="doccomment">/// expansion is a parse error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Macro Syntax</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The macro contents `if atomic() {} else {}` are part of the macro</span>
-<span class="doccomment">/// invocation. Only the contents of the two blocks are actual Rust code.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The acceptable arguments to `atomic()` are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `8`</span>
-<span class="doccomment">/// - `16`</span>
-<span class="doccomment">/// - `32`</span>
-<span class="doccomment">/// - `64`</span>
-<span class="doccomment">/// - `ptr`</span>
-<span class="doccomment">/// - `bool`: alias for `8`</span>
-<span class="doccomment">/// - `size`: alias for `ptr`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In addition, the `atomic()` test can be inverted, as `!atomic()`, to reverse</span>
-<span class="doccomment">/// the preserve/destroy behavior of the `if` and `else` blocks.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This demonstrates the use of `if_atomic!` to produce multiple statements,</span>
-<span class="doccomment">/// and then to produce a single type-name.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// radium::if_atomic! {</span>
-<span class="doccomment">///   if atomic(size) { use core::sync::atomic::AtomicUsize; }</span>
-<span class="doccomment">///   if !atomic(size) { use core::cell::Cell; }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// struct RadiumRc&lt;T: ?Sized&gt; {</span>
-<span class="doccomment">///   strong: radium::if_atomic! {</span>
-<span class="doccomment">///     if atomic(ptr) { AtomicUsize }</span>
-<span class="doccomment">///     else { Cell&lt;usize&gt; }</span>
-<span class="doccomment">///   },</span>
-<span class="doccomment">///   weak: radium::types::RadiumUsize,</span>
-<span class="doccomment">///   data: T,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">if_atomic</span> {
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">8</span>) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_8!</span> {
-            [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> ] [ $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> ]
+<span class="doccomment">/// Conditional compilation based on the presence of atomic instructions.
+///
+/// This macro allows you to write `if`/`else` clauses, evaluated at
+/// compile-time, that test the presence of atomic instructions and preserve or
+/// destroy their guarded code accordingly.
+///
+/// The `if atomic(WIDTH)` test preserves the contents of its block when the
+/// target architecture has atomic instructions for the requested `WIDTH`, and
+/// removes them from the syntax tree when the target does not. If an `else`
+/// clause is provided, the contents of the `else` block are used as a
+/// substitute when the `if` is destroyed.
+///
+/// This macro can be used in any position. When it is used in item or statement
+/// position, it can contain multiple `if` clauses, and each will be evaluated
+/// in turn. Expression and type positions can only accept exactly one code
+/// span, and so may only have exactly one `if`/`else` clause. An `else` clause
+/// is required here so that the macro will always expand to something; an empty
+/// expansion is a parse error.
+///
+/// # Macro Syntax
+///
+/// The macro contents `if atomic() {} else {}` are part of the macro
+/// invocation. Only the contents of the two blocks are actual Rust code.
+///
+/// The acceptable arguments to `atomic()` are:
+///
+/// - `8`
+/// - `16`
+/// - `32`
+/// - `64`
+/// - `ptr`
+/// - `bool`: alias for `8`
+/// - `size`: alias for `ptr`
+///
+/// In addition, the `atomic()` test can be inverted, as `!atomic()`, to reverse
+/// the preserve/destroy behavior of the `if` and `else` blocks.
+///
+/// # Examples
+///
+/// This demonstrates the use of `if_atomic!` to produce multiple statements,
+/// and then to produce a single type-name.
+///
+/// ```rust
+/// radium::if_atomic! {
+///   if atomic(size) { use core::sync::atomic::AtomicUsize; }
+///   if !atomic(size) { use core::cell::Cell; }
+/// }
+///
+/// struct RadiumRc&lt;T: ?Sized&gt; {
+///   strong: radium::if_atomic! {
+///     if atomic(ptr) { AtomicUsize }
+///     else { Cell&lt;usize&gt; }
+///   },
+///   weak: radium::types::RadiumUsize,
+///   data: T,
+/// }
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>if_atomic {
+    ( <span class="kw">if </span>atomic(<span class="number">8</span>) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_8! </span>{
+            [ $(<span class="macro-nonterminal">$a</span>)* ] [ $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>]
         }
-        $(<span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> })<span class="question-mark">?</span>
-    };
+        $(<span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* })<span class="question-mark">?
+    </span>};
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">16</span>) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_16!</span> {
-            [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> ] [ $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> ]
+    ( <span class="kw">if </span>atomic(<span class="number">16</span>) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_16! </span>{
+            [ $(<span class="macro-nonterminal">$a</span>)* ] [ $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>]
         }
-        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> } )<span class="question-mark">?</span>
-    };
+        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* } )<span class="question-mark">?
+    </span>};
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">32</span>) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_32!</span> {
-            [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> ] [ $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> ]
+    ( <span class="kw">if </span>atomic(<span class="number">32</span>) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_32! </span>{
+            [ $(<span class="macro-nonterminal">$a</span>)* ] [ $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>]
         }
-        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> } )<span class="question-mark">?</span>
-    };
+        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* } )<span class="question-mark">?
+    </span>};
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="number">64</span>) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_64!</span> {
-            [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> ] [ $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> ]
+    ( <span class="kw">if </span>atomic(<span class="number">64</span>) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_64! </span>{
+            [ $(<span class="macro-nonterminal">$a</span>)* ] [ $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>]
         }
-        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> } )<span class="question-mark">?</span>
-    };
+        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* } )<span class="question-mark">?
+    </span>};
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">ptr</span>) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_ptr!</span> {
-            [ $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> ] [ $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> ]
+    ( <span class="kw">if </span>atomic(ptr) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::__radium_if_atomic_ptr! </span>{
+            [ $(<span class="macro-nonterminal">$a</span>)* ] [ $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>]
         }
-        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> } )<span class="question-mark">?</span>
+        $( <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* } )<span class="question-mark">?
+    </span>};
+
+    ( <span class="kw">if </span>atomic(bool) $(<span class="macro-nonterminal">$rest</span>:tt)* ) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span><span class="macro-nonterminal">atomic</span>(<span class="number">8</span>) $(<span class="macro-nonterminal">$rest</span>)* }
     };
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">bool</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> <span class="macro-nonterminal">atomic</span>(<span class="number">8</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> }
+    ( <span class="kw">if </span>atomic(size) $(<span class="macro-nonterminal">$rest</span>:tt)* ) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{ <span class="kw">if </span><span class="macro-nonterminal">atomic</span>(ptr) $(<span class="macro-nonterminal">$rest</span>)* }
     };
 
-    ( <span class="kw">if</span> <span class="ident">atomic</span>(<span class="ident">size</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> { <span class="kw">if</span> <span class="macro-nonterminal">atomic</span>(<span class="ident">ptr</span>) $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> }
-    };
-
-    ( <span class="kw">if</span> <span class="op">!</span> <span class="ident">atomic</span>( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">tt</span> ) { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">tt</span>)<span class="op">*</span> } $( <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">tt</span>)<span class="op">*</span> } )<span class="question-mark">?</span> $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span> )<span class="question-mark">?</span> ) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic!</span> {
-            <span class="kw">if</span> <span class="macro-nonterminal">atomic</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) { $( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>)<span class="op">*</span> )<span class="question-mark">?</span> } <span class="kw">else</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="op">*</span> } $( <span class="kw">if</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span> )<span class="question-mark">?</span>
-        }
+    ( <span class="kw">if </span>! atomic( <span class="macro-nonterminal">$t</span>:tt ) { $(<span class="macro-nonterminal">$a</span>:tt)* } $( <span class="kw">else </span>{ $(<span class="macro-nonterminal">$b</span>:tt)* } )<span class="question-mark">? </span>$( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>:tt)* )<span class="question-mark">? </span>) =&gt; {
+        <span class="macro-nonterminal">$</span><span class="macro">crate::if_atomic! </span>{
+            <span class="kw">if </span><span class="macro-nonterminal">atomic</span>(<span class="macro-nonterminal">$t</span>) { $( $(<span class="macro-nonterminal">$b</span>)* )<span class="question-mark">? </span>} <span class="kw">else </span>{ $(<span class="macro-nonterminal">$a</span>)* } $( <span class="kw">if </span>$(<span class="macro-nonterminal">$rest</span>)* )<span class="question-mark">?
+        </span>}
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="radium" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

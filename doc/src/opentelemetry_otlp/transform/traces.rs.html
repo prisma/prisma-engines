@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/transform/traces.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traces.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/transform/traces.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traces.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -342,100 +342,100 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::to_nanos</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry::sdk</span>::{<span class="self">self</span>, <span class="ident">export::trace::SpanData</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">Link</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::transform::common::to_nanos;
+<span class="kw">use </span>opentelemetry::sdk::{<span class="self">self</span>, export::trace::SpanData};
+<span class="kw">use </span>opentelemetry::trace::{Link, SpanId, SpanKind, StatusCode};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tonic</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::resource::v1::Resource</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::trace::v1</span>::{
-        <span class="ident">span</span>, <span class="ident">status</span>, <span class="ident">InstrumentationLibrarySpans</span>, <span class="ident">ResourceSpans</span>, <span class="ident">Span</span>, <span class="ident">Status</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">mod </span>tonic {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::resource::v1::Resource;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::trace::v1::{
+        span, status, InstrumentationLibrarySpans, ResourceSpans, Span, Status,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::tonic::Attributes</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::transform::common::tonic::Attributes;
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::SpanKind</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">span_kind</span> {
-                <span class="ident">SpanKind::Client</span> =&gt; <span class="ident">span::SpanKind::Client</span>,
-                <span class="ident">SpanKind::Consumer</span> =&gt; <span class="ident">span::SpanKind::Consumer</span>,
-                <span class="ident">SpanKind::Internal</span> =&gt; <span class="ident">span::SpanKind::Internal</span>,
-                <span class="ident">SpanKind::Producer</span> =&gt; <span class="ident">span::SpanKind::Producer</span>,
-                <span class="ident">SpanKind::Server</span> =&gt; <span class="ident">span::SpanKind::Server</span>,
+    <span class="kw">impl </span>From&lt;SpanKind&gt; <span class="kw">for </span>span::SpanKind {
+        <span class="kw">fn </span>from(span_kind: SpanKind) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>span_kind {
+                SpanKind::Client =&gt; span::SpanKind::Client,
+                SpanKind::Consumer =&gt; span::SpanKind::Consumer,
+                SpanKind::Internal =&gt; span::SpanKind::Internal,
+                SpanKind::Producer =&gt; span::SpanKind::Producer,
+                SpanKind::Server =&gt; span::SpanKind::Server,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">status::StatusCode</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status_code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">status_code</span> {
-                <span class="ident">StatusCode::Ok</span> =&gt; <span class="ident">status::StatusCode::Ok</span>,
-                <span class="ident">StatusCode::Unset</span> =&gt; <span class="ident">status::StatusCode::Unset</span>,
-                <span class="ident">StatusCode::Error</span> =&gt; <span class="ident">status::StatusCode::Error</span>,
+    <span class="kw">impl </span>From&lt;StatusCode&gt; <span class="kw">for </span>status::StatusCode {
+        <span class="kw">fn </span>from(status_code: StatusCode) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>status_code {
+                StatusCode::Ok =&gt; status::StatusCode::Ok,
+                StatusCode::Unset =&gt; status::StatusCode::Unset,
+                StatusCode::Error =&gt; status::StatusCode::Error,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::Link</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">span::Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
-                <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
+    <span class="kw">impl </span>From&lt;Link&gt; <span class="kw">for </span>span::Link {
+        <span class="kw">fn </span>from(link: Link) -&gt; <span class="self">Self </span>{
+            span::Link {
+                trace_id: link.span_context().trace_id().to_bytes().to_vec(),
+                span_id: link.span_context().span_id().to_bytes().to_vec(),
+                trace_state: link.span_context().trace_state().header(),
+                attributes: Attributes::from(link.attributes().clone()).<span class="number">0</span>,
+                dropped_attributes_count: link.dropped_attributes_count(),
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResourceSpans</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source_span</span>: <span class="ident">SpanData</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">span_kind</span>: <span class="ident">span::SpanKind</span> <span class="op">=</span> <span class="ident">source_span</span>.<span class="ident">span_kind</span>.<span class="ident">into</span>();
-            <span class="ident">ResourceSpans</span> {
-                <span class="ident">resource</span>: <span class="prelude-val">Some</span>(<span class="ident">Resource</span> {
-                    <span class="ident">attributes</span>: <span class="ident">resource_attributes</span>(
-                        <span class="ident">source_span</span>.<span class="ident">resource</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>),
+    <span class="kw">impl </span>From&lt;SpanData&gt; <span class="kw">for </span>ResourceSpans {
+        <span class="kw">fn </span>from(source_span: SpanData) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>span_kind: span::SpanKind = source_span.span_kind.into();
+            ResourceSpans {
+                resource: <span class="prelude-val">Some</span>(Resource {
+                    attributes: resource_attributes(
+                        source_span.resource.as_ref().map(AsRef::as_ref),
                     )
                     .<span class="number">0</span>,
-                    <span class="ident">dropped_attributes_count</span>: <span class="number">0</span>,
+                    dropped_attributes_count: <span class="number">0</span>,
                 }),
-                <span class="ident">instrumentation_library_spans</span>: <span class="macro">vec!</span>[<span class="ident">InstrumentationLibrarySpans</span> {
-                    <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
-                    <span class="ident">spans</span>: <span class="macro">vec!</span>[<span class="ident">Span</span> {
-                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                        <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                        <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                        <span class="ident">parent_span_id</span>: {
-                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
-                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
-                            } <span class="kw">else</span> {
+                instrumentation_library_spans: <span class="macro">vec!</span>[InstrumentationLibrarySpans {
+                    instrumentation_library: Default::default(),
+                    spans: <span class="macro">vec!</span>[Span {
+                        trace_id: source_span.span_context.trace_id().to_bytes().to_vec(),
+                        span_id: source_span.span_context.span_id().to_bytes().to_vec(),
+                        trace_state: source_span.span_context.trace_state().header(),
+                        parent_span_id: {
+                            <span class="kw">if </span>source_span.parent_span_id != SpanId::INVALID {
+                                source_span.parent_span_id.to_bytes().to_vec()
+                            } <span class="kw">else </span>{
                                 <span class="macro">vec!</span>[]
                             }
                         },
-                        <span class="ident">name</span>: <span class="ident">source_span</span>.<span class="ident">name</span>.<span class="ident">into_owned</span>(),
-                        <span class="ident">kind</span>: <span class="ident">span_kind</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                        <span class="ident">start_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">start_time</span>),
-                        <span class="ident">end_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">end_time</span>),
-                        <span class="ident">dropped_attributes_count</span>: <span class="ident">source_span</span>.<span class="ident">attributes</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">source_span</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                        <span class="ident">dropped_events_count</span>: <span class="ident">source_span</span>.<span class="ident">events</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">events</span>: <span class="ident">source_span</span>
-                            .<span class="ident">events</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="ident">span::Event</span> {
-                                <span class="ident">time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">event</span>.<span class="ident">timestamp</span>),
-                                <span class="ident">name</span>: <span class="ident">event</span>.<span class="ident">name</span>.<span class="ident">into</span>(),
-                                <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">event</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                                <span class="ident">dropped_attributes_count</span>: <span class="ident">event</span>.<span class="ident">dropped_attributes_count</span>,
+                        name: source_span.name.into_owned(),
+                        kind: span_kind <span class="kw">as </span>i32,
+                        start_time_unix_nano: to_nanos(source_span.start_time),
+                        end_time_unix_nano: to_nanos(source_span.end_time),
+                        dropped_attributes_count: source_span.attributes.dropped_count(),
+                        attributes: Attributes::from(source_span.attributes).<span class="number">0</span>,
+                        dropped_events_count: source_span.events.dropped_count(),
+                        events: source_span
+                            .events
+                            .into_iter()
+                            .map(|event| span::Event {
+                                time_unix_nano: to_nanos(event.timestamp),
+                                name: event.name.into(),
+                                attributes: Attributes::from(event.attributes).<span class="number">0</span>,
+                                dropped_attributes_count: event.dropped_attributes_count,
                             })
-                            .<span class="ident">collect</span>(),
-                        <span class="ident">dropped_links_count</span>: <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">links</span>: <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
-                        <span class="ident">status</span>: <span class="prelude-val">Some</span>(<span class="ident">Status</span> {
-                            <span class="ident">code</span>: <span class="ident">status::StatusCode::from</span>(<span class="ident">source_span</span>.<span class="ident">status_code</span>).<span class="ident">into</span>(),
-                            <span class="ident">message</span>: <span class="ident">source_span</span>.<span class="ident">status_message</span>.<span class="ident">into_owned</span>(),
-                            ..<span class="ident">Default::default</span>()
+                            .collect(),
+                        dropped_links_count: source_span.links.dropped_count(),
+                        links: source_span.links.into_iter().map(Into::into).collect(),
+                        status: <span class="prelude-val">Some</span>(Status {
+                            code: status::StatusCode::from(source_span.status_code).into(),
+                            message: source_span.status_message.into_owned(),
+                            ..Default::default()
                         }),
                     }],
                 }],
@@ -443,108 +443,108 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">resource_attributes</span>(<span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sdk::Resource</span><span class="op">&gt;</span>) -&gt; <span class="ident">Attributes</span> {
-        <span class="ident">resource</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
-                <span class="ident">res</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">opentelemetry::KeyValue::new</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>()))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="kw">fn </span>resource_attributes(resource: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>sdk::Resource&gt;) -&gt; Attributes {
+        resource
+            .map(|res| {
+                res.iter()
+                    .map(|(k, v)| opentelemetry::KeyValue::new(k.clone(), v.clone()))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             })
-            .<span class="ident">unwrap_or_default</span>()
-            .<span class="ident">into</span>()
+            .unwrap_or_default()
+            .into()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">prost</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::prost::resource::v1::Resource</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::prost::trace::v1</span>::{
-        <span class="ident">span</span>, <span class="ident">status</span>, <span class="ident">InstrumentationLibrarySpans</span>, <span class="ident">ResourceSpans</span>, <span class="ident">Span</span>, <span class="ident">Status</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">mod </span>prost {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::prost::resource::v1::Resource;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::prost::trace::v1::{
+        span, status, InstrumentationLibrarySpans, ResourceSpans, Span, Status,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::prost::Attributes</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::transform::common::prost::Attributes;
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::SpanKind</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">span_kind</span> {
-                <span class="ident">SpanKind::Client</span> =&gt; <span class="ident">span::SpanKind::Client</span>,
-                <span class="ident">SpanKind::Consumer</span> =&gt; <span class="ident">span::SpanKind::Consumer</span>,
-                <span class="ident">SpanKind::Internal</span> =&gt; <span class="ident">span::SpanKind::Internal</span>,
-                <span class="ident">SpanKind::Producer</span> =&gt; <span class="ident">span::SpanKind::Producer</span>,
-                <span class="ident">SpanKind::Server</span> =&gt; <span class="ident">span::SpanKind::Server</span>,
+    <span class="kw">impl </span>From&lt;SpanKind&gt; <span class="kw">for </span>span::SpanKind {
+        <span class="kw">fn </span>from(span_kind: SpanKind) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>span_kind {
+                SpanKind::Client =&gt; span::SpanKind::Client,
+                SpanKind::Consumer =&gt; span::SpanKind::Consumer,
+                SpanKind::Internal =&gt; span::SpanKind::Internal,
+                SpanKind::Producer =&gt; span::SpanKind::Producer,
+                SpanKind::Server =&gt; span::SpanKind::Server,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">status::StatusCode</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status_code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">status_code</span> {
-                <span class="ident">StatusCode::Ok</span> =&gt; <span class="ident">status::StatusCode::Ok</span>,
-                <span class="ident">StatusCode::Unset</span> =&gt; <span class="ident">status::StatusCode::Unset</span>,
-                <span class="ident">StatusCode::Error</span> =&gt; <span class="ident">status::StatusCode::Error</span>,
+    <span class="kw">impl </span>From&lt;StatusCode&gt; <span class="kw">for </span>status::StatusCode {
+        <span class="kw">fn </span>from(status_code: StatusCode) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>status_code {
+                StatusCode::Ok =&gt; status::StatusCode::Ok,
+                StatusCode::Unset =&gt; status::StatusCode::Unset,
+                StatusCode::Error =&gt; status::StatusCode::Error,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">span::Link</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">span::Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
-                <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
+    <span class="kw">impl </span>From&lt;Link&gt; <span class="kw">for </span>span::Link {
+        <span class="kw">fn </span>from(link: Link) -&gt; <span class="self">Self </span>{
+            span::Link {
+                trace_id: link.span_context().trace_id().to_bytes().to_vec(),
+                span_id: link.span_context().span_id().to_bytes().to_vec(),
+                trace_state: link.span_context().trace_state().header(),
+                attributes: Attributes::from(link.attributes().clone()).<span class="number">0</span>,
+                dropped_attributes_count: link.dropped_attributes_count(),
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResourceSpans</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source_span</span>: <span class="ident">SpanData</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">let</span> <span class="ident">span_kind</span>: <span class="ident">span::SpanKind</span> <span class="op">=</span> <span class="ident">source_span</span>.<span class="ident">span_kind</span>.<span class="ident">into</span>();
-            <span class="ident">ResourceSpans</span> {
-                <span class="ident">resource</span>: <span class="prelude-val">Some</span>(<span class="ident">Resource</span> {
-                    <span class="ident">attributes</span>: <span class="ident">resource_attributes</span>(
-                        <span class="ident">source_span</span>.<span class="ident">resource</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>),
+    <span class="kw">impl </span>From&lt;SpanData&gt; <span class="kw">for </span>ResourceSpans {
+        <span class="kw">fn </span>from(source_span: SpanData) -&gt; <span class="self">Self </span>{
+            <span class="kw">let </span>span_kind: span::SpanKind = source_span.span_kind.into();
+            ResourceSpans {
+                resource: <span class="prelude-val">Some</span>(Resource {
+                    attributes: resource_attributes(
+                        source_span.resource.as_ref().map(AsRef::as_ref),
                     )
                     .<span class="number">0</span>,
-                    <span class="ident">dropped_attributes_count</span>: <span class="number">0</span>,
+                    dropped_attributes_count: <span class="number">0</span>,
                 }),
-                <span class="ident">instrumentation_library_spans</span>: <span class="macro">vec!</span>[<span class="ident">InstrumentationLibrarySpans</span> {
-                    <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
-                    <span class="ident">spans</span>: <span class="macro">vec!</span>[<span class="ident">Span</span> {
-                        <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                        <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                        <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                        <span class="ident">parent_span_id</span>: {
-                            <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
-                                <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
-                            } <span class="kw">else</span> {
+                instrumentation_library_spans: <span class="macro">vec!</span>[InstrumentationLibrarySpans {
+                    instrumentation_library: Default::default(),
+                    spans: <span class="macro">vec!</span>[Span {
+                        trace_id: source_span.span_context.trace_id().to_bytes().to_vec(),
+                        span_id: source_span.span_context.span_id().to_bytes().to_vec(),
+                        trace_state: source_span.span_context.trace_state().header(),
+                        parent_span_id: {
+                            <span class="kw">if </span>source_span.parent_span_id != SpanId::INVALID {
+                                source_span.parent_span_id.to_bytes().to_vec()
+                            } <span class="kw">else </span>{
                                 <span class="macro">vec!</span>[]
                             }
                         },
-                        <span class="ident">name</span>: <span class="ident">source_span</span>.<span class="ident">name</span>.<span class="ident">into_owned</span>(),
-                        <span class="ident">kind</span>: <span class="ident">span_kind</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                        <span class="ident">start_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">start_time</span>),
-                        <span class="ident">end_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">end_time</span>),
-                        <span class="ident">dropped_attributes_count</span>: <span class="ident">source_span</span>.<span class="ident">attributes</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">source_span</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                        <span class="ident">dropped_events_count</span>: <span class="ident">source_span</span>.<span class="ident">events</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">events</span>: <span class="ident">source_span</span>
-                            .<span class="ident">events</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="ident">span::Event</span> {
-                                <span class="ident">time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">event</span>.<span class="ident">timestamp</span>),
-                                <span class="ident">name</span>: <span class="ident">event</span>.<span class="ident">name</span>.<span class="ident">into</span>(),
-                                <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">event</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                                <span class="ident">dropped_attributes_count</span>: <span class="ident">event</span>.<span class="ident">dropped_attributes_count</span>,
+                        name: source_span.name.into_owned(),
+                        kind: span_kind <span class="kw">as </span>i32,
+                        start_time_unix_nano: to_nanos(source_span.start_time),
+                        end_time_unix_nano: to_nanos(source_span.end_time),
+                        dropped_attributes_count: source_span.attributes.dropped_count(),
+                        attributes: Attributes::from(source_span.attributes).<span class="number">0</span>,
+                        dropped_events_count: source_span.events.dropped_count(),
+                        events: source_span
+                            .events
+                            .into_iter()
+                            .map(|event| span::Event {
+                                time_unix_nano: to_nanos(event.timestamp),
+                                name: event.name.into(),
+                                attributes: Attributes::from(event.attributes).<span class="number">0</span>,
+                                dropped_attributes_count: event.dropped_attributes_count,
                             })
-                            .<span class="ident">collect</span>(),
-                        <span class="ident">dropped_links_count</span>: <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">dropped_count</span>(),
-                        <span class="ident">links</span>: <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
-                        <span class="ident">status</span>: <span class="prelude-val">Some</span>(<span class="ident">Status</span> {
-                            <span class="ident">code</span>: <span class="ident">status::StatusCode::from</span>(<span class="ident">source_span</span>.<span class="ident">status_code</span>).<span class="ident">into</span>(),
-                            <span class="ident">message</span>: <span class="ident">source_span</span>.<span class="ident">status_message</span>.<span class="ident">into_owned</span>(),
-                            ..<span class="ident">Default::default</span>()
+                            .collect(),
+                        dropped_links_count: source_span.links.dropped_count(),
+                        links: source_span.links.into_iter().map(Into::into).collect(),
+                        status: <span class="prelude-val">Some</span>(Status {
+                            code: status::StatusCode::from(source_span.status_code).into(),
+                            message: source_span.status_message.into_owned(),
+                            ..Default::default()
                         }),
                     }],
                 }],
@@ -552,139 +552,139 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">resource_attributes</span>(<span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sdk::Resource</span><span class="op">&gt;</span>) -&gt; <span class="ident">Attributes</span> {
-        <span class="ident">resource</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> {
-                <span class="ident">res</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">opentelemetry::KeyValue::new</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>()))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="kw">fn </span>resource_attributes(resource: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>sdk::Resource&gt;) -&gt; Attributes {
+        resource
+            .map(|res| {
+                res.iter()
+                    .map(|(k, v)| opentelemetry::KeyValue::new(k.clone(), v.clone()))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             })
-            .<span class="ident">unwrap_or_default</span>()
-            .<span class="ident">into</span>()
+            .unwrap_or_default()
+            .into()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">grpcio</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::grpcio::resource::Resource</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::grpcio::trace</span>::{
-        <span class="ident">InstrumentationLibrarySpans</span>, <span class="ident">ResourceSpans</span>, <span class="ident">Span</span>, <span class="ident">Span_Event</span>, <span class="ident">Span_Link</span>, <span class="ident">Span_SpanKind</span>,
-        <span class="ident">Status</span>, <span class="ident">Status_StatusCode</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">mod </span>grpcio {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::grpcio::resource::Resource;
+    <span class="kw">use </span><span class="kw">crate</span>::proto::grpcio::trace::{
+        InstrumentationLibrarySpans, ResourceSpans, Span, Span_Event, Span_Link, Span_SpanKind,
+        Status, Status_StatusCode,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::common::grpcio::Attributes</span>;
-    <span class="kw">use</span> <span class="ident">protobuf</span>::{<span class="ident">RepeatedField</span>, <span class="ident">SingularPtrField</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::transform::common::grpcio::Attributes;
+    <span class="kw">use </span>protobuf::{RepeatedField, SingularPtrField};
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Span_SpanKind</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">span_kind</span>: <span class="ident">SpanKind</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">span_kind</span> {
-                <span class="ident">SpanKind::Client</span> =&gt; <span class="ident">Span_SpanKind::SPAN_KIND_CLIENT</span>,
-                <span class="ident">SpanKind::Consumer</span> =&gt; <span class="ident">Span_SpanKind::SPAN_KIND_CONSUMER</span>,
-                <span class="ident">SpanKind::Internal</span> =&gt; <span class="ident">Span_SpanKind::SPAN_KIND_INTERNAL</span>,
-                <span class="ident">SpanKind::Producer</span> =&gt; <span class="ident">Span_SpanKind::SPAN_KIND_PRODUCER</span>,
-                <span class="ident">SpanKind::Server</span> =&gt; <span class="ident">Span_SpanKind::SPAN_KIND_SERVER</span>,
+    <span class="kw">impl </span>From&lt;SpanKind&gt; <span class="kw">for </span>Span_SpanKind {
+        <span class="kw">fn </span>from(span_kind: SpanKind) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>span_kind {
+                SpanKind::Client =&gt; Span_SpanKind::SPAN_KIND_CLIENT,
+                SpanKind::Consumer =&gt; Span_SpanKind::SPAN_KIND_CONSUMER,
+                SpanKind::Internal =&gt; Span_SpanKind::SPAN_KIND_INTERNAL,
+                SpanKind::Producer =&gt; Span_SpanKind::SPAN_KIND_PRODUCER,
+                SpanKind::Server =&gt; Span_SpanKind::SPAN_KIND_SERVER,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Status_StatusCode</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status_code</span>: <span class="ident">StatusCode</span>) -&gt; <span class="self">Self</span> {
-            <span class="kw">match</span> <span class="ident">status_code</span> {
-                <span class="ident">StatusCode::Ok</span> =&gt; <span class="ident">Status_StatusCode::STATUS_CODE_OK</span>,
-                <span class="ident">StatusCode::Unset</span> =&gt; <span class="ident">Status_StatusCode::STATUS_CODE_UNSET</span>,
-                <span class="ident">StatusCode::Error</span> =&gt; <span class="ident">Status_StatusCode::STATUS_CODE_ERROR</span>,
+    <span class="kw">impl </span>From&lt;StatusCode&gt; <span class="kw">for </span>Status_StatusCode {
+        <span class="kw">fn </span>from(status_code: StatusCode) -&gt; <span class="self">Self </span>{
+            <span class="kw">match </span>status_code {
+                StatusCode::Ok =&gt; Status_StatusCode::STATUS_CODE_OK,
+                StatusCode::Unset =&gt; Status_StatusCode::STATUS_CODE_UNSET,
+                StatusCode::Error =&gt; Status_StatusCode::STATUS_CODE_ERROR,
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Link</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Span_Link</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">link</span>: <span class="ident">Link</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">Span_Link</span> {
-                <span class="ident">trace_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">span_id</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                <span class="ident">trace_state</span>: <span class="ident">link</span>.<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">link</span>.<span class="ident">attributes</span>().<span class="ident">clone</span>()).<span class="number">0</span>,
-                <span class="ident">dropped_attributes_count</span>: <span class="ident">link</span>.<span class="ident">dropped_attributes_count</span>(),
-                ..<span class="ident">Default::default</span>()
+    <span class="kw">impl </span>From&lt;Link&gt; <span class="kw">for </span>Span_Link {
+        <span class="kw">fn </span>from(link: Link) -&gt; <span class="self">Self </span>{
+            Span_Link {
+                trace_id: link.span_context().trace_id().to_bytes().to_vec(),
+                span_id: link.span_context().span_id().to_bytes().to_vec(),
+                trace_state: link.span_context().trace_state().header(),
+                attributes: Attributes::from(link.attributes().clone()).<span class="number">0</span>,
+                dropped_attributes_count: link.dropped_attributes_count(),
+                ..Default::default()
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResourceSpans</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source_span</span>: <span class="ident">SpanData</span>) -&gt; <span class="self">Self</span> {
-            <span class="ident">ResourceSpans</span> {
-                <span class="ident">resource</span>: <span class="ident">SingularPtrField::from</span>(<span class="prelude-val">Some</span>(<span class="ident">Resource</span> {
-                    <span class="ident">attributes</span>: <span class="ident">resource_attributes</span>(
-                        <span class="ident">source_span</span>.<span class="ident">resource</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">AsRef::as_ref</span>),
+    <span class="kw">impl </span>From&lt;SpanData&gt; <span class="kw">for </span>ResourceSpans {
+        <span class="kw">fn </span>from(source_span: SpanData) -&gt; <span class="self">Self </span>{
+            ResourceSpans {
+                resource: SingularPtrField::from(<span class="prelude-val">Some</span>(Resource {
+                    attributes: resource_attributes(
+                        source_span.resource.as_ref().map(AsRef::as_ref),
                     )
                     .<span class="number">0</span>,
-                    <span class="ident">dropped_attributes_count</span>: <span class="number">0</span>,
-                    ..<span class="ident">Default::default</span>()
+                    dropped_attributes_count: <span class="number">0</span>,
+                    ..Default::default()
                 })),
-                <span class="ident">instrumentation_library_spans</span>: <span class="ident">RepeatedField::from_vec</span>(<span class="macro">vec!</span>[
-                    <span class="ident">InstrumentationLibrarySpans</span> {
-                        <span class="ident">instrumentation_library</span>: <span class="ident">Default::default</span>(),
-                        <span class="ident">spans</span>: <span class="ident">RepeatedField::from_vec</span>(<span class="macro">vec!</span>[<span class="ident">Span</span> {
-                            <span class="ident">trace_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                            <span class="ident">span_id</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">span_id</span>().<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>(),
-                            <span class="ident">trace_state</span>: <span class="ident">source_span</span>.<span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>(),
-                            <span class="ident">parent_span_id</span>: {
-                                <span class="kw">if</span> <span class="ident">source_span</span>.<span class="ident">parent_span_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SpanId::INVALID</span> {
-                                    <span class="ident">source_span</span>.<span class="ident">parent_span_id</span>.<span class="ident">to_bytes</span>().<span class="ident">to_vec</span>()
-                                } <span class="kw">else</span> {
+                instrumentation_library_spans: RepeatedField::from_vec(<span class="macro">vec!</span>[
+                    InstrumentationLibrarySpans {
+                        instrumentation_library: Default::default(),
+                        spans: RepeatedField::from_vec(<span class="macro">vec!</span>[Span {
+                            trace_id: source_span.span_context.trace_id().to_bytes().to_vec(),
+                            span_id: source_span.span_context.span_id().to_bytes().to_vec(),
+                            trace_state: source_span.span_context.trace_state().header(),
+                            parent_span_id: {
+                                <span class="kw">if </span>source_span.parent_span_id != SpanId::INVALID {
+                                    source_span.parent_span_id.to_bytes().to_vec()
+                                } <span class="kw">else </span>{
                                     <span class="macro">vec!</span>[]
                                 }
                             },
-                            <span class="ident">name</span>: <span class="ident">source_span</span>.<span class="ident">name</span>.<span class="ident">into_owned</span>(),
-                            <span class="ident">kind</span>: <span class="ident">source_span</span>.<span class="ident">span_kind</span>.<span class="ident">into</span>(),
-                            <span class="ident">start_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">start_time</span>),
-                            <span class="ident">end_time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">source_span</span>.<span class="ident">end_time</span>),
-                            <span class="ident">dropped_attributes_count</span>: <span class="ident">source_span</span>.<span class="ident">attributes</span>.<span class="ident">dropped_count</span>(),
-                            <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">source_span</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                            <span class="ident">dropped_events_count</span>: <span class="ident">source_span</span>.<span class="ident">events</span>.<span class="ident">dropped_count</span>(),
-                            <span class="ident">events</span>: <span class="ident">RepeatedField::from_vec</span>(
-                                <span class="ident">source_span</span>
-                                    .<span class="ident">events</span>
-                                    .<span class="ident">into_iter</span>()
-                                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">event</span><span class="op">|</span> <span class="ident">Span_Event</span> {
-                                        <span class="ident">time_unix_nano</span>: <span class="ident">to_nanos</span>(<span class="ident">event</span>.<span class="ident">timestamp</span>),
-                                        <span class="ident">name</span>: <span class="ident">event</span>.<span class="ident">name</span>.<span class="ident">into</span>(),
-                                        <span class="ident">attributes</span>: <span class="ident">Attributes::from</span>(<span class="ident">event</span>.<span class="ident">attributes</span>).<span class="number">0</span>,
-                                        <span class="ident">dropped_attributes_count</span>: <span class="ident">event</span>.<span class="ident">dropped_attributes_count</span>,
-                                        ..<span class="ident">Default::default</span>()
+                            name: source_span.name.into_owned(),
+                            kind: source_span.span_kind.into(),
+                            start_time_unix_nano: to_nanos(source_span.start_time),
+                            end_time_unix_nano: to_nanos(source_span.end_time),
+                            dropped_attributes_count: source_span.attributes.dropped_count(),
+                            attributes: Attributes::from(source_span.attributes).<span class="number">0</span>,
+                            dropped_events_count: source_span.events.dropped_count(),
+                            events: RepeatedField::from_vec(
+                                source_span
+                                    .events
+                                    .into_iter()
+                                    .map(|event| Span_Event {
+                                        time_unix_nano: to_nanos(event.timestamp),
+                                        name: event.name.into(),
+                                        attributes: Attributes::from(event.attributes).<span class="number">0</span>,
+                                        dropped_attributes_count: event.dropped_attributes_count,
+                                        ..Default::default()
                                     })
-                                    .<span class="ident">collect</span>(),
+                                    .collect(),
                             ),
-                            <span class="ident">dropped_links_count</span>: <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">dropped_count</span>(),
-                            <span class="ident">links</span>: <span class="ident">RepeatedField::from_vec</span>(
-                                <span class="ident">source_span</span>.<span class="ident">links</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
+                            dropped_links_count: source_span.links.dropped_count(),
+                            links: RepeatedField::from_vec(
+                                source_span.links.into_iter().map(Into::into).collect(),
                             ),
-                            <span class="ident">status</span>: <span class="ident">SingularPtrField::some</span>(<span class="ident">Status</span> {
-                                <span class="ident">code</span>: <span class="ident">Status_StatusCode::from</span>(<span class="ident">source_span</span>.<span class="ident">status_code</span>),
-                                <span class="ident">message</span>: <span class="ident">source_span</span>.<span class="ident">status_message</span>.<span class="ident">into_owned</span>(),
-                                ..<span class="ident">Default::default</span>()
+                            status: SingularPtrField::some(Status {
+                                code: Status_StatusCode::from(source_span.status_code),
+                                message: source_span.status_message.into_owned(),
+                                ..Default::default()
                             }),
-                            ..<span class="ident">Default::default</span>()
+                            ..Default::default()
                         }]),
-                        ..<span class="ident">Default::default</span>()
+                        ..Default::default()
                     },
                 ]),
-                ..<span class="ident">Default::default</span>()
+                ..Default::default()
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">resource_attributes</span>(<span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">sdk::Resource</span><span class="op">&gt;</span>) -&gt; <span class="ident">Attributes</span> {
-        <span class="ident">resource</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">resource</span><span class="op">|</span> {
-                <span class="ident">resource</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">opentelemetry::KeyValue::new</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">v</span>.<span class="ident">clone</span>()))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="kw">fn </span>resource_attributes(resource: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>sdk::Resource&gt;) -&gt; Attributes {
+        resource
+            .map(|resource| {
+                resource
+                    .iter()
+                    .map(|(k, v)| opentelemetry::KeyValue::new(k.clone(), v.clone()))
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
             })
-            .<span class="ident">unwrap_or_default</span>()
-            .<span class="ident">into</span>()
+            .unwrap_or_default()
+            .into()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

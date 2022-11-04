@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/reload.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reload.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -285,290 +285,290 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Wrapper for a `Layer` to allow it to be dynamically reloaded.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides a [`Layer` type] which wraps another type implementing</span>
-<span class="doccomment">//! the [`Layer` trait], allowing the wrapped type to be replaced with another</span>
-<span class="doccomment">//! instance of that type at runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This can be used in cases where a subset of `Subscriber` functionality</span>
-<span class="doccomment">//! should be dynamically reconfigured, such as when filtering directives may</span>
-<span class="doccomment">//! change at runtime. Note that this layer introduces a (relatively small)</span>
-<span class="doccomment">//! amount of overhead, and should thus only be used as needed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Reloading a [global filtering](crate::layer#global-filtering) layer:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use tracing::info;</span>
-<span class="doccomment">//! use tracing_subscriber::{filter, fmt, reload, prelude::*};</span>
-<span class="doccomment">//! let filter = filter::LevelFilter::WARN;</span>
-<span class="doccomment">//! let (filter, reload_handle) = reload::Layer::new(filter);</span>
-<span class="doccomment">//! tracing_subscriber::registry()</span>
-<span class="doccomment">//!   .with(filter)</span>
-<span class="doccomment">//!   .with(fmt::Layer::default())</span>
-<span class="doccomment">//!   .init();</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // specifying the Registry type is required</span>
-<span class="doccomment">//! # let _: &amp;reload::Handle&lt;filter::LevelFilter, tracing_subscriber::Registry&gt; = &amp;reload_handle;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! info!(&quot;This will be ignored&quot;);</span>
-<span class="doccomment">//! reload_handle.modify(|filter| *filter = filter::LevelFilter::INFO);</span>
-<span class="doccomment">//! info!(&quot;This will be logged&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Reloading a [`Filtered`](crate::filter::Filtered) layer:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use tracing::info;</span>
-<span class="doccomment">//! use tracing_subscriber::{filter, fmt, reload, prelude::*};</span>
-<span class="doccomment">//! let filtered_layer = fmt::Layer::default().with_filter(filter::LevelFilter::WARN);</span>
-<span class="doccomment">//! let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # // specifying the Registry type is required</span>
-<span class="doccomment">//! # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;tracing_subscriber::Registry&gt;,</span>
-<span class="doccomment">//! # filter::LevelFilter, tracing_subscriber::Registry&gt;,tracing_subscriber::Registry&gt;</span>
-<span class="doccomment">//! # = &amp;reload_handle;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! tracing_subscriber::registry()</span>
-<span class="doccomment">//!   .with(filtered_layer)</span>
-<span class="doccomment">//!   .init();</span>
-<span class="doccomment">//! info!(&quot;This will be ignored&quot;);</span>
-<span class="doccomment">//! reload_handle.modify(|layer| *layer.filter_mut() = filter::LevelFilter::INFO);</span>
-<span class="doccomment">//! info!(&quot;This will be logged&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Layer` type]: struct.Layer.html</span>
-<span class="doccomment">//! [`Layer` trait]: ../layer/trait.Layer.html</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::layer</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::RwLock</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Wrapper for a `Layer` to allow it to be dynamically reloaded.
+//!
+//! This module provides a [`Layer` type] which wraps another type implementing
+//! the [`Layer` trait], allowing the wrapped type to be replaced with another
+//! instance of that type at runtime.
+//!
+//! This can be used in cases where a subset of `Subscriber` functionality
+//! should be dynamically reconfigured, such as when filtering directives may
+//! change at runtime. Note that this layer introduces a (relatively small)
+//! amount of overhead, and should thus only be used as needed.
+//!
+//! # Examples
+//!
+//! Reloading a [global filtering](crate::layer#global-filtering) layer:
+//!
+//! ```rust
+//! # use tracing::info;
+//! use tracing_subscriber::{filter, fmt, reload, prelude::*};
+//! let filter = filter::LevelFilter::WARN;
+//! let (filter, reload_handle) = reload::Layer::new(filter);
+//! tracing_subscriber::registry()
+//!   .with(filter)
+//!   .with(fmt::Layer::default())
+//!   .init();
+//! #
+//! # // specifying the Registry type is required
+//! # let _: &amp;reload::Handle&lt;filter::LevelFilter, tracing_subscriber::Registry&gt; = &amp;reload_handle;
+//! #
+//! info!(&quot;This will be ignored&quot;);
+//! reload_handle.modify(|filter| *filter = filter::LevelFilter::INFO);
+//! info!(&quot;This will be logged&quot;);
+//! ```
+//!
+//! Reloading a [`Filtered`](crate::filter::Filtered) layer:
+//!
+//! ```rust
+//! # use tracing::info;
+//! use tracing_subscriber::{filter, fmt, reload, prelude::*};
+//! let filtered_layer = fmt::Layer::default().with_filter(filter::LevelFilter::WARN);
+//! let (filtered_layer, reload_handle) = reload::Layer::new(filtered_layer);
+//! #
+//! # // specifying the Registry type is required
+//! # let _: &amp;reload::Handle&lt;filter::Filtered&lt;fmt::Layer&lt;tracing_subscriber::Registry&gt;,
+//! # filter::LevelFilter, tracing_subscriber::Registry&gt;,tracing_subscriber::Registry&gt;
+//! # = &amp;reload_handle;
+//! #
+//! tracing_subscriber::registry()
+//!   .with(filtered_layer)
+//!   .init();
+//! info!(&quot;This will be ignored&quot;);
+//! reload_handle.modify(|layer| *layer.filter_mut() = filter::LevelFilter::INFO);
+//! info!(&quot;This will be logged&quot;);
+//! ```
+//!
+//! [`Layer` type]: struct.Layer.html
+//! [`Layer` trait]: ../layer/trait.Layer.html
+</span><span class="kw">use </span><span class="kw">crate</span>::layer;
+<span class="kw">use </span><span class="kw">crate</span>::sync::RwLock;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">error</span>, <span class="ident">fmt</span>,
-    <span class="ident">marker::PhantomData</span>,
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
+<span class="kw">use </span>std::{
+    error, fmt,
+    marker::PhantomData,
+    sync::{Arc, Weak},
 };
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">callsite</span>, <span class="ident">span</span>,
-    <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
-    <span class="ident">Event</span>, <span class="ident">Metadata</span>,
+<span class="kw">use </span>tracing_core::{
+    callsite, span,
+    subscriber::{Interest, Subscriber},
+    Event, Metadata,
 };
 
-<span class="doccomment">/// Wraps a `Layer`, allowing it to be reloaded dynamically at runtime.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="comment">// TODO(eliza): this once used a `crossbeam_util::ShardedRwLock`. We may</span>
-    <span class="comment">// eventually wish to replace it with a sharded lock implementation on top</span>
-    <span class="comment">// of our internal `RwLock` wrapper type. If possible, we should profile</span>
-    <span class="comment">// this first to determine if it&#39;s necessary.</span>
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Wraps a `Layer`, allowing it to be reloaded dynamically at runtime.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Layer&lt;L, S&gt; {
+    <span class="comment">// TODO(eliza): this once used a `crossbeam_util::ShardedRwLock`. We may
+    // eventually wish to replace it with a sharded lock implementation on top
+    // of our internal `RwLock` wrapper type. If possible, we should profile
+    // this first to determine if it&#39;s necessary.
+    </span>inner: Arc&lt;RwLock&lt;L&gt;&gt;,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="doccomment">/// Allows reloading the state of an associated [`Layer`](crate::layer::Layer).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Allows reloading the state of an associated [`Layer`](crate::layer::Layer).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Handle&lt;L, S&gt; {
+    inner: Weak&lt;RwLock&lt;L&gt;&gt;,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="doccomment">/// Indicates that an error occurred when reloading a layer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span> {
-    <span class="ident">kind</span>: <span class="ident">ErrorKind</span>,
+<span class="doccomment">/// Indicates that an error occurred when reloading a layer.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Error {
+    kind: ErrorKind,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="ident">SubscriberGone</span>,
-    <span class="ident">Poisoned</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>ErrorKind {
+    SubscriberGone,
+    Poisoned,
 }
 
-<span class="comment">// ===== impl Layer =====</span>
+<span class="comment">// ===== impl Layer =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+</span><span class="kw">impl</span>&lt;L, S&gt; <span class="kw">crate</span>::Layer&lt;S&gt; <span class="kw">for </span>Layer&lt;L, S&gt;
+<span class="kw">where
+    </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
+    S: Subscriber,
 {
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">write</span>(), <span class="kw">else</span> <span class="kw">return</span>).<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+    <span class="kw">fn </span>on_layer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;mut </span>S) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.write(), <span class="kw">else return</span>).on_layer(subscriber);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="ident">Interest::sometimes</span>()).<span class="ident">register_callsite</span>(<span class="ident">metadata</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span>Interest::sometimes()).register_callsite(metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="bool-val">false</span>).<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read(), <span class="kw">else return </span><span class="bool-val">false</span>).enabled(metadata, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_new_span(attrs, id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_record(span, values, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_follows_from(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, follows: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_follows_from(span, follows, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_event(event, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_enter(id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_exit(id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_close(id, ctx)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="macro">try_lock!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">read</span>()).<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_id_change(<span class="kw-2">&amp;</span><span class="self">self</span>, old: <span class="kw-2">&amp;</span>span::Id, new: <span class="kw-2">&amp;</span>span::Id, ctx: layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="macro">try_lock!</span>(<span class="self">self</span>.inner.read()).on_id_change(old, new, ctx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="kw">impl</span>&lt;L, S&gt; Layer&lt;L, S&gt;
+<span class="kw">where
+    </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
+    S: Subscriber,
 {
-    <span class="doccomment">/// Wraps the given `Layer`, returning a `Layer` and a `Handle` that allows</span>
-    <span class="doccomment">/// the inner type to be modified at runtime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">L</span>) -&gt; (<span class="self">Self</span>, <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">RwLock::new</span>(<span class="ident">inner</span>)),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Wraps the given `Layer`, returning a `Layer` and a `Handle` that allows
+    /// the inner type to be modified at runtime.
+    </span><span class="kw">pub fn </span>new(inner: L) -&gt; (<span class="self">Self</span>, Handle&lt;L, S&gt;) {
+        <span class="kw">let </span>this = <span class="self">Self </span>{
+            inner: Arc::new(RwLock::new(inner)),
+            _s: PhantomData,
         };
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">this</span>.<span class="ident">handle</span>();
-        (<span class="ident">this</span>, <span class="ident">handle</span>)
+        <span class="kw">let </span>handle = this.handle();
+        (this, handle)
     }
 
-    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped `Layer`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Handle</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns a `Handle` that can be used to reload the wrapped `Layer`.
+    </span><span class="kw">pub fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle&lt;L, S&gt; {
+        Handle {
+            inner: Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.inner),
+            _s: PhantomData,
         }
     }
 }
 
-<span class="comment">// ===== impl Handle =====</span>
+<span class="comment">// ===== impl Handle =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident"><span class="kw">crate</span>::Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+</span><span class="kw">impl</span>&lt;L, S&gt; Handle&lt;L, S&gt;
+<span class="kw">where
+    </span>L: <span class="kw">crate</span>::Layer&lt;S&gt; + <span class="lifetime">&#39;static</span>,
+    S: Subscriber,
 {
-    <span class="doccomment">/// Replace the current layer with the provided `new_layer`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Warning:** The [`Filtered`](crate::filter::Filtered) type currently can&#39;t be changed</span>
-    <span class="doccomment">/// at runtime via the [`Handle::reload`] method.</span>
-    <span class="doccomment">/// Use the [`Handle::modify`] method to change the filter instead.</span>
-    <span class="doccomment">/// (see &lt;https://github.com/tokio-rs/tracing/issues/1629&gt;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">new_layer</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">modify</span>(<span class="op">|</span><span class="ident">layer</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">layer</span> <span class="op">=</span> <span class="ident">new_layer</span>.<span class="ident">into</span>();
+    <span class="doccomment">/// Replace the current layer with the provided `new_layer`.
+    ///
+    /// **Warning:** The [`Filtered`](crate::filter::Filtered) type currently can&#39;t be changed
+    /// at runtime via the [`Handle::reload`] method.
+    /// Use the [`Handle::modify`] method to change the filter instead.
+    /// (see &lt;https://github.com/tokio-rs/tracing/issues/1629&gt;)
+    </span><span class="kw">pub fn </span>reload(<span class="kw-2">&amp;</span><span class="self">self</span>, new_layer: <span class="kw">impl </span>Into&lt;L&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.modify(|layer| {
+            <span class="kw-2">*</span>layer = new_layer.into();
         })
     }
 
-    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer,</span>
-    <span class="doccomment">/// allowing it to be modified in place.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">L</span>)) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">upgrade</span>().<span class="ident">ok_or</span>(<span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::SubscriberGone</span>,
+    <span class="doccomment">/// Invokes a closure with a mutable reference to the current layer,
+    /// allowing it to be modified in place.
+    </span><span class="kw">pub fn </span>modify(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>L)) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>inner = <span class="self">self</span>.inner.upgrade().ok_or(Error {
+            kind: ErrorKind::SubscriberGone,
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="ident">inner</span>.<span class="ident">write</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::poisoned</span>()));
-        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">lock</span>);
-        <span class="comment">// Release the lock before rebuilding the interest cache, as that</span>
-        <span class="comment">// function will lock the new layer.</span>
-        <span class="ident">drop</span>(<span class="ident">lock</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="macro">try_lock!</span>(inner.write(), <span class="kw">else return </span><span class="prelude-val">Err</span>(Error::poisoned()));
+        f(<span class="kw-2">&amp;mut *</span>lock);
+        <span class="comment">// Release the lock before rebuilding the interest cache, as that
+        // function will lock the new layer.
+        </span>drop(lock);
 
-        <span class="ident">callsite::rebuild_interest_cache</span>();
+        callsite::rebuild_interest_cache();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Returns a clone of the layer&#39;s current value if it still exists.</span>
-    <span class="doccomment">/// Otherwise, if the subscriber has been dropped, returns `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">L</span>: <span class="ident">Clone</span>,
+    <span class="doccomment">/// Returns a clone of the layer&#39;s current value if it still exists.
+    /// Otherwise, if the subscriber has been dropped, returns `None`.
+    </span><span class="kw">pub fn </span>clone_current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;L&gt;
+    <span class="kw">where
+        </span>L: Clone,
     {
-        <span class="self">self</span>.<span class="ident">with_current</span>(<span class="ident">L::clone</span>).<span class="ident">ok</span>()
+        <span class="self">self</span>.with_current(L::clone).ok()
     }
 
-    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer,</span>
-    <span class="doccomment">/// returning the result (or an error if the subscriber no longer exists).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_current</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">L</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">upgrade</span>().<span class="ident">ok_or</span>(<span class="ident">Error</span> {
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::SubscriberGone</span>,
+    <span class="doccomment">/// Invokes a closure with a borrowed reference to the current layer,
+    /// returning the result (or an error if the subscriber no longer exists).
+    </span><span class="kw">pub fn </span>with_current&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>L) -&gt; T) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+        <span class="kw">let </span>inner = <span class="self">self</span>.inner.upgrade().ok_or(Error {
+            kind: ErrorKind::SubscriberGone,
         })<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="macro">try_lock!</span>(<span class="ident">inner</span>.<span class="ident">read</span>(), <span class="kw">else</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::poisoned</span>()));
-        <span class="prelude-val">Ok</span>(<span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">inner</span>))
+        <span class="kw">let </span>inner = <span class="macro">try_lock!</span>(inner.read(), <span class="kw">else return </span><span class="prelude-val">Err</span>(Error::poisoned()));
+        <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;*</span>inner))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Handle</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Handle</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;L, S&gt; Clone <span class="kw">for </span>Handle&lt;L, S&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Handle {
+            inner: <span class="self">self</span>.inner.clone(),
+            _s: PhantomData,
         }
     }
 }
 
-<span class="comment">// ===== impl Error =====</span>
+<span class="comment">// ===== impl Error =====
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">poisoned</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="ident">ErrorKind::Poisoned</span>,
+</span><span class="kw">impl </span>Error {
+    <span class="kw">fn </span>poisoned() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: ErrorKind::Poisoned,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if this error occurred because the layer was poisoned by</span>
-    <span class="doccomment">/// a panic on another thread.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_poisoned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ErrorKind::Poisoned</span>)
+    <span class="doccomment">/// Returns `true` if this error occurred because the layer was poisoned by
+    /// a panic on another thread.
+    </span><span class="kw">pub fn </span>is_poisoned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, ErrorKind::Poisoned)
     }
 
-    <span class="doccomment">/// Returns `true` if this error occurred because the `Subscriber`</span>
-    <span class="doccomment">/// containing the reloadable layer was dropped.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dropped</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ErrorKind::SubscriberGone</span>)
+    <span class="doccomment">/// Returns `true` if this error occurred because the `Subscriber`
+    /// containing the reloadable layer was dropped.
+    </span><span class="kw">pub fn </span>is_dropped(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, ErrorKind::SubscriberGone)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="ident">ErrorKind::SubscriberGone</span> =&gt; <span class="string">&quot;subscriber no longer exists&quot;</span>,
-            <span class="ident">ErrorKind::Poisoned</span> =&gt; <span class="string">&quot;lock poisoned&quot;</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>msg = <span class="kw">match </span><span class="self">self</span>.kind {
+            ErrorKind::SubscriberGone =&gt; <span class="string">&quot;subscriber no longer exists&quot;</span>,
+            ErrorKind::Poisoned =&gt; <span class="string">&quot;lock poisoned&quot;</span>,
         };
-        <span class="ident">f</span>.<span class="ident">pad</span>(<span class="ident">msg</span>)
+        f.pad(msg)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

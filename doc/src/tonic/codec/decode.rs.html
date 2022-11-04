@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/decode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/codec/decode.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>decode.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -381,307 +381,307 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::compression</span>::{<span class="ident">decompress</span>, <span class="ident">CompressionEncoding</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">DecodeBuf</span>, <span class="ident">Decoder</span>, <span class="ident">HEADER_SIZE</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">body::BoxBody</span>, <span class="ident">metadata::MetadataMap</span>, <span class="ident">Code</span>, <span class="ident">Status</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">ready</span>};
-<span class="kw">use</span> <span class="ident">http::StatusCode</span>;
-<span class="kw">use</span> <span class="ident">http_body::Body</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::compression::{decompress, CompressionEncoding};
+<span class="kw">use super</span>::{DecodeBuf, Decoder, HEADER_SIZE};
+<span class="kw">use crate</span>::{body::BoxBody, metadata::MetadataMap, Code, Status};
+<span class="kw">use </span>bytes::{Buf, BufMut, BytesMut};
+<span class="kw">use </span>futures_core::Stream;
+<span class="kw">use </span>futures_util::{future, ready};
+<span class="kw">use </span>http::StatusCode;
+<span class="kw">use </span>http_body::Body;
+<span class="kw">use </span>std::{
+    fmt,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+<span class="kw">use </span>tracing::{debug, trace};
 
-<span class="kw">const</span> <span class="ident">BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="number">1024</span>;
+<span class="kw">const </span>BUFFER_SIZE: usize = <span class="number">8 </span>* <span class="number">1024</span>;
 
-<span class="doccomment">/// Streaming requests and responses.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will wrap some inner [`Body`] and [`Decoder`] and provide an interface</span>
-<span class="doccomment">/// to fetch the message stream and trailing metadata</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">decoder</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">body</span>: <span class="ident">BoxBody</span>,
-    <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="ident">direction</span>: <span class="ident">Direction</span>,
-    <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
-    <span class="ident">trailers</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MetadataMap</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-    <span class="ident">decompress_buf</span>: <span class="ident">BytesMut</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-    <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Streaming requests and responses.
+///
+/// This will wrap some inner [`Body`] and [`Decoder`] and provide an interface
+/// to fetch the message stream and trailing metadata
+</span><span class="kw">pub struct </span>Streaming&lt;T&gt; {
+    decoder: Box&lt;<span class="kw">dyn </span>Decoder&lt;Item = T, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>&gt;,
+    body: BoxBody,
+    state: State,
+    direction: Direction,
+    buf: BytesMut,
+    trailers: <span class="prelude-ty">Option</span>&lt;MetadataMap&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+    </span>decompress_buf: BytesMut,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+    </span>encoding: <span class="prelude-ty">Option</span>&lt;CompressionEncoding&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T&gt; Unpin <span class="kw">for </span>Streaming&lt;T&gt; {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="ident">ReadHeader</span>,
-    <span class="ident">ReadBody</span> { <span class="ident">compression</span>: <span class="ident">bool</span>, <span class="ident">len</span>: <span class="ident">usize</span> },
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>State {
+    ReadHeader,
+    ReadBody { compression: bool, len: usize },
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Direction</span> {
-    <span class="ident">Request</span>,
-    <span class="ident">Response</span>(<span class="ident">StatusCode</span>),
-    <span class="ident">EmptyResponse</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>Direction {
+    Request,
+    Response(StatusCode),
+    EmptyResponse,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_response</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-        <span class="ident">decoder</span>: <span class="ident">D</span>,
-        <span class="ident">body</span>: <span class="ident">B</span>,
-        <span class="ident">status_code</span>: <span class="ident">StatusCode</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; Streaming&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_response&lt;B, D&gt;(
+        decoder: D,
+        body: B,
+        status_code: StatusCode,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)] </span>encoding: <span class="prelude-ty">Option</span>&lt;CompressionEncoding&gt;,
+    ) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>B: Body + Send + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        D: Decoder&lt;Item = T, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">decoder</span>,
-            <span class="ident">body</span>,
-            <span class="ident">Direction::Response</span>(<span class="ident">status_code</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-            <span class="ident">encoding</span>,
+        <span class="self">Self</span>::new(
+            decoder,
+            body,
+            Direction::Response(status_code),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span>encoding,
         )
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_empty</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">decoder</span>: <span class="ident">D</span>, <span class="ident">body</span>: <span class="ident">B</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_empty&lt;B, D&gt;(decoder: D, body: B) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>B: Body + Send + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        D: Decoder&lt;Item = T, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">decoder</span>,
-            <span class="ident">body</span>,
-            <span class="ident">Direction::EmptyResponse</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-            <span class="prelude-val">None</span>,
+        <span class="self">Self</span>::new(
+            decoder,
+            body,
+            Direction::EmptyResponse,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span><span class="prelude-val">None</span>,
         )
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_request</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-        <span class="ident">decoder</span>: <span class="ident">D</span>,
-        <span class="ident">body</span>: <span class="ident">B</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>new_request&lt;B, D&gt;(
+        decoder: D,
+        body: B,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)] </span>encoding: <span class="prelude-ty">Option</span>&lt;CompressionEncoding&gt;,
+    ) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>B: Body + Send + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        D: Decoder&lt;Item = T, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">decoder</span>,
-            <span class="ident">body</span>,
-            <span class="ident">Direction::Request</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-            <span class="ident">encoding</span>,
+        <span class="self">Self</span>::new(
+            decoder,
+            body,
+            Direction::Request,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span>encoding,
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">B</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-        <span class="ident">decoder</span>: <span class="ident">D</span>,
-        <span class="ident">body</span>: <span class="ident">B</span>,
-        <span class="ident">direction</span>: <span class="ident">Direction</span>,
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span> <span class="ident">encoding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompressionEncoding</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">B</span>: <span class="ident">Body</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
-        <span class="ident">D</span>: <span class="ident">Decoder</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Status</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">fn </span>new&lt;B, D&gt;(
+        decoder: D,
+        body: B,
+        direction: Direction,
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)] </span>encoding: <span class="prelude-ty">Option</span>&lt;CompressionEncoding&gt;,
+    ) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>B: Body + Send + <span class="lifetime">&#39;static</span>,
+        B::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
+        D: Decoder&lt;Item = T, Error = Status&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="self">Self</span> {
-            <span class="ident">decoder</span>: <span class="ident">Box::new</span>(<span class="ident">decoder</span>),
-            <span class="ident">body</span>: <span class="ident">body</span>
-                .<span class="ident">map_data</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">buf</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">copy_to_bytes</span>(<span class="ident">buf</span>.<span class="ident">remaining</span>()))
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">Status::map_error</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
-                .<span class="ident">boxed_unsync</span>(),
-            <span class="ident">state</span>: <span class="ident">State::ReadHeader</span>,
-            <span class="ident">direction</span>,
-            <span class="ident">buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">BUFFER_SIZE</span>),
-            <span class="ident">trailers</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-            <span class="ident">decompress_buf</span>: <span class="ident">BytesMut::new</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-            <span class="ident">encoding</span>,
+        <span class="self">Self </span>{
+            decoder: Box::new(decoder),
+            body: body
+                .map_data(|<span class="kw-2">mut </span>buf| buf.copy_to_bytes(buf.remaining()))
+                .map_err(|err| Status::map_error(err.into()))
+                .boxed_unsync(),
+            state: State::ReadHeader,
+            direction,
+            buf: BytesMut::with_capacity(BUFFER_SIZE),
+            trailers: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span>decompress_buf: BytesMut::new(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+            </span>encoding,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Fetch the next message from this stream.</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tonic::{Streaming, Status, codec::Decoder};</span>
-    <span class="doccomment">/// # use std::fmt::Debug;</span>
-    <span class="doccomment">/// # async fn next_message_ex&lt;T, D&gt;(mut request: Streaming&lt;T&gt;) -&gt; Result&lt;(), Status&gt;</span>
-    <span class="doccomment">/// # where T: Debug,</span>
-    <span class="doccomment">/// # D: Decoder&lt;Item = T, Error = Status&gt; + Send  + &#39;static,</span>
-    <span class="doccomment">/// # {</span>
-    <span class="doccomment">/// if let Some(next_message) = request.message().await? {</span>
-    <span class="doccomment">///     println!(&quot;{:?}&quot;, next_message);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>)).<span class="kw">await</span> {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">m</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">m</span>)),
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+<span class="kw">impl</span>&lt;T&gt; Streaming&lt;T&gt; {
+    <span class="doccomment">/// Fetch the next message from this stream.
+    /// ```rust
+    /// # use tonic::{Streaming, Status, codec::Decoder};
+    /// # use std::fmt::Debug;
+    /// # async fn next_message_ex&lt;T, D&gt;(mut request: Streaming&lt;T&gt;) -&gt; Result&lt;(), Status&gt;
+    /// # where T: Debug,
+    /// # D: Decoder&lt;Item = T, Error = Status&gt; + Send  + &#39;static,
+    /// # {
+    /// if let Some(next_message) = request.message().await? {
+    ///     println!(&quot;{:?}&quot;, next_message);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>message(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, Status&gt; {
+        <span class="kw">match </span>future::poll_fn(|cx| Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>).poll_next(cx)).<span class="kw">await </span>{
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(m)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(m)),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; <span class="prelude-val">Err</span>(e),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Fetch the trailing metadata.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will drain the stream of all its messages to receive the trailing</span>
-    <span class="doccomment">/// metadata. If [`Streaming::message`] returns `None` then this function</span>
-    <span class="doccomment">/// will not need to poll for trailers since the body was totally consumed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tonic::{Streaming, Status};</span>
-    <span class="doccomment">/// # async fn trailers_ex&lt;T&gt;(mut request: Streaming&lt;T&gt;) -&gt; Result&lt;(), Status&gt; {</span>
-    <span class="doccomment">/// if let Some(metadata) = request.trailers().await? {</span>
-    <span class="doccomment">///     println!(&quot;{:?}&quot;, metadata);</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">trailers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MetadataMap</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span> {
-        <span class="comment">// Shortcut to see if we already pulled the trailers in the stream step</span>
-        <span class="comment">// we need to do that so that the stream can error on trailing grpc-status</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">trailers</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">trailers</span>.<span class="ident">take</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">trailers</span>));
+    <span class="doccomment">/// Fetch the trailing metadata.
+    ///
+    /// This will drain the stream of all its messages to receive the trailing
+    /// metadata. If [`Streaming::message`] returns `None` then this function
+    /// will not need to poll for trailers since the body was totally consumed.
+    ///
+    /// ```rust
+    /// # use tonic::{Streaming, Status};
+    /// # async fn trailers_ex&lt;T&gt;(mut request: Streaming&lt;T&gt;) -&gt; Result&lt;(), Status&gt; {
+    /// if let Some(metadata) = request.trailers().await? {
+    ///     println!(&quot;{:?}&quot;, metadata);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>trailers(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;MetadataMap&gt;, Status&gt; {
+        <span class="comment">// Shortcut to see if we already pulled the trailers in the stream step
+        // we need to do that so that the stream can error on trailing grpc-status
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(trailers) = <span class="self">self</span>.trailers.take() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(trailers));
         }
 
-        <span class="comment">// To fetch the trailers we must clear the body and drop it.</span>
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">message</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">is_some</span>() {}
+        <span class="comment">// To fetch the trailers we must clear the body and drop it.
+        </span><span class="kw">while </span><span class="self">self</span>.message().<span class="kw">await</span><span class="question-mark">?</span>.is_some() {}
 
-        <span class="comment">// Since we call poll_trailers internally on poll_next we need to</span>
-        <span class="comment">// check if it got cached again.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">trailers</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">trailers</span>.<span class="ident">take</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">trailers</span>));
+        <span class="comment">// Since we call poll_trailers internally on poll_next we need to
+        // check if it got cached again.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(trailers) = <span class="self">self</span>.trailers.take() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(trailers));
         }
 
-        <span class="comment">// Trailers were not caught during poll_next and thus lets poll for</span>
-        <span class="comment">// them manually.</span>
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>))
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Status::from_error</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)));
+        <span class="comment">// Trailers were not caught during poll_next and thus lets poll for
+        // them manually.
+        </span><span class="kw">let </span>map = future::poll_fn(|cx| Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.body).poll_trailers(cx))
+            .<span class="kw">await
+            </span>.map_err(|e| Status::from_error(Box::new(e)));
 
-        <span class="ident">map</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">map</span>(<span class="ident">MetadataMap::from_headers</span>))
+        map.map(|x| x.map(MetadataMap::from_headers))
     }
 
-    <span class="kw">fn</span> <span class="ident">decode_chunk</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Status</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::ReadHeader</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="ident">HEADER_SIZE</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+    <span class="kw">fn </span>decode_chunk(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;T&gt;, Status&gt; {
+        <span class="kw">if let </span>State::ReadHeader = <span class="self">self</span>.state {
+            <span class="kw">if </span><span class="self">self</span>.buf.remaining() &lt; HEADER_SIZE {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">is_compressed</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_u8</span>() {
-                <span class="number">0</span> =&gt; <span class="bool-val">false</span>,
-                <span class="number">1</span> =&gt; {
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-                    {
-                        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">is_some</span>() {
-                            <span class="bool-val">true</span>
-                        } <span class="kw">else</span> {
-                            <span class="comment">// https://grpc.github.io/grpc/core/md_doc_compression.html</span>
-                            <span class="comment">// An ill-constructed message with its Compressed-Flag bit set but lacking a grpc-encoding</span>
-                            <span class="comment">// entry different from identity in its metadata MUST fail with INTERNAL status,</span>
-                            <span class="comment">// its associated description indicating the invalid Compressed-Flag condition.</span>
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="string">&quot;protocol error: received message with compressed-flag but no grpc-encoding was specified&quot;</span>));
+            <span class="kw">let </span>is_compressed = <span class="kw">match </span><span class="self">self</span>.buf.get_u8() {
+                <span class="number">0 </span>=&gt; <span class="bool-val">false</span>,
+                <span class="number">1 </span>=&gt; {
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+                    </span>{
+                        <span class="kw">if </span><span class="self">self</span>.encoding.is_some() {
+                            <span class="bool-val">true
+                        </span>} <span class="kw">else </span>{
+                            <span class="comment">// https://grpc.github.io/grpc/core/md_doc_compression.html
+                            // An ill-constructed message with its Compressed-Flag bit set but lacking a grpc-encoding
+                            // entry different from identity in its metadata MUST fail with INTERNAL status,
+                            // its associated description indicating the invalid Compressed-Flag condition.
+                            </span><span class="kw">return </span><span class="prelude-val">Err</span>(Status::new(Code::Internal, <span class="string">&quot;protocol error: received message with compressed-flag but no grpc-encoding was specified&quot;</span>));
                         }
                     }
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
-                    {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(
-                            <span class="ident">Code::Unimplemented</span>,
-                            <span class="string">&quot;Message compressed, compression support not enabled.&quot;</span>.<span class="ident">to_string</span>(),
+                    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compression&quot;</span>))]
+                    </span>{
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Status::new(
+                            Code::Unimplemented,
+                            <span class="string">&quot;Message compressed, compression support not enabled.&quot;</span>.to_string(),
                         ));
                     }
                 }
-                <span class="ident">f</span> =&gt; {
+                f =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;unexpected compression flag&quot;</span>);
-                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Response</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span> {
+                    <span class="kw">let </span>message = <span class="kw">if let </span>Direction::Response(status) = <span class="self">self</span>.direction {
                         <span class="macro">format!</span>(
                             <span class="string">&quot;protocol error: received message with invalid compression flag: {} (valid flags are 0 and 1) while receiving response with status: {}&quot;</span>,
-                            <span class="ident">f</span>, <span class="ident">status</span>
+                            f, status
                         )
-                    } <span class="kw">else</span> {
-                        <span class="macro">format!</span>(<span class="string">&quot;protocol error: received message with invalid compression flag: {} (valid flags are 0 and 1), while sending request&quot;</span>, <span class="ident">f</span>)
+                    } <span class="kw">else </span>{
+                        <span class="macro">format!</span>(<span class="string">&quot;protocol error: received message with invalid compression flag: {} (valid flags are 0 and 1), while sending request&quot;</span>, f)
                     };
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="ident">message</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Status::new(Code::Internal, message));
                 }
             };
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get_u32</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">len</span>);
+            <span class="kw">let </span>len = <span class="self">self</span>.buf.get_u32() <span class="kw">as </span>usize;
+            <span class="self">self</span>.buf.reserve(len);
 
-            <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ReadBody</span> {
-                <span class="ident">compression</span>: <span class="ident">is_compressed</span>,
-                <span class="ident">len</span>,
+            <span class="self">self</span>.state = State::ReadBody {
+                compression: is_compressed,
+                len,
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::ReadBody</span> { <span class="ident">len</span>, <span class="ident">compression</span> } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span> {
-            <span class="comment">// if we haven&#39;t read enough of the message then return and keep</span>
-            <span class="comment">// reading</span>
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">len</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if let </span>State::ReadBody { len, compression } = <span class="kw-2">&amp;</span><span class="self">self</span>.state {
+            <span class="comment">// if we haven&#39;t read enough of the message then return and keep
+            // reading
+            </span><span class="kw">if </span><span class="self">self</span>.buf.remaining() &lt; <span class="kw-2">*</span>len || <span class="self">self</span>.buf.len() &lt; <span class="kw-2">*</span>len {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">decoding_result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">compression</span> {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-                {
-                    <span class="self">self</span>.<span class="ident">decompress_buf</span>.<span class="ident">clear</span>();
+            <span class="kw">let </span>decoding_result = <span class="kw">if </span><span class="kw-2">*</span>compression {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+                </span>{
+                    <span class="self">self</span>.decompress_buf.clear();
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">decompress</span>(
-                        <span class="self">self</span>.<span class="ident">encoding</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="comment">// SAFETY: The check while in State::ReadHeader would already have returned Code::Internal</span>
-                            <span class="macro">unreachable!</span>(<span class="string">&quot;message was compressed but `Streaming.encoding` was `None`. This is a bug in Tonic. Please file an issue&quot;</span>)
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = decompress(
+                        <span class="self">self</span>.encoding.unwrap_or_else(|| {
+                            <span class="comment">// SAFETY: The check while in State::ReadHeader would already have returned Code::Internal
+                            </span><span class="macro">unreachable!</span>(<span class="string">&quot;message was compressed but `Streaming.encoding` was `None`. This is a bug in Tonic. Please file an issue&quot;</span>)
                         }),
-                        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buf</span>,
-                        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>,
-                        <span class="kw-2">*</span><span class="ident">len</span>,
+                        <span class="kw-2">&amp;mut </span><span class="self">self</span>.buf,
+                        <span class="kw-2">&amp;mut </span><span class="self">self</span>.decompress_buf,
+                        <span class="kw-2">*</span>len,
                     ) {
-                        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Response</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span> {
+                        <span class="kw">let </span>message = <span class="kw">if let </span>Direction::Response(status) = <span class="self">self</span>.direction {
                             <span class="macro">format!</span>(
                                 <span class="string">&quot;Error decompressing: {}, while receiving response with status: {}&quot;</span>,
-                                <span class="ident">err</span>, <span class="ident">status</span>
+                                err, status
                             )
-                        } <span class="kw">else</span> {
-                            <span class="macro">format!</span>(<span class="string">&quot;Error decompressing: {}, while sending request&quot;</span>, <span class="ident">err</span>)
+                        } <span class="kw">else </span>{
+                            <span class="macro">format!</span>(<span class="string">&quot;Error decompressing: {}, while sending request&quot;</span>, err)
                         };
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(<span class="ident">Code::Internal</span>, <span class="ident">message</span>));
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Status::new(Code::Internal, message));
                     }
-                    <span class="kw">let</span> <span class="ident">decompressed_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>.<span class="ident">len</span>();
-                    <span class="self">self</span>.<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">DecodeBuf::new</span>(
-                        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">decompress_buf</span>,
-                        <span class="ident">decompressed_len</span>,
+                    <span class="kw">let </span>decompressed_len = <span class="self">self</span>.decompress_buf.len();
+                    <span class="self">self</span>.decoder.decode(<span class="kw-2">&amp;mut </span>DecodeBuf::new(
+                        <span class="kw-2">&amp;mut </span><span class="self">self</span>.decompress_buf,
+                        decompressed_len,
                     ))
                 }
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>))]</span>
-                <span class="macro">unreachable!</span>(<span class="string">&quot;should not take this branch if compression is disabled&quot;</span>)
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">decoder</span>
-                    .<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">DecodeBuf::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buf</span>, <span class="kw-2">*</span><span class="ident">len</span>))
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compression&quot;</span>))]
+                </span><span class="macro">unreachable!</span>(<span class="string">&quot;should not take this branch if compression is disabled&quot;</span>)
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.decoder
+                    .decode(<span class="kw-2">&amp;mut </span>DecodeBuf::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.buf, <span class="kw-2">*</span>len))
             };
 
-            <span class="kw">return</span> <span class="kw">match</span> <span class="ident">decoding_result</span> {
-                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::ReadHeader</span>;
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>))
+            <span class="kw">return match </span>decoding_result {
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(msg)) =&gt; {
+                    <span class="self">self</span>.state = State::ReadHeader;
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(msg))
                 }
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
             };
         }
 
@@ -689,78 +689,78 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Status</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T&gt; Stream <span class="kw">for </span>Streaming&lt;T&gt; {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T, Status&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// FIXME: implement the ability to poll trailers when we _know_ that</span>
-            <span class="comment">// the consumer of this stream will only poll for the first message.</span>
-            <span class="comment">// This means we skip the poll_trailers step.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode_chunk</span>()<span class="question-mark">?</span> {
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">item</span>)));
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="comment">// FIXME: implement the ability to poll trailers when we _know_ that
+            // the consumer of this stream will only poll for the first message.
+            // This means we skip the poll_trailers step.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(item) = <span class="self">self</span>.decode_chunk()<span class="question-mark">? </span>{
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(item)));
             }
 
-            <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_data</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">d</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>),
-                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
-                    <span class="macro">debug!</span>(<span class="string">&quot;decoder inner stream error: {:?}&quot;</span>, <span class="ident">err</span>);
-                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="ident">err</span>);
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">status</span>)));
+            <span class="kw">let </span>chunk = <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.body).poll_data(cx)) {
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(d)) =&gt; <span class="prelude-val">Some</span>(d),
+                <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; {
+                    <span class="kw">let </span>err: <span class="kw">crate</span>::Error = e.into();
+                    <span class="macro">debug!</span>(<span class="string">&quot;decoder inner stream error: {:?}&quot;</span>, err);
+                    <span class="kw">let </span>status = Status::from_error(err);
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(status)));
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">chunk</span> {
-                <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">put</span>(<span class="ident">data</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// FIXME: improve buf usage.</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">has_remaining</span>() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = chunk {
+                <span class="self">self</span>.buf.put(data);
+            } <span class="kw">else </span>{
+                <span class="comment">// FIXME: improve buf usage.
+                </span><span class="kw">if </span><span class="self">self</span>.buf.has_remaining() {
                     <span class="macro">trace!</span>(<span class="string">&quot;unexpected EOF decoding stream&quot;</span>);
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Status::new</span>(
-                        <span class="ident">Code::Internal</span>,
-                        <span class="string">&quot;Unexpected EOF decoding stream.&quot;</span>.<span class="ident">to_string</span>(),
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(Status::new(
+                        Code::Internal,
+                        <span class="string">&quot;Unexpected EOF decoding stream.&quot;</span>.to_string(),
                     ))));
-                } <span class="kw">else</span> {
+                } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Direction::Response</span>(<span class="ident">status</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span> {
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_trailers</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Ok</span>(<span class="ident">trailer</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::status::infer_grpc_status</span>(<span class="ident">trailer</span>.<span class="ident">as_ref</span>(), <span class="ident">status</span>) {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">e</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)).<span class="ident">into</span>();
-                        } <span class="kw">else</span> {
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if let </span>Direction::Response(status) = <span class="self">self</span>.direction {
+            <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.body).poll_trailers(cx)) {
+                <span class="prelude-val">Ok</span>(trailer) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = <span class="kw">crate</span>::status::infer_grpc_status(trailer.as_ref(), status) {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(e) = e {
+                            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)).into();
+                        } <span class="kw">else </span>{
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
                         }
-                    } <span class="kw">else</span> {
-                        <span class="self">self</span>.<span class="ident">trailers</span> <span class="op">=</span> <span class="ident">trailer</span>.<span class="ident">map</span>(<span class="ident">MetadataMap::from_headers</span>);
+                    } <span class="kw">else </span>{
+                        <span class="self">self</span>.trailers = trailer.map(MetadataMap::from_headers);
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
-                    <span class="macro">debug!</span>(<span class="string">&quot;decoder inner trailers error: {:?}&quot;</span>, <span class="ident">err</span>);
-                    <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Status::from_error</span>(<span class="ident">err</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">status</span>)).<span class="ident">into</span>();
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="kw">let </span>err: <span class="kw">crate</span>::Error = e.into();
+                    <span class="macro">debug!</span>(<span class="string">&quot;decoder inner trailers error: {:?}&quot;</span>, err);
+                    <span class="kw">let </span>status = Status::from_error(err);
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(status)).into();
                 }
             }
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+        Poll::Ready(<span class="prelude-val">None</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Streaming</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Streaming&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>Streaming&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Streaming&quot;</span>).finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="macro">static_assertions::assert_impl_all!</span>(<span class="ident">Streaming</span><span class="op">&lt;</span>()<span class="op">&gt;</span>: <span class="ident">Send</span>);
+<span class="attribute">#[cfg(test)]
+</span><span class="macro">static_assertions::assert_impl_all!</span>(Streaming&lt;()&gt;: Send);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

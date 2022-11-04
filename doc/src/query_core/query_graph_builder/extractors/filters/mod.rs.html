@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/extractors/filters/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -353,360 +353,360 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite</span>;
-<span class="kw">mod</span> <span class="ident">filter_fold</span>;
-<span class="kw">mod</span> <span class="ident">filter_grouping</span>;
-<span class="kw">mod</span> <span class="ident">relation</span>;
-<span class="kw">mod</span> <span class="ident">scalar</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>composite;
+<span class="kw">mod </span>filter_fold;
+<span class="kw">mod </span>filter_grouping;
+<span class="kw">mod </span>relation;
+<span class="kw">mod </span>scalar;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::utils</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>},
-    <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
+<span class="kw">use </span><span class="kw">super</span>::utils;
+<span class="kw">use crate</span>::{
+    query_document::{ParsedInputMap, ParsedInputValue},
+    QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{
-    <span class="ident">filter::Filter</span>, <span class="ident">CompositeCompare</span>, <span class="ident">QueryMode</span>, <span class="ident">RelationCompare</span>, <span class="ident">ScalarCompare</span>, <span class="ident">ScalarCondition</span>, <span class="ident">ScalarProjection</span>,
+<span class="kw">use </span>connector::{
+    filter::Filter, CompositeCompare, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection,
 };
-<span class="kw">use</span> <span class="ident">filter_fold</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">filter_grouping</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>,
+<span class="kw">use </span>filter_fold::<span class="kw-2">*</span>;
+<span class="kw">use </span>filter_grouping::<span class="kw-2">*</span>;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>prisma_models::{
+    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
 };
-<span class="kw">use</span> <span class="ident">schema_builder::constants::filters</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">convert::TryInto</span>, <span class="ident">str::FromStr</span>};
+<span class="kw">use </span>schema_builder::constants::filters;
+<span class="kw">use </span>std::{collections::HashMap, convert::TryInto, str::FromStr};
 
-<span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_unique_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">value_map</span>.<span class="ident">tag</span>.<span class="ident">clone</span>();
-    <span class="comment">// Partition the input into a map containing only the unique fields and one containing all the other filters</span>
-    <span class="comment">// so that we can parse them separately and ensure we AND both filters</span>
-    <span class="kw">let</span> (<span class="ident">unique_map</span>, <span class="ident">rest_map</span>): (<span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>) <span class="op">=</span>
-        <span class="ident">value_map</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">partition</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">unique</span>(),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">utils::resolve_compound_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>).<span class="ident">is_some</span>(),
+<span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
+</span><span class="kw">pub fn </span>extract_unique_filter(value_map: ParsedInputMap, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+    <span class="kw">let </span>tag = value_map.tag.clone();
+    <span class="comment">// Partition the input into a map containing only the unique fields and one containing all the other filters
+    // so that we can parse them separately and ensure we AND both filters
+    </span><span class="kw">let </span>(unique_map, rest_map): (IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, IndexMap&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;) =
+        value_map
+            .into_iter()
+            .partition(|(field_name, <span class="kw">_</span>)| <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>field_name) {
+                <span class="prelude-val">Ok</span>(field) =&gt; field.unique(),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(<span class="kw-2">&amp;</span>field_name, <span class="kw-2">&amp;</span>model).is_some(),
             });
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unique_map</span> <span class="op">=</span> <span class="ident">ParsedInputMap::from</span>(<span class="ident">unique_map</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rest_map</span> <span class="op">=</span> <span class="ident">ParsedInputMap::from</span>(<span class="ident">rest_map</span>);
-    <span class="ident">unique_map</span>.<span class="ident">set_tag</span>(<span class="ident">tag</span>.<span class="ident">clone</span>());
-    <span class="ident">rest_map</span>.<span class="ident">set_tag</span>(<span class="ident">tag</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>unique_map = ParsedInputMap::from(unique_map);
+    <span class="kw">let </span><span class="kw-2">mut </span>rest_map = ParsedInputMap::from(rest_map);
+    unique_map.set_tag(tag.clone());
+    rest_map.set_tag(tag);
 
-    <span class="kw">let</span> <span class="ident">unique_filters</span> <span class="op">=</span> <span class="ident">internal_extract_unique_filter</span>(<span class="ident">unique_map</span>, <span class="ident">model</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">rest_filters</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">rest_map</span>, <span class="ident">model</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>unique_filters = internal_extract_unique_filter(unique_map, model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>rest_filters = extract_filter(rest_map, model)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="macro">vec!</span>[<span class="ident">unique_filters</span>, <span class="ident">rest_filters</span>]))
+    <span class="prelude-val">Ok</span>(Filter::and(<span class="macro">vec!</span>[unique_filters, rest_filters]))
 }
 
-<span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.</span>
-<span class="doccomment">/// The input map must only contain unique &amp; compound unique fields.</span>
-<span class="kw">fn</span> <span class="ident">internal_extract_unique_filter</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">value_map</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="ident">value</span>): (<span class="ident">String</span>, <span class="ident">ParsedInputValue</span>)<span class="op">|</span> {
-            <span class="comment">// Always try to resolve regular fields first. If that fails, try to resolve compound fields.</span>
-            <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">value</span>))
+<span class="doccomment">/// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
+/// The input map must only contain unique &amp; compound unique fields.
+</span><span class="kw">fn </span>internal_extract_unique_filter(value_map: ParsedInputMap, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+    <span class="kw">let </span>filters = value_map
+        .into_iter()
+        .map(|(field_name, value): (String, ParsedInputValue)| {
+            <span class="comment">// Always try to resolve regular fields first. If that fails, try to resolve compound fields.
+            </span><span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>field_name) {
+                <span class="prelude-val">Ok</span>(field) =&gt; {
+                    <span class="kw">let </span>value: PrismaValue = value.try_into()<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(field.equals(value))
                 }
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">utils::resolve_compound_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">QueryGraphBuilderError::AssertionError</span>(<span class="macro">format!</span>(
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; utils::resolve_compound_field(<span class="kw-2">&amp;</span>field_name, <span class="kw-2">&amp;</span>model)
+                    .ok_or_else(|| {
+                        QueryGraphBuilderError::AssertionError(<span class="macro">format!</span>(
                             <span class="string">&quot;Unable to resolve field {} to a field or set of scalar fields on model {}&quot;</span>,
-                            <span class="ident">field_name</span>, <span class="ident">model</span>.<span class="ident">name</span>
+                            field_name, model.name
                         ))
                     })
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">handle_compound_field</span>(<span class="ident">fields</span>, <span class="ident">value</span>)),
+                    .and_then(|fields| handle_compound_field(fields, value)),
             }
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="ident">filters</span>))
+    <span class="prelude-val">Ok</span>(Filter::and(filters))
 }
 
-<span class="kw">fn</span> <span class="ident">handle_compound_field</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="kw">fn </span>handle_compound_field(fields: Vec&lt;ScalarFieldRef&gt;, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>input_map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">pv</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input_map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">sf</span>.<span class="ident">equals</span>(<span class="ident">pv</span>))
+    <span class="kw">let </span>filters: Vec&lt;Filter&gt; = fields
+        .into_iter()
+        .map(|sf| {
+            <span class="kw">let </span>pv: PrismaValue = input_map.remove(<span class="kw-2">&amp;</span>sf.name).unwrap().try_into()<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(sf.equals(pv))
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Filter::And</span>(<span class="ident">filters</span>))
+    <span class="prelude-val">Ok</span>(Filter::And(filters))
 }
 
-<span class="doccomment">/// Extracts a regular filter potentially matching many records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Filter rules</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This function recurses to create a structure of `AND/OR/NOT` conditions. The</span>
-<span class="doccomment">/// rules are defined as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Name | 0 filters         | 1 filter               | n filters            |</span>
-<span class="doccomment">/// |---   |---                |---                     |---                   |</span>
-<span class="doccomment">/// | OR   | return empty list | validate single filter | validate all filters |</span>
-<span class="doccomment">/// | AND  | return all items  | validate single filter | validate all filters |</span>
-<span class="doccomment">/// | NOT  | return all items  | validate single filter | validate all filters |</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_filter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>, <span class="ident">container</span>: <span class="ident">T</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ParentContainer</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extracts a regular filter potentially matching many records.
+///
+/// # Filter rules
+///
+/// This function recurses to create a structure of `AND/OR/NOT` conditions. The
+/// rules are defined as follows:
+///
+/// | Name | 0 filters         | 1 filter               | n filters            |
+/// |---   |---                |---                     |---                   |
+/// | OR   | return empty list | validate single filter | validate all filters |
+/// | AND  | return all items  | validate single filter | validate all filters |
+/// | NOT  | return all items  | validate single filter | validate all filters |
+</span><span class="kw">pub fn </span>extract_filter&lt;T&gt;(value_map: ParsedInputMap, container: T) -&gt; QueryGraphBuilderResult&lt;Filter&gt;
+<span class="kw">where
+    </span>T: Into&lt;ParentContainer&gt;,
 {
-    <span class="kw">let</span> <span class="ident">container</span> <span class="op">=</span> <span class="ident">container</span>.<span class="ident">into</span>();
+    <span class="kw">let </span>container = container.into();
 
-    <span class="comment">// We define an internal function so we can track the recursion depth. Empty</span>
-    <span class="comment">// filters at the root layer cannot always be removed.</span>
-    <span class="kw">fn</span> <span class="ident">extract_filter</span>(
-        <span class="ident">value_map</span>: <span class="ident">ParsedInputMap</span>,
-        <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-        <span class="ident">depth</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">value_map</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> {
-                <span class="comment">// 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.</span>
-                <span class="kw">match</span> <span class="ident">FilterGrouping::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">filter_kind</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                            <span class="ident">ParsedInputValue::List</span>(<span class="ident">values</span>) =&gt; <span class="ident">values</span>
-                                .<span class="ident">into_iter</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">extract_filter</span>(<span class="ident">val</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">container</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>))
-                                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+    <span class="comment">// We define an internal function so we can track the recursion depth. Empty
+    // filters at the root layer cannot always be removed.
+    </span><span class="kw">fn </span>extract_filter(
+        value_map: ParsedInputMap,
+        container: <span class="kw-2">&amp;</span>ParentContainer,
+        depth: usize,
+    ) -&gt; QueryGraphBuilderResult&lt;Filter&gt; {
+        <span class="kw">let </span>filters = value_map
+            .into_iter()
+            .map(|(key, value)| {
+                <span class="comment">// 2 possibilities: Either a filter group (and, or, not) with a vector/object, or a field name with a filter object behind.
+                </span><span class="kw">match </span>FilterGrouping::from_str(<span class="kw-2">&amp;</span>key) {
+                    <span class="prelude-val">Ok</span>(filter_kind) =&gt; {
+                        <span class="kw">let </span>filters = <span class="kw">match </span>value {
+                            ParsedInputValue::List(values) =&gt; values
+                                .into_iter()
+                                .map(|val| extract_filter(val.try_into()<span class="question-mark">?</span>, container, depth + <span class="number">1</span>))
+                                .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?</span>,
 
-                            <span class="comment">// Single map to vec coercion</span>
-                            <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; {
-                                <span class="ident">extract_filter</span>(<span class="ident">map</span>, <span class="ident">container</span>, <span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">res</span>])<span class="question-mark">?</span>
-                            }
+                            <span class="comment">// Single map to vec coercion
+                            </span>ParsedInputValue::Map(map) =&gt; {
+                                extract_filter(map, container, depth + <span class="number">1</span>).map(|res| <span class="macro">vec!</span>[res])<span class="question-mark">?
+                            </span>}
 
-                            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                         };
 
-                        <span class="comment">// strip empty filters</span>
-                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">filters</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">filter</span>, <span class="ident">Filter::Empty</span>))
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                        <span class="comment">// strip empty filters
+                        </span><span class="kw">let </span>filters = filters
+                            .into_iter()
+                            .filter(|filter| !<span class="macro">matches!</span>(filter, Filter::Empty))
+                            .collect::&lt;Vec&lt;Filter&gt;&gt;();
 
-                        <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-                            <span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">depth</span> {
-                                <span class="number">0</span> =&gt; <span class="kw">match</span> <span class="ident">filter_kind</span> {
-                                    <span class="ident">FilterGrouping::And</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="ident">filters</span>)),
-                                    <span class="ident">FilterGrouping::Or</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::or</span>(<span class="ident">filters</span>)),
-                                    <span class="ident">FilterGrouping::Not</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::not</span>(<span class="ident">filters</span>)),
+                        <span class="kw">match </span>filters.len() {
+                            <span class="number">0 </span>=&gt; <span class="kw">match </span>depth {
+                                <span class="number">0 </span>=&gt; <span class="kw">match </span>filter_kind {
+                                    FilterGrouping::And =&gt; <span class="prelude-val">Ok</span>(Filter::and(filters)),
+                                    FilterGrouping::Or =&gt; <span class="prelude-val">Ok</span>(Filter::or(filters)),
+                                    FilterGrouping::Not =&gt; <span class="prelude-val">Ok</span>(Filter::not(filters)),
                                 },
-                                <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::empty</span>()),
+                                <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Filter::empty()),
                             },
-                            <span class="number">1</span> =&gt; <span class="kw">match</span> <span class="ident">filter_kind</span> {
-                                <span class="ident">FilterGrouping::Not</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::not</span>(<span class="ident">filters</span>)),
-                                <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+                            <span class="number">1 </span>=&gt; <span class="kw">match </span>filter_kind {
+                                FilterGrouping::Not =&gt; <span class="prelude-val">Ok</span>(Filter::not(filters)),
+                                <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(filters.into_iter().next().unwrap()),
                             },
-                            <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">filter_kind</span> {
-                                <span class="ident">FilterGrouping::And</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="ident">filters</span>)),
-                                <span class="ident">FilterGrouping::Or</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::or</span>(<span class="ident">filters</span>)),
-                                <span class="ident">FilterGrouping::Not</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::not</span>(<span class="ident">filters</span>)),
+                            <span class="kw">_ </span>=&gt; <span class="kw">match </span>filter_kind {
+                                FilterGrouping::And =&gt; <span class="prelude-val">Ok</span>(Filter::and(filters)),
+                                FilterGrouping::Or =&gt; <span class="prelude-val">Ok</span>(Filter::or(filters)),
+                                FilterGrouping::Not =&gt; <span class="prelude-val">Ok</span>(Filter::not(filters)),
                             },
                         }
                     }
                     <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">container</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">expect</span>(<span class="string">&quot;Invalid field passed validation.&quot;</span>) {
-                            <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">extract_relation_filters</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>, <span class="ident">value</span>),
-                            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">extract_scalar_filters</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>, <span class="ident">value</span>),
-                            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">extract_composite_filters</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>, <span class="ident">value</span>),
+                        <span class="kw">let </span>filters = <span class="kw">match </span>container.find_field(<span class="kw-2">&amp;</span>key).expect(<span class="string">&quot;Invalid field passed validation.&quot;</span>) {
+                            Field::Relation(rf) =&gt; extract_relation_filters(<span class="kw-2">&amp;</span>rf, value),
+                            Field::Scalar(sf) =&gt; extract_scalar_filters(<span class="kw-2">&amp;</span>sf, value),
+                            Field::Composite(cf) =&gt; extract_composite_filters(<span class="kw-2">&amp;</span>cf, value),
                         }<span class="question-mark">?</span>;
 
-                        <span class="comment">// strip empty filters</span>
-                        <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">filters</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">filter</span>, <span class="ident">Filter::Empty</span>))
-                            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                        <span class="comment">// strip empty filters
+                        </span><span class="kw">let </span>filters = filters
+                            .into_iter()
+                            .filter(|filter| !<span class="macro">matches!</span>(filter, Filter::Empty))
+                            .collect::&lt;Vec&lt;Filter&gt;&gt;();
 
-                        <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-                            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::empty</span>()),
-                            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()),
-                            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="ident">filters</span>)),
+                        <span class="kw">match </span>filters.len() {
+                            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(Filter::empty()),
+                            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(filters.into_iter().next().unwrap()),
+                            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Filter::and(filters)),
                         }
                     }
                 }
             })
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">filter</span>, <span class="prelude-val">Ok</span>(<span class="ident">Filter::Empty</span>)))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .filter(|filter| !<span class="macro">matches!</span>(filter, <span class="prelude-val">Ok</span>(Filter::Empty)))
+            .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">filters</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::empty</span>()),
-            <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">filters</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Filter::and</span>(<span class="ident">filters</span>)),
+        <span class="kw">match </span>filters.len() {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(Filter::empty()),
+            <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(filters.into_iter().next().unwrap()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Filter::and(filters)),
         }
     }
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">value_map</span>, <span class="kw-2">&amp;</span><span class="ident">container</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">merge_search_filters</span>(<span class="ident">filter</span>);
+    <span class="kw">let </span>filter = extract_filter(value_map, <span class="kw-2">&amp;</span>container, <span class="number">0</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = merge_search_filters(filter);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">filter</span>)
+    <span class="prelude-val">Ok</span>(filter)
 }
 
-<span class="doccomment">/// Search filters that have the same query and that are in the same condition block</span>
-<span class="doccomment">/// are merged together to optimize the generated SQL statements.</span>
-<span class="doccomment">/// This is done in three steps (below transformations are using pseudo-code):</span>
-<span class="doccomment">/// 1. We flatten the filter tree.</span>
-<span class="doccomment">/// eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -&gt; `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`</span>
-<span class="doccomment">/// 2. We index search filters by their query.</span>
-<span class="doccomment">/// eg: `Filter(And([SearchFilter(&quot;query&quot;, [FieldA]), SearchFilter(&quot;query&quot;, [FieldB])]))` -&gt; `{ &quot;query&quot;: [FieldA, FieldB] }`</span>
-<span class="doccomment">/// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way</span>
-<span class="doccomment">/// eg: `Filter(And([SearchFilter(&quot;query&quot;, [FieldA]), SearchFilter(&quot;query&quot;, [FieldB])]))` -&gt; `Filter(And([SearchFilter(&quot;query&quot;, [FieldA, FieldB])]))`</span>
-<span class="kw">fn</span> <span class="ident">merge_search_filters</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="ident">Filter</span> {
-    <span class="comment">// The filter tree _needs_ to be flattened for the merge to work properly</span>
-    <span class="kw">let</span> <span class="ident">flattened</span> <span class="op">=</span> <span class="ident">fold_filter</span>(<span class="ident">filter</span>);
+<span class="doccomment">/// Search filters that have the same query and that are in the same condition block
+/// are merged together to optimize the generated SQL statements.
+/// This is done in three steps (below transformations are using pseudo-code):
+/// 1. We flatten the filter tree.
+/// eg: `Filter(And([ScalarFilter, ScalarFilter], And([ScalarFilter])))` -&gt; `Filter(And([ScalarFilter, ScalarFilter, ScalarFilter]))`
+/// 2. We index search filters by their query.
+/// eg: `Filter(And([SearchFilter(&quot;query&quot;, [FieldA]), SearchFilter(&quot;query&quot;, [FieldB])]))` -&gt; `{ &quot;query&quot;: [FieldA, FieldB] }`
+/// 3. We reconstruct the filter tree and merge the search filters that have the same query along the way
+/// eg: `Filter(And([SearchFilter(&quot;query&quot;, [FieldA]), SearchFilter(&quot;query&quot;, [FieldB])]))` -&gt; `Filter(And([SearchFilter(&quot;query&quot;, [FieldA, FieldB])]))`
+</span><span class="kw">fn </span>merge_search_filters(filter: Filter) -&gt; Filter {
+    <span class="comment">// The filter tree _needs_ to be flattened for the merge to work properly
+    </span><span class="kw">let </span>flattened = fold_filter(filter);
 
-    <span class="kw">match</span> <span class="ident">flattened</span> {
-        <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; <span class="ident">Filter::And</span>(<span class="ident">fold_search_filters</span>(<span class="kw-2">&amp;</span><span class="ident">and</span>)),
-        <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; <span class="ident">Filter::Or</span>(<span class="ident">fold_search_filters</span>(<span class="kw-2">&amp;</span><span class="ident">or</span>)),
-        <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; <span class="ident">Filter::Not</span>(<span class="ident">fold_search_filters</span>(<span class="kw-2">&amp;</span><span class="ident">not</span>)),
-        <span class="kw">_</span> =&gt; <span class="ident">flattened</span>,
+    <span class="kw">match </span>flattened {
+        Filter::And(and) =&gt; Filter::And(fold_search_filters(<span class="kw-2">&amp;</span>and)),
+        Filter::Or(or) =&gt; Filter::Or(fold_search_filters(<span class="kw-2">&amp;</span>or)),
+        Filter::Not(not) =&gt; Filter::Not(fold_search_filters(<span class="kw-2">&amp;</span>not)),
+        <span class="kw">_ </span>=&gt; flattened,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fold_search_filters</span>(<span class="ident">filters</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filters_by_val</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PrismaValue</span>, <span class="kw-2">&amp;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">projections_by_val</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">PrismaValue</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>fold_search_filters(filters: <span class="kw-2">&amp;</span>Vec&lt;Filter&gt;) -&gt; Vec&lt;Filter&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>filters_by_val: HashMap&lt;PrismaValue, <span class="kw-2">&amp;</span>Filter&gt; = HashMap::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>projections_by_val: HashMap&lt;PrismaValue, Vec&lt;ScalarProjection&gt;&gt; = HashMap::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>output: Vec&lt;Filter&gt; = <span class="macro">vec!</span>[];
 
-    <span class="comment">// Gather search filters that have the same condition</span>
-    <span class="kw">for</span> <span class="ident">filter</span> <span class="kw">in</span> <span class="ident">filters</span>.<span class="ident">iter</span>() {
-        <span class="kw">match</span> <span class="ident">filter</span> {
-            <span class="ident">Filter::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">sf</span>) =&gt; <span class="kw">match</span> <span class="ident">sf</span>.<span class="ident">condition</span> {
-                <span class="ident">ScalarCondition::Search</span>(<span class="kw-2">ref</span> <span class="ident">pv</span>, <span class="kw">_</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">pv</span> <span class="op">=</span> <span class="ident">pv</span>.<span class="ident">as_value</span>().<span class="ident">unwrap</span>();
-                    <span class="comment">// If there&#39;s already an entry, then store the &quot;additional&quot; projections that will need to be merged</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">projections</span>) <span class="op">=</span> <span class="ident">projections_by_val</span>.<span class="ident">get_mut</span>(<span class="ident">pv</span>) {
-                        <span class="ident">projections</span>.<span class="ident">push</span>(<span class="ident">sf</span>.<span class="ident">projection</span>.<span class="ident">clone</span>());
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Otherwise, store the first search filter found on which we&#39;ll merge the additional projections</span>
-                        <span class="ident">projections_by_val</span>.<span class="ident">insert</span>(<span class="ident">pv</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[]);
-                        <span class="ident">filters_by_val</span>.<span class="ident">insert</span>(<span class="ident">pv</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>);
+    <span class="comment">// Gather search filters that have the same condition
+    </span><span class="kw">for </span>filter <span class="kw">in </span>filters.iter() {
+        <span class="kw">match </span>filter {
+            Filter::Scalar(<span class="kw-2">ref </span>sf) =&gt; <span class="kw">match </span>sf.condition {
+                ScalarCondition::Search(<span class="kw-2">ref </span>pv, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">let </span>pv = pv.as_value().unwrap();
+                    <span class="comment">// If there&#39;s already an entry, then store the &quot;additional&quot; projections that will need to be merged
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(projections) = projections_by_val.get_mut(pv) {
+                        projections.push(sf.projection.clone());
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Otherwise, store the first search filter found on which we&#39;ll merge the additional projections
+                        </span>projections_by_val.insert(pv.clone(), <span class="macro">vec!</span>[]);
+                        filters_by_val.insert(pv.clone(), filter);
                     }
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">filter</span>.<span class="ident">clone</span>()),
+                <span class="kw">_ </span>=&gt; output.push(filter.clone()),
             },
-            <span class="ident">Filter::And</span>(<span class="ident">and</span>) =&gt; {
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">Filter::And</span>(<span class="ident">fold_search_filters</span>(<span class="ident">and</span>)));
+            Filter::And(and) =&gt; {
+                output.push(Filter::And(fold_search_filters(and)));
             }
-            <span class="ident">Filter::Or</span>(<span class="ident">or</span>) =&gt; {
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">Filter::Or</span>(<span class="ident">fold_search_filters</span>(<span class="ident">or</span>)));
+            Filter::Or(or) =&gt; {
+                output.push(Filter::Or(fold_search_filters(or)));
             }
-            <span class="ident">Filter::Not</span>(<span class="ident">not</span>) =&gt; {
-                <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">Filter::Not</span>(<span class="ident">fold_search_filters</span>(<span class="ident">not</span>)));
+            Filter::Not(not) =&gt; {
+                output.push(Filter::Not(fold_search_filters(not)));
             }
-            <span class="ident">x</span> =&gt; <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">x</span>.<span class="ident">clone</span>()),
+            x =&gt; output.push(x.clone()),
         }
     }
 
-    <span class="comment">// Merge the search filters that have the same condition</span>
-    <span class="kw">for</span> (<span class="ident">pv</span>, <span class="ident">filter</span>) <span class="kw">in</span> <span class="ident">filters_by_val</span>.<span class="ident">into_iter</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">projections</span> <span class="op">=</span> <span class="ident">projections_by_val</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pv</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">clone</span>();
+    <span class="comment">// Merge the search filters that have the same condition
+    </span><span class="kw">for </span>(pv, filter) <span class="kw">in </span>filters_by_val.into_iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>projections = projections_by_val.get_mut(<span class="kw-2">&amp;</span>pv).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>filter = filter.clone();
 
-        <span class="kw">match</span> <span class="ident">filter</span> {
-            <span class="ident">Filter::Scalar</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">sf</span>) =&gt; <span class="kw">match</span> <span class="ident">sf</span>.<span class="ident">condition</span> {
-                <span class="ident">ScalarCondition::Search</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">search_proj</span>) =&gt; {
-                    <span class="ident">search_proj</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">projections</span>);
+        <span class="kw">match </span>filter {
+            Filter::Scalar(<span class="kw-2">ref mut </span>sf) =&gt; <span class="kw">match </span>sf.condition {
+                ScalarCondition::Search(<span class="kw">_</span>, <span class="kw-2">ref mut </span>search_proj) =&gt; {
+                    search_proj.append(<span class="kw-2">&amp;mut </span>projections);
                 }
-                <span class="ident">ScalarCondition::NotSearch</span>(<span class="kw">_</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">search_proj</span>) =&gt; {
-                    <span class="ident">search_proj</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">projections</span>);
+                ScalarCondition::NotSearch(<span class="kw">_</span>, <span class="kw-2">ref mut </span>search_proj) =&gt; {
+                    search_proj.append(<span class="kw-2">&amp;mut </span>projections);
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             },
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
 
-        <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">filter</span>.<span class="ident">clone</span>());
+        output.push(filter.clone());
     }
 
-    <span class="ident">output</span>
+    output
 }
 
-<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.</span>
-<span class="doccomment">/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).</span>
-<span class="kw">fn</span> <span class="ident">extract_scalar_filters</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">pv</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">pv</span>)]),
-        <span class="ident">ParsedInputValue::Map</span>(<span class="kw-2">mut</span> <span class="ident">filter_map</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filter_map</span>.<span class="ident">remove</span>(<span class="ident">filters::MODE</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">parse_query_mode</span>(<span class="ident">i</span>)<span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="ident">QueryMode::Default</span>,
+<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.
+/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
+</span><span class="kw">fn </span>extract_scalar_filters(field: <span class="kw-2">&amp;</span>ScalarFieldRef, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+    <span class="kw">match </span>value {
+        ParsedInputValue::Single(pv) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(pv)]),
+        ParsedInputValue::Map(<span class="kw-2">mut </span>filter_map) =&gt; {
+            <span class="kw">let </span>mode = <span class="kw">match </span>filter_map.remove(filters::MODE) {
+                <span class="prelude-val">Some</span>(i) =&gt; parse_query_mode(i)<span class="question-mark">?</span>,
+                <span class="prelude-val">None </span>=&gt; QueryMode::Default,
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">scalar::ScalarFilterParser::new</span>(<span class="ident">field</span>, <span class="bool-val">false</span>).<span class="ident">parse</span>(<span class="ident">filter_map</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>filters: Vec&lt;Filter&gt; = scalar::ScalarFilterParser::new(field, <span class="bool-val">false</span>).parse(filter_map)<span class="question-mark">?</span>;
 
-            <span class="ident">filters</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">set_mode</span>(<span class="ident">mode</span>.<span class="ident">clone</span>()));
-            <span class="prelude-val">Ok</span>(<span class="ident">filters</span>)
+            filters.iter_mut().for_each(|f| f.set_mode(mode.clone()));
+            <span class="prelude-val">Ok</span>(filters)
         }
-        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+        x =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
             <span class="string">&quot;Invalid scalar filter input: {:?}&quot;</span>,
-            <span class="ident">x</span>
+            x
         ))),
     }
 }
 
-<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.</span>
-<span class="doccomment">/// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).</span>
-<span class="kw">fn</span> <span class="ident">extract_relation_filters</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="comment">// Implicit is null filter (`where: { &lt;field&gt;: null }`)</span>
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">one_relation_is_null</span>()]),
+<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.
+/// `value` can be either a filter object (for shorthand filter notation) or an object (full filter syntax).
+</span><span class="kw">fn </span>extract_relation_filters(field: <span class="kw-2">&amp;</span>RelationFieldRef, value: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+    <span class="kw">match </span>value {
+        <span class="comment">// Implicit is null filter (`where: { &lt;field&gt;: null }`)
+        </span>ParsedInputValue::Single(PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.one_relation_is_null()]),
 
-        <span class="comment">// Complex relation filter</span>
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">filter_map</span>) <span class="kw">if</span> <span class="ident">filter_map</span>.<span class="ident">is_relation_envelope</span>() =&gt; <span class="ident">filter_map</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">relation::parse</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="ident">field</span>, <span class="ident">v</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+        <span class="comment">// Complex relation filter
+        </span>ParsedInputValue::Map(filter_map) <span class="kw">if </span>filter_map.is_relation_envelope() =&gt; filter_map
+            .clone()
+            .into_iter()
+            .map(|(k, v)| relation::parse(<span class="kw-2">&amp;</span>k, field, v))
+            .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;(),
 
-        <span class="comment">// Implicit is</span>
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">filter_map</span>) =&gt; {
-            <span class="ident">extract_filter</span>(<span class="ident">filter_map</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">related_model</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">to_one_related</span>(<span class="ident">filter</span>)])
+        <span class="comment">// Implicit is
+        </span>ParsedInputValue::Map(filter_map) =&gt; {
+            extract_filter(filter_map, <span class="kw-2">&amp;</span>field.related_model()).map(|filter| <span class="macro">vec!</span>[field.to_one_related(filter)])
         }
 
-        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+        x =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
             <span class="string">&quot;Invalid relation filter input: {:?}&quot;</span>,
-            <span class="ident">x</span>
+            x
         ))),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_query_mode</span>(<span class="ident">input</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryMode</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">PrismaValue::Enum</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-        <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">fn </span>parse_query_mode(input: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;QueryMode&gt; {
+    <span class="kw">let </span>value: PrismaValue = input.try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>s = <span class="kw">match </span>value {
+        PrismaValue::Enum(s) =&gt; s,
+        PrismaValue::String(s) =&gt; s,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">s</span>.<span class="ident">as_str</span>() {
-        <span class="string">&quot;default&quot;</span> =&gt; <span class="ident">QueryMode::Default</span>,
-        <span class="string">&quot;insensitive&quot;</span> =&gt; <span class="ident">QueryMode::Insensitive</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="prelude-val">Ok</span>(<span class="kw">match </span>s.as_str() {
+        <span class="string">&quot;default&quot; </span>=&gt; QueryMode::Default,
+        <span class="string">&quot;insensitive&quot; </span>=&gt; QueryMode::Insensitive,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     })
 }
 
-<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.</span>
-<span class="doccomment">/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).</span>
-<span class="kw">fn</span> <span class="ident">extract_composite_filters</span>(
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">value</span> {
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">val</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">val</span>)]), <span class="comment">// Todo: Do we want to do coercions here? (list, object)</span>
-        <span class="ident">ParsedInputValue::List</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">equals</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>))]),
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">filter_map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[<span class="ident">composite::parse</span>(<span class="ident">filter_map</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>]),
-        <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+<span class="doccomment">/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { &lt;field&gt;: &lt;value&gt; }.
+/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
+</span><span class="kw">fn </span>extract_composite_filters(
+    field: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    value: ParsedInputValue,
+) -&gt; QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt; {
+    <span class="kw">match </span>value {
+        ParsedInputValue::Single(val) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(val)]), <span class="comment">// Todo: Do we want to do coercions here? (list, object)
+        </span>ParsedInputValue::List(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[field.equals(PrismaValue::List(value.try_into()<span class="question-mark">?</span>))]),
+        ParsedInputValue::Map(filter_map) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[composite::parse(filter_map, field, <span class="bool-val">false</span>)<span class="question-mark">?</span>]),
+        x =&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::InputError(<span class="macro">format!</span>(
             <span class="string">&quot;Invalid composite filter input: {:?}&quot;</span>,
-            <span class="ident">x</span>
+            x
         ))),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

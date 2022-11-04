@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/scalar_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/scalar_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -432,439 +432,439 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IndexFieldWalker</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
-    <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">OperatorClassStore</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
-    <span class="ident">walkers</span>::{<span class="ident">EnumWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">Walker</span>},
-    <span class="ident">OperatorClass</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::IndexFieldWalker;
+<span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, WithName},
+    types::{DefaultAttribute, FieldWithArgs, OperatorClassStore, ScalarField, ScalarType, SortOrder},
+    walkers::{EnumWalker, ModelWalker, Walker},
+    OperatorClass, ParserDatabase, ScalarFieldType,
 };
-<span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
-<span class="kw">use</span> <span class="ident">either::Either</span>;
+<span class="kw">use </span>diagnostics::Span;
+<span class="kw">use </span>either::Either;
 
-<span class="doccomment">/// A scalar field, as part of a model.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ScalarField</span>,
+<span class="doccomment">/// A scalar field, as part of a model.
+</span><span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) scalar_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarField,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">field_id</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.model_id == other.model_id &amp;&amp; <span class="self">self</span>.field_id == other.field_id
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Eq <span class="kw">for </span>ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The ID of the field node in the AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
-        <span class="self">self</span>.<span class="ident">field_id</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The ID of the field node in the AST.
+    </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
+        <span class="self">self</span>.field_id
     }
 
-    <span class="doccomment">/// The field node in the AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
+    <span class="doccomment">/// The field node in the AST.
+    </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][<span class="self">self</span>.field_id]
     }
 
-    <span class="doccomment">/// The name of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
+    <span class="doccomment">/// The name of the field.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="self">self</span>.ast_field().name()
     }
 
-    <span class="doccomment">/// The `@default()` AST attribute on the field, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_field</span>
-            .<span class="ident">default</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">default_attribute</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The `@default()` AST attribute on the field, if any.
+    </span><span class="kw">pub fn </span>default_attribute(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute&gt; {
+        <span class="self">self</span>.scalar_field
+            .default
+            .as_ref()
+            .map(|d| d.default_attribute)
+            .map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[id])
     }
 
-    <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>()
-            .<span class="ident">mapped_name</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
+    <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.
+    </span><span class="kw">pub fn </span>database_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="self">self</span>.attributes()
+            .mapped_name
+            .map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
+            .unwrap_or_else(|| <span class="self">self</span>.name())
     }
 
-    <span class="doccomment">/// Does the field have an `@default(autoincrement())` attribute?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">dv</span><span class="op">|</span> <span class="ident">dv</span>.<span class="ident">is_autoincrement</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Does the field have an `@default(autoincrement())` attribute?
+    </span><span class="kw">pub fn </span>is_autoincrement(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.default_value().map(|dv| dv.is_autoincrement()).unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// Does the field define a primary key by its own.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single_pk</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">field_is_single_pk</span>(<span class="self">self</span>.<span class="ident">field_id</span>)
+    <span class="doccomment">/// Does the field define a primary key by its own.
+    </span><span class="kw">pub fn </span>is_single_pk(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.model().field_is_single_pk(<span class="self">self</span>.field_id)
     }
 
-    <span class="doccomment">/// Is the field part of a compound primary key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_a_compound_pk</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">field_is_part_of_a_compound_pk</span>(<span class="self">self</span>.<span class="ident">field_id</span>)
+    <span class="doccomment">/// Is the field part of a compound primary key.
+    </span><span class="kw">pub fn </span>is_part_of_a_compound_pk(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.model().field_is_part_of_a_compound_pk(<span class="self">self</span>.field_id)
     }
 
-    <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">is_ignored</span>
+    <span class="doccomment">/// Is there an `@ignore` attribute on the field?
+    </span><span class="kw">pub fn </span>is_ignored(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.attributes().is_ignored
     }
 
-    <span class="doccomment">/// Is the field optional / nullable?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_optional</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_optional</span>()
+    <span class="doccomment">/// Is the field optional / nullable?
+    </span><span class="kw">pub fn </span>is_optional(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.ast_field().arity.is_optional()
     }
 
-    <span class="doccomment">/// Is there an `@updatedAt` attribute on the field?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_updated_at</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">is_updated_at</span>
+    <span class="doccomment">/// Is there an `@updatedAt` attribute on the field?
+    </span><span class="kw">pub fn </span>is_updated_at(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.attributes().is_updated_at
     }
 
-    <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ScalarField</span> {
-        <span class="self">self</span>.<span class="ident">scalar_field</span>
+    <span class="kw">fn </span>attributes(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ScalarField {
+        <span class="self">self</span>.scalar_field
     }
 
-    <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type_as_enum</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">scalar_field_type</span>() {
-            <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Walker</span> {
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-                <span class="ident">id</span>: <span class="ident">enum_id</span>,
+    <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.
+    </span><span class="kw">pub fn </span>field_type_as_enum(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;EnumWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.scalar_field_type() {
+            ScalarFieldType::Enum(enum_id) =&gt; <span class="prelude-val">Some</span>(Walker {
+                db: <span class="self">self</span>.db,
+                id: enum_id,
             }),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The name in the `@map(&lt;name&gt;)` attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The name in the `@map(&lt;name&gt;)` attribute.
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.attributes().mapped_name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// The model that contains the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+    <span class="doccomment">/// The model that contains the field.
+    </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
     }
 
-    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">Span</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>;
-        <span class="self">self</span>.<span class="ident">attributes</span>()
-            .<span class="ident">native_type</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">db</span>[<span class="kw-2">*</span><span class="ident">datasource_name</span>], <span class="kw-2">&amp;</span><span class="ident">db</span>[<span class="kw-2">*</span><span class="ident">name</span>], <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)
+    </span><span class="kw">pub fn </span>raw_native_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[String], Span)&gt; {
+        <span class="kw">let </span>db = <span class="self">self</span>.db;
+        <span class="self">self</span>.attributes()
+            .native_type
+            .as_ref()
+            .map(<span class="kw">move </span>|(datasource_name, name, args, span)| (<span class="kw-2">&amp;</span>db[<span class="kw-2">*</span>datasource_name], <span class="kw-2">&amp;</span>db[<span class="kw-2">*</span>name], args.as_slice(), <span class="kw-2">*</span>span))
     }
 
-    <span class="doccomment">/// Is the type of the field `Unsupported(&quot;...&quot;)`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">field_type</span>, <span class="ident">ast::FieldType::Unsupported</span>(<span class="kw">_</span>, <span class="kw">_</span>))
+    <span class="doccomment">/// Is the type of the field `Unsupported(&quot;...&quot;)`?
+    </span><span class="kw">pub fn </span>is_unsupported(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.ast_field().field_type, ast::FieldType::Unsupported(<span class="kw">_</span>, <span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// The `@default()` attribute of the field, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">DefaultValueWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">field_id</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">default</span>,
+    <span class="doccomment">/// The `@default()` attribute of the field, if any.
+    </span><span class="kw">pub fn </span>default_value(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;DefaultValueWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.attributes().default.as_ref().map(|default| DefaultValueWalker {
+            model_id: <span class="self">self</span>.model_id,
+            field_id: <span class="self">self</span>.field_id,
+            db: <span class="self">self</span>.db,
+            default,
         })
     }
 
-    <span class="doccomment">/// The type of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_type</span>(<span class="self">self</span>) -&gt; <span class="ident">ScalarFieldType</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">r#type</span>
+    <span class="doccomment">/// The type of the field.
+    </span><span class="kw">pub fn </span>scalar_field_type(<span class="self">self</span>) -&gt; ScalarFieldType {
+        <span class="self">self</span>.attributes().r#type
     }
 
-    <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">r#type</span> {
-            <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">scalar</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// The type of the field in case it is a scalar type (not an enum, not a composite type).
+    </span><span class="kw">pub fn </span>scalar_type(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarType&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.scalar_field.r#type {
+            ScalarFieldType::BuiltInScalar(scalar) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>scalar),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// An `@default()` attribute on a field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">default</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">DefaultAttribute</span>,
+<span class="doccomment">/// An `@default()` attribute on a field.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>DefaultValueWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) field_id: ast::FieldId,
+    <span class="kw">pub</span>(<span class="kw">super</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">super</span>) default: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>DefaultAttribute,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The AST node of the attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">default_attribute</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; DefaultValueWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The AST node of the attribute.
+    </span><span class="kw">pub fn </span>ast_attribute(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.default.default_attribute]
     }
 
-    <span class="doccomment">/// The value expression in the `@default` attribute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// score Int @default(0)</span>
-    <span class="doccomment">///                    ^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast_attribute</span>().<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">argument_idx</span>].<span class="ident">value</span>
+    <span class="doccomment">/// The value expression in the `@default` attribute.
+    ///
+    /// ```ignore
+    /// score Int @default(0)
+    ///                    ^
+    /// ```
+    </span><span class="kw">pub fn </span>value(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.ast_attribute().arguments.arguments[<span class="self">self</span>.default.argument_idx].value
     }
 
-    <span class="doccomment">/// Is this an `@default(autoincrement())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(autoincrement())`?
+    </span><span class="kw">pub fn </span>is_autoincrement(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;autoincrement&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(cuid())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cuid</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(cuid())`?
+    </span><span class="kw">pub fn </span>is_cuid(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;cuid&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(dbgenerated())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(dbgenerated())`?
+    </span><span class="kw">pub fn </span>is_dbgenerated(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;dbgenerated&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(auto())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_auto</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;auto&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(auto())`?
+    </span><span class="kw">pub fn </span>is_auto(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;auto&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(now())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_now</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(now())`?
+    </span><span class="kw">pub fn </span>is_now(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;now&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(sequence())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;sequence&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(sequence())`?
+    </span><span class="kw">pub fn </span>is_sequence(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;sequence&quot;</span>)
     }
 
-    <span class="doccomment">/// Is this an `@default(uuid())`?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uuid</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span>)
+    <span class="doccomment">/// Is this an `@default(uuid())`?
+    </span><span class="kw">pub fn </span>is_uuid(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.value(), ast::Expression::Function(name, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>name == <span class="string">&quot;uuid&quot;</span>)
     }
 
-    <span class="doccomment">/// The mapped name of the default value. Not applicable to all connectors. See crate docs for</span>
-    <span class="doccomment">/// details on mapped names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String @default(&quot;george&quot;, map: &quot;name_default_to_george&quot;)</span>
-    <span class="doccomment">///                                     ^^^^^^^^^^^^^^^^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The mapped name of the default value. Not applicable to all connectors. See crate docs for
+    /// details on mapped names.
+    ///
+    /// ```ignore
+    /// name String @default(&quot;george&quot;, map: &quot;name_default_to_george&quot;)
+    ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.default.mapped_name.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[id])
     }
 
-    <span class="doccomment">/// The field carrying the default attribute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// name String @default(&quot;george&quot;)</span>
-    <span class="doccomment">/// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="self">self</span>) -&gt; <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="ident">ScalarFieldWalker</span> {
-            <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
-            <span class="ident">field_id</span>: <span class="self">self</span>.<span class="ident">field_id</span>,
-            <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-            <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">field_id</span>)],
+    <span class="doccomment">/// The field carrying the default attribute.
+    ///
+    /// ```ignore
+    /// name String @default(&quot;george&quot;)
+    /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>field(<span class="self">self</span>) -&gt; ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        ScalarFieldWalker {
+            model_id: <span class="self">self</span>.model_id,
+            field_id: <span class="self">self</span>.field_id,
+            db: <span class="self">self</span>.db,
+            scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id)],
         }
     }
 }
 
-<span class="doccomment">/// An operator class defines the operators allowed in an index. Mostly</span>
-<span class="doccomment">/// a PostgreSQL thing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">class</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">OperatorClassStore</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+<span class="doccomment">/// An operator class defines the operators allowed in an index. Mostly
+/// a PostgreSQL thing.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>OperatorClassWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) class: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>OperatorClassStore,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Gets the operator class of the indexed field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index(name(ops: InetOps))</span>
-    <span class="doccomment">/// //                ^ Either::Left(InetOps)</span>
-    <span class="doccomment">/// @@index(name(ops: raw(&quot;tsvector_ops&quot;)))</span>
-    <span class="doccomment">/// //                ^ Either::Right(&quot;tsvector_ops&quot;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="ident">Either</span><span class="op">&lt;</span><span class="ident">OperatorClass</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">class</span>.<span class="ident">inner</span> {
-            <span class="ident">Either::Left</span>(<span class="ident">class</span>) =&gt; <span class="ident">Either::Left</span>(<span class="ident">class</span>),
-            <span class="ident">Either::Right</span>(<span class="ident">id</span>) =&gt; <span class="ident">Either::Right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>]),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; OperatorClassWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// Gets the operator class of the indexed field.
+    ///
+    /// ```ignore
+    /// @@index(name(ops: InetOps))
+    /// //                ^ Either::Left(InetOps)
+    /// @@index(name(ops: raw(&quot;tsvector_ops&quot;)))
+    /// //                ^ Either::Right(&quot;tsvector_ops&quot;)
+    </span><span class="kw">pub fn </span>get(<span class="self">self</span>) -&gt; Either&lt;OperatorClass, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="kw">match </span><span class="self">self</span>.class.inner {
+            Either::Left(class) =&gt; Either::Left(class),
+            Either::Right(id) =&gt; Either::Right(<span class="kw-2">&amp;</span><span class="self">self</span>.db[id]),
         }
     }
 }
 
-<span class="doccomment">/// A scalar field as referenced in a key specification (id, index or unique).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">FieldWithArgs</span>],
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_arg_id</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// A scalar field as referenced in a key specification (id, index or unique).
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) fields: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>[FieldWithArgs],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_arg_id: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">args</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">FieldWithArgs</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fields</span>[<span class="self">self</span>.<span class="ident">field_arg_id</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; ScalarFieldAttributeWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>args(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>FieldWithArgs {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.fields[<span class="self">self</span>.field_arg_id]
     }
 
-    <span class="doccomment">/// The length argument on the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index(name(length: 10))</span>
-    <span class="doccomment">///                      ^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">length</span>
+    <span class="doccomment">/// The length argument on the field.
+    ///
+    /// ```ignore
+    /// @@index(name(length: 10))
+    ///                      ^^
+    /// ```
+    </span><span class="kw">pub fn </span>length(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.args().length
     }
 
-    <span class="doccomment">/// A custom operator class to control the operators catched by the index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index([name(ops: InetOps)], type: Gist)</span>
-    <span class="doccomment">///                    ^^^^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">operator_class</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClassWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>()
-            .<span class="ident">operator_class</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">class</span><span class="op">|</span> <span class="ident">OperatorClassWalker</span> { <span class="ident">class</span>, <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span> })
+    <span class="doccomment">/// A custom operator class to control the operators catched by the index.
+    ///
+    /// ```ignore
+    /// @@index([name(ops: InetOps)], type: Gist)
+    ///                    ^^^^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>operator_class(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;OperatorClassWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+        <span class="self">self</span>.args()
+            .operator_class
+            .as_ref()
+            .map(|class| OperatorClassWalker { class, db: <span class="self">self</span>.db })
     }
 
-    <span class="doccomment">/// The underlying field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// // either this</span>
-    <span class="doccomment">/// model Test {</span>
-    <span class="doccomment">///   id          Int @id</span>
-    <span class="doccomment">///   name        String</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^^^^^^^</span>
-    <span class="doccomment">///   kind        Int</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   @@index([name])</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // or this</span>
-    <span class="doccomment">/// type A {</span>
-    <span class="doccomment">///   field String</span>
-    <span class="doccomment">///   ^^^^^^^^^^^^</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// model Test {</span>
-    <span class="doccomment">///   id Int @id</span>
-    <span class="doccomment">///   a  A</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   @@index([a.field])</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_index_field</span>(<span class="self">self</span>) -&gt; <span class="ident">IndexFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
-        <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
+    <span class="doccomment">/// The underlying field.
+    ///
+    /// ```ignore
+    /// // either this
+    /// model Test {
+    ///   id          Int @id
+    ///   name        String
+    ///   ^^^^^^^^^^^^^^^^^^
+    ///   kind        Int
+    ///
+    ///   @@index([name])
+    /// }
+    ///
+    /// // or this
+    /// type A {
+    ///   field String
+    ///   ^^^^^^^^^^^^
+    /// }
+    ///
+    /// model Test {
+    ///   id Int @id
+    ///   a  A
+    ///
+    ///   @@index([a.field])
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>as_index_field(<span class="self">self</span>) -&gt; IndexFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="kw">let </span>path = <span class="kw-2">&amp;</span><span class="self">self</span>.args().path;
+        <span class="kw">let </span>field_id = path.field_in_index();
 
-        <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
-                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>).<span class="ident">scalar_field</span>(<span class="ident">field_id</span>);
+        <span class="kw">match </span>path.type_holding_the_indexed_field() {
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span>field_id = path.field_in_index();
+                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id).scalar_field(field_id);
 
-                <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+                IndexFieldWalker::new(walker)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>).<span class="ident">field</span>(<span class="ident">field_id</span>);
-                <span class="ident">IndexFieldWalker::new</span>(<span class="ident">walker</span>)
+            <span class="prelude-val">Some</span>(ctid) =&gt; {
+                <span class="kw">let </span>walker = <span class="self">self</span>.db.walk_composite_type(ctid).field(field_id);
+                IndexFieldWalker::new(walker)
             }
         }
     }
 
-    <span class="doccomment">/// Gives the full path from the current model to the field included in the index.</span>
-    <span class="doccomment">/// For example, if the field is through two composite types:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type A {</span>
-    <span class="doccomment">///   field Int</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// type B {</span>
-    <span class="doccomment">///   a A</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// model C {</span>
-    <span class="doccomment">///   id Int @id</span>
-    <span class="doccomment">///   b  B</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   @@index([b.a.field])</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The method would return a vector from model to the final field:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// vec![(&quot;b&quot;, None), (&quot;a&quot;, Some(&quot;B&quot;)), (&quot;field&quot;, Some(&quot;A&quot;))];</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The first part of the tuple is the name of the field, the second part is</span>
-    <span class="doccomment">/// the name of the composite type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method prefers the prisma side naming, and should not be used when</span>
-    <span class="doccomment">/// writing to the database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_path_to_indexed_field</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>();
+    <span class="doccomment">/// Gives the full path from the current model to the field included in the index.
+    /// For example, if the field is through two composite types:
+    ///
+    /// ```ignore
+    /// type A {
+    ///   field Int
+    /// }
+    ///
+    /// type B {
+    ///   a A
+    /// }
+    ///
+    /// model C {
+    ///   id Int @id
+    ///   b  B
+    ///
+    ///   @@index([b.a.field])
+    /// }
+    /// ```
+    ///
+    /// The method would return a vector from model to the final field:
+    ///
+    /// ```ignore
+    /// vec![(&quot;b&quot;, None), (&quot;a&quot;, Some(&quot;B&quot;)), (&quot;field&quot;, Some(&quot;A&quot;))];
+    /// ```
+    ///
+    /// The first part of the tuple is the name of the field, the second part is
+    /// the name of the composite type.
+    ///
+    /// This method prefers the prisma side naming, and should not be used when
+    /// writing to the database.
+    </span><span class="kw">pub fn </span>as_path_to_indexed_field(<span class="self">self</span>) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt;)&gt; {
+        <span class="kw">let </span>path = <span class="kw-2">&amp;</span><span class="self">self</span>.args().path;
+        <span class="kw">let </span>root = <span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][path.root()].name();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[(root, <span class="prelude-val">None</span>)];
 
-        <span class="kw">for</span> (<span class="ident">ctid</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">path</span>() {
-            <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>];
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>();
+        <span class="kw">for </span>(ctid, field_id) <span class="kw">in </span>path.path() {
+            <span class="kw">let </span>ct = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="kw-2">*</span>ctid];
+            <span class="kw">let </span>field = ct[<span class="kw-2">*</span>field_id].name();
 
-            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>())));
+            result.push((field, <span class="prelude-val">Some</span>(ct.name())));
         }
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="doccomment">/// Similar to the method [`as_path_to_indexed_field`], but prefers the</span>
-    <span class="doccomment">/// mapped names and is to be used when defining indices in the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`as_path_to_indexed_field`]: struct.ScalarFieldAttributeWalker</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mapped_path_to_indexed_field</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>().<span class="ident">path</span>;
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="ident">path</span>.<span class="ident">root</span>())].<span class="ident">mapped_name</span>;
+    <span class="doccomment">/// Similar to the method [`as_path_to_indexed_field`], but prefers the
+    /// mapped names and is to be used when defining indices in the database.
+    ///
+    /// [`as_path_to_indexed_field`]: struct.ScalarFieldAttributeWalker
+    </span><span class="kw">pub fn </span>as_mapped_path_to_indexed_field(<span class="self">self</span>) -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt;)&gt; {
+        <span class="kw">let </span>path = <span class="kw-2">&amp;</span><span class="self">self</span>.args().path;
+        <span class="kw">let </span>root = {
+            <span class="kw">let </span>mapped = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="self">self</span>.model_id, path.root())].mapped_name;
 
-            <span class="ident">mapped</span>
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="ident">path</span>.<span class="ident">root</span>()].<span class="ident">name</span>())
+            mapped
+                .and_then(|id| <span class="self">self</span>.db.interner.get(id))
+                .unwrap_or_else(|| <span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][path.root()].name())
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="ident">root</span>, <span class="prelude-val">None</span>)];
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[(root, <span class="prelude-val">None</span>)];
 
-        <span class="kw">for</span> (<span class="ident">ctid</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="ident">path</span>.<span class="ident">path</span>() {
-            <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>];
+        <span class="kw">for </span>(ctid, field_id) <span class="kw">in </span>path.path() {
+            <span class="kw">let </span>ct = <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="kw-2">*</span>ctid];
 
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">ctid</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)]
-                .<span class="ident">mapped_name</span>
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">id</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ct</span>[<span class="kw-2">*</span><span class="ident">field_id</span>].<span class="ident">name</span>());
+            <span class="kw">let </span>field = <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.composite_type_fields[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>ctid, <span class="kw-2">*</span>field_id)]
+                .mapped_name
+                .and_then(|id| <span class="self">self</span>.db.interner.get(id))
+                .unwrap_or_else(|| ct[<span class="kw-2">*</span>field_id].name());
 
-            <span class="ident">result</span>.<span class="ident">push</span>((<span class="ident">field</span>, <span class="prelude-val">Some</span>(<span class="ident">ct</span>.<span class="ident">name</span>())));
+            result.push((field, <span class="prelude-val">Some</span>(ct.name())));
         }
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="doccomment">/// The sort order (asc or desc) on the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// @@index(name(sort: Desc))</span>
-    <span class="doccomment">///                    ^^^^</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortOrder</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>().<span class="ident">sort_order</span>
+    <span class="doccomment">/// The sort order (asc or desc) on the field.
+    ///
+    /// ```ignore
+    /// @@index(name(sort: Desc))
+    ///                    ^^^^
+    /// ```
+    </span><span class="kw">pub fn </span>sort_order(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SortOrder&gt; {
+        <span class="self">self</span>.args().sort_order
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

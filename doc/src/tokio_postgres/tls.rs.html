@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -162,169 +162,169 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-</pre><pre class="rust"><code><span class="doccomment">//! TLS support.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! TLS support.
 
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">io</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
+</span><span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::{fmt, io};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">private</span> {
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForcePrivateApi</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>private {
+    <span class="kw">pub struct </span>ForcePrivateApi;
 }
 
-<span class="doccomment">/// Channel binding information returned from a TLS handshake.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelBinding</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tls_server_end_point</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Channel binding information returned from a TLS handshake.
+</span><span class="kw">pub struct </span>ChannelBinding {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tls_server_end_point: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ChannelBinding</span> {
-    <span class="doccomment">/// Creates a `ChannelBinding` containing no information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident">ChannelBinding</span> {
-        <span class="ident">ChannelBinding</span> {
-            <span class="ident">tls_server_end_point</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ChannelBinding {
+    <span class="doccomment">/// Creates a `ChannelBinding` containing no information.
+    </span><span class="kw">pub fn </span>none() -&gt; ChannelBinding {
+        ChannelBinding {
+            tls_server_end_point: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Creates a `ChannelBinding` containing `tls-server-end-point` channel binding information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_server_end_point</span>(<span class="ident">tls_server_end_point</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">ChannelBinding</span> {
-        <span class="ident">ChannelBinding</span> {
-            <span class="ident">tls_server_end_point</span>: <span class="prelude-val">Some</span>(<span class="ident">tls_server_end_point</span>),
+    <span class="doccomment">/// Creates a `ChannelBinding` containing `tls-server-end-point` channel binding information.
+    </span><span class="kw">pub fn </span>tls_server_end_point(tls_server_end_point: Vec&lt;u8&gt;) -&gt; ChannelBinding {
+        ChannelBinding {
+            tls_server_end_point: <span class="prelude-val">Some</span>(tls_server_end_point),
         }
     }
 }
 
-<span class="doccomment">/// A constructor of `TlsConnect`ors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `runtime` Cargo feature (enabled by default).</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MakeTlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The stream type created by the `TlsConnect` implementation.</span>
-    <span class="kw">type</span> <span class="ident">Stream</span>: <span class="ident">TlsStream</span> <span class="op">+</span> <span class="ident">Unpin</span>;
-    <span class="doccomment">/// The `TlsConnect` implementation created by this type.</span>
-    <span class="kw">type</span> <span class="ident">TlsConnect</span>: <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Stream</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Stream</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// The error type returned by the `TlsConnect` implementation.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A constructor of `TlsConnect`ors.
+///
+/// Requires the `runtime` Cargo feature (enabled by default).
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">pub trait </span>MakeTlsConnect&lt;S&gt; {
+    <span class="doccomment">/// The stream type created by the `TlsConnect` implementation.
+    </span><span class="kw">type </span>Stream: TlsStream + Unpin;
+    <span class="doccomment">/// The `TlsConnect` implementation created by this type.
+    </span><span class="kw">type </span>TlsConnect: TlsConnect&lt;S, Stream = <span class="self">Self</span>::Stream&gt;;
+    <span class="doccomment">/// The error type returned by the `TlsConnect` implementation.
+    </span><span class="kw">type </span>Error: Into&lt;Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt;;
 
-    <span class="doccomment">/// Creates a new `TlsConnect`or.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The domain name is provided for certificate verification and SNI.</span>
-    <span class="kw">fn</span> <span class="ident">make_tls_connect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">domain</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::TlsConnect</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Creates a new `TlsConnect`or.
+    ///
+    /// The domain name is provided for certificate verification and SNI.
+    </span><span class="kw">fn </span>make_tls_connect(<span class="kw-2">&amp;mut </span><span class="self">self</span>, domain: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::TlsConnect, <span class="self">Self</span>::Error&gt;;
 }
 
-<span class="doccomment">/// An asynchronous function wrapping a stream in a TLS session.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The stream returned by the future.</span>
-    <span class="kw">type</span> <span class="ident">Stream</span>: <span class="ident">TlsStream</span> <span class="op">+</span> <span class="ident">Unpin</span>;
-    <span class="doccomment">/// The error returned by the future.</span>
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// The future returned by the connector.</span>
-    <span class="kw">type</span> <span class="ident">Future</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Stream</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An asynchronous function wrapping a stream in a TLS session.
+</span><span class="kw">pub trait </span>TlsConnect&lt;S&gt; {
+    <span class="doccomment">/// The stream returned by the future.
+    </span><span class="kw">type </span>Stream: TlsStream + Unpin;
+    <span class="doccomment">/// The error returned by the future.
+    </span><span class="kw">type </span>Error: Into&lt;Box&lt;<span class="kw">dyn </span>Error + Sync + Send&gt;&gt;;
+    <span class="doccomment">/// The future returned by the connector.
+    </span><span class="kw">type </span>Future: Future&lt;Output = <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Stream, <span class="self">Self</span>::Error&gt;&gt;;
 
-    <span class="doccomment">/// Returns a future performing a TLS handshake over the stream.</span>
-    <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span>;
+    <span class="doccomment">/// Returns a future performing a TLS handshake over the stream.
+    </span><span class="kw">fn </span>connect(<span class="self">self</span>, stream: S) -&gt; <span class="self">Self</span>::Future;
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">can_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">private::ForcePrivateApi</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>can_connect(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: private::ForcePrivateApi) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="doccomment">/// A TLS-wrapped connection to a PostgreSQL database.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TlsStream</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> {
-    <span class="doccomment">/// Returns channel binding information for the session.</span>
-    <span class="kw">fn</span> <span class="ident">channel_binding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ChannelBinding</span>;
+<span class="doccomment">/// A TLS-wrapped connection to a PostgreSQL database.
+</span><span class="kw">pub trait </span>TlsStream: AsyncRead + AsyncWrite {
+    <span class="doccomment">/// Returns channel binding information for the session.
+    </span><span class="kw">fn </span>channel_binding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ChannelBinding;
 }
 
-<span class="doccomment">/// A `MakeTlsConnect` and `TlsConnect` implementation which simply returns an error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used when `sslmode` is `none` or `prefer`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoTls</span>;
+<span class="doccomment">/// A `MakeTlsConnect` and `TlsConnect` implementation which simply returns an error.
+///
+/// This can be used when `sslmode` is `none` or `prefer`.
+</span><span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>NoTls;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">MakeTlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoTls</span> {
-    <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">NoTlsStream</span>;
-    <span class="kw">type</span> <span class="ident">TlsConnect</span> <span class="op">=</span> <span class="ident">NoTls</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">NoTlsError</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">impl</span>&lt;S&gt; MakeTlsConnect&lt;S&gt; <span class="kw">for </span>NoTls {
+    <span class="kw">type </span>Stream = NoTlsStream;
+    <span class="kw">type </span>TlsConnect = NoTls;
+    <span class="kw">type </span>Error = NoTlsError;
 
-    <span class="kw">fn</span> <span class="ident">make_tls_connect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NoTls</span>, <span class="ident">NoTlsError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">NoTls</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NoTls</span> {
-    <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">NoTlsStream</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">NoTlsError</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">NoTlsFuture</span>;
-
-    <span class="kw">fn</span> <span class="ident">connect</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">S</span>) -&gt; <span class="ident">NoTlsFuture</span> {
-        <span class="ident">NoTlsFuture</span>(())
-    }
-
-    <span class="kw">fn</span> <span class="ident">can_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">private::ForcePrivateApi</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+    <span class="kw">fn </span>make_tls_connect(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;NoTls, NoTlsError&gt; {
+        <span class="prelude-val">Ok</span>(NoTls)
     }
 }
 
-<span class="doccomment">/// The future returned by `NoTls`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoTlsFuture</span>(());
+<span class="kw">impl</span>&lt;S&gt; TlsConnect&lt;S&gt; <span class="kw">for </span>NoTls {
+    <span class="kw">type </span>Stream = NoTlsStream;
+    <span class="kw">type </span>Error = NoTlsError;
+    <span class="kw">type </span>Future = NoTlsFuture;
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">NoTlsFuture</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NoTlsStream</span>, <span class="ident">NoTlsError</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>connect(<span class="self">self</span>, <span class="kw">_</span>: S) -&gt; NoTlsFuture {
+        NoTlsFuture(())
+    }
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">NoTlsError</span>(())))
+    <span class="kw">fn </span>can_connect(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: private::ForcePrivateApi) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="doccomment">/// The future returned by `NoTls`.
+</span><span class="kw">pub struct </span>NoTlsFuture(());
+
+<span class="kw">impl </span>Future <span class="kw">for </span>NoTlsFuture {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;NoTlsStream, NoTlsError&gt;;
+
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Poll::Ready(<span class="prelude-val">Err</span>(NoTlsError(())))
     }
 }
 
-<span class="doccomment">/// The TLS &quot;stream&quot; type produced by the `NoTls` connector.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Since `NoTls` doesn&#39;t support TLS, this type is uninhabited.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NoTlsStream</span> {}
+<span class="doccomment">/// The TLS &quot;stream&quot; type produced by the `NoTls` connector.
+///
+/// Since `NoTls` doesn&#39;t support TLS, this type is uninhabited.
+</span><span class="kw">pub enum </span>NoTlsStream {}
 
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">NoTlsStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>NoTlsStream {
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">NoTlsStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>NoTlsStream {
+    <span class="kw">fn </span>poll_write(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;</span>[u8]) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">TlsStream</span> <span class="kw">for</span> <span class="ident">NoTlsStream</span> {
-    <span class="kw">fn</span> <span class="ident">channel_binding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ChannelBinding</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 }
 
-<span class="doccomment">/// The error returned by `NoTls`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoTlsError</span>(());
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NoTlsError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;no TLS implementation configured&quot;</span>)
+<span class="kw">impl </span>TlsStream <span class="kw">for </span>NoTlsStream {
+    <span class="kw">fn </span>channel_binding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ChannelBinding {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">NoTlsError</span> {}
+<span class="doccomment">/// The error returned by `NoTls`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>NoTlsError(());
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>NoTlsError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.write_str(<span class="string">&quot;no TLS implementation configured&quot;</span>)
+    }
+}
+
+<span class="kw">impl </span>Error <span class="kw">for </span>NoTlsError {}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

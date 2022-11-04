@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bumpalo-3.11.0/src/alloc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>alloc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bumpalo/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bumpalo/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bumpalo/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bumpalo-3.11.0/src/alloc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>alloc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bumpalo/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bumpalo/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bumpalo/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -792,799 +792,799 @@
 <span id="792">792</span>
 <span id="793">793</span>
 <span id="794">794</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 The Rust Project Developers. See the COPYRIGHT</span>
-<span class="comment">// file at the top-level directory of this distribution and at</span>
-<span class="comment">// http://rust-lang.org/COPYRIGHT.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 The Rust Project Developers. See the COPYRIGHT
+// file at the top-level directory of this distribution and at
+// http://rust-lang.org/COPYRIGHT.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unstable_name_collisions</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+</span><span class="attribute">#![allow(unstable_name_collisions)]
+#![allow(dead_code)]
+#![allow(deprecated)]
 
-<span class="doccomment">//! Memory allocation APIs</span>
+</span><span class="doccomment">//! Memory allocation APIs
 
-<span class="kw">use</span> <span class="ident">core::cmp</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>::{<span class="self">self</span>, <span class="ident">NonNull</span>};
-<span class="kw">use</span> <span class="ident">core::usize</span>;
+</span><span class="kw">use </span>core::cmp;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::ptr::{<span class="self">self</span>, NonNull};
+<span class="kw">use </span>core::usize;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core::alloc</span>::{<span class="ident">Layout</span>, <span class="ident">LayoutErr</span>};
+<span class="kw">pub use </span>core::alloc::{Layout, LayoutErr};
 
-<span class="kw">fn</span> <span class="ident">new_layout_err</span>() -&gt; <span class="ident">LayoutErr</span> {
-    <span class="ident">Layout::from_size_align</span>(<span class="number">1</span>, <span class="number">3</span>).<span class="ident">unwrap_err</span>()
+<span class="kw">fn </span>new_layout_err() -&gt; LayoutErr {
+    Layout::from_size_align(<span class="number">1</span>, <span class="number">3</span>).unwrap_err()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_alloc_error</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="op">!</span> {
-    <span class="macro">panic!</span>(<span class="string">&quot;encountered allocation error: {:?}&quot;</span>, <span class="ident">layout</span>)
+<span class="kw">pub fn </span>handle_alloc_error(layout: Layout) -&gt; ! {
+    <span class="macro">panic!</span>(<span class="string">&quot;encountered allocation error: {:?}&quot;</span>, layout)
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">UnstableLayoutMethods</span> {
-    <span class="kw">fn</span> <span class="ident">padding_needed_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">align</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span>;
-    <span class="kw">fn</span> <span class="ident">repeat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Layout</span>, <span class="ident">usize</span>), <span class="ident">LayoutErr</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">array</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Layout</span>, <span class="ident">LayoutErr</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>UnstableLayoutMethods {
+    <span class="kw">fn </span>padding_needed_for(<span class="kw-2">&amp;</span><span class="self">self</span>, align: usize) -&gt; usize;
+    <span class="kw">fn </span>repeat(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(Layout, usize), LayoutErr&gt;;
+    <span class="kw">fn </span>array&lt;T&gt;(n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Layout, LayoutErr&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">UnstableLayoutMethods</span> <span class="kw">for</span> <span class="ident">Layout</span> {
-    <span class="kw">fn</span> <span class="ident">padding_needed_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">align</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">size</span>();
+<span class="kw">impl </span>UnstableLayoutMethods <span class="kw">for </span>Layout {
+    <span class="kw">fn </span>padding_needed_for(<span class="kw-2">&amp;</span><span class="self">self</span>, align: usize) -&gt; usize {
+        <span class="kw">let </span>len = <span class="self">self</span>.size();
 
-        <span class="comment">// Rounded up value is:</span>
-        <span class="comment">//   len_rounded_up = (len + align - 1) &amp; !(align - 1);</span>
-        <span class="comment">// and then we return the padding difference: `len_rounded_up - len`.</span>
-        <span class="comment">//</span>
-        <span class="comment">// We use modular arithmetic throughout:</span>
-        <span class="comment">//</span>
-        <span class="comment">// 1. align is guaranteed to be &gt; 0, so align - 1 is always</span>
-        <span class="comment">//    valid.</span>
-        <span class="comment">//</span>
-        <span class="comment">// 2. `len + align - 1` can overflow by at most `align - 1`,</span>
-        <span class="comment">//    so the &amp;-mask with `!(align - 1)` will ensure that in the</span>
-        <span class="comment">//    case of overflow, `len_rounded_up` will itself be 0.</span>
-        <span class="comment">//    Thus the returned padding, when added to `len`, yields 0,</span>
-        <span class="comment">//    which trivially satisfies the alignment `align`.</span>
-        <span class="comment">//</span>
-        <span class="comment">// (Of course, attempts to allocate blocks of memory whose</span>
-        <span class="comment">// size and padding overflow in the above manner should cause</span>
-        <span class="comment">// the allocator to yield an error anyway.)</span>
+        <span class="comment">// Rounded up value is:
+        //   len_rounded_up = (len + align - 1) &amp; !(align - 1);
+        // and then we return the padding difference: `len_rounded_up - len`.
+        //
+        // We use modular arithmetic throughout:
+        //
+        // 1. align is guaranteed to be &gt; 0, so align - 1 is always
+        //    valid.
+        //
+        // 2. `len + align - 1` can overflow by at most `align - 1`,
+        //    so the &amp;-mask with `!(align - 1)` will ensure that in the
+        //    case of overflow, `len_rounded_up` will itself be 0.
+        //    Thus the returned padding, when added to `len`, yields 0,
+        //    which trivially satisfies the alignment `align`.
+        //
+        // (Of course, attempts to allocate blocks of memory whose
+        // size and padding overflow in the above manner should cause
+        // the allocator to yield an error anyway.)
 
-        <span class="kw">let</span> <span class="ident">len_rounded_up</span> <span class="op">=</span> <span class="ident">len</span>.<span class="ident">wrapping_add</span>(<span class="ident">align</span>).<span class="ident">wrapping_sub</span>(<span class="number">1</span>) <span class="op">&amp;</span> <span class="op">!</span><span class="ident">align</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>);
-        <span class="ident">len_rounded_up</span>.<span class="ident">wrapping_sub</span>(<span class="ident">len</span>)
+        </span><span class="kw">let </span>len_rounded_up = len.wrapping_add(align).wrapping_sub(<span class="number">1</span>) &amp; !align.wrapping_sub(<span class="number">1</span>);
+        len_rounded_up.wrapping_sub(len)
     }
 
-    <span class="kw">fn</span> <span class="ident">repeat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Layout</span>, <span class="ident">usize</span>), <span class="ident">LayoutErr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">padded_size</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">size</span>()
-            .<span class="ident">checked_add</span>(<span class="self">self</span>.<span class="ident">padding_needed_for</span>(<span class="self">self</span>.<span class="ident">align</span>()))
-            .<span class="ident">ok_or_else</span>(<span class="ident">new_layout_err</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">alloc_size</span> <span class="op">=</span> <span class="ident">padded_size</span>.<span class="ident">checked_mul</span>(<span class="ident">n</span>).<span class="ident">ok_or_else</span>(<span class="ident">new_layout_err</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>repeat(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(Layout, usize), LayoutErr&gt; {
+        <span class="kw">let </span>padded_size = <span class="self">self
+            </span>.size()
+            .checked_add(<span class="self">self</span>.padding_needed_for(<span class="self">self</span>.align()))
+            .ok_or_else(new_layout_err)<span class="question-mark">?</span>;
+        <span class="kw">let </span>alloc_size = padded_size.checked_mul(n).ok_or_else(new_layout_err)<span class="question-mark">?</span>;
 
-        <span class="kw">unsafe</span> {
-            <span class="comment">// self.align is already known to be valid and alloc_size has been</span>
-            <span class="comment">// padded already.</span>
-            <span class="prelude-val">Ok</span>((
-                <span class="ident">Layout::from_size_align_unchecked</span>(<span class="ident">alloc_size</span>, <span class="self">self</span>.<span class="ident">align</span>()),
-                <span class="ident">padded_size</span>,
+        <span class="kw">unsafe </span>{
+            <span class="comment">// self.align is already known to be valid and alloc_size has been
+            // padded already.
+            </span><span class="prelude-val">Ok</span>((
+                Layout::from_size_align_unchecked(alloc_size, <span class="self">self</span>.align()),
+                padded_size,
             ))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">array</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Layout</span>, <span class="ident">LayoutErr</span><span class="op">&gt;</span> {
-        <span class="ident">Layout::new</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">repeat</span>(<span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">offs</span>)<span class="op">|</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">offs</span> <span class="op">==</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-            <span class="ident">k</span>
+    <span class="kw">fn </span>array&lt;T&gt;(n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Layout, LayoutErr&gt; {
+        Layout::new::&lt;T&gt;().repeat(n).map(|(k, offs)| {
+            <span class="macro">debug_assert!</span>(offs == mem::size_of::&lt;T&gt;());
+            k
         })
     }
 }
 
-<span class="doccomment">/// Represents the combination of a starting address and</span>
-<span class="doccomment">/// a total capacity of the returned block.</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Excess</span>(<span class="kw">pub</span> <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="kw">pub</span> <span class="ident">usize</span>);
+<span class="doccomment">/// Represents the combination of a starting address and
+/// a total capacity of the returned block.
+</span><span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Excess(<span class="kw">pub </span>NonNull&lt;u8&gt;, <span class="kw">pub </span>usize);
 
-<span class="kw">fn</span> <span class="ident">size_align</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-    (<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(), <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
+<span class="kw">fn </span>size_align&lt;T&gt;() -&gt; (usize, usize) {
+    (mem::size_of::&lt;T&gt;(), mem::align_of::&lt;T&gt;())
 }
 
-<span class="doccomment">/// The `AllocErr` error indicates an allocation failure</span>
-<span class="doccomment">/// that may be due to resource exhaustion or to</span>
-<span class="doccomment">/// something wrong when combining the given input arguments with this</span>
-<span class="doccomment">/// allocator.</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AllocErr</span>;
+<span class="doccomment">/// The `AllocErr` error indicates an allocation failure
+/// that may be due to resource exhaustion or to
+/// something wrong when combining the given input arguments with this
+/// allocator.
+</span><span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub struct </span>AllocErr;
 
-<span class="comment">// (we need this for downstream impl of trait Error)</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AllocErr</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;memory allocation failed&quot;</span>)
+<span class="comment">// (we need this for downstream impl of trait Error)
+// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>AllocErr {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;memory allocation failed&quot;</span>)
     }
 }
 
-<span class="doccomment">/// The `CannotReallocInPlace` error is used when `grow_in_place` or</span>
-<span class="doccomment">/// `shrink_in_place` were unable to reuse the given memory block for</span>
-<span class="doccomment">/// a requested layout.</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CannotReallocInPlace</span>;
+<span class="doccomment">/// The `CannotReallocInPlace` error is used when `grow_in_place` or
+/// `shrink_in_place` were unable to reuse the given memory block for
+/// a requested layout.
+</span><span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub struct </span>CannotReallocInPlace;
 
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="kw">impl</span> <span class="ident">CannotReallocInPlace</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;cannot reallocate allocator&#39;s memory in place&quot;</span>
+<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="kw">impl </span>CannotReallocInPlace {
+    <span class="kw">pub fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;cannot reallocate allocator&#39;s memory in place&quot;
+    </span>}
+}
+
+<span class="comment">// (we need this for downstream impl of trait Error)
+// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>CannotReallocInPlace {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.description())
     }
 }
 
-<span class="comment">// (we need this for downstream impl of trait Error)</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CannotReallocInPlace</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">description</span>())
-    }
-}
+<span class="doccomment">/// An implementation of `Alloc` can allocate, reallocate, and
+/// deallocate arbitrary blocks of data described via `Layout`.
+///
+/// Some of the methods require that a memory block be *currently
+/// allocated* via an allocator. This means that:
+///
+/// * the starting address for that memory block was previously
+///   returned by a previous call to an allocation method (`alloc`,
+///   `alloc_zeroed`, `alloc_excess`, `alloc_one`, `alloc_array`) or
+///   reallocation method (`realloc`, `realloc_excess`, or
+///   `realloc_array`), and
+///
+/// * the memory block has not been subsequently deallocated, where
+///   blocks are deallocated either by being passed to a deallocation
+///   method (`dealloc`, `dealloc_one`, `dealloc_array`) or by being
+///   passed to a reallocation method (see above) that returns `Ok`.
+///
+/// A note regarding zero-sized types and zero-sized layouts: many
+/// methods in the `Alloc` trait state that allocation requests
+/// must be non-zero size, or else undefined behavior can result.
+///
+/// * However, some higher-level allocation methods (`alloc_one`,
+///   `alloc_array`) are well-defined on zero-sized types and can
+///   optionally support them: it is left up to the implementor
+///   whether to return `Err`, or to return `Ok` with some pointer.
+///
+/// * If an `Alloc` implementation chooses to return `Ok` in this
+///   case (i.e. the pointer denotes a zero-sized inaccessible block)
+///   then that returned pointer must be considered &quot;currently
+///   allocated&quot;. On such an allocator, *all* methods that take
+///   currently-allocated pointers as inputs must accept these
+///   zero-sized pointers, *without* causing undefined behavior.
+///
+/// * In other words, if a zero-sized pointer can flow out of an
+///   allocator, then that allocator must likewise accept that pointer
+///   flowing back into its deallocation and reallocation methods.
+///
+/// Some of the methods require that a layout *fit* a memory block.
+/// What it means for a layout to &quot;fit&quot; a memory block means (or
+/// equivalently, for a memory block to &quot;fit&quot; a layout) is that the
+/// following two conditions must hold:
+///
+/// 1. The block&#39;s starting address must be aligned to `layout.align()`.
+///
+/// 2. The block&#39;s size must fall in the range `[use_min, use_max]`, where:
+///
+///    * `use_min` is `self.usable_size(layout).0`, and
+///
+///    * `use_max` is the capacity that was (or would have been)
+///      returned when (if) the block was allocated via a call to
+///      `alloc_excess` or `realloc_excess`.
+///
+/// Note that:
+///
+///  * the size of the layout most recently used to allocate the block
+///    is guaranteed to be in the range `[use_min, use_max]`, and
+///
+///  * a lower-bound on `use_max` can be safely approximated by a call to
+///    `usable_size`.
+///
+///  * if a layout `k` fits a memory block (denoted by `ptr`)
+///    currently allocated via an allocator `a`, then it is legal to
+///    use that layout to deallocate it, i.e. `a.dealloc(ptr, k);`.
+///
+/// # Unsafety
+///
+/// The `Alloc` trait is an `unsafe` trait for a number of reasons, and
+/// implementors must ensure that they adhere to these contracts:
+///
+/// * Pointers returned from allocation functions must point to valid memory and
+///   retain their validity until at least the instance of `Alloc` is dropped
+///   itself.
+///
+/// * `Layout` queries and calculations in general must be correct. Callers of
+///   this trait are allowed to rely on the contracts defined on each method,
+///   and implementors must ensure such contracts remain true.
+///
+/// Note that this list may get tweaked over time as clarifications are made in
+/// the future.
+</span><span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]
+</span><span class="kw">pub unsafe trait </span>Alloc {
+    <span class="comment">// (Note: some existing allocators have unspecified but well-defined
+    // behavior in response to a zero size allocation request ;
+    // e.g. in C, `malloc` of 0 will either return a null pointer or a
+    // unique pointer, but will not have arbitrary undefined
+    // behavior.
+    // However in jemalloc for example,
+    // `mallocx(0)` is documented as undefined behavior.)
 
-<span class="doccomment">/// An implementation of `Alloc` can allocate, reallocate, and</span>
-<span class="doccomment">/// deallocate arbitrary blocks of data described via `Layout`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Some of the methods require that a memory block be *currently</span>
-<span class="doccomment">/// allocated* via an allocator. This means that:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * the starting address for that memory block was previously</span>
-<span class="doccomment">///   returned by a previous call to an allocation method (`alloc`,</span>
-<span class="doccomment">///   `alloc_zeroed`, `alloc_excess`, `alloc_one`, `alloc_array`) or</span>
-<span class="doccomment">///   reallocation method (`realloc`, `realloc_excess`, or</span>
-<span class="doccomment">///   `realloc_array`), and</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * the memory block has not been subsequently deallocated, where</span>
-<span class="doccomment">///   blocks are deallocated either by being passed to a deallocation</span>
-<span class="doccomment">///   method (`dealloc`, `dealloc_one`, `dealloc_array`) or by being</span>
-<span class="doccomment">///   passed to a reallocation method (see above) that returns `Ok`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A note regarding zero-sized types and zero-sized layouts: many</span>
-<span class="doccomment">/// methods in the `Alloc` trait state that allocation requests</span>
-<span class="doccomment">/// must be non-zero size, or else undefined behavior can result.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * However, some higher-level allocation methods (`alloc_one`,</span>
-<span class="doccomment">///   `alloc_array`) are well-defined on zero-sized types and can</span>
-<span class="doccomment">///   optionally support them: it is left up to the implementor</span>
-<span class="doccomment">///   whether to return `Err`, or to return `Ok` with some pointer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * If an `Alloc` implementation chooses to return `Ok` in this</span>
-<span class="doccomment">///   case (i.e. the pointer denotes a zero-sized inaccessible block)</span>
-<span class="doccomment">///   then that returned pointer must be considered &quot;currently</span>
-<span class="doccomment">///   allocated&quot;. On such an allocator, *all* methods that take</span>
-<span class="doccomment">///   currently-allocated pointers as inputs must accept these</span>
-<span class="doccomment">///   zero-sized pointers, *without* causing undefined behavior.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * In other words, if a zero-sized pointer can flow out of an</span>
-<span class="doccomment">///   allocator, then that allocator must likewise accept that pointer</span>
-<span class="doccomment">///   flowing back into its deallocation and reallocation methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Some of the methods require that a layout *fit* a memory block.</span>
-<span class="doccomment">/// What it means for a layout to &quot;fit&quot; a memory block means (or</span>
-<span class="doccomment">/// equivalently, for a memory block to &quot;fit&quot; a layout) is that the</span>
-<span class="doccomment">/// following two conditions must hold:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. The block&#39;s starting address must be aligned to `layout.align()`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 2. The block&#39;s size must fall in the range `[use_min, use_max]`, where:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    * `use_min` is `self.usable_size(layout).0`, and</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    * `use_max` is the capacity that was (or would have been)</span>
-<span class="doccomment">///      returned when (if) the block was allocated via a call to</span>
-<span class="doccomment">///      `alloc_excess` or `realloc_excess`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  * the size of the layout most recently used to allocate the block</span>
-<span class="doccomment">///    is guaranteed to be in the range `[use_min, use_max]`, and</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  * a lower-bound on `use_max` can be safely approximated by a call to</span>
-<span class="doccomment">///    `usable_size`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  * if a layout `k` fits a memory block (denoted by `ptr`)</span>
-<span class="doccomment">///    currently allocated via an allocator `a`, then it is legal to</span>
-<span class="doccomment">///    use that layout to deallocate it, i.e. `a.dealloc(ptr, k);`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Unsafety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Alloc` trait is an `unsafe` trait for a number of reasons, and</span>
-<span class="doccomment">/// implementors must ensure that they adhere to these contracts:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * Pointers returned from allocation functions must point to valid memory and</span>
-<span class="doccomment">///   retain their validity until at least the instance of `Alloc` is dropped</span>
-<span class="doccomment">///   itself.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `Layout` queries and calculations in general must be correct. Callers of</span>
-<span class="doccomment">///   this trait are allowed to rely on the contracts defined on each method,</span>
-<span class="doccomment">///   and implementors must ensure such contracts remain true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this list may get tweaked over time as clarifications are made in</span>
-<span class="doccomment">/// the future.</span>
-<span class="comment">// #[unstable(feature = &quot;allocator_api&quot;, issue = &quot;32838&quot;)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">Alloc</span> {
-    <span class="comment">// (Note: some existing allocators have unspecified but well-defined</span>
-    <span class="comment">// behavior in response to a zero size allocation request ;</span>
-    <span class="comment">// e.g. in C, `malloc` of 0 will either return a null pointer or a</span>
-    <span class="comment">// unique pointer, but will not have arbitrary undefined</span>
-    <span class="comment">// behavior.</span>
-    <span class="comment">// However in jemalloc for example,</span>
-    <span class="comment">// `mallocx(0)` is documented as undefined behavior.)</span>
+    </span><span class="doccomment">/// Returns a pointer meeting the size and alignment guarantees of
+    /// `layout`.
+    ///
+    /// If this method returns an `Ok(addr)`, then the `addr` returned
+    /// will be non-null address pointing to a block of storage
+    /// suitable for holding an instance of `layout`.
+    ///
+    /// The returned block of storage may or may not have its contents
+    /// initialized. (Extension subtraits might restrict this
+    /// behavior, e.g. to ensure initialization to particular sets of
+    /// bit patterns.)
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure that `layout` has non-zero size.
+    ///
+    /// (Extension subtraits might provide more specific bounds on
+    /// behavior, e.g. guarantee a sentinel address or a null pointer
+    /// in response to a zero-size allocation request.)
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `layout` does not meet allocator&#39;s size or alignment
+    /// constraints.
+    ///
+    /// Implementations are encouraged to return `Err` on memory
+    /// exhaustion rather than panicking or aborting, but this is not
+    /// a strict requirement. (Specifically: it is *legal* to
+    /// implement this trait atop an underlying native allocation
+    /// library that aborts on memory exhaustion.)
+    ///
+    /// Clients wishing to abort computation in response to an
+    /// allocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>alloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;u8&gt;, AllocErr&gt;;
 
-    <span class="doccomment">/// Returns a pointer meeting the size and alignment guarantees of</span>
-    <span class="doccomment">/// `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this method returns an `Ok(addr)`, then the `addr` returned</span>
-    <span class="doccomment">/// will be non-null address pointing to a block of storage</span>
-    <span class="doccomment">/// suitable for holding an instance of `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned block of storage may or may not have its contents</span>
-    <span class="doccomment">/// initialized. (Extension subtraits might restrict this</span>
-    <span class="doccomment">/// behavior, e.g. to ensure initialization to particular sets of</span>
-    <span class="doccomment">/// bit patterns.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure that `layout` has non-zero size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (Extension subtraits might provide more specific bounds on</span>
-    <span class="doccomment">/// behavior, e.g. guarantee a sentinel address or a null pointer</span>
-    <span class="doccomment">/// in response to a zero-size allocation request.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `layout` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations are encouraged to return `Err` on memory</span>
-    <span class="doccomment">/// exhaustion rather than panicking or aborting, but this is not</span>
-    <span class="doccomment">/// a strict requirement. (Specifically: it is *legal* to</span>
-    <span class="doccomment">/// implement this trait atop an underlying native allocation</span>
-    <span class="doccomment">/// library that aborts on memory exhaustion.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to an</span>
-    <span class="doccomment">/// allocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">alloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Deallocate the memory referenced by `ptr`.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure all of the following:
+    ///
+    /// * `ptr` must denote a block of memory currently allocated via
+    ///   this allocator,
+    ///
+    /// * `layout` must *fit* that block of memory,
+    ///
+    /// * In addition to fitting the block of memory `layout`, the
+    ///   alignment of the `layout` must match the alignment used
+    ///   to allocate that block of memory.
+    </span><span class="kw">unsafe fn </span>dealloc(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ptr: NonNull&lt;u8&gt;, layout: Layout);
 
-    <span class="doccomment">/// Deallocate the memory referenced by `ptr`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure all of the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must denote a block of memory currently allocated via</span>
-    <span class="doccomment">///   this allocator,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `layout` must *fit* that block of memory,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * In addition to fitting the block of memory `layout`, the</span>
-    <span class="doccomment">///   alignment of the `layout` must match the alignment used</span>
-    <span class="doccomment">///   to allocate that block of memory.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>);
+    <span class="comment">// == ALLOCATOR-SPECIFIC QUANTITIES AND LIMITS ==
+    // usable_size
 
-    <span class="comment">// == ALLOCATOR-SPECIFIC QUANTITIES AND LIMITS ==</span>
-    <span class="comment">// usable_size</span>
-
-    <span class="doccomment">/// Returns bounds on the guaranteed usable size of a successful</span>
-    <span class="doccomment">/// allocation created with the specified `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In particular, if one has a memory block allocated via a given</span>
-    <span class="doccomment">/// allocator `a` and layout `k` where `a.usable_size(k)` returns</span>
-    <span class="doccomment">/// `(l, u)`, then one can pass that block to `a.dealloc()` with a</span>
-    <span class="doccomment">/// layout in the size range [l, u].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (All implementors of `usable_size` must ensure that</span>
-    <span class="doccomment">/// `l &lt;= k.size() &lt;= u`)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Both the lower- and upper-bounds (`l` and `u` respectively)</span>
-    <span class="doccomment">/// are provided, because an allocator based on size classes could</span>
-    <span class="doccomment">/// misbehave if one attempts to deallocate a block without</span>
-    <span class="doccomment">/// providing a correct value for its size (i.e., one within the</span>
-    <span class="doccomment">/// range `[l, u]`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients who wish to make use of excess capacity are encouraged</span>
-    <span class="doccomment">/// to use the `alloc_excess` and `realloc_excess` instead, as</span>
-    <span class="doccomment">/// this method is constrained to report conservative values that</span>
-    <span class="doccomment">/// serve as valid bounds for *all possible* allocation method</span>
-    <span class="doccomment">/// calls.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// However, for clients that do not wish to track the capacity</span>
-    <span class="doccomment">/// returned by `alloc_excess` locally, this method is likely to</span>
-    <span class="doccomment">/// produce useful results.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">usable_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">layout</span>: <span class="kw-2">&amp;</span><span class="ident">Layout</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-        (<span class="ident">layout</span>.<span class="ident">size</span>(), <span class="ident">layout</span>.<span class="ident">size</span>())
+    </span><span class="doccomment">/// Returns bounds on the guaranteed usable size of a successful
+    /// allocation created with the specified `layout`.
+    ///
+    /// In particular, if one has a memory block allocated via a given
+    /// allocator `a` and layout `k` where `a.usable_size(k)` returns
+    /// `(l, u)`, then one can pass that block to `a.dealloc()` with a
+    /// layout in the size range [l, u].
+    ///
+    /// (All implementors of `usable_size` must ensure that
+    /// `l &lt;= k.size() &lt;= u`)
+    ///
+    /// Both the lower- and upper-bounds (`l` and `u` respectively)
+    /// are provided, because an allocator based on size classes could
+    /// misbehave if one attempts to deallocate a block without
+    /// providing a correct value for its size (i.e., one within the
+    /// range `[l, u]`).
+    ///
+    /// Clients who wish to make use of excess capacity are encouraged
+    /// to use the `alloc_excess` and `realloc_excess` instead, as
+    /// this method is constrained to report conservative values that
+    /// serve as valid bounds for *all possible* allocation method
+    /// calls.
+    ///
+    /// However, for clients that do not wish to track the capacity
+    /// returned by `alloc_excess` locally, this method is likely to
+    /// produce useful results.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>usable_size(<span class="kw-2">&amp;</span><span class="self">self</span>, layout: <span class="kw-2">&amp;</span>Layout) -&gt; (usize, usize) {
+        (layout.size(), layout.size())
     }
 
-    <span class="comment">// == METHODS FOR MEMORY REUSE ==</span>
-    <span class="comment">// realloc. alloc_excess, realloc_excess</span>
+    <span class="comment">// == METHODS FOR MEMORY REUSE ==
+    // realloc. alloc_excess, realloc_excess
 
-    <span class="doccomment">/// Returns a pointer suitable for holding data described by</span>
-    <span class="doccomment">/// a new layout with `layout`’s alignment and a size given</span>
-    <span class="doccomment">/// by `new_size`. To</span>
-    <span class="doccomment">/// accomplish this, this may extend or shrink the allocation</span>
-    <span class="doccomment">/// referenced by `ptr` to fit the new layout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Ok`, then ownership of the memory block</span>
-    <span class="doccomment">/// referenced by `ptr` has been transferred to this</span>
-    <span class="doccomment">/// allocator. The memory may or may not have been freed, and</span>
-    <span class="doccomment">/// should be considered unusable (unless of course it was</span>
-    <span class="doccomment">/// transferred back to the caller again via the return value of</span>
-    <span class="doccomment">/// this method).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this method returns `Err`, then ownership of the memory</span>
-    <span class="doccomment">/// block has not been transferred to this allocator, and the</span>
-    <span class="doccomment">/// contents of the memory block are unaltered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure all of the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must be currently allocated via this allocator,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `layout` must *fit* the `ptr` (see above). (The `new_size`</span>
-    <span class="doccomment">///   argument need not fit it.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `new_size` must be greater than zero.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `new_size`, when rounded up to the nearest multiple of `layout.align()`,</span>
-    <span class="doccomment">///   must not overflow (i.e. the rounded value must be less than `usize::MAX`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (Extension subtraits might provide more specific bounds on</span>
-    <span class="doccomment">/// behavior, e.g. guarantee a sentinel address or a null pointer</span>
-    <span class="doccomment">/// in response to a zero-size allocation request.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Err` only if the new layout</span>
-    <span class="doccomment">/// does not meet the allocator&#39;s size</span>
-    <span class="doccomment">/// and alignment constraints of the allocator, or if reallocation</span>
-    <span class="doccomment">/// otherwise fails.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations are encouraged to return `Err` on memory</span>
-    <span class="doccomment">/// exhaustion rather than panicking or aborting, but this is not</span>
-    <span class="doccomment">/// a strict requirement. (Specifically: it is *legal* to</span>
-    <span class="doccomment">/// implement this trait atop an underlying native allocation</span>
-    <span class="doccomment">/// library that aborts on memory exhaustion.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to a</span>
-    <span class="doccomment">/// reallocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">realloc</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">layout</span>: <span class="ident">Layout</span>,
-        <span class="ident">new_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">old_size</span> <span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>();
+    </span><span class="doccomment">/// Returns a pointer suitable for holding data described by
+    /// a new layout with `layout`’s alignment and a size given
+    /// by `new_size`. To
+    /// accomplish this, this may extend or shrink the allocation
+    /// referenced by `ptr` to fit the new layout.
+    ///
+    /// If this returns `Ok`, then ownership of the memory block
+    /// referenced by `ptr` has been transferred to this
+    /// allocator. The memory may or may not have been freed, and
+    /// should be considered unusable (unless of course it was
+    /// transferred back to the caller again via the return value of
+    /// this method).
+    ///
+    /// If this method returns `Err`, then ownership of the memory
+    /// block has not been transferred to this allocator, and the
+    /// contents of the memory block are unaltered.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure all of the following:
+    ///
+    /// * `ptr` must be currently allocated via this allocator,
+    ///
+    /// * `layout` must *fit* the `ptr` (see above). (The `new_size`
+    ///   argument need not fit it.)
+    ///
+    /// * `new_size` must be greater than zero.
+    ///
+    /// * `new_size`, when rounded up to the nearest multiple of `layout.align()`,
+    ///   must not overflow (i.e. the rounded value must be less than `usize::MAX`).
+    ///
+    /// (Extension subtraits might provide more specific bounds on
+    /// behavior, e.g. guarantee a sentinel address or a null pointer
+    /// in response to a zero-size allocation request.)
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` only if the new layout
+    /// does not meet the allocator&#39;s size
+    /// and alignment constraints of the allocator, or if reallocation
+    /// otherwise fails.
+    ///
+    /// Implementations are encouraged to return `Err` on memory
+    /// exhaustion rather than panicking or aborting, but this is not
+    /// a strict requirement. (Specifically: it is *legal* to
+    /// implement this trait atop an underlying native allocation
+    /// library that aborts on memory exhaustion.)
+    ///
+    /// Clients wishing to abort computation in response to a
+    /// reallocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>realloc(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        ptr: NonNull&lt;u8&gt;,
+        layout: Layout,
+        new_size: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;u8&gt;, AllocErr&gt; {
+        <span class="kw">let </span>old_size = layout.size();
 
-        <span class="kw">if</span> <span class="ident">new_size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">old_size</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(()) <span class="op">=</span> <span class="self">self</span>.<span class="ident">grow_in_place</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>, <span class="ident">new_size</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ptr</span>);
+        <span class="kw">if </span>new_size &gt;= old_size {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(()) = <span class="self">self</span>.grow_in_place(ptr, layout, new_size) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(ptr);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">new_size</span> <span class="op">&lt;</span> <span class="ident">old_size</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(()) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shrink_in_place</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>, <span class="ident">new_size</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ptr</span>);
+        } <span class="kw">else if </span>new_size &lt; old_size {
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(()) = <span class="self">self</span>.shrink_in_place(ptr, layout, new_size) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(ptr);
             }
         }
 
-        <span class="comment">// otherwise, fall back on alloc + copy + dealloc.</span>
-        <span class="kw">let</span> <span class="ident">new_layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align_unchecked</span>(<span class="ident">new_size</span>, <span class="ident">layout</span>.<span class="ident">align</span>());
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alloc</span>(<span class="ident">new_layout</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">new_ptr</span>) <span class="op">=</span> <span class="ident">result</span> {
-            <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">new_ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">cmp::min</span>(<span class="ident">old_size</span>, <span class="ident">new_size</span>));
-            <span class="self">self</span>.<span class="ident">dealloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
+        <span class="comment">// otherwise, fall back on alloc + copy + dealloc.
+        </span><span class="kw">let </span>new_layout = Layout::from_size_align_unchecked(new_size, layout.align());
+        <span class="kw">let </span>result = <span class="self">self</span>.alloc(new_layout);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(new_ptr) = result {
+            ptr::copy_nonoverlapping(ptr.as_ptr(), new_ptr.as_ptr(), cmp::min(old_size, new_size));
+            <span class="self">self</span>.dealloc(ptr, layout);
         }
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="doccomment">/// Behaves like `alloc`, but also ensures that the contents</span>
-    <span class="doccomment">/// are set to zero before being returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe for the same reasons that `alloc` is.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `layout` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints, just as in `alloc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to an</span>
-    <span class="doccomment">/// allocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">alloc_zeroed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>();
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alloc</span>(<span class="ident">layout</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">p</span>) <span class="op">=</span> <span class="ident">p</span> {
-            <span class="ident">ptr::write_bytes</span>(<span class="ident">p</span>.<span class="ident">as_ptr</span>(), <span class="number">0</span>, <span class="ident">size</span>);
+    <span class="doccomment">/// Behaves like `alloc`, but also ensures that the contents
+    /// are set to zero before being returned.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe for the same reasons that `alloc` is.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `layout` does not meet allocator&#39;s size or alignment
+    /// constraints, just as in `alloc`.
+    ///
+    /// Clients wishing to abort computation in response to an
+    /// allocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>alloc_zeroed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;u8&gt;, AllocErr&gt; {
+        <span class="kw">let </span>size = layout.size();
+        <span class="kw">let </span>p = <span class="self">self</span>.alloc(layout);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(p) = p {
+            ptr::write_bytes(p.as_ptr(), <span class="number">0</span>, size);
         }
-        <span class="ident">p</span>
+        p
     }
 
-    <span class="doccomment">/// Behaves like `alloc`, but also returns the whole size of</span>
-    <span class="doccomment">/// the returned block. For some `layout` inputs, like arrays, this</span>
-    <span class="doccomment">/// may include extra storage usable for additional data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe for the same reasons that `alloc` is.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `layout` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints, just as in `alloc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to an</span>
-    <span class="doccomment">/// allocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">alloc_excess</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Excess</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">usable_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">usable_size</span>(<span class="kw-2">&amp;</span><span class="ident">layout</span>);
-        <span class="self">self</span>.<span class="ident">alloc</span>(<span class="ident">layout</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Excess</span>(<span class="ident">p</span>, <span class="ident">usable_size</span>.<span class="number">1</span>))
+    <span class="doccomment">/// Behaves like `alloc`, but also returns the whole size of
+    /// the returned block. For some `layout` inputs, like arrays, this
+    /// may include extra storage usable for additional data.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe for the same reasons that `alloc` is.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `layout` does not meet allocator&#39;s size or alignment
+    /// constraints, just as in `alloc`.
+    ///
+    /// Clients wishing to abort computation in response to an
+    /// allocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>alloc_excess(<span class="kw-2">&amp;mut </span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;Excess, AllocErr&gt; {
+        <span class="kw">let </span>usable_size = <span class="self">self</span>.usable_size(<span class="kw-2">&amp;</span>layout);
+        <span class="self">self</span>.alloc(layout).map(|p| Excess(p, usable_size.<span class="number">1</span>))
     }
 
-    <span class="doccomment">/// Behaves like `realloc`, but also returns the whole size of</span>
-    <span class="doccomment">/// the returned block. For some `layout` inputs, like arrays, this</span>
-    <span class="doccomment">/// may include extra storage usable for additional data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe for the same reasons that `realloc` is.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `layout` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints, just as in `realloc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to a</span>
-    <span class="doccomment">/// reallocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">realloc_excess</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">layout</span>: <span class="ident">Layout</span>,
-        <span class="ident">new_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Excess</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">new_layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align_unchecked</span>(<span class="ident">new_size</span>, <span class="ident">layout</span>.<span class="ident">align</span>());
-        <span class="kw">let</span> <span class="ident">usable_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">usable_size</span>(<span class="kw-2">&amp;</span><span class="ident">new_layout</span>);
-        <span class="self">self</span>.<span class="ident">realloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>, <span class="ident">new_size</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">Excess</span>(<span class="ident">p</span>, <span class="ident">usable_size</span>.<span class="number">1</span>))
+    <span class="doccomment">/// Behaves like `realloc`, but also returns the whole size of
+    /// the returned block. For some `layout` inputs, like arrays, this
+    /// may include extra storage usable for additional data.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe for the same reasons that `realloc` is.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `layout` does not meet allocator&#39;s size or alignment
+    /// constraints, just as in `realloc`.
+    ///
+    /// Clients wishing to abort computation in response to a
+    /// reallocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>realloc_excess(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        ptr: NonNull&lt;u8&gt;,
+        layout: Layout,
+        new_size: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Excess, AllocErr&gt; {
+        <span class="kw">let </span>new_layout = Layout::from_size_align_unchecked(new_size, layout.align());
+        <span class="kw">let </span>usable_size = <span class="self">self</span>.usable_size(<span class="kw-2">&amp;</span>new_layout);
+        <span class="self">self</span>.realloc(ptr, layout, new_size)
+            .map(|p| Excess(p, usable_size.<span class="number">1</span>))
     }
 
-    <span class="doccomment">/// Attempts to extend the allocation referenced by `ptr` to fit `new_size`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Ok`, then the allocator has asserted that the</span>
-    <span class="doccomment">/// memory block referenced by `ptr` now fits `new_size`, and thus can</span>
-    <span class="doccomment">/// be used to carry data of a layout of that size and same alignment as</span>
-    <span class="doccomment">/// `layout`. (The allocator is allowed to</span>
-    <span class="doccomment">/// expend effort to accomplish this, such as extending the memory block to</span>
-    <span class="doccomment">/// include successor blocks, or virtual memory tricks.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Regardless of what this method returns, ownership of the</span>
-    <span class="doccomment">/// memory block referenced by `ptr` has not been transferred, and</span>
-    <span class="doccomment">/// the contents of the memory block are unaltered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure all of the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must be currently allocated via this allocator,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `layout` must *fit* the `ptr` (see above); note the</span>
-    <span class="doccomment">///   `new_size` argument need not fit it,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `new_size` must not be less than `layout.size()`,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Err(CannotReallocInPlace)` when the allocator is</span>
-    <span class="doccomment">/// unable to assert that the memory block referenced by `ptr`</span>
-    <span class="doccomment">/// could fit `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that one cannot pass `CannotReallocInPlace` to the `handle_alloc_error`</span>
-    <span class="doccomment">/// function; clients are expected either to be able to recover from</span>
-    <span class="doccomment">/// `grow_in_place` failures without aborting, or to fall back on</span>
-    <span class="doccomment">/// another reallocation method before resorting to an abort.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">grow_in_place</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">layout</span>: <span class="ident">Layout</span>,
-        <span class="ident">new_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CannotReallocInPlace</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">ptr</span>; <span class="comment">// this default implementation doesn&#39;t care about the actual address.</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">new_size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>());
-        <span class="kw">let</span> (<span class="ident">_l</span>, <span class="ident">u</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">usable_size</span>(<span class="kw-2">&amp;</span><span class="ident">layout</span>);
-        <span class="comment">// _l &lt;= layout.size()                       [guaranteed by usable_size()]</span>
-        <span class="comment">//       layout.size() &lt;= new_layout.size()  [required by this method]</span>
-        <span class="kw">if</span> <span class="ident">new_size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u</span> {
+    <span class="doccomment">/// Attempts to extend the allocation referenced by `ptr` to fit `new_size`.
+    ///
+    /// If this returns `Ok`, then the allocator has asserted that the
+    /// memory block referenced by `ptr` now fits `new_size`, and thus can
+    /// be used to carry data of a layout of that size and same alignment as
+    /// `layout`. (The allocator is allowed to
+    /// expend effort to accomplish this, such as extending the memory block to
+    /// include successor blocks, or virtual memory tricks.)
+    ///
+    /// Regardless of what this method returns, ownership of the
+    /// memory block referenced by `ptr` has not been transferred, and
+    /// the contents of the memory block are unaltered.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure all of the following:
+    ///
+    /// * `ptr` must be currently allocated via this allocator,
+    ///
+    /// * `layout` must *fit* the `ptr` (see above); note the
+    ///   `new_size` argument need not fit it,
+    ///
+    /// * `new_size` must not be less than `layout.size()`,
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(CannotReallocInPlace)` when the allocator is
+    /// unable to assert that the memory block referenced by `ptr`
+    /// could fit `layout`.
+    ///
+    /// Note that one cannot pass `CannotReallocInPlace` to the `handle_alloc_error`
+    /// function; clients are expected either to be able to recover from
+    /// `grow_in_place` failures without aborting, or to fall back on
+    /// another reallocation method before resorting to an abort.
+    </span><span class="kw">unsafe fn </span>grow_in_place(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        ptr: NonNull&lt;u8&gt;,
+        layout: Layout,
+        new_size: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), CannotReallocInPlace&gt; {
+        <span class="kw">let _ </span>= ptr; <span class="comment">// this default implementation doesn&#39;t care about the actual address.
+        </span><span class="macro">debug_assert!</span>(new_size &gt;= layout.size());
+        <span class="kw">let </span>(_l, u) = <span class="self">self</span>.usable_size(<span class="kw-2">&amp;</span>layout);
+        <span class="comment">// _l &lt;= layout.size()                       [guaranteed by usable_size()]
+        //       layout.size() &lt;= new_layout.size()  [required by this method]
+        </span><span class="kw">if </span>new_size &lt;= u {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">CannotReallocInPlace</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(CannotReallocInPlace)
         }
     }
 
-    <span class="doccomment">/// Attempts to shrink the allocation referenced by `ptr` to fit `new_size`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Ok`, then the allocator has asserted that the</span>
-    <span class="doccomment">/// memory block referenced by `ptr` now fits `new_size`, and</span>
-    <span class="doccomment">/// thus can only be used to carry data of that smaller</span>
-    <span class="doccomment">/// layout. (The allocator is allowed to take advantage of this,</span>
-    <span class="doccomment">/// carving off portions of the block for reuse elsewhere.) The</span>
-    <span class="doccomment">/// truncated contents of the block within the smaller layout are</span>
-    <span class="doccomment">/// unaltered, and ownership of block has not been transferred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this returns `Err`, then the memory block is considered to</span>
-    <span class="doccomment">/// still represent the original (larger) `layout`. None of the</span>
-    <span class="doccomment">/// block has been carved off for reuse elsewhere, ownership of</span>
-    <span class="doccomment">/// the memory block has not been transferred, and the contents of</span>
-    <span class="doccomment">/// the memory block are unaltered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure all of the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must be currently allocated via this allocator,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `layout` must *fit* the `ptr` (see above); note the</span>
-    <span class="doccomment">///   `new_size` argument need not fit it,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `new_size` must not be greater than `layout.size()`</span>
-    <span class="doccomment">///   (and must be greater than zero),</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `Err(CannotReallocInPlace)` when the allocator is</span>
-    <span class="doccomment">/// unable to assert that the memory block referenced by `ptr`</span>
-    <span class="doccomment">/// could fit `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that one cannot pass `CannotReallocInPlace` to the `handle_alloc_error`</span>
-    <span class="doccomment">/// function; clients are expected either to be able to recover from</span>
-    <span class="doccomment">/// `shrink_in_place` failures without aborting, or to fall back</span>
-    <span class="doccomment">/// on another reallocation method before resorting to an abort.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">shrink_in_place</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">layout</span>: <span class="ident">Layout</span>,
-        <span class="ident">new_size</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CannotReallocInPlace</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">ptr</span>; <span class="comment">// this default implementation doesn&#39;t care about the actual address.</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">new_size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>());
-        <span class="kw">let</span> (<span class="ident">l</span>, <span class="ident">_u</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">usable_size</span>(<span class="kw-2">&amp;</span><span class="ident">layout</span>);
-        <span class="comment">//                      layout.size() &lt;= _u  [guaranteed by usable_size()]</span>
-        <span class="comment">// new_layout.size() &lt;= layout.size()        [required by this method]</span>
-        <span class="kw">if</span> <span class="ident">l</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">new_size</span> {
+    <span class="doccomment">/// Attempts to shrink the allocation referenced by `ptr` to fit `new_size`.
+    ///
+    /// If this returns `Ok`, then the allocator has asserted that the
+    /// memory block referenced by `ptr` now fits `new_size`, and
+    /// thus can only be used to carry data of that smaller
+    /// layout. (The allocator is allowed to take advantage of this,
+    /// carving off portions of the block for reuse elsewhere.) The
+    /// truncated contents of the block within the smaller layout are
+    /// unaltered, and ownership of block has not been transferred.
+    ///
+    /// If this returns `Err`, then the memory block is considered to
+    /// still represent the original (larger) `layout`. None of the
+    /// block has been carved off for reuse elsewhere, ownership of
+    /// the memory block has not been transferred, and the contents of
+    /// the memory block are unaltered.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure all of the following:
+    ///
+    /// * `ptr` must be currently allocated via this allocator,
+    ///
+    /// * `layout` must *fit* the `ptr` (see above); note the
+    ///   `new_size` argument need not fit it,
+    ///
+    /// * `new_size` must not be greater than `layout.size()`
+    ///   (and must be greater than zero),
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(CannotReallocInPlace)` when the allocator is
+    /// unable to assert that the memory block referenced by `ptr`
+    /// could fit `layout`.
+    ///
+    /// Note that one cannot pass `CannotReallocInPlace` to the `handle_alloc_error`
+    /// function; clients are expected either to be able to recover from
+    /// `shrink_in_place` failures without aborting, or to fall back
+    /// on another reallocation method before resorting to an abort.
+    </span><span class="kw">unsafe fn </span>shrink_in_place(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        ptr: NonNull&lt;u8&gt;,
+        layout: Layout,
+        new_size: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), CannotReallocInPlace&gt; {
+        <span class="kw">let _ </span>= ptr; <span class="comment">// this default implementation doesn&#39;t care about the actual address.
+        </span><span class="macro">debug_assert!</span>(new_size &lt;= layout.size());
+        <span class="kw">let </span>(l, _u) = <span class="self">self</span>.usable_size(<span class="kw-2">&amp;</span>layout);
+        <span class="comment">//                      layout.size() &lt;= _u  [guaranteed by usable_size()]
+        // new_layout.size() &lt;= layout.size()        [required by this method]
+        </span><span class="kw">if </span>l &lt;= new_size {
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">CannotReallocInPlace</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(CannotReallocInPlace)
         }
     }
 
-    <span class="comment">// == COMMON USAGE PATTERNS ==</span>
-    <span class="comment">// alloc_one, dealloc_one, alloc_array, realloc_array. dealloc_array</span>
+    <span class="comment">// == COMMON USAGE PATTERNS ==
+    // alloc_one, dealloc_one, alloc_array, realloc_array. dealloc_array
 
-    <span class="doccomment">/// Allocates a block suitable for holding an instance of `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Captures a common usage pattern for allocators.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned block is suitable for passing to the</span>
-    <span class="doccomment">/// `alloc`/`realloc` methods of this allocator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note to implementors: If this returns `Ok(ptr)`, then `ptr`</span>
-    <span class="doccomment">/// must be considered &quot;currently allocated&quot; and must be</span>
-    <span class="doccomment">/// acceptable input to methods such as `realloc` or `dealloc`,</span>
-    <span class="doccomment">/// *even if* `T` is a zero-sized type. In other words, if your</span>
-    <span class="doccomment">/// `Alloc` implementation overrides this method in a manner</span>
-    <span class="doccomment">/// that can return a zero-sized `ptr`, then all reallocation and</span>
-    <span class="doccomment">/// deallocation methods need to be similarly overridden to accept</span>
-    <span class="doccomment">/// such values as input.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `T` does not meet allocator&#39;s size or alignment constraints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For zero-sized `T`, may return either of `Ok` or `Err`, but</span>
-    <span class="doccomment">/// will *not* yield undefined behavior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to an</span>
-    <span class="doccomment">/// allocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">fn</span> <span class="ident">alloc_one</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    </span><span class="doccomment">/// Allocates a block suitable for holding an instance of `T`.
+    ///
+    /// Captures a common usage pattern for allocators.
+    ///
+    /// The returned block is suitable for passing to the
+    /// `alloc`/`realloc` methods of this allocator.
+    ///
+    /// Note to implementors: If this returns `Ok(ptr)`, then `ptr`
+    /// must be considered &quot;currently allocated&quot; and must be
+    /// acceptable input to methods such as `realloc` or `dealloc`,
+    /// *even if* `T` is a zero-sized type. In other words, if your
+    /// `Alloc` implementation overrides this method in a manner
+    /// that can return a zero-sized `ptr`, then all reallocation and
+    /// deallocation methods need to be similarly overridden to accept
+    /// such values as input.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `T` does not meet allocator&#39;s size or alignment constraints.
+    ///
+    /// For zero-sized `T`, may return either of `Ok` or `Err`, but
+    /// will *not* yield undefined behavior.
+    ///
+    /// Clients wishing to abort computation in response to an
+    /// allocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">fn </span>alloc_one&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;T&gt;, AllocErr&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">Layout::new</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-        <span class="kw">if</span> <span class="ident">k</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">alloc</span>(<span class="ident">k</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">cast</span>()) }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">AllocErr</span>)
+        <span class="kw">let </span>k = Layout::new::&lt;T&gt;();
+        <span class="kw">if </span>k.size() &gt; <span class="number">0 </span>{
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.alloc(k).map(|p| p.cast()) }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(AllocErr)
         }
     }
 
-    <span class="doccomment">/// Deallocates a block suitable for holding an instance of `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The given block must have been produced by this allocator,</span>
-    <span class="doccomment">/// and must be suitable for storing a `T` (in terms of alignment</span>
-    <span class="doccomment">/// as well as minimum and maximum size); otherwise yields</span>
-    <span class="doccomment">/// undefined behavior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Captures a common usage pattern for allocators.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure both:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must denote a block of memory currently allocated via this allocator</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * the layout of `T` must *fit* that block of memory.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">dealloc_one</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Deallocates a block suitable for holding an instance of `T`.
+    ///
+    /// The given block must have been produced by this allocator,
+    /// and must be suitable for storing a `T` (in terms of alignment
+    /// as well as minimum and maximum size); otherwise yields
+    /// undefined behavior.
+    ///
+    /// Captures a common usage pattern for allocators.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure both:
+    ///
+    /// * `ptr` must denote a block of memory currently allocated via this allocator
+    ///
+    /// * the layout of `T` must *fit* that block of memory.
+    </span><span class="kw">unsafe fn </span>dealloc_one&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ptr: NonNull&lt;T&gt;)
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">Layout::new</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-        <span class="kw">if</span> <span class="ident">k</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">dealloc</span>(<span class="ident">ptr</span>.<span class="ident">cast</span>(), <span class="ident">k</span>);
+        <span class="kw">let </span>k = Layout::new::&lt;T&gt;();
+        <span class="kw">if </span>k.size() &gt; <span class="number">0 </span>{
+            <span class="self">self</span>.dealloc(ptr.cast(), k);
         }
     }
 
-    <span class="doccomment">/// Allocates a block suitable for holding `n` instances of `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Captures a common usage pattern for allocators.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned block is suitable for passing to the</span>
-    <span class="doccomment">/// `alloc`/`realloc` methods of this allocator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note to implementors: If this returns `Ok(ptr)`, then `ptr`</span>
-    <span class="doccomment">/// must be considered &quot;currently allocated&quot; and must be</span>
-    <span class="doccomment">/// acceptable input to methods such as `realloc` or `dealloc`,</span>
-    <span class="doccomment">/// *even if* `T` is a zero-sized type. In other words, if your</span>
-    <span class="doccomment">/// `Alloc` implementation overrides this method in a manner</span>
-    <span class="doccomment">/// that can return a zero-sized `ptr`, then all reallocation and</span>
-    <span class="doccomment">/// deallocation methods need to be similarly overridden to accept</span>
-    <span class="doccomment">/// such values as input.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `[T; n]` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For zero-sized `T` or `n == 0`, may return either of `Ok` or</span>
-    <span class="doccomment">/// `Err`, but will *not* yield undefined behavior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Always returns `Err` on arithmetic overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to an</span>
-    <span class="doccomment">/// allocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">fn</span> <span class="ident">alloc_array</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Allocates a block suitable for holding `n` instances of `T`.
+    ///
+    /// Captures a common usage pattern for allocators.
+    ///
+    /// The returned block is suitable for passing to the
+    /// `alloc`/`realloc` methods of this allocator.
+    ///
+    /// Note to implementors: If this returns `Ok(ptr)`, then `ptr`
+    /// must be considered &quot;currently allocated&quot; and must be
+    /// acceptable input to methods such as `realloc` or `dealloc`,
+    /// *even if* `T` is a zero-sized type. In other words, if your
+    /// `Alloc` implementation overrides this method in a manner
+    /// that can return a zero-sized `ptr`, then all reallocation and
+    /// deallocation methods need to be similarly overridden to accept
+    /// such values as input.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `[T; n]` does not meet allocator&#39;s size or alignment
+    /// constraints.
+    ///
+    /// For zero-sized `T` or `n == 0`, may return either of `Ok` or
+    /// `Err`, but will *not* yield undefined behavior.
+    ///
+    /// Always returns `Err` on arithmetic overflow.
+    ///
+    /// Clients wishing to abort computation in response to an
+    /// allocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">fn </span>alloc_array&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;T&gt;, AllocErr&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">match</span> <span class="ident">Layout::array</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">layout</span>) <span class="kw">if</span> <span class="ident">layout</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">alloc</span>(<span class="ident">layout</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">cast</span>()) },
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AllocErr</span>),
+        <span class="kw">match </span>Layout::array::&lt;T&gt;(n) {
+            <span class="prelude-val">Ok</span>(layout) <span class="kw">if </span>layout.size() &gt; <span class="number">0 </span>=&gt; <span class="kw">unsafe </span>{ <span class="self">self</span>.alloc(layout).map(|p| p.cast()) },
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(AllocErr),
         }
     }
 
-    <span class="doccomment">/// Reallocates a block previously suitable for holding `n_old`</span>
-    <span class="doccomment">/// instances of `T`, returning a block suitable for holding</span>
-    <span class="doccomment">/// `n_new` instances of `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Captures a common usage pattern for allocators.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The returned block is suitable for passing to the</span>
-    <span class="doccomment">/// `alloc`/`realloc` methods of this allocator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure all of the following:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must be currently allocated via this allocator,</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * the layout of `[T; n_old]` must *fit* that block of memory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either memory is exhausted or</span>
-    <span class="doccomment">/// `[T; n_new]` does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For zero-sized `T` or `n_new == 0`, may return either of `Ok` or</span>
-    <span class="doccomment">/// `Err`, but will *not* yield undefined behavior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Always returns `Err` on arithmetic overflow.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Clients wishing to abort computation in response to a</span>
-    <span class="doccomment">/// reallocation error are encouraged to call the [`handle_alloc_error`] function,</span>
-    <span class="doccomment">/// rather than directly invoking `panic!` or similar.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">realloc_array</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">n_old</span>: <span class="ident">usize</span>,
-        <span class="ident">n_new</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocErr</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Reallocates a block previously suitable for holding `n_old`
+    /// instances of `T`, returning a block suitable for holding
+    /// `n_new` instances of `T`.
+    ///
+    /// Captures a common usage pattern for allocators.
+    ///
+    /// The returned block is suitable for passing to the
+    /// `alloc`/`realloc` methods of this allocator.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure all of the following:
+    ///
+    /// * `ptr` must be currently allocated via this allocator,
+    ///
+    /// * the layout of `[T; n_old]` must *fit* that block of memory.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either memory is exhausted or
+    /// `[T; n_new]` does not meet allocator&#39;s size or alignment
+    /// constraints.
+    ///
+    /// For zero-sized `T` or `n_new == 0`, may return either of `Ok` or
+    /// `Err`, but will *not* yield undefined behavior.
+    ///
+    /// Always returns `Err` on arithmetic overflow.
+    ///
+    /// Clients wishing to abort computation in response to a
+    /// reallocation error are encouraged to call the [`handle_alloc_error`] function,
+    /// rather than directly invoking `panic!` or similar.
+    ///
+    /// [`handle_alloc_error`]: ../../alloc/alloc/fn.handle_alloc_error.html
+    </span><span class="kw">unsafe fn </span>realloc_array&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        ptr: NonNull&lt;T&gt;,
+        n_old: usize,
+        n_new: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;NonNull&lt;T&gt;, AllocErr&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">match</span> (<span class="ident">Layout::array</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n_old</span>), <span class="ident">Layout::array</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n_new</span>)) {
-            (<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">k_old</span>), <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">k_new</span>)) <span class="kw">if</span> <span class="ident">k_old</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">k_new</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> =&gt; {
-                <span class="macro">debug_assert!</span>(<span class="ident">k_old</span>.<span class="ident">align</span>() <span class="op">==</span> <span class="ident">k_new</span>.<span class="ident">align</span>());
-                <span class="self">self</span>.<span class="ident">realloc</span>(<span class="ident">ptr</span>.<span class="ident">cast</span>(), <span class="ident">k_old</span>.<span class="ident">clone</span>(), <span class="ident">k_new</span>.<span class="ident">size</span>())
-                    .<span class="ident">map</span>(<span class="ident">NonNull::cast</span>)
+        <span class="kw">match </span>(Layout::array::&lt;T&gt;(n_old), Layout::array::&lt;T&gt;(n_new)) {
+            (<span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>k_old), <span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>k_new)) <span class="kw">if </span>k_old.size() &gt; <span class="number">0 </span>&amp;&amp; k_new.size() &gt; <span class="number">0 </span>=&gt; {
+                <span class="macro">debug_assert!</span>(k_old.align() == k_new.align());
+                <span class="self">self</span>.realloc(ptr.cast(), k_old.clone(), k_new.size())
+                    .map(NonNull::cast)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AllocErr</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(AllocErr),
         }
     }
 
-    <span class="doccomment">/// Deallocates a block suitable for holding `n` instances of `T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Captures a common usage pattern for allocators.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because undefined behavior can result</span>
-    <span class="doccomment">/// if the caller does not ensure both:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `ptr` must denote a block of memory currently allocated via this allocator</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * the layout of `[T; n]` must *fit* that block of memory.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returning `Err` indicates that either `[T; n]` or the given</span>
-    <span class="doccomment">/// memory block does not meet allocator&#39;s size or alignment</span>
-    <span class="doccomment">/// constraints.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Always returns `Err` on arithmetic overflow.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">dealloc_array</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">AllocErr</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="doccomment">/// Deallocates a block suitable for holding `n` instances of `T`.
+    ///
+    /// Captures a common usage pattern for allocators.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe because undefined behavior can result
+    /// if the caller does not ensure both:
+    ///
+    /// * `ptr` must denote a block of memory currently allocated via this allocator
+    ///
+    /// * the layout of `[T; n]` must *fit* that block of memory.
+    ///
+    /// # Errors
+    ///
+    /// Returning `Err` indicates that either `[T; n]` or the given
+    /// memory block does not meet allocator&#39;s size or alignment
+    /// constraints.
+    ///
+    /// Always returns `Err` on arithmetic overflow.
+    </span><span class="kw">unsafe fn </span>dealloc_array&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ptr: NonNull&lt;T&gt;, n: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), AllocErr&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">match</span> <span class="ident">Layout::array</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">n</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">k</span>) <span class="kw">if</span> <span class="ident">k</span>.<span class="ident">size</span>() <span class="op">&gt;</span> <span class="number">0</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">dealloc</span>(<span class="ident">ptr</span>.<span class="ident">cast</span>(), <span class="ident">k</span>);
+        <span class="kw">match </span>Layout::array::&lt;T&gt;(n) {
+            <span class="prelude-val">Ok</span>(k) <span class="kw">if </span>k.size() &gt; <span class="number">0 </span>=&gt; {
+                <span class="self">self</span>.dealloc(ptr.cast(), k);
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">AllocErr</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(AllocErr),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bumpalo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bumpalo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

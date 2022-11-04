@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/text.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../cuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/text.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>text.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../cuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -183,190 +183,190 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">char</span>, <span class="ident">cmp::Ordering</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">f64</span>, <span class="ident">iter</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{char, cmp::Ordering};
+<span class="kw">use </span>std::{f64, iter};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::CuidError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::BASE</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::CuidError;
+<span class="kw">use </span><span class="kw">crate</span>::BASE;
 
-<span class="doccomment">/// Convert a number to a string of the specified radix.</span>
-<span class="kw">fn</span> <span class="ident">to_radix_string</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">radix</span>: <span class="ident">u8</span>, <span class="ident">number</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">number</span> <span class="op">=</span> <span class="ident">number</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">rad_u32</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">radix</span>.<span class="ident">into</span>();
+<span class="doccomment">/// Convert a number to a string of the specified radix.
+</span><span class="kw">fn </span>to_radix_string&lt;N: Into&lt;u128&gt;&gt;(radix: u8, number: N) -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>number = number.into();
+    <span class="kw">let </span>rad_u32: u32 = radix.into();
 
-    <span class="kw">if</span> <span class="ident">number</span> <span class="op">&lt;</span> <span class="ident">radix</span>.<span class="ident">into</span>() {
-        <span class="comment">// No need to allocate a vector or do any math</span>
-        <span class="comment">// NOTE: we are okay to cast to u32 here, b/c number &lt; radix,</span>
-        <span class="comment">// which has to be 255 or below.</span>
-        <span class="kw">return</span> <span class="ident">char::from_digit</span>(<span class="ident">number</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">rad_u32</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">to_string</span>())
-            .<span class="ident">ok_or</span>(<span class="ident">CuidError::TextError</span>(<span class="string">&quot;Bad digit&quot;</span>));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">number</span> <span class="op">&gt;</span> <span class="ident">f64::MAX</span> <span class="kw">as</span> <span class="ident">u128</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CuidError::TextError</span>(<span class="string">&quot;Input number too large&quot;</span>));
+    <span class="kw">if </span>number &lt; radix.into() {
+        <span class="comment">// No need to allocate a vector or do any math
+        // NOTE: we are okay to cast to u32 here, b/c number &lt; radix,
+        // which has to be 255 or below.
+        </span><span class="kw">return </span>char::from_digit(number <span class="kw">as </span>u32, rad_u32)
+            .map(|c| c.to_string())
+            .ok_or(CuidError::TextError(<span class="string">&quot;Bad digit&quot;</span>));
+    } <span class="kw">else if </span>number &gt; f64::MAX <span class="kw">as </span>u128 {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(CuidError::TextError(<span class="string">&quot;Input number too large&quot;</span>));
     }
 
-    <span class="comment">// 32 chars should almost always be enough to fill without needing to grow</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">32</span>);
-    <span class="kw">while</span> <span class="ident">number</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="comment">// We can unwrap here b/c we know that the modulus must be less than the</span>
-        <span class="comment">// radix, which is less than 256</span>
-        <span class="ident">chars</span>.<span class="ident">push</span>(<span class="ident">char::from_digit</span>((<span class="ident">number</span> <span class="op">%</span> <span class="ident">radix</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">rad_u32</span>).<span class="ident">unwrap</span>());
-        <span class="ident">number</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix</span> <span class="kw">as</span> <span class="ident">u128</span>;
+    <span class="comment">// 32 chars should almost always be enough to fill without needing to grow
+    </span><span class="kw">let </span><span class="kw-2">mut </span>chars: Vec&lt;char&gt; = Vec::with_capacity(<span class="number">32</span>);
+    <span class="kw">while </span>number &gt; <span class="number">0 </span>{
+        <span class="comment">// We can unwrap here b/c we know that the modulus must be less than the
+        // radix, which is less than 256
+        </span>chars.push(char::from_digit((number % radix <span class="kw">as </span>u128) <span class="kw">as </span>u32, rad_u32).unwrap());
+        number /= radix <span class="kw">as </span>u128;
     }
-    <span class="ident">chars</span>.<span class="ident">reverse</span>();
-    <span class="prelude-val">Ok</span>(<span class="ident">chars</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>())
+    chars.reverse();
+    <span class="prelude-val">Ok</span>(chars.into_iter().collect())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_base_string</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">number</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="ident">to_radix_string</span>(<span class="ident">BASE</span>, <span class="ident">number</span>)
+<span class="kw">pub fn </span>to_base_string&lt;N: Into&lt;u128&gt;&gt;(number: N) -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
+    to_radix_string(BASE, number)
 }
 
-<span class="doccomment">/// Pad a string `to_pad` up to size `size` with char `char`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Inserts `char` at the beginning of the string until the string is equal to</span>
-<span class="doccomment">/// size `size`. If `to_pad` is longer than `size`, remove characters from the</span>
-<span class="doccomment">/// start of the string until it is of size `size`.</span>
-<span class="kw">fn</span> <span class="ident">pad_with_char</span>(<span class="ident">pad_char</span>: <span class="ident">char</span>, <span class="ident">size</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">to_pad</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">to_pad</span>.<span class="ident">len</span>();
+<span class="doccomment">/// Pad a string `to_pad` up to size `size` with char `char`
+///
+/// Inserts `char` at the beginning of the string until the string is equal to
+/// size `size`. If `to_pad` is longer than `size`, remove characters from the
+/// start of the string until it is of size `size`.
+</span><span class="kw">fn </span>pad_with_char(pad_char: char, size: usize, <span class="kw-2">mut </span>to_pad: String) -&gt; String {
+    <span class="kw">let </span>length = to_pad.len();
 
-    <span class="kw">match</span> <span class="ident">length</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">size</span>) {
-        <span class="ident">Ordering::Less</span> =&gt; {}
-        <span class="ident">Ordering::Equal</span> =&gt; <span class="kw">return</span> <span class="ident">to_pad</span>,
-        <span class="ident">Ordering::Greater</span> =&gt; {
-            <span class="comment">// Cut from the start of the string to pad down to the expected size,</span>
-            <span class="comment">// e.g. for a size of 2, `abc` would become `bc`</span>
-            <span class="comment">// benchmarking has shown that returning a new string here is faster</span>
-            <span class="comment">// than mutating the old one</span>
-            <span class="kw">return</span> <span class="ident">to_pad</span>[<span class="ident">length</span> <span class="op">-</span> <span class="ident">size</span>..].<span class="ident">to_string</span>();
+    <span class="kw">match </span>length.cmp(<span class="kw-2">&amp;</span>size) {
+        Ordering::Less =&gt; {}
+        Ordering::Equal =&gt; <span class="kw">return </span>to_pad,
+        Ordering::Greater =&gt; {
+            <span class="comment">// Cut from the start of the string to pad down to the expected size,
+            // e.g. for a size of 2, `abc` would become `bc`
+            // benchmarking has shown that returning a new string here is faster
+            // than mutating the old one
+            </span><span class="kw">return </span>to_pad[length - size..].to_string();
         }
     }
 
-    <span class="kw">let</span> <span class="ident">size_diff</span> <span class="op">=</span> <span class="ident">size</span> <span class="op">-</span> <span class="ident">length</span>;
+    <span class="kw">let </span>size_diff = size - length;
 
-    <span class="kw">let</span> <span class="ident">to_insert</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">iter::once</span>(<span class="ident">pad_char</span>).<span class="ident">cycle</span>().<span class="ident">take</span>(<span class="ident">size_diff</span>).<span class="ident">collect</span>();
-    <span class="ident">to_pad</span>.<span class="ident">insert_str</span>(<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">to_insert</span>);
-    <span class="ident">to_pad</span>
+    <span class="kw">let </span>to_insert: String = iter::once(pad_char).cycle().take(size_diff).collect();
+    to_pad.insert_str(<span class="number">0</span>, <span class="kw-2">&amp;</span>to_insert);
+    to_pad
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pad</span>(<span class="ident">size</span>: <span class="ident">usize</span>, <span class="ident">to_pad</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">pad_with_char</span>(<span class="string">&#39;0&#39;</span>, <span class="ident">size</span>, <span class="ident">to_pad</span>)
+<span class="kw">pub fn </span>pad(size: usize, to_pad: String) -&gt; String {
+    pad_with_char(<span class="string">&#39;0&#39;</span>, size, to_pad)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">pad_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>pad_tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">does_not_pad_str_of_size</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;foo&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pad_with_char</span>(<span class="string">&#39;a&#39;</span>, <span class="number">3</span>, <span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>()))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>does_not_pad_str_of_size() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;foo&quot;</span>, <span class="kw-2">&amp;*</span>pad_with_char(<span class="string">&#39;a&#39;</span>, <span class="number">3</span>, <span class="string">&quot;foo&quot;</span>.into()))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">single_char_pad</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;afoo&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pad_with_char</span>(<span class="string">&#39;a&#39;</span>, <span class="number">4</span>, <span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>()))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>single_char_pad() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;afoo&quot;</span>, <span class="kw-2">&amp;*</span>pad_with_char(<span class="string">&#39;a&#39;</span>, <span class="number">4</span>, <span class="string">&quot;foo&quot;</span>.into()))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">multichar_pad</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;aaafoo&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pad_with_char</span>(<span class="string">&#39;a&#39;</span>, <span class="number">6</span>, <span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>()))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>multichar_pad() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;aaafoo&quot;</span>, <span class="kw-2">&amp;*</span>pad_with_char(<span class="string">&#39;a&#39;</span>, <span class="number">6</span>, <span class="string">&quot;foo&quot;</span>.into()))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smaller_pad</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;c&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pad_with_char</span>(<span class="string">&#39;a&#39;</span>, <span class="number">1</span>, <span class="string">&quot;abc&quot;</span>.<span class="ident">into</span>()))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smaller_pad() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;c&quot;</span>, <span class="kw-2">&amp;*</span>pad_with_char(<span class="string">&#39;a&#39;</span>, <span class="number">1</span>, <span class="string">&quot;abc&quot;</span>.into()))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pad_0s</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;00foo&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pad</span>(<span class="number">5</span>, <span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>()))
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">radix_str_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hex_number_below_radix</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;8&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">to_radix_string</span>(<span class="number">16</span>, <span class="number">8u8</span>).<span class="ident">unwrap</span>());
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hex_number_below_radix_letter</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">to_radix_string</span>(<span class="number">16</span>, <span class="number">10u8</span>).<span class="ident">unwrap</span>());
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">number_above_radix</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;10&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">to_radix_string</span>(<span class="number">16</span>, <span class="number">16u8</span>).<span class="ident">unwrap</span>())
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">number_well_above_radix</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;16i&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">to_radix_string</span>(<span class="number">32</span>, <span class="number">1234u16</span>).<span class="ident">unwrap</span>())
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">large_base_36</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;7cik2&quot;</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">to_radix_string</span>(<span class="number">36</span>, <span class="number">12341234u32</span>).<span class="ident">unwrap</span>())
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pad_0s() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;00foo&quot;</span>, <span class="kw-2">&amp;*</span>pad(<span class="number">5</span>, <span class="string">&quot;foo&quot;</span>.into()))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">nightly</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">benchmarks</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::u32</span>;
-    <span class="kw">use</span> <span class="ident">test::Bencher</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>radix_str_tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">digits_in_some_base</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">digits_in_base</span>(<span class="number">16</span>, <span class="number">12345678</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hex_number_below_radix() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;8&quot;</span>, <span class="kw-2">&amp;*</span>to_radix_string(<span class="number">16</span>, <span class="number">8u8</span>).unwrap());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>hex_number_below_radix_letter() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;a&quot;</span>, <span class="kw-2">&amp;*</span>to_radix_string(<span class="number">16</span>, <span class="number">10u8</span>).unwrap());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>number_above_radix() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;10&quot;</span>, <span class="kw-2">&amp;*</span>to_radix_string(<span class="number">16</span>, <span class="number">16u8</span>).unwrap())
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>number_well_above_radix() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;16i&quot;</span>, <span class="kw-2">&amp;*</span>to_radix_string(<span class="number">32</span>, <span class="number">1234u16</span>).unwrap())
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>large_base_36() {
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;7cik2&quot;</span>, <span class="kw-2">&amp;*</span>to_radix_string(<span class="number">36</span>, <span class="number">12341234u32</span>).unwrap())
+    }
+}
+
+<span class="attribute">#[cfg(nightly)]
+#[cfg(test)]
+</span><span class="kw">mod </span>benchmarks {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::u32;
+    <span class="kw">use </span>test::Bencher;
+
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>digits_in_some_base(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            digits_in_base(<span class="number">16</span>, <span class="number">12345678</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_radix_str_less_than_radix</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">to_radix_str</span>(<span class="number">16</span>, <span class="number">10u8</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>to_radix_str_less_than_radix(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            to_radix_str(<span class="number">16</span>, <span class="number">10u8</span>).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_radix_str_medium</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">to_radix_str</span>(<span class="number">16</span>, <span class="number">1_000_000_000u32</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>to_radix_str_medium(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            to_radix_str(<span class="number">16</span>, <span class="number">1_000_000_000u32</span>).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_radix_str_large</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">to_radix_str</span>(<span class="number">16</span>, <span class="ident">u32::MAX</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>to_radix_str_large(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            to_radix_str(<span class="number">16</span>, u32::MAX).unwrap();
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pad_equal</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">pad_with_char</span>(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;ooo ooo ooo &quot;</span>);
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>pad_equal(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            pad_with_char(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;ooo ooo ooo &quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pad_small_string</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">pad_with_char</span>(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;oo&quot;</span>);
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>pad_small_string(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            pad_with_char(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;oo&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pad_larger_string</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">pad_with_char</span>(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;ooo ooo ooo ooo &quot;</span>);
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>pad_larger_string(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            pad_with_char(<span class="string">&#39;0&#39;</span>, <span class="number">12</span>, <span class="string">&quot;ooo ooo ooo ooo &quot;</span>);
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

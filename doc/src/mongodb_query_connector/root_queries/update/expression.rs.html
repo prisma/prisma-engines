@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/update/expression.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expression.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/update/expression.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expression.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -286,293 +286,293 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">into_expression::IntoUpdateExpression</span>, <span class="ident">operation</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{into_expression::IntoUpdateExpression, operation};
 
-<span class="kw">use</span> <span class="ident">connector_interface::FieldPath</span>;
-<span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>};
+<span class="kw">use </span>connector_interface::FieldPath;
+<span class="kw">use </span>indexmap::IndexMap;
+<span class="kw">use </span>mongodb::bson::{doc, Bson, Document};
 
-<span class="doccomment">/// `UpdateExpression` is an intermediary AST that&#39;s used to represent MongoDB expressions.</span>
-<span class="doccomment">/// It is meant to be transformed into `BSON`.</span>
-<span class="doccomment">/// Only add new variants _if_ the expression needs to retain semantic information when transformed into `BSON` or another `UpdateExpression`.</span>
-<span class="doccomment">/// Otherwise, use `Generic`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">UpdateExpression</span> {
-    <span class="doccomment">/// A `$set` expression</span>
-    <span class="ident">Set</span>(<span class="ident">Set</span>),
-    <span class="doccomment">/// A `$cond` expression</span>
-    <span class="ident">IfThenElse</span>(<span class="ident">IfThenElse</span>),
-    <span class="doccomment">/// A `$mergeObjects` expression</span>
-    <span class="ident">MergeObjects</span>(<span class="ident">MergeObjects</span>),
-    <span class="doccomment">/// A document `{ ... }` expression</span>
-    <span class="doccomment">/// (used to retain semantic information on the values (as opposed to a generic Bson::Document))</span>
-    <span class="ident">MergeDocument</span>(<span class="ident">MergeDocument</span>),
-    <span class="doccomment">/// Anything else</span>
-    <span class="ident">Generic</span>(<span class="ident">Bson</span>),
+<span class="doccomment">/// `UpdateExpression` is an intermediary AST that&#39;s used to represent MongoDB expressions.
+/// It is meant to be transformed into `BSON`.
+/// Only add new variants _if_ the expression needs to retain semantic information when transformed into `BSON` or another `UpdateExpression`.
+/// Otherwise, use `Generic`.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>UpdateExpression {
+    <span class="doccomment">/// A `$set` expression
+    </span>Set(Set),
+    <span class="doccomment">/// A `$cond` expression
+    </span>IfThenElse(IfThenElse),
+    <span class="doccomment">/// A `$mergeObjects` expression
+    </span>MergeObjects(MergeObjects),
+    <span class="doccomment">/// A document `{ ... }` expression
+    /// (used to retain semantic information on the values (as opposed to a generic Bson::Document))
+    </span>MergeDocument(MergeDocument),
+    <span class="doccomment">/// Anything else
+    </span>Generic(Bson),
 }
 
-<span class="kw">impl</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="ident">field_path</span>: <span class="ident">FieldPath</span>, <span class="ident">expression</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Set</span>(<span class="ident">Set</span> {
-            <span class="ident">field_path</span>,
-            <span class="ident">expression</span>: <span class="ident">Box::new</span>(<span class="ident">expression</span>.<span class="ident">into</span>()),
+<span class="kw">impl </span>UpdateExpression {
+    <span class="kw">pub fn </span>set(field_path: FieldPath, expression: <span class="kw">impl </span>Into&lt;UpdateExpression&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Set(Set {
+            field_path,
+            expression: Box::new(expression.into()),
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">if_then_else</span>(
-        <span class="ident">cond</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
-        <span class="ident">then</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
-        <span class="ident">els</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::IfThenElse</span>(<span class="ident">IfThenElse</span> {
-            <span class="ident">cond</span>: <span class="ident">Box::new</span>(<span class="ident">cond</span>.<span class="ident">into</span>()),
-            <span class="ident">then</span>: <span class="ident">Box::new</span>(<span class="ident">then</span>.<span class="ident">into</span>()),
-            <span class="ident">els</span>: <span class="ident">Box::new</span>(<span class="ident">els</span>.<span class="ident">into</span>()),
+    <span class="kw">pub fn </span>if_then_else(
+        cond: <span class="kw">impl </span>Into&lt;UpdateExpression&gt;,
+        then: <span class="kw">impl </span>Into&lt;UpdateExpression&gt;,
+        els: <span class="kw">impl </span>Into&lt;UpdateExpression&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::IfThenElse(IfThenElse {
+            cond: Box::new(cond.into()),
+            then: Box::new(then.into()),
+            els: Box::new(els.into()),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_into_set</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Set</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Set</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_into_set(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Set&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Set(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_merge_objects_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">MergeObjects</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::MergeObjects</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_merge_objects_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>MergeObjects&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::MergeObjects(<span class="kw-2">ref mut </span>v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Set</span> {
-    <span class="doccomment">/// The field path to which this $set expression should be applied</span>
-    <span class="kw">pub</span> <span class="ident">field_path</span>: <span class="ident">FieldPath</span>,
-    <span class="doccomment">/// The inner expression that should be set</span>
-    <span class="kw">pub</span> <span class="ident">expression</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Set {
+    <span class="doccomment">/// The field path to which this $set expression should be applied
+    </span><span class="kw">pub </span>field_path: FieldPath,
+    <span class="doccomment">/// The inner expression that should be set
+    </span><span class="kw">pub </span>expression: Box&lt;UpdateExpression&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Set</span> {
-    <span class="doccomment">/// Get a reference to the set&#39;s field path.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FieldPath</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_path</span>
+<span class="kw">impl </span>Set {
+    <span class="doccomment">/// Get a reference to the set&#39;s field path.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>field_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FieldPath {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.field_path
     }
 
-    <span class="doccomment">/// Transforms a `Set` expression into a conditional one. eg:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// from: { $set: { {set.field_path}: {set.expression} } }</span>
-    <span class="doccomment">/// to:   { $set: { $cond: { if: {cond}, then: {set.expression}, else: &quot;${set.field_path}&quot;  } } }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_conditional_set</span>(<span class="self">self</span>, <span class="ident">cond</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">dollar_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field_path</span>().<span class="ident">dollar_path</span>(<span class="bool-val">true</span>);
+    <span class="doccomment">/// Transforms a `Set` expression into a conditional one. eg:
+    /// ```text
+    /// from: { $set: { {set.field_path}: {set.expression} } }
+    /// to:   { $set: { $cond: { if: {cond}, then: {set.expression}, else: &quot;${set.field_path}&quot;  } } }
+    /// ```
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_conditional_set(<span class="self">self</span>, cond: <span class="kw">impl </span>Into&lt;UpdateExpression&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>dollar_path = <span class="self">self</span>.field_path().dollar_path(<span class="bool-val">true</span>);
 
-        <span class="self">Self</span> {
-            <span class="ident">field_path</span>: <span class="self">self</span>.<span class="ident">field_path</span>,
-            <span class="ident">expression</span>: <span class="ident">Box::new</span>(<span class="ident">UpdateExpression::IfThenElse</span>(<span class="ident">IfThenElse</span> {
-                <span class="ident">cond</span>: <span class="ident">Box::new</span>(<span class="ident">cond</span>.<span class="ident">into</span>()),
-                <span class="ident">then</span>: <span class="self">self</span>.<span class="ident">expression</span>,
-                <span class="ident">els</span>: <span class="ident">Box::new</span>(<span class="ident">UpdateExpression::Generic</span>(<span class="ident">Bson::String</span>(<span class="ident">dollar_path</span>))),
+        <span class="self">Self </span>{
+            field_path: <span class="self">self</span>.field_path,
+            expression: Box::new(UpdateExpression::IfThenElse(IfThenElse {
+                cond: Box::new(cond.into()),
+                then: <span class="self">self</span>.expression,
+                els: Box::new(UpdateExpression::Generic(Bson::String(dollar_path))),
             })),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IfThenElse</span> {
-    <span class="doccomment">/// The condition of the if expression</span>
-    <span class="kw">pub</span> <span class="ident">cond</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The then branch</span>
-    <span class="kw">pub</span> <span class="ident">then</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The else branch</span>
-    <span class="kw">pub</span> <span class="ident">els</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IfThenElse {
+    <span class="doccomment">/// The condition of the if expression
+    </span><span class="kw">pub </span>cond: Box&lt;UpdateExpression&gt;,
+    <span class="doccomment">/// The then branch
+    </span><span class="kw">pub </span>then: Box&lt;UpdateExpression&gt;,
+    <span class="doccomment">/// The else branch
+    </span><span class="kw">pub </span>els: Box&lt;UpdateExpression&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MergeDocument</span> {
-    <span class="kw">pub</span> <span class="ident">inner</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">UpdateExpression</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MergeDocument {
+    <span class="kw">pub </span>inner: IndexMap&lt;String, UpdateExpression&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">MergeDocument</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">String</span>, <span class="ident">UpdateExpression</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">indexmap::map::IntoIter</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">UpdateExpression</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>MergeDocument {
+    <span class="kw">type </span>Item = (String, UpdateExpression);
+    <span class="kw">type </span>IntoIter = indexmap::map::IntoIter&lt;String, UpdateExpression&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into_iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.inner.into_iter()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MergeDocument</span> {
-    <span class="doccomment">/// Get a mutable reference to the merge document&#39;s inner.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">inner_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">UpdateExpression</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+<span class="kw">impl </span>MergeDocument {
+    <span class="doccomment">/// Get a mutable reference to the merge document&#39;s inner.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>inner_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>IndexMap&lt;String, UpdateExpression&gt; {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MergeObjects</span> {
-    <span class="doccomment">/// The field path to which this $mergeObjects expression should be applied</span>
-    <span class="doccomment">/// { $mergeObjects: [&lt;field_path&gt;, ...] }</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_path</span>: <span class="ident">FieldPath</span>,
-    <span class="doccomment">/// Document against which it should be merged</span>
-    <span class="doccomment">/// { $mergeObjects: [..., &lt;document&gt;] }</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">document</span>: <span class="ident">MergeDocument</span>,
-    <span class="doccomment">/// Hack: keys of the document located in `field_path` to unset</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keys_to_unset</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MergeObjects {
+    <span class="doccomment">/// The field path to which this $mergeObjects expression should be applied
+    /// { $mergeObjects: [&lt;field_path&gt;, ...] }
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) field_path: FieldPath,
+    <span class="doccomment">/// Document against which it should be merged
+    /// { $mergeObjects: [..., &lt;document&gt;] }
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) document: MergeDocument,
+    <span class="doccomment">/// Hack: keys of the document located in `field_path` to unset
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) keys_to_unset: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">MergeObjects</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">field_path</span>: <span class="ident">FieldPath</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">field_path</span>,
-            <span class="ident">document</span>: <span class="ident">MergeDocument::default</span>(),
-            <span class="ident">keys_to_unset</span>: <span class="macro">vec!</span>[],
+<span class="kw">impl </span>MergeObjects {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(field_path: FieldPath) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            field_path,
+            document: MergeDocument::default(),
+            keys_to_unset: <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="doccomment">/// Get a reference to the merge objects&#39;s field path.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FieldPath</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_path</span>
+    <span class="doccomment">/// Get a reference to the merge objects&#39;s field path.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>field_path(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FieldPath {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.field_path
     }
 
-    <span class="doccomment">/// Get a mutable reference to the merge objects&#39;s doc.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">doc_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">UpdateExpression</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">document</span>.<span class="ident">inner_mut</span>()
+    <span class="doccomment">/// Get a mutable reference to the merge objects&#39;s doc.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>doc_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>IndexMap&lt;String, UpdateExpression&gt; {
+        <span class="self">self</span>.document.inner_mut()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert_set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">set</span>: <span class="ident">Set</span>) {
-        <span class="kw">let</span> <span class="ident">set_expr</span> <span class="op">=</span> <span class="ident">set</span>.<span class="ident">expression</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> (<span class="ident">target</span>, <span class="ident">inner_merge</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">fill_nested_merge_objects</span>(<span class="ident">set</span>.<span class="ident">field_path</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, set: Set) {
+        <span class="kw">let </span>set_expr = set.expression.clone();
+        <span class="kw">let </span>(target, inner_merge) = <span class="self">self</span>.fill_nested_merge_objects(set.field_path());
 
-        <span class="ident">inner_merge</span>.<span class="ident">doc_mut</span>().<span class="ident">insert</span>(<span class="ident">target</span>.<span class="ident">to_owned</span>(), <span class="kw-2">*</span><span class="ident">set_expr</span>);
+        inner_merge.doc_mut().insert(target.to_owned(), <span class="kw-2">*</span>set_expr);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert_upsert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">upsert</span>: <span class="ident">operation::Upsert</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">field_path</span> <span class="op">=</span> <span class="ident">upsert</span>.<span class="ident">field_path</span>().<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">merge_doc</span> <span class="op">=</span> <span class="ident">MergeObjects::new</span>(<span class="ident">field_path</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> (<span class="ident">target</span>, <span class="ident">inner_merge</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">fill_nested_merge_objects</span>(<span class="kw-2">&amp;</span><span class="ident">field_path</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_upsert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, upsert: operation::Upsert) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="kw">let </span>field_path = upsert.field_path().clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>merge_doc = MergeObjects::new(field_path.clone());
+        <span class="kw">let </span>(target, inner_merge) = <span class="self">self</span>.fill_nested_merge_objects(<span class="kw-2">&amp;</span>field_path);
 
-        <span class="kw">for</span> <span class="ident">op</span> <span class="kw">in</span> <span class="ident">upsert</span>.<span class="ident">updates</span> {
-            <span class="kw">match</span> <span class="ident">op</span> {
-                <span class="ident">operation::UpdateOperation::Generic</span>(<span class="ident">generic</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">generic</span>.<span class="ident">into_update_expression</span>()<span class="question-mark">?</span>.<span class="ident">try_into_set</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">set</span>.<span class="ident">field_path</span>.<span class="ident">keep_last</span>();
+        <span class="kw">for </span>op <span class="kw">in </span>upsert.updates {
+            <span class="kw">match </span>op {
+                operation::UpdateOperation::Generic(generic) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>set = generic.into_update_expression()<span class="question-mark">?</span>.try_into_set().unwrap();
+                    set.field_path.keep_last();
 
-                    <span class="ident">merge_doc</span>.<span class="ident">insert_set</span>(<span class="ident">set</span>);
+                    merge_doc.insert_set(set);
                 }
-                <span class="ident">operation::UpdateOperation::UpdateMany</span>(<span class="ident">update_many</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">update_many</span>.<span class="ident">into_update_expression</span>()<span class="question-mark">?</span>.<span class="ident">try_into_set</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">set</span>.<span class="ident">field_path</span>.<span class="ident">keep_last</span>();
+                operation::UpdateOperation::UpdateMany(update_many) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>set = update_many.into_update_expression()<span class="question-mark">?</span>.try_into_set().unwrap();
+                    set.field_path.keep_last();
 
-                    <span class="ident">merge_doc</span>.<span class="ident">insert_set</span>(<span class="ident">set</span>);
+                    merge_doc.insert_set(set);
                 }
-                <span class="ident">operation::UpdateOperation::Upsert</span>(<span class="kw-2">mut</span> <span class="ident">upsert</span>) =&gt; {
-                    <span class="ident">upsert</span>.<span class="ident">field_path</span>.<span class="ident">keep_last</span>();
+                operation::UpdateOperation::Upsert(<span class="kw-2">mut </span>upsert) =&gt; {
+                    upsert.field_path.keep_last();
 
-                    <span class="ident">merge_doc</span>.<span class="ident">insert_upsert</span>(<span class="ident">upsert</span>)<span class="question-mark">?</span>;
+                    merge_doc.insert_upsert(upsert)<span class="question-mark">?</span>;
                 }
-                <span class="ident">operation::UpdateOperation::Unset</span>(<span class="kw-2">mut</span> <span class="ident">unset</span>) =&gt; {
-                    <span class="ident">unset</span>.<span class="ident">field_path</span>.<span class="ident">keep_last</span>();
+                operation::UpdateOperation::Unset(<span class="kw-2">mut </span>unset) =&gt; {
+                    unset.field_path.keep_last();
 
-                    <span class="ident">merge_doc</span>.<span class="ident">insert_unset</span>(<span class="ident">unset</span>);
+                    merge_doc.insert_unset(unset);
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">new_if</span> <span class="op">=</span> <span class="ident">UpdateExpression::if_then_else</span>(
-            <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="ident">operation::Upsert::render_should_set_condition</span>(<span class="kw-2">&amp;</span><span class="ident">upsert</span>.<span class="ident">set</span>.<span class="ident">field_path</span>().<span class="ident">clone</span>()), <span class="bool-val">true</span>] },
-            <span class="ident">upsert</span>.<span class="ident">set</span>.<span class="ident">expression</span>,
-            <span class="ident">merge_doc</span>,
+        <span class="kw">let </span>new_if = UpdateExpression::if_then_else(
+            <span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [operation::Upsert::render_should_set_condition(<span class="kw-2">&amp;</span>upsert.set.field_path().clone()), <span class="bool-val">true</span>] },
+            upsert.set.expression,
+            merge_doc,
         );
 
-        <span class="ident">inner_merge</span>.<span class="ident">doc_mut</span>().<span class="ident">insert</span>(<span class="ident">target</span>.<span class="ident">to_owned</span>(), <span class="ident">new_if</span>);
+        inner_merge.doc_mut().insert(target.to_owned(), new_if);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert_unset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">unset</span>: <span class="ident">operation::Unset</span>) {
-        <span class="kw">let</span> (<span class="ident">target</span>, <span class="ident">inner_merge</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">fill_nested_merge_objects</span>(<span class="ident">unset</span>.<span class="ident">field_path</span>());
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_unset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, unset: operation::Unset) {
+        <span class="kw">let </span>(target, inner_merge) = <span class="self">self</span>.fill_nested_merge_objects(unset.field_path());
 
-        <span class="ident">inner_merge</span>.<span class="ident">keys_to_unset</span>.<span class="ident">push</span>(<span class="ident">target</span>.<span class="ident">clone</span>());
+        inner_merge.keys_to_unset.push(target.clone());
     }
 
-    <span class="doccomment">/// Given a mut ref to a `MergeObjects` and a `FieldPath`, fills nested empty `MergeObjects` unless one is already present.</span>
-    <span class="doccomment">/// Returns a mut ref to the most nested `MergeObjects` along side the key to insert a value inside its `MergeDocument`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;] -&gt;</span>
-    <span class="doccomment">/// (</span>
-    <span class="doccomment">///   &quot;c&quot;, &lt;- key to insert into the most nested `MergeObjects`&#39;s MergeDocument</span>
-    <span class="doccomment">///   MergeObjects([&quot;a&quot;],</span>
-    <span class="doccomment">///     doc! {</span>
-    <span class="doccomment">///       &quot;a&quot;: MergeObjects([&quot;a&quot;, &quot;b&quot;],</span>
-    <span class="doccomment">///         doc! { &quot;b&quot;: MergeObjects([&quot;a&quot;,&quot;b&quot;,&quot;c&quot;], &lt;- Mutable reference to this MergeObjects</span>
-    <span class="doccomment">///           doc! {}</span>
-    <span class="doccomment">///         )</span>
-    <span class="doccomment">///     })</span>
-    <span class="doccomment">///   })</span>
-    <span class="doccomment">/// )</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">fill_nested_merge_objects</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">field_path</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">FieldPath</span>,
-    ) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">MergeObjects</span>) {
-        <span class="kw">let</span> (<span class="ident">target</span>, <span class="ident">segments</span>) <span class="op">=</span> <span class="ident">field_path</span>.<span class="ident">path</span>.<span class="ident">split_last</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Given a mut ref to a `MergeObjects` and a `FieldPath`, fills nested empty `MergeObjects` unless one is already present.
+    /// Returns a mut ref to the most nested `MergeObjects` along side the key to insert a value inside its `MergeDocument`.
+    ///
+    /// ```text
+    /// [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;] -&gt;
+    /// (
+    ///   &quot;c&quot;, &lt;- key to insert into the most nested `MergeObjects`&#39;s MergeDocument
+    ///   MergeObjects([&quot;a&quot;],
+    ///     doc! {
+    ///       &quot;a&quot;: MergeObjects([&quot;a&quot;, &quot;b&quot;],
+    ///         doc! { &quot;b&quot;: MergeObjects([&quot;a&quot;,&quot;b&quot;,&quot;c&quot;], &lt;- Mutable reference to this MergeObjects
+    ///           doc! {}
+    ///         )
+    ///     })
+    ///   })
+    /// )
+    /// ```
+    </span><span class="kw">fn </span>fill_nested_merge_objects&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        field_path: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>FieldPath,
+    ) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>MergeObjects) {
+        <span class="kw">let </span>(target, segments) = field_path.path.split_last().unwrap();
 
-        <span class="kw">let</span> <span class="ident">inner_merge</span> <span class="op">=</span> <span class="ident">segments</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">fold</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">acc</span>, (<span class="ident">depth</span>, <span class="ident">segment</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">merge_path</span> <span class="op">=</span> <span class="ident">field_path</span>.<span class="ident">clone</span>();
-            <span class="ident">merge_path</span>.<span class="ident">take</span>(<span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="kw">let </span>inner_merge = segments.iter().enumerate().fold(<span class="self">self</span>, |acc, (depth, segment)| {
+            <span class="kw">let </span><span class="kw-2">mut </span>merge_path = field_path.clone();
+            merge_path.take(depth + <span class="number">1</span>);
 
-            <span class="kw">let</span> <span class="ident">inner_merge</span> <span class="op">=</span> <span class="ident">acc</span>
-                .<span class="ident">doc_mut</span>()
-                .<span class="ident">entry</span>(<span class="ident">segment</span>.<span class="ident">to_string</span>())
-                .<span class="ident">or_insert</span>(<span class="ident">MergeObjects::new</span>(<span class="ident">merge_path</span>).<span class="ident">into</span>())
-                .<span class="ident">as_merge_objects_mut</span>()
-                .<span class="ident">unwrap</span>();
+            <span class="kw">let </span>inner_merge = acc
+                .doc_mut()
+                .entry(segment.to_string())
+                .or_insert(MergeObjects::new(merge_path).into())
+                .as_merge_objects_mut()
+                .unwrap();
 
-            <span class="ident">inner_merge</span>
+            inner_merge
         });
 
-        (<span class="ident">target</span>, <span class="ident">inner_merge</span>)
+        (target, inner_merge)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bson</span>: <span class="ident">Bson</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Generic</span>(<span class="ident">bson</span>)
+<span class="kw">impl </span>From&lt;Bson&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(bson: Bson) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Generic(bson)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">doc</span>: <span class="ident">Document</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Generic</span>(<span class="ident">doc</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;Document&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(doc: Document) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Generic(doc.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Set</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">set</span>: <span class="ident">Set</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Set</span>(<span class="ident">set</span>)
+<span class="kw">impl </span>From&lt;Set&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(set: Set) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Set(set)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IfThenElse</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">if_then_else</span>: <span class="ident">IfThenElse</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::IfThenElse</span>(<span class="ident">if_then_else</span>)
+<span class="kw">impl </span>From&lt;IfThenElse&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(if_then_else: IfThenElse) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::IfThenElse(if_then_else)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MergeDocument</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">merge_doc</span>: <span class="ident">MergeDocument</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::MergeDocument</span>(<span class="ident">merge_doc</span>)
+<span class="kw">impl </span>From&lt;MergeDocument&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(merge_doc: MergeDocument) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::MergeDocument(merge_doc)
     }
 }
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MergeObjects</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpdateExpression</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">merge_objects</span>: <span class="ident">MergeObjects</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::MergeObjects</span>(<span class="ident">merge_objects</span>)
+<span class="kw">impl </span>From&lt;MergeObjects&gt; <span class="kw">for </span>UpdateExpression {
+    <span class="kw">fn </span>from(merge_objects: MergeObjects) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::MergeObjects(merge_objects)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

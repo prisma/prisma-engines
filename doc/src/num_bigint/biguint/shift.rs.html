@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/shift.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shift.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/shift.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shift.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -170,177 +170,177 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">biguint_from_vec</span>, <span class="ident">BigUint</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{biguint_from_vec, BigUint};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std_alloc</span>::{<span class="ident">Cow</span>, <span class="ident">Vec</span>};
+<span class="kw">use </span><span class="kw">crate</span>::big_digit;
+<span class="kw">use </span><span class="kw">crate</span>::std_alloc::{Cow, Vec};
 
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Shl</span>, <span class="ident">ShlAssign</span>, <span class="ident">Shr</span>, <span class="ident">ShrAssign</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">PrimInt</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::ops::{Shl, ShlAssign, Shr, ShrAssign};
+<span class="kw">use </span>num_traits::{PrimInt, Zero};
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">biguint_shl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PrimInt</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">BigUint</span><span class="op">&gt;</span>, <span class="ident">shift</span>: <span class="ident">T</span>) -&gt; <span class="ident">BigUint</span> {
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&lt;</span> <span class="ident">T::zero</span>() {
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>biguint_shl&lt;T: PrimInt&gt;(n: Cow&lt;<span class="lifetime">&#39;_</span>, BigUint&gt;, shift: T) -&gt; BigUint {
+    <span class="kw">if </span>shift &lt; T::zero() {
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to shift left with negative&quot;</span>);
     }
-    <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> <span class="ident">n</span>.<span class="ident">into_owned</span>();
+    <span class="kw">if </span>n.is_zero() {
+        <span class="kw">return </span>n.into_owned();
     }
-    <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">T::from</span>(<span class="ident">big_digit::BITS</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">digits</span> <span class="op">=</span> (<span class="ident">shift</span> <span class="op">/</span> <span class="ident">bits</span>).<span class="ident">to_usize</span>().<span class="ident">expect</span>(<span class="string">&quot;capacity overflow&quot;</span>);
-    <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> (<span class="ident">shift</span> <span class="op">%</span> <span class="ident">bits</span>).<span class="ident">to_u8</span>().<span class="ident">unwrap</span>();
-    <span class="ident">biguint_shl2</span>(<span class="ident">n</span>, <span class="ident">digits</span>, <span class="ident">shift</span>)
+    <span class="kw">let </span>bits = T::from(big_digit::BITS).unwrap();
+    <span class="kw">let </span>digits = (shift / bits).to_usize().expect(<span class="string">&quot;capacity overflow&quot;</span>);
+    <span class="kw">let </span>shift = (shift % bits).to_u8().unwrap();
+    biguint_shl2(n, digits, shift)
 }
 
-<span class="kw">fn</span> <span class="ident">biguint_shl2</span>(<span class="ident">n</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">BigUint</span><span class="op">&gt;</span>, <span class="ident">digits</span>: <span class="ident">usize</span>, <span class="ident">shift</span>: <span class="ident">u8</span>) -&gt; <span class="ident">BigUint</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">digits</span> {
-        <span class="number">0</span> =&gt; <span class="ident">n</span>.<span class="ident">into_owned</span>().<span class="ident">data</span>,
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">digits</span>.<span class="ident">saturating_add</span>(<span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">len</span>);
-            <span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">digits</span>, <span class="number">0</span>);
-            <span class="ident">data</span>.<span class="ident">extend</span>(<span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">iter</span>());
-            <span class="ident">data</span>
+<span class="kw">fn </span>biguint_shl2(n: Cow&lt;<span class="lifetime">&#39;_</span>, BigUint&gt;, digits: usize, shift: u8) -&gt; BigUint {
+    <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="kw">match </span>digits {
+        <span class="number">0 </span>=&gt; n.into_owned().data,
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span>len = digits.saturating_add(n.data.len() + <span class="number">1</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>data = Vec::with_capacity(len);
+            data.resize(digits, <span class="number">0</span>);
+            data.extend(n.data.iter());
+            data
         }
     };
 
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">carry_shift</span> <span class="op">=</span> <span class="ident">big_digit::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">shift</span>;
-        <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">data</span>[<span class="ident">digits</span>..].<span class="ident">iter_mut</span>() {
-            <span class="kw">let</span> <span class="ident">new_carry</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">carry_shift</span>;
-            <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>) <span class="op">|</span> <span class="ident">carry</span>;
-            <span class="ident">carry</span> <span class="op">=</span> <span class="ident">new_carry</span>;
+    <span class="kw">if </span>shift &gt; <span class="number">0 </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>carry = <span class="number">0</span>;
+        <span class="kw">let </span>carry_shift = big_digit::BITS <span class="kw">as </span>u8 - shift;
+        <span class="kw">for </span>elem <span class="kw">in </span>data[digits..].iter_mut() {
+            <span class="kw">let </span>new_carry = <span class="kw-2">*</span>elem &gt;&gt; carry_shift;
+            <span class="kw-2">*</span>elem = (<span class="kw-2">*</span>elem &lt;&lt; shift) | carry;
+            carry = new_carry;
         }
-        <span class="kw">if</span> <span class="ident">carry</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">carry</span>);
+        <span class="kw">if </span>carry != <span class="number">0 </span>{
+            data.push(carry);
         }
     }
 
-    <span class="ident">biguint_from_vec</span>(<span class="ident">data</span>)
+    biguint_from_vec(data)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">biguint_shr</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">PrimInt</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">BigUint</span><span class="op">&gt;</span>, <span class="ident">shift</span>: <span class="ident">T</span>) -&gt; <span class="ident">BigUint</span> {
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&lt;</span> <span class="ident">T::zero</span>() {
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>biguint_shr&lt;T: PrimInt&gt;(n: Cow&lt;<span class="lifetime">&#39;_</span>, BigUint&gt;, shift: T) -&gt; BigUint {
+    <span class="kw">if </span>shift &lt; T::zero() {
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to shift right with negative&quot;</span>);
     }
-    <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> <span class="ident">n</span>.<span class="ident">into_owned</span>();
+    <span class="kw">if </span>n.is_zero() {
+        <span class="kw">return </span>n.into_owned();
     }
-    <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">T::from</span>(<span class="ident">big_digit::BITS</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">digits</span> <span class="op">=</span> (<span class="ident">shift</span> <span class="op">/</span> <span class="ident">bits</span>).<span class="ident">to_usize</span>().<span class="ident">unwrap_or</span>(<span class="ident">core::usize::MAX</span>);
-    <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> (<span class="ident">shift</span> <span class="op">%</span> <span class="ident">bits</span>).<span class="ident">to_u8</span>().<span class="ident">unwrap</span>();
-    <span class="ident">biguint_shr2</span>(<span class="ident">n</span>, <span class="ident">digits</span>, <span class="ident">shift</span>)
+    <span class="kw">let </span>bits = T::from(big_digit::BITS).unwrap();
+    <span class="kw">let </span>digits = (shift / bits).to_usize().unwrap_or(core::usize::MAX);
+    <span class="kw">let </span>shift = (shift % bits).to_u8().unwrap();
+    biguint_shr2(n, digits, shift)
 }
 
-<span class="kw">fn</span> <span class="ident">biguint_shr2</span>(<span class="ident">n</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">BigUint</span><span class="op">&gt;</span>, <span class="ident">digits</span>: <span class="ident">usize</span>, <span class="ident">shift</span>: <span class="ident">u8</span>) -&gt; <span class="ident">BigUint</span> {
-    <span class="kw">if</span> <span class="ident">digits</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">into_owned</span>();
-        <span class="ident">n</span>.<span class="ident">set_zero</span>();
-        <span class="kw">return</span> <span class="ident">n</span>;
+<span class="kw">fn </span>biguint_shr2(n: Cow&lt;<span class="lifetime">&#39;_</span>, BigUint&gt;, digits: usize, shift: u8) -&gt; BigUint {
+    <span class="kw">if </span>digits &gt;= n.data.len() {
+        <span class="kw">let </span><span class="kw-2">mut </span>n = n.into_owned();
+        n.set_zero();
+        <span class="kw">return </span>n;
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">n</span> {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">n</span>) =&gt; <span class="ident">n</span>.<span class="ident">data</span>[<span class="ident">digits</span>..].<span class="ident">to_vec</span>(),
-        <span class="ident">Cow::Owned</span>(<span class="kw-2">mut</span> <span class="ident">n</span>) =&gt; {
-            <span class="ident">n</span>.<span class="ident">data</span>.<span class="ident">drain</span>(..<span class="ident">digits</span>);
-            <span class="ident">n</span>.<span class="ident">data</span>
+    <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="kw">match </span>n {
+        Cow::Borrowed(n) =&gt; n.data[digits..].to_vec(),
+        Cow::Owned(<span class="kw-2">mut </span>n) =&gt; {
+            n.data.drain(..digits);
+            n.data
         }
     };
 
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">borrow_shift</span> <span class="op">=</span> <span class="ident">big_digit::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">shift</span>;
-        <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-            <span class="kw">let</span> <span class="ident">new_borrow</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">borrow_shift</span>;
-            <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>) <span class="op">|</span> <span class="ident">borrow</span>;
-            <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">new_borrow</span>;
+    <span class="kw">if </span>shift &gt; <span class="number">0 </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>borrow = <span class="number">0</span>;
+        <span class="kw">let </span>borrow_shift = big_digit::BITS <span class="kw">as </span>u8 - shift;
+        <span class="kw">for </span>elem <span class="kw">in </span>data.iter_mut().rev() {
+            <span class="kw">let </span>new_borrow = <span class="kw-2">*</span>elem &lt;&lt; borrow_shift;
+            <span class="kw-2">*</span>elem = (<span class="kw-2">*</span>elem &gt;&gt; shift) | borrow;
+            borrow = new_borrow;
         }
     }
 
-    <span class="ident">biguint_from_vec</span>(<span class="ident">data</span>)
+    biguint_from_vec(data)
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_shift</span> {
-    (@<span class="kw-2">ref</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Shx</span>:<span class="ident">ident</span> :: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ShxAssign</span>:<span class="ident">ident</span> :: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx_assign</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Shx</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="macro">macro_rules! </span>impl_shift {
+    (@<span class="kw-2">ref </span><span class="macro-nonterminal">$Shx</span>:ident :: <span class="macro-nonterminal">$shx</span>:ident, <span class="macro-nonterminal">$ShxAssign</span>:ident :: <span class="macro-nonterminal">$shx_assign</span>:ident, <span class="macro-nonterminal">$rhs</span>:ty) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; <span class="macro-nonterminal">$Shx</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Shx</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx</span>(<span class="self">self</span>, <span class="kw-2">*</span><span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$shx</span>(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                <span class="macro-nonterminal">$Shx</span>::<span class="macro-nonterminal">$shx</span>(<span class="self">self</span>, <span class="kw-2">*</span>rhs)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Shx</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; <span class="macro-nonterminal">$Shx</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">Shx</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx</span>(<span class="self">self</span>, <span class="kw-2">*</span><span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$shx</span>(<span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                <span class="macro-nonterminal">$Shx</span>::<span class="macro-nonterminal">$shx</span>(<span class="self">self</span>, <span class="kw-2">*</span>rhs)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ShxAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ShxAssign</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">shx_assign</span>(<span class="self">self</span>, <span class="kw-2">*</span><span class="ident">rhs</span>);
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>&gt; <span class="macro-nonterminal">$ShxAssign</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$shx_assign</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="macro-nonterminal">$rhs</span>) {
+                <span class="macro-nonterminal">$ShxAssign</span>::<span class="macro-nonterminal">$shx_assign</span>(<span class="self">self</span>, <span class="kw-2">*</span>rhs);
             }
         }
     };
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>:<span class="ident">ty</span>),<span class="op">+</span>) =&gt; {$(
-        <span class="kw">impl</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+    ($(<span class="macro-nonterminal">$rhs</span>:ty),+) =&gt; {$(
+        <span class="kw">impl </span>Shl&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="ident">biguint_shl</span>(<span class="ident">Cow::Owned</span>(<span class="self">self</span>), <span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shl(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                biguint_shl(Cow::Owned(<span class="self">self</span>), rhs)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Shl&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="ident">biguint_shl</span>(<span class="ident">Cow::Borrowed</span>(<span class="self">self</span>), <span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shl(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                biguint_shl(Cow::Borrowed(<span class="self">self</span>), rhs)
             }
         }
-        <span class="kw">impl</span> <span class="ident">ShlAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shl_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigUint::zero</span>());
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">rhs</span>;
+        <span class="kw">impl </span>ShlAssign&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shl_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) {
+                <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigUint::zero());
+                <span class="kw-2">*</span><span class="self">self </span>= n &lt;&lt; rhs;
             }
         }
-        <span class="macro">impl_shift!</span> { @<span class="kw-2">ref</span> <span class="ident">Shl::shl</span>, <span class="ident">ShlAssign::shl_assign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span> }
+        <span class="macro">impl_shift! </span>{ @<span class="kw-2">ref </span>Shl::shl, ShlAssign::shl_assign, <span class="macro-nonterminal">$rhs </span>}
 
-        <span class="kw">impl</span> <span class="ident">Shr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+        <span class="kw">impl </span>Shr&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="ident">biguint_shr</span>(<span class="ident">Cow::Owned</span>(<span class="self">self</span>), <span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shr(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                biguint_shr(Cow::Owned(<span class="self">self</span>), rhs)
             }
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Shr</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Shr&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+            <span class="kw">type </span>Output = BigUint;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shr</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) -&gt; <span class="ident">BigUint</span> {
-                <span class="ident">biguint_shr</span>(<span class="ident">Cow::Borrowed</span>(<span class="self">self</span>), <span class="ident">rhs</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shr(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) -&gt; BigUint {
+                biguint_shr(Cow::Borrowed(<span class="self">self</span>), rhs)
             }
         }
-        <span class="kw">impl</span> <span class="ident">ShrAssign</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">shr_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span>) {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigUint::zero</span>());
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">rhs</span>;
+        <span class="kw">impl </span>ShrAssign&lt;<span class="macro-nonterminal">$rhs</span>&gt; <span class="kw">for </span>BigUint {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>shr_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="macro-nonterminal">$rhs</span>) {
+                <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigUint::zero());
+                <span class="kw-2">*</span><span class="self">self </span>= n &gt;&gt; rhs;
             }
         }
-        <span class="macro">impl_shift!</span> { @<span class="kw-2">ref</span> <span class="ident">Shr::shr</span>, <span class="ident">ShrAssign::shr_assign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rhs</span> }
+        <span class="macro">impl_shift! </span>{ @<span class="kw-2">ref </span>Shr::shr, ShrAssign::shr_assign, <span class="macro-nonterminal">$rhs </span>}
     )<span class="kw-2">*</span>};
 }
 
-<span class="macro">impl_shift!</span> { <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>, <span class="ident">u64</span>, <span class="ident">u128</span>, <span class="ident">usize</span> }
-<span class="macro">impl_shift!</span> { <span class="ident">i8</span>, <span class="ident">i16</span>, <span class="ident">i32</span>, <span class="ident">i64</span>, <span class="ident">i128</span>, <span class="ident">isize</span> }
+<span class="macro">impl_shift! </span>{ u8, u16, u32, u64, u128, usize }
+<span class="macro">impl_shift! </span>{ i8, i16, i32, i64, i128, isize }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -468,473 +468,473 @@
 <span id="466">466</span>
 <span id="467">467</span>
 <span id="468">468</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata</span>::{<span class="ident">MetadataMap</span>, <span class="ident">MetadataValue</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::server::TlsConnectInfo</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport</span>::{<span class="ident">server::TcpConnectInfo</span>, <span class="ident">Certificate</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Extensions</span>;
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">net::SocketAddr</span>, <span class="ident">time::Duration</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::metadata::{MetadataMap, MetadataValue};
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;transport&quot;</span>, feature = <span class="string">&quot;tls&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::transport::server::TlsConnectInfo;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;transport&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::transport::{server::TcpConnectInfo, Certificate};
+<span class="kw">use </span><span class="kw">crate</span>::Extensions;
+<span class="kw">use </span>futures_core::Stream;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;transport&quot;</span>)]
+</span><span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::{net::SocketAddr, time::Duration};
 
-<span class="doccomment">/// A gRPC request and metadata from an RPC call.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">metadata</span>: <span class="ident">MetadataMap</span>,
-    <span class="ident">message</span>: <span class="ident">T</span>,
-    <span class="ident">extensions</span>: <span class="ident">Extensions</span>,
+<span class="doccomment">/// A gRPC request and metadata from an RPC call.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Request&lt;T&gt; {
+    metadata: MetadataMap,
+    message: T,
+    extensions: Extensions,
 }
 
-<span class="doccomment">/// Trait implemented by RPC request types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Types implementing this trait can be used as arguments to client RPC</span>
-<span class="doccomment">/// methods without explicitly wrapping them into `tonic::Request`s. The purpose</span>
-<span class="doccomment">/// is to make client calls slightly more convenient to write.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Tonic&#39;s code generation and blanket implementations handle this for you,</span>
-<span class="doccomment">/// so it is not necessary to implement this trait directly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given the following gRPC method definition:</span>
-<span class="doccomment">/// ```proto</span>
-<span class="doccomment">/// rpc GetFeature(Point) returns (Feature) {}</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// we can call `get_feature` in two equivalent ways:</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # pub struct Point {}</span>
-<span class="doccomment">/// # pub struct Client {}</span>
-<span class="doccomment">/// # impl Client {</span>
-<span class="doccomment">/// #   fn get_feature(&amp;self, r: impl tonic::IntoRequest&lt;Point&gt;) {}</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # let client = Client {};</span>
-<span class="doccomment">/// use tonic::Request;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.get_feature(Point {});</span>
-<span class="doccomment">/// client.get_feature(Request::new(Point {}));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">sealed::Sealed</span> {
-    <span class="doccomment">/// Wrap the input message `T` in a `tonic::Request`</span>
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Trait implemented by RPC request types.
+///
+/// Types implementing this trait can be used as arguments to client RPC
+/// methods without explicitly wrapping them into `tonic::Request`s. The purpose
+/// is to make client calls slightly more convenient to write.
+///
+/// Tonic&#39;s code generation and blanket implementations handle this for you,
+/// so it is not necessary to implement this trait directly.
+///
+/// # Example
+///
+/// Given the following gRPC method definition:
+/// ```proto
+/// rpc GetFeature(Point) returns (Feature) {}
+/// ```
+///
+/// we can call `get_feature` in two equivalent ways:
+/// ```rust
+/// # pub struct Point {}
+/// # pub struct Client {}
+/// # impl Client {
+/// #   fn get_feature(&amp;self, r: impl tonic::IntoRequest&lt;Point&gt;) {}
+/// # }
+/// # let client = Client {};
+/// use tonic::Request;
+///
+/// client.get_feature(Point {});
+/// client.get_feature(Request::new(Point {}));
+/// ```
+</span><span class="kw">pub trait </span>IntoRequest&lt;T&gt;: sealed::Sealed {
+    <span class="doccomment">/// Wrap the input message `T` in a `tonic::Request`
+    </span><span class="kw">fn </span>into_request(<span class="self">self</span>) -&gt; Request&lt;T&gt;;
 }
 
-<span class="doccomment">/// Trait implemented by RPC streaming request types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Types implementing this trait can be used as arguments to client streaming</span>
-<span class="doccomment">/// RPC methods without explicitly wrapping them into `tonic::Request`s. The</span>
-<span class="doccomment">/// purpose is to make client calls slightly more convenient to write.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Tonic&#39;s code generation and blanket implementations handle this for you,</span>
-<span class="doccomment">/// so it is not necessary to implement this trait directly.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given the following gRPC service method definition:</span>
-<span class="doccomment">/// ```proto</span>
-<span class="doccomment">/// rpc RecordRoute(stream Point) returns (RouteSummary) {}</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// we can call `record_route` in two equivalent ways:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[derive(Clone)]</span>
-<span class="doccomment">/// # pub struct Point {};</span>
-<span class="doccomment">/// # pub struct Client {};</span>
-<span class="doccomment">/// # impl Client {</span>
-<span class="doccomment">/// #   fn record_route(&amp;self, r: impl tonic::IntoStreamingRequest&lt;Message = Point&gt;) {}</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # let client = Client {};</span>
-<span class="doccomment">/// use tonic::Request;</span>
-<span class="doccomment">/// use futures_util::stream;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let messages = vec![Point {}, Point {}];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.record_route(Request::new(stream::iter(messages.clone())));</span>
-<span class="doccomment">/// client.record_route(stream::iter(messages));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoStreamingRequest</span>: <span class="ident">sealed::Sealed</span> {
-    <span class="doccomment">/// The RPC request stream type</span>
-    <span class="kw">type</span> <span class="ident">Stream</span>: <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Message</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="doccomment">/// Trait implemented by RPC streaming request types.
+///
+/// Types implementing this trait can be used as arguments to client streaming
+/// RPC methods without explicitly wrapping them into `tonic::Request`s. The
+/// purpose is to make client calls slightly more convenient to write.
+///
+/// Tonic&#39;s code generation and blanket implementations handle this for you,
+/// so it is not necessary to implement this trait directly.
+///
+/// # Example
+///
+/// Given the following gRPC service method definition:
+/// ```proto
+/// rpc RecordRoute(stream Point) returns (RouteSummary) {}
+/// ```
+/// we can call `record_route` in two equivalent ways:
+///
+/// ```rust
+/// # #[derive(Clone)]
+/// # pub struct Point {};
+/// # pub struct Client {};
+/// # impl Client {
+/// #   fn record_route(&amp;self, r: impl tonic::IntoStreamingRequest&lt;Message = Point&gt;) {}
+/// # }
+/// # let client = Client {};
+/// use tonic::Request;
+/// use futures_util::stream;
+///
+/// let messages = vec![Point {}, Point {}];
+///
+/// client.record_route(Request::new(stream::iter(messages.clone())));
+/// client.record_route(stream::iter(messages));
+/// ```
+</span><span class="kw">pub trait </span>IntoStreamingRequest: sealed::Sealed {
+    <span class="doccomment">/// The RPC request stream type
+    </span><span class="kw">type </span>Stream: Stream&lt;Item = <span class="self">Self</span>::Message&gt; + Send + <span class="lifetime">&#39;static</span>;
 
-    <span class="doccomment">/// The RPC request type</span>
-    <span class="kw">type</span> <span class="ident">Message</span>;
+    <span class="doccomment">/// The RPC request type
+    </span><span class="kw">type </span>Message;
 
-    <span class="doccomment">/// Wrap the stream of messages in a `tonic::Request`</span>
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Stream</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Wrap the stream of messages in a `tonic::Request`
+    </span><span class="kw">fn </span>into_streaming_request(<span class="self">self</span>) -&gt; Request&lt;<span class="self">Self</span>::Stream&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new gRPC request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tonic::Request;</span>
-    <span class="doccomment">/// # pub struct HelloRequest {</span>
-    <span class="doccomment">/// #   pub name: String,</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// Request::new(HelloRequest {</span>
-    <span class="doccomment">///    name: &quot;Bob&quot;.into(),</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Request</span> {
-            <span class="ident">metadata</span>: <span class="ident">MetadataMap::new</span>(),
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="ident">Extensions::new</span>(),
+<span class="kw">impl</span>&lt;T&gt; Request&lt;T&gt; {
+    <span class="doccomment">/// Create a new gRPC request.
+    ///
+    /// ```rust
+    /// # use tonic::Request;
+    /// # pub struct HelloRequest {
+    /// #   pub name: String,
+    /// # }
+    /// Request::new(HelloRequest {
+    ///    name: &quot;Bob&quot;.into(),
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>new(message: T) -&gt; <span class="self">Self </span>{
+        Request {
+            metadata: MetadataMap::new(),
+            message,
+            extensions: Extensions::new(),
         }
     }
 
-    <span class="doccomment">/// Get a reference to the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Get a reference to the message
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 
-    <span class="doccomment">/// Get a mutable reference to the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Get a mutable reference to the message
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.message
     }
 
-    <span class="doccomment">/// Get a reference to the custom request metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MetadataMap</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metadata</span>
+    <span class="doccomment">/// Get a reference to the custom request metadata.
+    </span><span class="kw">pub fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>MetadataMap {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.metadata
     }
 
-    <span class="doccomment">/// Get a mutable reference to the request metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">MetadataMap</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">metadata</span>
+    <span class="doccomment">/// Get a mutable reference to the request metadata.
+    </span><span class="kw">pub fn </span>metadata_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>MetadataMap {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.metadata
     }
 
-    <span class="doccomment">/// Consumes `self`, returning the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Consumes `self`, returning the message
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.message
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">MetadataMap</span>, <span class="ident">Extensions</span>, <span class="ident">T</span>) {
-        (<span class="self">self</span>.<span class="ident">metadata</span>, <span class="self">self</span>.<span class="ident">extensions</span>, <span class="self">self</span>.<span class="ident">message</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_parts(<span class="self">self</span>) -&gt; (MetadataMap, Extensions, T) {
+        (<span class="self">self</span>.metadata, <span class="self">self</span>.extensions, <span class="self">self</span>.message)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">metadata</span>: <span class="ident">MetadataMap</span>, <span class="ident">extensions</span>: <span class="ident">Extensions</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">metadata</span>,
-            <span class="ident">extensions</span>,
-            <span class="ident">message</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_parts(metadata: MetadataMap, extensions: Extensions, message: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            metadata,
+            extensions,
+            message,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_http_parts</span>(<span class="ident">parts</span>: <span class="ident">http::request::Parts</span>, <span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Request</span> {
-            <span class="ident">metadata</span>: <span class="ident">MetadataMap::from_headers</span>(<span class="ident">parts</span>.<span class="ident">headers</span>),
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="ident">Extensions::from_http</span>(<span class="ident">parts</span>.<span class="ident">extensions</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_http_parts(parts: http::request::Parts, message: T) -&gt; <span class="self">Self </span>{
+        Request {
+            metadata: MetadataMap::from_headers(parts.headers),
+            message,
+            extensions: Extensions::from_http(parts.extensions),
         }
     }
 
-    <span class="doccomment">/// Convert an HTTP request to a gRPC request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_http</span>(<span class="ident">http</span>: <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">parts</span>, <span class="ident">message</span>) <span class="op">=</span> <span class="ident">http</span>.<span class="ident">into_parts</span>();
-        <span class="ident">Request::from_http_parts</span>(<span class="ident">parts</span>, <span class="ident">message</span>)
+    <span class="doccomment">/// Convert an HTTP request to a gRPC request
+    </span><span class="kw">pub fn </span>from_http(http: http::Request&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(parts, message) = http.into_parts();
+        Request::from_http_parts(parts, message)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_http</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_http(
         <span class="self">self</span>,
-        <span class="ident">uri</span>: <span class="ident">http::Uri</span>,
-        <span class="ident">sanitize_headers</span>: <span class="ident">SanitizeHeaders</span>,
-    ) -&gt; <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">http::Request::new</span>(<span class="self">self</span>.<span class="ident">message</span>);
+        uri: http::Uri,
+        sanitize_headers: SanitizeHeaders,
+    ) -&gt; http::Request&lt;T&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>request = http::Request::new(<span class="self">self</span>.message);
 
-        <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">version_mut</span>() <span class="op">=</span> <span class="ident">http::Version::HTTP_2</span>;
-        <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">method_mut</span>() <span class="op">=</span> <span class="ident">http::Method::POST</span>;
-        <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">uri_mut</span>() <span class="op">=</span> <span class="ident">uri</span>;
-        <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">headers_mut</span>() <span class="op">=</span> <span class="kw">match</span> <span class="ident">sanitize_headers</span> {
-            <span class="ident">SanitizeHeaders::Yes</span> =&gt; <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_sanitized_headers</span>(),
-            <span class="ident">SanitizeHeaders::No</span> =&gt; <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_headers</span>(),
+        <span class="kw-2">*</span>request.version_mut() = http::Version::HTTP_2;
+        <span class="kw-2">*</span>request.method_mut() = http::Method::POST;
+        <span class="kw-2">*</span>request.uri_mut() = uri;
+        <span class="kw-2">*</span>request.headers_mut() = <span class="kw">match </span>sanitize_headers {
+            SanitizeHeaders::Yes =&gt; <span class="self">self</span>.metadata.into_sanitized_headers(),
+            SanitizeHeaders::No =&gt; <span class="self">self</span>.metadata.into_headers(),
         };
-        <span class="kw-2">*</span><span class="ident">request</span>.<span class="ident">extensions_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">into_http</span>();
+        <span class="kw-2">*</span>request.extensions_mut() = <span class="self">self</span>.extensions.into_http();
 
-        <span class="ident">request</span>
+        request
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>map&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Request&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">message</span>);
+        <span class="kw">let </span>message = f(<span class="self">self</span>.message);
 
-        <span class="ident">Request</span> {
-            <span class="ident">metadata</span>: <span class="self">self</span>.<span class="ident">metadata</span>,
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="self">self</span>.<span class="ident">extensions</span>,
+        Request {
+            metadata: <span class="self">self</span>.metadata,
+            message,
+            extensions: <span class="self">self</span>.extensions,
         }
     }
 
-    <span class="doccomment">/// Get the remote address of this connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will return `None` if the `IO` type used</span>
-    <span class="doccomment">/// does not implement `Connected`. This currently,</span>
-    <span class="doccomment">/// only works on the server side.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remote_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SocketAddr</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
-        {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-            {
-                <span class="self">self</span>.<span class="ident">extensions</span>()
-                    .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">TcpConnectInfo</span><span class="op">&gt;</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">remote_addr</span>())
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="self">self</span>.<span class="ident">extensions</span>()
-                            .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">TlsConnectInfo</span><span class="op">&lt;</span><span class="ident">TcpConnectInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">get_ref</span>().<span class="ident">remote_addr</span>())
+    <span class="doccomment">/// Get the remote address of this connection.
+    ///
+    /// This will return `None` if the `IO` type used
+    /// does not implement `Connected`. This currently,
+    /// only works on the server side.
+    </span><span class="kw">pub fn </span>remote_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SocketAddr&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;transport&quot;</span>)]
+        </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+            </span>{
+                <span class="self">self</span>.extensions()
+                    .get::&lt;TcpConnectInfo&gt;()
+                    .and_then(|i| i.remote_addr())
+                    .or_else(|| {
+                        <span class="self">self</span>.extensions()
+                            .get::&lt;TlsConnectInfo&lt;TcpConnectInfo&gt;&gt;()
+                            .and_then(|i| i.get_ref().remote_addr())
                     })
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-            {
-                <span class="self">self</span>.<span class="ident">extensions</span>()
-                    .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">TcpConnectInfo</span><span class="op">&gt;</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">remote_addr</span>())
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+            </span>{
+                <span class="self">self</span>.extensions()
+                    .get::&lt;TcpConnectInfo&gt;()
+                    .and_then(|i| i.remote_addr())
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>))]</span>
-        {
-            <span class="prelude-val">None</span>
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;transport&quot;</span>))]
+        </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Get the peer certificates of the connected client.
+    ///
+    /// This is used to fetch the certificates from the TLS session
+    /// and is mostly used for mTLS. This currently only returns
+    /// `Some` on the server side of the `transport` server with
+    /// TLS enabled connections.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;transport&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;transport&quot;</span>)))]
+    </span><span class="kw">pub fn </span>peer_certs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Vec&lt;Certificate&gt;&gt;&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span>{
+            <span class="self">self</span>.extensions()
+                .get::&lt;TlsConnectInfo&lt;TcpConnectInfo&gt;&gt;()
+                .and_then(|i| i.peer_certs())
         }
+
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Get the peer certificates of the connected client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used to fetch the certificates from the TLS session</span>
-    <span class="doccomment">/// and is mostly used for mTLS. This currently only returns</span>
-    <span class="doccomment">/// `Some` on the server side of the `transport` server with</span>
-    <span class="doccomment">/// TLS enabled connections.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;transport&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peer_certs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        {
-            <span class="self">self</span>.<span class="ident">extensions</span>()
-                .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">TlsConnectInfo</span><span class="op">&lt;</span><span class="ident">TcpConnectInfo</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">peer_certs</span>())
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        {
-            <span class="prelude-val">None</span>
-        }
+    <span class="doccomment">/// Set the max duration the request is allowed to take.
+    ///
+    /// Requires the server to support the `grpc-timeout` metadata, which Tonic does.
+    ///
+    /// The duration will be formatted according to [the spec] and use the most precise unit
+    /// possible.
+    ///
+    /// Example:
+    ///
+    /// ```rust
+    /// use std::time::Duration;
+    /// use tonic::Request;
+    ///
+    /// let mut request = Request::new(());
+    ///
+    /// request.set_timeout(Duration::from_secs(30));
+    ///
+    /// let value = request.metadata().get(&quot;grpc-timeout&quot;).unwrap();
+    ///
+    /// assert_eq!(
+    ///     value,
+    ///     // equivalent to 30 seconds
+    ///     &quot;30000000u&quot;
+    /// );
+    /// ```
+    ///
+    /// [the spec]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md
+    </span><span class="kw">pub fn </span>set_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, deadline: Duration) {
+        <span class="kw">let </span>value = MetadataValue::from_str(<span class="kw-2">&amp;</span>duration_to_grpc_timeout(deadline)).unwrap();
+        <span class="self">self</span>.metadata_mut()
+            .insert(<span class="kw">crate</span>::metadata::GRPC_TIMEOUT_HEADER, value);
     }
 
-    <span class="doccomment">/// Set the max duration the request is allowed to take.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the server to support the `grpc-timeout` metadata, which Tonic does.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The duration will be formatted according to [the spec] and use the most precise unit</span>
-    <span class="doccomment">/// possible.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Example:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// use std::time::Duration;</span>
-    <span class="doccomment">/// use tonic::Request;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut request = Request::new(());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// request.set_timeout(Duration::from_secs(30));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let value = request.metadata().get(&quot;grpc-timeout&quot;).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     value,</span>
-    <span class="doccomment">///     // equivalent to 30 seconds</span>
-    <span class="doccomment">///     &quot;30000000u&quot;</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [the spec]: https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">deadline</span>: <span class="ident">Duration</span>) {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">MetadataValue::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">duration_to_grpc_timeout</span>(<span class="ident">deadline</span>)).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">metadata_mut</span>()
-            .<span class="ident">insert</span>(<span class="ident"><span class="kw">crate</span>::metadata::GRPC_TIMEOUT_HEADER</span>, <span class="ident">value</span>);
+    <span class="doccomment">/// Returns a reference to the associated extensions.
+    </span><span class="kw">pub fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Extensions {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.extensions
     }
 
-    <span class="doccomment">/// Returns a reference to the associated extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Extensions</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>
-    }
-
-    <span class="doccomment">/// Returns a mutable reference to the associated extensions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Extensions can be set in interceptors:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// use tonic::{Request, service::interceptor};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// struct MyExtension {</span>
-    <span class="doccomment">///     some_piece_of_data: String,</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// interceptor(|mut request: Request&lt;()&gt;| {</span>
-    <span class="doccomment">///     request.extensions_mut().insert(MyExtension {</span>
-    <span class="doccomment">///         some_piece_of_data: &quot;foo&quot;.to_string(),</span>
-    <span class="doccomment">///     });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     Ok(request)</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// And picked up by RPCs:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// use tonic::{async_trait, Status, Request, Response};</span>
-    <span class="doccomment">/// #</span>
-    <span class="doccomment">/// # struct Output {}</span>
-    <span class="doccomment">/// # struct Input;</span>
-    <span class="doccomment">/// # struct MyService;</span>
-    <span class="doccomment">/// # struct MyExtension;</span>
-    <span class="doccomment">/// # #[async_trait]</span>
-    <span class="doccomment">/// # trait TestService {</span>
-    <span class="doccomment">/// #     async fn handler(&amp;self, req: Request&lt;Input&gt;) -&gt; Result&lt;Response&lt;Output&gt;, Status&gt;;</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// #[async_trait]</span>
-    <span class="doccomment">/// impl TestService for MyService {</span>
-    <span class="doccomment">///     async fn handler(&amp;self, req: Request&lt;Input&gt;) -&gt; Result&lt;Response&lt;Output&gt;, Status&gt; {</span>
-    <span class="doccomment">///         let value: &amp;MyExtension = req.extensions().get::&lt;MyExtension&gt;().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///         Ok(Response::new(Output {}))</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Extensions</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">extensions</span>
+    <span class="doccomment">/// Returns a mutable reference to the associated extensions.
+    ///
+    /// # Example
+    ///
+    /// Extensions can be set in interceptors:
+    ///
+    /// ```no_run
+    /// use tonic::{Request, service::interceptor};
+    ///
+    /// struct MyExtension {
+    ///     some_piece_of_data: String,
+    /// }
+    ///
+    /// interceptor(|mut request: Request&lt;()&gt;| {
+    ///     request.extensions_mut().insert(MyExtension {
+    ///         some_piece_of_data: &quot;foo&quot;.to_string(),
+    ///     });
+    ///
+    ///     Ok(request)
+    /// });
+    /// ```
+    ///
+    /// And picked up by RPCs:
+    ///
+    /// ```no_run
+    /// use tonic::{async_trait, Status, Request, Response};
+    /// #
+    /// # struct Output {}
+    /// # struct Input;
+    /// # struct MyService;
+    /// # struct MyExtension;
+    /// # #[async_trait]
+    /// # trait TestService {
+    /// #     async fn handler(&amp;self, req: Request&lt;Input&gt;) -&gt; Result&lt;Response&lt;Output&gt;, Status&gt;;
+    /// # }
+    ///
+    /// #[async_trait]
+    /// impl TestService for MyService {
+    ///     async fn handler(&amp;self, req: Request&lt;Input&gt;) -&gt; Result&lt;Response&lt;Output&gt;, Status&gt; {
+    ///         let value: &amp;MyExtension = req.extensions().get::&lt;MyExtension&gt;().unwrap();
+    ///
+    ///         Ok(Response::new(Output {}))
+    ///     }
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>extensions_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Extensions {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.extensions
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Request::new</span>(<span class="self">self</span>)
+<span class="kw">impl</span>&lt;T&gt; IntoRequest&lt;T&gt; <span class="kw">for </span>T {
+    <span class="kw">fn </span>into_request(<span class="self">self</span>) -&gt; Request&lt;<span class="self">Self</span>&gt; {
+        Request::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoRequest</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>
-    }
+<span class="kw">impl</span>&lt;T&gt; IntoRequest&lt;T&gt; <span class="kw">for </span>Request&lt;T&gt; {
+    <span class="kw">fn </span>into_request(<span class="self">self</span>) -&gt; Request&lt;T&gt; {
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoStreamingRequest</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; IntoStreamingRequest <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: Stream + Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">Message</span> <span class="op">=</span> <span class="ident">T::Item</span>;
+    <span class="kw">type </span>Stream = T;
+    <span class="kw">type </span>Message = T::Item;
 
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="ident">Request</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Request::new</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_streaming_request(<span class="self">self</span>) -&gt; Request&lt;<span class="self">Self</span>&gt; {
+        Request::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoStreamingRequest</span> <span class="kw">for</span> <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Stream</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T&gt; IntoStreamingRequest <span class="kw">for </span>Request&lt;T&gt;
+<span class="kw">where
+    </span>T: Stream + Send + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Stream</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">type</span> <span class="ident">Message</span> <span class="op">=</span> <span class="ident">T::Item</span>;
+    <span class="kw">type </span>Stream = T;
+    <span class="kw">type </span>Message = T::Item;
 
-    <span class="kw">fn</span> <span class="ident">into_streaming_request</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>into_streaming_request(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T&gt; sealed::Sealed <span class="kw">for </span>T {}
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
+<span class="kw">mod </span>sealed {
+    <span class="kw">pub trait </span>Sealed {}
 }
 
-<span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">fn</span> <span class="ident">try_format</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-        <span class="ident">duration</span>: <span class="ident">Duration</span>,
-        <span class="ident">unit</span>: <span class="ident">char</span>,
-        <span class="ident">convert</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="ident">Duration</span>) -&gt; <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// The gRPC spec specifies that the timeout most be at most 8 digits. So this is the largest a</span>
-        <span class="comment">// value can be before we need to use a bigger unit.</span>
-        <span class="kw">let</span> <span class="ident">max_size</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="number">99_999_999</span>; <span class="comment">// exactly 8 digits</span>
+<span class="kw">fn </span>duration_to_grpc_timeout(duration: Duration) -&gt; String {
+    <span class="kw">fn </span>try_format&lt;T: Into&lt;u128&gt;&gt;(
+        duration: Duration,
+        unit: char,
+        convert: <span class="kw">impl </span>FnOnce(Duration) -&gt; T,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="comment">// The gRPC spec specifies that the timeout most be at most 8 digits. So this is the largest a
+        // value can be before we need to use a bigger unit.
+        </span><span class="kw">let </span>max_size: u128 = <span class="number">99_999_999</span>; <span class="comment">// exactly 8 digits
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">convert</span>(<span class="ident">duration</span>).<span class="ident">into</span>();
-        <span class="kw">if</span> <span class="ident">value</span> <span class="op">&gt;</span> <span class="ident">max_size</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">value</span>, <span class="ident">unit</span>))
+        </span><span class="kw">let </span>value = convert(duration).into();
+        <span class="kw">if </span>value &gt; max_size {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, value, unit))
         }
     }
 
-    <span class="comment">// pick the most precise unit that is less than or equal to 8 digits as per the gRPC spec</span>
-    <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;n&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_nanos</span>())
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;u&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_micros</span>()))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;m&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_millis</span>()))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;S&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_secs</span>()))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;M&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_secs</span>() <span class="op">/</span> <span class="number">60</span>))
-        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">try_format</span>(<span class="ident">duration</span>, <span class="string">&#39;H&#39;</span>, <span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">as_secs</span>() <span class="op">/</span> <span class="number">60</span>;
-                <span class="ident">minutes</span> <span class="op">/</span> <span class="number">60</span>
-            })
+    <span class="comment">// pick the most precise unit that is less than or equal to 8 digits as per the gRPC spec
+    </span>try_format(duration, <span class="string">&#39;n&#39;</span>, |d| d.as_nanos())
+        .or_else(|| try_format(duration, <span class="string">&#39;u&#39;</span>, |d| d.as_micros()))
+        .or_else(|| try_format(duration, <span class="string">&#39;m&#39;</span>, |d| d.as_millis()))
+        .or_else(|| try_format(duration, <span class="string">&#39;S&#39;</span>, |d| d.as_secs()))
+        .or_else(|| try_format(duration, <span class="string">&#39;M&#39;</span>, |d| d.as_secs() / <span class="number">60</span>))
+        .or_else(|| {
+            try_format(duration, <span class="string">&#39;H&#39;</span>, |d| {
+                <span class="kw">let </span>minutes = d.as_secs() / <span class="number">60</span>;
+                minutes / <span class="number">60
+            </span>})
         })
-        <span class="comment">// duration has to be more than 11_415 years for this to happen</span>
-        .<span class="ident">expect</span>(<span class="string">&quot;duration is unrealistically large&quot;</span>)
+        <span class="comment">// duration has to be more than 11_415 years for this to happen
+        </span>.expect(<span class="string">&quot;duration is unrealistically large&quot;</span>)
 }
 
-<span class="doccomment">/// When converting a `tonic::Request` into a `http::Request` should reserved</span>
-<span class="doccomment">/// headers be removed?</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SanitizeHeaders</span> {
-    <span class="ident">Yes</span>,
-    <span class="ident">No</span>,
+<span class="doccomment">/// When converting a `tonic::Request` into a `http::Request` should reserved
+/// headers be removed?
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SanitizeHeaders {
+    Yes,
+    No,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata::MetadataValue</span>;
-    <span class="kw">use</span> <span class="ident">http::Uri</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::metadata::MetadataValue;
+    <span class="kw">use </span>http::Uri;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reserved_headers_are_excluded</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>reserved_headers_are_excluded() {
+        <span class="kw">let </span><span class="kw-2">mut </span>r = Request::new(<span class="number">1</span>);
 
-        <span class="kw">for</span> <span class="ident">header</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">MetadataMap::GRPC_RESERVED_HEADERS</span> {
-            <span class="ident">r</span>.<span class="ident">metadata_mut</span>()
-                .<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">header</span>, <span class="ident">MetadataValue::from_static</span>(<span class="string">&quot;invalid&quot;</span>));
+        <span class="kw">for </span>header <span class="kw">in </span><span class="kw-2">&amp;</span>MetadataMap::GRPC_RESERVED_HEADERS {
+            r.metadata_mut()
+                .insert(<span class="kw-2">*</span>header, MetadataValue::from_static(<span class="string">&quot;invalid&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">http_request</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">into_http</span>(<span class="ident">Uri::default</span>(), <span class="ident">SanitizeHeaders::Yes</span>);
-        <span class="macro">assert!</span>(<span class="ident">http_request</span>.<span class="ident">headers</span>().<span class="ident">is_empty</span>());
+        <span class="kw">let </span>http_request = r.into_http(Uri::default(), SanitizeHeaders::Yes);
+        <span class="macro">assert!</span>(http_request.headers().is_empty());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout_less_than_second</span>() {
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>);
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">timeout</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="macro">format!</span>(<span class="string">&quot;{}u&quot;</span>, <span class="ident">timeout</span>.<span class="ident">as_micros</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>duration_to_grpc_timeout_less_than_second() {
+        <span class="kw">let </span>timeout = Duration::from_millis(<span class="number">500</span>);
+        <span class="kw">let </span>value = duration_to_grpc_timeout(timeout);
+        <span class="macro">assert_eq!</span>(value, <span class="macro">format!</span>(<span class="string">&quot;{}u&quot;</span>, timeout.as_micros()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout_more_than_second</span>() {
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span>);
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">timeout</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="macro">format!</span>(<span class="string">&quot;{}u&quot;</span>, <span class="ident">timeout</span>.<span class="ident">as_micros</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>duration_to_grpc_timeout_more_than_second() {
+        <span class="kw">let </span>timeout = Duration::from_secs(<span class="number">30</span>);
+        <span class="kw">let </span>value = duration_to_grpc_timeout(timeout);
+        <span class="macro">assert_eq!</span>(value, <span class="macro">format!</span>(<span class="string">&quot;{}u&quot;</span>, timeout.as_micros()));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">duration_to_grpc_timeout_a_very_long_time</span>() {
-        <span class="kw">let</span> <span class="ident">one_hour</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">60</span> <span class="op">*</span> <span class="number">60</span>);
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">duration_to_grpc_timeout</span>(<span class="ident">one_hour</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="macro">format!</span>(<span class="string">&quot;{}m&quot;</span>, <span class="ident">one_hour</span>.<span class="ident">as_millis</span>()));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>duration_to_grpc_timeout_a_very_long_time() {
+        <span class="kw">let </span>one_hour = Duration::from_secs(<span class="number">60 </span>* <span class="number">60</span>);
+        <span class="kw">let </span>value = duration_to_grpc_timeout(one_hour);
+        <span class="macro">assert_eq!</span>(value, <span class="macro">format!</span>(<span class="string">&quot;{}m&quot;</span>, one_hour.as_millis()));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

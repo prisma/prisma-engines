@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/codec/utf_8.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utf_8.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../encoding/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/codec/utf_8.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utf_8.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../encoding/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -826,35 +826,35 @@
 <span id="826">826</span>
 <span id="827">827</span>
 <span id="828">828</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">// Copyright (c) 2013-2015, Kang Seonghoon.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
-<span class="comment">//</span>
-<span class="comment">// Portions Copyright (c) 2008-2009 Bjoern Hoehrmann &lt;bjoern@hoehrmann.de&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
-<span class="comment">// in the Software without restriction, including without limitation the rights</span>
-<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
-<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span>
-<span class="comment">// furnished to do so, subject to the following conditions:</span>
-<span class="comment">//</span>
-<span class="comment">// The above copyright notice and this permission notice shall be included in</span>
-<span class="comment">// all copies or substantial portions of the Software.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
-<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
-<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
-<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
-<span class="comment">// SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+// Copyright (c) 2013-2015, Kang Seonghoon.
+// See README.md and LICENSE.txt for details.
+//
+// Portions Copyright (c) 2008-2009 Bjoern Hoehrmann &lt;bjoern@hoehrmann.de&gt;
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the &quot;Software&quot;), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-<span class="doccomment">//! UTF-8, the universal encoding.</span>
+</span><span class="doccomment">//! UTF-8, the universal encoding.
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">str</span>, <span class="ident">mem</span>};
-<span class="kw">use</span> <span class="ident">std::convert::Into</span>;
-<span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span>std::{str, mem};
+<span class="kw">use </span>std::convert::Into;
+<span class="kw">use </span>types::<span class="kw-2">*</span>;
 
 <span class="doccomment">/**
  * UTF-8 (UCS Transformation Format, 8-bit).
@@ -870,70 +870,70 @@
  *
  * The UTF-8 scanner used by this module is heavily based on Bjoern Hoehrmann&#39;s
  * [Flexible and Economical UTF-8 Decoder](http://bjoern.hoehrmann.de/utf-8/decoder/dfa/).
- */</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UTF8Encoding</span>;
+ */
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>UTF8Encoding;
 
-<span class="kw">impl</span> <span class="ident">Encoding</span> <span class="kw">for</span> <span class="ident">UTF8Encoding</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> { <span class="string">&quot;utf-8&quot;</span> }
-    <span class="kw">fn</span> <span class="ident">whatwg_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="string">&quot;utf-8&quot;</span>) }
-    <span class="kw">fn</span> <span class="ident">raw_encoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">UTF8Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">raw_decoder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">UTF8Decoder::new</span>() }
+<span class="kw">impl </span>Encoding <span class="kw">for </span>UTF8Encoding {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str { <span class="string">&quot;utf-8&quot; </span>}
+    <span class="kw">fn </span>whatwg_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; { <span class="prelude-val">Some</span>(<span class="string">&quot;utf-8&quot;</span>) }
+    <span class="kw">fn </span>raw_encoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawEncoder&gt; { UTF8Encoder::new() }
+    <span class="kw">fn </span>raw_decoder(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawDecoder&gt; { UTF8Decoder::new() }
 }
 
-<span class="doccomment">/// An encoder for UTF-8.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UTF8Encoder</span>;
+<span class="doccomment">/// An encoder for UTF-8.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>UTF8Encoder;
 
-<span class="kw">impl</span> <span class="ident">UTF8Encoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">Box::new</span>(<span class="ident">UTF8Encoder</span>) }
+<span class="kw">impl </span>UTF8Encoder {
+    <span class="kw">pub fn </span>new() -&gt; Box&lt;RawEncoder&gt; { Box::new(UTF8Encoder) }
 }
 
-<span class="kw">impl</span> <span class="ident">RawEncoder</span> <span class="kw">for</span> <span class="ident">UTF8Encoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawEncoder</span><span class="op">&gt;</span> { <span class="ident">UTF8Encoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
+<span class="kw">impl </span>RawEncoder <span class="kw">for </span>UTF8Encoder {
+    <span class="kw">fn </span>from_self(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawEncoder&gt; { UTF8Encoder::new() }
+    <span class="kw">fn </span>is_ascii_compatible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="bool-val">true </span>}
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ByteWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_bytes</span>();
-        <span class="macro">assert!</span>(<span class="ident">str::from_utf8</span>(<span class="ident">input</span>).<span class="ident">is_ok</span>());
-        <span class="ident">output</span>.<span class="ident">write_bytes</span>(<span class="ident">input</span>);
-        (<span class="ident">input</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>)
+    <span class="kw">fn </span>raw_feed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>str, output: <span class="kw-2">&amp;mut </span>ByteWriter) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;CodecError&gt;) {
+        <span class="kw">let </span>input: <span class="kw-2">&amp;</span>[u8] = input.as_bytes();
+        <span class="macro">assert!</span>(str::from_utf8(input).is_ok());
+        output.write_bytes(input);
+        (input.len(), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ByteWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>raw_finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _output: <span class="kw-2">&amp;mut </span>ByteWriter) -&gt; <span class="prelude-ty">Option</span>&lt;CodecError&gt; {
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="doccomment">/// A decoder for UTF-8.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>UTF8Decoder {
+    queuelen: usize,
+    queue: [u8; <span class="number">4</span>],
+    state: u8,
+}
+
+<span class="kw">impl </span>UTF8Decoder {
+    <span class="kw">pub fn </span>new() -&gt; Box&lt;RawDecoder&gt; {
+        Box::new(UTF8Decoder { queuelen: <span class="number">0</span>, queue: [<span class="number">0</span>; <span class="number">4</span>], state: INITIAL_STATE })
     }
 }
 
-<span class="doccomment">/// A decoder for UTF-8.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UTF8Decoder</span> {
-    <span class="ident">queuelen</span>: <span class="ident">usize</span>,
-    <span class="ident">queue</span>: [<span class="ident">u8</span>; <span class="number">4</span>],
-    <span class="ident">state</span>: <span class="ident">u8</span>,
-}
+<span class="kw">static </span>CHAR_CATEGORY: [u8; <span class="number">256</span>] = [
+    <span class="comment">//  0 (00-7F): one byte sequence
+    //  1 (80-8F): continuation byte
+    //  2 (C2-DF): start of two byte sequence
+    //  3 (E1-EC,EE-EF): start of three byte sequence, next byte unrestricted
+    //  4 (ED): start of three byte sequence, next byte restricted to non-surrogates (80-9F)
+    //  5 (F4): start of four byte sequence, next byte restricted to 0+10FFFF (80-8F)
+    //  6 (F1-F3): start of four byte sequence, next byte unrestricted
+    //  7 (A0-BF): continuation byte
+    //  8 (C0-C1,F5-FF): invalid (overlong or out-of-range) start of multi byte sequences
+    //  9 (90-9F): continuation byte
+    // 10 (E0): start of three byte sequence, next byte restricted to non-overlong (A0-BF)
+    // 11 (F0): start of four byte sequence, next byte restricted to non-overlong (90-BF)
 
-<span class="kw">impl</span> <span class="ident">UTF8Decoder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">UTF8Decoder</span> { <span class="ident">queuelen</span>: <span class="number">0</span>, <span class="ident">queue</span>: [<span class="number">0</span>; <span class="number">4</span>], <span class="ident">state</span>: <span class="ident">INITIAL_STATE</span> })
-    }
-}
-
-<span class="kw">static</span> <span class="ident">CHAR_CATEGORY</span>: [<span class="ident">u8</span>; <span class="number">256</span>] <span class="op">=</span> [
-    <span class="comment">//  0 (00-7F): one byte sequence</span>
-    <span class="comment">//  1 (80-8F): continuation byte</span>
-    <span class="comment">//  2 (C2-DF): start of two byte sequence</span>
-    <span class="comment">//  3 (E1-EC,EE-EF): start of three byte sequence, next byte unrestricted</span>
-    <span class="comment">//  4 (ED): start of three byte sequence, next byte restricted to non-surrogates (80-9F)</span>
-    <span class="comment">//  5 (F4): start of four byte sequence, next byte restricted to 0+10FFFF (80-8F)</span>
-    <span class="comment">//  6 (F1-F3): start of four byte sequence, next byte unrestricted</span>
-    <span class="comment">//  7 (A0-BF): continuation byte</span>
-    <span class="comment">//  8 (C0-C1,F5-FF): invalid (overlong or out-of-range) start of multi byte sequences</span>
-    <span class="comment">//  9 (90-9F): continuation byte</span>
-    <span class="comment">// 10 (E0): start of three byte sequence, next byte restricted to non-overlong (A0-BF)</span>
-    <span class="comment">// 11 (F0): start of four byte sequence, next byte restricted to non-overlong (90-BF)</span>
-
-     <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,  <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,
+     </span><span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,  <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,
      <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,  <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,
      <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,  <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,
      <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,  <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,
@@ -943,716 +943,716 @@
     <span class="number">10</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">3</span>,<span class="number">3</span>, <span class="number">11</span>,<span class="number">6</span>,<span class="number">6</span>,<span class="number">6</span>,<span class="number">5</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,<span class="number">8</span>,
 ];
 
-<span class="kw">static</span> <span class="ident">STATE_TRANSITIONS</span>: [<span class="ident">u8</span>; <span class="number">110</span>] <span class="op">=</span> [
-     <span class="number">0</span>,<span class="number">98</span>,<span class="number">12</span>,<span class="number">24</span>,<span class="number">48</span>,<span class="number">84</span>,<span class="number">72</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">36</span>,<span class="number">60</span>,       <span class="comment">//  0: &#39;??</span>
-    <span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 12: .. &#39;cc</span>
-    <span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 24: .. &#39;cc cc</span>
-    <span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 36: .. &#39;cc(A0-BF) cc</span>
-    <span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 48: .. &#39;cc(80-9F) cc</span>
-    <span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 60: .. &#39;cc(90-BF) cc cc</span>
-    <span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 72: .. &#39;cc cc cc</span>
-    <span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>, <span class="comment">// 84: .. &#39;cc(80-8F) cc cc</span>
-       <span class="comment">// 86,86,86,86,86,86,86,86,86,86,86,86, // 86: .. xx &#39;..</span>
-          <span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>, <span class="comment">// 98: xx &#39;..</span>
-];
+<span class="kw">static </span>STATE_TRANSITIONS: [u8; <span class="number">110</span>] = [
+     <span class="number">0</span>,<span class="number">98</span>,<span class="number">12</span>,<span class="number">24</span>,<span class="number">48</span>,<span class="number">84</span>,<span class="number">72</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">36</span>,<span class="number">60</span>,       <span class="comment">//  0: &#39;??
+    </span><span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>, <span class="number">0</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 12: .. &#39;cc
+    </span><span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 24: .. &#39;cc cc
+    </span><span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 36: .. &#39;cc(A0-BF) cc
+    </span><span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">12</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 48: .. &#39;cc(80-9F) cc
+    </span><span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 60: .. &#39;cc(90-BF) cc cc
+    </span><span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,       <span class="comment">// 72: .. &#39;cc cc cc
+    </span><span class="number">86</span>,<span class="number">24</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>,<span class="number">86</span>, <span class="comment">// 84: .. &#39;cc(80-8F) cc cc
+       // 86,86,86,86,86,86,86,86,86,86,86,86, // 86: .. xx &#39;..
+          </span><span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>,<span class="number">98</span>, <span class="comment">// 98: xx &#39;..
+</span>];
 
-<span class="kw">static</span> <span class="ident">INITIAL_STATE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">static</span> <span class="ident">ACCEPT_STATE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">static</span> <span class="ident">REJECT_STATE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">98</span>;
-<span class="kw">static</span> <span class="ident">REJECT_STATE_WITH_BACKUP</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">86</span>;
+<span class="kw">static </span>INITIAL_STATE: u8 = <span class="number">0</span>;
+<span class="kw">static </span>ACCEPT_STATE: u8 = <span class="number">0</span>;
+<span class="kw">static </span>REJECT_STATE: u8 = <span class="number">98</span>;
+<span class="kw">static </span>REJECT_STATE_WITH_BACKUP: u8 = <span class="number">86</span>;
 
-<span class="macro">macro_rules!</span> <span class="ident">is_reject_state</span>((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">expr</span>) =&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">REJECT_STATE_WITH_BACKUP</span>));
-<span class="macro">macro_rules!</span> <span class="ident">next_state</span>((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ch</span>:<span class="ident">expr</span>) =&gt; (
-    <span class="ident">STATE_TRANSITIONS</span>[(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">state</span> <span class="op">+</span> <span class="ident">CHAR_CATEGORY</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ch</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="kw">as</span> <span class="ident">usize</span>]
+<span class="macro">macro_rules! </span>is_reject_state((<span class="macro-nonterminal">$state</span>:expr) =&gt; (<span class="macro-nonterminal">$state </span>&gt;= REJECT_STATE_WITH_BACKUP));
+<span class="macro">macro_rules! </span>next_state((<span class="macro-nonterminal">$state</span>:expr, <span class="macro-nonterminal">$ch</span>:expr) =&gt; (
+    STATE_TRANSITIONS[(<span class="macro-nonterminal">$state </span>+ CHAR_CATEGORY[<span class="macro-nonterminal">$ch </span><span class="kw">as </span>usize]) <span class="kw">as </span>usize]
 ));
 
-<span class="kw">impl</span> <span class="ident">RawDecoder</span> <span class="kw">for</span> <span class="ident">UTF8Decoder</span> {
-    <span class="kw">fn</span> <span class="ident">from_self</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RawDecoder</span><span class="op">&gt;</span> { <span class="ident">UTF8Decoder::new</span>() }
-    <span class="kw">fn</span> <span class="ident">is_ascii_compatible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="bool-val">true</span> }
+<span class="kw">impl </span>RawDecoder <span class="kw">for </span>UTF8Decoder {
+    <span class="kw">fn </span>from_self(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;RawDecoder&gt; { UTF8Decoder::new() }
+    <span class="kw">fn </span>is_ascii_compatible(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool { <span class="bool-val">true </span>}
 
-    <span class="kw">fn</span> <span class="ident">raw_feed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StringWriter</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span>) {
-        <span class="ident">output</span>.<span class="ident">writer_hint</span>(<span class="ident">input</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>raw_feed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;</span>[u8], output: <span class="kw-2">&amp;mut </span>StringWriter) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;CodecError&gt;) {
+        output.writer_hint(input.len());
 
-        <span class="kw">fn</span> <span class="ident">write_bytes</span>(<span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StringWriter</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-            <span class="ident">output</span>.<span class="ident">write_str</span>(<span class="kw">unsafe</span> {<span class="ident">mem::transmute</span>(<span class="ident">bytes</span>)});
+        <span class="kw">fn </span>write_bytes(output: <span class="kw-2">&amp;mut </span>StringWriter, bytes: <span class="kw-2">&amp;</span>[u8]) {
+            output.write_str(<span class="kw">unsafe </span>{mem::transmute(bytes)});
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">processed</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state;
+        <span class="kw">let </span><span class="kw-2">mut </span>processed = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>offset = <span class="number">0</span>;
 
-        <span class="comment">// optimization: if we are in the initial state, quickly skip to the first non-MSB-set byte.</span>
-        <span class="kw">if</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">INITIAL_STATE</span> {
-            <span class="kw">let</span> <span class="ident">first_msb</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">ch</span><span class="op">|</span> <span class="ident">ch</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0x80</span>).<span class="ident">unwrap_or</span>(<span class="ident">input</span>.<span class="ident">len</span>());
-            <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">first_msb</span>;
-            <span class="ident">processed</span> <span class="op">+</span><span class="op">=</span> <span class="ident">first_msb</span>;
+        <span class="comment">// optimization: if we are in the initial state, quickly skip to the first non-MSB-set byte.
+        </span><span class="kw">if </span>state == INITIAL_STATE {
+            <span class="kw">let </span>first_msb = input.iter().position(|<span class="kw-2">&amp;</span>ch| ch &gt;= <span class="number">0x80</span>).unwrap_or(input.len());
+            offset += first_msb;
+            processed += first_msb;
         }
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">ch</span>) <span class="kw">in</span> <span class="ident">input</span>[<span class="ident">offset</span>..].<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">state</span> <span class="op">=</span> <span class="macro">next_state!</span>(<span class="ident">state</span>, <span class="ident">ch</span>);
-            <span class="kw">if</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">ACCEPT_STATE</span> {
-                <span class="ident">processed</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">is_reject_state!</span>(<span class="ident">state</span>) {
-                <span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">state</span> <span class="op">==</span> <span class="ident">REJECT_STATE</span> {<span class="ident">i</span> <span class="op">+</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>} <span class="kw">else</span> {<span class="ident">i</span> <span class="op">+</span> <span class="ident">offset</span>};
-                <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">INITIAL_STATE</span>;
-                <span class="kw">if</span> <span class="ident">processed</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="comment">// flush `queue` outside the problem</span>
-                    <span class="ident">write_bytes</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">queue</span>[<span class="number">0</span>..<span class="self">self</span>.<span class="ident">queuelen</span>]);
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>ch) <span class="kw">in </span>input[offset..].iter().enumerate() {
+            state = <span class="macro">next_state!</span>(state, ch);
+            <span class="kw">if </span>state == ACCEPT_STATE {
+                processed = i + offset + <span class="number">1</span>;
+            } <span class="kw">else if </span><span class="macro">is_reject_state!</span>(state) {
+                <span class="kw">let </span>upto = <span class="kw">if </span>state == REJECT_STATE {i + offset + <span class="number">1</span>} <span class="kw">else </span>{i + offset};
+                <span class="self">self</span>.state = INITIAL_STATE;
+                <span class="kw">if </span>processed &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.queuelen &gt; <span class="number">0 </span>{ <span class="comment">// flush `queue` outside the problem
+                    </span>write_bytes(output, <span class="kw-2">&amp;</span><span class="self">self</span>.queue[<span class="number">0</span>..<span class="self">self</span>.queuelen]);
                 }
-                <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="ident">write_bytes</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">0</span>..<span class="ident">processed</span>]);
-                <span class="kw">return</span> (<span class="ident">processed</span>, <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> {
-                    <span class="ident">upto</span>: <span class="ident">upto</span> <span class="kw">as</span> <span class="ident">isize</span>, <span class="ident">cause</span>: <span class="string">&quot;invalid sequence&quot;</span>.<span class="ident">into</span>()
+                <span class="self">self</span>.queuelen = <span class="number">0</span>;
+                write_bytes(output, <span class="kw-2">&amp;</span>input[<span class="number">0</span>..processed]);
+                <span class="kw">return </span>(processed, <span class="prelude-val">Some</span>(CodecError {
+                    upto: upto <span class="kw">as </span>isize, cause: <span class="string">&quot;invalid sequence&quot;</span>.into()
                 }));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>;
-        <span class="kw">if</span> <span class="ident">processed</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="comment">// flush `queue`</span>
-            <span class="ident">write_bytes</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">queue</span>[<span class="number">0</span>..<span class="self">self</span>.<span class="ident">queuelen</span>]);
-            <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.state = state;
+        <span class="kw">if </span>processed &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.queuelen &gt; <span class="number">0 </span>{ <span class="comment">// flush `queue`
+            </span>write_bytes(output, <span class="kw-2">&amp;</span><span class="self">self</span>.queue[<span class="number">0</span>..<span class="self">self</span>.queuelen]);
+            <span class="self">self</span>.queuelen = <span class="number">0</span>;
         }
-        <span class="ident">write_bytes</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="number">0</span>..<span class="ident">processed</span>]);
-        <span class="kw">if</span> <span class="ident">processed</span> <span class="op">&lt;</span> <span class="ident">input</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">morequeuelen</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">processed</span>;
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">morequeuelen</span> {
-                <span class="self">self</span>.<span class="ident">queue</span>[<span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">+</span> <span class="ident">i</span>] <span class="op">=</span> <span class="ident">input</span>[<span class="ident">processed</span> <span class="op">+</span> <span class="ident">i</span>];
+        write_bytes(output, <span class="kw-2">&amp;</span>input[<span class="number">0</span>..processed]);
+        <span class="kw">if </span>processed &lt; input.len() {
+            <span class="kw">let </span>morequeuelen = input.len() - processed;
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..morequeuelen {
+                <span class="self">self</span>.queue[<span class="self">self</span>.queuelen + i] = input[processed + i];
             }
-            <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">+</span><span class="op">=</span> <span class="ident">morequeuelen</span>;
+            <span class="self">self</span>.queuelen += morequeuelen;
         }
-        (<span class="ident">processed</span>, <span class="prelude-val">None</span>)
+        (processed, <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">raw_finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StringWriter</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>;
-        <span class="kw">let</span> <span class="ident">queuelen</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">queuelen</span>;
-        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">INITIAL_STATE</span>;
-        <span class="self">self</span>.<span class="ident">queuelen</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ACCEPT_STATE</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">CodecError</span> { <span class="ident">upto</span>: <span class="number">0</span>, <span class="ident">cause</span>: <span class="string">&quot;incomplete sequence&quot;</span>.<span class="ident">into</span>() })
-        } <span class="kw">else</span> {
-            <span class="macro">assert!</span>(<span class="ident">queuelen</span> <span class="op">==</span> <span class="number">0</span>);
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">fn </span>raw_finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _output: <span class="kw-2">&amp;mut </span>StringWriter) -&gt; <span class="prelude-ty">Option</span>&lt;CodecError&gt; {
+        <span class="kw">let </span>state = <span class="self">self</span>.state;
+        <span class="kw">let </span>queuelen = <span class="self">self</span>.queuelen;
+        <span class="self">self</span>.state = INITIAL_STATE;
+        <span class="self">self</span>.queuelen = <span class="number">0</span>;
+        <span class="kw">if </span>state != ACCEPT_STATE {
+            <span class="prelude-val">Some</span>(CodecError { upto: <span class="number">0</span>, cause: <span class="string">&quot;incomplete sequence&quot;</span>.into() })
+        } <span class="kw">else </span>{
+            <span class="macro">assert!</span>(queuelen == <span class="number">0</span>);
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="doccomment">/// Almost equivalent to `std::str::from_utf8`.</span>
-<span class="doccomment">/// This function is provided for the fair benchmark against the stdlib&#39;s UTF-8 conversion</span>
-<span class="doccomment">/// functions, as rust-encoding always allocates a new string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_utf8</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">iter</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>;
+<span class="doccomment">/// Almost equivalent to `std::str::from_utf8`.
+/// This function is provided for the fair benchmark against the stdlib&#39;s UTF-8 conversion
+/// functions, as rust-encoding always allocates a new string.
+</span><span class="kw">pub fn </span>from_utf8&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = input.iter();
+    <span class="kw">let </span><span class="kw-2">mut </span>state;
 
-    <span class="macro">macro_rules!</span> <span class="ident">return_as_whole</span>(() =&gt; (<span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> {<span class="ident">mem::transmute</span>(<span class="ident">input</span>)})));
+    <span class="macro">macro_rules! </span>return_as_whole(() =&gt; (<span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{mem::transmute(input)})));
 
-    <span class="comment">// optimization: if we are in the initial state, quickly skip to the first non-MSB-set byte.</span>
-    <span class="kw">loop</span> {
-        <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ch</span>) <span class="kw">if</span> <span class="ident">ch</span> <span class="op">&lt;</span> <span class="number">0x80</span> =&gt; {}
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">ch</span>) =&gt; {
-                <span class="ident">state</span> <span class="op">=</span> <span class="macro">next_state!</span>(<span class="ident">INITIAL_STATE</span>, <span class="ident">ch</span>);
+    <span class="comment">// optimization: if we are in the initial state, quickly skip to the first non-MSB-set byte.
+    </span><span class="kw">loop </span>{
+        <span class="kw">match </span>iter.next() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ch) <span class="kw">if </span>ch &lt; <span class="number">0x80 </span>=&gt; {}
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ch) =&gt; {
+                state = <span class="macro">next_state!</span>(INITIAL_STATE, ch);
                 <span class="kw">break</span>;
             }
-            <span class="prelude-val">None</span> =&gt; { <span class="macro">return_as_whole!</span>(); }
+            <span class="prelude-val">None </span>=&gt; { <span class="macro">return_as_whole!</span>(); }
         }
     }
 
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">ch</span> <span class="kw">in</span> <span class="ident">iter</span> {
-        <span class="ident">state</span> <span class="op">=</span> <span class="macro">next_state!</span>(<span class="ident">state</span>, <span class="ident">ch</span>);
-        <span class="kw">if</span> <span class="macro">is_reject_state!</span>(<span class="ident">state</span>) { <span class="kw">return</span> <span class="prelude-val">None</span>; }
+    <span class="kw">for </span><span class="kw-2">&amp;</span>ch <span class="kw">in </span>iter {
+        state = <span class="macro">next_state!</span>(state, ch);
+        <span class="kw">if </span><span class="macro">is_reject_state!</span>(state) { <span class="kw">return </span><span class="prelude-val">None</span>; }
     }
-    <span class="kw">if</span> <span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ACCEPT_STATE</span> { <span class="kw">return</span> <span class="prelude-val">None</span>; }
+    <span class="kw">if </span>state != ACCEPT_STATE { <span class="kw">return </span><span class="prelude-val">None</span>; }
     <span class="macro">return_as_whole!</span>();
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="comment">// portions of these tests are adopted from Markus Kuhn&#39;s UTF-8 decoder capability and</span>
-    <span class="comment">// stress test: &lt;http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt&gt;.</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="comment">// portions of these tests are adopted from Markus Kuhn&#39;s UTF-8 decoder capability and
+    // stress test: &lt;http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt&gt;.
 
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">UTF8Encoding</span>, <span class="ident">from_utf8</span>};
-    <span class="kw">use</span> <span class="ident">std::str</span>;
-    <span class="kw">use</span> <span class="ident">testutils</span>;
-    <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::{UTF8Encoding, from_utf8};
+    <span class="kw">use </span>std::str;
+    <span class="kw">use </span>testutils;
+    <span class="kw">use </span>types::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_valid</span>() {
-        <span class="comment">// one byte</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x41</span>], [], <span class="string">&quot;A&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x42</span>, <span class="number">0x43</span>], [], <span class="string">&quot;BC&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x44</span>, <span class="number">0x45</span>, <span class="number">0x46</span>], [], <span class="string">&quot;DEF&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_valid() {
+        <span class="comment">// one byte
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x41</span>], [], <span class="string">&quot;A&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x42</span>, <span class="number">0x43</span>], [], <span class="string">&quot;BC&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x44</span>, <span class="number">0x45</span>, <span class="number">0x46</span>], [], <span class="string">&quot;DEF&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// two bytes</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0xa2</span>], [], <span class="string">&quot;\u{a2}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0xac</span>, <span class="number">0xc2</span>, <span class="number">0xa9</span>], [], <span class="string">&quot;\u{ac}\u{0a9}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xd5</span>, <span class="number">0xa1</span>, <span class="number">0xd5</span>, <span class="number">0xb5</span>, <span class="number">0xd5</span>, <span class="number">0xa2</span>, <span class="number">0xd5</span>, <span class="number">0xb8</span>, <span class="number">0xd6</span>, <span class="number">0x82</span>,
+        <span class="comment">// two bytes
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc2</span>, <span class="number">0xa2</span>], [], <span class="string">&quot;\u{a2}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc2</span>, <span class="number">0xac</span>, <span class="number">0xc2</span>, <span class="number">0xa9</span>], [], <span class="string">&quot;\u{ac}\u{0a9}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xd5</span>, <span class="number">0xa1</span>, <span class="number">0xd5</span>, <span class="number">0xb5</span>, <span class="number">0xd5</span>, <span class="number">0xa2</span>, <span class="number">0xd5</span>, <span class="number">0xb8</span>, <span class="number">0xd6</span>, <span class="number">0x82</span>,
                             <span class="number">0xd5</span>, <span class="number">0xa2</span>, <span class="number">0xd5</span>, <span class="number">0xa5</span>, <span class="number">0xd5</span>, <span class="number">0xb6</span>], [],
                         <span class="string">&quot;\u{561}\u{0575}\u{562}\u{578}\u{582}\u{562}\u{565}\u{576}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// three bytes</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xed</span>, <span class="number">0x92</span>, <span class="number">0x89</span>], [], <span class="string">&quot;\u{d489}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xe6</span>, <span class="number">0xbc</span>, <span class="number">0xa2</span>, <span class="number">0xe5</span>, <span class="number">0xad</span>, <span class="number">0x97</span>], [], <span class="string">&quot;\u{6f22}\u{5b57}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc9</span>, <span class="number">0x99</span>, <span class="number">0xc9</span>, <span class="number">0x94</span>, <span class="number">0xc9</span>, <span class="number">0x90</span>], [], <span class="string">&quot;\u{259}\u{0254}\u{250}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// three bytes
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xed</span>, <span class="number">0x92</span>, <span class="number">0x89</span>], [], <span class="string">&quot;\u{d489}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xe6</span>, <span class="number">0xbc</span>, <span class="number">0xa2</span>, <span class="number">0xe5</span>, <span class="number">0xad</span>, <span class="number">0x97</span>], [], <span class="string">&quot;\u{6f22}\u{5b57}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc9</span>, <span class="number">0x99</span>, <span class="number">0xc9</span>, <span class="number">0x94</span>, <span class="number">0xc9</span>, <span class="number">0x90</span>], [], <span class="string">&quot;\u{259}\u{0254}\u{250}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// four bytes</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x82</span>, <span class="number">0x82</span>], [], <span class="string">&quot;\u{10082}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// four bytes
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x82</span>, <span class="number">0x82</span>], [], <span class="string">&quot;\u{10082}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// we don&#39;t test encoders as it is largely a no-op.</span>
+        <span class="comment">// we don&#39;t test encoders as it is largely a no-op.
+    </span>}
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_valid_boundary() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x00</span>], [], <span class="string">&quot;\x00&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x7f</span>], [], <span class="string">&quot;\x7f&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xdf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{7ff}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xe0</span>, <span class="number">0xa0</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xed</span>, <span class="number">0x9f</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{d7ff}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xee</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{e000}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xef</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{ffff}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xf4</span>, <span class="number">0x8f</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{10ffff}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_valid_boundary</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x00</span>], [], <span class="string">&quot;\x00&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_valid_partial() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xf0</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0x90</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0x82</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x82</span>], [<span class="number">0xed</span>], <span class="string">&quot;\u{10082}&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x92</span>, <span class="number">0x89</span>], [], <span class="string">&quot;\u{d489}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x7f</span>], [], <span class="string">&quot;\x7f&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xdf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{7ff}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xe0</span>, <span class="number">0xa0</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xed</span>, <span class="number">0x9f</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{d7ff}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xee</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{e000}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xef</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{ffff}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xf4</span>, <span class="number">0x8f</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], [], <span class="string">&quot;\u{10ffff}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xc2</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xa9</span>, <span class="number">0x20</span>], [], <span class="string">&quot;\u{a9}\u{020}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_valid_partial</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xf0</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0x90</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0x82</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x82</span>], [<span class="number">0xed</span>], <span class="string">&quot;\u{10082}&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x92</span>, <span class="number">0x89</span>], [], <span class="string">&quot;\u{d489}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_continuation() {
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0x80</span>..<span class="number">0xc0 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xc2</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xa9</span>, <span class="number">0x20</span>], [], <span class="string">&quot;\u{a9}\u{020}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-    }
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [c], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_continuation</span>() {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="number">0x80</span>..<span class="number">0xc0</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="ident">c</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="ident">c</span>, <span class="ident">c</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [c, c], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_surrogate</span>() {
-        <span class="comment">// surrogates should fail at the second byte.</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_surrogate() {
+        <span class="comment">// surrogates should fail at the second byte.
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xa0</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xa0</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xad</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xad</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xae</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xae</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xaf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xaf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xb0</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xb0</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xbe</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xbe</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xed</span>], [<span class="number">0xbf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xed</span>], [<span class="number">0xbf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_boundary</span>() {
-        <span class="comment">// as with surrogates, should fail at the second byte.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xf4</span>], [<span class="number">0x90</span>, <span class="number">0x90</span>, <span class="number">0x90</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// U+110000</span>
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_boundary() {
+        <span class="comment">// as with surrogates, should fail at the second byte.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xf4</span>], [<span class="number">0x90</span>, <span class="number">0x90</span>, <span class="number">0x90</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// U+110000
+        </span><span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_start_immediate_test_finish</span>() {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="number">0xf5</span>..<span class="number">0x100</span> {
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_start_immediate_test_finish() {
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0xf5</span>..<span class="number">0x100 </span>{
+            <span class="kw">let </span>c = c <span class="kw">as </span>u8;
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_start_followed_by_space</span>() {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="number">0xf5</span>..<span class="number">0x100</span> {
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_start_followed_by_space() {
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0xf5</span>..<span class="number">0x100 </span>{
+            <span class="kw">let </span>c = c <span class="kw">as </span>u8;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0x20</span>], [], <span class="string">&quot;\x20&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0x20</span>], [], <span class="string">&quot;\x20&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_lone_start_immediate_test_finish</span>() {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="number">0xc2</span>..<span class="number">0xf5</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_finish_err!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_lone_start_immediate_test_finish() {
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0xc2</span>..<span class="number">0xf5 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_finish_err!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_lone_start_followed_by_space</span>() {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="number">0xc2</span>..<span class="number">0xf5</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_lone_start_followed_by_space() {
+        <span class="kw">for </span>c <span class="kw">in </span><span class="number">0xc2</span>..<span class="number">0xf5 </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_incomplete_three_byte_seq_followed_by_space</span>() {
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="number">0xe0</span>..<span class="number">0xf5</span> {
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0xe0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0xf0</span> {<span class="number">0xa0</span>} <span class="kw">else</span> {<span class="number">0x80</span>};
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_incomplete_three_byte_seq_followed_by_space() {
+        <span class="kw">for </span>b <span class="kw">in </span><span class="number">0xe0</span>..<span class="number">0xf5 </span>{
+            <span class="kw">let </span>c = <span class="kw">if </span>b == <span class="number">0xe0 </span>|| b == <span class="number">0xf0 </span>{<span class="number">0xa0</span>} <span class="kw">else </span>{<span class="number">0x80</span>};
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">b</span>, <span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [b, c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">b</span>, <span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [b, c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">b</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [b], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">b</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [b], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_ok!</span>(d, [], [c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_incomplete_four_byte_seq_followed_by_space</span>() {
-        <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="number">0xf0</span>..<span class="number">0xf5</span> {
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0xf0</span> {<span class="number">0xa0</span>} <span class="kw">else</span> {<span class="number">0x80</span>};
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="number">0x80</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_incomplete_four_byte_seq_followed_by_space() {
+        <span class="kw">for </span>a <span class="kw">in </span><span class="number">0xf0</span>..<span class="number">0xf5 </span>{
+            <span class="kw">let </span>b = <span class="kw">if </span>a == <span class="number">0xf0 </span>{<span class="number">0xa0</span>} <span class="kw">else </span>{<span class="number">0x80</span>};
+            <span class="kw">let </span>c = <span class="number">0x80</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_err!</span>(d, [], [a, b, c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">a</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">b</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [a], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_ok!</span>(d, [], [b], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_ok!</span>(d, [], [c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">a</span>, <span class="ident">b</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="ident">c</span>], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [a, b], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [c], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-            <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes</span>
-            <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
-            <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+            <span class="macro">assert_feed_ok!</span>(d, [], [a, b, c], <span class="string">&quot;&quot;</span>); <span class="comment">// wait for cont. bytes
+            </span><span class="macro">assert_feed_err!</span>(d, [], [], [<span class="number">0x20</span>], <span class="string">&quot;&quot;</span>);
+            <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_too_many_cont_bytes</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_too_many_cont_bytes() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0xe0</span>, <span class="number">0xa0</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0xe0</span>, <span class="number">0xa0</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// no continuation byte is consumed after 5/6-byte sequence starters and FE/FF</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xf8</span>], [<span class="number">0x88</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// no continuation byte is consumed after 5/6-byte sequence starters and FE/FF
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xf8</span>], [<span class="number">0x88</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xfc</span>], [<span class="number">0x84</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xfc</span>], [<span class="number">0x84</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xfe</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xfe</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_too_many_cont_bytes_partial</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xc2</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_too_many_cont_bytes_partial() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xc2</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xe0</span>, <span class="number">0xa0</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xe0</span>, <span class="number">0xa0</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{800}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [], [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [], [<span class="number">0xf0</span>, <span class="number">0x90</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [<span class="number">0x80</span>], [<span class="number">0x80</span>], [], <span class="string">&quot;\u{10000}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="comment">// no continuation byte is consumed after 5/6-byte sequence starters and FE/FF</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xf8</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x88</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="comment">// no continuation byte is consumed after 5/6-byte sequence starters and FE/FF
+        </span><span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xf8</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x88</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xfc</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x84</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xfc</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x84</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xfe</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xfe</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xff</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xff</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0x80</span>], [], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_overlong_minimal</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xc0</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_overlong_minimal() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xc0</span>], [<span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xe0</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xe0</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xf0</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xf0</span>], [<span class="number">0x80</span>, <span class="number">0x80</span>, <span class="number">0x80</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_overlong_maximal</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xc1</span>], [<span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_overlong_maximal() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xc1</span>], [<span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xe0</span>], [<span class="number">0x9f</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xe0</span>], [<span class="number">0x9f</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_err!</span>(<span class="ident">d</span>, [], [<span class="number">0xf0</span>], [<span class="number">0x8f</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_err!</span>(d, [], [<span class="number">0xf0</span>], [<span class="number">0x8f</span>, <span class="number">0xbf</span>, <span class="number">0xbf</span>], <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_feed_after_finish</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">UTF8Encoding</span>.<span class="ident">raw_decoder</span>();
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [<span class="number">0xc2</span>], <span class="string">&quot;\u{80}&quot;</span>);
-        <span class="macro">assert_finish_err!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
-        <span class="macro">assert_feed_ok!</span>(<span class="ident">d</span>, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
-        <span class="macro">assert_finish_ok!</span>(<span class="ident">d</span>, <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_feed_after_finish() {
+        <span class="kw">let </span><span class="kw-2">mut </span>d = UTF8Encoding.raw_decoder();
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [<span class="number">0xc2</span>], <span class="string">&quot;\u{80}&quot;</span>);
+        <span class="macro">assert_finish_err!</span>(d, <span class="string">&quot;&quot;</span>);
+        <span class="macro">assert_feed_ok!</span>(d, [<span class="number">0xc2</span>, <span class="number">0x80</span>], [], <span class="string">&quot;\u{80}&quot;</span>);
+        <span class="macro">assert_finish_ok!</span>(d, <span class="string">&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_correct_from_utf8</span>() {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>.<span class="ident">as_bytes</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">from_utf8</span>(<span class="ident">s</span>), <span class="ident">str::from_utf8</span>(<span class="ident">s</span>).<span class="ident">ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_correct_from_utf8() {
+        <span class="kw">let </span>s = testutils::ASCII_TEXT.as_bytes();
+        <span class="macro">assert_eq!</span>(from_utf8(s), str::from_utf8(s).ok());
 
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>.<span class="ident">as_bytes</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">from_utf8</span>(<span class="ident">s</span>), <span class="ident">str::from_utf8</span>(<span class="ident">s</span>).<span class="ident">ok</span>());
+        <span class="kw">let </span>s = testutils::KOREAN_TEXT.as_bytes();
+        <span class="macro">assert_eq!</span>(from_utf8(s), str::from_utf8(s).ok());
 
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::INVALID_UTF8_TEXT</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">from_utf8</span>(<span class="ident">s</span>), <span class="ident">str::from_utf8</span>(<span class="ident">s</span>).<span class="ident">ok</span>());
+        <span class="kw">let </span>s = testutils::INVALID_UTF8_TEXT;
+        <span class="macro">assert_eq!</span>(from_utf8(s), str::from_utf8(s).ok());
     }
 
-    <span class="kw">mod</span> <span class="ident">bench_ascii</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">UTF8Encoding</span>, <span class="ident">from_utf8</span>};
-        <span class="kw">use</span> <span class="ident">std::str</span>;
-        <span class="kw">use</span> <span class="ident">testutils</span>;
-        <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
+    <span class="kw">mod </span>bench_ascii {
+        <span class="kw">extern crate </span>test;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{UTF8Encoding, from_utf8};
+        <span class="kw">use </span>std::str;
+        <span class="kw">use </span>testutils;
+        <span class="kw">use </span>types::<span class="kw-2">*</span>;
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_encode</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">encode</span>(<span class="ident">s</span>, <span class="ident">EncoderTrap::Strict</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_encode(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::ASCII_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.encode(s, EncoderTrap::Strict)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_decode</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">decode</span>(<span class="ident">s</span>, <span class="ident">DecoderTrap::Strict</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_decode(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::ASCII_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.decode(s, DecoderTrap::Strict)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_from_utf8</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">from_utf8</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_from_utf8(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::ASCII_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                from_utf8(s)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">str::from_utf8</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::ASCII_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                str::from_utf8(s)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_lossy</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::ASCII_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">String::from_utf8_lossy</span>(<span class="ident">s</span>)
-            }))
-        }
-    }
-
-    <span class="comment">// why Korean? it has an excellent mix of multibyte sequences and ASCII sequences</span>
-    <span class="comment">// unlike other CJK scripts, so it reflects a practical use case a bit better.</span>
-    <span class="kw">mod</span> <span class="ident">bench_korean</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">UTF8Encoding</span>, <span class="ident">from_utf8</span>};
-        <span class="kw">use</span> <span class="ident">std::str</span>;
-        <span class="kw">use</span> <span class="ident">testutils</span>;
-        <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
-
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_encode</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">encode</span>(<span class="ident">s</span>, <span class="ident">EncoderTrap::Strict</span>)
-            }))
-        }
-
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_decode</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">decode</span>(<span class="ident">s</span>, <span class="ident">DecoderTrap::Strict</span>)
-            }))
-        }
-
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_from_utf8</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">from_utf8</span>(<span class="ident">s</span>)
-            }))
-        }
-
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">str::from_utf8</span>(<span class="ident">s</span>)
-            }))
-        }
-
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_lossy</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::KOREAN_TEXT</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">String::from_utf8_lossy</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_lossy(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::ASCII_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                String::from_utf8_lossy(s)
             }))
         }
     }
 
-    <span class="kw">mod</span> <span class="ident">bench_lossy_invalid</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">UTF8Encoding</span>, <span class="ident">from_utf8</span>};
-        <span class="kw">use</span> <span class="ident">std::str</span>;
-        <span class="kw">use</span> <span class="ident">testutils</span>;
-        <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">types::DecoderTrap::Replace</span> <span class="kw">as</span> <span class="ident">DecodeReplace</span>;
+    <span class="comment">// why Korean? it has an excellent mix of multibyte sequences and ASCII sequences
+    // unlike other CJK scripts, so it reflects a practical use case a bit better.
+    </span><span class="kw">mod </span>bench_korean {
+        <span class="kw">extern crate </span>test;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{UTF8Encoding, from_utf8};
+        <span class="kw">use </span>std::str;
+        <span class="kw">use </span>testutils;
+        <span class="kw">use </span>types::<span class="kw-2">*</span>;
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_decode_replace</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::INVALID_UTF8_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">decode</span>(<span class="ident">s</span>, <span class="ident">DecodeReplace</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_encode(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::KOREAN_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.encode(s, EncoderTrap::Strict)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_from_utf8_failing</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::INVALID_UTF8_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">from_utf8</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_decode(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::KOREAN_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.decode(s, DecoderTrap::Strict)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_failing</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::INVALID_UTF8_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">str::from_utf8</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_from_utf8(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::KOREAN_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                from_utf8(s)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_lossy</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::INVALID_UTF8_TEXT</span>;
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">String::from_utf8_lossy</span>(<span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::KOREAN_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                str::from_utf8(s)
+            }))
+        }
+
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_lossy(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::KOREAN_TEXT.as_bytes();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                String::from_utf8_lossy(s)
             }))
         }
     }
 
-    <span class="kw">mod</span> <span class="ident">bench_lossy_external</span> {
-        <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">UTF8Encoding</span>, <span class="ident">from_utf8</span>};
-        <span class="kw">use</span> <span class="ident">std::str</span>;
-        <span class="kw">use</span> <span class="ident">testutils</span>;
-        <span class="kw">use</span> <span class="ident">types</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident">types::DecoderTrap::Replace</span> <span class="kw">as</span> <span class="ident">DecodeReplace</span>;
+    <span class="kw">mod </span>bench_lossy_invalid {
+        <span class="kw">extern crate </span>test;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{UTF8Encoding, from_utf8};
+        <span class="kw">use </span>std::str;
+        <span class="kw">use </span>testutils;
+        <span class="kw">use </span>types::<span class="kw-2">*</span>;
+        <span class="kw">use </span>types::DecoderTrap::Replace <span class="kw">as </span>DecodeReplace;
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">bench_decode_replace</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::get_external_bench_data</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">UTF8Encoding</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="ident">DecodeReplace</span>)
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_decode_replace(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::INVALID_UTF8_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.decode(s, DecodeReplace)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_from_utf8_failing</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::get_external_bench_data</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_from_utf8_failing(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::INVALID_UTF8_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                from_utf8(s)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_failing</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::get_external_bench_data</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_failing(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::INVALID_UTF8_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                str::from_utf8(s)
             }))
         }
 
-        <span class="attribute">#[<span class="ident">bench</span>]</span> <span class="comment">// for the comparison</span>
-        <span class="kw">fn</span> <span class="ident">bench_stdlib_from_utf8_lossy</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">testutils::get_external_bench_data</span>();
-            <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">test::black_box</span>({
-                <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>)
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_lossy(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::INVALID_UTF8_TEXT;
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                String::from_utf8_lossy(s)
+            }))
+        }
+    }
+
+    <span class="kw">mod </span>bench_lossy_external {
+        <span class="kw">extern crate </span>test;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{UTF8Encoding, from_utf8};
+        <span class="kw">use </span>std::str;
+        <span class="kw">use </span>testutils;
+        <span class="kw">use </span>types::<span class="kw-2">*</span>;
+        <span class="kw">use </span>types::DecoderTrap::Replace <span class="kw">as </span>DecodeReplace;
+
+        <span class="attribute">#[bench]
+        </span><span class="kw">fn </span>bench_decode_replace(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::get_external_bench_data();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                UTF8Encoding.decode(<span class="kw-2">&amp;</span>s, DecodeReplace)
+            }))
+        }
+
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_from_utf8_failing(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::get_external_bench_data();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                from_utf8(<span class="kw-2">&amp;</span>s)
+            }))
+        }
+
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_failing(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::get_external_bench_data();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                str::from_utf8(<span class="kw-2">&amp;</span>s)
+            }))
+        }
+
+        <span class="attribute">#[bench] </span><span class="comment">// for the comparison
+        </span><span class="kw">fn </span>bench_stdlib_from_utf8_lossy(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+            <span class="kw">let </span>s = testutils::get_external_bench_data();
+            bencher.bytes = s.len() <span class="kw">as </span>u64;
+            bencher.iter(|| test::black_box({
+                String::from_utf8_lossy(<span class="kw-2">&amp;</span>s)
             }))
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

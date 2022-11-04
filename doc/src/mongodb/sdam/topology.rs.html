@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/topology.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>topology.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/topology.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>topology.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -966,973 +966,973 @@
 <span id="966">966</span>
 <span id="967">967</span>
 <span id="968">968</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">future::Future</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time::Duration</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    collections::{HashMap, HashSet},
+    future::Future,
+    sync::Arc,
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="ident">bson::oid::ObjectId</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">futures_util::stream</span>::{<span class="ident">FuturesUnordered</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{
-    <span class="ident">broadcast</span>,
-    <span class="ident">mpsc</span>::{<span class="self">self</span>, <span class="ident">UnboundedReceiver</span>, <span class="ident">UnboundedSender</span>},
-    <span class="ident">watch</span>::{<span class="self">self</span>, <span class="ident">Ref</span>},
+<span class="kw">use </span>bson::oid::ObjectId;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>futures_util::stream::{FuturesUnordered, StreamExt};
+<span class="kw">use </span>futures_util::FutureExt;
+<span class="kw">use </span>tokio::sync::{
+    broadcast,
+    mpsc::{<span class="self">self</span>, UnboundedReceiver, UnboundedSender},
+    watch::{<span class="self">self</span>, Ref},
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client::options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">ServerAddress</span>},
-    <span class="ident">cmap</span>::{<span class="ident">conn::ConnectionGeneration</span>, <span class="ident">Command</span>, <span class="ident">Connection</span>, <span class="ident">PoolGeneration</span>},
-    <span class="ident">error</span>::{<span class="ident">load_balanced_mode_mismatch</span>, <span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::sdam</span>::{
-        <span class="ident">handle_sdam_event</span>,
-        <span class="ident">SdamEvent</span>,
-        <span class="ident">ServerClosedEvent</span>,
-        <span class="ident">ServerDescriptionChangedEvent</span>,
-        <span class="ident">ServerOpeningEvent</span>,
-        <span class="ident">TopologyClosedEvent</span>,
-        <span class="ident">TopologyDescriptionChangedEvent</span>,
-        <span class="ident">TopologyOpeningEvent</span>,
+<span class="kw">use crate</span>::{
+    client::options::{ClientOptions, ServerAddress},
+    cmap::{conn::ConnectionGeneration, Command, Connection, PoolGeneration},
+    error::{load_balanced_mode_mismatch, Error, <span class="prelude-ty">Result</span>},
+    event::sdam::{
+        handle_sdam_event,
+        SdamEvent,
+        ServerClosedEvent,
+        ServerDescriptionChangedEvent,
+        ServerOpeningEvent,
+        TopologyClosedEvent,
+        TopologyDescriptionChangedEvent,
+        TopologyOpeningEvent,
     },
-    <span class="ident">runtime</span>::{<span class="self">self</span>, <span class="ident">AcknowledgedMessage</span>, <span class="ident">HttpClient</span>, <span class="ident">WorkerHandle</span>, <span class="ident">WorkerHandleListener</span>},
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
-    <span class="ident">ClusterTime</span>,
-    <span class="ident">ServerInfo</span>,
-    <span class="ident">ServerType</span>,
-    <span class="ident">TopologyType</span>,
+    runtime::{<span class="self">self</span>, AcknowledgedMessage, HttpClient, WorkerHandle, WorkerHandleListener},
+    selection_criteria::SelectionCriteria,
+    ClusterTime,
+    ServerInfo,
+    ServerType,
+    TopologyType,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">srv_polling::SrvPollingMonitor</span>,
-    <span class="ident">Monitor</span>,
-    <span class="ident">Server</span>,
-    <span class="ident">ServerDescription</span>,
-    <span class="ident">SessionSupportStatus</span>,
-    <span class="ident">TopologyDescription</span>,
-    <span class="ident">TransactionSupportStatus</span>,
+<span class="kw">use super</span>::{
+    srv_polling::SrvPollingMonitor,
+    Monitor,
+    Server,
+    ServerDescription,
+    SessionSupportStatus,
+    TopologyDescription,
+    TransactionSupportStatus,
 };
 
-<span class="doccomment">/// A struct providing access to the client&#39;s current view of the topology.</span>
-<span class="doccomment">/// When this is dropped, monitors will stop performing checks.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Topology</span> {
-    <span class="ident">watcher</span>: <span class="ident">TopologyWatcher</span>,
-    <span class="ident">updater</span>: <span class="ident">TopologyUpdater</span>,
-    <span class="ident">check_requester</span>: <span class="ident">TopologyCheckRequester</span>,
-    <span class="ident">_worker_handle</span>: <span class="ident">WorkerHandle</span>,
+<span class="doccomment">/// A struct providing access to the client&#39;s current view of the topology.
+/// When this is dropped, monitors will stop performing checks.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Topology {
+    watcher: TopologyWatcher,
+    updater: TopologyUpdater,
+    check_requester: TopologyCheckRequester,
+    _worker_handle: WorkerHandle,
 }
 
-<span class="kw">impl</span> <span class="ident">Topology</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Topology</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">http_client</span> <span class="op">=</span> <span class="ident">HttpClient::default</span>();
-        <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">TopologyDescription::new</span>(<span class="ident">options</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">load_balanced</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+<span class="kw">impl </span>Topology {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: ClientOptions) -&gt; <span class="prelude-ty">Result</span>&lt;Topology&gt; {
+        <span class="kw">let </span>http_client = HttpClient::default();
+        <span class="kw">let </span>description = TopologyDescription::new(options.clone())<span class="question-mark">?</span>;
+        <span class="kw">let </span>is_load_balanced = options.load_balanced == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
 
-        <span class="kw">let</span> <span class="ident">update_requester</span> <span class="op">=</span> <span class="ident">TopologyCheckRequester::new</span>();
-        <span class="kw">let</span> <span class="ident">event_emitter</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">sdam_event_handler</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">tx</span>, <span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">mpsc::unbounded_channel</span>::<span class="op">&lt;</span><span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">SdamEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>update_requester = TopologyCheckRequester::new();
+        <span class="kw">let </span>event_emitter = options.sdam_event_handler.as_ref().map(|handler| {
+            <span class="kw">let </span>(tx, <span class="kw-2">mut </span>rx) = mpsc::unbounded_channel::&lt;AcknowledgedMessage&lt;SdamEvent&gt;&gt;();
 
-            <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">clone</span>();
-            <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="kw">await</span> {
-                    <span class="kw">let</span> (<span class="ident">event</span>, <span class="ident">ack</span>) <span class="op">=</span> <span class="ident">event</span>.<span class="ident">into_parts</span>();
+            <span class="kw">let </span>handler = handler.clone();
+            runtime::execute(<span class="kw">async move </span>{
+                <span class="kw">while let </span><span class="prelude-val">Some</span>(event) = rx.recv().<span class="kw">await </span>{
+                    <span class="kw">let </span>(event, ack) = event.into_parts();
 
-                    <span class="kw">let</span> <span class="ident">is_closed</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">SdamEvent::TopologyClosed</span>(<span class="kw">_</span>));
-                    <span class="ident">handle_sdam_event</span>(<span class="ident">handler</span>.<span class="ident">as_ref</span>(), <span class="ident">event</span>);
+                    <span class="kw">let </span>is_closed = <span class="macro">matches!</span>(event, SdamEvent::TopologyClosed(<span class="kw">_</span>));
+                    handle_sdam_event(handler.as_ref(), event);
 
-                    <span class="ident">ack</span>.<span class="ident">acknowledge</span>(());
+                    ack.acknowledge(());
 
-                    <span class="comment">// no more events should be emitted after a TopologyClosedEvent</span>
-                    <span class="kw">if</span> <span class="ident">is_closed</span> {
+                    <span class="comment">// no more events should be emitted after a TopologyClosedEvent
+                    </span><span class="kw">if </span>is_closed {
                         <span class="kw">break</span>;
                     };
                 }
             });
-            <span class="ident">SdamEventEmitter</span> { <span class="ident">sender</span>: <span class="ident">tx</span> }
+            SdamEventEmitter { sender: tx }
         });
 
-        <span class="kw">let</span> (<span class="ident">updater</span>, <span class="ident">update_receiver</span>) <span class="op">=</span> <span class="ident">TopologyUpdater::channel</span>();
-        <span class="kw">let</span> (<span class="ident">worker_handle</span>, <span class="ident">handle_listener</span>) <span class="op">=</span> <span class="ident">WorkerHandleListener::channel</span>();
+        <span class="kw">let </span>(updater, update_receiver) = TopologyUpdater::channel();
+        <span class="kw">let </span>(worker_handle, handle_listener) = WorkerHandleListener::channel();
 
-        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="ident">description</span>
-            .<span class="ident">server_addresses</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">address</span><span class="op">|</span> {
+        <span class="kw">let </span>servers = description
+            .server_addresses()
+            .map(|address| {
                 (
-                    <span class="ident">address</span>.<span class="ident">clone</span>(),
-                    <span class="ident">Server::new</span>(
-                        <span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">options</span>.<span class="ident">clone</span>(),
-                        <span class="ident">http_client</span>.<span class="ident">clone</span>(),
-                        <span class="ident">updater</span>.<span class="ident">clone</span>(),
+                    address.clone(),
+                    Server::new(
+                        address.clone(),
+                        options.clone(),
+                        http_client.clone(),
+                        updater.clone(),
                     ),
                 )
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">TopologyState</span> {
-            <span class="ident">description</span>,
-            <span class="ident">servers</span>,
+        <span class="kw">let </span>state = TopologyState {
+            description,
+            servers,
         };
 
-        <span class="kw">let</span> <span class="ident">addresses</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>addresses = state.servers.keys().cloned().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-        <span class="kw">let</span> (<span class="ident">watcher</span>, <span class="ident">publisher</span>) <span class="op">=</span> <span class="ident">TopologyWatcher::channel</span>(<span class="ident">state</span>);
+        <span class="kw">let </span>(watcher, publisher) = TopologyWatcher::channel(state);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-        <span class="kw">let</span> <span class="ident">disable_monitoring_threads</span> <span class="op">=</span> <span class="ident">options</span>
-            .<span class="ident">test_options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">to</span>.<span class="ident">disable_monitoring_threads</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-        <span class="kw">let</span> <span class="ident">disable_monitoring_threads</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">is_load_balanced</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">disable_monitoring_threads</span> {
-            <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">addresses</span> {
-                <span class="ident">Monitor::start</span>(
-                    <span class="ident">address</span>.<span class="ident">clone</span>(),
-                    <span class="ident">updater</span>.<span class="ident">clone</span>(),
-                    <span class="ident">watcher</span>.<span class="ident">clone</span>(),
-                    <span class="ident">event_emitter</span>.<span class="ident">clone</span>(),
-                    <span class="ident">update_requester</span>.<span class="ident">subscribe</span>(),
-                    <span class="ident">options</span>.<span class="ident">clone</span>(),
+        <span class="attribute">#[cfg(test)]
+        </span><span class="kw">let </span>disable_monitoring_threads = options
+            .test_options
+            .as_ref()
+            .map(|to| to.disable_monitoring_threads)
+            .unwrap_or(<span class="bool-val">false</span>);
+        <span class="attribute">#[cfg(not(test))]
+        </span><span class="kw">let </span>disable_monitoring_threads = <span class="bool-val">false</span>;
+        <span class="kw">if </span>!is_load_balanced &amp;&amp; !disable_monitoring_threads {
+            <span class="kw">for </span>address <span class="kw">in </span>addresses {
+                Monitor::start(
+                    address.clone(),
+                    updater.clone(),
+                    watcher.clone(),
+                    event_emitter.clone(),
+                    update_requester.subscribe(),
+                    options.clone(),
                 );
             }
 
-            <span class="ident">SrvPollingMonitor::start</span>(<span class="ident">updater</span>.<span class="ident">clone</span>(), <span class="ident">watcher</span>.<span class="ident">clone</span>(), <span class="ident">options</span>.<span class="ident">clone</span>());
+            SrvPollingMonitor::start(updater.clone(), watcher.clone(), options.clone());
         }
 
-        <span class="kw">let</span> <span class="ident">worker</span> <span class="op">=</span> <span class="ident">TopologyWorker</span> {
-            <span class="ident">id</span>: <span class="ident">ObjectId::new</span>(),
-            <span class="ident">update_receiver</span>,
-            <span class="ident">publisher</span>,
-            <span class="ident">options</span>,
-            <span class="ident">http_client</span>,
-            <span class="ident">topology_watcher</span>: <span class="ident">watcher</span>.<span class="ident">clone</span>(),
-            <span class="ident">topology_updater</span>: <span class="ident">updater</span>.<span class="ident">clone</span>(),
-            <span class="ident">update_requester</span>: <span class="ident">update_requester</span>.<span class="ident">clone</span>(),
-            <span class="ident">handle_listener</span>,
-            <span class="ident">event_emitter</span>,
+        <span class="kw">let </span>worker = TopologyWorker {
+            id: ObjectId::new(),
+            update_receiver,
+            publisher,
+            options,
+            http_client,
+            topology_watcher: watcher.clone(),
+            topology_updater: updater.clone(),
+            update_requester: update_requester.clone(),
+            handle_listener,
+            event_emitter,
         };
 
-        <span class="comment">// Emit events for the initialization of the topology and the seed list.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">emitter</span>) <span class="op">=</span> <span class="ident">worker</span>.<span class="ident">event_emitter</span> {
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">SdamEvent::TopologyOpening</span>(<span class="ident">TopologyOpeningEvent</span> {
-                <span class="ident">topology_id</span>: <span class="ident">worker</span>.<span class="ident">id</span>,
+        <span class="comment">// Emit events for the initialization of the topology and the seed list.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>emitter) = worker.event_emitter {
+            <span class="kw">let </span>event = SdamEvent::TopologyOpening(TopologyOpeningEvent {
+                topology_id: worker.id,
             });
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">event</span>);
+            <span class="kw">let _ </span>= emitter.emit(event);
 
-            <span class="kw">let</span> <span class="ident">new_description</span> <span class="op">=</span> <span class="ident">worker</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">description</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">TopologyDescriptionChangedEvent</span> {
-                <span class="ident">topology_id</span>: <span class="ident">worker</span>.<span class="ident">id</span>,
-                <span class="ident">previous_description</span>: <span class="ident">TopologyDescription::new_empty</span>().<span class="ident">into</span>(),
-                <span class="ident">new_description</span>,
+            <span class="kw">let </span>new_description = worker.borrow_latest_state().description.clone().into();
+            <span class="kw">let </span>event = TopologyDescriptionChangedEvent {
+                topology_id: worker.id,
+                previous_description: TopologyDescription::new_empty().into(),
+                new_description,
             };
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">SdamEvent::TopologyDescriptionChanged</span>(<span class="ident">Box::new</span>(<span class="ident">event</span>)));
+            <span class="kw">let _ </span>= emitter.emit(SdamEvent::TopologyDescriptionChanged(Box::new(event)));
 
-            <span class="kw">for</span> <span class="ident">server_address</span> <span class="kw">in</span> <span class="ident">worker</span>.<span class="ident">options</span>.<span class="ident">hosts</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">SdamEvent::ServerOpening</span>(<span class="ident">ServerOpeningEvent</span> {
-                    <span class="ident">topology_id</span>: <span class="ident">worker</span>.<span class="ident">id</span>,
-                    <span class="ident">address</span>: <span class="ident">server_address</span>.<span class="ident">clone</span>(),
+            <span class="kw">for </span>server_address <span class="kw">in </span>worker.options.hosts.iter() {
+                <span class="kw">let </span>event = SdamEvent::ServerOpening(ServerOpeningEvent {
+                    topology_id: worker.id,
+                    address: server_address.clone(),
                 });
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">event</span>);
+                <span class="kw">let _ </span>= emitter.emit(event);
             }
         }
 
-        <span class="comment">// Load-balanced clients don&#39;t have a heartbeat monitor, so we synthesize</span>
-        <span class="comment">// updating the server to `ServerType::LoadBalancer` with an RTT of 0 so it&#39;ll</span>
-        <span class="comment">// be selected.</span>
-        <span class="kw">if</span> <span class="ident">is_load_balanced</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_state</span> <span class="op">=</span> <span class="ident">worker</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">old_description</span> <span class="op">=</span> <span class="ident">new_state</span>.<span class="ident">description</span>.<span class="ident">clone</span>();
+        <span class="comment">// Load-balanced clients don&#39;t have a heartbeat monitor, so we synthesize
+        // updating the server to `ServerType::LoadBalancer` with an RTT of 0 so it&#39;ll
+        // be selected.
+        </span><span class="kw">if </span>is_load_balanced {
+            <span class="kw">let </span><span class="kw-2">mut </span>new_state = worker.borrow_latest_state().clone();
+            <span class="kw">let </span>old_description = new_state.description.clone();
 
-            <span class="kw">for</span> <span class="ident">server_address</span> <span class="kw">in</span> <span class="ident">new_state</span>.<span class="ident">servers</span>.<span class="ident">keys</span>() {
-                <span class="kw">let</span> <span class="ident">new_desc</span> <span class="op">=</span> <span class="ident">ServerDescription</span> {
-                    <span class="ident">server_type</span>: <span class="ident">ServerType::LoadBalancer</span>,
-                    <span class="ident">average_round_trip_time</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_nanos</span>(<span class="number">0</span>)),
-                    ..<span class="ident">ServerDescription::new</span>(<span class="ident">server_address</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>)
+            <span class="kw">for </span>server_address <span class="kw">in </span>new_state.servers.keys() {
+                <span class="kw">let </span>new_desc = ServerDescription {
+                    server_type: ServerType::LoadBalancer,
+                    average_round_trip_time: <span class="prelude-val">Some</span>(Duration::from_nanos(<span class="number">0</span>)),
+                    ..ServerDescription::new(server_address.clone(), <span class="prelude-val">None</span>)
                 };
-                <span class="ident">new_state</span>
-                    .<span class="ident">description</span>
-                    .<span class="ident">update</span>(<span class="ident">new_desc</span>)
-                    .<span class="ident">map_err</span>(<span class="ident">Error::internal</span>)<span class="question-mark">?</span>;
+                new_state
+                    .description
+                    .update(new_desc)
+                    .map_err(Error::internal)<span class="question-mark">?</span>;
             }
 
-            <span class="ident">worker</span>.<span class="ident">process_topology_diff</span>(<span class="kw-2">&amp;</span><span class="ident">old_description</span>, <span class="kw-2">&amp;</span><span class="ident">new_state</span>.<span class="ident">description</span>);
-            <span class="ident">worker</span>.<span class="ident">publisher</span>.<span class="ident">publish_new_state</span>(<span class="ident">new_state</span>);
+            worker.process_topology_diff(<span class="kw-2">&amp;</span>old_description, <span class="kw-2">&amp;</span>new_state.description);
+            worker.publisher.publish_new_state(new_state);
         }
 
-        <span class="ident">worker</span>.<span class="ident">start</span>();
+        worker.start();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Topology</span> {
-            <span class="ident">watcher</span>,
-            <span class="ident">updater</span>,
-            <span class="ident">check_requester</span>: <span class="ident">update_requester</span>,
-            <span class="ident">_worker_handle</span>: <span class="ident">worker_handle</span>,
+        <span class="prelude-val">Ok</span>(Topology {
+            watcher,
+            updater,
+            check_requester: update_requester,
+            _worker_handle: worker_handle,
         })
     }
 
-    <span class="doccomment">/// Begin watching for changes in the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyWatcher</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">clone</span>();
-        <span class="comment">// mark the latest topology as seen</span>
-        <span class="ident">watcher</span>.<span class="ident">receiver</span>.<span class="ident">borrow_and_update</span>();
-        <span class="ident">watcher</span>
+    <span class="doccomment">/// Begin watching for changes in the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyWatcher {
+        <span class="kw">let </span><span class="kw-2">mut </span>watcher = <span class="self">self</span>.watcher.clone();
+        <span class="comment">// mark the latest topology as seen
+        </span>watcher.receiver.borrow_and_update();
+        watcher
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clone_updater</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyUpdater</span> {
-        <span class="self">self</span>.<span class="ident">updater</span>.<span class="ident">clone</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clone_updater(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyUpdater {
+        <span class="self">self</span>.updater.clone()
     }
 
-    <span class="doccomment">/// Request that all server monitors perform an immediate check of the topology.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">request_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">check_requester</span>.<span class="ident">request</span>()
+    <span class="doccomment">/// Request that all server monitors perform an immediate check of the topology.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>request_update(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.check_requester.request()
     }
 
-    <span class="doccomment">/// Handle an error that occurred during operation execution.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_application_error</span>(
+    <span class="doccomment">/// Handle an error that occurred during operation execution.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handle_application_error(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
-        <span class="ident">phase</span>: <span class="ident">HandshakePhase</span>,
+        address: ServerAddress,
+        error: Error,
+        phase: HandshakePhase,
     ) {
-        <span class="self">self</span>.<span class="ident">updater</span>
-            .<span class="ident">handle_application_error</span>(<span class="ident">address</span>, <span class="ident">error</span>, <span class="ident">phase</span>)
+        <span class="self">self</span>.updater
+            .handle_application_error(address, error, phase)
             .<span class="kw">await</span>;
     }
 
-    <span class="doccomment">/// Get the topology&#39;s currently highest seen cluster time.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">cluster_time</span>()
-            .<span class="ident">cloned</span>()
+    <span class="doccomment">/// Get the topology&#39;s currently highest seen cluster time.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ClusterTime&gt; {
+        <span class="self">self</span>.watcher
+            .peek_latest()
+            .description
+            .cluster_time()
+            .cloned()
     }
 
-    <span class="doccomment">/// Update the topology&#39;s highest seen cluster time.</span>
-    <span class="doccomment">/// If the provided cluster time is not higher than the topology&#39;s currently highest seen</span>
-    <span class="doccomment">/// cluster time, this method has no effect.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">to</span>: <span class="ident">ClusterTime</span>) {
-        <span class="self">self</span>.<span class="ident">updater</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">to</span>).<span class="kw">await</span>;
+    <span class="doccomment">/// Update the topology&#39;s highest seen cluster time.
+    /// If the provided cluster time is not higher than the topology&#39;s currently highest seen
+    /// cluster time, this method has no effect.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>advance_cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>, to: ClusterTime) {
+        <span class="self">self</span>.updater.advance_cluster_time(to).<span class="kw">await</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyType</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">peek_latest</span>().<span class="ident">description</span>.<span class="ident">topology_type</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>topology_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyType {
+        <span class="self">self</span>.watcher.peek_latest().description.topology_type
     }
 
-    <span class="doccomment">/// Gets the latest information on whether sessions are supported or not.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SessionSupportStatus</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">session_support_status</span>()
+    <span class="doccomment">/// Gets the latest information on whether sessions are supported or not.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>session_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SessionSupportStatus {
+        <span class="self">self</span>.watcher
+            .peek_latest()
+            .description
+            .session_support_status()
     }
 
-    <span class="doccomment">/// Gets the latest information on whether transactions are support or not.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TransactionSupportStatus</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">transaction_support_status</span>()
+    <span class="doccomment">/// Gets the latest information on whether transactions are support or not.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>transaction_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TransactionSupportStatus {
+        <span class="self">self</span>.watcher
+            .peek_latest()
+            .description
+            .transaction_support_status()
     }
 
-    <span class="doccomment">/// Updates the given `command` as needed based on the `criteria`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_command_with_read_pref</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Updates the given `command` as needed based on the `criteria`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_command_with_read_pref&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">server_address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
+        server_address: <span class="kw-2">&amp;</span>ServerAddress,
+        command: <span class="kw-2">&amp;mut </span>Command&lt;T&gt;,
+        criteria: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt;,
     ) {
-        <span class="self">self</span>.<span class="ident">watcher</span>
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">update_command_with_read_pref</span>(<span class="ident">server_address</span>, <span class="ident">command</span>, <span class="ident">criteria</span>)
+        <span class="self">self</span>.watcher
+            .peek_latest()
+            .description
+            .update_command_with_read_pref(server_address, command, criteria)
     }
 
-    <span class="doccomment">/// Creates a new server selection timeout error message given the `criteria`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_selection_timeout_error_message</span>(
+    <span class="doccomment">/// Creates a new server selection timeout error message given the `criteria`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_selection_timeout_error_message(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">criteria</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">server_selection_timeout_error_message</span>(<span class="ident">criteria</span>)
+        criteria: <span class="kw-2">&amp;</span>SelectionCriteria,
+    ) -&gt; String {
+        <span class="self">self</span>.watcher
+            .peek_latest()
+            .description
+            .server_selection_timeout_error_message(criteria)
     }
 
-    <span class="doccomment">/// Gets the addresses of the servers in the cluster.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">peek_latest</span>().<span class="ident">servers</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>()
+    <span class="doccomment">/// Gets the addresses of the servers in the cluster.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_addresses(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashSet&lt;ServerAddress&gt; {
+        <span class="self">self</span>.watcher.peek_latest().servers.keys().cloned().collect()
     }
 
-    <span class="doccomment">/// Gets the addresses of the servers in the cluster.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">peek_latest</span>().<span class="ident">servers</span>.<span class="ident">clone</span>()
+    <span class="doccomment">/// Gets the addresses of the servers in the cluster.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>servers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;ServerAddress, Arc&lt;Server&gt;&gt; {
+        <span class="self">self</span>.watcher.peek_latest().servers.clone()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyDescription</span> {
-        <span class="self">self</span>.<span class="ident">watcher</span>.<span class="ident">peek_latest</span>().<span class="ident">description</span>.<span class="ident">clone</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyDescription {
+        <span class="self">self</span>.watcher.peek_latest().description.clone()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_workers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">updater</span>.<span class="ident">sync_workers</span>().<span class="kw">await</span>;
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>sync_workers(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.updater.sync_workers().<span class="kw">await</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyState</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">description</span>: <span class="ident">TopologyDescription</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">servers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ServerAddress</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyState {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) description: TopologyDescription,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) servers: HashMap&lt;ServerAddress, Arc&lt;Server&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">UpdateMessage</span> {
-    <span class="ident">AdvanceClusterTime</span>(<span class="ident">ClusterTime</span>),
-    <span class="ident">ServerUpdate</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span>),
-    <span class="ident">SyncHosts</span>(<span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>),
-    <span class="ident">MonitorError</span> {
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>UpdateMessage {
+    AdvanceClusterTime(ClusterTime),
+    ServerUpdate(Box&lt;ServerDescription&gt;),
+    SyncHosts(HashSet&lt;ServerAddress&gt;),
+    MonitorError {
+        address: ServerAddress,
+        error: Error,
     },
-    <span class="ident">ApplicationError</span> {
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
-        <span class="ident">phase</span>: <span class="ident">HandshakePhase</span>,
+    ApplicationError {
+        address: ServerAddress,
+        error: Error,
+        phase: HandshakePhase,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="ident">SyncWorkers</span>,
+    <span class="attribute">#[cfg(test)]
+    </span>SyncWorkers,
 }
 
-<span class="kw">struct</span> <span class="ident">TopologyWorker</span> {
-    <span class="ident">id</span>: <span class="ident">ObjectId</span>,
-    <span class="ident">update_receiver</span>: <span class="ident">TopologyUpdateReceiver</span>,
-    <span class="ident">handle_listener</span>: <span class="ident">WorkerHandleListener</span>,
-    <span class="ident">publisher</span>: <span class="ident">TopologyPublisher</span>,
-    <span class="ident">event_emitter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SdamEventEmitter</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">ClientOptions</span>,
-    <span class="ident">http_client</span>: <span class="ident">HttpClient</span>,
+<span class="kw">struct </span>TopologyWorker {
+    id: ObjectId,
+    update_receiver: TopologyUpdateReceiver,
+    handle_listener: WorkerHandleListener,
+    publisher: TopologyPublisher,
+    event_emitter: <span class="prelude-ty">Option</span>&lt;SdamEventEmitter&gt;,
+    options: ClientOptions,
+    http_client: HttpClient,
 
-    <span class="comment">// the following fields stored here for creating new server monitors</span>
-    <span class="ident">topology_watcher</span>: <span class="ident">TopologyWatcher</span>,
-    <span class="ident">topology_updater</span>: <span class="ident">TopologyUpdater</span>,
-    <span class="ident">update_requester</span>: <span class="ident">TopologyCheckRequester</span>,
+    <span class="comment">// the following fields stored here for creating new server monitors
+    </span>topology_watcher: TopologyWatcher,
+    topology_updater: TopologyUpdater,
+    update_requester: TopologyCheckRequester,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyWorker</span> {
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">loop</span> {
-                <span class="macro">tokio::select!</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">update</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">update_receiver</span>.<span class="ident">recv</span>() =&gt; {
-                        <span class="kw">let</span> (<span class="ident">update</span>, <span class="ident">ack</span>) <span class="op">=</span> <span class="ident">update</span>.<span class="ident">into_parts</span>();
-                        <span class="kw">let</span> <span class="ident">changed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">update</span> {
-                            <span class="ident">UpdateMessage::AdvanceClusterTime</span>(<span class="ident">to</span>) =&gt; {
-                                <span class="self">self</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">to</span>);
-                                <span class="bool-val">true</span>
-                            }
-                            <span class="ident">UpdateMessage::SyncHosts</span>(<span class="ident">hosts</span>) =&gt; {
-                                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">clone</span>();
-                                <span class="self">self</span>.<span class="ident">sync_hosts</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>, <span class="ident">hosts</span>);
-                                <span class="self">self</span>.<span class="ident">publisher</span>.<span class="ident">publish_new_state</span>(<span class="ident">state</span>);
-                                <span class="bool-val">true</span>
-                            }
-                            <span class="ident">UpdateMessage::ServerUpdate</span>(<span class="ident">sd</span>) =&gt; <span class="self">self</span>.<span class="ident">update_server</span>(<span class="kw-2">*</span><span class="ident">sd</span>).<span class="kw">await</span>,
-                            <span class="ident">UpdateMessage::MonitorError</span> { <span class="ident">address</span>, <span class="ident">error</span> } =&gt; {
-                                <span class="self">self</span>.<span class="ident">handle_monitor_error</span>(<span class="ident">address</span>, <span class="ident">error</span>).<span class="kw">await</span>
-                            }
-                            <span class="ident">UpdateMessage::ApplicationError</span> {
-                                <span class="ident">address</span>,
-                                <span class="ident">error</span>,
-                                <span class="ident">phase</span>,
-                            } =&gt; <span class="self">self</span>.<span class="ident">handle_application_error</span>(<span class="ident">address</span>, <span class="ident">error</span>, <span class="ident">phase</span>).<span class="kw">await</span>,
-                            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-                            <span class="ident">UpdateMessage::SyncWorkers</span> =&gt; {
-                                <span class="kw">let</span> <span class="ident">rxen</span>: <span class="ident">FuturesUnordered</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-                                    .<span class="ident">borrow_latest_state</span>()
-                                    .<span class="ident">servers</span>
-                                    .<span class="ident">values</span>()
-                                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">pool</span>.<span class="ident">sync_worker</span>())
-                                    .<span class="ident">collect</span>();
-                                <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rxen</span>.<span class="ident">collect</span>().<span class="kw">await</span>;
-                                <span class="bool-val">false</span>
-                            }
+<span class="kw">impl </span>TopologyWorker {
+    <span class="kw">fn </span>start(<span class="kw-2">mut </span><span class="self">self</span>) {
+        runtime::execute(<span class="kw">async move </span>{
+            <span class="kw">loop </span>{
+                <span class="macro">tokio::select! </span>{
+                    <span class="prelude-val">Some</span>(update) = <span class="self">self</span>.update_receiver.recv() =&gt; {
+                        <span class="kw">let </span>(update, ack) = update.into_parts();
+                        <span class="kw">let </span>changed = <span class="kw">match </span>update {
+                            UpdateMessage::AdvanceClusterTime(to) =&gt; {
+                                <span class="self">self</span>.advance_cluster_time(to);
+                                <span class="bool-val">true
+                            </span>}
+                            UpdateMessage::SyncHosts(hosts) =&gt; {
+                                <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.borrow_latest_state().clone();
+                                <span class="self">self</span>.sync_hosts(<span class="kw-2">&amp;mut </span>state, hosts);
+                                <span class="self">self</span>.publisher.publish_new_state(state);
+                                <span class="bool-val">true
+                            </span>}
+                            UpdateMessage::ServerUpdate(sd) =&gt; <span class="self">self</span>.update_server(<span class="kw-2">*</span>sd).<span class="kw">await</span>,
+                            UpdateMessage::MonitorError { address, error } =&gt; {
+                                <span class="self">self</span>.handle_monitor_error(address, error).<span class="kw">await
+                            </span>}
+                            UpdateMessage::ApplicationError {
+                                address,
+                                error,
+                                phase,
+                            } =&gt; <span class="self">self</span>.handle_application_error(address, error, phase).<span class="kw">await</span>,
+                            <span class="attribute">#[cfg(test)]
+                            </span>UpdateMessage::SyncWorkers =&gt; {
+                                <span class="kw">let </span>rxen: FuturesUnordered&lt;<span class="kw">_</span>&gt; = <span class="self">self
+                                    </span>.borrow_latest_state()
+                                    .servers
+                                    .values()
+                                    .map(|v| v.pool.sync_worker())
+                                    .collect();
+                                <span class="kw">let _</span>: Vec&lt;<span class="kw">_</span>&gt; = rxen.collect().<span class="kw">await</span>;
+                                <span class="bool-val">false
+                            </span>}
                         };
-                        <span class="ident">ack</span>.<span class="ident">acknowledge</span>(<span class="ident">changed</span>);
+                        ack.acknowledge(changed);
                     },
-                    <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle_listener</span>.<span class="ident">wait_for_all_handle_drops</span>() =&gt; {
-                        <span class="kw">break</span>
-                    }
+                    <span class="kw">_ </span>= <span class="self">self</span>.handle_listener.wait_for_all_handle_drops() =&gt; {
+                        <span class="kw">break
+                    </span>}
                 }
             }
 
-            <span class="comment">// indicate to the topology watchers that the topology is no longer alive</span>
-            <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">publisher</span>);
+            <span class="comment">// indicate to the topology watchers that the topology is no longer alive
+            </span>drop(<span class="self">self</span>.publisher);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">emitter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_emitter</span> {
-                <span class="ident">emitter</span>
-                    .<span class="ident">emit</span>(<span class="ident">SdamEvent::TopologyClosed</span>(<span class="ident">TopologyClosedEvent</span> {
-                        <span class="ident">topology_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(emitter) = <span class="self">self</span>.event_emitter {
+                emitter
+                    .emit(SdamEvent::TopologyClosed(TopologyClosedEvent {
+                        topology_id: <span class="self">self</span>.id,
                     }))
                     .<span class="kw">await</span>;
             }
         });
     }
 
-    <span class="doccomment">/// Get a reference to the latest topology state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this holds a read lock, so broadcasting a new state while an</span>
-    <span class="doccomment">/// outstanding reference to the `TopologyState` is held will deadlock.</span>
-    <span class="kw">fn</span> <span class="ident">borrow_latest_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">TopologyState</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">topology_watcher</span>.<span class="ident">peek_latest</span>()
+    <span class="doccomment">/// Get a reference to the latest topology state.
+    ///
+    /// Note that this holds a read lock, so broadcasting a new state while an
+    /// outstanding reference to the `TopologyState` is held will deadlock.
+    </span><span class="kw">fn </span>borrow_latest_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ref&lt;TopologyState&gt; {
+        <span class="self">self</span>.topology_watcher.peek_latest()
     }
 
-    <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">to</span>: <span class="ident">ClusterTime</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">latest_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">clone</span>();
-        <span class="ident">latest_state</span>.<span class="ident">description</span>.<span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;</span><span class="ident">to</span>);
-        <span class="self">self</span>.<span class="ident">publisher</span>.<span class="ident">publish_new_state</span>(<span class="ident">latest_state</span>);
+    <span class="kw">fn </span>advance_cluster_time(<span class="kw-2">&amp;mut </span><span class="self">self</span>, to: ClusterTime) {
+        <span class="kw">let </span><span class="kw-2">mut </span>latest_state = <span class="self">self</span>.borrow_latest_state().clone();
+        latest_state.description.advance_cluster_time(<span class="kw-2">&amp;</span>to);
+        <span class="self">self</span>.publisher.publish_new_state(latest_state);
     }
 
-    <span class="kw">fn</span> <span class="ident">sync_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TopologyState</span>, <span class="ident">hosts</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>) {
-        <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">host</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">hosts</span>.<span class="ident">contains</span>(<span class="ident">host</span>));
-        <span class="ident">state</span>.<span class="ident">description</span>.<span class="ident">sync_hosts</span>(<span class="kw-2">&amp;</span><span class="ident">hosts</span>);
+    <span class="kw">fn </span>sync_hosts(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>TopologyState, hosts: HashSet&lt;ServerAddress&gt;) {
+        state.servers.retain(|host, <span class="kw">_</span>| hosts.contains(host));
+        state.description.sync_hosts(<span class="kw-2">&amp;</span>hosts);
 
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">hosts</span> {
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>) {
+        <span class="kw">for </span>address <span class="kw">in </span>hosts {
+            <span class="kw">if </span>state.servers.contains_key(<span class="kw-2">&amp;</span>address) {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server::new</span>(
-                <span class="ident">address</span>.<span class="ident">clone</span>(),
-                <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">clone</span>(),
-                <span class="self">self</span>.<span class="ident">http_client</span>.<span class="ident">clone</span>(),
-                <span class="self">self</span>.<span class="ident">topology_updater</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>server = Server::new(
+                address.clone(),
+                <span class="self">self</span>.options.clone(),
+                <span class="self">self</span>.http_client.clone(),
+                <span class="self">self</span>.topology_updater.clone(),
             );
-            <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">insert</span>(<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">server</span>);
+            state.servers.insert(address.clone(), server);
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="kw">let</span> <span class="ident">disable_monitoring_threads</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">options</span>
-                .<span class="ident">test_options</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">to</span>.<span class="ident">disable_monitoring_threads</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-            <span class="kw">let</span> <span class="ident">disable_monitoring_threads</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="attribute">#[cfg(test)]
+            </span><span class="kw">let </span>disable_monitoring_threads = <span class="self">self
+                </span>.options
+                .test_options
+                .as_ref()
+                .map(|to| to.disable_monitoring_threads)
+                .unwrap_or(<span class="bool-val">false</span>);
+            <span class="attribute">#[cfg(not(test))]
+            </span><span class="kw">let </span>disable_monitoring_threads = <span class="bool-val">false</span>;
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">disable_monitoring_threads</span> {
-                <span class="ident">Monitor::start</span>(
-                    <span class="ident">address</span>,
-                    <span class="self">self</span>.<span class="ident">topology_updater</span>.<span class="ident">clone</span>(),
-                    <span class="self">self</span>.<span class="ident">topology_watcher</span>.<span class="ident">clone</span>(),
-                    <span class="self">self</span>.<span class="ident">event_emitter</span>.<span class="ident">clone</span>(),
-                    <span class="self">self</span>.<span class="ident">update_requester</span>.<span class="ident">subscribe</span>(),
-                    <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">clone</span>(),
+            <span class="kw">if </span>!disable_monitoring_threads {
+                Monitor::start(
+                    address,
+                    <span class="self">self</span>.topology_updater.clone(),
+                    <span class="self">self</span>.topology_watcher.clone(),
+                    <span class="self">self</span>.event_emitter.clone(),
+                    <span class="self">self</span>.update_requester.subscribe(),
+                    <span class="self">self</span>.options.clone(),
                 );
             }
         }
     }
 
-    <span class="doccomment">/// Update the topology using the provided `ServerDescription`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_server</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">sd</span>: <span class="ident">ServerDescription</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">latest_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">old_description</span> <span class="op">=</span> <span class="ident">latest_state</span>.<span class="ident">description</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// Update the topology using the provided `ServerDescription`.
+    </span><span class="kw">async fn </span>update_server(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>sd: ServerDescription) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>latest_state = <span class="self">self</span>.borrow_latest_state().clone();
+        <span class="kw">let </span>old_description = latest_state.description.clone();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expected_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>.<span class="ident">repl_set_name</span> {
-            <span class="kw">if</span> <span class="ident">sd</span>.<span class="ident">is_available</span>() {
-                <span class="kw">let</span> <span class="ident">got_name</span> <span class="op">=</span> <span class="ident">sd</span>.<span class="ident">set_name</span>();
-                <span class="kw">if</span> <span class="ident">latest_state</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::Single</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">got_name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">opt</span><span class="op">|</span> <span class="ident">opt</span>.<span class="ident">as_ref</span>()) <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">expected_name</span>))
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(expected_name) = <span class="kw-2">&amp;</span><span class="self">self</span>.options.repl_set_name {
+            <span class="kw">if </span>sd.is_available() {
+                <span class="kw">let </span>got_name = sd.set_name();
+                <span class="kw">if </span>latest_state.description.topology_type() == TopologyType::Single
+                    &amp;&amp; got_name.as_ref().map(|opt| opt.as_ref()) != <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(expected_name))
                 {
-                    <span class="kw">let</span> <span class="ident">got_display</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">got_name</span> {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">s</span>),
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="string">&quot;&lt;none&gt;&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="prelude-val">Err</span>(<span class="ident">s</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&lt;error: {}&gt;&quot;</span>, <span class="ident">s</span>),
+                    <span class="kw">let </span>got_display = <span class="kw">match </span>got_name {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, s),
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) =&gt; <span class="string">&quot;&lt;none&gt;&quot;</span>.to_string(),
+                        <span class="prelude-val">Err</span>(s) =&gt; <span class="macro">format!</span>(<span class="string">&quot;&lt;error: {}&gt;&quot;</span>, s),
                     };
-                    <span class="comment">// Mark server as unknown.</span>
-                    <span class="ident">sd</span> <span class="op">=</span> <span class="ident">ServerDescription::new</span>(
-                        <span class="ident">sd</span>.<span class="ident">address</span>,
+                    <span class="comment">// Mark server as unknown.
+                    </span>sd = ServerDescription::new(
+                        sd.address,
                         <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="macro">format!</span>(
                             <span class="string">&quot;Connection string replicaSet name {:?} does not match actual name {}&quot;</span>,
-                            <span class="ident">expected_name</span>, <span class="ident">got_display</span>,
+                            expected_name, got_display,
                         ))),
                     );
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="ident">sd</span>.<span class="ident">server_type</span>;
-        <span class="kw">let</span> <span class="ident">server_address</span> <span class="op">=</span> <span class="ident">sd</span>.<span class="ident">address</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>server_type = sd.server_type;
+        <span class="kw">let </span>server_address = sd.address.clone();
 
-        <span class="comment">// TODO: RUST-1270 change this method to not return a result.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">latest_state</span>.<span class="ident">description</span>.<span class="ident">update</span>(<span class="ident">sd</span>);
+        <span class="comment">// TODO: RUST-1270 change this method to not return a result.
+        </span><span class="kw">let _ </span>= latest_state.description.update(sd);
 
-        <span class="kw">let</span> <span class="ident">hosts</span> <span class="op">=</span> <span class="ident">latest_state</span>
-            .<span class="ident">description</span>
-            .<span class="ident">server_addresses</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">collect</span>();
-        <span class="self">self</span>.<span class="ident">sync_hosts</span>(<span class="kw-2">&amp;mut</span> <span class="ident">latest_state</span>, <span class="ident">hosts</span>);
+        <span class="kw">let </span>hosts = latest_state
+            .description
+            .server_addresses()
+            .cloned()
+            .collect();
+        <span class="self">self</span>.sync_hosts(<span class="kw-2">&amp;mut </span>latest_state, hosts);
 
-        <span class="kw">let</span> <span class="ident">topology_changed</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">process_topology_diff</span>(<span class="kw-2">&amp;</span><span class="ident">old_description</span>, <span class="kw-2">&amp;</span><span class="ident">latest_state</span>.<span class="ident">description</span>);
+        <span class="kw">let </span>topology_changed =
+            <span class="self">self</span>.process_topology_diff(<span class="kw-2">&amp;</span>old_description, <span class="kw-2">&amp;</span>latest_state.description);
 
-        <span class="kw">if</span> <span class="ident">topology_changed</span>
-            <span class="op">&amp;&amp;</span> (<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>()
-                <span class="op">|</span><span class="op">|</span> (<span class="ident">server_type</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ServerType::Unknown</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">latest_state</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::Single</span>))
+        <span class="kw">if </span>topology_changed
+            &amp;&amp; (server_type.is_data_bearing()
+                || (server_type != ServerType::Unknown
+                    &amp;&amp; latest_state.description.topology_type() == TopologyType::Single))
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">latest_state</span>.<span class="ident">servers</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">server_address</span>) {
-                <span class="ident">s</span>.<span class="ident">pool</span>.<span class="ident">mark_as_ready</span>().<span class="kw">await</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = latest_state.servers.get(<span class="kw-2">&amp;</span>server_address) {
+                s.pool.mark_as_ready().<span class="kw">await</span>;
             }
         }
 
-        <span class="self">self</span>.<span class="ident">publisher</span>.<span class="ident">publish_new_state</span>(<span class="ident">latest_state</span>);
+        <span class="self">self</span>.publisher.publish_new_state(latest_state);
 
-        <span class="ident">topology_changed</span>
+        topology_changed
     }
 
-    <span class="doccomment">/// Emit the appropriate SDAM monitoring events given the changes to the</span>
-    <span class="doccomment">/// topology as the result of an update, if any.</span>
-    <span class="kw">fn</span> <span class="ident">process_topology_diff</span>(
+    <span class="doccomment">/// Emit the appropriate SDAM monitoring events given the changes to the
+    /// topology as the result of an update, if any.
+    </span><span class="kw">fn </span>process_topology_diff(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">old_description</span>: <span class="kw-2">&amp;</span><span class="ident">TopologyDescription</span>,
-        <span class="ident">new_description</span>: <span class="kw-2">&amp;</span><span class="ident">TopologyDescription</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">old_description</span>.<span class="ident">diff</span>(<span class="ident">new_description</span>);
-        <span class="kw">let</span> <span class="ident">changed</span> <span class="op">=</span> <span class="ident">diff</span>.<span class="ident">is_some</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">emitter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_emitter</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">diff</span>) <span class="op">=</span> <span class="ident">diff</span> {
-                <span class="kw">for</span> (<span class="ident">address</span>, (<span class="ident">previous_description</span>, <span class="ident">new_description</span>)) <span class="kw">in</span> <span class="ident">diff</span>.<span class="ident">changed_servers</span> {
-                    <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ServerDescriptionChangedEvent</span> {
-                        <span class="ident">address</span>: <span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">topology_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-                        <span class="ident">previous_description</span>: <span class="ident">ServerInfo::new_owned</span>(<span class="ident">previous_description</span>.<span class="ident">clone</span>()),
-                        <span class="ident">new_description</span>: <span class="ident">ServerInfo::new_owned</span>(<span class="ident">new_description</span>.<span class="ident">clone</span>()),
+        old_description: <span class="kw-2">&amp;</span>TopologyDescription,
+        new_description: <span class="kw-2">&amp;</span>TopologyDescription,
+    ) -&gt; bool {
+        <span class="kw">let </span>diff = old_description.diff(new_description);
+        <span class="kw">let </span>changed = diff.is_some();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>emitter) = <span class="self">self</span>.event_emitter {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(diff) = diff {
+                <span class="kw">for </span>(address, (previous_description, new_description)) <span class="kw">in </span>diff.changed_servers {
+                    <span class="kw">let </span>event = ServerDescriptionChangedEvent {
+                        address: address.clone(),
+                        topology_id: <span class="self">self</span>.id,
+                        previous_description: ServerInfo::new_owned(previous_description.clone()),
+                        new_description: ServerInfo::new_owned(new_description.clone()),
                     };
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">SdamEvent::ServerDescriptionChanged</span>(<span class="ident">Box::new</span>(<span class="ident">event</span>)));
+                    <span class="kw">let _ </span>= emitter.emit(SdamEvent::ServerDescriptionChanged(Box::new(event)));
                 }
 
-                <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">diff</span>.<span class="ident">removed_addresses</span> {
-                    <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">SdamEvent::ServerClosed</span>(<span class="ident">ServerClosedEvent</span> {
-                        <span class="ident">address</span>: <span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">topology_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+                <span class="kw">for </span>address <span class="kw">in </span>diff.removed_addresses {
+                    <span class="kw">let </span>event = SdamEvent::ServerClosed(ServerClosedEvent {
+                        address: address.clone(),
+                        topology_id: <span class="self">self</span>.id,
                     });
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">event</span>);
+                    <span class="kw">let _ </span>= emitter.emit(event);
                 }
 
-                <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">diff</span>.<span class="ident">added_addresses</span> {
-                    <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">ServerOpeningEvent</span> {
-                        <span class="ident">address</span>: <span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">topology_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
+                <span class="kw">for </span>address <span class="kw">in </span>diff.added_addresses {
+                    <span class="kw">let </span>event = ServerOpeningEvent {
+                        address: address.clone(),
+                        topology_id: <span class="self">self</span>.id,
                     };
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">SdamEvent::ServerOpening</span>(<span class="ident">event</span>));
+                    <span class="kw">let _ </span>= emitter.emit(SdamEvent::ServerOpening(event));
                 }
 
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">TopologyDescriptionChangedEvent</span> {
-                    <span class="ident">topology_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
-                    <span class="ident">previous_description</span>: <span class="ident">old_description</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
-                    <span class="ident">new_description</span>: <span class="ident">new_description</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
+                <span class="kw">let </span>event = TopologyDescriptionChangedEvent {
+                    topology_id: <span class="self">self</span>.id,
+                    previous_description: old_description.clone().into(),
+                    new_description: new_description.clone().into(),
                 };
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">SdamEvent::TopologyDescriptionChanged</span>(<span class="ident">Box::new</span>(<span class="ident">event</span>)));
+                <span class="kw">let _ </span>= emitter.emit(SdamEvent::TopologyDescriptionChanged(Box::new(event)));
             }
         }
-        <span class="ident">changed</span>
+        changed
     }
 
-    <span class="doccomment">/// Mark the server at the given address as Unknown using the provided error as the cause.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_server_as_unknown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">address</span>: <span class="ident">ServerAddress</span>, <span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">ServerDescription::new</span>(<span class="ident">address</span>, <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">to_string</span>())));
-        <span class="self">self</span>.<span class="ident">update_server</span>(<span class="ident">description</span>).<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Mark the server at the given address as Unknown using the provided error as the cause.
+    </span><span class="kw">async fn </span>mark_server_as_unknown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, address: ServerAddress, error: Error) -&gt; bool {
+        <span class="kw">let </span>description = ServerDescription::new(address, <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(error.to_string())));
+        <span class="self">self</span>.update_server(description).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Handle an error that occurred during opreration execution.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_application_error</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
-        <span class="ident">handshake</span>: <span class="ident">HandshakePhase</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+    <span class="doccomment">/// Handle an error that occurred during opreration execution.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handle_application_error(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        address: ServerAddress,
+        error: Error,
+        handshake: HandshakePhase,
+    ) -&gt; bool {
+        <span class="kw">let </span>server = <span class="kw">match </span><span class="self">self</span>.server(<span class="kw-2">&amp;</span>address) {
+            <span class="prelude-val">Some</span>(s) =&gt; s,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
         };
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">handshake</span> {
-            <span class="ident">HandshakePhase::PreHello</span> { <span class="ident">generation</span> } =&gt; {
-                <span class="kw">match</span> (<span class="ident">generation</span>, <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">generation</span>()) {
-                    (<span class="ident">PoolGeneration::Normal</span>(<span class="ident">hgen</span>), <span class="ident">PoolGeneration::Normal</span>(<span class="ident">sgen</span>)) =&gt; {
-                        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">hgen</span> <span class="op">&lt;</span> <span class="ident">sgen</span> {
-                            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">match </span><span class="kw-2">&amp;</span>handshake {
+            HandshakePhase::PreHello { generation } =&gt; {
+                <span class="kw">match </span>(generation, server.pool.generation()) {
+                    (PoolGeneration::Normal(hgen), PoolGeneration::Normal(sgen)) =&gt; {
+                        <span class="kw">if </span><span class="kw-2">*</span>hgen &lt; sgen {
+                            <span class="kw">return </span><span class="bool-val">false</span>;
                         }
                     }
-                    <span class="comment">// Pre-hello handshake errors are ignored in load-balanced mode.</span>
-                    (<span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>), <span class="ident">PoolGeneration::LoadBalanced</span>(<span class="kw">_</span>)) =&gt; {
-                        <span class="kw">return</span> <span class="bool-val">false</span>
-                    }
-                    <span class="kw">_</span> =&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
+                    <span class="comment">// Pre-hello handshake errors are ignored in load-balanced mode.
+                    </span>(PoolGeneration::LoadBalanced(<span class="kw">_</span>), PoolGeneration::LoadBalanced(<span class="kw">_</span>)) =&gt; {
+                        <span class="kw">return </span><span class="bool-val">false
+                    </span>}
+                    <span class="kw">_ </span>=&gt; <span class="macro">load_balanced_mode_mismatch!</span>(<span class="bool-val">false</span>),
                 }
             }
-            <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span> }
-            <span class="op">|</span> <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } =&gt; {
-                <span class="kw">if</span> <span class="ident">generation</span>.<span class="ident">is_stale</span>(<span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">generation</span>()) {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+            HandshakePhase::PostHello { generation }
+            | HandshakePhase::AfterCompletion { generation, .. } =&gt; {
+                <span class="kw">if </span>generation.is_stale(<span class="kw-2">&amp;</span>server.pool.generation()) {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">is_load_balanced</span> <span class="op">=</span>
-            <span class="self">self</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">description</span>.<span class="ident">topology_type</span>() <span class="op">==</span> <span class="ident">TopologyType::LoadBalanced</span>;
-        <span class="kw">if</span> <span class="ident">error</span>.<span class="ident">is_state_change_error</span>() {
-            <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span>
-                <span class="ident">is_load_balanced</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">mark_server_as_unknown</span>(<span class="ident">address</span>, <span class="ident">error</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
+        <span class="kw">let </span>is_load_balanced =
+            <span class="self">self</span>.borrow_latest_state().description.topology_type() == TopologyType::LoadBalanced;
+        <span class="kw">if </span>error.is_state_change_error() {
+            <span class="kw">let </span>updated =
+                is_load_balanced || <span class="self">self</span>.mark_server_as_unknown(address, error.clone()).<span class="kw">await</span>;
 
-            <span class="kw">if</span> <span class="ident">updated</span> <span class="op">&amp;&amp;</span> (<span class="ident">error</span>.<span class="ident">is_shutting_down</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">handshake</span>.<span class="ident">wire_version</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">&lt;</span> <span class="number">8</span>) {
-                <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">clear</span>(<span class="ident">error</span>, <span class="ident">handshake</span>.<span class="ident">service_id</span>()).<span class="kw">await</span>;
+            <span class="kw">if </span>updated &amp;&amp; (error.is_shutting_down() || handshake.wire_version().unwrap_or(<span class="number">0</span>) &lt; <span class="number">8</span>) {
+                server.pool.clear(error, handshake.service_id()).<span class="kw">await</span>;
             }
-            <span class="self">self</span>.<span class="ident">update_requester</span>.<span class="ident">request</span>();
+            <span class="self">self</span>.update_requester.request();
 
-            <span class="ident">updated</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">error</span>.<span class="ident">is_non_timeout_network_error</span>()
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">handshake</span>.<span class="ident">is_before_completion</span>()
-                <span class="op">&amp;&amp;</span> (<span class="ident">error</span>.<span class="ident">is_auth_error</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">error</span>.<span class="ident">is_network_timeout</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">error</span>.<span class="ident">is_command_error</span>()))
+            updated
+        } <span class="kw">else if </span>error.is_non_timeout_network_error()
+            || (handshake.is_before_completion()
+                &amp;&amp; (error.is_auth_error()
+                    || error.is_network_timeout()
+                    || error.is_command_error()))
         {
-            <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="ident">is_load_balanced</span>
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>
-                    .<span class="ident">mark_server_as_unknown</span>(<span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">error</span>.<span class="ident">clone</span>())
+            <span class="kw">let </span>updated = is_load_balanced
+                || <span class="self">self
+                    </span>.mark_server_as_unknown(server.address.clone(), error.clone())
                     .<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="ident">updated</span> {
-                <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">clear</span>(<span class="ident">error</span>, <span class="ident">handshake</span>.<span class="ident">service_id</span>()).<span class="kw">await</span>;
+            <span class="kw">if </span>updated {
+                server.pool.clear(error, handshake.service_id()).<span class="kw">await</span>;
             }
-            <span class="ident">updated</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+            updated
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Handle an error that occurred during a monitor check.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_monitor_error</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">server</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mark_server_as_unknown</span>(<span class="ident">address</span>, <span class="ident">error</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
-                <span class="kw">if</span> <span class="ident">updated</span> {
-                    <span class="comment">// The heartbeat monitor is disabled in load-balanced mode, so this will never</span>
-                    <span class="comment">// have a service id.</span>
-                    <span class="ident">server</span>.<span class="ident">pool</span>.<span class="ident">clear</span>(<span class="ident">error</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
+    <span class="doccomment">/// Handle an error that occurred during a monitor check.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handle_monitor_error(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        address: ServerAddress,
+        error: Error,
+    ) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.server(<span class="kw-2">&amp;</span>address) {
+            <span class="prelude-val">Some</span>(server) =&gt; {
+                <span class="kw">let </span>updated = <span class="self">self</span>.mark_server_as_unknown(address, error.clone()).<span class="kw">await</span>;
+                <span class="kw">if </span>updated {
+                    <span class="comment">// The heartbeat monitor is disabled in load-balanced mode, so this will never
+                    // have a service id.
+                    </span>server.pool.clear(error, <span class="prelude-val">None</span>).<span class="kw">await</span>;
                 }
-                <span class="ident">updated</span>
+                updated
             }
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Get the server at the provided address if present in the topology.</span>
-    <span class="kw">fn</span> <span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Server</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">borrow_latest_state</span>().<span class="ident">servers</span>.<span class="ident">get</span>(<span class="ident">address</span>).<span class="ident">cloned</span>()
+    <span class="doccomment">/// Get the server at the provided address if present in the topology.
+    </span><span class="kw">fn </span>server(<span class="kw-2">&amp;</span><span class="self">self</span>, address: <span class="kw-2">&amp;</span>ServerAddress) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;Server&gt;&gt; {
+        <span class="self">self</span>.borrow_latest_state().servers.get(address).cloned()
     }
 }
 
-<span class="doccomment">/// Struct used to update the topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyUpdater</span> {
-    <span class="ident">sender</span>: <span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">UpdateMessage</span>, <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct used to update the topology.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyUpdater {
+    sender: UnboundedSender&lt;AcknowledgedMessage&lt;UpdateMessage, bool&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyUpdater</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">channel</span>() -&gt; (<span class="ident">TopologyUpdater</span>, <span class="ident">TopologyUpdateReceiver</span>) {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">tokio::sync::mpsc::unbounded_channel</span>();
+<span class="kw">impl </span>TopologyUpdater {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>channel() -&gt; (TopologyUpdater, TopologyUpdateReceiver) {
+        <span class="kw">let </span>(tx, rx) = tokio::sync::mpsc::unbounded_channel();
 
-        <span class="kw">let</span> <span class="ident">updater</span> <span class="op">=</span> <span class="ident">TopologyUpdater</span> { <span class="ident">sender</span>: <span class="ident">tx</span> };
+        <span class="kw">let </span>updater = TopologyUpdater { sender: tx };
 
-        <span class="kw">let</span> <span class="ident">update_receiver</span> <span class="op">=</span> <span class="ident">TopologyUpdateReceiver</span> {
-            <span class="ident">update_receiver</span>: <span class="ident">rx</span>,
+        <span class="kw">let </span>update_receiver = TopologyUpdateReceiver {
+            update_receiver: rx,
         };
 
-        (<span class="ident">updater</span>, <span class="ident">update_receiver</span>)
+        (updater, update_receiver)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">update</span>: <span class="ident">UpdateMessage</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> (<span class="ident">message</span>, <span class="ident">receiver</span>) <span class="op">=</span> <span class="ident">AcknowledgedMessage::package</span>(<span class="ident">update</span>);
+    <span class="kw">async fn </span>send_message(<span class="kw-2">&amp;</span><span class="self">self</span>, update: UpdateMessage) -&gt; bool {
+        <span class="kw">let </span>(message, receiver) = AcknowledgedMessage::package(update);
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">message</span>) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">receiver</span>.<span class="ident">wait_for_acknowledgment</span>().<span class="kw">await</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        <span class="kw">match </span><span class="self">self</span>.sender.send(message) {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; receiver.wait_for_acknowledgment().<span class="kw">await</span>.unwrap_or(<span class="bool-val">false</span>),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Handle an error that occurred during a monitor check.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_monitor_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">ServerAddress</span>, <span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::MonitorError</span> { <span class="ident">address</span>, <span class="ident">error</span> })
-            .<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Handle an error that occurred during a monitor check.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handle_monitor_error(<span class="kw-2">&amp;</span><span class="self">self</span>, address: ServerAddress, error: Error) -&gt; bool {
+        <span class="self">self</span>.send_message(UpdateMessage::MonitorError { address, error })
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Handle an error that occurred during operation execution.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_application_error</span>(
+    <span class="doccomment">/// Handle an error that occurred during operation execution.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handle_application_error(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">error</span>: <span class="ident">Error</span>,
-        <span class="ident">phase</span>: <span class="ident">HandshakePhase</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::ApplicationError</span> {
-            <span class="ident">address</span>,
-            <span class="ident">error</span>,
-            <span class="ident">phase</span>,
+        address: ServerAddress,
+        error: Error,
+        phase: HandshakePhase,
+    ) -&gt; bool {
+        <span class="self">self</span>.send_message(UpdateMessage::ApplicationError {
+            address,
+            error,
+            phase,
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Update the topology using the provided server description, returning a bool</span>
-    <span class="doccomment">/// indicating whether the topology changed as a result of the update.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sd</span>: <span class="ident">ServerDescription</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::ServerUpdate</span>(<span class="ident">Box::new</span>(<span class="ident">sd</span>)))
-            .<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Update the topology using the provided server description, returning a bool
+    /// indicating whether the topology changed as a result of the update.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>update(<span class="kw-2">&amp;</span><span class="self">self</span>, sd: ServerDescription) -&gt; bool {
+        <span class="self">self</span>.send_message(UpdateMessage::ServerUpdate(Box::new(sd)))
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">to</span>: <span class="ident">ClusterTime</span>) {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::AdvanceClusterTime</span>(<span class="ident">to</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>advance_cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>, to: ClusterTime) {
+        <span class="self">self</span>.send_message(UpdateMessage::AdvanceClusterTime(to))
             .<span class="kw">await</span>;
     }
 
-    <span class="doccomment">/// Update the provided state to contain the given list of hosts, removing any</span>
-    <span class="doccomment">/// existing servers whose addresses aren&#39;t present in the list.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will start server monitors for the newly added servers.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hosts</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::SyncHosts</span>(<span class="ident">hosts</span>)).<span class="kw">await</span>;
+    <span class="doccomment">/// Update the provided state to contain the given list of hosts, removing any
+    /// existing servers whose addresses aren&#39;t present in the list.
+    ///
+    /// This will start server monitors for the newly added servers.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>sync_hosts(<span class="kw-2">&amp;</span><span class="self">self</span>, hosts: HashSet&lt;ServerAddress&gt;) {
+        <span class="self">self</span>.send_message(UpdateMessage::SyncHosts(hosts)).<span class="kw">await</span>;
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_workers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">send_message</span>(<span class="ident">UpdateMessage::SyncWorkers</span>).<span class="kw">await</span>;
-    }
-}
-
-<span class="doccomment">/// Receiver used to listen for updates to the topology.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyUpdateReceiver</span> {
-    <span class="ident">update_receiver</span>: <span class="ident">UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">UpdateMessage</span>, <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">TopologyUpdateReceiver</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">UpdateMessage</span>, <span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">update_receiver</span>.<span class="ident">recv</span>().<span class="kw">await</span>
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>sync_workers(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.send_message(UpdateMessage::SyncWorkers).<span class="kw">await</span>;
     }
 }
 
-<span class="doccomment">/// Struct used to get the latest topology state and monitor the topology for changes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyWatcher</span> {
-    <span class="ident">receiver</span>: <span class="ident">watch::Receiver</span><span class="op">&lt;</span><span class="ident">TopologyState</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Receiver used to listen for updates to the topology.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyUpdateReceiver {
+    update_receiver: UnboundedReceiver&lt;AcknowledgedMessage&lt;UpdateMessage, bool&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyWatcher</span> {
-    <span class="kw">fn</span> <span class="ident">channel</span>(<span class="ident">initial_state</span>: <span class="ident">TopologyState</span>) -&gt; (<span class="ident">TopologyWatcher</span>, <span class="ident">TopologyPublisher</span>) {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">watch::channel</span>(<span class="ident">initial_state</span>);
-        <span class="kw">let</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="ident">TopologyWatcher</span> { <span class="ident">receiver</span>: <span class="ident">rx</span> };
-        <span class="kw">let</span> <span class="ident">publisher</span> <span class="op">=</span> <span class="ident">TopologyPublisher</span> { <span class="ident">state_sender</span>: <span class="ident">tx</span> };
-        (<span class="ident">watcher</span>, <span class="ident">publisher</span>)
-    }
-
-    <span class="doccomment">/// Whether the topology is still active or if all `Client` instances using it have gone</span>
-    <span class="doccomment">/// out of scope.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_alive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">has_changed</span>().<span class="ident">is_ok</span>()
-    }
-
-    <span class="doccomment">/// Get a server description for the server at the provided address.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerDescription</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>
-            .<span class="ident">borrow</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">get_server_description</span>(<span class="ident">address</span>)
-            .<span class="ident">cloned</span>()
-    }
-
-    <span class="doccomment">/// Clone the latest state, marking it as seen.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">observe_latest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">TopologyState</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">borrow_and_update</span>().<span class="ident">clone</span>()
-    }
-
-    <span class="doccomment">/// Wait for a new state to be published or for the timeout to be reached, returning a bool</span>
-    <span class="doccomment">/// indicating whether an update was seen or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method marks the new topology state as seen.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">changed</span> <span class="op">=</span> <span class="ident">runtime::timeout</span>(<span class="ident">timeout</span>, <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">changed</span>())
-            .<span class="kw">await</span>
-            .<span class="ident">is_ok</span>();
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">borrow_and_update</span>();
-        <span class="ident">changed</span>
-    }
-
-    <span class="doccomment">/// Borrow the latest state. This does not mark it as seen.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: this method holds a read lock on the state, so it is best if the borrow is</span>
-    <span class="doccomment">/// short-lived. For longer use-cases, clone the `TopologyState` or use `observe_latest`</span>
-    <span class="doccomment">/// instead.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek_latest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="ident">TopologyState</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">borrow</span>()
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyType</span> {
-        <span class="self">self</span>.<span class="ident">peek_latest</span>().<span class="ident">description</span>.<span class="ident">topology_type</span>
-    }
+<span class="kw">impl </span>TopologyUpdateReceiver {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;AcknowledgedMessage&lt;UpdateMessage, bool&gt;&gt; {
+        <span class="self">self</span>.update_receiver.recv().<span class="kw">await
+    </span>}
 }
 
-<span class="doccomment">/// Struct used to broadcsat the latest view of the topology.</span>
-<span class="kw">struct</span> <span class="ident">TopologyPublisher</span> {
-    <span class="ident">state_sender</span>: <span class="ident">watch::Sender</span><span class="op">&lt;</span><span class="ident">TopologyState</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Struct used to get the latest topology state and monitor the topology for changes.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyWatcher {
+    receiver: watch::Receiver&lt;TopologyState&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyPublisher</span> {
-    <span class="doccomment">/// Publish a new state, notifying all the of the outstanding `TopologyWatcher`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that even if the provided state is equivalent to the previously broadcasted</span>
-    <span class="doccomment">/// `TopologyState`, the watchers will still be notified.</span>
-    <span class="kw">fn</span> <span class="ident">publish_new_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="ident">TopologyState</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state_sender</span>.<span class="ident">send</span>(<span class="ident">state</span>);
+<span class="kw">impl </span>TopologyWatcher {
+    <span class="kw">fn </span>channel(initial_state: TopologyState) -&gt; (TopologyWatcher, TopologyPublisher) {
+        <span class="kw">let </span>(tx, rx) = watch::channel(initial_state);
+        <span class="kw">let </span>watcher = TopologyWatcher { receiver: rx };
+        <span class="kw">let </span>publisher = TopologyPublisher { state_sender: tx };
+        (watcher, publisher)
+    }
+
+    <span class="doccomment">/// Whether the topology is still active or if all `Client` instances using it have gone
+    /// out of scope.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_alive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.receiver.has_changed().is_ok()
+    }
+
+    <span class="doccomment">/// Get a server description for the server at the provided address.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_description(<span class="kw-2">&amp;</span><span class="self">self</span>, address: <span class="kw-2">&amp;</span>ServerAddress) -&gt; <span class="prelude-ty">Option</span>&lt;ServerDescription&gt; {
+        <span class="self">self</span>.receiver
+            .borrow()
+            .description
+            .get_server_description(address)
+            .cloned()
+    }
+
+    <span class="doccomment">/// Clone the latest state, marking it as seen.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>observe_latest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; TopologyState {
+        <span class="self">self</span>.receiver.borrow_and_update().clone()
+    }
+
+    <span class="doccomment">/// Wait for a new state to be published or for the timeout to be reached, returning a bool
+    /// indicating whether an update was seen or not.
+    ///
+    /// This method marks the new topology state as seen.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>wait_for_update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: Duration) -&gt; bool {
+        <span class="kw">let </span>changed = runtime::timeout(timeout, <span class="self">self</span>.receiver.changed())
+            .<span class="kw">await
+            </span>.is_ok();
+        <span class="self">self</span>.receiver.borrow_and_update();
+        changed
+    }
+
+    <span class="doccomment">/// Borrow the latest state. This does not mark it as seen.
+    ///
+    /// Note: this method holds a read lock on the state, so it is best if the borrow is
+    /// short-lived. For longer use-cases, clone the `TopologyState` or use `observe_latest`
+    /// instead.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>peek_latest(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ref&lt;TopologyState&gt; {
+        <span class="self">self</span>.receiver.borrow()
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>topology_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyType {
+        <span class="self">self</span>.peek_latest().description.topology_type
     }
 }
 
-<span class="doccomment">/// Handle used to request that monitors perform immediate checks of the topology.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">TopologyCheckRequester</span> {
-    <span class="ident">sender</span>: <span class="ident">broadcast::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+<span class="doccomment">/// Struct used to broadcsat the latest view of the topology.
+</span><span class="kw">struct </span>TopologyPublisher {
+    state_sender: watch::Sender&lt;TopologyState&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyCheckRequester</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">TopologyCheckRequester</span> {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">_rx</span>) <span class="op">=</span> <span class="ident">broadcast::channel</span>(<span class="number">1</span>);
-        <span class="ident">TopologyCheckRequester</span> { <span class="ident">sender</span>: <span class="ident">tx</span> }
+<span class="kw">impl </span>TopologyPublisher {
+    <span class="doccomment">/// Publish a new state, notifying all the of the outstanding `TopologyWatcher`s.
+    ///
+    /// Note that even if the provided state is equivalent to the previously broadcasted
+    /// `TopologyState`, the watchers will still be notified.
+    </span><span class="kw">fn </span>publish_new_state(<span class="kw-2">&amp;</span><span class="self">self</span>, state: TopologyState) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.state_sender.send(state);
+    }
+}
+
+<span class="doccomment">/// Handle used to request that monitors perform immediate checks of the topology.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>TopologyCheckRequester {
+    sender: broadcast::Sender&lt;()&gt;,
+}
+
+<span class="kw">impl </span>TopologyCheckRequester {
+    <span class="kw">fn </span>new() -&gt; TopologyCheckRequester {
+        <span class="kw">let </span>(tx, _rx) = broadcast::channel(<span class="number">1</span>);
+        TopologyCheckRequester { sender: tx }
     }
 
-    <span class="doccomment">/// Request that all monitors perform immediate checks.</span>
-    <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(());
+    <span class="doccomment">/// Request that all monitors perform immediate checks.
+    </span><span class="kw">fn </span>request(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let _ </span>= <span class="self">self</span>.sender.send(());
     }
 
-    <span class="doccomment">/// Subscribe to check requests.</span>
-    <span class="kw">fn</span> <span class="ident">subscribe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyCheckRequestReceiver</span> {
-        <span class="ident">TopologyCheckRequestReceiver</span> {
-            <span class="ident">receiver</span>: <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">subscribe</span>(),
+    <span class="doccomment">/// Subscribe to check requests.
+    </span><span class="kw">fn </span>subscribe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyCheckRequestReceiver {
+        TopologyCheckRequestReceiver {
+            receiver: <span class="self">self</span>.sender.subscribe(),
         }
     }
 }
 
-<span class="doccomment">/// Receiver used to listen for check requests.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TopologyCheckRequestReceiver</span> {
-    <span class="ident">receiver</span>: <span class="ident">broadcast::Receiver</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+<span class="doccomment">/// Receiver used to listen for check requests.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TopologyCheckRequestReceiver {
+    receiver: broadcast::Receiver&lt;()&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyCheckRequestReceiver</span> {
-    <span class="doccomment">/// Wait until a check request is seen or the given duration has elapsed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wait_for_check_request</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) {
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">runtime::timeout</span>(<span class="ident">timeout</span>, <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">recv</span>()).<span class="kw">await</span>;
+<span class="kw">impl </span>TopologyCheckRequestReceiver {
+    <span class="doccomment">/// Wait until a check request is seen or the given duration has elapsed.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>wait_for_check_request(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timeout: Duration) {
+        <span class="kw">let _</span>: std::result::Result&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = runtime::timeout(timeout, <span class="self">self</span>.receiver.recv()).<span class="kw">await</span>;
     }
 
-    <span class="doccomment">/// Clear out prior check requests so that the next call to `wait_for_check_requests` doesn&#39;t</span>
-    <span class="doccomment">/// return immediately.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear_check_requests</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">try_recv</span>();
-    }
-}
-
-<span class="doccomment">/// Handle used to emit SDAM events.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the topology has been closed, events emitted via this handle will not be sent to</span>
-<span class="doccomment">/// handlers.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SdamEventEmitter</span> {
-    <span class="ident">sender</span>: <span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">AcknowledgedMessage</span><span class="op">&lt;</span><span class="ident">SdamEvent</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">SdamEventEmitter</span> {
-    <span class="doccomment">/// Emit an SDAM event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method returns a future that can be awaited until the event has been actually emitted.</span>
-    <span class="doccomment">/// It is not necessary to await this future.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SdamEvent</span><span class="op">&gt;</span>) -&gt; <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">msg</span>, <span class="ident">ack</span>) <span class="op">=</span> <span class="ident">AcknowledgedMessage::package</span>(<span class="ident">event</span>.<span class="ident">into</span>());
-        <span class="comment">// if event handler has stopped listening, no more events should be emitted,</span>
-        <span class="comment">// so we can safely ignore any send errors here.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">msg</span>);
-
-        <span class="ident">ack</span>.<span class="ident">wait_for_acknowledgment</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+    <span class="doccomment">/// Clear out prior check requests so that the next call to `wait_for_check_requests` doesn&#39;t
+    /// return immediately.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear_check_requests(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let _</span>: std::result::Result&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt; = <span class="self">self</span>.receiver.try_recv();
     }
 }
 
-<span class="doccomment">/// Enum describing a point in time during an operation&#39;s execution relative to when the MongoDB</span>
-<span class="doccomment">/// handshake for the conection being used in that operation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is used to determine the error handling semantics for certain error types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">HandshakePhase</span> {
-    <span class="doccomment">/// Describes a point that occurred before the initial hello completed (e.g. when opening the</span>
-    <span class="doccomment">/// socket).</span>
-    <span class="ident">PreHello</span> { <span class="ident">generation</span>: <span class="ident">PoolGeneration</span> },
+<span class="doccomment">/// Handle used to emit SDAM events.
+///
+/// If the topology has been closed, events emitted via this handle will not be sent to
+/// handlers.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SdamEventEmitter {
+    sender: UnboundedSender&lt;AcknowledgedMessage&lt;SdamEvent&gt;&gt;,
+}
 
-    <span class="doccomment">/// Describes a point in time after the initial hello has completed, but before the entire</span>
-    <span class="doccomment">/// handshake (e.g. including authentication) completes.</span>
-    <span class="ident">PostHello</span> { <span class="ident">generation</span>: <span class="ident">ConnectionGeneration</span> },
+<span class="kw">impl </span>SdamEventEmitter {
+    <span class="doccomment">/// Emit an SDAM event.
+    ///
+    /// This method returns a future that can be awaited until the event has been actually emitted.
+    /// It is not necessary to await this future.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw">impl </span>Into&lt;SdamEvent&gt;) -&gt; <span class="kw">impl </span>Future&lt;Output = ()&gt; {
+        <span class="kw">let </span>(msg, ack) = AcknowledgedMessage::package(event.into());
+        <span class="comment">// if event handler has stopped listening, no more events should be emitted,
+        // so we can safely ignore any send errors here.
+        </span><span class="kw">let _ </span>= <span class="self">self</span>.sender.send(msg);
 
-    <span class="doccomment">/// Describes a point in time after the handshake completed (e.g. when the command was sent to</span>
-    <span class="doccomment">/// the server).</span>
-    <span class="ident">AfterCompletion</span> {
-        <span class="ident">generation</span>: <span class="ident">ConnectionGeneration</span>,
-        <span class="ident">max_wire_version</span>: <span class="ident">i32</span>,
+        ack.wait_for_acknowledgment().map(|<span class="kw">_</span>| ())
+    }
+}
+
+<span class="doccomment">/// Enum describing a point in time during an operation&#39;s execution relative to when the MongoDB
+/// handshake for the conection being used in that operation.
+///
+/// This is used to determine the error handling semantics for certain error types.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>HandshakePhase {
+    <span class="doccomment">/// Describes a point that occurred before the initial hello completed (e.g. when opening the
+    /// socket).
+    </span>PreHello { generation: PoolGeneration },
+
+    <span class="doccomment">/// Describes a point in time after the initial hello has completed, but before the entire
+    /// handshake (e.g. including authentication) completes.
+    </span>PostHello { generation: ConnectionGeneration },
+
+    <span class="doccomment">/// Describes a point in time after the handshake completed (e.g. when the command was sent to
+    /// the server).
+    </span>AfterCompletion {
+        generation: ConnectionGeneration,
+        max_wire_version: i32,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">HandshakePhase</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">after_completion</span>(<span class="ident">handshaked_connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::AfterCompletion</span> {
-            <span class="ident">generation</span>: <span class="ident">handshaked_connection</span>.<span class="ident">generation</span>.<span class="ident">clone</span>(),
-            <span class="comment">// given that this is a handshaked connection, the stream description should</span>
-            <span class="comment">// always be available, so 0 should never actually be returned here.</span>
-            <span class="ident">max_wire_version</span>: <span class="ident">handshaked_connection</span>
-                .<span class="ident">stream_description</span>()
-                .<span class="ident">ok</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sd</span><span class="op">|</span> <span class="ident">sd</span>.<span class="ident">max_wire_version</span>)
-                .<span class="ident">unwrap_or</span>(<span class="number">0</span>),
+<span class="kw">impl </span>HandshakePhase {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>after_completion(handshaked_connection: <span class="kw-2">&amp;</span>Connection) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::AfterCompletion {
+            generation: handshaked_connection.generation.clone(),
+            <span class="comment">// given that this is a handshaked connection, the stream description should
+            // always be available, so 0 should never actually be returned here.
+            </span>max_wire_version: handshaked_connection
+                .stream_description()
+                .ok()
+                .and_then(|sd| sd.max_wire_version)
+                .unwrap_or(<span class="number">0</span>),
         }
     }
 
-    <span class="doccomment">/// The `serviceId` reported by the server.  If the initial hello has not completed, returns</span>
-    <span class="doccomment">/// `None`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">service_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandshakePhase::PreHello</span> { .. } =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">HandshakePhase::PostHello</span> { <span class="ident">generation</span>, .. } =&gt; <span class="ident">generation</span>.<span class="ident">service_id</span>(),
-            <span class="ident">HandshakePhase::AfterCompletion</span> { <span class="ident">generation</span>, .. } =&gt; <span class="ident">generation</span>.<span class="ident">service_id</span>(),
+    <span class="doccomment">/// The `serviceId` reported by the server.  If the initial hello has not completed, returns
+    /// `None`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>service_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            HandshakePhase::PreHello { .. } =&gt; <span class="prelude-val">None</span>,
+            HandshakePhase::PostHello { generation, .. } =&gt; generation.service_id(),
+            HandshakePhase::AfterCompletion { generation, .. } =&gt; generation.service_id(),
         }
     }
 
-    <span class="doccomment">/// Whether this phase is before the handshake completed or not.</span>
-    <span class="kw">fn</span> <span class="ident">is_before_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">HandshakePhase::AfterCompletion</span> { .. })
+    <span class="doccomment">/// Whether this phase is before the handshake completed or not.
+    </span><span class="kw">fn </span>is_before_completion(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="macro">matches!</span>(<span class="self">self</span>, HandshakePhase::AfterCompletion { .. })
     }
 
-    <span class="doccomment">/// The wire version of the server as reported by the handshake. If the handshake did not</span>
-    <span class="doccomment">/// complete, this returns `None`.</span>
-    <span class="kw">fn</span> <span class="ident">wire_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">HandshakePhase::AfterCompletion</span> {
-                <span class="ident">max_wire_version</span>, ..
-            } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">max_wire_version</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// The wire version of the server as reported by the handshake. If the handshake did not
+    /// complete, this returns `None`.
+    </span><span class="kw">fn </span>wire_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            HandshakePhase::AfterCompletion {
+                max_wire_version, ..
+            } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>max_wire_version),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

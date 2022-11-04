@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -144,149 +144,149 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">metadata::MetadataMap</span>, <span class="ident">Extensions</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{metadata::MetadataMap, Extensions};
 
-<span class="doccomment">/// A gRPC response and metadata from an RPC call.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">metadata</span>: <span class="ident">MetadataMap</span>,
-    <span class="ident">message</span>: <span class="ident">T</span>,
-    <span class="ident">extensions</span>: <span class="ident">Extensions</span>,
+<span class="doccomment">/// A gRPC response and metadata from an RPC call.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Response&lt;T&gt; {
+    metadata: MetadataMap,
+    message: T,
+    extensions: Extensions,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new gRPC response.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use tonic::Response;</span>
-    <span class="doccomment">/// # pub struct HelloReply {</span>
-    <span class="doccomment">/// #   pub message: String,</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// # let name = &quot;&quot;;</span>
-    <span class="doccomment">/// Response::new(HelloReply {</span>
-    <span class="doccomment">///     message: format!(&quot;Hello, {}!&quot;, name).into(),</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">message</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Response</span> {
-            <span class="ident">metadata</span>: <span class="ident">MetadataMap::new</span>(),
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="ident">Extensions::new</span>(),
+<span class="kw">impl</span>&lt;T&gt; Response&lt;T&gt; {
+    <span class="doccomment">/// Create a new gRPC response.
+    ///
+    /// ```rust
+    /// # use tonic::Response;
+    /// # pub struct HelloReply {
+    /// #   pub message: String,
+    /// # }
+    /// # let name = &quot;&quot;;
+    /// Response::new(HelloReply {
+    ///     message: format!(&quot;Hello, {}!&quot;, name).into(),
+    /// });
+    /// ```
+    </span><span class="kw">pub fn </span>new(message: T) -&gt; <span class="self">Self </span>{
+        Response {
+            metadata: MetadataMap::new(),
+            message,
+            extensions: Extensions::new(),
         }
     }
 
-    <span class="doccomment">/// Get a immutable reference to `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Get a immutable reference to `T`.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 
-    <span class="doccomment">/// Get a mutable reference to the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Get a mutable reference to the message
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.message
     }
 
-    <span class="doccomment">/// Get a reference to the custom response metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MetadataMap</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">metadata</span>
+    <span class="doccomment">/// Get a reference to the custom response metadata.
+    </span><span class="kw">pub fn </span>metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>MetadataMap {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.metadata
     }
 
-    <span class="doccomment">/// Get a mutable reference to the response metadata.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">metadata_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">MetadataMap</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">metadata</span>
+    <span class="doccomment">/// Get a mutable reference to the response metadata.
+    </span><span class="kw">pub fn </span>metadata_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>MetadataMap {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.metadata
     }
 
-    <span class="doccomment">/// Consumes `self`, returning the message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// Consumes `self`, returning the message
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.message
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">MetadataMap</span>, <span class="ident">T</span>, <span class="ident">Extensions</span>) {
-        (<span class="self">self</span>.<span class="ident">metadata</span>, <span class="self">self</span>.<span class="ident">message</span>, <span class="self">self</span>.<span class="ident">extensions</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_parts(<span class="self">self</span>) -&gt; (MetadataMap, T, Extensions) {
+        (<span class="self">self</span>.metadata, <span class="self">self</span>.message, <span class="self">self</span>.extensions)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_parts</span>(<span class="ident">metadata</span>: <span class="ident">MetadataMap</span>, <span class="ident">message</span>: <span class="ident">T</span>, <span class="ident">extensions</span>: <span class="ident">Extensions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">metadata</span>,
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_parts(metadata: MetadataMap, message: T, extensions: Extensions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            metadata,
+            message,
+            extensions,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_http</span>(<span class="ident">res</span>: <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">message</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">into_parts</span>();
-        <span class="ident">Response</span> {
-            <span class="ident">metadata</span>: <span class="ident">MetadataMap::from_headers</span>(<span class="ident">head</span>.<span class="ident">headers</span>),
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="ident">Extensions::from_http</span>(<span class="ident">head</span>.<span class="ident">extensions</span>),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_http(res: http::Response&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(head, message) = res.into_parts();
+        Response {
+            metadata: MetadataMap::from_headers(head.headers),
+            message,
+            extensions: Extensions::from_http(head.extensions),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_http</span>(<span class="self">self</span>) -&gt; <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">http::Response::new</span>(<span class="self">self</span>.<span class="ident">message</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_http(<span class="self">self</span>) -&gt; http::Response&lt;T&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>res = http::Response::new(<span class="self">self</span>.message);
 
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">version_mut</span>() <span class="op">=</span> <span class="ident">http::Version::HTTP_2</span>;
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">headers_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">metadata</span>.<span class="ident">into_sanitized_headers</span>();
-        <span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">extensions_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">into_http</span>();
+        <span class="kw-2">*</span>res.version_mut() = http::Version::HTTP_2;
+        <span class="kw-2">*</span>res.headers_mut() = <span class="self">self</span>.metadata.into_sanitized_headers();
+        <span class="kw-2">*</span>res.extensions_mut() = <span class="self">self</span>.extensions.into_http();
 
-        <span class="ident">res</span>
+        res
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>map&lt;F, U&gt;(<span class="self">self</span>, f: F) -&gt; Response&lt;U&gt;
+    <span class="kw">where
+        </span>F: FnOnce(T) -&gt; U,
     {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">message</span>);
-        <span class="ident">Response</span> {
-            <span class="ident">metadata</span>: <span class="self">self</span>.<span class="ident">metadata</span>,
-            <span class="ident">message</span>,
-            <span class="ident">extensions</span>: <span class="self">self</span>.<span class="ident">extensions</span>,
+        <span class="kw">let </span>message = f(<span class="self">self</span>.message);
+        Response {
+            metadata: <span class="self">self</span>.metadata,
+            message,
+            extensions: <span class="self">self</span>.extensions,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the associated extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Extensions</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>
+    <span class="doccomment">/// Returns a reference to the associated extensions.
+    </span><span class="kw">pub fn </span>extensions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Extensions {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.extensions
     }
 
-    <span class="doccomment">/// Returns a mutable reference to the associated extensions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extensions_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Extensions</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">extensions</span>
+    <span class="doccomment">/// Returns a mutable reference to the associated extensions.
+    </span><span class="kw">pub fn </span>extensions_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Extensions {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.extensions
     }
 
-    <span class="doccomment">/// Disable compression of the response body.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This disables compression of the body of this response, even if compression is enabled on</span>
-    <span class="doccomment">/// the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: This only has effect on responses to unary requests and responses to client to</span>
-    <span class="doccomment">/// server streams. Response streams (server to client stream and bidirectional streams) will</span>
-    <span class="doccomment">/// still be compressed according to the configuration of the server.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compression&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">disable_compression</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">extensions_mut</span>()
-            .<span class="ident">insert</span>(<span class="ident"><span class="kw">crate</span>::codec::compression::SingleMessageCompressionOverride::Disable</span>);
+    <span class="doccomment">/// Disable compression of the response body.
+    ///
+    /// This disables compression of the body of this response, even if compression is enabled on
+    /// the server.
+    ///
+    /// **Note**: This only has effect on responses to unary requests and responses to client to
+    /// server streams. Response streams (server to client stream and bidirectional streams) will
+    /// still be compressed according to the configuration of the server.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;compression&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;compression&quot;</span>)))]
+    </span><span class="kw">pub fn </span>disable_compression(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.extensions_mut()
+            .insert(<span class="kw">crate</span>::codec::compression::SingleMessageCompressionOverride::Disable);
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metadata::MetadataValue</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::metadata::MetadataValue;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reserved_headers_are_excluded</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>reserved_headers_are_excluded() {
+        <span class="kw">let </span><span class="kw-2">mut </span>r = Response::new(<span class="number">1</span>);
 
-        <span class="kw">for</span> <span class="ident">header</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">MetadataMap::GRPC_RESERVED_HEADERS</span> {
-            <span class="ident">r</span>.<span class="ident">metadata_mut</span>()
-                .<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">header</span>, <span class="ident">MetadataValue::from_static</span>(<span class="string">&quot;invalid&quot;</span>));
+        <span class="kw">for </span>header <span class="kw">in </span><span class="kw-2">&amp;</span>MetadataMap::GRPC_RESERVED_HEADERS {
+            r.metadata_mut()
+                .insert(<span class="kw-2">*</span>header, MetadataValue::from_static(<span class="string">&quot;invalid&quot;</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">http_response</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">into_http</span>();
-        <span class="macro">assert!</span>(<span class="ident">http_response</span>.<span class="ident">headers</span>().<span class="ident">is_empty</span>());
+        <span class="kw">let </span>http_response = r.into_http();
+        <span class="macro">assert!</span>(http_response.headers().is_empty());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

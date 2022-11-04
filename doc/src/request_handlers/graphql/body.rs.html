@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/body.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>body.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/request-handlers/src/graphql/body.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>body.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../request_handlers/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../request_handlers/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -78,85 +78,85 @@
 <span id="78">78</span>
 <span id="79">79</span>
 <span id="80">80</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::GraphQLProtocolAdapter</span>;
-<span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">BatchDocument</span>, <span class="ident">BatchDocumentTransaction</span>, <span class="ident">Operation</span>, <span class="ident">QueryDocument</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::GraphQLProtocolAdapter;
+<span class="kw">use </span>query_core::{BatchDocument, BatchDocumentTransaction, Operation, QueryDocument};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">GraphQlBody</span> {
-    <span class="ident">Single</span>(<span class="ident">SingleQuery</span>),
-    <span class="ident">Multi</span>(<span class="ident">MultiQuery</span>),
+<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>, untagged)]
+</span><span class="kw">pub enum </span>GraphQlBody {
+    Single(SingleQuery),
+    Multi(MultiQuery),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SingleQuery</span> {
-    <span class="ident">query</span>: <span class="ident">String</span>,
-    <span class="ident">operation_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">variables</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SingleQuery {
+    query: String,
+    operation_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    variables: HashMap&lt;String, String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiQuery</span> {
-    <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SingleQuery</span><span class="op">&gt;</span>,
-    <span class="ident">transaction</span>: <span class="ident">bool</span>,
-    <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>MultiQuery {
+    batch: Vec&lt;SingleQuery&gt;,
+    transaction: bool,
+    isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">MultiQuery</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SingleQuery</span><span class="op">&gt;</span>, <span class="ident">transaction</span>: <span class="ident">bool</span>, <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">batch</span>,
-            <span class="ident">transaction</span>,
-            <span class="ident">isolation_level</span>,
+<span class="kw">impl </span>MultiQuery {
+    <span class="kw">pub fn </span>new(batch: Vec&lt;SingleQuery&gt;, transaction: bool, isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            batch,
+            transaction,
+            isolation_level,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SingleQuery</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">query</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SingleQuery</span> {
-            <span class="ident">query</span>,
-            <span class="ident">operation_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">variables</span>: <span class="ident">HashMap::new</span>(),
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>SingleQuery {
+    <span class="kw">fn </span>from(query: String) -&gt; <span class="self">Self </span>{
+        SingleQuery {
+            query,
+            operation_name: <span class="prelude-val">None</span>,
+            variables: HashMap::new(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SingleQuery</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">String::from</span>(<span class="ident">query</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>SingleQuery {
+    <span class="kw">fn </span>from(query: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        String::from(query).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GraphQlBody</span> {
-    <span class="doccomment">/// Convert a `GraphQlBody` into a `QueryDocument`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_doc</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryDocument</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">GraphQlBody::Single</span>(<span class="ident">body</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">operation</span> <span class="op">=</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>GraphQlBody {
+    <span class="doccomment">/// Convert a `GraphQlBody` into a `QueryDocument`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_doc(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;QueryDocument&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            GraphQlBody::Single(body) =&gt; {
+                <span class="kw">let </span>operation = GraphQLProtocolAdapter::convert_query_to_operation(<span class="kw-2">&amp;</span>body.query, body.operation_name)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Single</span>(<span class="ident">operation</span>))
+                <span class="prelude-val">Ok</span>(QueryDocument::Single(operation))
             }
-            <span class="ident">GraphQlBody::Multi</span>(<span class="ident">bodies</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">operations</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bodies</span>
-                    .<span class="ident">batch</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">GraphQLProtocolAdapter::convert_query_to_operation</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>.<span class="ident">query</span>, <span class="ident">body</span>.<span class="ident">operation_name</span>))
-                    .<span class="ident">collect</span>();
-                <span class="kw">let</span> <span class="ident">transaction</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">bodies</span>.<span class="ident">transaction</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">BatchDocumentTransaction::new</span>(<span class="ident">bodies</span>.<span class="ident">isolation_level</span>))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                };
+            GraphQlBody::Multi(bodies) =&gt; {
+                <span class="kw">let </span>operations: <span class="kw">crate</span>::Result&lt;Vec&lt;Operation&gt;&gt; = bodies
+                    .batch
+                    .into_iter()
+                    .map(|body| GraphQLProtocolAdapter::convert_query_to_operation(<span class="kw-2">&amp;</span>body.query, body.operation_name))
+                    .collect();
+                <span class="kw">let </span>transaction = <span class="kw">if </span>bodies.transaction {
+                    <span class="prelude-val">Some</span>(BatchDocumentTransaction::new(bodies.isolation_level))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>};
 
-                <span class="prelude-val">Ok</span>(<span class="ident">QueryDocument::Multi</span>(<span class="ident">BatchDocument::new</span>(<span class="ident">operations</span><span class="question-mark">?</span>, <span class="ident">transaction</span>)))
+                <span class="prelude-val">Ok</span>(QueryDocument::Multi(BatchDocument::new(operations<span class="question-mark">?</span>, transaction)))
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="request_handlers" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/segmentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>segmentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/convert_case-0.5.0/src/segmentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>segmentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../convert_case/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../convert_case/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -430,437 +430,437 @@
 <span id="430">430</span>
 <span id="431">431</span>
 <span id="432">432</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">strum_macros::EnumIter</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>strum_macros::EnumIter;
 
-<span class="doccomment">/// A boundary defines how a string is split into words.  Some boundaries, `Hyphen`, `Underscore`,</span>
-<span class="doccomment">/// and `Space`, consume the character they split on, whereas the other boundaries</span>
-<span class="doccomment">/// do not.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The struct offers methods that return `Vec`s containing useful groups of boundaries.  It also</span>
-<span class="doccomment">/// contains the [`list_from`](Boundary::list_from) method which will generate a list of boundaries</span>
-<span class="doccomment">/// based on a string slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that all boundaries are distinct and do not share functionality.  That is, there is no</span>
-<span class="doccomment">/// such DigitLetter variant, because that would be equivalent to the current `DigitUpper` and</span>
-<span class="doccomment">/// `DigitLower` variants.  For common functionality, consider using</span>
-<span class="doccomment">/// some provided functions that return a list of boundaries.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use convert_case::{Boundary, Case, Casing, Converter};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     &quot;transformations_in_3d&quot;,</span>
-<span class="doccomment">///     &quot;TransformationsIn3D&quot;</span>
-<span class="doccomment">///         .from_case(Case::Camel)</span>
-<span class="doccomment">///         .without_boundaries(&amp;Boundary::digit_letter())</span>
-<span class="doccomment">///         .to_case(Case::Snake)</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let conv = Converter::new()</span>
-<span class="doccomment">///     .set_boundaries(&amp;Boundary::list_from(&quot;aA &quot;))</span>
-<span class="doccomment">///     .to_case(Case::Title);</span>
-<span class="doccomment">/// assert_eq!(&quot;7empest By Tool&quot;, conv.convert(&quot;7empest byTool&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">derive</span>(<span class="ident">EnumIter</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Boundary</span> {
-    <span class="doccomment">/// Splits on `-`, consuming the character on segmentation.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::Hyphen],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;-&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Hyphen</span>,
+<span class="doccomment">/// A boundary defines how a string is split into words.  Some boundaries, `Hyphen`, `Underscore`,
+/// and `Space`, consume the character they split on, whereas the other boundaries
+/// do not.
+///
+/// The struct offers methods that return `Vec`s containing useful groups of boundaries.  It also
+/// contains the [`list_from`](Boundary::list_from) method which will generate a list of boundaries
+/// based on a string slice.
+///
+/// Note that all boundaries are distinct and do not share functionality.  That is, there is no
+/// such DigitLetter variant, because that would be equivalent to the current `DigitUpper` and
+/// `DigitLower` variants.  For common functionality, consider using
+/// some provided functions that return a list of boundaries.
+/// ```
+/// use convert_case::{Boundary, Case, Casing, Converter};
+///
+/// assert_eq!(
+///     &quot;transformations_in_3d&quot;,
+///     &quot;TransformationsIn3D&quot;
+///         .from_case(Case::Camel)
+///         .without_boundaries(&amp;Boundary::digit_letter())
+///         .to_case(Case::Snake)
+/// );
+///
+/// let conv = Converter::new()
+///     .set_boundaries(&amp;Boundary::list_from(&quot;aA &quot;))
+///     .to_case(Case::Title);
+/// assert_eq!(&quot;7empest By Tool&quot;, conv.convert(&quot;7empest byTool&quot;));
+/// ```
+</span><span class="attribute">#[cfg_attr(test, derive(EnumIter))]
+#[derive(Clone, Copy, Eq, PartialEq, Debug)]
+</span><span class="kw">pub enum </span>Boundary {
+    <span class="doccomment">/// Splits on `-`, consuming the character on segmentation.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::Hyphen],
+    ///     Boundary::list_from(&quot;-&quot;)
+    /// );
+    /// ```
+    </span>Hyphen,
 
-    <span class="doccomment">/// Splits on `_`, consuming the character on segmentation.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::Underscore],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;_&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Underscore</span>,
+    <span class="doccomment">/// Splits on `_`, consuming the character on segmentation.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::Underscore],
+    ///     Boundary::list_from(&quot;_&quot;)
+    /// );
+    /// ```
+    </span>Underscore,
 
-    <span class="doccomment">/// Splits on space, consuming the character on segmentation.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::Space],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot; &quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Space</span>,
+    <span class="doccomment">/// Splits on space, consuming the character on segmentation.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::Space],
+    ///     Boundary::list_from(&quot; &quot;)
+    /// );
+    /// ```
+    </span>Space,
 
-    <span class="doccomment">/// Splits where an uppercase letter is followed by a lowercase letter.  This is seldom used,</span>
-    <span class="doccomment">/// and is not included in the [defaults](Boundary::defaults).</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::UpperLower],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;Aa&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">UpperLower</span>,
+    <span class="doccomment">/// Splits where an uppercase letter is followed by a lowercase letter.  This is seldom used,
+    /// and is not included in the [defaults](Boundary::defaults).
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::UpperLower],
+    ///     Boundary::list_from(&quot;Aa&quot;)
+    /// );
+    /// ```
+    </span>UpperLower,
 
-    <span class="doccomment">/// Splits where a lowercase letter is followed by an uppercase letter.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::LowerUpper],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;aA&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">LowerUpper</span>,
+    <span class="doccomment">/// Splits where a lowercase letter is followed by an uppercase letter.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::LowerUpper],
+    ///     Boundary::list_from(&quot;aA&quot;)
+    /// );
+    /// ```
+    </span>LowerUpper,
 
-    <span class="doccomment">/// Splits where digit is followed by an uppercase letter.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::DigitUpper],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;1A&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">DigitUpper</span>,
+    <span class="doccomment">/// Splits where digit is followed by an uppercase letter.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::DigitUpper],
+    ///     Boundary::list_from(&quot;1A&quot;)
+    /// );
+    /// ```
+    </span>DigitUpper,
 
-    <span class="doccomment">/// Splits where an uppercase letter is followed by a digit.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::UpperDigit],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;A1&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">UpperDigit</span>,
+    <span class="doccomment">/// Splits where an uppercase letter is followed by a digit.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::UpperDigit],
+    ///     Boundary::list_from(&quot;A1&quot;)
+    /// );
+    /// ```
+    </span>UpperDigit,
 
-    <span class="doccomment">/// Splits where digit is followed by a lowercase letter.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::DigitLower],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;1a&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">DigitLower</span>,
+    <span class="doccomment">/// Splits where digit is followed by a lowercase letter.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::DigitLower],
+    ///     Boundary::list_from(&quot;1a&quot;)
+    /// );
+    /// ```
+    </span>DigitLower,
 
-    <span class="doccomment">/// Splits where a lowercase letter is followed by a digit.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::LowerDigit],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;a1&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">LowerDigit</span>,
+    <span class="doccomment">/// Splits where a lowercase letter is followed by a digit.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::LowerDigit],
+    ///     Boundary::list_from(&quot;a1&quot;)
+    /// );
+    /// ```
+    </span>LowerDigit,
 
-    <span class="doccomment">/// Acronyms are identified by two uppercase letters followed by a lowercase letter.</span>
-    <span class="doccomment">/// The word boundary is between the two uppercase letters.  For example, &quot;HTTPRequest&quot;</span>
-    <span class="doccomment">/// would have an acronym boundary identified at &quot;PRe&quot; and split into &quot;HTTP&quot; and &quot;Request&quot;.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Boundary::Acronym],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;AAa&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Acronym</span>,
+    <span class="doccomment">/// Acronyms are identified by two uppercase letters followed by a lowercase letter.
+    /// The word boundary is between the two uppercase letters.  For example, &quot;HTTPRequest&quot;
+    /// would have an acronym boundary identified at &quot;PRe&quot; and split into &quot;HTTP&quot; and &quot;Request&quot;.
+    /// ```
+    /// use convert_case::Boundary;
+    /// assert_eq!(
+    ///     vec![Boundary::Acronym],
+    ///     Boundary::list_from(&quot;AAa&quot;)
+    /// );
+    /// ```
+    </span>Acronym,
 }
 
-<span class="kw">impl</span> <span class="ident">Boundary</span> {
-    <span class="doccomment">/// Returns a list of all boundaries that are identified within the given string.</span>
-    <span class="doccomment">/// Could be a short of writing out all the boundaries in a list directly.  This will not</span>
-    <span class="doccomment">/// identify boundary `UpperLower` if it also used as part of `Acronym`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you want to be very explicit and not overlap boundaries, it is recommended to use a colon</span>
-    <span class="doccomment">/// character.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Hyphen, Space, LowerUpper, UpperDigit, DigitLower],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;aA8a -&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Underscore, LowerUpper, DigitUpper, Acronym],</span>
-    <span class="doccomment">///     Boundary::list_from(&quot;bD:0B:_:AAa&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Boundary::all</span>().<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">boundary</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">left_iter</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>();
-            <span class="kw">let</span> <span class="ident">mid_iter</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">right_iter</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">2</span>);
+<span class="kw">impl </span>Boundary {
+    <span class="doccomment">/// Returns a list of all boundaries that are identified within the given string.
+    /// Could be a short of writing out all the boundaries in a list directly.  This will not
+    /// identify boundary `UpperLower` if it also used as part of `Acronym`.
+    ///
+    /// If you want to be very explicit and not overlap boundaries, it is recommended to use a colon
+    /// character.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![Hyphen, Space, LowerUpper, UpperDigit, DigitLower],
+    ///     Boundary::list_from(&quot;aA8a -&quot;)
+    /// );
+    /// assert_eq!(
+    ///     vec![Underscore, LowerUpper, DigitUpper, Acronym],
+    ///     Boundary::list_from(&quot;bD:0B:_:AAa&quot;)
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>list_from(s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        Boundary::all().iter().filter(|boundary| {
+            <span class="kw">let </span>left_iter = s.chars();
+            <span class="kw">let </span>mid_iter = s.chars().skip(<span class="number">1</span>);
+            <span class="kw">let </span>right_iter = s.chars().skip(<span class="number">2</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one_iter</span> <span class="op">=</span> <span class="ident">left_iter</span>.<span class="ident">clone</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>one_iter = left_iter.clone();
 
-            <span class="comment">// Also capture when the previous pair was both uppercase, so we don&#39;t</span>
-            <span class="comment">// match the UpperLower boundary in the case of Acronym</span>
-            <span class="kw">let</span> <span class="ident">two_iter</span> <span class="op">=</span> <span class="ident">left_iter</span>.<span class="ident">clone</span>().<span class="ident">zip</span>(<span class="ident">mid_iter</span>.<span class="ident">clone</span>());
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">two_iter_and_upper</span> <span class="op">=</span> <span class="ident">two_iter</span>.<span class="ident">clone</span>()
-                .<span class="ident">zip</span>(<span class="ident">std::iter::once</span>(<span class="bool-val">false</span>).<span class="ident">chain</span>(
-                        <span class="ident">two_iter</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">is_uppercase</span>())
+            <span class="comment">// Also capture when the previous pair was both uppercase, so we don&#39;t
+            // match the UpperLower boundary in the case of Acronym
+            </span><span class="kw">let </span>two_iter = left_iter.clone().zip(mid_iter.clone());
+            <span class="kw">let </span><span class="kw-2">mut </span>two_iter_and_upper = two_iter.clone()
+                .zip(std::iter::once(<span class="bool-val">false</span>).chain(
+                        two_iter.map(|(a, b)| a.is_uppercase() &amp;&amp; b.is_uppercase())
                 ));
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">three_iter</span> <span class="op">=</span> <span class="ident">left_iter</span>.<span class="ident">zip</span>(<span class="ident">mid_iter</span>).<span class="ident">zip</span>(<span class="ident">right_iter</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>three_iter = left_iter.zip(mid_iter).zip(right_iter);
 
-            <span class="ident">one_iter</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">boundary</span>.<span class="ident">detect_one</span>(<span class="ident">a</span>))
-                <span class="op">|</span><span class="op">|</span> <span class="ident">two_iter_and_upper</span>.<span class="ident">any</span>(<span class="op">|</span>((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">is_acro</span>)<span class="op">|</span> <span class="ident">boundary</span>.<span class="ident">detect_two</span>(<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_acro</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="ident">three_iter</span>.<span class="ident">any</span>(<span class="op">|</span>((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">c</span>)<span class="op">|</span> <span class="ident">boundary</span>.<span class="ident">detect_three</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>))
-        }).<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span>).<span class="ident">collect</span>()
+            one_iter.any(|a| boundary.detect_one(a))
+                || two_iter_and_upper.any(|((a, b), is_acro)| boundary.detect_two(a, b) &amp;&amp; !is_acro)
+                || three_iter.any(|((a, b), c)| boundary.detect_three(a, b, c))
+        }).map(|b| <span class="kw-2">*</span>b).collect()
     }
 
-    <span class="doccomment">/// The default list of boundaries used when `Casing::to_case` is called directly</span>
-    <span class="doccomment">/// and in a `Converter` generated from `Converter::new()`.  This includes</span>
-    <span class="doccomment">/// all the boundaries except the `UpperLower` boundary.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Underscore, Hyphen, Space, LowerUpper, UpperDigit, </span>
-    <span class="doccomment">///         DigitUpper, DigitLower, LowerDigit, Acronym,</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     Boundary::defaults()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">defaults</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// The default list of boundaries used when `Casing::to_case` is called directly
+    /// and in a `Converter` generated from `Converter::new()`.  This includes
+    /// all the boundaries except the `UpperLower` boundary.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![
+    ///         Underscore, Hyphen, Space, LowerUpper, UpperDigit, 
+    ///         DigitUpper, DigitLower, LowerDigit, Acronym,
+    ///     ],
+    ///     Boundary::defaults()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>defaults() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="macro">vec!</span>[
-            <span class="ident">Underscore</span>, <span class="ident">Hyphen</span>, <span class="ident">Space</span>, <span class="ident">LowerUpper</span>, <span class="ident">UpperDigit</span>, <span class="ident">DigitUpper</span>, <span class="ident">DigitLower</span>, <span class="ident">LowerDigit</span>,
-            <span class="ident">Acronym</span>,
+            Underscore, Hyphen, Space, LowerUpper, UpperDigit, DigitUpper, DigitLower, LowerDigit,
+            Acronym,
         ]
     }
 
-    <span class="doccomment">/// Returns the boundaries that split around single characters: `Hyphen`,</span>
-    <span class="doccomment">/// `Underscore`, and `Space`.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![Hyphen, Underscore, Space],</span>
-    <span class="doccomment">///     Boundary::delims()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delims</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="macro">vec!</span>[<span class="ident">Hyphen</span>, <span class="ident">Underscore</span>, <span class="ident">Space</span>]
+    <span class="doccomment">/// Returns the boundaries that split around single characters: `Hyphen`,
+    /// `Underscore`, and `Space`.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![Hyphen, Underscore, Space],
+    ///     Boundary::delims()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>delims() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[Hyphen, Underscore, Space]
     }
 
-    <span class="doccomment">/// Returns the boundaries that involve digits: `DigitUpper`, `DigitLower`, `UpperDigit`, and</span>
-    <span class="doccomment">/// `LowerDigit`.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![DigitUpper, UpperDigit, DigitLower, LowerDigit],</span>
-    <span class="doccomment">///     Boundary::digits()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digits</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="macro">vec!</span>[<span class="ident">DigitUpper</span>, <span class="ident">UpperDigit</span>, <span class="ident">DigitLower</span>, <span class="ident">LowerDigit</span>]
+    <span class="doccomment">/// Returns the boundaries that involve digits: `DigitUpper`, `DigitLower`, `UpperDigit`, and
+    /// `LowerDigit`.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![DigitUpper, UpperDigit, DigitLower, LowerDigit],
+    ///     Boundary::digits()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>digits() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[DigitUpper, UpperDigit, DigitLower, LowerDigit]
     }
 
-    <span class="doccomment">/// Returns the boundaries that are letters followed by digits: `UpperDigit` and `LowerDigit`.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![UpperDigit, LowerDigit],</span>
-    <span class="doccomment">///     Boundary::letter_digit()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">letter_digit</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="macro">vec!</span>[<span class="ident">UpperDigit</span>, <span class="ident">LowerDigit</span>]
+    <span class="doccomment">/// Returns the boundaries that are letters followed by digits: `UpperDigit` and `LowerDigit`.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![UpperDigit, LowerDigit],
+    ///     Boundary::letter_digit()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>letter_digit() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[UpperDigit, LowerDigit]
     }
 
-    <span class="doccomment">/// Returns the boundaries that are digits followed by letters: `DigitUpper` and</span>
-    <span class="doccomment">/// `DigitLower`.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![DigitUpper, DigitLower],</span>
-    <span class="doccomment">///     Boundary::digit_letter()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit_letter</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="macro">vec!</span>[<span class="ident">DigitUpper</span>, <span class="ident">DigitLower</span>]
+    <span class="doccomment">/// Returns the boundaries that are digits followed by letters: `DigitUpper` and
+    /// `DigitLower`.
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![DigitUpper, DigitLower],
+    ///     Boundary::digit_letter()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>digit_letter() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="macro">vec!</span>[DigitUpper, DigitLower]
     }
 
-    <span class="doccomment">/// Returns all boundaries.  Note that this includes the `UpperLower` variant which</span>
-    <span class="doccomment">/// might be unhelpful.  Please look at [`Boundary::defaults`].</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use convert_case::Boundary;</span>
-    <span class="doccomment">/// use Boundary::*;</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Hyphen, Underscore, Space, LowerUpper, UpperLower, DigitUpper,</span>
-    <span class="doccomment">///         UpperDigit, DigitLower, LowerDigit, Acronym,</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     Boundary::all()</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Returns all boundaries.  Note that this includes the `UpperLower` variant which
+    /// might be unhelpful.  Please look at [`Boundary::defaults`].
+    /// ```
+    /// use convert_case::Boundary;
+    /// use Boundary::*;
+    /// assert_eq!(
+    ///     vec![
+    ///         Hyphen, Underscore, Space, LowerUpper, UpperLower, DigitUpper,
+    ///         UpperDigit, DigitLower, LowerDigit, Acronym,
+    ///     ],
+    ///     Boundary::all()
+    /// );
+    /// ```
+    </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="macro">vec!</span>[
-            <span class="ident">Hyphen</span>, <span class="ident">Underscore</span>, <span class="ident">Space</span>, <span class="ident">LowerUpper</span>, <span class="ident">UpperLower</span>, <span class="ident">DigitUpper</span>, <span class="ident">UpperDigit</span>, 
-            <span class="ident">DigitLower</span>, <span class="ident">LowerDigit</span>, <span class="ident">Acronym</span>
+            Hyphen, Underscore, Space, LowerUpper, UpperLower, DigitUpper, UpperDigit, 
+            DigitLower, LowerDigit, Acronym
         ]
     }
 
-    <span class="kw">fn</span> <span class="ident">detect_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Hyphen</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span>,
-            <span class="ident">Underscore</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span>,
-            <span class="ident">Space</span> =&gt; <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>detect_one(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char) -&gt; bool {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Hyphen =&gt; c == <span class="string">&#39;-&#39;</span>,
+            Underscore =&gt; c == <span class="string">&#39;_&#39;</span>,
+            Space =&gt; c == <span class="string">&#39; &#39;</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">detect_two</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">d</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">UpperLower</span> =&gt; <span class="ident">c</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_lowercase</span>(),
-            <span class="ident">LowerUpper</span> =&gt; <span class="ident">c</span>.<span class="ident">is_lowercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_uppercase</span>(),
-            <span class="ident">DigitUpper</span> =&gt; <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_uppercase</span>(),
-            <span class="ident">UpperDigit</span> =&gt; <span class="ident">c</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_ascii_digit</span>(),
-            <span class="ident">DigitLower</span> =&gt; <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_lowercase</span>(),
-            <span class="ident">LowerDigit</span> =&gt; <span class="ident">c</span>.<span class="ident">is_lowercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_ascii_digit</span>(),
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>detect_two(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char, d: char) -&gt; bool {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            UpperLower =&gt; c.is_uppercase() &amp;&amp; d.is_lowercase(),
+            LowerUpper =&gt; c.is_lowercase() &amp;&amp; d.is_uppercase(),
+            DigitUpper =&gt; c.is_ascii_digit() &amp;&amp; d.is_uppercase(),
+            UpperDigit =&gt; c.is_uppercase() &amp;&amp; d.is_ascii_digit(),
+            DigitLower =&gt; c.is_ascii_digit() &amp;&amp; d.is_lowercase(),
+            LowerDigit =&gt; c.is_lowercase() &amp;&amp; d.is_ascii_digit(),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">detect_three</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">d</span>: <span class="ident">char</span>, <span class="ident">e</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Acronym</span> <span class="op">=</span> <span class="self">self</span> {
-            <span class="ident">c</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">d</span>.<span class="ident">is_uppercase</span>() <span class="op">&amp;&amp;</span> <span class="ident">e</span>.<span class="ident">is_lowercase</span>()
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+    <span class="kw">fn </span>detect_three(<span class="kw-2">&amp;</span><span class="self">self</span>, c: char, d: char, e: char) -&gt; bool {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
+        <span class="kw">if let </span>Acronym = <span class="self">self </span>{
+            c.is_uppercase() &amp;&amp; d.is_uppercase() &amp;&amp; e.is_lowercase()
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 }
 
-<span class="comment">// idea: make a bitset for each boundary.  Its fixed size,</span>
-<span class="comment">// and can be copied.  Also no fear in adding duplicates</span>
+<span class="comment">// idea: make a bitset for each boundary.  Its fixed size,
+// and can be copied.  Also no fear in adding duplicates
 
-<span class="comment">// gross</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">boundaries</span>: <span class="kw-2">&amp;</span>[<span class="ident">Boundary</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+// gross
+</span><span class="kw">pub fn </span>split&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized&gt;(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, boundaries: <span class="kw-2">&amp;</span>[Boundary]) -&gt; Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;
+<span class="kw">where
+    </span>T: AsRef&lt;str&gt;,
 {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
+    <span class="kw">let </span>s = s.as_ref();
 
-    <span class="kw">let</span> <span class="ident">single_splits</span> <span class="op">=</span> <span class="ident">s</span>
-        .<span class="ident">chars</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">c</span>)<span class="op">|</span> <span class="ident">boundaries</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">detect_one</span>(<span class="kw-2">*</span><span class="ident">c</span>)))
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>single_splits = s
+        .chars()
+        .enumerate()
+        .filter(|(<span class="kw">_</span>, c)| boundaries.iter().any(|b| b.detect_one(<span class="kw-2">*</span>c)))
+        .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>)
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">replace_at_indicies</span>(<span class="ident">s</span>, <span class="ident">single_splits</span>);
+    <span class="kw">let </span>words = replace_at_indicies(s, single_splits);
 
-    <span class="kw">let</span> <span class="ident">final_words</span> <span class="op">=</span> <span class="ident">words</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">w</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">left_iter</span> <span class="op">=</span> <span class="ident">w</span>.<span class="ident">chars</span>();
-        <span class="kw">let</span> <span class="ident">mid_iter</span> <span class="op">=</span> <span class="ident">w</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">right_iter</span> <span class="op">=</span> <span class="ident">w</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">2</span>);
+    <span class="kw">let </span>final_words = words.iter().flat_map(|<span class="kw-2">&amp;</span>w| {
+        <span class="kw">let </span>left_iter = w.chars();
+        <span class="kw">let </span>mid_iter = w.chars().skip(<span class="number">1</span>);
+        <span class="kw">let </span>right_iter = w.chars().skip(<span class="number">2</span>);
 
-        <span class="kw">let</span> <span class="ident">three_iter</span> <span class="op">=</span> <span class="ident">left_iter</span>.<span class="ident">clone</span>().<span class="ident">zip</span>(<span class="ident">mid_iter</span>.<span class="ident">clone</span>()).<span class="ident">zip</span>(<span class="ident">right_iter</span>);
-        <span class="kw">let</span> <span class="ident">two_iter</span> <span class="op">=</span> <span class="ident">left_iter</span>.<span class="ident">clone</span>().<span class="ident">zip</span>(<span class="ident">mid_iter</span>);
+        <span class="kw">let </span>three_iter = left_iter.clone().zip(mid_iter.clone()).zip(right_iter);
+        <span class="kw">let </span>two_iter = left_iter.clone().zip(mid_iter);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splits</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">three_iter</span>
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, ((<span class="ident">c</span>, <span class="ident">d</span>), <span class="ident">e</span>))<span class="op">|</span> <span class="ident">boundaries</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">detect_three</span>(<span class="kw-2">*</span><span class="ident">c</span>, <span class="kw-2">*</span><span class="ident">d</span>, <span class="kw-2">*</span><span class="ident">e</span>)))
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)
-            .<span class="ident">chain</span>(
-                <span class="ident">two_iter</span>
-                    .<span class="ident">enumerate</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, (<span class="ident">c</span>, <span class="ident">d</span>))<span class="op">|</span> <span class="ident">boundaries</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">detect_two</span>(<span class="kw-2">*</span><span class="ident">c</span>, <span class="kw-2">*</span><span class="ident">d</span>)))
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>splits: Vec&lt;usize&gt; = three_iter
+            .enumerate()
+            .filter(|(<span class="kw">_</span>, ((c, d), e))| boundaries.iter().any(|b| b.detect_three(<span class="kw-2">*</span>c, <span class="kw-2">*</span>d, <span class="kw-2">*</span>e)))
+            .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>)
+            .chain(
+                two_iter
+                    .enumerate()
+                    .filter(|(<span class="kw">_</span>, (c, d))| boundaries.iter().any(|b| b.detect_two(<span class="kw-2">*</span>c, <span class="kw-2">*</span>d)))
+                    .map(|(i, <span class="kw">_</span>)| i + <span class="number">1</span>),
             )
-            .<span class="ident">collect</span>();
-        <span class="ident">splits</span>.<span class="ident">sort_unstable</span>();
+            .collect();
+        splits.sort_unstable();
 
-        <span class="ident">split_on_indicies</span>(<span class="ident">w</span>, <span class="ident">splits</span>)
+        split_on_indicies(w, splits)
     });
 
-    <span class="ident">final_words</span>.<span class="ident">rev</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>()).<span class="ident">collect</span>()
+    final_words.rev().filter(|s| !s.is_empty()).collect()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace_at_indicies</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">splits</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">pub fn </span>replace_at_indicies(s: <span class="kw-2">&amp;</span>str, splits: Vec&lt;usize&gt;) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>words = Vec::new();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">s</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span>;
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">in</span> <span class="ident">splits</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">split_at</span>(<span class="ident">x</span>);
-        <span class="ident">first</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">pair</span>.<span class="number">0</span>[..(<span class="ident">pair</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)];
-        <span class="ident">second</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="number">1</span>;
-        <span class="ident">words</span>.<span class="ident">push</span>(<span class="ident">second</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>first = s;
+    <span class="kw">let </span><span class="kw-2">mut </span>second;
+    <span class="kw">for </span><span class="kw-2">&amp;</span>x <span class="kw">in </span>splits.iter().rev() {
+        <span class="kw">let </span>pair = first.split_at(x);
+        first = <span class="kw-2">&amp;</span>pair.<span class="number">0</span>[..(pair.<span class="number">0</span>.len() - <span class="number">1</span>)];
+        second = pair.<span class="number">1</span>;
+        words.push(second);
     }
-    <span class="ident">words</span>.<span class="ident">push</span>(<span class="ident">first</span>);
+    words.push(first);
 
-    <span class="ident">words</span>
+    words
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_on_indicies</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">splits</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">words</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">pub fn </span>split_on_indicies(s: <span class="kw-2">&amp;</span>str, splits: Vec&lt;usize&gt;) -&gt; Vec&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>words = Vec::new();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">s</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second</span>;
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">x</span> <span class="kw">in</span> <span class="ident">splits</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-        <span class="kw">let</span> <span class="ident">pair</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">split_at</span>(<span class="ident">x</span>);
-        <span class="ident">first</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="number">0</span>;
-        <span class="ident">second</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="number">1</span>;
-        <span class="ident">words</span>.<span class="ident">push</span>(<span class="ident">second</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>first = s;
+    <span class="kw">let </span><span class="kw-2">mut </span>second;
+    <span class="kw">for </span><span class="kw-2">&amp;</span>x <span class="kw">in </span>splits.iter().rev() {
+        <span class="kw">let </span>pair = first.split_at(x);
+        first = pair.<span class="number">0</span>;
+        second = pair.<span class="number">1</span>;
+        words.push(second);
     }
-    <span class="ident">words</span>.<span class="ident">push</span>(<span class="ident">first</span>);
+    words.push(first);
 
-    <span class="ident">words</span>
+    words
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">strum::IntoEnumIterator</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>strum::IntoEnumIterator;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">all_boundaries_in_iter</span>() {
-        <span class="kw">let</span> <span class="ident">all</span> <span class="op">=</span> <span class="ident">Boundary::all</span>();
-        <span class="kw">for</span> <span class="ident">boundary</span> <span class="kw">in</span> <span class="ident">Boundary::iter</span>() {
-            <span class="macro">assert!</span>(<span class="ident">all</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">boundary</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>all_boundaries_in_iter() {
+        <span class="kw">let </span>all = Boundary::all();
+        <span class="kw">for </span>boundary <span class="kw">in </span>Boundary::iter() {
+            <span class="macro">assert!</span>(all.contains(<span class="kw-2">&amp;</span>boundary));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">split_on_delims</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>split_on_delims() {
         <span class="macro">assert_eq!</span>(
             <span class="macro">vec!</span>[<span class="string">&quot;my&quot;</span>, <span class="string">&quot;word&quot;</span>, <span class="string">&quot;list&quot;</span>, <span class="string">&quot;separated&quot;</span>, <span class="string">&quot;by&quot;</span>, <span class="string">&quot;delims&quot;</span>],
-            <span class="ident">split</span>(<span class="string">&quot;my_word-list separated-by_delims&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">Boundary::delims</span>())
+            split(<span class="string">&quot;my_word-list separated-by_delims&quot;</span>, <span class="kw-2">&amp;</span>Boundary::delims())
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">boundaries_found_in_string</span>() {
-        <span class="kw">use</span> <span class="ident">Boundary</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>boundaries_found_in_string() {
+        <span class="kw">use </span>Boundary::<span class="kw-2">*</span>;
         <span class="macro">assert_eq!</span>(
-            <span class="macro">vec!</span>[<span class="ident">LowerUpper</span>, <span class="ident">UpperLower</span>, <span class="ident">LowerDigit</span>],
-            <span class="ident">Boundary::list_from</span>(<span class="string">&quot;a8.Aa.aA&quot;</span>)
+            <span class="macro">vec!</span>[LowerUpper, UpperLower, LowerDigit],
+            Boundary::list_from(<span class="string">&quot;a8.Aa.aA&quot;</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Boundary::digits</span>(),
-            <span class="ident">Boundary::list_from</span>(<span class="string">&quot;b1B1b&quot;</span>)
+            Boundary::digits(),
+            Boundary::list_from(<span class="string">&quot;b1B1b&quot;</span>)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">vec!</span>[<span class="ident">Hyphen</span>, <span class="ident">Underscore</span>, <span class="ident">Space</span>, <span class="ident">Acronym</span>],
-            <span class="ident">Boundary::list_from</span>(<span class="string">&quot;AAa -_&quot;</span>)
+            <span class="macro">vec!</span>[Hyphen, Underscore, Space, Acronym],
+            Boundary::list_from(<span class="string">&quot;AAa -_&quot;</span>)
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="convert_case" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/semantic_tokens.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>semantic_tokens.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/semantic_tokens.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>semantic_tokens.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -709,578 +709,578 @@
 <span id="709">709</span>
 <span id="710">710</span>
 <span id="711">711</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::ser::SerializeSeq;
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">PartialResultParams</span>, <span class="ident">Range</span>, <span class="ident">StaticRegistrationOptions</span>, <span class="ident">TextDocumentIdentifier</span>,
-    <span class="ident">TextDocumentRegistrationOptions</span>, <span class="ident">WorkDoneProgressOptions</span>, <span class="ident">WorkDoneProgressParams</span>,
+<span class="kw">use crate</span>::{
+    PartialResultParams, Range, StaticRegistrationOptions, TextDocumentIdentifier,
+    TextDocumentRegistrationOptions, WorkDoneProgressOptions, WorkDoneProgressParams,
 };
-<span class="doccomment">/// A set of predefined token types. This set is not fixed</span>
-<span class="doccomment">/// and clients can specify additional token types via the</span>
-<span class="doccomment">/// corresponding client capabilities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokenType</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A set of predefined token types. This set is not fixed
+/// and clients can specify additional token types via the
+/// corresponding client capabilities.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Hash, PartialOrd, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>SemanticTokenType(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
 
-<span class="kw">impl</span> <span class="ident">SemanticTokenType</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NAMESPACE</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;namespace&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TYPE</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;type&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLASS</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;class&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ENUM</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;enum&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INTERFACE</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;interface&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STRUCT</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;struct&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TYPE_PARAMETER</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;typeParameter&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PARAMETER</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;parameter&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VARIABLE</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;variable&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PROPERTY</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;property&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ENUM_MEMBER</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;enumMember&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EVENT</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;event&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FUNCTION</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;function&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">METHOD</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;method&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MACRO</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;macro&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KEYWORD</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;keyword&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MODIFIER</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;modifier&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COMMENT</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;comment&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STRING</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;string&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NUMBER</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;number&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REGEXP</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;regexp&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OPERATOR</span>: <span class="ident">SemanticTokenType</span> <span class="op">=</span> <span class="ident">SemanticTokenType::new</span>(<span class="string">&quot;operator&quot;</span>);
+<span class="kw">impl </span>SemanticTokenType {
+    <span class="kw">pub const </span>NAMESPACE: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;namespace&quot;</span>);
+    <span class="kw">pub const </span>TYPE: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;type&quot;</span>);
+    <span class="kw">pub const </span>CLASS: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;class&quot;</span>);
+    <span class="kw">pub const </span>ENUM: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;enum&quot;</span>);
+    <span class="kw">pub const </span>INTERFACE: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;interface&quot;</span>);
+    <span class="kw">pub const </span>STRUCT: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;struct&quot;</span>);
+    <span class="kw">pub const </span>TYPE_PARAMETER: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;typeParameter&quot;</span>);
+    <span class="kw">pub const </span>PARAMETER: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;parameter&quot;</span>);
+    <span class="kw">pub const </span>VARIABLE: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;variable&quot;</span>);
+    <span class="kw">pub const </span>PROPERTY: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;property&quot;</span>);
+    <span class="kw">pub const </span>ENUM_MEMBER: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;enumMember&quot;</span>);
+    <span class="kw">pub const </span>EVENT: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;event&quot;</span>);
+    <span class="kw">pub const </span>FUNCTION: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;function&quot;</span>);
+    <span class="kw">pub const </span>METHOD: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;method&quot;</span>);
+    <span class="kw">pub const </span>MACRO: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;macro&quot;</span>);
+    <span class="kw">pub const </span>KEYWORD: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;keyword&quot;</span>);
+    <span class="kw">pub const </span>MODIFIER: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;modifier&quot;</span>);
+    <span class="kw">pub const </span>COMMENT: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;comment&quot;</span>);
+    <span class="kw">pub const </span>STRING: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;string&quot;</span>);
+    <span class="kw">pub const </span>NUMBER: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;number&quot;</span>);
+    <span class="kw">pub const </span>REGEXP: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;regexp&quot;</span>);
+    <span class="kw">pub const </span>OPERATOR: SemanticTokenType = SemanticTokenType::new(<span class="string">&quot;operator&quot;</span>);
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenType</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">tag</span>))
+    <span class="kw">pub const fn </span>new(tag: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        SemanticTokenType(Cow::Borrowed(tag))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>SemanticTokenType {
+    <span class="kw">fn </span>from(from: String) -&gt; <span class="self">Self </span>{
+        SemanticTokenType(Cow::from(from))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokenType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenType</span>(<span class="ident">Cow::from</span>(<span class="ident">from</span>))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>SemanticTokenType {
+    <span class="kw">fn </span>from(from: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        SemanticTokenType::new(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokenType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenType::new</span>(<span class="ident">from</span>)
+<span class="doccomment">/// A set of predefined token modifiers. This set is not fixed
+/// and clients can specify additional token types via the
+/// corresponding client capabilities.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Hash, PartialOrd, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>SemanticTokenModifier(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
+
+<span class="kw">impl </span>SemanticTokenModifier {
+    <span class="kw">pub const </span>DECLARATION: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;declaration&quot;</span>);
+    <span class="kw">pub const </span>DEFINITION: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;definition&quot;</span>);
+    <span class="kw">pub const </span>READONLY: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;readonly&quot;</span>);
+    <span class="kw">pub const </span>STATIC: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;static&quot;</span>);
+    <span class="kw">pub const </span>DEPRECATED: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;deprecated&quot;</span>);
+    <span class="kw">pub const </span>ABSTRACT: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;abstract&quot;</span>);
+    <span class="kw">pub const </span>ASYNC: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;async&quot;</span>);
+    <span class="kw">pub const </span>MODIFICATION: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;modification&quot;</span>);
+    <span class="kw">pub const </span>DOCUMENTATION: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;documentation&quot;</span>);
+    <span class="kw">pub const </span>DEFAULT_LIBRARY: SemanticTokenModifier = SemanticTokenModifier::new(<span class="string">&quot;defaultLibrary&quot;</span>);
+
+    <span class="kw">pub const fn </span>new(tag: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        SemanticTokenModifier(Cow::Borrowed(tag))
+    }
+
+    <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>SemanticTokenModifier {
+    <span class="kw">fn </span>from(from: String) -&gt; <span class="self">Self </span>{
+        SemanticTokenModifier(Cow::from(from))
     }
 }
 
-<span class="doccomment">/// A set of predefined token modifiers. This set is not fixed</span>
-<span class="doccomment">/// and clients can specify additional token types via the</span>
-<span class="doccomment">/// corresponding client capabilities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokenModifier</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">SemanticTokenModifier</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DECLARATION</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;declaration&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFINITION</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;definition&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">READONLY</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;readonly&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STATIC</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;static&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEPRECATED</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;deprecated&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ABSTRACT</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;abstract&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ASYNC</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;async&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MODIFICATION</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;modification&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DOCUMENTATION</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;documentation&quot;</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT_LIBRARY</span>: <span class="ident">SemanticTokenModifier</span> <span class="op">=</span> <span class="ident">SemanticTokenModifier::new</span>(<span class="string">&quot;defaultLibrary&quot;</span>);
-
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenModifier</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">tag</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>SemanticTokenModifier {
+    <span class="kw">fn </span>from(from: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        SemanticTokenModifier::new(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokenModifier</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenModifier</span>(<span class="ident">Cow::from</span>(<span class="ident">from</span>))
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Hash, PartialOrd, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>TokenFormat(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
+
+<span class="kw">impl </span>TokenFormat {
+    <span class="kw">pub const </span>RELATIVE: TokenFormat = TokenFormat::new(<span class="string">&quot;relative&quot;</span>);
+
+    <span class="kw">pub const fn </span>new(tag: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        TokenFormat(Cow::Borrowed(tag))
+    }
+
+    <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>TokenFormat {
+    <span class="kw">fn </span>from(from: String) -&gt; <span class="self">Self </span>{
+        TokenFormat(Cow::from(from))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokenModifier</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokenModifier::new</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>TokenFormat {
+    <span class="kw">fn </span>from(from: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        TokenFormat::new(from)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokenFormat</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensLegend {
+    <span class="doccomment">/// The token types a server uses.
+    </span><span class="kw">pub </span>token_types: Vec&lt;SemanticTokenType&gt;,
 
-<span class="kw">impl</span> <span class="ident">TokenFormat</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RELATIVE</span>: <span class="ident">TokenFormat</span> <span class="op">=</span> <span class="ident">TokenFormat::new</span>(<span class="string">&quot;relative&quot;</span>);
-
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TokenFormat</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">tag</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// The token modifiers a server uses.
+    </span><span class="kw">pub </span>token_modifiers: Vec&lt;SemanticTokenModifier&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TokenFormat</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TokenFormat</span>(<span class="ident">Cow::from</span>(<span class="ident">from</span>))
-    }
+<span class="doccomment">/// The actual tokens. For a detailed description about how the data is
+/// structured please see
+/// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L71&gt;
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Copy, Clone, Default)]
+</span><span class="kw">pub struct </span>SemanticToken {
+    <span class="kw">pub </span>delta_line: u32,
+    <span class="kw">pub </span>delta_start: u32,
+    <span class="kw">pub </span>length: u32,
+    <span class="kw">pub </span>token_type: u32,
+    <span class="kw">pub </span>token_modifiers_bitset: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TokenFormat</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TokenFormat::new</span>(<span class="ident">from</span>)
-    }
-}
-
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensLegend</span> {
-    <span class="doccomment">/// The token types a server uses.</span>
-    <span class="kw">pub</span> <span class="ident">token_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokenType</span><span class="op">&gt;</span>,
-
-    <span class="doccomment">/// The token modifiers a server uses.</span>
-    <span class="kw">pub</span> <span class="ident">token_modifiers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokenModifier</span><span class="op">&gt;</span>,
-}
-
-<span class="doccomment">/// The actual tokens. For a detailed description about how the data is</span>
-<span class="doccomment">/// structured please see</span>
-<span class="doccomment">/// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L71&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticToken</span> {
-    <span class="kw">pub</span> <span class="ident">delta_line</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">delta_start</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">length</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">token_type</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">token_modifiers_bitset</span>: <span class="ident">u32</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">SemanticToken</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize_tokens</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>SemanticToken {
+    <span class="kw">fn </span>deserialize_tokens&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;SemanticToken&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">chunks</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">chunks_exact</span>(<span class="number">5</span>);
+        <span class="kw">let </span>data = Vec::&lt;u32&gt;::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>chunks = data.chunks_exact(<span class="number">5</span>);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">chunks</span>.<span class="ident">remainder</span>().<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="ident">Result::Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="string">&quot;Length is not divisible by 5&quot;</span>));
+        <span class="kw">if </span>!chunks.remainder().is_empty() {
+            <span class="kw">return </span>Result::Err(serde::de::Error::custom(<span class="string">&quot;Length is not divisible by 5&quot;</span>));
         }
 
-        <span class="ident">Result::Ok</span>(
-            <span class="ident">chunks</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> <span class="ident">SemanticToken</span> {
-                    <span class="ident">delta_line</span>: <span class="ident">chunk</span>[<span class="number">0</span>],
-                    <span class="ident">delta_start</span>: <span class="ident">chunk</span>[<span class="number">1</span>],
-                    <span class="ident">length</span>: <span class="ident">chunk</span>[<span class="number">2</span>],
-                    <span class="ident">token_type</span>: <span class="ident">chunk</span>[<span class="number">3</span>],
-                    <span class="ident">token_modifiers_bitset</span>: <span class="ident">chunk</span>[<span class="number">4</span>],
+        Result::Ok(
+            chunks
+                .map(|chunk| SemanticToken {
+                    delta_line: chunk[<span class="number">0</span>],
+                    delta_start: chunk[<span class="number">1</span>],
+                    length: chunk[<span class="number">2</span>],
+                    token_type: chunk[<span class="number">3</span>],
+                    token_modifiers_bitset: chunk[<span class="number">4</span>],
                 })
-                .<span class="ident">collect</span>(),
+                .collect(),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_tokens</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">tokens</span>: <span class="kw-2">&amp;</span>[<span class="ident">SemanticToken</span>], <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    <span class="kw">fn </span>serialize_tokens&lt;S&gt;(tokens: <span class="kw-2">&amp;</span>[SemanticToken], serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="ident">tokens</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">5</span>))<span class="question-mark">?</span>;
-        <span class="kw">for</span> <span class="ident">token</span> <span class="kw">in</span> <span class="ident">tokens</span>.<span class="ident">iter</span>() {
-            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">delta_line</span>)<span class="question-mark">?</span>;
-            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">delta_start</span>)<span class="question-mark">?</span>;
-            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">length</span>)<span class="question-mark">?</span>;
-            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">token_type</span>)<span class="question-mark">?</span>;
-            <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">token_modifiers_bitset</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>seq = serializer.serialize_seq(<span class="prelude-val">Some</span>(tokens.len() * <span class="number">5</span>))<span class="question-mark">?</span>;
+        <span class="kw">for </span>token <span class="kw">in </span>tokens.iter() {
+            seq.serialize_element(<span class="kw-2">&amp;</span>token.delta_line)<span class="question-mark">?</span>;
+            seq.serialize_element(<span class="kw-2">&amp;</span>token.delta_start)<span class="question-mark">?</span>;
+            seq.serialize_element(<span class="kw-2">&amp;</span>token.length)<span class="question-mark">?</span>;
+            seq.serialize_element(<span class="kw-2">&amp;</span>token.token_type)<span class="question-mark">?</span>;
+            seq.serialize_element(<span class="kw-2">&amp;</span>token.token_modifiers_bitset)<span class="question-mark">?</span>;
         }
-        <span class="ident">seq</span>.<span class="ident">end</span>()
+        seq.end()
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_tokens_opt</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(
-        <span class="ident">deserializer</span>: <span class="ident">D</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize_tokens_opt&lt;<span class="lifetime">&#39;de</span>, D&gt;(
+        deserializer: D,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Vec&lt;SemanticToken&gt;&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Wrapper</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>)]</span>
-            <span class="ident">tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span>,
-        }
-
-        <span class="prelude-val">Ok</span>(<span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">Wrapper</span><span class="op">&gt;</span><span class="ident">::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">wrapper</span><span class="op">|</span> <span class="ident">wrapper</span>.<span class="ident">tokens</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">serialize_tokens_opt</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
-    {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>)]</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Wrapper</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::serialize_tokens&quot;</span>)]</span>
-            <span class="ident">tokens</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span>,
+        <span class="attribute">#[derive(Deserialize)]
+        #[serde(transparent)]
+        </span><span class="kw">struct </span>Wrapper {
+            <span class="attribute">#[serde(deserialize_with = <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>)]
+            </span>tokens: Vec&lt;SemanticToken&gt;,
         }
 
-        <span class="kw">let</span> <span class="ident">opt</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">Wrapper</span> { <span class="ident">tokens</span>: <span class="ident">t</span>.<span class="ident">to_vec</span>() });
+        <span class="prelude-val">Ok</span>(<span class="prelude-ty">Option</span>::&lt;Wrapper&gt;::deserialize(deserializer)<span class="question-mark">?</span>.map(|wrapper| wrapper.tokens))
+    }
 
-        <span class="ident">opt</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    <span class="kw">fn </span>serialize_tokens_opt&lt;S&gt;(
+        data: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Vec&lt;SemanticToken&gt;&gt;,
+        serializer: S,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
+    {
+        <span class="attribute">#[derive(Serialize)]
+        #[serde(transparent)]
+        </span><span class="kw">struct </span>Wrapper {
+            <span class="attribute">#[serde(serialize_with = <span class="string">&quot;SemanticToken::serialize_tokens&quot;</span>)]
+            </span>tokens: Vec&lt;SemanticToken&gt;,
+        }
+
+        <span class="kw">let </span>opt = data.as_ref().map(|t| Wrapper { tokens: t.to_vec() });
+
+        opt.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokens</span> {
-    <span class="doccomment">/// An optional result id. If provided and clients support delta updating</span>
-    <span class="doccomment">/// the client will include the result id in the next semantic token request.</span>
-    <span class="doccomment">/// A server can then instead of computing all semantic tokens again simply</span>
-    <span class="doccomment">/// send a delta.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">result_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokens {
+    <span class="doccomment">/// An optional result id. If provided and clients support delta updating
+    /// the client will include the result id in the next semantic token request.
+    /// A server can then instead of computing all semantic tokens again simply
+    /// send a delta.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>result_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The actual tokens. For a detailed description about how the data is</span>
-    <span class="doccomment">/// structured please see</span>
-    <span class="doccomment">/// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L71&gt;</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::serialize_tokens&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The actual tokens. For a detailed description about how the data is
+    /// structured please see
+    /// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L71&gt;
+    </span><span class="attribute">#[serde(
+        deserialize_with = <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>,
+        serialize_with = <span class="string">&quot;SemanticToken::serialize_tokens&quot;
+    </span>)]
+    </span><span class="kw">pub </span>data: Vec&lt;SemanticToken&gt;,
 }
 
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensPartialResult</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::serialize_tokens&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span>,
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensPartialResult {
+    <span class="attribute">#[serde(
+        deserialize_with = <span class="string">&quot;SemanticToken::deserialize_tokens&quot;</span>,
+        serialize_with = <span class="string">&quot;SemanticToken::serialize_tokens&quot;
+    </span>)]
+    </span><span class="kw">pub </span>data: Vec&lt;SemanticToken&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensResult</span> {
-    <span class="ident">Tokens</span>(<span class="ident">SemanticTokens</span>),
-    <span class="ident">Partial</span>(<span class="ident">SemanticTokensPartialResult</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>SemanticTokensResult {
+    Tokens(SemanticTokens),
+    Partial(SemanticTokensPartialResult),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokens</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokens</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensResult::Tokens</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokens&gt; <span class="kw">for </span>SemanticTokensResult {
+    <span class="kw">fn </span>from(from: SemanticTokens) -&gt; <span class="self">Self </span>{
+        SemanticTokensResult::Tokens(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokensPartialResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokensPartialResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensResult::Partial</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokensPartialResult&gt; <span class="kw">for </span>SemanticTokensResult {
+    <span class="kw">fn </span>from(from: SemanticTokensPartialResult) -&gt; <span class="self">Self </span>{
+        SemanticTokensResult::Partial(from)
     }
 }
 
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensEdit</span> {
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">delete_count</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensEdit {
+    <span class="kw">pub </span>start: u32,
+    <span class="kw">pub </span>delete_count: u32,
 
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">default</span>,
-        <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::deserialize_tokens_opt&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;SemanticToken::serialize_tokens_opt&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticToken</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(
+        default,
+        skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>,
+        deserialize_with = <span class="string">&quot;SemanticToken::deserialize_tokens_opt&quot;</span>,
+        serialize_with = <span class="string">&quot;SemanticToken::serialize_tokens_opt&quot;
+    </span>)]
+    </span><span class="kw">pub </span>data: <span class="prelude-ty">Option</span>&lt;Vec&lt;SemanticToken&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensFullDeltaResult</span> {
-    <span class="ident">Tokens</span>(<span class="ident">SemanticTokens</span>),
-    <span class="ident">TokensDelta</span>(<span class="ident">SemanticTokensDelta</span>),
-    <span class="ident">PartialTokensDelta</span> { <span class="ident">edits</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokensEdit</span><span class="op">&gt;</span> },
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>SemanticTokensFullDeltaResult {
+    Tokens(SemanticTokens),
+    TokensDelta(SemanticTokensDelta),
+    PartialTokensDelta { edits: Vec&lt;SemanticTokensEdit&gt; },
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokens</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensFullDeltaResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokens</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensFullDeltaResult::Tokens</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokens&gt; <span class="kw">for </span>SemanticTokensFullDeltaResult {
+    <span class="kw">fn </span>from(from: SemanticTokens) -&gt; <span class="self">Self </span>{
+        SemanticTokensFullDeltaResult::Tokens(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokensDelta</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensFullDeltaResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokensDelta</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensFullDeltaResult::TokensDelta</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokensDelta&gt; <span class="kw">for </span>SemanticTokensFullDeltaResult {
+    <span class="kw">fn </span>from(from: SemanticTokensDelta) -&gt; <span class="self">Self </span>{
+        SemanticTokensFullDeltaResult::TokensDelta(from)
     }
 }
 
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensDelta</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">result_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// For a detailed description how these edits are structured please see</span>
-    <span class="doccomment">/// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L131&gt;</span>
-    <span class="kw">pub</span> <span class="ident">edits</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokensEdit</span><span class="op">&gt;</span>,
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensDelta {
+    <span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>result_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="doccomment">/// For a detailed description how these edits are structured please see
+    /// &lt;https://github.com/microsoft/vscode-extension-samples/blob/5ae1f7787122812dcc84e37427ca90af5ee09f14/semantic-tokens-sample/vscode.proposed.d.ts#L131&gt;
+    </span><span class="kw">pub </span>edits: Vec&lt;SemanticTokensEdit&gt;,
 }
 
-<span class="doccomment">/// Capabilities specific to the `textDocument/semanticTokens/*` requests.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensClientCapabilities</span> {
-    <span class="doccomment">/// Whether implementation supports dynamic registration. If this is set to `true`</span>
-    <span class="doccomment">/// the client supports the new `(TextDocumentRegistrationOptions &amp; StaticRegistrationOptions)`</span>
-    <span class="doccomment">/// return value for the corresponding server capability as well.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Capabilities specific to the `textDocument/semanticTokens/*` requests.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensClientCapabilities {
+    <span class="doccomment">/// Whether implementation supports dynamic registration. If this is set to `true`
+    /// the client supports the new `(TextDocumentRegistrationOptions &amp; StaticRegistrationOptions)`
+    /// return value for the corresponding server capability as well.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Which requests the client supports and might send to the server</span>
-    <span class="doccomment">/// depending on the server&#39;s capability. Please note that clients might not</span>
-    <span class="doccomment">/// show semantic tokens or degrade some of the user experience if a range</span>
-    <span class="doccomment">/// or full request is advertised by the client but not provided by the</span>
-    <span class="doccomment">/// server. If for example the client capability `requests.full` and</span>
-    <span class="doccomment">/// `request.range` are both set to true but the server only provides a</span>
-    <span class="doccomment">/// range provider the client might not render a minimap correctly or might</span>
-    <span class="doccomment">/// even decide to not show any semantic tokens at all.</span>
-    <span class="kw">pub</span> <span class="ident">requests</span>: <span class="ident">SemanticTokensClientCapabilitiesRequests</span>,
+    <span class="doccomment">/// Which requests the client supports and might send to the server
+    /// depending on the server&#39;s capability. Please note that clients might not
+    /// show semantic tokens or degrade some of the user experience if a range
+    /// or full request is advertised by the client but not provided by the
+    /// server. If for example the client capability `requests.full` and
+    /// `request.range` are both set to true but the server only provides a
+    /// range provider the client might not render a minimap correctly or might
+    /// even decide to not show any semantic tokens at all.
+    </span><span class="kw">pub </span>requests: SemanticTokensClientCapabilitiesRequests,
 
-    <span class="doccomment">/// The token types that the client supports.</span>
-    <span class="kw">pub</span> <span class="ident">token_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokenType</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The token types that the client supports.
+    </span><span class="kw">pub </span>token_types: Vec&lt;SemanticTokenType&gt;,
 
-    <span class="doccomment">/// The token modifiers that the client supports.</span>
-    <span class="kw">pub</span> <span class="ident">token_modifiers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SemanticTokenModifier</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The token modifiers that the client supports.
+    </span><span class="kw">pub </span>token_modifiers: Vec&lt;SemanticTokenModifier&gt;,
 
-    <span class="doccomment">/// The token formats the clients supports.</span>
-    <span class="kw">pub</span> <span class="ident">formats</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TokenFormat</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The token formats the clients supports.
+    </span><span class="kw">pub </span>formats: Vec&lt;TokenFormat&gt;,
 
-    <span class="doccomment">/// Whether the client supports tokens that can overlap each other.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">overlapping_token_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the client supports tokens that can overlap each other.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>overlapping_token_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Whether the client supports tokens that can span multiple lines.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">multiline_token_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether the client supports tokens that can span multiple lines.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>multiline_token_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensClientCapabilitiesRequests</span> {
-    <span class="doccomment">/// The client will send the `textDocument/semanticTokens/range` request if the server provides a corresponding handler.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensClientCapabilitiesRequests {
+    <span class="doccomment">/// The client will send the `textDocument/semanticTokens/range` request if the server provides a corresponding handler.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>range: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The client will send the `textDocument/semanticTokens/full` request if the server provides a corresponding handler.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SemanticTokensFullOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client will send the `textDocument/semanticTokens/full` request if the server provides a corresponding handler.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>full: <span class="prelude-ty">Option</span>&lt;SemanticTokensFullOptions&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensFullOptions</span> {
-    <span class="ident">Bool</span>(<span class="ident">bool</span>),
-    <span class="ident">Delta</span> {
-        <span class="doccomment">/// The client will send the `textDocument/semanticTokens/full/delta` request if the server provides a corresponding handler.</span>
-        <span class="doccomment">/// The server supports deltas for full documents.</span>
-        <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-        <span class="ident">delta</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>SemanticTokensFullOptions {
+    Bool(bool),
+    Delta {
+        <span class="doccomment">/// The client will send the `textDocument/semanticTokens/full/delta` request if the server provides a corresponding handler.
+        /// The server supports deltas for full documents.
+        </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span>delta: <span class="prelude-ty">Option</span>&lt;bool&gt;,
     },
 }
 
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensOptions</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_options</span>: <span class="ident">WorkDoneProgressOptions</span>,
+<span class="doccomment">/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensOptions {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_options: WorkDoneProgressOptions,
 
-    <span class="doccomment">/// The legend used by the server</span>
-    <span class="kw">pub</span> <span class="ident">legend</span>: <span class="ident">SemanticTokensLegend</span>,
+    <span class="doccomment">/// The legend used by the server
+    </span><span class="kw">pub </span>legend: SemanticTokensLegend,
 
-    <span class="doccomment">/// Server supports providing semantic tokens for a sepcific range</span>
-    <span class="doccomment">/// of a document.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Server supports providing semantic tokens for a sepcific range
+    /// of a document.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>range: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Server supports providing semantic tokens for a full document.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SemanticTokensFullOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Server supports providing semantic tokens for a full document.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>full: <span class="prelude-ty">Option</span>&lt;SemanticTokensFullOptions&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensRegistrationOptions</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">text_document_registration_options</span>: <span class="ident">TextDocumentRegistrationOptions</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensRegistrationOptions {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>text_document_registration_options: TextDocumentRegistrationOptions,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">semantic_tokens_options</span>: <span class="ident">SemanticTokensOptions</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>semantic_tokens_options: SemanticTokensOptions,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">static_registration_options</span>: <span class="ident">StaticRegistrationOptions</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>static_registration_options: StaticRegistrationOptions,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensServerCapabilities</span> {
-    <span class="ident">SemanticTokensOptions</span>(<span class="ident">SemanticTokensOptions</span>),
-    <span class="ident">SemanticTokensRegistrationOptions</span>(<span class="ident">SemanticTokensRegistrationOptions</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>SemanticTokensServerCapabilities {
+    SemanticTokensOptions(SemanticTokensOptions),
+    SemanticTokensRegistrationOptions(SemanticTokensRegistrationOptions),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokensOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensServerCapabilities</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokensOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensServerCapabilities::SemanticTokensOptions</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokensOptions&gt; <span class="kw">for </span>SemanticTokensServerCapabilities {
+    <span class="kw">fn </span>from(from: SemanticTokensOptions) -&gt; <span class="self">Self </span>{
+        SemanticTokensServerCapabilities::SemanticTokensOptions(from)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokensRegistrationOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensServerCapabilities</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">from</span>: <span class="ident">SemanticTokensRegistrationOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensServerCapabilities::SemanticTokensRegistrationOptions</span>(<span class="ident">from</span>)
+<span class="kw">impl </span>From&lt;SemanticTokensRegistrationOptions&gt; <span class="kw">for </span>SemanticTokensServerCapabilities {
+    <span class="kw">fn </span>from(from: SemanticTokensRegistrationOptions) -&gt; <span class="self">Self </span>{
+        SemanticTokensServerCapabilities::SemanticTokensRegistrationOptions(from)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensWorkspaceClientCapabilities</span> {
-    <span class="doccomment">/// Whether the client implementation supports a refresh request sent from</span>
-    <span class="doccomment">/// the server to the client.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that this event is global and will force the client to refresh all</span>
-    <span class="doccomment">/// semantic tokens currently shown. It should be used with absolute care</span>
-    <span class="doccomment">/// and is useful for situation where a server for example detect a project</span>
-    <span class="doccomment">/// wide change that requires such a calculation.</span>
-    <span class="kw">pub</span> <span class="ident">refresh_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensWorkspaceClientCapabilities {
+    <span class="doccomment">/// Whether the client implementation supports a refresh request sent from
+    /// the server to the client.
+    ///
+    /// Note that this event is global and will force the client to refresh all
+    /// semantic tokens currently shown. It should be used with absolute care
+    /// and is useful for situation where a server for example detect a project
+    /// wide change that requires such a calculation.
+    </span><span class="kw">pub </span>refresh_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensParams</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensParams {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensDeltaParams</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensDeltaParams {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="doccomment">/// The result id of a previous response. The result Id can either point to a full response</span>
-    <span class="doccomment">/// or a delta response depending on what was recevied last.</span>
-    <span class="kw">pub</span> <span class="ident">previous_result_id</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The result id of a previous response. The result Id can either point to a full response
+    /// or a delta response depending on what was recevied last.
+    </span><span class="kw">pub </span>previous_result_id: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SemanticTokensRangeParams</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress_params</span>: <span class="ident">WorkDoneProgressParams</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>SemanticTokensRangeParams {
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>work_done_progress_params: WorkDoneProgressParams,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">partial_result_params</span>: <span class="ident">PartialResultParams</span>,
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>partial_result_params: PartialResultParams,
 
-    <span class="doccomment">/// The text document.</span>
-    <span class="kw">pub</span> <span class="ident">text_document</span>: <span class="ident">TextDocumentIdentifier</span>,
+    <span class="doccomment">/// The text document.
+    </span><span class="kw">pub </span>text_document: TextDocumentIdentifier,
 
-    <span class="doccomment">/// The range the semantic tokens are requested for.</span>
-    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">Range</span>,
+    <span class="doccomment">/// The range the semantic tokens are requested for.
+    </span><span class="kw">pub </span>range: Range,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SemanticTokensRangeResult</span> {
-    <span class="ident">Tokens</span>(<span class="ident">SemanticTokens</span>),
-    <span class="ident">Partial</span>(<span class="ident">SemanticTokensPartialResult</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>SemanticTokensRangeResult {
+    Tokens(SemanticTokens),
+    Partial(SemanticTokensPartialResult),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokens</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensRangeResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tokens</span>: <span class="ident">SemanticTokens</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensRangeResult::Tokens</span>(<span class="ident">tokens</span>)
+<span class="kw">impl </span>From&lt;SemanticTokens&gt; <span class="kw">for </span>SemanticTokensRangeResult {
+    <span class="kw">fn </span>from(tokens: SemanticTokens) -&gt; <span class="self">Self </span>{
+        SemanticTokensRangeResult::Tokens(tokens)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SemanticTokensPartialResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SemanticTokensRangeResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">partial</span>: <span class="ident">SemanticTokensPartialResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SemanticTokensRangeResult::Partial</span>(<span class="ident">partial</span>)
+<span class="kw">impl </span>From&lt;SemanticTokensPartialResult&gt; <span class="kw">for </span>SemanticTokensRangeResult {
+    <span class="kw">fn </span>from(partial: SemanticTokensPartialResult) -&gt; <span class="self">Self </span>{
+        SemanticTokensRangeResult::Partial(partial)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests</span>::{<span class="ident">test_deserialization</span>, <span class="ident">test_serialization</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::tests::{test_deserialization, test_serialization};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_semantic_tokens_support_serialization</span>() {
-        <span class="ident">test_serialization</span>(
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_semantic_tokens_support_serialization() {
+        test_serialization(
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[],
             },
             <span class="string">r#&quot;{&quot;data&quot;:[]}&quot;#</span>,
         );
 
-        <span class="ident">test_serialization</span>(
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="ident">SemanticToken</span> {
-                    <span class="ident">delta_line</span>: <span class="number">2</span>,
-                    <span class="ident">delta_start</span>: <span class="number">5</span>,
-                    <span class="ident">length</span>: <span class="number">3</span>,
-                    <span class="ident">token_type</span>: <span class="number">0</span>,
-                    <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+        test_serialization(
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[SemanticToken {
+                    delta_line: <span class="number">2</span>,
+                    delta_start: <span class="number">5</span>,
+                    length: <span class="number">3</span>,
+                    token_type: <span class="number">0</span>,
+                    token_modifiers_bitset: <span class="number">3</span>,
                 }],
             },
             <span class="string">r#&quot;{&quot;data&quot;:[2,5,3,0,3]}&quot;#</span>,
         );
 
-        <span class="ident">test_serialization</span>(
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">2</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">3</span>,
-                        <span class="ident">token_type</span>: <span class="number">0</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+        test_serialization(
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[
+                    SemanticToken {
+                        delta_line: <span class="number">2</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">3</span>,
+                        token_type: <span class="number">0</span>,
+                        token_modifiers_bitset: <span class="number">3</span>,
                     },
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">0</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">4</span>,
-                        <span class="ident">token_type</span>: <span class="number">1</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">0</span>,
+                    SemanticToken {
+                        delta_line: <span class="number">0</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">4</span>,
+                        token_type: <span class="number">1</span>,
+                        token_modifiers_bitset: <span class="number">0</span>,
                     },
                 ],
             },
@@ -1288,137 +1288,137 @@
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_semantic_tokens_support_deserialization</span>() {
-        <span class="ident">test_deserialization</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_semantic_tokens_support_deserialization() {
+        test_deserialization(
             <span class="string">r#&quot;{&quot;data&quot;:[]}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[],
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[],
             },
         );
 
-        <span class="ident">test_deserialization</span>(
+        test_deserialization(
             <span class="string">r#&quot;{&quot;data&quot;:[2,5,3,0,3]}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="ident">SemanticToken</span> {
-                    <span class="ident">delta_line</span>: <span class="number">2</span>,
-                    <span class="ident">delta_start</span>: <span class="number">5</span>,
-                    <span class="ident">length</span>: <span class="number">3</span>,
-                    <span class="ident">token_type</span>: <span class="number">0</span>,
-                    <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[SemanticToken {
+                    delta_line: <span class="number">2</span>,
+                    delta_start: <span class="number">5</span>,
+                    length: <span class="number">3</span>,
+                    token_type: <span class="number">0</span>,
+                    token_modifiers_bitset: <span class="number">3</span>,
                 }],
             },
         );
 
-        <span class="ident">test_deserialization</span>(
+        test_deserialization(
             <span class="string">r#&quot;{&quot;data&quot;:[2,5,3,0,3,0,5,4,1,0]}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">2</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">3</span>,
-                        <span class="ident">token_type</span>: <span class="number">0</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[
+                    SemanticToken {
+                        delta_line: <span class="number">2</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">3</span>,
+                        token_type: <span class="number">0</span>,
+                        token_modifiers_bitset: <span class="number">3</span>,
                     },
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">0</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">4</span>,
-                        <span class="ident">token_type</span>: <span class="number">1</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">0</span>,
+                    SemanticToken {
+                        delta_line: <span class="number">0</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">4</span>,
+                        token_type: <span class="number">1</span>,
+                        token_modifiers_bitset: <span class="number">0</span>,
                     },
                 ],
             },
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_semantic_tokens_support_deserialization_err</span>() {
-        <span class="ident">test_deserialization</span>(
+    <span class="attribute">#[test]
+    #[should_panic]
+    </span><span class="kw">fn </span>test_semantic_tokens_support_deserialization_err() {
+        test_deserialization(
             <span class="string">r#&quot;{&quot;data&quot;:[1]}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokens</span> {
-                <span class="ident">result_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">data</span>: <span class="macro">vec!</span>[],
+            <span class="kw-2">&amp;</span>SemanticTokens {
+                result_id: <span class="prelude-val">None</span>,
+                data: <span class="macro">vec!</span>[],
             },
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_semantic_tokens_edit_support_deserialization</span>() {
-        <span class="ident">test_deserialization</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_semantic_tokens_edit_support_deserialization() {
+        test_deserialization(
             <span class="string">r#&quot;{&quot;start&quot;:0,&quot;deleteCount&quot;:1,&quot;data&quot;:[2,5,3,0,3,0,5,4,1,0]}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokensEdit</span> {
-                <span class="ident">start</span>: <span class="number">0</span>,
-                <span class="ident">delete_count</span>: <span class="number">1</span>,
-                <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">2</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">3</span>,
-                        <span class="ident">token_type</span>: <span class="number">0</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+            <span class="kw-2">&amp;</span>SemanticTokensEdit {
+                start: <span class="number">0</span>,
+                delete_count: <span class="number">1</span>,
+                data: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
+                    SemanticToken {
+                        delta_line: <span class="number">2</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">3</span>,
+                        token_type: <span class="number">0</span>,
+                        token_modifiers_bitset: <span class="number">3</span>,
                     },
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">0</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">4</span>,
-                        <span class="ident">token_type</span>: <span class="number">1</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">0</span>,
+                    SemanticToken {
+                        delta_line: <span class="number">0</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">4</span>,
+                        token_type: <span class="number">1</span>,
+                        token_modifiers_bitset: <span class="number">0</span>,
                     },
                 ]),
             },
         );
 
-        <span class="ident">test_deserialization</span>(
+        test_deserialization(
             <span class="string">r#&quot;{&quot;start&quot;:0,&quot;deleteCount&quot;:1}&quot;#</span>,
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokensEdit</span> {
-                <span class="ident">start</span>: <span class="number">0</span>,
-                <span class="ident">delete_count</span>: <span class="number">1</span>,
-                <span class="ident">data</span>: <span class="prelude-val">None</span>,
+            <span class="kw-2">&amp;</span>SemanticTokensEdit {
+                start: <span class="number">0</span>,
+                delete_count: <span class="number">1</span>,
+                data: <span class="prelude-val">None</span>,
             },
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_semantic_tokens_edit_support_serialization</span>() {
-        <span class="ident">test_serialization</span>(
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokensEdit</span> {
-                <span class="ident">start</span>: <span class="number">0</span>,
-                <span class="ident">delete_count</span>: <span class="number">1</span>,
-                <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">2</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">3</span>,
-                        <span class="ident">token_type</span>: <span class="number">0</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">3</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_semantic_tokens_edit_support_serialization() {
+        test_serialization(
+            <span class="kw-2">&amp;</span>SemanticTokensEdit {
+                start: <span class="number">0</span>,
+                delete_count: <span class="number">1</span>,
+                data: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
+                    SemanticToken {
+                        delta_line: <span class="number">2</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">3</span>,
+                        token_type: <span class="number">0</span>,
+                        token_modifiers_bitset: <span class="number">3</span>,
                     },
-                    <span class="ident">SemanticToken</span> {
-                        <span class="ident">delta_line</span>: <span class="number">0</span>,
-                        <span class="ident">delta_start</span>: <span class="number">5</span>,
-                        <span class="ident">length</span>: <span class="number">4</span>,
-                        <span class="ident">token_type</span>: <span class="number">1</span>,
-                        <span class="ident">token_modifiers_bitset</span>: <span class="number">0</span>,
+                    SemanticToken {
+                        delta_line: <span class="number">0</span>,
+                        delta_start: <span class="number">5</span>,
+                        length: <span class="number">4</span>,
+                        token_type: <span class="number">1</span>,
+                        token_modifiers_bitset: <span class="number">0</span>,
                     },
                 ]),
             },
             <span class="string">r#&quot;{&quot;start&quot;:0,&quot;deleteCount&quot;:1,&quot;data&quot;:[2,5,3,0,3,0,5,4,1,0]}&quot;#</span>,
         );
 
-        <span class="ident">test_serialization</span>(
-            <span class="kw-2">&amp;</span><span class="ident">SemanticTokensEdit</span> {
-                <span class="ident">start</span>: <span class="number">0</span>,
-                <span class="ident">delete_count</span>: <span class="number">1</span>,
-                <span class="ident">data</span>: <span class="prelude-val">None</span>,
+        test_serialization(
+            <span class="kw-2">&amp;</span>SemanticTokensEdit {
+                start: <span class="number">0</span>,
+                delete_count: <span class="number">1</span>,
+                data: <span class="prelude-val">None</span>,
             },
             <span class="string">r#&quot;{&quot;start&quot;:0,&quot;deleteCount&quot;:1}&quot;#</span>,
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

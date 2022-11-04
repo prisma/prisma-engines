@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../cuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cuid-1.2.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../cuid/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../cuid/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -216,223 +216,223 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # cuid-rust</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! CUID generation in rust</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use cuid;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a full CUID</span>
-<span class="doccomment">//! println!(&quot;{}&quot;, cuid::cuid().unwrap());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Get a shorter, URL-appropriate CUID slug</span>
-<span class="doccomment">//! println!(&quot;{}&quot;, cuid::slug().unwrap());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that this crate also provides a very simple, single purpose</span>
-<span class="doccomment">//! commandline interface:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```sh</span>
-<span class="doccomment">//! $&gt; cuid</span>
-<span class="doccomment">//! ckfritrvg0000kdtwc766fful</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [original implementation] for more details on CUIDs in general.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [original implementation]: https://github.com/ericelliott/cuid</span>
-<span class="doccomment">//!</span>
-<span class="kw">use</span> <span class="ident">std::sync::atomic::AtomicU32</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # cuid-rust
+//!
+//! CUID generation in rust
+//!
+//! ```rust
+//! use cuid;
+//!
+//! // Get a full CUID
+//! println!(&quot;{}&quot;, cuid::cuid().unwrap());
+//!
+//! // Get a shorter, URL-appropriate CUID slug
+//! println!(&quot;{}&quot;, cuid::slug().unwrap());
+//! ```
+//!
+//! Note that this crate also provides a very simple, single purpose
+//! commandline interface:
+//!
+//! ```sh
+//! $&gt; cuid
+//! ckfritrvg0000kdtwc766fful
+//! ```
+//!
+//! See the [original implementation] for more details on CUIDs in general.
+//!
+//! [original implementation]: https://github.com/ericelliott/cuid
+//!
+</span><span class="kw">use </span>std::sync::atomic::AtomicU32;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>lazy_static;
 
-<span class="kw">mod</span> <span class="ident">counter</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">fingerprint</span>;
-<span class="kw">mod</span> <span class="ident">random</span>;
-<span class="kw">mod</span> <span class="ident">text</span>;
-<span class="kw">mod</span> <span class="ident">time</span>;
+<span class="kw">mod </span>counter;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>fingerprint;
+<span class="kw">mod </span>random;
+<span class="kw">mod </span>text;
+<span class="kw">mod </span>time;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::CuidError</span>;
+<span class="kw">pub use </span>error::CuidError;
 
-<span class="kw">static</span> <span class="ident">BASE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">36</span>;
-<span class="kw">static</span> <span class="ident">BLOCK_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">static</span> <span class="ident">DISCRETE_VALUES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1679616</span>; <span class="comment">// BASE^BLOCK_SIZE</span>
-<span class="kw">static</span> <span class="ident">START_STR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;c&quot;</span>;
+<span class="kw">static </span>BASE: u8 = <span class="number">36</span>;
+<span class="kw">static </span>BLOCK_SIZE: usize = <span class="number">4</span>;
+<span class="kw">static </span>DISCRETE_VALUES: u32 = <span class="number">1679616</span>; <span class="comment">// BASE^BLOCK_SIZE
+</span><span class="kw">static </span>START_STR: <span class="kw-2">&amp;</span>str = <span class="string">&quot;c&quot;</span>;
 
-<span class="kw">static</span> <span class="ident">COUNTER</span>: <span class="ident">AtomicU32</span> <span class="op">=</span> <span class="ident">AtomicU32::new</span>(<span class="number">0</span>);
+<span class="kw">static </span>COUNTER: AtomicU32 = AtomicU32::new(<span class="number">0</span>);
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">FINGERPRINT</span>: <span class="ident">String</span> <span class="op">=</span>
-        <span class="ident">fingerprint::fingerprint</span>().<span class="ident">expect</span>(<span class="string">&quot;Could not determine system fingerprint!&quot;</span>);
+<span class="macro">lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>FINGERPRINT: String =
+        fingerprint::fingerprint().expect(<span class="string">&quot;Could not determine system fingerprint!&quot;</span>);
 }
 
-<span class="doccomment">/// Generate a CUID</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A CUID is composed of:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - The letter `c`</span>
-<span class="doccomment">/// - The timestamp in milliseconds as a base 36 number</span>
-<span class="doccomment">/// - An atomic counter that goes from 0 through 36^4 and then repeats, as a</span>
-<span class="doccomment">///   base 36 number</span>
-<span class="doccomment">/// - A (base 36) fingerprint derived from the system&#39;s hostname</span>
-<span class="doccomment">/// - Two random numbers between 0 and 36^4, each converted to base 36</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// extern crate cuid;</span>
-<span class="doccomment">/// let id = cuid::cuid();</span>
-<span class="doccomment">/// assert!(cuid::is_cuid(id.unwrap()));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cuid</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Generate a CUID
+///
+/// A CUID is composed of:
+///
+/// - The letter `c`
+/// - The timestamp in milliseconds as a base 36 number
+/// - An atomic counter that goes from 0 through 36^4 and then repeats, as a
+///   base 36 number
+/// - A (base 36) fingerprint derived from the system&#39;s hostname
+/// - Two random numbers between 0 and 36^4, each converted to base 36
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate cuid;
+/// let id = cuid::cuid();
+/// assert!(cuid::is_cuid(id.unwrap()));
+/// ```
+</span><span class="kw">pub fn </span>cuid() -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
     <span class="prelude-val">Ok</span>([
-        <span class="ident">START_STR</span>,
-        <span class="kw-2">&amp;</span><span class="ident">time::timestamp</span>()<span class="question-mark">?</span>,
-        <span class="kw-2">&amp;</span><span class="ident">counter::current</span>()<span class="question-mark">?</span>,
-        <span class="kw-2">&amp;</span><span class="ident">FINGERPRINT</span>,
-        <span class="kw-2">&amp;</span><span class="ident">random::random_block</span>()<span class="question-mark">?</span>,
-        <span class="kw-2">&amp;</span><span class="ident">random::random_block</span>()<span class="question-mark">?</span>,
+        START_STR,
+        <span class="kw-2">&amp;</span>time::timestamp()<span class="question-mark">?</span>,
+        <span class="kw-2">&amp;</span>counter::current()<span class="question-mark">?</span>,
+        <span class="kw-2">&amp;</span>FINGERPRINT,
+        <span class="kw-2">&amp;</span>random::random_block()<span class="question-mark">?</span>,
+        <span class="kw-2">&amp;</span>random::random_block()<span class="question-mark">?</span>,
     ]
-    .<span class="ident">concat</span>())
+    .concat())
 }
 
-<span class="doccomment">/// Generate a CUID slug</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// CUID slugs are shorter, appropriate for short URLs or other uses</span>
-<span class="doccomment">/// where uniqueness is not the primary requirement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this library is capable of generating over 2 million CUID slugs</span>
-<span class="doccomment">/// per second on a single thread on a fast machine. If your use case involves</span>
-<span class="doccomment">/// generating slugs in loops across threads, it is very possible you&#39;ll wind up</span>
-<span class="doccomment">/// with some non-unique slugs, given that the components of the slug are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Two characters from the millisecond timestamp as base 36</span>
-<span class="doccomment">/// - Four characters from the atomic counter, which has only ~1.6 million</span>
-<span class="doccomment">///   unique values, as base 36</span>
-<span class="doccomment">/// - The first and last character of the fingerprint (which is always the same</span>
-<span class="doccomment">///   on a given host)</span>
-<span class="doccomment">/// - Two characters from a random block</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For most use cases (i.e. generating fewer than a million slugs per second on</span>
-<span class="doccomment">/// a given host), slugs are very likely to be globally unique. However, please</span>
-<span class="doccomment">/// bear that limitation in mind, and use full CUIDs if you need a stronger</span>
-<span class="doccomment">/// guarantee of uniqueness.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// extern crate cuid;</span>
-<span class="doccomment">/// let slug = cuid::slug();</span>
-<span class="doccomment">/// assert!(cuid::is_slug(slug.unwrap()));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slug</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CuidError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">time::timestamp</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">counter::current</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">rand</span> <span class="op">=</span> <span class="ident">random::random_block</span>()<span class="question-mark">?</span>;
+<span class="doccomment">/// Generate a CUID slug
+///
+/// CUID slugs are shorter, appropriate for short URLs or other uses
+/// where uniqueness is not the primary requirement.
+///
+/// Note that this library is capable of generating over 2 million CUID slugs
+/// per second on a single thread on a fast machine. If your use case involves
+/// generating slugs in loops across threads, it is very possible you&#39;ll wind up
+/// with some non-unique slugs, given that the components of the slug are:
+///
+/// - Two characters from the millisecond timestamp as base 36
+/// - Four characters from the atomic counter, which has only ~1.6 million
+///   unique values, as base 36
+/// - The first and last character of the fingerprint (which is always the same
+///   on a given host)
+/// - Two characters from a random block
+///
+/// For most use cases (i.e. generating fewer than a million slugs per second on
+/// a given host), slugs are very likely to be globally unique. However, please
+/// bear that limitation in mind, and use full CUIDs if you need a stronger
+/// guarantee of uniqueness.
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate cuid;
+/// let slug = cuid::slug();
+/// assert!(cuid::is_slug(slug.unwrap()));
+/// ```
+</span><span class="kw">pub fn </span>slug() -&gt; <span class="prelude-ty">Result</span>&lt;String, CuidError&gt; {
+    <span class="kw">let </span>timestamp = time::timestamp()<span class="question-mark">?</span>;
+    <span class="kw">let </span>count = counter::current()<span class="question-mark">?</span>;
+    <span class="kw">let </span>rand = random::random_block()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>([
-        <span class="kw-2">&amp;</span><span class="ident">timestamp</span>[<span class="ident">timestamp</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>..],
-        <span class="kw-2">&amp;</span><span class="ident">count</span>[<span class="ident">count</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="number">4</span>)..],
-        <span class="kw-2">&amp;</span><span class="ident">FINGERPRINT</span>[..<span class="number">1</span>],
-        <span class="kw-2">&amp;</span><span class="ident">FINGERPRINT</span>[<span class="ident">FINGERPRINT</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>..],
-        <span class="kw-2">&amp;</span><span class="ident">rand</span>[<span class="ident">rand</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>..],
+        <span class="kw-2">&amp;</span>timestamp[timestamp.len() - <span class="number">2</span>..],
+        <span class="kw-2">&amp;</span>count[count.len().saturating_sub(<span class="number">4</span>)..],
+        <span class="kw-2">&amp;</span>FINGERPRINT[..<span class="number">1</span>],
+        <span class="kw-2">&amp;</span>FINGERPRINT[FINGERPRINT.len() - <span class="number">1</span>..],
+        <span class="kw-2">&amp;</span>rand[rand.len() - <span class="number">2</span>..],
     ]
-    .<span class="ident">concat</span>())
+    .concat())
 }
 
-<span class="doccomment">/// Return whether a string is a legitimate CUID</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// extern crate cuid;</span>
-<span class="doccomment">/// let id = cuid::cuid().unwrap();</span>
-<span class="doccomment">/// assert!(cuid::is_cuid(id));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cuid</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">to_check</span>: <span class="ident">S</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">to_check</span> <span class="op">=</span> <span class="ident">to_check</span>.<span class="ident">as_ref</span>();
-    <span class="kw">match</span> <span class="ident">to_check</span>.<span class="ident">len</span>() {
-        <span class="comment">// the CUID length will increase as the timestamp increases. The</span>
-        <span class="comment">// timestamp portion currently represents 8 characters. It has the</span>
-        <span class="comment">// potential to increase to up to 15 characters when the timestamp</span>
-        <span class="comment">// reaches the maximum 64-bit integer, at which point the earth will be</span>
-        <span class="comment">// long gone, presumably along with this code. At that time, the CUID</span>
-        <span class="comment">// length would be 32. 9 characters gives us up through at least the</span>
-        <span class="comment">// year 5138, though, so checking for 25 or 26 characters should do it.</span>
-        <span class="number">25</span>..<span class="op">=</span><span class="number">26</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">to_check</span>[..<span class="number">1</span>] <span class="op">==</span> <span class="ident">START_STR</span>,
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-    }
-}
-
-<span class="doccomment">/// Return whether a string is a legitimate CUID slug</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// extern crate cuid;</span>
-<span class="doccomment">/// let slug = cuid::slug().unwrap();</span>
-<span class="doccomment">/// assert!(cuid::is_slug(slug));</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_slug</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">to_check</span>: <span class="ident">S</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// the slug will always be 10 characters</span>
-    <span class="ident">to_check</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">10</span>
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">correct_discrete_values</span>() {
-        <span class="macro">assert_eq!</span>((<span class="ident">BASE</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">pow</span>(<span class="ident">BLOCK_SIZE</span> <span class="kw">as</span> <span class="ident">u32</span>), <span class="ident">DISCRETE_VALUES</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cuid_len</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">cuid</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>(), <span class="number">25</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cuid_is_cuid</span>() {
-        <span class="macro">assert!</span>(<span class="ident">is_cuid</span>(<span class="ident">cuid</span>().<span class="ident">unwrap</span>()));
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cuid_is_not_cuid_zero_len</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">is_cuid</span>(<span class="string">&quot;&quot;</span>), <span class="bool-val">false</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">slug_len</span>() {
-        <span class="macro">assert!</span>(<span class="ident">slug</span>().<span class="ident">unwrap</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">10</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">slug_is_slug</span>() {
-        <span class="macro">assert!</span>(<span class="ident">is_slug</span>(<span class="ident">slug</span>().<span class="ident">unwrap</span>()));
+<span class="doccomment">/// Return whether a string is a legitimate CUID
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate cuid;
+/// let id = cuid::cuid().unwrap();
+/// assert!(cuid::is_cuid(id));
+/// ```
+</span><span class="kw">pub fn </span>is_cuid&lt;S: AsRef&lt;str&gt;&gt;(to_check: S) -&gt; bool {
+    <span class="kw">let </span>to_check = to_check.as_ref();
+    <span class="kw">match </span>to_check.len() {
+        <span class="comment">// the CUID length will increase as the timestamp increases. The
+        // timestamp portion currently represents 8 characters. It has the
+        // potential to increase to up to 15 characters when the timestamp
+        // reaches the maximum 64-bit integer, at which point the earth will be
+        // long gone, presumably along with this code. At that time, the CUID
+        // length would be 32. 9 characters gives us up through at least the
+        // year 5138, though, so checking for 25 or 26 characters should do it.
+        </span><span class="number">25</span>..=<span class="number">26 </span>=&gt; <span class="kw-2">&amp;</span>to_check[..<span class="number">1</span>] == START_STR,
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">nightly</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">benchmarks</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">test::Bencher</span>;
+<span class="doccomment">/// Return whether a string is a legitimate CUID slug
+///
+/// # Examples
+///
+/// ```rust
+/// extern crate cuid;
+/// let slug = cuid::slug().unwrap();
+/// assert!(cuid::is_slug(slug));
+/// ```
+</span><span class="kw">pub fn </span>is_slug&lt;S: AsRef&lt;str&gt;&gt;(to_check: S) -&gt; bool {
+    <span class="comment">// the slug will always be 10 characters
+    </span>to_check.as_ref().len() == <span class="number">10
+</span>}
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_cuid</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">cuid</span>().<span class="ident">unwrap</span>();
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>correct_discrete_values() {
+        <span class="macro">assert_eq!</span>((BASE <span class="kw">as </span>u32).pow(BLOCK_SIZE <span class="kw">as </span>u32), DISCRETE_VALUES);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>cuid_len() {
+        <span class="macro">assert_eq!</span>(cuid().unwrap().len(), <span class="number">25</span>);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>cuid_is_cuid() {
+        <span class="macro">assert!</span>(is_cuid(cuid().unwrap()));
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>cuid_is_not_cuid_zero_len() {
+        <span class="macro">assert_eq!</span>(is_cuid(<span class="string">&quot;&quot;</span>), <span class="bool-val">false</span>);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>slug_len() {
+        <span class="macro">assert!</span>(slug().unwrap().len() == <span class="number">10</span>);
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>slug_is_slug() {
+        <span class="macro">assert!</span>(is_slug(slug().unwrap()));
+    }
+}
+
+<span class="attribute">#[cfg(nightly)]
+#[cfg(test)]
+</span><span class="kw">mod </span>benchmarks {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>test::Bencher;
+
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>bench_cuid(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            cuid().unwrap();
         })
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_slug</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">slug</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>bench_slug(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            slug().unwrap();
         })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cuid" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

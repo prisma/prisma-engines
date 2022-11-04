@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/graphmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>graphmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/graphmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>graphmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -884,585 +884,585 @@
 <span id="884">884</span>
 <span id="885">885</span>
 <span id="886">886</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `GraphMap&lt;N, E, Ty&gt;` is a graph datastructure where node values are mapping</span>
-<span class="doccomment">//! keys.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `GraphMap&lt;N, E, Ty&gt;` is a graph datastructure where node values are mapping
+//! keys.
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="self">self</span>, <span class="ident">Hash</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>::{
-    <span class="ident">Cloned</span>,
-    <span class="ident">DoubleEndedIterator</span>,
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::hash::{<span class="self">self</span>, Hash};
+<span class="kw">use </span>std::iter::{
+    Cloned,
+    DoubleEndedIterator,
 };
-<span class="kw">use</span> <span class="ident">std::slice</span>::{
-    <span class="ident">Iter</span>,
+<span class="kw">use </span>std::slice::{
+    Iter,
 };
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Index</span>, <span class="ident">IndexMut</span>, <span class="ident">Deref</span>};
-<span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">ordermap::OrderMap</span>;
-<span class="kw">use</span> <span class="ident">ordermap</span>::{
-    <span class="ident">Iter</span> <span class="kw">as</span> <span class="ident">OrderMapIter</span>, <span class="ident">IterMut</span> <span class="kw">as</span> <span class="ident">OrderMapIterMut</span>
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::ops::{Index, IndexMut, Deref};
+<span class="kw">use </span>std::iter::FromIterator;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>ordermap::OrderMap;
+<span class="kw">use </span>ordermap::{
+    Iter <span class="kw">as </span>OrderMapIter, IterMut <span class="kw">as </span>OrderMapIterMut
 };
-<span class="kw">use</span> <span class="ident">ordermap::Keys</span>;
+<span class="kw">use </span>ordermap::Keys;
 
-<span class="kw">use</span> {
-    <span class="ident">EdgeType</span>,
-    <span class="ident">Directed</span>,
-    <span class="ident">Undirected</span>,
-    <span class="ident">Direction</span>,
-    <span class="ident">Incoming</span>,
-    <span class="ident">Outgoing</span>,
+<span class="kw">use </span>{
+    EdgeType,
+    Directed,
+    Undirected,
+    Direction,
+    Incoming,
+    Outgoing,
 };
 
-<span class="kw">use</span> <span class="ident">IntoWeightedEdge</span>;
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">IntoNodeIdentifiers</span>, <span class="ident">NodeCount</span>, <span class="ident">IntoNodeReferences</span>, <span class="ident">NodeIndexable</span>};
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">NodeCompactIndexable</span>, <span class="ident">IntoEdgeReferences</span>, <span class="ident">IntoEdges</span>};
-<span class="kw">use</span> <span class="ident">graph::Graph</span>;
-<span class="kw">use</span> <span class="ident">graph::node_index</span>;
+<span class="kw">use </span>IntoWeightedEdge;
+<span class="kw">use </span>visit::{IntoNodeIdentifiers, NodeCount, IntoNodeReferences, NodeIndexable};
+<span class="kw">use </span>visit::{NodeCompactIndexable, IntoEdgeReferences, IntoEdges};
+<span class="kw">use </span>graph::Graph;
+<span class="kw">use </span>graph::node_index;
 
-<span class="doccomment">/// A `GraphMap` with undirected edges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, an edge between *1* and *2* is equivalent to an edge between</span>
-<span class="doccomment">/// *2* and *1*.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UnGraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Undirected</span><span class="op">&gt;</span>;
-<span class="doccomment">/// A `GraphMap` with directed edges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, an edge from *1* to *2* is distinct from an edge from *2* to</span>
-<span class="doccomment">/// *1*.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DiGraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Directed</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A `GraphMap` with undirected edges.
+///
+/// For example, an edge between *1* and *2* is equivalent to an edge between
+/// *2* and *1*.
+</span><span class="kw">pub type </span>UnGraphMap&lt;N, E&gt; = GraphMap&lt;N, E, Undirected&gt;;
+<span class="doccomment">/// A `GraphMap` with directed edges.
+///
+/// For example, an edge from *1* to *2* is distinct from an edge from *2* to
+/// *1*.
+</span><span class="kw">pub type </span>DiGraphMap&lt;N, E&gt; = GraphMap&lt;N, E, Directed&gt;;
 
-<span class="doccomment">/// `GraphMap&lt;N, E, Ty&gt;` is a graph datastructure using an associative array</span>
-<span class="doccomment">/// of its node weights `N`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It uses an combined adjacency list and sparse adjacency matrix</span>
-<span class="doccomment">/// representation, using **O(|V| + |E|)** space, and allows testing for edge</span>
-<span class="doccomment">/// existance in constant time.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `GraphMap` is parameterized over:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Associated data `N` for nodes and `E` for edges, called *weights*.</span>
-<span class="doccomment">/// - The node weight `N` must implement `Copy` and will be used as node</span>
-<span class="doccomment">/// identifier, duplicated into several places in the data structure.</span>
-<span class="doccomment">/// It must be suitable as a hash table key (implementing `Eq + Hash`).</span>
-<span class="doccomment">/// The node type must also implement `Ord` so that the implementation can</span>
-<span class="doccomment">/// order the pair (`a`, `b`) for an edge connecting any two nodes `a` and `b`.</span>
-<span class="doccomment">/// - `E` can be of arbitrary type.</span>
-<span class="doccomment">/// - Edge type `Ty` that determines whether the graph edges are directed or</span>
-<span class="doccomment">/// undirected.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can use the type aliases `UnGraphMap` and `DiGraphMap` for convenience.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `GraphMap` does not allow parallel edges, but self loops are allowed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Depends on crate feature `graphmap` (default).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-    <span class="ident">nodes</span>: <span class="ident">OrderMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">edges</span>: <span class="ident">OrderMap</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">N</span>), <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="doccomment">/// `GraphMap&lt;N, E, Ty&gt;` is a graph datastructure using an associative array
+/// of its node weights `N`.
+///
+/// It uses an combined adjacency list and sparse adjacency matrix
+/// representation, using **O(|V| + |E|)** space, and allows testing for edge
+/// existance in constant time.
+///
+/// `GraphMap` is parameterized over:
+///
+/// - Associated data `N` for nodes and `E` for edges, called *weights*.
+/// - The node weight `N` must implement `Copy` and will be used as node
+/// identifier, duplicated into several places in the data structure.
+/// It must be suitable as a hash table key (implementing `Eq + Hash`).
+/// The node type must also implement `Ord` so that the implementation can
+/// order the pair (`a`, `b`) for an edge connecting any two nodes `a` and `b`.
+/// - `E` can be of arbitrary type.
+/// - Edge type `Ty` that determines whether the graph edges are directed or
+/// undirected.
+///
+/// You can use the type aliases `UnGraphMap` and `DiGraphMap` for convenience.
+///
+/// `GraphMap` does not allow parallel edges, but self loops are allowed.
+///
+/// Depends on crate feature `graphmap` (default).
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>GraphMap&lt;N, E, Ty&gt; {
+    nodes: OrderMap&lt;N, Vec&lt;(N, CompactDirection)&gt;&gt;,
+    edges: OrderMap&lt;(N, N), E&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">fmt::Debug</span>, <span class="ident">E</span>: <span class="ident">fmt::Debug</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;N: Eq + Hash + fmt::Debug, E: fmt::Debug, Ty: EdgeType&gt; fmt::Debug <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.nodes.fmt(f)
     }
 }
 
-<span class="doccomment">/// A trait group for `GraphMap`&#39;s node identifier.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NodeTrait</span> : <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="ident">NodeTrait</span> <span class="kw">for</span> <span class="ident">N</span> <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Hash</span> {}
+<span class="doccomment">/// A trait group for `GraphMap`&#39;s node identifier.
+</span><span class="kw">pub trait </span>NodeTrait : Copy + Ord + Hash {}
+<span class="kw">impl</span>&lt;N&gt; NodeTrait <span class="kw">for </span>N <span class="kw">where </span>N: Copy + Ord + Hash {}
 
-<span class="comment">// non-repr(usize) version of Direction</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">CompactDirection</span> {
-    <span class="ident">Outgoing</span>,
-    <span class="ident">Incoming</span>,
+<span class="comment">// non-repr(usize) version of Direction
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq)]
+</span><span class="kw">enum </span>CompactDirection {
+    Outgoing,
+    Incoming,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Direction</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompactDirection</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">d</span>: <span class="ident">Direction</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">d</span> {
-            <span class="ident">Outgoing</span> =&gt; <span class="ident">CompactDirection::Outgoing</span>,
-            <span class="ident">Incoming</span> =&gt; <span class="ident">CompactDirection::Incoming</span>,
+<span class="kw">impl </span>From&lt;Direction&gt; <span class="kw">for </span>CompactDirection {
+    <span class="kw">fn </span>from(d: Direction) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>d {
+            Outgoing =&gt; CompactDirection::Outgoing,
+            Incoming =&gt; CompactDirection::Incoming,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Direction</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CompactDirection</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Direction</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">==</span> (<span class="kw-2">*</span><span class="ident">rhs</span> <span class="kw">as</span> <span class="ident">usize</span>)
+<span class="kw">impl </span>PartialEq&lt;Direction&gt; <span class="kw">for </span>CompactDirection {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Direction) -&gt; bool {
+        (<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>usize) == (<span class="kw-2">*</span>rhs <span class="kw">as </span>usize)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;N, E, Ty&gt; GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="doccomment">/// Create a new `GraphMap`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+    <span class="doccomment">/// Create a new `GraphMap`
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Create a new `GraphMap` with estimated capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">nodes</span>: <span class="ident">usize</span>, <span class="ident">edges</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">GraphMap</span> {
-            <span class="ident">nodes</span>: <span class="ident">OrderMap::with_capacity</span>(<span class="ident">nodes</span>),
-            <span class="ident">edges</span>: <span class="ident">OrderMap::with_capacity</span>(<span class="ident">edges</span>),
-            <span class="ident">ty</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Create a new `GraphMap` with estimated capacity.
+    </span><span class="kw">pub fn </span>with_capacity(nodes: usize, edges: usize) -&gt; <span class="self">Self </span>{
+        GraphMap {
+            nodes: OrderMap::with_capacity(nodes),
+            edges: OrderMap::with_capacity(edges),
+            ty: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Return the current node and edge capacity of the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-        (<span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">capacity</span>(), <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">capacity</span>())
+    <span class="doccomment">/// Return the current node and edge capacity of the graph.
+    </span><span class="kw">pub fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, usize) {
+        (<span class="self">self</span>.nodes.capacity(), <span class="self">self</span>.edges.capacity())
     }
 
-    <span class="doccomment">/// Use their natual order to map the node pair (a, b) to a canonical edge id.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">edge_key</span>(<span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; (<span class="ident">N</span>, <span class="ident">N</span>) {
-        <span class="kw">if</span> <span class="ident">Ty::is_directed</span>() {
-            (<span class="ident">a</span>, <span class="ident">b</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">b</span> { (<span class="ident">a</span>, <span class="ident">b</span>) } <span class="kw">else</span> { (<span class="ident">b</span>, <span class="ident">a</span>) }
+    <span class="doccomment">/// Use their natual order to map the node pair (a, b) to a canonical edge id.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>edge_key(a: N, b: N) -&gt; (N, N) {
+        <span class="kw">if </span>Ty::is_directed() {
+            (a, b)
+        } <span class="kw">else </span>{
+            <span class="kw">if </span>a &lt;= b { (a, b) } <span class="kw">else </span>{ (b, a) }
         }
     }
 
-    <span class="doccomment">/// Whether the graph has directed edges.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_directed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Ty::is_directed</span>()
+    <span class="doccomment">/// Whether the graph has directed edges.
+    </span><span class="kw">pub fn </span>is_directed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        Ty::is_directed()
     }
 
-    <span class="doccomment">/// Create a new `GraphMap` from an iterable of edges.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Node values are taken directly from the list.</span>
-    <span class="doccomment">/// Edge weights `E` may either be specified in the list,</span>
-    <span class="doccomment">/// or they are filled with default values.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Nodes are inserted automatically to match the edges.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use petgraph::graphmap::UnGraphMap;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new undirected GraphMap.</span>
-    <span class="doccomment">/// // Use a type hint to have `()` be the edge weight type.</span>
-    <span class="doccomment">/// let gr = UnGraphMap::&lt;_, ()&gt;::from_edges(&amp;[</span>
-    <span class="doccomment">///     (0, 1), (0, 2), (0, 3),</span>
-    <span class="doccomment">///     (1, 2), (1, 3),</span>
-    <span class="doccomment">///     (2, 3),</span>
-    <span class="doccomment">/// ]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_edges</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
-              <span class="ident">I::Item</span>: <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Create a new `GraphMap` from an iterable of edges.
+    ///
+    /// Node values are taken directly from the list.
+    /// Edge weights `E` may either be specified in the list,
+    /// or they are filled with default values.
+    ///
+    /// Nodes are inserted automatically to match the edges.
+    ///
+    /// ```
+    /// use petgraph::graphmap::UnGraphMap;
+    ///
+    /// // Create a new undirected GraphMap.
+    /// // Use a type hint to have `()` be the edge weight type.
+    /// let gr = UnGraphMap::&lt;_, ()&gt;::from_edges(&amp;[
+    ///     (0, 1), (0, 2), (0, 3),
+    ///     (1, 2), (1, 3),
+    ///     (2, 3),
+    /// ]);
+    /// ```
+    </span><span class="kw">pub fn </span>from_edges&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>I: IntoIterator,
+              I::Item: IntoWeightedEdge&lt;E, NodeId=N&gt;
     {
-        <span class="ident"><span class="self">Self</span>::from_iter</span>(<span class="ident">iterable</span>)
+        <span class="self">Self</span>::from_iter(iterable)
     }
 
-    <span class="doccomment">/// Return the number of nodes in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Return the number of nodes in the graph.
+    </span><span class="kw">pub fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.nodes.len()
     }
 
-    <span class="doccomment">/// Return the number of edges in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Return the number of edges in the graph.
+    </span><span class="kw">pub fn </span>edge_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.edges.len()
     }
 
-    <span class="doccomment">/// Remove all nodes and edges</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clear</span>();
+    <span class="doccomment">/// Remove all nodes and edges
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.nodes.clear();
+        <span class="self">self</span>.edges.clear();
     }
 
-    <span class="doccomment">/// Add node `n` to the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">N</span> {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">entry</span>(<span class="ident">n</span>).<span class="ident">or_insert</span>(<span class="ident">Vec::new</span>());
-        <span class="ident">n</span>
+    <span class="doccomment">/// Add node `n` to the graph.
+    </span><span class="kw">pub fn </span>add_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: N) -&gt; N {
+        <span class="self">self</span>.nodes.entry(n).or_insert(Vec::new());
+        n
     }
 
-    <span class="doccomment">/// Return `true` if node `n` was removed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">links</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">sus</span>) =&gt; <span class="ident">sus</span>,
+    <span class="doccomment">/// Return `true` if node `n` was removed.
+    </span><span class="kw">pub fn </span>remove_node(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: N) -&gt; bool {
+        <span class="kw">let </span>links = <span class="kw">match </span><span class="self">self</span>.nodes.swap_remove(<span class="kw-2">&amp;</span>n) {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(sus) =&gt; sus,
         };
-        <span class="kw">for</span> (<span class="ident">succ</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">links</span> {
-            <span class="comment">// remove all successor links</span>
-            <span class="self">self</span>.<span class="ident">remove_single_edge</span>(<span class="kw-2">&amp;</span><span class="ident">succ</span>, <span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="ident">Incoming</span>);
-            <span class="comment">// Remove all edge values</span>
-            <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">swap_remove</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">n</span>, <span class="ident">succ</span>));
+        <span class="kw">for </span>(succ, <span class="kw">_</span>) <span class="kw">in </span>links {
+            <span class="comment">// remove all successor links
+            </span><span class="self">self</span>.remove_single_edge(<span class="kw-2">&amp;</span>succ, <span class="kw-2">&amp;</span>n, Incoming);
+            <span class="comment">// Remove all edge values
+            </span><span class="self">self</span>.edges.swap_remove(<span class="kw-2">&amp;</span><span class="self">Self</span>::edge_key(n, succ));
         }
-        <span class="bool-val">true</span>
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Return `true` if the node is contained in the graph.
+    </span><span class="kw">pub fn </span>contains_node(<span class="kw-2">&amp;</span><span class="self">self</span>, n: N) -&gt; bool {
+        <span class="self">self</span>.nodes.contains_key(<span class="kw-2">&amp;</span>n)
     }
 
-    <span class="doccomment">/// Return `true` if the node is contained in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>)
-    }
-
-    <span class="doccomment">/// Add an edge connecting `a` and `b` to the graph, with associated</span>
-    <span class="doccomment">/// data `weight`. For a directed graph, the edge is directed from `a`</span>
-    <span class="doccomment">/// to `b`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Inserts nodes `a` and/or `b` if they aren&#39;t already part of the graph.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return `None` if the edge did not previously exist, otherwise,</span>
-    <span class="doccomment">/// the associated data is updated and the old value is returned</span>
-    <span class="doccomment">/// as `Some(old_weight)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// // Create a GraphMap with directed edges, and add one edge to it</span>
-    <span class="doccomment">/// use petgraph::graphmap::DiGraphMap;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut g = DiGraphMap::new();</span>
-    <span class="doccomment">/// g.add_edge(&quot;x&quot;, &quot;y&quot;, -1);</span>
-    <span class="doccomment">/// assert_eq!(g.node_count(), 2);</span>
-    <span class="doccomment">/// assert_eq!(g.edge_count(), 1);</span>
-    <span class="doccomment">/// assert!(g.contains_edge(&quot;x&quot;, &quot;y&quot;));</span>
-    <span class="doccomment">/// assert!(!g.contains_edge(&quot;y&quot;, &quot;x&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">old</span> @ <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">insert</span>(<span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">weight</span>) {
-            <span class="ident">old</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// insert in the adjacency list if it&#39;s a new edge</span>
-            <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">entry</span>(<span class="ident">a</span>)
-                      .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>))
-                      .<span class="ident">push</span>((<span class="ident">b</span>, <span class="ident">CompactDirection::Outgoing</span>));
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span> {
-                <span class="comment">// self loops don&#39;t have the Incoming entry</span>
-                <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">entry</span>(<span class="ident">b</span>)
-                          .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>))
-                          .<span class="ident">push</span>((<span class="ident">a</span>, <span class="ident">CompactDirection::Incoming</span>));
+    <span class="doccomment">/// Add an edge connecting `a` and `b` to the graph, with associated
+    /// data `weight`. For a directed graph, the edge is directed from `a`
+    /// to `b`.
+    ///
+    /// Inserts nodes `a` and/or `b` if they aren&#39;t already part of the graph.
+    ///
+    /// Return `None` if the edge did not previously exist, otherwise,
+    /// the associated data is updated and the old value is returned
+    /// as `Some(old_weight)`.
+    ///
+    /// ```
+    /// // Create a GraphMap with directed edges, and add one edge to it
+    /// use petgraph::graphmap::DiGraphMap;
+    ///
+    /// let mut g = DiGraphMap::new();
+    /// g.add_edge(&quot;x&quot;, &quot;y&quot;, -1);
+    /// assert_eq!(g.node_count(), 2);
+    /// assert_eq!(g.edge_count(), 1);
+    /// assert!(g.contains_edge(&quot;x&quot;, &quot;y&quot;));
+    /// assert!(!g.contains_edge(&quot;y&quot;, &quot;x&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>add_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: N, b: N, weight: E) -&gt; <span class="prelude-ty">Option</span>&lt;E&gt; {
+        <span class="kw">if let </span>old @ <span class="prelude-val">Some</span>(<span class="kw">_</span>) = <span class="self">self</span>.edges.insert(<span class="self">Self</span>::edge_key(a, b), weight) {
+            old
+        } <span class="kw">else </span>{
+            <span class="comment">// insert in the adjacency list if it&#39;s a new edge
+            </span><span class="self">self</span>.nodes.entry(a)
+                      .or_insert_with(|| Vec::with_capacity(<span class="number">1</span>))
+                      .push((b, CompactDirection::Outgoing));
+            <span class="kw">if </span>a != b {
+                <span class="comment">// self loops don&#39;t have the Incoming entry
+                </span><span class="self">self</span>.nodes.entry(b)
+                          .or_insert_with(|| Vec::with_capacity(<span class="number">1</span>))
+                          .push((a, CompactDirection::Incoming));
             }
-            <span class="prelude-val">None</span>
-        }
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Remove edge relation from a to b</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return `true` if it did exist.</span>
-    <span class="kw">fn</span> <span class="ident">remove_single_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">N</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">N</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_mut</span>(<span class="ident">a</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">sus</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">Ty::is_directed</span>() {
-                    <span class="kw">match</span> <span class="ident">sus</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">elt</span><span class="op">|</span> <span class="ident">elt</span> <span class="op">==</span> <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">b</span>, <span class="ident">CompactDirection::from</span>(<span class="ident">dir</span>))) {
-                        <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; { <span class="ident">sus</span>.<span class="ident">swap_remove</span>(<span class="ident">index</span>); <span class="bool-val">true</span> }
-                        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Remove edge relation from a to b
+    ///
+    /// Return `true` if it did exist.
+    </span><span class="kw">fn </span>remove_single_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: <span class="kw-2">&amp;</span>N, b: <span class="kw-2">&amp;</span>N, dir: Direction) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.nodes.get_mut(a) {
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(sus) =&gt; {
+                <span class="kw">if </span>Ty::is_directed() {
+                    <span class="kw">match </span>sus.iter().position(|elt| elt == <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>b, CompactDirection::from(dir))) {
+                        <span class="prelude-val">Some</span>(index) =&gt; { sus.swap_remove(index); <span class="bool-val">true </span>}
+                        <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
                     }
-                } <span class="kw">else</span> {
-                    <span class="kw">match</span> <span class="ident">sus</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">elt</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">elt</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">b</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; { <span class="ident">sus</span>.<span class="ident">swap_remove</span>(<span class="ident">index</span>); <span class="bool-val">true</span> }
-                        <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+                } <span class="kw">else </span>{
+                    <span class="kw">match </span>sus.iter().position(|elt| <span class="kw-2">&amp;</span>elt.<span class="number">0 </span>== b) {
+                        <span class="prelude-val">Some</span>(index) =&gt; { sus.swap_remove(index); <span class="bool-val">true </span>}
+                        <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
                     }
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Remove edge from `a` to `b` from the graph and return the edge weight.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Return `None` if the edge didn&#39;t exist.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// // Create a GraphMap with undirected edges, and add and remove an edge.</span>
-    <span class="doccomment">/// use petgraph::graphmap::UnGraphMap;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut g = UnGraphMap::new();</span>
-    <span class="doccomment">/// g.add_edge(&quot;x&quot;, &quot;y&quot;, -1);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let edge_data = g.remove_edge(&quot;y&quot;, &quot;x&quot;);</span>
-    <span class="doccomment">/// assert_eq!(edge_data, Some(-1));</span>
-    <span class="doccomment">/// assert_eq!(g.edge_count(), 0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">exist1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remove_single_edge</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>, <span class="ident">Outgoing</span>);
-        <span class="kw">let</span> <span class="ident">exist2</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span> {
-            <span class="self">self</span>.<span class="ident">remove_single_edge</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>, <span class="ident">Incoming</span>)
-        } <span class="kw">else</span> { <span class="ident">exist1</span> };
-        <span class="kw">let</span> <span class="ident">weight</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>));
-        <span class="macro">debug_assert!</span>(<span class="ident">exist1</span> <span class="op">==</span> <span class="ident">exist2</span> <span class="op">&amp;&amp;</span> <span class="ident">exist1</span> <span class="op">==</span> <span class="ident">weight</span>.<span class="ident">is_some</span>());
-        <span class="ident">weight</span>
+    <span class="doccomment">/// Remove edge from `a` to `b` from the graph and return the edge weight.
+    ///
+    /// Return `None` if the edge didn&#39;t exist.
+    ///
+    /// ```
+    /// // Create a GraphMap with undirected edges, and add and remove an edge.
+    /// use petgraph::graphmap::UnGraphMap;
+    ///
+    /// let mut g = UnGraphMap::new();
+    /// g.add_edge(&quot;x&quot;, &quot;y&quot;, -1);
+    ///
+    /// let edge_data = g.remove_edge(&quot;y&quot;, &quot;x&quot;);
+    /// assert_eq!(edge_data, Some(-1));
+    /// assert_eq!(g.edge_count(), 0);
+    /// ```
+    </span><span class="kw">pub fn </span>remove_edge(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: N, b: N) -&gt; <span class="prelude-ty">Option</span>&lt;E&gt; {
+        <span class="kw">let </span>exist1 = <span class="self">self</span>.remove_single_edge(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, Outgoing);
+        <span class="kw">let </span>exist2 = <span class="kw">if </span>a != b {
+            <span class="self">self</span>.remove_single_edge(<span class="kw-2">&amp;</span>b, <span class="kw-2">&amp;</span>a, Incoming)
+        } <span class="kw">else </span>{ exist1 };
+        <span class="kw">let </span>weight = <span class="self">self</span>.edges.remove(<span class="kw-2">&amp;</span><span class="self">Self</span>::edge_key(a, b));
+        <span class="macro">debug_assert!</span>(exist1 == exist2 &amp;&amp; exist1 == weight.is_some());
+        weight
     }
 
-    <span class="doccomment">/// Return `true` if the edge connecting `a` with `b` is contained in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_edge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>))
+    <span class="doccomment">/// Return `true` if the edge connecting `a` with `b` is contained in the graph.
+    </span><span class="kw">pub fn </span>contains_edge(<span class="kw-2">&amp;</span><span class="self">self</span>, a: N, b: N) -&gt; bool {
+        <span class="self">self</span>.edges.contains_key(<span class="kw-2">&amp;</span><span class="self">Self</span>::edge_key(a, b))
     }
 
-    <span class="doccomment">/// Return an iterator over the nodes of the graph.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterator element type is `N`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Nodes</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="ident">Nodes</span>{<span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">keys</span>().<span class="ident">cloned</span>()}
+    <span class="doccomment">/// Return an iterator over the nodes of the graph.
+    ///
+    /// Iterator element type is `N`.
+    </span><span class="kw">pub fn </span>nodes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Nodes&lt;N&gt; {
+        Nodes{iter: <span class="self">self</span>.nodes.keys().cloned()}
     }
 
-    <span class="doccomment">/// Return an iterator of all nodes with an edge starting from `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `Directed`: Outgoing edges from `a`.</span>
-    <span class="doccomment">/// - `Undirected`: All edges from or to `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;</span>
-    <span class="doccomment">/// Iterator element type is `N`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">neighbors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>) -&gt; <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-        <span class="ident">Neighbors</span> {
-            <span class="ident">iter</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">neigh</span>) =&gt; <span class="ident">neigh</span>.<span class="ident">iter</span>(),
-                <span class="prelude-val">None</span> =&gt; [].<span class="ident">iter</span>(),
+    <span class="doccomment">/// Return an iterator of all nodes with an edge starting from `a`.
+    ///
+    /// - `Directed`: Outgoing edges from `a`.
+    /// - `Undirected`: All edges from or to `a`.
+    ///
+    /// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;
+    /// Iterator element type is `N`.
+    </span><span class="kw">pub fn </span>neighbors(<span class="kw-2">&amp;</span><span class="self">self</span>, a: N) -&gt; Neighbors&lt;N, Ty&gt; {
+        Neighbors {
+            iter: <span class="kw">match </span><span class="self">self</span>.nodes.get(<span class="kw-2">&amp;</span>a) {
+                <span class="prelude-val">Some</span>(neigh) =&gt; neigh.iter(),
+                <span class="prelude-val">None </span>=&gt; [].iter(),
             },
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+            ty: <span class="self">self</span>.ty,
         }
     }
 
-    <span class="doccomment">/// Return an iterator of all neighbors that have an edge between them and</span>
-    <span class="doccomment">/// `a`, in the specified direction.</span>
-    <span class="doccomment">/// If the graph&#39;s edges are undirected, this is equivalent to *.neighbors(a)*.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `Directed`, `Outgoing`: All edges from `a`.</span>
-    <span class="doccomment">/// - `Directed`, `Incoming`: All edges to `a`.</span>
-    <span class="doccomment">/// - `Undirected`: All edges from or to `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;</span>
-    <span class="doccomment">/// Iterator element type is `N`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">neighbors_directed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>)
-        -&gt; <span class="ident">NeighborsDirected</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Return an iterator of all neighbors that have an edge between them and
+    /// `a`, in the specified direction.
+    /// If the graph&#39;s edges are undirected, this is equivalent to *.neighbors(a)*.
+    ///
+    /// - `Directed`, `Outgoing`: All edges from `a`.
+    /// - `Directed`, `Incoming`: All edges to `a`.
+    /// - `Undirected`: All edges from or to `a`.
+    ///
+    /// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;
+    /// Iterator element type is `N`.
+    </span><span class="kw">pub fn </span>neighbors_directed(<span class="kw-2">&amp;</span><span class="self">self</span>, a: N, dir: Direction)
+        -&gt; NeighborsDirected&lt;N, Ty&gt;
     {
-        <span class="ident">NeighborsDirected</span> {
-            <span class="ident">iter</span>: <span class="kw">match</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">neigh</span>) =&gt; <span class="ident">neigh</span>.<span class="ident">iter</span>(),
-                <span class="prelude-val">None</span> =&gt; [].<span class="ident">iter</span>(),
+        NeighborsDirected {
+            iter: <span class="kw">match </span><span class="self">self</span>.nodes.get(<span class="kw-2">&amp;</span>a) {
+                <span class="prelude-val">Some</span>(neigh) =&gt; neigh.iter(),
+                <span class="prelude-val">None </span>=&gt; [].iter(),
             },
-            <span class="ident">dir</span>: <span class="ident">dir</span>,
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+            dir: dir,
+            ty: <span class="self">self</span>.ty,
         }
     }
 
-    <span class="doccomment">/// Return an iterator of target nodes with an edge starting from `a`,</span>
-    <span class="doccomment">/// paired with their respective edge weights.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `Directed`: Outgoing edges from `a`.</span>
-    <span class="doccomment">/// - `Undirected`: All edges from or to `a`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;</span>
-    <span class="doccomment">/// Iterator element type is `(N, &amp;E)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">N</span>) -&gt; <span class="ident">Edges</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-        <span class="ident">Edges</span> {
-            <span class="ident">from</span>: <span class="ident">from</span>,
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">neighbors</span>(<span class="ident">from</span>),
-            <span class="ident">edges</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">edges</span>,
+    <span class="doccomment">/// Return an iterator of target nodes with an edge starting from `a`,
+    /// paired with their respective edge weights.
+    ///
+    /// - `Directed`: Outgoing edges from `a`.
+    /// - `Undirected`: All edges from or to `a`.
+    ///
+    /// Produces an empty iterator if the node doesn&#39;t exist.&lt;br&gt;
+    /// Iterator element type is `(N, &amp;E)`.
+    </span><span class="kw">pub fn </span>edges(<span class="kw-2">&amp;</span><span class="self">self</span>, from: N) -&gt; Edges&lt;N, E, Ty&gt; {
+        Edges {
+            from: from,
+            iter: <span class="self">self</span>.neighbors(from),
+            edges: <span class="kw-2">&amp;</span><span class="self">self</span>.edges,
         }
     }
 
-    <span class="doccomment">/// Return a reference to the edge weight connecting `a` with `b`, or</span>
-    <span class="doccomment">/// `None` if the edge does not exist in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>))
+    <span class="doccomment">/// Return a reference to the edge weight connecting `a` with `b`, or
+    /// `None` if the edge does not exist in the graph.
+    </span><span class="kw">pub fn </span>edge_weight(<span class="kw-2">&amp;</span><span class="self">self</span>, a: N, b: N) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>E&gt; {
+        <span class="self">self</span>.edges.get(<span class="kw-2">&amp;</span><span class="self">Self</span>::edge_key(a, b))
     }
 
-    <span class="doccomment">/// Return a mutable reference to the edge weight connecting `a` with `b`, or</span>
-    <span class="doccomment">/// `None` if the edge does not exist in the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">N</span>, <span class="ident">b</span>: <span class="ident">N</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>))
+    <span class="doccomment">/// Return a mutable reference to the edge weight connecting `a` with `b`, or
+    /// `None` if the edge does not exist in the graph.
+    </span><span class="kw">pub fn </span>edge_weight_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: N, b: N) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>E&gt; {
+        <span class="self">self</span>.edges.get_mut(<span class="kw-2">&amp;</span><span class="self">Self</span>::edge_key(a, b))
     }
 
-    <span class="doccomment">/// Return an iterator over all edges of the graph with their weight in arbitrary order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterator element type is `(N, N, &amp;E)`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AllEdges</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-        <span class="ident">AllEdges</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">iter</span>(),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+    <span class="doccomment">/// Return an iterator over all edges of the graph with their weight in arbitrary order.
+    ///
+    /// Iterator element type is `(N, N, &amp;E)`
+    </span><span class="kw">pub fn </span>all_edges(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AllEdges&lt;N, E, Ty&gt; {
+        AllEdges {
+            inner: <span class="self">self</span>.edges.iter(),
+            ty: <span class="self">self</span>.ty,
         }
     }
 
-    <span class="doccomment">/// Return an iterator over all edges of the graph in arbitrary order, with a mutable reference</span>
-    <span class="doccomment">/// to their weight.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterator element type is `(N, N, &amp;mut E)`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_edges_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">AllEdgesMut</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> {
-        <span class="ident">AllEdgesMut</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">iter_mut</span>(),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
+    <span class="doccomment">/// Return an iterator over all edges of the graph in arbitrary order, with a mutable reference
+    /// to their weight.
+    ///
+    /// Iterator element type is `(N, N, &amp;mut E)`
+    </span><span class="kw">pub fn </span>all_edges_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; AllEdgesMut&lt;N, E, Ty&gt; {
+        AllEdgesMut {
+            inner: <span class="self">self</span>.edges.iter_mut(),
+            ty: <span class="self">self</span>.ty,
         }
     }
 
-    <span class="doccomment">/// Return a `Graph` that corresponds to this `GraphMap`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. Note that node and edge indices in the `Graph` have nothing in common</span>
-    <span class="doccomment">///    with the `GraphMap`s node weights `N`. The node weights `N` are used as</span>
-    <span class="doccomment">///    node weights in the resulting `Graph`, too.</span>
-    <span class="doccomment">/// 2. Note that the index type is user-chosen.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Computes in **O(|V| + |E|)** time (average).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the number of nodes or edges does not fit with</span>
-    <span class="doccomment">/// the resulting graph&#39;s index type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_graph</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">::graph::IndexType</span>,
+    <span class="doccomment">/// Return a `Graph` that corresponds to this `GraphMap`.
+    ///
+    /// 1. Note that node and edge indices in the `Graph` have nothing in common
+    ///    with the `GraphMap`s node weights `N`. The node weights `N` are used as
+    ///    node weights in the resulting `Graph`, too.
+    /// 2. Note that the index type is user-chosen.
+    ///
+    /// Computes in **O(|V| + |E|)** time (average).
+    ///
+    /// **Panics** if the number of nodes or edges does not fit with
+    /// the resulting graph&#39;s index type.
+    </span><span class="kw">pub fn </span>into_graph&lt;Ix&gt;(<span class="self">self</span>) -&gt; Graph&lt;N, E, Ty, Ix&gt;
+        <span class="kw">where </span>Ix: ::graph::IndexType,
     {
-        <span class="comment">// assuming two successive iterations of the same hashmap produce the same order</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gr</span> <span class="op">=</span> <span class="ident">Graph::with_capacity</span>(<span class="self">self</span>.<span class="ident">node_count</span>(), <span class="self">self</span>.<span class="ident">edge_count</span>());
-        <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nodes</span> {
-            <span class="ident">gr</span>.<span class="ident">add_node</span>(<span class="ident">node</span>);
+        <span class="comment">// assuming two successive iterations of the same hashmap produce the same order
+        </span><span class="kw">let </span><span class="kw-2">mut </span>gr = Graph::with_capacity(<span class="self">self</span>.node_count(), <span class="self">self</span>.edge_count());
+        <span class="kw">for </span>(<span class="kw-2">&amp;</span>node, <span class="kw">_</span>) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.nodes {
+            gr.add_node(node);
         }
-        <span class="kw">for</span> ((<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">edge_weight</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">edges</span> {
-            <span class="kw">let</span> (<span class="ident">ai</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_full</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> (<span class="ident">bi</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_full</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>).<span class="ident">unwrap</span>();
-            <span class="ident">gr</span>.<span class="ident">add_edge</span>(<span class="ident">node_index</span>(<span class="ident">ai</span>), <span class="ident">node_index</span>(<span class="ident">bi</span>), <span class="ident">edge_weight</span>);
+        <span class="kw">for </span>((a, b), edge_weight) <span class="kw">in </span><span class="self">self</span>.edges {
+            <span class="kw">let </span>(ai, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="self">self</span>.nodes.get_full(<span class="kw-2">&amp;</span>a).unwrap();
+            <span class="kw">let </span>(bi, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="self">self</span>.nodes.get_full(<span class="kw-2">&amp;</span>b).unwrap();
+            gr.add_edge(node_index(ai), node_index(bi), edge_weight);
         }
-        <span class="ident">gr</span>
+        gr
     }
 }
 
-<span class="doccomment">/// Create a new `GraphMap` from an iterable of edges.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Item</span>: <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>,
-          <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="doccomment">/// Create a new `GraphMap` from an iterable of edges.
+</span><span class="kw">impl</span>&lt;N, E, Ty, Item&gt; FromIterator&lt;Item&gt; <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>Item: IntoWeightedEdge&lt;E, NodeId=N&gt;,
+          N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">iterable</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-        <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>from_iter&lt;I&gt;(iterable: I) -&gt; <span class="self">Self
+        </span><span class="kw">where </span>I: IntoIterator&lt;Item=Item&gt;,
     {
-        <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iterable</span>.<span class="ident">into_iter</span>();
-        <span class="kw">let</span> (<span class="ident">low</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">size_hint</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">g</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="number">0</span>, <span class="ident">low</span>);
-        <span class="ident">g</span>.<span class="ident">extend</span>(<span class="ident">iter</span>);
-        <span class="ident">g</span>
+        <span class="kw">let </span>iter = iterable.into_iter();
+        <span class="kw">let </span>(low, <span class="kw">_</span>) = iter.size_hint();
+        <span class="kw">let </span><span class="kw-2">mut </span>g = <span class="self">Self</span>::with_capacity(<span class="number">0</span>, low);
+        g.extend(iter);
+        g
     }
 }
 
-<span class="doccomment">/// Extend the graph from an iterable of edges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Nodes are inserted automatically to match the edges.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Item</span>: <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">NodeId</span><span class="op">=</span><span class="ident">N</span><span class="op">&gt;</span>,
-          <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="doccomment">/// Extend the graph from an iterable of edges.
+///
+/// Nodes are inserted automatically to match the edges.
+</span><span class="kw">impl</span>&lt;N, E, Ty, Item&gt; Extend&lt;Item&gt; <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>Item: IntoWeightedEdge&lt;E, NodeId=N&gt;,
+          N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iterable</span>: <span class="ident">I</span>)
-        <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">Item</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>extend&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, iterable: I)
+        <span class="kw">where </span>I: IntoIterator&lt;Item=Item&gt;,
     {
-        <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iterable</span>.<span class="ident">into_iter</span>();
-        <span class="kw">let</span> (<span class="ident">low</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">size_hint</span>();
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">reserve</span>(<span class="ident">low</span>);
+        <span class="kw">let </span>iter = iterable.into_iter();
+        <span class="kw">let </span>(low, <span class="kw">_</span>) = iter.size_hint();
+        <span class="self">self</span>.edges.reserve(low);
 
-        <span class="kw">for</span> <span class="ident">elt</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span>) <span class="op">=</span> <span class="ident">elt</span>.<span class="ident">into_weighted_edge</span>();
-            <span class="self">self</span>.<span class="ident">add_edge</span>(<span class="ident">source</span>, <span class="ident">target</span>, <span class="ident">weight</span>);
+        <span class="kw">for </span>elt <span class="kw">in </span>iter {
+            <span class="kw">let </span>(source, target, weight) = elt.into_weighted_edge();
+            <span class="self">self</span>.add_edge(source, target, weight);
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">iterator_wrap</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span> <span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typarm</span>:<span class="ident">tt</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="kw">where</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bounds</span>: <span class="ident">tt</span>)<span class="op">*</span> }
-     <span class="ident">item</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>: <span class="ident">ty</span>,
-     <span class="ident">iter</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>: <span class="ident">ty</span>,
+<span class="macro">macro_rules! </span>iterator_wrap {
+    (<span class="macro-nonterminal">$name</span>: ident &lt;$(<span class="macro-nonterminal">$typarm</span>:tt),<span class="kw-2">*</span>&gt; <span class="kw">where </span>{ $(<span class="macro-nonterminal">$bounds</span>: tt)* }
+     item: <span class="macro-nonterminal">$item</span>: ty,
+     iter: <span class="macro-nonterminal">$iter</span>: ty,
      ) =&gt; (
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typarm</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bounds</span>)<span class="op">*</span> {
-            <span class="ident">iter</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>,
+        <span class="kw">pub struct </span><span class="macro-nonterminal">$name </span>&lt;$(<span class="macro-nonterminal">$typarm</span>),<span class="kw-2">*</span>&gt; <span class="kw">where </span>$(<span class="macro-nonterminal">$bounds</span>)* {
+            iter: <span class="macro-nonterminal">$iter</span>,
         }
-        <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typarm</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typarm</span>),<span class="kw-2">*</span><span class="op">&gt;</span>
-            <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bounds</span>)<span class="op">*</span>
+        <span class="kw">impl</span>&lt;$(<span class="macro-nonterminal">$typarm</span>),<span class="kw-2">*</span>&gt; Iterator <span class="kw">for </span><span class="macro-nonterminal">$name </span>&lt;$(<span class="macro-nonterminal">$typarm</span>),<span class="kw-2">*</span>&gt;
+            <span class="kw">where </span>$(<span class="macro-nonterminal">$bounds</span>)*
         {
-            <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">item</span>;
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
+            <span class="kw">type </span>Item = <span class="macro-nonterminal">$item</span>;
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+                <span class="self">self</span>.iter.next()
             }
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-                <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>()
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+                <span class="self">self</span>.iter.size_hint()
             }
         }
     );
 }
 
-<span class="macro">iterator_wrap!</span> {
-    <span class="ident">Nodes</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="kw">where</span> { <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span> }
-    <span class="ident">item</span>: <span class="ident">N</span>,
-    <span class="ident">iter</span>: <span class="ident">Cloned</span><span class="op">&lt;</span><span class="ident">Keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="macro">iterator_wrap! </span>{
+    Nodes &lt;<span class="lifetime">&#39;a</span>, N&gt; <span class="kw">where </span>{ N: <span class="lifetime">&#39;a </span>+ NodeTrait }
+    item: N,
+    iter: Cloned&lt;Keys&lt;<span class="lifetime">&#39;a</span>, N, Vec&lt;(N, CompactDirection)&gt;&gt;&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span> <span class="op">=</span> <span class="ident">Undirected</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">pub struct </span>Neighbors&lt;<span class="lifetime">&#39;a</span>, N, Ty = Undirected&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="ident">iter</span>: <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+    iter: Iter&lt;<span class="lifetime">&#39;a</span>, (N, CompactDirection)&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt; Iterator <span class="kw">for </span>Neighbors&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">Ty::is_directed</span>() {
-            (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">iter</span>)
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="ident">dir</span>)<span class="op">|</span> <span class="kw">if</span> <span class="ident">dir</span> <span class="op">==</span> <span class="ident">Outgoing</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">n</span>)
-                } <span class="kw">else</span> { <span class="prelude-val">None</span> })
-                .<span class="ident">next</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>)
+    <span class="kw">type </span>Item = N;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt; {
+        <span class="kw">if </span>Ty::is_directed() {
+            (<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter)
+                .filter_map(|<span class="kw-2">&amp;</span>(n, dir)| <span class="kw">if </span>dir == Outgoing {
+                    <span class="prelude-val">Some</span>(n)
+                } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
+                .next()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.iter.next().map(|<span class="kw-2">&amp;</span>(n, <span class="kw">_</span>)| n)
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NeighborsDirected</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">pub struct </span>NeighborsDirected&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="ident">iter</span>: <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span>,
-    <span class="ident">dir</span>: <span class="ident">Direction</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+    iter: Iter&lt;<span class="lifetime">&#39;a</span>, (N, CompactDirection)&gt;,
+    dir: Direction,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">NeighborsDirected</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt; Iterator <span class="kw">for </span>NeighborsDirected&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">Ty::is_directed</span>() {
-            <span class="kw">let</span> <span class="ident">self_dir</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dir</span>;
-            (<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">iter</span>)
-                .<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="ident">dir</span>)<span class="op">|</span> <span class="kw">if</span> <span class="ident">dir</span> <span class="op">==</span> <span class="ident">self_dir</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">n</span>)
-                } <span class="kw">else</span> { <span class="prelude-val">None</span> })
-                .<span class="ident">next</span>()
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>)
+    <span class="kw">type </span>Item = N;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;N&gt; {
+        <span class="kw">if </span>Ty::is_directed() {
+            <span class="kw">let </span>self_dir = <span class="self">self</span>.dir;
+            (<span class="kw-2">&amp;mut </span><span class="self">self</span>.iter)
+                .filter_map(<span class="kw">move </span>|<span class="kw-2">&amp;</span>(n, dir)| <span class="kw">if </span>dir == self_dir {
+                    <span class="prelude-val">Some</span>(n)
+                } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
+                .next()
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.iter.next().map(|<span class="kw-2">&amp;</span>(n, <span class="kw">_</span>)| n)
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>
+<span class="kw">pub struct </span>Edges&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait,
+          Ty: EdgeType
 {
-    <span class="ident">from</span>: <span class="ident">N</span>,
-    <span class="ident">edges</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OrderMap</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">N</span>), <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">iter</span>: <span class="ident">Neighbors</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ty</span><span class="op">&gt;</span>,
+    from: N,
+    edges: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OrderMap&lt;(N, N), E&gt;,
+    iter: Neighbors&lt;<span class="lifetime">&#39;a</span>, N, Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; Iterator <span class="kw">for </span>Edges&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>);
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">from</span>;
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">GraphMap</span>::<span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span><span class="ident">::edge_key</span>(<span class="ident">a</span>, <span class="ident">b</span>)) {
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
-                    <span class="prelude-val">Some</span>(<span class="ident">edge</span>) =&gt; {
-                        <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">edge</span>))
+    <span class="kw">type </span>Item = (N, N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.iter.next() {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(b) =&gt; {
+                <span class="kw">let </span>a = <span class="self">self</span>.from;
+                <span class="kw">match </span><span class="self">self</span>.edges.get(<span class="kw-2">&amp;</span>GraphMap::&lt;N, E, Ty&gt;::edge_key(a, b)) {
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
+                    <span class="prelude-val">Some</span>(edge) =&gt; {
+                        <span class="prelude-val">Some</span>((a, b, edge))
                     }
                 }
             }
@@ -1470,305 +1470,305 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoEdgeReferences</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N: <span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty&gt; IntoEdgeReferences <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">EdgeRef</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>);
-    <span class="kw">type</span> <span class="ident">EdgeReferences</span> <span class="op">=</span> <span class="ident">AllEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edge_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::EdgeReferences</span> {
-        <span class="self">self</span>.<span class="ident">all_edges</span>()
+    <span class="kw">type </span>EdgeRef = (N, N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E);
+    <span class="kw">type </span>EdgeReferences = AllEdges&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;;
+    <span class="kw">fn </span>edge_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::EdgeReferences {
+        <span class="self">self</span>.all_edges()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AllEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span> {
-    <span class="ident">inner</span>: <span class="ident">OrderMapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">N</span>, <span class="ident">N</span>), <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>AllEdges&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt; <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait {
+    inner: OrderMapIter&lt;<span class="lifetime">&#39;a</span>, (N, N), E&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AllEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; Iterator <span class="kw">for </span>AllEdges&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">E</span>);
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
+    <span class="kw">type </span>Item = (N, N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>E);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>(<span class="ident">a</span>, <span class="ident">b</span>), <span class="ident">v</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">v</span>))
+        <span class="kw">match </span><span class="self">self</span>.inner.next() {
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>(a, b), v)) =&gt; <span class="prelude-val">Some</span>((a, b, v))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.inner.size_hint()
     }
 
-    <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">count</span>()
+    <span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.count()
     }
 
-    <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">nth</span>(<span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">fn </span>nth(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.nth(n).map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 
-    <span class="kw">fn</span> <span class="ident">last</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">fn </span>last(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.last().map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">AllEdges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; DoubleEndedIterator <span class="kw">for </span>AllEdges&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.next_back().map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AllEdgesMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span> {
-    <span class="ident">inner</span>: <span class="ident">OrderMapIterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, (<span class="ident">N</span>, <span class="ident">N</span>), <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>AllEdgesMut&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt; <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait {
+    inner: OrderMapIterMut&lt;<span class="lifetime">&#39;a</span>, (N, N), E&gt;,
+    ty: PhantomData&lt;Ty&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">AllEdgesMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; Iterator <span class="kw">for </span>AllEdgesMut&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">E</span>);
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">type </span>Item = (N, N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>E);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.next().map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">size_hint</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.inner.size_hint()
     }
 
-    <span class="kw">fn</span> <span class="ident">count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">count</span>()
+    <span class="kw">fn </span>count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.count()
     }
 
-    <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">nth</span>(<span class="ident">n</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">fn </span>nth(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.nth(n).map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 
-    <span class="kw">fn</span> <span class="ident">last</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">AllEdgesMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-{
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span>(<span class="ident">n1</span>, <span class="ident">n2</span>), <span class="ident">weight</span>)<span class="op">|</span> (<span class="ident">n1</span>, <span class="ident">n2</span>, <span class="ident">weight</span>))
+    <span class="kw">fn </span>last(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.last().map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="lifetime">&#39;a</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoEdges</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; DoubleEndedIterator <span class="kw">for </span>AllEdgesMut&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Edges</span> <span class="op">=</span> <span class="ident">Edges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">edges</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident"><span class="self">Self</span>::Edges</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>(<span class="ident">a</span>)
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.inner.next_back().map(|(<span class="kw-2">&amp;</span>(n1, n2), weight)| (n1, n2, weight))
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N: <span class="lifetime">&#39;a</span>, E: <span class="lifetime">&#39;a</span>, Ty&gt; IntoEdges <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
+{
+    <span class="kw">type </span>Edges = Edges&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;;
+    <span class="kw">fn </span>edges(<span class="self">self</span>, a: <span class="self">Self</span>::NodeId) -&gt; <span class="self">Self</span>::Edges {
+        <span class="self">self</span>.edges(a)
     }
 }
 
 
-<span class="doccomment">/// Index `GraphMap` by node pairs to access edge weights.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Index</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">N</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="doccomment">/// Index `GraphMap` by node pairs to access edge weights.
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Index&lt;(N, N)&gt; <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">E</span>;
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: (<span class="ident">N</span>, <span class="ident">N</span>)) -&gt; <span class="kw-2">&amp;</span><span class="ident">E</span>
+    <span class="kw">type </span>Output = E;
+    <span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: (N, N)) -&gt; <span class="kw-2">&amp;</span>E
     {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">index</span>.<span class="number">0</span>, <span class="ident">index</span>.<span class="number">1</span>);
-        <span class="self">self</span>.<span class="ident">edge_weight</span>(<span class="ident">index</span>.<span class="number">0</span>, <span class="ident">index</span>.<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;GraphMap::index: no such edge&quot;</span>)
+        <span class="kw">let </span>index = <span class="self">Self</span>::edge_key(index.<span class="number">0</span>, index.<span class="number">1</span>);
+        <span class="self">self</span>.edge_weight(index.<span class="number">0</span>, index.<span class="number">1</span>).expect(<span class="string">&quot;GraphMap::index: no such edge&quot;</span>)
     }
 }
 
-<span class="doccomment">/// Index `GraphMap` by node pairs to access edge weights.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IndexMut</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">N</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="doccomment">/// Index `GraphMap` by node pairs to access edge weights.
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; IndexMut&lt;(N, N)&gt; <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: (<span class="ident">N</span>, <span class="ident">N</span>)) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">E</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::edge_key</span>(<span class="ident">index</span>.<span class="number">0</span>, <span class="ident">index</span>.<span class="number">1</span>);
-        <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">index</span>.<span class="number">0</span>, <span class="ident">index</span>.<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;GraphMap::index: no such edge&quot;</span>)
+    <span class="kw">fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: (N, N)) -&gt; <span class="kw-2">&amp;mut </span>E {
+        <span class="kw">let </span>index = <span class="self">Self</span>::edge_key(index.<span class="number">0</span>, index.<span class="number">1</span>);
+        <span class="self">self</span>.edge_weight_mut(index.<span class="number">0</span>, index.<span class="number">1</span>).expect(<span class="string">&quot;GraphMap::index: no such edge&quot;</span>)
     }
 }
 
-<span class="doccomment">/// Create a new empty `GraphMap`.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="doccomment">/// Create a new empty `GraphMap`.
+</span><span class="kw">impl</span>&lt;N, E, Ty&gt; Default <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> { <span class="ident">GraphMap::with_capacity</span>(<span class="number">0</span>, <span class="number">0</span>) }
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{ GraphMap::with_capacity(<span class="number">0</span>, <span class="number">0</span>) }
 }
 
-<span class="doccomment">/// A reference that is hashed and compared by its pointer value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Ptr` is used for certain configurations of `GraphMap`,</span>
-<span class="doccomment">/// in particular in the combination where the node type for</span>
-<span class="doccomment">/// `GraphMap` is something of type for example `Ptr(&amp;Cell&lt;T&gt;)`,</span>
-<span class="doccomment">/// with the `Cell&lt;T&gt;` being `TypedArena` allocated.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span>: <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">T</span>);
+<span class="doccomment">/// A reference that is hashed and compared by its pointer value.
+///
+/// `Ptr` is used for certain configurations of `GraphMap`,
+/// in particular in the combination where the node type for
+/// `GraphMap` is something of type for example `Ptr(&amp;Cell&lt;T&gt;)`,
+/// with the `Cell&lt;T&gt;` being `TypedArena` allocated.
+</span><span class="kw">pub struct </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T: <span class="lifetime">&#39;b</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Copy <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt; {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Clone <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> { <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{ <span class="kw-2">*</span><span class="self">self </span>}
 }
 
 
-<span class="kw">fn</span> <span class="ident">ptr_eq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">T</span>, <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>
+<span class="kw">fn </span>ptr_eq&lt;T&gt;(a: <span class="kw-2">*const </span>T, b: <span class="kw-2">*const </span>T) -&gt; bool {
+    a == b
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; PartialEq <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;
 {
-    <span class="doccomment">/// Ptr compares by pointer equality, i.e if they point to the same value</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">ptr_eq</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">other</span>.<span class="number">0</span>)
+    <span class="doccomment">/// Ptr compares by pointer equality, i.e if they point to the same value
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;) -&gt; bool {
+        ptr_eq(<span class="self">self</span>.<span class="number">0</span>, other.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; PartialOrd <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;
 {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Ord <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;
 {
-    <span class="doccomment">/// Ptr is ordered by pointer value, i.e. an arbitrary but stable and total order.</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">T</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">T</span> <span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>;
-        <span class="ident">a</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>)
+    <span class="doccomment">/// Ptr is ordered by pointer value, i.e. an arbitrary but stable and total order.
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;) -&gt; Ordering {
+        <span class="kw">let </span>a: <span class="kw-2">*const </span>T = <span class="self">self</span>.<span class="number">0</span>;
+        <span class="kw">let </span>b: <span class="kw-2">*const </span>T = other.<span class="number">0</span>;
+        a.cmp(<span class="kw-2">&amp;</span>b)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Deref <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt; {
+    <span class="kw">type </span>Target = T;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Eq <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T&gt; Hash <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt;
 {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">st</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
+    <span class="kw">fn </span>hash&lt;H: hash::Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, st: <span class="kw-2">&amp;mut </span>H)
     {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="self">self</span>.<span class="number">0</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span>;
-        <span class="ident">ptr</span>.<span class="ident">hash</span>(<span class="ident">st</span>)
+        <span class="kw">let </span>ptr = (<span class="self">self</span>.<span class="number">0</span>) <span class="kw">as </span><span class="kw-2">*const </span>T;
+        ptr.hash(st)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Ptr</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;b</span>, T: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Ptr&lt;<span class="lifetime">&#39;b</span>, T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoNodeIdentifiers</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt; IntoNodeIdentifiers <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">NodeIdentifiers</span> <span class="op">=</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>NodeIdentifiers = NodeIdentifiers&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;;
 
-    <span class="kw">fn</span> <span class="ident">node_identifiers</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeIdentifiers</span> {
-        <span class="ident">NodeIdentifiers</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">iter</span>(),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
-            <span class="ident">edge_ty</span>: <span class="ident">PhantomData</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">NodeCount</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-{
-    <span class="kw">fn</span> <span class="ident">node_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">node_count</span>()
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span> {
-    <span class="ident">iter</span>: <span class="ident">OrderMapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
-    <span class="ident">edge_ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">NodeIdentifiers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">N</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
-    {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">n</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">IntoNodeReferences</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
-{
-    <span class="kw">type</span> <span class="ident">NodeRef</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">N</span>);
-    <span class="kw">type</span> <span class="ident">NodeReferences</span> <span class="op">=</span> <span class="ident">NodeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">node_references</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeReferences</span> {
-        <span class="ident">NodeReferences</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">iter</span>(),
-            <span class="ident">ty</span>: <span class="self">self</span>.<span class="ident">ty</span>,
-            <span class="ident">edge_ty</span>: <span class="ident">PhantomData</span>,
+    <span class="kw">fn </span>node_identifiers(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeIdentifiers {
+        NodeIdentifiers {
+            iter: <span class="self">self</span>.nodes.iter(),
+            ty: <span class="self">self</span>.ty,
+            edge_ty: PhantomData,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NodeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span> {
-    <span class="ident">iter</span>: <span class="ident">OrderMapIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">CompactDirection</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>,
-    <span class="ident">edge_ty</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N, E, Ty&gt; NodeCount <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
+{
+    <span class="kw">fn </span>node_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="kw-2">*</span><span class="self">self</span>).node_count()
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">NodeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">NodeTrait</span>, <span class="ident">E</span>: <span class="lifetime">&#39;a</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">pub struct </span>NodeIdentifiers&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt; <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait {
+    iter: OrderMapIter&lt;<span class="lifetime">&#39;a</span>, N, Vec&lt;(N, CompactDirection)&gt;&gt;,
+    ty: PhantomData&lt;Ty&gt;,
+    edge_ty: PhantomData&lt;E&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; Iterator <span class="kw">for </span>NodeIdentifiers&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">N</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">N</span>);
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>
+    <span class="kw">type </span>Item = N;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;
     {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">n</span>, <span class="kw">_</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">n</span>, <span class="ident">n</span>))
+        <span class="self">self</span>.iter.next().map(|(<span class="kw-2">&amp;</span>n, <span class="kw">_</span>)| n)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">NodeIndexable</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; IntoNodeReferences <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
-    <span class="kw">fn</span> <span class="ident">node_bound</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">node_count</span>() }
-    <span class="kw">fn</span> <span class="ident">to_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident"><span class="self">Self</span>::NodeId</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_full</span>(<span class="kw-2">&amp;</span><span class="ident">ix</span>).<span class="ident">unwrap</span>();
-        <span class="ident">i</span>
-    }
-    <span class="kw">fn</span> <span class="ident">from_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ix</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::NodeId</span> {
-        <span class="kw">let</span> (<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_index</span>(<span class="ident">ix</span>).<span class="ident">unwrap</span>();
-        <span class="ident">key</span>
+    <span class="kw">type </span>NodeRef = (N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>N);
+    <span class="kw">type </span>NodeReferences = NodeReferences&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;;
+    <span class="kw">fn </span>node_references(<span class="self">self</span>) -&gt; <span class="self">Self</span>::NodeReferences {
+        NodeReferences {
+            iter: <span class="self">self</span>.nodes.iter(),
+            ty: <span class="self">self</span>.ty,
+            edge_ty: PhantomData,
+        }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span> <span class="ident">NodeCompactIndexable</span> <span class="kw">for</span> <span class="ident">GraphMap</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">N</span>: <span class="ident">NodeTrait</span>,
-          <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
+<span class="kw">pub struct </span>NodeReferences&lt;<span class="lifetime">&#39;a</span>, N, E: <span class="lifetime">&#39;a</span>, Ty&gt; <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait {
+    iter: OrderMapIter&lt;<span class="lifetime">&#39;a</span>, N, Vec&lt;(N, CompactDirection)&gt;&gt;,
+    ty: PhantomData&lt;Ty&gt;,
+    edge_ty: PhantomData&lt;E&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt; Iterator <span class="kw">for </span>NodeReferences&lt;<span class="lifetime">&#39;a</span>, N, E, Ty&gt;
+    <span class="kw">where </span>N: <span class="lifetime">&#39;a </span>+ NodeTrait, E: <span class="lifetime">&#39;a</span>,
+          Ty: EdgeType,
+{
+    <span class="kw">type </span>Item = (N, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>N);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;
+    {
+        <span class="self">self</span>.iter.next().map(|(n, <span class="kw">_</span>)| (<span class="kw-2">*</span>n, n))
+    }
+}
+
+<span class="kw">impl</span>&lt;N, E, Ty&gt; NodeIndexable <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
+{
+    <span class="kw">fn </span>node_bound(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.node_count() }
+    <span class="kw">fn </span>to_index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: <span class="self">Self</span>::NodeId) -&gt; usize {
+        <span class="kw">let </span>(i, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="self">self</span>.nodes.get_full(<span class="kw-2">&amp;</span>ix).unwrap();
+        i
+    }
+    <span class="kw">fn </span>from_index(<span class="kw-2">&amp;</span><span class="self">self</span>, ix: usize) -&gt; <span class="self">Self</span>::NodeId {
+        <span class="kw">let </span>(<span class="kw-2">&amp;</span>key, <span class="kw">_</span>) = <span class="self">self</span>.nodes.get_index(ix).unwrap();
+        key
+    }
+}
+
+<span class="kw">impl</span>&lt;N, E, Ty&gt; NodeCompactIndexable <span class="kw">for </span>GraphMap&lt;N, E, Ty&gt;
+    <span class="kw">where </span>N: NodeTrait,
+          Ty: EdgeType,
 {
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

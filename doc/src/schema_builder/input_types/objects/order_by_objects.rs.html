@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/objects/order_by_objects.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order_by_objects.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/objects/order_by_objects.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order_by_objects.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -320,327 +320,327 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">aggregations</span>, <span class="ident">ordering</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">output_types::aggregation</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::prelude::ParentContainer</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>constants::{aggregations, ordering};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>output_types::aggregation;
+<span class="kw">use </span>prisma_models::prelude::ParentContainer;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OrderByOptions</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">include_relations</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">include_scalar_aggregations</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">include_full_text_search</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OrderByOptions {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) include_relations: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) include_scalar_aggregations: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) include_full_text_search: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">OrderByOptions</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>OrderByOptions {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_aggregates</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">include_scalar_aggregations</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>
-    }
+    <span class="kw">pub fn </span>with_aggregates(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.include_scalar_aggregations = <span class="bool-val">true</span>;
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_suffix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> (
-            <span class="self">self</span>.<span class="ident">include_relations</span>,
-            <span class="self">self</span>.<span class="ident">include_scalar_aggregations</span>,
-            <span class="self">self</span>.<span class="ident">include_full_text_search</span>,
+    <span class="kw">pub fn </span>type_suffix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span>(
+            <span class="self">self</span>.include_relations,
+            <span class="self">self</span>.include_scalar_aggregations,
+            <span class="self">self</span>.include_full_text_search,
         ) {
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;WithRelation&quot;</span>,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="string">&quot;WithAggregation&quot;</span>,
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="string">&quot;WithRelationAndSearchRelevance&quot;</span>,
-            <span class="kw">_</span> =&gt; <span class="string">&quot;&quot;</span>,
+            <span class="kw">_ </span>=&gt; <span class="string">&quot;&quot;</span>,
         }
     }
 }
 
-<span class="doccomment">/// Builds &quot;&lt;Container&gt;OrderBy&lt;Suffixes&gt;Input&quot; object types.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">order_by_object_type</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByOptions</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}Input&quot;</span>, <span class="ident">container</span>.<span class="ident">name</span>(), <span class="ident">options</span>.<span class="ident">type_suffix</span>()),
-        <span class="ident">PRISMA_NAMESPACE</span>,
+<span class="doccomment">/// Builds &quot;&lt;Container&gt;OrderBy&lt;Suffixes&gt;Input&quot; object types.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>order_by_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+    options: <span class="kw-2">&amp;</span>OrderByOptions,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(
+        <span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}Input&quot;</span>, container.name(), options.type_suffix()),
+        PRISMA_NAMESPACE,
     );
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">require_at_most_one_field</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.require_at_most_one_field();
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="comment">// Basic orderBy fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">container</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="comment">// We exclude composites if we&#39;re in aggregations land (groupBy).</span>
-            <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">include_scalar_aggregations</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">orderby_field_mapper</span>(<span class="ident">field</span>, <span class="ident">ctx</span>, <span class="ident">options</span>),
+    <span class="comment">// Basic orderBy fields.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>fields: Vec&lt;<span class="kw">_</span>&gt; = container
+        .fields()
+        .iter()
+        .filter_map(|field| <span class="kw">match </span>field {
+            <span class="comment">// We exclude composites if we&#39;re in aggregations land (groupBy).
+            </span>ModelField::Composite(<span class="kw">_</span>) <span class="kw">if </span>options.include_scalar_aggregations =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; orderby_field_mapper(field, ctx, options),
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">include_scalar_aggregations</span> {
-        <span class="comment">// orderBy Fields for aggregation orderings.</span>
-        <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">compute_scalar_aggregation_fields</span>(<span class="ident">ctx</span>, <span class="ident">container</span>));
+    <span class="kw">if </span>options.include_scalar_aggregations {
+        <span class="comment">// orderBy Fields for aggregation orderings.
+        </span>fields.extend(compute_scalar_aggregation_fields(ctx, container));
     }
 
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">include_full_text_search</span> {
-        <span class="comment">// orderBy Fields for full text searches.</span>
-        <span class="ident">append_opt</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fields</span>, <span class="ident">order_by_field_text_search</span>(<span class="ident">ctx</span>, <span class="ident">container</span>))
+    <span class="kw">if </span>options.include_full_text_search {
+        <span class="comment">// orderBy Fields for full text searches.
+        </span>append_opt(<span class="kw-2">&amp;mut </span>fields, order_by_field_text_search(ctx, container))
     }
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    input_object.set_fields(fields);
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn</span> <span class="ident">compute_scalar_aggregation_fields</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">non_list_nor_json_fields</span> <span class="op">=</span> <span class="ident">aggregation::collect_non_list_nor_json_fields</span>(<span class="ident">container</span>);
-    <span class="kw">let</span> <span class="ident">numeric_fields</span> <span class="op">=</span> <span class="ident">aggregation::collect_numeric_fields</span>(<span class="ident">container</span>);
-    <span class="kw">let</span> <span class="ident">scalar_fields</span> <span class="op">=</span> <span class="ident">container</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">flat_map</span>(<span class="ident">ModelField::into_scalar</span>)
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+<span class="kw">fn </span>compute_scalar_aggregation_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>non_list_nor_json_fields = aggregation::collect_non_list_nor_json_fields(container);
+    <span class="kw">let </span>numeric_fields = aggregation::collect_numeric_fields(container);
+    <span class="kw">let </span>scalar_fields = container
+        .fields()
+        .into_iter()
+        .flat_map(ModelField::into_scalar)
+        .collect::&lt;Vec&lt;ScalarFieldRef&gt;&gt;();
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="ident">order_by_field_aggregate</span>(<span class="ident">aggregations::UNDERSCORE_COUNT</span>, <span class="string">&quot;Count&quot;</span>, <span class="ident">ctx</span>, <span class="ident">container</span>, <span class="ident">scalar_fields</span>),
-        <span class="ident">order_by_field_aggregate</span>(
-            <span class="ident">aggregations::UNDERSCORE_AVG</span>,
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[
+        order_by_field_aggregate(aggregations::UNDERSCORE_COUNT, <span class="string">&quot;Count&quot;</span>, ctx, container, scalar_fields),
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_AVG,
             <span class="string">&quot;Avg&quot;</span>,
-            <span class="ident">ctx</span>,
-            <span class="ident">container</span>,
-            <span class="ident">numeric_fields</span>.<span class="ident">clone</span>(),
+            ctx,
+            container,
+            numeric_fields.clone(),
         ),
-        <span class="ident">order_by_field_aggregate</span>(
-            <span class="ident">aggregations::UNDERSCORE_MAX</span>,
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_MAX,
             <span class="string">&quot;Max&quot;</span>,
-            <span class="ident">ctx</span>,
-            <span class="ident">container</span>,
-            <span class="ident">non_list_nor_json_fields</span>.<span class="ident">clone</span>(),
+            ctx,
+            container,
+            non_list_nor_json_fields.clone(),
         ),
-        <span class="ident">order_by_field_aggregate</span>(
-            <span class="ident">aggregations::UNDERSCORE_MIN</span>,
+        order_by_field_aggregate(
+            aggregations::UNDERSCORE_MIN,
             <span class="string">&quot;Min&quot;</span>,
-            <span class="ident">ctx</span>,
-            <span class="ident">container</span>,
-            <span class="ident">non_list_nor_json_fields</span>,
+            ctx,
+            container,
+            non_list_nor_json_fields,
         ),
-        <span class="ident">order_by_field_aggregate</span>(<span class="ident">aggregations::UNDERSCORE_SUM</span>, <span class="string">&quot;Sum&quot;</span>, <span class="ident">ctx</span>, <span class="ident">container</span>, <span class="ident">numeric_fields</span>),
+        order_by_field_aggregate(aggregations::UNDERSCORE_SUM, <span class="string">&quot;Sum&quot;</span>, ctx, container, numeric_fields),
     ];
 
-    <span class="ident">fields</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>().<span class="ident">collect</span>()
+    fields.into_iter().flatten().collect()
 }
 
-<span class="kw">fn</span> <span class="ident">orderby_field_mapper</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ModelField</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByOptions</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">field</span> {
-        <span class="comment">// To-many relation field.</span>
-        <span class="ident">ModelField::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">options</span>.<span class="ident">include_relations</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-            <span class="kw">let</span> <span class="ident">to_many_aggregate_type</span> <span class="op">=</span> <span class="ident">order_by_to_many_aggregate_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">related_model</span>.<span class="ident">into</span>());
+<span class="kw">fn </span>orderby_field_mapper(field: <span class="kw-2">&amp;</span>ModelField, ctx: <span class="kw-2">&amp;mut </span>BuilderContext, options: <span class="kw-2">&amp;</span>OrderByOptions) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">match </span>field {
+        <span class="comment">// To-many relation field.
+        </span>ModelField::Relation(rf) <span class="kw">if </span>rf.is_list() &amp;&amp; options.include_relations =&gt; {
+            <span class="kw">let </span>related_model = rf.related_model();
+            <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>related_model.into());
 
-            <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">to_many_aggregate_type</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+            <span class="prelude-val">Some</span>(input_field(rf.name.clone(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
         }
 
-        <span class="comment">// To-one relation field.</span>
-        <span class="ident">ModelField::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">include_relations</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-            <span class="kw">let</span> <span class="ident">related_object_type</span> <span class="op">=</span> <span class="ident">order_by_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">related_model</span>.<span class="ident">into</span>(), <span class="ident">options</span>);
+        <span class="comment">// To-one relation field.
+        </span>ModelField::Relation(rf) <span class="kw">if </span>options.include_relations =&gt; {
+            <span class="kw">let </span>related_model = rf.related_model();
+            <span class="kw">let </span>related_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>related_model.into(), options);
 
-            <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">related_object_type</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+            <span class="prelude-val">Some</span>(input_field(rf.name.clone(), InputType::object(related_object_type), <span class="prelude-val">None</span>).optional())
         }
 
-        <span class="comment">// Scalar field.</span>
-        <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>))];
+        <span class="comment">// Scalar field.
+        </span>ModelField::Scalar(sf) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>types = <span class="macro">vec!</span>[InputType::Enum(sort_order_enum(ctx))];
 
-            <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::OrderByNulls</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::OrderByNullsFirstLast</span>)
-                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_required</span>()
-                <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_list</span>()
+            <span class="kw">if </span>ctx.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::OrderByNulls)
+                &amp;&amp; ctx.has_capability(ConnectorCapability::OrderByNullsFirstLast)
+                &amp;&amp; !sf.is_required()
+                &amp;&amp; !sf.is_list()
             {
-                <span class="ident">types</span>.<span class="ident">push</span>(<span class="ident">InputType::object</span>(<span class="ident">sort_nulls_object_type</span>(<span class="ident">ctx</span>)));
+                types.push(InputType::object(sort_nulls_object_type(ctx)));
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+            <span class="prelude-val">Some</span>(input_field(sf.name.clone(), types, <span class="prelude-val">None</span>).optional())
         }
 
-        <span class="comment">// Composite field.</span>
-        <span class="ident">ModelField::Composite</span>(<span class="ident">cf</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; {
-            <span class="kw">let</span> <span class="ident">to_many_aggregate_type</span> <span class="op">=</span> <span class="ident">order_by_to_many_aggregate_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>).<span class="ident">into</span>());
-            <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">cf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">to_many_aggregate_type</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+        <span class="comment">// Composite field.
+        </span>ModelField::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; {
+            <span class="kw">let </span>to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ).into());
+            <span class="prelude-val">Some</span>(input_field(cf.name.clone(), InputType::object(to_many_aggregate_type), <span class="prelude-val">None</span>).optional())
         }
 
-        <span class="ident">ModelField::Composite</span>(<span class="ident">cf</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">composite_order_object_type</span> <span class="op">=</span> <span class="ident">order_by_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>).<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">OrderByOptions::new</span>());
+        ModelField::Composite(cf) =&gt; {
+            <span class="kw">let </span>composite_order_object_type = order_by_object_type(ctx, <span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>cf.typ).into(), <span class="kw-2">&amp;</span>OrderByOptions::new());
 
-            <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">cf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">composite_order_object_type</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
+            <span class="prelude-val">Some</span>(input_field(cf.name.clone(), InputType::object(composite_order_object_type), <span class="prelude-val">None</span>).optional())
         }
 
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">sort_nulls_object_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="string">&quot;SortOrderInput&quot;</span>, <span class="ident">PRISMA_NAMESPACE</span>);
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+<span class="kw">fn </span>sort_nulls_object_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(<span class="string">&quot;SortOrderInput&quot;</span>, PRISMA_NAMESPACE);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="ident">input_field</span>(<span class="ident">ordering::SORT</span>, <span class="ident">InputType::Enum</span>(<span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>)), <span class="prelude-val">None</span>),
-        <span class="ident">input_field</span>(<span class="ident">ordering::NULLS</span>, <span class="ident">InputType::Enum</span>(<span class="ident">nulls_order_enum</span>(<span class="ident">ctx</span>)), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[
+        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>),
+        input_field(ordering::NULLS, InputType::Enum(nulls_order_enum(ctx)), <span class="prelude-val">None</span>).optional(),
     ];
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    input_object.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn</span> <span class="ident">order_by_field_aggregate</span>(
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-    <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">scalar_fields</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
+<span class="kw">fn </span>order_by_field_aggregate(
+    name: <span class="kw-2">&amp;</span>str,
+    suffix: <span class="kw-2">&amp;</span>str,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+    scalar_fields: Vec&lt;ScalarFieldRef&gt;,
+) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">if </span>scalar_fields.is_empty() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
         <span class="prelude-val">Some</span>(
-            <span class="ident">input_field</span>(
-                <span class="ident">name</span>,
-                <span class="ident">InputType::object</span>(<span class="ident">order_by_object_type_aggregate</span>(<span class="ident">suffix</span>, <span class="ident">ctx</span>, <span class="ident">container</span>, <span class="ident">scalar_fields</span>)),
+            input_field(
+                name,
+                InputType::object(order_by_object_type_aggregate(suffix, ctx, container, scalar_fields)),
                 <span class="prelude-val">None</span>,
             )
-            .<span class="ident">optional</span>(),
+            .optional(),
         )
     }
 }
 
-<span class="kw">fn</span> <span class="ident">order_by_object_type_aggregate</span>(
-    <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-    <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}OrderByAggregateInput&quot;</span>, <span class="ident">container</span>.<span class="ident">name</span>(), <span class="ident">suffix</span>),
-        <span class="ident">PRISMA_NAMESPACE</span>,
+<span class="kw">fn </span>order_by_object_type_aggregate(
+    suffix: <span class="kw-2">&amp;</span>str,
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+    scalar_fields: Vec&lt;ScalarFieldRef&gt;,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}OrderByAggregateInput&quot;</span>, container.name(), suffix),
+        PRISMA_NAMESPACE,
     );
 
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">require_exactly_one_field</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.require_exactly_one_field();
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">scalar_fields</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">input_field</span>(<span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::Enum</span>(<span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>)), <span class="prelude-val">None</span>).<span class="ident">optional</span>())
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>fields = scalar_fields
+        .iter()
+        .map(|sf| input_field(sf.name.clone(), InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>).optional())
+        .collect();
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    input_object.set_fields(fields);
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn</span> <span class="ident">order_by_to_many_aggregate_object_type</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">container_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">container</span> {
-        <span class="ident">ParentContainer::Model</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Relation&quot;</span>,
-        <span class="ident">ParentContainer::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Composite&quot;</span>,
+<span class="kw">fn </span>order_by_to_many_aggregate_object_type(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>container_type = <span class="kw">match </span>container {
+        ParentContainer::Model(<span class="kw">_</span>) =&gt; <span class="string">&quot;Relation&quot;</span>,
+        ParentContainer::CompositeType(<span class="kw">_</span>) =&gt; <span class="string">&quot;Composite&quot;</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}AggregateInput&quot;</span>, <span class="ident">container</span>.<span class="ident">name</span>(), <span class="ident">container_type</span>),
-        <span class="ident">PRISMA_NAMESPACE</span>,
+    <span class="kw">let </span>ident = Identifier::new(
+        <span class="macro">format!</span>(<span class="string">&quot;{}OrderBy{}AggregateInput&quot;</span>, container.name(), container_type),
+        PRISMA_NAMESPACE,
     );
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">input_object</span>.<span class="ident">require_exactly_one_field</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>input_object = init_input_object_type(ident.clone());
+    input_object.require_exactly_one_field();
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">input_object</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input_field</span>(
-        <span class="ident">aggregations::UNDERSCORE_COUNT</span>,
-        <span class="ident">InputType::Enum</span>(<span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>)),
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[input_field(
+        aggregations::UNDERSCORE_COUNT,
+        InputType::Enum(sort_order_enum(ctx)),
         <span class="prelude-val">None</span>,
     )
-    .<span class="ident">optional</span>()];
+    .optional()];
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    input_object.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 
-<span class="kw">fn</span> <span class="ident">order_by_field_text_search</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">container</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">type_identifier</span> <span class="op">==</span> <span class="ident">TypeIdentifier::String</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">fn </span>order_by_field_text_search(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, container: <span class="kw-2">&amp;</span>ParentContainer) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">let </span>scalar_fields: Vec&lt;<span class="kw">_</span>&gt; = container
+        .fields()
+        .into_iter()
+        .filter_map(|field| <span class="kw">match </span>field {
+            ModelField::Scalar(sf) <span class="kw">if </span>sf.type_identifier == TypeIdentifier::String =&gt; <span class="prelude-val">Some</span>(sf),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">if</span> <span class="ident">scalar_fields</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
+    <span class="kw">if </span>scalar_fields.is_empty() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
         <span class="prelude-val">Some</span>(
-            <span class="ident">input_field</span>(
-                <span class="ident">ordering::UNDERSCORE_RELEVANCE</span>,
-                <span class="ident">InputType::object</span>(<span class="ident">order_by_object_type_text_search</span>(<span class="ident">ctx</span>, <span class="ident">container</span>, <span class="ident">scalar_fields</span>)),
+            input_field(
+                ordering::UNDERSCORE_RELEVANCE,
+                InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields)),
                 <span class="prelude-val">None</span>,
             )
-            .<span class="ident">optional</span>(),
+            .optional(),
         )
     }
 }
 
-<span class="kw">fn</span> <span class="ident">order_by_object_type_text_search</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-    <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="macro">format!</span>(<span class="string">&quot;{}OrderByRelevanceInput&quot;</span>, <span class="ident">container</span>.<span class="ident">name</span>()), <span class="ident">PRISMA_NAMESPACE</span>);
+<span class="kw">fn </span>order_by_object_type_text_search(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+    scalar_fields: Vec&lt;ScalarFieldRef&gt;,
+) -&gt; InputObjectTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(<span class="macro">format!</span>(<span class="string">&quot;{}OrderByRelevanceInput&quot;</span>, container.name()), PRISMA_NAMESPACE);
 
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
+    <span class="macro">return_cached_input!</span>(ctx, <span class="kw-2">&amp;</span>ident);
 
-    <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
 
-    <span class="kw">let</span> <span class="ident">fields_enum_type</span> <span class="op">=</span> <span class="ident">InputType::enum_type</span>(<span class="ident">order_by_relevance_enum</span>(
-        <span class="ident">ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">container</span>.<span class="ident">name</span>(),
-        <span class="ident">scalar_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">collect_vec</span>(),
+    <span class="kw">let </span>fields_enum_type = InputType::enum_type(order_by_relevance_enum(
+        ctx,
+        <span class="kw-2">&amp;</span>container.name(),
+        scalar_fields.iter().map(|sf| sf.name.clone()).collect_vec(),
     ));
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="ident">input_field</span>(
-            <span class="ident">ordering::FIELDS</span>,
-            <span class="macro">vec!</span>[<span class="ident">fields_enum_type</span>.<span class="ident">clone</span>(), <span class="ident">InputType::list</span>(<span class="ident">fields_enum_type</span>)],
+    <span class="kw">let </span>fields = <span class="macro">vec!</span>[
+        input_field(
+            ordering::FIELDS,
+            <span class="macro">vec!</span>[fields_enum_type.clone(), InputType::list(fields_enum_type)],
             <span class="prelude-val">None</span>,
         ),
-        <span class="ident">input_field</span>(<span class="ident">ordering::SORT</span>, <span class="ident">InputType::Enum</span>(<span class="ident">sort_order_enum</span>(<span class="ident">ctx</span>)), <span class="prelude-val">None</span>),
-        <span class="ident">input_field</span>(<span class="ident">ordering::SEARCH</span>, <span class="ident">InputType::string</span>(), <span class="prelude-val">None</span>),
+        input_field(ordering::SORT, InputType::Enum(sort_order_enum(ctx)), <span class="prelude-val">None</span>),
+        input_field(ordering::SEARCH, InputType::string(), <span class="prelude-val">None</span>),
     ];
 
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    input_object.set_fields(fields);
 
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
+    Arc::downgrade(<span class="kw-2">&amp;</span>input_object)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

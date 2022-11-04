@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/postgres_datamodel_connector/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -512,29 +512,29 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::PostgresType</span>;
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>},
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::IndexWalker</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
-    <span class="ident">PreviewFeature</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::PostgresType;
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{walker_ext_traits::<span class="kw-2">*</span>, Connector},
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{ast::WithSpan, walkers::IndexWalker, IndexAlgorithm, OperatorClass},
+    PreviewFeature,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PostgresDatasourceProperties</span>;
+<span class="kw">use </span><span class="kw">super</span>::PostgresDatasourceProperties;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">compatible_native_types</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="ident">connector</span>) {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>();
-            <span class="kw">let</span> <span class="ident">r#type</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
-            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>compatible_native_types(index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+    <span class="kw">for </span>field <span class="kw">in </span>index.fields() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) = field.native_type_instance(connector) {
+            <span class="kw">let </span>span = field.ast_field().span();
+            <span class="kw">let </span>r#type: <span class="kw-2">&amp;</span>PostgresType = native_type.downcast_ref();
+            <span class="kw">let </span>error = connector.native_instance_error(<span class="kw-2">&amp;</span>native_type);
 
-            <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">PostgresType::Xml</span> {
-                <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>))
-                } <span class="kw">else</span> {
-                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>))
+            <span class="kw">if </span>r#type == <span class="kw-2">&amp;</span>PostgresType::Xml {
+                <span class="kw">if </span>index.is_unique() {
+                    errors.push_error(error.new_incompatible_native_type_with_unique(<span class="string">&quot;&quot;</span>, span))
+                } <span class="kw">else </span>{
+                    errors.push_error(error.new_incompatible_native_type_with_index(<span class="string">&quot;&quot;</span>, span))
                 };
 
                 <span class="kw">break</span>;
@@ -543,488 +543,488 @@
     }
 }
 
-<span class="doccomment">/// Cannot have more than one column in SP-GiST indices.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">spgist_indexed_column_count</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-    <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">index</span>.<span class="ident">algorithm</span>(), <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>)) {
+<span class="doccomment">/// Cannot have more than one column in SP-GiST indices.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>spgist_indexed_column_count(index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+    <span class="kw">if </span>!<span class="macro">matches!</span>(index.algorithm(), <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist)) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+    <span class="kw">if </span>index.fields().len() == <span class="number">1 </span>{
         <span class="kw">return</span>;
     }
 
-    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+    errors.push_error(DatamodelError::new_attribute_validation_error(
         <span class="string">&quot;SpGist does not support multi-column indices.&quot;</span>,
-        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-        <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+        index.attribute_name(),
+        index.ast_attribute().span,
     ));
 }
 
-<span class="doccomment">/// Validating the correct usage of GiST/GIN/SP-GiST and BRIN indices.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">generalized_index_validations</span>(
-    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+<span class="doccomment">/// Validating the correct usage of GiST/GIN/SP-GiST and BRIN indices.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>generalized_index_validations(
+    index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
 ) {
-    <span class="kw">use</span> <span class="ident">OperatorClass</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>OperatorClass::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">algo</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">unwrap_or</span>(<span class="ident">IndexAlgorithm::BTree</span>);
+    <span class="kw">let </span>algo = index.algorithm().unwrap_or(IndexAlgorithm::BTree);
 
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
-        <span class="comment">// No validation for `raw` needed.</span>
-        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">operator_class</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>().<span class="ident">is_right</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+    <span class="kw">for </span>field <span class="kw">in </span>index.scalar_field_attributes() {
+        <span class="comment">// No validation for `raw` needed.
+        </span><span class="kw">if </span>field.operator_class().map(|c| c.get().is_right()).unwrap_or(<span class="bool-val">false</span>) {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">native_type_instance</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">native_type_instance</span>(<span class="ident">connector</span>);
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">native_type_instance</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">downcast_ref</span>());
-        <span class="kw">let</span> <span class="ident">native_type_name</span> <span class="op">=</span> <span class="ident">native_type_instance</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">native_type_to_parts</span>(<span class="ident">nt</span>).<span class="number">0</span>);
+        <span class="kw">let </span>native_type_instance = field.as_index_field().native_type_instance(connector);
+        <span class="kw">let </span>native_type: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresType&gt; = native_type_instance.as_ref().map(|t| t.downcast_ref());
+        <span class="kw">let </span>native_type_name = native_type_instance
+            .as_ref()
+            .map(|nt| connector.native_type_to_parts(nt).<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">scalar_field_type</span>();
+        <span class="kw">let </span>r#type = field.as_index_field().scalar_field_type();
 
-        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">operator_class</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">get</span>().<span class="ident">left</span>());
+        <span class="kw">let </span>opclass = field.operator_class().and_then(|c| c.get().left());
 
-        <span class="kw">match</span> <span class="ident">opclass</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">opclass</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">opclass</span>.<span class="ident">supports_index_type</span>(<span class="ident">algo</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span>
+        <span class="kw">match </span>opclass {
+            <span class="prelude-val">Some</span>(opclass) <span class="kw">if </span>!opclass.supports_index_type(algo) =&gt; {
+                <span class="kw">let </span>msg =
                     <span class="macro">format!</span>(<span class="string">&quot;The given operator class `{opclass}` is not supported with the `{algo}` index type.&quot;</span>);
 
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                    <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                errors.push_error(DatamodelError::new_attribute_validation_error(
+                    <span class="kw-2">&amp;</span>msg,
+                    index.attribute_name(),
+                    index.ast_attribute().span,
                 ));
 
                 <span class="kw">continue</span>;
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err_f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">native_type_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">opclass</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">native_type_name</span>, <span class="ident">opclass</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">native_type</span>), <span class="prelude-val">Some</span>(<span class="ident">opclass</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>err_f = |native_type_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, opclass| <span class="kw">match </span>(native_type_name, opclass) {
+            (<span class="prelude-val">Some</span>(native_type), <span class="prelude-val">Some</span>(opclass)) =&gt; {
+                <span class="kw">let </span>name = field.as_index_field().name();
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                    <span class="string">&quot;The given operator class `{opclass}` does not support native type `{native_type}` of field `{name}`.&quot;</span>
-                );
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                    <span class="string">&quot;The given operator class `{opclass}` does not support native type `{native_type}` of field `{name}`.&quot;
+                </span>);
 
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                    <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                errors.push_error(DatamodelError::new_attribute_validation_error(
+                    <span class="kw-2">&amp;</span>msg,
+                    index.attribute_name(),
+                    index.ast_attribute().span,
                 ));
             }
-            (<span class="prelude-val">Some</span>(<span class="ident">native_type</span>), <span class="prelude-val">None</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The {algo} index field type `{native_type}` has no default operator class.&quot;</span>);
+            (<span class="prelude-val">Some</span>(native_type), <span class="prelude-val">None</span>) =&gt; {
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The {algo} index field type `{native_type}` has no default operator class.&quot;</span>);
 
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                    <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                errors.push_error(DatamodelError::new_attribute_validation_error(
+                    <span class="kw-2">&amp;</span>msg,
+                    index.attribute_name(),
+                    index.ast_attribute().span,
                 ));
             }
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">opclass</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                    <span class="string">&quot;The given operator class `{opclass}` expects the field `{name}` to define a valid native type.&quot;</span>
-                );
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(opclass)) =&gt; {
+                <span class="kw">let </span>name = field.as_index_field().name();
+                <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                    <span class="string">&quot;The given operator class `{opclass}` expects the field `{name}` to define a valid native type.&quot;
+                </span>);
 
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                    <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                    <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                errors.push_error(DatamodelError::new_attribute_validation_error(
+                    <span class="kw-2">&amp;</span>msg,
+                    index.attribute_name(),
+                    index.ast_attribute().span,
                 ));
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">algo</span>.<span class="ident">supports_field_type</span>(<span class="ident">field</span>.<span class="ident">as_index_field</span>()) {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The {algo} index type does not support the type of the field `{name}`.&quot;</span>);
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">if </span>!algo.supports_field_type(field.as_index_field()) {
+                    <span class="kw">let </span>name = field.as_index_field().name();
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The {algo} index type does not support the type of the field `{name}`.&quot;</span>);
 
-                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                        <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        <span class="kw-2">&amp;</span>msg,
+                        index.attribute_name(),
+                        index.ast_attribute().span,
                     ));
                 }
             }
         };
 
-        <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_gist</span>() {
-            <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
-                <span class="comment">// Inet / InetOps</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetOps</span>)) =&gt; (),
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
+        <span class="kw">if </span>algo.is_gist() {
+            <span class="kw">match </span>(<span class="kw-2">&amp;</span>native_type, opclass) {
+                <span class="comment">// Inet / InetOps
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetOps)) =&gt; (),
+                <span class="kw">_ </span>=&gt; err_f(native_type_name, opclass),
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_gin</span>() {
-            <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
-                <span class="comment">// Jsonb / JsonbOps + JsonbPathOps</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_json</span>() =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::JsonB</span>), <span class="prelude-val">Some</span>(<span class="ident">JsonbOps</span> <span class="op">|</span> <span class="ident">JsonbPathOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
+        } <span class="kw">else if </span>algo.is_gin() {
+            <span class="kw">match </span>(<span class="kw-2">&amp;</span>native_type, opclass) {
+                <span class="comment">// Jsonb / JsonbOps + JsonbPathOps
+                </span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_json() =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::JsonB), <span class="prelude-val">Some</span>(JsonbOps | JsonbPathOps) | <span class="prelude-val">None</span>) =&gt; (),
 
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">JsonbOps</span> <span class="op">|</span> <span class="ident">JsonbPathOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_json</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(JsonbOps | JsonbPathOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_json() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                        <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Json type.&quot;</span>
-                    );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                        <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Json type.&quot;
+                    </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// any array / ArrayOps</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">ArrayOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">field</span>
-                        .<span class="ident">as_index_field</span>()
-                        .<span class="ident">as_scalar_field</span>()
-                        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>())
-                        .<span class="ident">is_none</span>()
+                <span class="comment">// any array / ArrayOps
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(ArrayOps)) =&gt; {
+                    <span class="kw">if </span>field
+                        .as_index_field()
+                        .as_scalar_field()
+                        .filter(|sf| !sf.ast_field().arity.is_list())
+                        .is_none()
                     {
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
+                    <span class="kw">let </span>name = field.as_index_field().name();
 
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                        <span class="string">&quot;The given operator class `ArrayOps` expects the type of field `{name}` to be an array.&quot;</span>
-                    );
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                        <span class="string">&quot;The given operator class `ArrayOps` expects the type of field `{name}` to be an array.&quot;
+                    </span>);
 
-                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                        <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                        <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                        <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                    errors.push_error(DatamodelError::new_attribute_validation_error(
+                        <span class="kw-2">&amp;</span>msg,
+                        index.attribute_name(),
+                        index.ast_attribute().span,
                     ));
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
+                <span class="kw">_ </span>=&gt; err_f(native_type_name, opclass),
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_spgist</span>() {
-            <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
-                <span class="comment">// Inet</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
+        } <span class="kw">else if </span>algo.is_spgist() {
+            <span class="kw">match </span>(<span class="kw-2">&amp;</span>native_type, opclass) {
+                <span class="comment">// Inet
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetOps) | <span class="prelude-val">None</span>) =&gt; (),
 
-                <span class="comment">// Text / TextOps</span>
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_string</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_string</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Text / TextOps
+                </span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_string() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(TextOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_string() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of String type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of String type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>), <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Text), <span class="prelude-val">Some</span>(TextOps) | <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TextOps) | <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Char(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TextOps) | <span class="prelude-val">None</span>) =&gt; (),
 
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
+                <span class="kw">_ </span>=&gt; err_f(native_type_name, opclass),
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">algo</span>.<span class="ident">is_brin</span>() {
-            <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">native_type</span>, <span class="ident">opclass</span>) {
-                <span class="comment">// Bit</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Bit</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">BitMinMaxOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
+        } <span class="kw">else if </span>algo.is_brin() {
+            <span class="kw">match </span>(<span class="kw-2">&amp;</span>native_type, opclass) {
+                <span class="comment">// Bit
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Bit(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(BitMinMaxOps) | <span class="prelude-val">None</span>) =&gt; (),
 
-                <span class="comment">// VarBit</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarBit</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">VarBitMinMaxOps</span>) <span class="op">|</span> <span class="prelude-val">None</span>) =&gt; (),
+                <span class="comment">// VarBit
+                </span>(<span class="prelude-val">Some</span>(PostgresType::VarBit(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(VarBitMinMaxOps) | <span class="prelude-val">None</span>) =&gt; (),
 
-                <span class="comment">// Char</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">BpcharBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Char</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">BpcharMinMaxOps</span>)) =&gt; (),
+                <span class="comment">// Char
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Char(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Char(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(BpcharBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Char(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(BpcharMinMaxOps)) =&gt; (),
 
-                <span class="comment">// Date</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Date</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Date</span>), <span class="prelude-val">Some</span>(<span class="ident">DateBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Date</span>), <span class="prelude-val">Some</span>(<span class="ident">DateMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Date</span>), <span class="prelude-val">Some</span>(<span class="ident">DateMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Date
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Date), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Date), <span class="prelude-val">Some</span>(DateBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Date), <span class="prelude-val">Some</span>(DateMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Date), <span class="prelude-val">Some</span>(DateMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Float4</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Real</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Real</span>), <span class="prelude-val">Some</span>(<span class="ident">Float4BloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Real</span>), <span class="prelude-val">Some</span>(<span class="ident">Float4MinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Real</span>), <span class="prelude-val">Some</span>(<span class="ident">Float4MinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Float4
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Real), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Real), <span class="prelude-val">Some</span>(Float4BloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Real), <span class="prelude-val">Some</span>(Float4MinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Real), <span class="prelude-val">Some</span>(Float4MinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Float8</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::DoublePrecision</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::DoublePrecision</span>), <span class="prelude-val">Some</span>(<span class="ident">Float8BloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::DoublePrecision</span>), <span class="prelude-val">Some</span>(<span class="ident">Float8MinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::DoublePrecision</span>), <span class="prelude-val">Some</span>(<span class="ident">Float8MinMaxMultiOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_float</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Float8BloomOps</span> <span class="op">|</span> <span class="ident">Float8MinMaxOps</span> <span class="op">|</span> <span class="ident">Float8MinMaxMultiOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_float</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Float8
+                </span>(<span class="prelude-val">Some</span>(PostgresType::DoublePrecision), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::DoublePrecision), <span class="prelude-val">Some</span>(Float8BloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::DoublePrecision), <span class="prelude-val">Some</span>(Float8MinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::DoublePrecision), <span class="prelude-val">Some</span>(Float8MinMaxMultiOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_float() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Float8BloomOps | Float8MinMaxOps | Float8MinMaxMultiOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_float() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Float type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Float type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Inet</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetInclusionOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Inet</span>), <span class="prelude-val">Some</span>(<span class="ident">InetMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Inet
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetInclusionOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Inet), <span class="prelude-val">Some</span>(InetMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Int2</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::SmallInt</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::SmallInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int2BloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::SmallInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int2MinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::SmallInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int2MinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Int2
+                </span>(<span class="prelude-val">Some</span>(PostgresType::SmallInt), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::SmallInt), <span class="prelude-val">Some</span>(Int2BloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::SmallInt), <span class="prelude-val">Some</span>(Int2MinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::SmallInt), <span class="prelude-val">Some</span>(Int2MinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Int4</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Integer</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Integer</span>), <span class="prelude-val">Some</span>(<span class="ident">Int4BloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Integer</span>), <span class="prelude-val">Some</span>(<span class="ident">Int4MinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Integer</span>), <span class="prelude-val">Some</span>(<span class="ident">Int4MinMaxMultiOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_int</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Int4BloomOps</span> <span class="op">|</span> <span class="ident">Int4MinMaxOps</span> <span class="op">|</span> <span class="ident">Int4MinMaxMultiOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_int</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Int4
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Integer), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Integer), <span class="prelude-val">Some</span>(Int4BloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Integer), <span class="prelude-val">Some</span>(Int4MinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Integer), <span class="prelude-val">Some</span>(Int4MinMaxMultiOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_int() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Int4BloomOps | Int4MinMaxOps | Int4MinMaxMultiOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_int() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Int type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Int type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Int8</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::BigInt</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::BigInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int8BloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::BigInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int8MinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::BigInt</span>), <span class="prelude-val">Some</span>(<span class="ident">Int8MinMaxMultiOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_bigint</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">Int8BloomOps</span> <span class="op">|</span> <span class="ident">Int8MinMaxOps</span> <span class="op">|</span> <span class="ident">Int8MinMaxMultiOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_bigint</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Int8
+                </span>(<span class="prelude-val">Some</span>(PostgresType::BigInt), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::BigInt), <span class="prelude-val">Some</span>(Int8BloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::BigInt), <span class="prelude-val">Some</span>(Int8MinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::BigInt), <span class="prelude-val">Some</span>(Int8MinMaxMultiOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_bigint() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(Int8BloomOps | Int8MinMaxOps | Int8MinMaxMultiOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_bigint() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of BigInt type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of BigInt type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Numeric</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">NumericBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">NumericMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Decimal</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">NumericMinMaxMultiOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_decimal</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">NumericBloomOps</span> <span class="op">|</span> <span class="ident">NumericMinMaxOps</span> <span class="op">|</span> <span class="ident">NumericMinMaxMultiOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_decimal</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Numeric
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Decimal(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Decimal(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(NumericBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Decimal(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(NumericMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Decimal(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(NumericMinMaxMultiOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_decimal() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(NumericBloomOps | NumericMinMaxOps | NumericMinMaxMultiOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_decimal() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Decimal type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Decimal type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Oid</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Oid</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Oid</span>), <span class="prelude-val">Some</span>(<span class="ident">OidBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Oid</span>), <span class="prelude-val">Some</span>(<span class="ident">OidMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Oid</span>), <span class="prelude-val">Some</span>(<span class="ident">OidMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Oid
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Oid), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Oid), <span class="prelude-val">Some</span>(OidBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Oid), <span class="prelude-val">Some</span>(OidMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Oid), <span class="prelude-val">Some</span>(OidMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Bytes</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::ByteA</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::ByteA</span>), <span class="prelude-val">Some</span>(<span class="ident">ByteaBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::ByteA</span>), <span class="prelude-val">Some</span>(<span class="ident">ByteaMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_bytes</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">ByteaBloomOps</span> <span class="op">|</span> <span class="ident">ByteaMinMaxOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_bytes</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Bytes
+                </span>(<span class="prelude-val">Some</span>(PostgresType::ByteA), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::ByteA), <span class="prelude-val">Some</span>(ByteaBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::ByteA), <span class="prelude-val">Some</span>(ByteaMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_bytes() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(ByteaBloomOps | ByteaMinMaxOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_bytes() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Bytes type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of Bytes type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Text</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>), <span class="prelude-val">Some</span>(<span class="ident">TextBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Text</span>), <span class="prelude-val">Some</span>(<span class="ident">TextMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::VarChar</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TextMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_string</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">TextBloomOps</span> <span class="op">|</span> <span class="ident">TextMinMaxOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_string</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Text
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Text), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Text), <span class="prelude-val">Some</span>(TextBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Text), <span class="prelude-val">Some</span>(TextMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TextBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::VarChar(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TextMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_string() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(TextBloomOps | TextMinMaxOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_string() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of String type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of String type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Timestamp</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamp</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamp</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamp</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamp</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampMinMaxMultiOps</span>)) =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if</span> <span class="ident">r#type</span>.<span class="ident">is_datetime</span>() =&gt; (),
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">TimestampBloomOps</span> <span class="op">|</span> <span class="ident">TimestampMinMaxOps</span> <span class="op">|</span> <span class="ident">TimestampMinMaxMultiOps</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">r#type</span>.<span class="ident">is_datetime</span>() {
-                        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_index_field</span>().<span class="ident">name</span>();
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="ident">opclass</span>.<span class="ident">unwrap</span>();
+                <span class="comment">// Timestamp
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Timestamp(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamp(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamp(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamp(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampMinMaxMultiOps)) =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="kw">if </span>r#type.is_datetime() =&gt; (),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(TimestampBloomOps | TimestampMinMaxOps | TimestampMinMaxMultiOps)) =&gt; {
+                    <span class="kw">if </span>!r#type.is_datetime() {
+                        <span class="kw">let </span>name = field.as_index_field().name();
+                        <span class="kw">let </span>opclass = opclass.unwrap();
 
-                        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
-                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of DateTime type.&quot;</span>
-                        );
+                        <span class="kw">let </span>msg = <span class="macro">format!</span>(
+                            <span class="string">&quot;The given operator class `{opclass}` points to the field `{name}` that is not of DateTime type.&quot;
+                        </span>);
 
-                        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">msg</span>,
-                            <span class="ident">index</span>.<span class="ident">attribute_name</span>(),
-                            <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+                        errors.push_error(DatamodelError::new_attribute_validation_error(
+                            <span class="kw-2">&amp;</span>msg,
+                            index.attribute_name(),
+                            index.ast_attribute().span,
                         ));
                     }
                 }
 
-                <span class="comment">// Timestamptz</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamptz</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamptz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampTzBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamptz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampTzMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timestamptz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimestampTzMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Timestamptz
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Timestamptz(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamptz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampTzBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamptz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampTzMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timestamptz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimestampTzMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Time</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Time</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Time</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Time</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Time</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Time
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Time(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Time(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Time(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Time(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Timetz</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timetz</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timetz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeTzBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timetz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeTzMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Timetz</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">TimeTzMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Timetz
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Timetz(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timetz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeTzBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timetz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeTzMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Timetz(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(TimeTzMinMaxMultiOps)) =&gt; (),
 
-                <span class="comment">// Uuid</span>
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">None</span>) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">Some</span>(<span class="ident">UuidBloomOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">Some</span>(<span class="ident">UuidMinMaxOps</span>)) =&gt; (),
-                (<span class="prelude-val">Some</span>(<span class="ident">PostgresType::Uuid</span>), <span class="prelude-val">Some</span>(<span class="ident">UuidMinMaxMultiOps</span>)) =&gt; (),
+                <span class="comment">// Uuid
+                </span>(<span class="prelude-val">Some</span>(PostgresType::Uuid), <span class="prelude-val">None</span>) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Uuid), <span class="prelude-val">Some</span>(UuidBloomOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Uuid), <span class="prelude-val">Some</span>(UuidMinMaxOps)) =&gt; (),
+                (<span class="prelude-val">Some</span>(PostgresType::Uuid), <span class="prelude-val">Some</span>(UuidMinMaxMultiOps)) =&gt; (),
 
-                <span class="kw">_</span> =&gt; <span class="ident">err_f</span>(<span class="ident">native_type_name</span>, <span class="ident">opclass</span>),
+                <span class="kw">_ </span>=&gt; err_f(native_type_name, opclass),
             }
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">extensions_preview_flag_must_be_set</span>(
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">props</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProperties</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>extensions_preview_flag_must_be_set(
+    preview_features: BitFlags&lt;PreviewFeature&gt;,
+    props: <span class="kw-2">&amp;</span>PostgresDatasourceProperties,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
 ) {
-    <span class="kw">if</span> <span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::PostgresqlExtensions</span>) {
+    <span class="kw">if </span>preview_features.contains(PreviewFeature::PostgresqlExtensions) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">props</span>.<span class="ident">extensions</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">extensions</span>) =&gt; <span class="ident">extensions</span>.<span class="ident">span</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>span = <span class="kw">match </span>props.extensions() {
+        <span class="prelude-val">Some</span>(extensions) =&gt; extensions.span,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_static</span>(
+    errors.push_error(DatamodelError::new_static(
         <span class="string">&quot;The `extensions` property is only available with the `postgresqlExtensions` preview feature.&quot;</span>,
-        <span class="ident">span</span>,
+        span,
     ));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">extension_names_follow_prisma_syntax_rules</span>(
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">props</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProperties</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>extension_names_follow_prisma_syntax_rules(
+    preview_features: BitFlags&lt;PreviewFeature&gt;,
+    props: <span class="kw-2">&amp;</span>PostgresDatasourceProperties,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::PostgresqlExtensions</span>) {
+    <span class="kw">if </span>!preview_features.contains(PreviewFeature::PostgresqlExtensions) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">props</span>.<span class="ident">extensions</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">extensions</span>) =&gt; <span class="ident">extensions</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>extensions = <span class="kw">match </span>props.extensions() {
+        <span class="prelude-val">Some</span>(extensions) =&gt; extensions,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="comment">// Sadly these rules are already in identifier validation. It is</span>
-    <span class="comment">// not easy to share those rules here due to the code</span>
-    <span class="comment">// organization. TODO: organize the code better!</span>
-    <span class="kw">for</span> <span class="ident">extension</span> <span class="kw">in</span> <span class="ident">extensions</span>.<span class="ident">extensions</span>() {
-        <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+    <span class="comment">// Sadly these rules are already in identifier validation. It is
+    // not easy to share those rules here due to the code
+    // organization. TODO: organize the code better!
+    </span><span class="kw">for </span>extension <span class="kw">in </span>extensions.extensions() {
+        <span class="kw">if </span>extension.name.is_empty() {
+            errors.push_error(DatamodelError::new_validation_error(
                 <span class="string">&quot;The name of an extension must not be empty.&quot;</span>,
-                <span class="ident">extension</span>.<span class="ident">span</span>,
+                extension.span,
             ));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">is_numeric</span>() {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+        } <span class="kw">else if </span>extension.name.chars().next().unwrap().is_numeric() {
+            errors.push_error(DatamodelError::new_validation_error(
                 <span class="string">&quot;The name of an extension must not start with a number.&quot;</span>,
-                <span class="ident">extension</span>.<span class="ident">span</span>,
+                extension.span,
             ));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">extension</span>.<span class="ident">name</span>.<span class="ident">contains</span>(<span class="string">&#39;-&#39;</span>) {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+        } <span class="kw">else if </span>extension.name.contains(<span class="string">&#39;-&#39;</span>) {
+            errors.push_error(DatamodelError::new_validation_error(
                 <span class="string">&quot;The character `-` is not allowed in extension names.&quot;</span>,
-                <span class="ident">extension</span>.<span class="ident">span</span>,
+                extension.span,
             ))
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

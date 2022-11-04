@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hmac-0.12.1/src/optim.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>optim.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hmac-0.12.1/src/optim.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>optim.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hmac/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -280,285 +280,285 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">get_der_key</span>, <span class="ident">IPAD</span>, <span class="ident">OPAD</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">slice</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">digest::Reset</span>;
-<span class="kw">use</span> <span class="ident">digest</span>::{
-    <span class="ident">block_buffer::Eager</span>,
-    <span class="ident">core_api</span>::{
-        <span class="ident">AlgorithmName</span>, <span class="ident">Block</span>, <span class="ident">BlockSizeUser</span>, <span class="ident">Buffer</span>, <span class="ident">BufferKindUser</span>, <span class="ident">CoreProxy</span>, <span class="ident">CoreWrapper</span>,
-        <span class="ident">FixedOutputCore</span>, <span class="ident">OutputSizeUser</span>, <span class="ident">UpdateCore</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{get_der_key, IPAD, OPAD};
+<span class="kw">use </span>core::{fmt, slice};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+</span><span class="kw">use </span>digest::Reset;
+<span class="kw">use </span>digest::{
+    block_buffer::Eager,
+    core_api::{
+        AlgorithmName, Block, BlockSizeUser, Buffer, BufferKindUser, CoreProxy, CoreWrapper,
+        FixedOutputCore, OutputSizeUser, UpdateCore,
     },
-    <span class="ident">crypto_common</span>::{<span class="ident">Key</span>, <span class="ident">KeySizeUser</span>},
-    <span class="ident">generic_array::typenum</span>::{<span class="ident">IsLess</span>, <span class="ident">Le</span>, <span class="ident">NonZero</span>, <span class="ident">U256</span>},
-    <span class="ident">HashMarker</span>, <span class="ident">InvalidLength</span>, <span class="ident">KeyInit</span>, <span class="ident">MacMarker</span>, <span class="ident">Output</span>,
+    crypto_common::{Key, KeySizeUser},
+    generic_array::typenum::{IsLess, Le, NonZero, U256},
+    HashMarker, InvalidLength, KeyInit, MacMarker, Output,
 };
 
-<span class="doccomment">/// Generic HMAC instance.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">CoreWrapper</span><span class="op">&lt;</span><span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Generic HMAC instance.
+</span><span class="kw">pub type </span>Hmac&lt;D&gt; = CoreWrapper&lt;HmacCore&lt;D&gt;&gt;;
 
-<span class="doccomment">/// Generic core HMAC instance, which operates over blocks.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="doccomment">/// Generic core HMAC instance, which operates over blocks.
+</span><span class="kw">pub struct </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="ident">digest</span>: <span class="ident">D::Core</span>,
-    <span class="ident">opad_digest</span>: <span class="ident">D::Core</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-    <span class="ident">ipad_digest</span>: <span class="ident">D::Core</span>,
+    digest: D::Core,
+    opad_digest: D::Core,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+    </span>ipad_digest: D::Core,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; Clone <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">digest</span>: <span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">clone</span>(),
-            <span class="ident">opad_digest</span>: <span class="self">self</span>.<span class="ident">opad_digest</span>.<span class="ident">clone</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-            <span class="ident">ipad_digest</span>: <span class="self">self</span>.<span class="ident">ipad_digest</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            digest: <span class="self">self</span>.digest.clone(),
+            opad_digest: <span class="self">self</span>.opad_digest.clone(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+            </span>ipad_digest: <span class="self">self</span>.ipad_digest.clone(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">MacMarker</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; MacMarker <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">BufferKindUser</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; BufferKindUser <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">type</span> <span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span>;
+    <span class="kw">type </span>BufferKind = Eager;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">KeySizeUser</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; KeySizeUser <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">type</span> <span class="ident">KeySize</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D</span> <span class="kw">as</span> <span class="ident">CoreProxy</span><span class="op">&gt;</span><span class="ident">::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>;
+    <span class="kw">type </span>KeySize = &lt;&lt;D <span class="kw">as </span>CoreProxy&gt;::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">BlockSizeUser</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; BlockSizeUser <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">type</span> <span class="ident">BlockSize</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D</span> <span class="kw">as</span> <span class="ident">CoreProxy</span><span class="op">&gt;</span><span class="ident">::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>;
+    <span class="kw">type </span>BlockSize = &lt;&lt;D <span class="kw">as </span>CoreProxy&gt;::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">OutputSizeUser</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; OutputSizeUser <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">type</span> <span class="ident">OutputSize</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D</span> <span class="kw">as</span> <span class="ident">CoreProxy</span><span class="op">&gt;</span><span class="ident">::Core</span> <span class="kw">as</span> <span class="ident">OutputSizeUser</span><span class="op">&gt;</span><span class="ident">::OutputSize</span>;
+    <span class="kw">type </span>OutputSize = &lt;&lt;D <span class="kw">as </span>CoreProxy&gt;::Core <span class="kw">as </span>OutputSizeUser&gt;::OutputSize;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">KeyInit</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; KeyInit <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new_from_slice</span>(<span class="ident">key</span>.<span class="ident">as_slice</span>()).<span class="ident">unwrap</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>new(key: <span class="kw-2">&amp;</span>Key&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_from_slice(key.as_slice()).unwrap()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidLength</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">get_der_key</span>::<span class="op">&lt;</span><span class="ident">CoreWrapper</span><span class="op">&lt;</span><span class="ident">D::Core</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>);
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">buf</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">IPAD</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>new_from_slice(key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidLength&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = get_der_key::&lt;CoreWrapper&lt;D::Core&gt;&gt;(key);
+        <span class="kw">for </span>b <span class="kw">in </span>buf.iter_mut() {
+            <span class="kw-2">*</span>b ^= IPAD;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">D::Core::default</span>();
-        <span class="ident">digest</span>.<span class="ident">update_blocks</span>(<span class="ident">slice::from_ref</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>digest = D::Core::default();
+        digest.update_blocks(slice::from_ref(<span class="kw-2">&amp;</span>buf));
 
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">buf</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">IPAD</span> <span class="op">^</span> <span class="ident">OPAD</span>;
+        <span class="kw">for </span>b <span class="kw">in </span>buf.iter_mut() {
+            <span class="kw-2">*</span>b ^= IPAD ^ OPAD;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opad_digest</span> <span class="op">=</span> <span class="ident">D::Core::default</span>();
-        <span class="ident">opad_digest</span>.<span class="ident">update_blocks</span>(<span class="ident">slice::from_ref</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>opad_digest = D::Core::default();
+        opad_digest.update_blocks(slice::from_ref(<span class="kw-2">&amp;</span>buf));
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-            <span class="ident">ipad_digest</span>: <span class="ident">digest</span>.<span class="ident">clone</span>(),
-            <span class="ident">opad_digest</span>,
-            <span class="ident">digest</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+            </span>ipad_digest: digest.clone(),
+            opad_digest,
+            digest,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">UpdateCore</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; UpdateCore <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">update_blocks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">blocks</span>: <span class="kw-2">&amp;</span>[<span class="ident">Block</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>]) {
-        <span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">update_blocks</span>(<span class="ident">blocks</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>update_blocks(<span class="kw-2">&amp;mut </span><span class="self">self</span>, blocks: <span class="kw-2">&amp;</span>[Block&lt;<span class="self">Self</span>&gt;]) {
+        <span class="self">self</span>.digest.update_blocks(blocks);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">FixedOutputCore</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; FixedOutputCore <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_fixed_core</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">Output</span>::<span class="op">&lt;</span><span class="ident">D::Core</span><span class="op">&gt;</span><span class="ident">::default</span>();
-        <span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">finalize_fixed_core</span>(<span class="ident">buffer</span>, <span class="kw-2">&amp;mut</span> <span class="ident">hash</span>);
-        <span class="comment">// finalize_fixed_core should reset the buffer as well, but</span>
-        <span class="comment">// to be extra safe we reset it explicitly again.</span>
-        <span class="ident">buffer</span>.<span class="ident">reset</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">opad_digest</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">opad_digest</span>.<span class="ident">clone</span>();
-        <span class="ident">buffer</span>.<span class="ident">digest_blocks</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">update_blocks</span>(<span class="ident">b</span>));
-        <span class="ident">h</span>.<span class="ident">finalize_fixed_core</span>(<span class="ident">buffer</span>, <span class="ident">out</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>finalize_fixed_core(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buffer: <span class="kw-2">&amp;mut </span>Buffer&lt;<span class="self">Self</span>&gt;, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash = Output::&lt;D::Core&gt;::default();
+        <span class="self">self</span>.digest.finalize_fixed_core(buffer, <span class="kw-2">&amp;mut </span>hash);
+        <span class="comment">// finalize_fixed_core should reset the buffer as well, but
+        // to be extra safe we reset it explicitly again.
+        </span>buffer.reset();
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;reset&quot;</span>))]
+        </span><span class="kw">let </span>h = <span class="kw-2">&amp;mut </span><span class="self">self</span>.opad_digest;
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>h = <span class="self">self</span>.opad_digest.clone();
+        buffer.digest_blocks(<span class="kw-2">&amp;</span>hash, |b| h.update_blocks(b));
+        h.finalize_fixed_core(buffer, out);
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">Reset</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;reset&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;D&gt; Reset <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">digest</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ipad_digest</span>.<span class="ident">clone</span>();
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.digest = <span class="self">self</span>.ipad_digest.clone();
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">AlgorithmName</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">AlgorithmName</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; AlgorithmName <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + AlgorithmName
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">fn</span> <span class="ident">write_alg_name</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Hmac&lt;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">AlgorithmName</span><span class="op">&gt;</span><span class="ident">::write_alg_name</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;&gt;&quot;</span>)
+    <span class="kw">fn </span>write_alg_name(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;Hmac&lt;&quot;</span>)<span class="question-mark">?</span>;
+        &lt;D::Core <span class="kw">as </span>AlgorithmName&gt;::write_alg_name(f)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;&gt;&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">HmacCore</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">CoreProxy</span>,
-    <span class="ident">D::Core</span>: <span class="ident">HashMarker</span>
-        <span class="op">+</span> <span class="ident">AlgorithmName</span>
-        <span class="op">+</span> <span class="ident">UpdateCore</span>
-        <span class="op">+</span> <span class="ident">FixedOutputCore</span>
-        <span class="op">+</span> <span class="ident">BufferKindUser</span><span class="op">&lt;</span><span class="ident">BufferKind</span> <span class="op">=</span> <span class="ident">Eager</span><span class="op">&gt;</span>
-        <span class="op">+</span> <span class="ident">Default</span>
-        <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>: <span class="ident">IsLess</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span>,
-    <span class="ident">Le</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span><span class="ident">::BlockSize</span>, <span class="ident">U256</span><span class="op">&gt;</span>: <span class="ident">NonZero</span>,
+<span class="kw">impl</span>&lt;D&gt; fmt::Debug <span class="kw">for </span>HmacCore&lt;D&gt;
+<span class="kw">where
+    </span>D: CoreProxy,
+    D::Core: HashMarker
+        + AlgorithmName
+        + UpdateCore
+        + FixedOutputCore
+        + BufferKindUser&lt;BufferKind = Eager&gt;
+        + Default
+        + Clone,
+    &lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize: IsLess&lt;U256&gt;,
+    Le&lt;&lt;D::Core <span class="kw">as </span>BlockSizeUser&gt;::BlockSize, U256&gt;: NonZero,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;HmacCore&lt;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="op">&lt;</span><span class="ident">D::Core</span> <span class="kw">as</span> <span class="ident">AlgorithmName</span><span class="op">&gt;</span><span class="ident">::write_alg_name</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;&gt; { ... }&quot;</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;HmacCore&lt;&quot;</span>)<span class="question-mark">?</span>;
+        &lt;D::Core <span class="kw">as </span>AlgorithmName&gt;::write_alg_name(f)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;&gt; { ... }&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hmac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hmac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

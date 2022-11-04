@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -266,273 +266,273 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::Display;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::prelude::DomainError</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">query_engine::DatabaseConstraint</span>, <span class="ident">KnownError</span>};
+<span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::prelude::DomainError;
+<span class="kw">use </span>thiserror::Error;
+<span class="kw">use </span>user_facing_errors::{query_engine::DatabaseConstraint, KnownError};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kind</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorError</span> {
-    <span class="doccomment">/// An optional error already rendered for users in case the migration core does not handle it.</span>
-    <span class="kw">pub</span> <span class="ident">user_facing_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KnownError</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The error information for internal use.</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ErrorKind</span>,
+<span class="attribute">#[derive(Debug, Error)]
+#[error(<span class="string">&quot;{}&quot;</span>, kind)]
+</span><span class="kw">pub struct </span>ConnectorError {
+    <span class="doccomment">/// An optional error already rendered for users in case the migration core does not handle it.
+    </span><span class="kw">pub </span>user_facing_error: <span class="prelude-ty">Option</span>&lt;KnownError&gt;,
+    <span class="doccomment">/// The error information for internal use.
+    </span><span class="kw">pub </span>kind: ErrorKind,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">user_facing_error</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">kind</span> {
-            <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::NullConstraintViolation</span> {
-                    <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">to_owned</span>(),
+<span class="kw">impl </span>ConnectorError {
+    <span class="kw">pub fn </span>from_kind(kind: ErrorKind) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>user_facing_error = <span class="kw">match </span><span class="kw-2">&amp;</span>kind {
+            ErrorKind::NullConstraintViolation { constraint } =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::NullConstraintViolation {
+                    constraint: constraint.to_owned(),
                 },
             )),
-            <span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> } =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::TableDoesNotExist</span> {
-                    <span class="ident">table</span>: <span class="ident">table</span>.<span class="ident">clone</span>(),
+            ErrorKind::TableDoesNotExist { table } =&gt; {
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::TableDoesNotExist {
+                    table: table.clone(),
                 }))
             }
-            <span class="ident">ErrorKind::ColumnDoesNotExist</span> { <span class="ident">column</span> } =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::ColumnDoesNotExist</span> {
-                    <span class="ident">column</span>: <span class="ident">column</span>.<span class="ident">clone</span>(),
+            ErrorKind::ColumnDoesNotExist { column } =&gt; {
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::ColumnDoesNotExist {
+                    column: column.clone(),
                 }))
             }
-            <span class="ident">ErrorKind::InvalidDatabaseUrl</span> { <span class="ident">details</span>, <span class="ident">url</span>: <span class="kw">_</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="ident">user_facing_errors::quaint::invalid_connection_string_description</span>(<span class="ident">details</span>);
+            ErrorKind::InvalidDatabaseUrl { details, url: <span class="kw">_ </span>} =&gt; {
+                <span class="kw">let </span>details = user_facing_errors::quaint::invalid_connection_string_description(details);
 
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::common::InvalidConnectionString</span> {
-                    <span class="ident">details</span>,
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::common::InvalidConnectionString {
+                    details,
                 }))
             }
-            <span class="ident">ErrorKind::ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">constraint</span> {
-                    <span class="ident">DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>),
-                    <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">index</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{} (index)&quot;</span>, <span class="ident">index</span>),
-                    <span class="ident">DatabaseConstraint::ForeignKey</span> =&gt; <span class="string">&quot;foreign key&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">DatabaseConstraint::CannotParse</span> =&gt; <span class="string">&quot;(not available)&quot;</span>.<span class="ident">to_string</span>(),
+            ErrorKind::ForeignKeyConstraintViolation { constraint } =&gt; {
+                <span class="kw">let </span>field_name = <span class="kw">match </span>constraint {
+                    DatabaseConstraint::Fields(fields) =&gt; fields.join(<span class="string">&quot;,&quot;</span>),
+                    DatabaseConstraint::Index(index) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{} (index)&quot;</span>, index),
+                    DatabaseConstraint::ForeignKey =&gt; <span class="string">&quot;foreign key&quot;</span>.to_string(),
+                    DatabaseConstraint::CannotParse =&gt; <span class="string">&quot;(not available)&quot;</span>.to_string(),
                 };
 
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::ForeignKeyViolation</span> {
-                    <span class="ident">field_name</span>,
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::ForeignKeyViolation {
+                    field_name,
                 }))
             }
-            <span class="ident">ErrorKind::ConversionError</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::InconsistentColumnData</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>),
+            ErrorKind::ConversionError(message) =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::InconsistentColumnData {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, message),
                 },
             )),
-            <span class="ident">ErrorKind::QueryInvalidInput</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::DatabaseAssertionViolation</span> {
-                    <span class="ident">database_error</span>: <span class="ident">message</span>.<span class="ident">to_owned</span>(),
+            ErrorKind::QueryInvalidInput(message) =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::DatabaseAssertionViolation {
+                    database_error: message.to_owned(),
                 },
             )),
-            <span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::UnsupportedFeature</span> {
-                    <span class="ident">feature</span>: <span class="ident">feature</span>.<span class="ident">clone</span>(),
+            ErrorKind::UnsupportedFeature(feature) =&gt; {
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::UnsupportedFeature {
+                    feature: feature.clone(),
                 }))
             }
-            <span class="ident">ErrorKind::MultiError</span>(<span class="ident">merror</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::MultiError</span> {
-                <span class="ident">errors</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">merror</span>),
+            ErrorKind::MultiError(merror) =&gt; <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::MultiError {
+                errors: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, merror),
             })),
-            <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">user_facing_errors::query_engine::UniqueKeyViolation</span> {
-                    <span class="ident">constraint</span>: <span class="ident">constraint</span>.<span class="ident">clone</span>(),
+            ErrorKind::UniqueConstraintViolation { constraint } =&gt; {
+                <span class="prelude-val">Some</span>(KnownError::new(user_facing_errors::query_engine::UniqueKeyViolation {
+                    constraint: constraint.clone(),
                 }))
             }
 
-            <span class="ident">ErrorKind::IncorrectNumberOfParameters</span> { <span class="ident">expected</span>, <span class="ident">actual</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::common::IncorrectNumberOfParameters</span> {
-                    <span class="ident">expected</span>: <span class="kw-2">*</span><span class="ident">expected</span>,
-                    <span class="ident">actual</span>: <span class="kw-2">*</span><span class="ident">actual</span>,
+            ErrorKind::IncorrectNumberOfParameters { expected, actual } =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::common::IncorrectNumberOfParameters {
+                    expected: <span class="kw-2">*</span>expected,
+                    actual: <span class="kw-2">*</span>actual,
                 },
             )),
-            <span class="ident">ErrorKind::QueryParameterLimitExceeded</span>(<span class="ident">message</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::QueryParameterLimitExceeded</span> {
-                    <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">clone</span>(),
+            ErrorKind::QueryParameterLimitExceeded(message) =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::QueryParameterLimitExceeded {
+                    message: message.clone(),
                 },
             )),
 
-            <span class="ident">ErrorKind::MissingFullTextSearchIndex</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::MissingFullTextSearchIndex</span> {},
+            ErrorKind::MissingFullTextSearchIndex =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::MissingFullTextSearchIndex {},
             )),
-            <span class="ident">ErrorKind::TransactionAborted</span> { <span class="ident">message</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::InteractiveTransactionError</span> { <span class="ident">error</span>: <span class="ident">message</span>.<span class="ident">clone</span>() },
+            ErrorKind::TransactionAborted { message } =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
             )),
-            <span class="ident">ErrorKind::TransactionWriteConflict</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::TransactionWriteConflict</span> {},
+            ErrorKind::TransactionWriteConflict =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::TransactionWriteConflict {},
             )),
-            <span class="ident">ErrorKind::MongoReplicaSetRequired</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
-                <span class="ident">user_facing_errors::query_engine::MongoReplicaSetRequired</span> {},
+            ErrorKind::MongoReplicaSetRequired =&gt; <span class="prelude-val">Some</span>(KnownError::new(
+                user_facing_errors::query_engine::MongoReplicaSetRequired {},
             )),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">ConnectorError</span> {
-            <span class="ident">user_facing_error</span>,
-            <span class="ident">kind</span>,
+        ConnectorError {
+            user_facing_error,
+            kind,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unique constraint failed: {}&quot;</span>, <span class="ident">constraint</span>)]</span>
-    <span class="ident">UniqueConstraintViolation</span> { <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span> },
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>ErrorKind {
+    <span class="attribute">#[error(<span class="string">&quot;Unique constraint failed: {}&quot;</span>, constraint)]
+    </span>UniqueConstraintViolation { constraint: DatabaseConstraint },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Null constraint failed: {}&quot;</span>, <span class="ident">constraint</span>)]</span>
-    <span class="ident">NullConstraintViolation</span> { <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Null constraint failed: {}&quot;</span>, constraint)]
+    </span>NullConstraintViolation { constraint: DatabaseConstraint },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Foreign key constraint failed&quot;</span>)]</span>
-    <span class="ident">ForeignKeyConstraintViolation</span> { <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Foreign key constraint failed&quot;</span>)]
+    </span>ForeignKeyConstraintViolation { constraint: DatabaseConstraint },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Record does not exist.&quot;</span>)]</span>
-    <span class="ident">RecordDoesNotExist</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Record does not exist.&quot;</span>)]
+    </span>RecordDoesNotExist,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Column &#39;{}&#39; does not exist.&quot;</span>, <span class="ident">column</span>)]</span>
-    <span class="ident">ColumnDoesNotExist</span> { <span class="ident">column</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Column &#39;{}&#39; does not exist.&quot;</span>, column)]
+    </span>ColumnDoesNotExist { column: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Table &#39;{}&#39; does not exist.&quot;</span>, <span class="ident">table</span>)]</span>
-    <span class="ident">TableDoesNotExist</span> { <span class="ident">table</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Table &#39;{}&#39; does not exist.&quot;</span>, table)]
+    </span>TableDoesNotExist { table: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error creating a database connection. ({})&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">ConnectionError</span>(<span class="ident">anyhow::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error creating a database connection. ({})&quot;</span>, _0)]
+    </span>ConnectionError(anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error querying the database: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">QueryError</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error querying the database: {}&quot;</span>, _0)]
+    </span>QueryError(Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The provided arguments are not supported.&quot;</span>)]</span>
-    <span class="ident">InvalidConnectionArguments</span>,
+    <span class="attribute">#[error(<span class="string">&quot;The provided arguments are not supported.&quot;</span>)]
+    </span>InvalidConnectionArguments,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The column value was different from the model&quot;</span>)]</span>
-    <span class="ident">ColumnReadFailure</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>),
+    <span class="attribute">#[error(<span class="string">&quot;The column value was different from the model&quot;</span>)]
+    </span>ColumnReadFailure(Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Field cannot be null: {}&quot;</span>, <span class="ident">field</span>)]</span>
-    <span class="ident">FieldCannotBeNull</span> { <span class="ident">field</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Field cannot be null: {}&quot;</span>, field)]
+    </span>FieldCannotBeNull { field: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">DomainError</span>(<span class="ident">DomainError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>DomainError(DomainError),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Record not found: {:?}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">RecordNotFoundForWhere</span>(<span class="ident">Filter</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Record not found: {:?}&quot;</span>, _0)]
+    </span>RecordNotFoundForWhere(Filter),
 
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(
         <span class="string">&quot;Violating a relation {} between {} and {}&quot;</span>,
-        <span class="ident">relation_name</span>,
-        <span class="ident">model_a_name</span>,
-        <span class="ident">model_b_name</span>
-    )]</span>
-    <span class="ident">RelationViolation</span> {
-        <span class="ident">relation_name</span>: <span class="ident">String</span>,
-        <span class="ident">model_a_name</span>: <span class="ident">String</span>,
-        <span class="ident">model_b_name</span>: <span class="ident">String</span>,
+        relation_name,
+        model_a_name,
+        model_b_name
+    )]
+    </span>RelationViolation {
+        relation_name: String,
+        model_a_name: String,
+        model_b_name: String,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(
         <span class="string">&quot;The relation {} has no record for the model {} connected to a record for the model {} on your write path.&quot;</span>,
-        <span class="ident">relation_name</span>,
-        <span class="ident">parent_name</span>,
-        <span class="ident">child_name</span>
-    )]</span>
-    <span class="ident">RecordsNotConnected</span> {
-        <span class="ident">relation_name</span>: <span class="ident">String</span>,
-        <span class="ident">parent_name</span>: <span class="ident">String</span>,
-        <span class="ident">child_name</span>: <span class="ident">String</span>,
+        relation_name,
+        parent_name,
+        child_name
+    )]
+    </span>RecordsNotConnected {
+        relation_name: String,
+        parent_name: String,
+        child_name: String,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Conversion error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">ConversionError</span>(<span class="ident">anyhow::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Conversion error: {}&quot;</span>, _0)]
+    </span>ConversionError(anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid input provided to query: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">QueryInvalidInput</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Invalid input provided to query: {}&quot;</span>, _0)]
+    </span>QueryInvalidInput(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Conversion error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">InternalConversionError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Conversion error: {}&quot;</span>, _0)]
+    </span>InternalConversionError(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database creation error: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">DatabaseCreationError</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Database creation error: {}&quot;</span>, _0)]
+    </span>DatabaseCreationError(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database &#39;{}&#39; does not exist.&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseDoesNotExist</span> { <span class="ident">db_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Database &#39;{}&#39; does not exist.&quot;</span>, db_name)]
+    </span>DatabaseDoesNotExist { db_name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseAccessDenied</span> { <span class="ident">db_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, db_name)]
+    </span>DatabaseAccessDenied { db_name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, <span class="ident">user</span>)]</span>
-    <span class="ident">AuthenticationFailed</span> { <span class="ident">user</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, user)]
+    </span>AuthenticationFailed { user: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database error. error code: {}, error message: {}&quot;</span>, <span class="ident">code</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">RawDatabaseError</span> { <span class="ident">code</span>: <span class="ident">String</span>, <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Database error. error code: {}, error message: {}&quot;</span>, code, message)]
+    </span>RawDatabaseError { code: String, message: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Raw API error: {0}&quot;</span>)]</span>
-    <span class="ident">RawApiError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Raw API error: {0}&quot;</span>)]
+    </span>RawApiError(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">details</span>)]</span>
-    <span class="ident">InvalidDatabaseUrl</span> { <span class="ident">details</span>: <span class="ident">String</span>, <span class="ident">url</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, details)]
+    </span>InvalidDatabaseUrl { details: String, url: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unsupported connector feature: {0}&quot;</span>)]</span>
-    <span class="ident">UnsupportedFeature</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Unsupported connector feature: {0}&quot;</span>)]
+    </span>UnsupportedFeature(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Multiple errors occurred: {}&quot;</span>, <span class="number">0</span>)]</span>
-    <span class="ident">MultiError</span>(<span class="ident">MultiError</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Multiple errors occurred: {}&quot;</span>, <span class="number">0</span>)]
+    </span>MultiError(MultiError),
 
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(
         <span class="string">&quot;Incorrect number of parameters given to a statement. Expected {}: got: {}.&quot;</span>,
-        <span class="ident">expected</span>,
-        <span class="ident">actual</span>
-    )]</span>
-    <span class="ident">IncorrectNumberOfParameters</span> { <span class="ident">expected</span>: <span class="ident">usize</span>, <span class="ident">actual</span>: <span class="ident">usize</span> },
+        expected,
+        actual
+    )]
+    </span>IncorrectNumberOfParameters { expected: usize, actual: usize },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Server terminated the connection.&quot;</span>)]</span>
-    <span class="ident">ConnectionClosed</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Server terminated the connection.&quot;</span>)]
+    </span>ConnectionClosed,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Transaction aborted: {}&quot;</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">TransactionAborted</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Transaction aborted: {}&quot;</span>, message)]
+    </span>TransactionAborted { message: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">TransactionAlreadyClosed</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, message)]
+    </span>TransactionAlreadyClosed { message: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Transaction write conflict&quot;</span>)]</span>
-    <span class="ident">TransactionWriteConflict</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Transaction write conflict&quot;</span>)]
+    </span>TransactionWriteConflict,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;ROLLBACK statement has no corresponding BEGIN statement&quot;</span>)]</span>
-    <span class="ident">RollbackWithoutBegin</span>,
+    <span class="attribute">#[error(<span class="string">&quot;ROLLBACK statement has no corresponding BEGIN statement&quot;</span>)]
+    </span>RollbackWithoutBegin,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;The query parameter limit supported by your database is exceeded: {0}.&quot;</span>)]</span>
-    <span class="ident">QueryParameterLimitExceeded</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;The query parameter limit supported by your database is exceeded: {0}.&quot;</span>)]
+    </span>QueryParameterLimitExceeded(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Cannot find a fulltext index to use for the search&quot;</span>)]</span>
-    <span class="ident">MissingFullTextSearchIndex</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Cannot find a fulltext index to use for the search&quot;</span>)]
+    </span>MissingFullTextSearchIndex,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Replica Set required for Transactions&quot;</span>)]</span>
-    <span class="ident">MongoReplicaSetRequired</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Replica Set required for Transactions&quot;</span>)]
+    </span>MongoReplicaSetRequired,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DomainError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">DomainError</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::DomainError</span>(<span class="ident">e</span>))
+<span class="kw">impl </span>From&lt;DomainError&gt; <span class="kw">for </span>ConnectorError {
+    <span class="kw">fn </span>from(e: DomainError) -&gt; ConnectorError {
+        ConnectorError::from_kind(ErrorKind::DomainError(e))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiError</span> {
-    <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ErrorKind</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>MultiError {
+    <span class="kw">pub </span>errors: Vec&lt;ErrorKind&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">MultiError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">errors</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">err</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}) {}&quot;</span>, <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">err</span>))
-            .<span class="ident">collect_vec</span>();
+<span class="kw">impl </span>Display <span class="kw">for </span>MultiError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">let </span>errors = <span class="self">self
+            </span>.errors
+            .iter()
+            .enumerate()
+            .map(|(i, err)| <span class="macro">format!</span>(<span class="string">&quot;{}) {}&quot;</span>, i + <span class="number">1</span>, err))
+            .collect_vec();
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">errors</span>.<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>))
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, errors.join(<span class="string">&quot;\n&quot;</span>))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

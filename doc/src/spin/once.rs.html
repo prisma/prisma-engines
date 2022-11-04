@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/spin-0.5.2/src/once.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>once.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../spin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/spin-0.5.2/src/once.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>once.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../spin/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../spin/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -288,295 +288,295 @@
 <span id="288">288</span>
 <span id="289">289</span>
 <span id="290">290</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>, <span class="ident">spin_loop_hint</span> <span class="kw">as</span> <span class="ident">cpu_relax</span>};
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::cell::UnsafeCell;
+<span class="kw">use </span>core::sync::atomic::{AtomicUsize, Ordering, spin_loop_hint <span class="kw">as </span>cpu_relax};
+<span class="kw">use </span>core::fmt;
 
-<span class="doccomment">/// A synchronization primitive which can be used to run a one-time global</span>
-<span class="doccomment">/// initialization. Unlike its std equivalent, this is generalized so that the</span>
-<span class="doccomment">/// closure returns a value and it is stored. Once therefore acts something like</span>
-<span class="doccomment">/// a future, too.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use spin;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// static START: spin::Once&lt;()&gt; = spin::Once::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// START.call_once(|| {</span>
-<span class="doccomment">///     // run initialization here</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
-    <span class="ident">data</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// TODO remove option and use mem::uninitialized</span>
-}
+<span class="doccomment">/// A synchronization primitive which can be used to run a one-time global
+/// initialization. Unlike its std equivalent, this is generalized so that the
+/// closure returns a value and it is stored. Once therefore acts something like
+/// a future, too.
+///
+/// # Examples
+///
+/// ```
+/// use spin;
+///
+/// static START: spin::Once&lt;()&gt; = spin::Once::new();
+///
+/// START.call_once(|| {
+///     // run initialization here
+/// });
+/// ```
+</span><span class="kw">pub struct </span>Once&lt;T&gt; {
+    state: AtomicUsize,
+    data: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt;, <span class="comment">// TODO remove option and use mem::uninitialized
+</span>}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ data: &quot;</span>)
-				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">s</span>.<span class="ident">fmt</span>(<span class="ident">f</span>))
-				.<span class="ident">and_then</span>(<span class="op">|</span>()<span class="op">|</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;}}&quot;</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Once {{ &lt;uninitialized&gt; }}&quot;</span>)
+<span class="kw">impl</span>&lt;T: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Once&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.<span class="kw">try</span>() {
+            <span class="prelude-val">Some</span>(s) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Once {{ data: &quot;</span>)
+				.and_then(|()| s.fmt(f))
+				.and_then(|()| <span class="macro">write!</span>(f, <span class="string">&quot;}}&quot;</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Once {{ &lt;uninitialized&gt; }}&quot;</span>)
         }
     }
 }
 
-<span class="comment">// Same unsafe impls as `std::sync::RwLock`, because this also allows for</span>
-<span class="comment">// concurrent reads.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// Same unsafe impls as `std::sync::RwLock`, because this also allows for
+// concurrent reads.
+</span><span class="kw">unsafe impl</span>&lt;T: Send + Sync&gt; Sync <span class="kw">for </span>Once&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>Once&lt;T&gt; {}
 
-<span class="comment">// Four states that a Once can be in, encoded into the lower bits of `state` in</span>
-<span class="comment">// the Once structure.</span>
-<span class="kw">const</span> <span class="ident">INCOMPLETE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x0</span>;
-<span class="kw">const</span> <span class="ident">RUNNING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x1</span>;
-<span class="kw">const</span> <span class="ident">COMPLETE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x2</span>;
-<span class="kw">const</span> <span class="ident">PANICKED</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x3</span>;
+<span class="comment">// Four states that a Once can be in, encoded into the lower bits of `state` in
+// the Once structure.
+</span><span class="kw">const </span>INCOMPLETE: usize = <span class="number">0x0</span>;
+<span class="kw">const </span>RUNNING: usize = <span class="number">0x1</span>;
+<span class="kw">const </span>COMPLETE: usize = <span class="number">0x2</span>;
+<span class="kw">const </span>PANICKED: usize = <span class="number">0x3</span>;
 
-<span class="kw">use</span> <span class="ident">core::hint::unreachable_unchecked</span> <span class="kw">as</span> <span class="ident">unreachable</span>;
+<span class="kw">use </span>core::hint::unreachable_unchecked <span class="kw">as </span>unreachable;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Initialization constant of `Once`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INIT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="ident">Once</span> {
-        <span class="ident">state</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">INCOMPLETE</span>),
-        <span class="ident">data</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
+<span class="kw">impl</span>&lt;T&gt; Once&lt;T&gt; {
+    <span class="doccomment">/// Initialization constant of `Once`.
+    </span><span class="kw">pub const </span>INIT: <span class="self">Self </span>= Once {
+        state: AtomicUsize::new(INCOMPLETE),
+        data: UnsafeCell::new(<span class="prelude-val">None</span>),
     };
 
-    <span class="doccomment">/// Creates a new `Once` value.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::INIT</span>
+    <span class="doccomment">/// Creates a new `Once` value.
+    </span><span class="kw">pub const fn </span>new() -&gt; Once&lt;T&gt; {
+        <span class="self">Self</span>::INIT
     }
 
-    <span class="kw">fn</span> <span class="ident">force_get</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> {
-        <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() }.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">None</span>    =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
-            <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
+    <span class="kw">fn </span>force_get&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T {
+        <span class="kw">match unsafe </span>{ <span class="kw-2">&amp;*</span><span class="self">self</span>.data.get() }.as_ref() {
+            <span class="prelude-val">None    </span>=&gt; <span class="kw">unsafe </span>{ unreachable() },
+            <span class="prelude-val">Some</span>(p) =&gt; p,
         }
     }
 
-    <span class="doccomment">/// Performs an initialization routine once and only once. The given closure</span>
-    <span class="doccomment">/// will be executed if this is the first time `call_once` has been called,</span>
-    <span class="doccomment">/// and otherwise the routine will *not* be invoked.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will block the calling thread if another initialization</span>
-    <span class="doccomment">/// routine is currently running.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When this function returns, it is guaranteed that some initialization</span>
-    <span class="doccomment">/// has run and completed (it may not be the closure specified). The</span>
-    <span class="doccomment">/// returned pointer will point to the result from the closure that was</span>
-    <span class="doccomment">/// run.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use spin;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// static INIT: spin::Once&lt;usize&gt; = spin::Once::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn get_cached_val() -&gt; usize {</span>
-    <span class="doccomment">///     *INIT.call_once(expensive_computation)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn expensive_computation() -&gt; usize {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// # 2</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call_once</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">builder</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>
+    <span class="doccomment">/// Performs an initialization routine once and only once. The given closure
+    /// will be executed if this is the first time `call_once` has been called,
+    /// and otherwise the routine will *not* be invoked.
+    ///
+    /// This method will block the calling thread if another initialization
+    /// routine is currently running.
+    ///
+    /// When this function returns, it is guaranteed that some initialization
+    /// has run and completed (it may not be the closure specified). The
+    /// returned pointer will point to the result from the closure that was
+    /// run.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use spin;
+    ///
+    /// static INIT: spin::Once&lt;usize&gt; = spin::Once::new();
+    ///
+    /// fn get_cached_val() -&gt; usize {
+    ///     *INIT.call_once(expensive_computation)
+    /// }
+    ///
+    /// fn expensive_computation() -&gt; usize {
+    ///     // ...
+    /// # 2
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>call_once&lt;<span class="lifetime">&#39;a</span>, F&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, builder: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T
+        <span class="kw">where </span>F: FnOnce() -&gt; T
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>status = <span class="self">self</span>.state.load(Ordering::SeqCst);
 
-        <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">INCOMPLETE</span> {
-            <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compare_and_swap</span>(<span class="ident">INCOMPLETE</span>,
-                                                 <span class="ident">RUNNING</span>,
-                                                 <span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="ident">status</span> <span class="op">==</span> <span class="ident">INCOMPLETE</span> { <span class="comment">// We init</span>
-                <span class="comment">// We use a guard (Finish) to catch panics caused by builder</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">finish</span> <span class="op">=</span> <span class="ident">Finish</span> { <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>, <span class="ident">panicked</span>: <span class="bool-val">true</span> };
-                <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">builder</span>()) };
-                <span class="ident">finish</span>.<span class="ident">panicked</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>status == INCOMPLETE {
+            status = <span class="self">self</span>.state.compare_and_swap(INCOMPLETE,
+                                                 RUNNING,
+                                                 Ordering::SeqCst);
+            <span class="kw">if </span>status == INCOMPLETE { <span class="comment">// We init
+                // We use a guard (Finish) to catch panics caused by builder
+                </span><span class="kw">let </span><span class="kw-2">mut </span>finish = Finish { state: <span class="kw-2">&amp;</span><span class="self">self</span>.state, panicked: <span class="bool-val">true </span>};
+                <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.data.get() = <span class="prelude-val">Some</span>(builder()) };
+                finish.panicked = <span class="bool-val">false</span>;
 
-                <span class="ident">status</span> <span class="op">=</span> <span class="ident">COMPLETE</span>;
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">status</span>, <span class="ident">Ordering::SeqCst</span>);
+                status = COMPLETE;
+                <span class="self">self</span>.state.store(status, Ordering::SeqCst);
 
-                <span class="comment">// This next line is strictly an optimization</span>
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">force_get</span>();
+                <span class="comment">// This next line is strictly an optimization
+                </span><span class="kw">return </span><span class="self">self</span>.force_get();
             }
         }
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">status</span> {
-                <span class="ident">INCOMPLETE</span> =&gt; <span class="macro">unreachable!</span>(),
-                <span class="ident">RUNNING</span> =&gt; { <span class="comment">// We spin</span>
-                    <span class="ident">cpu_relax</span>();
-                    <span class="ident">status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
+        <span class="kw">loop </span>{
+            <span class="kw">match </span>status {
+                INCOMPLETE =&gt; <span class="macro">unreachable!</span>(),
+                RUNNING =&gt; { <span class="comment">// We spin
+                    </span>cpu_relax();
+                    status = <span class="self">self</span>.state.load(Ordering::SeqCst)
                 },
-                <span class="ident">PANICKED</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
-                <span class="ident">COMPLETE</span> =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="ident">force_get</span>(),
-                <span class="kw">_</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
+                PANICKED =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
+                COMPLETE =&gt; <span class="kw">return </span><span class="self">self</span>.force_get(),
+                <span class="kw">_ </span>=&gt; <span class="kw">unsafe </span>{ unreachable() },
             }
         }
     }
 
-    <span class="doccomment">/// Returns a pointer iff the `Once` was previously initialized</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
-            <span class="ident">COMPLETE</span> =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
-            <span class="kw">_</span>        =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns a pointer iff the `Once` was previously initialized
+    </span><span class="kw">pub fn try</span>&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; {
+        <span class="kw">match </span><span class="self">self</span>.state.load(Ordering::SeqCst) {
+            COMPLETE =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span>.force_get()),
+            <span class="kw">_        </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Like try, but will spin if the `Once` is in the process of being</span>
-    <span class="doccomment">/// initialized</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
-                <span class="ident">INCOMPLETE</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">RUNNING</span>    =&gt; <span class="ident">cpu_relax</span>(), <span class="comment">// We spin</span>
-                <span class="ident">COMPLETE</span>   =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">force_get</span>()),
-                <span class="ident">PANICKED</span>   =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
-                <span class="kw">_</span> =&gt; <span class="kw">unsafe</span> { <span class="ident">unreachable</span>() },
+    <span class="doccomment">/// Like try, but will spin if the `Once` is in the process of being
+    /// initialized
+    </span><span class="kw">pub fn </span>wait&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.state.load(Ordering::SeqCst) {
+                INCOMPLETE =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                RUNNING    =&gt; cpu_relax(), <span class="comment">// We spin
+                </span>COMPLETE   =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self</span>.force_get()),
+                PANICKED   =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Once has panicked&quot;</span>),
+                <span class="kw">_ </span>=&gt; <span class="kw">unsafe </span>{ unreachable() },
             }
         }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Finish</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicUsize</span>,
-    <span class="ident">panicked</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>Finish&lt;<span class="lifetime">&#39;a</span>&gt; {
+    state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicUsize,
+    panicked: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Finish</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">panicked</span> {
-            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">store</span>(<span class="ident">PANICKED</span>, <span class="ident">Ordering::SeqCst</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Drop <span class="kw">for </span>Finish&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.panicked {
+            <span class="self">self</span>.state.store(PANICKED, Ordering::SeqCst);
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::prelude::v1</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">std::sync::mpsc::channel</span>;
-    <span class="kw">use</span> <span class="ident">std::thread</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Once</span>;
+    <span class="kw">use </span>std::sync::mpsc::channel;
+    <span class="kw">use </span>std::thread;
+    <span class="kw">use </span><span class="kw">super</span>::Once;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke_once</span>() {
-        <span class="kw">static</span> <span class="ident">O</span>: <span class="ident">Once</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="number">1</span>);
-        <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke_once() {
+        <span class="kw">static </span>O: Once&lt;()&gt; = Once::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>a = <span class="number">0</span>;
+        O.call_once(|| a += <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(a, <span class="number">1</span>);
+        O.call_once(|| a += <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(a, <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">smoke_once_value</span>() {
-        <span class="kw">static</span> <span class="ident">O</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">a</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">b</span>, <span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>smoke_once_value() {
+        <span class="kw">static </span>O: Once&lt;usize&gt; = Once::new();
+        <span class="kw">let </span>a = O.call_once(|| <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>a, <span class="number">1</span>);
+        <span class="kw">let </span>b = O.call_once(|| <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>b, <span class="number">1</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">stampede_once</span>() {
-        <span class="kw">static</span> <span class="ident">O</span>: <span class="ident">Once</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
-        <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">RUN</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>stampede_once() {
+        <span class="kw">static </span>O: Once&lt;()&gt; = Once::new();
+        <span class="kw">static </span><span class="kw-2">mut </span>RUN: bool = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">channel</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
-            <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">clone</span>();
-            <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> {
-                <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> { <span class="ident">thread::yield_now</span>() }
-                <span class="kw">unsafe</span> {
-                    <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">RUN</span>);
-                        <span class="ident">RUN</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let </span>(tx, rx) = channel();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
+            <span class="kw">let </span>tx = tx.clone();
+            thread::spawn(<span class="kw">move</span>|| {
+                <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">4 </span>{ thread::yield_now() }
+                <span class="kw">unsafe </span>{
+                    O.call_once(|| {
+                        <span class="macro">assert!</span>(!RUN);
+                        RUN = <span class="bool-val">true</span>;
                     });
-                    <span class="macro">assert!</span>(<span class="ident">RUN</span>);
+                    <span class="macro">assert!</span>(RUN);
                 }
-                <span class="ident">tx</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+                tx.send(()).unwrap();
             });
         }
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">RUN</span>);
-                <span class="ident">RUN</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">unsafe </span>{
+            O.call_once(|| {
+                <span class="macro">assert!</span>(!RUN);
+                RUN = <span class="bool-val">true</span>;
             });
-            <span class="macro">assert!</span>(<span class="ident">RUN</span>);
+            <span class="macro">assert!</span>(RUN);
         }
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
-            <span class="ident">rx</span>.<span class="ident">recv</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">10 </span>{
+            rx.recv().unwrap();
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try</span>() {
-        <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn try</span>() {
+        <span class="kw">static </span>INIT: Once&lt;usize&gt; = Once::new();
 
-        <span class="macro">assert!</span>(<span class="ident">INIT</span>.<span class="ident">try</span>().<span class="ident">is_none</span>());
-        <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">INIT</span>.<span class="ident">try</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        <span class="macro">assert!</span>(INIT.<span class="kw">try</span>().is_none());
+        INIT.call_once(|| <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(INIT.<span class="kw">try</span>().map(|r| <span class="kw-2">*</span>r), <span class="prelude-val">Some</span>(<span class="number">2</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_no_wait</span>() {
-        <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>try_no_wait() {
+        <span class="kw">static </span>INIT: Once&lt;usize&gt; = Once::new();
 
-        <span class="macro">assert!</span>(<span class="ident">INIT</span>.<span class="ident">try</span>().<span class="ident">is_none</span>());
-        <span class="ident">thread::spawn</span>(<span class="kw">move</span><span class="op">|</span><span class="op">|</span> {
-            <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">loop</span> { });
+        <span class="macro">assert!</span>(INIT.<span class="kw">try</span>().is_none());
+        thread::spawn(<span class="kw">move</span>|| {
+            INIT.call_once(|| <span class="kw">loop </span>{ });
         });
-        <span class="macro">assert!</span>(<span class="ident">INIT</span>.<span class="ident">try</span>().<span class="ident">is_none</span>());
+        <span class="macro">assert!</span>(INIT.<span class="kw">try</span>().is_none());
     }
 
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">wait</span>() {
-        <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>wait() {
+        <span class="kw">static </span>INIT: Once&lt;usize&gt; = Once::new();
 
-        <span class="macro">assert!</span>(<span class="ident">INIT</span>.<span class="ident">wait</span>().<span class="ident">is_none</span>());
-        <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">INIT</span>.<span class="ident">wait</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span>), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="macro">assert!</span>(INIT.wait().is_none());
+        INIT.call_once(|| <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(INIT.wait().map(|r| <span class="kw-2">*</span>r), <span class="prelude-val">Some</span>(<span class="number">3</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">panic</span>() {
-        <span class="kw">use</span> <span class="ident">::std::panic</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>panic() {
+        <span class="kw">use </span>::std::panic;
 
-        <span class="kw">static</span> <span class="ident">INIT</span>: <span class="ident">Once</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+        <span class="kw">static </span>INIT: Once&lt;()&gt; = Once::new();
 
-        <span class="comment">// poison the once</span>
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>());
+        <span class="comment">// poison the once
+        </span><span class="kw">let </span>t = panic::catch_unwind(|| {
+            INIT.call_once(|| <span class="macro">panic!</span>());
         });
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(t.is_err());
 
-        <span class="comment">// poisoning propagates</span>
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">INIT</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {});
+        <span class="comment">// poisoning propagates
+        </span><span class="kw">let </span>t = panic::catch_unwind(|| {
+            INIT.call_once(|| {});
         });
-        <span class="macro">assert!</span>(<span class="ident">t</span>.<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(t.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">init_constant</span>() {
-        <span class="kw">static</span> <span class="ident">O</span>: <span class="ident">Once</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Once::INIT</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="number">1</span>);
-        <span class="ident">O</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>, <span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>init_constant() {
+        <span class="kw">static </span>O: Once&lt;()&gt; = Once::INIT;
+        <span class="kw">let </span><span class="kw-2">mut </span>a = <span class="number">0</span>;
+        O.call_once(|| a += <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(a, <span class="number">1</span>);
+        O.call_once(|| a += <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(a, <span class="number">1</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="spin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="spin" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

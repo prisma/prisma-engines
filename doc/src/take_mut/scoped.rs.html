@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/take_mut-0.2.2/src/scoped.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scoped.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../take_mut/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/take_mut-0.2.2/src/scoped.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scoped.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../take_mut/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -173,179 +173,179 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module provides a scoped API, allowing for taking an arbitrary number of `&amp;mut T` into `T` within one closure.</span>
-<span class="doccomment">//! The references are all required to outlive the closure.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use take_mut::scoped;</span>
-<span class="doccomment">//! struct Foo;</span>
-<span class="doccomment">//! let mut foo = Foo; // Must outlive scope</span>
-<span class="doccomment">//! scoped::scope(|scope| {</span>
-<span class="doccomment">//!     let (t, hole) = scope.take(&amp;mut foo);</span>
-<span class="doccomment">//!     drop(t);</span>
-<span class="doccomment">//!     hole.fill(Foo); // If not called before the closure ends, causes an abort.</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Invalid Example (does not compile)</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! use take_mut::scoped;</span>
-<span class="doccomment">//! struct Foo;</span>
-<span class="doccomment">//! scoped::scope(|scope| {</span>
-<span class="doccomment">//!     let mut foo = Foo; // Invalid because foo must come from outside the scope.</span>
-<span class="doccomment">//!     let (t, hole) = scope.take(&amp;mut foo);</span>
-<span class="doccomment">//!     drop(t);</span>
-<span class="doccomment">//!     hole.fill(Foo);</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! </span>
-<span class="doccomment">//! `Scope` also offers `take_or_recover`, which takes a function to call in the event the hole isn&#39;t filled.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module provides a scoped API, allowing for taking an arbitrary number of `&amp;mut T` into `T` within one closure.
+//! The references are all required to outlive the closure.
+//!
+//! # Example
+//! ```
+//! use take_mut::scoped;
+//! struct Foo;
+//! let mut foo = Foo; // Must outlive scope
+//! scoped::scope(|scope| {
+//!     let (t, hole) = scope.take(&amp;mut foo);
+//!     drop(t);
+//!     hole.fill(Foo); // If not called before the closure ends, causes an abort.
+//! });
+//! ```
+//!
+//! # Invalid Example (does not compile)
+//! ```ignore
+//! use take_mut::scoped;
+//! struct Foo;
+//! scoped::scope(|scope| {
+//!     let mut foo = Foo; // Invalid because foo must come from outside the scope.
+//!     let (t, hole) = scope.take(&amp;mut foo);
+//!     drop(t);
+//!     hole.fill(Foo);
+//! });
+//! ```
+//! 
+//! `Scope` also offers `take_or_recover`, which takes a function to call in the event the hole isn&#39;t filled.
 
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+</span><span class="attribute">#![warn(missing_docs)]
 
 
-<span class="kw">use</span> <span class="ident">std</span>;
-<span class="kw">use</span> <span class="ident">std::panic</span>;
-<span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+</span><span class="kw">use </span>std;
+<span class="kw">use </span>std::panic;
+<span class="kw">use </span>std::cell::Cell;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="doccomment">/// Represents a scope within which, it is possible to take a `T` from a `&amp;mut T` as long as the `&amp;mut T` outlives the scope.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> {
-    <span class="ident">active_holes</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;s</span> <span class="kw-2">mut</span> ()<span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="doccomment">/// Represents a scope within which, it is possible to take a `T` from a `&amp;mut T` as long as the `&amp;mut T` outlives the scope.
+</span><span class="kw">pub struct </span>Scope&lt;<span class="lifetime">&#39;s</span>&gt; {
+    active_holes: Cell&lt;usize&gt;,
+    marker: PhantomData&lt;Cell&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;s </span><span class="kw-2">mut </span>()&gt;&gt;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> <span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;s</span>&gt; Scope&lt;<span class="lifetime">&#39;s</span>&gt; {
 
-    <span class="doccomment">/// Takes a `(T, Hole&lt;&#39;c, &#39;m, T, F&gt;)` from an `&amp;&#39;m mut T`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `Hole` is dropped without being filled, either due to panic or forgetting to fill, will run the `recovery` function to obtain a `T` to fill itself with.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_or_recover</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>: <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="lifetime">&#39;m</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="self">self</span>, <span class="ident">mut_ref</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;m</span> <span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">recovery</span>: <span class="ident">F</span>) -&gt; (<span class="ident">T</span>, <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>) {
-        <span class="kw">use</span> <span class="ident">std::ptr</span>;
+    <span class="doccomment">/// Takes a `(T, Hole&lt;&#39;c, &#39;m, T, F&gt;)` from an `&amp;&#39;m mut T`.
+    ///
+    /// If the `Hole` is dropped without being filled, either due to panic or forgetting to fill, will run the `recovery` function to obtain a `T` to fill itself with.
+    </span><span class="kw">pub fn </span>take_or_recover&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>: <span class="lifetime">&#39;s</span>, T: <span class="lifetime">&#39;m</span>, F: FnOnce() -&gt; T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="self">self</span>, mut_ref: <span class="kw-2">&amp;</span><span class="lifetime">&#39;m </span><span class="kw-2">mut </span>T, recovery: F) -&gt; (T, Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T, F&gt;) {
+        <span class="kw">use </span>std::ptr;
         
-        <span class="kw">let</span> <span class="ident">t</span>: <span class="ident">T</span>;
-        <span class="kw">let</span> <span class="ident">hole</span>: <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>;
-        <span class="kw">let</span> <span class="ident">num_of_holes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">get</span>();
-        <span class="kw">if</span> <span class="ident">num_of_holes</span> <span class="op">==</span> <span class="ident">std::usize::MAX</span> {
+        <span class="kw">let </span>t: T;
+        <span class="kw">let </span>hole: Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T, F&gt;;
+        <span class="kw">let </span>num_of_holes = <span class="self">self</span>.active_holes.get();
+        <span class="kw">if </span>num_of_holes == std::usize::MAX {
             <span class="macro">panic!</span>(<span class="string">&quot;Too many holes!&quot;</span>);
         }
-        <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">set</span>(<span class="ident">num_of_holes</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="kw">unsafe</span> {
-            <span class="ident">t</span> <span class="op">=</span> <span class="ident">ptr::read</span>(<span class="ident">mut_ref</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>);
-            <span class="ident">hole</span> <span class="op">=</span> <span class="ident">Hole</span> {
-                <span class="ident">active_holes</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">active_holes</span>,
-                <span class="ident">hole</span>: <span class="ident">mut_ref</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>,
-                <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
-                <span class="ident">recovery</span>: <span class="prelude-val">Some</span>(<span class="ident">recovery</span>)
+        <span class="self">self</span>.active_holes.set(num_of_holes + <span class="number">1</span>);
+        <span class="kw">unsafe </span>{
+            t = ptr::read(mut_ref <span class="kw">as </span><span class="kw-2">*mut </span>T);
+            hole = Hole {
+                active_holes: <span class="kw-2">&amp;</span><span class="self">self</span>.active_holes,
+                hole: mut_ref <span class="kw">as </span><span class="kw-2">*mut </span>T,
+                phantom: PhantomData,
+                recovery: <span class="prelude-val">Some</span>(recovery)
             };
         };
-        (<span class="ident">t</span>, <span class="ident">hole</span>)
+        (t, hole)
     }
     
-    <span class="doccomment">/// Takes a `(T, Hole&lt;&#39;c, &#39;m, T, F&gt;)` from an `&amp;&#39;m mut T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>: <span class="lifetime">&#39;s</span>, <span class="ident">T</span>: <span class="lifetime">&#39;m</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="self">self</span>, <span class="ident">mut_ref</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;m</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; (<span class="ident">T</span>, <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>, <span class="kw">fn</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span>) {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">panic</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; <span class="ident">T</span> {
+    <span class="doccomment">/// Takes a `(T, Hole&lt;&#39;c, &#39;m, T, F&gt;)` from an `&amp;&#39;m mut T`.
+    </span><span class="kw">pub fn </span>take&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>: <span class="lifetime">&#39;s</span>, T: <span class="lifetime">&#39;m</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span><span class="self">self</span>, mut_ref: <span class="kw-2">&amp;</span><span class="lifetime">&#39;m </span><span class="kw-2">mut </span>T) -&gt; (T, Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T, <span class="kw">fn</span>() -&gt; T&gt;) {
+        <span class="attribute">#[allow(missing_docs)]
+        </span><span class="kw">fn </span>panic&lt;T&gt;() -&gt; T {
             <span class="macro">panic!</span>(<span class="string">&quot;Failed to recover a Hole!&quot;</span>)
         }
-        <span class="self">self</span>.<span class="ident">take_or_recover</span>(<span class="ident">mut_ref</span>, <span class="ident">panic</span>)
+        <span class="self">self</span>.take_or_recover(mut_ref, panic)
     }
 }
 
-<span class="doccomment">/// Main function to create a `Scope`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the given closure ends without all Holes filled, will abort the program.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scope</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Scope</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span><span class="op">&gt;</span>) -&gt; <span class="ident">R</span> {
-    <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="ident">Scope</span> { <span class="ident">active_holes</span>: <span class="ident">Cell::new</span>(<span class="number">0</span>), <span class="ident">marker</span>: <span class="ident">PhantomData</span> };
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>)
+<span class="doccomment">/// Main function to create a `Scope`.
+///
+/// If the given closure ends without all Holes filled, will abort the program.
+</span><span class="kw">pub fn </span>scope&lt;<span class="lifetime">&#39;s</span>, F, R&gt;(f: F) -&gt; R
+    <span class="kw">where </span>F: FnOnce(<span class="kw-2">&amp;</span>Scope&lt;<span class="lifetime">&#39;s</span>&gt;) -&gt; R {
+    <span class="kw">let </span>this = Scope { active_holes: Cell::new(<span class="number">0</span>), marker: PhantomData };
+    <span class="kw">let </span>result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        f(<span class="kw-2">&amp;</span>this)
     }));
-    <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">active_holes</span>.<span class="ident">get</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">std::process::abort</span>();
+    <span class="kw">if </span>this.active_holes.get() != <span class="number">0 </span>{
+        std::process::abort();
     }
-    <span class="kw">match</span> <span class="ident">result</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">p</span>) =&gt; <span class="ident">panic::resume_unwind</span>(<span class="ident">p</span>),
+    <span class="kw">match </span>result {
+        <span class="prelude-val">Ok</span>(r) =&gt; r,
+        <span class="prelude-val">Err</span>(p) =&gt; panic::resume_unwind(p),
     }
     
 }
 
-<span class="doccomment">/// A `Hole&lt;&#39;c, &#39;m, T, F&gt;` represents an unfilled `&amp;&#39;m mut T` which must be filled before the end of the `Scope` with lifetime `&#39;c` and recovery closure `F`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An unfilled `Hole&lt;&#39;c, &#39;m, T, F&gt; that is destructed will try to use `F` to fill the hole.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the scope ends without the `Hole` being filled, the program will `std::process::abort()`.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>: <span class="lifetime">&#39;m</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">active_holes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c</span> <span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">hole</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>,
-    <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;m</span> <span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">recovery</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A `Hole&lt;&#39;c, &#39;m, T, F&gt;` represents an unfilled `&amp;&#39;m mut T` which must be filled before the end of the `Scope` with lifetime `&#39;c` and recovery closure `F`.
+///
+/// An unfilled `Hole&lt;&#39;c, &#39;m, T, F&gt; that is destructed will try to use `F` to fill the hole.
+///
+/// If the scope ends without the `Hole` being filled, the program will `std::process::abort()`.
+</span><span class="attribute">#[must_use]
+</span><span class="kw">pub struct </span>Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T: <span class="lifetime">&#39;m</span>, F: FnOnce() -&gt; T&gt; {
+    active_holes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;c </span>Cell&lt;usize&gt;,
+    hole: <span class="kw-2">*mut </span>T,
+    phantom: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;m </span><span class="kw-2">mut </span>T&gt;,
+    recovery: <span class="prelude-ty">Option</span>&lt;F&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>: <span class="lifetime">&#39;m</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Fills the Hole.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) {
-        <span class="kw">use</span> <span class="ident">std::ptr</span>;
-        <span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T: <span class="lifetime">&#39;m</span>, F: FnOnce() -&gt; T&gt; Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T, F&gt; {
+    <span class="doccomment">/// Fills the Hole.
+    </span><span class="kw">pub fn </span>fill(<span class="self">self</span>, t: T) {
+        <span class="kw">use </span>std::ptr;
+        <span class="kw">use </span>std::mem;
         
-        <span class="kw">unsafe</span> {
-            <span class="ident">ptr::write</span>(<span class="self">self</span>.<span class="ident">hole</span>, <span class="ident">t</span>);
+        <span class="kw">unsafe </span>{
+            ptr::write(<span class="self">self</span>.hole, t);
         }
-        <span class="kw">let</span> <span class="ident">num_holes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">get</span>();
-        <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">set</span>(<span class="ident">num_holes</span> <span class="op">-</span> <span class="number">1</span>);
-        <span class="ident">mem::forget</span>(<span class="self">self</span>);
+        <span class="kw">let </span>num_holes = <span class="self">self</span>.active_holes.get();
+        <span class="self">self</span>.active_holes.set(num_holes - <span class="number">1</span>);
+        mem::forget(<span class="self">self</span>);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>: <span class="lifetime">&#39;m</span>, <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Hole</span><span class="op">&lt;</span><span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, <span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident">std::ptr</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T: <span class="lifetime">&#39;m</span>, F: FnOnce() -&gt; T&gt; Drop <span class="kw">for </span>Hole&lt;<span class="lifetime">&#39;c</span>, <span class="lifetime">&#39;m</span>, T, F&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span>std::ptr;
         
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">recovery</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;No recovery function in Hole!&quot;</span>))();
-        <span class="kw">unsafe</span> {
-            <span class="ident">ptr::write</span>(<span class="self">self</span>.<span class="ident">hole</span>, <span class="ident">t</span>);
+        <span class="kw">let </span>t = (<span class="self">self</span>.recovery.take().expect(<span class="string">&quot;No recovery function in Hole!&quot;</span>))();
+        <span class="kw">unsafe </span>{
+            ptr::write(<span class="self">self</span>.hole, t);
         }
-        <span class="kw">let</span> <span class="ident">num_holes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">get</span>();
-        <span class="self">self</span>.<span class="ident">active_holes</span>.<span class="ident">set</span>(<span class="ident">num_holes</span> <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let </span>num_holes = <span class="self">self</span>.active_holes.get();
+        <span class="self">self</span>.active_holes.set(num_holes - <span class="number">1</span>);
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">scope_based_take</span>() {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Foo</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>scope_based_take() {
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">struct </span>Foo;
     
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Bar</span> {
-        <span class="ident">a</span>: <span class="ident">Foo</span>,
-        <span class="ident">b</span>: <span class="ident">Foo</span>
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">struct </span>Bar {
+        a: Foo,
+        b: Foo
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bar</span> <span class="op">=</span> <span class="ident">Bar</span> { <span class="ident">a</span>: <span class="ident">Foo</span>, <span class="ident">b</span>: <span class="ident">Foo</span> };
-    <span class="ident">scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">a_hole</span>) <span class="op">=</span> <span class="ident">scope</span>.<span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bar</span>.<span class="ident">a</span>);
-        <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">b_hole</span>) <span class="op">=</span> <span class="ident">scope</span>.<span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bar</span>.<span class="ident">b</span>);
-        <span class="comment">// Imagine consuming a and b</span>
-        <span class="ident">a_hole</span>.<span class="ident">fill</span>(<span class="ident">Foo</span>);
-        <span class="ident">b_hole</span>.<span class="ident">fill</span>(<span class="ident">Foo</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>bar = Bar { a: Foo, b: Foo };
+    scope(|scope| {
+        <span class="kw">let </span>(a, a_hole) = scope.take(<span class="kw-2">&amp;mut </span>bar.a);
+        <span class="kw">let </span>(b, b_hole) = scope.take(<span class="kw-2">&amp;mut </span>bar.b);
+        <span class="comment">// Imagine consuming a and b
+        </span>a_hole.fill(Foo);
+        b_hole.fill(Foo);
     });
-    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">bar</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="kw-2">&amp;</span>bar);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">panic_on_recovered_panic</span>() {
-    <span class="kw">use</span> <span class="ident">std::panic</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>panic_on_recovered_panic() {
+    <span class="kw">use </span>std::panic;
     
-    <span class="kw">struct</span> <span class="ident">Foo</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">Foo</span>;
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">t</span>, <span class="ident">hole</span>) <span class="op">=</span> <span class="ident">scope</span>.<span class="ident">take_or_recover</span>(<span class="kw-2">&amp;mut</span> <span class="ident">foo</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">Foo</span>);
+    <span class="kw">struct </span>Foo;
+    <span class="kw">let </span><span class="kw-2">mut </span>foo = Foo;
+    <span class="kw">let </span>result = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        scope(|scope| {
+            <span class="kw">let </span>(t, hole) = scope.take_or_recover(<span class="kw-2">&amp;mut </span>foo, || Foo);
             <span class="macro">panic!</span>(<span class="string">&quot;Oops!&quot;</span>);
         });
     }));
-    <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+    <span class="macro">assert!</span>(result.is_err());
 }</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="take_mut" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="take_mut" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

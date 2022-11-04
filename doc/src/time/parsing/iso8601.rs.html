@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -310,315 +310,315 @@
 <span id="308">308</span>
 <span id="309">309</span>
 <span id="310">310</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parse parts of an ISO 8601-formatted value.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parse parts of an ISO 8601-formatted value.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ParseFromDescription</span>::{<span class="ident">InvalidComponent</span>, <span class="ident">InvalidLiteral</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known::iso8601::EncodedConfig</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known::Iso8601</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator::rfc::iso8601</span>::{
-    <span class="ident">day</span>, <span class="ident">dayk</span>, <span class="ident">dayo</span>, <span class="ident">float</span>, <span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">month</span>, <span class="ident">week</span>, <span class="ident">year</span>, <span class="ident">ExtendedKind</span>,
+</span><span class="kw">use </span><span class="kw">crate</span>::error;
+<span class="kw">use </span><span class="kw">crate</span>::error::ParseFromDescription::{InvalidComponent, InvalidLiteral};
+<span class="kw">use </span><span class="kw">crate</span>::format_description::well_known::iso8601::EncodedConfig;
+<span class="kw">use </span><span class="kw">crate</span>::format_description::well_known::Iso8601;
+<span class="kw">use </span><span class="kw">crate</span>::parsing::combinator::rfc::iso8601::{
+    day, dayk, dayo, float, hour, min, month, week, year, ExtendedKind,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator</span>::{<span class="ident">ascii_char</span>, <span class="ident">sign</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing</span>::{<span class="ident">Parsed</span>, <span class="ident">ParsedItem</span>};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::combinator::{ascii_char, sign};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::{Parsed, ParsedItem};
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span> {
-    <span class="comment">// Basic: [year][month][day]</span>
-    <span class="comment">// Extended: [year][&quot;-&quot;][month][&quot;-&quot;][day]</span>
-    <span class="comment">// Basic: [year][dayo]</span>
-    <span class="comment">// Extended: [year][&quot;-&quot;][dayo]</span>
-    <span class="comment">// Basic: [year][&quot;W&quot;][week][dayk]</span>
-    <span class="comment">// Extended: [year][&quot;-&quot;][&quot;W&quot;][week][&quot;-&quot;][dayk]</span>
-    <span class="doccomment">/// Parse a date in the basic or extended format. Reduced precision is permitted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_date</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="ident">parsed</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Parsed</span>,
-        <span class="ident">extended_kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ExtendedKind</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">error::Parse</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="kw">move</span> <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="comment">// Same for any acceptable format.</span>
-            <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">year</span>) <span class="op">=</span> <span class="ident">year</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="ident">extended_kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;-&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">new_input</span>, ())) =&gt; {
-                    <span class="ident">input</span> <span class="op">=</span> <span class="ident">new_input</span>;
-                    <span class="ident">ExtendedKind::Extended</span>
+<span class="kw">impl</span>&lt;<span class="kw">const </span>CONFIG: EncodedConfig&gt; Iso8601&lt;CONFIG&gt; {
+    <span class="comment">// Basic: [year][month][day]
+    // Extended: [year][&quot;-&quot;][month][&quot;-&quot;][day]
+    // Basic: [year][dayo]
+    // Extended: [year][&quot;-&quot;][dayo]
+    // Basic: [year][&quot;W&quot;][week][dayk]
+    // Extended: [year][&quot;-&quot;][&quot;W&quot;][week][&quot;-&quot;][dayk]
+    </span><span class="doccomment">/// Parse a date in the basic or extended format. Reduced precision is permitted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_date&lt;<span class="lifetime">&#39;a</span>&gt;(
+        parsed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Parsed,
+        extended_kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ExtendedKind,
+    ) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[u8], error::Parse&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">move </span>|input| {
+            <span class="comment">// Same for any acceptable format.
+            </span><span class="kw">let </span>ParsedItem(<span class="kw-2">mut </span>input, year) = year(input).ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw-2">*</span>extended_kind = <span class="kw">match </span>ascii_char::&lt;<span class="string">b&#39;-&#39;</span>&gt;(input) {
+                <span class="prelude-val">Some</span>(ParsedItem(new_input, ())) =&gt; {
+                    input = new_input;
+                    ExtendedKind::Extended
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="ident">ExtendedKind::Basic</span>, <span class="comment">// no separator before mandatory month/ordinal/week</span>
+                <span class="prelude-val">None </span>=&gt; ExtendedKind::Basic, <span class="comment">// no separator before mandatory month/ordinal/week
+            </span>};
+
+            <span class="kw">let </span><span class="kw-2">mut </span>ret_error = <span class="kw">match </span>(|| {
+                <span class="kw">let </span>ParsedItem(<span class="kw-2">mut </span>input, month) = month(input).ok_or(InvalidComponent(<span class="string">&quot;month&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">if </span>extended_kind.is_extended() {
+                    input = ascii_char::&lt;<span class="string">b&#39;-&#39;</span>&gt;(input)
+                        .ok_or(InvalidLiteral)<span class="question-mark">?
+                        </span>.into_inner();
+                }
+                <span class="kw">let </span>ParsedItem(input, day) = day(input).ok_or(InvalidComponent(<span class="string">&quot;day&quot;</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(ParsedItem(input, (month, day)))
+            })() {
+                <span class="prelude-val">Ok</span>(ParsedItem(input, (month, day))) =&gt; {
+                    <span class="kw-2">*</span>parsed = parsed
+                        .with_year(year)
+                        .ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?
+                        </span>.with_month(month)
+                        .ok_or(InvalidComponent(<span class="string">&quot;month&quot;</span>))<span class="question-mark">?
+                        </span>.with_day(day)
+                        .ok_or(InvalidComponent(<span class="string">&quot;day&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
+                }
+                <span class="prelude-val">Err</span>(err) =&gt; err,
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret_error</span> <span class="op">=</span> <span class="kw">match</span> (<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">month</span>) <span class="op">=</span> <span class="ident">month</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;month&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">is_extended</span>() {
-                    <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;-&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>
-                        .<span class="ident">into_inner</span>();
+            <span class="kw">match </span>dayo(input) {
+                <span class="prelude-val">Some</span>(ParsedItem(input, ordinal)) =&gt; {
+                    <span class="kw-2">*</span>parsed = parsed
+                        .with_year(year)
+                        .ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?
+                        </span>.with_ordinal(ordinal)
+                        .ok_or(InvalidComponent(<span class="string">&quot;ordinal&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
                 }
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">day</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;day&quot;</span>))<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">month</span>, <span class="ident">day</span>)))
-            })() {
-                <span class="prelude-val">Ok</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">month</span>, <span class="ident">day</span>))) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_year</span>(<span class="ident">year</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_month</span>(<span class="ident">month</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;month&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_day</span>(<span class="ident">day</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;day&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
-                }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>,
-            };
+                <span class="prelude-val">None </span>=&gt; {} <span class="comment">// The error from year-month-day will always take priority.
+            </span>}
 
-            <span class="kw">match</span> <span class="ident">dayo</span>(<span class="ident">input</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">ordinal</span>)) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_year</span>(<span class="ident">year</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_ordinal</span>(<span class="ident">ordinal</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;ordinal&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+            <span class="kw">match </span>(|| {
+                <span class="kw">let </span>input = ascii_char::&lt;<span class="string">b&#39;W&#39;</span>&gt;(input)
+                    .ok_or((<span class="bool-val">false</span>, InvalidLiteral))<span class="question-mark">?
+                    </span>.into_inner();
+                <span class="kw">let </span>ParsedItem(<span class="kw-2">mut </span>input, week) =
+                    week(input).ok_or((<span class="bool-val">true</span>, InvalidComponent(<span class="string">&quot;week&quot;</span>)))<span class="question-mark">?</span>;
+                <span class="kw">if </span>extended_kind.is_extended() {
+                    input = ascii_char::&lt;<span class="string">b&#39;-&#39;</span>&gt;(input)
+                        .ok_or((<span class="bool-val">true</span>, InvalidLiteral))<span class="question-mark">?
+                        </span>.into_inner();
                 }
-                <span class="prelude-val">None</span> =&gt; {} <span class="comment">// The error from year-month-day will always take priority.</span>
+                <span class="kw">let </span>ParsedItem(input, weekday) =
+                    dayk(input).ok_or((<span class="bool-val">true</span>, InvalidComponent(<span class="string">&quot;weekday&quot;</span>)))<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(ParsedItem(input, (week, weekday)))
+            })() {
+                <span class="prelude-val">Ok</span>(ParsedItem(input, (week, weekday))) =&gt; {
+                    <span class="kw-2">*</span>parsed = parsed
+                        .with_iso_year(year)
+                        .ok_or(InvalidComponent(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?
+                        </span>.with_iso_week_number(week)
+                        .ok_or(InvalidComponent(<span class="string">&quot;week&quot;</span>))<span class="question-mark">?
+                        </span>.with_weekday(weekday)
+                        .ok_or(InvalidComponent(<span class="string">&quot;weekday&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
+                }
+                <span class="prelude-val">Err</span>((<span class="bool-val">false</span>, _err)) =&gt; {}
+                <span class="comment">// This error is more accurate than the one from year-month-day.
+                </span><span class="prelude-val">Err</span>((<span class="bool-val">true</span>, err)) =&gt; ret_error = err,
             }
 
-            <span class="kw">match</span> (<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;W&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)
-                    .<span class="ident">ok_or</span>((<span class="bool-val">false</span>, <span class="ident">InvalidLiteral</span>))<span class="question-mark">?</span>
-                    .<span class="ident">into_inner</span>();
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">week</span>) <span class="op">=</span>
-                    <span class="ident">week</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>((<span class="bool-val">true</span>, <span class="ident">InvalidComponent</span>(<span class="string">&quot;week&quot;</span>)))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">is_extended</span>() {
-                    <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;-&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)
-                        .<span class="ident">ok_or</span>((<span class="bool-val">true</span>, <span class="ident">InvalidLiteral</span>))<span class="question-mark">?</span>
-                        .<span class="ident">into_inner</span>();
-                }
-                <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">weekday</span>) <span class="op">=</span>
-                    <span class="ident">dayk</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>((<span class="bool-val">true</span>, <span class="ident">InvalidComponent</span>(<span class="string">&quot;weekday&quot;</span>)))<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">week</span>, <span class="ident">weekday</span>)))
-            })() {
-                <span class="prelude-val">Ok</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">week</span>, <span class="ident">weekday</span>))) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_iso_year</span>(<span class="ident">year</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_iso_week_number</span>(<span class="ident">week</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;week&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_weekday</span>(<span class="ident">weekday</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;weekday&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
-                }
-                <span class="prelude-val">Err</span>((<span class="bool-val">false</span>, <span class="ident">_err</span>)) =&gt; {}
-                <span class="comment">// This error is more accurate than the one from year-month-day.</span>
-                <span class="prelude-val">Err</span>((<span class="bool-val">true</span>, <span class="ident">err</span>)) =&gt; <span class="ident">ret_error</span> <span class="op">=</span> <span class="ident">err</span>,
-            }
-
-            <span class="prelude-val">Err</span>(<span class="ident">ret_error</span>.<span class="ident">into</span>())
+            <span class="prelude-val">Err</span>(ret_error.into())
         }
     }
 
-    <span class="comment">// Basic: [&quot;T&quot;][hour][min][sec]</span>
-    <span class="comment">// Extended: [&quot;T&quot;][hour][&quot;:&quot;][min][&quot;:&quot;][sec]</span>
-    <span class="comment">// Reduced precision: components after [hour] (including their preceding separator) can be</span>
-    <span class="comment">// omitted. [&quot;T&quot;] can be omitted if there is no date present.</span>
-    <span class="doccomment">/// Parse a time in the basic or extended format. Reduced precision is permitted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_time</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="ident">parsed</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Parsed</span>,
-        <span class="ident">extended_kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ExtendedKind</span>,
-        <span class="ident">date_is_present</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">error::Parse</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">date_is_present</span> {
-                <span class="ident">input</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;T&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>)
-                    .<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>
-                    .<span class="ident">into_inner</span>();
+    <span class="comment">// Basic: [&quot;T&quot;][hour][min][sec]
+    // Extended: [&quot;T&quot;][hour][&quot;:&quot;][min][&quot;:&quot;][sec]
+    // Reduced precision: components after [hour] (including their preceding separator) can be
+    // omitted. [&quot;T&quot;] can be omitted if there is no date present.
+    </span><span class="doccomment">/// Parse a time in the basic or extended format. Reduced precision is permitted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_time&lt;<span class="lifetime">&#39;a</span>&gt;(
+        parsed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Parsed,
+        extended_kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ExtendedKind,
+        date_is_present: bool,
+    ) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[u8], error::Parse&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">move </span>|<span class="kw-2">mut </span>input| {
+            <span class="kw">if </span>date_is_present {
+                input = ascii_char::&lt;<span class="string">b&#39;T&#39;</span>&gt;(input)
+                    .ok_or(InvalidLiteral)<span class="question-mark">?
+                    </span>.into_inner();
             }
 
-            <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">hour</span>) <span class="op">=</span> <span class="ident">float</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">hour</span> {
-                (<span class="ident">hour</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">parsed</span>.<span class="ident">set_hour_24</span>(<span class="ident">hour</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>,
-                (<span class="ident">hour</span>, <span class="prelude-val">Some</span>(<span class="ident">fractional_part</span>)) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_hour_24</span>(<span class="ident">hour</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_minute</span>((<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">60.0</span>) <span class="kw">as</span> <span class="kw">_</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_second</span>((<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">3600.0</span> <span class="op">%</span> <span class="number">60.</span>) <span class="kw">as</span> <span class="kw">_</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_subsecond</span>(
-                            (<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">3_600.</span> <span class="op">*</span> <span class="number">1_000_000_000.</span> <span class="op">%</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="kw">let </span>ParsedItem(<span class="kw-2">mut </span>input, hour) = float(input).ok_or(InvalidComponent(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">match </span>hour {
+                (hour, <span class="prelude-val">None</span>) =&gt; parsed.set_hour_24(hour).ok_or(InvalidComponent(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>,
+                (hour, <span class="prelude-val">Some</span>(fractional_part)) =&gt; {
+                    <span class="kw-2">*</span>parsed = parsed
+                        .with_hour_24(hour)
+                        .ok_or(InvalidComponent(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?
+                        </span>.with_minute((fractional_part * <span class="number">60.0</span>) <span class="kw">as _</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?
+                        </span>.with_second((fractional_part * <span class="number">3600.0 </span>% <span class="number">60.</span>) <span class="kw">as _</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?
+                        </span>.with_subsecond(
+                            (fractional_part * <span class="number">3_600. </span>* <span class="number">1_000_000_000. </span>% <span class="number">1_000_000_000.</span>) <span class="kw">as _</span>,
                         )
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+                        .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
                 }
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">new_input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;:&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                <span class="ident">extended_kind</span>
-                    .<span class="ident">coerce_extended</span>()
-                    .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>;
-                <span class="ident">input</span> <span class="op">=</span> <span class="ident">new_input</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(ParsedItem(new_input, ())) = ascii_char::&lt;<span class="string">b&#39;:&#39;</span>&gt;(input) {
+                extended_kind
+                    .coerce_extended()
+                    .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>;
+                input = new_input;
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">float</span>(<span class="ident">input</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">minute</span>, <span class="prelude-val">None</span>))) =&gt; {
-                    <span class="ident">extended_kind</span>.<span class="ident">coerce_basic</span>();
-                    <span class="ident">parsed</span>
-                        .<span class="ident">set_minute</span>(<span class="ident">minute</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="ident">input</span>
+            <span class="kw">let </span><span class="kw-2">mut </span>input = <span class="kw">match </span>float(input) {
+                <span class="prelude-val">Some</span>(ParsedItem(input, (minute, <span class="prelude-val">None</span>))) =&gt; {
+                    extended_kind.coerce_basic();
+                    parsed
+                        .set_minute(minute)
+                        .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>;
+                    input
                 }
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">minute</span>, <span class="prelude-val">Some</span>(<span class="ident">fractional_part</span>)))) =&gt; {
-                    <span class="comment">// `None` is valid behavior, so don&#39;t error if this fails.</span>
-                    <span class="ident">extended_kind</span>.<span class="ident">coerce_basic</span>();
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_minute</span>(<span class="ident">minute</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_second</span>((<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">60.</span>) <span class="kw">as</span> <span class="kw">_</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_subsecond</span>(
-                            (<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">60.</span> <span class="op">*</span> <span class="number">1_000_000_000.</span> <span class="op">%</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="kw">_</span>,
+                <span class="prelude-val">Some</span>(ParsedItem(input, (minute, <span class="prelude-val">Some</span>(fractional_part)))) =&gt; {
+                    <span class="comment">// `None` is valid behavior, so don&#39;t error if this fails.
+                    </span>extended_kind.coerce_basic();
+                    <span class="kw-2">*</span>parsed = parsed
+                        .with_minute(minute)
+                        .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?
+                        </span>.with_second((fractional_part * <span class="number">60.</span>) <span class="kw">as _</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?
+                        </span>.with_subsecond(
+                            (fractional_part * <span class="number">60. </span>* <span class="number">1_000_000_000. </span>% <span class="number">1_000_000_000.</span>) <span class="kw">as _</span>,
                         )
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+                        .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
                 }
-                <span class="comment">// colon was present, so minutes are required</span>
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">is_extended</span>() =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Parse::ParseFromDescription</span>(<span class="ident">InvalidComponent</span>(
+                <span class="comment">// colon was present, so minutes are required
+                </span><span class="prelude-val">None </span><span class="kw">if </span>extended_kind.is_extended() =&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(error::Parse::ParseFromDescription(InvalidComponent(
                         <span class="string">&quot;minute&quot;</span>,
                     )));
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// Missing components are assumed to be zero.</span>
-                    <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                        .<span class="ident">with_minute</span>(<span class="number">0</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_second</span>(<span class="number">0</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-                        .<span class="ident">with_subsecond</span>(<span class="number">0</span>)
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// Missing components are assumed to be zero.
+                    </span><span class="kw-2">*</span>parsed = parsed
+                        .with_minute(<span class="number">0</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?
+                        </span>.with_second(<span class="number">0</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?
+                        </span>.with_subsecond(<span class="number">0</span>)
+                        .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
                 }
             };
 
-            <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">is_extended</span>() {
-                <span class="kw">match</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;:&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">new_input</span>, ())) =&gt; <span class="ident">input</span> <span class="op">=</span> <span class="ident">new_input</span>,
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                            .<span class="ident">with_second</span>(<span class="number">0</span>)
-                            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-                            .<span class="ident">with_subsecond</span>(<span class="number">0</span>)
-                            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+            <span class="kw">if </span>extended_kind.is_extended() {
+                <span class="kw">match </span>ascii_char::&lt;<span class="string">b&#39;:&#39;</span>&gt;(input) {
+                    <span class="prelude-val">Some</span>(ParsedItem(new_input, ())) =&gt; input = new_input,
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw-2">*</span>parsed = parsed
+                            .with_second(<span class="number">0</span>)
+                            .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?
+                            </span>.with_subsecond(<span class="number">0</span>)
+                            .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
                     }
                 }
             }
 
-            <span class="kw">let</span> (<span class="ident">input</span>, <span class="ident">second</span>, <span class="ident">subsecond</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">float</span>(<span class="ident">input</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">second</span>, <span class="prelude-val">None</span>))) =&gt; (<span class="ident">input</span>, <span class="ident">second</span>, <span class="number">0</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, (<span class="ident">second</span>, <span class="prelude-val">Some</span>(<span class="ident">fractional_part</span>)))) =&gt; {
-                    (<span class="ident">input</span>, <span class="ident">second</span>, <span class="ident">round</span>(<span class="ident">fractional_part</span> <span class="op">*</span> <span class="number">1_000_000_000.</span>) <span class="kw">as</span> <span class="kw">_</span>)
+            <span class="kw">let </span>(input, second, subsecond) = <span class="kw">match </span>float(input) {
+                <span class="prelude-val">Some</span>(ParsedItem(input, (second, <span class="prelude-val">None</span>))) =&gt; (input, second, <span class="number">0</span>),
+                <span class="prelude-val">Some</span>(ParsedItem(input, (second, <span class="prelude-val">Some</span>(fractional_part)))) =&gt; {
+                    (input, second, round(fractional_part * <span class="number">1_000_000_000.</span>) <span class="kw">as _</span>)
                 }
-                <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">is_extended</span>() =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Parse::ParseFromDescription</span>(<span class="ident">InvalidComponent</span>(
+                <span class="prelude-val">None </span><span class="kw">if </span>extended_kind.is_extended() =&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(error::Parse::ParseFromDescription(InvalidComponent(
                         <span class="string">&quot;second&quot;</span>,
                     )));
                 }
-                <span class="comment">// Missing components are assumed to be zero.</span>
-                <span class="prelude-val">None</span> =&gt; (<span class="ident">input</span>, <span class="number">0</span>, <span class="number">0</span>),
+                <span class="comment">// Missing components are assumed to be zero.
+                </span><span class="prelude-val">None </span>=&gt; (input, <span class="number">0</span>, <span class="number">0</span>),
             };
-            <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                .<span class="ident">with_second</span>(<span class="ident">second</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-                .<span class="ident">with_subsecond</span>(<span class="ident">subsecond</span>)
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw-2">*</span>parsed = parsed
+                .with_second(second)
+                .ok_or(InvalidComponent(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?
+                </span>.with_subsecond(subsecond)
+                .ok_or(InvalidComponent(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">input</span>)
+            <span class="prelude-val">Ok</span>(input)
         }
     }
 
-    <span class="comment">// Basic: [±][hour][min] or [&quot;Z&quot;]</span>
-    <span class="comment">// Extended: [±][hour][&quot;:&quot;][min] or [&quot;Z&quot;]</span>
-    <span class="comment">// Reduced precision: [±][hour] or [&quot;Z&quot;]</span>
-    <span class="doccomment">/// Parse a UTC offset in the basic or extended format. Reduced precision is supported.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_offset</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="ident">parsed</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Parsed</span>,
-        <span class="ident">extended_kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ExtendedKind</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">error::Parse</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="kw">move</span> <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;Z&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                <span class="kw-2">*</span><span class="ident">parsed</span> <span class="op">=</span> <span class="ident">parsed</span>
-                    .<span class="ident">with_offset_hour</span>(<span class="number">0</span>)
-                    .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>
-                    .<span class="ident">with_offset_minute_signed</span>(<span class="number">0</span>)
-                    .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>
-                    .<span class="ident">with_offset_second_signed</span>(<span class="number">0</span>)
-                    .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset second&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+    <span class="comment">// Basic: [±][hour][min] or [&quot;Z&quot;]
+    // Extended: [±][hour][&quot;:&quot;][min] or [&quot;Z&quot;]
+    // Reduced precision: [±][hour] or [&quot;Z&quot;]
+    </span><span class="doccomment">/// Parse a UTC offset in the basic or extended format. Reduced precision is supported.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_offset&lt;<span class="lifetime">&#39;a</span>&gt;(
+        parsed: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Parsed,
+        extended_kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>ExtendedKind,
+    ) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[u8], error::Parse&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">move </span>|input| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(ParsedItem(input, ())) = ascii_char::&lt;<span class="string">b&#39;Z&#39;</span>&gt;(input) {
+                <span class="kw-2">*</span>parsed = parsed
+                    .with_offset_hour(<span class="number">0</span>)
+                    .ok_or(InvalidComponent(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?
+                    </span>.with_offset_minute_signed(<span class="number">0</span>)
+                    .ok_or(InvalidComponent(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?
+                    </span>.with_offset_second_signed(<span class="number">0</span>)
+                    .ok_or(InvalidComponent(<span class="string">&quot;offset second&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(input);
             }
 
-            <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">sign</span>) <span class="op">=</span> <span class="ident">sign</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">hour</span>(<span class="ident">input</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed_item</span><span class="op">|</span> {
-                    <span class="ident">parsed_item</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">hour</span><span class="op">|</span> {
-                        <span class="ident">parsed</span>.<span class="ident">set_offset_hour</span>(<span class="kw">if</span> <span class="ident">sign</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
-                            <span class="op">-</span>(<span class="ident">hour</span> <span class="kw">as</span> <span class="ident">i8</span>)
-                        } <span class="kw">else</span> {
-                            <span class="ident">hour</span> <span class="kw">as</span> <span class="kw">_</span>
-                        })
+            <span class="kw">let </span>ParsedItem(input, sign) = sign(input).ok_or(InvalidComponent(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>input = hour(input)
+                .and_then(|parsed_item| {
+                    parsed_item.consume_value(|hour| {
+                        parsed.set_offset_hour(<span class="kw">if </span>sign == <span class="string">b&#39;-&#39; </span>{
+                            -(hour <span class="kw">as </span>i8)
+                        } <span class="kw">else </span>{
+                            hour <span class="kw">as _
+                        </span>})
                     })
                 })
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>;
+                .ok_or(InvalidComponent(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">extended_kind</span>.<span class="ident">maybe_extended</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">new_input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;:&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                    <span class="ident">extended_kind</span>
-                        .<span class="ident">coerce_extended</span>()
-                        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>;
-                    <span class="ident">input</span> <span class="op">=</span> <span class="ident">new_input</span>;
+            <span class="kw">if </span>extended_kind.maybe_extended() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(ParsedItem(new_input, ())) = ascii_char::&lt;<span class="string">b&#39;:&#39;</span>&gt;(input) {
+                    extended_kind
+                        .coerce_extended()
+                        .ok_or(InvalidComponent(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>;
+                    input = new_input;
                 };
             }
 
-            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">input</span>)
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parsed_item</span><span class="op">|</span> {
-                    <span class="ident">parsed_item</span>.<span class="ident">consume_value</span>(<span class="op">|</span><span class="ident">min</span><span class="op">|</span> {
-                        <span class="ident">parsed</span>.<span class="ident">set_offset_minute_signed</span>(<span class="kw">if</span> <span class="ident">sign</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
-                            <span class="op">-</span>(<span class="ident">min</span> <span class="kw">as</span> <span class="ident">i8</span>)
-                        } <span class="kw">else</span> {
-                            <span class="ident">min</span> <span class="kw">as</span> <span class="kw">_</span>
-                        })
+            <span class="kw">let </span>input = min(input)
+                .and_then(|parsed_item| {
+                    parsed_item.consume_value(|min| {
+                        parsed.set_offset_minute_signed(<span class="kw">if </span>sign == <span class="string">b&#39;-&#39; </span>{
+                            -(min <span class="kw">as </span>i8)
+                        } <span class="kw">else </span>{
+                            min <span class="kw">as _
+                        </span>})
                     })
                 })
-                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>;
-            <span class="comment">// If `:` was present, the format has already been set to extended. As such, this call</span>
-            <span class="comment">// will do nothing in that case. If there wasn&#39;t `:` but minutes were</span>
-            <span class="comment">// present, we know it&#39;s the basic format. Do not use `?` on the call, as</span>
-            <span class="comment">// returning `None` is valid behavior.</span>
-            <span class="ident">extended_kind</span>.<span class="ident">coerce_basic</span>();
+                .ok_or(InvalidComponent(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>;
+            <span class="comment">// If `:` was present, the format has already been set to extended. As such, this call
+            // will do nothing in that case. If there wasn&#39;t `:` but minutes were
+            // present, we know it&#39;s the basic format. Do not use `?` on the call, as
+            // returning `None` is valid behavior.
+            </span>extended_kind.coerce_basic();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">input</span>)
+            <span class="prelude-val">Ok</span>(input)
         }
     }
 }
 
-<span class="doccomment">/// Round wrapper that uses hardware implementation if `std` is available, falling back to manual</span>
-<span class="doccomment">/// implementation for `no_std`</span>
-<span class="kw">fn</span> <span class="ident">round</span>(<span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    {
-        <span class="ident">value</span>.<span class="ident">round</span>()
+<span class="doccomment">/// Round wrapper that uses hardware implementation if `std` is available, falling back to manual
+/// implementation for `no_std`
+</span><span class="kw">fn </span>round(value: f64) -&gt; f64 {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span>{
+        value.round()
     }
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    {
-        <span class="ident">round_impl</span>(<span class="ident">value</span>)
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+    </span>{
+        round_impl(value)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-<span class="kw">fn</span> <span class="ident">round_impl</span>(<span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">value</span>.<span class="ident">is_sign_positive</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">value</span>.<span class="ident">is_nan</span>());
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+#[allow(clippy::missing_docs_in_private_items)]
+</span><span class="kw">fn </span>round_impl(value: f64) -&gt; f64 {
+    <span class="macro">debug_assert!</span>(value.is_sign_positive() &amp;&amp; !value.is_nan());
 
-    <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">value</span> <span class="op">%</span> <span class="number">1.</span>;
-    <span class="kw">if</span> <span class="ident">f</span> <span class="op">&lt;</span> <span class="number">0.5</span> { <span class="ident">value</span> <span class="op">-</span> <span class="ident">f</span> } <span class="kw">else</span> { <span class="ident">value</span> <span class="op">-</span> <span class="ident">f</span> <span class="op">+</span> <span class="number">1.</span> }
+    <span class="kw">let </span>f = value % <span class="number">1.</span>;
+    <span class="kw">if </span>f &lt; <span class="number">0.5 </span>{ value - f } <span class="kw">else </span>{ value - f + <span class="number">1. </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

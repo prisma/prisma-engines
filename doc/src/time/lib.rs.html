@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -332,337 +332,337 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # Feature flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate exposes a number of features. These can be enabled or disabled as shown</span>
-<span class="doccomment">//! [in Cargo&#39;s documentation](https://doc.rust-lang.org/cargo/reference/features.html). Features</span>
-<span class="doccomment">//! are _disabled_ by default unless otherwise noted.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Reliance on a given feature is always indicated alongside the item definition.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `std` (_enabled by default, implicitly enables `alloc`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   This enables a number of features that depend on the standard library.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `alloc` (_enabled by default via `std`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables a number of features that require the ability to dynamically allocate memory.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `macros`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables macros that provide compile-time verification of values and intuitive syntax.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `formatting` (_implicitly enables `std`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables formatting of most structs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `parsing`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables parsing of most structs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `local-offset` (_implicitly enables `std`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   This feature enables a number of methods that allow obtaining the system&#39;s UTC offset.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `large-dates`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   By default, only years within the ±9999 range (inclusive) are supported. If you need support</span>
-<span class="doccomment">//!   for years outside this range, consider enabling this feature; the supported range will be</span>
-<span class="doccomment">//!   increased to ±999,999.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Note that enabling this feature has some costs, as it means forgoing some optimizations.</span>
-<span class="doccomment">//!   Ambiguities may be introduced when parsing that would not otherwise exist.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `serde`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables [serde](https://docs.rs/serde) support for all types except [`Instant`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `serde-human-readable` (_implicitly enables `serde`, `formatting`, and `parsing`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Allows serde representations to use a human-readable format. This is determined by the</span>
-<span class="doccomment">//!   serializer, not the user. If this feature is not enabled or if the serializer requests a</span>
-<span class="doccomment">//!   non-human-readable format, a format optimized for binary representation will be used.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Libraries should never enable this feature, as the decision of what format to use should be up</span>
-<span class="doccomment">//!   to the user.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `serde-well-known` (_implicitly enables `serde/alloc`, `formatting`, and `parsing`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables support for serializing and deserializing well-known formats using serde&#39;s</span>
-<span class="doccomment">//!   [`#[with]` attribute](https://serde.rs/field-attrs.html#with).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `rand`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables [rand](https://docs.rs/rand) support for all types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `quickcheck` (_implicitly enables `alloc`_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables [quickcheck](https://docs.rs/quickcheck) support for all types except [`Instant`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `wasm-bindgen`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   Enables [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) support for converting</span>
-<span class="doccomment">//!   [JavaScript dates](https://rustwasm.github.io/wasm-bindgen/api/js_sys/struct.Date.html), as</span>
-<span class="doccomment">//!   well as obtaining the UTC offset from JavaScript.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! One pseudo-feature flag that is only available to end users is the `unsound_local_offset` cfg.</span>
-<span class="doccomment">//! As the name indicates, using the feature is unsound, and [may cause unexpected segmentation</span>
-<span class="doccomment">//! faults](https://github.com/time-rs/time/issues/293). Unlike other flags, this is deliberately</span>
-<span class="doccomment">//! only available to end users; this is to ensure that a user doesn&#39;t have unsound behavior without</span>
-<span class="doccomment">//! knowing it. To enable this behavior, you must use `RUSTFLAGS=&quot;--cfg unsound_local_offset&quot; cargo</span>
-<span class="doccomment">//! build` or similar. Note: This flag is _not tested anywhere_, including in the regular test of</span>
-<span class="doccomment">//! the powerset of all feature flags. Use at your own risk. Without this flag, any method that</span>
-<span class="doccomment">//! requires the local offset will return the `Err` variant when otherwise unsound.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! # Feature flags
+//!
+//! This crate exposes a number of features. These can be enabled or disabled as shown
+//! [in Cargo&#39;s documentation](https://doc.rust-lang.org/cargo/reference/features.html). Features
+//! are _disabled_ by default unless otherwise noted.
+//!
+//! Reliance on a given feature is always indicated alongside the item definition.
+//!
+//! - `std` (_enabled by default, implicitly enables `alloc`_)
+//!
+//!   This enables a number of features that depend on the standard library.
+//!
+//! - `alloc` (_enabled by default via `std`_)
+//!
+//!   Enables a number of features that require the ability to dynamically allocate memory.
+//!
+//! - `macros`
+//!
+//!   Enables macros that provide compile-time verification of values and intuitive syntax.
+//!
+//! - `formatting` (_implicitly enables `std`_)
+//!
+//!   Enables formatting of most structs.
+//!
+//! - `parsing`
+//!
+//!   Enables parsing of most structs.
+//!
+//! - `local-offset` (_implicitly enables `std`_)
+//!
+//!   This feature enables a number of methods that allow obtaining the system&#39;s UTC offset.
+//!
+//! - `large-dates`
+//!
+//!   By default, only years within the ±9999 range (inclusive) are supported. If you need support
+//!   for years outside this range, consider enabling this feature; the supported range will be
+//!   increased to ±999,999.
+//!
+//!   Note that enabling this feature has some costs, as it means forgoing some optimizations.
+//!   Ambiguities may be introduced when parsing that would not otherwise exist.
+//!
+//! - `serde`
+//!
+//!   Enables [serde](https://docs.rs/serde) support for all types except [`Instant`].
+//!
+//! - `serde-human-readable` (_implicitly enables `serde`, `formatting`, and `parsing`_)
+//!
+//!   Allows serde representations to use a human-readable format. This is determined by the
+//!   serializer, not the user. If this feature is not enabled or if the serializer requests a
+//!   non-human-readable format, a format optimized for binary representation will be used.
+//!
+//!   Libraries should never enable this feature, as the decision of what format to use should be up
+//!   to the user.
+//!
+//! - `serde-well-known` (_implicitly enables `serde/alloc`, `formatting`, and `parsing`_)
+//!
+//!   Enables support for serializing and deserializing well-known formats using serde&#39;s
+//!   [`#[with]` attribute](https://serde.rs/field-attrs.html#with).
+//!
+//! - `rand`
+//!
+//!   Enables [rand](https://docs.rs/rand) support for all types.
+//!
+//! - `quickcheck` (_implicitly enables `alloc`_)
+//!
+//!   Enables [quickcheck](https://docs.rs/quickcheck) support for all types except [`Instant`].
+//!
+//! - `wasm-bindgen`
+//!
+//!   Enables [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) support for converting
+//!   [JavaScript dates](https://rustwasm.github.io/wasm-bindgen/api/js_sys/struct.Date.html), as
+//!   well as obtaining the UTC offset from JavaScript.
+//!
+//! One pseudo-feature flag that is only available to end users is the `unsound_local_offset` cfg.
+//! As the name indicates, using the feature is unsound, and [may cause unexpected segmentation
+//! faults](https://github.com/time-rs/time/issues/293). Unlike other flags, this is deliberately
+//! only available to end users; this is to ensure that a user doesn&#39;t have unsound behavior without
+//! knowing it. To enable this behavior, you must use `RUSTFLAGS=&quot;--cfg unsound_local_offset&quot; cargo
+//! build` or similar. Note: This flag is _not tested anywhere_, including in the regular test of
+//! the powerset of all feature flags. Use at your own risk. Without this flag, any method that
+//! requires the local offset will return the `Err` variant when otherwise unsound.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_playground_url</span> <span class="op">=</span> <span class="string">&quot;https://play.rust-lang.org&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc_auto_cfg</span>, <span class="ident">doc_notable_trait</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">__time_03_docs</span>,
-    <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>, <span class="ident">rustdoc::private_intra_doc_links</span>)
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(
-    <span class="ident">anonymous_parameters</span>,
-    <span class="ident">clippy::all</span>,
-    <span class="ident">clippy::undocumented_unsafe_blocks</span>,
-    <span class="ident">const_err</span>,
-    <span class="ident">illegal_floating_point_literal_pattern</span>,
-    <span class="ident">late_bound_lifetime_arguments</span>,
-    <span class="ident">path_statements</span>,
-    <span class="ident">patterns_in_fns_without_body</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">trivial_casts</span>,
-    <span class="ident">trivial_numeric_casts</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">unsafe_op_in_unsafe_fn</span>,
-    <span class="ident">unused_extern_crates</span>
-)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">clippy::dbg_macro</span>,
-    <span class="ident">clippy::decimal_literal_representation</span>,
-    <span class="ident">clippy::get_unwrap</span>,
-    <span class="ident">clippy::missing_docs_in_private_items</span>,
-    <span class="ident">clippy::nursery</span>,
-    <span class="ident">clippy::print_stdout</span>,
-    <span class="ident">clippy::todo</span>,
-    <span class="ident">clippy::unimplemented</span>,
-    <span class="ident">clippy::unnested_or_patterns</span>,
-    <span class="ident">clippy::unwrap_in_result</span>,
-    <span class="ident">clippy::unwrap_used</span>,
-    <span class="ident">clippy::use_debug</span>,
-    <span class="ident">deprecated_in_future</span>,
-    <span class="ident">missing_copy_implementations</span>,
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">unused_qualifications</span>,
-    <span class="ident">variant_size_differences</span>
-)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_pub_crate</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_favicon_url</span> <span class="op">=</span> <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">test</span>(<span class="ident">attr</span>(<span class="ident">deny</span>(<span class="ident">warnings</span>))))]</span>
+</span><span class="attribute">#![doc(html_playground_url = <span class="string">&quot;https://play.rust-lang.org&quot;</span>)]
+#![cfg_attr(__time_03_docs, feature(doc_cfg, doc_auto_cfg, doc_notable_trait))]
+#![cfg_attr(
+    __time_03_docs,
+    deny(rustdoc::broken_intra_doc_links, rustdoc::private_intra_doc_links)
+)]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+#![deny(
+    anonymous_parameters,
+    clippy::all,
+    clippy::undocumented_unsafe_blocks,
+    const_err,
+    illegal_floating_point_literal_pattern,
+    late_bound_lifetime_arguments,
+    path_statements,
+    patterns_in_fns_without_body,
+    rust_2018_idioms,
+    trivial_casts,
+    trivial_numeric_casts,
+    unreachable_pub,
+    unsafe_op_in_unsafe_fn,
+    unused_extern_crates
+)]
+#![warn(
+    clippy::dbg_macro,
+    clippy::decimal_literal_representation,
+    clippy::get_unwrap,
+    clippy::missing_docs_in_private_items,
+    clippy::nursery,
+    clippy::print_stdout,
+    clippy::todo,
+    clippy::unimplemented,
+    clippy::unnested_or_patterns,
+    clippy::unwrap_in_result,
+    clippy::unwrap_used,
+    clippy::use_debug,
+    deprecated_in_future,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    unused_qualifications,
+    variant_size_differences
+)]
+#![allow(clippy::redundant_pub_crate)]
+#![doc(html_favicon_url = <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]
+#![doc(html_logo_url = <span class="string">&quot;https://avatars0.githubusercontent.com/u/55999857&quot;</span>)]
+#![doc(test(attr(deny(warnings))))]
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+#[allow(unused_extern_crates)]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="comment">// region: macros</span>
-<span class="doccomment">/// Helper macro for easily implementing `OpAssign`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">__impl_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span>:<span class="ident">ident</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span>) =&gt; {$(
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_qualifications</span>)]</span>
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span>
-        <span class="kw">impl</span> <span class="ident">core::ops</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sym</span> <span class="ident">rhs</span>;
+<span class="comment">// region: macros
+</span><span class="doccomment">/// Helper macro for easily implementing `OpAssign`.
+</span><span class="macro">macro_rules! </span>__impl_assign {
+    (<span class="macro-nonterminal">$sym</span>:tt <span class="macro-nonterminal">$op</span>:ident <span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident $target</span>:ty : $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$t</span>:ty),+) =&gt; {$(
+        <span class="attribute">#[allow(unused_qualifications)]
+        </span>$(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)*
+        <span class="kw">impl </span>core::ops::<span class="macro-nonterminal">$op</span>&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$target </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">self</span>, rhs: <span class="macro-nonterminal">$t</span>) {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span><span class="macro-nonterminal">$sym </span>rhs;
             }
         }
-    )<span class="op">+</span>};
+    )+};
 }
 
-<span class="doccomment">/// Implement `AddAssign` for the provided types.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_add_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">__impl_assign!</span>(<span class="op">+</span> <span class="ident">AddAssign</span> <span class="ident">add_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+<span class="doccomment">/// Implement `AddAssign` for the provided types.
+</span><span class="macro">macro_rules! </span>impl_add_assign {
+    (<span class="macro-nonterminal">$target</span>:ty : $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$t</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">__impl_assign!</span>(+ AddAssign add_assign <span class="macro-nonterminal">$target </span>: $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="macro-nonterminal">$t</span>),+);
     };
 }
 
-<span class="doccomment">/// Implement `SubAssign` for the provided types.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_sub_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">__impl_assign!</span>(<span class="op">-</span> <span class="ident">SubAssign</span> <span class="ident">sub_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+<span class="doccomment">/// Implement `SubAssign` for the provided types.
+</span><span class="macro">macro_rules! </span>impl_sub_assign {
+    (<span class="macro-nonterminal">$target</span>:ty : $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$t</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">__impl_assign!</span>(- SubAssign sub_assign <span class="macro-nonterminal">$target </span>: $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="macro-nonterminal">$t</span>),+);
     };
 }
 
-<span class="doccomment">/// Implement `MulAssign` for the provided types.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_mul_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">__impl_assign!</span>(<span class="op">*</span> <span class="ident">MulAssign</span> <span class="ident">mul_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+<span class="doccomment">/// Implement `MulAssign` for the provided types.
+</span><span class="macro">macro_rules! </span>impl_mul_assign {
+    (<span class="macro-nonterminal">$target</span>:ty : $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$t</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">__impl_assign!</span>(* MulAssign mul_assign <span class="macro-nonterminal">$target </span>: $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="macro-nonterminal">$t</span>),+);
     };
 }
 
-<span class="doccomment">/// Implement `DivAssign` for the provided types.</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_div_assign</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span>:<span class="ident">ty</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; {
-        <span class="macro">__impl_assign!</span>(<span class="op">/</span> <span class="ident">DivAssign</span> <span class="ident">div_assign</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">target</span> : $($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>),<span class="op">+</span>);
+<span class="doccomment">/// Implement `DivAssign` for the provided types.
+</span><span class="macro">macro_rules! </span>impl_div_assign {
+    (<span class="macro-nonterminal">$target</span>:ty : $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* <span class="macro-nonterminal">$t</span>:ty),+ $(,)<span class="question-mark">?</span>) =&gt; {
+        <span class="macro">__impl_assign!</span>(/ DivAssign div_assign <span class="macro-nonterminal">$target </span>: $($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="macro-nonterminal">$t</span>),+);
     };
 }
 
-<span class="doccomment">/// Division of integers, rounding the resulting value towards negative infinity.</span>
-<span class="macro">macro_rules!</span> <span class="ident">div_floor</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_a</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>;
-        <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>;
+<span class="doccomment">/// Division of integers, rounding the resulting value towards negative infinity.
+</span><span class="macro">macro_rules! </span>div_floor {
+    (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$b</span>:expr) =&gt; {{
+        <span class="kw">let </span>_a = <span class="macro-nonterminal">$a</span>;
+        <span class="kw">let </span>_b = <span class="macro-nonterminal">$b</span>;
 
-        <span class="kw">let</span> (<span class="ident">_quotient</span>, <span class="ident">_remainder</span>) <span class="op">=</span> (<span class="ident">_a</span> <span class="op">/</span> <span class="ident">_b</span>, <span class="ident">_a</span> <span class="op">%</span> <span class="ident">_b</span>);
+        <span class="kw">let </span>(_quotient, _remainder) = (_a / _b, _a % _b);
 
-        <span class="kw">if</span> (<span class="ident">_remainder</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">_b</span> <span class="op">&lt;</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">_remainder</span> <span class="op">&lt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">_b</span> <span class="op">&gt;</span> <span class="number">0</span>) {
-            <span class="ident">_quotient</span> <span class="op">-</span> <span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="ident">_quotient</span>
+        <span class="kw">if </span>(_remainder &gt; <span class="number">0 </span>&amp;&amp; _b &lt; <span class="number">0</span>) || (_remainder &lt; <span class="number">0 </span>&amp;&amp; _b &gt; <span class="number">0</span>) {
+            _quotient - <span class="number">1
+        </span>} <span class="kw">else </span>{
+            _quotient
         }
     }};
 }
 
-<span class="doccomment">/// Cascade an out-of-bounds value.</span>
-<span class="macro">macro_rules!</span> <span class="ident">cascade</span> {
-    (@<span class="ident">ordinal</span> <span class="ident">ordinal</span>) =&gt; {};
-    (@<span class="ident">year</span> <span class="ident">year</span>) =&gt; {};
+<span class="doccomment">/// Cascade an out-of-bounds value.
+</span><span class="macro">macro_rules! </span>cascade {
+    (@ordinal ordinal) =&gt; {};
+    (@year year) =&gt; {};
 
-    <span class="comment">// Cascade an out-of-bounds value from &quot;from&quot; to &quot;to&quot;.</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>:<span class="ident">literal</span>.. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>:<span class="ident">literal</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">tt</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_comparisons</span>, <span class="ident">unused_assignments</span>)]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">-</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span> <span class="op">+</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">min</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="comment">// Cascade an out-of-bounds value from &quot;from&quot; to &quot;to&quot;.
+    </span>(<span class="macro-nonterminal">$from</span>:ident <span class="kw">in </span><span class="macro-nonterminal">$min</span>:literal.. <span class="macro-nonterminal">$max</span>:literal =&gt; <span class="macro-nonterminal">$to</span>:tt) =&gt; {
+        <span class="attribute">#[allow(unused_comparisons, unused_assignments)]
+        </span><span class="kw">if </span><span class="macro-nonterminal">$from </span>&gt;= <span class="macro-nonterminal">$max </span>{
+            <span class="macro-nonterminal">$from </span>-= <span class="macro-nonterminal">$max </span>- <span class="macro-nonterminal">$min</span>;
+            <span class="macro-nonterminal">$to </span>+= <span class="number">1</span>;
+        } <span class="kw">else if </span><span class="macro-nonterminal">$from </span>&lt; <span class="macro-nonterminal">$min </span>{
+            <span class="macro-nonterminal">$from </span>+= <span class="macro-nonterminal">$max </span>- <span class="macro-nonterminal">$min</span>;
+            <span class="macro-nonterminal">$to </span>-= <span class="number">1</span>;
         }
     };
 
-    <span class="comment">// Special case the ordinal-to-year cascade, as it has different behavior.</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>:<span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="comment">// We need to actually capture the idents. Without this, macro hygiene causes errors.</span>
-        <span class="macro">cascade!</span>(@<span class="ident">ordinal</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span>);
-        <span class="macro">cascade!</span>(@<span class="ident">year</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_assignments</span>)]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>) {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="number">1</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ordinal</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::util::days_in_year</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">year</span>);
+    <span class="comment">// Special case the ordinal-to-year cascade, as it has different behavior.
+    </span>(<span class="macro-nonterminal">$ordinal</span>:ident =&gt; <span class="macro-nonterminal">$year</span>:ident) =&gt; {
+        <span class="comment">// We need to actually capture the idents. Without this, macro hygiene causes errors.
+        </span><span class="macro">cascade!</span>(@ordinal <span class="macro-nonterminal">$ordinal</span>);
+        <span class="macro">cascade!</span>(@year <span class="macro-nonterminal">$year</span>);
+        <span class="attribute">#[allow(unused_assignments)]
+        </span><span class="kw">if </span><span class="macro-nonterminal">$ordinal </span>&gt; <span class="kw">crate</span>::util::days_in_year(<span class="macro-nonterminal">$year</span>) {
+            <span class="macro-nonterminal">$year </span>+= <span class="number">1</span>;
+            <span class="macro-nonterminal">$ordinal </span>= <span class="number">1</span>;
+        } <span class="kw">else if </span><span class="macro-nonterminal">$ordinal </span>== <span class="number">0 </span>{
+            <span class="macro-nonterminal">$year </span>-= <span class="number">1</span>;
+            <span class="macro-nonterminal">$ordinal </span>= <span class="kw">crate</span>::util::days_in_year(<span class="macro-nonterminal">$year</span>);
         }
     };
 }
 
-<span class="doccomment">/// Returns `Err(error::ComponentRange)` if the value is not in range.</span>
-<span class="macro">macro_rules!</span> <span class="ident">ensure_value_in_range</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
-        <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="ident">_start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="ident">_end</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::ComponentRange</span> {
-                <span class="ident">name</span>: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),
-                <span class="ident">minimum</span>: <span class="ident">_start</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">maximum</span>: <span class="ident">_end</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">conditional_range</span>: <span class="bool-val">false</span>,
+<span class="doccomment">/// Returns `Err(error::ComponentRange)` if the value is not in range.
+</span><span class="macro">macro_rules! </span>ensure_value_in_range {
+    (<span class="macro-nonterminal">$value</span>:ident <span class="kw">in </span><span class="macro-nonterminal">$start</span>:expr =&gt; <span class="macro-nonterminal">$end</span>:expr) =&gt; {{
+        <span class="kw">let </span>_start = <span class="macro-nonterminal">$start</span>;
+        <span class="kw">let </span>_end = <span class="macro-nonterminal">$end</span>;
+        <span class="attribute">#[allow(trivial_numeric_casts, unused_comparisons)]
+        </span><span class="kw">if </span><span class="macro-nonterminal">$value </span>&lt; _start || <span class="macro-nonterminal">$value </span>&gt; _end {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::error::ComponentRange {
+                name: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$value</span>),
+                minimum: _start <span class="kw">as _</span>,
+                maximum: _end <span class="kw">as _</span>,
+                value: <span class="macro-nonterminal">$value </span><span class="kw">as _</span>,
+                conditional_range: <span class="bool-val">false</span>,
             });
         }
     }};
 
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span> <span class="ident">conditionally</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">_start</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">start</span>;
-        <span class="kw">let</span> <span class="ident">_end</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>;
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">trivial_numeric_casts</span>, <span class="ident">unused_comparisons</span>)]</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&lt;</span> <span class="ident">_start</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">&gt;</span> <span class="ident">_end</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::ComponentRange</span> {
-                <span class="ident">name</span>: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),
-                <span class="ident">minimum</span>: <span class="ident">_start</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">maximum</span>: <span class="ident">_end</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">conditional_range</span>: <span class="bool-val">true</span>,
+    (<span class="macro-nonterminal">$value</span>:ident conditionally <span class="kw">in </span><span class="macro-nonterminal">$start</span>:expr =&gt; <span class="macro-nonterminal">$end</span>:expr) =&gt; {{
+        <span class="kw">let </span>_start = <span class="macro-nonterminal">$start</span>;
+        <span class="kw">let </span>_end = <span class="macro-nonterminal">$end</span>;
+        <span class="attribute">#[allow(trivial_numeric_casts, unused_comparisons)]
+        </span><span class="kw">if </span><span class="macro-nonterminal">$value </span>&lt; _start || <span class="macro-nonterminal">$value </span>&gt; _end {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::error::ComponentRange {
+                name: <span class="macro">stringify!</span>(<span class="macro-nonterminal">$value</span>),
+                minimum: _start <span class="kw">as _</span>,
+                maximum: _end <span class="kw">as _</span>,
+                value: <span class="macro-nonterminal">$value </span><span class="kw">as _</span>,
+                conditional_range: <span class="bool-val">true</span>,
             });
         }
     }};
 }
 
-<span class="doccomment">/// Try to unwrap an expression, returning if not possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is similar to the `?` operator, but does not perform `.into()`. Because of this, it is</span>
-<span class="doccomment">/// usable in `const` contexts.</span>
-<span class="macro">macro_rules!</span> <span class="ident">const_try</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>),
+<span class="doccomment">/// Try to unwrap an expression, returning if not possible.
+///
+/// This is similar to the `?` operator, but does not perform `.into()`. Because of this, it is
+/// usable in `const` contexts.
+</span><span class="macro">macro_rules! </span>const_try {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+            <span class="prelude-val">Ok</span>(value) =&gt; value,
+            <span class="prelude-val">Err</span>(error) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(error),
         }
     };
 }
 
-<span class="doccomment">/// Try to unwrap an expression, returning if not possible.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is similar to the `?` operator, but is usable in `const` contexts.</span>
-<span class="macro">macro_rules!</span> <span class="ident">const_try_opt</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+<span class="doccomment">/// Try to unwrap an expression, returning if not possible.
+///
+/// This is similar to the `?` operator, but is usable in `const` contexts.
+</span><span class="macro">macro_rules! </span>const_try_opt {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; {
+        <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+            <span class="prelude-val">Some</span>(value) =&gt; value,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         }
     };
 }
-<span class="comment">// endregion macros</span>
+<span class="comment">// endregion macros
 
-<span class="kw">mod</span> <span class="ident">date</span>;
-<span class="kw">mod</span> <span class="ident">duration</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ext</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">format_description</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;formatting&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">formatting</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">instant</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span>;
-<span class="kw">mod</span> <span class="ident">month</span>;
-<span class="kw">mod</span> <span class="ident">offset_date_time</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parsing&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parsing</span>;
-<span class="kw">mod</span> <span class="ident">primitive_date_time</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">quickcheck</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rand&quot;</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">rand</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_copy_implementations</span>, <span class="ident">missing_debug_implementations</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serde</span>;
-<span class="kw">mod</span> <span class="ident">sys</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span>;
-<span class="kw">mod</span> <span class="ident">time</span>;
-<span class="kw">mod</span> <span class="ident">utc_offset</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
-<span class="kw">mod</span> <span class="ident">weekday</span>;
+</span><span class="kw">mod </span>date;
+<span class="kw">mod </span>duration;
+<span class="kw">pub mod </span>error;
+<span class="kw">pub mod </span>ext;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;formatting&quot;</span>, feature = <span class="string">&quot;parsing&quot;</span>))]
+</span><span class="kw">pub mod </span>format_description;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;formatting&quot;</span>)]
+</span><span class="kw">pub mod </span>formatting;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">mod </span>instant;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;macros&quot;</span>)]
+</span><span class="kw">pub mod </span>macros;
+<span class="kw">mod </span>month;
+<span class="kw">mod </span>offset_date_time;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parsing&quot;</span>)]
+</span><span class="kw">pub mod </span>parsing;
+<span class="kw">mod </span>primitive_date_time;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quickcheck&quot;</span>)]
+#[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;quickcheck&quot;</span>)))]
+</span><span class="kw">mod </span>quickcheck;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rand&quot;</span>)]
+#[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;rand&quot;</span>)))]
+</span><span class="kw">mod </span>rand;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+#[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;serde&quot;</span>)))]
+#[allow(missing_copy_implementations, missing_debug_implementations)]
+</span><span class="kw">pub mod </span>serde;
+<span class="kw">mod </span>sys;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests;
+<span class="kw">mod </span>time;
+<span class="kw">mod </span>utc_offset;
+<span class="kw">pub mod </span>util;
+<span class="kw">mod </span>weekday;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::date::Date</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::duration::Duration</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::instant::Instant</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::month::Month</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset_date_time::OffsetDateTime</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitive_date_time::PrimitiveDateTime</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::time::Time</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utc_offset::UtcOffset</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::weekday::Weekday</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::date::Date;
+<span class="kw">pub use </span><span class="kw">crate</span>::duration::Duration;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::Error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::instant::Instant;
+<span class="kw">pub use </span><span class="kw">crate</span>::month::Month;
+<span class="kw">pub use </span><span class="kw">crate</span>::offset_date_time::OffsetDateTime;
+<span class="kw">pub use </span><span class="kw">crate</span>::primitive_date_time::PrimitiveDateTime;
+<span class="kw">pub use </span><span class="kw">crate</span>::time::Time;
+<span class="kw">pub use </span><span class="kw">crate</span>::utc_offset::UtcOffset;
+<span class="kw">pub use </span><span class="kw">crate</span>::weekday::Weekday;
 
-<span class="doccomment">/// An alias for [`std::result::Result`] with a generic error from the time crate.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An alias for [`std::result::Result`] with a generic error from the time crate.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = core::result::Result&lt;T, Error&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

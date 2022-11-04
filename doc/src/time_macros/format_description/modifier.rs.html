@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/format_description/modifier.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>modifier.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/format_description/modifier.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>modifier.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -415,422 +415,422 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::mem</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::mem;
 
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
+<span class="kw">use </span>proc_macro::{Ident, Span, TokenStream, TokenTree};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::error::InvalidFormatDescription</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::helper</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_tokens</span>::{<span class="ident">ToTokenStream</span>, <span class="ident">ToTokenTree</span>};
+<span class="kw">use </span><span class="kw">crate</span>::format_description::error::InvalidFormatDescription;
+<span class="kw">use </span><span class="kw">crate</span>::format_description::helper;
+<span class="kw">use </span><span class="kw">crate</span>::to_tokens::{ToTokenStream, ToTokenTree};
 
-<span class="macro">macro_rules!</span> <span class="ident">to_tokens</span> {
+<span class="macro">macro_rules! </span>to_tokens {
     (
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_vis</span>:<span class="ident">vis</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_name</span>:<span class="ident">ident</span> {$(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_vis</span>:<span class="ident">vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_name</span>:<span class="ident">ident</span> : <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_ty</span>:<span class="ident">ty</span>
-        ),<span class="op">+</span> $(,)<span class="question-mark">?</span>}
+        $(<span class="attribute">#[<span class="macro-nonterminal">$struct_attr</span>:meta]</span>)*
+        <span class="macro-nonterminal">$struct_vis</span>:vis <span class="kw">struct </span><span class="macro-nonterminal">$struct_name</span>:ident {$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$field_attr</span>:meta]</span>)*
+            <span class="macro-nonterminal">$field_vis</span>:vis <span class="macro-nonterminal">$field_name</span>:ident : <span class="macro-nonterminal">$field_ty</span>:ty
+        ),+ $(,)<span class="question-mark">?</span>}
     ) =&gt; {
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_attr</span>]</span>)<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_vis</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_name</span> {$(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_attr</span>]</span>)<span class="op">*</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_ty</span>
-        ),<span class="op">+</span>}
+        $(<span class="attribute">#[<span class="macro-nonterminal">$struct_attr</span>]</span>)*
+        <span class="macro-nonterminal">$struct_vis </span><span class="kw">struct </span><span class="macro-nonterminal">$struct_name </span>{$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$field_attr</span>]</span>)*
+            <span class="macro-nonterminal">$field_vis $field_name</span>: <span class="macro-nonterminal">$field_ty
+        </span>),+}
 
-        <span class="kw">impl</span> <span class="ident">ToTokenTree</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_name</span> {
-            <span class="kw">fn</span> <span class="ident">into_token_tree</span>(<span class="self">self</span>) -&gt; <span class="ident">TokenTree</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-                <span class="kw">let</span> <span class="self">Self</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_name</span>),<span class="op">+</span>} <span class="op">=</span> <span class="self">self</span>;
+        <span class="kw">impl </span>ToTokenTree <span class="kw">for </span><span class="macro-nonterminal">$struct_name </span>{
+            <span class="kw">fn </span>into_token_tree(<span class="self">self</span>) -&gt; TokenTree {
+                <span class="kw">let </span><span class="kw-2">mut </span>tokens = TokenStream::new();
+                <span class="kw">let </span><span class="self">Self </span>{$(<span class="macro-nonterminal">$field_name</span>),+} = <span class="self">self</span>;
 
-                <span class="macro">quote_append!</span> { <span class="ident">tokens</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">::time::format_description::modifier</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">struct_name::default</span>();
+                <span class="macro">quote_append! </span>{ tokens
+                    <span class="kw">let </span><span class="kw-2">mut </span>value = ::time::format_description::modifier::<span class="macro-nonterminal">$struct_name::default</span>();
                 };
                 $(
-                    <span class="macro">quote_append!</span>(<span class="ident">tokens</span> <span class="ident">value</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_name</span> <span class="op">=</span>);
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field_name</span>.<span class="ident">append_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tokens</span>);
-                    <span class="macro">quote_append!</span>(<span class="ident">tokens</span> ;);
-                )<span class="op">+</span>
-                <span class="macro">quote_append!</span>(<span class="ident">tokens</span> <span class="ident">value</span>);
+                    <span class="macro">quote_append!</span>(tokens value.<span class="macro-nonterminal">$field_name </span>=);
+                    <span class="macro-nonterminal">$field_name</span>.append_to(<span class="kw-2">&amp;mut </span>tokens);
+                    <span class="macro">quote_append!</span>(tokens ;);
+                )+
+                <span class="macro">quote_append!</span>(tokens value);
 
-                <span class="ident">proc_macro::TokenTree::Group</span>(<span class="ident">proc_macro::Group::new</span>(
-                    <span class="ident">proc_macro::Delimiter::Brace</span>,
-                    <span class="ident">tokens</span>,
+                proc_macro::TokenTree::Group(proc_macro::Group::new(
+                    proc_macro::Delimiter::Brace,
+                    tokens,
                 ))
             }
         }
     };
 
     (
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_vis</span>:<span class="ident">vis</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>:<span class="ident">ident</span> {$(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_name</span>:<span class="ident">ident</span>
-        ),<span class="op">+</span> $(,)<span class="question-mark">?</span>}
+        $(<span class="attribute">#[<span class="macro-nonterminal">$enum_attr</span>:meta]</span>)*
+        <span class="macro-nonterminal">$enum_vis</span>:vis <span class="kw">enum </span><span class="macro-nonterminal">$enum_name</span>:ident {$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$variant_attr</span>:meta]</span>)*
+            <span class="macro-nonterminal">$variant_name</span>:ident
+        ),+ $(,)<span class="question-mark">?</span>}
     ) =&gt; {
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_attr</span>]</span>)<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_vis</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {$(
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_attr</span>]</span>)<span class="op">*</span>
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_name</span>
-        ),<span class="op">+</span>}
+        $(<span class="attribute">#[<span class="macro-nonterminal">$enum_attr</span>]</span>)*
+        <span class="macro-nonterminal">$enum_vis </span><span class="kw">enum </span><span class="macro-nonterminal">$enum_name </span>{$(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$variant_attr</span>]</span>)*
+            <span class="macro-nonterminal">$variant_name
+        </span>),+}
 
-        <span class="kw">impl</span> <span class="ident">ToTokenStream</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span> {
-            <span class="kw">fn</span> <span class="ident">append_to</span>(<span class="self">self</span>, <span class="ident">ts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span>) {
-                <span class="macro">quote_append!</span> { <span class="ident">ts</span>
-                    <span class="ident">::time::format_description::modifier</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enum_name</span>::
+        <span class="kw">impl </span>ToTokenStream <span class="kw">for </span><span class="macro-nonterminal">$enum_name </span>{
+            <span class="kw">fn </span>append_to(<span class="self">self</span>, ts: <span class="kw-2">&amp;mut </span>TokenStream) {
+                <span class="macro">quote_append! </span>{ ts
+                    ::time::format_description::modifier::<span class="macro-nonterminal">$enum_name</span>::
                 };
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-                    $(<span class="self">Self</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_name</span> =&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant_name</span>)),<span class="op">+</span>
+                <span class="kw">let </span>name = <span class="kw">match </span><span class="self">self </span>{
+                    $(<span class="self">Self</span>::<span class="macro-nonterminal">$variant_name </span>=&gt; <span class="macro">stringify!</span>(<span class="macro-nonterminal">$variant_name</span>)),+
                 };
-                <span class="ident">ts</span>.<span class="ident">extend</span>([<span class="ident">TokenTree::Ident</span>(<span class="ident">Ident::new</span>(<span class="ident">name</span>, <span class="ident">Span::mixed_site</span>()))]);
+                ts.extend([TokenTree::Ident(Ident::new(name, Span::mixed_site()))]);
             }
         }
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Day</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Day {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">MonthRepr</span> {
-        <span class="ident">Numerical</span>,
-        <span class="ident">Long</span>,
-        <span class="ident">Short</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>MonthRepr {
+        Numerical,
+        Long,
+        Short,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Month</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">repr</span>: <span class="ident">MonthRepr</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">case_sensitive</span>: <span class="ident">bool</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Month {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) repr: MonthRepr,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) case_sensitive: bool,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Ordinal</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Ordinal {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">WeekdayRepr</span> {
-        <span class="ident">Short</span>,
-        <span class="ident">Long</span>,
-        <span class="ident">Sunday</span>,
-        <span class="ident">Monday</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>WeekdayRepr {
+        Short,
+        Long,
+        Sunday,
+        Monday,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Weekday</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">repr</span>: <span class="ident">WeekdayRepr</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">one_indexed</span>: <span class="ident">bool</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">case_sensitive</span>: <span class="ident">bool</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Weekday {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) repr: WeekdayRepr,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) one_indexed: bool,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) case_sensitive: bool,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">WeekNumberRepr</span> {
-        <span class="ident">Iso</span>,
-        <span class="ident">Sunday</span>,
-        <span class="ident">Monday</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>WeekNumberRepr {
+        Iso,
+        Sunday,
+        Monday,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WeekNumber</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">repr</span>: <span class="ident">WeekNumberRepr</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WeekNumber {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) repr: WeekNumberRepr,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">YearRepr</span> {
-        <span class="ident">Full</span>,
-        <span class="ident">LastTwo</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>YearRepr {
+        Full,
+        LastTwo,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Year</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">repr</span>: <span class="ident">YearRepr</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">iso_week_based</span>: <span class="ident">bool</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sign_is_mandatory</span>: <span class="ident">bool</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Year {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) repr: YearRepr,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) iso_week_based: bool,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) sign_is_mandatory: bool,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Hour</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_12_hour_clock</span>: <span class="ident">bool</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Hour {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) is_12_hour_clock: bool,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Minute</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Minute {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Period</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_uppercase</span>: <span class="ident">bool</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">case_sensitive</span>: <span class="ident">bool</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Period {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) is_uppercase: bool,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) case_sensitive: bool,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Second</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Second {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SubsecondDigits</span> {
-        <span class="ident">One</span>,
-        <span class="ident">Two</span>,
-        <span class="ident">Three</span>,
-        <span class="ident">Four</span>,
-        <span class="ident">Five</span>,
-        <span class="ident">Six</span>,
-        <span class="ident">Seven</span>,
-        <span class="ident">Eight</span>,
-        <span class="ident">Nine</span>,
-        <span class="ident">OneOrMore</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SubsecondDigits {
+        One,
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        OneOrMore,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Subsecond</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">digits</span>: <span class="ident">SubsecondDigits</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Subsecond {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) digits: SubsecondDigits,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OffsetHour</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sign_is_mandatory</span>: <span class="ident">bool</span>,
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OffsetHour {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) sign_is_mandatory: bool,
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OffsetMinute</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OffsetMinute {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">OffsetSecond</span> {
-        <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="ident">Padding</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>OffsetSecond {
+        <span class="kw">pub</span>(<span class="kw">crate</span>) padding: Padding,
     }
 }
 
-<span class="macro">to_tokens!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Padding</span> {
-        <span class="ident">Space</span>,
-        <span class="ident">Zero</span>,
+<span class="macro">to_tokens! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Padding {
+        Space,
+        Zero,
         <span class="prelude-val">None</span>,
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_default</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>:<span class="ident">expr</span>;)<span class="kw-2">*</span>) =&gt; {$(
-        <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> {
-            <span class="kw">fn</span> <span class="macro-nonterminal">default</span>() -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">default</span>
-            }
+<span class="macro">macro_rules! </span>impl_default {
+    ($(<span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty </span>=&gt; <span class="macro-nonterminal">$default</span>:expr;)<span class="kw-2">*</span>) =&gt; {$(
+        <span class="kw">impl </span>Default <span class="kw">for </span><span class="macro-nonterminal">$</span><span class="kw">type </span>{
+            <span class="kw">fn </span><span class="macro-nonterminal">default</span>() -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$default
+            </span>}
         }
     )<span class="kw-2">*</span>};
 }
 
-<span class="macro">impl_default!</span> {
-    <span class="ident">Day</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">MonthRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Numerical</span>;
-    <span class="ident">Month</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">padding</span>: <span class="ident">Padding::default</span>(),
-        <span class="ident">repr</span>: <span class="ident">MonthRepr::default</span>(),
-        <span class="ident">case_sensitive</span>: <span class="bool-val">true</span>,
+<span class="macro">impl_default! </span>{
+    Day =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    MonthRepr =&gt; <span class="self">Self</span>::Numerical;
+    Month =&gt; <span class="self">Self </span>{
+        padding: Padding::default(),
+        repr: MonthRepr::default(),
+        case_sensitive: <span class="bool-val">true</span>,
     };
-    <span class="ident">Ordinal</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">WeekdayRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Long</span>;
-    <span class="ident">Weekday</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">repr</span>: <span class="ident">WeekdayRepr::default</span>(),
-        <span class="ident">one_indexed</span>: <span class="bool-val">true</span>,
-        <span class="ident">case_sensitive</span>: <span class="bool-val">true</span>,
+    Ordinal =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    WeekdayRepr =&gt; <span class="self">Self</span>::Long;
+    Weekday =&gt; <span class="self">Self </span>{
+        repr: WeekdayRepr::default(),
+        one_indexed: <span class="bool-val">true</span>,
+        case_sensitive: <span class="bool-val">true</span>,
     };
-    <span class="ident">WeekNumberRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Iso</span>;
-    <span class="ident">WeekNumber</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">padding</span>: <span class="ident">Padding::default</span>(),
-        <span class="ident">repr</span>: <span class="ident">WeekNumberRepr::default</span>(),
+    WeekNumberRepr =&gt; <span class="self">Self</span>::Iso;
+    WeekNumber =&gt; <span class="self">Self </span>{
+        padding: Padding::default(),
+        repr: WeekNumberRepr::default(),
     };
-    <span class="ident">YearRepr</span> =&gt; <span class="ident"><span class="self">Self</span>::Full</span>;
-    <span class="ident">Year</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">padding</span>: <span class="ident">Padding::default</span>(),
-        <span class="ident">repr</span>: <span class="ident">YearRepr::default</span>(),
-        <span class="ident">iso_week_based</span>: <span class="bool-val">false</span>,
-        <span class="ident">sign_is_mandatory</span>: <span class="bool-val">false</span>,
+    YearRepr =&gt; <span class="self">Self</span>::Full;
+    Year =&gt; <span class="self">Self </span>{
+        padding: Padding::default(),
+        repr: YearRepr::default(),
+        iso_week_based: <span class="bool-val">false</span>,
+        sign_is_mandatory: <span class="bool-val">false</span>,
     };
-    <span class="ident">Hour</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">padding</span>: <span class="ident">Padding::default</span>(),
-        <span class="ident">is_12_hour_clock</span>: <span class="bool-val">false</span>,
+    Hour =&gt; <span class="self">Self </span>{
+        padding: Padding::default(),
+        is_12_hour_clock: <span class="bool-val">false</span>,
     };
-    <span class="ident">Minute</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">Period</span> =&gt; <span class="self">Self</span> { <span class="ident">is_uppercase</span>: <span class="bool-val">true</span>, <span class="ident">case_sensitive</span>: <span class="bool-val">true</span> };
-    <span class="ident">Second</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">SubsecondDigits</span> =&gt; <span class="ident"><span class="self">Self</span>::OneOrMore</span>;
-    <span class="ident">Subsecond</span> =&gt; <span class="self">Self</span> { <span class="ident">digits</span>: <span class="ident">SubsecondDigits::default</span>() };
-    <span class="ident">OffsetHour</span> =&gt; <span class="self">Self</span> {
-        <span class="ident">sign_is_mandatory</span>: <span class="bool-val">true</span>,
-        <span class="ident">padding</span>: <span class="ident">Padding::default</span>(),
+    Minute =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    Period =&gt; <span class="self">Self </span>{ is_uppercase: <span class="bool-val">true</span>, case_sensitive: <span class="bool-val">true </span>};
+    Second =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    SubsecondDigits =&gt; <span class="self">Self</span>::OneOrMore;
+    Subsecond =&gt; <span class="self">Self </span>{ digits: SubsecondDigits::default() };
+    OffsetHour =&gt; <span class="self">Self </span>{
+        sign_is_mandatory: <span class="bool-val">true</span>,
+        padding: Padding::default(),
     };
-    <span class="ident">OffsetMinute</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">OffsetSecond</span> =&gt; <span class="self">Self</span> { <span class="ident">padding</span>: <span class="ident">Padding::default</span>() };
-    <span class="ident">Padding</span> =&gt; <span class="ident"><span class="self">Self</span>::Zero</span>;
+    OffsetMinute =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    OffsetSecond =&gt; <span class="self">Self </span>{ padding: Padding::default() };
+    Padding =&gt; <span class="self">Self</span>::Zero;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Modifiers</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">padding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Padding</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hour_is_12_hour_clock</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">period_is_uppercase</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">month_repr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MonthRepr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">subsecond_digits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SubsecondDigits</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">weekday_repr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WeekdayRepr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">weekday_is_one_indexed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">week_number_repr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WeekNumberRepr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">year_repr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">YearRepr</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">year_is_iso_week_based</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sign_is_mandatory</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">case_sensitive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Modifiers {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) padding: <span class="prelude-ty">Option</span>&lt;Padding&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) hour_is_12_hour_clock: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) period_is_uppercase: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) month_repr: <span class="prelude-ty">Option</span>&lt;MonthRepr&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) subsecond_digits: <span class="prelude-ty">Option</span>&lt;SubsecondDigits&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) weekday_repr: <span class="prelude-ty">Option</span>&lt;WeekdayRepr&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) weekday_is_one_indexed: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) week_number_repr: <span class="prelude-ty">Option</span>&lt;WeekNumberRepr&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) year_repr: <span class="prelude-ty">Option</span>&lt;YearRepr&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) year_is_iso_week_based: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) sign_is_mandatory: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) case_sensitive: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Modifiers</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_lines</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(
-        <span class="ident">component_name</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">index</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidFormatDescription</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modifiers</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+<span class="kw">impl </span>Modifiers {
+    <span class="attribute">#[allow(clippy::too_many_lines)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(
+        component_name: <span class="kw-2">&amp;</span>[u8],
+        <span class="kw-2">mut </span>bytes: <span class="kw-2">&amp;</span>[u8],
+        index: <span class="kw-2">&amp;mut </span>usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidFormatDescription&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>modifiers = <span class="self">Self</span>::default();
 
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">bytes</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// Trim any whitespace between modifiers.</span>
-            <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">helper::consume_whitespace</span>(<span class="ident">bytes</span>, <span class="ident">index</span>);
+        <span class="kw">while </span>!bytes.is_empty() {
+            <span class="comment">// Trim any whitespace between modifiers.
+            </span>bytes = helper::consume_whitespace(bytes, index);
 
-            <span class="kw">let</span> <span class="ident">modifier</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">whitespace_loc</span>) <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="ident">u8::is_ascii_whitespace</span>) {
-                <span class="kw-2">*</span><span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">whitespace_loc</span>;
-                <span class="ident">modifier</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bytes</span>[..<span class="ident">whitespace_loc</span>];
-                <span class="ident">bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">bytes</span>[<span class="ident">whitespace_loc</span>..];
-            } <span class="kw">else</span> {
-                <span class="ident">modifier</span> <span class="op">=</span> <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
+            <span class="kw">let </span>modifier;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(whitespace_loc) = bytes.iter().position(u8::is_ascii_whitespace) {
+                <span class="kw-2">*</span>index += whitespace_loc;
+                modifier = <span class="kw-2">&amp;</span>bytes[..whitespace_loc];
+                bytes = <span class="kw-2">&amp;</span>bytes[whitespace_loc..];
+            } <span class="kw">else </span>{
+                modifier = mem::take(<span class="kw-2">&amp;mut </span>bytes);
             }
 
-            <span class="kw">if</span> <span class="ident">modifier</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">if </span>modifier.is_empty() {
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">match</span> (<span class="ident">component_name</span>, <span class="ident">modifier</span>) {
+            <span class="kw">match </span>(component_name, modifier) {
                 (
-                    <span class="string">b&quot;day&quot;</span> <span class="op">|</span> <span class="string">b&quot;hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;minute&quot;</span> <span class="op">|</span> <span class="string">b&quot;month&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_minute&quot;</span>
-                    <span class="op">|</span> <span class="string">b&quot;offset_second&quot;</span> <span class="op">|</span> <span class="string">b&quot;ordinal&quot;</span> <span class="op">|</span> <span class="string">b&quot;second&quot;</span> <span class="op">|</span> <span class="string">b&quot;week_number&quot;</span> <span class="op">|</span> <span class="string">b&quot;year&quot;</span>,
+                    <span class="string">b&quot;day&quot; </span>| <span class="string">b&quot;hour&quot; </span>| <span class="string">b&quot;minute&quot; </span>| <span class="string">b&quot;month&quot; </span>| <span class="string">b&quot;offset_hour&quot; </span>| <span class="string">b&quot;offset_minute&quot;
+                    </span>| <span class="string">b&quot;offset_second&quot; </span>| <span class="string">b&quot;ordinal&quot; </span>| <span class="string">b&quot;second&quot; </span>| <span class="string">b&quot;week_number&quot; </span>| <span class="string">b&quot;year&quot;</span>,
                     <span class="string">b&quot;padding:space&quot;</span>,
-                ) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Space</span>),
+                ) =&gt; modifiers.padding = <span class="prelude-val">Some</span>(Padding::Space),
                 (
-                    <span class="string">b&quot;day&quot;</span> <span class="op">|</span> <span class="string">b&quot;hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;minute&quot;</span> <span class="op">|</span> <span class="string">b&quot;month&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_minute&quot;</span>
-                    <span class="op">|</span> <span class="string">b&quot;offset_second&quot;</span> <span class="op">|</span> <span class="string">b&quot;ordinal&quot;</span> <span class="op">|</span> <span class="string">b&quot;second&quot;</span> <span class="op">|</span> <span class="string">b&quot;week_number&quot;</span> <span class="op">|</span> <span class="string">b&quot;year&quot;</span>,
+                    <span class="string">b&quot;day&quot; </span>| <span class="string">b&quot;hour&quot; </span>| <span class="string">b&quot;minute&quot; </span>| <span class="string">b&quot;month&quot; </span>| <span class="string">b&quot;offset_hour&quot; </span>| <span class="string">b&quot;offset_minute&quot;
+                    </span>| <span class="string">b&quot;offset_second&quot; </span>| <span class="string">b&quot;ordinal&quot; </span>| <span class="string">b&quot;second&quot; </span>| <span class="string">b&quot;week_number&quot; </span>| <span class="string">b&quot;year&quot;</span>,
                     <span class="string">b&quot;padding:zero&quot;</span>,
-                ) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::Zero</span>),
+                ) =&gt; modifiers.padding = <span class="prelude-val">Some</span>(Padding::Zero),
                 (
-                    <span class="string">b&quot;day&quot;</span> <span class="op">|</span> <span class="string">b&quot;hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;minute&quot;</span> <span class="op">|</span> <span class="string">b&quot;month&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;offset_minute&quot;</span>
-                    <span class="op">|</span> <span class="string">b&quot;offset_second&quot;</span> <span class="op">|</span> <span class="string">b&quot;ordinal&quot;</span> <span class="op">|</span> <span class="string">b&quot;second&quot;</span> <span class="op">|</span> <span class="string">b&quot;week_number&quot;</span> <span class="op">|</span> <span class="string">b&quot;year&quot;</span>,
+                    <span class="string">b&quot;day&quot; </span>| <span class="string">b&quot;hour&quot; </span>| <span class="string">b&quot;minute&quot; </span>| <span class="string">b&quot;month&quot; </span>| <span class="string">b&quot;offset_hour&quot; </span>| <span class="string">b&quot;offset_minute&quot;
+                    </span>| <span class="string">b&quot;offset_second&quot; </span>| <span class="string">b&quot;ordinal&quot; </span>| <span class="string">b&quot;second&quot; </span>| <span class="string">b&quot;week_number&quot; </span>| <span class="string">b&quot;year&quot;</span>,
                     <span class="string">b&quot;padding:none&quot;</span>,
-                ) =&gt; <span class="ident">modifiers</span>.<span class="ident">padding</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Padding::None</span>),
-                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:24&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:12&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">hour_is_12_hour_clock</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                (<span class="string">b&quot;month&quot;</span> <span class="op">|</span> <span class="string">b&quot;period&quot;</span> <span class="op">|</span> <span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+                ) =&gt; modifiers.padding = <span class="prelude-val">Some</span>(Padding::None),
+                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:24&quot;</span>) =&gt; modifiers.hour_is_12_hour_clock = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;hour&quot;</span>, <span class="string">b&quot;repr:12&quot;</span>) =&gt; modifiers.hour_is_12_hour_clock = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                (<span class="string">b&quot;month&quot; </span>| <span class="string">b&quot;period&quot; </span>| <span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:true&quot;</span>) =&gt; {
+                    modifiers.case_sensitive = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
                 }
-                (<span class="string">b&quot;month&quot;</span> <span class="op">|</span> <span class="string">b&quot;period&quot;</span> <span class="op">|</span> <span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">case_sensitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)
+                (<span class="string">b&quot;month&quot; </span>| <span class="string">b&quot;period&quot; </span>| <span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;case_sensitive:false&quot;</span>) =&gt; {
+                    modifiers.case_sensitive = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)
                 }
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:numerical&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Numerical</span>),
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Long</span>),
-                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">month_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MonthRepr::Short</span>),
-                (<span class="string">b&quot;offset_hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">sign_is_mandatory</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:numerical&quot;</span>) =&gt; modifiers.month_repr = <span class="prelude-val">Some</span>(MonthRepr::Numerical),
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; modifiers.month_repr = <span class="prelude-val">Some</span>(MonthRepr::Long),
+                (<span class="string">b&quot;month&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; modifiers.month_repr = <span class="prelude-val">Some</span>(MonthRepr::Short),
+                (<span class="string">b&quot;offset_hour&quot; </span>| <span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:automatic&quot;</span>) =&gt; {
+                    modifiers.sign_is_mandatory = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
-                (<span class="string">b&quot;offset_hour&quot;</span> <span class="op">|</span> <span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">sign_is_mandatory</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+                (<span class="string">b&quot;offset_hour&quot; </span>| <span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;sign:mandatory&quot;</span>) =&gt; {
+                    modifiers.sign_is_mandatory = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
                 }
-                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:upper&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:lower&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">period_is_uppercase</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:upper&quot;</span>) =&gt; modifiers.period_is_uppercase = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                (<span class="string">b&quot;period&quot;</span>, <span class="string">b&quot;case:lower&quot;</span>) =&gt; modifiers.period_is_uppercase = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::One</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::One);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:2&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Two</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Two);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:3&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Three</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Three);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:4&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Four</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Four);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:5&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Five</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Five);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:6&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Six</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Six);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:7&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Seven</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Seven);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:8&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Eight</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Eight);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:9&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::Nine</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::Nine);
                 }
                 (<span class="string">b&quot;subsecond&quot;</span>, <span class="string">b&quot;digits:1+&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">subsecond_digits</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SubsecondDigits::OneOrMore</span>);
+                    modifiers.subsecond_digits = <span class="prelude-val">Some</span>(SubsecondDigits::OneOrMore);
                 }
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Short</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Long</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Sunday</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekdayRepr::Monday</span>),
-                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:true&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">weekday_is_one_indexed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:short&quot;</span>) =&gt; modifiers.weekday_repr = <span class="prelude-val">Some</span>(WeekdayRepr::Short),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:long&quot;</span>) =&gt; modifiers.weekday_repr = <span class="prelude-val">Some</span>(WeekdayRepr::Long),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) =&gt; modifiers.weekday_repr = <span class="prelude-val">Some</span>(WeekdayRepr::Sunday),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) =&gt; modifiers.weekday_repr = <span class="prelude-val">Some</span>(WeekdayRepr::Monday),
+                (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:true&quot;</span>) =&gt; modifiers.weekday_is_one_indexed = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
                 (<span class="string">b&quot;weekday&quot;</span>, <span class="string">b&quot;one_indexed:false&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">weekday_is_one_indexed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+                    modifiers.weekday_is_one_indexed = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
                 (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:iso&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Iso</span>);
+                    modifiers.week_number_repr = <span class="prelude-val">Some</span>(WeekNumberRepr::Iso);
                 }
                 (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:sunday&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Sunday</span>);
+                    modifiers.week_number_repr = <span class="prelude-val">Some</span>(WeekNumberRepr::Sunday);
                 }
                 (<span class="string">b&quot;week_number&quot;</span>, <span class="string">b&quot;repr:monday&quot;</span>) =&gt; {
-                    <span class="ident">modifiers</span>.<span class="ident">week_number_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">WeekNumberRepr::Monday</span>);
+                    modifiers.week_number_repr = <span class="prelude-val">Some</span>(WeekNumberRepr::Monday);
                 }
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:full&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::Full</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:last_two&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">YearRepr::LastTwo</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:calendar&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
-                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:iso_week&quot;</span>) =&gt; <span class="ident">modifiers</span>.<span class="ident">year_is_iso_week_based</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidFormatDescription::InvalidModifier</span> {
-                        <span class="ident">value</span>: <span class="ident">String::from_utf8_lossy</span>(<span class="ident">modifier</span>).<span class="ident">into_owned</span>(),
-                        <span class="ident">index</span>: <span class="kw-2">*</span><span class="ident">index</span>,
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:full&quot;</span>) =&gt; modifiers.year_repr = <span class="prelude-val">Some</span>(YearRepr::Full),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;repr:last_two&quot;</span>) =&gt; modifiers.year_repr = <span class="prelude-val">Some</span>(YearRepr::LastTwo),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:calendar&quot;</span>) =&gt; modifiers.year_is_iso_week_based = <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+                (<span class="string">b&quot;year&quot;</span>, <span class="string">b&quot;base:iso_week&quot;</span>) =&gt; modifiers.year_is_iso_week_based = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidFormatDescription::InvalidModifier {
+                        value: String::from_utf8_lossy(modifier).into_owned(),
+                        index: <span class="kw-2">*</span>index,
                     });
                 }
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">modifiers</span>)
+        <span class="prelude-val">Ok</span>(modifiers)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

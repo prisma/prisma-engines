@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/zero.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>zero.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/flavors/zero.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>zero.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_channel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -493,500 +493,500 @@
 <span id="493">493</span>
 <span id="494">494</span>
 <span id="495">495</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Zero-capacity channel.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This kind of channel is also known as *rendezvous* channel.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Zero-capacity channel.
+//!
+//! This kind of channel is also known as *rendezvous* channel.
 
-<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">ptr</span>};
+</span><span class="kw">use </span>std::cell::UnsafeCell;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::sync::atomic::{AtomicBool, Ordering};
+<span class="kw">use </span>std::sync::Mutex;
+<span class="kw">use </span>std::time::Instant;
+<span class="kw">use </span>std::{fmt, ptr};
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils::Backoff</span>;
+<span class="kw">use </span>crossbeam_utils::Backoff;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::Context</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::err</span>::{<span class="ident">RecvTimeoutError</span>, <span class="ident">SendTimeoutError</span>, <span class="ident">TryRecvError</span>, <span class="ident">TrySendError</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::select</span>::{<span class="ident">Operation</span>, <span class="ident">SelectHandle</span>, <span class="ident">Selected</span>, <span class="ident">Token</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::waker::Waker</span>;
+<span class="kw">use </span><span class="kw">crate</span>::context::Context;
+<span class="kw">use </span><span class="kw">crate</span>::err::{RecvTimeoutError, SendTimeoutError, TryRecvError, TrySendError};
+<span class="kw">use </span><span class="kw">crate</span>::select::{Operation, SelectHandle, Selected, Token};
+<span class="kw">use </span><span class="kw">crate</span>::waker::Waker;
 
-<span class="doccomment">/// A pointer to a packet.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ZeroToken</span>(<span class="kw-2">*mut</span> ());
+<span class="doccomment">/// A pointer to a packet.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ZeroToken(<span class="kw-2">*mut </span>());
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ZeroToken</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">ptr::null_mut</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>ZeroToken {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(ptr::null_mut())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ZeroToken</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>), <span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ZeroToken {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span>usize), f)
     }
 }
 
-<span class="doccomment">/// A slot for passing one message from a sender to a receiver.</span>
-<span class="kw">struct</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Equals `true` if the packet is allocated on the stack.</span>
-    <span class="ident">on_stack</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A slot for passing one message from a sender to a receiver.
+</span><span class="kw">struct </span>Packet&lt;T&gt; {
+    <span class="doccomment">/// Equals `true` if the packet is allocated on the stack.
+    </span>on_stack: bool,
 
-    <span class="doccomment">/// Equals `true` once the packet is ready for reading or writing.</span>
-    <span class="ident">ready</span>: <span class="ident">AtomicBool</span>,
+    <span class="doccomment">/// Equals `true` once the packet is ready for reading or writing.
+    </span>ready: AtomicBool,
 
-    <span class="doccomment">/// The message.</span>
-    <span class="ident">msg</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message.
+    </span>msg: UnsafeCell&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates an empty packet on the stack.</span>
-    <span class="kw">fn</span> <span class="ident">empty_on_stack</span>() -&gt; <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Packet</span> {
-            <span class="ident">on_stack</span>: <span class="bool-val">true</span>,
-            <span class="ident">ready</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">msg</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
+<span class="kw">impl</span>&lt;T&gt; Packet&lt;T&gt; {
+    <span class="doccomment">/// Creates an empty packet on the stack.
+    </span><span class="kw">fn </span>empty_on_stack() -&gt; Packet&lt;T&gt; {
+        Packet {
+            on_stack: <span class="bool-val">true</span>,
+            ready: AtomicBool::new(<span class="bool-val">false</span>),
+            msg: UnsafeCell::new(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Creates an empty packet on the heap.</span>
-    <span class="kw">fn</span> <span class="ident">empty_on_heap</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">Packet</span> {
-            <span class="ident">on_stack</span>: <span class="bool-val">false</span>,
-            <span class="ident">ready</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">msg</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">None</span>),
+    <span class="doccomment">/// Creates an empty packet on the heap.
+    </span><span class="kw">fn </span>empty_on_heap() -&gt; Box&lt;Packet&lt;T&gt;&gt; {
+        Box::new(Packet {
+            on_stack: <span class="bool-val">false</span>,
+            ready: AtomicBool::new(<span class="bool-val">false</span>),
+            msg: UnsafeCell::new(<span class="prelude-val">None</span>),
         })
     }
 
-    <span class="doccomment">/// Creates a packet on the stack, containing a message.</span>
-    <span class="kw">fn</span> <span class="ident">message_on_stack</span>(<span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Packet</span> {
-            <span class="ident">on_stack</span>: <span class="bool-val">true</span>,
-            <span class="ident">ready</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">msg</span>: <span class="ident">UnsafeCell::new</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>)),
+    <span class="doccomment">/// Creates a packet on the stack, containing a message.
+    </span><span class="kw">fn </span>message_on_stack(msg: T) -&gt; Packet&lt;T&gt; {
+        Packet {
+            on_stack: <span class="bool-val">true</span>,
+            ready: AtomicBool::new(<span class="bool-val">false</span>),
+            msg: UnsafeCell::new(<span class="prelude-val">Some</span>(msg)),
         }
     }
 
-    <span class="doccomment">/// Waits until the packet becomes ready for reading or writing.</span>
-    <span class="kw">fn</span> <span class="ident">wait_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ready</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) {
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+    <span class="doccomment">/// Waits until the packet becomes ready for reading or writing.
+    </span><span class="kw">fn </span>wait_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">while </span>!<span class="self">self</span>.ready.load(Ordering::Acquire) {
+            backoff.snooze();
         }
     }
 }
 
-<span class="doccomment">/// Inner representation of a zero-capacity channel.</span>
-<span class="kw">struct</span> <span class="ident">Inner</span> {
-    <span class="doccomment">/// Senders waiting to pair up with a receive operation.</span>
-    <span class="ident">senders</span>: <span class="ident">Waker</span>,
+<span class="doccomment">/// Inner representation of a zero-capacity channel.
+</span><span class="kw">struct </span>Inner {
+    <span class="doccomment">/// Senders waiting to pair up with a receive operation.
+    </span>senders: Waker,
 
-    <span class="doccomment">/// Receivers waiting to pair up with a send operation.</span>
-    <span class="ident">receivers</span>: <span class="ident">Waker</span>,
+    <span class="doccomment">/// Receivers waiting to pair up with a send operation.
+    </span>receivers: Waker,
 
-    <span class="doccomment">/// Equals `true` when the channel is disconnected.</span>
-    <span class="ident">is_disconnected</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Equals `true` when the channel is disconnected.
+    </span>is_disconnected: bool,
 }
 
-<span class="doccomment">/// Zero-capacity channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Inner representation of the channel.</span>
-    <span class="ident">inner</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Zero-capacity channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Channel&lt;T&gt; {
+    <span class="doccomment">/// Inner representation of the channel.
+    </span>inner: Mutex&lt;Inner&gt;,
 
-    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop values of type `T`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates that dropping a `Channel&lt;T&gt;` may drop values of type `T`.
+    </span>_marker: PhantomData&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a new zero-capacity channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Channel</span> {
-            <span class="ident">inner</span>: <span class="ident">Mutex::new</span>(<span class="ident">Inner</span> {
-                <span class="ident">senders</span>: <span class="ident">Waker::new</span>(),
-                <span class="ident">receivers</span>: <span class="ident">Waker::new</span>(),
-                <span class="ident">is_disconnected</span>: <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;T&gt; Channel&lt;T&gt; {
+    <span class="doccomment">/// Constructs a new zero-capacity channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        Channel {
+            inner: Mutex::new(Inner {
+                senders: Waker::new(),
+                receivers: Waker::new(),
+                is_disconnected: <span class="bool-val">false</span>,
             }),
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+            _marker: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Returns a receiver handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">receiver</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Receiver</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a receiver handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>receiver(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Receiver(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns a sender handle to the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Sender</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns a sender handle to the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sender(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        Sender(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Attempts to reserve a slot for sending a message.</span>
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Attempts to reserve a slot for sending a message.
+    </span><span class="kw">fn </span>start_send(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
+        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.receivers.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            <span class="bool-val">true
+        </span>} <span class="kw">else if </span>inner.is_disconnected {
+            token.zero.<span class="number">0 </span>= ptr::null_mut();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Writes a message into the packet.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), T&gt; {
+        <span class="comment">// If there is no packet, the channel is disconnected.
+        </span><span class="kw">if </span>token.zero.<span class="number">0</span>.is_null() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(msg);
         }
-    }
 
-    <span class="doccomment">/// Writes a message into the packet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="comment">// If there is no packet, the channel is disconnected.</span>
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">msg</span>);
-        }
-
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-        <span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">write</span>(<span class="prelude-val">Some</span>(<span class="ident">msg</span>));
-        <span class="ident">packet</span>.<span class="ident">ready</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Release</span>);
+        <span class="kw">let </span>packet = <span class="kw-2">&amp;*</span>(token.zero.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*const </span>Packet&lt;T&gt;);
+        packet.msg.get().write(<span class="prelude-val">Some</span>(msg));
+        packet.ready.store(<span class="bool-val">true</span>, Ordering::Release);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Attempts to pair up with a sender.</span>
-    <span class="kw">fn</span> <span class="ident">start_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Attempts to pair up with a sender.
+    </span><span class="kw">fn </span>start_recv(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="comment">// If there&#39;s a waiting sender, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
+        <span class="comment">// If there&#39;s a waiting sender, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.senders.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            <span class="bool-val">true
+        </span>} <span class="kw">else if </span>inner.is_disconnected {
+            token.zero.<span class="number">0 </span>= ptr::null_mut();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Reads a message from the packet.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; <span class="prelude-ty">Result</span>&lt;T, ()&gt; {
+        <span class="comment">// If there is no packet, the channel is disconnected.
+        </span><span class="kw">if </span>token.zero.<span class="number">0</span>.is_null() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
+        }
+
+        <span class="kw">let </span>packet = <span class="kw-2">&amp;*</span>(token.zero.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*const </span>Packet&lt;T&gt;);
+
+        <span class="kw">if </span>packet.on_stack {
+            <span class="comment">// The message has been in the packet from the beginning, so there is no need to wait
+            // for it. However, after reading the message, we need to set `ready` to `true` in
+            // order to signal that the packet can be destroyed.
+            </span><span class="kw">let </span>msg = packet.msg.get().replace(<span class="prelude-val">None</span>).unwrap();
+            packet.ready.store(<span class="bool-val">true</span>, Ordering::Release);
+            <span class="prelude-val">Ok</span>(msg)
+        } <span class="kw">else </span>{
+            <span class="comment">// Wait until the message becomes available, then read it and destroy the
+            // heap-allocated packet.
+            </span>packet.wait_ready();
+            <span class="kw">let </span>msg = packet.msg.get().replace(<span class="prelude-val">None</span>).unwrap();
+            drop(Box::from_raw(token.zero.<span class="number">0</span>.cast::&lt;Packet&lt;T&gt;&gt;()));
+            <span class="prelude-val">Ok</span>(msg)
         }
     }
 
-    <span class="doccomment">/// Reads a message from the packet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, ()<span class="op">&gt;</span> {
-        <span class="comment">// If there is no packet, the channel is disconnected.</span>
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span>.<span class="ident">is_null</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-        }
+    <span class="doccomment">/// Attempts to send a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_send(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: T) -&gt; <span class="prelude-ty">Result</span>&lt;(), TrySendError&lt;T&gt;&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
-
-        <span class="kw">if</span> <span class="ident">packet</span>.<span class="ident">on_stack</span> {
-            <span class="comment">// The message has been in the packet from the beginning, so there is no need to wait</span>
-            <span class="comment">// for it. However, after reading the message, we need to set `ready` to `true` in</span>
-            <span class="comment">// order to signal that the packet can be destroyed.</span>
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-            <span class="ident">packet</span>.<span class="ident">ready</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Release</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Wait until the message becomes available, then read it and destroy the</span>
-            <span class="comment">// heap-allocated packet.</span>
-            <span class="ident">packet</span>.<span class="ident">wait_ready</span>();
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
-            <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>()));
-            <span class="prelude-val">Ok</span>(<span class="ident">msg</span>)
-        }
-    }
-
-    <span class="doccomment">/// Attempts to send a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-
-        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
-            <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">token</span>, <span class="ident">msg</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.receivers.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            drop(inner);
+            <span class="kw">unsafe </span>{
+                <span class="self">self</span>.write(token, msg).ok().unwrap();
             }
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Disconnected</span>(<span class="ident">msg</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TrySendError::Full</span>(<span class="ident">msg</span>))
+        } <span class="kw">else if </span>inner.is_disconnected {
+            <span class="prelude-val">Err</span>(TrySendError::Disconnected(msg))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(TrySendError::Full(msg))
         }
     }
 
-    <span class="doccomment">/// Sends a message into the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(
+    <span class="doccomment">/// Sends a message into the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>send(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">msg</span>: <span class="ident">T</span>,
-        <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SendTimeoutError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        msg: T,
+        deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), SendTimeoutError&lt;T&gt;&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
-            <span class="kw">unsafe</span> {
-                <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">token</span>, <span class="ident">msg</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// If there&#39;s a waiting receiver, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.receivers.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            drop(inner);
+            <span class="kw">unsafe </span>{
+                <span class="self">self</span>.write(token, msg).ok().unwrap();
             }
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SendTimeoutError::Disconnected</span>(<span class="ident">msg</span>));
+        <span class="kw">if </span>inner.is_disconnected {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(SendTimeoutError::Disconnected(msg));
         }
 
-        <span class="ident">Context::with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-            <span class="comment">// Prepare for blocking until a receiver wakes us up.</span>
-            <span class="kw">let</span> <span class="ident">oper</span> <span class="op">=</span> <span class="ident">Operation::hook</span>(<span class="ident">token</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">Packet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::message_on_stack</span>(<span class="ident">msg</span>);
-            <span class="ident">inner</span>
-                .<span class="ident">senders</span>
-                .<span class="ident">register_with_packet</span>(<span class="ident">oper</span>, <span class="kw-2">&amp;mut</span> <span class="ident">packet</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*mut</span> (), <span class="ident">cx</span>);
-            <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">notify</span>();
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
+        Context::with(|cx| {
+            <span class="comment">// Prepare for blocking until a receiver wakes us up.
+            </span><span class="kw">let </span>oper = Operation::hook(token);
+            <span class="kw">let </span><span class="kw-2">mut </span>packet = Packet::&lt;T&gt;::message_on_stack(msg);
+            inner
+                .senders
+                .register_with_packet(oper, <span class="kw-2">&amp;mut </span>packet <span class="kw">as </span><span class="kw-2">*mut </span>Packet&lt;T&gt; <span class="kw">as </span><span class="kw-2">*mut </span>(), cx);
+            inner.receivers.notify();
+            drop(inner);
 
-            <span class="comment">// Block the current thread.</span>
-            <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_until</span>(<span class="ident">deadline</span>);
+            <span class="comment">// Block the current thread.
+            </span><span class="kw">let </span>sel = cx.wait_until(deadline);
 
-            <span class="kw">match</span> <span class="ident">sel</span> {
-                <span class="ident">Selected::Waiting</span> =&gt; <span class="macro">unreachable!</span>(),
-                <span class="ident">Selected::Aborted</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">senders</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>() };
-                    <span class="prelude-val">Err</span>(<span class="ident">SendTimeoutError::Timeout</span>(<span class="ident">msg</span>))
+            <span class="kw">match </span>sel {
+                Selected::Waiting =&gt; <span class="macro">unreachable!</span>(),
+                Selected::Aborted =&gt; {
+                    <span class="self">self</span>.inner.lock().unwrap().senders.unregister(oper).unwrap();
+                    <span class="kw">let </span>msg = <span class="kw">unsafe </span>{ packet.msg.get().replace(<span class="prelude-val">None</span>).unwrap() };
+                    <span class="prelude-val">Err</span>(SendTimeoutError::Timeout(msg))
                 }
-                <span class="ident">Selected::Disconnected</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">senders</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>() };
-                    <span class="prelude-val">Err</span>(<span class="ident">SendTimeoutError::Disconnected</span>(<span class="ident">msg</span>))
+                Selected::Disconnected =&gt; {
+                    <span class="self">self</span>.inner.lock().unwrap().senders.unregister(oper).unwrap();
+                    <span class="kw">let </span>msg = <span class="kw">unsafe </span>{ packet.msg.get().replace(<span class="prelude-val">None</span>).unwrap() };
+                    <span class="prelude-val">Err</span>(SendTimeoutError::Disconnected(msg))
                 }
-                <span class="ident">Selected::Operation</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="comment">// Wait until the message is read, then drop the packet.</span>
-                    <span class="ident">packet</span>.<span class="ident">wait_ready</span>();
+                Selected::Operation(<span class="kw">_</span>) =&gt; {
+                    <span class="comment">// Wait until the message is read, then drop the packet.
+                    </span>packet.wait_ready();
                     <span class="prelude-val">Ok</span>(())
                 }
             }
         })
     }
 
-    <span class="doccomment">/// Attempts to receive a message without blocking.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Attempts to receive a message without blocking.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_recv(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryRecvError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="comment">// If there&#39;s a waiting sender, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TryRecvError::Disconnected</span>) }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Disconnected</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>)
+        <span class="comment">// If there&#39;s a waiting sender, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.senders.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            drop(inner);
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.read(token).map_err(|<span class="kw">_</span>| TryRecvError::Disconnected) }
+        } <span class="kw">else if </span>inner.is_disconnected {
+            <span class="prelude-val">Err</span>(TryRecvError::Disconnected)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(TryRecvError::Empty)
         }
     }
 
-    <span class="doccomment">/// Receives a message from the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">RecvTimeoutError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Token::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Receives a message from the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recv(<span class="kw-2">&amp;</span><span class="self">self</span>, deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;T, RecvTimeoutError&gt; {
+        <span class="kw">let </span>token = <span class="kw-2">&amp;mut </span>Token::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="comment">// If there&#39;s a waiting sender, pair up with it.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">try_select</span>() {
-            <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">packet</span>;
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
-            <span class="kw">unsafe</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">read</span>(<span class="ident">token</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RecvTimeoutError::Disconnected</span>);
+        <span class="comment">// If there&#39;s a waiting sender, pair up with it.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = inner.senders.try_select() {
+            token.zero.<span class="number">0 </span>= operation.packet;
+            drop(inner);
+            <span class="kw">unsafe </span>{
+                <span class="kw">return </span><span class="self">self</span>.read(token).map_err(|<span class="kw">_</span>| RecvTimeoutError::Disconnected);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RecvTimeoutError::Disconnected</span>);
+        <span class="kw">if </span>inner.is_disconnected {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(RecvTimeoutError::Disconnected);
         }
 
-        <span class="ident">Context::with</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-            <span class="comment">// Prepare for blocking until a sender wakes us up.</span>
-            <span class="kw">let</span> <span class="ident">oper</span> <span class="op">=</span> <span class="ident">Operation::hook</span>(<span class="ident">token</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">Packet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::empty_on_stack</span>();
-            <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">register_with_packet</span>(
-                <span class="ident">oper</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">packet</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*mut</span> (),
-                <span class="ident">cx</span>,
+        Context::with(|cx| {
+            <span class="comment">// Prepare for blocking until a sender wakes us up.
+            </span><span class="kw">let </span>oper = Operation::hook(token);
+            <span class="kw">let </span><span class="kw-2">mut </span>packet = Packet::&lt;T&gt;::empty_on_stack();
+            inner.receivers.register_with_packet(
+                oper,
+                <span class="kw-2">&amp;mut </span>packet <span class="kw">as </span><span class="kw-2">*mut </span>Packet&lt;T&gt; <span class="kw">as </span><span class="kw-2">*mut </span>(),
+                cx,
             );
-            <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">notify</span>();
-            <span class="ident">drop</span>(<span class="ident">inner</span>);
+            inner.senders.notify();
+            drop(inner);
 
-            <span class="comment">// Block the current thread.</span>
-            <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_until</span>(<span class="ident">deadline</span>);
+            <span class="comment">// Block the current thread.
+            </span><span class="kw">let </span>sel = cx.wait_until(deadline);
 
-            <span class="kw">match</span> <span class="ident">sel</span> {
-                <span class="ident">Selected::Waiting</span> =&gt; <span class="macro">unreachable!</span>(),
-                <span class="ident">Selected::Aborted</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">inner</span>
-                        .<span class="ident">lock</span>()
-                        .<span class="ident">unwrap</span>()
-                        .<span class="ident">receivers</span>
-                        .<span class="ident">unregister</span>(<span class="ident">oper</span>)
-                        .<span class="ident">unwrap</span>();
-                    <span class="prelude-val">Err</span>(<span class="ident">RecvTimeoutError::Timeout</span>)
+            <span class="kw">match </span>sel {
+                Selected::Waiting =&gt; <span class="macro">unreachable!</span>(),
+                Selected::Aborted =&gt; {
+                    <span class="self">self</span>.inner
+                        .lock()
+                        .unwrap()
+                        .receivers
+                        .unregister(oper)
+                        .unwrap();
+                    <span class="prelude-val">Err</span>(RecvTimeoutError::Timeout)
                 }
-                <span class="ident">Selected::Disconnected</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">inner</span>
-                        .<span class="ident">lock</span>()
-                        .<span class="ident">unwrap</span>()
-                        .<span class="ident">receivers</span>
-                        .<span class="ident">unregister</span>(<span class="ident">oper</span>)
-                        .<span class="ident">unwrap</span>();
-                    <span class="prelude-val">Err</span>(<span class="ident">RecvTimeoutError::Disconnected</span>)
+                Selected::Disconnected =&gt; {
+                    <span class="self">self</span>.inner
+                        .lock()
+                        .unwrap()
+                        .receivers
+                        .unregister(oper)
+                        .unwrap();
+                    <span class="prelude-val">Err</span>(RecvTimeoutError::Disconnected)
                 }
-                <span class="ident">Selected::Operation</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="comment">// Wait until the message is provided, then read it.</span>
-                    <span class="ident">packet</span>.<span class="ident">wait_ready</span>();
-                    <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>(<span class="ident">packet</span>.<span class="ident">msg</span>.<span class="ident">get</span>().<span class="ident">replace</span>(<span class="prelude-val">None</span>).<span class="ident">unwrap</span>()) }
+                Selected::Operation(<span class="kw">_</span>) =&gt; {
+                    <span class="comment">// Wait until the message is provided, then read it.
+                    </span>packet.wait_ready();
+                    <span class="kw">unsafe </span>{ <span class="prelude-val">Ok</span>(packet.msg.get().replace(<span class="prelude-val">None</span>).unwrap()) }
                 }
             }
         })
     }
 
-    <span class="doccomment">/// Disconnects the channel and wakes up all blocked senders and receivers.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `true` if this call disconnected the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+    <span class="doccomment">/// Disconnects the channel and wakes up all blocked senders and receivers.
+    ///
+    /// Returns `true` if this call disconnected the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">is_disconnected</span> {
-            <span class="ident">inner</span>.<span class="ident">is_disconnected</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">disconnect</span>();
-            <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">disconnect</span>();
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+        <span class="kw">if </span>!inner.is_disconnected {
+            inner.is_disconnected = <span class="bool-val">true</span>;
+            inner.senders.disconnect();
+            inner.receivers.disconnect();
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Returns the current number of messages inside the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the current number of messages inside the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Returns the capacity of the channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns the capacity of the channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
         <span class="prelude-val">Some</span>(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Returns `true` if the channel is empty.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Returns `true` if the channel is empty.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Returns `true` if the channel is full.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Returns `true` if the channel is full.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="doccomment">/// Receiver handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Receiver handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Receiver&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="doccomment">/// Sender handle to a channel.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Channel</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Sender handle to a channel.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Sender&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Channel&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_recv</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Receiver&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_recv(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="kw">let </span>packet = Box::into_raw(Packet::&lt;T&gt;::empty_on_heap());
+
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner
+            .receivers
+            .register_with_packet(oper, packet.cast::&lt;()&gt;(), cx);
+        inner.senders.notify();
+        inner.senders.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">Packet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::empty_on_heap</span>());
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>
-            .<span class="ident">receivers</span>
-            .<span class="ident">register_with_packet</span>(<span class="ident">oper</span>, <span class="ident">packet</span>.<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(), <span class="ident">cx</span>);
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">notify</span>();
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">receivers</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>) {
-            <span class="kw">unsafe</span> {
-                <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">operation</span>.<span class="ident">packet</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>()));
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap().receivers.unregister(oper) {
+            <span class="kw">unsafe </span>{
+                drop(Box::from_raw(operation.packet.cast::&lt;Packet&lt;T&gt;&gt;()));
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_packet</span>();
-        <span class="bool-val">true</span>
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        token.zero.<span class="number">0 </span>= cx.wait_packet();
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.senders.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.receivers.watch(oper, cx);
+        inner.senders.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">watch</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">unwatch</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.receivers.unwatch(oper);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SelectHandle</span> <span class="kw">for</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">start_send</span>(<span class="ident">token</span>)
+<span class="kw">impl</span>&lt;T&gt; SelectHandle <span class="kw">for </span>Sender&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.start_send(token)
     }
 
-    <span class="kw">fn</span> <span class="ident">deadline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="kw">fn </span>deadline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>register(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="kw">let </span>packet = Box::into_raw(Packet::&lt;T&gt;::empty_on_heap());
+
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner
+            .senders
+            .register_with_packet(oper, packet.cast::&lt;()&gt;(), cx);
+        inner.receivers.notify();
+        inner.receivers.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">register</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">Box::into_raw</span>(<span class="ident">Packet</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::empty_on_heap</span>());
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>
-            .<span class="ident">senders</span>
-            .<span class="ident">register_with_packet</span>(<span class="ident">oper</span>, <span class="ident">packet</span>.<span class="ident">cast</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>(), <span class="ident">cx</span>);
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">notify</span>();
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">unregister</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">operation</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">senders</span>.<span class="ident">unregister</span>(<span class="ident">oper</span>) {
-            <span class="kw">unsafe</span> {
-                <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">operation</span>.<span class="ident">packet</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>()));
+    <span class="kw">fn </span>unregister(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(operation) = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap().senders.unregister(oper) {
+            <span class="kw">unsafe </span>{
+                drop(Box::from_raw(operation.packet.cast::&lt;Packet&lt;T&gt;&gt;()));
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">accept</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Token</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">token</span>.<span class="ident">zero</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">wait_packet</span>();
-        <span class="bool-val">true</span>
+    <span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;mut </span>Token, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        token.zero.<span class="number">0 </span>= cx.wait_packet();
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>is_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.receivers.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">is_ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
+    <span class="kw">fn </span>watch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation, cx: <span class="kw-2">&amp;</span>Context) -&gt; bool {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.senders.watch(oper, cx);
+        inner.receivers.can_select() || inner.is_disconnected
     }
 
-    <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">watch</span>(<span class="ident">oper</span>, <span class="ident">cx</span>);
-        <span class="ident">inner</span>.<span class="ident">receivers</span>.<span class="ident">can_select</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">is_disconnected</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">unwatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">oper</span>: <span class="ident">Operation</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">senders</span>.<span class="ident">unwatch</span>(<span class="ident">oper</span>);
+    <span class="kw">fn </span>unwatch(<span class="kw-2">&amp;</span><span class="self">self</span>, oper: Operation) {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.<span class="number">0</span>.inner.lock().unwrap();
+        inner.senders.unwatch(oper);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

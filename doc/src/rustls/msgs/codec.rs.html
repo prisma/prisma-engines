@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/codec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/codec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -259,266 +259,266 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
+<span class="kw">use </span>std::fmt::Debug;
 
-<span class="doccomment">/// Read from a byte slice.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">offs</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Read from a byte slice.
+</span><span class="kw">pub struct </span>Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    offs: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Reader</span> {
-        <span class="ident">Reader</span> {
-            <span class="ident">buf</span>: <span class="ident">bytes</span>,
-            <span class="ident">offs</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Reader&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>init(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; Reader {
+        Reader {
+            buf: bytes,
+            offs: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rest</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">offs</span>..];
-        <span class="self">self</span>.<span class="ident">offs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>();
-        <span class="ident">ret</span>
+    <span class="kw">pub fn </span>rest(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">let </span>ret = <span class="kw-2">&amp;</span><span class="self">self</span>.buf[<span class="self">self</span>.offs..];
+        <span class="self">self</span>.offs = <span class="self">self</span>.buf.len();
+        ret
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">left</span>() <span class="op">&lt;</span> <span class="ident">len</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
+        <span class="kw">if </span><span class="self">self</span>.left() &lt; len {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offs</span>;
-        <span class="self">self</span>.<span class="ident">offs</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">current</span>..<span class="ident">current</span> <span class="op">+</span> <span class="ident">len</span>])
+        <span class="kw">let </span>current = <span class="self">self</span>.offs;
+        <span class="self">self</span>.offs += len;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.buf[current..current + len])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any_left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">offs</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>()
+    <span class="kw">pub fn </span>any_left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.offs &lt; <span class="self">self</span>.buf.len()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">offs</span>
+    <span class="kw">pub fn </span>left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.buf.len() - <span class="self">self</span>.offs
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">used</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">offs</span>
+    <span class="kw">pub fn </span>used(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.offs
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Reader</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">take</span>(<span class="ident">len</span>).<span class="ident">map</span>(<span class="ident">Reader::init</span>)
-    }
-}
-
-<span class="doccomment">/// Things we can encode and read from a Reader.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Codec</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="doccomment">/// Encode yourself by appending onto `bytes`.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
-
-    <span class="doccomment">/// Decode yourself by fiddling with the `Reader`.</span>
-    <span class="doccomment">/// Return Some if it worked, None if not.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Convenience function to get the results of `encode()`.</span>
-    <span class="kw">fn</span> <span class="ident">get_encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>);
-        <span class="ident">ret</span>
-    }
-
-    <span class="doccomment">/// Read one of these from the front of `bytes` and</span>
-    <span class="doccomment">/// return it.</span>
-    <span class="kw">fn</span> <span class="ident">read_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">Reader::init</span>(<span class="ident">bytes</span>);
-        <span class="ident"><span class="self">Self</span>::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>)
+    <span class="kw">pub fn </span>sub(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Reader&gt; {
+        <span class="self">self</span>.take(len).map(Reader::init)
     }
 }
 
-<span class="comment">// Encoding functions.</span>
-<span class="kw">fn</span> <span class="ident">decode_u8</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> [<span class="ident">value</span>]: [<span class="ident">u8</span>; <span class="number">1</span>] <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-    <span class="prelude-val">Some</span>(<span class="ident">value</span>)
-}
+<span class="doccomment">/// Things we can encode and read from a Reader.
+</span><span class="kw">pub trait </span>Codec: Debug + Sized {
+    <span class="doccomment">/// Encode yourself by appending onto `bytes`.
+    </span><span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;);
 
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="self">self</span>);
-    }
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">1</span>).<span class="ident">and_then</span>(<span class="ident">decode_u8</span>)
-    }
-}
+    <span class="doccomment">/// Decode yourself by fiddling with the `Reader`.
+    /// Return Some if it worked, None if not.
+    </span><span class="kw">fn </span>read(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put_u16</span>(<span class="ident">v</span>: <span class="ident">u16</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">out</span>[..<span class="number">2</span>]).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-    <span class="kw-2">*</span><span class="ident">out</span> <span class="op">=</span> <span class="ident">u16::to_be_bytes</span>(<span class="ident">v</span>);
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_u16</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="ident">u16::from_be_bytes</span>(<span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>))
-}
-
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b16</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">2</span>];
-        <span class="ident">put_u16</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">b16</span>);
-        <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">b16</span>);
+    <span class="doccomment">/// Convenience function to get the results of `encode()`.
+    </span><span class="kw">fn </span>get_encoding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = Vec::new();
+        <span class="self">self</span>.encode(<span class="kw-2">&amp;mut </span>ret);
+        ret
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">2</span>).<span class="ident">and_then</span>(<span class="ident">decode_u16</span>)
+    <span class="doccomment">/// Read one of these from the front of `bytes` and
+    /// return it.
+    </span><span class="kw">fn </span>read_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>rd = Reader::init(bytes);
+        <span class="self">Self</span>::read(<span class="kw-2">&amp;mut </span>rd)
     }
 }
 
-<span class="comment">// Make a distinct type for u24, even though it&#39;s a u32 underneath</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">u24</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
+<span class="comment">// Encoding functions.
+</span><span class="kw">fn </span>decode_u8(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
+    <span class="kw">let </span>[value]: [u8; <span class="number">1</span>] = bytes.try_into().ok()<span class="question-mark">?</span>;
+    <span class="prelude-val">Some</span>(value)
+}
 
-<span class="kw">impl</span> <span class="ident">u24</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> [<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>]: [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="ident">u32::from_be_bytes</span>([<span class="number">0</span>, <span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>])))
+<span class="kw">impl </span>Codec <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        bytes.push(<span class="kw-2">*</span><span class="self">self</span>);
+    }
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        r.take(<span class="number">1</span>).and_then(decode_u8)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u24</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">usize</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">u24</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">v</span>.<span class="number">0</span> <span class="kw">as</span> <span class="self">Self</span>
+<span class="kw">pub fn </span>put_u16(v: u16, out: <span class="kw-2">&amp;mut </span>[u8]) {
+    <span class="kw">let </span>out: <span class="kw-2">&amp;mut </span>[u8; <span class="number">2</span>] = (<span class="kw-2">&amp;mut </span>out[..<span class="number">2</span>]).try_into().unwrap();
+    <span class="kw-2">*</span>out = u16::to_be_bytes(v);
+}
+
+<span class="kw">pub fn </span>decode_u16(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u16&gt; {
+    <span class="prelude-val">Some</span>(u16::from_be_bytes(bytes.try_into().ok()<span class="question-mark">?</span>))
+}
+
+<span class="kw">impl </span>Codec <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>b16 = [<span class="number">0u8</span>; <span class="number">2</span>];
+        put_u16(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">&amp;mut </span>b16);
+        bytes.extend_from_slice(<span class="kw-2">&amp;</span>b16);
+    }
+
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        r.take(<span class="number">2</span>).and_then(decode_u16)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">u24</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">be_bytes</span> <span class="op">=</span> <span class="ident">u32::to_be_bytes</span>(<span class="self">self</span>.<span class="number">0</span>);
-        <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">be_bytes</span>[<span class="number">1</span>..])
-    }
+<span class="comment">// Make a distinct type for u24, even though it&#39;s a u32 underneath
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>u24(<span class="kw">pub </span>u32);
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">3</span>).<span class="ident">and_then</span>(<span class="ident"><span class="self">Self</span>::decode</span>)
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_u32</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="ident">u32::from_be_bytes</span>(<span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>))
-}
-
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">bytes</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::to_be_bytes</span>(<span class="kw-2">*</span><span class="self">self</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">4</span>).<span class="ident">and_then</span>(<span class="ident">decode_u32</span>)
+<span class="kw">impl </span>u24 {
+    <span class="kw">pub fn </span>decode(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>[a, b, c]: [u8; <span class="number">3</span>] = bytes.try_into().ok()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>(u32::from_be_bytes([<span class="number">0</span>, a, b, c])))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put_u64</span>(<span class="ident">v</span>: <span class="ident">u64</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>[..<span class="number">8</span>]).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-    <span class="kw-2">*</span><span class="ident">bytes</span> <span class="op">=</span> <span class="ident">u64::to_be_bytes</span>(<span class="ident">v</span>)
+<span class="attribute">#[cfg(any(target_pointer_width = <span class="string">&quot;32&quot;</span>, target_pointer_width = <span class="string">&quot;64&quot;</span>))]
+</span><span class="kw">impl </span>From&lt;u24&gt; <span class="kw">for </span>usize {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(v: u24) -&gt; <span class="self">Self </span>{
+        v.<span class="number">0 </span><span class="kw">as </span><span class="self">Self
+    </span>}
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_u64</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Some</span>(<span class="ident">u64::from_be_bytes</span>(<span class="ident">bytes</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>))
-}
-
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b64</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
-        <span class="ident">put_u64</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">b64</span>);
-        <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">b64</span>);
+<span class="kw">impl </span>Codec <span class="kw">for </span>u24 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span>be_bytes = u32::to_be_bytes(<span class="self">self</span>.<span class="number">0</span>);
+        bytes.extend_from_slice(<span class="kw-2">&amp;</span>be_bytes[<span class="number">1</span>..])
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">8</span>).<span class="ident">and_then</span>(<span class="ident">decode_u64</span>)
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        r.take(<span class="number">3</span>).and_then(<span class="self">Self</span>::decode)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_vec_u8</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) {
-    <span class="kw">let</span> <span class="ident">len_offset</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
-    <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="number">0</span>);
-
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="ident">i</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-    }
-
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">len_offset</span> <span class="op">-</span> <span class="number">1</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xff</span>);
-    <span class="ident">bytes</span>[<span class="ident">len_offset</span>] <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span>;
+<span class="kw">pub fn </span>decode_u32(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+    <span class="prelude-val">Some</span>(u32::from_be_bytes(bytes.try_into().ok()<span class="question-mark">?</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_vec_u16</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) {
-    <span class="kw">let</span> <span class="ident">len_offset</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
-    <span class="ident">bytes</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>]);
-
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="ident">i</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
+<span class="kw">impl </span>Codec <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        bytes.extend(<span class="kw-2">&amp;</span><span class="self">Self</span>::to_be_bytes(<span class="kw-2">*</span><span class="self">self</span>))
     }
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">len_offset</span> <span class="op">-</span> <span class="number">2</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xffff</span>);
-    <span class="kw">let</span> <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>[<span class="ident">len_offset</span>..<span class="ident">len_offset</span> <span class="op">+</span> <span class="number">2</span>])
-        .<span class="ident">try_into</span>()
-        .<span class="ident">unwrap</span>();
-    <span class="kw-2">*</span><span class="ident">out</span> <span class="op">=</span> <span class="ident">u16::to_be_bytes</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u16</span>);
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        r.take(<span class="number">4</span>).and_then(decode_u32)
+    }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_vec_u24</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">items</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) {
-    <span class="kw">let</span> <span class="ident">len_offset</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
-    <span class="ident">bytes</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
-
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="ident">i</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-    }
-
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">len_offset</span> <span class="op">-</span> <span class="number">3</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xff_ffff</span>);
-    <span class="kw">let</span> <span class="ident">len_bytes</span> <span class="op">=</span> <span class="ident">u32::to_be_bytes</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>);
-    <span class="kw">let</span> <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>[<span class="ident">len_offset</span>..<span class="ident">len_offset</span> <span class="op">+</span> <span class="number">3</span>])
-        .<span class="ident">try_into</span>()
-        .<span class="ident">unwrap</span>();
-    <span class="ident">out</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">len_bytes</span>[<span class="number">1</span>..]);
+<span class="kw">pub fn </span>put_u64(v: u64, bytes: <span class="kw-2">&amp;mut </span>[u8]) {
+    <span class="kw">let </span>bytes: <span class="kw-2">&amp;mut </span>[u8; <span class="number">8</span>] = (<span class="kw-2">&amp;mut </span>bytes[..<span class="number">8</span>]).try_into().unwrap();
+    <span class="kw-2">*</span>bytes = u64::to_be_bytes(v)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec_u8</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-
-    <span class="kw">while</span> <span class="ident">sub</span>.<span class="ident">any_left</span>() {
-        <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">T::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>);
-    }
-
-    <span class="prelude-val">Some</span>(<span class="ident">ret</span>)
+<span class="kw">pub fn </span>decode_u64(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+    <span class="prelude-val">Some</span>(u64::from_be_bytes(bytes.try_into().ok()<span class="question-mark">?</span>))
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec_u16</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">usize::from</span>(<span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-
-    <span class="kw">while</span> <span class="ident">sub</span>.<span class="ident">any_left</span>() {
-        <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">T::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>);
+<span class="kw">impl </span>Codec <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>b64 = [<span class="number">0u8</span>; <span class="number">8</span>];
+        put_u64(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">&amp;mut </span>b64);
+        bytes.extend_from_slice(<span class="kw-2">&amp;</span>b64);
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">ret</span>)
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        r.take(<span class="number">8</span>).and_then(decode_u64)
+    }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_vec_u24_limited</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>, <span class="ident">max_bytes</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u24::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">max_bytes</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">pub fn </span>encode_vec_u8&lt;T: Codec&gt;(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, items: <span class="kw-2">&amp;</span>[T]) {
+    <span class="kw">let </span>len_offset = bytes.len();
+    bytes.push(<span class="number">0</span>);
+
+    <span class="kw">for </span>i <span class="kw">in </span>items {
+        i.encode(bytes);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>len = bytes.len() - len_offset - <span class="number">1</span>;
+    <span class="macro">debug_assert!</span>(len &lt;= <span class="number">0xff</span>);
+    bytes[len_offset] = len <span class="kw">as </span>u8;
+}
 
-    <span class="kw">while</span> <span class="ident">sub</span>.<span class="ident">any_left</span>() {
-        <span class="ident">ret</span>.<span class="ident">push</span>(<span class="ident">T::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>);
+<span class="kw">pub fn </span>encode_vec_u16&lt;T: Codec&gt;(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, items: <span class="kw-2">&amp;</span>[T]) {
+    <span class="kw">let </span>len_offset = bytes.len();
+    bytes.extend(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>]);
+
+    <span class="kw">for </span>i <span class="kw">in </span>items {
+        i.encode(bytes);
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">ret</span>)
+    <span class="kw">let </span>len = bytes.len() - len_offset - <span class="number">2</span>;
+    <span class="macro">debug_assert!</span>(len &lt;= <span class="number">0xffff</span>);
+    <span class="kw">let </span>out: <span class="kw-2">&amp;mut </span>[u8; <span class="number">2</span>] = (<span class="kw-2">&amp;mut </span>bytes[len_offset..len_offset + <span class="number">2</span>])
+        .try_into()
+        .unwrap();
+    <span class="kw-2">*</span>out = u16::to_be_bytes(len <span class="kw">as </span>u16);
+}
+
+<span class="kw">pub fn </span>encode_vec_u24&lt;T: Codec&gt;(bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;, items: <span class="kw-2">&amp;</span>[T]) {
+    <span class="kw">let </span>len_offset = bytes.len();
+    bytes.extend(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+
+    <span class="kw">for </span>i <span class="kw">in </span>items {
+        i.encode(bytes);
+    }
+
+    <span class="kw">let </span>len = bytes.len() - len_offset - <span class="number">3</span>;
+    <span class="macro">debug_assert!</span>(len &lt;= <span class="number">0xff_ffff</span>);
+    <span class="kw">let </span>len_bytes = u32::to_be_bytes(len <span class="kw">as </span>u32);
+    <span class="kw">let </span>out: <span class="kw-2">&amp;mut </span>[u8; <span class="number">3</span>] = (<span class="kw-2">&amp;mut </span>bytes[len_offset..len_offset + <span class="number">3</span>])
+        .try_into()
+        .unwrap();
+    out.copy_from_slice(<span class="kw-2">&amp;</span>len_bytes[<span class="number">1</span>..]);
+}
+
+<span class="kw">pub fn </span>read_vec_u8&lt;T: Codec&gt;(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>ret: Vec&lt;T&gt; = Vec::new();
+    <span class="kw">let </span>len = usize::from(u8::read(r)<span class="question-mark">?</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
+
+    <span class="kw">while </span>sub.any_left() {
+        ret.push(T::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>);
+    }
+
+    <span class="prelude-val">Some</span>(ret)
+}
+
+<span class="kw">pub fn </span>read_vec_u16&lt;T: Codec&gt;(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>ret: Vec&lt;T&gt; = Vec::new();
+    <span class="kw">let </span>len = usize::from(u16::read(r)<span class="question-mark">?</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
+
+    <span class="kw">while </span>sub.any_left() {
+        ret.push(T::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>);
+    }
+
+    <span class="prelude-val">Some</span>(ret)
+}
+
+<span class="kw">pub fn </span>read_vec_u24_limited&lt;T: Codec&gt;(r: <span class="kw-2">&amp;mut </span>Reader, max_bytes: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;T&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>ret: Vec&lt;T&gt; = Vec::new();
+    <span class="kw">let </span>len = u24::read(r)<span class="question-mark">?</span>.<span class="number">0 </span><span class="kw">as </span>usize;
+    <span class="kw">if </span>len &gt; max_bytes {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
+    }
+
+    <span class="kw">let </span><span class="kw-2">mut </span>sub = r.sub(len)<span class="question-mark">?</span>;
+
+    <span class="kw">while </span>sub.any_left() {
+        ret.push(T::read(<span class="kw-2">&amp;mut </span>sub)<span class="question-mark">?</span>);
+    }
+
+    <span class="prelude-val">Some</span>(ret)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

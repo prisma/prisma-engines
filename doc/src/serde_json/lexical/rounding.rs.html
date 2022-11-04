@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/rounding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rounding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/rounding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rounding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -229,236 +229,236 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="doccomment">//! Defines rounding schemes for floating-point numbers.</span>
+</span><span class="doccomment">//! Defines rounding schemes for floating-point numbers.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::float::ExtendedFloat</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::num</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::shift</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::float::ExtendedFloat;
+<span class="kw">use </span><span class="kw">super</span>::num::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::shift::<span class="kw-2">*</span>;
+<span class="kw">use </span>core::mem;
 
-<span class="comment">// MASKS</span>
+<span class="comment">// MASKS
 
-<span class="doccomment">/// Calculate a scalar factor of 2 above the halfway point.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nth_bit</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">bits</span>, <span class="string">&quot;nth_bit() overflow in shl.&quot;</span>);
+</span><span class="doccomment">/// Calculate a scalar factor of 2 above the halfway point.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nth_bit(n: u64) -&gt; u64 {
+    <span class="kw">let </span>bits: u64 = mem::size_of::&lt;u64&gt;() <span class="kw">as </span>u64 * <span class="number">8</span>;
+    <span class="macro">debug_assert!</span>(n &lt; bits, <span class="string">&quot;nth_bit() overflow in shl.&quot;</span>);
 
-    <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">n</span>
+    <span class="number">1 </span>&lt;&lt; n
 }
 
-<span class="doccomment">/// Generate a bitwise mask for the lower `n` bits.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_mask</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;lower_n_mask() overflow in shl.&quot;</span>);
+<span class="doccomment">/// Generate a bitwise mask for the lower `n` bits.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lower_n_mask(n: u64) -&gt; u64 {
+    <span class="kw">let </span>bits: u64 = mem::size_of::&lt;u64&gt;() <span class="kw">as </span>u64 * <span class="number">8</span>;
+    <span class="macro">debug_assert!</span>(n &lt;= bits, <span class="string">&quot;lower_n_mask() overflow in shl.&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">bits</span> {
-        <span class="ident">u64::max_value</span>()
-    } <span class="kw">else</span> {
-        (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">n</span>) <span class="op">-</span> <span class="number">1</span>
+    <span class="kw">if </span>n == bits {
+        u64::max_value()
+    } <span class="kw">else </span>{
+        (<span class="number">1 </span>&lt;&lt; n) - <span class="number">1
+    </span>}
+}
+
+<span class="doccomment">/// Calculate the halfway point for the lower `n` bits.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lower_n_halfway(n: u64) -&gt; u64 {
+    <span class="kw">let </span>bits: u64 = mem::size_of::&lt;u64&gt;() <span class="kw">as </span>u64 * <span class="number">8</span>;
+    <span class="macro">debug_assert!</span>(n &lt;= bits, <span class="string">&quot;lower_n_halfway() overflow in shl.&quot;</span>);
+
+    <span class="kw">if </span>n == <span class="number">0 </span>{
+        <span class="number">0
+    </span>} <span class="kw">else </span>{
+        nth_bit(n - <span class="number">1</span>)
     }
 }
 
-<span class="doccomment">/// Calculate the halfway point for the lower `n` bits.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lower_n_halfway</span>(<span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;lower_n_halfway() overflow in shl.&quot;</span>);
+<span class="doccomment">/// Calculate a bitwise mask with `n` 1 bits starting at the `bit` position.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>internal_n_mask(bit: u64, n: u64) -&gt; u64 {
+    <span class="kw">let </span>bits: u64 = mem::size_of::&lt;u64&gt;() <span class="kw">as </span>u64 * <span class="number">8</span>;
+    <span class="macro">debug_assert!</span>(bit &lt;= bits, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
+    <span class="macro">debug_assert!</span>(n &lt;= bits, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
+    <span class="macro">debug_assert!</span>(bit &gt;= n, <span class="string">&quot;internal_n_halfway() overflow in sub.&quot;</span>);
 
-    <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="number">0</span>
-    } <span class="kw">else</span> {
-        <span class="ident">nth_bit</span>(<span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>)
+    lower_n_mask(bit) ^ lower_n_mask(bit - n)
+}
+
+<span class="comment">// NEAREST ROUNDING
+
+// Shift right N-bytes and round to the nearest.
+//
+// Return if we are above halfway and if we are halfway.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_nearest(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, shift: i32) -&gt; (bool, bool) {
+    <span class="comment">// Extract the truncated bits using mask.
+    // Calculate if the value of the truncated bits are either above
+    // the mid-way point, or equal to it.
+    //
+    // For example, for 4 truncated bytes, the mask would be b1111
+    // and the midway point would be b1000.
+    </span><span class="kw">let </span>mask: u64 = lower_n_mask(shift <span class="kw">as </span>u64);
+    <span class="kw">let </span>halfway: u64 = lower_n_halfway(shift <span class="kw">as </span>u64);
+
+    <span class="kw">let </span>truncated_bits = fp.mant &amp; mask;
+    <span class="kw">let </span>is_above = truncated_bits &gt; halfway;
+    <span class="kw">let </span>is_halfway = truncated_bits == halfway;
+
+    <span class="comment">// Bit shift so the leading bit is in the hidden bit.
+    </span>overflowing_shr(fp, shift);
+
+    (is_above, is_halfway)
+}
+
+<span class="comment">// Tie rounded floating point to event.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tie_even(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, is_above: bool, is_halfway: bool) {
+    <span class="comment">// Extract the last bit after shifting (and determine if it is odd).
+    </span><span class="kw">let </span>is_odd = fp.mant &amp; <span class="number">1 </span>== <span class="number">1</span>;
+
+    <span class="comment">// Calculate if we need to roundup.
+    // We need to roundup if we are above halfway, or if we are odd
+    // and at half-way (need to tie-to-even).
+    </span><span class="kw">if </span>is_above || (is_odd &amp;&amp; is_halfway) {
+        fp.mant += <span class="number">1</span>;
     }
 }
 
-<span class="doccomment">/// Calculate a bitwise mask with `n` 1 bits starting at the `bit` position.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">internal_n_mask</span>(<span class="ident">bit</span>: <span class="ident">u64</span>, <span class="ident">n</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="ident">bits</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="number">8</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">bit</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>, <span class="string">&quot;internal_n_halfway() overflow in shl.&quot;</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">bit</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span>, <span class="string">&quot;internal_n_halfway() overflow in sub.&quot;</span>);
-
-    <span class="ident">lower_n_mask</span>(<span class="ident">bit</span>) <span class="op">^</span> <span class="ident">lower_n_mask</span>(<span class="ident">bit</span> <span class="op">-</span> <span class="ident">n</span>)
+<span class="comment">// Shift right N-bytes and round nearest, tie-to-even.
+//
+// Floating-point arithmetic uses round to nearest, ties to even,
+// which rounds to the nearest value, if the value is halfway in between,
+// round to an even value.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_nearest_tie_even(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, shift: i32) {
+    <span class="kw">let </span>(is_above, is_halfway) = round_nearest(fp, shift);
+    tie_even(fp, is_above, is_halfway);
 }
 
-<span class="comment">// NEAREST ROUNDING</span>
+<span class="comment">// DIRECTED ROUNDING
 
-<span class="comment">// Shift right N-bytes and round to the nearest.</span>
-<span class="comment">//</span>
-<span class="comment">// Return if we are above halfway and if we are halfway.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_nearest</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">bool</span>) {
-    <span class="comment">// Extract the truncated bits using mask.</span>
-    <span class="comment">// Calculate if the value of the truncated bits are either above</span>
-    <span class="comment">// the mid-way point, or equal to it.</span>
-    <span class="comment">//</span>
-    <span class="comment">// For example, for 4 truncated bytes, the mask would be b1111</span>
-    <span class="comment">// and the midway point would be b1000.</span>
-    <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_mask</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="ident">halfway</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_halfway</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
+// Shift right N-bytes and round towards a direction.
+//
+// Return if we have any truncated bytes.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>round_toward(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, shift: i32) -&gt; bool {
+    <span class="kw">let </span>mask: u64 = lower_n_mask(shift <span class="kw">as </span>u64);
+    <span class="kw">let </span>truncated_bits = fp.mant &amp; mask;
 
-    <span class="kw">let</span> <span class="ident">truncated_bits</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
-    <span class="kw">let</span> <span class="ident">is_above</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">&gt;</span> <span class="ident">halfway</span>;
-    <span class="kw">let</span> <span class="ident">is_halfway</span> <span class="op">=</span> <span class="ident">truncated_bits</span> <span class="op">==</span> <span class="ident">halfway</span>;
+    <span class="comment">// Bit shift so the leading bit is in the hidden bit.
+    </span>overflowing_shr(fp, shift);
 
-    <span class="comment">// Bit shift so the leading bit is in the hidden bit.</span>
-    <span class="ident">overflowing_shr</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
+    truncated_bits != <span class="number">0
+</span>}
 
-    (<span class="ident">is_above</span>, <span class="ident">is_halfway</span>)
+<span class="comment">// Round down.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>downard(<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>ExtendedFloat, <span class="kw">_</span>: bool) {}
+
+<span class="comment">// Shift right N-bytes and round toward zero.
+//
+// Floating-point arithmetic defines round toward zero, which rounds
+// towards positive zero.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_downward(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, shift: i32) {
+    <span class="comment">// Bit shift so the leading bit is in the hidden bit.
+    // No rounding schemes, so we just ignore everything else.
+    </span><span class="kw">let </span>is_truncated = round_toward(fp, shift);
+    downard(fp, is_truncated);
 }
 
-<span class="comment">// Tie rounded floating point to event.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tie_even</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">is_above</span>: <span class="ident">bool</span>, <span class="ident">is_halfway</span>: <span class="ident">bool</span>) {
-    <span class="comment">// Extract the last bit after shifting (and determine if it is odd).</span>
-    <span class="kw">let</span> <span class="ident">is_odd</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span>;
+<span class="comment">// ROUND TO FLOAT
 
-    <span class="comment">// Calculate if we need to roundup.</span>
-    <span class="comment">// We need to roundup if we are above halfway, or if we are odd</span>
-    <span class="comment">// and at half-way (need to tie-to-even).</span>
-    <span class="kw">if</span> <span class="ident">is_above</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">is_odd</span> <span class="op">&amp;&amp;</span> <span class="ident">is_halfway</span>) {
-        <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-}
-
-<span class="comment">// Shift right N-bytes and round nearest, tie-to-even.</span>
-<span class="comment">//</span>
-<span class="comment">// Floating-point arithmetic uses round to nearest, ties to even,</span>
-<span class="comment">// which rounds to the nearest value, if the value is halfway in between,</span>
-<span class="comment">// round to an even value.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_nearest_tie_even</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) {
-    <span class="kw">let</span> (<span class="ident">is_above</span>, <span class="ident">is_halfway</span>) <span class="op">=</span> <span class="ident">round_nearest</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
-    <span class="ident">tie_even</span>(<span class="ident">fp</span>, <span class="ident">is_above</span>, <span class="ident">is_halfway</span>);
-}
-
-<span class="comment">// DIRECTED ROUNDING</span>
-
-<span class="comment">// Shift right N-bytes and round towards a direction.</span>
-<span class="comment">//</span>
-<span class="comment">// Return if we have any truncated bytes.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">round_toward</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_mask</span>(<span class="ident">shift</span> <span class="kw">as</span> <span class="ident">u64</span>);
-    <span class="kw">let</span> <span class="ident">truncated_bits</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
-
-    <span class="comment">// Bit shift so the leading bit is in the hidden bit.</span>
-    <span class="ident">overflowing_shr</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
-
-    <span class="ident">truncated_bits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-}
-
-<span class="comment">// Round down.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">downard</span>(<span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="kw">_</span>: <span class="ident">bool</span>) {}
-
-<span class="comment">// Shift right N-bytes and round toward zero.</span>
-<span class="comment">//</span>
-<span class="comment">// Floating-point arithmetic defines round toward zero, which rounds</span>
-<span class="comment">// towards positive zero.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_downward</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">shift</span>: <span class="ident">i32</span>) {
-    <span class="comment">// Bit shift so the leading bit is in the hidden bit.</span>
-    <span class="comment">// No rounding schemes, so we just ignore everything else.</span>
-    <span class="kw">let</span> <span class="ident">is_truncated</span> <span class="op">=</span> <span class="ident">round_toward</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
-    <span class="ident">downard</span>(<span class="ident">fp</span>, <span class="ident">is_truncated</span>);
-}
-
-<span class="comment">// ROUND TO FLOAT</span>
-
-<span class="comment">// Shift the ExtendedFloat fraction to the fraction bits in a native float.</span>
-<span class="comment">//</span>
-<span class="comment">// Floating-point arithmetic uses round to nearest, ties to even,</span>
-<span class="comment">// which rounds to the nearest value, if the value is halfway in between,</span>
-<span class="comment">// round to an even value.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_to_float</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
-    <span class="ident">Algorithm</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">i32</span>),
+// Shift the ExtendedFloat fraction to the fraction bits in a native float.
+//
+// Floating-point arithmetic uses round to nearest, ties to even,
+// which rounds to the nearest value, if the value is halfway in between,
+// round to an even value.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_to_float&lt;F, Algorithm&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, algorithm: Algorithm)
+<span class="kw">where
+    </span>F: Float,
+    Algorithm: FnOnce(<span class="kw-2">&amp;mut </span>ExtendedFloat, i32),
 {
-    <span class="comment">// Calculate the difference to allow a single calculation</span>
-    <span class="comment">// rather than a loop, to minimize the number of ops required.</span>
-    <span class="comment">// This does underflow detection.</span>
-    <span class="kw">let</span> <span class="ident">final_exp</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">+</span> <span class="ident">F::DEFAULT_SHIFT</span>;
-    <span class="kw">if</span> <span class="ident">final_exp</span> <span class="op">&lt;</span> <span class="ident">F::DENORMAL_EXPONENT</span> {
-        <span class="comment">// We would end up with a denormal exponent, try to round to more</span>
-        <span class="comment">// digits. Only shift right if we can avoid zeroing out the value,</span>
-        <span class="comment">// which requires the exponent diff to be &lt; M::BITS. The value</span>
-        <span class="comment">// is already normalized, so we shouldn&#39;t have any issue zeroing</span>
-        <span class="comment">// out the value.</span>
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">F::DENORMAL_EXPONENT</span> <span class="op">-</span> <span class="ident">fp</span>.<span class="ident">exp</span>;
-        <span class="kw">if</span> <span class="ident">diff</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u64::FULL</span> {
-            <span class="comment">// We can avoid underflow, can get a valid representation.</span>
-            <span class="ident">algorithm</span>(<span class="ident">fp</span>, <span class="ident">diff</span>);
-        } <span class="kw">else</span> {
-            <span class="comment">// Certain underflow, assign literal 0s.</span>
-            <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// Calculate the difference to allow a single calculation
+    // rather than a loop, to minimize the number of ops required.
+    // This does underflow detection.
+    </span><span class="kw">let </span>final_exp = fp.exp + F::DEFAULT_SHIFT;
+    <span class="kw">if </span>final_exp &lt; F::DENORMAL_EXPONENT {
+        <span class="comment">// We would end up with a denormal exponent, try to round to more
+        // digits. Only shift right if we can avoid zeroing out the value,
+        // which requires the exponent diff to be &lt; M::BITS. The value
+        // is already normalized, so we shouldn&#39;t have any issue zeroing
+        // out the value.
+        </span><span class="kw">let </span>diff = F::DENORMAL_EXPONENT - fp.exp;
+        <span class="kw">if </span>diff &lt;= u64::FULL {
+            <span class="comment">// We can avoid underflow, can get a valid representation.
+            </span>algorithm(fp, diff);
+        } <span class="kw">else </span>{
+            <span class="comment">// Certain underflow, assign literal 0s.
+            </span>fp.mant = <span class="number">0</span>;
+            fp.exp = <span class="number">0</span>;
         }
-    } <span class="kw">else</span> {
-        <span class="ident">algorithm</span>(<span class="ident">fp</span>, <span class="ident">F::DEFAULT_SHIFT</span>);
+    } <span class="kw">else </span>{
+        algorithm(fp, F::DEFAULT_SHIFT);
     }
 
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">F::CARRY_MASK</span> <span class="op">==</span> <span class="ident">F::CARRY_MASK</span> {
-        <span class="comment">// Roundup carried over to 1 past the hidden bit.</span>
-        <span class="ident">shr</span>(<span class="ident">fp</span>, <span class="number">1</span>);
+    <span class="kw">if </span>fp.mant &amp; F::CARRY_MASK == F::CARRY_MASK {
+        <span class="comment">// Roundup carried over to 1 past the hidden bit.
+        </span>shr(fp, <span class="number">1</span>);
     }
 }
 
-<span class="comment">// AVOID OVERFLOW/UNDERFLOW</span>
+<span class="comment">// AVOID OVERFLOW/UNDERFLOW
 
-<span class="comment">// Avoid overflow for large values, shift left as needed.</span>
-<span class="comment">//</span>
-<span class="comment">// Shift until a 1-bit is in the hidden bit, if the mantissa is not 0.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">avoid_overflow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
+// Avoid overflow for large values, shift left as needed.
+//
+// Shift until a 1-bit is in the hidden bit, if the mantissa is not 0.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>avoid_overflow&lt;F&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat)
+<span class="kw">where
+    </span>F: Float,
 {
-    <span class="comment">// Calculate the difference to allow a single calculation</span>
-    <span class="comment">// rather than a loop, minimizing the number of ops required.</span>
-    <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">F::MAX_EXPONENT</span> {
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">-</span> <span class="ident">F::MAX_EXPONENT</span>;
-        <span class="kw">if</span> <span class="ident">diff</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">F::MANTISSA_SIZE</span> {
-            <span class="comment">// Our overflow mask needs to start at the hidden bit, or at</span>
-            <span class="comment">// `F::MANTISSA_SIZE+1`, and needs to have `diff+1` bits set,</span>
-            <span class="comment">// to see if our value overflows.</span>
-            <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> (<span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> (<span class="ident">diff</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u64</span>;
-            <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">internal_n_mask</span>(<span class="ident">bit</span>, <span class="ident">n</span>);
-            <span class="kw">if</span> (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>) <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// If we have no 1-bit in the hidden-bit position,</span>
-                <span class="comment">// which is index 0, we need to shift 1.</span>
-                <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">diff</span> <span class="op">+</span> <span class="number">1</span>;
-                <span class="ident">shl</span>(<span class="ident">fp</span>, <span class="ident">shift</span>);
+    <span class="comment">// Calculate the difference to allow a single calculation
+    // rather than a loop, minimizing the number of ops required.
+    </span><span class="kw">if </span>fp.exp &gt;= F::MAX_EXPONENT {
+        <span class="kw">let </span>diff = fp.exp - F::MAX_EXPONENT;
+        <span class="kw">if </span>diff &lt;= F::MANTISSA_SIZE {
+            <span class="comment">// Our overflow mask needs to start at the hidden bit, or at
+            // `F::MANTISSA_SIZE+1`, and needs to have `diff+1` bits set,
+            // to see if our value overflows.
+            </span><span class="kw">let </span>bit = (F::MANTISSA_SIZE + <span class="number">1</span>) <span class="kw">as </span>u64;
+            <span class="kw">let </span>n = (diff + <span class="number">1</span>) <span class="kw">as </span>u64;
+            <span class="kw">let </span>mask = internal_n_mask(bit, n);
+            <span class="kw">if </span>(fp.mant &amp; mask) == <span class="number">0 </span>{
+                <span class="comment">// If we have no 1-bit in the hidden-bit position,
+                // which is index 0, we need to shift 1.
+                </span><span class="kw">let </span>shift = diff + <span class="number">1</span>;
+                shl(fp, shift);
             }
         }
     }
 }
 
-<span class="comment">// ROUND TO NATIVE</span>
+<span class="comment">// ROUND TO NATIVE
 
-<span class="comment">// Round an extended-precision float to a native float representation.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">round_to_native</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>(<span class="ident">fp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>)
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Float</span>,
-    <span class="ident">Algorithm</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ExtendedFloat</span>, <span class="ident">i32</span>),
+// Round an extended-precision float to a native float representation.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>round_to_native&lt;F, Algorithm&gt;(fp: <span class="kw-2">&amp;mut </span>ExtendedFloat, algorithm: Algorithm)
+<span class="kw">where
+    </span>F: Float,
+    Algorithm: FnOnce(<span class="kw-2">&amp;mut </span>ExtendedFloat, i32),
 {
-    <span class="comment">// Shift all the way left, to ensure a consistent representation.</span>
-    <span class="comment">// The following right-shifts do not work for a non-normalized number.</span>
-    <span class="ident">fp</span>.<span class="ident">normalize</span>();
+    <span class="comment">// Shift all the way left, to ensure a consistent representation.
+    // The following right-shifts do not work for a non-normalized number.
+    </span>fp.normalize();
 
-    <span class="comment">// Round so the fraction is in a native mantissa representation,</span>
-    <span class="comment">// and avoid overflow/underflow.</span>
-    <span class="ident">round_to_float</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">fp</span>, <span class="ident">algorithm</span>);
-    <span class="ident">avoid_overflow</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">fp</span>);
+    <span class="comment">// Round so the fraction is in a native mantissa representation,
+    // and avoid overflow/underflow.
+    </span>round_to_float::&lt;F, <span class="kw">_</span>&gt;(fp, algorithm);
+    avoid_overflow::&lt;F&gt;(fp);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
